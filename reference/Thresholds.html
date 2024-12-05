@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>load_dataset – pointblank</title>
+<title>thresholds – pointblank</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -57,7 +57,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </style>
 
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
 <script src="../site_libs/quarto-nav/headroom.min.js"></script>
 <script src="../site_libs/clipboard/clipboard.min.js"></script>
 <script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
@@ -100,9 +100,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     "search-label": "Search"
   }
 }</script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
-
-<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
 
 
 </head>
@@ -155,268 +152,62 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#parameters" id="toc-parameters" class="nav-link active" data-scroll-target="#parameters">Parameters</a></li>
+  <li><a href="#pointblank.Thresholds" id="toc-pointblank.Thresholds" class="nav-link active" data-scroll-target="#pointblank.Thresholds">Thresholds</a>
+  <ul class="collapse">
+  <li><a href="#parameters" id="toc-parameters" class="nav-link" data-scroll-target="#parameters">Parameters</a></li>
   <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
-  <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
+  </ul></li>
   </ul>
 </nav>
     </div>
 <!-- main -->
-<main class="content" id="quarto-document-content">
-
-<header id="title-block-header" class="quarto-title-block default">
-<div class="quarto-title">
-<h1 class="title">load_dataset</h1>
-</div>
+<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"></header>
 
 
 
-<div class="quarto-title-meta">
 
-    
-  
-    
-  </div>
-  
-
-
-</header>
-
-
-<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>load_dataset(dataset<span class="op">=</span><span class="st">'small_table'</span>, tbl_type<span class="op">=</span><span class="st">'polars'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Load a dataset hosted in the library as specified DataFrame type.</p>
+<section id="pointblank.Thresholds" class="level1">
+<h1>Thresholds</h1>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>Thresholds(</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    warn_at<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    stop_at<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    notify_at<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    warn_fraction<span class="op">=</span>field(default<span class="op">=</span><span class="va">None</span>, init<span class="op">=</span><span class="va">False</span>),</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    warn_count<span class="op">=</span>field(default<span class="op">=</span><span class="va">None</span>, init<span class="op">=</span><span class="va">False</span>),</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    stop_fraction<span class="op">=</span>field(default<span class="op">=</span><span class="va">None</span>, init<span class="op">=</span><span class="va">False</span>),</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    stop_count<span class="op">=</span>field(default<span class="op">=</span><span class="va">None</span>, init<span class="op">=</span><span class="va">False</span>),</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    notify_fraction<span class="op">=</span>field(default<span class="op">=</span><span class="va">None</span>, init<span class="op">=</span><span class="va">False</span>),</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    notify_count<span class="op">=</span>field(default<span class="op">=</span><span class="va">None</span>, init<span class="op">=</span><span class="va">False</span>),</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Definition of threshold values.</p>
 <section id="parameters" class="level2 doc-section doc-section-parameters">
 <h2 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters">Parameters</h2>
 <dl>
-<dt><code><span class="parameter-name"><strong>dataset</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation">Literal['small_table', 'game_revenue']</span> <span class="parameter-default-sep">=</span> <span class="parameter-default">'small_table'</span></code></dt>
+<dt><code><span class="parameter-name"><strong>warn_at</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation">int | float | None</span> <span class="parameter-default-sep">=</span> <span class="parameter-default">None</span></code></dt>
 <dd>
-<p>The name of the dataset to load. Current options are <code>"small_table"</code> and <code>"game_revenue"</code>.</p>
+<p>The threshold for the ‘warn’ level. This can be an absolute count or a fraction of the total.</p>
 </dd>
-<dt><code><span class="parameter-name"><strong>tbl_type</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation">Literal['polars', 'pandas']</span> <span class="parameter-default-sep">=</span> <span class="parameter-default">'polars'</span></code></dt>
+<dt><code><span class="parameter-name"><strong>stop_at</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation">int | float | None</span> <span class="parameter-default-sep">=</span> <span class="parameter-default">None</span></code></dt>
 <dd>
-<p>The type of DataFrame to generate from the dataset. The named options are <code>"polars"</code> and <code>"pandas"</code>.</p>
+<p>The threshold for the ‘stop’ level. This can be an absolute count or a fraction of the total.</p>
+</dd>
+<dt><code><span class="parameter-name"><strong>notify_at</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation">int | float | None</span> <span class="parameter-default-sep">=</span> <span class="parameter-default">None</span></code></dt>
+<dd>
+<p>The threshold for the ‘notify’ level. This can be an absolute count or a fraction of the total.</p>
 </dd>
 </dl>
 </section>
 <section id="returns" class="level2 doc-section doc-section-returns">
 <h2 class="doc-section doc-section-returns anchored" data-anchor-id="returns">Returns</h2>
 <dl>
-<dt><code><span class="parameter-name"></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation">FrameT</span></code></dt>
+<dt><code><span class="parameter-name"></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation">Thresholds</span></code></dt>
 <dd>
-<p>The dataset for the <code>Validate</code> object.</p>
+<p>A Thresholds object. This can be used when using the <code>Validate</code> class (to set thresholds globally) or when defining validation steps through <code>Validate</code>’s methods (so that threshold values are scoped to individual validation steps, overriding any global thresholds).</p>
 </dd>
 </dl>
+
+
 </section>
-<section id="examples" class="level2 doc-section doc-section-examples">
-<h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
-<p>Load the <code>small_table</code> dataset as a Polars DataFrame by calling <code>load_dataset()</code> with its defaults:</p>
-<div id="27de13b4" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>small_table <span class="op">=</span> pb.load_dataset()</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>small_table</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="1">
-<div><style>
-.dataframe > thead > tr,
-.dataframe > tbody > tr {
-  text-align: right;
-  white-space: pre-wrap;
-}
-</style>
-<small>shape: (13, 8)</small><table class="dataframe table table-sm table-striped small"><thead><tr><th>date_time</th><th>date</th><th>a</th><th>b</th><th>c</th><th>d</th><th>e</th><th>f</th></tr><tr><td>datetime[μs]</td><td>date</td><td>i64</td><td>str</td><td>i64</td><td>f64</td><td>bool</td><td>str</td></tr></thead><tbody><tr><td>2016-01-04 11:00:00</td><td>2016-01-04</td><td>2</td><td>"1-bcd-345"</td><td>3</td><td>3423.29</td><td>true</td><td>"high"</td></tr><tr><td>2016-01-04 00:32:00</td><td>2016-01-04</td><td>3</td><td>"5-egh-163"</td><td>8</td><td>9999.99</td><td>true</td><td>"low"</td></tr><tr><td>2016-01-05 13:32:00</td><td>2016-01-05</td><td>6</td><td>"8-kdg-938"</td><td>3</td><td>2343.23</td><td>true</td><td>"high"</td></tr><tr><td>2016-01-06 17:23:00</td><td>2016-01-06</td><td>2</td><td>"5-jdo-903"</td><td>null</td><td>3892.4</td><td>false</td><td>"mid"</td></tr><tr><td>2016-01-09 12:36:00</td><td>2016-01-09</td><td>8</td><td>"3-ldm-038"</td><td>7</td><td>283.94</td><td>true</td><td>"low"</td></tr><tr><td>…</td><td>…</td><td>…</td><td>…</td><td>…</td><td>…</td><td>…</td><td>…</td></tr><tr><td>2016-01-20 04:30:00</td><td>2016-01-20</td><td>3</td><td>"5-bce-642"</td><td>9</td><td>837.93</td><td>false</td><td>"high"</td></tr><tr><td>2016-01-20 04:30:00</td><td>2016-01-20</td><td>3</td><td>"5-bce-642"</td><td>9</td><td>837.93</td><td>false</td><td>"high"</td></tr><tr><td>2016-01-26 20:07:00</td><td>2016-01-26</td><td>4</td><td>"2-dmx-010"</td><td>7</td><td>833.98</td><td>true</td><td>"low"</td></tr><tr><td>2016-01-28 02:51:00</td><td>2016-01-28</td><td>2</td><td>"7-dmx-010"</td><td>8</td><td>108.34</td><td>false</td><td>"low"</td></tr><tr><td>2016-01-30 11:23:00</td><td>2016-01-30</td><td>1</td><td>"3-dka-303"</td><td>null</td><td>2230.09</td><td>true</td><td>"high"</td></tr></tbody></table></div>
-</div>
-</div>
-<p>The <code>game_revenue</code> dataset can be loaded as a Pandas DataFrame by specifying the dataset name and setting <code>tbl_type="pandas"</code>:</p>
-<div id="4f516573" class="cell" data-execution_count="2">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>game_revenue <span class="op">=</span> pb.load_dataset(dataset<span class="op">=</span><span class="st">"game_revenue"</span>, tbl_type<span class="op">=</span><span class="st">"pandas"</span>)</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>game_revenue</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="2">
-<div>
-
-<table class="dataframe table table-sm table-striped small">
-  <thead>
-    <tr>
-      <th></th>
-      <th>player_id</th>
-      <th>session_id</th>
-      <th>session_start</th>
-      <th>time</th>
-      <th>item_type</th>
-      <th>item_name</th>
-      <th>item_revenue</th>
-      <th>session_duration</th>
-      <th>start_day</th>
-      <th>acquisition</th>
-      <th>country</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>ECPANOIXLZHF896</td>
-      <td>ECPANOIXLZHF896-eol2j8bs</td>
-      <td>2015-01-01 01:31:03+00:00</td>
-      <td>2015-01-01 01:31:27+00:00</td>
-      <td>iap</td>
-      <td>offer2</td>
-      <td>8.991</td>
-      <td>16.3</td>
-      <td>2015-01-01</td>
-      <td>google</td>
-      <td>Germany</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>ECPANOIXLZHF896</td>
-      <td>ECPANOIXLZHF896-eol2j8bs</td>
-      <td>2015-01-01 01:31:03+00:00</td>
-      <td>2015-01-01 01:36:57+00:00</td>
-      <td>iap</td>
-      <td>gems3</td>
-      <td>22.491</td>
-      <td>16.3</td>
-      <td>2015-01-01</td>
-      <td>google</td>
-      <td>Germany</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>ECPANOIXLZHF896</td>
-      <td>ECPANOIXLZHF896-eol2j8bs</td>
-      <td>2015-01-01 01:31:03+00:00</td>
-      <td>2015-01-01 01:37:45+00:00</td>
-      <td>iap</td>
-      <td>gold7</td>
-      <td>107.991</td>
-      <td>16.3</td>
-      <td>2015-01-01</td>
-      <td>google</td>
-      <td>Germany</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>ECPANOIXLZHF896</td>
-      <td>ECPANOIXLZHF896-eol2j8bs</td>
-      <td>2015-01-01 01:31:03+00:00</td>
-      <td>2015-01-01 01:42:33+00:00</td>
-      <td>ad</td>
-      <td>ad_20sec</td>
-      <td>0.760</td>
-      <td>16.3</td>
-      <td>2015-01-01</td>
-      <td>google</td>
-      <td>Germany</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>ECPANOIXLZHF896</td>
-      <td>ECPANOIXLZHF896-hdu9jkls</td>
-      <td>2015-01-01 11:50:02+00:00</td>
-      <td>2015-01-01 11:55:20+00:00</td>
-      <td>ad</td>
-      <td>ad_5sec</td>
-      <td>0.030</td>
-      <td>35.2</td>
-      <td>2015-01-01</td>
-      <td>google</td>
-      <td>Germany</td>
-    </tr>
-    <tr>
-      <th>...</th>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
-    </tr>
-    <tr>
-      <th>1995</th>
-      <td>NAOJRDMCSEBI281</td>
-      <td>NAOJRDMCSEBI281-j2vs9ilp</td>
-      <td>2015-01-21 01:57:50+00:00</td>
-      <td>2015-01-21 02:02:50+00:00</td>
-      <td>ad</td>
-      <td>ad_survey</td>
-      <td>1.332</td>
-      <td>25.8</td>
-      <td>2015-01-11</td>
-      <td>organic</td>
-      <td>Norway</td>
-    </tr>
-    <tr>
-      <th>1996</th>
-      <td>NAOJRDMCSEBI281</td>
-      <td>NAOJRDMCSEBI281-j2vs9ilp</td>
-      <td>2015-01-21 01:57:50+00:00</td>
-      <td>2015-01-21 02:22:14+00:00</td>
-      <td>ad</td>
-      <td>ad_survey</td>
-      <td>1.350</td>
-      <td>25.8</td>
-      <td>2015-01-11</td>
-      <td>organic</td>
-      <td>Norway</td>
-    </tr>
-    <tr>
-      <th>1997</th>
-      <td>RMOSWHJGELCI675</td>
-      <td>RMOSWHJGELCI675-vbhcsmtr</td>
-      <td>2015-01-21 02:39:48+00:00</td>
-      <td>2015-01-21 02:40:00+00:00</td>
-      <td>ad</td>
-      <td>ad_5sec</td>
-      <td>0.030</td>
-      <td>8.4</td>
-      <td>2015-01-10</td>
-      <td>other_campaign</td>
-      <td>France</td>
-    </tr>
-    <tr>
-      <th>1998</th>
-      <td>RMOSWHJGELCI675</td>
-      <td>RMOSWHJGELCI675-vbhcsmtr</td>
-      <td>2015-01-21 02:39:48+00:00</td>
-      <td>2015-01-21 02:47:12+00:00</td>
-      <td>iap</td>
-      <td>offer5</td>
-      <td>26.091</td>
-      <td>8.4</td>
-      <td>2015-01-10</td>
-      <td>other_campaign</td>
-      <td>France</td>
-    </tr>
-    <tr>
-      <th>1999</th>
-      <td>GJCXNTWEBIPQ369</td>
-      <td>GJCXNTWEBIPQ369-9elq67md</td>
-      <td>2015-01-21 03:59:23+00:00</td>
-      <td>2015-01-21 04:06:29+00:00</td>
-      <td>ad</td>
-      <td>ad_5sec</td>
-      <td>0.120</td>
-      <td>18.5</td>
-      <td>2015-01-14</td>
-      <td>organic</td>
-      <td>United States</td>
-    </tr>
-  </tbody>
-</table>
-<p>2000 rows × 11 columns</p>
-</div>
-</div>
-</div>
-
-
 </section>
 
 </main> <!-- /main -->

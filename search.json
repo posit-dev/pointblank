@@ -7,53 +7,74 @@
     "text": "The pointblank library is all about assessing the state of data quality in a table. You provide the validation rules and the library will dutifully interrogate the data and provide useful reporting. We can use different types of tables like Polars and Pandas DataFrames, Parquet files, or a selection of DB tables. Let’s walk through what table validation looks like in pointblank!"
   },
   {
-    "objectID": "get-started/index.html#a-simple-example-with-the-basics",
-    "href": "get-started/index.html#a-simple-example-with-the-basics",
+    "objectID": "get-started/index.html#a-simple-validation-table",
+    "href": "get-started/index.html#a-simple-validation-table",
     "title": "Intro",
-    "section": "A Simple Example with the Basics",
-    "text": "A Simple Example with the Basics\nThis is a validation table that produced from a validation of a Polars DataFrame:\n\n\nCode\nimport pointblank as pb\n\nvalidation_1 = (\n    pb.Validate(data=pb.load_dataset(dataset=\"small_table\"))\n    .col_vals_lt(columns=\"a\", value=10)\n    .col_vals_between(columns=\"d\", left=0, right=5000)\n    .col_vals_in_set(columns=\"f\", set=[\"low\", \"mid\", \"high\"])\n    .col_vals_regex(columns=\"b\", pattern=r\"^[0-9]-[a-z]{3}-[0-9]{3}$\")\n    .interrogate()\n)\n\nvalidation_1.get_tabular_report()\n\n\n\n\n\n\n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n\n\n\n\n  \n    Pointblank Validation\n  \n  \n    2024-12-05|17:25:01Polars\n  \n\n  \n  \n  STEP\n  COLUMNS\n  VALUES\n  TBL\n  EVAL\n  UNITS\n  PASS\n  FAIL\n  W\n  S\n  N\n  EXT\n\n\n\n  \n    #4CA64C\n    1\n    \n        \n        \n\n    col_vals_lt\n    \n        \n            \n            \n        \n    \n\n        \n         col_vals_lt()\n        \n    a\n    10\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    13\n    131.00\n    00.00\n    —\n    —\n    —\n    —\n  \n  \n    #4CA64C66\n    2\n    \n        \n        \n\n    col_vals_between\n    \n        \n            \n            \n        \n    \n\n        \n         col_vals_between()\n        \n    d\n    [0, 5000]\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    13\n    120.92\n    10.08\n    —\n    —\n    —\n    CSV\n  \n  \n    #4CA64C\n    3\n    \n        \n        \n\n    col_vals_in_set\n    \n        \n            \n            \n        \n    \n\n        \n         col_vals_in_set()\n        \n    f\n    low, mid, high\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    13\n    131.00\n    00.00\n    —\n    —\n    —\n    —\n  \n  \n    #4CA64C\n    4\n    \n        \n        \n\n    col_vals_regex\n    \n        \n            \n            \n                \n                \n            \n        \n    \n\n        \n         col_vals_regex()\n        \n    b\n    ^[0-9]-[a-z]{3}-[0-9]{3}$\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    13\n    131.00\n    00.00\n    —\n    —\n    —\n    —\n  \n\n  \n  \n  \n    2024-12-05 17:25:01 UTC&lt; 1 s2024-12-05 17:25:01 UTC\n  \n\n\n\n\n\n\n        \n\n\nEach row in this reporting table constitutes a single validation step. Roughly, the left-hand side outlines the validation rules and the right-hand side provides the results of each validation step.\nWhile simple in principle, there’s a lot of useful information packed into this validation table! The bright green color strips at the left of each validation step indicates that all test units passed validation. The lighter green color in the second step means that there was at least one failing unit. What are test units? Each validation step could perform one or many atomic tests (e.g., one test per cell in column). It’s quite a bit to take in, so here’s a diagram that describes a few of the important parts of the validation table:\n\nThe code that performs the validation on the Polars table can be revealed by interacting with the Code disclosure triangle up above. Here’s a rundown of how it all works, in three steps.\n\nStep 1\nThe object that we need for this workflow is created with the Validate class. Such an object can handle one input table at any given time and the data= argument is where the table is specified. In case you want to see the content of the input table, it’s provided just below.\n\n\nThe Polars table\n\n\n\n\nshape: (13, 8)date_timedateabcdefdatetime[μs]datei64stri64f64boolstr2016-01-04 11:00:002016-01-042\"1-bcd-345\"33423.29true\"high\"2016-01-04 00:32:002016-01-043\"5-egh-163\"89999.99true\"low\"2016-01-05 13:32:002016-01-056\"8-kdg-938\"32343.23true\"high\"2016-01-06 17:23:002016-01-062\"5-jdo-903\"null3892.4false\"mid\"2016-01-09 12:36:002016-01-098\"3-ldm-038\"7283.94true\"low\"……………………2016-01-20 04:30:002016-01-203\"5-bce-642\"9837.93false\"high\"2016-01-20 04:30:002016-01-203\"5-bce-642\"9837.93false\"high\"2016-01-26 20:07:002016-01-264\"2-dmx-010\"7833.98true\"low\"2016-01-28 02:51:002016-01-282\"7-dmx-010\"8108.34false\"low\"2016-01-30 11:23:002016-01-301\"3-dka-303\"null2230.09true\"high\"\n\n\n\n\n\nStep 2\nThe validation process needs directives on how exactly to check the tabular data. To this end we draw upon validation methods to define the validation rules (e.g., col_vals_gt(), col_vals_between(), etc.). Each invocation translates to discrete validation steps. We can use as many of these as is necessary for testing the table in question—more is usually better.\n\n\nStep 3\nWe conclude this process with the interrogate() method. All of the validation methods defined will not act on the input table until interrogate() is used. During the interrogation phase, the validation plan (the collection of validation steps) will be executed. We then get useful results within the Validate object.\nThat’s data validation with pointblank in a nutshell! Of course, we do want reporting on how it went down, so using the get_tabular_report() method as the fourth step will almost always be a thing that’s done. In the next section we’ll go a bit further by introducing a means to gauge data quality with failure thresholds."
+    "section": "A Simple Validation Table",
+    "text": "A Simple Validation Table\nThis is a validation table that is produced from a validation of a Polars DataFrame:\n\n\nCode\nimport pointblank as pb\n\nvalidation_1 = (\n    pb.Validate(data=pb.load_dataset(dataset=\"small_table\"))\n    .col_vals_lt(columns=\"a\", value=10)\n    .col_vals_between(columns=\"d\", left=0, right=5000)\n    .col_vals_in_set(columns=\"f\", set=[\"low\", \"mid\", \"high\"])\n    .col_vals_regex(columns=\"b\", pattern=r\"^[0-9]-[a-z]{3}-[0-9]{3}$\")\n    .interrogate()\n)\n\nvalidation_1\n\n\n\n\n\n\n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n\n\n\n\n  \n    Pointblank Validation\n  \n  \n    2024-12-05|21:21:41Polars\n  \n\n  \n  \n  STEP\n  COLUMNS\n  VALUES\n  TBL\n  EVAL\n  UNITS\n  PASS\n  FAIL\n  W\n  S\n  N\n  EXT\n\n\n\n  \n    #4CA64C\n    1\n    \n        \n        \n\n    col_vals_lt\n    \n        \n            \n            \n        \n    \n\n        \n         col_vals_lt()\n        \n    a\n    10\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    13\n    131.00\n    00.00\n    —\n    —\n    —\n    —\n  \n  \n    #4CA64C66\n    2\n    \n        \n        \n\n    col_vals_between\n    \n        \n            \n            \n        \n    \n\n        \n         col_vals_between()\n        \n    d\n    [0, 5000]\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    13\n    120.92\n    10.08\n    —\n    —\n    —\n    CSV\n  \n  \n    #4CA64C\n    3\n    \n        \n        \n\n    col_vals_in_set\n    \n        \n            \n            \n        \n    \n\n        \n         col_vals_in_set()\n        \n    f\n    low, mid, high\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    13\n    131.00\n    00.00\n    —\n    —\n    —\n    —\n  \n  \n    #4CA64C\n    4\n    \n        \n        \n\n    col_vals_regex\n    \n        \n            \n            \n                \n                \n            \n        \n    \n\n        \n         col_vals_regex()\n        \n    b\n    ^[0-9]-[a-z]{3}-[0-9]{3}$\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    13\n    131.00\n    00.00\n    —\n    —\n    —\n    —\n  \n\n  \n  \n  \n    2024-12-05 21:21:41 UTC&lt; 1 s2024-12-05 21:21:41 UTC\n  \n\n\n\n\n\n\n        \n\n\nEach row in this reporting table constitutes a single validation step. Roughly, the left-hand side outlines the validation rules and the right-hand side provides the results of each validation step. While simple in principle, there’s a lot of useful information packed into this validation table.\nHere’s a diagram that describes a few of the important parts of the validation table:\n\nThere are three important sections of this table,\n\nvalidation steps: each step is a distinct test on the table focused on a certain part of the table (here, the different columns)\nvalidation rules: the validation type is provided here along with key constraints\nvalidation results: post-interrogation results are provided here, with a breakdown of test units (total, passing, failing), threshold states, etc.\n\nThe intent is to provide the key information in one place, and have it be interpretable by a broad audience."
+  },
+  {
+    "objectID": "get-started/index.html#example-code-step-by-step",
+    "href": "get-started/index.html#example-code-step-by-step",
+    "title": "Intro",
+    "section": "Example Code, Step-by-Step",
+    "text": "Example Code, Step-by-Step\nHere’s the code that performs the validation on the Polars table.\n\nimport pointblank as pb\n\nvalidation_2 = (\n    pb.Validate(data=pb.load_dataset(dataset=\"small_table\"))\n    .col_vals_lt(columns=\"a\", value=10)\n    .col_vals_between(columns=\"d\", left=0, right=5000)\n    .col_vals_in_set(columns=\"f\", set=[\"low\", \"mid\", \"high\"])\n    .col_vals_regex(columns=\"b\", pattern=r\"^[0-9]-[a-z]{3}-[0-9]{3}$\")\n    .interrogate()\n)\n\nvalidation_2\n\n\n\n\n\n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n\n\n\n\n  \n    Pointblank Validation\n  \n  \n    2024-12-05|21:21:41Polars\n  \n\n  \n  \n  STEP\n  COLUMNS\n  VALUES\n  TBL\n  EVAL\n  UNITS\n  PASS\n  FAIL\n  W\n  S\n  N\n  EXT\n\n\n\n  \n    #4CA64C\n    1\n    \n        \n        \n\n    col_vals_lt\n    \n        \n            \n            \n        \n    \n\n        \n         col_vals_lt()\n        \n    a\n    10\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    13\n    131.00\n    00.00\n    —\n    —\n    —\n    —\n  \n  \n    #4CA64C66\n    2\n    \n        \n        \n\n    col_vals_between\n    \n        \n            \n            \n        \n    \n\n        \n         col_vals_between()\n        \n    d\n    [0, 5000]\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    13\n    120.92\n    10.08\n    —\n    —\n    —\n    CSV\n  \n  \n    #4CA64C\n    3\n    \n        \n        \n\n    col_vals_in_set\n    \n        \n            \n            \n        \n    \n\n        \n         col_vals_in_set()\n        \n    f\n    low, mid, high\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    13\n    131.00\n    00.00\n    —\n    —\n    —\n    —\n  \n  \n    #4CA64C\n    4\n    \n        \n        \n\n    col_vals_regex\n    \n        \n            \n            \n                \n                \n            \n        \n    \n\n        \n         col_vals_regex()\n        \n    b\n    ^[0-9]-[a-z]{3}-[0-9]{3}$\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    13\n    131.00\n    00.00\n    —\n    —\n    —\n    —\n  \n\n  \n  \n  \n    2024-12-05 21:21:41 UTC&lt; 1 s2024-12-05 21:21:41 UTC\n  \n\n\n\n\n\n\n        \n\n\nNote these three key pieces in the code:\n\nthe Validate(data=...) argument takes a DataFrame that you want to validate\nthe methods starting with col_* specify validation steps that run on specific columns\nthe interrogate() method executes the validation plan on the table\n\nThat’s data validation with pointblank in a nutshell! In the next section we’ll go a bit further by introducing a means to gauge data quality with failure thresholds."
+  },
+  {
+    "objectID": "get-started/index.html#understanding-test-units",
+    "href": "get-started/index.html#understanding-test-units",
+    "title": "Intro",
+    "section": "Understanding Test Units",
+    "text": "Understanding Test Units\nEach validation step will execute a validation test. For example, col_vals_lt() tests that each value in a column is less than a specified number. One important piece that’s reported is the number of test units that pass or fail.\nTest units are dependent on the test being run. The col_vals_* tests each value in a column, so each value will be a test unit.\nThis matters because you can set thresholds that signal WARN, STOP, and NOTIFY states based the proportion or number of failing test units.\nHere’s a simple example that uses a single col_vals_lt() step along with thresholds.\n\nvalidation_3 = (\n    pb.Validate(data=pb.load_dataset(dataset=\"small_table\"))\n    .col_vals_lt(columns=\"a\", value=7, thresholds=(2, 4))\n    .interrogate()\n)\n\nvalidation_3\n\n\n\n\n\n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n\n\n\n\n  \n    Pointblank Validation\n  \n  \n    2024-12-05|21:21:41Polars\n  \n\n  \n  \n  STEP\n  COLUMNS\n  VALUES\n  TBL\n  EVAL\n  UNITS\n  PASS\n  FAIL\n  W\n  S\n  N\n  EXT\n\n\n\n  \n    #FFBF00\n    1\n    \n        \n        \n\n    col_vals_lt\n    \n        \n            \n            \n        \n    \n\n        \n         col_vals_lt()\n        \n    a\n    7\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    13\n    110.85\n    20.15\n    ●\n    ○\n    —\n    CSV\n  \n\n  \n  \n  \n    2024-12-05 21:21:41 UTC&lt; 1 s2024-12-05 21:21:41 UTC\n  \n\n\n\n\n\n\n        \n\n\nThe code uses thresholds=(2, 4) to set a WARN threshold of 2 and a STOP threshold of 4. Notice these pieces in the validation table:\n\nThe FAIL column shows that 2 tests units have failed\nThe W column (short for WARN) shows a filled yellow circle indicating it’s reached threshold\nThe S column (short for STOP) shows an open red circle indicating it’s below threshold\n\nThe one final threshold, N (NOTIFY), wasn’t set so appears on the validation table as a dash.\nThresholds let you take action at different levels of severity. The next section discusses setting and acting on thresholds in detail."
   },
   {
     "objectID": "get-started/index.html#using-threshold-levels",
     "href": "get-started/index.html#using-threshold-levels",
     "title": "Intro",
     "section": "Using Threshold Levels",
-    "text": "Using Threshold Levels\nIt can be useful to gauge data quality by setting failure thresholds for validation steps. For example, it may be acceptable at some point in time to tolerate up to 5% of failing test units for a given validation. Or, having several levels of data quality might be useful and instructive, where failing test units across validations are grouped into the 0-5%, 5-10%, and 10%- bands.\nWe can specify failure threshold levels in the thresholds= argument of Validate. To do that, we can use the Thresholds class and pass in the resulting object to thresholds=. In the following, we use fractional failure-rate values (i.e., real numbers between 0 and 1) to define thresholds for the WARN and STOP states.\n\nthresholds = pb.Thresholds(warn_at=0.1, stop_at=0.2)\n\nLet’s use this thresholds object in a new validation. It’s similar to the last one but the parameters for some of the validation functions will result in more failing test units. We’ll see that the interrogation messages show mention of STOP and WARNING state being met.\n\nvalidation_2 = (\n    pb.Validate(data=pb.load_dataset(dataset=\"small_table\"), thresholds=thresholds)\n    .col_vals_in_set(columns=\"f\", set=[\"low\", \"mid\"])\n    .col_vals_lt(columns=\"a\", value=7)\n    .col_vals_regex(columns=\"b\", pattern=r\"^[0-9]-[a-w]{3}-[2-9]{3}$\")\n    .col_vals_between(columns=\"d\", left=0, right=4000)\n    .interrogate()\n)\n\nvalidation_2.get_tabular_report()\n\n\n\n\n\n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n\n\n\n\n  \n    Pointblank Validation\n  \n  \n    2024-12-05|17:25:01PolarsWARN0.1STOP0.2NOTIFY—\n  \n\n  \n  \n  STEP\n  COLUMNS\n  VALUES\n  TBL\n  EVAL\n  UNITS\n  PASS\n  FAIL\n  W\n  S\n  N\n  EXT\n\n\n\n  \n    #CF142B\n    1\n    \n        \n        \n\n    col_vals_in_set\n    \n        \n            \n            \n        \n    \n\n        \n         col_vals_in_set()\n        \n    f\n    low, mid\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    13\n    70.54\n    60.46\n    ●\n    ●\n    —\n    CSV\n  \n  \n    #FFBF00\n    2\n    \n        \n        \n\n    col_vals_lt\n    \n        \n            \n            \n        \n    \n\n        \n         col_vals_lt()\n        \n    a\n    7\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    13\n    110.85\n    20.15\n    ●\n    ○\n    —\n    CSV\n  \n  \n    #CF142B\n    3\n    \n        \n        \n\n    col_vals_regex\n    \n        \n            \n            \n                \n                \n            \n        \n    \n\n        \n         col_vals_regex()\n        \n    b\n    ^[0-9]-[a-w]{3}-[2-9]{3}$\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    13\n    60.46\n    70.54\n    ●\n    ●\n    —\n    CSV\n  \n  \n    #4CA64C66\n    4\n    \n        \n        \n\n    col_vals_between\n    \n        \n            \n            \n        \n    \n\n        \n         col_vals_between()\n        \n    d\n    [0, 4000]\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    13\n    120.92\n    10.08\n    ○\n    ○\n    —\n    CSV\n  \n\n  \n  \n  \n    2024-12-05 17:25:01 UTC&lt; 1 s2024-12-05 17:25:01 UTC\n  \n\n\n\n\n\n\n        \n\n\nAs can be seen, all validation steps have some non-zero number of failing test units. Here’s a breakdown on how this validation table can be interpreted:\n\nsteps 1 and 3: failure rate high enough to enter the WARN and STOP states (more than 20% of test units failed in both steps)\nstep 2: failure rate to enter the WARN state (more than 10% of test units failed)\nstep 4: one failing test units but well below the 10%-failing WARN threshold\n\nThe availability of data extracts that show where the failures occurred can help you get at the heart of what caused such failures in the first place. On the flip side, one could modify the rules of the validation steps should the flagged rows in the extracts turn out to be reasonable."
+    "text": "Using Threshold Levels\nThresholds enable you to signal failure at different severity levels. In the near future, thresholds will be able to trigger custom actions. For example, when testing a column for NULLs with col_vals_not_null() you might want to warn on any NULLs and stop where there are 10% NULLs in the column.\nvalidation_3 = (\n    pb.Validate(data=pb.load_dataset(dataset=\"small_table\"))\n    .col_vals_not_null(columns=\"a\", thresholds=(1, 0.1))\n    .interrogate()\n)\n\nvalidation_3\nIn this case, the thresholds= argument in the cols_vals_not_null() step was used, but we can also set thresholds globally by using Validate(thresholds=...).\nFor more on thresholds, see the Thresholds article."
   },
   {
-    "objectID": "reference/Validate.get_sundered_data.html",
-    "href": "reference/Validate.get_sundered_data.html",
-    "title": "Validate.get_sundered_data",
+    "objectID": "reference/Validate.col_vals_le.html",
+    "href": "reference/Validate.col_vals_le.html",
+    "title": "Validate.col_vals_le",
     "section": "",
-    "text": "Validate.get_sundered_data(type='pass')\nGet the data that passed or failed the validation steps.\nValidation of the data is one thing but, sometimes, you want to use the best part of the input dataset for something else. The get_sundered_data() method works with a Validate object that has been interrogated (i.e., the interrogate() method was used). We can get either the ‘pass’ data piece (rows with no failing test units across all row-based validation functions), or, the ‘fail’ data piece (rows with at least one failing test unit across the same series of validations).\n\n\nThere are some caveats to sundering. The validation steps considered for this splitting will only involve steps where:\n\nof certain check types, where test units are cells checked row-by-row (e.g., the col_vals_*() methods)\nactive= is not set to False\npre= has not been given an expression for modify the input table\n\nSo long as these conditions are met, the data will be split into two constituent tables: one with the rows that passed all validation steps and another with the rows that failed at least one validation step.\n\n\n\n\ntype :  = 'pass'\n\nThe type of data to return. Options are \"pass\" or \"fail\", where the former returns a table only containing rows where test units always passed validation steps, and the latter returns a table only containing rows had test units that failed in at least one validation step.\n\n\n\n\n\n\n : FrameT\n\nA table containing the data that passed or failed the validation steps.\n\n\n\n\n\nCreate a Validate plan of two validation steps, focused on testing row values for part of the small_table object. Then, use interrogate() to put the validation plan into action."
+    "text": "Validate.col_vals_le(\n    columns,\n    value,\n    na_pass=False,\n    pre=None,\n    thresholds=None,\n    active=True,\n)\nValidate whether column values are less than or equal to a single value.\nThe col_vals_le() validation method checks whether column values in a table are less than or equal to a specified value= (the exact comparison used in this function is col_val &lt;= value). The value is specified as a single, literal value. This validation will operate over the number of test units that is equal to the number of rows in the table (determined after any pre= mutation has been applied).\n\n\n\ncolumns : str | list[str]\n\nA single column or a list of columns to validate. If multiple columns are supplied, there will be a separate validation step generated for each column.\n\nvalue : float | int\n\nThe value to compare against.\n\nna_pass : bool = False\n\nShould any encountered None, NA, or Null values be considered as passing test units? By default, this is False. Set to True to pass test units with missing values.\n\npre : Callable | None = None\n\nA pre-processing function or lambda to apply to the data table for the validation step.\n\nthresholds : int | float | tuple | dict | Thresholds = None\n\nFailure threshold levels so that the validation step can react accordingly when exceeding the set levels for different states (warn, stop, and notify). This can be created simply as an integer or float denoting the absolute number or fraction of failing test units for the ‘warn’ level. Otherwise, you can use a tuple of 1-3 values, a dictionary of 1-3 entries, or a Thresholds object.\n\nactive : bool = True\n\nA boolean value indicating whether the validation step should be active. Using False will make the validation step inactive (still reporting its presence and keeping indexes for the steps unchanged).\n\n\n\n\n\n\n : Validate\n\nThe Validate object with the added validation step."
   },
   {
-    "objectID": "reference/Validate.get_sundered_data.html#details",
-    "href": "reference/Validate.get_sundered_data.html#details",
-    "title": "Validate.get_sundered_data",
+    "objectID": "reference/Validate.col_vals_le.html#parameters",
+    "href": "reference/Validate.col_vals_le.html#parameters",
+    "title": "Validate.col_vals_le",
     "section": "",
-    "text": "There are some caveats to sundering. The validation steps considered for this splitting will only involve steps where:\n\nof certain check types, where test units are cells checked row-by-row (e.g., the col_vals_*() methods)\nactive= is not set to False\npre= has not been given an expression for modify the input table\n\nSo long as these conditions are met, the data will be split into two constituent tables: one with the rows that passed all validation steps and another with the rows that failed at least one validation step."
+    "text": "columns : str | list[str]\n\nA single column or a list of columns to validate. If multiple columns are supplied, there will be a separate validation step generated for each column.\n\nvalue : float | int\n\nThe value to compare against.\n\nna_pass : bool = False\n\nShould any encountered None, NA, or Null values be considered as passing test units? By default, this is False. Set to True to pass test units with missing values.\n\npre : Callable | None = None\n\nA pre-processing function or lambda to apply to the data table for the validation step.\n\nthresholds : int | float | tuple | dict | Thresholds = None\n\nFailure threshold levels so that the validation step can react accordingly when exceeding the set levels for different states (warn, stop, and notify). This can be created simply as an integer or float denoting the absolute number or fraction of failing test units for the ‘warn’ level. Otherwise, you can use a tuple of 1-3 values, a dictionary of 1-3 entries, or a Thresholds object.\n\nactive : bool = True\n\nA boolean value indicating whether the validation step should be active. Using False will make the validation step inactive (still reporting its presence and keeping indexes for the steps unchanged)."
   },
   {
-    "objectID": "reference/Validate.get_sundered_data.html#parameters",
-    "href": "reference/Validate.get_sundered_data.html#parameters",
-    "title": "Validate.get_sundered_data",
+    "objectID": "reference/Validate.col_vals_le.html#returns",
+    "href": "reference/Validate.col_vals_le.html#returns",
+    "title": "Validate.col_vals_le",
     "section": "",
-    "text": "type :  = 'pass'\n\nThe type of data to return. Options are \"pass\" or \"fail\", where the former returns a table only containing rows where test units always passed validation steps, and the latter returns a table only containing rows had test units that failed in at least one validation step."
+    "text": ": Validate\n\nThe Validate object with the added validation step."
   },
   {
-    "objectID": "reference/Validate.get_sundered_data.html#returns",
-    "href": "reference/Validate.get_sundered_data.html#returns",
-    "title": "Validate.get_sundered_data",
+    "objectID": "reference/Validate.col_exists.html",
+    "href": "reference/Validate.col_exists.html",
+    "title": "Validate.col_exists",
     "section": "",
-    "text": ": FrameT\n\nA table containing the data that passed or failed the validation steps."
+    "text": "Validate.col_exists(columns, thresholds=None, active=True)\nValidate whether one or more columns exist in the table.\nThe col_exists() method checks whether one or more columns exist in the target table. The only requirement is specification of the column names. Each validation step or expectation will operate over a single test unit, which is whether the column exists or not.\n\n\n\ncolumns : str | list[str]\n\nA single column or a list of columns to validate. If multiple columns are supplied, there will be a separate validation step generated for each column.\n\nthresholds : int | float | tuple | dict | Thresholds = None\n\nFailure threshold levels so that the validation step can react accordingly when exceeding the set levels for different states (warn, stop, and notify). This can be created simply as an integer or float denoting the absolute number or fraction of failing test units for the ‘warn’ level. Otherwise, you can use a tuple of 1-3 values, a dictionary of 1-3 entries, or a Thresholds object.\n\nactive : bool = True\n\nA boolean value indicating whether the validation step should be active. Using False will make the validation step inactive (still reporting its presence and keeping indexes for the steps unchanged).\n\n\n\n\n\n\n : Validate\n\nThe Validate object with the added validation step."
   },
   {
-    "objectID": "reference/Validate.get_sundered_data.html#examples",
-    "href": "reference/Validate.get_sundered_data.html#examples",
-    "title": "Validate.get_sundered_data",
+    "objectID": "reference/Validate.col_exists.html#parameters",
+    "href": "reference/Validate.col_exists.html#parameters",
+    "title": "Validate.col_exists",
     "section": "",
-    "text": "Create a Validate plan of two validation steps, focused on testing row values for part of the small_table object. Then, use interrogate() to put the validation plan into action."
+    "text": "columns : str | list[str]\n\nA single column or a list of columns to validate. If multiple columns are supplied, there will be a separate validation step generated for each column.\n\nthresholds : int | float | tuple | dict | Thresholds = None\n\nFailure threshold levels so that the validation step can react accordingly when exceeding the set levels for different states (warn, stop, and notify). This can be created simply as an integer or float denoting the absolute number or fraction of failing test units for the ‘warn’ level. Otherwise, you can use a tuple of 1-3 values, a dictionary of 1-3 entries, or a Thresholds object.\n\nactive : bool = True\n\nA boolean value indicating whether the validation step should be active. Using False will make the validation step inactive (still reporting its presence and keeping indexes for the steps unchanged)."
+  },
+  {
+    "objectID": "reference/Validate.col_exists.html#returns",
+    "href": "reference/Validate.col_exists.html#returns",
+    "title": "Validate.col_exists",
+    "section": "",
+    "text": ": Validate\n\nThe Validate object with the added validation step."
   },
   {
     "objectID": "reference/Validate.col_vals_ne.html",
@@ -116,245 +137,259 @@
     "href": "reference/Validate.html#creating-a-validation-plan-and-interrogating",
     "title": "Validate",
     "section": "Creating a validation plan and interrogating",
-    "text": "Creating a validation plan and interrogating\nLet’s walk through a data quality analysis of an extremely small table. It’s actually called small_table and it’s accessible through the load_dataset() function.\n\nimport pointblank as pb\n\n# Load the small_table dataset\nsmall_table = pb.load_dataset()\n\nsmall_table\n\n\nshape: (13, 8)date_timedateabcdefdatetime[μs]datei64stri64f64boolstr2016-01-04 11:00:002016-01-042\"1-bcd-345\"33423.29true\"high\"2016-01-04 00:32:002016-01-043\"5-egh-163\"89999.99true\"low\"2016-01-05 13:32:002016-01-056\"8-kdg-938\"32343.23true\"high\"2016-01-06 17:23:002016-01-062\"5-jdo-903\"null3892.4false\"mid\"2016-01-09 12:36:002016-01-098\"3-ldm-038\"7283.94true\"low\"……………………2016-01-20 04:30:002016-01-203\"5-bce-642\"9837.93false\"high\"2016-01-20 04:30:002016-01-203\"5-bce-642\"9837.93false\"high\"2016-01-26 20:07:002016-01-264\"2-dmx-010\"7833.98true\"low\"2016-01-28 02:51:002016-01-282\"7-dmx-010\"8108.34false\"low\"2016-01-30 11:23:002016-01-301\"3-dka-303\"null2230.09true\"high\"\n\n\nWe ought to think about what’s tolerable in terms of data quality so let’s designate proportional failure thresholds to the warn, stop, and notify states. This can be done by using the Thresholds class.\n\nthresholds = pb.Thresholds(warn_at=0.10, stop_at=0.25, notify_at=0.35)\n\nNow, we use the Validate class and give it the thresholds object (which serves as a default for all validation steps but can be overridden). The static thresholds provided in thresholds will make the reporting a bit more useful. We also need to provide a target table and we’ll use small_table for this.\n\nvalidation = (\n    pb.Validate(\n        data=small_table,\n        tbl_name=\"small_table\",\n        label=\"`Validate` example.\",\n        thresholds=thresholds\n    )\n)\n\nThen, as with any Validate object, we can add steps to the validation plan by using as many validation methods as we want. To conclude the process (and actually query the data table), we use the interrogate() method.\n\nvalidation = (\n    validation\n    .col_vals_gt(columns=\"d\", value=100)\n    .col_vals_le(columns=\"c\", value=5)\n    .col_vals_between(columns=\"c\", left=3, right=10, na_pass=True)\n    .col_vals_regex(columns=\"b\", pattern=r\"[0-9]-[a-z]{3}-[0-9]{3}\")\n    .col_exists(columns=[\"date\", \"date_time\"])\n    .interrogate()\n)\n\nThe validation object can be printed as a reporting table with the get_tabular_report() method.\n\nvalidation.get_tabular_report()\n\n\n\n\n\n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n\n\n\n\n  \n    Pointblank Validation\n  \n  \n    `Validate` example.Polarssmall_tableWARN0.1STOP0.25NOTIFY0.35\n  \n\n  \n  \n  STEP\n  COLUMNS\n  VALUES\n  TBL\n  EVAL\n  UNITS\n  PASS\n  FAIL\n  W\n  S\n  N\n  EXT\n\n\n\n  \n    #4CA64C\n    1\n    \n        \n        \n\n    col_vals_gt\n    \n        \n            \n            \n        \n    \n\n        \n         col_vals_gt()\n        \n    d\n    100\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    13\n    131.00\n    00.00\n    ○\n    ○\n    ○\n    —\n  \n  \n    #CF142B\n    2\n    \n        \n        \n\n    col_vals_lte\n    \n        \n            \n            \n        \n    \n\n        \n         col_vals_le()\n        \n    c\n    5\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    13\n    50.38\n    60.46\n    ●\n    ●\n    ●\n    CSV\n  \n  \n    #4CA64C66\n    3\n    \n        \n        \n\n    col_vals_between\n    \n        \n            \n            \n        \n    \n\n        \n         col_vals_between()\n        \n    c\n    [3, 10]\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    13\n    120.92\n    10.08\n    ○\n    ○\n    ○\n    CSV\n  \n  \n    #4CA64C\n    4\n    \n        \n        \n\n    col_vals_regex\n    \n        \n            \n            \n                \n                \n            \n        \n    \n\n        \n         col_vals_regex()\n        \n    b\n    [0-9]-[a-z]{3}-[0-9]{3}\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    13\n    131.00\n    00.00\n    ○\n    ○\n    ○\n    —\n  \n  \n    #4CA64C\n    5\n    \n        \n        \n\n    col_exists\n    \n        \n            \n            \n            \n        \n    \n\n        \n         col_exists()\n        \n    date\n    None\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    1\n    11.00\n    00.00\n    ○\n    ○\n    ○\n    —\n  \n  \n    #4CA64C\n    6\n    \n        \n        \n\n    col_exists\n    \n        \n            \n            \n            \n        \n    \n\n        \n         col_exists()\n        \n    date_time\n    None\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    1\n    11.00\n    00.00\n    ○\n    ○\n    ○\n    —\n  \n\n  \n  \n  \n    2024-12-05 17:24:56 UTC&lt; 1 s2024-12-05 17:24:56 UTC"
+    "text": "Creating a validation plan and interrogating\nLet’s walk through a data quality analysis of an extremely small table. It’s actually called small_table and it’s accessible through the load_dataset() function.\n\nimport pointblank as pb\n\n# Load the small_table dataset\nsmall_table = pb.load_dataset()\n\nsmall_table\n\n\nshape: (13, 8)date_timedateabcdefdatetime[μs]datei64stri64f64boolstr2016-01-04 11:00:002016-01-042\"1-bcd-345\"33423.29true\"high\"2016-01-04 00:32:002016-01-043\"5-egh-163\"89999.99true\"low\"2016-01-05 13:32:002016-01-056\"8-kdg-938\"32343.23true\"high\"2016-01-06 17:23:002016-01-062\"5-jdo-903\"null3892.4false\"mid\"2016-01-09 12:36:002016-01-098\"3-ldm-038\"7283.94true\"low\"……………………2016-01-20 04:30:002016-01-203\"5-bce-642\"9837.93false\"high\"2016-01-20 04:30:002016-01-203\"5-bce-642\"9837.93false\"high\"2016-01-26 20:07:002016-01-264\"2-dmx-010\"7833.98true\"low\"2016-01-28 02:51:002016-01-282\"7-dmx-010\"8108.34false\"low\"2016-01-30 11:23:002016-01-301\"3-dka-303\"null2230.09true\"high\"\n\n\nWe ought to think about what’s tolerable in terms of data quality so let’s designate proportional failure thresholds to the warn, stop, and notify states. This can be done by using the Thresholds class.\n\nthresholds = pb.Thresholds(warn_at=0.10, stop_at=0.25, notify_at=0.35)\n\nNow, we use the Validate class and give it the thresholds object (which serves as a default for all validation steps but can be overridden). The static thresholds provided in thresholds will make the reporting a bit more useful. We also need to provide a target table and we’ll use small_table for this.\n\nvalidation = (\n    pb.Validate(\n        data=small_table,\n        tbl_name=\"small_table\",\n        label=\"`Validate` example.\",\n        thresholds=thresholds\n    )\n)\n\nThen, as with any Validate object, we can add steps to the validation plan by using as many validation methods as we want. To conclude the process (and actually query the data table), we use the interrogate() method.\n\nvalidation = (\n    validation\n    .col_vals_gt(columns=\"d\", value=100)\n    .col_vals_le(columns=\"c\", value=5)\n    .col_vals_between(columns=\"c\", left=3, right=10, na_pass=True)\n    .col_vals_regex(columns=\"b\", pattern=r\"[0-9]-[a-z]{3}-[0-9]{3}\")\n    .col_exists(columns=[\"date\", \"date_time\"])\n    .interrogate()\n)\n\nThe validation object can be printed as a reporting table with the get_tabular_report() method.\n\nvalidation.get_tabular_report()\n\n\n\n\n\n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n\n\n\n\n  \n    Pointblank Validation\n  \n  \n    `Validate` example.Polarssmall_tableWARN0.1STOP0.25NOTIFY0.35\n  \n\n  \n  \n  STEP\n  COLUMNS\n  VALUES\n  TBL\n  EVAL\n  UNITS\n  PASS\n  FAIL\n  W\n  S\n  N\n  EXT\n\n\n\n  \n    #4CA64C\n    1\n    \n        \n        \n\n    col_vals_gt\n    \n        \n            \n            \n        \n    \n\n        \n         col_vals_gt()\n        \n    d\n    100\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    13\n    131.00\n    00.00\n    ○\n    ○\n    ○\n    —\n  \n  \n    #CF142B\n    2\n    \n        \n        \n\n    col_vals_lte\n    \n        \n            \n            \n        \n    \n\n        \n         col_vals_le()\n        \n    c\n    5\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    13\n    50.38\n    60.46\n    ●\n    ●\n    ●\n    CSV\n  \n  \n    #4CA64C66\n    3\n    \n        \n        \n\n    col_vals_between\n    \n        \n            \n            \n        \n    \n\n        \n         col_vals_between()\n        \n    c\n    [3, 10]\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    13\n    120.92\n    10.08\n    ○\n    ○\n    ○\n    CSV\n  \n  \n    #4CA64C\n    4\n    \n        \n        \n\n    col_vals_regex\n    \n        \n            \n            \n                \n                \n            \n        \n    \n\n        \n         col_vals_regex()\n        \n    b\n    [0-9]-[a-z]{3}-[0-9]{3}\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    13\n    131.00\n    00.00\n    ○\n    ○\n    ○\n    —\n  \n  \n    #4CA64C\n    5\n    \n        \n        \n\n    col_exists\n    \n        \n            \n            \n            \n        \n    \n\n        \n         col_exists()\n        \n    date\n    None\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    1\n    11.00\n    00.00\n    ○\n    ○\n    ○\n    —\n  \n  \n    #4CA64C\n    6\n    \n        \n        \n\n    col_exists\n    \n        \n            \n            \n            \n        \n    \n\n        \n         col_exists()\n        \n    date_time\n    None\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    1\n    11.00\n    00.00\n    ○\n    ○\n    ○\n    —\n  \n\n  \n  \n  \n    2024-12-05 21:21:34 UTC&lt; 1 s2024-12-05 21:21:34 UTC"
   },
   {
-    "objectID": "reference/Validate.get_data_extracts.html",
-    "href": "reference/Validate.get_data_extracts.html",
-    "title": "Validate.get_data_extracts",
+    "objectID": "reference/Validate.col_vals_not_null.html",
+    "href": "reference/Validate.col_vals_not_null.html",
+    "title": "Validate.col_vals_not_null",
     "section": "",
-    "text": "Validate.get_data_extracts(i=None)\nGet the rows that failed for each validation step.\n\n\n\ni : int | list[int] | None = None\n\nThe validation step number(s) from which the failed rows are obtained. If None, all steps are included.\n\n\n\n\n\n\n : dict[int, FrameT]\n\nA dictionary of tables containing the rows that failed in every row-based validation step."
+    "text": "Validate.col_vals_not_null(columns, pre=None, thresholds=None, active=True)\nValidate whether values in a column are not NULL.\nThe col_vals_not_null() validation method checks whether column values in a table are not NULL. This validation will operate over the number of test units that is equal to the number of rows in the table.\n\n\n\ncolumns : str | list[str]\n\nA single column or a list of columns to validate. If multiple columns are supplied, there will be a separate validation step generated for each column.\n\npre : Callable | None = None\n\nA pre-processing function or lambda to apply to the data table for the validation step.\n\nthresholds : int | float | tuple | dict | Thresholds = None\n\nFailure threshold levels so that the validation step can react accordingly when exceeding the set levels for different states (warn, stop, and notify). This can be created simply as an integer or float denoting the absolute number or fraction of failing test units for the ‘warn’ level. Otherwise, you can use a tuple of 1-3 values, a dictionary of 1-3 entries, or a Thresholds object.\n\nactive : bool = True\n\nA boolean value indicating whether the validation step should be active. Using False will make the validation step inactive (still reporting its presence and keeping indexes for the steps unchanged).\n\n\n\n\n\n\n : Validate\n\nThe Validate object with the added validation step."
   },
   {
-    "objectID": "reference/Validate.get_data_extracts.html#parameters",
-    "href": "reference/Validate.get_data_extracts.html#parameters",
-    "title": "Validate.get_data_extracts",
+    "objectID": "reference/Validate.col_vals_not_null.html#parameters",
+    "href": "reference/Validate.col_vals_not_null.html#parameters",
+    "title": "Validate.col_vals_not_null",
     "section": "",
-    "text": "i : int | list[int] | None = None\n\nThe validation step number(s) from which the failed rows are obtained. If None, all steps are included."
+    "text": "columns : str | list[str]\n\nA single column or a list of columns to validate. If multiple columns are supplied, there will be a separate validation step generated for each column.\n\npre : Callable | None = None\n\nA pre-processing function or lambda to apply to the data table for the validation step.\n\nthresholds : int | float | tuple | dict | Thresholds = None\n\nFailure threshold levels so that the validation step can react accordingly when exceeding the set levels for different states (warn, stop, and notify). This can be created simply as an integer or float denoting the absolute number or fraction of failing test units for the ‘warn’ level. Otherwise, you can use a tuple of 1-3 values, a dictionary of 1-3 entries, or a Thresholds object.\n\nactive : bool = True\n\nA boolean value indicating whether the validation step should be active. Using False will make the validation step inactive (still reporting its presence and keeping indexes for the steps unchanged)."
   },
   {
-    "objectID": "reference/Validate.get_data_extracts.html#returns",
-    "href": "reference/Validate.get_data_extracts.html#returns",
-    "title": "Validate.get_data_extracts",
+    "objectID": "reference/Validate.col_vals_not_null.html#returns",
+    "href": "reference/Validate.col_vals_not_null.html#returns",
+    "title": "Validate.col_vals_not_null",
     "section": "",
-    "text": ": dict[int, FrameT]\n\nA dictionary of tables containing the rows that failed in every row-based validation step."
+    "text": ": Validate\n\nThe Validate object with the added validation step."
   },
   {
-    "objectID": "reference/Validate.col_vals_between.html",
-    "href": "reference/Validate.col_vals_between.html",
-    "title": "Validate.col_vals_between",
+    "objectID": "reference/Validate.get_tabular_report.html",
+    "href": "reference/Validate.get_tabular_report.html",
+    "title": "Validate.get_tabular_report",
     "section": "",
-    "text": "Validate.col_vals_between(\n    columns,\n    left,\n    right,\n    inclusive=(True, True),\n    na_pass=False,\n    pre=None,\n    thresholds=None,\n    active=True,\n)\nValidate whether column values are between two values.\nThe col_vals_between() validation method checks whether column values in a table fall within a range. The range is specified with three arguments: left=, right=, and inclusive=. The left= and right= values specify the lower and upper bounds. The bounds are is specified as single, literal values. This validation will operate over the number of test units that is equal to the number of rows in the table (determined after any pre= mutation has been applied).\n\n\n\ncolumns : str | list[str]\n\nA single column or a list of columns to validate. If multiple columns are supplied, there will be a separate validation step generated for each column.\n\nleft : float | int\n\nThe lower bound of the range.\n\nright : float | int\n\nThe upper bound of the range.\n\ninclusive : tuple[bool, bool] = (True, True)\n\nA tuple of two boolean values indicating whether the comparison should be inclusive. The position of the boolean values correspond to the left= and right= values, respectively. By default, both values are True.\n\nna_pass : bool = False\n\nShould any encountered None, NA, or Null values be considered as passing test units? By default, this is False. Set to True to pass test units with missing values.\n\npre : Callable | None = None\n\nA pre-processing function or lambda to apply to the data table for the validation step.\n\nthresholds : int | float | tuple | dict | Thresholds = None\n\nFailure threshold levels so that the validation step can react accordingly when exceeding the set levels for different states (warn, stop, and notify). This can be created simply as an integer or float denoting the absolute number or fraction of failing test units for the ‘warn’ level. Otherwise, you can use a tuple of 1-3 values, a dictionary of 1-3 entries, or a Thresholds object.\n\nactive : bool = True\n\nA boolean value indicating whether the validation step should be active. Using False will make the validation step inactive (still reporting its presence and keeping indexes for the steps unchanged).\n\n\n\n\n\n\n : Validate\n\nThe Validate object with the added validation step."
+    "text": "Validate.get_tabular_report(title=':default:')\nValidation report as a GT table."
   },
   {
-    "objectID": "reference/Validate.col_vals_between.html#parameters",
-    "href": "reference/Validate.col_vals_between.html#parameters",
-    "title": "Validate.col_vals_between",
+    "objectID": "reference/Validate.get_tabular_report.html#parameters",
+    "href": "reference/Validate.get_tabular_report.html#parameters",
+    "title": "Validate.get_tabular_report",
+    "section": "Parameters",
+    "text": "Parameters\n\ntitle : str | None = ':default:'\n\nOptions for customizing the title of the report. The default is the \":default:\" value which produces a generic title. Another option is \":tbl_name:\", and that presents the name of the table as the title for the report. If no title is wanted, then \":none:\" can be used. Aside from keyword options, text can be provided for the title. This will be interpreted as Markdown text and transformed internally to HTML."
+  },
+  {
+    "objectID": "reference/Validate.get_tabular_report.html#returns",
+    "href": "reference/Validate.get_tabular_report.html#returns",
+    "title": "Validate.get_tabular_report",
+    "section": "Returns",
+    "text": "Returns\n\n : GT\n\nA GT table object that represents the validation report."
+  },
+  {
+    "objectID": "reference/Validate.get_tabular_report.html#examples",
+    "href": "reference/Validate.get_tabular_report.html#examples",
+    "title": "Validate.get_tabular_report",
+    "section": "Examples",
+    "text": "Examples\nLet’s create a Validate object with a few validation steps and then interrogate the data table to see how it performs against the validation plan. We can then generate a tabular report to get a summary of the results.\n\nimport pointblank as pb\nimport polars as pl\n\n# Create a Polars DataFrame\ntbl_pl = pl.DataFrame({\"x\": [1, 2, 3, 4], \"y\": [4, 5, 6, 7]})\n\n# Validate data using Polars DataFrame\nv = (\n    pb.Validate(data=tbl_pl, tbl_name=\"tbl_xy\", thresholds=(2, 3, 4))\n    .col_vals_gt(columns=\"x\", value=1)\n    .col_vals_lt(columns=\"x\", value=3)\n    .col_vals_le(columns=\"y\", value=7)\n    .interrogate()\n)\n\n# Generate the tabular report\nv.get_tabular_report()\n\n\n\n\n\n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n\n\n\n\n  \n    Pointblank Validation\n  \n  \n    2024-12-05|21:21:30Polarstbl_xyWARN2STOP3NOTIFY4\n  \n\n  \n  \n  STEP\n  COLUMNS\n  VALUES\n  TBL\n  EVAL\n  UNITS\n  PASS\n  FAIL\n  W\n  S\n  N\n  EXT\n\n\n\n  \n    #4CA64C66\n    1\n    \n        \n        \n\n    col_vals_gt\n    \n        \n            \n            \n        \n    \n\n        \n         col_vals_gt()\n        \n    x\n    1\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    4\n    30.75\n    10.25\n    ○\n    ○\n    ○\n    CSV\n  \n  \n    #FFBF00\n    2\n    \n        \n        \n\n    col_vals_lt\n    \n        \n            \n            \n        \n    \n\n        \n         col_vals_lt()\n        \n    x\n    3\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    4\n    20.50\n    20.50\n    ●\n    ○\n    ○\n    CSV\n  \n  \n    #4CA64C\n    3\n    \n        \n        \n\n    col_vals_lte\n    \n        \n            \n            \n        \n    \n\n        \n         col_vals_le()\n        \n    y\n    7\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    4\n    41.00\n    00.00\n    ○\n    ○\n    ○\n    —\n  \n\n  \n  \n  \n    2024-12-05 21:21:30 UTC&lt; 1 s2024-12-05 21:21:30 UTC\n  \n\n\n\n\n\n\n        \n\n\nThe title option was set to \":default:\", which produces a generic title for the report. We can change this to the name of the table by setting the title to \":tbl_name:\". This will use the string provided in the tbl_name= argument of the Validate object.\n\nv.get_tabular_report(title=\":tbl_name:\")\n\n\n\n\n\n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n\n\n\n\n  \n    tbl_xy\n  \n  \n    2024-12-05|21:21:30Polarstbl_xyWARN2STOP3NOTIFY4\n  \n\n  \n  \n  STEP\n  COLUMNS\n  VALUES\n  TBL\n  EVAL\n  UNITS\n  PASS\n  FAIL\n  W\n  S\n  N\n  EXT\n\n\n\n  \n    #4CA64C66\n    1\n    \n        \n        \n\n    col_vals_gt\n    \n        \n            \n            \n        \n    \n\n        \n         col_vals_gt()\n        \n    x\n    1\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    4\n    30.75\n    10.25\n    ○\n    ○\n    ○\n    CSV\n  \n  \n    #FFBF00\n    2\n    \n        \n        \n\n    col_vals_lt\n    \n        \n            \n            \n        \n    \n\n        \n         col_vals_lt()\n        \n    x\n    3\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    4\n    20.50\n    20.50\n    ●\n    ○\n    ○\n    CSV\n  \n  \n    #4CA64C\n    3\n    \n        \n        \n\n    col_vals_lte\n    \n        \n            \n            \n        \n    \n\n        \n         col_vals_le()\n        \n    y\n    7\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    4\n    41.00\n    00.00\n    ○\n    ○\n    ○\n    —\n  \n\n  \n  \n  \n    2024-12-05 21:21:30 UTC&lt; 1 s2024-12-05 21:21:30 UTC"
+  },
+  {
+    "objectID": "reference/Validate.n_passed.html",
+    "href": "reference/Validate.n_passed.html",
+    "title": "Validate.n_passed",
+    "section": "",
+    "text": "Validate.n_passed(i=None)\nProvides a dictionary of the number of test units that passed for each validation step.\n\n\n\ni : int | list[int] | None = None\n\nThe validation step number(s) from which the number of passing test units is obtained. If None, all steps are included.\n\n\n\n\n\n\n : dict[int, int]\n\nA dictionary of the number of failing test units for each validation step."
+  },
+  {
+    "objectID": "reference/Validate.n_passed.html#parameters",
+    "href": "reference/Validate.n_passed.html#parameters",
+    "title": "Validate.n_passed",
+    "section": "",
+    "text": "i : int | list[int] | None = None\n\nThe validation step number(s) from which the number of passing test units is obtained. If None, all steps are included."
+  },
+  {
+    "objectID": "reference/Validate.n_passed.html#returns",
+    "href": "reference/Validate.n_passed.html#returns",
+    "title": "Validate.n_passed",
+    "section": "",
+    "text": ": dict[int, int]\n\nA dictionary of the number of failing test units for each validation step."
+  },
+  {
+    "objectID": "reference/Validate.col_vals_outside.html",
+    "href": "reference/Validate.col_vals_outside.html",
+    "title": "Validate.col_vals_outside",
+    "section": "",
+    "text": "Validate.col_vals_outside(\n    columns,\n    left,\n    right,\n    inclusive=(True, True),\n    na_pass=False,\n    pre=None,\n    thresholds=None,\n    active=True,\n)\nValidate whether column values are outside of two values.\nThe col_vals_between() validation method checks whether column values in a table do not fall within a certain range. The range is specified with three arguments: left=, right=, and inclusive=. The left= and right= values specify the lower and upper bounds. The bounds are is specified as single, literal values. This validation will operate over the number of test units that is equal to the number of rows in the table (determined after any pre= mutation has been applied).\n\n\n\ncolumns : str | list[str]\n\nA single column or a list of columns to validate. If multiple columns are supplied, there will be a separate validation step generated for each column.\n\nleft : float | int\n\nThe lower bound of the range.\n\nright : float | int\n\nThe upper bound of the range.\n\ninclusive : tuple[bool, bool] = (True, True)\n\nA tuple of two boolean values indicating whether the comparison should be inclusive. The position of the boolean values correspond to the left= and right= values, respectively. By default, both values are True.\n\nna_pass : bool = False\n\nShould any encountered None, NA, or Null values be considered as passing test units? By default, this is False. Set to True to pass test units with missing values.\n\npre : Callable | None = None\n\nA pre-processing function or lambda to apply to the data table for the validation step.\n\nthresholds : int | float | tuple | dict | Thresholds = None\n\nFailure threshold levels so that the validation step can react accordingly when exceeding the set levels for different states (warn, stop, and notify). This can be created simply as an integer or float denoting the absolute number or fraction of failing test units for the ‘warn’ level. Otherwise, you can use a tuple of 1-3 values, a dictionary of 1-3 entries, or a Thresholds object.\n\nactive : bool = True\n\nA boolean value indicating whether the validation step should be active. Using False will make the validation step inactive (still reporting its presence and keeping indexes for the steps unchanged).\n\n\n\n\n\n\n : Validate\n\nThe Validate object with the added validation step."
+  },
+  {
+    "objectID": "reference/Validate.col_vals_outside.html#parameters",
+    "href": "reference/Validate.col_vals_outside.html#parameters",
+    "title": "Validate.col_vals_outside",
     "section": "",
     "text": "columns : str | list[str]\n\nA single column or a list of columns to validate. If multiple columns are supplied, there will be a separate validation step generated for each column.\n\nleft : float | int\n\nThe lower bound of the range.\n\nright : float | int\n\nThe upper bound of the range.\n\ninclusive : tuple[bool, bool] = (True, True)\n\nA tuple of two boolean values indicating whether the comparison should be inclusive. The position of the boolean values correspond to the left= and right= values, respectively. By default, both values are True.\n\nna_pass : bool = False\n\nShould any encountered None, NA, or Null values be considered as passing test units? By default, this is False. Set to True to pass test units with missing values.\n\npre : Callable | None = None\n\nA pre-processing function or lambda to apply to the data table for the validation step.\n\nthresholds : int | float | tuple | dict | Thresholds = None\n\nFailure threshold levels so that the validation step can react accordingly when exceeding the set levels for different states (warn, stop, and notify). This can be created simply as an integer or float denoting the absolute number or fraction of failing test units for the ‘warn’ level. Otherwise, you can use a tuple of 1-3 values, a dictionary of 1-3 entries, or a Thresholds object.\n\nactive : bool = True\n\nA boolean value indicating whether the validation step should be active. Using False will make the validation step inactive (still reporting its presence and keeping indexes for the steps unchanged)."
   },
   {
-    "objectID": "reference/Validate.col_vals_between.html#returns",
-    "href": "reference/Validate.col_vals_between.html#returns",
-    "title": "Validate.col_vals_between",
+    "objectID": "reference/Validate.col_vals_outside.html#returns",
+    "href": "reference/Validate.col_vals_outside.html#returns",
+    "title": "Validate.col_vals_outside",
     "section": "",
     "text": ": Validate\n\nThe Validate object with the added validation step."
   },
   {
-    "objectID": "reference/Validate.col_vals_eq.html",
-    "href": "reference/Validate.col_vals_eq.html",
-    "title": "Validate.col_vals_eq",
+    "objectID": "reference/Validate.notify.html",
+    "href": "reference/Validate.notify.html",
+    "title": "Validate.notify",
     "section": "",
-    "text": "Validate.col_vals_eq(\n    columns,\n    value,\n    na_pass=False,\n    pre=None,\n    thresholds=None,\n    active=True,\n)\nValidate whether column values are equal to a single value.\nThe col_vals_eq() validation method checks whether column values in a table are equal to a specified value= (the exact comparison used in this function is col_val == value). The value is specified as a single, literal value. This validation will operate over the number of test units that is equal to the number of rows in the table (determined after any pre= mutation has been applied).\n\n\n\ncolumns : str | list[str]\n\nA single column or a list of columns to validate. If multiple columns are supplied, there will be a separate validation step generated for each column.\n\nvalue : float | int\n\nThe value to compare against.\n\nna_pass : bool = False\n\nShould any encountered None, NA, or Null values be considered as passing test units? By default, this is False. Set to True to pass test units with missing values.\n\npre : Callable | None = None\n\nA pre-processing function or lambda to apply to the data table for the validation step.\n\nthresholds : int | float | tuple | dict | Thresholds = None\n\nFailure threshold levels so that the validation step can react accordingly when exceeding the set levels for different states (warn, stop, and notify). This can be created simply as an integer or float denoting the absolute number or fraction of failing test units for the ‘warn’ level. Otherwise, you can use a tuple of 1-3 values, a dictionary of 1-3 entries, or a Thresholds object.\n\nactive : bool = True\n\nA boolean value indicating whether the validation step should be active. Using False will make the validation step inactive (still reporting its presence and keeping indexes for the steps unchanged).\n\n\n\n\n\n\n : Validate\n\nThe Validate object with the added validation step."
+    "text": "Validate.notify(i=None)\nProvides a dictionary of the notification status for each validation step.\n\n\n\ni : int | list[int] | None = None\n\nThe validation step number(s) from which the notification status is obtained. If None, all steps are included.\n\n\n\n\n\n\n : dict[int, bool]\n\nA dictionary of the notification status for each validation step."
   },
   {
-    "objectID": "reference/Validate.col_vals_eq.html#parameters",
-    "href": "reference/Validate.col_vals_eq.html#parameters",
-    "title": "Validate.col_vals_eq",
+    "objectID": "reference/Validate.notify.html#parameters",
+    "href": "reference/Validate.notify.html#parameters",
+    "title": "Validate.notify",
+    "section": "",
+    "text": "i : int | list[int] | None = None\n\nThe validation step number(s) from which the notification status is obtained. If None, all steps are included."
+  },
+  {
+    "objectID": "reference/Validate.notify.html#returns",
+    "href": "reference/Validate.notify.html#returns",
+    "title": "Validate.notify",
+    "section": "",
+    "text": ": dict[int, bool]\n\nA dictionary of the notification status for each validation step."
+  },
+  {
+    "objectID": "reference/Validate.col_vals_lt.html",
+    "href": "reference/Validate.col_vals_lt.html",
+    "title": "Validate.col_vals_lt",
+    "section": "",
+    "text": "Validate.col_vals_lt(\n    columns,\n    value,\n    na_pass=False,\n    pre=None,\n    thresholds=None,\n    active=True,\n)\nValidate whether column values are less than a single value.\nThe col_vals_lt() validation method checks whether column values in a table are less than a specified value= (the exact comparison used in this function is col_val &lt; value). The value is specified as a single, literal value. This validation will operate over the number of test units that is equal to the number of rows in the table (determined after any pre= mutation has been applied).\n\n\n\ncolumns : str | list[str]\n\nA single column or a list of columns to validate. If multiple columns are supplied, there will be a separate validation step generated for each column.\n\nvalue : float | int\n\nThe value to compare against.\n\nna_pass : bool = False\n\nShould any encountered None, NA, or Null values be considered as passing test units? By default, this is False. Set to True to pass test units with missing values.\n\npre : Callable | None = None\n\nA pre-processing function or lambda to apply to the data table for the validation step.\n\nthresholds : int | float | tuple | dict | Thresholds = None\n\nFailure threshold levels so that the validation step can react accordingly when exceeding the set levels for different states (warn, stop, and notify). This can be created simply as an integer or float denoting the absolute number or fraction of failing test units for the ‘warn’ level. Otherwise, you can use a tuple of 1-3 values, a dictionary of 1-3 entries, or a Thresholds object.\n\nactive : bool = True\n\nA boolean value indicating whether the validation step should be active. Using False will make the validation step inactive (still reporting its presence and keeping indexes for the steps unchanged).\n\n\n\n\n\n\n : Validate\n\nThe Validate object with the added validation step."
+  },
+  {
+    "objectID": "reference/Validate.col_vals_lt.html#parameters",
+    "href": "reference/Validate.col_vals_lt.html#parameters",
+    "title": "Validate.col_vals_lt",
     "section": "",
     "text": "columns : str | list[str]\n\nA single column or a list of columns to validate. If multiple columns are supplied, there will be a separate validation step generated for each column.\n\nvalue : float | int\n\nThe value to compare against.\n\nna_pass : bool = False\n\nShould any encountered None, NA, or Null values be considered as passing test units? By default, this is False. Set to True to pass test units with missing values.\n\npre : Callable | None = None\n\nA pre-processing function or lambda to apply to the data table for the validation step.\n\nthresholds : int | float | tuple | dict | Thresholds = None\n\nFailure threshold levels so that the validation step can react accordingly when exceeding the set levels for different states (warn, stop, and notify). This can be created simply as an integer or float denoting the absolute number or fraction of failing test units for the ‘warn’ level. Otherwise, you can use a tuple of 1-3 values, a dictionary of 1-3 entries, or a Thresholds object.\n\nactive : bool = True\n\nA boolean value indicating whether the validation step should be active. Using False will make the validation step inactive (still reporting its presence and keeping indexes for the steps unchanged)."
   },
   {
-    "objectID": "reference/Validate.col_vals_eq.html#returns",
-    "href": "reference/Validate.col_vals_eq.html#returns",
-    "title": "Validate.col_vals_eq",
+    "objectID": "reference/Validate.col_vals_lt.html#returns",
+    "href": "reference/Validate.col_vals_lt.html#returns",
+    "title": "Validate.col_vals_lt",
     "section": "",
     "text": ": Validate\n\nThe Validate object with the added validation step."
   },
   {
-    "objectID": "reference/Validate.n.html",
-    "href": "reference/Validate.n.html",
-    "title": "Validate.n",
+    "objectID": "reference/Validate.all_passed.html",
+    "href": "reference/Validate.all_passed.html",
+    "title": "Validate.all_passed",
     "section": "",
-    "text": "Validate.n(i=None)\nProvides a dictionary of the number of test units for each validation step.\n\n\n\ni : int | list[int] | None = None\n\nThe validation step number(s) from which the number of test units is obtained. If None, all steps are included.\n\n\n\n\n\n\n : dict[int, int]\n\nA dictionary of the number of test units for each validation step."
+    "text": "Validate.all_passed()\nDetermine if every validation step passed perfectly, with no failing test units.\n\n\n\n : bool\n\nTrue if all validations passed, False otherwise."
   },
   {
-    "objectID": "reference/Validate.n.html#parameters",
-    "href": "reference/Validate.n.html#parameters",
-    "title": "Validate.n",
+    "objectID": "reference/Validate.all_passed.html#returns",
+    "href": "reference/Validate.all_passed.html#returns",
+    "title": "Validate.all_passed",
     "section": "",
-    "text": "i : int | list[int] | None = None\n\nThe validation step number(s) from which the number of test units is obtained. If None, all steps are included."
+    "text": ": bool\n\nTrue if all validations passed, False otherwise."
   },
   {
-    "objectID": "reference/Validate.n.html#returns",
-    "href": "reference/Validate.n.html#returns",
-    "title": "Validate.n",
+    "objectID": "reference/Validate.interrogate.html",
+    "href": "reference/Validate.interrogate.html",
+    "title": "Validate.interrogate",
     "section": "",
-    "text": ": dict[int, int]\n\nA dictionary of the number of test units for each validation step."
+    "text": "Validate.interrogate(\n    collect_extracts=True,\n    collect_tbl_checked=True,\n    get_first_n=None,\n    sample_n=None,\n    sample_frac=None,\n    sample_limit=5000,\n)\nEvaluate each validation against the table and store the results.\nWhen a validation plan has been set with a series of validation steps, the interrogation process through interrogate() should then be invoked. Interrogation will evaluate each validation step against the table and store the results. The interrogation process is non-destructive; the original table is not altered (but a copy is made for each validation).\nAfter that, the Validate object will have gathered information, and we can use methods like get_tabular_report(), all_passed() and many more to understand how the table performed against the validation plan.\n\n\n\ncollect_extracts : bool = True\n\nAn option to collect rows of the input table that didn’t pass a particular validation step. The default is True and further options (i.e., get_first_n=, sample_*=) allow for fine control of how these rows are collected.\n\ncollect_tbl_checked : bool = True\n\nThe processed data frames produced by executing the validation steps is collected and stored in the Validate object if collect_tbl_checked=True. This information is necessary for some methods (e.g., get_sundered_data()), but it potentially makes the object grow to a large size. To opt out of attaching this data, set this argument to False.\n\nget_first_n : int | None = None\n\nIf the option to collect rows where test units is chosen, there is the option here to collect the first n rows. Supply an integer number of rows to extract from the top of subset table containing non-passing rows (the ordering of data from the original table is retained).\n\nsample_n : int | None = None\n\nIf the option to collect non-passing rows is chosen, this option allows for the sampling of n rows. Supply an integer number of rows to sample from the subset table. If n happens to be greater than the number of non-passing rows, then all such rows will be returned.\n\nsample_frac : int | float | None = None\n\nIf the option to collect non-passing rows is chosen, this option allows for the sampling of a fraction of those rows. Provide a number in the range of 0 and 1. The number of rows to return could be very large, however, the sample_limit= option will apply a hard limit to the returned rows.\n\nsample_limit : int = 5000\n\nA value that limits the possible number of rows returned when sampling non-passing rows using the sample_frac= option.\n\n\n\n\n\n\n : Validate\n\nThe Validate object with the results of the interrogation."
   },
   {
-    "objectID": "reference/Validate.warn.html",
-    "href": "reference/Validate.warn.html",
-    "title": "Validate.warn",
+    "objectID": "reference/Validate.interrogate.html#parameters",
+    "href": "reference/Validate.interrogate.html#parameters",
+    "title": "Validate.interrogate",
     "section": "",
-    "text": "Validate.warn(i=None)\nProvides a dictionary of the warning status for each validation step.\n\n\n\ni : int | list[int] | None = None\n\nThe validation step number(s) from which the warning status is obtained. If None, all steps are included.\n\n\n\n\n\n\n : dict[int, bool]\n\nA dictionary of the warning status for each validation step."
+    "text": "collect_extracts : bool = True\n\nAn option to collect rows of the input table that didn’t pass a particular validation step. The default is True and further options (i.e., get_first_n=, sample_*=) allow for fine control of how these rows are collected.\n\ncollect_tbl_checked : bool = True\n\nThe processed data frames produced by executing the validation steps is collected and stored in the Validate object if collect_tbl_checked=True. This information is necessary for some methods (e.g., get_sundered_data()), but it potentially makes the object grow to a large size. To opt out of attaching this data, set this argument to False.\n\nget_first_n : int | None = None\n\nIf the option to collect rows where test units is chosen, there is the option here to collect the first n rows. Supply an integer number of rows to extract from the top of subset table containing non-passing rows (the ordering of data from the original table is retained).\n\nsample_n : int | None = None\n\nIf the option to collect non-passing rows is chosen, this option allows for the sampling of n rows. Supply an integer number of rows to sample from the subset table. If n happens to be greater than the number of non-passing rows, then all such rows will be returned.\n\nsample_frac : int | float | None = None\n\nIf the option to collect non-passing rows is chosen, this option allows for the sampling of a fraction of those rows. Provide a number in the range of 0 and 1. The number of rows to return could be very large, however, the sample_limit= option will apply a hard limit to the returned rows.\n\nsample_limit : int = 5000\n\nA value that limits the possible number of rows returned when sampling non-passing rows using the sample_frac= option."
   },
   {
-    "objectID": "reference/Validate.warn.html#parameters",
-    "href": "reference/Validate.warn.html#parameters",
-    "title": "Validate.warn",
+    "objectID": "reference/Validate.interrogate.html#returns",
+    "href": "reference/Validate.interrogate.html#returns",
+    "title": "Validate.interrogate",
     "section": "",
-    "text": "i : int | list[int] | None = None\n\nThe validation step number(s) from which the warning status is obtained. If None, all steps are included."
+    "text": ": Validate\n\nThe Validate object with the results of the interrogation."
   },
   {
-    "objectID": "reference/Validate.warn.html#returns",
-    "href": "reference/Validate.warn.html#returns",
-    "title": "Validate.warn",
+    "objectID": "reference/Validate.n_failed.html",
+    "href": "reference/Validate.n_failed.html",
+    "title": "Validate.n_failed",
     "section": "",
-    "text": ": dict[int, bool]\n\nA dictionary of the warning status for each validation step."
+    "text": "Validate.n_failed(i=None)\nProvides a dictionary of the number of test units that failed for each validation step.\n\n\n\ni : int | list[int] | None = None\n\nThe validation step number(s) from which the number of failing test units is obtained. If None, all steps are included.\n\n\n\n\n\n\n : dict[int, int]\n\nA dictionary of the number of failing test units for each validation step."
   },
   {
-    "objectID": "reference/Validate.col_vals_not_in_set.html",
-    "href": "reference/Validate.col_vals_not_in_set.html",
-    "title": "Validate.col_vals_not_in_set",
+    "objectID": "reference/Validate.n_failed.html#parameters",
+    "href": "reference/Validate.n_failed.html#parameters",
+    "title": "Validate.n_failed",
     "section": "",
-    "text": "Validate.col_vals_not_in_set(\n    columns,\n    set,\n    pre=None,\n    thresholds=None,\n    active=True,\n)\nValidate whether column values are not in a set of values.\nThe col_vals_not_in_set() validation method checks whether column values in a table are not part of a specified set= of values. This validation will operate over the number of test units that is equal to the number of rows in the table (determined after any pre= mutation has been applied).\n\n\n\ncolumns : str | list[str]\n\nA single column or a list of columns to validate. If multiple columns are supplied, there will be a separate validation step generated for each column.\n\nset : list[float | int]\n\nA list of values to compare against.\n\npre : Callable | None = None\n\nA pre-processing function or lambda to apply to the data table for the validation step.\n\nthresholds : int | float | tuple | dict | Thresholds = None\n\nFailure threshold levels so that the validation step can react accordingly when exceeding the set levels for different states (warn, stop, and notify). This can be created simply as an integer or float denoting the absolute number or fraction of failing test units for the ‘warn’ level. Otherwise, you can use a tuple of 1-3 values, a dictionary of 1-3 entries, or a Thresholds object.\n\nactive : bool = True\n\nA boolean value indicating whether the validation step should be active. Using False\n\n\n\n\n\n\n : Validate\n\nThe Validate object with the added validation step."
+    "text": "i : int | list[int] | None = None\n\nThe validation step number(s) from which the number of failing test units is obtained. If None, all steps are included."
   },
   {
-    "objectID": "reference/Validate.col_vals_not_in_set.html#parameters",
-    "href": "reference/Validate.col_vals_not_in_set.html#parameters",
-    "title": "Validate.col_vals_not_in_set",
+    "objectID": "reference/Validate.n_failed.html#returns",
+    "href": "reference/Validate.n_failed.html#returns",
+    "title": "Validate.n_failed",
     "section": "",
-    "text": "columns : str | list[str]\n\nA single column or a list of columns to validate. If multiple columns are supplied, there will be a separate validation step generated for each column.\n\nset : list[float | int]\n\nA list of values to compare against.\n\npre : Callable | None = None\n\nA pre-processing function or lambda to apply to the data table for the validation step.\n\nthresholds : int | float | tuple | dict | Thresholds = None\n\nFailure threshold levels so that the validation step can react accordingly when exceeding the set levels for different states (warn, stop, and notify). This can be created simply as an integer or float denoting the absolute number or fraction of failing test units for the ‘warn’ level. Otherwise, you can use a tuple of 1-3 values, a dictionary of 1-3 entries, or a Thresholds object.\n\nactive : bool = True\n\nA boolean value indicating whether the validation step should be active. Using False"
+    "text": ": dict[int, int]\n\nA dictionary of the number of failing test units for each validation step."
   },
   {
-    "objectID": "reference/Validate.col_vals_not_in_set.html#returns",
-    "href": "reference/Validate.col_vals_not_in_set.html#returns",
-    "title": "Validate.col_vals_not_in_set",
+    "objectID": "reference/Validate.col_vals_in_set.html",
+    "href": "reference/Validate.col_vals_in_set.html",
+    "title": "Validate.col_vals_in_set",
     "section": "",
-    "text": ": Validate\n\nThe Validate object with the added validation step."
+    "text": "Validate.col_vals_in_set(columns, set, pre=None, thresholds=None, active=True)\nValidate whether column values are in a set of values.\nThe col_vals_in_set() validation method checks whether column values in a table are part of a specified set= of values. This validation will operate over the number of test units that is equal to the number of rows in the table (determined after any pre= mutation has been applied).\n\n\n\ncolumns : str | list[str]\n\nA single column or a list of columns to validate. If multiple columns are supplied, there will be a separate validation step generated for each column.\n\nset : list[float | int]\n\nA list of values to compare against.\n\npre : Callable | None = None\n\nA pre-processing function or lambda to apply to the data table for the validation step.\n\nthresholds : int | float | tuple | dict | Thresholds = None\n\nFailure threshold levels so that the validation step can react accordingly when exceeding the set levels for different states (warn, stop, and notify). This can be created simply as an integer or float denoting the absolute number or fraction of failing test units for the ‘warn’ level. Otherwise, you can use a tuple of 1-3 values, a dictionary of 1-3 entries, or a Thresholds object.\n\nactive : bool = True\n\nA boolean value indicating whether the validation step should be active. Using False will make the validation step inactive (still reporting its presence and keeping indexes for the steps unchanged).\n\n\n\n\n\n\n : Validate\n\nThe Validate object with the added validation step."
   },
   {
-    "objectID": "reference/load_dataset.html",
-    "href": "reference/load_dataset.html",
-    "title": "load_dataset",
+    "objectID": "reference/Validate.col_vals_in_set.html#parameters",
+    "href": "reference/Validate.col_vals_in_set.html#parameters",
+    "title": "Validate.col_vals_in_set",
     "section": "",
-    "text": "load_dataset(dataset='small_table', tbl_type='polars')\nLoad a dataset hosted in the library as specified DataFrame type."
+    "text": "columns : str | list[str]\n\nA single column or a list of columns to validate. If multiple columns are supplied, there will be a separate validation step generated for each column.\n\nset : list[float | int]\n\nA list of values to compare against.\n\npre : Callable | None = None\n\nA pre-processing function or lambda to apply to the data table for the validation step.\n\nthresholds : int | float | tuple | dict | Thresholds = None\n\nFailure threshold levels so that the validation step can react accordingly when exceeding the set levels for different states (warn, stop, and notify). This can be created simply as an integer or float denoting the absolute number or fraction of failing test units for the ‘warn’ level. Otherwise, you can use a tuple of 1-3 values, a dictionary of 1-3 entries, or a Thresholds object.\n\nactive : bool = True\n\nA boolean value indicating whether the validation step should be active. Using False will make the validation step inactive (still reporting its presence and keeping indexes for the steps unchanged)."
   },
   {
-    "objectID": "reference/load_dataset.html#parameters",
-    "href": "reference/load_dataset.html#parameters",
-    "title": "load_dataset",
-    "section": "Parameters",
-    "text": "Parameters\n\ndataset : Literal['small_table', 'game_revenue'] = 'small_table'\n\nThe name of the dataset to load. Current options are \"small_table\" and \"game_revenue\".\n\ntbl_type : Literal['polars', 'pandas'] = 'polars'\n\nThe type of DataFrame to generate from the dataset. The named options are \"polars\" and \"pandas\"."
-  },
-  {
-    "objectID": "reference/load_dataset.html#returns",
-    "href": "reference/load_dataset.html#returns",
-    "title": "load_dataset",
-    "section": "Returns",
-    "text": "Returns\n\n : FrameT\n\nThe dataset for the Validate object."
-  },
-  {
-    "objectID": "reference/load_dataset.html#examples",
-    "href": "reference/load_dataset.html#examples",
-    "title": "load_dataset",
-    "section": "Examples",
-    "text": "Examples\nLoad the small_table dataset as a Polars DataFrame by calling load_dataset() with its defaults:\n\nimport pointblank as pb\n\nsmall_table = pb.load_dataset()\n\nsmall_table\n\n\nshape: (13, 8)date_timedateabcdefdatetime[μs]datei64stri64f64boolstr2016-01-04 11:00:002016-01-042\"1-bcd-345\"33423.29true\"high\"2016-01-04 00:32:002016-01-043\"5-egh-163\"89999.99true\"low\"2016-01-05 13:32:002016-01-056\"8-kdg-938\"32343.23true\"high\"2016-01-06 17:23:002016-01-062\"5-jdo-903\"null3892.4false\"mid\"2016-01-09 12:36:002016-01-098\"3-ldm-038\"7283.94true\"low\"……………………2016-01-20 04:30:002016-01-203\"5-bce-642\"9837.93false\"high\"2016-01-20 04:30:002016-01-203\"5-bce-642\"9837.93false\"high\"2016-01-26 20:07:002016-01-264\"2-dmx-010\"7833.98true\"low\"2016-01-28 02:51:002016-01-282\"7-dmx-010\"8108.34false\"low\"2016-01-30 11:23:002016-01-301\"3-dka-303\"null2230.09true\"high\"\n\n\nThe game_revenue dataset can be loaded as a Pandas DataFrame by specifying the dataset name and setting tbl_type=\"pandas\":\n\nimport pointblank as pb\n\ngame_revenue = pb.load_dataset(dataset=\"game_revenue\", tbl_type=\"pandas\")\n\ngame_revenue\n\n\n\n\n  \n    \n      \n      player_id\n      session_id\n      session_start\n      time\n      item_type\n      item_name\n      item_revenue\n      session_duration\n      start_day\n      acquisition\n      country\n    \n  \n  \n    \n      0\n      ECPANOIXLZHF896\n      ECPANOIXLZHF896-eol2j8bs\n      2015-01-01 01:31:03+00:00\n      2015-01-01 01:31:27+00:00\n      iap\n      offer2\n      8.991\n      16.3\n      2015-01-01\n      google\n      Germany\n    \n    \n      1\n      ECPANOIXLZHF896\n      ECPANOIXLZHF896-eol2j8bs\n      2015-01-01 01:31:03+00:00\n      2015-01-01 01:36:57+00:00\n      iap\n      gems3\n      22.491\n      16.3\n      2015-01-01\n      google\n      Germany\n    \n    \n      2\n      ECPANOIXLZHF896\n      ECPANOIXLZHF896-eol2j8bs\n      2015-01-01 01:31:03+00:00\n      2015-01-01 01:37:45+00:00\n      iap\n      gold7\n      107.991\n      16.3\n      2015-01-01\n      google\n      Germany\n    \n    \n      3\n      ECPANOIXLZHF896\n      ECPANOIXLZHF896-eol2j8bs\n      2015-01-01 01:31:03+00:00\n      2015-01-01 01:42:33+00:00\n      ad\n      ad_20sec\n      0.760\n      16.3\n      2015-01-01\n      google\n      Germany\n    \n    \n      4\n      ECPANOIXLZHF896\n      ECPANOIXLZHF896-hdu9jkls\n      2015-01-01 11:50:02+00:00\n      2015-01-01 11:55:20+00:00\n      ad\n      ad_5sec\n      0.030\n      35.2\n      2015-01-01\n      google\n      Germany\n    \n    \n      ...\n      ...\n      ...\n      ...\n      ...\n      ...\n      ...\n      ...\n      ...\n      ...\n      ...\n      ...\n    \n    \n      1995\n      NAOJRDMCSEBI281\n      NAOJRDMCSEBI281-j2vs9ilp\n      2015-01-21 01:57:50+00:00\n      2015-01-21 02:02:50+00:00\n      ad\n      ad_survey\n      1.332\n      25.8\n      2015-01-11\n      organic\n      Norway\n    \n    \n      1996\n      NAOJRDMCSEBI281\n      NAOJRDMCSEBI281-j2vs9ilp\n      2015-01-21 01:57:50+00:00\n      2015-01-21 02:22:14+00:00\n      ad\n      ad_survey\n      1.350\n      25.8\n      2015-01-11\n      organic\n      Norway\n    \n    \n      1997\n      RMOSWHJGELCI675\n      RMOSWHJGELCI675-vbhcsmtr\n      2015-01-21 02:39:48+00:00\n      2015-01-21 02:40:00+00:00\n      ad\n      ad_5sec\n      0.030\n      8.4\n      2015-01-10\n      other_campaign\n      France\n    \n    \n      1998\n      RMOSWHJGELCI675\n      RMOSWHJGELCI675-vbhcsmtr\n      2015-01-21 02:39:48+00:00\n      2015-01-21 02:47:12+00:00\n      iap\n      offer5\n      26.091\n      8.4\n      2015-01-10\n      other_campaign\n      France\n    \n    \n      1999\n      GJCXNTWEBIPQ369\n      GJCXNTWEBIPQ369-9elq67md\n      2015-01-21 03:59:23+00:00\n      2015-01-21 04:06:29+00:00\n      ad\n      ad_5sec\n      0.120\n      18.5\n      2015-01-14\n      organic\n      United States\n    \n  \n\n2000 rows × 11 columns"
-  },
-  {
-    "objectID": "reference/Validate.get_json_report.html",
-    "href": "reference/Validate.get_json_report.html",
-    "title": "Validate.get_json_report",
-    "section": "",
-    "text": "Validate.get_json_report(use_fields=None, exclude_fields=None)\nGet a report of the validation results as a JSON-formatted string.\n\n\n\nuse_fields : list[str] | None = None\n\nA list of fields to include in the report. If None, all fields are included.\n\nexclude_fields : list[str] | None = None\n\nA list of fields to exclude from the report. If None, no fields are excluded.\n\n\n\n\n\n\n : str\n\nA JSON-formatted string representing the validation report."
-  },
-  {
-    "objectID": "reference/Validate.get_json_report.html#parameters",
-    "href": "reference/Validate.get_json_report.html#parameters",
-    "title": "Validate.get_json_report",
-    "section": "",
-    "text": "use_fields : list[str] | None = None\n\nA list of fields to include in the report. If None, all fields are included.\n\nexclude_fields : list[str] | None = None\n\nA list of fields to exclude from the report. If None, no fields are excluded."
-  },
-  {
-    "objectID": "reference/Validate.get_json_report.html#returns",
-    "href": "reference/Validate.get_json_report.html#returns",
-    "title": "Validate.get_json_report",
-    "section": "",
-    "text": ": str\n\nA JSON-formatted string representing the validation report."
-  },
-  {
-    "objectID": "reference/Validate.col_vals_regex.html",
-    "href": "reference/Validate.col_vals_regex.html",
-    "title": "Validate.col_vals_regex",
-    "section": "",
-    "text": "Validate.col_vals_regex(\n    columns,\n    pattern,\n    na_pass=False,\n    pre=None,\n    thresholds=None,\n    active=True,\n)\nValidate whether column values match a regular expression pattern.\nThe col_vals_regex() validation method checks whether column values in a table correspond to a pattern= matching expression. This validation will operate over the number of test units that is equal to the number of rows in the table (determined after any pre= mutation has been applied).\n\n\n\ncolumns : str | list[str]\n\nA single column or a list of columns to validate. If multiple columns are supplied, there will be a separate validation step generated for each column.\n\npattern : str\n\nA regular expression pattern to compare against.\n\nna_pass : bool = False\n\nShould any encountered None, NA, or Null values be considered as passing test units? By default, this is False. Set to True to pass test units with missing values.\n\npre : Callable | None = None\n\nA pre-processing function or lambda to apply to the data table for the validation step.\n\nthresholds : int | float | tuple | dict | Thresholds = None\n\nFailure threshold levels so that the validation step can react accordingly when exceeding the set levels for different states (warn, stop, and notify). This can be created simply as an integer or float denoting the absolute number or fraction of failing test units for the ‘warn’ level. Otherwise, you can use a tuple of 1-3 values, a dictionary of 1-3 entries, or a Thresholds object.\n\nactive : bool = True\n\nA boolean value indicating whether the validation step should be active. Using False will make the validation step inactive (still reporting its presence and keeping indexes for the steps unchanged).\n\n\n\n\n\n\n : Validate\n\nThe Validate object with the added validation step."
-  },
-  {
-    "objectID": "reference/Validate.col_vals_regex.html#parameters",
-    "href": "reference/Validate.col_vals_regex.html#parameters",
-    "title": "Validate.col_vals_regex",
-    "section": "",
-    "text": "columns : str | list[str]\n\nA single column or a list of columns to validate. If multiple columns are supplied, there will be a separate validation step generated for each column.\n\npattern : str\n\nA regular expression pattern to compare against.\n\nna_pass : bool = False\n\nShould any encountered None, NA, or Null values be considered as passing test units? By default, this is False. Set to True to pass test units with missing values.\n\npre : Callable | None = None\n\nA pre-processing function or lambda to apply to the data table for the validation step.\n\nthresholds : int | float | tuple | dict | Thresholds = None\n\nFailure threshold levels so that the validation step can react accordingly when exceeding the set levels for different states (warn, stop, and notify). This can be created simply as an integer or float denoting the absolute number or fraction of failing test units for the ‘warn’ level. Otherwise, you can use a tuple of 1-3 values, a dictionary of 1-3 entries, or a Thresholds object.\n\nactive : bool = True\n\nA boolean value indicating whether the validation step should be active. Using False will make the validation step inactive (still reporting its presence and keeping indexes for the steps unchanged)."
-  },
-  {
-    "objectID": "reference/Validate.col_vals_regex.html#returns",
-    "href": "reference/Validate.col_vals_regex.html#returns",
-    "title": "Validate.col_vals_regex",
+    "objectID": "reference/Validate.col_vals_in_set.html#returns",
+    "href": "reference/Validate.col_vals_in_set.html#returns",
+    "title": "Validate.col_vals_in_set",
     "section": "",
     "text": ": Validate\n\nThe Validate object with the added validation step."
   },
   {
-    "objectID": "reference/Validate.f_passed.html",
-    "href": "reference/Validate.f_passed.html",
-    "title": "Validate.f_passed",
+    "objectID": "reference/Validate.f_failed.html",
+    "href": "reference/Validate.f_failed.html",
+    "title": "Validate.f_failed",
     "section": "",
-    "text": "Validate.f_passed(i=None)\nProvides a dictionary of the fraction of test units that passed for each validation step.\n\n\n\ni : int | list[int] | None = None\n\nThe validation step number(s) from which the fraction of passing test units is obtained. If None, all steps are included.\n\n\n\n\n\n\n : dict[int, float]\n\nA dictionary of the fraction of passing test units for each validation step."
+    "text": "Validate.f_failed(i=None)\nProvides a dictionary of the fraction of test units that failed for each validation step.\n\n\n\ni : int | list[int] | None = None\n\nThe validation step number(s) from which the fraction of failing test units is obtained. If None, all steps are included.\n\n\n\n\n\n\n : dict[int, float]\n\nA dictionary of the fraction of failing test units for each validation step."
   },
   {
-    "objectID": "reference/Validate.f_passed.html#parameters",
-    "href": "reference/Validate.f_passed.html#parameters",
-    "title": "Validate.f_passed",
+    "objectID": "reference/Validate.f_failed.html#parameters",
+    "href": "reference/Validate.f_failed.html#parameters",
+    "title": "Validate.f_failed",
     "section": "",
-    "text": "i : int | list[int] | None = None\n\nThe validation step number(s) from which the fraction of passing test units is obtained. If None, all steps are included."
+    "text": "i : int | list[int] | None = None\n\nThe validation step number(s) from which the fraction of failing test units is obtained. If None, all steps are included."
   },
   {
-    "objectID": "reference/Validate.f_passed.html#returns",
-    "href": "reference/Validate.f_passed.html#returns",
-    "title": "Validate.f_passed",
+    "objectID": "reference/Validate.f_failed.html#returns",
+    "href": "reference/Validate.f_failed.html#returns",
+    "title": "Validate.f_failed",
     "section": "",
-    "text": ": dict[int, float]\n\nA dictionary of the fraction of passing test units for each validation step."
+    "text": ": dict[int, float]\n\nA dictionary of the fraction of failing test units for each validation step."
   },
   {
-    "objectID": "reference/Validate.col_vals_gt.html",
-    "href": "reference/Validate.col_vals_gt.html",
-    "title": "Validate.col_vals_gt",
+    "objectID": "reference/Thresholds.html",
+    "href": "reference/Thresholds.html",
+    "title": "Thresholds",
     "section": "",
-    "text": "Validate.col_vals_gt(\n    columns,\n    value,\n    na_pass=False,\n    pre=None,\n    thresholds=None,\n    active=True,\n)\nValidate whether column values are greater than a single value.\nThe col_vals_gt() validation method checks whether column values in a table are greater than a specified value= (the exact comparison used in this function is col_val &gt; value). The value is specified as a single, literal value. This validation will operate over the number of test units that is equal to the number of rows in the table (determined after any pre= mutation has been applied).\n\n\n\ncolumns : str | list[str]\n\nA single column or a list of columns to validate. If multiple columns are supplied, there will be a separate validation step generated for each column.\n\nvalue : float | int\n\nThe value to compare against.\n\nna_pass : bool = False\n\nShould any encountered None, NA, or Null values be considered as passing test units? By default, this is False. Set to True to pass test units with missing values.\n\npre : Callable | None = None\n\nA pre-processing function or lambda to apply to the data table for the validation step.\n\nthresholds : int | float | tuple | dict | Thresholds = None\n\nFailure threshold levels so that the validation step can react accordingly when exceeding the set levels for different states (warn, stop, and notify). This can be created simply as an integer or float denoting the absolute number or fraction of failing test units for the ‘warn’ level. Otherwise, you can use a tuple of 1-3 values, a dictionary of 1-3 entries, or a Thresholds object.\n\nactive : bool = True\n\nA boolean value indicating whether the validation step should be active. Using False will make the validation step inactive (still reporting its presence and keeping indexes for the steps unchanged).\n\n\n\n\n\n\n : Validate\n\nThe Validate object with the added validation step."
+    "text": "Thresholds(\n    warn_at=None,\n    stop_at=None,\n    notify_at=None,\n    warn_fraction=field(default=None, init=False),\n    warn_count=field(default=None, init=False),\n    stop_fraction=field(default=None, init=False),\n    stop_count=field(default=None, init=False),\n    notify_fraction=field(default=None, init=False),\n    notify_count=field(default=None, init=False),\n)\nDefinition of threshold values.\n\n\n\nwarn_at : int | float | None = None\n\nThe threshold for the ‘warn’ level. This can be an absolute count or a fraction of the total.\n\nstop_at : int | float | None = None\n\nThe threshold for the ‘stop’ level. This can be an absolute count or a fraction of the total.\n\nnotify_at : int | float | None = None\n\nThe threshold for the ‘notify’ level. This can be an absolute count or a fraction of the total.\n\n\n\n\n\n\n : Thresholds\n\nA Thresholds object. This can be used when using the Validate class (to set thresholds globally) or when defining validation steps through Validate’s methods (so that threshold values are scoped to individual validation steps, overriding any global thresholds)."
   },
   {
-    "objectID": "reference/Validate.col_vals_gt.html#parameters",
-    "href": "reference/Validate.col_vals_gt.html#parameters",
-    "title": "Validate.col_vals_gt",
+    "objectID": "reference/Thresholds.html#parameters",
+    "href": "reference/Thresholds.html#parameters",
+    "title": "Thresholds",
     "section": "",
-    "text": "columns : str | list[str]\n\nA single column or a list of columns to validate. If multiple columns are supplied, there will be a separate validation step generated for each column.\n\nvalue : float | int\n\nThe value to compare against.\n\nna_pass : bool = False\n\nShould any encountered None, NA, or Null values be considered as passing test units? By default, this is False. Set to True to pass test units with missing values.\n\npre : Callable | None = None\n\nA pre-processing function or lambda to apply to the data table for the validation step.\n\nthresholds : int | float | tuple | dict | Thresholds = None\n\nFailure threshold levels so that the validation step can react accordingly when exceeding the set levels for different states (warn, stop, and notify). This can be created simply as an integer or float denoting the absolute number or fraction of failing test units for the ‘warn’ level. Otherwise, you can use a tuple of 1-3 values, a dictionary of 1-3 entries, or a Thresholds object.\n\nactive : bool = True\n\nA boolean value indicating whether the validation step should be active. Using False will make the validation step inactive (still reporting its presence and keeping indexes for the steps unchanged)."
+    "text": "warn_at : int | float | None = None\n\nThe threshold for the ‘warn’ level. This can be an absolute count or a fraction of the total.\n\nstop_at : int | float | None = None\n\nThe threshold for the ‘stop’ level. This can be an absolute count or a fraction of the total.\n\nnotify_at : int | float | None = None\n\nThe threshold for the ‘notify’ level. This can be an absolute count or a fraction of the total."
   },
   {
-    "objectID": "reference/Validate.col_vals_gt.html#returns",
-    "href": "reference/Validate.col_vals_gt.html#returns",
-    "title": "Validate.col_vals_gt",
+    "objectID": "reference/Thresholds.html#returns",
+    "href": "reference/Thresholds.html#returns",
+    "title": "Thresholds",
     "section": "",
-    "text": ": Validate\n\nThe Validate object with the added validation step."
+    "text": ": Thresholds\n\nA Thresholds object. This can be used when using the Validate class (to set thresholds globally) or when defining validation steps through Validate’s methods (so that threshold values are scoped to individual validation steps, overriding any global thresholds)."
   },
   {
     "objectID": "articles/intro.html",
@@ -368,7 +403,7 @@
     "href": "articles/intro.html#getting-started",
     "title": "pointblank",
     "section": "Getting Started",
-    "text": "Getting Started\nLet’s take a Polars DataFrame and validate it against a set of constraints. We do that using the pb.Validate class and its collection of validation methods:\nimport pointblank as pb\n\nv = (\n    pb.Validate(data=pb.load_dataset(dataset=\"small_table\")) # Use pb.Validate to start\n    .col_vals_gt(columns=\"d\", value=100)       # STEP 1 |\n    .col_vals_le(columns=\"c\", value=5)         # STEP 2 | &lt;-- Building a validation plan\n    .col_exists(columns=[\"date\", \"date_time\"]) # STEP 3 |\n    .interrogate() # This will execute all validation steps and collect intel\n)\n\nv.get_tabular_report()\n\n\n\nThe rows in the reporting table correspond to each of the validation steps. Some fields to the far right are empty but they are concerned with failure details that aren’t opted into in this simple example. One of the key concept is that validation steps can be broken down into atomic test cases (test units) and each of these test units is given either of pass/fail status based on the validation constraints. You’ll see these tallied up in the reporting table (in the \"UNITS\", \"PASS\", and \"FAIL\" columns).\nThe reporting through a display table is just one way to see the results. You can get fine-grained results of the interrogation as well as JSON output. You can also utilize the validation results by filtering the input table based on row-level pass/fail status (via the get_sundered_data() method).\nOn the input side, we can use the following table sources:\n\nPolars DataFrame\nPandas DataFrame\nDuckDB table\nMySQL table\nPostgreSQL table\nSQLite table\nParquet\n\nWe use Narwhals to internally handle Polars and Pandas DataFrames. We integrate with Ibis to enable the use of DuckDB, MySQL, PostgreSQL, SQLite, and Parquet. In doing all of this, we can provide an ergonomic and consistent API for validating tabular data from disparate sources."
+    "text": "Getting Started\nLet’s take a Polars DataFrame and validate it against a set of constraints. We do that using the pb.Validate class and its collection of validation methods:\nimport pointblank as pb\n\nvalidation = (\n    pb.Validate(data=pb.load_dataset(dataset=\"small_table\")) # Use pb.Validate to start\n    .col_vals_gt(columns=\"d\", value=100)       # STEP 1 |\n    .col_vals_le(columns=\"c\", value=5)         # STEP 2 | &lt;-- Building a validation plan\n    .col_exists(columns=[\"date\", \"date_time\"]) # STEP 3 |\n    .interrogate() # This will execute all validation steps and collect intel\n)\n\nvalidation\n\n\n\nThe rows in the reporting table correspond to each of the validation steps. Some fields to the far right are empty but they are concerned with failure details that aren’t opted into in this simple example. One of the key concept is that validation steps can be broken down into atomic test cases (test units) and each of these test units is given either of pass/fail status based on the validation constraints. You’ll see these tallied up in the reporting table (in the \"UNITS\", \"PASS\", and \"FAIL\" columns).\nThe reporting through a display table is just one way to see the results. You can get fine-grained results of the interrogation as well as JSON output. You can also utilize the validation results by filtering the input table based on row-level pass/fail status (via the get_sundered_data() method).\nOn the input side, we can use the following table sources:\n\nPolars DataFrame\nPandas DataFrame\nDuckDB table\nMySQL table\nPostgreSQL table\nSQLite table\nParquet\n\nWe use Narwhals to internally handle Polars and Pandas DataFrames. We integrate with Ibis to enable the use of DuckDB, MySQL, PostgreSQL, SQLite, and Parquet. In doing all of this, we can provide an ergonomic and consistent API for validating tabular data from disparate sources."
   },
   {
     "objectID": "articles/intro.html#features",
@@ -413,214 +448,242 @@
     "text": "🏛️ Governance\nThis project is primarily maintained by Rich Iannone. Other authors may occasionally assist with some of these duties."
   },
   {
-    "objectID": "reference/Validate.f_failed.html",
-    "href": "reference/Validate.f_failed.html",
-    "title": "Validate.f_failed",
+    "objectID": "reference/Validate.col_vals_gt.html",
+    "href": "reference/Validate.col_vals_gt.html",
+    "title": "Validate.col_vals_gt",
     "section": "",
-    "text": "Validate.f_failed(i=None)\nProvides a dictionary of the fraction of test units that failed for each validation step.\n\n\n\ni : int | list[int] | None = None\n\nThe validation step number(s) from which the fraction of failing test units is obtained. If None, all steps are included.\n\n\n\n\n\n\n : dict[int, float]\n\nA dictionary of the fraction of failing test units for each validation step."
+    "text": "Validate.col_vals_gt(\n    columns,\n    value,\n    na_pass=False,\n    pre=None,\n    thresholds=None,\n    active=True,\n)\nValidate whether column values are greater than a single value.\nThe col_vals_gt() validation method checks whether column values in a table are greater than a specified value= (the exact comparison used in this function is col_val &gt; value). The value is specified as a single, literal value. This validation will operate over the number of test units that is equal to the number of rows in the table (determined after any pre= mutation has been applied).\n\n\n\ncolumns : str | list[str]\n\nA single column or a list of columns to validate. If multiple columns are supplied, there will be a separate validation step generated for each column.\n\nvalue : float | int\n\nThe value to compare against.\n\nna_pass : bool = False\n\nShould any encountered None, NA, or Null values be considered as passing test units? By default, this is False. Set to True to pass test units with missing values.\n\npre : Callable | None = None\n\nA pre-processing function or lambda to apply to the data table for the validation step.\n\nthresholds : int | float | tuple | dict | Thresholds = None\n\nFailure threshold levels so that the validation step can react accordingly when exceeding the set levels for different states (warn, stop, and notify). This can be created simply as an integer or float denoting the absolute number or fraction of failing test units for the ‘warn’ level. Otherwise, you can use a tuple of 1-3 values, a dictionary of 1-3 entries, or a Thresholds object.\n\nactive : bool = True\n\nA boolean value indicating whether the validation step should be active. Using False will make the validation step inactive (still reporting its presence and keeping indexes for the steps unchanged).\n\n\n\n\n\n\n : Validate\n\nThe Validate object with the added validation step."
   },
   {
-    "objectID": "reference/Validate.f_failed.html#parameters",
-    "href": "reference/Validate.f_failed.html#parameters",
-    "title": "Validate.f_failed",
-    "section": "",
-    "text": "i : int | list[int] | None = None\n\nThe validation step number(s) from which the fraction of failing test units is obtained. If None, all steps are included."
-  },
-  {
-    "objectID": "reference/Validate.f_failed.html#returns",
-    "href": "reference/Validate.f_failed.html#returns",
-    "title": "Validate.f_failed",
-    "section": "",
-    "text": ": dict[int, float]\n\nA dictionary of the fraction of failing test units for each validation step."
-  },
-  {
-    "objectID": "reference/Validate.col_vals_in_set.html",
-    "href": "reference/Validate.col_vals_in_set.html",
-    "title": "Validate.col_vals_in_set",
-    "section": "",
-    "text": "Validate.col_vals_in_set(columns, set, pre=None, thresholds=None, active=True)\nValidate whether column values are in a set of values.\nThe col_vals_in_set() validation method checks whether column values in a table are part of a specified set= of values. This validation will operate over the number of test units that is equal to the number of rows in the table (determined after any pre= mutation has been applied).\n\n\n\ncolumns : str | list[str]\n\nA single column or a list of columns to validate. If multiple columns are supplied, there will be a separate validation step generated for each column.\n\nset : list[float | int]\n\nA list of values to compare against.\n\npre : Callable | None = None\n\nA pre-processing function or lambda to apply to the data table for the validation step.\n\nthresholds : int | float | tuple | dict | Thresholds = None\n\nFailure threshold levels so that the validation step can react accordingly when exceeding the set levels for different states (warn, stop, and notify). This can be created simply as an integer or float denoting the absolute number or fraction of failing test units for the ‘warn’ level. Otherwise, you can use a tuple of 1-3 values, a dictionary of 1-3 entries, or a Thresholds object.\n\nactive : bool = True\n\nA boolean value indicating whether the validation step should be active. Using False will make the validation step inactive (still reporting its presence and keeping indexes for the steps unchanged).\n\n\n\n\n\n\n : Validate\n\nThe Validate object with the added validation step."
-  },
-  {
-    "objectID": "reference/Validate.col_vals_in_set.html#parameters",
-    "href": "reference/Validate.col_vals_in_set.html#parameters",
-    "title": "Validate.col_vals_in_set",
-    "section": "",
-    "text": "columns : str | list[str]\n\nA single column or a list of columns to validate. If multiple columns are supplied, there will be a separate validation step generated for each column.\n\nset : list[float | int]\n\nA list of values to compare against.\n\npre : Callable | None = None\n\nA pre-processing function or lambda to apply to the data table for the validation step.\n\nthresholds : int | float | tuple | dict | Thresholds = None\n\nFailure threshold levels so that the validation step can react accordingly when exceeding the set levels for different states (warn, stop, and notify). This can be created simply as an integer or float denoting the absolute number or fraction of failing test units for the ‘warn’ level. Otherwise, you can use a tuple of 1-3 values, a dictionary of 1-3 entries, or a Thresholds object.\n\nactive : bool = True\n\nA boolean value indicating whether the validation step should be active. Using False will make the validation step inactive (still reporting its presence and keeping indexes for the steps unchanged)."
-  },
-  {
-    "objectID": "reference/Validate.col_vals_in_set.html#returns",
-    "href": "reference/Validate.col_vals_in_set.html#returns",
-    "title": "Validate.col_vals_in_set",
-    "section": "",
-    "text": ": Validate\n\nThe Validate object with the added validation step."
-  },
-  {
-    "objectID": "reference/Validate.n_failed.html",
-    "href": "reference/Validate.n_failed.html",
-    "title": "Validate.n_failed",
-    "section": "",
-    "text": "Validate.n_failed(i=None)\nProvides a dictionary of the number of test units that failed for each validation step.\n\n\n\ni : int | list[int] | None = None\n\nThe validation step number(s) from which the number of failing test units is obtained. If None, all steps are included.\n\n\n\n\n\n\n : dict[int, int]\n\nA dictionary of the number of failing test units for each validation step."
-  },
-  {
-    "objectID": "reference/Validate.n_failed.html#parameters",
-    "href": "reference/Validate.n_failed.html#parameters",
-    "title": "Validate.n_failed",
-    "section": "",
-    "text": "i : int | list[int] | None = None\n\nThe validation step number(s) from which the number of failing test units is obtained. If None, all steps are included."
-  },
-  {
-    "objectID": "reference/Validate.n_failed.html#returns",
-    "href": "reference/Validate.n_failed.html#returns",
-    "title": "Validate.n_failed",
-    "section": "",
-    "text": ": dict[int, int]\n\nA dictionary of the number of failing test units for each validation step."
-  },
-  {
-    "objectID": "reference/Validate.interrogate.html",
-    "href": "reference/Validate.interrogate.html",
-    "title": "Validate.interrogate",
-    "section": "",
-    "text": "Validate.interrogate(\n    collect_extracts=True,\n    collect_tbl_checked=True,\n    get_first_n=None,\n    sample_n=None,\n    sample_frac=None,\n    sample_limit=5000,\n)\nEvaluate each validation against the table and store the results.\nWhen a validation plan has been set with a series of validation steps, the interrogation process through interrogate() should then be invoked. Interrogation will evaluate each validation step against the table and store the results. The interrogation process is non-destructive; the original table is not altered (but a copy is made for each validation).\nAfter that, the Validate object will have gathered information, and we can use methods like get_tabular_report(), all_passed() and many more to understand how the table performed against the validation plan.\n\n\n\ncollect_extracts : bool = True\n\nAn option to collect rows of the input table that didn’t pass a particular validation step. The default is True and further options (i.e., get_first_n=, sample_*=) allow for fine control of how these rows are collected.\n\ncollect_tbl_checked : bool = True\n\nThe processed data frames produced by executing the validation steps is collected and stored in the Validate object if collect_tbl_checked=True. This information is necessary for some methods (e.g., get_sundered_data()), but it potentially makes the object grow to a large size. To opt out of attaching this data, set this argument to False.\n\nget_first_n : int | None = None\n\nIf the option to collect rows where test units is chosen, there is the option here to collect the first n rows. Supply an integer number of rows to extract from the top of subset table containing non-passing rows (the ordering of data from the original table is retained).\n\nsample_n : int | None = None\n\nIf the option to collect non-passing rows is chosen, this option allows for the sampling of n rows. Supply an integer number of rows to sample from the subset table. If n happens to be greater than the number of non-passing rows, then all such rows will be returned.\n\nsample_frac : int | float | None = None\n\nIf the option to collect non-passing rows is chosen, this option allows for the sampling of a fraction of those rows. Provide a number in the range of 0 and 1. The number of rows to return could be very large, however, the sample_limit= option will apply a hard limit to the returned rows.\n\nsample_limit : int = 5000\n\nA value that limits the possible number of rows returned when sampling non-passing rows using the sample_frac= option.\n\n\n\n\n\n\n : Validate\n\nThe Validate object with the results of the interrogation."
-  },
-  {
-    "objectID": "reference/Validate.interrogate.html#parameters",
-    "href": "reference/Validate.interrogate.html#parameters",
-    "title": "Validate.interrogate",
-    "section": "",
-    "text": "collect_extracts : bool = True\n\nAn option to collect rows of the input table that didn’t pass a particular validation step. The default is True and further options (i.e., get_first_n=, sample_*=) allow for fine control of how these rows are collected.\n\ncollect_tbl_checked : bool = True\n\nThe processed data frames produced by executing the validation steps is collected and stored in the Validate object if collect_tbl_checked=True. This information is necessary for some methods (e.g., get_sundered_data()), but it potentially makes the object grow to a large size. To opt out of attaching this data, set this argument to False.\n\nget_first_n : int | None = None\n\nIf the option to collect rows where test units is chosen, there is the option here to collect the first n rows. Supply an integer number of rows to extract from the top of subset table containing non-passing rows (the ordering of data from the original table is retained).\n\nsample_n : int | None = None\n\nIf the option to collect non-passing rows is chosen, this option allows for the sampling of n rows. Supply an integer number of rows to sample from the subset table. If n happens to be greater than the number of non-passing rows, then all such rows will be returned.\n\nsample_frac : int | float | None = None\n\nIf the option to collect non-passing rows is chosen, this option allows for the sampling of a fraction of those rows. Provide a number in the range of 0 and 1. The number of rows to return could be very large, however, the sample_limit= option will apply a hard limit to the returned rows.\n\nsample_limit : int = 5000\n\nA value that limits the possible number of rows returned when sampling non-passing rows using the sample_frac= option."
-  },
-  {
-    "objectID": "reference/Validate.interrogate.html#returns",
-    "href": "reference/Validate.interrogate.html#returns",
-    "title": "Validate.interrogate",
-    "section": "",
-    "text": ": Validate\n\nThe Validate object with the results of the interrogation."
-  },
-  {
-    "objectID": "reference/Validate.all_passed.html",
-    "href": "reference/Validate.all_passed.html",
-    "title": "Validate.all_passed",
-    "section": "",
-    "text": "Validate.all_passed()\nDetermine if every validation step passed perfectly, with no failing test units.\n\n\n\n : bool\n\nTrue if all validations passed, False otherwise."
-  },
-  {
-    "objectID": "reference/Validate.all_passed.html#returns",
-    "href": "reference/Validate.all_passed.html#returns",
-    "title": "Validate.all_passed",
-    "section": "",
-    "text": ": bool\n\nTrue if all validations passed, False otherwise."
-  },
-  {
-    "objectID": "reference/Validate.col_vals_lt.html",
-    "href": "reference/Validate.col_vals_lt.html",
-    "title": "Validate.col_vals_lt",
-    "section": "",
-    "text": "Validate.col_vals_lt(\n    columns,\n    value,\n    na_pass=False,\n    pre=None,\n    thresholds=None,\n    active=True,\n)\nValidate whether column values are less than a single value.\nThe col_vals_lt() validation method checks whether column values in a table are less than a specified value= (the exact comparison used in this function is col_val &lt; value). The value is specified as a single, literal value. This validation will operate over the number of test units that is equal to the number of rows in the table (determined after any pre= mutation has been applied).\n\n\n\ncolumns : str | list[str]\n\nA single column or a list of columns to validate. If multiple columns are supplied, there will be a separate validation step generated for each column.\n\nvalue : float | int\n\nThe value to compare against.\n\nna_pass : bool = False\n\nShould any encountered None, NA, or Null values be considered as passing test units? By default, this is False. Set to True to pass test units with missing values.\n\npre : Callable | None = None\n\nA pre-processing function or lambda to apply to the data table for the validation step.\n\nthresholds : int | float | tuple | dict | Thresholds = None\n\nFailure threshold levels so that the validation step can react accordingly when exceeding the set levels for different states (warn, stop, and notify). This can be created simply as an integer or float denoting the absolute number or fraction of failing test units for the ‘warn’ level. Otherwise, you can use a tuple of 1-3 values, a dictionary of 1-3 entries, or a Thresholds object.\n\nactive : bool = True\n\nA boolean value indicating whether the validation step should be active. Using False will make the validation step inactive (still reporting its presence and keeping indexes for the steps unchanged).\n\n\n\n\n\n\n : Validate\n\nThe Validate object with the added validation step."
-  },
-  {
-    "objectID": "reference/Validate.col_vals_lt.html#parameters",
-    "href": "reference/Validate.col_vals_lt.html#parameters",
-    "title": "Validate.col_vals_lt",
+    "objectID": "reference/Validate.col_vals_gt.html#parameters",
+    "href": "reference/Validate.col_vals_gt.html#parameters",
+    "title": "Validate.col_vals_gt",
     "section": "",
     "text": "columns : str | list[str]\n\nA single column or a list of columns to validate. If multiple columns are supplied, there will be a separate validation step generated for each column.\n\nvalue : float | int\n\nThe value to compare against.\n\nna_pass : bool = False\n\nShould any encountered None, NA, or Null values be considered as passing test units? By default, this is False. Set to True to pass test units with missing values.\n\npre : Callable | None = None\n\nA pre-processing function or lambda to apply to the data table for the validation step.\n\nthresholds : int | float | tuple | dict | Thresholds = None\n\nFailure threshold levels so that the validation step can react accordingly when exceeding the set levels for different states (warn, stop, and notify). This can be created simply as an integer or float denoting the absolute number or fraction of failing test units for the ‘warn’ level. Otherwise, you can use a tuple of 1-3 values, a dictionary of 1-3 entries, or a Thresholds object.\n\nactive : bool = True\n\nA boolean value indicating whether the validation step should be active. Using False will make the validation step inactive (still reporting its presence and keeping indexes for the steps unchanged)."
   },
   {
-    "objectID": "reference/Validate.col_vals_lt.html#returns",
-    "href": "reference/Validate.col_vals_lt.html#returns",
-    "title": "Validate.col_vals_lt",
+    "objectID": "reference/Validate.col_vals_gt.html#returns",
+    "href": "reference/Validate.col_vals_gt.html#returns",
+    "title": "Validate.col_vals_gt",
     "section": "",
     "text": ": Validate\n\nThe Validate object with the added validation step."
   },
   {
-    "objectID": "reference/Validate.notify.html",
-    "href": "reference/Validate.notify.html",
-    "title": "Validate.notify",
+    "objectID": "reference/Validate.f_passed.html",
+    "href": "reference/Validate.f_passed.html",
+    "title": "Validate.f_passed",
     "section": "",
-    "text": "Validate.notify(i=None)\nProvides a dictionary of the notification status for each validation step.\n\n\n\ni : int | list[int] | None = None\n\nThe validation step number(s) from which the notification status is obtained. If None, all steps are included.\n\n\n\n\n\n\n : dict[int, bool]\n\nA dictionary of the notification status for each validation step."
+    "text": "Validate.f_passed(i=None)\nProvides a dictionary of the fraction of test units that passed for each validation step.\n\n\n\ni : int | list[int] | None = None\n\nThe validation step number(s) from which the fraction of passing test units is obtained. If None, all steps are included.\n\n\n\n\n\n\n : dict[int, float]\n\nA dictionary of the fraction of passing test units for each validation step."
   },
   {
-    "objectID": "reference/Validate.notify.html#parameters",
-    "href": "reference/Validate.notify.html#parameters",
-    "title": "Validate.notify",
+    "objectID": "reference/Validate.f_passed.html#parameters",
+    "href": "reference/Validate.f_passed.html#parameters",
+    "title": "Validate.f_passed",
     "section": "",
-    "text": "i : int | list[int] | None = None\n\nThe validation step number(s) from which the notification status is obtained. If None, all steps are included."
+    "text": "i : int | list[int] | None = None\n\nThe validation step number(s) from which the fraction of passing test units is obtained. If None, all steps are included."
   },
   {
-    "objectID": "reference/Validate.notify.html#returns",
-    "href": "reference/Validate.notify.html#returns",
-    "title": "Validate.notify",
+    "objectID": "reference/Validate.f_passed.html#returns",
+    "href": "reference/Validate.f_passed.html#returns",
+    "title": "Validate.f_passed",
     "section": "",
-    "text": ": dict[int, bool]\n\nA dictionary of the notification status for each validation step."
+    "text": ": dict[int, float]\n\nA dictionary of the fraction of passing test units for each validation step."
   },
   {
-    "objectID": "reference/Validate.col_vals_outside.html",
-    "href": "reference/Validate.col_vals_outside.html",
-    "title": "Validate.col_vals_outside",
+    "objectID": "reference/Validate.col_vals_regex.html",
+    "href": "reference/Validate.col_vals_regex.html",
+    "title": "Validate.col_vals_regex",
     "section": "",
-    "text": "Validate.col_vals_outside(\n    columns,\n    left,\n    right,\n    inclusive=(True, True),\n    na_pass=False,\n    pre=None,\n    thresholds=None,\n    active=True,\n)\nValidate whether column values are outside of two values.\nThe col_vals_between() validation method checks whether column values in a table do not fall within a certain range. The range is specified with three arguments: left=, right=, and inclusive=. The left= and right= values specify the lower and upper bounds. The bounds are is specified as single, literal values. This validation will operate over the number of test units that is equal to the number of rows in the table (determined after any pre= mutation has been applied).\n\n\n\ncolumns : str | list[str]\n\nA single column or a list of columns to validate. If multiple columns are supplied, there will be a separate validation step generated for each column.\n\nleft : float | int\n\nThe lower bound of the range.\n\nright : float | int\n\nThe upper bound of the range.\n\ninclusive : tuple[bool, bool] = (True, True)\n\nA tuple of two boolean values indicating whether the comparison should be inclusive. The position of the boolean values correspond to the left= and right= values, respectively. By default, both values are True.\n\nna_pass : bool = False\n\nShould any encountered None, NA, or Null values be considered as passing test units? By default, this is False. Set to True to pass test units with missing values.\n\npre : Callable | None = None\n\nA pre-processing function or lambda to apply to the data table for the validation step.\n\nthresholds : int | float | tuple | dict | Thresholds = None\n\nFailure threshold levels so that the validation step can react accordingly when exceeding the set levels for different states (warn, stop, and notify). This can be created simply as an integer or float denoting the absolute number or fraction of failing test units for the ‘warn’ level. Otherwise, you can use a tuple of 1-3 values, a dictionary of 1-3 entries, or a Thresholds object.\n\nactive : bool = True\n\nA boolean value indicating whether the validation step should be active. Using False will make the validation step inactive (still reporting its presence and keeping indexes for the steps unchanged).\n\n\n\n\n\n\n : Validate\n\nThe Validate object with the added validation step."
+    "text": "Validate.col_vals_regex(\n    columns,\n    pattern,\n    na_pass=False,\n    pre=None,\n    thresholds=None,\n    active=True,\n)\nValidate whether column values match a regular expression pattern.\nThe col_vals_regex() validation method checks whether column values in a table correspond to a pattern= matching expression. This validation will operate over the number of test units that is equal to the number of rows in the table (determined after any pre= mutation has been applied).\n\n\n\ncolumns : str | list[str]\n\nA single column or a list of columns to validate. If multiple columns are supplied, there will be a separate validation step generated for each column.\n\npattern : str\n\nA regular expression pattern to compare against.\n\nna_pass : bool = False\n\nShould any encountered None, NA, or Null values be considered as passing test units? By default, this is False. Set to True to pass test units with missing values.\n\npre : Callable | None = None\n\nA pre-processing function or lambda to apply to the data table for the validation step.\n\nthresholds : int | float | tuple | dict | Thresholds = None\n\nFailure threshold levels so that the validation step can react accordingly when exceeding the set levels for different states (warn, stop, and notify). This can be created simply as an integer or float denoting the absolute number or fraction of failing test units for the ‘warn’ level. Otherwise, you can use a tuple of 1-3 values, a dictionary of 1-3 entries, or a Thresholds object.\n\nactive : bool = True\n\nA boolean value indicating whether the validation step should be active. Using False will make the validation step inactive (still reporting its presence and keeping indexes for the steps unchanged).\n\n\n\n\n\n\n : Validate\n\nThe Validate object with the added validation step."
   },
   {
-    "objectID": "reference/Validate.col_vals_outside.html#parameters",
-    "href": "reference/Validate.col_vals_outside.html#parameters",
-    "title": "Validate.col_vals_outside",
+    "objectID": "reference/Validate.col_vals_regex.html#parameters",
+    "href": "reference/Validate.col_vals_regex.html#parameters",
+    "title": "Validate.col_vals_regex",
+    "section": "",
+    "text": "columns : str | list[str]\n\nA single column or a list of columns to validate. If multiple columns are supplied, there will be a separate validation step generated for each column.\n\npattern : str\n\nA regular expression pattern to compare against.\n\nna_pass : bool = False\n\nShould any encountered None, NA, or Null values be considered as passing test units? By default, this is False. Set to True to pass test units with missing values.\n\npre : Callable | None = None\n\nA pre-processing function or lambda to apply to the data table for the validation step.\n\nthresholds : int | float | tuple | dict | Thresholds = None\n\nFailure threshold levels so that the validation step can react accordingly when exceeding the set levels for different states (warn, stop, and notify). This can be created simply as an integer or float denoting the absolute number or fraction of failing test units for the ‘warn’ level. Otherwise, you can use a tuple of 1-3 values, a dictionary of 1-3 entries, or a Thresholds object.\n\nactive : bool = True\n\nA boolean value indicating whether the validation step should be active. Using False will make the validation step inactive (still reporting its presence and keeping indexes for the steps unchanged)."
+  },
+  {
+    "objectID": "reference/Validate.col_vals_regex.html#returns",
+    "href": "reference/Validate.col_vals_regex.html#returns",
+    "title": "Validate.col_vals_regex",
+    "section": "",
+    "text": ": Validate\n\nThe Validate object with the added validation step."
+  },
+  {
+    "objectID": "reference/Validate.get_json_report.html",
+    "href": "reference/Validate.get_json_report.html",
+    "title": "Validate.get_json_report",
+    "section": "",
+    "text": "Validate.get_json_report(use_fields=None, exclude_fields=None)\nGet a report of the validation results as a JSON-formatted string.\n\n\n\nuse_fields : list[str] | None = None\n\nA list of fields to include in the report. If None, all fields are included.\n\nexclude_fields : list[str] | None = None\n\nA list of fields to exclude from the report. If None, no fields are excluded.\n\n\n\n\n\n\n : str\n\nA JSON-formatted string representing the validation report."
+  },
+  {
+    "objectID": "reference/Validate.get_json_report.html#parameters",
+    "href": "reference/Validate.get_json_report.html#parameters",
+    "title": "Validate.get_json_report",
+    "section": "",
+    "text": "use_fields : list[str] | None = None\n\nA list of fields to include in the report. If None, all fields are included.\n\nexclude_fields : list[str] | None = None\n\nA list of fields to exclude from the report. If None, no fields are excluded."
+  },
+  {
+    "objectID": "reference/Validate.get_json_report.html#returns",
+    "href": "reference/Validate.get_json_report.html#returns",
+    "title": "Validate.get_json_report",
+    "section": "",
+    "text": ": str\n\nA JSON-formatted string representing the validation report."
+  },
+  {
+    "objectID": "reference/load_dataset.html",
+    "href": "reference/load_dataset.html",
+    "title": "load_dataset",
+    "section": "",
+    "text": "load_dataset(dataset='small_table', tbl_type='polars')\nLoad a dataset hosted in the library as specified DataFrame type."
+  },
+  {
+    "objectID": "reference/load_dataset.html#parameters",
+    "href": "reference/load_dataset.html#parameters",
+    "title": "load_dataset",
+    "section": "Parameters",
+    "text": "Parameters\n\ndataset : Literal['small_table', 'game_revenue'] = 'small_table'\n\nThe name of the dataset to load. Current options are \"small_table\" and \"game_revenue\".\n\ntbl_type : Literal['polars', 'pandas'] = 'polars'\n\nThe type of DataFrame to generate from the dataset. The named options are \"polars\" and \"pandas\"."
+  },
+  {
+    "objectID": "reference/load_dataset.html#returns",
+    "href": "reference/load_dataset.html#returns",
+    "title": "load_dataset",
+    "section": "Returns",
+    "text": "Returns\n\n : FrameT\n\nThe dataset for the Validate object."
+  },
+  {
+    "objectID": "reference/load_dataset.html#examples",
+    "href": "reference/load_dataset.html#examples",
+    "title": "load_dataset",
+    "section": "Examples",
+    "text": "Examples\nLoad the small_table dataset as a Polars DataFrame by calling load_dataset() with its defaults:\n\nimport pointblank as pb\n\nsmall_table = pb.load_dataset()\n\nsmall_table\n\n\nshape: (13, 8)date_timedateabcdefdatetime[μs]datei64stri64f64boolstr2016-01-04 11:00:002016-01-042\"1-bcd-345\"33423.29true\"high\"2016-01-04 00:32:002016-01-043\"5-egh-163\"89999.99true\"low\"2016-01-05 13:32:002016-01-056\"8-kdg-938\"32343.23true\"high\"2016-01-06 17:23:002016-01-062\"5-jdo-903\"null3892.4false\"mid\"2016-01-09 12:36:002016-01-098\"3-ldm-038\"7283.94true\"low\"……………………2016-01-20 04:30:002016-01-203\"5-bce-642\"9837.93false\"high\"2016-01-20 04:30:002016-01-203\"5-bce-642\"9837.93false\"high\"2016-01-26 20:07:002016-01-264\"2-dmx-010\"7833.98true\"low\"2016-01-28 02:51:002016-01-282\"7-dmx-010\"8108.34false\"low\"2016-01-30 11:23:002016-01-301\"3-dka-303\"null2230.09true\"high\"\n\n\nThe game_revenue dataset can be loaded as a Pandas DataFrame by specifying the dataset name and setting tbl_type=\"pandas\":\n\nimport pointblank as pb\n\ngame_revenue = pb.load_dataset(dataset=\"game_revenue\", tbl_type=\"pandas\")\n\ngame_revenue\n\n\n\n\n  \n    \n      \n      player_id\n      session_id\n      session_start\n      time\n      item_type\n      item_name\n      item_revenue\n      session_duration\n      start_day\n      acquisition\n      country\n    \n  \n  \n    \n      0\n      ECPANOIXLZHF896\n      ECPANOIXLZHF896-eol2j8bs\n      2015-01-01 01:31:03+00:00\n      2015-01-01 01:31:27+00:00\n      iap\n      offer2\n      8.991\n      16.3\n      2015-01-01\n      google\n      Germany\n    \n    \n      1\n      ECPANOIXLZHF896\n      ECPANOIXLZHF896-eol2j8bs\n      2015-01-01 01:31:03+00:00\n      2015-01-01 01:36:57+00:00\n      iap\n      gems3\n      22.491\n      16.3\n      2015-01-01\n      google\n      Germany\n    \n    \n      2\n      ECPANOIXLZHF896\n      ECPANOIXLZHF896-eol2j8bs\n      2015-01-01 01:31:03+00:00\n      2015-01-01 01:37:45+00:00\n      iap\n      gold7\n      107.991\n      16.3\n      2015-01-01\n      google\n      Germany\n    \n    \n      3\n      ECPANOIXLZHF896\n      ECPANOIXLZHF896-eol2j8bs\n      2015-01-01 01:31:03+00:00\n      2015-01-01 01:42:33+00:00\n      ad\n      ad_20sec\n      0.760\n      16.3\n      2015-01-01\n      google\n      Germany\n    \n    \n      4\n      ECPANOIXLZHF896\n      ECPANOIXLZHF896-hdu9jkls\n      2015-01-01 11:50:02+00:00\n      2015-01-01 11:55:20+00:00\n      ad\n      ad_5sec\n      0.030\n      35.2\n      2015-01-01\n      google\n      Germany\n    \n    \n      ...\n      ...\n      ...\n      ...\n      ...\n      ...\n      ...\n      ...\n      ...\n      ...\n      ...\n      ...\n    \n    \n      1995\n      NAOJRDMCSEBI281\n      NAOJRDMCSEBI281-j2vs9ilp\n      2015-01-21 01:57:50+00:00\n      2015-01-21 02:02:50+00:00\n      ad\n      ad_survey\n      1.332\n      25.8\n      2015-01-11\n      organic\n      Norway\n    \n    \n      1996\n      NAOJRDMCSEBI281\n      NAOJRDMCSEBI281-j2vs9ilp\n      2015-01-21 01:57:50+00:00\n      2015-01-21 02:22:14+00:00\n      ad\n      ad_survey\n      1.350\n      25.8\n      2015-01-11\n      organic\n      Norway\n    \n    \n      1997\n      RMOSWHJGELCI675\n      RMOSWHJGELCI675-vbhcsmtr\n      2015-01-21 02:39:48+00:00\n      2015-01-21 02:40:00+00:00\n      ad\n      ad_5sec\n      0.030\n      8.4\n      2015-01-10\n      other_campaign\n      France\n    \n    \n      1998\n      RMOSWHJGELCI675\n      RMOSWHJGELCI675-vbhcsmtr\n      2015-01-21 02:39:48+00:00\n      2015-01-21 02:47:12+00:00\n      iap\n      offer5\n      26.091\n      8.4\n      2015-01-10\n      other_campaign\n      France\n    \n    \n      1999\n      GJCXNTWEBIPQ369\n      GJCXNTWEBIPQ369-9elq67md\n      2015-01-21 03:59:23+00:00\n      2015-01-21 04:06:29+00:00\n      ad\n      ad_5sec\n      0.120\n      18.5\n      2015-01-14\n      organic\n      United States\n    \n  \n\n2000 rows × 11 columns"
+  },
+  {
+    "objectID": "reference/Validate.col_vals_not_in_set.html",
+    "href": "reference/Validate.col_vals_not_in_set.html",
+    "title": "Validate.col_vals_not_in_set",
+    "section": "",
+    "text": "Validate.col_vals_not_in_set(\n    columns,\n    set,\n    pre=None,\n    thresholds=None,\n    active=True,\n)\nValidate whether column values are not in a set of values.\nThe col_vals_not_in_set() validation method checks whether column values in a table are not part of a specified set= of values. This validation will operate over the number of test units that is equal to the number of rows in the table (determined after any pre= mutation has been applied).\n\n\n\ncolumns : str | list[str]\n\nA single column or a list of columns to validate. If multiple columns are supplied, there will be a separate validation step generated for each column.\n\nset : list[float | int]\n\nA list of values to compare against.\n\npre : Callable | None = None\n\nA pre-processing function or lambda to apply to the data table for the validation step.\n\nthresholds : int | float | tuple | dict | Thresholds = None\n\nFailure threshold levels so that the validation step can react accordingly when exceeding the set levels for different states (warn, stop, and notify). This can be created simply as an integer or float denoting the absolute number or fraction of failing test units for the ‘warn’ level. Otherwise, you can use a tuple of 1-3 values, a dictionary of 1-3 entries, or a Thresholds object.\n\nactive : bool = True\n\nA boolean value indicating whether the validation step should be active. Using False\n\n\n\n\n\n\n : Validate\n\nThe Validate object with the added validation step."
+  },
+  {
+    "objectID": "reference/Validate.col_vals_not_in_set.html#parameters",
+    "href": "reference/Validate.col_vals_not_in_set.html#parameters",
+    "title": "Validate.col_vals_not_in_set",
+    "section": "",
+    "text": "columns : str | list[str]\n\nA single column or a list of columns to validate. If multiple columns are supplied, there will be a separate validation step generated for each column.\n\nset : list[float | int]\n\nA list of values to compare against.\n\npre : Callable | None = None\n\nA pre-processing function or lambda to apply to the data table for the validation step.\n\nthresholds : int | float | tuple | dict | Thresholds = None\n\nFailure threshold levels so that the validation step can react accordingly when exceeding the set levels for different states (warn, stop, and notify). This can be created simply as an integer or float denoting the absolute number or fraction of failing test units for the ‘warn’ level. Otherwise, you can use a tuple of 1-3 values, a dictionary of 1-3 entries, or a Thresholds object.\n\nactive : bool = True\n\nA boolean value indicating whether the validation step should be active. Using False"
+  },
+  {
+    "objectID": "reference/Validate.col_vals_not_in_set.html#returns",
+    "href": "reference/Validate.col_vals_not_in_set.html#returns",
+    "title": "Validate.col_vals_not_in_set",
+    "section": "",
+    "text": ": Validate\n\nThe Validate object with the added validation step."
+  },
+  {
+    "objectID": "reference/Validate.warn.html",
+    "href": "reference/Validate.warn.html",
+    "title": "Validate.warn",
+    "section": "",
+    "text": "Validate.warn(i=None)\nProvides a dictionary of the warning status for each validation step.\n\n\n\ni : int | list[int] | None = None\n\nThe validation step number(s) from which the warning status is obtained. If None, all steps are included.\n\n\n\n\n\n\n : dict[int, bool]\n\nA dictionary of the warning status for each validation step."
+  },
+  {
+    "objectID": "reference/Validate.warn.html#parameters",
+    "href": "reference/Validate.warn.html#parameters",
+    "title": "Validate.warn",
+    "section": "",
+    "text": "i : int | list[int] | None = None\n\nThe validation step number(s) from which the warning status is obtained. If None, all steps are included."
+  },
+  {
+    "objectID": "reference/Validate.warn.html#returns",
+    "href": "reference/Validate.warn.html#returns",
+    "title": "Validate.warn",
+    "section": "",
+    "text": ": dict[int, bool]\n\nA dictionary of the warning status for each validation step."
+  },
+  {
+    "objectID": "reference/Validate.n.html",
+    "href": "reference/Validate.n.html",
+    "title": "Validate.n",
+    "section": "",
+    "text": "Validate.n(i=None)\nProvides a dictionary of the number of test units for each validation step.\n\n\n\ni : int | list[int] | None = None\n\nThe validation step number(s) from which the number of test units is obtained. If None, all steps are included.\n\n\n\n\n\n\n : dict[int, int]\n\nA dictionary of the number of test units for each validation step."
+  },
+  {
+    "objectID": "reference/Validate.n.html#parameters",
+    "href": "reference/Validate.n.html#parameters",
+    "title": "Validate.n",
+    "section": "",
+    "text": "i : int | list[int] | None = None\n\nThe validation step number(s) from which the number of test units is obtained. If None, all steps are included."
+  },
+  {
+    "objectID": "reference/Validate.n.html#returns",
+    "href": "reference/Validate.n.html#returns",
+    "title": "Validate.n",
+    "section": "",
+    "text": ": dict[int, int]\n\nA dictionary of the number of test units for each validation step."
+  },
+  {
+    "objectID": "reference/Validate.col_vals_eq.html",
+    "href": "reference/Validate.col_vals_eq.html",
+    "title": "Validate.col_vals_eq",
+    "section": "",
+    "text": "Validate.col_vals_eq(\n    columns,\n    value,\n    na_pass=False,\n    pre=None,\n    thresholds=None,\n    active=True,\n)\nValidate whether column values are equal to a single value.\nThe col_vals_eq() validation method checks whether column values in a table are equal to a specified value= (the exact comparison used in this function is col_val == value). The value is specified as a single, literal value. This validation will operate over the number of test units that is equal to the number of rows in the table (determined after any pre= mutation has been applied).\n\n\n\ncolumns : str | list[str]\n\nA single column or a list of columns to validate. If multiple columns are supplied, there will be a separate validation step generated for each column.\n\nvalue : float | int\n\nThe value to compare against.\n\nna_pass : bool = False\n\nShould any encountered None, NA, or Null values be considered as passing test units? By default, this is False. Set to True to pass test units with missing values.\n\npre : Callable | None = None\n\nA pre-processing function or lambda to apply to the data table for the validation step.\n\nthresholds : int | float | tuple | dict | Thresholds = None\n\nFailure threshold levels so that the validation step can react accordingly when exceeding the set levels for different states (warn, stop, and notify). This can be created simply as an integer or float denoting the absolute number or fraction of failing test units for the ‘warn’ level. Otherwise, you can use a tuple of 1-3 values, a dictionary of 1-3 entries, or a Thresholds object.\n\nactive : bool = True\n\nA boolean value indicating whether the validation step should be active. Using False will make the validation step inactive (still reporting its presence and keeping indexes for the steps unchanged).\n\n\n\n\n\n\n : Validate\n\nThe Validate object with the added validation step."
+  },
+  {
+    "objectID": "reference/Validate.col_vals_eq.html#parameters",
+    "href": "reference/Validate.col_vals_eq.html#parameters",
+    "title": "Validate.col_vals_eq",
+    "section": "",
+    "text": "columns : str | list[str]\n\nA single column or a list of columns to validate. If multiple columns are supplied, there will be a separate validation step generated for each column.\n\nvalue : float | int\n\nThe value to compare against.\n\nna_pass : bool = False\n\nShould any encountered None, NA, or Null values be considered as passing test units? By default, this is False. Set to True to pass test units with missing values.\n\npre : Callable | None = None\n\nA pre-processing function or lambda to apply to the data table for the validation step.\n\nthresholds : int | float | tuple | dict | Thresholds = None\n\nFailure threshold levels so that the validation step can react accordingly when exceeding the set levels for different states (warn, stop, and notify). This can be created simply as an integer or float denoting the absolute number or fraction of failing test units for the ‘warn’ level. Otherwise, you can use a tuple of 1-3 values, a dictionary of 1-3 entries, or a Thresholds object.\n\nactive : bool = True\n\nA boolean value indicating whether the validation step should be active. Using False will make the validation step inactive (still reporting its presence and keeping indexes for the steps unchanged)."
+  },
+  {
+    "objectID": "reference/Validate.col_vals_eq.html#returns",
+    "href": "reference/Validate.col_vals_eq.html#returns",
+    "title": "Validate.col_vals_eq",
+    "section": "",
+    "text": ": Validate\n\nThe Validate object with the added validation step."
+  },
+  {
+    "objectID": "reference/Validate.col_vals_between.html",
+    "href": "reference/Validate.col_vals_between.html",
+    "title": "Validate.col_vals_between",
+    "section": "",
+    "text": "Validate.col_vals_between(\n    columns,\n    left,\n    right,\n    inclusive=(True, True),\n    na_pass=False,\n    pre=None,\n    thresholds=None,\n    active=True,\n)\nValidate whether column values are between two values.\nThe col_vals_between() validation method checks whether column values in a table fall within a range. The range is specified with three arguments: left=, right=, and inclusive=. The left= and right= values specify the lower and upper bounds. The bounds are is specified as single, literal values. This validation will operate over the number of test units that is equal to the number of rows in the table (determined after any pre= mutation has been applied).\n\n\n\ncolumns : str | list[str]\n\nA single column or a list of columns to validate. If multiple columns are supplied, there will be a separate validation step generated for each column.\n\nleft : float | int\n\nThe lower bound of the range.\n\nright : float | int\n\nThe upper bound of the range.\n\ninclusive : tuple[bool, bool] = (True, True)\n\nA tuple of two boolean values indicating whether the comparison should be inclusive. The position of the boolean values correspond to the left= and right= values, respectively. By default, both values are True.\n\nna_pass : bool = False\n\nShould any encountered None, NA, or Null values be considered as passing test units? By default, this is False. Set to True to pass test units with missing values.\n\npre : Callable | None = None\n\nA pre-processing function or lambda to apply to the data table for the validation step.\n\nthresholds : int | float | tuple | dict | Thresholds = None\n\nFailure threshold levels so that the validation step can react accordingly when exceeding the set levels for different states (warn, stop, and notify). This can be created simply as an integer or float denoting the absolute number or fraction of failing test units for the ‘warn’ level. Otherwise, you can use a tuple of 1-3 values, a dictionary of 1-3 entries, or a Thresholds object.\n\nactive : bool = True\n\nA boolean value indicating whether the validation step should be active. Using False will make the validation step inactive (still reporting its presence and keeping indexes for the steps unchanged).\n\n\n\n\n\n\n : Validate\n\nThe Validate object with the added validation step."
+  },
+  {
+    "objectID": "reference/Validate.col_vals_between.html#parameters",
+    "href": "reference/Validate.col_vals_between.html#parameters",
+    "title": "Validate.col_vals_between",
     "section": "",
     "text": "columns : str | list[str]\n\nA single column or a list of columns to validate. If multiple columns are supplied, there will be a separate validation step generated for each column.\n\nleft : float | int\n\nThe lower bound of the range.\n\nright : float | int\n\nThe upper bound of the range.\n\ninclusive : tuple[bool, bool] = (True, True)\n\nA tuple of two boolean values indicating whether the comparison should be inclusive. The position of the boolean values correspond to the left= and right= values, respectively. By default, both values are True.\n\nna_pass : bool = False\n\nShould any encountered None, NA, or Null values be considered as passing test units? By default, this is False. Set to True to pass test units with missing values.\n\npre : Callable | None = None\n\nA pre-processing function or lambda to apply to the data table for the validation step.\n\nthresholds : int | float | tuple | dict | Thresholds = None\n\nFailure threshold levels so that the validation step can react accordingly when exceeding the set levels for different states (warn, stop, and notify). This can be created simply as an integer or float denoting the absolute number or fraction of failing test units for the ‘warn’ level. Otherwise, you can use a tuple of 1-3 values, a dictionary of 1-3 entries, or a Thresholds object.\n\nactive : bool = True\n\nA boolean value indicating whether the validation step should be active. Using False will make the validation step inactive (still reporting its presence and keeping indexes for the steps unchanged)."
   },
   {
-    "objectID": "reference/Validate.col_vals_outside.html#returns",
-    "href": "reference/Validate.col_vals_outside.html#returns",
-    "title": "Validate.col_vals_outside",
+    "objectID": "reference/Validate.col_vals_between.html#returns",
+    "href": "reference/Validate.col_vals_between.html#returns",
+    "title": "Validate.col_vals_between",
     "section": "",
     "text": ": Validate\n\nThe Validate object with the added validation step."
   },
   {
-    "objectID": "reference/Validate.n_passed.html",
-    "href": "reference/Validate.n_passed.html",
-    "title": "Validate.n_passed",
+    "objectID": "reference/Validate.get_data_extracts.html",
+    "href": "reference/Validate.get_data_extracts.html",
+    "title": "Validate.get_data_extracts",
     "section": "",
-    "text": "Validate.n_passed(i=None)\nProvides a dictionary of the number of test units that passed for each validation step.\n\n\n\ni : int | list[int] | None = None\n\nThe validation step number(s) from which the number of passing test units is obtained. If None, all steps are included.\n\n\n\n\n\n\n : dict[int, int]\n\nA dictionary of the number of failing test units for each validation step."
+    "text": "Validate.get_data_extracts(i=None)\nGet the rows that failed for each validation step.\n\n\n\ni : int | list[int] | None = None\n\nThe validation step number(s) from which the failed rows are obtained. If None, all steps are included.\n\n\n\n\n\n\n : dict[int, FrameT]\n\nA dictionary of tables containing the rows that failed in every row-based validation step."
   },
   {
-    "objectID": "reference/Validate.n_passed.html#parameters",
-    "href": "reference/Validate.n_passed.html#parameters",
-    "title": "Validate.n_passed",
+    "objectID": "reference/Validate.get_data_extracts.html#parameters",
+    "href": "reference/Validate.get_data_extracts.html#parameters",
+    "title": "Validate.get_data_extracts",
     "section": "",
-    "text": "i : int | list[int] | None = None\n\nThe validation step number(s) from which the number of passing test units is obtained. If None, all steps are included."
+    "text": "i : int | list[int] | None = None\n\nThe validation step number(s) from which the failed rows are obtained. If None, all steps are included."
   },
   {
-    "objectID": "reference/Validate.n_passed.html#returns",
-    "href": "reference/Validate.n_passed.html#returns",
-    "title": "Validate.n_passed",
+    "objectID": "reference/Validate.get_data_extracts.html#returns",
+    "href": "reference/Validate.get_data_extracts.html#returns",
+    "title": "Validate.get_data_extracts",
     "section": "",
-    "text": ": dict[int, int]\n\nA dictionary of the number of failing test units for each validation step."
-  },
-  {
-    "objectID": "reference/Validate.get_tabular_report.html",
-    "href": "reference/Validate.get_tabular_report.html",
-    "title": "Validate.get_tabular_report",
-    "section": "",
-    "text": "Validate.get_tabular_report(title=':default:')\nValidation report as a GT table."
-  },
-  {
-    "objectID": "reference/Validate.get_tabular_report.html#parameters",
-    "href": "reference/Validate.get_tabular_report.html#parameters",
-    "title": "Validate.get_tabular_report",
-    "section": "Parameters",
-    "text": "Parameters\n\ntitle : str | None = ':default:'\n\nOptions for customizing the title of the report. The default is the \":default:\" value which produces a generic title. Another option is \":tbl_name:\", and that presents the name of the table as the title for the report. If no title is wanted, then \":none:\" can be used. Aside from keyword options, text can be provided for the title. This will be interpreted as Markdown text and transformed internally to HTML."
-  },
-  {
-    "objectID": "reference/Validate.get_tabular_report.html#returns",
-    "href": "reference/Validate.get_tabular_report.html#returns",
-    "title": "Validate.get_tabular_report",
-    "section": "Returns",
-    "text": "Returns\n\n : GT\n\nA GT table object that represents the validation report."
-  },
-  {
-    "objectID": "reference/Validate.get_tabular_report.html#examples",
-    "href": "reference/Validate.get_tabular_report.html#examples",
-    "title": "Validate.get_tabular_report",
-    "section": "Examples",
-    "text": "Examples\nLet’s create a Validate object with a few validation steps and then interrogate the data table to see how it performs against the validation plan. We can then generate a tabular report to get a summary of the results.\n\nimport pointblank as pb\nimport polars as pl\n\n# Create a Polars DataFrame\ntbl_pl = pl.DataFrame({\"x\": [1, 2, 3, 4], \"y\": [4, 5, 6, 7]})\n\n# Validate data using Polars DataFrame\nv = (\n    pb.Validate(data=tbl_pl, tbl_name=\"tbl_xy\", thresholds=(2, 3, 4))\n    .col_vals_gt(columns=\"x\", value=1)\n    .col_vals_lt(columns=\"x\", value=3)\n    .col_vals_le(columns=\"y\", value=7)\n    .interrogate()\n)\n\n# Generate the tabular report\nv.get_tabular_report()\n\n\n\n\n\n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n\n\n\n\n  \n    Pointblank Validation\n  \n  \n    2024-12-05|17:24:53Polarstbl_xyWARN2STOP3NOTIFY4\n  \n\n  \n  \n  STEP\n  COLUMNS\n  VALUES\n  TBL\n  EVAL\n  UNITS\n  PASS\n  FAIL\n  W\n  S\n  N\n  EXT\n\n\n\n  \n    #4CA64C66\n    1\n    \n        \n        \n\n    col_vals_gt\n    \n        \n            \n            \n        \n    \n\n        \n         col_vals_gt()\n        \n    x\n    1\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    4\n    30.75\n    10.25\n    ○\n    ○\n    ○\n    CSV\n  \n  \n    #FFBF00\n    2\n    \n        \n        \n\n    col_vals_lt\n    \n        \n            \n            \n        \n    \n\n        \n         col_vals_lt()\n        \n    x\n    3\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    4\n    20.50\n    20.50\n    ●\n    ○\n    ○\n    CSV\n  \n  \n    #4CA64C\n    3\n    \n        \n        \n\n    col_vals_lte\n    \n        \n            \n            \n        \n    \n\n        \n         col_vals_le()\n        \n    y\n    7\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    4\n    41.00\n    00.00\n    ○\n    ○\n    ○\n    —\n  \n\n  \n  \n  \n    2024-12-05 17:24:53 UTC&lt; 1 s2024-12-05 17:24:53 UTC\n  \n\n\n\n\n\n\n        \n\n\nThe title option was set to \":default:\", which produces a generic title for the report. We can change this to the name of the table by setting the title to \":tbl_name:\". This will use the string provided in the tbl_name= argument of the Validate object.\n\nv.get_tabular_report(title=\":tbl_name:\")\n\n\n\n\n\n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n  \n\n\n\n\n  \n    tbl_xy\n  \n  \n    2024-12-05|17:24:53Polarstbl_xyWARN2STOP3NOTIFY4\n  \n\n  \n  \n  STEP\n  COLUMNS\n  VALUES\n  TBL\n  EVAL\n  UNITS\n  PASS\n  FAIL\n  W\n  S\n  N\n  EXT\n\n\n\n  \n    #4CA64C66\n    1\n    \n        \n        \n\n    col_vals_gt\n    \n        \n            \n            \n        \n    \n\n        \n         col_vals_gt()\n        \n    x\n    1\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    4\n    30.75\n    10.25\n    ○\n    ○\n    ○\n    CSV\n  \n  \n    #FFBF00\n    2\n    \n        \n        \n\n    col_vals_lt\n    \n        \n            \n            \n        \n    \n\n        \n         col_vals_lt()\n        \n    x\n    3\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    4\n    20.50\n    20.50\n    ●\n    ○\n    ○\n    CSV\n  \n  \n    #4CA64C\n    3\n    \n        \n        \n\n    col_vals_lte\n    \n        \n            \n            \n        \n    \n\n        \n         col_vals_le()\n        \n    y\n    7\n    \n    \n        \n            \n            \n            \n        \n    \n\n    ✓\n    4\n    41.00\n    00.00\n    ○\n    ○\n    ○\n    —\n  \n\n  \n  \n  \n    2024-12-05 17:24:53 UTC&lt; 1 s2024-12-05 17:24:53 UTC"
+    "text": ": dict[int, FrameT]\n\nA dictionary of tables containing the rows that failed in every row-based validation step."
   },
   {
     "objectID": "reference/Validate.stop.html",
@@ -648,21 +711,21 @@
     "href": "reference/index.html",
     "title": "API Reference",
     "section": "",
-    "text": "If going down the road of preparing a data quality analysis, you’ll need the Validate class to get the process started. The object is given the target table along with a stepwise validation plan composed via validation methods.\n\n\n\nValidate\nWorkflow for defining a set of validations on a table and interrogating for results.\n\n\n\n\n\n\nThe validation steps are the individual validation methods that can be used to build a validation plan. These methods are used to interrogate the data and report on the results.\n\n\n\nValidate.col_vals_gt\nValidate whether column values are greater than a single value.\n\n\nValidate.col_vals_lt\nValidate whether column values are less than a single value.\n\n\nValidate.col_vals_ge\nValidate whether column values are greater than or equal to a single value.\n\n\nValidate.col_vals_le\nValidate whether column values are less than or equal to a single value.\n\n\nValidate.col_vals_eq\nValidate whether column values are equal to a single value.\n\n\nValidate.col_vals_ne\nValidate whether column values are not equal to a single value.\n\n\nValidate.col_vals_between\nValidate whether column values are between two values.\n\n\nValidate.col_vals_outside\nValidate whether column values are outside of two values.\n\n\nValidate.col_vals_in_set\nValidate whether column values are in a set of values.\n\n\nValidate.col_vals_not_in_set\nValidate whether column values are not in a set of values.\n\n\nValidate.col_vals_regex\nValidate whether column values match a regular expression pattern.\n\n\n\n\n\n\nThe interrogation and reporting methods are used to extract data and report on the results.\n\n\n\nValidate.interrogate\nEvaluate each validation against the table and store the results.\n\n\nValidate.get_data_extracts\nGet the rows that failed for each validation step.\n\n\nValidate.get_json_report\nGet a report of the validation results as a JSON-formatted string.\n\n\nValidate.get_tabular_report\nValidation report as a GT table.\n\n\nValidate.get_sundered_data\nGet the data that passed or failed the validation steps.\n\n\nValidate.all_passed\nDetermine if every validation step passed perfectly, with no failing test units.\n\n\nValidate.n\nProvides a dictionary of the number of test units for each validation step.\n\n\nValidate.n_passed\nProvides a dictionary of the number of test units that passed for each validation step.\n\n\nValidate.n_failed\nProvides a dictionary of the number of test units that failed for each validation step.\n\n\nValidate.f_passed\nProvides a dictionary of the fraction of test units that passed for each validation step.\n\n\nValidate.f_failed\nProvides a dictionary of the fraction of test units that failed for each validation step.\n\n\nValidate.warn\nProvides a dictionary of the warning status for each validation step.\n\n\nValidate.stop\nProvides a dictionary of the stopping status for each validation step.\n\n\nValidate.notify\nProvides a dictionary of the notification status for each validation step.\n\n\n\n\n\n\nThe utilities group will contain functions that are helpful for the validation process.\n\n\n\nload_dataset\nLoad a dataset hosted in the library as specified DataFrame type."
+    "text": "If going down the road of preparing a data quality analysis, you’ll need the Validate class to get the process started. The object is given the target table along with a stepwise validation plan composed via validation methods.\n\n\n\nValidate\nWorkflow for defining a set of validations on a table and interrogating for results.\n\n\nThresholds\nDefinition of threshold values.\n\n\n\n\n\n\nThe validation steps are the individual validation methods that can be used to build a validation plan. These methods are used to interrogate the data and report on the results.\n\n\n\nValidate.col_vals_gt\nValidate whether column values are greater than a single value.\n\n\nValidate.col_vals_lt\nValidate whether column values are less than a single value.\n\n\nValidate.col_vals_ge\nValidate whether column values are greater than or equal to a single value.\n\n\nValidate.col_vals_le\nValidate whether column values are less than or equal to a single value.\n\n\nValidate.col_vals_eq\nValidate whether column values are equal to a single value.\n\n\nValidate.col_vals_ne\nValidate whether column values are not equal to a single value.\n\n\nValidate.col_vals_between\nValidate whether column values are between two values.\n\n\nValidate.col_vals_outside\nValidate whether column values are outside of two values.\n\n\nValidate.col_vals_in_set\nValidate whether column values are in a set of values.\n\n\nValidate.col_vals_not_in_set\nValidate whether column values are not in a set of values.\n\n\nValidate.col_vals_regex\nValidate whether column values match a regular expression pattern.\n\n\nValidate.col_vals_not_null\nValidate whether values in a column are not NULL.\n\n\nValidate.col_exists\nValidate whether one or more columns exist in the table.\n\n\n\n\n\n\nThe interrogation and reporting methods are used to extract data and report on the results.\n\n\n\nValidate.interrogate\nEvaluate each validation against the table and store the results.\n\n\nValidate.get_data_extracts\nGet the rows that failed for each validation step.\n\n\nValidate.get_json_report\nGet a report of the validation results as a JSON-formatted string.\n\n\nValidate.get_tabular_report\nValidation report as a GT table.\n\n\nValidate.get_sundered_data\nGet the data that passed or failed the validation steps.\n\n\nValidate.all_passed\nDetermine if every validation step passed perfectly, with no failing test units.\n\n\nValidate.n\nProvides a dictionary of the number of test units for each validation step.\n\n\nValidate.n_passed\nProvides a dictionary of the number of test units that passed for each validation step.\n\n\nValidate.n_failed\nProvides a dictionary of the number of test units that failed for each validation step.\n\n\nValidate.f_passed\nProvides a dictionary of the fraction of test units that passed for each validation step.\n\n\nValidate.f_failed\nProvides a dictionary of the fraction of test units that failed for each validation step.\n\n\nValidate.warn\nProvides a dictionary of the warning status for each validation step.\n\n\nValidate.stop\nProvides a dictionary of the stopping status for each validation step.\n\n\nValidate.notify\nProvides a dictionary of the notification status for each validation step.\n\n\n\n\n\n\nThe utilities group will contain functions that are helpful for the validation process.\n\n\n\nload_dataset\nLoad a dataset hosted in the library as specified DataFrame type."
   },
   {
     "objectID": "reference/index.html#validate",
     "href": "reference/index.html#validate",
     "title": "API Reference",
     "section": "",
-    "text": "If going down the road of preparing a data quality analysis, you’ll need the Validate class to get the process started. The object is given the target table along with a stepwise validation plan composed via validation methods.\n\n\n\nValidate\nWorkflow for defining a set of validations on a table and interrogating for results."
+    "text": "If going down the road of preparing a data quality analysis, you’ll need the Validate class to get the process started. The object is given the target table along with a stepwise validation plan composed via validation methods.\n\n\n\nValidate\nWorkflow for defining a set of validations on a table and interrogating for results.\n\n\nThresholds\nDefinition of threshold values."
   },
   {
     "objectID": "reference/index.html#validation-steps",
     "href": "reference/index.html#validation-steps",
     "title": "API Reference",
     "section": "",
-    "text": "The validation steps are the individual validation methods that can be used to build a validation plan. These methods are used to interrogate the data and report on the results.\n\n\n\nValidate.col_vals_gt\nValidate whether column values are greater than a single value.\n\n\nValidate.col_vals_lt\nValidate whether column values are less than a single value.\n\n\nValidate.col_vals_ge\nValidate whether column values are greater than or equal to a single value.\n\n\nValidate.col_vals_le\nValidate whether column values are less than or equal to a single value.\n\n\nValidate.col_vals_eq\nValidate whether column values are equal to a single value.\n\n\nValidate.col_vals_ne\nValidate whether column values are not equal to a single value.\n\n\nValidate.col_vals_between\nValidate whether column values are between two values.\n\n\nValidate.col_vals_outside\nValidate whether column values are outside of two values.\n\n\nValidate.col_vals_in_set\nValidate whether column values are in a set of values.\n\n\nValidate.col_vals_not_in_set\nValidate whether column values are not in a set of values.\n\n\nValidate.col_vals_regex\nValidate whether column values match a regular expression pattern."
+    "text": "The validation steps are the individual validation methods that can be used to build a validation plan. These methods are used to interrogate the data and report on the results.\n\n\n\nValidate.col_vals_gt\nValidate whether column values are greater than a single value.\n\n\nValidate.col_vals_lt\nValidate whether column values are less than a single value.\n\n\nValidate.col_vals_ge\nValidate whether column values are greater than or equal to a single value.\n\n\nValidate.col_vals_le\nValidate whether column values are less than or equal to a single value.\n\n\nValidate.col_vals_eq\nValidate whether column values are equal to a single value.\n\n\nValidate.col_vals_ne\nValidate whether column values are not equal to a single value.\n\n\nValidate.col_vals_between\nValidate whether column values are between two values.\n\n\nValidate.col_vals_outside\nValidate whether column values are outside of two values.\n\n\nValidate.col_vals_in_set\nValidate whether column values are in a set of values.\n\n\nValidate.col_vals_not_in_set\nValidate whether column values are not in a set of values.\n\n\nValidate.col_vals_regex\nValidate whether column values match a regular expression pattern.\n\n\nValidate.col_vals_not_null\nValidate whether values in a column are not NULL.\n\n\nValidate.col_exists\nValidate whether one or more columns exist in the table."
   },
   {
     "objectID": "reference/index.html#interrogation-and-reporting",
@@ -700,24 +763,87 @@
     "text": ": Validate\n\nThe Validate object with the added validation step."
   },
   {
-    "objectID": "reference/Validate.col_vals_le.html",
-    "href": "reference/Validate.col_vals_le.html",
-    "title": "Validate.col_vals_le",
+    "objectID": "reference/Validate.get_sundered_data.html",
+    "href": "reference/Validate.get_sundered_data.html",
+    "title": "Validate.get_sundered_data",
     "section": "",
-    "text": "Validate.col_vals_le(\n    columns,\n    value,\n    na_pass=False,\n    pre=None,\n    thresholds=None,\n    active=True,\n)\nValidate whether column values are less than or equal to a single value.\nThe col_vals_le() validation method checks whether column values in a table are less than or equal to a specified value= (the exact comparison used in this function is col_val &lt;= value). The value is specified as a single, literal value. This validation will operate over the number of test units that is equal to the number of rows in the table (determined after any pre= mutation has been applied).\n\n\n\ncolumns : str | list[str]\n\nA single column or a list of columns to validate. If multiple columns are supplied, there will be a separate validation step generated for each column.\n\nvalue : float | int\n\nThe value to compare against.\n\nna_pass : bool = False\n\nShould any encountered None, NA, or Null values be considered as passing test units? By default, this is False. Set to True to pass test units with missing values.\n\npre : Callable | None = None\n\nA pre-processing function or lambda to apply to the data table for the validation step.\n\nthresholds : int | float | tuple | dict | Thresholds = None\n\nFailure threshold levels so that the validation step can react accordingly when exceeding the set levels for different states (warn, stop, and notify). This can be created simply as an integer or float denoting the absolute number or fraction of failing test units for the ‘warn’ level. Otherwise, you can use a tuple of 1-3 values, a dictionary of 1-3 entries, or a Thresholds object.\n\nactive : bool = True\n\nA boolean value indicating whether the validation step should be active. Using False will make the validation step inactive (still reporting its presence and keeping indexes for the steps unchanged).\n\n\n\n\n\n\n : Validate\n\nThe Validate object with the added validation step."
+    "text": "Validate.get_sundered_data(type='pass')\nGet the data that passed or failed the validation steps.\nValidation of the data is one thing but, sometimes, you want to use the best part of the input dataset for something else. The get_sundered_data() method works with a Validate object that has been interrogated (i.e., the interrogate() method was used). We can get either the ‘pass’ data piece (rows with no failing test units across all row-based validation functions), or, the ‘fail’ data piece (rows with at least one failing test unit across the same series of validations).\n\n\nThere are some caveats to sundering. The validation steps considered for this splitting will only involve steps where:\n\nof certain check types, where test units are cells checked row-by-row (e.g., the col_vals_*() methods)\nactive= is not set to False\npre= has not been given an expression for modify the input table\n\nSo long as these conditions are met, the data will be split into two constituent tables: one with the rows that passed all validation steps and another with the rows that failed at least one validation step.\n\n\n\n\ntype :  = 'pass'\n\nThe type of data to return. Options are \"pass\" or \"fail\", where the former returns a table only containing rows where test units always passed validation steps, and the latter returns a table only containing rows had test units that failed in at least one validation step.\n\n\n\n\n\n\n : FrameT\n\nA table containing the data that passed or failed the validation steps.\n\n\n\n\n\nCreate a Validate plan of two validation steps, focused on testing row values for part of the small_table object. Then, use interrogate() to put the validation plan into action."
   },
   {
-    "objectID": "reference/Validate.col_vals_le.html#parameters",
-    "href": "reference/Validate.col_vals_le.html#parameters",
-    "title": "Validate.col_vals_le",
+    "objectID": "reference/Validate.get_sundered_data.html#details",
+    "href": "reference/Validate.get_sundered_data.html#details",
+    "title": "Validate.get_sundered_data",
     "section": "",
-    "text": "columns : str | list[str]\n\nA single column or a list of columns to validate. If multiple columns are supplied, there will be a separate validation step generated for each column.\n\nvalue : float | int\n\nThe value to compare against.\n\nna_pass : bool = False\n\nShould any encountered None, NA, or Null values be considered as passing test units? By default, this is False. Set to True to pass test units with missing values.\n\npre : Callable | None = None\n\nA pre-processing function or lambda to apply to the data table for the validation step.\n\nthresholds : int | float | tuple | dict | Thresholds = None\n\nFailure threshold levels so that the validation step can react accordingly when exceeding the set levels for different states (warn, stop, and notify). This can be created simply as an integer or float denoting the absolute number or fraction of failing test units for the ‘warn’ level. Otherwise, you can use a tuple of 1-3 values, a dictionary of 1-3 entries, or a Thresholds object.\n\nactive : bool = True\n\nA boolean value indicating whether the validation step should be active. Using False will make the validation step inactive (still reporting its presence and keeping indexes for the steps unchanged)."
+    "text": "There are some caveats to sundering. The validation steps considered for this splitting will only involve steps where:\n\nof certain check types, where test units are cells checked row-by-row (e.g., the col_vals_*() methods)\nactive= is not set to False\npre= has not been given an expression for modify the input table\n\nSo long as these conditions are met, the data will be split into two constituent tables: one with the rows that passed all validation steps and another with the rows that failed at least one validation step."
   },
   {
-    "objectID": "reference/Validate.col_vals_le.html#returns",
-    "href": "reference/Validate.col_vals_le.html#returns",
-    "title": "Validate.col_vals_le",
+    "objectID": "reference/Validate.get_sundered_data.html#parameters",
+    "href": "reference/Validate.get_sundered_data.html#parameters",
+    "title": "Validate.get_sundered_data",
     "section": "",
-    "text": ": Validate\n\nThe Validate object with the added validation step."
+    "text": "type :  = 'pass'\n\nThe type of data to return. Options are \"pass\" or \"fail\", where the former returns a table only containing rows where test units always passed validation steps, and the latter returns a table only containing rows had test units that failed in at least one validation step."
+  },
+  {
+    "objectID": "reference/Validate.get_sundered_data.html#returns",
+    "href": "reference/Validate.get_sundered_data.html#returns",
+    "title": "Validate.get_sundered_data",
+    "section": "",
+    "text": ": FrameT\n\nA table containing the data that passed or failed the validation steps."
+  },
+  {
+    "objectID": "reference/Validate.get_sundered_data.html#examples",
+    "href": "reference/Validate.get_sundered_data.html#examples",
+    "title": "Validate.get_sundered_data",
+    "section": "",
+    "text": "Create a Validate plan of two validation steps, focused on testing row values for part of the small_table object. Then, use interrogate() to put the validation plan into action."
+  },
+  {
+    "objectID": "get-started/thresholds.html",
+    "href": "get-started/thresholds.html",
+    "title": "Intro",
+    "section": "",
+    "text": "This is a work in progress. It’s just an outline for now.\nThresholds enable you to signal failure at different severity levels. In the near future, thresholds will be able to trigger custom actions. For example, when testing a column for NULLs with col_vals_not_null() you might want to warn on any NULLs and stop where there are 10% NULLs in the column.\nThe code uses thresholds=(1, 0.1) to set a WARN threshold of 1 and a STOP threshold of 10% failing test units. Notice these pieces in the validation table:\nThe one final threshold, N (NOTIFY), wasn’t set so appears on the validation table as a dash."
+  },
+  {
+    "objectID": "get-started/thresholds.html#using-the-validationthreshold-argument",
+    "href": "get-started/thresholds.html#using-the-validationthreshold-argument",
+    "title": "Intro",
+    "section": "Using the Validation(threshold=) argument",
+    "text": "Using the Validation(threshold=) argument\nWe can also define thresholds globally. This means that every validation step will re-use the same set of threshold values.\nimport pointblank as pb\n\nvalidation_2 = (\n    pb.Validate(data=pb.load_dataset(dataset=\"small_table\"), thresholds=(1, 0.1))\n    .col_vals_not_null(columns=\"a\")\n    .col_vals_gt(columns=\"b\", value=2)\n    .interrogate()\n)\n\nvalidation_2\nIn this, both the col_vals_not_null() and col_vals_gt() steps will use the thresholds set in the Validate() call. The threshold= argument to every validation method will take priority over the globally set value."
+  },
+  {
+    "objectID": "get-started/thresholds.html#defining-thresholds",
+    "href": "get-started/thresholds.html#defining-thresholds",
+    "title": "Intro",
+    "section": "Defining Thresholds",
+    "text": "Defining Thresholds\n\nThreshold shorthands\nThe fastest way to define a threshold is a use a tuple with entries for WARN, STOP, and NOTIFY levels.\n# [WARN, STOP, NOTIFY]\nthreshold = (1, 2, 3)\n\nValidate(data=..., threshold=threshold)\nNote that a shorter tuple or even single values are also allowed:\n\n(1, 2): warn on 1 failure, stop on 2\n1 or (1, ): warn on 1 failure\n\n\n\nThreshold cutoff values\nThreshold values can be specified in two ways:\n\npercentage: a decimal value like 0.1 to mean 10% test units failed\nnumber: a fixed number of test units failed\n\nThreshold cutoffs are inclusive so any value of failing test units greater than or equal to the cutoff will result in triggering the threshold. So if a threshold is defined with a cutoff value of 5, then 5 failing test units will result in threshold.\n\n\nThe Threshold class"
+  },
+  {
+    "objectID": "get-started/thresholds.html#triggering-actions",
+    "href": "get-started/thresholds.html#triggering-actions",
+    "title": "Intro",
+    "section": "Triggering Actions",
+    "text": "Triggering Actions\nThis is not currently implemented."
+  },
+  {
+    "objectID": "get-started/thresholds.html#use-case-stopping-on-any-failures",
+    "href": "get-started/thresholds.html#use-case-stopping-on-any-failures",
+    "title": "Intro",
+    "section": "Use Case: Stopping on any Failures",
+    "text": "Use Case: Stopping on any Failures"
+  },
+  {
+    "objectID": "get-started/thresholds.html#use-case-global-tolerance-bands",
+    "href": "get-started/thresholds.html#use-case-global-tolerance-bands",
+    "title": "Intro",
+    "section": "Use Case: Global tolerance bands",
+    "text": "Use Case: Global tolerance bands"
+  },
+  {
+    "objectID": "get-started/thresholds.html#use-case-schema-correctness-after-table-joins",
+    "href": "get-started/thresholds.html#use-case-schema-correctness-after-table-joins",
+    "title": "Intro",
+    "section": "Use Case: Schema Correctness After Table Joins",
+    "text": "Use Case: Schema Correctness After Table Joins"
   }
 ]
