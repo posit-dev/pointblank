@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>index – pointblank</title>
+<title>validate.col_vals_null – pointblank</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -19,6 +19,40 @@ ul.task-list li input[type="checkbox"] {
   width: 0.8em;
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 </style>
 
@@ -92,7 +126,7 @@ ul.task-list li input[type="checkbox"] {
 <span class="menu-text">Get Started</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link active" href="../reference/index.html" aria-current="page"> 
+    <a class="nav-link" href="../reference/index.html"> 
 <span class="menu-text">Reference</span></a>
   </li>  
 </ul>
@@ -118,12 +152,10 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#api-reference" id="toc-api-reference" class="nav-link active" data-scroll-target="#api-reference">API Reference</a>
+  <li><a href="#pointblank.Validate.col_vals_null" id="toc-pointblank.Validate.col_vals_null" class="nav-link active" data-scroll-target="#pointblank.Validate.col_vals_null">Validate.col_vals_null</a>
   <ul class="collapse">
-  <li><a href="#validate" id="toc-validate" class="nav-link" data-scroll-target="#validate">Validate</a></li>
-  <li><a href="#validation-steps" id="toc-validation-steps" class="nav-link" data-scroll-target="#validation-steps">Validation Steps</a></li>
-  <li><a href="#interrogation-and-reporting" id="toc-interrogation-and-reporting" class="nav-link" data-scroll-target="#interrogation-and-reporting">Interrogation and Reporting</a></li>
-  <li><a href="#utilities" id="toc-utilities" class="nav-link" data-scroll-target="#utilities">Utilities</a></li>
+  <li><a href="#parameters" id="toc-parameters" class="nav-link" data-scroll-target="#parameters">Parameters</a></li>
+  <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -134,163 +166,40 @@ ul.task-list li input[type="checkbox"] {
 
 
 
-<section id="api-reference" class="level1 doc doc-index">
-<h1 class="doc doc-index">API Reference</h1>
-<section id="validate" class="level2">
-<h2 class="anchored" data-anchor-id="validate">Validate</h2>
-<p>If going down the road of preparing a data quality analysis, you’ll need the Validate class to get the process started. The object is given the target table along with a stepwise validation plan composed via validation methods.</p>
-<table class="caption-top table">
-<tbody>
-<tr class="odd">
-<td><a href="../reference/Validate.html#pointblank.Validate">Validate</a></td>
-<td>Workflow for defining a set of validations on a table and interrogating for results.</td>
-</tr>
-<tr class="even">
-<td><a href="../reference/Thresholds.html#pointblank.Thresholds">Thresholds</a></td>
-<td>Definition of threshold values.</td>
-</tr>
-</tbody>
-</table>
+<section id="pointblank.Validate.col_vals_null" class="level1">
+<h1>Validate.col_vals_null</h1>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>Validate.col_vals_null(columns, pre<span class="op">=</span><span class="va">None</span>, thresholds<span class="op">=</span><span class="va">None</span>, active<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Validate whether values in a column are NULL.</p>
+<p>The <code>col_vals_null()</code> validation method checks whether column values in a table are NULL. This validation will operate over the number of test units that is equal to the number of rows in the table.</p>
+<section id="parameters" class="level2 doc-section doc-section-parameters">
+<h2 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters">Parameters</h2>
+<dl>
+<dt><code><span class="parameter-name"><strong>columns</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation">str | list[str]</span></code></dt>
+<dd>
+<p>A single column or a list of columns to validate. If multiple columns are supplied, there will be a separate validation step generated for each column.</p>
+</dd>
+<dt><code><span class="parameter-name"><strong>pre</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation">Callable | None</span> <span class="parameter-default-sep">=</span> <span class="parameter-default">None</span></code></dt>
+<dd>
+<p>A pre-processing function or lambda to apply to the data table for the validation step.</p>
+</dd>
+<dt><code><span class="parameter-name"><strong>thresholds</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation">int | float | tuple | dict | Thresholds</span> <span class="parameter-default-sep">=</span> <span class="parameter-default">None</span></code></dt>
+<dd>
+<p>Failure threshold levels so that the validation step can react accordingly when exceeding the set levels for different states (<code>warn</code>, <code>stop</code>, and <code>notify</code>). This can be created simply as an integer or float denoting the absolute number or fraction of failing test units for the ‘warn’ level. Otherwise, you can use a tuple of 1-3 values, a dictionary of 1-3 entries, or a Thresholds object.</p>
+</dd>
+<dt><code><span class="parameter-name"><strong>active</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation">bool</span> <span class="parameter-default-sep">=</span> <span class="parameter-default">True</span></code></dt>
+<dd>
+<p>A boolean value indicating whether the validation step should be active. Using <code>False</code> will make the validation step inactive (still reporting its presence and keeping indexes for the steps unchanged).</p>
+</dd>
+</dl>
 </section>
-<section id="validation-steps" class="level2">
-<h2 class="anchored" data-anchor-id="validation-steps">Validation Steps</h2>
-<p>The validation steps are the individual validation methods that can be used to build a validation plan. These methods are used to interrogate the data and report on the results.</p>
-<table class="caption-top table">
-<tbody>
-<tr class="odd">
-<td><a href="../reference/Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt">Validate.col_vals_gt</a></td>
-<td>Validate whether column values are greater than a single value.</td>
-</tr>
-<tr class="even">
-<td><a href="../reference/Validate.col_vals_lt.html#pointblank.Validate.col_vals_lt">Validate.col_vals_lt</a></td>
-<td>Validate whether column values are less than a single value.</td>
-</tr>
-<tr class="odd">
-<td><a href="../reference/Validate.col_vals_ge.html#pointblank.Validate.col_vals_ge">Validate.col_vals_ge</a></td>
-<td>Validate whether column values are greater than or equal to a single value.</td>
-</tr>
-<tr class="even">
-<td><a href="../reference/Validate.col_vals_le.html#pointblank.Validate.col_vals_le">Validate.col_vals_le</a></td>
-<td>Validate whether column values are less than or equal to a single value.</td>
-</tr>
-<tr class="odd">
-<td><a href="../reference/Validate.col_vals_eq.html#pointblank.Validate.col_vals_eq">Validate.col_vals_eq</a></td>
-<td>Validate whether column values are equal to a single value.</td>
-</tr>
-<tr class="even">
-<td><a href="../reference/Validate.col_vals_ne.html#pointblank.Validate.col_vals_ne">Validate.col_vals_ne</a></td>
-<td>Validate whether column values are not equal to a single value.</td>
-</tr>
-<tr class="odd">
-<td><a href="../reference/Validate.col_vals_between.html#pointblank.Validate.col_vals_between">Validate.col_vals_between</a></td>
-<td>Validate whether column values are between two values.</td>
-</tr>
-<tr class="even">
-<td><a href="../reference/Validate.col_vals_outside.html#pointblank.Validate.col_vals_outside">Validate.col_vals_outside</a></td>
-<td>Validate whether column values are outside of two values.</td>
-</tr>
-<tr class="odd">
-<td><a href="../reference/Validate.col_vals_in_set.html#pointblank.Validate.col_vals_in_set">Validate.col_vals_in_set</a></td>
-<td>Validate whether column values are in a set of values.</td>
-</tr>
-<tr class="even">
-<td><a href="../reference/Validate.col_vals_not_in_set.html#pointblank.Validate.col_vals_not_in_set">Validate.col_vals_not_in_set</a></td>
-<td>Validate whether column values are not in a set of values.</td>
-</tr>
-<tr class="odd">
-<td><a href="../reference/Validate.col_vals_null.html#pointblank.Validate.col_vals_null">Validate.col_vals_null</a></td>
-<td>Validate whether values in a column are NULL.</td>
-</tr>
-<tr class="even">
-<td><a href="../reference/Validate.col_vals_not_null.html#pointblank.Validate.col_vals_not_null">Validate.col_vals_not_null</a></td>
-<td>Validate whether values in a column are not NULL.</td>
-</tr>
-<tr class="odd">
-<td><a href="../reference/Validate.col_vals_regex.html#pointblank.Validate.col_vals_regex">Validate.col_vals_regex</a></td>
-<td>Validate whether column values match a regular expression pattern.</td>
-</tr>
-<tr class="even">
-<td><a href="../reference/Validate.col_exists.html#pointblank.Validate.col_exists">Validate.col_exists</a></td>
-<td>Validate whether one or more columns exist in the table.</td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="interrogation-and-reporting" class="level2">
-<h2 class="anchored" data-anchor-id="interrogation-and-reporting">Interrogation and Reporting</h2>
-<p>The interrogation and reporting methods are used to extract data and report on the results.</p>
-<table class="caption-top table">
-<tbody>
-<tr class="odd">
-<td><a href="../reference/Validate.interrogate.html#pointblank.Validate.interrogate">Validate.interrogate</a></td>
-<td>Evaluate each validation against the table and store the results.</td>
-</tr>
-<tr class="even">
-<td><a href="../reference/Validate.get_data_extracts.html#pointblank.Validate.get_data_extracts">Validate.get_data_extracts</a></td>
-<td>Get the rows that failed for each validation step.</td>
-</tr>
-<tr class="odd">
-<td><a href="../reference/Validate.get_json_report.html#pointblank.Validate.get_json_report">Validate.get_json_report</a></td>
-<td>Get a report of the validation results as a JSON-formatted string.</td>
-</tr>
-<tr class="even">
-<td><a href="../reference/Validate.get_tabular_report.html#pointblank.Validate.get_tabular_report">Validate.get_tabular_report</a></td>
-<td>Validation report as a GT table.</td>
-</tr>
-<tr class="odd">
-<td><a href="../reference/Validate.get_sundered_data.html#pointblank.Validate.get_sundered_data">Validate.get_sundered_data</a></td>
-<td>Get the data that passed or failed the validation steps.</td>
-</tr>
-<tr class="even">
-<td><a href="../reference/Validate.all_passed.html#pointblank.Validate.all_passed">Validate.all_passed</a></td>
-<td>Determine if every validation step passed perfectly, with no failing test units.</td>
-</tr>
-<tr class="odd">
-<td><a href="../reference/Validate.n.html#pointblank.Validate.n">Validate.n</a></td>
-<td>Provides a dictionary of the number of test units for each validation step.</td>
-</tr>
-<tr class="even">
-<td><a href="../reference/Validate.n_passed.html#pointblank.Validate.n_passed">Validate.n_passed</a></td>
-<td>Provides a dictionary of the number of test units that passed for each validation step.</td>
-</tr>
-<tr class="odd">
-<td><a href="../reference/Validate.n_failed.html#pointblank.Validate.n_failed">Validate.n_failed</a></td>
-<td>Provides a dictionary of the number of test units that failed for each validation step.</td>
-</tr>
-<tr class="even">
-<td><a href="../reference/Validate.f_passed.html#pointblank.Validate.f_passed">Validate.f_passed</a></td>
-<td>Provides a dictionary of the fraction of test units that passed for each validation step.</td>
-</tr>
-<tr class="odd">
-<td><a href="../reference/Validate.f_failed.html#pointblank.Validate.f_failed">Validate.f_failed</a></td>
-<td>Provides a dictionary of the fraction of test units that failed for each validation step.</td>
-</tr>
-<tr class="even">
-<td><a href="../reference/Validate.warn.html#pointblank.Validate.warn">Validate.warn</a></td>
-<td>Provides a dictionary of the warning status for each validation step.</td>
-</tr>
-<tr class="odd">
-<td><a href="../reference/Validate.stop.html#pointblank.Validate.stop">Validate.stop</a></td>
-<td>Provides a dictionary of the stopping status for each validation step.</td>
-</tr>
-<tr class="even">
-<td><a href="../reference/Validate.notify.html#pointblank.Validate.notify">Validate.notify</a></td>
-<td>Provides a dictionary of the notification status for each validation step.</td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="utilities" class="level2">
-<h2 class="anchored" data-anchor-id="utilities">Utilities</h2>
-<p>The utilities group will contain functions that are helpful for the validation process.</p>
-<table class="caption-top table">
-<tbody>
-<tr class="odd">
-<td><a href="../reference/load_dataset.html#pointblank.load_dataset">load_dataset</a></td>
-<td>Load a dataset hosted in the library as specified DataFrame type.</td>
-</tr>
-</tbody>
-</table>
+<section id="returns" class="level2 doc-section doc-section-returns">
+<h2 class="doc-section doc-section-returns anchored" data-anchor-id="returns">Returns</h2>
+<dl>
+<dt><code><span class="parameter-name"></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation">Validate</span></code></dt>
+<dd>
+<p>The <code>Validate</code> object with the added validation step.</p>
+</dd>
+</dl>
 
 
 </section>
