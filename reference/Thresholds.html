@@ -183,17 +183,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="parameters" class="level2 doc-section doc-section-parameters">
 <h2 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters">Parameters</h2>
 <dl>
-<dt><code><span class="parameter-name"><strong>warn_at</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation">int | float | None</span> <span class="parameter-default-sep">=</span> <span class="parameter-default">None</span></code></dt>
+<dt><code><span class="parameter-name"><strong>warn_at</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation">int | float | bool | None</span> <span class="parameter-default-sep">=</span> <span class="parameter-default">None</span></code></dt>
 <dd>
-<p>The threshold for the ‘warn’ level. This can be an absolute count or a fraction of the total.</p>
+<p>The threshold for the ‘warn’ level. This can be an absolute count or a fraction of the total. Using <code>True</code> will set this threshold to 1.</p>
 </dd>
-<dt><code><span class="parameter-name"><strong>stop_at</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation">int | float | None</span> <span class="parameter-default-sep">=</span> <span class="parameter-default">None</span></code></dt>
+<dt><code><span class="parameter-name"><strong>stop_at</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation">int | float | bool | None</span> <span class="parameter-default-sep">=</span> <span class="parameter-default">None</span></code></dt>
 <dd>
-<p>The threshold for the ‘stop’ level. This can be an absolute count or a fraction of the total.</p>
+<p>The threshold for the ‘stop’ level. This can be an absolute count or a fraction of the total. Using <code>True</code> will set this threshold to 1.</p>
 </dd>
-<dt><code><span class="parameter-name"><strong>notify_at</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation">int | float | None</span> <span class="parameter-default-sep">=</span> <span class="parameter-default">None</span></code></dt>
+<dt><code><span class="parameter-name"><strong>notify_at</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation">int | float | bool | None</span> <span class="parameter-default-sep">=</span> <span class="parameter-default">None</span></code></dt>
 <dd>
-<p>The threshold for the ‘notify’ level. This can be an absolute count or a fraction of the total.</p>
+<p>The threshold for the ‘notify’ level. This can be an absolute count or a fraction of the total. Using <code>True</code> will set this threshold to 1.</p>
 </dd>
 </dl>
 </section>
