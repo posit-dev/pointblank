@@ -178,8 +178,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    thresholds<span class="op">=</span><span class="va">None</span>,</span>
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    active<span class="op">=</span><span class="va">True</span>,</span>
 <span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Validate whether column values are between two values.</p>
-<p>The <code>col_vals_between()</code> validation method checks whether column values in a table fall within a range. The range is specified with three arguments: <code>left=</code>, <code>right=</code>, and <code>inclusive=</code>. The <code>left=</code> and <code>right=</code> values specify the lower and upper bounds. The bounds are is specified as single, literal values. This validation will operate over the number of test units that is equal to the number of rows in the table (determined after any <code>pre=</code> mutation has been applied).</p>
+<p>Do column data lie between two specified values or data in other columns?</p>
+<p>The <code>col_vals_between()</code> validation method checks whether column values in a table fall within a range. The range is specified with three arguments: <code>left=</code>, <code>right=</code>, and <code>inclusive=</code>. The <code>left=</code> and <code>right=</code> values specify the lower and upper bounds. These bounds can be specified as literal values or as column names provided within <code>col()</code>. The validation will operate over the number of test units that is equal to the number of rows in the table (determined after any <code>pre=</code> mutation has been applied).</p>
 <section id="parameters" class="level2 doc-section doc-section-parameters">
 <h2 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters">Parameters</h2>
 <dl>
@@ -189,11 +189,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </dd>
 <dt><code><span class="parameter-name"><strong>left</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation">float | int</span></code></dt>
 <dd>
-<p>The lower bound of the range.</p>
+<p>The lower bound of the range. Can be a single numeric value or a column name given in <code>col()</code>.</p>
 </dd>
 <dt><code><span class="parameter-name"><strong>right</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation">float | int</span></code></dt>
 <dd>
-<p>The upper bound of the range.</p>
+<p>The upper bound of the range. Can be a single numeric value or a column name given in <code>col()</code>.</p>
 </dd>
 <dt><code><span class="parameter-name"><strong>inclusive</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation">tuple[bool, bool]</span> <span class="parameter-default-sep">=</span> <span class="parameter-default">(True, True)</span></code></dt>
 <dd>

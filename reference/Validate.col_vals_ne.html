@@ -176,8 +176,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    thresholds<span class="op">=</span><span class="va">None</span>,</span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    active<span class="op">=</span><span class="va">True</span>,</span>
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Validate whether column values are not equal to a single value.</p>
-<p>The <code>col_vals_ne()</code> validation method checks whether column values in a table are <em>not equal to</em> a specified <code>value=</code> (the exact comparison used in this function is <code>col_val != value</code>). The <code>value</code> is specified as a single, literal value. This validation will operate over the number of test units that is equal to the number of rows in the table (determined after any <code>pre=</code> mutation has been applied).</p>
+<p>Are column data not equal to a fixed value or data in another column?</p>
+<p>The <code>col_vals_ne()</code> validation method checks whether column values in a table are <em>not equal to</em> a specified <code>value=</code> (the exact comparison used in this function is <code>col_val != value</code>). The <code>value=</code> can be specified as a single, literal value or as a column name given in <code>col()</code>. This validation will operate over the number of test units that is equal to the number of rows in the table (determined after any <code>pre=</code> mutation has been applied).</p>
 <section id="parameters" class="level2 doc-section doc-section-parameters">
 <h2 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters">Parameters</h2>
 <dl>
@@ -187,7 +187,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </dd>
 <dt><code><span class="parameter-name"><strong>value</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation">float | int</span></code></dt>
 <dd>
-<p>The value to compare against.</p>
+<p>The value to compare against. This can be a single numeric value or a column name given in <code>col()</code>.</p>
 </dd>
 <dt><code><span class="parameter-name"><strong>na_pass</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation">bool</span> <span class="parameter-default-sep">=</span> <span class="parameter-default">False</span></code></dt>
 <dd>
