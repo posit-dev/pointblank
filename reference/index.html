@@ -138,7 +138,7 @@ ul.task-list li input[type="checkbox"] {
 <h1 class="doc doc-index">API Reference</h1>
 <section id="validate" class="level2">
 <h2 class="anchored" data-anchor-id="validate">Validate</h2>
-<p>If going down the road of preparing a data quality analysis, you’ll need the Validate class to get the process started. The object is given the target table along with a stepwise validation plan composed via validation methods.</p>
+<p>When peforming data validation, you’ll need the <code>Validate</code> class to get the process started. It’s given the target table and you can optionally provide some metadata and/or failure thresholds (using the <code>Thresholds</code> class or through shorthands for this task). The <code>Validate</code> class has numerous methods for defining validation steps and for obtaining post-interrogation metrics and data.</p>
 <table class="caption-top table">
 <tbody>
 <tr class="odd">
@@ -154,7 +154,7 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="validation-steps" class="level2">
 <h2 class="anchored" data-anchor-id="validation-steps">Validation Steps</h2>
-<p>The validation steps are the individual validation methods that can be used to build a validation plan. These methods are used to interrogate the data and report on the results.</p>
+<p>Validation steps can be thought of as sequential validations on the target data. We call <code>Validate</code>’s validation methods to build up a validation plan: a collection of steps that, in the aggregate, provides good validation coverage.</p>
 <table class="caption-top table">
 <tbody>
 <tr class="odd">
@@ -213,12 +213,16 @@ ul.task-list li input[type="checkbox"] {
 <td><a href="../reference/Validate.col_exists.html#pointblank.Validate.col_exists">Validate.col_exists</a></td>
 <td>Validate whether one or more columns exist in the table.</td>
 </tr>
+<tr class="odd">
+<td><a href="../reference/col.html#pointblank.col">col</a></td>
+<td>Helper function for referencing a column in the input table.</td>
+</tr>
 </tbody>
 </table>
 </section>
 <section id="interrogation-and-reporting" class="level2">
 <h2 class="anchored" data-anchor-id="interrogation-and-reporting">Interrogation and Reporting</h2>
-<p>The interrogation and reporting methods are used to extract data and report on the results.</p>
+<p>The validation plan is put into action when <code>interrogate()</code> is called. The workflow for performing a comprehensive validation is then: (1) <code>Validate()</code>, (2) <validation steps="">, (3) <code>interrogate()</code>. After interrogation of the data, we can view a validation table (by printing the object or using <code>get_tabular_report()</code>), extract key metrics, or split the data based on the validation results (with <code>get_sundered_data()</code>).</validation></p>
 <table class="caption-top table">
 <tbody>
 <tr class="odd">
@@ -282,12 +286,16 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="utilities" class="level2">
 <h2 class="anchored" data-anchor-id="utilities">Utilities</h2>
-<p>The utilities group will contain functions that are helpful for the validation process.</p>
+<p>The utilities group contain functions that are helpful for the validation process. We can load datasets with <code>load_dataset()</code> and set global configuration parameters with <code>config()</code>.</p>
 <table class="caption-top table">
 <tbody>
 <tr class="odd">
 <td><a href="../reference/load_dataset.html#pointblank.load_dataset">load_dataset</a></td>
 <td>Load a dataset hosted in the library as specified DataFrame type.</td>
+</tr>
+<tr class="even">
+<td><a href="../reference/config.html#pointblank.config">config</a></td>
+<td>Configuration settings for the pointblank library.</td>
 </tr>
 </tbody>
 </table>
