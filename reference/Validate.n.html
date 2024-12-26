@@ -152,22 +152,34 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#pointblank.Validate.n" id="toc-pointblank.Validate.n" class="nav-link active" data-scroll-target="#pointblank.Validate.n">Validate.n</a>
-  <ul class="collapse">
-  <li><a href="#parameters" id="toc-parameters" class="nav-link" data-scroll-target="#parameters">Parameters</a></li>
+  <li><a href="#parameters" id="toc-parameters" class="nav-link active" data-scroll-target="#parameters">Parameters</a></li>
   <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
-  </ul></li>
+  <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
   </ul>
 </nav>
     </div>
 <!-- main -->
-<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"></header>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Validate.n</h1>
+</div>
 
 
 
+<div class="quarto-title-meta">
 
-<section id="pointblank.Validate.n" class="level1">
-<h1>Validate.n</h1>
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
 <div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>Validate.n(i<span class="op">=</span><span class="va">None</span>, scalar<span class="op">=</span><span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Provides a dictionary of the number of test units for each validation step.</p>
 <p>The <code>n()</code> method provides the number of test units for each validation step. This is the total number of test units that were evaluated in the validation step. It is always an integer value.</p>
@@ -194,9 +206,63 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>A dictionary of the number of test units for each validation step or a scalar value.</p>
 </dd>
 </dl>
-
-
 </section>
+<section id="examples" class="level2 doc-section doc-section-examples">
+<h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
+<p>Different types of validation steps can have different numbers of test units. In the example below, we’ll use a simple Polars DataFrame with three columns (<code>a</code>, <code>b</code>, and <code>c</code>). There will be three validation steps, and the number of test units for each step will be a little bit different.</p>
+<div id="93a1e6c0" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>tbl <span class="op">=</span> pl.DataFrame(</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    {</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>        <span class="st">"a"</span>: [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">9</span>, <span class="dv">5</span>],</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>        <span class="st">"b"</span>: [<span class="dv">5</span>, <span class="dv">6</span>, <span class="dv">10</span>, <span class="dv">3</span>],</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>        <span class="st">"c"</span>: [<span class="st">"a"</span>, <span class="st">"b"</span>, <span class="st">"a"</span>, <span class="st">"a"</span>],</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    .col_vals_gt(columns<span class="op">=</span><span class="st">"a"</span>, value<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    .col_exists(columns<span class="op">=</span><span class="st">"b"</span>)</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>    .col_vals_lt(columns<span class="op">=</span><span class="st">"b"</span>, value<span class="op">=</span><span class="dv">9</span>, pre<span class="op">=</span><span class="kw">lambda</span> df: df.<span class="bu">filter</span>(pl.col(<span class="st">"a"</span>) <span class="op">&gt;</span> <span class="dv">1</span>))</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The first validation step checks that all values in column <code>a</code> are greater than <code>0</code>. Let’s use the <code>n()</code> method to determine the number of test units this validation step.</p>
+<div id="89989b43" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>validation.n(i<span class="op">=</span><span class="dv">1</span>, scalar<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="2">
+<pre><code>4</code></pre>
+</div>
+</div>
+<p>The returned value of <code>4</code> is the number of test units for the first validation step. This value is the same as the number of rows in the table.</p>
+<p>The second validation step checks for the existence of column <code>b</code>. Using the <code>n()</code> method we can get the number of test units for this the second step.</p>
+<div id="342d6690" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>validation.n(i<span class="op">=</span><span class="dv">2</span>, scalar<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="3">
+<pre><code>1</code></pre>
+</div>
+</div>
+<p>There’s a single test unit here because the validation step is checking for the presence of a single column.</p>
+<p>The third validation step checks that all values in column <code>b</code> are less than <code>9</code> after filtering the table to only include rows where the value in column <code>a</code> is greater than <code>1</code>. Because the table is filtered, the number of test units will be less than the total number of rows in the input table. Let’s prove this by using the <code>n()</code> method.</p>
+<div id="36a231a4" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>validation.n(i<span class="op">=</span><span class="dv">3</span>, scalar<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="4">
+<pre><code>3</code></pre>
+</div>
+</div>
+<p>The returned value of <code>3</code> is the number of test units for the third validation step. When using the <code>pre=</code> argument, the input table can be mutated before performing the validation. The <code>n()</code> method is a good way to determine whether the mutation performed as expected.</p>
+<p>In all of these examples, the <code>scalar=True</code> argument was used to return the value as a scalar integer value. If <code>scalar=False</code>, the method will return a dictionary with an entry for the validation step number (from the <code>i=</code> argument) and the number of test units. Futhermore, leaving out the <code>i=</code> argument altogether will return a dictionary with filled with the number of test units for each validation step. Here’s what that looks like:</p>
+<div id="696767f3" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>validation.n()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="5">
+<pre><code>{1: 4, 2: 1, 3: 3}</code></pre>
+</div>
+</div>
+
+
 </section>
 
 </main> <!-- /main -->
