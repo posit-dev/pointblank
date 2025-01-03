@@ -183,7 +183,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>col(name)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>col(exprs)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Helper function for referencing a column in the input table.</p>
 <p>Many of the validation methods (i.e., <code>col_vals_*()</code> methods) in pointblank have a <code>value=</code> argument. These validations are comparisons between column values and a literal value, or, between column values and adjacent values in another column. The <code>col()</code> helper function is used to specify that it is a column being referenced, not a literal value.</p>
 <p>The <code>col()</code> doesn’t check that the column exists in the input table. It acts to signal that the value being compared is a column value. During validation (i.e., when <code>interrogate()</code> is called), pointblank will then check that the column exists in the input table.</p>
@@ -202,7 +202,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="parameters" class="level2 doc-section doc-section-parameters">
 <h2 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters">Parameters</h2>
 <dl>
-<dt><code><span class="parameter-name"><strong>name</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation">str</span></code></dt>
+<dt><code><span class="parameter-name"><strong>name</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"></span></code></dt>
 <dd>
 <p>The name of the column in the input table.</p>
 </dd>
@@ -220,7 +220,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="examples" class="level2 doc-section doc-section-examples">
 <h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Suppose we have a table with columns <code>a</code> and <code>b</code> and we’d like to validate that the values in column <code>a</code> are greater than the values in column <code>b</code>. We can use the <code>col()</code> helper function to reference the comparison column when creating the validation step.</p>
-<div id="47180164" class="cell" data-execution_count="2">
+<div id="7833df90" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -374,7 +374,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         
 </div>
 </div>
-<p>From the excerpt of the validation table, values in <code>a</code> were greater than values in <code>b</code> for every row (or test unit). Using <code>value=pb.col("b")</code> specified that the greater-than comparison is across columns, not with a fixed literal value.</p>
+<p>From results of the validation table it can be seen that values in <code>a</code> were greater than values in <code>b</code> for every row (or test unit). Using <code>value=pb.col("b")</code> specified that the greater-than comparison is across columns, not with a fixed literal value.</p>
 
 
 </section>
