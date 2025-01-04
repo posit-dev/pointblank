@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.6.39">
+<meta name="generator" content="quarto-1.6.40">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -35,7 +35,7 @@ ul.task-list li input[type="checkbox"] {
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-e26003cea8cd680ca0c55a263523d882.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-549806ee2085284f45b00abea8c6df48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="../site_libs/bootstrap/bootstrap-3880f9996964697631b29c8a347935b0.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
@@ -122,6 +122,7 @@ ul.task-list li input[type="checkbox"] {
   <ul class="collapse">
   <li><a href="#validate" id="toc-validate" class="nav-link" data-scroll-target="#validate">Validate</a></li>
   <li><a href="#validation-steps" id="toc-validation-steps" class="nav-link" data-scroll-target="#validation-steps">Validation Steps</a></li>
+  <li><a href="#column-selection" id="toc-column-selection" class="nav-link" data-scroll-target="#column-selection">Column Selection</a></li>
   <li><a href="#interrogation-and-reporting" id="toc-interrogation-and-reporting" class="nav-link" data-scroll-target="#interrogation-and-reporting">Interrogation and Reporting</a></li>
   <li><a href="#utilities" id="toc-utilities" class="nav-link" data-scroll-target="#utilities">Utilities</a></li>
   </ul></li>
@@ -225,9 +226,45 @@ ul.task-list li input[type="checkbox"] {
 <td><a href="../reference/Validate.col_schema_match.html#pointblank.Validate.col_schema_match">Validate.col_schema_match</a></td>
 <td>Do columns in the table (and their types) match a predefined schema?</td>
 </tr>
+</tbody>
+</table>
+</section>
+<section id="column-selection" class="level2">
+<h2 class="anchored" data-anchor-id="column-selection">Column Selection</h2>
+<p>A flexible way to select columns for validation is to use the <code>col()</code> function along with column selection helper functions. A combination of <code>col()</code> + <code>starts_with()</code>, <code>matches()</code>, etc., allows for the selection of multiple target columns (mapping a validation across many steps). Furthermore, the <code>col()</code> function can be used to declare a comparison column (e.g., for the <code>value=</code> argument in many <code>col_vals_*()</code> methods) when you can’t use a fixed value for comparison.</p>
+<table class="caption-top table">
+<tbody>
 <tr class="odd">
 <td><a href="../reference/col.html#pointblank.col">col</a></td>
 <td>Helper function for referencing a column in the input table.</td>
+</tr>
+<tr class="even">
+<td><a href="../reference/starts_with.html#pointblank.starts_with">starts_with</a></td>
+<td>Select columns that start with specified text.</td>
+</tr>
+<tr class="odd">
+<td><a href="../reference/ends_with.html#pointblank.ends_with">ends_with</a></td>
+<td>Select columns that end with specified text.</td>
+</tr>
+<tr class="even">
+<td><a href="../reference/contains.html#pointblank.contains">contains</a></td>
+<td>Select columns that contain specified text.</td>
+</tr>
+<tr class="odd">
+<td><a href="../reference/matches.html#pointblank.matches">matches</a></td>
+<td>Select columns that match a specified regular expression pattern.</td>
+</tr>
+<tr class="even">
+<td><a href="../reference/everything.html#pointblank.everything">everything</a></td>
+<td>Select all columns.</td>
+</tr>
+<tr class="odd">
+<td><a href="../reference/first_n.html#pointblank.first_n">first_n</a></td>
+<td>Select the first <code>n</code> columns in the column list.</td>
+</tr>
+<tr class="even">
+<td><a href="../reference/last_n.html#pointblank.last_n">last_n</a></td>
+<td>Select the last <code>n</code> columns in the column list.</td>
 </tr>
 </tbody>
 </table>
