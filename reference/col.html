@@ -157,6 +157,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul>
   <li><a href="#parameters" id="toc-parameters" class="nav-link active" data-scroll-target="#parameters">Parameters</a></li>
   <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
+  <li><a href="#usage-with-the-columns-argument" id="toc-usage-with-the-columns-argument" class="nav-link" data-scroll-target="#usage-with-the-columns-argument">Usage with the <code>columns=</code> Argument</a></li>
+  <li><a href="#usage-with-the-value-left-and-right-arguments" id="toc-usage-with-the-value-left-and-right-arguments" class="nav-link" data-scroll-target="#usage-with-the-value-left-and-right-arguments">Usage with the <code>value=</code>, <code>left=</code>, and <code>right=</code> Arguments</a></li>
   <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
   </ul>
 </nav>
@@ -187,24 +189,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Helper function for referencing a column in the input table.</p>
 <p>Many of the validation methods (i.e., <code>col_vals_*()</code> methods) in pointblank have a <code>value=</code> argument. These validations are comparisons between column values and a literal value, or, between column values and adjacent values in another column. The <code>col()</code> helper function is used to specify that it is a column being referenced, not a literal value.</p>
 <p>The <code>col()</code> doesn’t check that the column exists in the input table. It acts to signal that the value being compared is a column value. During validation (i.e., when <code>interrogate()</code> is called), pointblank will then check that the column exists in the input table.</p>
-<p>This function can be used in the <code>value=</code> argument of the following validation methods:</p>
-<ul>
-<li><code>col_vals_gt()</code></li>
-<li><code>col_vals_lt()</code></li>
-<li><code>col_vals_ge()</code></li>
-<li><code>col_vals_le()</code></li>
-<li><code>col_vals_eq()</code></li>
-<li><code>col_vals_ne()</code></li>
-<li><code>col_vals_between()</code></li>
-<li><code>col_vals_outside()</code></li>
-</ul>
-<p>For the last two methods cited, <code>col()</code> can be used with either of the <code>left=</code> and <code>right=</code> arguments, or both.</p>
 <section id="parameters" class="level2 doc-section doc-section-parameters">
 <h2 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters">Parameters</h2>
 <dl>
-<dt><code><span class="parameter-name"><strong>name</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"></span></code></dt>
+<dt><code><span class="parameter-name"><strong>exprs</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation">str | ColumnSelector</span></code></dt>
 <dd>
-<p>The name of the column in the input table.</p>
+<p>Either the name of a single column in the target table, provided as a string, or, an expression involving column selector functions (e.g., <code>starts_with("a")</code>, <code>ends_with("e") \| starts_with("a")</code>, etc.). Please read the documentation for further details on which input forms are valid depending on the context.</p>
 </dd>
 </dl>
 </section>
@@ -217,27 +207,70 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </dd>
 </dl>
 </section>
+<section id="usage-with-the-columns-argument" class="level2 doc-section doc-section-usage-with-the-columns-argument">
+<h2 class="doc-section doc-section-usage-with-the-columns-argument anchored" data-anchor-id="usage-with-the-columns-argument">Usage with the <code>columns=</code> Argument</h2>
+<p>The <code>col()</code> function can be used in the <code>columns=</code> argument of the following validation methods:</p>
+<ul>
+<li><code>col_vals_gt()</code></li>
+<li><code>col_vals_lt()</code></li>
+<li><code>col_vals_ge()</code></li>
+<li><code>col_vals_le()</code></li>
+<li><code>col_vals_eq()</code></li>
+<li><code>col_vals_ne()</code></li>
+<li><code>col_vals_between()</code></li>
+<li><code>col_vals_outside()</code></li>
+<li><code>col_vals_in_set()</code></li>
+<li><code>col_vals_not_in_set()</code></li>
+<li><code>col_vals_null()</code></li>
+<li><code>col_vals_not_null()</code></li>
+<li><code>col_vals_regex()</code></li>
+<li><code>col_exists()</code></li>
+</ul>
+<p>If specifying a single column with certainty (you have the exact name), <code>col()</code> is not necessary since you can just pass the column name as a string (though it is still valid to use <code>col("column_name")</code>, if preferred). However, if you want to select columns based on complex logic involving multiple column selector functions (e.g., columns that start with <code>"a"</code> but don’t end with <code>"e"</code>), you need to use <code>col()</code> to wrap expressions involving column selector functions and logical operators such as <code>&amp;</code>, <code>|</code>, <code>-</code>, and <code>~</code>.</p>
+<p>Here is an example of such usage with the <code>col_vals_gt()</code> validation method:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>col_vals_gt(columns<span class="op">=</span>col(starts_with(<span class="st">"a"</span>) <span class="op">&amp;</span> <span class="op">~</span>ends_with(<span class="st">"e"</span>)), value<span class="op">=</span><span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>If using only a single column selector function, you can pass the function directly to the <code>columns=</code> argument of the validation method, or, you can use <code>col()</code> to wrap the function (either is valid though the first is more concise). Here is an example of that simpler usage:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>col_vals_gt(columns<span class="op">=</span>starts_with(<span class="st">"a"</span>), value<span class="op">=</span><span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="usage-with-the-value-left-and-right-arguments" class="level2 doc-section doc-section-usage-with-the-value-left-and-right-arguments">
+<h2 class="doc-section doc-section-usage-with-the-value-left-and-right-arguments anchored" data-anchor-id="usage-with-the-value-left-and-right-arguments">Usage with the <code>value=</code>, <code>left=</code>, and <code>right=</code> Arguments</h2>
+<p>The <code>col()</code> function can be used in the <code>value=</code> argument of the following validation methods</p>
+<ul>
+<li><code>col_vals_gt()</code></li>
+<li><code>col_vals_lt()</code></li>
+<li><code>col_vals_ge()</code></li>
+<li><code>col_vals_le()</code></li>
+<li><code>col_vals_eq()</code></li>
+<li><code>col_vals_ne()</code></li>
+</ul>
+<p>and in the <code>left=</code> and <code>right=</code> arguments (either or both) of these two validation methods</p>
+<ul>
+<li><code>col_vals_between()</code></li>
+<li><code>col_vals_outside()</code></li>
+</ul>
+<p>You cannot use column selector functions such as <code>starts_with()</code> in either of the <code>value=</code>, <code>left=</code>, or <code>right=</code> arguments since there would be no guarantee that a single column will be resolved from the target table with this approach. The <code>col()</code> function is used to signal that the value being compared is a column value and not a literal value.</p>
+</section>
 <section id="examples" class="level2 doc-section doc-section-examples">
 <h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Suppose we have a table with columns <code>a</code> and <code>b</code> and we’d like to validate that the values in column <code>a</code> are greater than the values in column <code>b</code>. We can use the <code>col()</code> helper function to reference the comparison column when creating the validation step.</p>
-<div id="e2c1d5f6" class="cell" data-execution_count="2">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>tbl <span class="op">=</span> pl.DataFrame(</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    {</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>        <span class="st">"a"</span>: [<span class="dv">5</span>, <span class="dv">6</span>, <span class="dv">5</span>, <span class="dv">7</span>, <span class="dv">6</span>, <span class="dv">5</span>],</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>        <span class="st">"b"</span>: [<span class="dv">4</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">3</span>],</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    }</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    .col_vals_gt(columns<span class="op">=</span><span class="st">"a"</span>, value<span class="op">=</span>pb.col(<span class="st">"b"</span>))</span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>validation</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="fc395545" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>tbl <span class="op">=</span> pl.DataFrame(</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    {</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>        <span class="st">"a"</span>: [<span class="dv">5</span>, <span class="dv">6</span>, <span class="dv">5</span>, <span class="dv">7</span>, <span class="dv">6</span>, <span class="dv">5</span>],</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>        <span class="st">"b"</span>: [<span class="dv">4</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">3</span>],</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>    .col_vals_gt(columns<span class="op">=</span><span class="st">"a"</span>, value<span class="op">=</span>pb.col(<span class="st">"b"</span>))</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>validation</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="2">
 <div id="pb_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>
