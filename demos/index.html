@@ -195,21 +195,21 @@ Splitting your data into ‘pass’ and ‘fail’ subsets.
 </div>
 </div>
 <hr>
-<div style="text-align: center;">
-<p><a href="../demos/numeric-comparisons/index.html">Numeric Comparisons</a></p>
-<p><a href="../demos/comparisons-across-columns/index.html">Comparison Checks Across Columns</a></p>
-<p><a href="../demos/apply-checks-to-several-columns/index.html">Apply Validation Rules to Multiple Columns</a></p>
-<p><a href="../demos/checks-for-missing/index.html">Checks for Missing Values</a></p>
-<p><a href="../demos/expect-text-pattern/index.html">Expectations with a Text Pattern</a></p>
-<p><a href="../demos/set-membership/index.html">Set Membership</a></p>
-<p><a href="../demos/expect-no-duplicate-rows/index.html">Expect No Duplicate Rows</a></p>
-<p><a href="../demos/expect-no-duplicate-values/index.html">Checking for Duplicate Values</a></p>
-<p><a href="../demos/col-vals-custom-expr/index.html">Custom Expression for Checking Column Values</a></p>
-<p><a href="../demos/mutate-table-in-step/index.html">Mutate the Table in a Validation Step</a></p>
-<p><a href="../demos/check-row-column-counts/index.html">Verifying Row and Column Counts</a></p>
-<p><a href="../demos/failure-thresholds/index.html">Set Failure Threshold Levels</a></p>
-<p><a href="../demos/column-selector-functions/index.html">Column Selector Functions: Easily Pick Columns</a></p>
-<p><a href="../demos/schema-check/index.html">Check the Schema of a Table</a></p>
+<div style="text-align: left;">
+<p><a href="../demos/numeric-comparisons/index.html">Numeric Comparisons</a><br> Perform comparisons of values in columns to fixed values.</p>
+<p><a href="../demos/comparisons-across-columns/index.html">Comparison Checks Across Columns</a><br> Perform comparisons of values in columns to values in other columns.</p>
+<p><a href="../demos/apply-checks-to-several-columns/index.html">Apply Validation Rules to Multiple Columns</a><br> Create multiple validation steps by using a list of column names with <code>columns=</code>.</p>
+<p><a href="../demos/checks-for-missing/index.html">Checks for Missing Values</a><br> Perform validations that check whether missing/NA/Null values are present.</p>
+<p><a href="../demos/expect-text-pattern/index.html">Expectations with a Text Pattern</a><br> With <code>col_vals_regex()</code>, check for conformance to a regular expression.</p>
+<p><a href="../demos/set-membership/index.html">Set Membership</a><br> Perform validations that check whether values are part of a set (or <em>not</em> part of one).</p>
+<p><a href="../demos/expect-no-duplicate-rows/index.html">Expect No Duplicate Rows</a><br> We can check for duplicate rows in the table with <code>rows_distinct()</code>.</p>
+<p><a href="../demos/expect-no-duplicate-values/index.html">Checking for Duplicate Values</a><br> To check for duplicate values down a column, use <code>rows_distinct()</code> with a <code>columns_subset=</code> value.</p>
+<p><a href="../demos/col-vals-custom-expr/index.html">Custom Expression for Checking Column Values</a><br> A column expression can be used to check column values. Just use <code>col_vals_expr()</code> for this.</p>
+<p><a href="../demos/mutate-table-in-step/index.html">Mutate the Table in a Validation Step</a><br> For far more specialized validations, modify the table with the <code>pre=</code> argument before checking it.</p>
+<p><a href="../demos/check-row-column-counts/index.html">Verifying Row and Column Counts</a><br> Check the dimensions of the table with the <code>*_count_match()</code> validation methods.</p>
+<p><a href="../demos/failure-thresholds/index.html">Set Failure Threshold Levels</a><br> Set threshold levels to better gauge adverse data quality.</p>
+<p><a href="../demos/column-selector-functions/index.html">Column Selector Functions: Easily Pick Columns</a><br> Use column selector functions in the <code>columns=</code> argument to conveniently choose columns.</p>
+<p><a href="../demos/schema-check/index.html">Check the Schema of a Table</a><br> The schema of a table can be flexibly defined with <code>Schema</code> and verified with <code>col_schema_match()</code>.</p>
 </div>
 
 
