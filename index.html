@@ -176,10 +176,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p><img src="./assets/pointblank_logo.svg" class="img-fluid" width="350"></p>
 <p><em>Find out if your data is what you think it is</em></p>
 </div>
-<p>Pointblank is a table validation and testing library for Python. It helps you ensure that your tabular data meets certain expectations and constraints and it can present the results in a beautiful and useful tabular reporting framework.</p>
+<p>Pointblank is a table validation and testing library for Python. It helps you ensure that your tabular data meets certain expectations and constraints and it presents the results in a beautiful, and useful, validation report table.</p>
 <section id="getting-started" class="level2">
 <h2 class="anchored" data-anchor-id="getting-started">Getting Started</h2>
-<p>Let’s take a Polars DataFrame and validate it against a set of constraints. We do that using the <code>Validate</code> class and its collection of validation methods:</p>
+<p>Let’s take a Polars DataFrame and validate it against a set of constraints. We do that by using the <code>Validate</code> class along with adding validation steps:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
@@ -195,7 +195,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p><img src="./assets/pointblank-tabular-report.png" class="img-fluid" style="width:100.0%"></p>
 </div>
 <p>The rows in the validation table correspond to each of the validation steps. One of the key concepts is that validation steps can be broken down into atomic test cases (test units) and each of these test units is given either of pass/fail status based on the validation constraints. You’ll see these tallied up in the reporting table (in the <code>UNITS</code>, <code>PASS</code>, and <code>FAIL</code> columns).</p>
-<p>Tabular reporting is just one way to see the results. You can also obtain fine-grained results of the interrogation as JSON output or through methods that get key metrics. You can also utilize the validation results to perform filtering of the input table based on row-level pass/fail status (via the <code>get_sundered_data()</code> method).</p>
+<p>The tabular reporting view is just one way to see the results. You can also obtain fine-grained results of the interrogation as JSON output or through methods that get key metrics. You can also utilize the validation results to perform filtering of the input table based on row-level pass/fail status (via the <code>get_sundered_data()</code> method).</p>
 <p>On the input side, we can use the following types of tables:</p>
 <ul>
 <li>Polars DataFrame</li>
@@ -206,7 +206,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>SQLite table</li>
 <li>Parquet</li>
 </ul>
-<p>To make this all work seamlessly, we use <a href="https://github.com/narwhals-dev/narwhals">Narwhals</a> to work with Polars and Pandas DataFrames. We also integrate with <a href="https://github.com/ibis-project/ibis">Ibis</a> to enable the use of DuckDB, MySQL, PostgreSQL, SQLite, and Parquet. In doing all of this, we can provide an ergonomic and consistent API for validating tabular data from various sources.</p>
+<p>To make this all work seamlessly, we use <a href="https://github.com/narwhals-dev/narwhals">Narwhals</a> to work with Polars and Pandas DataFrames. We also integrate with <a href="https://github.com/ibis-project/ibis">Ibis</a> to enable the use of DuckDB, MySQL, PostgreSQL, SQLite, Parquet, and more! In doing all of this, we can provide an ergonomic and consistent API for validating tabular data from various sources.</p>
 </section>
 <section id="features" class="level2">
 <h2 class="anchored" data-anchor-id="features">Features</h2>
