@@ -176,7 +176,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p><img src="./assets/pointblank_logo.svg" class="img-fluid" width="350"></p>
 <p><em>Find out if your data is what you think it is</em></p>
 </div>
-<p>Pointblank is a table validation and testing library for Python. It helps you ensure that your tabular data meets certain expectations and constraints and it presents the results in a beautiful, and useful, validation report table.</p>
+<p>Pointblank is a table validation and testing library for Python. It helps you ensure that your tabular data meets certain expectations and constraints and it presents the results in a beautiful validation report table.</p>
 <section id="getting-started" class="level2">
 <h2 class="anchored" data-anchor-id="getting-started">Getting Started</h2>
 <p>Let’s take a Polars DataFrame and validate it against a set of constraints. We do that by using the <code>Validate</code> class along with adding validation steps:</p>
@@ -194,8 +194,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div style="text-align: center;">
 <p><img src="./assets/pointblank-tabular-report.png" class="img-fluid" style="width:100.0%"></p>
 </div>
-<p>The rows in the validation table correspond to each of the validation steps. One of the key concepts is that validation steps can be broken down into atomic test cases (test units) and each of these test units is given either of pass/fail status based on the validation constraints. You’ll see these tallied up in the reporting table (in the <code>UNITS</code>, <code>PASS</code>, and <code>FAIL</code> columns).</p>
-<p>The tabular reporting view is just one way to see the results. You can also obtain fine-grained results of the interrogation as JSON output or through methods that get key metrics. You can also utilize the validation results to perform filtering of the input table based on row-level pass/fail status (via the <code>get_sundered_data()</code> method).</p>
+<p>The rows in the validation report table correspond to each of the validation steps. One of the key concepts is that validation steps can be broken down into atomic test cases (test units), where each of these test units is given either of pass/fail status based on the validation constraints. You’ll see these tallied up in the reporting table (in the <code>UNITS</code>, <code>PASS</code>, and <code>FAIL</code> columns).</p>
+<p>The tabular reporting view is just one way to see the results. You can also obtain fine-grained results of the interrogation as individual step reports or via methods that provide key metrics. It’s also possible to use the validation results for downstream processing, such as filtering the input table based on the pass/fail status of the rows.</p>
 <p>On the input side, we can use the following types of tables:</p>
 <ul>
 <li>Polars DataFrame</li>
@@ -212,13 +212,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="features">Features</h2>
 <p>Here’s a short list of what we think makes Pointblank a great tool for data validation:</p>
 <ul>
-<li><strong>Declarative Syntax</strong>: Define your data validation rules simply, using a declarative syntax</li>
 <li><strong>Flexible</strong>: We support tables from Polars, Pandas, Duckdb, MySQL, PostgreSQL, SQLite, and Parquet</li>
-<li><strong>Beautiful Reports</strong>: Generate beautiful HTML table reports on how the data validation went down</li>
-<li><strong>Functional Output</strong>: Extract the specific data validation outputs you need for further processing</li>
-<li><strong>Data Testing</strong>: Write tests for your data and use them in your notebooks or testing framework</li>
-<li><strong>Easy to Use</strong>: Get started quickly with a simple API and super clear documentation</li>
-<li><strong>Powerful</strong>: You can develop complex data validation rules with flexible options for customization</li>
+<li><strong>Beautiful Reports</strong>: Generate beautiful HTML table reports of your data validation results</li>
+<li><strong>Functional Output</strong>: Easily pull the specific data validation outputs you need for further processing</li>
+<li><strong>Easy to Use</strong>: Get started quickly with a straightforward API and clear documentation examples</li>
+<li><strong>Powerful</strong>: You can make complex data validation rules with flexible options for composition</li>
 </ul>
 </section>
 <section id="installation" class="level2">
