@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>validate.interrogate – pointblank</title>
+<title>Examples: Using Parquet Data – pointblank</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -57,22 +57,22 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </style>
 
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="../site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="../site_libs/quarto-nav/headroom.min.js"></script>
-<script src="../site_libs/clipboard/clipboard.min.js"></script>
-<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="../site_libs/quarto-search/fuse.min.js"></script>
-<script src="../site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="../">
-<script src="../site_libs/quarto-html/quarto.js"></script>
-<script src="../site_libs/quarto-html/popper.min.js"></script>
-<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="../site_libs/quarto-html/anchor.min.js"></script>
-<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-549806ee2085284f45b00abea8c6df48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-5d5e2b814c9eac8a9e33d3c1d7adb1be.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-549806ee2085284f45b00abea8c6df48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-5d5e2b814c9eac8a9e33d3c1d7adb1be.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -107,14 +107,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 </head>
 
-<body class="nav-fixed">
+<body class="nav-fixed fullcontent">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a class="navbar-brand" href="../index.html">
+    <a class="navbar-brand" href="../../index.html">
     <span class="navbar-title">pointblank</span>
     </a>
   </div>
@@ -125,15 +125,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link" href="../get-started/index.html"> 
+    <a class="nav-link" href="../../get-started/index.html"> 
 <span class="menu-text">Get Started</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../demos/index.html"> 
+    <a class="nav-link" href="../../demos/index.html"> 
 <span class="menu-text">Examples</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../reference/index.html"> 
+    <a class="nav-link" href="../../reference/index.html"> 
 <span class="menu-text">Reference</span></a>
   </li>  
 </ul>
@@ -154,106 +154,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        <nav id="TOC" role="doc-toc" class="toc-active">
-    <h2 id="toc-title">On this page</h2>
-   
-  <ul>
-  <li><a href="#parameters" id="toc-parameters" class="nav-link active" data-scroll-target="#parameters">Parameters</a></li>
-  <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
-  <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
-  </ul>
-</nav>
-    </div>
+    
 <!-- main -->
-<main class="content" id="quarto-document-content">
-
-<header id="title-block-header" class="quarto-title-block default">
-<div class="quarto-title">
-<h1 class="title">Validate.interrogate</h1>
-</div>
+<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"></header>
 
 
 
-<div class="quarto-title-meta">
 
-    
-  
-    
-  </div>
-  
-
-
-</header>
-
-
-<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>Validate.interrogate(</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    collect_extracts<span class="op">=</span><span class="va">True</span>,</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    collect_tbl_checked<span class="op">=</span><span class="va">True</span>,</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    get_first_n<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    sample_n<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    sample_frac<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    sample_limit<span class="op">=</span><span class="dv">5000</span>,</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Execute each validation step against the table and store the results.</p>
-<p>When a validation plan has been set with a series of validation steps, the interrogation process through <code>interrogate()</code> should then be invoked. Interrogation will evaluate each validation step against the table and store the results.</p>
-<p>The interrogation process will collect extracts of failing rows if the <code>collect_extracts</code> option is set to <code>True</code> (the default). We can control the number of rows collected using the <code>get_first_n=</code>, <code>sample_n=</code>, and <code>sample_frac=</code> options. The <code>sample_limit=</code> option will enforce a hard limit on the number of rows collected when using the <code>sample_frac=</code> option.</p>
-<p>After interrogation is complete, the <code>Validate</code> object will have gathered information, and we can use methods like <code>n_passed()</code>, <code>f_failed()</code>, etc., to understand how the table performed against the validation plan. A visual representation of the validation results can be viewed by printing the <code>Validate</code> object; this will display the validation table in an HTML viewing environment.</p>
-<section id="parameters" class="level2 doc-section doc-section-parameters">
-<h2 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters">Parameters</h2>
-<dl>
-<dt><code><span class="parameter-name"><strong>collect_extracts</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation">bool</span> <span class="parameter-default-sep">=</span> <span class="parameter-default">True</span></code></dt>
-<dd>
-<p>An option to collect rows of the input table that didn’t pass a particular validation step. The default is <code>True</code> and further options (i.e., <code>get_first_n=</code>, <code>sample_*=</code>) allow for fine control of how these rows are collected.</p>
-</dd>
-<dt><code><span class="parameter-name"><strong>collect_tbl_checked</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation">bool</span> <span class="parameter-default-sep">=</span> <span class="parameter-default">True</span></code></dt>
-<dd>
-<p>The processed data frames produced by executing the validation steps is collected and stored in the <code>Validate</code> object if <code>collect_tbl_checked=True</code>. This information is necessary for some methods (e.g., <code>get_sundered_data()</code>), but it potentially makes the object grow to a large size. To opt out of attaching this data, set this argument to <code>False</code>.</p>
-</dd>
-<dt><code><span class="parameter-name"><strong>get_first_n</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation">int | None</span> <span class="parameter-default-sep">=</span> <span class="parameter-default">None</span></code></dt>
-<dd>
-<p>If the option to collect rows where test units is chosen, there is the option here to collect the first <code>n</code> rows. Supply an integer number of rows to extract from the top of subset table containing non-passing rows (the ordering of data from the original table is retained).</p>
-</dd>
-<dt><code><span class="parameter-name"><strong>sample_n</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation">int | None</span> <span class="parameter-default-sep">=</span> <span class="parameter-default">None</span></code></dt>
-<dd>
-<p>If the option to collect non-passing rows is chosen, this option allows for the sampling of <code>n</code> rows. Supply an integer number of rows to sample from the subset table. If <code>n</code> happens to be greater than the number of non-passing rows, then all such rows will be returned.</p>
-</dd>
-<dt><code><span class="parameter-name"><strong>sample_frac</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation">int | float | None</span> <span class="parameter-default-sep">=</span> <span class="parameter-default">None</span></code></dt>
-<dd>
-<p>If the option to collect non-passing rows is chosen, this option allows for the sampling of a fraction of those rows. Provide a number in the range of <code>0</code> and <code>1</code>. The number of rows to return could be very large, however, the <code>sample_limit=</code> option will apply a hard limit to the returned rows.</p>
-</dd>
-<dt><code><span class="parameter-name"><strong>sample_limit</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation">int</span> <span class="parameter-default-sep">=</span> <span class="parameter-default">5000</span></code></dt>
-<dd>
-<p>A value that limits the possible number of rows returned when sampling non-passing rows using the <code>sample_frac=</code> option.</p>
-</dd>
-</dl>
-</section>
-<section id="returns" class="level2 doc-section doc-section-returns">
-<h2 class="doc-section doc-section-returns anchored" data-anchor-id="returns">Returns</h2>
-<dl>
-<dt><code><span class="parameter-name"></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation">Validate</span></code></dt>
-<dd>
-<p>The <code>Validate</code> object with the results of the interrogation.</p>
-</dd>
-</dl>
-</section>
-<section id="examples" class="level2 doc-section doc-section-examples">
-<h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
-<p>Let’s use a built-in dataset (<code>"game_revenue"</code>) to demonstrate some of the options of the interrogation process. A series of validation steps will populate our validation plan. After setting up the plan, the next step is to interrogate the table and see how well it aligns with our expectations. We’ll use the <code>get_first_n=</code> option so that any extracts of failing rows are limited to the first <code>n</code> rows.</p>
-<div id="835773de" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>pb.load_dataset(dataset<span class="op">=</span><span class="st">"game_revenue"</span>))</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    .col_vals_lt(columns<span class="op">=</span><span class="st">"item_revenue"</span>, value<span class="op">=</span><span class="dv">200</span>)</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    .col_vals_gt(columns<span class="op">=</span><span class="st">"item_revenue"</span>, value<span class="op">=</span><span class="dv">0</span>)</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    .col_vals_gt(columns<span class="op">=</span><span class="st">"session_duration"</span>, value<span class="op">=</span><span class="dv">5</span>)</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    .col_vals_in_set(columns<span class="op">=</span><span class="st">"item_type"</span>, <span class="bu">set</span><span class="op">=</span>[<span class="st">"iap"</span>, <span class="st">"ad"</span>])</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    .col_vals_regex(columns<span class="op">=</span><span class="st">"player_id"</span>, pattern<span class="op">=</span><span class="vs">r"[A-Z]</span><span class="sc">{12}</span><span class="vs">[0-9]</span><span class="sc">{3}</span><span class="vs">"</span>)</span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>validation.interrogate(get_first_n<span class="op">=</span><span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="using-parquet-data" class="level3">
+<h3 class="anchored" data-anchor-id="using-parquet-data">Using Parquet Data</h3>
+<p>A Parquet dataset can be used for data validation, thanks to Ibis.</p>
+<div id="50e9c553" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div id="pb_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>
@@ -329,7 +240,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <td colspan="14" class="gt_heading gt_title gt_font_normal" style="color: #444444;font-size: 28px;text-align: left;font-weight: bold;">Pointblank Validation</td>
   </tr>
   <tr class="gt_heading">
-    <td colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border"><div><span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2025-01-30|16:46:00</span><div style="padding-top: 10px; padding-bottom: 5px;"><span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 10px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 10px 2px 10px; font-size: smaller;">Polars</span></div></div></td>
+    <td colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border"><div><span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">Example using a Parquet dataset.</span><div style="padding-top: 10px; padding-bottom: 5px;"><span style="background-color: #3F9FF9; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 10px 5px 0px; border: solid 1px #3F9FF9; font-weight: bold; padding: 2px 10px 2px 10px; font-size: smaller;">Parquet</span></div></div></td>
   </tr>
 <tr class="gt_col_headings">
   <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id=""></th>
@@ -461,7 +372,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" class="gt_row gt_center">—</td>
     <td style="height: 40px; background-color: #FCFCFC;" class="gt_row gt_center">—</td>
     <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" class="gt_row gt_center">—</td>
-    <td style="height: 40px;" class="gt_row gt_center"><a href="data:text/csv;base64,cGxheWVyX2lkLHNlc3Npb25faWQsc2Vzc2lvbl9zdGFydCx0aW1lLGl0ZW1fdHlwZSxpdGVtX25hbWUsaXRlbV9yZXZlbnVlLHNlc3Npb25fZHVyYXRpb24sc3RhcnRfZGF5LGFjcXVpc2l0aW9uLGNvdW50cnkKUU5MVlJERU9YRllKODkyLFFOTFZSREVPWEZZSjg5Mi1sejVmbXI2aywyMDE1LTAxLTEwVDE2OjQ0OjE3LjAwMDAwMCswMDAwLDIwMTUtMDEtMTBUMTY6NDU6MjkuMDAwMDAwKzAwMDAsaWFwLGdvbGQzLDMuNDksMy43LDIwMTUtMDEtMDksY3Jvc3Nwcm9tbyxBdXN0cmFsaWEKUk1PU1dISkdFTENJNjc1LFJNT1NXSEpHRUxDSTY3NS10NHk4YmpjdSwyMDE1LTAxLTExVDA3OjI0OjI0LjAwMDAwMCswMDAwLDIwMTUtMDEtMTFUMDc6MjU6MTguMDAwMDAwKzAwMDAsaWFwLG9mZmVyNCwxNy45OTEsNS4wLDIwMTUtMDEtMTAsb3RoZXJfY2FtcGFpZ24sRnJhbmNlClJNT1NXSEpHRUxDSTY3NSxSTU9TV0hKR0VMQ0k2NzUtdDR5OGJqY3UsMjAxNS0wMS0xMVQwNzoyNDoyNC4wMDAwMDArMDAwMCwyMDE1LTAxLTExVDA3OjI2OjI0LjAwMDAwMCswMDAwLGlhcCxvZmZlcjUsMjYuMDksNS4wLDIwMTUtMDEtMTAsb3RoZXJfY2FtcGFpZ24sRnJhbmNlClJNT1NXSEpHRUxDSTY3NSxSTU9TV0hKR0VMQ0k2NzUtdDR5OGJqY3UsMjAxNS0wMS0xMVQwNzoyNDoyNC4wMDAwMDArMDAwMCwyMDE1LTAxLTExVDA3OjI4OjM2LjAwMDAwMCswMDAwLGFkLGFkXzE1c2VjLDAuNTMsNS4wLDIwMTUtMDEtMTAsb3RoZXJfY2FtcGFpZ24sRnJhbmNlCkdGTFlKSEFQTVpXRDYzMSxHRkxZSkhBUE1aV0Q2MzEtaTJ2MWJsN2EsMjAxNS0wMS0xMVQxNjoxMzoyNC4wMDAwMDArMDAwMCwyMDE1LTAxLTExVDE2OjE0OjU0LjAwMDAwMCswMDAwLGlhcCxnZW1zMiwzLjk5LDMuNiwyMDE1LTAxLTA5LG9yZ2FuaWMsSW5kaWEKQkZOTFVSSVNKWFRINjQ3LEJGTkxVUklTSlhUSDY0Ny02bzVoeDI3eiwyMDE1LTAxLTEyVDE3OjM3OjM5LjAwMDAwMCswMDAwLDIwMTUtMDEtMTJUMTc6Mzk6MjcuMDAwMDAwKzAwMDAsaWFwLG9mZmVyNSwxMS41OSw0LjEsMjAxNS0wMS0xMCxvcmdhbmljLEluZGlhCkJGTkxVUklTSlhUSDY0NyxCRk5MVVJJU0pYVEg2NDctNm81aHgyN3osMjAxNS0wMS0xMlQxNzozNzozOS4wMDAwMDArMDAwMCwyMDE1LTAxLTEyVDE3OjQxOjQ1LjAwMDAwMCswMDAwLGlhcCxnZW1zMyw5Ljk5LDQuMSwyMDE1LTAxLTEwLG9yZ2FuaWMsSW5kaWEKS0lMV1pZSFJTSkVHMzE2LEtJTFdaWUhSU0pFRzMxNi11a2U3ZGhxaiwyMDE1LTAxLTEzVDIyOjE2OjI5LjAwMDAwMCswMDAwLDIwMTUtMDEtMTNUMjI6MTc6MzUuMDAwMDAwKzAwMDAsaWFwLG9mZmVyMiwxMC45OSwzLjIsMjAxNS0wMS0wNCxvcmdhbmljLERlbm1hcmsKSlVCRFZGSENOUVdUMTk4LEpVQkRWRkhDTlFXVDE5OC05aDR4czJwYiwyMDE1LTAxLTE0VDE2OjA4OjI1LjAwMDAwMCswMDAwLDIwMTUtMDEtMTRUMTY6MDg6NDMuMDAwMDAwKzAwMDAsaWFwLG9mZmVyNSw4LjY5LDMuMywyMDE1LTAxLTE0LG9yZ2FuaWMsUGhpbGlwcGluZXMKSlVCRFZGSENOUVdUMTk4LEpVQkRWRkhDTlFXVDE5OC05aDR4czJwYiwyMDE1LTAxLTE0VDE2OjA4OjI1LjAwMDAwMCswMDAwLDIwMTUtMDEtMTRUMTY6MTE6MDEuMDAwMDAwKzAwMDAsaWFwLG9mZmVyNCw1Ljk5LDMuMywyMDE1LTAxLTE0LG9yZ2FuaWMsUGhpbGlwcGluZXMK" download="extract_0003.csv"><button style="background-color: #67C2DC; color: #FFFFFF; border: none; padding: 5px; font-weight: bold; cursor: pointer; border-radius: 4px;">CSV</button></a></td>
+    <td style="height: 40px;" class="gt_row gt_center">—</td>
   </tr>
   <tr>
     <td style="height: 40px; background-color: #4CA64C; color: transparent;font-size: 0px;" class="gt_row gt_left">#4CA64C</td>
@@ -523,7 +434,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         <span style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size:11px;"> col_vals_regex()</span>
         </td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">player_id</td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">[A-Z]{12}[0-9]{3}</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">[A-Z]{12}\d{3}</td>
     <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" class="gt_row gt_center"><svg width="25px" height="25px" viewbox="0 0 25 25" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="vertical-align: middle;">
     <g id="unchanged" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="unchanged" transform="translate(0.500000, 0.570147)">
@@ -546,7 +457,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <tfoot class="gt_sourcenotes">
   
   <tr>
-    <td class="gt_sourcenote" colspan="14"><div style="margin-top: 5px; margin-bottom: 5px;"><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin-left: 10px; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2025-01-30 16:46:00 UTC</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">&lt; 1 s</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 1px 5px -1px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2025-01-30 16:46:00 UTC</span></div></td>
+    <td class="gt_sourcenote" colspan="14"><div style="margin-top: 5px; margin-bottom: 5px;"><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin-left: 10px; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2025-01-30 16:43:31 UTC</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">&lt; 1 s</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 1px 5px -1px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2025-01-30 16:43:31 UTC</span></div></td>
   </tr>
 
 </tfoot>
@@ -557,9 +468,27 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         
 </div>
 </div>
-<p>The validation table shows that step 3 (checking for <code>session_duration</code> greater than <code>5</code>) has 18 failing test units. This means that 18 rows in the table are problematic. We’d like to see the rows that failed this validation step and we can do that with the <code>get_data_extracts()</code> method.</p>
-<div id="101a6eff" class="cell" data-execution_count="2">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>pb.preview(validation.get_data_extracts(i<span class="op">=</span><span class="dv">3</span>, frame<span class="op">=</span><span class="va">True</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> ibis</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>game_revenue <span class="op">=</span> ibis.read_parquet(<span class="st">"data/game_revenue.parquet"</span>)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>game_revenue, label<span class="op">=</span><span class="st">"Example using a Parquet dataset."</span>)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    .col_vals_lt(columns<span class="op">=</span><span class="st">"item_revenue"</span>, value<span class="op">=</span><span class="dv">200</span>)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    .col_vals_gt(columns<span class="op">=</span><span class="st">"item_revenue"</span>, value<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    .col_vals_gt(columns<span class="op">=</span><span class="st">"session_duration"</span>, value<span class="op">=</span><span class="dv">5</span>)</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    .col_vals_in_set(columns<span class="op">=</span><span class="st">"item_type"</span>, <span class="bu">set</span><span class="op">=</span>[<span class="st">"iap"</span>, <span class="st">"ad"</span>])</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    .col_vals_regex(columns<span class="op">=</span><span class="st">"player_id"</span>, pattern<span class="op">=</span><span class="vs">r"[A-Z]</span><span class="sc">{12}</span><span class="vs">\d</span><span class="sc">{3}</span><span class="vs">"</span>)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>validation</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details>
+<summary>
+Preview of Input Table
+</summary>
+<div id="ca34a92c" class="cell" data-execution_count="2">
 <div class="cell-output cell-output-display" data-execution_count="2">
 <div id="pb_preview_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>
@@ -613,7 +542,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </style>
 <table style="table-layout: fixed;; width: 0px" class="gt_table" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
 <colgroup>
-  <col style="width:25.6px;">
+  <col style="width:41.2px;">
   <col style="width:127px;">
   <col style="width:197px;">
   <col style="width:205px;">
@@ -624,169 +553,169 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <col style="width:135px;">
   <col style="width:88px;">
   <col style="width:119px;">
-  <col style="width:96px;">
+  <col style="width:111px;">
 </colgroup>
 
 <thead>
 
   <tr class="gt_heading">
-    <td colspan="12" class="gt_heading gt_title gt_font_normal"><div><div style="padding-top: 0; padding-bottom: 7px;"><span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 10px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 10px 2px 10px; font-size: 10px;">Polars</span><span style="background-color: #eecbff; color: #333333; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 5px; font-weight: bold; border: solid 1px #eecbff; padding: 2px 15px 2px 15px; font-size: 10px;">Rows</span><span style="background-color: none; color: #333333; padding: 0.5em 0.5em; position: inherit; margin: 5px 0px 5px -4px; font-weight: bold; border: solid 1px #eecbff; padding: 2px 15px 2px 15px; font-size: 10px;">10</span><span style="background-color: #BDE7B4; color: #333333; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 3px; font-weight: bold; border: solid 1px #BDE7B4; padding: 2px 15px 2px 15px; font-size: 10px;">Columns</span><span style="background-color: none; color: #333333; padding: 0.5em 0.5em; position: inherit; margin: 5px 0px 5px -4px; font-weight: bold; border: solid 1px #BDE7B4; padding: 2px 15px 2px 15px; font-size: 10px;">11</span></div></div></td>
+    <td colspan="12" class="gt_heading gt_title gt_font_normal"><div><div style="padding-top: 0; padding-bottom: 7px;"><span style="background-color: #3F9FF9; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 10px 5px 0px; border: solid 1px #3F9FF9; font-weight: bold; padding: 2px 10px 2px 10px; font-size: 10px;">Parquet</span><span style="background-color: #eecbff; color: #333333; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 5px; font-weight: bold; border: solid 1px #eecbff; padding: 2px 15px 2px 15px; font-size: 10px;">Rows</span><span style="background-color: none; color: #333333; padding: 0.5em 0.5em; position: inherit; margin: 5px 0px 5px -4px; font-weight: bold; border: solid 1px #eecbff; padding: 2px 15px 2px 15px; font-size: 10px;">2000</span><span style="background-color: #BDE7B4; color: #333333; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 3px; font-weight: bold; border: solid 1px #BDE7B4; padding: 2px 15px 2px 15px; font-size: 10px;">Columns</span><span style="background-color: none; color: #333333; padding: 0.5em 0.5em; position: inherit; margin: 5px 0px 5px -4px; font-weight: bold; border: solid 1px #BDE7B4; padding: 2px 15px 2px 15px; font-size: 10px;">11</span></div></div></td>
   </tr>
 <tr class="gt_col_headings">
   <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="color: gray20;font-family: IBM Plex Mono;font-size: 12px;" scope="col" id=""></th>
-  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: gray20;font-family: IBM Plex Mono;font-size: 12px;" scope="col" id="<div><div style='white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-bottom: 2px; margin-bottom: 2px;'>player_id</div><div style='white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-top: 2px; margin-top: 2px;'><em>String</em></div></div>"><div><div style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-bottom: 2px; margin-bottom: 2px;">player_id</div><div style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-top: 2px; margin-top: 2px;"><em>String</em></div></div></th>
-  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: gray20;font-family: IBM Plex Mono;font-size: 12px;" scope="col" id="<div><div style='white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-bottom: 2px; margin-bottom: 2px;'>session_id</div><div style='white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-top: 2px; margin-top: 2px;'><em>String</em></div></div>"><div><div style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-bottom: 2px; margin-bottom: 2px;">session_id</div><div style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-top: 2px; margin-top: 2px;"><em>String</em></div></div></th>
-  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="color: gray20;font-family: IBM Plex Mono;font-size: 12px;" scope="col" id="<div><div style='white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-bottom: 2px; margin-bottom: 2px;'>session_start</div><div style='white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-top: 2px; margin-top: 2px;'><em>Datetime</em></div></div>"><div><div style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-bottom: 2px; margin-bottom: 2px;">session_start</div><div style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-top: 2px; margin-top: 2px;"><em>Datetime</em></div></div></th>
-  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="color: gray20;font-family: IBM Plex Mono;font-size: 12px;" scope="col" id="<div><div style='white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-bottom: 2px; margin-bottom: 2px;'>time</div><div style='white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-top: 2px; margin-top: 2px;'><em>Datetime</em></div></div>"><div><div style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-bottom: 2px; margin-bottom: 2px;">time</div><div style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-top: 2px; margin-top: 2px;"><em>Datetime</em></div></div></th>
-  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: gray20;font-family: IBM Plex Mono;font-size: 12px;" scope="col" id="<div><div style='white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-bottom: 2px; margin-bottom: 2px;'>item_type</div><div style='white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-top: 2px; margin-top: 2px;'><em>String</em></div></div>"><div><div style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-bottom: 2px; margin-bottom: 2px;">item_type</div><div style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-top: 2px; margin-top: 2px;"><em>String</em></div></div></th>
-  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: gray20;font-family: IBM Plex Mono;font-size: 12px;" scope="col" id="<div><div style='white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-bottom: 2px; margin-bottom: 2px;'>item_name</div><div style='white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-top: 2px; margin-top: 2px;'><em>String</em></div></div>"><div><div style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-bottom: 2px; margin-bottom: 2px;">item_name</div><div style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-top: 2px; margin-top: 2px;"><em>String</em></div></div></th>
-  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="color: gray20;font-family: IBM Plex Mono;font-size: 12px;" scope="col" id="<div><div style='white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-bottom: 2px; margin-bottom: 2px;'>item_revenue</div><div style='white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-top: 2px; margin-top: 2px;'><em>Float64</em></div></div>"><div><div style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-bottom: 2px; margin-bottom: 2px;">item_revenue</div><div style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-top: 2px; margin-top: 2px;"><em>Float64</em></div></div></th>
-  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="color: gray20;font-family: IBM Plex Mono;font-size: 12px;" scope="col" id="<div><div style='white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-bottom: 2px; margin-bottom: 2px;'>session_duration</div><div style='white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-top: 2px; margin-top: 2px;'><em>Float64</em></div></div>"><div><div style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-bottom: 2px; margin-bottom: 2px;">session_duration</div><div style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-top: 2px; margin-top: 2px;"><em>Float64</em></div></div></th>
-  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="color: gray20;font-family: IBM Plex Mono;font-size: 12px;" scope="col" id="<div><div style='white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-bottom: 2px; margin-bottom: 2px;'>start_day</div><div style='white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-top: 2px; margin-top: 2px;'><em>Date</em></div></div>"><div><div style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-bottom: 2px; margin-bottom: 2px;">start_day</div><div style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-top: 2px; margin-top: 2px;"><em>Date</em></div></div></th>
-  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: gray20;font-family: IBM Plex Mono;font-size: 12px;" scope="col" id="<div><div style='white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-bottom: 2px; margin-bottom: 2px;'>acquisition</div><div style='white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-top: 2px; margin-top: 2px;'><em>String</em></div></div>"><div><div style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-bottom: 2px; margin-bottom: 2px;">acquisition</div><div style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-top: 2px; margin-top: 2px;"><em>String</em></div></div></th>
-  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: gray20;font-family: IBM Plex Mono;font-size: 12px;" scope="col" id="<div><div style='white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-bottom: 2px; margin-bottom: 2px;'>country</div><div style='white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-top: 2px; margin-top: 2px;'><em>String</em></div></div>"><div><div style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-bottom: 2px; margin-bottom: 2px;">country</div><div style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-top: 2px; margin-top: 2px;"><em>String</em></div></div></th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: gray20;font-family: IBM Plex Mono;font-size: 12px;" scope="col" id="<div><div style='white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-bottom: 2px; margin-bottom: 2px;'>player_id</div><div style='white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-top: 2px; margin-top: 2px;'><em>string</em></div></div>"><div><div style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-bottom: 2px; margin-bottom: 2px;">player_id</div><div style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-top: 2px; margin-top: 2px;"><em>string</em></div></div></th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: gray20;font-family: IBM Plex Mono;font-size: 12px;" scope="col" id="<div><div style='white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-bottom: 2px; margin-bottom: 2px;'>session_id</div><div style='white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-top: 2px; margin-top: 2px;'><em>string</em></div></div>"><div><div style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-bottom: 2px; margin-bottom: 2px;">session_id</div><div style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-top: 2px; margin-top: 2px;"><em>string</em></div></div></th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="color: gray20;font-family: IBM Plex Mono;font-size: 12px;" scope="col" id="<div><div style='white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-bottom: 2px; margin-bottom: 2px;'>session_start</div><div style='white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-top: 2px; margin-top: 2px;'><em>timestamp</em></div></div>"><div><div style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-bottom: 2px; margin-bottom: 2px;">session_start</div><div style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-top: 2px; margin-top: 2px;"><em>timestamp</em></div></div></th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="color: gray20;font-family: IBM Plex Mono;font-size: 12px;" scope="col" id="<div><div style='white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-bottom: 2px; margin-bottom: 2px;'>time</div><div style='white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-top: 2px; margin-top: 2px;'><em>timestamp</em></div></div>"><div><div style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-bottom: 2px; margin-bottom: 2px;">time</div><div style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-top: 2px; margin-top: 2px;"><em>timestamp</em></div></div></th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: gray20;font-family: IBM Plex Mono;font-size: 12px;" scope="col" id="<div><div style='white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-bottom: 2px; margin-bottom: 2px;'>item_type</div><div style='white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-top: 2px; margin-top: 2px;'><em>string</em></div></div>"><div><div style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-bottom: 2px; margin-bottom: 2px;">item_type</div><div style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-top: 2px; margin-top: 2px;"><em>string</em></div></div></th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: gray20;font-family: IBM Plex Mono;font-size: 12px;" scope="col" id="<div><div style='white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-bottom: 2px; margin-bottom: 2px;'>item_name</div><div style='white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-top: 2px; margin-top: 2px;'><em>string</em></div></div>"><div><div style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-bottom: 2px; margin-bottom: 2px;">item_name</div><div style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-top: 2px; margin-top: 2px;"><em>string</em></div></div></th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="color: gray20;font-family: IBM Plex Mono;font-size: 12px;" scope="col" id="<div><div style='white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-bottom: 2px; margin-bottom: 2px;'>item_revenue</div><div style='white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-top: 2px; margin-top: 2px;'><em>float64</em></div></div>"><div><div style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-bottom: 2px; margin-bottom: 2px;">item_revenue</div><div style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-top: 2px; margin-top: 2px;"><em>float64</em></div></div></th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="color: gray20;font-family: IBM Plex Mono;font-size: 12px;" scope="col" id="<div><div style='white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-bottom: 2px; margin-bottom: 2px;'>session_duration</div><div style='white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-top: 2px; margin-top: 2px;'><em>float64</em></div></div>"><div><div style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-bottom: 2px; margin-bottom: 2px;">session_duration</div><div style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-top: 2px; margin-top: 2px;"><em>float64</em></div></div></th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="color: gray20;font-family: IBM Plex Mono;font-size: 12px;" scope="col" id="<div><div style='white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-bottom: 2px; margin-bottom: 2px;'>start_day</div><div style='white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-top: 2px; margin-top: 2px;'><em>date</em></div></div>"><div><div style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-bottom: 2px; margin-bottom: 2px;">start_day</div><div style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-top: 2px; margin-top: 2px;"><em>date</em></div></div></th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: gray20;font-family: IBM Plex Mono;font-size: 12px;" scope="col" id="<div><div style='white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-bottom: 2px; margin-bottom: 2px;'>acquisition</div><div style='white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-top: 2px; margin-top: 2px;'><em>string</em></div></div>"><div><div style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-bottom: 2px; margin-bottom: 2px;">acquisition</div><div style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-top: 2px; margin-top: 2px;"><em>string</em></div></div></th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: gray20;font-family: IBM Plex Mono;font-size: 12px;" scope="col" id="<div><div style='white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-bottom: 2px; margin-bottom: 2px;'>country</div><div style='white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-top: 2px; margin-top: 2px;'><em>string</em></div></div>"><div><div style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-bottom: 2px; margin-bottom: 2px;">country</div><div style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-top: 2px; margin-top: 2px;"><em>string</em></div></div></th>
 </tr>
 </thead>
 <tbody class="gt_table_body">
   <tr>
     <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; color: gray;font-family: IBM Plex Mono;font-size: 10px; border-right: 2px solid #6699CC80;" class="gt_row gt_right">1</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">QNLVRDEOXFYJ892</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">QNLVRDEOXFYJ892-lz5fmr6k</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">2015-01-10 16:44:17+00:00</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">2015-01-10 16:45:29+00:00</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">ECPANOIXLZHF896</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">ECPANOIXLZHF896-eol2j8bs</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">2015-01-01 01:31:03+00:00</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">2015-01-01 01:31:27+00:00</td>
     <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">iap</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">gold3</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">3.49</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">3.7</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">2015-01-09</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">crosspromo</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Australia</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">offer2</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">8.99</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">16.3</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">2015-01-01</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">google</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Germany</td>
   </tr>
   <tr>
     <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; color: gray;font-family: IBM Plex Mono;font-size: 10px; border-right: 2px solid #6699CC80;" class="gt_row gt_right">2</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">RMOSWHJGELCI675</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">RMOSWHJGELCI675-t4y8bjcu</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">2015-01-11 07:24:24+00:00</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">2015-01-11 07:25:18+00:00</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">ECPANOIXLZHF896</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">ECPANOIXLZHF896-eol2j8bs</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">2015-01-01 01:31:03+00:00</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">2015-01-01 01:36:57+00:00</td>
     <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">iap</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">offer4</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">17.991</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">5.0</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">2015-01-10</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">other_campaign</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">France</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">gems3</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">22.49</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">16.3</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">2015-01-01</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">google</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Germany</td>
   </tr>
   <tr>
     <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; color: gray;font-family: IBM Plex Mono;font-size: 10px; border-right: 2px solid #6699CC80;" class="gt_row gt_right">3</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">RMOSWHJGELCI675</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">RMOSWHJGELCI675-t4y8bjcu</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">2015-01-11 07:24:24+00:00</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">2015-01-11 07:26:24+00:00</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">ECPANOIXLZHF896</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">ECPANOIXLZHF896-eol2j8bs</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">2015-01-01 01:31:03+00:00</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">2015-01-01 01:37:45+00:00</td>
     <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">iap</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">offer5</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">26.09</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">5.0</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">2015-01-10</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">other_campaign</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">France</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">gold7</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">107.99</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">16.3</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">2015-01-01</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">google</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Germany</td>
   </tr>
   <tr>
     <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; color: gray;font-family: IBM Plex Mono;font-size: 10px; border-right: 2px solid #6699CC80;" class="gt_row gt_right">4</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">RMOSWHJGELCI675</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">RMOSWHJGELCI675-t4y8bjcu</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">2015-01-11 07:24:24+00:00</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">2015-01-11 07:28:36+00:00</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">ECPANOIXLZHF896</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">ECPANOIXLZHF896-eol2j8bs</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">2015-01-01 01:31:03+00:00</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">2015-01-01 01:42:33+00:00</td>
     <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">ad</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">ad_15sec</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">0.53</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">5.0</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">ad_20sec</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">0.76</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">16.3</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">2015-01-01</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">google</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Germany</td>
+  </tr>
+  <tr>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; border-bottom: 2px solid #6699CC80; color: gray;font-family: IBM Plex Mono;font-size: 10px; border-right: 2px solid #6699CC80;" class="gt_row gt_right">5</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; border-bottom: 2px solid #6699CC80;" class="gt_row gt_left">ECPANOIXLZHF896</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; border-bottom: 2px solid #6699CC80;" class="gt_row gt_left">ECPANOIXLZHF896-hdu9jkls</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; border-bottom: 2px solid #6699CC80;" class="gt_row gt_right">2015-01-01 11:50:02+00:00</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; border-bottom: 2px solid #6699CC80;" class="gt_row gt_right">2015-01-01 11:55:20+00:00</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; border-bottom: 2px solid #6699CC80;" class="gt_row gt_left">ad</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; border-bottom: 2px solid #6699CC80;" class="gt_row gt_left">ad_5sec</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; border-bottom: 2px solid #6699CC80;" class="gt_row gt_right">0.03</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; border-bottom: 2px solid #6699CC80;" class="gt_row gt_right">35.2</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; border-bottom: 2px solid #6699CC80;" class="gt_row gt_right">2015-01-01</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; border-bottom: 2px solid #6699CC80;" class="gt_row gt_left">google</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; border-bottom: 2px solid #6699CC80;" class="gt_row gt_left">Germany</td>
+  </tr>
+  <tr>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; color: gray;font-family: IBM Plex Mono;font-size: 10px; border-right: 2px solid #6699CC80;" class="gt_row gt_right">1996</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">NAOJRDMCSEBI281</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">NAOJRDMCSEBI281-j2vs9ilp</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">2015-01-21 01:57:50+00:00</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">2015-01-21 02:02:50+00:00</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">ad</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">ad_survey</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">1.332</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">25.8</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">2015-01-11</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">organic</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Norway</td>
+  </tr>
+  <tr>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; color: gray;font-family: IBM Plex Mono;font-size: 10px; border-right: 2px solid #6699CC80;" class="gt_row gt_right">1997</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">NAOJRDMCSEBI281</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">NAOJRDMCSEBI281-j2vs9ilp</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">2015-01-21 01:57:50+00:00</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">2015-01-21 02:22:14+00:00</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">ad</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">ad_survey</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">1.35</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">25.8</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">2015-01-11</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">organic</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Norway</td>
+  </tr>
+  <tr>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; color: gray;font-family: IBM Plex Mono;font-size: 10px; border-right: 2px solid #6699CC80;" class="gt_row gt_right">1998</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">RMOSWHJGELCI675</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">RMOSWHJGELCI675-vbhcsmtr</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">2015-01-21 02:39:48+00:00</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">2015-01-21 02:40:00+00:00</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">ad</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">ad_5sec</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">0.03</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">8.4</td>
     <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">2015-01-10</td>
     <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">other_campaign</td>
     <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">France</td>
   </tr>
   <tr>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; color: gray;font-family: IBM Plex Mono;font-size: 10px; border-right: 2px solid #6699CC80;" class="gt_row gt_right">5</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">GFLYJHAPMZWD631</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">GFLYJHAPMZWD631-i2v1bl7a</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">2015-01-11 16:13:24+00:00</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">2015-01-11 16:14:54+00:00</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">iap</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">gems2</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">3.99</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">3.6</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">2015-01-09</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">organic</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">India</td>
-  </tr>
-  <tr>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; color: gray;font-family: IBM Plex Mono;font-size: 10px; border-right: 2px solid #6699CC80;" class="gt_row gt_right">6</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">BFNLURISJXTH647</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">BFNLURISJXTH647-6o5hx27z</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">2015-01-12 17:37:39+00:00</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">2015-01-12 17:39:27+00:00</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; color: gray;font-family: IBM Plex Mono;font-size: 10px; border-right: 2px solid #6699CC80;" class="gt_row gt_right">1999</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">RMOSWHJGELCI675</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">RMOSWHJGELCI675-vbhcsmtr</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">2015-01-21 02:39:48+00:00</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">2015-01-21 02:47:12+00:00</td>
     <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">iap</td>
     <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">offer5</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">11.59</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">4.1</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">26.09</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">8.4</td>
     <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">2015-01-10</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">organic</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">India</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">other_campaign</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">France</td>
   </tr>
   <tr>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; color: gray;font-family: IBM Plex Mono;font-size: 10px; border-right: 2px solid #6699CC80;" class="gt_row gt_right">7</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">BFNLURISJXTH647</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">BFNLURISJXTH647-6o5hx27z</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">2015-01-12 17:37:39+00:00</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">2015-01-12 17:41:45+00:00</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">iap</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">gems3</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">9.99</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">4.1</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">2015-01-10</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">organic</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">India</td>
-  </tr>
-  <tr>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; color: gray;font-family: IBM Plex Mono;font-size: 10px; border-right: 2px solid #6699CC80;" class="gt_row gt_right">8</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">KILWZYHRSJEG316</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">KILWZYHRSJEG316-uke7dhqj</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">2015-01-13 22:16:29+00:00</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">2015-01-13 22:17:35+00:00</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">iap</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">offer2</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">10.99</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">3.2</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">2015-01-04</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">organic</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Denmark</td>
-  </tr>
-  <tr>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; color: gray;font-family: IBM Plex Mono;font-size: 10px; border-right: 2px solid #6699CC80;" class="gt_row gt_right">9</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">JUBDVFHCNQWT198</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">JUBDVFHCNQWT198-9h4xs2pb</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">2015-01-14 16:08:25+00:00</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">2015-01-14 16:08:43+00:00</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">iap</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">offer5</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">8.69</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">3.3</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; color: gray;font-family: IBM Plex Mono;font-size: 10px; border-right: 2px solid #6699CC80;" class="gt_row gt_right">2000</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">GJCXNTWEBIPQ369</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">GJCXNTWEBIPQ369-9elq67md</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">2015-01-21 03:59:23+00:00</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">2015-01-21 04:06:29+00:00</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">ad</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">ad_5sec</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">0.12</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">18.5</td>
     <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">2015-01-14</td>
     <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">organic</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Philippines</td>
-  </tr>
-  <tr>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; color: gray;font-family: IBM Plex Mono;font-size: 10px; border-right: 2px solid #6699CC80;" class="gt_row gt_right">10</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">JUBDVFHCNQWT198</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">JUBDVFHCNQWT198-9h4xs2pb</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">2015-01-14 16:08:25+00:00</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">2015-01-14 16:11:01+00:00</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">iap</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">offer4</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">5.99</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">3.3</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">2015-01-14</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">organic</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Philippines</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">United States</td>
   </tr>
 </tbody>
 
@@ -797,7 +726,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         
 </div>
 </div>
-<p>The <code>get_data_extracts()</code> method will return a Polars DataFrame with the first 10 rows that failed the validation step (we passed that into the <code>preview()</code> function for a better display). There are actually 18 rows that failed but we limited the collection of extracts with <code>get_first_n=10</code>.</p>
+</details>
 
 
 </section>
