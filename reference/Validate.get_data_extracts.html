@@ -236,7 +236,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="examples" class="level2 doc-section doc-section-examples">
 <h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Let’s perform a series of validation steps on a Polars DataFrame. We’ll use the <code>col_vals_gt()</code> in the first step, <code>col_vals_lt()</code> in the second step, and <code>col_vals_ge()</code> in the third step. The <code>interrogate()</code> method executes the validation; then, we can extract the rows that failed for each validation step.</p>
-<div id="30a9293c" class="cell" data-execution_count="2">
+<div id="92f049d9" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -258,31 +258,31 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>validation.get_data_extracts()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="2">
-<pre><code>{1: shape: (2, 3)
- ┌─────┬─────┬─────┐
- │ a   ┆ b   ┆ c   │
- │ --- ┆ --- ┆ --- │
- │ i64 ┆ i64 ┆ i64 │
- ╞═════╪═════╪═════╡
- │ 3   ┆ 5   ┆ 6   │
- │ 1   ┆ 6   ┆ 1   │
- └─────┴─────┴─────┘,
- 2: shape: (2, 3)
- ┌─────┬─────┬─────┐
- │ a   ┆ b   ┆ c   │
- │ --- ┆ --- ┆ --- │
- │ i64 ┆ i64 ┆ i64 │
- ╞═════╪═════╪═════╡
- │ 6   ┆ 2   ┆ 7   │
- │ 3   ┆ 5   ┆ 6   │
- └─────┴─────┴─────┘,
- 3: shape: (0, 3)
- ┌─────┬─────┬─────┐
- │ a   ┆ b   ┆ c   │
- │ --- ┆ --- ┆ --- │
- │ i64 ┆ i64 ┆ i64 │
- ╞═════╪═════╪═════╡
- └─────┴─────┴─────┘}</code></pre>
+<pre><code>{1: shape: (2, 4)
+ ┌───────────┬─────┬─────┬─────┐
+ │ _row_num_ ┆ a   ┆ b   ┆ c   │
+ │ ---       ┆ --- ┆ --- ┆ --- │
+ │ u32       ┆ i64 ┆ i64 ┆ i64 │
+ ╞═══════════╪═════╪═════╪═════╡
+ │ 4         ┆ 3   ┆ 5   ┆ 6   │
+ │ 6         ┆ 1   ┆ 6   ┆ 1   │
+ └───────────┴─────┴─────┴─────┘,
+ 2: shape: (2, 4)
+ ┌───────────┬─────┬─────┬─────┐
+ │ _row_num_ ┆ a   ┆ b   ┆ c   │
+ │ ---       ┆ --- ┆ --- ┆ --- │
+ │ u32       ┆ i64 ┆ i64 ┆ i64 │
+ ╞═══════════╪═════╪═════╪═════╡
+ │ 2         ┆ 6   ┆ 2   ┆ 7   │
+ │ 4         ┆ 3   ┆ 5   ┆ 6   │
+ └───────────┴─────┴─────┴─────┘,
+ 3: shape: (0, 4)
+ ┌───────────┬─────┬─────┬─────┐
+ │ _row_num_ ┆ a   ┆ b   ┆ c   │
+ │ ---       ┆ --- ┆ --- ┆ --- │
+ │ u32       ┆ i64 ┆ i64 ┆ i64 │
+ ╞═══════════╪═════╪═════╪═════╡
+ └───────────┴─────┴─────┴─────┘}</code></pre>
 </div>
 </div>
 <p>The <code>get_data_extracts()</code> method returns a dictionary of tables, where each table contains a subset of rows from the table. These are the rows that failed for each validation step.</p>
@@ -290,23 +290,23 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>In the second step, the <code>col_vals_lt()</code> method was used to check if the values in column <code>c</code> were less than <code>5</code>. In the extracted two-row table, we see that the values in column <code>c</code> are greater than <code>5</code>.</p>
 <p>The third step (<code>col_vals_ge()</code>) checked if the values in column <code>b</code> were greater than or equal to <code>1</code>. There were no failing test units, so the extracted table is empty (i.e., has columns but no rows).</p>
 <p>The <code>i=</code> argument can be used to narrow down the extraction to one or more steps. For example, to extract the rows that failed in the first step only:</p>
-<div id="39e4de7e" class="cell" data-execution_count="3">
+<div id="7671b47a" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>validation.get_data_extracts(i<span class="op">=</span><span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="3">
-<pre><code>{1: shape: (2, 3)
- ┌─────┬─────┬─────┐
- │ a   ┆ b   ┆ c   │
- │ --- ┆ --- ┆ --- │
- │ i64 ┆ i64 ┆ i64 │
- ╞═════╪═════╪═════╡
- │ 3   ┆ 5   ┆ 6   │
- │ 1   ┆ 6   ┆ 1   │
- └─────┴─────┴─────┘}</code></pre>
+<pre><code>{1: shape: (2, 4)
+ ┌───────────┬─────┬─────┬─────┐
+ │ _row_num_ ┆ a   ┆ b   ┆ c   │
+ │ ---       ┆ --- ┆ --- ┆ --- │
+ │ u32       ┆ i64 ┆ i64 ┆ i64 │
+ ╞═══════════╪═════╪═════╪═════╡
+ │ 4         ┆ 3   ┆ 5   ┆ 6   │
+ │ 6         ┆ 1   ┆ 6   ┆ 1   │
+ └───────────┴─────┴─────┴─────┘}</code></pre>
 </div>
 </div>
 <p>Note that the first validation step is indexed at <code>1</code> (not <code>0</code>). This 1-based indexing is in place here to match the step numbers reported in the validation table. What we get back is still a dictionary, but it only contains one table (the one for the first step).</p>
 <p>If you want to get the extracted table as a DataFrame, set <code>frame=True</code> and provide a scalar value for <code>i</code>. For example, to get the extracted table for the second step as a DataFrame:</p>
-<div id="b918333a" class="cell" data-execution_count="4">
+<div id="24a8f17e" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>pb.preview(validation.get_data_extracts(i<span class="op">=</span><span class="dv">2</span>, frame<span class="op">=</span><span class="va">True</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="4">
 <div id="pb_preview_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
@@ -378,13 +378,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </thead>
 <tbody class="gt_table_body">
   <tr>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; color: gray;font-family: IBM Plex Mono;font-size: 10px; border-right: 2px solid #6699CC80;" class="gt_row gt_right">1</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; color: gray;font-family: IBM Plex Mono;font-size: 10px; border-right: 2px solid #6699CC80;" class="gt_row gt_right">2</td>
     <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">6</td>
     <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">2</td>
     <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">7</td>
   </tr>
   <tr>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; color: gray;font-family: IBM Plex Mono;font-size: 10px; border-right: 2px solid #6699CC80;" class="gt_row gt_right">2</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; color: gray;font-family: IBM Plex Mono;font-size: 10px; border-right: 2px solid #6699CC80;" class="gt_row gt_right">4</td>
     <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">3</td>
     <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">5</td>
     <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">6</td>
