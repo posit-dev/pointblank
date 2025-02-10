@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>get_row_count – pointblank</title>
+<title>missing_vals_tbl – pointblank</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -156,53 +156,42 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#parameters" id="toc-parameters" class="nav-link active" data-scroll-target="#parameters">Parameters</a></li>
+  <li><a href="#pointblank.missing_vals_tbl" id="toc-pointblank.missing_vals_tbl" class="nav-link active" data-scroll-target="#pointblank.missing_vals_tbl">missing_vals_tbl</a>
+  <ul class="collapse">
+  <li><a href="#parameters" id="toc-parameters" class="nav-link" data-scroll-target="#parameters">Parameters</a></li>
   <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
   <li><a href="#supported-input-table-types" id="toc-supported-input-table-types" class="nav-link" data-scroll-target="#supported-input-table-types">Supported Input Table Types</a></li>
-  <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
+  <li><a href="#the-missing-values-table" id="toc-the-missing-values-table" class="nav-link" data-scroll-target="#the-missing-values-table">The Missing Values Table</a></li>
+  </ul></li>
   </ul>
 </nav>
     </div>
 <!-- main -->
-<main class="content" id="quarto-document-content">
-
-<header id="title-block-header" class="quarto-title-block default">
-<div class="quarto-title">
-<h1 class="title">get_row_count</h1>
-</div>
+<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"></header>
 
 
 
-<div class="quarto-title-meta">
 
-    
-  
-    
-  </div>
-  
-
-
-</header>
-
-
-<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>get_row_count(data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Get the number of rows in a table.</p>
-<p>The <code>get_row_count()</code> function returns the number of rows in a table. The function works with any table that is supported by the <code>pointblank</code> library, including Pandas, Polars, and Ibis backend tables (e.g., DuckDB, MySQL, PostgreSQL, SQLite, Parquet, etc.).</p>
+<section id="pointblank.missing_vals_tbl" class="level1">
+<h1>missing_vals_tbl</h1>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>missing_vals_tbl(data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Display a table that shows the missing values in the input table.</p>
+<p>The <code>missing_vals_tbl()</code> function generates a table that shows the missing values in the input table. The table is displayed using the Great Tables (<code>GT</code>) API, which allows for further customization of the table’s appearance if so desired.</p>
 <section id="parameters" class="level2 doc-section doc-section-parameters">
 <h2 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters">Parameters</h2>
 <dl>
 <dt><code><span class="parameter-name"><strong>data</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation">FrameT | Any</span></code></dt>
 <dd>
-<p>The table for which to get the row count, which could be a DataFrame object or an Ibis table object. Read the <em>Supported Input Table Types</em> section for details on the supported table types.</p>
+<p>The table for which to display the missing values. This could be a DataFrame object or an Ibis table object. Read the <em>Supported Input Table Types</em> section for details on the supported table types.</p>
 </dd>
 </dl>
 </section>
 <section id="returns" class="level2 doc-section doc-section-returns">
 <h2 class="doc-section doc-section-returns anchored" data-anchor-id="returns">Returns</h2>
 <dl>
-<dt><code><span class="parameter-name"></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation">int</span></code></dt>
+<dt><code><span class="parameter-name"></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation">GT</span></code></dt>
 <dd>
-<p>The number of rows in the table.</p>
+<p>A GT object that displays the table of missing values in the input table.</p>
 </dd>
 </dl>
 </section>
@@ -218,33 +207,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>SQLite table (<code>"sqlite"</code>)*</li>
 <li>Parquet table (<code>"parquet"</code>)*</li>
 </ul>
-<p>The table types marked with an asterisk need to be prepared as Ibis tables (with type of <code>ibis.expr.types.relations.Table</code>). Furthermore, using <code>get_row_count()</code> with these types of tables requires the Ibis library (<code>v9.5.0</code> or above) to be installed. If the input table is a Polars or Pandas DataFrame, the availability of Ibis is not needed.</p>
+<p>The table types marked with an asterisk need to be prepared as Ibis tables (with type of <code>ibis.expr.types.relations.Table</code>). Furthermore, using <code>missing_vals_tbl()</code> with these types of tables requires the Ibis library (<code>v9.5.0</code> or above) to be installed. If the input table is a Polars or Pandas DataFrame, the availability of Ibis is not needed.</p>
 </section>
-<section id="examples" class="level2 doc-section doc-section-examples">
-<h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
-<p>Getting the number of rows in a table is easily done by using the <code>get_row_count()</code> function. Here’s an example using the <code>game_revenue</code> dataset (itself loaded using the <code>load_dataset()</code> function):</p>
-<div id="87f115ae" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>game_revenue_polars <span class="op">=</span> pb.load_dataset(<span class="st">"game_revenue"</span>)</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>pb.get_row_count(game_revenue_polars)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="1">
-<pre><code>2000</code></pre>
-</div>
-</div>
-<p>This table is a Polars DataFrame, but the <code>get_row_count()</code> function works with any table supported by <code>pointblank</code>, including Pandas DataFrames and Ibis backend tables. Here’s an example using a DuckDB table handled by Ibis:</p>
-<div id="cdceccd4" class="cell" data-execution_count="2">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>game_revenue_duckdb <span class="op">=</span> pb.load_dataset(<span class="st">"game_revenue"</span>, tbl_type<span class="op">=</span><span class="st">"duckdb"</span>)</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>pb.get_row_count(game_revenue_duckdb)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="2">
-<pre><code>2000</code></pre>
-</div>
-</div>
-<p>The function always returns the number of rows in the table as an integer value, which is <code>2000</code> for the <code>game_revenue</code> dataset.</p>
+<section id="the-missing-values-table" class="level2 doc-section doc-section-the-missing-values-table">
+<h2 class="doc-section doc-section-the-missing-values-table anchored" data-anchor-id="the-missing-values-table">The Missing Values Table</h2>
+<p>The missing values table shows the proportion of missing values in each column of the input table. The table is divided into sectors, with each sector representing a range of rows in the table. The proportion of missing values in each sector is calculated for each column. The table is displayed using the Great Tables API, which allows for further customization of the table’s appearance.</p>
+<p>To ensure that the table can scale to tables with many columns, each row in the reporting table represents a column in the input table. There are 10 sectors shown in the table, where the first sector represents the first 10% of the rows, the second sector represents the next 10% of the rows, and so on. Any sectors that are light blue indicate that there are no missing values in that sector. If there are missing values, the proportion of missing values is shown by a gray color (light gray for low proportions, dark gray to black for very high proportions).</p>
 
 
+</section>
 </section>
 
 </main> <!-- /main -->
