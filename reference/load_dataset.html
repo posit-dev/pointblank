@@ -72,7 +72,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-549806ee2085284f45b00abea8c6df48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-5d5e2b814c9eac8a9e33d3c1d7adb1be.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-4cf0e90b86864d5bacae6bb4084c3375.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -190,7 +190,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 <div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>load_dataset(dataset<span class="op">=</span><span class="st">'small_table'</span>, tbl_type<span class="op">=</span><span class="st">'polars'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Load a dataset hosted in the library as specified DataFrame type.</p>
+<p>Load a dataset hosted in the library as specified table type.</p>
+<p>The Pointblank library includes several datasets that can be loaded using the <code>load_dataset()</code> function. The datasets can be loaded as a Polars DataFrame, a Pandas DataFrame, or as a DuckDB table (which uses the Ibis library backend). These datasets are used throughout the documentation’s examples to demonstrate the functionality of the library. They’re also useful for experimenting with the library and trying out different validation scenarios.</p>
 <section id="parameters" class="level2 doc-section doc-section-parameters">
 <h2 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters">Parameters</h2>
 <dl>
@@ -200,7 +201,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </dd>
 <dt><code><span class="parameter-name"><strong>tbl_type</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation">Literal['polars', 'pandas', 'duckdb']</span> <span class="parameter-default-sep">=</span> <span class="parameter-default">'polars'</span></code></dt>
 <dd>
-<p>The type of DataFrame to generate from the dataset. The named options are <code>"polars"</code>, <code>"pandas"</code>, and <code>"duckdb"</code>.</p>
+<p>The type of table to generate from the dataset. The named options are <code>"polars"</code>, <code>"pandas"</code>, and <code>"duckdb"</code>.</p>
 </dd>
 </dl>
 </section>
@@ -234,7 +235,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="examples" class="level2 doc-section doc-section-examples">
 <h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Load the <code>small_table</code> dataset as a Polars DataFrame by calling <code>load_dataset()</code> with its defaults:</p>
-<div id="1e4e5de2" class="cell" data-execution_count="1">
+<div id="0443fc0c" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>small_table <span class="op">=</span> pb.load_dataset()</span>
@@ -443,7 +444,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <p>Note that the <code>small_table</code> dataset is a simple Polars DataFrame and using the <code>preview()</code> function will display the table in an HTML viewing environment.</p>
 <p>The <code>game_revenue</code> dataset can be loaded as a Pandas DataFrame by specifying the dataset name and setting <code>tbl_type="pandas"</code>:</p>
-<div id="a2c10642" class="cell" data-execution_count="2">
+<div id="ef61e73b" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>game_revenue <span class="op">=</span> pb.load_dataset(dataset<span class="op">=</span><span class="st">"game_revenue"</span>, tbl_type<span class="op">=</span><span class="st">"pandas"</span>)</span>
@@ -688,7 +689,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <p>The <code>game_revenue</code> dataset is a more real-world dataset with a mix of data types, and it’s significantly larger than the <code>small_table</code> dataset at 2000 rows and 11 columns.</p>
 <p>The <code>nycflights</code> dataset can be loaded as a DuckDB table by specifying the dataset name and setting <code>tbl_type="duckdb"</code>:</p>
-<div id="5e5995f0" class="cell" data-execution_count="3">
+<div id="fb40e7cf" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>nycflights <span class="op">=</span> pb.load_dataset(dataset<span class="op">=</span><span class="st">"nycflights"</span>, tbl_type<span class="op">=</span><span class="st">"duckdb"</span>)</span>

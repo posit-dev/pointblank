@@ -38,7 +38,7 @@ ul.task-list li input[type="checkbox"] {
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-549806ee2085284f45b00abea8c6df48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-5d5e2b814c9eac8a9e33d3c1d7adb1be.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-4cf0e90b86864d5bacae6bb4084c3375.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -128,7 +128,7 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#validation-steps" id="toc-validation-steps" class="nav-link" data-scroll-target="#validation-steps">Validation Steps</a></li>
   <li><a href="#column-selection" id="toc-column-selection" class="nav-link" data-scroll-target="#column-selection">Column Selection</a></li>
   <li><a href="#interrogation-and-reporting" id="toc-interrogation-and-reporting" class="nav-link" data-scroll-target="#interrogation-and-reporting">Interrogation and Reporting</a></li>
-  <li><a href="#utilities" id="toc-utilities" class="nav-link" data-scroll-target="#utilities">Utilities</a></li>
+  <li><a href="#inspect" id="toc-inspect" class="nav-link" data-scroll-target="#inspect">Inspect</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -353,14 +353,14 @@ ul.task-list li input[type="checkbox"] {
 </tbody>
 </table>
 </section>
-<section id="utilities" class="level2">
-<h2 class="anchored" data-anchor-id="utilities">Utilities</h2>
-<p>The utilities group contains functions that are helpful for the validation process. We can load datasets with <code>load_dataset()</code>, preview a table with <code>preview()</code>, see where there are missing values in a table with <code>missing_vals_tbl()</code>, and set global configuration parameters with <code>config()</code>.</p>
+<section id="inspect" class="level2">
+<h2 class="anchored" data-anchor-id="inspect">Inspect</h2>
+<p>The <em>Inspect</em> group contains functions that are helpful for getting to grips on a new data table. Use the <code>DataScan</code> class to get a quick overview of the data, <code>preview()</code> to see the first and last few rows of a table, <code>missing_vals_tbl()</code> to see where there are missing values in a table, and <code>get_column_count()</code>/<code>get_row_count()</code> to get the number of columns and rows in a table. Several datasets included in the package can be accessed via the <code>load_dataset()</code> function. Finally, the <code>config()</code> utility lets us set global configuration parameters.</p>
 <table class="caption-top table">
 <tbody>
 <tr class="odd">
-<td><a href="../reference/load_dataset.html#pointblank.load_dataset">load_dataset</a></td>
-<td>Load a dataset hosted in the library as specified DataFrame type.</td>
+<td><a href="../reference/DataScan.html#pointblank.DataScan">DataScan</a></td>
+<td>Get a summary of a dataset.</td>
 </tr>
 <tr class="even">
 <td><a href="../reference/preview.html#pointblank.preview">preview</a></td>
@@ -379,6 +379,10 @@ ul.task-list li input[type="checkbox"] {
 <td>Get the number of rows in a table.</td>
 </tr>
 <tr class="even">
+<td><a href="../reference/load_dataset.html#pointblank.load_dataset">load_dataset</a></td>
+<td>Load a dataset hosted in the library as specified table type.</td>
+</tr>
+<tr class="odd">
 <td><a href="../reference/config.html#pointblank.config">config</a></td>
 <td>Configuration settings for the pointblank library.</td>
 </tr>
