@@ -13,18 +13,20 @@ from great_tables.gt import _get_column_of_values
 from pointblank._constants import ASSERTION_TYPE_METHOD_MAP, GENERAL_COLUMN_TYPES
 
 
-def _get_tbl_type(data: FrameT) -> str:
+def _get_tbl_type(data: FrameT | Any) -> str:
 
     type_str = str(type(data))
 
     ibis_tbl = "ibis.expr.types.relations.Table" in type_str
 
-    # TODO: in a later release of Narwhals, there will be a method for getting the namespace:
-    # `get_native_namespace()`
-
     if not ibis_tbl:
 
-        df_ns_str = str(nw.from_native(data).__native_namespace__())
+        # TODO: in a later release of Narwhals, there will be a method for getting the namespace:
+        # `get_native_namespace()`
+        try:
+            df_ns_str = str(nw.from_native(data).__native_namespace__())
+        except Exception as e:
+            raise TypeError("The `data` object is not a DataFrame or Ibis Table.") from e
 
         # Detect through regex if the table is a polars or pandas DataFrame
         if re.search(r"polars", df_ns_str, re.IGNORECASE):

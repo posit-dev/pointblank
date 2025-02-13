@@ -31,12 +31,14 @@ from pointblank.validate import (
 )
 from pointblank.schema import Schema
 from pointblank.thresholds import Thresholds
+from pointblank.datascan import DataScan
 
 __all__ = [
     "TF",
     "Validate",
     "Thresholds",
     "Schema",
+    "DataScan",
     "col",
     "starts_with",
     "ends_with",

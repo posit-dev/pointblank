@@ -118,16 +118,20 @@ quartodoc:
         - name: Validate.warn
         - name: Validate.stop
         - name: Validate.notify
-    - title: Utilities
+    - title: Inspect
       desc: >
-        The utilities group contains functions that are helpful for the validation process. We can
-        load datasets with `load_dataset()`, preview a table with `preview()`, see where there are
-        missing values in a table with `missing_vals_tbl()`, and set global configuration parameters
-        with `config()`.
+        The *Inspect* group contains functions that are helpful for getting to grips on a new data
+        table. Use the `DataScan` class to get a quick overview of the data, `preview()` to see the
+        first and last few rows of a table, `missing_vals_tbl()` to see where there are missing
+        values in a table, and `get_column_count()`/`get_row_count()` to get the number of columns
+        and rows in a table. Several datasets included in the package can be accessed via the
+        `load_dataset()` function. Finally, the `config()` utility lets us set global configuration
+        parameters.
       contents:
-        - name: load_dataset
+        - name: DataScan
         - name: preview
         - name: missing_vals_tbl
         - name: get_column_count
         - name: get_row_count
+        - name: load_dataset
         - name: config
