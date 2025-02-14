@@ -111,6 +111,11 @@ VALIDATION_REPORT_FIELDS = [
     "proc_duration_s",
 ]
 
+MODEL_PROVIDERS = [
+    "openai",
+    "anthropic",
+]
+
 TABLE_TYPE_STYLES = {
     "pandas": {"background": "#150458", "text": "#FFFFFF", "label": "Pandas"},
     "polars": {"background": "#0075FF", "text": "#FFFFFF", "label": "Polars"},

@@ -509,11 +509,13 @@ def _get_api_text() -> str:
         "Validate.notify",
     ]
 
-    utilities_exported = [
-        "load_dataset",
+    inspect_exported = [
+        "DataScan",
         "preview",
+        "missing_vals_tbl",
         "get_column_count",
         "get_row_count",
+        "load_dataset",
         "config",
     ]
 
@@ -540,9 +542,12 @@ validation steps, (3) `interrogate()`. After interrogation of the data, we can v
 report table (by printing the object or using `get_tabular_report()`), extract key metrics, or we
 can split the data based on the validation results (with `get_sundered_data()`)."""
 
-    utilities_desc = """The utilities group contains functions that are helpful for the validation
-process. We can load datasets with `load_dataset()`, preview a table with `preview()`, and set
-global configuration parameters with `config()`."""
+    inspect_desc = """The *Inspect* group contains functions that are helpful for getting to grips
+on a new data table. Use the `DataScan` class to get a quick overview of the data, `preview()` to
+see the first and last few rows of a table, `missing_vals_tbl()` to see where there are missing
+values in a table, and `get_column_count()`/`get_row_count()` to get the number of columns and rows
+in a table. Several datasets included in the package can be accessed via the `load_dataset()`
+function. Finally, the `config()` utility lets us set global configuration parameters."""
 
     #
     # Add headings (`*_desc` text) and API details for each family of functions/methods
@@ -560,8 +565,8 @@ global configuration parameters with `config()`."""
     api_text += f"""\n## The Interrogation and Reporting family\n\n{interrogation_desc}\n\n"""
     api_text += get_api_details(module=pointblank, exported_list=interrogation_exported)
 
-    api_text += f"""\n## The Utilities family\n\n{utilities_desc}\n\n"""
-    api_text += get_api_details(module=pointblank, exported_list=utilities_exported)
+    api_text += f"""\n## The Utilities family\n\n{inspect_desc}\n\n"""
+    api_text += get_api_details(module=pointblank, exported_list=inspect_exported)
 
     # Modify language syntax in all code cells
     api_text = api_text.replace("{python}", "python")

@@ -39,8 +39,8 @@ class DataScan:
     text to a file, the `save_to_json()` method could be used.
 
     :::{.callout-warning}
-    The `DataScan()` class (along with its methods) is still experimental. Please report any issues
-    you encounter in the [Pointblank issue tracker](https://github.com/posit-dev/pointblank/issues).
+    The `DataScan()` class is still experimental. Please report any issues you encounter in the
+    [Pointblank issue tracker](https://github.com/posit-dev/pointblank/issues).
     :::
 
     Parameters

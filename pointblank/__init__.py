@@ -32,6 +32,7 @@ from pointblank.validate import (
 from pointblank.schema import Schema
 from pointblank.thresholds import Thresholds
 from pointblank.datascan import DataScan
+from pointblank.draft import DraftValidation
 
 __all__ = [
     "TF",
@@ -39,6 +40,7 @@ __all__ = [
     "Thresholds",
     "Schema",
     "DataScan",
+    "DraftValidation",
     "col",
     "starts_with",
     "ends_with",

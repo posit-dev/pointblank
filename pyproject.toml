@@ -41,6 +41,11 @@ pd = [
 pl = [
     "polars>=1.17.1",
 ]
+generate = [
+    "chatlas>=0.3.0",
+    "anthropic>=0.45.2",
+    "openai>=1.63.0",
+]
 duckdb = [
     "ibis-framework[duckdb]>=9.5.0",
 ]
