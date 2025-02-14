@@ -195,11 +195,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="parameters" class="level2 doc-section doc-section-parameters">
 <h2 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters">Parameters</h2>
 <dl>
-<dt><code><span class="parameter-name"><strong>dataset</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation">Literal['small_table', 'game_revenue', 'nycflights']</span> <span class="parameter-default-sep">=</span> <span class="parameter-default">'small_table'</span></code></dt>
+<dt><code><span class="parameter-name"><strong>dataset</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><code>Literal</code>['small_table', 'game_revenue', 'nycflights']</span> <span class="parameter-default-sep">=</span> <span class="parameter-default">'small_table'</span></code></dt>
 <dd>
 <p>The name of the dataset to load. Current options are <code>"small_table"</code>, <code>"game_revenue"</code>, and <code>"nycflights"</code>.</p>
 </dd>
-<dt><code><span class="parameter-name"><strong>tbl_type</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation">Literal['polars', 'pandas', 'duckdb']</span> <span class="parameter-default-sep">=</span> <span class="parameter-default">'polars'</span></code></dt>
+<dt><code><span class="parameter-name"><strong>tbl_type</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><code>Literal</code>['polars', 'pandas', 'duckdb']</span> <span class="parameter-default-sep">=</span> <span class="parameter-default">'polars'</span></code></dt>
 <dd>
 <p>The type of table to generate from the dataset. The named options are <code>"polars"</code>, <code>"pandas"</code>, and <code>"duckdb"</code>.</p>
 </dd>
@@ -208,7 +208,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="returns" class="level2 doc-section doc-section-returns">
 <h2 class="doc-section doc-section-returns anchored" data-anchor-id="returns">Returns</h2>
 <dl>
-<dt><code><span class="parameter-name"></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation">FrameT | Any</span></code></dt>
+<dt><code><span class="parameter-name"></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><code>FrameT</code> | <code>Any</code></span></code></dt>
 <dd>
 <p>The dataset for the <code>Validate</code> object. This could be a Polars DataFrame, a Pandas DataFrame, or a DuckDB table as an Ibis table.</p>
 </dd>
@@ -235,7 +235,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="examples" class="level2 doc-section doc-section-examples">
 <h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Load the <code>small_table</code> dataset as a Polars DataFrame by calling <code>load_dataset()</code> with its defaults:</p>
-<div id="2626c3d8" class="cell" data-execution_count="1">
+<div id="513a3a8e" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>small_table <span class="op">=</span> pb.load_dataset()</span>
@@ -444,7 +444,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <p>Note that the <code>small_table</code> dataset is a simple Polars DataFrame and using the <code>preview()</code> function will display the table in an HTML viewing environment.</p>
 <p>The <code>game_revenue</code> dataset can be loaded as a Pandas DataFrame by specifying the dataset name and setting <code>tbl_type="pandas"</code>:</p>
-<div id="3d176956" class="cell" data-execution_count="2">
+<div id="d3a87caa" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>game_revenue <span class="op">=</span> pb.load_dataset(dataset<span class="op">=</span><span class="st">"game_revenue"</span>, tbl_type<span class="op">=</span><span class="st">"pandas"</span>)</span>
@@ -689,7 +689,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <p>The <code>game_revenue</code> dataset is a more real-world dataset with a mix of data types, and it’s significantly larger than the <code>small_table</code> dataset at 2000 rows and 11 columns.</p>
 <p>The <code>nycflights</code> dataset can be loaded as a DuckDB table by specifying the dataset name and setting <code>tbl_type="duckdb"</code>:</p>
-<div id="9353dc6b" class="cell" data-execution_count="3">
+<div id="2ca5128c" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>nycflights <span class="op">=</span> pb.load_dataset(dataset<span class="op">=</span><span class="st">"nycflights"</span>, tbl_type<span class="op">=</span><span class="st">"duckdb"</span>)</span>

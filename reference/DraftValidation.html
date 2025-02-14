@@ -159,10 +159,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#pointblank.DraftValidation" id="toc-pointblank.DraftValidation" class="nav-link active" data-scroll-target="#pointblank.DraftValidation">DraftValidation</a>
   <ul class="collapse">
   <li><a href="#parameters" id="toc-parameters" class="nav-link" data-scroll-target="#parameters">Parameters</a></li>
+  <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
   <li><a href="#constructing-the-model-argument" id="toc-constructing-the-model-argument" class="nav-link" data-scroll-target="#constructing-the-model-argument">Constructing the <code>model</code> Argument</a></li>
   <li><a href="#notes-on-authentication" id="toc-notes-on-authentication" class="nav-link" data-scroll-target="#notes-on-authentication">Notes on Authentication</a></li>
   <li><a href="#notes-on-data-sent-to-the-model-provider" id="toc-notes-on-data-sent-to-the-model-provider" class="nav-link" data-scroll-target="#notes-on-data-sent-to-the-model-provider">Notes on Data Sent to the Model Provider</a></li>
-  <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
   <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
   </ul></li>
   </ul>
@@ -195,17 +195,26 @@ Warning
 <section id="parameters" class="level2 doc-section doc-section-parameters">
 <h2 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters">Parameters</h2>
 <dl>
-<dt><code><span class="parameter-name"><strong>data</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation">FrameT | Any</span></code></dt>
+<dt><code><span class="parameter-name"><strong>data</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><code>FrameT</code> | <code>Any</code></span></code></dt>
 <dd>
 <p>The data to be used for drafting a validation plan.</p>
 </dd>
-<dt><code><span class="parameter-name"><strong>model</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation">str</span></code></dt>
+<dt><code><span class="parameter-name"><strong>model</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><code>str</code></span></code></dt>
 <dd>
 <p>The model to be used. This should be in the form of <code>provider:model</code> (e.g., <code>"anthropic:claude-3-5-sonnet-latest"</code>). Supported providers are <code>"anthropic"</code> and <code>"openai"</code>.</p>
 </dd>
-<dt><code><span class="parameter-name"><strong>api_key</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation">str | None</span> <span class="parameter-default-sep">=</span> <span class="parameter-default">None</span></code></dt>
+<dt><code><span class="parameter-name"><strong>api_key</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><code>str</code> | None</span> <span class="parameter-default-sep">=</span> <span class="parameter-default">None</span></code></dt>
 <dd>
 <p>The API key to be used for the model.</p>
+</dd>
+</dl>
+</section>
+<section id="returns" class="level2 doc-section doc-section-returns">
+<h2 class="doc-section doc-section-returns anchored" data-anchor-id="returns">Returns</h2>
+<dl>
+<dt><code><span class="parameter-name"></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><code>str</code></span></code></dt>
+<dd>
+<p>The drafted validation plan.</p>
 </dd>
 </dl>
 </section>
@@ -233,15 +242,6 @@ OPENAI_API_KEY="your_openai_api_key_here"</code></pre>
 <li>a short list of data values in each column</li>
 </ul>
 <p>The JSON summary is used to provide the model with the necessary information to draft a validation plan. As such, even very large tables can be used with the <code>DraftValidation</code> class since the contents of the table are not sent to the model provider.</p>
-</section>
-<section id="returns" class="level2 doc-section doc-section-returns">
-<h2 class="doc-section doc-section-returns anchored" data-anchor-id="returns">Returns</h2>
-<dl>
-<dt><code><span class="parameter-name"></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation">str</span></code></dt>
-<dd>
-<p>The drafted validation plan.</p>
-</dd>
-</dl>
 </section>
 <section id="examples" class="level2 doc-section doc-section-examples">
 <h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
