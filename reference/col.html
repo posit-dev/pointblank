@@ -194,8 +194,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>col(exprs)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Helper function for referencing a column in the input table.</p>
-<p>Many of the validation methods (i.e., <code>col_vals_*()</code> methods) in pointblank have a <code>value=</code> argument. These validations are comparisons between column values and a literal value, or, between column values and adjacent values in another column. The <code>col()</code> helper function is used to specify that it is a column being referenced, not a literal value.</p>
-<p>The <code>col()</code> doesn’t check that the column exists in the input table. It acts to signal that the value being compared is a column value. During validation (i.e., when <code>interrogate()</code> is called), pointblank will then check that the column exists in the input table.</p>
+<p>Many of the validation methods (i.e., <code>col_vals_*()</code> methods) in Pointblank have a <code>value=</code> argument. These validations are comparisons between column values and a literal value, or, between column values and adjacent values in another column. The <code>col()</code> helper function is used to specify that it is a column being referenced, not a literal value.</p>
+<p>The <code>col()</code> doesn’t check that the column exists in the input table. It acts to signal that the value being compared is a column value. During validation (i.e., when <a href="../reference/Validate.interrogate.html#pointblank.Validate.interrogate"><code>interrogate()</code></a> is called), Pointblank will then check that the column exists in the input table.</p>
 <section id="parameters" class="level2 doc-section doc-section-parameters">
 <h2 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters">Parameters</h2>
 <dl>
@@ -218,23 +218,23 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="doc-section doc-section-usage-with-the-columns-argument anchored" data-anchor-id="usage-with-the-columns-argument">Usage with the <code>columns=</code> Argument</h2>
 <p>The <code>col()</code> function can be used in the <code>columns=</code> argument of the following validation methods:</p>
 <ul>
-<li><code>col_vals_gt()</code></li>
-<li><code>col_vals_lt()</code></li>
-<li><code>col_vals_ge()</code></li>
-<li><code>col_vals_le()</code></li>
-<li><code>col_vals_eq()</code></li>
-<li><code>col_vals_ne()</code></li>
-<li><code>col_vals_between()</code></li>
-<li><code>col_vals_outside()</code></li>
-<li><code>col_vals_in_set()</code></li>
-<li><code>col_vals_not_in_set()</code></li>
-<li><code>col_vals_null()</code></li>
-<li><code>col_vals_not_null()</code></li>
-<li><code>col_vals_regex()</code></li>
-<li><code>col_exists()</code></li>
+<li><a href="../reference/Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt"><code>col_vals_gt()</code></a></li>
+<li><a href="../reference/Validate.col_vals_lt.html#pointblank.Validate.col_vals_lt"><code>col_vals_lt()</code></a></li>
+<li><a href="../reference/Validate.col_vals_ge.html#pointblank.Validate.col_vals_ge"><code>col_vals_ge()</code></a></li>
+<li><a href="../reference/Validate.col_vals_le.html#pointblank.Validate.col_vals_le"><code>col_vals_le()</code></a></li>
+<li><a href="../reference/Validate.col_vals_eq.html#pointblank.Validate.col_vals_eq"><code>col_vals_eq()</code></a></li>
+<li><a href="../reference/Validate.col_vals_ne.html#pointblank.Validate.col_vals_ne"><code>col_vals_ne()</code></a></li>
+<li><a href="../reference/Validate.col_vals_between.html#pointblank.Validate.col_vals_between"><code>col_vals_between()</code></a></li>
+<li><a href="../reference/Validate.col_vals_outside.html#pointblank.Validate.col_vals_outside"><code>col_vals_outside()</code></a></li>
+<li><a href="../reference/Validate.col_vals_in_set.html#pointblank.Validate.col_vals_in_set"><code>col_vals_in_set()</code></a></li>
+<li><a href="../reference/Validate.col_vals_not_in_set.html#pointblank.Validate.col_vals_not_in_set"><code>col_vals_not_in_set()</code></a></li>
+<li><a href="../reference/Validate.col_vals_null.html#pointblank.Validate.col_vals_null"><code>col_vals_null()</code></a></li>
+<li><a href="../reference/Validate.col_vals_not_null.html#pointblank.Validate.col_vals_not_null"><code>col_vals_not_null()</code></a></li>
+<li><a href="../reference/Validate.col_vals_regex.html#pointblank.Validate.col_vals_regex"><code>col_vals_regex()</code></a></li>
+<li><a href="../reference/Validate.col_exists.html#pointblank.Validate.col_exists"><code>col_exists()</code></a></li>
 </ul>
 <p>If specifying a single column with certainty (you have the exact name), <code>col()</code> is not necessary since you can just pass the column name as a string (though it is still valid to use <code>col("column_name")</code>, if preferred). However, if you want to select columns based on complex logic involving multiple column selector functions (e.g., columns that start with <code>"a"</code> but don’t end with <code>"e"</code>), you need to use <code>col()</code> to wrap expressions involving column selector functions and logical operators such as <code>&amp;</code>, <code>|</code>, <code>-</code>, and <code>~</code>.</p>
-<p>Here is an example of such usage with the <code>col_vals_gt()</code> validation method:</p>
+<p>Here is an example of such usage with the <a href="../reference/Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt"><code>col_vals_gt()</code></a> validation method:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>col_vals_gt(columns<span class="op">=</span>col(starts_with(<span class="st">"a"</span>) <span class="op">&amp;</span> <span class="op">~</span>ends_with(<span class="st">"e"</span>)), value<span class="op">=</span><span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>If using only a single column selector function, you can pass the function directly to the <code>columns=</code> argument of the validation method, or, you can use <code>col()</code> to wrap the function (either is valid though the first is more concise). Here is an example of that simpler usage:</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>col_vals_gt(columns<span class="op">=</span>starts_with(<span class="st">"a"</span>), value<span class="op">=</span><span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -243,31 +243,31 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="doc-section doc-section-usage-with-the-value-left-and-right-arguments anchored" data-anchor-id="usage-with-the-value-left-and-right-arguments">Usage with the <code>value=</code>, <code>left=</code>, and <code>right=</code> Arguments</h2>
 <p>The <code>col()</code> function can be used in the <code>value=</code> argument of the following validation methods</p>
 <ul>
-<li><code>col_vals_gt()</code></li>
-<li><code>col_vals_lt()</code></li>
-<li><code>col_vals_ge()</code></li>
-<li><code>col_vals_le()</code></li>
-<li><code>col_vals_eq()</code></li>
-<li><code>col_vals_ne()</code></li>
+<li><a href="../reference/Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt"><code>col_vals_gt()</code></a></li>
+<li><a href="../reference/Validate.col_vals_lt.html#pointblank.Validate.col_vals_lt"><code>col_vals_lt()</code></a></li>
+<li><a href="../reference/Validate.col_vals_ge.html#pointblank.Validate.col_vals_ge"><code>col_vals_ge()</code></a></li>
+<li><a href="../reference/Validate.col_vals_le.html#pointblank.Validate.col_vals_le"><code>col_vals_le()</code></a></li>
+<li><a href="../reference/Validate.col_vals_eq.html#pointblank.Validate.col_vals_eq"><code>col_vals_eq()</code></a></li>
+<li><a href="../reference/Validate.col_vals_ne.html#pointblank.Validate.col_vals_ne"><code>col_vals_ne()</code></a></li>
 </ul>
 <p>and in the <code>left=</code> and <code>right=</code> arguments (either or both) of these two validation methods</p>
 <ul>
-<li><code>col_vals_between()</code></li>
-<li><code>col_vals_outside()</code></li>
+<li><a href="../reference/Validate.col_vals_between.html#pointblank.Validate.col_vals_between"><code>col_vals_between()</code></a></li>
+<li><a href="../reference/Validate.col_vals_outside.html#pointblank.Validate.col_vals_outside"><code>col_vals_outside()</code></a></li>
 </ul>
-<p>You cannot use column selector functions such as <code>starts_with()</code> in either of the <code>value=</code>, <code>left=</code>, or <code>right=</code> arguments since there would be no guarantee that a single column will be resolved from the target table with this approach. The <code>col()</code> function is used to signal that the value being compared is a column value and not a literal value.</p>
+<p>You cannot use column selector functions such as <a href="../reference/starts_with.html#pointblank.starts_with"><code>starts_with()</code></a> in either of the <code>value=</code>, <code>left=</code>, or <code>right=</code> arguments since there would be no guarantee that a single column will be resolved from the target table with this approach. The <code>col()</code> function is used to signal that the value being compared is a column value and not a literal value.</p>
 </section>
 <section id="available-selectors" class="level2 doc-section doc-section-available-selectors">
 <h2 class="doc-section doc-section-available-selectors anchored" data-anchor-id="available-selectors">Available Selectors</h2>
 <p>There is a collection of selectors available in pointblank, allowing you to select columns based on attributes of column names and positions. The selectors are:</p>
 <ul>
-<li><code>starts_with()</code></li>
-<li><code>ends_with()</code></li>
-<li><code>contains()</code></li>
-<li><code>matches()</code></li>
-<li><code>everything()</code></li>
-<li><code>first_n()</code></li>
-<li><code>last_n()</code></li>
+<li><a href="../reference/starts_with.html#pointblank.starts_with"><code>starts_with()</code></a></li>
+<li><a href="../reference/ends_with.html#pointblank.ends_with"><code>ends_with()</code></a></li>
+<li><a href="../reference/contains.html#pointblank.contains"><code>contains()</code></a></li>
+<li><a href="../reference/matches.html#pointblank.matches"><code>matches()</code></a></li>
+<li><a href="../reference/everything.html#pointblank.everything"><code>everything()</code></a></li>
+<li><a href="../reference/first_n.html#pointblank.first_n"><code>first_n()</code></a></li>
+<li><a href="../reference/last_n.html#pointblank.last_n"><code>last_n()</code></a></li>
 </ul>
 <p>Alternatively, we support selectors from the Narwhals library! Those selectors can additionally take advantage of the data types of the columns. The selectors are:</p>
 <ul>
@@ -283,7 +283,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="examples" class="level2 doc-section doc-section-examples">
 <h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Suppose we have a table with columns <code>a</code> and <code>b</code> and we’d like to validate that the values in column <code>a</code> are greater than the values in column <code>b</code>. We can use the <code>col()</code> helper function to reference the comparison column when creating the validation step.</p>
-<div id="17e947bb" class="cell" data-execution_count="2">
+<div id="803a5d89" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -438,8 +438,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>From results of the validation table it can be seen that values in <code>a</code> were greater than values in <code>b</code> for every row (or test unit). Using <code>value=pb.col("b")</code> specified that the greater-than comparison is across columns, not with a fixed literal value.</p>
-<p>If you want to select an arbitrary set of columns upon which to base a validation, you can use column selector functions (e.g., <code>starts_with()</code>, <code>ends_with()</code>, etc.) to specify columns in the <code>columns=</code> argument of a validation method. Let’s use the <code>starts_with()</code> column selector function to select columns that start with <code>"paid"</code> and validate that the values in those columns are greater than <code>10</code>.</p>
-<div id="4dc1bbb9" class="cell" data-execution_count="3">
+<p>If you want to select an arbitrary set of columns upon which to base a validation, you can use column selector functions (e.g., <a href="../reference/starts_with.html#pointblank.starts_with"><code>starts_with()</code></a>, <a href="../reference/ends_with.html#pointblank.ends_with"><code>ends_with()</code></a>, etc.) to specify columns in the <code>columns=</code> argument of a validation method. Let’s use the <a href="../reference/starts_with.html#pointblank.starts_with"><code>starts_with()</code></a> column selector function to select columns that start with <code>"paid"</code> and validate that the values in those columns are greater than <code>10</code>.</p>
+<div id="bec40bdc" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>tbl <span class="op">=</span> pl.DataFrame(</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    {</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"name"</span>: [<span class="st">"Alice"</span>, <span class="st">"Bob"</span>, <span class="st">"Charlie"</span>],</span>
@@ -630,8 +630,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         
 </div>
 </div>
-<p>In the above example the <code>col()</code> function contains the invocation of the <code>starts_with()</code> column selector function. This is not strictly necessary when using a single column selector function, so <code>columns=pb.starts_with("paid")</code> would be equivalent usage here. However, the use of <code>col()</code> is required when using multiple column selector functions with logical operators. Here is an example of that more complex usage:</p>
-<div id="c67d0487" class="cell" data-execution_count="4">
+<p>In the above example the <code>col()</code> function contains the invocation of the <a href="../reference/starts_with.html#pointblank.starts_with"><code>starts_with()</code></a> column selector function. This is not strictly necessary when using a single column selector function, so <code>columns=pb.starts_with("paid")</code> would be equivalent usage here. However, the use of <code>col()</code> is required when using multiple column selector functions with logical operators. Here is an example of that more complex usage:</p>
+<div id="412192a0" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>tbl <span class="op">=</span> pl.DataFrame(</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    {</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"name"</span>: [<span class="st">"Alice"</span>, <span class="st">"Bob"</span>, <span class="st">"Charlie"</span>],</span>
@@ -828,9 +828,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         
 </div>
 </div>
-<p>In the above example the <code>col()</code> function contains the invocation of the <code>starts_with()</code> and <code>matches()</code> column selector functions, combined with the <code>&amp;</code> operator. This is necessary to specify the set of columns that start with <code>"paid"</code> <em>and</em> match the text <code>"2023"</code> or <code>"2024"</code>.</p>
+<p>In the above example the <code>col()</code> function contains the invocation of the <a href="../reference/starts_with.html#pointblank.starts_with"><code>starts_with()</code></a> and <a href="../reference/matches.html#pointblank.matches"><code>matches()</code></a> column selector functions, combined with the <code>&amp;</code> operator. This is necessary to specify the set of columns that start with <code>"paid"</code> <em>and</em> match the text <code>"2023"</code> or <code>"2024"</code>.</p>
 <p>If you’d like to take advantage of Narwhals selectors, that’s also possible. Here is an example of using the <code>numeric()</code> column selector function to select all numeric columns for validation, checking that their values are greater than <code>0</code>.</p>
-<div id="84f1e733" class="cell" data-execution_count="5">
+<div id="2e362546" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> narwhals.selectors <span class="im">as</span> ncs</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>tbl <span class="op">=</span> pl.DataFrame(</span>
@@ -1179,8 +1179,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>In the above example the <code>col()</code> function contains the invocation of the <code>numeric()</code> column selector function from Narwhals. As with the other selectors, this is not strictly necessary when using a single column selector, so <code>columns=ncs.numeric()</code> would also be fine here.</p>
-<p>Narwhals selectors can also use operators to combine multiple selectors. Here is an example of using the <code>numeric()</code> and <code>matches()</code> selectors together to select all numeric columns that fit a specific pattern.</p>
-<div id="41b5c5c4" class="cell" data-execution_count="6">
+<p>Narwhals selectors can also use operators to combine multiple selectors. Here is an example of using the <code>numeric()</code> and <a href="../reference/matches.html#pointblank.matches"><code>matches()</code></a> selectors together to select all numeric columns that fit a specific pattern.</p>
+<div id="43ab1d83" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>tbl <span class="op">=</span> pl.DataFrame(</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    {</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"name"</span>: [<span class="st">"Alice"</span>, <span class="st">"Bob"</span>, <span class="st">"Charlie"</span>],</span>
@@ -1374,7 +1374,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         
 </div>
 </div>
-<p>In the above example the <code>col()</code> function contains the invocation of the <code>numeric()</code> and <code>matches()</code> column selector functions from Narwhals, combined with the <code>&amp;</code> operator. This is necessary to specify the set of columns that are numeric <em>and</em> match the text <code>"2023"</code> or <code>"2024"</code>.</p>
+<p>In the above example the <code>col()</code> function contains the invocation of the <code>numeric()</code> and <a href="../reference/matches.html#pointblank.matches"><code>matches()</code></a> column selector functions from Narwhals, combined with the <code>&amp;</code> operator. This is necessary to specify the set of columns that are numeric <em>and</em> match the text <code>"2023"</code> or <code>"2024"</code>.</p>
 
 
 </section>

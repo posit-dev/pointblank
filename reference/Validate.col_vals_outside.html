@@ -200,21 +200,21 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    active<span class="op">=</span><span class="va">True</span>,</span>
 <span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Do column data lie outside of two specified values or data in other columns?</p>
-<p>The <code>col_vals_between()</code> validation method checks whether column values in a table <em>do not</em> fall within a certain range. The range is specified with three arguments: <code>left=</code>, <code>right=</code>, and <code>inclusive=</code>. The <code>left=</code> and <code>right=</code> values specify the lower and upper bounds. These bounds can be specified as literal values or as column names provided within <code>col()</code>. The validation will operate over the number of test units that is equal to the number of rows in the table (determined after any <code>pre=</code> mutation has been applied).</p>
+<p>The <code>col_vals_between()</code> validation method checks whether column values in a table <em>do not</em> fall within a certain range. The range is specified with three arguments: <code>left=</code>, <code>right=</code>, and <code>inclusive=</code>. The <code>left=</code> and <code>right=</code> values specify the lower and upper bounds. These bounds can be specified as literal values or as column names provided within <a href="../reference/col.html#pointblank.col"><code>col()</code></a>. The validation will operate over the number of test units that is equal to the number of rows in the table (determined after any <code>pre=</code> mutation has been applied).</p>
 <section id="parameters" class="level2 doc-section doc-section-parameters">
 <h2 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters">Parameters</h2>
 <dl>
 <dt><code><span class="parameter-name"><strong>columns</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><code>str</code> | <code>list</code>[<code>str</code>] | <code>Column</code> | <code>ColumnSelector</code> | <code>ColumnSelectorNarwhals</code></span></code></dt>
 <dd>
-<p>A single column or a list of columns to validate. Can also use <code>col()</code> with column selectors to specify one or more columns. If multiple columns are supplied or resolved, there will be a separate validation step generated for each column.</p>
+<p>A single column or a list of columns to validate. Can also use <a href="../reference/col.html#pointblank.col"><code>col()</code></a> with column selectors to specify one or more columns. If multiple columns are supplied or resolved, there will be a separate validation step generated for each column.</p>
 </dd>
 <dt><code><span class="parameter-name"><strong>left</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><code>float</code> | <code>int</code> | <code>Column</code></span></code></dt>
 <dd>
-<p>The lower bound of the range. This can be a single numeric value or a single column name given in <code>col()</code>. The latter option allows for a column-column comparison for the lower bound.</p>
+<p>The lower bound of the range. This can be a single numeric value or a single column name given in <a href="../reference/col.html#pointblank.col"><code>col()</code></a>. The latter option allows for a column-column comparison for the lower bound.</p>
 </dd>
 <dt><code><span class="parameter-name"><strong>right</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><code>float</code> | <code>int</code> | <code>Column</code></span></code></dt>
 <dd>
-<p>The upper bound of the range. This can be a single numeric value or a single column name given in <code>col()</code>. The latter option allows for a column-column comparison for the upper bound.</p>
+<p>The upper bound of the range. This can be a single numeric value or a single column name given in <a href="../reference/col.html#pointblank.col"><code>col()</code></a>. The latter option allows for a column-column comparison for the upper bound.</p>
 </dd>
 <dt><code><span class="parameter-name"><strong>inclusive</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><code>tuple</code>[<code>bool</code>, <code>bool</code>]</span> <span class="parameter-default-sep">=</span> <span class="parameter-default">(True, True)</span></code></dt>
 <dd>
@@ -250,7 +250,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="examples" class="level2 doc-section doc-section-examples">
 <h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>For the examples here, we’ll use a simple Polars DataFrame with three numeric columns (<code>a</code>, <code>b</code>, and <code>c</code>). The table is shown below:</p>
-<div id="4f50d945" class="cell" data-execution_count="2">
+<div id="f99c8ad6" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -378,7 +378,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>Let’s validate that values in column <code>a</code> are all outside the fixed boundary values of <code>1</code> and <code>4</code>. We’ll determine if this validation had any failing test units (there are six test units, one for each row).</p>
-<div id="d5c24572" class="cell" data-execution_count="3">
+<div id="40e8331f" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_outside(columns<span class="op">=</span><span class="st">"a"</span>, left<span class="op">=</span><span class="dv">1</span>, right<span class="op">=</span><span class="dv">4</span>)</span>
@@ -527,14 +527,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>Printing the <code>validation</code> object shows the validation table in an HTML viewing environment. The validation table shows the single entry that corresponds to the validation step created by using <code>col_vals_outside()</code>. All test units passed, and there are no failing test units.</p>
-<p>Aside from checking a column against two literal values representing the lower and upper bounds, we can also provide column names to the <code>left=</code> and/or <code>right=</code> arguments (by using the helper function <code>col()</code>). In this way, we can perform three additional comparison types:</p>
+<p>Aside from checking a column against two literal values representing the lower and upper bounds, we can also provide column names to the <code>left=</code> and/or <code>right=</code> arguments (by using the helper function <a href="../reference/col.html#pointblank.col"><code>col()</code></a>). In this way, we can perform three additional comparison types:</p>
 <ol type="1">
 <li><code>left=column</code>, <code>right=column</code></li>
 <li><code>left=literal</code>, <code>right=column</code></li>
 <li><code>left=column</code>, <code>right=literal</code></li>
 </ol>
 <p>For the next example, we’ll use <code>col_vals_outside()</code> to check whether the values in column <code>b</code> are outside of the range formed by the corresponding values in columns <code>a</code> (lower bound) and <code>c</code> (upper bound).</p>
-<div id="460aad4c" class="cell" data-execution_count="4">
+<div id="ea363261" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_outside(columns<span class="op">=</span><span class="st">"b"</span>, left<span class="op">=</span>pb.col(<span class="st">"a"</span>), right<span class="op">=</span>pb.col(<span class="st">"c"</span>))</span>

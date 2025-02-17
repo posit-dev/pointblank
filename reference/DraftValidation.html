@@ -247,7 +247,7 @@ OPENAI_API_KEY="your_openai_api_key_here"</code></pre>
 </section>
 <section id="examples" class="level2 doc-section doc-section-examples">
 <h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
-<p>Let’s look at how the <code>DraftValidation</code> class can be used to draft a validation plan for a table. The table to be used is <code>"nycflights"</code>, which is available here via the <code>load_dataset()</code> function. The model to be used is <code>"anthropic:claude-3-5-sonnet-latest"</code>. The example assumes that the API key is stored in an <code>.env</code> file as <code>ANTHROPIC_API_KEY</code>.</p>
+<p>Let’s look at how the <code>DraftValidation</code> class can be used to draft a validation plan for a table. The table to be used is <code>"nycflights"</code>, which is available here via the <a href="../reference/load_dataset.html#pointblank.load_dataset"><code>load_dataset()</code></a> function. The model to be used is <code>"anthropic:claude-3-5-sonnet-latest"</code>. The example assumes that the API key is stored in an <code>.env</code> file as <code>ANTHROPIC_API_KEY</code>.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Load the "nycflights" dataset as a DuckDB table</span></span>
