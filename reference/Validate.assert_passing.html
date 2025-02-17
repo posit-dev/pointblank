@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>validate.f_passed – pointblank</title>
+<title>validate.assert_passing – pointblank</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -158,8 +158,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#parameters" id="toc-parameters" class="nav-link active" data-scroll-target="#parameters">Parameters</a></li>
-  <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
+  <li><a href="#raises" id="toc-raises" class="nav-link active" data-scroll-target="#raises">Raises</a></li>
   <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
   </ul>
 </nav>
@@ -169,7 +168,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Validate.f_passed</h1>
+<h1 class="title">Validate.assert_passing</h1>
 </div>
 
 
@@ -186,70 +185,70 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>Validate.f_passed(i<span class="op">=</span><span class="va">None</span>, scalar<span class="op">=</span><span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Provides a dictionary of the fraction of test units that passed for each validation step.</p>
-<p>A measure of the fraction of test units that passed is provided by the <code>f_passed</code> attribute. This is the fraction of test units that passed the validation step over the total number of test units. Given this is a fractional value, it will always be in the range of <code>0</code> to <code>1</code>.</p>
-<p>Test units are the atomic units of the validation process. Different validations can have different numbers of test units. For example, a validation that checks for the presence of a column in a table will have a single test unit. A validation that checks for the presence of a value in a column will have as many test units as there are rows in the table.</p>
-<p>This method provides a dictionary of the fraction of passing test units for each validation step. If the <code>scalar=True</code> argument is provided and <code>i=</code> is a scalar, the value is returned as a scalar instead of a dictionary. Furthermore, a value obtained here will be the complement to the analogous value returned by the <a href="../reference/Validate.f_failed.html#pointblank.Validate.f_failed"><code>f_failed()</code></a> method (i.e., <code>1 - f_failed()</code>).</p>
-<section id="parameters" class="level2 doc-section doc-section-parameters">
-<h2 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters">Parameters</h2>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>Validate.assert_passing()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Raise an <code>AssertionError</code> if all tests are not passing.</p>
+<p>The <code>assert_passing()</code> method will raise an <code>AssertionError</code> if a test does not pass. This method simply wraps <code>all_passed</code> for more ready use in test suites. The method does not preserve information or the object itself, and must be further investigated.</p>
+<section id="raises" class="level2 doc-section doc-section-raises">
+<h2 class="doc-section doc-section-raises anchored" data-anchor-id="raises">Raises</h2>
 <dl>
-<dt><code><span class="parameter-name"><strong>i</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><code>int</code> | <code>list</code>[<code>int</code>] | None</span> <span class="parameter-default-sep">=</span> <span class="parameter-default">None</span></code></dt>
+<dt><code><span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><code>AssertionError</code></span></code></dt>
 <dd>
-<p>The validation step number(s) from which the fraction of passing test units is obtained. Can be provided as a list of integers or a single integer. If <code>None</code>, all steps are included.</p>
-</dd>
-<dt><code><span class="parameter-name"><strong>scalar</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><code>bool</code></span> <span class="parameter-default-sep">=</span> <span class="parameter-default">False</span></code></dt>
-<dd>
-<p>If <code>True</code> and <code>i=</code> is a scalar, return the value as a scalar instead of a dictionary.</p>
-</dd>
-</dl>
-</section>
-<section id="returns" class="level2 doc-section doc-section-returns">
-<h2 class="doc-section doc-section-returns anchored" data-anchor-id="returns">Returns</h2>
-<dl>
-<dt><code><span class="parameter-name"></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><code>dict</code>[<code>int</code>, <code>float</code>] | <code>float</code></span></code></dt>
-<dd>
-<p>A dictionary of the fraction of passing test units for each validation step or a scalar value.</p>
+<p>If any validation step has failing test units.</p>
 </dd>
 </dl>
 </section>
 <section id="examples" class="level2 doc-section doc-section-examples">
 <h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
-<p>In the example below, we’ll use a simple Polars DataFrame with three columns (<code>a</code>, <code>b</code>, and <code>c</code>). There will be three validation steps, all having some failing test units. After interrogation, the <code>f_passed()</code> method is used to determine the fraction of passing test units for each validation step.</p>
-<div id="f25a7b5e" class="cell" data-execution_count="1">
+<p>In the example below, we’ll use a simple Polars DataFrame with three columns (<code>a</code>, <code>b</code>, and <code>c</code>). There will be three validation steps, and the second step will have a failing test unit (the value <code>10</code> isn’t less than <code>9</code>). After interrogation, the <code>assert_passing()</code> method is used to assert that all validation steps passed perfectly.</p>
+<div id="8abf8dfe" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>tbl <span class="op">=</span> pl.DataFrame(</span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    {</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>        <span class="st">"a"</span>: [<span class="dv">7</span>, <span class="dv">4</span>, <span class="dv">9</span>, <span class="dv">7</span>, <span class="dv">12</span>, <span class="dv">3</span>, <span class="dv">10</span>],</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>        <span class="st">"b"</span>: [<span class="dv">9</span>, <span class="dv">8</span>, <span class="dv">10</span>, <span class="dv">5</span>, <span class="dv">10</span>, <span class="dv">6</span>, <span class="dv">2</span>],</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>        <span class="st">"c"</span>: [<span class="st">"a"</span>, <span class="st">"b"</span>, <span class="st">"c"</span>, <span class="st">"a"</span>, <span class="st">"b"</span>, <span class="st">"d"</span>, <span class="st">"c"</span>]</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"a"</span>: [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">9</span>, <span class="dv">5</span>],</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">"b"</span>: [<span class="dv">5</span>, <span class="dv">6</span>, <span class="dv">10</span>, <span class="dv">3</span>],</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">"c"</span>: [<span class="st">"a"</span>, <span class="st">"b"</span>, <span class="st">"a"</span>, <span class="st">"a"</span>],</span>
 <span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    }</span>
 <span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    .col_vals_gt(columns<span class="op">=</span><span class="st">"a"</span>, value<span class="op">=</span><span class="dv">5</span>)</span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    .col_vals_gt(columns<span class="op">=</span><span class="st">"b"</span>, value<span class="op">=</span>pb.col(<span class="st">"a"</span>))</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    .col_vals_gt(columns<span class="op">=</span><span class="st">"a"</span>, value<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    .col_vals_lt(columns<span class="op">=</span><span class="st">"b"</span>, value<span class="op">=</span><span class="dv">9</span>)</span>
 <span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>    .col_vals_in_set(columns<span class="op">=</span><span class="st">"c"</span>, <span class="bu">set</span><span class="op">=</span>[<span class="st">"a"</span>, <span class="st">"b"</span>])</span>
 <span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
 <span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>validation.f_passed()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="1">
-<pre><code>{1: 0.7142857142857143, 2: 0.5714285714285714, 3: 0.5714285714285714}</code></pre>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>validation.assert_passing()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-error">
+<div class="ansi-escaped-output">
+<pre><span class="ansi-red-fg">---------------------------------------------------------------------------</span>
+<span class="ansi-red-fg">AssertionError</span>                            Traceback (most recent call last)
+Cell <span class="ansi-green-fg">In[1], line 20</span>
+<span class="ansi-green-fg ansi-bold">      4</span> tbl <span style="color:rgb(98,98,98)">=</span> pl<span style="color:rgb(98,98,98)">.</span>DataFrame(
+<span class="ansi-green-fg ansi-bold">      5</span>     {
+<span class="ansi-green-fg ansi-bold">      6</span>     <span style="color:rgb(175,0,0)">"</span><span style="color:rgb(175,0,0)">a</span><span style="color:rgb(175,0,0)">"</span>: [<span style="color:rgb(98,98,98)">1</span>, <span style="color:rgb(98,98,98)">2</span>, <span style="color:rgb(98,98,98)">9</span>, <span style="color:rgb(98,98,98)">5</span>],
+<span class="ansi-green-fg">   (...)</span>
+<span class="ansi-green-fg ansi-bold">      9</span>     }
+<span class="ansi-green-fg ansi-bold">     10</span> )
+<span class="ansi-green-fg ansi-bold">     12</span> validation <span style="color:rgb(98,98,98)">=</span> (
+<span class="ansi-green-fg ansi-bold">     13</span>     pb<span style="color:rgb(98,98,98)">.</span>Validate(data<span style="color:rgb(98,98,98)">=</span>tbl)
+<span class="ansi-green-fg ansi-bold">     14</span>     <span style="color:rgb(98,98,98)">.</span>col_vals_gt(columns<span style="color:rgb(98,98,98)">=</span><span style="color:rgb(175,0,0)">"</span><span style="color:rgb(175,0,0)">a</span><span style="color:rgb(175,0,0)">"</span>, value<span style="color:rgb(98,98,98)">=</span><span style="color:rgb(98,98,98)">0</span>)
+<span class="ansi-green-fg">   (...)</span>
+<span class="ansi-green-fg ansi-bold">     17</span>     <span style="color:rgb(98,98,98)">.</span>interrogate()
+<span class="ansi-green-fg ansi-bold">     18</span> )
+<span class="ansi-green-fg">---&gt; 20</span> <span class="ansi-yellow-bg">validation</span><span style="color:rgb(98,98,98)" class="ansi-yellow-bg">.</span><span class="ansi-yellow-bg">assert_passing</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">)</span>
+
+File <span class="ansi-green-fg">/opt/hostedtoolcache/Python/3.10.16/x64/lib/python3.10/site-packages/pointblank/validate.py:5097</span>, in <span class="ansi-cyan-fg">Validate.assert_passing</span><span class="ansi-blue-fg">(self)</span>
+<span class="ansi-green-fg ansi-bold">   5095</span> <span style="font-weight:bold;color:rgb(0,135,0)">if</span> <span style="font-weight:bold;color:rgb(175,0,255)">not</span> <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>all_passed():
+<span class="ansi-green-fg ansi-bold">   5096</span>     msg <span style="color:rgb(98,98,98)">=</span> <span style="color:rgb(175,0,0)">"</span><span style="color:rgb(175,0,0)">All tests did not pass.</span><span style="color:rgb(175,0,0)">"</span>
+<span class="ansi-green-fg">-&gt; 5097</span>     <span style="font-weight:bold;color:rgb(0,135,0)">raise</span> <span style="font-weight:bold;color:rgb(215,95,95)">AssertionError</span>(msg)
+
+<span class="ansi-red-fg">AssertionError</span>: All tests did not pass.</pre>
 </div>
 </div>
-<p>The returned dictionary shows the fraction of passing test units for each validation step. The values are all less than <code>1</code> since there were failing test units in each step.</p>
-<p>If we wanted to check the fraction of passing test units for a single validation step, we can provide the step number. Also, we could have the value returned as a scalar by setting <code>scalar=True</code> (ensuring that <code>i=</code> is a scalar).</p>
-<div id="a6ef70e7" class="cell" data-execution_count="2">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>validation.f_passed(i<span class="op">=</span><span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="2">
-<pre><code>{1: 0.7142857142857143}</code></pre>
 </div>
-</div>
-<p>The returned value is the proportion of passing test units for the first validation step (5 passing test units out of 7 total test units).</p>
 
 
 </section>
