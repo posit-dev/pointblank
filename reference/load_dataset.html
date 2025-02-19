@@ -237,7 +237,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="examples" class="level2 doc-section doc-section-examples">
 <h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Load the <code>"small_table"</code> dataset as a Polars DataFrame by calling <code>load_dataset()</code> with its defaults:</p>
-<div id="f12236e7" class="cell" data-execution_count="1">
+<div id="cd165530" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>small_table <span class="op">=</span> pb.load_dataset()</span>
@@ -446,7 +446,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <p>Note that the <code>"small_table"</code> dataset is a simple Polars DataFrame and using the <a href="../reference/preview.html#pointblank.preview"><code>preview()</code></a> function will display the table in an HTML viewing environment.</p>
 <p>The <code>"game_revenue"</code> dataset can be loaded as a Pandas DataFrame by specifying the dataset name and setting <code>tbl_type="pandas"</code>:</p>
-<div id="907e8262" class="cell" data-execution_count="2">
+<div id="be2d4f30" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>game_revenue <span class="op">=</span> pb.load_dataset(dataset<span class="op">=</span><span class="st">"game_revenue"</span>, tbl_type<span class="op">=</span><span class="st">"pandas"</span>)</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>pb.preview(game_revenue)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -689,7 +689,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <p>The <code>"game_revenue"</code> dataset is a more real-world dataset with a mix of data types, and it’s significantly larger than the <code>small_table</code> dataset at 2000 rows and 11 columns.</p>
 <p>The <code>"nycflights"</code> dataset can be loaded as a DuckDB table by specifying the dataset name and setting <code>tbl_type="duckdb"</code>:</p>
-<div id="a5c4859b" class="cell" data-execution_count="3">
+<div id="1545918d" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>nycflights <span class="op">=</span> pb.load_dataset(dataset<span class="op">=</span><span class="st">"nycflights"</span>, tbl_type<span class="op">=</span><span class="st">"duckdb"</span>)</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>pb.preview(nycflights)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
