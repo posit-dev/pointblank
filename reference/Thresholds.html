@@ -191,20 +191,21 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>Thresholds(<span class="va">self</span>, warn_at<span class="op">=</span><span class="va">None</span>, stop_at<span class="op">=</span><span class="va">None</span>, notify_at<span class="op">=</span><span class="va">None</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Definition of threshold values.</p>
+<p>Thresholds are used to set limits on the number of failing test units at different levels. The levels are ‘warn’, ‘stop’, and ‘notify’. These levels correspond to different levels of severity when a threshold is reached. The threshold values can be set as absolute counts or as fractions of the total number of test units. When a threshold is reached, an action can be taken (e.g., displaying a message or calling a function) if there is an associated action defined for that level (defined through the <a href="../reference/Actions.html#pointblank.Actions"><code>Actions</code></a> class).</p>
 <section id="parameters" class="level2 doc-section doc-section-parameters">
 <h2 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters">Parameters</h2>
 <dl>
 <dt><code><span class="parameter-name"><strong>warn_at</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><code>int</code> | <code>float</code> | <code>bool</code> | None</span> <span class="parameter-default-sep">=</span> <span class="parameter-default">None</span></code></dt>
 <dd>
-<p>The threshold for the ‘warn’ level. This can be an absolute count or a fraction of the total. Using <code>True</code> will set this threshold to 1.</p>
+<p>The threshold for the ‘warn’ level. This can be an absolute count or a fraction of the total. Using <code>True</code> will set this threshold to <code>1</code>.</p>
 </dd>
 <dt><code><span class="parameter-name"><strong>stop_at</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><code>int</code> | <code>float</code> | <code>bool</code> | None</span> <span class="parameter-default-sep">=</span> <span class="parameter-default">None</span></code></dt>
 <dd>
-<p>The threshold for the ‘stop’ level. This can be an absolute count or a fraction of the total. Using <code>True</code> will set this threshold to 1.</p>
+<p>The threshold for the ‘stop’ level. This can be an absolute count or a fraction of the total. Using <code>True</code> will set this threshold to <code>1</code>.</p>
 </dd>
 <dt><code><span class="parameter-name"><strong>notify_at</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><code>int</code> | <code>float</code> | <code>bool</code> | None</span> <span class="parameter-default-sep">=</span> <span class="parameter-default">None</span></code></dt>
 <dd>
-<p>The threshold for the ‘notify’ level. This can be an absolute count or a fraction of the total. Using <code>True</code> will set this threshold to 1.</p>
+<p>The threshold for the ‘notify’ level. This can be an absolute count or a fraction of the total. Using <code>True</code> will set this threshold to <code>1</code>.</p>
 </dd>
 </dl>
 </section>
@@ -213,14 +214,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <dl>
 <dt><code><span class="parameter-name"></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><a href="../reference/Thresholds.html#pointblank.Thresholds">Thresholds</a></span></code></dt>
 <dd>
-<p>A Thresholds object. This can be used when using the <code>Validate</code> class (to set thresholds globally) or when defining validation steps through <code>Validate</code>’s methods (so that threshold values are scoped to individual validation steps, overriding any global thresholds).</p>
+<p>A <code>Thresholds</code> object. This can be used when using the <a href="../reference/Validate.html#pointblank.Validate"><code>Validate</code></a> class (to set thresholds globally) or when defining validation steps like <a href="../reference/Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt"><code>col_vals_gt()</code></a> (so that threshold values are scoped to individual validation steps, overriding any global thresholds).</p>
 </dd>
 </dl>
 </section>
 <section id="examples" class="level2 doc-section doc-section-examples">
 <h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>In a data validation workflow, you can set thresholds for the number of failing test units at different levels. For example, you can set a threshold to warn when the number of failing test units exceeds 10% of the total number of test units:</p>
-<div id="fa6c85aa" class="cell" data-execution_count="2">
+<div id="de31d282" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>thresholds <span class="op">=</span> pb.Thresholds(warn_at<span class="op">=</span><span class="fl">0.1</span>)</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>thresholds</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -229,7 +230,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>You can also set thresholds for the ‘stop’ and ‘notify’ levels:</p>
-<div id="e8356391" class="cell" data-execution_count="3">
+<div id="ed2cef9f" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>thresholds <span class="op">=</span> pb.Thresholds(warn_at<span class="op">=</span><span class="fl">0.1</span>, stop_at<span class="op">=</span><span class="fl">0.2</span>, notify_at<span class="op">=</span><span class="fl">0.05</span>)</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>thresholds</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -238,7 +239,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>Thresholds can also be set as absolute counts. Here’s an example where the ‘warn’ level is set to <code>5</code> failing test units:</p>
-<div id="ff25f642" class="cell" data-execution_count="4">
+<div id="ae2312f9" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>thresholds <span class="op">=</span> pb.Thresholds(warn_at<span class="op">=</span><span class="dv">5</span>)</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>thresholds</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -246,8 +247,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><code>Thresholds(warn_at=5, stop_at=None, notify_at=None)</code></pre>
 </div>
 </div>
-<p>The <code>Thresholds</code> object can be used to set global thresholds for all validation steps. Or, you can set thresholds for individual validation steps, which will override the global thresholds. Here’s a data validation workflow example where we set global thresholds and then override with different thresholds at the <a href="../reference/Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt"><code>col_vals_gt()</code></a> step:</p>
-<div id="592610f2" class="cell" data-execution_count="5">
+<p>The <code>thresholds</code> object can be used to set global thresholds for all validation steps. Or, you can set thresholds for individual validation steps, which will override the global thresholds. Here’s a data validation workflow example where we set global thresholds and then override with different thresholds at the <a href="../reference/Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt"><code>col_vals_gt()</code></a> step:</p>
+<div id="6a5b8a6b" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>        data<span class="op">=</span>pb.load_dataset(dataset<span class="op">=</span><span class="st">"small_table"</span>),</span>
@@ -482,7 +483,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         
 </div>
 </div>
-<p>As can be seen, the last step (<a href="../reference/Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt"><code>col_vals_gt()</code></a>) has its own thresholds, which override the global thresholds set at the beginning of the validation workflow (in the <code>Validate</code> class).</p>
+<p>As can be seen, the last step (<a href="../reference/Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt"><code>col_vals_gt()</code></a>) has its own thresholds, which override the global thresholds set at the beginning of the validation workflow (in the <a href="../reference/Validate.html#pointblank.Validate"><code>Validate</code></a> class).</p>
 
 
 </section>

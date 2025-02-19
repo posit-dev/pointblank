@@ -200,7 +200,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="examples" class="level2 doc-section doc-section-examples">
 <h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>In the example below, we’ll use a simple Polars DataFrame with three columns (<code>a</code>, <code>b</code>, and <code>c</code>). There will be three validation steps, and the second step will have a failing test unit (the value <code>10</code> isn’t less than <code>9</code>). After interrogation, the <code>assert_passing()</code> method is used to assert that all validation steps passed perfectly.</p>
-<div id="8abf8dfe" class="cell" data-execution_count="1">
+<div id="4f09d921" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -240,10 +240,10 @@ Cell <span class="ansi-green-fg">In[1], line 20</span>
 <span class="ansi-green-fg ansi-bold">     18</span> )
 <span class="ansi-green-fg">---&gt; 20</span> <span class="ansi-yellow-bg">validation</span><span style="color:rgb(98,98,98)" class="ansi-yellow-bg">.</span><span class="ansi-yellow-bg">assert_passing</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">)</span>
 
-File <span class="ansi-green-fg">/opt/hostedtoolcache/Python/3.10.16/x64/lib/python3.10/site-packages/pointblank/validate.py:5097</span>, in <span class="ansi-cyan-fg">Validate.assert_passing</span><span class="ansi-blue-fg">(self)</span>
-<span class="ansi-green-fg ansi-bold">   5095</span> <span style="font-weight:bold;color:rgb(0,135,0)">if</span> <span style="font-weight:bold;color:rgb(175,0,255)">not</span> <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>all_passed():
-<span class="ansi-green-fg ansi-bold">   5096</span>     msg <span style="color:rgb(98,98,98)">=</span> <span style="color:rgb(175,0,0)">"</span><span style="color:rgb(175,0,0)">All tests did not pass.</span><span style="color:rgb(175,0,0)">"</span>
-<span class="ansi-green-fg">-&gt; 5097</span>     <span style="font-weight:bold;color:rgb(0,135,0)">raise</span> <span style="font-weight:bold;color:rgb(215,95,95)">AssertionError</span>(msg)
+File <span class="ansi-green-fg">/opt/hostedtoolcache/Python/3.10.16/x64/lib/python3.10/site-packages/pointblank/validate.py:5300</span>, in <span class="ansi-cyan-fg">Validate.assert_passing</span><span class="ansi-blue-fg">(self)</span>
+<span class="ansi-green-fg ansi-bold">   5298</span> <span style="font-weight:bold;color:rgb(0,135,0)">if</span> <span style="font-weight:bold;color:rgb(175,0,255)">not</span> <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>all_passed():
+<span class="ansi-green-fg ansi-bold">   5299</span>     msg <span style="color:rgb(98,98,98)">=</span> <span style="color:rgb(175,0,0)">"</span><span style="color:rgb(175,0,0)">All tests did not pass.</span><span style="color:rgb(175,0,0)">"</span>
+<span class="ansi-green-fg">-&gt; 5300</span>     <span style="font-weight:bold;color:rgb(0,135,0)">raise</span> <span style="font-weight:bold;color:rgb(215,95,95)">AssertionError</span>(msg)
 
 <span class="ansi-red-fg">AssertionError</span>: All tests did not pass.</pre>
 </div>
