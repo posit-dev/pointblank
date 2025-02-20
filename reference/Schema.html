@@ -264,7 +264,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="examples" class="level2 doc-section doc-section-examples">
 <h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>A schema can be constructed via the <code>Schema</code> class in multiple ways. Let’s use the following Polars DataFrame as a basis for constructing a schema:</p>
-<div id="5a9c3ad9" class="cell" data-execution_count="2">
+<div id="39392bba" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -275,21 +275,21 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>You could provide <code>Schema(columns=)</code> a list of tuples containing column names and data types:</p>
-<div id="b25e5b38" class="cell" data-execution_count="3">
+<div id="43dfdce0" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(columns<span class="op">=</span>[(<span class="st">"name"</span>, <span class="st">"String"</span>), (<span class="st">"age"</span>, <span class="st">"Int64"</span>), (<span class="st">"height"</span>, <span class="st">"Float64"</span>)])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Alternatively, a dictionary containing column names and dtypes also works:</p>
-<div id="67e2ec13" class="cell" data-execution_count="4">
+<div id="70cb3816" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(columns<span class="op">=</span>{<span class="st">"name"</span>: <span class="st">"String"</span>, <span class="st">"age"</span>: <span class="st">"Int64"</span>, <span class="st">"height"</span>: <span class="st">"Float64"</span>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Another input method involves using individual column arguments in the form of keyword arguments:</p>
-<div id="12180c1d" class="cell" data-execution_count="5">
+<div id="04d4438d" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(name<span class="op">=</span><span class="st">"String"</span>, age<span class="op">=</span><span class="st">"Int64"</span>, height<span class="op">=</span><span class="st">"Float64"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Finally, could also provide a DataFrame (Polars and Pandas) or an Ibis table object to <code>tbl=</code> and the schema will be collected:</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(tbl<span class="op">=</span>df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Whichever method you choose, you can verify the schema inputs by printing the <code>schema</code> object:</p>
-<div id="c233ebff" class="cell" data-execution_count="6">
+<div id="6182f0cb" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(schema)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Pointblank Schema
@@ -299,7 +299,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>The <code>Schema</code> object can be used to validate the structure of a table against the schema. The relevant <code>Validate</code> method for this is <a href="../reference/Validate.col_schema_match.html#pointblank.Validate.col_schema_match"><code>col_schema_match()</code></a>. In a validation workflow, you’ll have a target table (defined at the beginning of the workflow) and you might want to ensure that your expectations of the table structure are met. The <a href="../reference/Validate.col_schema_match.html#pointblank.Validate.col_schema_match"><code>col_schema_match()</code></a> method works with a <code>Schema</code> object to validate the structure of the table. Here’s an example of how you could use <a href="../reference/Validate.col_schema_match.html#pointblank.Validate.col_schema_match"><code>col_schema_match()</code></a> in a validation workflow:</p>
-<div id="8b9cd162" class="cell" data-execution_count="7">
+<div id="c92cf2ea" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define the schema</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(name<span class="op">=</span><span class="st">"String"</span>, age<span class="op">=</span><span class="st">"Int64"</span>, height<span class="op">=</span><span class="st">"Float64"</span>)</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -455,7 +455,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <p>The <a href="../reference/Validate.col_schema_match.html#pointblank.Validate.col_schema_match"><code>col_schema_match()</code></a> validation method will validate the structure of the table against the schema during interrogation. If the structure of the table does not match the schema, the single test unit will fail. In this case, the defined schema matched the structure of the table, so the validation passed.</p>
 <p>We can also choose to check only the column names of the target table. This can be done by providing a simplified <code>Schema</code> object, which is given a list of column names:</p>
-<div id="16401dd2" class="cell" data-execution_count="8">
+<div id="249e1304" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(columns<span class="op">=</span>[<span class="st">"name"</span>, <span class="st">"age"</span>, <span class="st">"height"</span>])</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
@@ -608,7 +608,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <p>In this case, the schema only checks the column names of the table against the schema during interrogation. If the column names of the table do not match the schema, the single test unit will fail. In this case, the defined schema matched the column names of the table, so the validation passed.</p>
 <p>If you wanted to check column names and dtypes only for a subset of columns (and just the column names for the rest), you could use a list of mixed one- or two-item tuples in <code>columns=</code>:</p>
-<div id="64f8efcc" class="cell" data-execution_count="9">
+<div id="29d14c8d" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(columns<span class="op">=</span>[(<span class="st">"name"</span>, <span class="st">"String"</span>), (<span class="st">"age"</span>, ), (<span class="st">"height"</span>, )])</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
@@ -761,7 +761,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <p>Not specifying a dtype for a column (as is the case for the <code>age</code> and <code>height</code> columns in the above example) will only check the column name.</p>
 <p>There may also be the case where you want to check the column names and specify multiple dtypes for a column to have several attempts at matching the dtype. This can be done by providing a list of dtypes where there would normally be a single dtype:</p>
-<div id="dc762b9a" class="cell" data-execution_count="10">
+<div id="d8194c0c" class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  columns<span class="op">=</span>[(<span class="st">"name"</span>, <span class="st">"String"</span>), (<span class="st">"age"</span>, [<span class="st">"Float64"</span>, <span class="st">"Int64"</span>]), (<span class="st">"height"</span>, <span class="st">"Float64"</span>)]</span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>)</span>
