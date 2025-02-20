@@ -286,7 +286,7 @@ validation = (
     pb.Validate(
         data=your_data,
         label="Draft Validation",
-        thresholds=pb.Thresholds(warn_at=0.10, stop_at=0.25, notify_at=0.35)
+        thresholds=pb.Thresholds(warning=0.10, error=0.25, critical=0.35)
     )
     .col_schema_match(schema=schema)
     .col_vals_not_null(columns=[

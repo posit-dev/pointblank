@@ -174,24 +174,24 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="pointblank.Actions" class="level1">
 <h1>Actions</h1>
-<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>Actions(<span class="va">self</span>, warn<span class="op">=</span><span class="va">None</span>, stop<span class="op">=</span><span class="va">None</span>, notify<span class="op">=</span><span class="va">None</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>Actions(<span class="va">self</span>, warning<span class="op">=</span><span class="va">None</span>, error<span class="op">=</span><span class="va">None</span>, critical<span class="op">=</span><span class="va">None</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Definition of action values.</p>
 <p>Actions complement threshold values by defining what action should be taken when a threshold level is reached. The action can be a string or a <code>Callable</code>. When a string is used, it is interpreted as a message to be displayed. When a <code>Callable</code> is used, it will be invoked at interrogation time if the threshold level is met or exceeded.</p>
-<p>There are three threshold levels: ‘warn’, ‘stop’, and ‘notify’. These levels correspond to different levels of severity when a threshold is reached. Those thresholds can be defined using the <a href="../reference/Thresholds.html#pointblank.Thresholds"><code>Thresholds</code></a> class or various shorthand forms. Actions don’t have to be defined for all threshold levels; if an action is not defined for a level in exceedence, no action will be taken.</p>
+<p>There are three threshold levels: ‘warning’, ‘error’, and ‘critical’. These levels correspond to different levels of severity when a threshold is reached. Those thresholds can be defined using the <a href="../reference/Thresholds.html#pointblank.Thresholds"><code>Thresholds</code></a> class or various shorthand forms. Actions don’t have to be defined for all threshold levels; if an action is not defined for a level in exceedence, no action will be taken.</p>
 <section id="parameters" class="level2 doc-section doc-section-parameters">
 <h2 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters">Parameters</h2>
 <dl>
-<dt><code><span class="parameter-name"><strong>warn</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><code>str</code> | <code>Callable</code> | <code>list</code>[<code>str</code> | <code>Callable</code>] | None</span> <span class="parameter-default-sep">=</span> <span class="parameter-default">None</span></code></dt>
+<dt><code><span class="parameter-name"><strong>warning</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><code>str</code> | <code>Callable</code> | <code>list</code>[<code>str</code> | <code>Callable</code>] | None</span> <span class="parameter-default-sep">=</span> <span class="parameter-default">None</span></code></dt>
 <dd>
-<p>A string, <code>Callable</code>, or list of <code>Callable</code>/string values for the ‘warn’ level. Using <code>None</code> means no action should be performed at the ‘warn’ level.</p>
+<p>A string, <code>Callable</code>, or list of <code>Callable</code>/string values for the ‘warning’ level. Using <code>None</code> means no action should be performed at the ‘warning’ level.</p>
 </dd>
-<dt><code><span class="parameter-name"><strong>stop</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><code>str</code> | <code>Callable</code> | <code>list</code>[<code>str</code> | <code>Callable</code>] | None</span> <span class="parameter-default-sep">=</span> <span class="parameter-default">None</span></code></dt>
+<dt><code><span class="parameter-name"><strong>error</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><code>str</code> | <code>Callable</code> | <code>list</code>[<code>str</code> | <code>Callable</code>] | None</span> <span class="parameter-default-sep">=</span> <span class="parameter-default">None</span></code></dt>
 <dd>
-<p>A string, <code>Callable</code>, or list of <code>Callable</code>/string values for the ‘stop’ level. Using <code>None</code> means no action should be performed at the ‘warn’ level.</p>
+<p>A string, <code>Callable</code>, or list of <code>Callable</code>/string values for the ‘error’ level. Using <code>None</code> means no action should be performed at the ‘error’ level.</p>
 </dd>
-<dt><code><span class="parameter-name"><strong>notify</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><code>str</code> | <code>Callable</code> | <code>list</code>[<code>str</code> | <code>Callable</code>] | None</span> <span class="parameter-default-sep">=</span> <span class="parameter-default">None</span></code></dt>
+<dt><code><span class="parameter-name"><strong>critical</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><code>str</code> | <code>Callable</code> | <code>list</code>[<code>str</code> | <code>Callable</code>] | None</span> <span class="parameter-default-sep">=</span> <span class="parameter-default">None</span></code></dt>
 <dd>
-<p>A string, <code>Callable</code>, or list of <code>Callable</code>/string values for the ‘notify’ level. Using <code>None</code> means no action should be performed at the ‘warn’ level.</p>
+<p>A string, <code>Callable</code>, or list of <code>Callable</code>/string values for the ‘critical’ level. Using <code>None</code> means no action should be performed at the ‘critical’ level.</p>
 </dd>
 </dl>
 </section>
