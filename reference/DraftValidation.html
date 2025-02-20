@@ -180,7 +180,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h1>DraftValidation</h1>
 <div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>DraftValidation(<span class="va">self</span>, data, model, api_key<span class="op">=</span><span class="va">None</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Draft a validation plan for a given table using an LLM.</p>
-<p>By using a large language model (LLM) to draft a validation plan, you can quickly generate a starting point for validating a table. This can be useful when you have a new table and you want to get a sense of how to validate it (and adjustments could always be made later). The <code>DraftValidation</code> class uses the <code>chatlas</code> package to draft a validation plan for a given table using an LLM from either the <code>"anthropic"</code>, <code>"openai"</code>, or <code>"bedrock"</code> provider. You can install all requirements for the class by using an optional install of Pointblank via <code>pip install pointblank[generate]</code>.</p>
+<p>By using a large language model (LLM) to draft a validation plan, you can quickly generate a starting point for validating a table. This can be useful when you have a new table and you want to get a sense of how to validate it (and adjustments could always be made later). The <code>DraftValidation</code> class uses the <code>chatlas</code> package to draft a validation plan for a given table using an LLM from either the <code>"anthropic"</code>, <code>"openai"</code>, <code>"ollama"</code> or <code>"bedrock"</code> provider. You can install all requirements for the class through an optional ‘generate’ install of Pointblank via <code>pip install pointblank[generate]</code>.</p>
 <div class="callout callout-style-default callout-warning callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -203,7 +203,7 @@ Warning
 </dd>
 <dt><code><span class="parameter-name"><strong>model</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><code>str</code></span></code></dt>
 <dd>
-<p>The model to be used. This should be in the form of <code>provider:model</code> (e.g., <code>"anthropic:claude-3-5-sonnet-latest"</code>). Supported providers are <code>"anthropic"</code>, <code>"openai"</code>, and <code>"bedrock"</code> (Amazon Bedrock).</p>
+<p>The model to be used. This should be in the form of <code>provider:model</code> (e.g., <code>"anthropic:claude-3-5-sonnet-latest"</code>). Supported providers are <code>"anthropic"</code>, <code>"openai"</code>, <code>"ollama"</code>, and <code>"bedrock"</code>.</p>
 </dd>
 <dt><code><span class="parameter-name"><strong>api_key</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><code>str</code> | None</span> <span class="parameter-default-sep">=</span> <span class="parameter-default">None</span></code></dt>
 <dd>
@@ -222,7 +222,14 @@ Warning
 </section>
 <section id="constructing-the-model-argument" class="level2 doc-section doc-section-constructing-the-model-argument">
 <h2 class="doc-section doc-section-constructing-the-model-argument anchored" data-anchor-id="constructing-the-model-argument">Constructing the <code>model</code> Argument</h2>
-<p>The <code>model=</code> argument should be constructed using the provider and model name separated by a colon. The provider can be either <code>"anthropic"</code> or <code>"openai"</code>. The model name should be the specific model to be used. For example, model names are subject to change so consult the provider’s documentation for the most up-to-date model names.</p>
+<p>The <code>model=</code> argument should be constructed using the provider and model name separated by a colon (<code>provider:model</code>). The provider text can any of:</p>
+<ul>
+<li><code>"anthropic"</code> (Anthropic)</li>
+<li><code>"openai"</code> (OpenAI)</li>
+<li><code>"ollama"</code> (Ollama)</li>
+<li><code>"bedrock"</code> (Amazon Bedrock)</li>
+</ul>
+<p>The model name should be the specific model to be used from the provider. Model names are subject to change so consult the provider’s documentation for the most up-to-date model names.</p>
 </section>
 <section id="notes-on-authentication" class="level2 doc-section doc-section-notes-on-authentication">
 <h2 class="doc-section doc-section-notes-on-authentication anchored" data-anchor-id="notes-on-authentication">Notes on Authentication</h2>
@@ -244,10 +251,11 @@ OPENAI_API_KEY="your_openai_api_key_here"</code></pre>
 <li>a short list of data values in each column</li>
 </ul>
 <p>The JSON summary is used to provide the model with the necessary information to draft a validation plan. As such, even very large tables can be used with the <code>DraftValidation</code> class since the contents of the table are not sent to the model provider.</p>
+<p>The Amazon Bedrock is a special case since it is a self-hosted model and security controls are in place to ensure that data is kept within the user’s AWS environment. If using an Ollama model all data is handled locally, though only a few models are capable enough to perform the task of drafting a validation plan.</p>
 </section>
 <section id="examples" class="level2 doc-section doc-section-examples">
 <h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
-<p>Let’s look at how the <code>DraftValidation</code> class can be used to draft a validation plan for a table. The table to be used is <code>"nycflights"</code>, which is available here via the <a href="../reference/load_dataset.html#pointblank.load_dataset"><code>load_dataset()</code></a> function. The model to be used is <code>"anthropic:claude-3-5-sonnet-latest"</code>. The example assumes that the API key is stored in an <code>.env</code> file as <code>ANTHROPIC_API_KEY</code>.</p>
+<p>Let’s look at how the <code>DraftValidation</code> class can be used to draft a validation plan for a table. The table to be used is <code>"nycflights"</code>, which is available here via the <a href="../reference/load_dataset.html#pointblank.load_dataset"><code>load_dataset()</code></a> function. The model to be used is <code>"anthropic:claude-3-5-sonnet-latest"</code> (which performs very well compared to other LLMs). The example assumes that the API key is stored in an <code>.env</code> file as <code>ANTHROPIC_API_KEY</code>.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Load the "nycflights" dataset as a DuckDB table</span></span>
@@ -284,7 +292,7 @@ schema = pb.Schema(columns=[
 # The validation plan
 validation = (
     pb.Validate(
-        data=your_data,
+        data=your_data,  # Replace your_data with the actual data variable
         label="Draft Validation",
         thresholds=pb.Thresholds(warning=0.10, error=0.25, critical=0.35)
     )
@@ -311,7 +319,7 @@ validation = (
 validation
 ```</code></pre>
 <p>The drafted validation plan can be copied and pasted into a Python script or notebook for further use. In other words, the generated plan can be adjusted as needed to suit the specific requirements of the table being validated.</p>
-<p>Note that the output does not know how the data was obtained, so it uses the placeholder <code>your_data</code> in the <code>data=</code> argument of the <code>Validate</code> class. This should be replaced with the actual data variable.</p>
+<p>Note that the output does not know how the data was obtained, so it uses the placeholder <code>your_data</code> in the <code>data=</code> argument of the <code>Validate</code> class. When adapted for use, this should be replaced with the actual data variable.</p>
 
 
 </section>
