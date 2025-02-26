@@ -89,6 +89,12 @@ p,h1,h2,h3,#toc-title,#toc-function-reference,.nav-link,.table {
     padding-bottom: 4px;
 }
 
+.sidebar-menu-container {
+    border-bottom-style: solid;
+    border-bottom-width: 3px;
+    border-bottom-color: #FAFAFA;
+}
+
 #quarto-header > nav > div {
     margin-left: 5%;
     margin-right: 5%;
