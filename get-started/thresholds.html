@@ -191,16 +191,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#using-the-validationthresholds-argument" id="toc-using-the-validationthresholds-argument" class="nav-link active" data-scroll-target="#using-the-validationthresholds-argument">Using the <code>Validation(thresholds=)</code> Argument</a></li>
+  <li><a href="#two-types-of-threshold-values-proportional-and-absolute" id="toc-two-types-of-threshold-values-proportional-and-absolute" class="nav-link active" data-scroll-target="#two-types-of-threshold-values-proportional-and-absolute">Two Types of Threshold Values: Proportional and Absolute</a></li>
+  <li><a href="#using-the-validationthresholds-argument" id="toc-using-the-validationthresholds-argument" class="nav-link" data-scroll-target="#using-the-validationthresholds-argument">Using the <code>Validation(thresholds=)</code> Argument</a></li>
   <li><a href="#ways-to-define-thresholds" id="toc-ways-to-define-thresholds" class="nav-link" data-scroll-target="#ways-to-define-thresholds">Ways to Define Thresholds</a>
   <ul class="collapse">
-  <li><a href="#using-a-tuple" id="toc-using-a-tuple" class="nav-link" data-scroll-target="#using-a-tuple">Using a Tuple</a></li>
-  <li><a href="#the-threshold-class" id="toc-the-threshold-class" class="nav-link" data-scroll-target="#the-threshold-class">The <code>Threshold</code> Class</a></li>
+  <li><a href="#using-a-tuple-or-a-single-value" id="toc-using-a-tuple-or-a-single-value" class="nav-link" data-scroll-target="#using-a-tuple-or-a-single-value">Using a Tuple or a Single Value</a></li>
+  <li><a href="#using-the-thresholds-class" id="toc-using-the-thresholds-class" class="nav-link" data-scroll-target="#using-the-thresholds-class">Using the <code>Thresholds</code> Class</a></li>
+  <li><a href="#using-a-dictionary-to-set-thresholds" id="toc-using-a-dictionary-to-set-thresholds" class="nav-link" data-scroll-target="#using-a-dictionary-to-set-thresholds">Using a Dictionary to Set Thresholds</a></li>
   </ul></li>
-  <li><a href="#threshold-cutoff-values" id="toc-threshold-cutoff-values" class="nav-link" data-scroll-target="#threshold-cutoff-values">Threshold Cutoff Values</a></li>
-  <li><a href="#triggering-actions" id="toc-triggering-actions" class="nav-link" data-scroll-target="#triggering-actions">Triggering Actions</a></li>
-  <li><a href="#use-case-stopping-on-any-failures" id="toc-use-case-stopping-on-any-failures" class="nav-link" data-scroll-target="#use-case-stopping-on-any-failures">Use Case: Stopping on any Failures</a></li>
-  <li><a href="#use-case-global-tolerance-bands" id="toc-use-case-global-tolerance-bands" class="nav-link" data-scroll-target="#use-case-global-tolerance-bands">Use Case: Global tolerance bands</a></li>
   </ul>
 </nav>
     </div>
@@ -226,27 +224,20 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<div class="callout callout-style-simple callout-none no-icon">
-<div class="callout-body d-flex">
-<div class="callout-icon-container">
-<i class="callout-icon no-icon"></i>
-</div>
-<div class="callout-body-container">
-<p>This is a work in progress. And some of this article is just an outline for now.</p>
-</div>
-</div>
-</div>
-<p>Thresholds enable you to signal failure at different severity levels. In the near future, thresholds will be able to trigger custom actions. For example, when testing a column for null/missing values with <code>col_vals_not_null()</code> you might want a warning on any missing values an elevated flag where there are 10% missing values in the column.</p>
-<div id="300eb68c" class="cell" data-execution_count="1">
+<p>Thresholds enable you to signal failure at different severity levels. They also allow for the triggering of custom actions. For example, when testing a column for Null/missing values with <code>col_vals_not_null()</code> you might want to write something to the console when there are at least 20% missing values in the column.</p>
+<p>Let’s start with the basics though. Here’s an example of a simple validation where threshold values are set at the <code>col_vals_not_null()</code> step without any corresponding actions.</p>
+<div id="3ec5248d" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>validation_1 <span class="op">=</span> (</span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>pb.load_dataset(dataset<span class="op">=</span><span class="st">"small_table"</span>))</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    .col_vals_not_null(columns<span class="op">=</span><span class="st">"c"</span>, thresholds<span class="op">=</span>(<span class="dv">1</span>, <span class="fl">0.1</span>))</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>validation_1</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    .col_vals_not_null(</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>        columns<span class="op">=</span><span class="st">"c"</span>, thresholds<span class="op">=</span>(<span class="dv">1</span>, <span class="fl">0.2</span>)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>validation_1</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div id="pb_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>
@@ -322,7 +313,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <td colspan="14" class="gt_heading gt_title gt_font_normal" style="color: #444444;font-size: 28px;text-align: left;font-weight: bold;">Pointblank Validation</td>
   </tr>
   <tr class="gt_heading">
-    <td colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border"><div><span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2025-02-26|04:56:53</span><div style="padding-top: 10px; padding-bottom: 5px;"><span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 10px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 10px 2px 10px; font-size: smaller;">Polars</span></div></div></td>
+    <td colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border"><div><span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2025-02-26|05:45:57</span><div style="padding-top: 10px; padding-bottom: 5px;"><span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 10px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 10px 2px 10px; font-size: smaller;">Polars</span></div></div></td>
   </tr>
 <tr class="gt_col_headings">
   <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id=""></th>
@@ -378,7 +369,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">11<br>0.85</td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">2<br>0.15</td>
     <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" class="gt_row gt_center"><span style="color: #AAAAAA;">●</span></td>
-    <td style="height: 40px; background-color: #FCFCFC;" class="gt_row gt_center"><span style="color: #EBBC14;">●</span></td>
+    <td style="height: 40px; background-color: #FCFCFC;" class="gt_row gt_center"><span style="color: #EBBC14;">○</span></td>
     <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" class="gt_row gt_center">—</td>
     <td style="height: 40px;" class="gt_row gt_center"><a href="data:text/csv;base64,X3Jvd19udW1fLGRhdGVfdGltZSxkYXRlLGEsYixjLGQsZSxmCjQsMjAxNi0wMS0wNlQxNzoyMzowMC4wMDAwMDAsMjAxNi0wMS0wNiwyLDUtamRvLTkwMywsMzg5Mi40LGZhbHNlLG1pZAoxMywyMDE2LTAxLTMwVDExOjIzOjAwLjAwMDAwMCwyMDE2LTAxLTMwLDEsMy1ka2EtMzAzLCwyMjMwLjA5LHRydWUsaGlnaAo=" download="extract_0001.csv"><button style="background-color: #67C2DC; color: #FFFFFF; border: none; padding: 5px; font-weight: bold; cursor: pointer; border-radius: 4px;">CSV</button></a></td>
   </tr>
@@ -386,7 +377,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <tfoot class="gt_sourcenotes">
   
   <tr>
-    <td class="gt_sourcenote" colspan="14"><div style="margin-top: 5px; margin-bottom: 5px;"><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin-left: 10px; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2025-02-26 04:56:53 UTC</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">&lt; 1 s</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 1px 5px -1px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2025-02-26 04:56:53 UTC</span></div></td>
+    <td class="gt_sourcenote" colspan="14"><div style="margin-top: 5px; margin-bottom: 5px;"><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin-left: 10px; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2025-02-26 05:45:57 UTC</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">&lt; 1 s</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 1px 5px -1px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2025-02-26 05:45:57 UTC</span></div></td>
   </tr>
 
 </tfoot>
@@ -397,13 +388,22 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         
 </div>
 </div>
-<p>The code uses <code>thresholds=(1, 0.1)</code> to set a ‘warning’ threshold of <code>1</code> and an ‘error’ threshold of <code>0.1</code> (which is 10%) failing test units. Notice these pieces in the validation table:</p>
+<p>The code uses <code>thresholds=(1, 0.2)</code> to set a ‘warning’ threshold of <code>1</code> and an ‘error’ threshold of <code>0.2</code> (which is 20%) failing test units. You might notice the following in the validation table:</p>
 <ul>
 <li>The <code>FAIL</code> column shows that 2 tests units have failed</li>
-<li>The <code>W</code> column (short for ‘warning’) shows a filled yellow circle indicating it’s reached the threshold level</li>
-<li>The <code>E</code> column (for ‘error’ level) shows an open red circle indicating it’s below the threshold level</li>
+<li>The <code>W</code> column (short for ‘warning’) shows a filled gray circle indicating it’s reached its threshold level</li>
+<li>The <code>E</code> (‘error’) column shows an open yellow circle indicating it’s below the threshold level</li>
 </ul>
 <p>The one final threshold, <code>C</code> (‘critical’), wasn’t set so appears on the validation table as a dash.</p>
+<section id="two-types-of-threshold-values-proportional-and-absolute" class="level2">
+<h2 class="anchored" data-anchor-id="two-types-of-threshold-values-proportional-and-absolute">Two Types of Threshold Values: Proportional and Absolute</h2>
+<p>Threshold values can be specified in two ways:</p>
+<ul>
+<li>proportional: a decimal value like 0.1 is taken to mean 10% of all test units failed</li>
+<li>absolute: a whole number represents a fixed number of test units failed</li>
+</ul>
+<p>Threshold values act as cutoffs and are inclusive. So, any value of failing test units greater than or equal to the threshold value will result in exceeding the threshold. So if a threshold is defined with a value of <code>5</code>, then 5 failing test units will result in an exceedence.</p>
+</section>
 <section id="using-the-validationthresholds-argument" class="level2">
 <h2 class="anchored" data-anchor-id="using-the-validationthresholds-argument">Using the <code>Validation(thresholds=)</code> Argument</h2>
 <p>We can also define thresholds globally. This means that every validation step will re-use the same set of threshold values.</p>
@@ -417,47 +417,36 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>validation_2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>In this, both the <code>col_vals_not_null()</code> and <code>col_vals_gt()</code> steps will use the <code>thresholds=</code> value set in the <code>Validate()</code> call. Now, if you want to override these global threshold values for a given validation step, you can always use the <code>threshold=</code> argument when calling a validation method (the argument is present in every validation method).</p>
+<p>In this, both the <code>col_vals_not_null()</code> and <code>col_vals_gt()</code> steps will use the <code>thresholds=</code> value set in the <code>Validate()</code> call. Now, if you want to override these global threshold values for a given validation step, you can always use the <code>threshold=</code> argument when calling a validation method (the argument is present within every validation method).</p>
 </section>
 <section id="ways-to-define-thresholds" class="level2">
 <h2 class="anchored" data-anchor-id="ways-to-define-thresholds">Ways to Define Thresholds</h2>
-<section id="using-a-tuple" class="level3">
-<h3 class="anchored" data-anchor-id="using-a-tuple">Using a Tuple</h3>
-<p>The fastest way to define a threshold is to use a tuple with entries for ‘warning’, ‘error’, and ‘critical’ levels.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># (warning, error, critical)</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>thresholds <span class="op">=</span> (<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>)</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>pb.Validate(data<span class="op">=</span>..., thresholds<span class="op">=</span>thresholds)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Note that a shorter tuple or even single values are also allowed:</p>
+<p>There are more than a few ways to set threshold levels. We provide this flexibility because it’s often useful to have simple shorthand methods for such a common task.</p>
+<section id="using-a-tuple-or-a-single-value" class="level3">
+<h3 class="anchored" data-anchor-id="using-a-tuple-or-a-single-value">Using a Tuple or a Single Value</h3>
+<p>The fastest way to define a threshold is to use a tuple with positional entries for the ‘warning’, ‘error’, and ‘critical’ levels.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>thresholds_tuple <span class="op">=</span> (<span class="dv">1</span>, <span class="fl">0.1</span>, <span class="fl">0.25</span>) <span class="co"># (warning, error, critical)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Note that a shorter tuple is also allowed:</p>
 <ul>
-<li><code>(1, 2)</code>: ‘warning’ state at 1 failing test unit, <code>error</code> state at 2 failing test units</li>
-<li><code>1</code> or <code>(1, )</code>: ‘warning’ state at 1 failing test unit</li>
+<li><code>(1, )</code>: ‘warning’ state at 1 failing test unit</li>
+<li><code>(1, 0.1)</code>: ‘warning’ state at 1 failing test unit, <code>error</code> state at 10% failing test units</li>
 </ul>
+<p>You can even use a scalar value (float between <code>0</code> and <code>1</code> or an integer). That single value represents the threshold value for the ‘warning’ level:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>thresholds_single <span class="op">=</span> <span class="dv">1</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>While using a tuple or a scalar can be very succinct, a problem that arises is that the ordering of values always begins at the ‘warning’ level. This means you cannot define a threshold level for just the ‘error’ level, for example. This is fine for many cases, however, there are other ways to express thresholds without these constraints.</p>
 </section>
-<section id="the-threshold-class" class="level3">
-<h3 class="anchored" data-anchor-id="the-threshold-class">The <code>Threshold</code> Class</h3>
+<section id="using-the-thresholds-class" class="level3">
+<h3 class="anchored" data-anchor-id="using-the-thresholds-class">Using the <code>Thresholds</code> Class</h3>
+<p>Using the <code>Thresholds</code> class lets you define the threshold levels using the <code>warning=</code>, <code>error=</code>, and <code>critical=</code> arguments. And unlike the method of setting thresholds with a tuple, any of the threshold levels can be unset. Here’s an example where you might want to set the ‘error’ and ‘critical’ levels but not the ‘warning’ level:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>thresholds_class <span class="op">=</span> pb.Thresholds(error<span class="op">=</span><span class="fl">0.3</span>, critical<span class="op">=</span><span class="fl">0.5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
-</section>
-<section id="threshold-cutoff-values" class="level2">
-<h2 class="anchored" data-anchor-id="threshold-cutoff-values">Threshold Cutoff Values</h2>
-<p>Threshold values can be specified in two ways:</p>
-<ul>
-<li>percentage: a decimal value like 0.1 to mean 10% test units failed</li>
-<li>number: a fixed number of test units failed</li>
-</ul>
-<p>Threshold cutoffs are inclusive so any value of failing test units greater than or equal to the cutoff will result in triggering the threshold. So if a threshold is defined with a cutoff value of <code>5</code>, then 5 failing test units will result in threshold.</p>
-</section>
-<section id="triggering-actions" class="level2">
-<h2 class="anchored" data-anchor-id="triggering-actions">Triggering Actions</h2>
-<p>This is not currently implemented.</p>
-</section>
-<section id="use-case-stopping-on-any-failures" class="level2">
-<h2 class="anchored" data-anchor-id="use-case-stopping-on-any-failures">Use Case: Stopping on any Failures</h2>
-</section>
-<section id="use-case-global-tolerance-bands" class="level2">
-<h2 class="anchored" data-anchor-id="use-case-global-tolerance-bands">Use Case: Global tolerance bands</h2>
+<section id="using-a-dictionary-to-set-thresholds" class="level3">
+<h3 class="anchored" data-anchor-id="using-a-dictionary-to-set-thresholds">Using a Dictionary to Set Thresholds</h3>
+<p>A specially-crafted dictionary is acceptable as input to any <code>thresholds=</code> argument. You need to ensure that the keys are named using either <code>"warning"</code>, <code>"error"</code>, or <code>"critical"</code>. Any combination of keys is fine, but be careful to use only the aforementioned names (otherwise, you’ll get a <code>ValueError</code>). Here’s an example that sets the ‘warning’ and ‘critical’ levels:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>thresholds_dict <span class="op">=</span> {<span class="st">"warning"</span>: <span class="dv">1</span>, <span class="st">"critical"</span>: <span class="fl">0.1</span>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 
 
+</section>
 </section>
 
 </main> <!-- /main -->
