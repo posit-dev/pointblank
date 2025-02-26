@@ -162,6 +162,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul class="collapse">
   <li><a href="#parameters" id="toc-parameters" class="nav-link" data-scroll-target="#parameters">Parameters</a></li>
   <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
+  <li><a href="#types-of-actions" id="toc-types-of-actions" class="nav-link" data-scroll-target="#types-of-actions">Types of Actions</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -203,6 +204,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>An <code>Actions</code> object. This can be used when using the <a href="../reference/Validate.html#pointblank.Validate"><code>Validate</code></a> class (to set actions for meeting different threshold levels globally) or when defining validation steps like <a href="../reference/Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt"><code>col_vals_gt()</code></a> (so that actions are scoped to individual validation steps, overriding any globally set actions).</p>
 </dd>
 </dl>
+</section>
+<section id="types-of-actions" class="level2 doc-section doc-section-types-of-actions">
+<h2 class="doc-section doc-section-types-of-actions anchored" data-anchor-id="types-of-actions">Types of Actions</h2>
+<p>Actions can be defined in different ways:</p>
+<ol type="1">
+<li><strong>String</strong>: A message to be displayed when the threshold level is met or exceeded.</li>
+<li><strong>Callable</strong>: A function that is called when the threshold level is met or exceeded.</li>
+<li><strong>List of Strings/Callables</strong>: Multiple messages or functions to be called when the threshold level is met or exceeded.</li>
+</ol>
+<p>The actions are executed at interrogation time when the threshold level assigned to the action is exceeded by the number or proportion of failing test units. When providing a string, it will simply be printed to the console. A callable will also be executed at the time of interrogation. If providing a list of strings or callables, each item in the list will be executed in order. Such a list can contain a mix of strings and callables.</p>
 
 
 </section>
