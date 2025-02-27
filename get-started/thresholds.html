@@ -237,9 +237,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<p>Thresholds enable you to signal failure at different severity levels. They also allow for the triggering of custom actions. For example, when testing a column for Null/missing values with <code>col_vals_not_null()</code> you might want to write something to the console when there are at least 20% missing values in the column.</p>
-<p>Let’s start with the basics though. Here’s an example of a simple validation where threshold values are set at the <code>col_vals_not_null()</code> step without any corresponding actions.</p>
-<div id="a7587db2" class="cell" data-execution_count="2">
+<p>Thresholds enable you to signal failure at different severity levels. They also allow for the triggering of custom actions, a topic which is covered in the next section. For instance you might be testing a column for null/missing values. When doing so, you’d want to know when there are at least 10% missing values in the column. Alternatively, it could be the case that even a single missing value is critical to your work. Threshold settings in Pointblank give you the flexibility to devise data-failure signaling to whatever tolerances are important to you.</p>
+<p>Let’s start with the basics though. Here’s an example of a simple validation where threshold values are set in the <a href="https://posit-dev.github.io/pointblank/reference/Validate.col_vals_not_null.html"><code>col_vals_not_null()</code></a> validation step (this type of validation expects that there are no null/missing values in a particular column):</p>
+<div id="aee1d13c" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>validation_1 <span class="op">=</span> (</span>
@@ -326,7 +326,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <td colspan="14" class="gt_heading gt_title gt_font_normal" style="color: #444444;font-size: 28px;text-align: left;font-weight: bold;">Pointblank Validation</td>
   </tr>
   <tr class="gt_heading">
-    <td colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border"><div><span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2025-02-27|05:40:51</span><div style="padding-top: 10px; padding-bottom: 5px;"><span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 10px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 10px 2px 10px; font-size: smaller;">Polars</span></div></div></td>
+    <td colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border"><div><span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2025-02-27|05:54:31</span><div style="padding-top: 10px; padding-bottom: 5px;"><span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 10px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 10px 2px 10px; font-size: smaller;">Polars</span></div></div></td>
   </tr>
 <tr class="gt_col_headings">
   <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id=""></th>
@@ -424,7 +424,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>validation_2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>In this, both the <code>col_vals_not_null()</code> and <code>col_vals_gt()</code> steps will use the <code>thresholds=</code> value set in the <code>Validate()</code> call. Now, if you want to override these global threshold values for a given validation step, you can always use the <code>threshold=</code> argument when calling a validation method (the argument is present within every validation method).</p>
+<p>In this, both the <a href="https://posit-dev.github.io/pointblank/reference/Validate.col_vals_not_null.html"><code>col_vals_not_null()</code></a> and <a href="https://posit-dev.github.io/pointblank/reference/Validate.col_vals_gt.html"><code>col_vals_gt()</code></a> steps will use the <code>thresholds=</code> value set in the <a href="https://posit-dev.github.io/pointblank/reference/Validate.html"><code>Validate</code></a> call. Now, if you want to override these global threshold values for a given validation step, you can always use the <code>threshold=</code> argument when calling a validation method (this argument is present within every validation method).</p>
 </section>
 <section id="ways-to-define-thresholds" class="level2">
 <h2 class="anchored" data-anchor-id="ways-to-define-thresholds">Ways to Define Thresholds</h2>
@@ -444,12 +444,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="using-the-thresholds-class" class="level3">
 <h3 class="anchored" data-anchor-id="using-the-thresholds-class">Using the <code>Thresholds</code> Class</h3>
-<p>Using the <code>Thresholds</code> class lets you define the threshold levels using the <code>warning=</code>, <code>error=</code>, and <code>critical=</code> arguments. And unlike the method of setting thresholds with a tuple, any of the threshold levels can be unset. Here’s an example where you might want to set the ‘error’ and ‘critical’ levels but not the ‘warning’ level:</p>
+<p>Using the <a href="https://posit-dev.github.io/pointblank/reference/Thresholds.html"><code>Thresholds</code></a> class lets you define the threshold levels using the <code>warning=</code>, <code>error=</code>, and <code>critical=</code> arguments. And unlike the method of setting thresholds with a tuple, any of the threshold levels can be unset. Here’s an example where you might want to set the ‘error’ and ‘critical’ levels (leaving the ‘warning’ level unset):</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>thresholds_class <span class="op">=</span> pb.Thresholds(error<span class="op">=</span><span class="fl">0.3</span>, critical<span class="op">=</span><span class="fl">0.5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section id="using-a-dictionary-to-set-thresholds" class="level3">
 <h3 class="anchored" data-anchor-id="using-a-dictionary-to-set-thresholds">Using a Dictionary to Set Thresholds</h3>
-<p>A specially-crafted dictionary is acceptable as input to any <code>thresholds=</code> argument. You need to ensure that the keys are named using either <code>"warning"</code>, <code>"error"</code>, or <code>"critical"</code>. Any combination of keys is fine, but be careful to use only the aforementioned names (otherwise, you’ll get a <code>ValueError</code>). Here’s an example that sets the ‘warning’ and ‘critical’ levels:</p>
+<p>A specially-crafted dictionary is acceptable as input to any <code>thresholds=</code> argument. You need to ensure that the keys are named using either <code>"warning"</code>, <code>"error"</code>, or <code>"critical"</code>. Any combination of keys is fine, but be careful to use only the aforementioned names (otherwise, you’ll receive a <code>ValueError</code>). Here’s an example that sets the ‘warning’ and ‘critical’ levels:</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>thresholds_dict <span class="op">=</span> {<span class="st">"warning"</span>: <span class="dv">1</span>, <span class="st">"critical"</span>: <span class="fl">0.1</span>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 
 
