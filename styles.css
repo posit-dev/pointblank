@@ -49,12 +49,15 @@ p,h1,h2,h3,#toc-title,#toc-function-reference,.nav-link,.table {
 }
 
 #toc-title {
-    font-size: 20px;
+    font-size: 16px;
 }
 
-#quarto-margin-sidebar nav ul {
-    font-size: 16px;
-    padding-top: 5px;
+#toc-title > ul {
+    font-size: 14px;
+}
+
+#quarto-margin-sidebar {
+    margin-left: 20px;
 }
 
 #quarto-margin-sidebar nav ul li  {
