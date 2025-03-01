@@ -217,6 +217,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul>
   <li><a href="#the-basics-of-preprocessing-the-input-table" id="toc-the-basics-of-preprocessing-the-input-table" class="nav-link active" data-scroll-target="#the-basics-of-preprocessing-the-input-table">The Basics of Preprocessing the Input Table</a></li>
   <li><a href="#using-narwhals-to-preprocess-many-types-of-dataframes" id="toc-using-narwhals-to-preprocess-many-types-of-dataframes" class="nav-link" data-scroll-target="#using-narwhals-to-preprocess-many-types-of-dataframes">Using Narwhals to Preprocess Many Types of DataFrames</a></li>
+  <li><a href="#swapping-in-different-dataframes-just-in-time" id="toc-swapping-in-different-dataframes-just-in-time" class="nav-link" data-scroll-target="#swapping-in-different-dataframes-just-in-time">Swapping in Different DataFrames Just in Time</a></li>
   </ul>
 </nav>
     </div>
@@ -242,16 +243,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<p>While the validation methods available can do a lot for you, there’s alternatively a lot of things you <em>can’t</em> easily do with them. What if you wanted to validate:</p>
+<p>While the validation methods available can do a lot for you, there’s likewise a lot of things you <em>can’t</em> easily do with them. What if you wanted to validate:</p>
 <ul>
 <li>string lengths in a column are less than 10 characters</li>
 <li>the median of values in a column is less than the median of values in another column</li>
 <li>there are at least three instances of every categorical value in a column</li>
 </ul>
 <p>These are more complicated types of validations, yet checks of this type are very commonplace. We don’t need to have a very large library of validation methods to tackle each an every case; the number of combinations indeed seems exceedingly large. Instead, let’s transform the table through a preprocessing step and expose the key values. In conjunction with that sort of table mutation, we then can use the existing library of validation methods.</p>
-<p>At the heart of this approach is the idea of composability. And Pointblank makes it easy to safely transform the input table in a given validation step via the <code>pre=</code> argument. Any computed columns are available for the lifetime of the validation step during interrogation.</p>
+<p>Central to this approach is the idea of composability. Pointblank makes it easy to safely transform the input table in a given validation step via the <code>pre=</code> argument. Any computed columns are available for the (short) lifetime of the validation step during interrogation.</p>
 <p>Now, through a series of examples, let’s look at the process of performing the validations mentioned above. We’ll use the <code>small_table</code> dataset for all of the examples. Here it is in its entirety:</p>
-<div id="81032e25" class="cell" data-execution_count="2">
+<div id="958dc5ef" class="cell" data-execution_count="2">
 <div class="cell-output cell-output-display" data-execution_count="2">
 <div id="pb_preview_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>
@@ -488,8 +489,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <section id="the-basics-of-preprocessing-the-input-table" class="level2">
 <h2 class="anchored" data-anchor-id="the-basics-of-preprocessing-the-input-table">The Basics of Preprocessing the Input Table</h2>
-<p>In getting to grips with the basics, we’ll try to validate that string lengths in the <code>b</code> column are less than 10 characters. We can’t directly use the <a href="https://posit-dev.github.io/pointblank/reference/Validate.col_vals_lt.html"><code>col_vals_lt()</code></a> validation method with that column because it is meant to be used with a column of numeric values. Let’s just give that method what it needs and create a column with string lengths! The table is a Polars DataFrame so we’ll provide a lambda function that uses the Polars API to add in that numeric column:</p>
-<div id="516cd6b3" class="cell" data-execution_count="3">
+<p>In getting to grips with the basics, we’ll try to validate that string lengths in the <code>b</code> column are less than 10 characters. We can’t directly use the <a href="https://posit-dev.github.io/pointblank/reference/Validate.col_vals_lt.html"><code>col_vals_lt()</code></a> validation method with that column because it is meant to be used with a column of numeric values. Let’s just give that method what it needs and create a column with string lengths! The target table is a Polars DataFrame so we’ll provide a lambda function that uses the Polars API to add in that numeric column:</p>
+<div id="e86c1ac1" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>(</span>
@@ -649,10 +650,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         
 </div>
 </div>
-<p>The validation was successfully constructed and we can see from the validation report table that all strings in <code>b</code> had lengths less than 10 characters. We can see from the code itself that we’re not directly testing the <code>b</code> column. Instead the test is of the <code>string_lengths</code> column generated by the lambda provided to <code>pre=</code>. We used Polars to do the transformation work here and that’s the piece that generates numerical values of string lengths in the computed column.</p>
-<p>That transformation occurs only during interrogation and only for that validation step. Any prior or subsequent steps would normally use the as-provided <code>small_table</code>. Having the possibility for data transformation isolated at the step level means that you don’t have to generate separate validation plans for each form of the data, you’re free to transform at will and perform validations on different representations of the data.</p>
+<p>The validation was successfully constructed and we can see from the validation report table that all strings in <code>b</code> had lengths less than 10 characters. Also note that the icon under the <code>TBL</code> column is no longer a rightward-facing arrow, but one that is indicative of transformation.</p>
+<p>From the code itself, we’re not directly testing the <code>b</code> column. Instead the test is of the <code>string_lengths</code> column generated by the lambda provided to <code>pre=</code>. We used Polars to do the transformation work here and that’s the piece that generates numerical values of string lengths in the computed column.</p>
+<p>That transformation occurs only during interrogation and only for that validation step. Any prior or subsequent steps would normally use the as-provided <code>small_table</code>. Having the possibility for data transformation being isolated at the step level means that you don’t have to generate separate validation plans for each form of the data, you’re free to fluidly transform the target table as necessary for perform validations on different representations of the data.</p>
 <p>Aside from using a lambda, you can pass in a custom function. Just make sure not to evaluate it at the <code>pre=</code> parameter (everything is stored lazily until interrogation time). Here’s an example of that approach:</p>
-<div id="0a6d3438" class="cell" data-execution_count="4">
+<div id="e6c1328b" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> add_string_lengths(df):</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> df.with_columns(string_lengths<span class="op">=</span>pl.col(<span class="st">"b"</span>).<span class="bu">str</span>.len_chars())</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -815,14 +817,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="using-narwhals-to-preprocess-many-types-of-dataframes">Using Narwhals to Preprocess Many Types of DataFrames</h2>
 <p>In this previous example we used a Polars table (the <code>load_dataset()</code> returns a Polars DataFrame by default). You might have a situation where where you perform data validation variously on Pandas and Polars DataFrames. This is where Narwhals becomes handy.</p>
 <p>Let’s obtain <code>small_table</code> as a Pandas DataFrame. We’ll construct a validation step to verify that the median of column <code>c</code> is greater than the median in column <code>a</code>.</p>
-<div id="e5e95d54" class="cell" data-execution_count="5">
+<div id="833df331" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> narwhals <span class="im">as</span> nw</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>(</span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    pb.Validate(</span>
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>        data<span class="op">=</span>pb.load_dataset(<span class="st">"small_table"</span>, tbl_type<span class="op">=</span><span class="st">"pandas"</span>),</span>
 <span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>        tbl_name<span class="op">=</span><span class="st">"small_table"</span>,</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>        label<span class="op">=</span><span class="st">"String lengths"</span>,</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>        label<span class="op">=</span><span class="st">"Median comparison"</span>,</span>
 <span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    )</span>
 <span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    .col_vals_gt(</span>
 <span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>        columns<span class="op">=</span><span class="st">"c"</span>,</span>
@@ -906,7 +908,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <td colspan="14" class="gt_heading gt_title gt_font_normal" style="color: #444444;font-size: 28px;text-align: left;font-weight: bold;">Pointblank Validation</td>
   </tr>
   <tr class="gt_heading">
-    <td colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border"><div><span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">String lengths</span><div style="padding-top: 10px; padding-bottom: 5px;"><span style="background-color: #150458; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 0px; border: solid 1px #150458; font-weight: bold; padding: 2px 15px 2px 15px; font-size: smaller;">Pandas</span><span style="background-color: none; color: #222222; padding: 0.5em 0.5em; position: inherit; margin: 5px 10px 5px -4px; border: solid 1px #150458; font-weight: bold; padding: 2px 15px 2px 15px; font-size: smaller;">small_table</span></div></div></td>
+    <td colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border"><div><span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">Median comparison</span><div style="padding-top: 10px; padding-bottom: 5px;"><span style="background-color: #150458; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 0px; border: solid 1px #150458; font-weight: bold; padding: 2px 15px 2px 15px; font-size: smaller;">Pandas</span><span style="background-color: none; color: #222222; padding: 0.5em 0.5em; position: inherit; margin: 5px 10px 5px -4px; border: solid 1px #150458; font-weight: bold; padding: 2px 15px 2px 15px; font-size: smaller;">small_table</span></div></div></td>
   </tr>
 <tr class="gt_col_headings">
   <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id=""></th>
@@ -977,6 +979,25 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <p>There’s a bit to unpack here so let’s look at at the lambda function first. Narwhals can translate a Pandas DataFrame to a Narwhals DataFrame with its <code>from_native()</code> function. After that initiating step, you’re free to use the Narwhals API (which is modeled on a subset of the Polars API) to do the necessary data transformation. In this case, we are getting the medians of the <code>c</code> and <code>a</code> columns and ending up with a one-row, two-column table.</p>
 <p>The goal is to check that the median value of <code>c</code> is greater than the corresponding median of column <code>a</code>, so we set up <code>columns=</code> and <code>value=</code> parameters in that way within the <a href="https://posit-dev.github.io/pointblank/reference/Validate.col_vals_gt.html"><code>col_vals_gt()</code></a> validation method call.</p>
+</section>
+<section id="swapping-in-different-dataframes-just-in-time" class="level2">
+<h2 class="anchored" data-anchor-id="swapping-in-different-dataframes-just-in-time">Swapping in Different DataFrames Just in Time</h2>
+<p>Let’s now try to prepare the final validation scenario, checking that there are at least three instances of every categorical value in column <code>f</code> (which contains string values in the set of <code>"low"</code>, <code>"mid"</code>, and <code>"high"</code>). This time, we’ll prepare the transformed table (transformed by Polars expressions) outside of the Pointblank code. Then, we’ll plug in the <code>data_transformed</code> DataFrame with in lambda expression in <code>pre=</code>:</p>
+<div id="94a3a218" class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>data_original <span class="op">=</span> pb.load_dataset(<span class="st">"small_table"</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>data_transformed <span class="op">=</span> data_original.group_by(<span class="st">"f"</span>).<span class="bu">len</span>(name<span class="op">=</span><span class="st">"n"</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>v <span class="op">=</span> (</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    pb.Validate(</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>        data<span class="op">=</span>pb.load_dataset(<span class="st">"small_table"</span>),</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>        tbl_name<span class="op">=</span><span class="st">"small_table"</span>,</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>        label<span class="op">=</span><span class="st">"Category counts"</span>,</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    .col_vals_ge(columns<span class="op">=</span><span class="st">"n"</span>, value<span class="op">=</span><span class="dv">3</span>, pre<span class="op">=</span><span class="kw">lambda</span> x: data_transformed)</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We can see from the validation report table that there are three test units. This corresponds to a row for each of the categorical value counts. From the report, we find that two of the three test units are passing test units (turns out there are only two instances of <code>"mid"</code> in column <code>f</code>).</p>
 
 
 </section>
