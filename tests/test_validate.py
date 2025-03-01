@@ -8075,7 +8075,7 @@ def test_assert_passing(request, tbl: str, *, should_pass: bool) -> None:
         catcher = contextlib.nullcontext
     else:
         val = 100  # should always fail
-        catcher = partial(pytest.raises, AssertionError, match="All tests did not pass")
+        catcher = partial(pytest.raises, AssertionError, match="The following assertions failed")
 
     v = Validate(tbl).col_vals_gt(columns="x", value=val).interrogate()
 
@@ -8104,7 +8104,7 @@ def test_assert_passing_example() -> None:
         .col_vals_in_set(columns="c", set=["a", "b"])
         .interrogate()
     )
-    with pytest.raises(AssertionError, match="All tests did not pass"):
+    with pytest.raises(AssertionError, match="Step 2: Expect that values in `b`"):
         validation.assert_passing()
 
     passing_validation = (

@@ -5383,8 +5383,9 @@ class Validate:
         Raise an `AssertionError` if all tests are not passing.
 
         The `assert_passing()` method will raise an `AssertionError` if a test does not pass. This
-        method simply wraps `all_passed` for more ready use in test suites. The method does not
-        preserve information or the object itself, and must be further investigated.
+        method simply wraps `all_passed` for more ready use in test suites. The step number and
+        assertion made is printed in the `AssertionError` message if a failure occurs, ensuring
+        some details are preserved.
 
         Raises
         -------
@@ -5415,7 +5416,7 @@ class Validate:
         validation = (
             pb.Validate(data=tbl)
             .col_vals_gt(columns="a", value=0)
-            .col_vals_lt(columns="b", value=9)
+            .col_vals_lt(columns="b", value=9) # this assertion is false
             .col_vals_in_set(columns="c", set=["a", "b"])
             .interrogate()
         )
@@ -5423,8 +5424,15 @@ class Validate:
         validation.assert_passing()
         ```
         """
+
         if not self.all_passed():
-            msg = "All tests did not pass."
+            failed_steps = [
+            (i, str(step.autobrief)) for i, step in enumerate(self.validation_info)
+            if step.n_failed > 0
+            ]
+            msg = "The following assertions failed:\n" + "\n".join(
+                [f"- Step {i + 1}: {autobrief}" for i, autobrief in failed_steps]
+            )
             raise AssertionError(msg)
 
     def n(self, i: int | list[int] | None = None, scalar: bool = False) -> dict[int, int] | int:
