@@ -64,8 +64,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../get-started/across.html" rel="next">
-<link href="../get-started/types.html" rel="prev">
+<link href="../user-guide/across.html" rel="next">
+<link href="../user-guide/types.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -129,8 +129,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link active" href="../get-started/index.html" aria-current="page"> 
-<span class="menu-text">Get Started</span></a>
+    <a class="nav-link active" href="../user-guide/index.html" aria-current="page"> 
+<span class="menu-text">User Guide</span></a>
   </li>  
   <li class="nav-item">
     <a class="nav-link" href="../demos/index.html"> 
@@ -138,7 +138,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </li>  
   <li class="nav-item">
     <a class="nav-link" href="../reference/index.html"> 
-<span class="menu-text">Reference</span></a>
+<span class="menu-text">API Reference</span></a>
   </li>  
 </ul>
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
@@ -158,7 +158,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../get-started/columns.html">Defining Columns</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../user-guide/columns.html">Defining Columns</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -172,43 +172,43 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../get-started/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Intro</span></a>
+  <a href="../user-guide/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Getting Started</span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../get-started/thresholds.html" class="sidebar-item-text sidebar-link">
+  <a href="../user-guide/thresholds.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Thresholds</span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../get-started/actions.html" class="sidebar-item-text sidebar-link">
+  <a href="../user-guide/actions.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Actions</span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../get-started/types.html" class="sidebar-item-text sidebar-link">
+  <a href="../user-guide/types.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Validation Types</span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../get-started/columns.html" class="sidebar-item-text sidebar-link active">
+  <a href="../user-guide/columns.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">Defining Columns</span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../get-started/across.html" class="sidebar-item-text sidebar-link">
+  <a href="../user-guide/across.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Across Columns</span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../get-started/preprocessing.html" class="sidebar-item-text sidebar-link">
+  <a href="../user-guide/preprocessing.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Preprocessing</span></a>
   </div>
 </li>
@@ -255,7 +255,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Most of the validation methods included in Pointblank perform column-level checks. As such, they provide the common argument <code>columns=</code>. The pluralization in the name indicates that multiple columns can be provided. And it goes further than that, as column selectors can be used in <code>columns=</code> to resolve columns.</p>
 <p>Why do this? It can often be the case that you’d want to perform a validation check of a certain common type (e.g., checking that numerical values are all positive) across a number of columns. Rather than define the same rules across multiple invocations of the same validation method (one for each column), we can simply map the validation rules across those columns.</p>
 <p>We’ll run through several examples below, and all of them will use the <code>game_revenue</code> dataset. Here’s a preview of it:</p>
-<div id="edba963b" class="cell" data-execution_count="2">
+<div id="eb7ededc" class="cell" data-execution_count="2">
 <div class="cell-output cell-output-display" data-execution_count="2">
 <div id="pb_preview_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>
@@ -497,7 +497,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="using-a-list-of-column-names" class="level2">
 <h2 class="anchored" data-anchor-id="using-a-list-of-column-names">Using a List of Column Names</h2>
 <p>The <code>columns=</code> parameter (in every validation method that has that argument) can accept a list of column names. In the <code>game_revenue</code> dataset, there are two columns that contain numerical data: <code>item_revenue</code> and <code>session_duration</code>. Suppose we expect that data in both columns should be greater than <code>0</code>, providing a list of those two columns will create two validation steps from a single invocation of <a href="https://posit-dev.github.io/pointblank/reference/Validate.col_vals_gt.html"><code>col_vals_gt()</code></a>:</p>
-<div id="ddfb2e60" class="cell" data-execution_count="3">
+<div id="ce028816" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>(</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>pb.load_dataset(<span class="st">"game_revenue"</span>))</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_gt(columns<span class="op">=</span>[<span class="st">"item_revenue"</span>, <span class="st">"session_duration"</span>], value<span class="op">=</span><span class="dv">0</span>)</span>
@@ -679,7 +679,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <p>The validation report table indeed shows that two validation steps were created! Further to this, the interrogation results show that all values in the two columns are greater than <code>0</code>.</p>
 <p>It’s important to note that all validation parameters are shared across all generated steps. So if <code>thresholds=</code> were to be set, those threshold values would be cloned and used in each and every step generated (one step per column provided):</p>
-<div id="b962692f" class="cell" data-execution_count="4">
+<div id="ca0f67eb" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>(</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>pb.load_dataset(<span class="st">"game_revenue"</span>))</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_gt(</span>
@@ -875,7 +875,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </ul>
 <p>Two common ones, <a href="https://posit-dev.github.io/pointblank/reference/starts_with.html"><code>starts_with()</code></a> and <a href="https://posit-dev.github.io/pointblank/reference/ends_with.html"><code>ends_with()</code></a>, resolve columns based on starting and ending text in column names.</p>
 <p>The <code>game_revenue</code> dataset has three columns starting with the text ‘item’: <code>item_type</code>, <code>item_name</code>, and <code>item_revenue</code>. Let’s look at an example where we can succinctly express a validation plan checking that these columns contain no missing values:</p>
-<div id="06908574" class="cell" data-execution_count="5">
+<div id="a95e6b3f" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>(</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>pb.load_dataset(<span class="st">"game_revenue"</span>))</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_not_null(columns<span class="op">=</span>pb.starts_with(<span class="st">"item"</span>))</span>
@@ -1122,12 +1122,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li><code>~</code> (<em>not</em>)</li>
 </ul>
 <p>Taken together, if you wanted to select all columns except the first four, you would use this <a href="https://posit-dev.github.io/pointblank/reference/col.html"><code>col()</code></a> expression:</p>
-<div id="5cb21ed8" class="cell" data-execution_count="6">
+<div id="4c2691d9" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>col_selection <span class="op">=</span> pb.col(pb.everything() <span class="op">-</span> pb.first_n(<span class="dv">4</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>The logic here is that <a href="https://posit-dev.github.io/pointblank/reference/everything.html"><code>everything()</code></a> selects every column and the <code>- pb.first_n(4)</code> part then removes the first four columns from that selection.</p>
 <p>Let’s try using the <code>col_selection</code> object in a validation of the <code>game_revenue</code> table, checking multiple columns for missing values:</p>
-<div id="7c944c77" class="cell" data-execution_count="7">
+<div id="65470e45" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>(</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>pb.load_dataset(<span class="st">"game_revenue"</span>))</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_not_null(columns<span class="op">=</span>col_selection, thresholds<span class="op">=</span>(<span class="dv">1</span>, <span class="fl">0.05</span>, <span class="fl">0.1</span>))</span>
@@ -1526,7 +1526,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li><code>string()</code></li>
 </ul>
 <p>We support the use of these selectors for any input DataFrame that is supported by Narwhals (i.e., is in the aforementioned list). Here’s an example using the <code>numeric()</code> selector to select all numeric columns in <code>game_revenue</code>:</p>
-<div id="4dbf3fe0" class="cell" data-execution_count="8">
+<div id="544600bf" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> narwhals.selectors <span class="im">as</span> ncs</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>(</span>
@@ -1709,7 +1709,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>Narwhals selectors can also use operators to combine multiple selectors. Here is an example of using the <code>string()</code> and <code>matches()</code> selectors together to select all string columns matching the text ‘item_’:</p>
-<div id="f14d84e5" class="cell" data-execution_count="9">
+<div id="99580fee" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>(</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>pb.load_dataset(<span class="st">"game_revenue"</span>))</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_not_null(columns<span class="op">=</span>pb.col(ncs.string() <span class="op">&amp;</span> ncs.matches(<span class="st">"item_"</span>)))</span>
@@ -1900,7 +1900,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Provided there is systematic column naming already in place, using column selectors like <a href="https://posit-dev.github.io/pointblank/reference/starts_with.html"><code>starts_with()</code></a> can be very convenient. This is especially true as column counts become larger.</p>
 <p>A slight disadvantage to this approach is some uncertainty on whether those columns being checked actually exist. You might resolve fewer columns than anticipated or no columns at all due to errors in using the column selectors or through misunderstanding in the columns’ naming conventions.</p>
 <p>Should the use of a column selector yield no columns the interrogation process itself won’t fail, however, the validation report table will strongly signal that there was an evaluation issue:</p>
-<div id="673f1d65" class="cell" data-execution_count="10">
+<div id="699460d7" class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>(</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>pb.load_dataset(<span class="st">"game_revenue"</span>))</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_not_null(columns<span class="op">=</span>pb.starts_with(<span class="st">"items"</span>))</span>
@@ -2470,12 +2470,12 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../get-started/types.html" class="pagination-link" aria-label="Validation Types">
+      <a href="../user-guide/types.html" class="pagination-link" aria-label="Validation Types">
         <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Validation Types</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../get-started/across.html" class="pagination-link" aria-label="Across Columns">
+      <a href="../user-guide/across.html" class="pagination-link" aria-label="Across Columns">
         <span class="nav-page-text">Across Columns</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
