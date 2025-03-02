@@ -4551,6 +4551,7 @@ class Validate:
     def row_count_match(
         self,
         count: int | FrameT | Any,
+        tol: float | tuple[int, int] = 0,
         inverse: bool = False,
         pre: Callable | None = None,
         thresholds: int | float | bool | tuple | dict | Thresholds = None,
@@ -4575,6 +4576,14 @@ class Validate:
             The expected row count of the table. This can be an integer value, a Polars or Pandas
             DataFrame object, or an Ibis backend table. If a DataFrame/table is provided, the row
             count of that object will be used as the expected count.
+        tol
+            The tolerance allowable for the row count match. This can be specified as a single
+            numeric value (integer or float) or as a tuple of two integers representing the lower
+            and upper bounds of the tolerance range. If a single integer value (greater than 1) is
+            provided, it represents the absolute bounds of the tolerance, ie. plus or minus the value.
+            If a float value (between 0-1) is provided, it represents the relative tolerance, ie.
+            plus or minus the relative percentage of the target. If a tuple is provided, it represents
+            the lower and upper absolute bounds of the tolerance range. See the examples for more.
         inverse
             Should the validation step be inverted? If `True`, then the expectation is that the row
             count of the target table should not match the specified `count=` value.
@@ -4640,6 +4649,37 @@ class Validate:
 
         The validation table shows that the expectation value of `13` matches the actual count of
         rows in the target table. So, the single test unit passed.
+
+
+        Let's modify our example to show the different ways we can allow some tolerance to our validation
+        by using the `tol` argument.
+
+        ```{python}
+        smaller_small_table = small_table.sample(n = 12) # within the lower bound
+        validation = (
+            pb.Validate(data=smaller_small_table)
+            .row_count_match(count=13,tol=(2, 0)) # minus 2 but plus 0, ie. 11-13
+            .interrogate()
+        )
+
+        validation
+
+        validation = (
+            pb.Validate(data=smaller_small_table)
+            .row_count_match(count=13,tol=.05) # .05% tolerance of 13
+            .interrogate()
+        )
+
+        even_smaller_table = small_table.sample(n = 2)
+        validation = (
+            pb.Validate(data=even_smaller_table)
+            .row_count_match(count=13,tol=5) # plus or minus 5; this test will fail
+            .interrogate()
+        )
+
+        validation
+        ```
+
         """
 
         assertion_type = _get_fn_name()
@@ -4659,8 +4699,28 @@ class Validate:
         if _is_value_a_df(count) or "ibis.expr.types.relations.Table" in str(type(count)):
             count = get_row_count(count)
 
+        # Check the integrity of tolerance
+        if isinstance(tol, tuple):
+            for val in tol:
+                if not isinstance(val, int):
+                    msg = "Each element passed to `tol` must be an integer if defining upper and lower."
+                    raise TypeError(msg)
+                if val < 0:
+                    msg = (
+                        "If passing a tuple to `tol`, both bounds should be positive. Each limit is "
+                        "subtracted from the target, ie. (5, 5) means plus or minus 5."
+                    )
+                    raise ValueError(msg)
+        elif isinstance(tol, int | float):
+            if tol < 0:
+                msg = "Value passed to `tol` must be positive."
+                raise ValueError(msg)
+        else:
+            msg = f"`tol` must be a tuple of limits, int, or float, not {type(tol)!s}."
+            raise TypeError(msg)
+
         # Package up the `count=` and boolean params into a dictionary for later interrogation
-        values = {"count": count, "inverse": inverse}
+        values = {"count": count, "inverse": inverse, "tol": tol}
 
         val_info = _ValidationInfo(
             assertion_type=assertion_type,
@@ -5158,6 +5218,7 @@ class Validate:
                     count=value["count"],
                     inverse=value["inverse"],
                     threshold=threshold,
+                    tol = value["tol"],
                     tbl_type=tbl_type,
                 ).get_test_results()
 

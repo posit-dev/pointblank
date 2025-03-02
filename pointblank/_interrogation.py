@@ -1893,16 +1893,31 @@ class RowCountMatch:
     count: int
     inverse: bool
     threshold: int
+    tol : float | tuple[int, int] = 0
     tbl_type: str = "local"
 
     def __post_init__(self):
 
         from pointblank.validate import get_row_count
 
-        if not self.inverse:
-            res = get_row_count(data=self.data_tbl) == self.count
+        row_count :int = get_row_count(data=self.data_tbl)
+
+        if isinstance(self.tol, tuple):
+            raw_lower_lim, raw_upper_lim = self.tol
+            min_val : int = self.count - raw_lower_lim
+            max_val : int = self.count + raw_upper_lim
         else:
-            res = get_row_count(data=self.data_tbl) != self.count
+            if self.tol > 1: # treat as literal row tolerance
+                tol_as_raw :int = self.tol
+            else:
+                tol_as_raw : int = round(self.tol * row_count)
+            min_val : int = round(self.count - tol_as_raw)
+            max_val : int = round(self.count + tol_as_raw)
+
+        if self.inverse:
+            res : bool = not (row_count >= min_val and row_count <= max_val)
+        else:
+            res : bool = row_count >= min_val and row_count <= max_val
 
         self.test_unit_res = res
 
