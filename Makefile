@@ -9,6 +9,10 @@ test-update:
 test-coverage:
 	pytest --cov=pointblank --cov-report=term
 
+lint: ## Run ruff formatter and linter
+	@uv run ruff format
+	@uv run ruff check --fix
+
 check:
 	pyright --pythonversion 3.8 pointblank
 	pyright --pythonversion 3.9 pointblank

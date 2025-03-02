@@ -11,11 +11,16 @@ include = ["pointblank"]
 name = "pointblank"
 description = "Find out if your data is what you think it is."
 readme = "README.md"
-keywords = ["data", "quality", "validation", "testing", "data science", "data engineering"]
-license.file = "LICENSE"
-authors = [
-    { name = "Richard Iannone", email = "riannone@me.com" }
+keywords = [
+    "data",
+    "quality",
+    "validation",
+    "testing",
+    "data science",
+    "data engineering",
 ]
+license.file = "LICENSE"
+authors = [{ name = "Richard Iannone", email = "riannone@me.com" }]
 dynamic = ["version"]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
@@ -39,29 +44,13 @@ dependencies = [
 requires-python = ">=3.10"
 
 [project.optional-dependencies]
-pd = [
-    "pandas>=2.2.3",
-]
-pl = [
-    "polars>=1.17.1",
-]
-generate = [
-    "chatlas>=0.3.0",
-    "anthropic[bedrock]>=0.45.2",
-    "openai>=1.63.0",
-]
-duckdb = [
-    "ibis-framework[duckdb]>=9.5.0",
-]
-mysql = [
-    "ibis-framework[mysql]>=9.5.0",
-]
-postgres = [
-    "ibis-framework[postgres]>=9.5.0",
-]
-sqlite = [
-    "ibis-framework[sqlite]>=9.5.0",
-]
+pd = ["pandas>=2.2.3"]
+pl = ["polars>=1.17.1"]
+generate = ["chatlas>=0.3.0", "anthropic[bedrock]>=0.45.2", "openai>=1.63.0"]
+duckdb = ["ibis-framework[duckdb]>=9.5.0"]
+mysql = ["ibis-framework[mysql]>=9.5.0"]
+postgres = ["ibis-framework[postgres]>=9.5.0"]
+sqlite = ["ibis-framework[sqlite]>=9.5.0"]
 docs = [
     "jupyter",
     "nbclient>=0.10.0",
@@ -89,36 +78,30 @@ dev = [
     "pytest-cov",
     "pytest-snapshot",
     "quartodoc>=0.8.1; python_version >= '3.9'",
+    "ruff>=0.9.9",
 ]
 
 [project.urls]
 homepage = "https://github.com/posit-dev/pointblank"
-
-[tool.flake8]
-exclude = ["docs", ".venv", "tests/*"]
-
-ignore = [
-    "E402",    # module level import not at top of file
-    "E501",    # line too long (maximum 100 characters)
-    "W503",    # line break before binary operator
-    "F811",    # redefinition of unused name
-    "E203",    # whitespace before ':'
-    "F401",    # 'module' imported but unused
-    "F841",    # local variable 'name' is assigned to but never used
-    "E702",    # multiple statements on one line (semicolon)
-    "E704",    # multiple statements on one line (def)
-]
-
-max-line-length = 100
 
 [tool.pytest.ini_options]
 minversion = "6.0"
 addopts = "-ra --cov=pointblank"
 asyncio_mode = "strict"
 asyncio_default_fixture_loop_scope = "function"
-testpaths = [
-    "tests"
-]
+testpaths = ["tests"]
 
-[tool.black]
+[tool.ruff]
 line-length = 100
+
+[tool.ruff.lint]
+exclude = ["docs", ".venv", "tests/*"]
+
+ignore = [
+    "E402", # module level import not at top of file
+    "E501", # line too long (maximum 100 characters)
+    "F811", # redefinition of unused name
+    "E203", # whitespace before ':'
+    "F841", # local variable 'name' is assigned to but never used
+    "E702", # multiple statements on one line (semicolon)
+]
