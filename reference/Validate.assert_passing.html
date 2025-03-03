@@ -187,7 +187,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>Validate.assert_passing()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Raise an <code>AssertionError</code> if all tests are not passing.</p>
-<p>The <code>assert_passing()</code> method will raise an <code>AssertionError</code> if a test does not pass. This method simply wraps <code>all_passed</code> for more ready use in test suites. The method does not preserve information or the object itself, and must be further investigated.</p>
+<p>The <code>assert_passing()</code> method will raise an <code>AssertionError</code> if a test does not pass. This method simply wraps <code>all_passed</code> for more ready use in test suites. The step number and assertion made is printed in the <code>AssertionError</code> message if a failure occurs, ensuring some details are preserved.</p>
 <section id="raises" class="level2 doc-section doc-section-raises">
 <h2 class="doc-section doc-section-raises anchored" data-anchor-id="raises">Raises</h2>
 <dl>
@@ -200,7 +200,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="examples" class="level2 doc-section doc-section-examples">
 <h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>In the example below, we’ll use a simple Polars DataFrame with three columns (<code>a</code>, <code>b</code>, and <code>c</code>). There will be three validation steps, and the second step will have a failing test unit (the value <code>10</code> isn’t less than <code>9</code>). After interrogation, the <code>assert_passing()</code> method is used to assert that all validation steps passed perfectly.</p>
-<div id="df657327" class="cell" data-execution_count="1">
+<div id="d483ed05" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -215,7 +215,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
 <span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    .col_vals_gt(columns<span class="op">=</span><span class="st">"a"</span>, value<span class="op">=</span><span class="dv">0</span>)</span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    .col_vals_lt(columns<span class="op">=</span><span class="st">"b"</span>, value<span class="op">=</span><span class="dv">9</span>)</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    .col_vals_lt(columns<span class="op">=</span><span class="st">"b"</span>, value<span class="op">=</span><span class="dv">9</span>) <span class="co"># this assertion is false</span></span>
 <span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>    .col_vals_in_set(columns<span class="op">=</span><span class="st">"c"</span>, <span class="bu">set</span><span class="op">=</span>[<span class="st">"a"</span>, <span class="st">"b"</span>])</span>
 <span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
 <span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>)</span>
@@ -240,12 +240,18 @@ Cell <span class="ansi-green-fg">In[1], line 20</span>
 <span class="ansi-green-fg ansi-bold">     18</span> )
 <span class="ansi-green-fg">---&gt; 20</span> <span class="ansi-yellow-bg">validation</span><span style="color:rgb(98,98,98)" class="ansi-yellow-bg">.</span><span class="ansi-yellow-bg">assert_passing</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">)</span>
 
-File <span class="ansi-green-fg">/opt/hostedtoolcache/Python/3.10.16/x64/lib/python3.10/site-packages/pointblank/validate.py:5478</span>, in <span class="ansi-cyan-fg">Validate.assert_passing</span><span class="ansi-blue-fg">(self)</span>
-<span class="ansi-green-fg ansi-bold">   5476</span> <span style="font-weight:bold;color:rgb(0,135,0)">if</span> <span style="font-weight:bold;color:rgb(175,0,255)">not</span> <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>all_passed():
-<span class="ansi-green-fg ansi-bold">   5477</span>     msg <span style="color:rgb(98,98,98)">=</span> <span style="color:rgb(175,0,0)">"</span><span style="color:rgb(175,0,0)">All tests did not pass.</span><span style="color:rgb(175,0,0)">"</span>
-<span class="ansi-green-fg">-&gt; 5478</span>     <span style="font-weight:bold;color:rgb(0,135,0)">raise</span> <span style="font-weight:bold;color:rgb(215,95,95)">AssertionError</span>(msg)
+File <span class="ansi-green-fg">/opt/hostedtoolcache/Python/3.10.16/x64/lib/python3.10/site-packages/pointblank/validate.py:5486</span>, in <span class="ansi-cyan-fg">Validate.assert_passing</span><span class="ansi-blue-fg">(self)</span>
+<span class="ansi-green-fg ansi-bold">   5479</span> failed_steps <span style="color:rgb(98,98,98)">=</span> [
+<span class="ansi-green-fg ansi-bold">   5480</span> (i, <span style="color:rgb(0,135,0)">str</span>(step<span style="color:rgb(98,98,98)">.</span>autobrief)) <span style="font-weight:bold;color:rgb(0,135,0)">for</span> i, step <span style="font-weight:bold;color:rgb(175,0,255)">in</span> <span style="color:rgb(0,135,0)">enumerate</span>(<span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>validation_info)
+<span class="ansi-green-fg ansi-bold">   5481</span> <span style="font-weight:bold;color:rgb(0,135,0)">if</span> step<span style="color:rgb(98,98,98)">.</span>n_failed <span style="color:rgb(98,98,98)">&gt;</span> <span style="color:rgb(98,98,98)">0</span>
+<span class="ansi-green-fg ansi-bold">   5482</span> ]
+<span class="ansi-green-fg ansi-bold">   5483</span> msg <span style="color:rgb(98,98,98)">=</span> <span style="color:rgb(175,0,0)">"</span><span style="color:rgb(175,0,0)">The following assertions failed:</span><span style="font-weight:bold;color:rgb(175,95,0)">\n</span><span style="color:rgb(175,0,0)">"</span> <span style="color:rgb(98,98,98)">+</span> <span style="color:rgb(175,0,0)">"</span><span style="font-weight:bold;color:rgb(175,95,0)">\n</span><span style="color:rgb(175,0,0)">"</span><span style="color:rgb(98,98,98)">.</span>join(
+<span class="ansi-green-fg ansi-bold">   5484</span>     [<span style="color:rgb(175,0,0)">f</span><span style="color:rgb(175,0,0)">"</span><span style="color:rgb(175,0,0)">- Step </span><span style="font-weight:bold;color:rgb(175,95,135)">{</span>i<span style="color:rgb(188,188,188)"> </span><span style="color:rgb(98,98,98)">+</span><span style="color:rgb(188,188,188)"> </span><span style="color:rgb(98,98,98)">1</span><span style="font-weight:bold;color:rgb(175,95,135)">}</span><span style="color:rgb(175,0,0)">: </span><span style="font-weight:bold;color:rgb(175,95,135)">{</span>autobrief<span style="font-weight:bold;color:rgb(175,95,135)">}</span><span style="color:rgb(175,0,0)">"</span> <span style="font-weight:bold;color:rgb(0,135,0)">for</span> i, autobrief <span style="font-weight:bold;color:rgb(175,0,255)">in</span> failed_steps]
+<span class="ansi-green-fg ansi-bold">   5485</span> )
+<span class="ansi-green-fg">-&gt; 5486</span> <span style="font-weight:bold;color:rgb(0,135,0)">raise</span> <span style="font-weight:bold;color:rgb(215,95,95)">AssertionError</span>(msg)
 
-<span class="ansi-red-fg">AssertionError</span>: All tests did not pass.</pre>
+<span class="ansi-red-fg">AssertionError</span>: The following assertions failed:
+- Step 2: Expect that values in `b` should be &lt; `9`.</pre>
 </div>
 </div>
 </div>
