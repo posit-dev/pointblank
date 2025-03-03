@@ -266,7 +266,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="examples" class="level2 doc-section doc-section-examples">
 <h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>It’s easy to preview a table using the <code>preview()</code> function. Here’s an example using the <code>small_table</code> dataset (itself loaded using the <a href="../reference/load_dataset.html#pointblank.load_dataset"><code>load_dataset()</code></a> function):</p>
-<div id="0646d3f9" class="cell" data-execution_count="1">
+<div id="bd51f9c1" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>small_table_polars <span class="op">=</span> pb.load_dataset(<span class="st">"small_table"</span>)</span>
@@ -474,7 +474,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>This table is a Polars DataFrame, but the <code>preview()</code> function works with any table supported by <code>pointblank</code>, including Pandas DataFrames and Ibis backend tables. Here’s an example using a DuckDB table handled by Ibis:</p>
-<div id="47013255" class="cell" data-execution_count="2">
+<div id="d1980977" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>small_table_duckdb <span class="op">=</span> pb.load_dataset(<span class="st">"small_table"</span>, tbl_type<span class="op">=</span><span class="st">"duckdb"</span>)</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>pb.preview(small_table_duckdb)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -681,7 +681,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <p>The blue dividing line marks the end of the first <code>n_head=</code> rows and the start of the last <code>n_tail=</code> rows.</p>
 <p>We can adjust the number of rows shown from the start and end of the table by setting the <code>n_head=</code> and <code>n_tail=</code> parameters. Let’s enlarge each of these to <code>10</code>:</p>
-<div id="da0f26f4" class="cell" data-execution_count="3">
+<div id="c5c7a804" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>pb.preview(small_table_polars, n_head<span class="op">=</span><span class="dv">10</span>, n_tail<span class="op">=</span><span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="3">
 <div id="pb_preview_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
@@ -919,7 +919,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <p>In the above case, the entire dataset is shown since the sum of <code>n_head=</code> and <code>n_tail=</code> is greater than the number of rows in the table (which is 13).</p>
 <p>The <code>columns_subset=</code> parameter can be used to show only specific columns in the table. You can provide a list of column names to make the selection. Let’s try that with the <code>"game_revenue"</code> dataset as a Pandas DataFrame:</p>
-<div id="76c60487" class="cell" data-execution_count="4">
+<div id="691d1f57" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>game_revenue_pandas <span class="op">=</span> pb.load_dataset(<span class="st">"game_revenue"</span>, tbl_type<span class="op">=</span><span class="st">"pandas"</span>)</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>pb.preview(game_revenue_pandas, columns_subset<span class="op">=</span>[<span class="st">"player_id"</span>, <span class="st">"item_name"</span>, <span class="st">"item_revenue"</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -1065,7 +1065,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>Alternatively, we can use column selector functions like <a href="../reference/starts_with.html#pointblank.starts_with"><code>starts_with()</code></a> and <a href="../reference/matches.html#pointblank.matches"><code>matches()</code></a>` to select columns based on text or patterns:</p>
-<div id="f739867b" class="cell" data-execution_count="5">
+<div id="db99e724" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>pb.preview(game_revenue_pandas, n_head<span class="op">=</span><span class="dv">2</span>, n_tail<span class="op">=</span><span class="dv">2</span>, columns_subset<span class="op">=</span>pb.starts_with(<span class="st">"session"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="5">
 <div id="pb_preview_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
@@ -1173,7 +1173,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>Multiple column selector functions can be combined within <a href="../reference/col.html#pointblank.col"><code>col()</code></a> using operators like <code>|</code> and <code>&amp;</code>:</p>
-<div id="d90df78d" class="cell" data-execution_count="6">
+<div id="667e057a" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>pb.preview(</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  game_revenue_pandas,</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  n_head<span class="op">=</span><span class="dv">2</span>,</span>
