@@ -1,0 +1,70 @@
+---
+title: Validation Types
+jupyter: python3
+html-table-processing: none
+---
+
+Pointblank is a new Python package that'll help you validate data. If you have tabular data, and who
+doesn't these days?, this is the package for you! I've long been interested in data quality and,
+going further, building tooling that makes tackles data quality checking head on. And there's so
+many reasons to care about data quality. If I were to put down just one reason for caring about data
+quality it is that it strongly determines the quality of decisions.
+
+Having the ability to distinguish bad data from good data is the first step in solving DQ issues and
+the sustained practice doing data validation will guard against intrusions of poor-quality data.
+Pointblank could help here! It's a fairly new package, and available in PyPI. You can install it by
+using:
+
+```
+pip install pointblank
+```
+
+Alright! Let's look at a few demonstrations of Pointblank's capabilities for data validation.
+
+## A Simple Example
+
+Let's get right to performing a basic check of a Polars DataFrame. We'll make use of the included
+`small_table` dataset.
+
+```{python}
+import pointblank as pb
+
+small_table = pb.load_dataset(dataset="small_table", tbl_type="polars")
+
+validation = (
+    pb.Validate(
+        data=small_table,
+        tbl_name="small_table",
+        label="Example Validation"
+    )
+    .col_vals_lt(columns="a", value=10)
+    .col_vals_between(columns="d", left=0, right=5000)
+    .col_vals_in_set(columns="f", set=["low", "mid", "high"])
+    .col_vals_regex(columns="b", pattern=r"^[0-9]-[a-z]{3}-[0-9]{3}$")
+    .interrogate()
+)
+
+validation
+```
+
+There's a lot to take in here so let's break down the code first! Note these three key pieces:
+
+- the `Validate(data=...)` argument takes a DataFrame (or database table) that you want to validate
+- the methods starting with `col_*` specify validation steps that run on specific columns
+- the `interrogate()` method executes the validation plan on the table (it's the finishing step)
+
+This common pattern is used in a validation workflow, where `Validate` and `interrogate()` bookend
+a validation plan generated through calling validation methods.
+
+Now, onto the result: it's a table! Here at Posit we ❤️ Great Tables so naturally we used it here to
+give you the goods on how the validation went down. Each row in this reporting table represents
+a single validation step (one for each invocation of a `col_vals_*()` validation method). Generally
+speaking, the left side of the validation report tables outlines the key validation rules, and the
+right side provides the results of each validation step.
+
+We tried to keep it simple in principle, but a lot of useful information can be packed into this
+validation table. Here's a diagram that describes a few of the important parts of the validation
+table:
+
+![](/img/validation-table-diagram.png){width=100%}
+
