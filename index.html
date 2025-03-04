@@ -161,8 +161,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#getting-started" id="toc-getting-started" class="nav-link active" data-scroll-target="#getting-started">Getting Started</a></li>
   <li><a href="#features" id="toc-features" class="nav-link" data-scroll-target="#features">Features</a></li>
   <li><a href="#installation" id="toc-installation" class="nav-link" data-scroll-target="#installation">Installation</a></li>
-  <li><a href="#code-of-conduct" id="toc-code-of-conduct" class="nav-link" data-scroll-target="#code-of-conduct">Code of Conduct</a></li>
+  <li><a href="#getting-in-touch" id="toc-getting-in-touch" class="nav-link" data-scroll-target="#getting-in-touch">Getting in Touch</a></li>
   <li><a href="#contributing-to-pointblank" id="toc-contributing-to-pointblank" class="nav-link" data-scroll-target="#contributing-to-pointblank">Contributing to Pointblank</a></li>
+  <li><a href="#roadmap" id="toc-roadmap" class="nav-link" data-scroll-target="#roadmap">Roadmap</a></li>
+  <li><a href="#code-of-conduct" id="toc-code-of-conduct" class="nav-link" data-scroll-target="#code-of-conduct">Code of Conduct</a></li>
   <li><a href="#license" id="toc-license" class="nav-link" data-scroll-target="#license">📄 License</a></li>
   <li><a href="#governance" id="toc-governance" class="nav-link" data-scroll-target="#governance">🏛️ Governance</a></li>
   </ul>
@@ -225,16 +227,44 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="installation">Installation</h2>
 <p>You can install Pointblank using pip:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install pointblank</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>If you encounter a bug, have usage questions, or want to share ideas to make this package better, please feel free to file an <a href="https://github.com/posit-dev/pointblank/issues">issue</a>.</p>
 </section>
-<section id="code-of-conduct" class="level2">
-<h2 class="anchored" data-anchor-id="code-of-conduct">Code of Conduct</h2>
-<p>Please note that the Pointblank project is released with a <a href="https://www.contributor-covenant.org/version/2/1/code_of_conduct/">contributor code of conduct</a>. <br>By participating in this project you agree to abide by its terms.</p>
+<section id="getting-in-touch" class="level2">
+<h2 class="anchored" data-anchor-id="getting-in-touch">Getting in Touch</h2>
+<p>If you encounter a bug, have usage questions, or want to share ideas to make this package better, please feel free to file an <a href="https://github.com/posit-dev/pointblank/issues">issue</a>.</p>
+<p>Wanna talk about data validation in a more relaxed setting? Join our <a href="https://discord.com/invite/YH7CybCNCQ"><em>Discord server</em></a>! This is a great option for asking about the development of Pointblank, pitching ideas that may become features, and just sharing your ideas!</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="https://discord.com/invite/YH7CybCNCQ"><img src="https://img.shields.io/badge/Discord-Chat%20with%20us-blue?style=social&amp;logo=discord&amp;logoColor=purple.png" class="img-fluid figure-img" alt="Discord Server"></a></p>
+<figcaption>Discord Server</figcaption>
+</figure>
+</div>
 </section>
 <section id="contributing-to-pointblank" class="level2">
 <h2 class="anchored" data-anchor-id="contributing-to-pointblank">Contributing to Pointblank</h2>
 <p>There are many ways to contribute to the ongoing development of Pointblank. Some contributions can be simple (like fixing typos, improving documentation, filing issues for feature requests or problems, etc.) and others might take more time and care (like answering questions and submitting PRs with code changes). Just know that anything you can do to help would be very much appreciated!</p>
 <p>Please read over the <a href="https://github.com/posit-dev/pointblank/blob/main/CONTRIBUTING.md">contributing guidelines</a> for information on how to get started.</p>
+</section>
+<section id="roadmap" class="level2">
+<h2 class="anchored" data-anchor-id="roadmap">Roadmap</h2>
+<p>There is much to do to make Pointblank a dependable and useful tool for data validation. To that end, we have a roadmap that will serve as a guide for the development of the library. Here are some of the things we are working on or plan to work on in the near future:</p>
+<ol type="1">
+<li>more validation methods to cover a wider range of data validation needs</li>
+<li>easy-to-use but powerful logging functionality</li>
+<li>messaging actions (e.g., Slack, emailing, etc.) to better react to threshold exceedences</li>
+<li>additional functionality for building more complex validations via LLMs (extension of ideas from the current <code>DraftValidation</code> class)</li>
+<li>a feature for quickly obtaining summary information on any dataset (tying together existing and future dataset summary-generation pieces)</li>
+<li>ensuring there are text/dict/JSON/HTML versions of all reports</li>
+<li>supporting the writing and reading YAML validation config files</li>
+<li>a cli utility for Pointblank that can be used to run validations from the command line</li>
+<li>complete testing of validations across all compatible backends (for certification of those backends as fully supported)</li>
+<li>completion of the <strong>User Guide</strong> in the project website</li>
+<li>functionality for creating and publishing data dictionaries, which could: (a) use LLMs to more quickly draft column-level descriptions, and (b) incorporate templating features to make it easier to keep descriptions consistent and up to date</li>
+</ol>
+<p>If you have any ideas for features or improvements, don’t hesitate to share them with us! We are always looking for ways to make Pointblank better.</p>
+</section>
+<section id="code-of-conduct" class="level2">
+<h2 class="anchored" data-anchor-id="code-of-conduct">Code of Conduct</h2>
+<p>Please note that the Pointblank project is released with a <a href="https://www.contributor-covenant.org/version/2/1/code_of_conduct/">contributor code of conduct</a>. <br>By participating in this project you agree to abide by its terms.</p>
 </section>
 <section id="license" class="level2">
 <h2 class="anchored" data-anchor-id="license">📄 License</h2>
