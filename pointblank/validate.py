@@ -6980,6 +6980,8 @@ class Validate:
                 status_color_list.append(SEVERITY_LEVEL_COLORS["green"])
             elif validation_info_dict["critical"][i]:
                 status_color_list.append(SEVERITY_LEVEL_COLORS["critical"])
+            elif validation_info_dict["error"][i]:
+                status_color_list.append(SEVERITY_LEVEL_COLORS["error"])
             elif validation_info_dict["warning"][i]:
                 status_color_list.append(SEVERITY_LEVEL_COLORS["warning"])
             else:
