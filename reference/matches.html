@@ -262,7 +262,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="examples" class="level2 doc-section doc-section-examples">
 <h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Suppose we have a table with columns <code>name</code>, <code>id_old</code>, <code>new_identifier</code>, and <code>pay_2021</code> and we’d like to validate that text values in columns having <code>"id"</code> or <code>"identifier"</code> in the name have a specific syntax. We can use the <code>matches()</code> column selector function to specify the columns that match the pattern.</p>
-<div id="dbb57d97" class="cell" data-execution_count="2">
+<div id="2f06c40e" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -464,7 +464,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <p>From the results of the validation table we get two validation steps, one for <code>id_old</code> and one for <code>new_identifier</code>. The values in both columns all match the pattern <code>"ID\d{4}"</code>.</p>
 <p>We can also use the <code>matches()</code> function in combination with other column selectors (within <a href="../reference/col.html#pointblank.col"><code>col()</code></a>) to create more complex column selection criteria (i.e., to select columns that satisfy multiple conditions). For example, to select columns that contain <code>"pay"</code> and match the text <code>"2023"</code> or <code>"2024"</code>, we can use the <code>&amp;</code> operator to combine column selectors.</p>
-<div id="b8b52982" class="cell" data-execution_count="3">
+<div id="7813b377" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>tbl <span class="op">=</span> pl.DataFrame(</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    {</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"name"</span>: [<span class="st">"Alice"</span>, <span class="st">"Bob"</span>, <span class="st">"Charlie"</span>],</span>
