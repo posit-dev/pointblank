@@ -272,7 +272,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="a-simple-validation-table" class="level2">
 <h2 class="anchored" data-anchor-id="a-simple-validation-table">A Simple Validation Table</h2>
 <p>This is a validation report table that is produced from a validation of a Polars DataFrame:</p>
-<div id="ca03dea3" class="cell" data-execution_count="2">
+<div id="ce7744aa" class="cell" data-execution_count="2">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
@@ -575,22 +575,22 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>validation</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Note these three key pieces in the code:</p>
 <ul>
-<li>the <code>Validate(data=...)</code> argument takes a DataFrame or database table that you want to validate</li>
-<li>the methods starting with <code>col_*</code> specify validation steps that run on specific columns</li>
-<li>the <code>interrogate()</code> method executes the validation plan on the table</li>
+<li>the <code>Validate(data=)</code> argument takes a DataFrame or database table that you want to validate</li>
+<li>the methods starting with <code>col_vals_</code> specify validation steps that run on specific columns</li>
+<li>the <a href="https://posit-dev.github.io/pointblank/reference/Validate.interrogate.html"><code>interrogate()</code></a> method executes the validation plan on the table</li>
 </ul>
 <p>This common pattern is used in a validation workflow, where <a href="https://posit-dev.github.io/pointblank/reference/Validate.html"><code>Validate</code></a> and <a href="https://posit-dev.github.io/pointblank/reference/Validate.interrogate.html"><code>interrogate()</code></a> bookend a validation plan generated through calling validation methods. And that’s data validation with Pointblank in a nutshell! In the next section we’ll go a bit further by understanding how we can measure data quality with test units and failure thresholds.</p>
 </section>
 <section id="understanding-test-units" class="level2">
 <h2 class="anchored" data-anchor-id="understanding-test-units">Understanding Test Units</h2>
-<p>Each validation step will execute a type of validation test on the target table. For example, a <code>col_vals_lt()</code> validation step can test that each value in a column is less than a specified number. The key finding that’s reported as a result of this test is the number of test units that pass or fail.</p>
-<p>Test units are dependent on the test being run. The collection of <code>col_vals_*</code> validation methods will test each and every value in a particular column, so each value will be a test unit (and the number of test units is the number of rows in the target table). Some validation methods like <code>col_exists()</code> or <code>row_count_match()</code> have only a single test unit since they aren’t testing individual values but rather if a single condition is true or false.</p>
+<p>Each validation step will execute a type of validation test on the target table. For example, a <a href="https://posit-dev.github.io/pointblank/reference/Validate.col_vals_lt.html"><code>col_vals_lt()</code></a> validation step can test that each value in a column is less than a specified number. The key finding that’s reported as a result of this test is the number of test units that pass or fail.</p>
+<p>Test units are dependent on the test being run. The collection of <code>col_vals_*</code> validation methods will test each and every value in a particular column, so each value will be a test unit (and the number of test units is the number of rows in the target table). Some validation methods like <a href="https://posit-dev.github.io/pointblank/reference/Validate.col_exists.html"><code>col_exists()</code></a> or <a href="https://posit-dev.github.io/pointblank/reference/Validate.row_count_match.html"><code>row_count_match()</code></a> have only a single test unit since they aren’t testing individual values but rather if the overall test passes or fails.</p>
 </section>
 <section id="using-threshold-levels" class="level2">
 <h2 class="anchored" data-anchor-id="using-threshold-levels">Using Threshold Levels</h2>
 <p>Knowing about the numbers of test units across validation methods matters because you have the option to set thresholds (that can signal ‘warning’, ‘error’, and ‘critical’ flags) based on either the relative proportion or absolute number of failing test units.</p>
 <p>Here’s a simple example that uses a single validation step along with thresholds set in the <code>thresholds=</code> argument of the validation method.</p>
-<div id="1f48e875" class="cell" data-execution_count="3">
+<div id="cbd0d3a9" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>validation_2 <span class="op">=</span> (</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>pb.load_dataset(dataset<span class="op">=</span><span class="st">"small_table"</span>))</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_lt(columns<span class="op">=</span><span class="st">"a"</span>, value<span class="op">=</span><span class="dv">7</span>, thresholds<span class="op">=</span>(<span class="dv">2</span>, <span class="dv">4</span>))</span>
@@ -673,7 +673,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <td colspan="14" class="gt_heading gt_title gt_font_normal" style="color: #444444;font-size: 28px;text-align: left;font-weight: bold;">Pointblank Validation</td>
   </tr>
   <tr class="gt_heading">
-    <td colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border"><div><span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2025-03-05|15:40:02</span><div style="padding-top: 10px; padding-bottom: 5px;"><span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 10px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 10px 2px 10px; font-size: smaller;">Polars</span></div></div></td>
+    <td colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border"><div><span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2025-03-05|16:42:23</span><div style="padding-top: 10px; padding-bottom: 5px;"><span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 10px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 10px 2px 10px; font-size: smaller;">Polars</span></div></div></td>
   </tr>
 <tr class="gt_col_headings">
   <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id=""></th>
@@ -747,7 +747,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>the <code>E</code> column (short for ‘error’) shows an open yellow circle indicating that the number of failing test units is below that threshold</li>
 </ul>
 <p>The one final threshold level, <code>C</code> (for ‘critical’), wasn’t set so it appears on the validation table as a long dash.</p>
-<p>Setting thresholds is important since you might want some sort of signal for the discovery of errors in your data. How you set the particular threshold levels is highly dependent on your tolerance for data failures. The idea of thresholds and associated actions is central to how Pointblank works, so, the next two sections in the User Guide will deal with (1) a more in-depth treatment of thresholds, and (2) how to set actions for threshold exceedences.</p>
+<p>Setting thresholds is important since you might want some sort of signal for the discovery of errors in your data. How you set the particular threshold levels is highly dependent on your tolerance for data failures. The idea of thresholds and associated actions is central to how Pointblank works, so, the next two sections in the <strong>User Guide</strong> will deal with (1) a more in-depth treatment of thresholds, and (2) how to set actions for threshold exceedences.</p>
 
 
 </section>
