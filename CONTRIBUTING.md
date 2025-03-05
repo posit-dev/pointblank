@@ -22,6 +22,7 @@ Once there is consensus that a PR based on the issue would be helpful, adhering 
 - The pointblank package follows the [Style Guide for Python Code](https://peps.python.org/pep-0008/) so please adopt those guidelines in your submitted code as best as possible
 - Comment your code, particularly in those hard-to-understand areas
 - Add test cases that cover the changes made in the PR; having tests for any new codepaths will help guard against regressions
+- Run pre-commit checks with `make pre-commit` to ensure the PR passes CI upon push
 
 ### Setting Up Your Development Environment
 
@@ -31,6 +32,7 @@ To set up your development environment, you can follow these steps:
 - Create a virtual environment for the folder
 - Install the package in editable mode with `pip install -e .` from the root of the project folder
 - Install the development dependencies with `pip install '.[dev]'` (have a look at the `pyproject.toml` file for the list of development dependencies)
+- Install pre-commit with `make install-pre-commit` (optional)
 
 Our documentation uses `quartodoc` which in turn requires a local install of the Quarto CLI. To install Quarto, go to <https://quarto.org/docs/get-started/> to get the latest build for your platform.
 

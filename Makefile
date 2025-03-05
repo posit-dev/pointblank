@@ -13,6 +13,12 @@ lint: ## Run ruff formatter and linter
 	@uv run ruff format
 	@uv run ruff check --fix
 
+install-pre-commit: ## Install pre-commit hook to local repo
+	@uv run pre-commit install
+
+pre-commit: ## Run pre-commit checks
+	@uv run pre-commit
+
 check:
 	pyright --pythonversion 3.8 pointblank
 	pyright --pythonversion 3.9 pointblank
