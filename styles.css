@@ -9,7 +9,7 @@
 }
 
 body {
-    background-color: #FAFAFA;
+    background-color: #E7EAF6;
 }
 
 p a {
@@ -24,6 +24,11 @@ p a {
 .sidebar-item-container {
     text-transform: uppercase;
     font-weight: bold;
+}
+
+.sourceCode {
+    border-color: lightsteelblue;
+    border-style: dotted;
 }
 
 code {
