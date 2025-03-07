@@ -167,6 +167,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#pointblank.DataScan" id="toc-pointblank.DataScan" class="nav-link active" data-scroll-target="#pointblank.DataScan">DataScan</a>
   <ul class="collapse">
   <li><a href="#parameters" id="toc-parameters" class="nav-link" data-scroll-target="#parameters">Parameters</a></li>
+  <li><a href="#measures-of-missingness-and-distinctness" id="toc-measures-of-missingness-and-distinctness" class="nav-link" data-scroll-target="#measures-of-missingness-and-distinctness">Measures of Missingness and Distinctness</a></li>
+  <li><a href="#counts-and-fractions-of-negative-zero-and-positive-values" id="toc-counts-and-fractions-of-negative-zero-and-positive-values" class="nav-link" data-scroll-target="#counts-and-fractions-of-negative-zero-and-positive-values">Counts and Fractions of Negative, Zero, and Positive Values</a></li>
+  <li><a href="#statistics-for-numerical-columns" id="toc-statistics-for-numerical-columns" class="nav-link" data-scroll-target="#statistics-for-numerical-columns">Statistics for Numerical Columns</a></li>
+  <li><a href="#statistics-for-string-columns" id="toc-statistics-for-string-columns" class="nav-link" data-scroll-target="#statistics-for-string-columns">Statistics for String Columns</a></li>
+  <li><a href="#statistics-for-datetime-columns" id="toc-statistics-for-datetime-columns" class="nav-link" data-scroll-target="#statistics-for-datetime-columns">Statistics for Datetime Columns</a></li>
   <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
   </ul></li>
   </ul>
@@ -191,13 +196,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <ul>
 <li>the column name</li>
 <li>the column type</li>
-<li>the number of missing values</li>
-<li>the number of unique values</li>
-<li>a sample of the data</li>
+<li>measures of missingness and distinctness</li>
+<li>measures of negative, zero, and positive values (for numerical columns)</li>
+<li>a sample of the data (the first 5 values)</li>
 <li>statistics (if the column contains numbers, strings, or datetimes)</li>
 </ul></li>
 </ul>
-<p>To obtain a dictionary representation of the summary, you can use the <code>get_profile()</code> method. To get a JSON representation of the summary, you can use the <code>to_json()</code> method. To save the JSON text to a file, the <code>save_to_json()</code> method could be used.</p>
+<p>To obtain a dictionary representation of the summary, you can use the <code>to_dict()</code> method. To get a JSON representation of the summary, you can use the <code>to_json()</code> method. To save the JSON text to a file, the <code>save_to_json()</code> method could be used.</p>
 <div class="callout callout-style-default callout-warning callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -223,6 +228,64 @@ Warning
 <p>Optionally, the name of the table could be provided as <code>tbl_name</code>.</p>
 </dd>
 </dl>
+</section>
+<section id="measures-of-missingness-and-distinctness" class="level2 doc-section doc-section-measures-of-missingness-and-distinctness">
+<h2 class="doc-section doc-section-measures-of-missingness-and-distinctness anchored" data-anchor-id="measures-of-missingness-and-distinctness">Measures of Missingness and Distinctness</h2>
+<p>For each column, the following measures are provided:</p>
+<ul>
+<li><code>n_missing_values</code>: the number of missing values in the column</li>
+<li><code>f_missing_values</code>: the fraction of missing values in the column</li>
+<li><code>n_unique_values</code>: the number of unique values in the column</li>
+<li><code>f_unique_values</code>: the fraction of unique values in the column</li>
+</ul>
+<p>The fractions are calculated as the ratio of the measure to the total number of rows in the dataset.</p>
+</section>
+<section id="counts-and-fractions-of-negative-zero-and-positive-values" class="level2 doc-section doc-section-counts-and-fractions-of-negative-zero-and-positive-values">
+<h2 class="doc-section doc-section-counts-and-fractions-of-negative-zero-and-positive-values anchored" data-anchor-id="counts-and-fractions-of-negative-zero-and-positive-values">Counts and Fractions of Negative, Zero, and Positive Values</h2>
+<p>For numerical columns, the following measures are provided:</p>
+<ul>
+<li><code>n_negative_values</code>: the number of negative values in the column</li>
+<li><code>f_negative_values</code>: the fraction of negative values in the column</li>
+<li><code>n_zero_values</code>: the number of zero values in the column</li>
+<li><code>f_zero_values</code>: the fraction of zero values in the column</li>
+<li><code>n_positive_values</code>: the number of positive values in the column</li>
+<li><code>f_positive_values</code>: the fraction of positive values in the column</li>
+</ul>
+<p>The fractions are calculated as the ratio of the measure to the total number of rows in the dataset.</p>
+</section>
+<section id="statistics-for-numerical-columns" class="level2 doc-section doc-section-statistics-for-numerical-columns">
+<h2 class="doc-section doc-section-statistics-for-numerical-columns anchored" data-anchor-id="statistics-for-numerical-columns">Statistics for Numerical Columns</h2>
+<p>For numerical columns, the following descriptive statistics are provided:</p>
+<ul>
+<li><code>mean</code>: the mean of the column</li>
+<li><code>std_dev</code>: the standard deviation of the column</li>
+</ul>
+<p>Additionally, the following quantiles are provided:</p>
+<ul>
+<li><code>min</code>: the minimum value in the column</li>
+<li><code>p05</code>: the 5th percentile of the column</li>
+<li><code>q_1</code>: the first quartile of the column</li>
+<li><code>med</code>: the median of the column</li>
+<li><code>q_3</code>: the third quartile of the column</li>
+<li><code>p95</code>: the 95th percentile of the column</li>
+<li><code>max</code>: the maximum value in the column</li>
+<li><code>iqr</code>: the interquartile range of the column</li>
+</ul>
+</section>
+<section id="statistics-for-string-columns" class="level2 doc-section doc-section-statistics-for-string-columns">
+<h2 class="doc-section doc-section-statistics-for-string-columns anchored" data-anchor-id="statistics-for-string-columns">Statistics for String Columns</h2>
+<p>For string columns, the following statistics are provided:</p>
+<ul>
+<li><code>mode</code>: the mode of the column</li>
+</ul>
+</section>
+<section id="statistics-for-datetime-columns" class="level2 doc-section doc-section-statistics-for-datetime-columns">
+<h2 class="doc-section doc-section-statistics-for-datetime-columns anchored" data-anchor-id="statistics-for-datetime-columns">Statistics for Datetime Columns</h2>
+<p>For datetime columns, the following statistics are provided:</p>
+<ul>
+<li><code>min_date</code>: the minimum date in the column</li>
+<li><code>max_date</code>: the maximum date in the column</li>
+</ul>
 </section>
 <section id="returns" class="level2 doc-section doc-section-returns">
 <h2 class="doc-section doc-section-returns anchored" data-anchor-id="returns">Returns</h2>
