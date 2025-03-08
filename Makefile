@@ -19,7 +19,10 @@ check:
 	pyright --pythonversion 3.10 pointblank
 	pyright --pythonversion 3.11 pointblank
 
-clean: clean-build clean-pyc clean-test ## remove all build, test, coverage and Python artifacts
+clean: clean-build clean-pyc clean-test clean-ruff ## remove all build, test, coverage and Python artifacts
+
+clean-ruff: ## clean ruff caches
+	@uv run ruff clean
 
 clean-build: ## remove build artifacts
 	rm -fr build/

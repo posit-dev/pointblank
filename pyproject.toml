@@ -95,7 +95,15 @@ testpaths = ["tests"]
 line-length = 100
 
 [tool.ruff.lint]
-exclude = ["docs", ".venv", "tests/*"]
+exclude = [
+    "docs",
+    ".venv",
+    "tests/snapshots/",
+    "tests/manual_tests",
+    "pointblank/data/",
+    "docs/user-guide/",
+    "docs/assets/",
+]
 
 ignore = [
     "E402", # module level import not at top of file
@@ -107,6 +115,4 @@ ignore = [
 ]
 
 [tool.coverage.report]
-exclude_also = [
-    "if TYPE_CHECKING:"
-]
+exclude_also = ["if TYPE_CHECKING:"]
