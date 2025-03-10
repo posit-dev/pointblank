@@ -70,6 +70,10 @@ p,h1,h2,h3,#toc-title,#toc-function-reference,.nav-link,.table {
     font-weight: bold;
 }
 
+a.sidebar-item-toggle.text-start > i {
+    color: #FAFAFD;
+}
+
 #api-reference > h1 {
     margin: 0;
 }
