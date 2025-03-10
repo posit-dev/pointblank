@@ -91,6 +91,12 @@ p,h1,h2,h3,#toc-title,#toc-function-reference,.nav-link,.table {
     background-color: #FAFAFD;
 }
 
+.sidebar-item-text > span {
+    text-transform: uppercase;
+    font-weight: 600;
+    color: dimgray;
+}
+
 .sidebar-menu-container {
     border-bottom-style: solid;
     border-bottom-width: 3px;
@@ -99,6 +105,10 @@ p,h1,h2,h3,#toc-title,#toc-function-reference,.nav-link,.table {
 
 .menu-text {
     font-size: 15.3px;
+}
+
+.sidebar-item .sidebar-item-section {
+    padding-bottom: 8px;
 }
 
 #quarto-header > nav > div {
