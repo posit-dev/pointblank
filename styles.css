@@ -91,7 +91,7 @@ p,h1,h2,h3,#toc-title,#toc-function-reference,.nav-link,.table {
     background-color: #FAFAFD;
 }
 
-.sidebar-item-text {
+a.sidebar-item-text.sidebar-link.text-start > span {
     text-transform: uppercase;
     font-weight: 600;
     color: dimgray;
