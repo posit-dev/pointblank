@@ -88,13 +88,17 @@ p,h1,h2,h3,#toc-title,#toc-function-reference,.nav-link,.table {
 }
 
 #quarto-sidebar {
-    background-color: #F5F5F5;
+    background-color: #FAFAFD;
 }
 
 .sidebar-menu-container {
     border-bottom-style: solid;
     border-bottom-width: 3px;
     border-bottom-color: #E7EAF6;
+}
+
+.menu-text {
+    font-size: 15.3px;
 }
 
 #quarto-header > nav > div {
