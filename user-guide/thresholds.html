@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Thresholds – Pointblank</title>
+<title>Setting Failure Thresholds – Pointblank</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -173,7 +173,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../user-guide/index.html">Getting Started</a></li><li class="breadcrumb-item"><a href="../user-guide/thresholds.html">Thresholds</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../user-guide/index.html">Getting Started</a></li><li class="breadcrumb-item"><a href="../user-guide/thresholds.html">Setting Failure Thresholds</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -203,13 +203,13 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../user-guide/thresholds.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text">Thresholds</span></a>
+ <span class="menu-text">Setting Failure Thresholds</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../user-guide/actions.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Actions</span></a>
+ <span class="menu-text">Triggering Actions</span></a>
   </div>
 </li>
       </ul>
@@ -296,9 +296,9 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../user-guide/index.html">Getting Started</a></li><li class="breadcrumb-item"><a href="../user-guide/thresholds.html">Thresholds</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../user-guide/index.html">Getting Started</a></li><li class="breadcrumb-item"><a href="../user-guide/thresholds.html">Setting Failure Thresholds</a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">Thresholds</h1>
+<h1 class="title">Setting Failure Thresholds</h1>
 </div>
 
 
@@ -317,18 +317,16 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 
 <p>Thresholds enable you to signal failure at different severity levels. They also allow for the triggering of custom actions, a topic which is covered in the next section. For instance you might be testing a column for null/missing values. When doing so, you’d want to know when there are at least 10% missing values in the column. Alternatively, it could be the case that even a single missing value is critical to your work. Threshold settings in Pointblank give you the flexibility to devise data-failure signaling to whatever tolerances are important to you.</p>
 <p>Let’s start with the basics though. Here’s an example of a simple validation where threshold values are set in the <a href="https://posit-dev.github.io/pointblank/reference/Validate.col_vals_not_null.html"><code>col_vals_not_null()</code></a> validation step (this type of validation expects that there are no null/missing values in a particular column):</p>
-<div id="06233212" class="cell" data-execution_count="2">
+<div id="6c1f2549" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>validation_1 <span class="op">=</span> (</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>pb.load_dataset(dataset<span class="op">=</span><span class="st">"small_table"</span>))</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    .col_vals_not_null(</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>        columns<span class="op">=</span><span class="st">"c"</span>, thresholds<span class="op">=</span>(<span class="dv">1</span>, <span class="fl">0.2</span>)</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>validation_1</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>pb.load_dataset(dataset<span class="op">=</span><span class="st">"small_table"</span>, tbl_type<span class="op">=</span><span class="st">"polars"</span>))</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    .col_vals_not_null(columns<span class="op">=</span><span class="st">"c"</span>, thresholds<span class="op">=</span>(<span class="dv">1</span>, <span class="fl">0.2</span>))</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>validation_1</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="2">
 <div id="pb_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>
@@ -404,7 +402,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     <td colspan="14" class="gt_heading gt_title gt_font_normal" style="color: #444444;font-size: 28px;text-align: left;font-weight: bold;">Pointblank Validation</td>
   </tr>
   <tr class="gt_heading">
-    <td colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border"><div><span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2025-03-11|19:32:39</span><div style="padding-top: 10px; padding-bottom: 5px;"><span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 10px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 10px 2px 10px; font-size: smaller;">Polars</span></div></div></td>
+    <td colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border"><div><span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2025-03-11|19:54:39</span><div style="padding-top: 10px; padding-bottom: 5px;"><span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 10px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 10px 2px 10px; font-size: smaller;">Polars</span></div></div></td>
   </tr>
 <tr class="gt_col_headings">
   <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-status_color"></th>
@@ -491,18 +489,21 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </section>
 <section id="using-the-validationthresholds-argument" class="level2">
 <h2 class="anchored" data-anchor-id="using-the-validationthresholds-argument">Using the <code>Validation(thresholds=)</code> Argument</h2>
-<p>We can also define thresholds globally. This means that every validation step will re-use the same set of threshold values.</p>
+<p>We can also define thresholds globally (within the <code>Validate</code> call). This means that every validation step will re-use the same set of threshold values.</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>validation_2 <span class="op">=</span> (</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>pb.load_dataset(dataset<span class="op">=</span><span class="st">"small_table"</span>), thresholds<span class="op">=</span>(<span class="dv">1</span>, <span class="fl">0.1</span>))</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    .col_vals_not_null(columns<span class="op">=</span><span class="st">"a"</span>)</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    .col_vals_gt(columns<span class="op">=</span><span class="st">"b"</span>, value<span class="op">=</span><span class="dv">2</span>)</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>validation_2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>In this, both the <a href="https://posit-dev.github.io/pointblank/reference/Validate.col_vals_not_null.html"><code>col_vals_not_null()</code></a> and <a href="https://posit-dev.github.io/pointblank/reference/Validate.col_vals_gt.html"><code>col_vals_gt()</code></a> steps will use the <code>thresholds=</code> value set in the <a href="https://posit-dev.github.io/pointblank/reference/Validate.html"><code>Validate</code></a> call. Now, if you want to override these global threshold values for a given validation step, you can always use the <code>threshold=</code> argument when calling a validation method (this argument is present within every validation method).</p>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    pb.Validate(</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>        data<span class="op">=</span>pb.load_dataset(dataset<span class="op">=</span><span class="st">"small_table"</span>, tbl_type<span class="op">=</span><span class="st">"polars"</span>),</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>        thresholds<span class="op">=</span>(<span class="dv">1</span>, <span class="fl">0.1</span>)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    .col_vals_not_null(columns<span class="op">=</span><span class="st">"a"</span>)</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    .col_vals_gt(columns<span class="op">=</span><span class="st">"b"</span>, value<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>validation_2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>In this, both the <a href="https://posit-dev.github.io/pointblank/reference/Validate.col_vals_not_null.html"><code>col_vals_not_null()</code></a> and <a href="https://posit-dev.github.io/pointblank/reference/Validate.col_vals_gt.html"><code>col_vals_gt()</code></a> steps will use the <code>thresholds=</code> value set in the <a href="https://posit-dev.github.io/pointblank/reference/Validate.html"><code>Validate</code></a> call. Now, if you want to override these global threshold values for a given validation step, you can always use the <code>thresholds=</code> argument when calling a validation method (this argument is present within every validation method).</p>
 </section>
 <section id="ways-to-define-thresholds" class="level2">
 <h2 class="anchored" data-anchor-id="ways-to-define-thresholds">Ways to Define Thresholds</h2>
@@ -522,7 +523,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </section>
 <section id="using-the-thresholds-class" class="level3">
 <h3 class="anchored" data-anchor-id="using-the-thresholds-class">Using the <code>Thresholds</code> Class</h3>
-<p>Using the <a href="https://posit-dev.github.io/pointblank/reference/Thresholds.html"><code>Thresholds</code></a> class lets you define the threshold levels using the <code>warning=</code>, <code>error=</code>, and <code>critical=</code> arguments. And unlike the method of setting thresholds with a tuple, any of the threshold levels can be unset. Here’s an example where you might want to set the ‘error’ and ‘critical’ levels (leaving the ‘warning’ level unset):</p>
+<p>Using the <a href="https://posit-dev.github.io/pointblank/reference/Thresholds.html"><code>Thresholds</code></a> class lets you define the threshold levels using the <code>warning=</code>, <code>error=</code>, and <code>critical=</code> arguments. And unlike the method of setting thresholds with a tuple, any of the threshold levels can be left unset. Here’s an example where you might want to set the ‘error’ and ‘critical’ levels (leaving the ‘warning’ level unset):</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>thresholds_class <span class="op">=</span> pb.Thresholds(error<span class="op">=</span><span class="fl">0.3</span>, critical<span class="op">=</span><span class="fl">0.5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section id="using-a-dictionary-to-set-thresholds" class="level3">
@@ -959,8 +960,8 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../user-guide/actions.html" class="pagination-link" aria-label="Actions">
-        <span class="nav-page-text">Actions</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../user-guide/actions.html" class="pagination-link" aria-label="Triggering Actions">
+        <span class="nav-page-text">Triggering Actions</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>
