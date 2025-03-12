@@ -178,9 +178,8 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
   <li><a href="#parameters" id="toc-parameters" class="nav-link" data-scroll-target="#parameters">Parameters</a></li>
   <li><a href="#measures-of-missingness-and-distinctness" id="toc-measures-of-missingness-and-distinctness" class="nav-link" data-scroll-target="#measures-of-missingness-and-distinctness">Measures of Missingness and Distinctness</a></li>
   <li><a href="#counts-and-fractions-of-negative-zero-and-positive-values" id="toc-counts-and-fractions-of-negative-zero-and-positive-values" class="nav-link" data-scroll-target="#counts-and-fractions-of-negative-zero-and-positive-values">Counts and Fractions of Negative, Zero, and Positive Values</a></li>
-  <li><a href="#statistics-for-numerical-columns" id="toc-statistics-for-numerical-columns" class="nav-link" data-scroll-target="#statistics-for-numerical-columns">Statistics for Numerical Columns</a></li>
-  <li><a href="#statistics-for-string-columns" id="toc-statistics-for-string-columns" class="nav-link" data-scroll-target="#statistics-for-string-columns">Statistics for String Columns</a></li>
-  <li><a href="#statistics-for-datetime-columns" id="toc-statistics-for-datetime-columns" class="nav-link" data-scroll-target="#statistics-for-datetime-columns">Statistics for Datetime Columns</a></li>
+  <li><a href="#statistics-for-numerical-and-string-columns" id="toc-statistics-for-numerical-and-string-columns" class="nav-link" data-scroll-target="#statistics-for-numerical-and-string-columns">Statistics for Numerical and String Columns</a></li>
+  <li><a href="#statistics-for-date-and-datetime-columns" id="toc-statistics-for-date-and-datetime-columns" class="nav-link" data-scroll-target="#statistics-for-date-and-datetime-columns">Statistics for Date and Datetime Columns</a></li>
   <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
   </ul></li>
   </ul>
@@ -262,9 +261,10 @@ Warning
 </ul>
 <p>The fractions are calculated as the ratio of the measure to the total number of rows in the dataset.</p>
 </section>
-<section id="statistics-for-numerical-columns" class="level2 doc-section doc-section-statistics-for-numerical-columns">
-<h2 class="doc-section doc-section-statistics-for-numerical-columns anchored" data-anchor-id="statistics-for-numerical-columns">Statistics for Numerical Columns</h2>
-<p>For numerical columns, the following descriptive statistics are provided:</p>
+<section id="statistics-for-numerical-and-string-columns" class="level2 doc-section doc-section-statistics-for-numerical-and-string-columns">
+<h2 class="doc-section doc-section-statistics-for-numerical-and-string-columns anchored" data-anchor-id="statistics-for-numerical-and-string-columns">Statistics for Numerical and String Columns</h2>
+<p>For numerical and string columns, several statistical measures are provided. Please note that for string columms, the statistics are based on the lengths of the strings in the column.</p>
+<p>The following descriptive statistics are provided:</p>
 <ul>
 <li><code>mean</code>: the mean of the column</li>
 <li><code>std_dev</code>: the standard deviation of the column</li>
@@ -281,19 +281,12 @@ Warning
 <li><code>iqr</code>: the interquartile range of the column</li>
 </ul>
 </section>
-<section id="statistics-for-string-columns" class="level2 doc-section doc-section-statistics-for-string-columns">
-<h2 class="doc-section doc-section-statistics-for-string-columns anchored" data-anchor-id="statistics-for-string-columns">Statistics for String Columns</h2>
-<p>For string columns, the following statistics are provided:</p>
+<section id="statistics-for-date-and-datetime-columns" class="level2 doc-section doc-section-statistics-for-date-and-datetime-columns">
+<h2 class="doc-section doc-section-statistics-for-date-and-datetime-columns anchored" data-anchor-id="statistics-for-date-and-datetime-columns">Statistics for Date and Datetime Columns</h2>
+<p>For date/datetime columns, the following statistics are provided:</p>
 <ul>
-<li><code>mode</code>: the mode of the column</li>
-</ul>
-</section>
-<section id="statistics-for-datetime-columns" class="level2 doc-section doc-section-statistics-for-datetime-columns">
-<h2 class="doc-section doc-section-statistics-for-datetime-columns anchored" data-anchor-id="statistics-for-datetime-columns">Statistics for Datetime Columns</h2>
-<p>For datetime columns, the following statistics are provided:</p>
-<ul>
-<li><code>min_date</code>: the minimum date in the column</li>
-<li><code>max_date</code>: the maximum date in the column</li>
+<li><code>min</code>: the minimum date/datetime in the column</li>
+<li><code>max</code>: the maximum date/datetime in the column</li>
 </ul>
 </section>
 <section id="returns" class="level2 doc-section doc-section-returns">

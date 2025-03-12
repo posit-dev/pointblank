@@ -384,7 +384,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </section>
 <section id="inspect" class="level2">
 <h2 class="anchored" data-anchor-id="inspect">Inspect</h2>
-<p>The <em>Inspect</em> group contains functions that are helpful for getting to grips on a new data table. Use the <code>DataScan</code> class to get a quick overview of the data, <code>preview()</code> to see the first and last few rows of a table, <code>missing_vals_tbl()</code> to see where there are missing values in a table, and <code>get_column_count()</code>/<code>get_row_count()</code> to get the number of columns and rows in a table. Several datasets included in the package can be accessed via the <code>load_dataset()</code> function. Finally, the <code>config()</code> utility lets us set global configuration parameters.</p>
+<p>The <em>Inspect</em> group contains functions that are helpful for getting to grips on a new data table. Use the <code>DataScan</code> class to get a quick overview of the data, <code>preview()</code> to see the first and last few rows of a table, <code>col_summary_tbl()</code> for a column-level summary of a table, <code>missing_vals_tbl()</code> to see where there are missing values in a table, and <code>get_column_count()</code>/<code>get_row_count()</code> to get the number of columns and rows in a table. Several datasets included in the package can be accessed via the <code>load_dataset()</code> function. Finally, the <code>config()</code> utility lets us set global configuration parameters.</p>
 <table class="caption-top table">
 <tbody>
 <tr class="odd">
@@ -396,22 +396,26 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <td>Display a table preview that shows some rows from the top, some from the bottom.</td>
 </tr>
 <tr class="odd">
+<td><a href="../reference/col_summary_tbl.html#pointblank.col_summary_tbl">col_summary_tbl</a></td>
+<td>Generate a column-level summary table of a dataset.</td>
+</tr>
+<tr class="even">
 <td><a href="../reference/missing_vals_tbl.html#pointblank.missing_vals_tbl">missing_vals_tbl</a></td>
 <td>Display a table that shows the missing values in the input table.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><a href="../reference/get_column_count.html#pointblank.get_column_count">get_column_count</a></td>
 <td>Get the number of columns in a table.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><a href="../reference/get_row_count.html#pointblank.get_row_count">get_row_count</a></td>
 <td>Get the number of rows in a table.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><a href="../reference/load_dataset.html#pointblank.load_dataset">load_dataset</a></td>
 <td>Load a dataset hosted in the library as specified table type.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><a href="../reference/config.html#pointblank.config">config</a></td>
 <td>Configuration settings for the pointblank library.</td>
 </tr>
