@@ -632,10 +632,10 @@ class DataScan:
 
         # Iterate over each column's data and obtain a dictionary of statistics for each column
         for idx, col in enumerate(column_data):
-            if "statistics" in col and (
-                "numerical" in col["statistics"] or "string_lengths" in col["statistics"]
-            ):
-                col_dict = _process_numerical_string_column_data(col)
+            if "statistics" in col and "numerical" in col["statistics"]:
+                col_dict = _process_numerical_column_data(col)
+            elif "statistics" in col and "string_lengths" in col["statistics"]:
+                col_dict = _process_string_column_data(col)
             elif "statistics" in col and "datetime" in col["statistics"]:
                 col_dict = _process_datetime_column_data(col)
                 datetime_row_list.append(idx)
@@ -743,6 +743,9 @@ class DataScan:
                 style=style.fill(color="#FCFCFC"),
                 locations=loc.body(columns=["missing_vals", "unique_vals", "iqr"]),
             )
+            .tab_style(
+                style=style.text(align="center"), locations=loc.column_labels(columns=stat_columns)
+            )
             .cols_label(
                 column_number="",
                 icon="",
@@ -750,7 +753,7 @@ class DataScan:
                 missing_vals="NAs",
                 unique_vals="Uniq.",
                 mean="Mean",
-                std_dev="S.D.",
+                std_dev="SD",
                 min="Min",
                 p05="P05",
                 q_1="Q1",
@@ -937,7 +940,7 @@ def _compact_0_1_fmt(value: float | int) -> str:
     return formatted
 
 
-def _process_numerical_string_column_data(column_data: dict) -> dict:
+def _process_numerical_column_data(column_data: dict) -> dict:
     column_number = column_data["column_number"]
     column_name = column_data["column_name"]
     column_type = column_data["column_type"]
@@ -946,14 +949,6 @@ def _process_numerical_string_column_data(column_data: dict) -> dict:
         f"<div style='font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;'>{column_name}</div>"
         f"<div style='font-size: 11px; color: gray;'>{column_type}</div>"
     )
-
-    # Determine if the column is a numerical or string column
-    if "numerical" in column_data["statistics"]:
-        key = "numerical"
-        icon = "numeric"
-    elif "string_lengths" in column_data["statistics"]:
-        key = "string_lengths"
-        icon = "string"
 
     # Get the Missing and Unique value counts and fractions
     missing_vals = column_data["n_missing_values"]
@@ -965,8 +960,8 @@ def _process_numerical_string_column_data(column_data: dict) -> dict:
     unique_vals_str = f"{unique_vals}<br>{unique_vals_frac}"
 
     # Get the descriptive and quantile statistics
-    descriptive_stats = column_data["statistics"][key]["descriptive"]
-    quantile_stats = column_data["statistics"][key]["quantiles"]
+    descriptive_stats = column_data["statistics"]["numerical"]["descriptive"]
+    quantile_stats = column_data["statistics"]["numerical"]["quantiles"]
 
     # Get all values from the descriptive and quantile stats into a single list
     quantile_stats_vals = [v[1] for v in quantile_stats.items()]
@@ -1000,12 +995,91 @@ def _process_numerical_string_column_data(column_data: dict) -> dict:
     # Create a single dictionary with the statistics for the column
     stats_dict = {
         "column_number": column_number,
-        "icon": SVG_ICONS_FOR_DATA_TYPES[icon],
+        "icon": SVG_ICONS_FOR_DATA_TYPES["numeric"],
         "column_name": column_name_and_type,
         "missing_vals": missing_vals_str,
         "unique_vals": unique_vals_str,
         **descriptive_stats,
         **quantile_stats,
+    }
+
+    return stats_dict
+
+
+def _process_string_column_data(column_data: dict) -> dict:
+    column_number = column_data["column_number"]
+    column_name = column_data["column_name"]
+    column_type = column_data["column_type"]
+
+    column_name_and_type = (
+        f"<div style='font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;'>{column_name}</div>"
+        f"<div style='font-size: 11px; color: gray;'>{column_type}</div>"
+    )
+
+    # Get the Missing and Unique value counts and fractions
+    missing_vals = column_data["n_missing_values"]
+    unique_vals = column_data["n_unique_values"]
+    missing_vals_frac = _compact_decimal_fmt(column_data["f_missing_values"])
+    unique_vals_frac = _compact_decimal_fmt(column_data["f_unique_values"])
+
+    missing_vals_str = f"{missing_vals}<br>{missing_vals_frac}"
+    unique_vals_str = f"{unique_vals}<br>{unique_vals_frac}"
+
+    # Get the descriptive and quantile statistics
+    descriptive_stats = column_data["statistics"]["string_lengths"]["descriptive"]
+    quantile_stats = column_data["statistics"]["string_lengths"]["quantiles"]
+
+    # Get all values from the descriptive and quantile stats into a single list
+    quantile_stats_vals = [v[1] for v in quantile_stats.items()]
+
+    # Determine if the quantile stats are all integerlike
+    integerlike = []
+
+    # Determine if the quantile stats are integerlike
+    for val in quantile_stats_vals:
+        # Check if a quantile value is a number and then if it is intergerlike
+        if not isinstance(val, (int, float)):
+            continue
+        else:
+            integerlike.append(val % 1 == 0)
+    quantile_vals_integerlike = all(integerlike)
+
+    # Determine the formatter to use for the quantile values
+    if quantile_vals_integerlike:
+        q_formatter = _compact_integer_fmt
+    else:
+        q_formatter = _compact_decimal_fmt
+
+    # Format the descriptive statistics (mean and standard deviation)
+    for key, value in descriptive_stats.items():
+        formatted_val = _compact_decimal_fmt(value=value)
+        descriptive_stats[key] = (
+            f'<div><div>{formatted_val}</div><div style="float: left; position: absolute;"><div title="String Lengths" style="font-size: 7px; color: #999; font-style: italic;">SL</div></div></div>'
+        )
+
+    # Format the quantile statistics
+    for key, value in quantile_stats.items():
+        formatted_val = q_formatter(value=value)
+        quantile_stats[key] = (
+            f'<div><div>{formatted_val}</div><div style="float: left; position: absolute;"><div title="String Lengths" style="font-size: 7px; color: #999; font-style: italic;">SL</div></div></div>'
+        )
+
+    # Create a single dictionary with the statistics for the column
+    stats_dict = {
+        "column_number": column_number,
+        "icon": SVG_ICONS_FOR_DATA_TYPES["string"],
+        "column_name": column_name_and_type,
+        "missing_vals": missing_vals_str,
+        "unique_vals": unique_vals_str,
+        **descriptive_stats,
+        "min": quantile_stats["min"],
+        "p05": "&mdash;",
+        "q_1": "&mdash;",
+        "med": quantile_stats["med"],
+        "q_3": "&mdash;",
+        "p95": "&mdash;",
+        "max": quantile_stats["max"],
+        "iqr": quantile_stats["iqr"],
     }
 
     return stats_dict
