@@ -339,7 +339,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="trying-out-col_summary_tbl" class="level2">
 <h2 class="anchored" data-anchor-id="trying-out-col_summary_tbl">Trying out <code>col_summary_tbl()</code></h2>
 <p>The function only requires a table. Let’s use the <code>small_table</code> dataset (a very simple table) to start us off:</p>
-<div id="4b237b78" class="cell" data-execution_count="2">
+<div id="fcf9a1b4" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>small_table <span class="op">=</span> pb.load_dataset(dataset<span class="op">=</span><span class="st">"small_table"</span>, tbl_type<span class="op">=</span><span class="st">"polars"</span>)</span>
@@ -671,7 +671,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </section>
 <section id="data-categories-in-the-column-summary-table" class="level2">
 <h2 class="anchored" data-anchor-id="data-categories-in-the-column-summary-table">Data Categories in the Column Summary Table</h2>
-<p>On the left side of the table are icons of different colors. These represent categories that the columns fall into. There are only five categories and columns can only be of one type. The mapping from letter marks to categories are:</p>
+<p>On the left side of the table are icons of different colors. These represent categories that the columns fall into. There are only five categories and columns can only be of one type. The categories (and their letter marks) are:</p>
 <ul>
 <li><code>N</code>: numeric</li>
 <li><code>S</code>: string-based</li>
@@ -692,7 +692,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </section>
 <section id="datedatetime-data-and-boolean-data" class="level2">
 <h2 class="anchored" data-anchor-id="datedatetime-data-and-boolean-data">Date/Datetime Data and Boolean Data</h2>
-<p>We see that in the first two rows of our summary table that we have summaries of the <code>date_time</code> and <code>date</code> columns. The summaries we provide for a date/datetime category (notice the green <code>D</code> to the left of the column names) are:</p>
+<p>We see that in the first two rows of our summary table there are summaries of the <code>date_time</code> and <code>date</code> columns. The summaries we provide for a date/datetime category (notice the green <code>D</code> to the left of the column names) are:</p>
 <ol type="1">
 <li>the missing count/proportion (<code>NA</code>)</li>
 <li>the unique value count/proportion (<code>UQ</code>)</li>
