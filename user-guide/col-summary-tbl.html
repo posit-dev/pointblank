@@ -346,7 +346,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="trying-out-col_summary_tbl" class="level2">
 <h2 class="anchored" data-anchor-id="trying-out-col_summary_tbl">Trying out <code>col_summary_tbl()</code></h2>
 <p>The function only requires a table. Let’s use the <code>small_table</code> dataset (a very simple table) to start us off:</p>
-<div id="d835b950" class="cell" data-execution_count="2">
+<div id="7ded6021" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>small_table <span class="op">=</span> pb.load_dataset(dataset<span class="op">=</span><span class="st">"small_table"</span>, tbl_type<span class="op">=</span><span class="st">"polars"</span>)</span>
@@ -695,7 +695,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </section>
 <section id="string-data" class="level2">
 <h2 class="anchored" data-anchor-id="string-data">String Data</h2>
-<p>String data is present in <code>small_table</code>, being in columns <code>b</code> and <code>f</code>. The missing value (<code>NA</code>) and uniqueness (<code>UQ</code>) measures are accounted for here. The statistical measures are all based on string lengths, so what happens is that all strings in a column are converted to those numeric values and a subset of stats values is presented. To avoid some understandable confusion when reading the table, the stats values in each of the cells with values are annotated with the text <code>"SL"</code>. It makes less sense to provide a full suite a quantile values so only the minimum (<code>Min</code>), median (<code>Med</code>), and maximum (<code>Max</code>) are provided.</p>
+<p>String data is present in <code>small_table</code>, being in columns <code>b</code> and <code>f</code>. The missing value (<code>NA</code>) and uniqueness (<code>UQ</code>) measures are accounted for here. The statistical measures are all based on string lengths, so what happens is that all strings in a column are converted to those numeric values and a subset of stats values is presented. To avoid some understandable confusion when reading the table, the stats values in each of the cells with values are annotated with the text <code>"SL"</code>. It makes less sense to provide a full suite of quantile values so only the minimum (<code>Min</code>), median (<code>Med</code>), and maximum (<code>Max</code>) are provided.</p>
 </section>
 <section id="datedatetime-data-and-boolean-data" class="level2">
 <h2 class="anchored" data-anchor-id="datedatetime-data-and-boolean-data">Date/Datetime Data and Boolean Data</h2>
