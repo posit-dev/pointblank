@@ -346,7 +346,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="trying-out-col_summary_tbl" class="level2">
 <h2 class="anchored" data-anchor-id="trying-out-col_summary_tbl">Trying out <code>col_summary_tbl()</code></h2>
 <p>The function only requires a table. Let’s use the <code>small_table</code> dataset (a very simple table) to start us off:</p>
-<div id="046d0a1f" class="cell" data-execution_count="2">
+<div id="d835b950" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>small_table <span class="op">=</span> pb.load_dataset(dataset<span class="op">=</span><span class="st">"small_table"</span>, tbl_type<span class="op">=</span><span class="st">"polars"</span>)</span>
@@ -674,7 +674,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
         
 </div>
 </div>
-<p>The header provides the type of table we’re looking at (<code>POLARS</code>, since this is a Pandas DataFrame) and the table dimensions. The rest of the table focuses on the column-level summaries. As such, each row represents a summary of a column in the <code>small_table</code> dataset. There’s a lot of information in this summary table to digest. Some of it is intuitive since this sort of table summarization isn’t all that uncommon, but other aspects of it could also give some pause. So we’ll carefully wade through how to interpret this report.</p>
+<p>The header provides the type of table we’re looking at (<code>POLARS</code>, since this is a Polars DataFrame) and the table dimensions. The rest of the table focuses on the column-level summaries. As such, each row represents a summary of a column in the <code>small_table</code> dataset. There’s a lot of information in this summary table to digest. Some of it is intuitive since this sort of table summarization isn’t all that uncommon, but other aspects of it could also give some pause. So we’ll carefully wade through how to interpret this report.</p>
 </section>
 <section id="data-categories-in-the-column-summary-table" class="level2">
 <h2 class="anchored" data-anchor-id="data-categories-in-the-column-summary-table">Data Categories in the Column Summary Table</h2>
