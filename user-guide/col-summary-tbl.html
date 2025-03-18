@@ -64,6 +64,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
+<link href="../user-guide/missing-vals-tbl.html" rel="next">
 <link href="../user-guide/preview.html" rel="prev">
 <link href="../assets/fav-logo.png" rel="icon" type="image/png">
 <script src="../site_libs/quarto-html/quarto.js"></script>
@@ -292,6 +293,12 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
  <span class="menu-text">Getting Column Summaries</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../user-guide/missing-vals-tbl.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Checking Missingness in a Table</span></a>
+  </div>
+</li>
       </ul>
   </li>
     </ul>
@@ -339,7 +346,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="trying-out-col_summary_tbl" class="level2">
 <h2 class="anchored" data-anchor-id="trying-out-col_summary_tbl">Trying out <code>col_summary_tbl()</code></h2>
 <p>The function only requires a table. Let’s use the <code>small_table</code> dataset (a very simple table) to start us off:</p>
-<div id="df8a0995" class="cell" data-execution_count="2">
+<div id="950e833f" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>small_table <span class="op">=</span> pb.load_dataset(dataset<span class="op">=</span><span class="st">"small_table"</span>, tbl_type<span class="op">=</span><span class="st">"polars"</span>)</span>
@@ -1128,6 +1135,9 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       </a>          
   </div>
   <div class="nav-page nav-page-next">
+      <a href="../user-guide/missing-vals-tbl.html" class="pagination-link" aria-label="Checking Missingness in a Table">
+        <span class="nav-page-text">Checking Missingness in a Table</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
   </div>
 </nav>
 </div> <!-- /content -->
