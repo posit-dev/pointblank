@@ -1,0 +1,1138 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.6.42">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Getting Column Summaries – Pointblank</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../user-guide/preview.html" rel="prev">
+<link href="../assets/fav-logo.png" rel="icon" type="image/png">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-2f5df379a58b258e96c21c0638c20c03.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-7a20cca8b90711b4aa27f23ac0648a9c.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": true,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-XSFKYZM9GW"></script>
+
+<script type="text/javascript">
+
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+
+<link rel="stylesheet" href="../styles.css">
+<link rel="stylesheet" href="reference/_styles-quartodoc.css">
+</head>
+
+<body class="nav-sidebar floating nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">Pointblank</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link active" href="../user-guide/index.html" aria-current="page"> 
+<span class="menu-text">User Guide</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../demos/index.html"> 
+<span class="menu-text">Examples</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../reference/index.html"> 
+<span class="menu-text">API Reference</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://discord.com/invite/YH7CybCNCQ"> <i class="bi bi-discord" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/posit-dev/pointblank"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../user-guide/preview.html">Data Inspection</a></li><li class="breadcrumb-item"><a href="../user-guide/col-summary-tbl.html">Getting Column Summaries</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Getting Started</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../user-guide/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Introduction</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../user-guide/thresholds.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Setting Failure Thresholds</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../user-guide/actions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Triggering Actions</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Defining Validation Steps</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../user-guide/types.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Validation Types</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../user-guide/columns.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Applying Rules Across Columns</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../user-guide/across.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Comparing Values Across Columns</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../user-guide/preprocessing.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Transforming the Target Table</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Post Interrogation</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../user-guide/extracts.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Data Extracts</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../user-guide/sundering.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Sundering Data</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
+ <span class="menu-text">Data Inspection</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../user-guide/preview.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Previewing Data</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../user-guide/col-summary-tbl.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Getting Column Summaries</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#trying-out-col_summary_tbl" id="toc-trying-out-col_summary_tbl" class="nav-link active" data-scroll-target="#trying-out-col_summary_tbl">Trying out <code>col_summary_tbl()</code></a></li>
+  <li><a href="#data-categories-in-the-column-summary-table" id="toc-data-categories-in-the-column-summary-table" class="nav-link" data-scroll-target="#data-categories-in-the-column-summary-table">Data Categories in the Column Summary Table</a></li>
+  <li><a href="#numeric-data" id="toc-numeric-data" class="nav-link" data-scroll-target="#numeric-data">Numeric Data</a></li>
+  <li><a href="#string-data" id="toc-string-data" class="nav-link" data-scroll-target="#string-data">String Data</a></li>
+  <li><a href="#datedatetime-data-and-boolean-data" id="toc-datedatetime-data-and-boolean-data" class="nav-link" data-scroll-target="#datedatetime-data-and-boolean-data">Date/Datetime Data and Boolean Data</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../user-guide/preview.html">Data Inspection</a></li><li class="breadcrumb-item"><a href="../user-guide/col-summary-tbl.html">Getting Column Summaries</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">Getting Column Summaries</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>While previewing a table with <a href="https://posit-dev.github.io/pointblank/reference/preview.html"><code>preview()</code></a> is undoubtedly a good thing to do, sometimes you need more. This is where summarizing a table comes in. When you view a summary of a table, the column-by-column info can quickly increase your understanding of a dataset. Plus, it allows you to quickly catch anomalies in your data (e.g., the maximum value of a column could be far outside the realm of possibility).</p>
+<p>Pointblank provides a function to make it extremely easy to view column-level summaries in a single table. That function is called <a href="https://posit-dev.github.io/pointblank/reference/col_summary_tbl.html"><code>col_summary_tbl()</code></a> and, just like <a href="https://posit-dev.github.io/pointblank/reference/preview.html"><code>preview()</code></a> does, it supports the use of any table that Pointblank can use for validation. And no matter what the input data is, the resultant reporting table is consistent in its design and construction.</p>
+<section id="trying-out-col_summary_tbl" class="level2">
+<h2 class="anchored" data-anchor-id="trying-out-col_summary_tbl">Trying out <code>col_summary_tbl()</code></h2>
+<p>The function only requires a table. Let’s use the <code>small_table</code> dataset (a very simple table) to start us off:</p>
+<div id="4b237b78" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>small_table <span class="op">=</span> pb.load_dataset(dataset<span class="op">=</span><span class="st">"small_table"</span>, tbl_type<span class="op">=</span><span class="st">"polars"</span>)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>pb.col_summary_tbl(small_table)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="2">
+<div id="col_summary" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap');
+#col_summary table {
+          font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+        }
+
+#col_summary thead, tbody, tfoot, tr, td, th { border-style: none; }
+ tr { background-color: transparent; }
+#col_summary p { margin: 0; padding: 0; }
+ #col_summary .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 16px; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: auto; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
+ #col_summary .gt_caption { padding-top: 4px; padding-bottom: 4px; }
+ #col_summary .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
+ #col_summary .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
+ #col_summary .gt_heading { background-color: #FFFFFF; text-align: left; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #col_summary .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #col_summary .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #col_summary .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
+ #col_summary .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
+ #col_summary .gt_column_spanner_outer:first-child { padding-left: 0; }
+ #col_summary .gt_column_spanner_outer:last-child { padding-right: 0; }
+ #col_summary .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
+ #col_summary .gt_spanner_row { border-bottom-style: hidden; }
+ #col_summary .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
+ #col_summary .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
+ #col_summary .gt_from_md> :first-child { margin-top: 0; }
+ #col_summary .gt_from_md> :last-child { margin-bottom: 0; }
+ #col_summary .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
+ #col_summary .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
+ #col_summary .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
+ #col_summary .gt_row_group_first td { border-top-width: 2px; }
+ #col_summary .gt_row_group_first th { border-top-width: 2px; }
+ #col_summary .gt_striped { background-color: rgba(128,128,128,0.05); }
+ #col_summary .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #col_summary .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #col_summary .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #col_summary .gt_left { text-align: left; }
+ #col_summary .gt_center { text-align: center; }
+ #col_summary .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
+ #col_summary .gt_font_normal { font-weight: normal; }
+ #col_summary .gt_font_bold { font-weight: bold; }
+ #col_summary .gt_font_italic { font-style: italic; }
+ #col_summary .gt_super { font-size: 65%; }
+ #col_summary .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
+ #col_summary .gt_asterisk { font-size: 100%; vertical-align: 0; }
+ 
+</style>
+<table style="table-layout: fixed;; width: 0px" class="gt_table" data-quarto-disable-processing="true" data-quarto-bootstrap="false">
+<colgroup>
+  <col style="width:40px;">
+  <col style="width:35px;">
+  <col style="width:200px;">
+  <col style="width:50px;">
+  <col style="width:50px;">
+  <col style="width:50px;">
+  <col style="width:50px;">
+  <col style="width:50px;">
+  <col style="width:50px;">
+  <col style="width:50px;">
+  <col style="width:50px;">
+  <col style="width:50px;">
+  <col style="width:50px;">
+  <col style="width:50px;">
+  <col style="width:50px;">
+</colgroup>
+
+<thead>
+
+  <tr class="gt_heading">
+    <td colspan="15" class="gt_heading gt_title gt_font_normal"><div><div style="padding-top: 0; padding-bottom: 7px;"><span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 10px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 10px 2px 10px; font-size: 10px;">Polars</span><span style="background-color: #eecbff; color: #333333; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 5px; font-weight: bold; border: solid 1px #eecbff; padding: 2px 15px 2px 15px; font-size: 10px;">Rows</span><span style="background-color: none; color: #333333; padding: 0.5em 0.5em; position: inherit; margin: 5px 0px 5px -4px; font-weight: bold; border: solid 1px #eecbff; padding: 2px 15px 2px 15px; font-size: 10px;">13</span><span style="background-color: #BDE7B4; color: #333333; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 3px; font-weight: bold; border: solid 1px #BDE7B4; padding: 2px 15px 2px 15px; font-size: 10px;">Columns</span><span style="background-color: none; color: #333333; padding: 0.5em 0.5em; position: inherit; margin: 5px 0px 5px -4px; font-weight: bold; border: solid 1px #BDE7B4; padding: 2px 15px 2px 15px; font-size: 10px;">8</span></div></div></td>
+  </tr>
+<tr class="gt_col_headings">
+  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="col_summary-column_number"></th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="col_summary-icon"></th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="col_summary-column_name">Column</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="text-align: center;" scope="col" id="col_summary-missing_vals">NA</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="text-align: center;" scope="col" id="col_summary-unique_vals">UQ</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="text-align: center;" scope="col" id="col_summary-mean">Mean</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="text-align: center;" scope="col" id="col_summary-std_dev">SD</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="text-align: center;" scope="col" id="col_summary-min">Min</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="text-align: center;" scope="col" id="col_summary-p05">P<span style="font-size: 0.75em; vertical-align: sub; position: relative; line-height: 0.5em;">5</span></th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="text-align: center;" scope="col" id="col_summary-q_1">Q<span style="font-size: 0.75em; vertical-align: sub; position: relative; line-height: 0.5em;">1</span></th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="text-align: center;" scope="col" id="col_summary-med">Med</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="text-align: center;" scope="col" id="col_summary-q_3">Q<span style="font-size: 0.75em; vertical-align: sub; position: relative; line-height: 0.5em;">3</span></th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="text-align: center;" scope="col" id="col_summary-p95">P<span style="font-size: 0.75em; vertical-align: sub; position: relative; line-height: 0.5em;">95</span></th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="text-align: center;" scope="col" id="col_summary-max">Max</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="text-align: center;" scope="col" id="col_summary-iqr">IQR</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+  <tr>
+    <td style="font-family: IBM Plex Mono; font-size: 14px;" class="gt_row gt_right">1</td>
+    <td style="font-family: IBM Plex Mono;" class="gt_row gt_left"><svg width="24px" viewbox="0 0 180 181" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF; display: block; vertical-align: middle; margin: auto; padding-top: 0.5px;">
+    <title>date</title>
+    <g id="icon" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="date" transform="translate(4.000000, 4.339342)">
+            <rect id="square" stroke="#007D00" stroke-width="4" fill="#2CCF00" x="2" y="2" width="168" height="168" rx="8"></rect>
+            <g id="D" transform="translate(49.664000, 39.864000)" fill="#FFFFFF" fill-rule="nonzero">
+                <path d="M0,0 L34.716,0 C40.788,0 46.332,0.968 51.348,2.904 C56.364,4.84 60.632,7.722 64.152,11.55 C67.672,15.378 70.4,20.174 72.336,25.938 C74.272,31.702 75.24,38.412 75.24,46.068 C75.24,53.724 74.272,60.434 72.336,66.198 C70.4,71.962 67.672,76.758 64.152,80.586 C60.632,84.414 56.364,87.296 51.348,89.232 C46.332,91.168 40.788,92.136 34.716,92.136 L0,92.136 L0,0 Z M34.716,74.316 C40.7,74.316 45.408,72.644 48.84,69.3 C52.272,65.956 53.988,60.588 53.988,53.196 L53.988,38.94 C53.988,31.548 52.272,26.18 48.84,22.836 C45.408,19.492 40.7,17.82 34.716,17.82 L20.064,17.82 L20.064,74.316 L34.716,74.316 Z"></path>
+            </g>
+        </g>
+    </g>
+</svg></td>
+    <td style="font-family: IBM Plex Mono; font-size: 12px;" class="gt_row gt_left"><div style="font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">date_time</div><div style="font-size: 7.5px; color: gray; margin-top: 3px; margin-bottom: 2px;">Datetime(time_unit='us', time_zone=None)</div></td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px solid #D3D3D3; background-color: #FCFCFC;" class="gt_row gt_right">0<br> 0.00</td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; background-color: #FCFCFC;" class="gt_row gt_right">12<br> 0.92</td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px solid #D3D3D3;" class="gt_row gt_right">—</td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">—</td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; white-space: pre; overflow-x: visible; border-left: 1px solid #D3D3D3;" class="gt_row gt_right"><span style="text-align: left; white-space: nowrap; overflow-x: visible;">&nbsp;2016-01-04 00:32:00 – 2016-01-30 11:23:00</span></td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5; border-left: 1px none #000000;" class="gt_row gt_right"></td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5; border-left: 1px none #000000;" class="gt_row gt_right"></td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5; border-left: 1px none #000000;" class="gt_row gt_right"></td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5; border-left: 1px none #000000;" class="gt_row gt_right"></td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5; border-left: 1px none #000000;" class="gt_row gt_right"></td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5; border-left: 1px none #000000;" class="gt_row gt_right"></td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px solid #D3D3D3; background-color: #FCFCFC;" class="gt_row gt_right">—</td>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono; font-size: 14px;" class="gt_row gt_right">2</td>
+    <td style="font-family: IBM Plex Mono;" class="gt_row gt_left"><svg width="24px" viewbox="0 0 180 181" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF; display: block; vertical-align: middle; margin: auto; padding-top: 0.5px;">
+    <title>date</title>
+    <g id="icon" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="date" transform="translate(4.000000, 4.339342)">
+            <rect id="square" stroke="#007D00" stroke-width="4" fill="#2CCF00" x="2" y="2" width="168" height="168" rx="8"></rect>
+            <g id="D" transform="translate(49.664000, 39.864000)" fill="#FFFFFF" fill-rule="nonzero">
+                <path d="M0,0 L34.716,0 C40.788,0 46.332,0.968 51.348,2.904 C56.364,4.84 60.632,7.722 64.152,11.55 C67.672,15.378 70.4,20.174 72.336,25.938 C74.272,31.702 75.24,38.412 75.24,46.068 C75.24,53.724 74.272,60.434 72.336,66.198 C70.4,71.962 67.672,76.758 64.152,80.586 C60.632,84.414 56.364,87.296 51.348,89.232 C46.332,91.168 40.788,92.136 34.716,92.136 L0,92.136 L0,0 Z M34.716,74.316 C40.7,74.316 45.408,72.644 48.84,69.3 C52.272,65.956 53.988,60.588 53.988,53.196 L53.988,38.94 C53.988,31.548 52.272,26.18 48.84,22.836 C45.408,19.492 40.7,17.82 34.716,17.82 L20.064,17.82 L20.064,74.316 L34.716,74.316 Z"></path>
+            </g>
+        </g>
+    </g>
+</svg></td>
+    <td style="font-family: IBM Plex Mono; font-size: 12px;" class="gt_row gt_left"><div style="font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">date</div><div style="font-size: 11px; color: gray;">Date</div></td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px solid #D3D3D3; background-color: #FCFCFC;" class="gt_row gt_right">0<br> 0.00</td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; background-color: #FCFCFC;" class="gt_row gt_right">11<br> 0.85</td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px solid #D3D3D3;" class="gt_row gt_right">—</td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">—</td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; white-space: pre; overflow-x: visible; border-left: 1px solid #D3D3D3;" class="gt_row gt_right"><span style="text-align: left; white-space: nowrap; overflow-x: visible;">&nbsp;2016-01-04 – 2016-01-30</span></td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5; border-left: 1px none #000000;" class="gt_row gt_right"></td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5; border-left: 1px none #000000;" class="gt_row gt_right"></td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5; border-left: 1px none #000000;" class="gt_row gt_right"></td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5; border-left: 1px none #000000;" class="gt_row gt_right"></td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5; border-left: 1px none #000000;" class="gt_row gt_right"></td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5; border-left: 1px none #000000;" class="gt_row gt_right"></td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px solid #D3D3D3; background-color: #FCFCFC;" class="gt_row gt_right">—</td>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono; font-size: 14px;" class="gt_row gt_right">3</td>
+    <td style="font-family: IBM Plex Mono;" class="gt_row gt_left"><svg width="24px" viewbox="0 0 180 181" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF; display: block; vertical-align: middle; margin: auto; padding-top: 0.5px;">
+    <title>numeric</title>
+    <g id="icon" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="numeric" transform="translate(4.000000, 4.339342)">
+            <rect id="square" stroke="#640177" stroke-width="4" fill="#A400CF" x="2" y="2" width="168" height="168" rx="8"></rect>
+            <g id="N" transform="translate(49.664000, 39.864000)" fill="#FFFFFF" fill-rule="nonzero">
+                <polygon points="28.116 48.576 19.272 30.096 18.876 30.096 18.876 92.136 0 92.136 0 0 21.912 0 47.124 43.56 55.968 62.04 56.364 62.04 56.364 0 75.24 0 75.24 92.136 53.328 92.136"></polygon>
+            </g>
+        </g>
+    </g>
+</svg></td>
+    <td style="font-family: IBM Plex Mono; font-size: 12px;" class="gt_row gt_left"><div style="font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">a</div><div style="font-size: 11px; color: gray;">Int64</div></td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px solid #D3D3D3; background-color: #FCFCFC;" class="gt_row gt_right">0<br> 0.00</td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; background-color: #FCFCFC;" class="gt_row gt_right">7<br> 0.54</td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px solid #D3D3D3;" class="gt_row gt_right">3.77</td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">2.09</td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; white-space: pre; overflow-x: visible; border-left: 1px solid #D3D3D3;" class="gt_row gt_right">1.00</td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">1.60</td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">2.00</td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">3.00</td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">4.00</td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">7.40</td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">8.00</td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px solid #D3D3D3; background-color: #FCFCFC;" class="gt_row gt_right">2.00</td>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono; font-size: 14px;" class="gt_row gt_right">4</td>
+    <td style="font-family: IBM Plex Mono;" class="gt_row gt_left"><svg width="24px" viewbox="0 0 180 181" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF; display: block; vertical-align: middle; margin: auto; padding-top: 0.5px;">
+    <title>string</title>
+    <g id="icon" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="string" transform="translate(4.000000, 4.500000)">
+            <rect id="square" stroke="#9A8700" stroke-width="4" fill="#CFB600" x="2" y="2" width="168" height="168" rx="8"></rect>
+            <g id="S" transform="translate(49.516000, 38.280000)" fill="#FFFFFF" fill-rule="nonzero">
+                <path d="M34.98,95.304 C26.884,95.304 20.02,93.918 14.388,91.146 C8.756,88.374 3.96,84.788 0,80.388 L13.2,67.056 C19.448,74.096 27.148,77.616 36.3,77.616 C41.228,77.616 44.88,76.604 47.256,74.58 C49.632,72.556 50.82,69.872 50.82,66.528 C50.82,63.976 50.116,61.842 48.708,60.126 C47.3,58.41 44.44,57.244 40.128,56.628 L31.02,55.44 C21.252,54.208 14.102,51.26 9.57,46.596 C5.038,41.932 2.772,35.728 2.772,27.984 C2.772,23.848 3.564,20.064 5.148,16.632 C6.732,13.2 8.998,10.252 11.946,7.788 C14.894,5.324 18.502,3.41 22.77,2.046 C27.038,0.682 31.9,0 37.356,0 C44.308,0 50.424,1.1 55.704,3.3 C60.984,5.5 65.516,8.712 69.3,12.936 L55.968,26.4 C53.768,23.848 51.106,21.758 47.982,20.13 C44.858,18.502 40.92,17.688 36.168,17.688 C31.68,17.688 28.336,18.48 26.136,20.064 C23.936,21.648 22.836,23.848 22.836,26.664 C22.836,29.832 23.694,32.12 25.41,33.528 C27.126,34.936 29.92,35.948 33.792,36.564 L42.9,38.016 C52.404,39.512 59.444,42.438 64.02,46.794 C68.596,51.15 70.884,57.332 70.884,65.34 C70.884,69.74 70.092,73.788 68.508,77.484 C66.924,81.18 64.614,84.348 61.578,86.988 C58.542,89.628 54.78,91.674 50.292,93.126 C45.804,94.578 40.7,95.304 34.98,95.304 Z"></path>
+            </g>
+        </g>
+    </g>
+</svg></td>
+    <td style="font-family: IBM Plex Mono; font-size: 12px;" class="gt_row gt_left"><div style="font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">b</div><div style="font-size: 11px; color: gray;">String</div></td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px solid #D3D3D3; background-color: #FCFCFC;" class="gt_row gt_right">0<br> 0.00</td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; background-color: #FCFCFC;" class="gt_row gt_right">12<br> 0.92</td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px solid #D3D3D3;" class="gt_row gt_right"><div><div>9.00</div><div style="float: left; position: absolute;"><div title="string length measure" style="font-size: 7px; color: #999; font-style: italic; cursor: help;">SL</div></div></div></td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right"><div><div>0.00</div><div style="float: left; position: absolute;"><div title="string length measure" style="font-size: 7px; color: #999; font-style: italic; cursor: help;">SL</div></div></div></td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; white-space: pre; overflow-x: visible; border-left: 1px solid #D3D3D3;" class="gt_row gt_right"><div><div>9</div><div style="float: left; position: absolute;"><div title="string length measure" style="font-size: 7px; color: #999; font-style: italic; cursor: help;">SL</div></div></div></td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">—</td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">—</td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right"><div><div>9</div><div style="float: left; position: absolute;"><div title="string length measure" style="font-size: 7px; color: #999; font-style: italic; cursor: help;">SL</div></div></div></td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">—</td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">—</td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right"><div><div>9</div><div style="float: left; position: absolute;"><div title="string length measure" style="font-size: 7px; color: #999; font-style: italic; cursor: help;">SL</div></div></div></td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px solid #D3D3D3; background-color: #FCFCFC;" class="gt_row gt_right">—</td>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono; font-size: 14px;" class="gt_row gt_right">5</td>
+    <td style="font-family: IBM Plex Mono;" class="gt_row gt_left"><svg width="24px" viewbox="0 0 180 181" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF; display: block; vertical-align: middle; margin: auto; padding-top: 0.5px;">
+    <title>numeric</title>
+    <g id="icon" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="numeric" transform="translate(4.000000, 4.339342)">
+            <rect id="square" stroke="#640177" stroke-width="4" fill="#A400CF" x="2" y="2" width="168" height="168" rx="8"></rect>
+            <g id="N" transform="translate(49.664000, 39.864000)" fill="#FFFFFF" fill-rule="nonzero">
+                <polygon points="28.116 48.576 19.272 30.096 18.876 30.096 18.876 92.136 0 92.136 0 0 21.912 0 47.124 43.56 55.968 62.04 56.364 62.04 56.364 0 75.24 0 75.24 92.136 53.328 92.136"></polygon>
+            </g>
+        </g>
+    </g>
+</svg></td>
+    <td style="font-family: IBM Plex Mono; font-size: 12px;" class="gt_row gt_left"><div style="font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">c</div><div style="font-size: 11px; color: gray;">Int64</div></td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px solid #D3D3D3; background-color: #FCFCFC;" class="gt_row gt_right">2<br> 0.15</td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; background-color: #FCFCFC;" class="gt_row gt_right">6<br> 0.46</td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px solid #D3D3D3;" class="gt_row gt_right">5.73</td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">2.72</td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; white-space: pre; overflow-x: visible; border-left: 1px solid #D3D3D3;" class="gt_row gt_right">2.00</td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">2.50</td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">3.00</td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">7.00</td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">8.00</td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">9.00</td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">9.00</td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px solid #D3D3D3; background-color: #FCFCFC;" class="gt_row gt_right">5.00</td>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono; font-size: 14px;" class="gt_row gt_right">6</td>
+    <td style="font-family: IBM Plex Mono;" class="gt_row gt_left"><svg width="24px" viewbox="0 0 180 181" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF; display: block; vertical-align: middle; margin: auto; padding-top: 0.5px;">
+    <title>numeric</title>
+    <g id="icon" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="numeric" transform="translate(4.000000, 4.339342)">
+            <rect id="square" stroke="#640177" stroke-width="4" fill="#A400CF" x="2" y="2" width="168" height="168" rx="8"></rect>
+            <g id="N" transform="translate(49.664000, 39.864000)" fill="#FFFFFF" fill-rule="nonzero">
+                <polygon points="28.116 48.576 19.272 30.096 18.876 30.096 18.876 92.136 0 92.136 0 0 21.912 0 47.124 43.56 55.968 62.04 56.364 62.04 56.364 0 75.24 0 75.24 92.136 53.328 92.136"></polygon>
+            </g>
+        </g>
+    </g>
+</svg></td>
+    <td style="font-family: IBM Plex Mono; font-size: 12px;" class="gt_row gt_left"><div style="font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">d</div><div style="font-size: 11px; color: gray;">Float64</div></td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px solid #D3D3D3; background-color: #FCFCFC;" class="gt_row gt_right">0<br> 0.00</td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; background-color: #FCFCFC;" class="gt_row gt_right">12<br> 0.92</td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px solid #D3D3D3;" class="gt_row gt_right">2305</td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">2631</td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; white-space: pre; overflow-x: visible; border-left: 1px solid #D3D3D3;" class="gt_row gt_right">108</td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">214</td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">838</td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">1036</td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">3291</td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">6335</td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">10000</td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px solid #D3D3D3; background-color: #FCFCFC;" class="gt_row gt_right">2453</td>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono; font-size: 14px;" class="gt_row gt_right">7</td>
+    <td style="font-family: IBM Plex Mono;" class="gt_row gt_left"><svg width="24px" viewbox="0 0 180 181" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF; display: block; vertical-align: middle; margin: auto; padding-top: 0.5px;">
+    <title>boolean</title>
+    <g id="icon" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="boolean" transform="translate(4.000000, 4.339342)">
+            <rect id="square" stroke="#9C3E00" stroke-width="4" fill="#CF6100" x="2" y="2" width="168" height="168" rx="8"></rect>
+            <g id="T" transform="translate(32.322000, 29.972000)" fill="#FFFFFF" fill-rule="nonzero">
+                <polygon points="29.326 11.61 29.326 60.028 16.254 60.028 16.254 11.61 0 11.61 0 0 45.58 0 45.58 11.61"></polygon>
+            </g>
+            <g id="F" transform="translate(99.122000, 81.972000)" fill="#FFFFFF" fill-rule="nonzero">
+                <polygon points="0 60.028 0 0 39.818 0 39.818 11.61 13.072 11.61 13.072 23.908 35.862 23.908 35.862 35.432 13.072 35.432 13.072 60.028"></polygon>
+            </g>
+            <rect id="line" stroke="#FFFFFF" fill="#FFFFFF" transform="translate(82.022437, 84.377940) rotate(-315.000000) translate(-82.022437, -84.377940) " x="78.0224369" y="25.37794" width="8" height="118"></rect>
+        </g>
+    </g>
+</svg></td>
+    <td style="font-family: IBM Plex Mono; font-size: 12px;" class="gt_row gt_left"><div style="font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">e</div><div style="font-size: 11px; color: gray;">Boolean</div></td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px solid #D3D3D3; background-color: #FCFCFC;" class="gt_row gt_right">0<br> 0.00</td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; background-color: #FCFCFC;" class="gt_row gt_right"><span style="font-weight: bold;">T</span> 0.61<br><span style="font-weight: bold;">F</span> 0.39</td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px solid #D3D3D3;" class="gt_row gt_right">—</td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">—</td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; white-space: pre; overflow-x: visible; border-left: 1px solid #D3D3D3;" class="gt_row gt_right">—</td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">—</td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">—</td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">—</td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">—</td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">—</td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">—</td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px solid #D3D3D3; background-color: #FCFCFC;" class="gt_row gt_right">—</td>
+  </tr>
+  <tr>
+    <td style="font-family: IBM Plex Mono; font-size: 14px;" class="gt_row gt_right">8</td>
+    <td style="font-family: IBM Plex Mono;" class="gt_row gt_left"><svg width="24px" viewbox="0 0 180 181" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF; display: block; vertical-align: middle; margin: auto; padding-top: 0.5px;">
+    <title>string</title>
+    <g id="icon" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="string" transform="translate(4.000000, 4.500000)">
+            <rect id="square" stroke="#9A8700" stroke-width="4" fill="#CFB600" x="2" y="2" width="168" height="168" rx="8"></rect>
+            <g id="S" transform="translate(49.516000, 38.280000)" fill="#FFFFFF" fill-rule="nonzero">
+                <path d="M34.98,95.304 C26.884,95.304 20.02,93.918 14.388,91.146 C8.756,88.374 3.96,84.788 0,80.388 L13.2,67.056 C19.448,74.096 27.148,77.616 36.3,77.616 C41.228,77.616 44.88,76.604 47.256,74.58 C49.632,72.556 50.82,69.872 50.82,66.528 C50.82,63.976 50.116,61.842 48.708,60.126 C47.3,58.41 44.44,57.244 40.128,56.628 L31.02,55.44 C21.252,54.208 14.102,51.26 9.57,46.596 C5.038,41.932 2.772,35.728 2.772,27.984 C2.772,23.848 3.564,20.064 5.148,16.632 C6.732,13.2 8.998,10.252 11.946,7.788 C14.894,5.324 18.502,3.41 22.77,2.046 C27.038,0.682 31.9,0 37.356,0 C44.308,0 50.424,1.1 55.704,3.3 C60.984,5.5 65.516,8.712 69.3,12.936 L55.968,26.4 C53.768,23.848 51.106,21.758 47.982,20.13 C44.858,18.502 40.92,17.688 36.168,17.688 C31.68,17.688 28.336,18.48 26.136,20.064 C23.936,21.648 22.836,23.848 22.836,26.664 C22.836,29.832 23.694,32.12 25.41,33.528 C27.126,34.936 29.92,35.948 33.792,36.564 L42.9,38.016 C52.404,39.512 59.444,42.438 64.02,46.794 C68.596,51.15 70.884,57.332 70.884,65.34 C70.884,69.74 70.092,73.788 68.508,77.484 C66.924,81.18 64.614,84.348 61.578,86.988 C58.542,89.628 54.78,91.674 50.292,93.126 C45.804,94.578 40.7,95.304 34.98,95.304 Z"></path>
+            </g>
+        </g>
+    </g>
+</svg></td>
+    <td style="font-family: IBM Plex Mono; font-size: 12px;" class="gt_row gt_left"><div style="font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">f</div><div style="font-size: 11px; color: gray;">String</div></td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px solid #D3D3D3; background-color: #FCFCFC;" class="gt_row gt_right">0<br> 0.00</td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; background-color: #FCFCFC;" class="gt_row gt_right">3<br> 0.23</td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px solid #D3D3D3;" class="gt_row gt_right"><div><div>3.46</div><div style="float: left; position: absolute;"><div title="string length measure" style="font-size: 7px; color: #999; font-style: italic; cursor: help;">SL</div></div></div></td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right"><div><div>0.52</div><div style="float: left; position: absolute;"><div title="string length measure" style="font-size: 7px; color: #999; font-style: italic; cursor: help;">SL</div></div></div></td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; white-space: pre; overflow-x: visible; border-left: 1px solid #D3D3D3;" class="gt_row gt_right"><div><div>3</div><div style="float: left; position: absolute;"><div title="string length measure" style="font-size: 7px; color: #999; font-style: italic; cursor: help;">SL</div></div></div></td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">—</td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">—</td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right"><div><div>3</div><div style="float: left; position: absolute;"><div title="string length measure" style="font-size: 7px; color: #999; font-style: italic; cursor: help;">SL</div></div></div></td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">—</td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">—</td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right"><div><div>4</div><div style="float: left; position: absolute;"><div title="string length measure" style="font-size: 7px; color: #999; font-style: italic; cursor: help;">SL</div></div></div></td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px solid #D3D3D3; background-color: #FCFCFC;" class="gt_row gt_right">—</td>
+  </tr>
+</tbody>
+
+
+</table>
+
+</div>
+        
+</div>
+</div>
+<p>The header provides the type of table we’re looking at (<code>POLARS</code>, since this is a Pandas DataFrame) and the table dimensions. The rest of the table focuses on the column-level summaries. As such, each row represents a summary of a column in the <code>small_table</code> dataset. There’s a lot of information in this summary table to digest. Some of it is intuitive since this sort of table summarization isn’t all that uncommon, but other aspects of it could also give some pause. So we’ll carefully wade through how to interpret this report.</p>
+</section>
+<section id="data-categories-in-the-column-summary-table" class="level2">
+<h2 class="anchored" data-anchor-id="data-categories-in-the-column-summary-table">Data Categories in the Column Summary Table</h2>
+<p>On the left side of the table are icons of different colors. These represent categories that the columns fall into. There are only five categories and columns can only be of one type. The mapping from letter marks to categories are:</p>
+<ul>
+<li><code>N</code>: numeric</li>
+<li><code>S</code>: string-based</li>
+<li><code>D</code>: date/datetime</li>
+<li><code>T/F</code>: boolean</li>
+<li><code>O</code>: object</li>
+</ul>
+<p>The numeric category (<code>N</code>) takes data types such as floats and integers. The <code>S</code> category is for string-based columns. Date or datetime values are lumped into the <code>D</code> category. Boolean columns (<code>T/F</code>) have their own category and are <em>not</em> considered numeric (e.g., <code>0</code>/<code>1</code>). The <code>O</code> category is a catchall for all other types of columns. Given the disparity of these categories and that we want them in the same table, some statistical measures will be sensible for certain column categories but not for others. Given that, we’ll explain how each category is represented in the column summary table.</p>
+</section>
+<section id="numeric-data" class="level2">
+<h2 class="anchored" data-anchor-id="numeric-data">Numeric Data</h2>
+<p>Three columns in <code>small_table</code> are numeric: <code>a</code> (<code>Int64</code>), <code>c</code> (<code>Int64</code>), and <code>d</code> (<code>Float64</code>). The common measures of the missing count/proportion (<code>NA</code>) and the unique value count/proportion (<code>UQ</code>) are provided for the numeric data type. For these two measures, the top number is the absolute count of missing values and the count of unique values. The bottom number is a proportion of the absolute count divided by the row count; this makes each proportion a value between <code>0</code> and <code>1</code> (bounds included).</p>
+<p>The next two columns represent the mean (<code>Mean</code>) and the standard deviation (<code>SD</code>). The minumum (<code>Min</code>), maximum, (<code>Max</code>) and a set of quantiles occupy the next few columns (includes <code>P5</code>, <code>Q1</code>, <code>Med</code> for median, <code>Q3</code>, and <code>P95</code>). Finally, the interquartile range (<code>IQR</code>: <code>Q3</code> - <code>Q1</code>) is the last measure provided.</p>
+</section>
+<section id="string-data" class="level2">
+<h2 class="anchored" data-anchor-id="string-data">String Data</h2>
+<p>String data is present in <code>small_table</code>, being in columns <code>b</code> and <code>f</code>. The missing value (<code>NA</code>) and uniqueness (<code>UQ</code>) measures are accounted for here. The statistical measures are all based on string lengths, so what happens is that all strings in a column are converted to those numeric values and a subset of stats values is presented. To avoid some understandable confusion when reading the table, the stats values in each of the cells with values are annotated with the text <code>"SL"</code>. It makes less sense to provide a full suite a quantile values so only the minimum (<code>Min</code>), median (<code>Med</code>), and maximum (<code>Max</code>) are provided.</p>
+</section>
+<section id="datedatetime-data-and-boolean-data" class="level2">
+<h2 class="anchored" data-anchor-id="datedatetime-data-and-boolean-data">Date/Datetime Data and Boolean Data</h2>
+<p>We see that in the first two rows of our summary table that we have summaries of the <code>date_time</code> and <code>date</code> columns. The summaries we provide for a date/datetime category (notice the green <code>D</code> to the left of the column names) are:</p>
+<ol type="1">
+<li>the missing count/proportion (<code>NA</code>)</li>
+<li>the unique value count/proportion (<code>UQ</code>)</li>
+<li>the minimum and maximum dates/datetimes</li>
+</ol>
+<p>One column, <code>e</code>, is of the <code>Boolean</code> type. Because columns of this type could only have <code>True</code>, <code>False</code>, or missing values, we provide summary data for missingness (under <code>NA</code>) and proportions of <code>True</code> and <code>False</code> values (under <code>UQ</code>).</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/posit-dev\.github\.io\/pointblank\/");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../user-guide/preview.html" class="pagination-link" aria-label="Previewing Data">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Previewing Data</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
