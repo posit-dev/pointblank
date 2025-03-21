@@ -341,7 +341,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <p>The previous section demonstrated the use of the many validation methods. In all of the examples where column values were compared against another value, that value was always one that was fixed. These sorts of comparisons (e.g., are values in column <code>x</code> greater than or equal to zero?) are useful but sometimes you need more.</p>
 <p>For a more dynamic type of comparison check, you can also compare a column’s values against those of another column. The name of the comparison column is provided as the <code>value=</code> parameter (or <code>left=</code> and <code>right=</code> as needed in the <a href="https://posit-dev.github.io/pointblank/reference/Validate.col_vals_between.html"><code>col_vals_between()</code></a> and <a href="https://posit-dev.github.io/pointblank/reference/Validate.col_vals_outside.html"><code>col_vals_outside()</code></a> validation methods).</p>
 <p>Let’s see how this type of validation is made possible through a few examples using the <code>small_table</code> dataset shown below:</p>
-<div id="f9665e20" class="cell" data-execution_count="2">
+<div id="107f9b8c" class="cell" data-execution_count="2">
 <div class="cell-output cell-output-display" data-execution_count="2">
 <div id="pb_preview_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>
@@ -587,7 +587,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>.col_vals_gt(columns<span class="op">=</span><span class="st">"a"</span>, value<span class="op">=</span>pb.col(<span class="st">"x"</span>), ...)</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>...</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Using the <a href="https://posit-dev.github.io/pointblank/reference/col.html"><code>col()</code></a> helper function here in <code>value=</code> is key. It lets Pointblank know that you’re not using a literal, fixed value for the comparison (you’re specifying a column). So long as you do this, the validation will involve checking that every value <code>a</code> is greater than every adjacent value in <code>x</code>. Here’s an example of this:</p>
-<div id="473f27a8" class="cell" data-execution_count="3">
+<div id="7d2d49be" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>(</span>
@@ -734,7 +734,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <p>Notice that in the <code>COLUMNS</code> and <code>VALUES</code> columns of the validation report, the two column names are shown: <code>d</code> and <code>c</code>. A thing that could be surprising is that there are two failing test units, even though values in <code>d</code> are consistently larger than values in column <code>c</code>. The reason is that there are missing values (i.e., <code>None</code> values) in column <code>c</code> and any missing value in a comparison check will result in a failing test unit.</p>
 <p>When doing a comparison against a fixed value, we only had to worry about missing values in the target column. When comparing across columns, there is potential for missing values in both columns and that could result in correspondingly more failing test units. The corrective here is to use <code>na_pass=True</code>. If you feel missing values (in either column) should be disregarded, this setting is a reasonable choice (and you could always use <a href="https://posit-dev.github.io/pointblank/reference/Validate.col_vals_not_null.html"><code>col_vals_not_null()</code></a> to perform missing value checks on these columns anyway).</p>
 <p>Let’s take a quick look at the results when <code>na_pass=True</code> is used:</p>
-<div id="81420621" class="cell" data-execution_count="4">
+<div id="a8e1fdc5" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>(</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>pb.load_dataset(<span class="st">"small_table"</span>))</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_gt(columns<span class="op">=</span><span class="st">"d"</span>, value<span class="op">=</span>pb.col(<span class="st">"c"</span>), na_pass<span class="op">=</span><span class="va">True</span>)</span>
@@ -895,7 +895,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <li><a href="https://posit-dev.github.io/pointblank/reference/Validate.col_vals_outside.html"><code>col_vals_outside()</code></a></li>
 </ul>
 <p>These validation methods both have <code>left=</code> and <code>right=</code> arguments. You can use a mix of literal values and <a href="https://posit-dev.github.io/pointblank/reference/col.html"><code>col()</code></a>-based expressions for these parameters. Here’s an example where we check values in <code>d</code> to be in the range of lower-bound values in column <code>c</code> and a fixed upper-bound value of <code>10000</code>:</p>
-<div id="45a53058" class="cell" data-execution_count="5">
+<div id="9cf849bf" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>(</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>pb.load_dataset(<span class="st">"small_table"</span>))</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_between(columns<span class="op">=</span><span class="st">"d"</span>, left<span class="op">=</span>pb.col(<span class="st">"c"</span>), right<span class="op">=</span><span class="dv">10_000</span>, na_pass<span class="op">=</span><span class="va">True</span>)</span>
