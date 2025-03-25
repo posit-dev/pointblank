@@ -146,6 +146,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
   <li><a href="#column-selection" id="toc-column-selection" class="nav-link" data-scroll-target="#column-selection">Column Selection</a></li>
   <li><a href="#interrogation-and-reporting" id="toc-interrogation-and-reporting" class="nav-link" data-scroll-target="#interrogation-and-reporting">Interrogation and Reporting</a></li>
   <li><a href="#inspection-and-assistance" id="toc-inspection-and-assistance" class="nav-link" data-scroll-target="#inspection-and-assistance">Inspection and Assistance</a></li>
+  <li><a href="#utility-functions" id="toc-utility-functions" class="nav-link" data-scroll-target="#utility-functions">Utility Functions</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -384,7 +385,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </section>
 <section id="inspection-and-assistance" class="level2">
 <h2 class="anchored" data-anchor-id="inspection-and-assistance">Inspection and Assistance</h2>
-<p>The <em>Inspection and Assistance</em> group contains functions that are helpful for getting to grips on a new data table. Use the <code>DataScan</code> class to get a quick overview of the data, <code>preview()</code> to see the first and last few rows of a table, <code>col_summary_tbl()</code> for a column-level summary of a table, <code>missing_vals_tbl()</code> to see where there are missing values in a table, and <code>get_column_count()</code>/<code>get_row_count()</code> to get the number of columns and rows in a table. Several datasets included in the package can be accessed via the <code>load_dataset()</code> function. Finally, the <code>config()</code> utility lets us set global configuration parameters. Want to chat with an assistant? Use the <code>assistant()</code> function to get help with Pointblank.</p>
+<p>The <em>Inspection and Assistance</em> group contains functions that are helpful for getting to grips on a new data table. Use the <code>DataScan</code> class to get a quick overview of the data, <code>preview()</code> to see the first and last few rows of a table, <code>col_summary_tbl()</code> for a column-level summary of a table, and <code>missing_vals_tbl()</code> to see where there are missing values in a table. Several datasets included in the package can be accessed via the <code>load_dataset()</code> function. On the assistance side, the <code>assistant()</code> function can be used to get help with Pointblank.</p>
 <table class="caption-top table">
 <tbody>
 <tr class="odd">
@@ -404,6 +405,22 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <td>Display a table that shows the missing values in the input table.</td>
 </tr>
 <tr class="odd">
+<td><a href="../reference/assistant.html#pointblank.assistant">assistant</a></td>
+<td>Chat with the PbA (Pointblank Assistant) about your data validation needs.</td>
+</tr>
+<tr class="even">
+<td><a href="../reference/load_dataset.html#pointblank.load_dataset">load_dataset</a></td>
+<td>Load a dataset hosted in the library as specified table type.</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="utility-functions" class="level2">
+<h2 class="anchored" data-anchor-id="utility-functions">Utility Functions</h2>
+<p>The <em>Utility Functions</em> group contains functions that are useful accessing metadata about the target data. Use <code>get_column_count()</code> or <code>get_row_count()</code> to get the number of columns or rows in a table. The <code>get_action_metadata()</code> function is useful when building custom actions since it returns metadata about the validation step that’s triggering the action. Lastly, the <code>config()</code> utility lets us set global configuration parameters.</p>
+<table class="caption-top table">
+<tbody>
+<tr class="odd">
 <td><a href="../reference/get_column_count.html#pointblank.get_column_count">get_column_count</a></td>
 <td>Get the number of columns in a table.</td>
 </tr>
@@ -412,16 +429,12 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <td>Get the number of rows in a table.</td>
 </tr>
 <tr class="odd">
-<td><a href="../reference/load_dataset.html#pointblank.load_dataset">load_dataset</a></td>
-<td>Load a dataset hosted in the library as specified table type.</td>
+<td><a href="../reference/get_action_metadata.html#pointblank.get_action_metadata">get_action_metadata</a></td>
+<td>Access step-level metadata when authoring custom actions.</td>
 </tr>
 <tr class="even">
 <td><a href="../reference/config.html#pointblank.config">config</a></td>
 <td>Configuration settings for the pointblank library.</td>
-</tr>
-<tr class="odd">
-<td><a href="../reference/assistant.html#pointblank.assistant">assistant</a></td>
-<td>Chat with the PbA (Pointblank Assistant) about your data validation needs.</td>
 </tr>
 </tbody>
 </table>
