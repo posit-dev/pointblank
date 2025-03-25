@@ -8361,3 +8361,7 @@ def test_assert_passing_example() -> None:
     )
 
     passing_validation.assert_passing()
+
+
+if __name__ == "__main__":
+    test_missing_vals_tbl_no_polars()

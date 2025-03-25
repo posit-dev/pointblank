@@ -12,6 +12,8 @@ from narwhals.typing import FrameT
 from pointblank._constants import ASSERTION_TYPE_METHOD_MAP, GENERAL_COLUMN_TYPES
 
 if TYPE_CHECKING:
+    from collections.abc import Mapping
+
     from pointblank._typing import AbsoluteBounds, Tolerance
 
 
@@ -750,3 +752,14 @@ def _format_to_float_value(
     formatted_vals = _get_column_of_values(gt, column_name="x", context="html")
 
     return formatted_vals[0]
+
+
+def _pivot_to_dict(col_dict: Mapping[str, Any]):  # TODO : Type hint and unit test
+    result_dict = {}
+    for col, sub_dict in col_dict.items():
+        for key, value in sub_dict.items():
+            # add columns fields not present
+            if key not in result_dict:
+                result_dict[key] = [None] * len(col_dict)
+            result_dict[key][list(col_dict.keys()).index(col)] = value
+    return result_dict
