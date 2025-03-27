@@ -257,7 +257,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="examples" class="level2 doc-section doc-section-examples">
 <h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Let’s use a built-in dataset (<code>"game_revenue"</code>) to demonstrate some of the options of the interrogation process. A series of validation steps will populate our validation plan. After setting up the plan, the next step is to interrogate the table and see how well it aligns with our expectations. We’ll use the <code>get_first_n=</code> option so that any extracts of failing rows are limited to the first <code>n</code> rows.</p>
-<div id="6da4eda0" class="cell" data-execution_count="1">
+<div id="dc94151e" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -346,7 +346,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     <td colspan="14" class="gt_heading gt_title gt_font_normal" style="color: #444444;font-size: 28px;text-align: left;font-weight: bold;">Pointblank Validation</td>
   </tr>
   <tr class="gt_heading">
-    <td colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border"><div><span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2025-03-27|17:30:53</span><div style="padding-top: 10px; padding-bottom: 5px;"><span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 10px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 10px 2px 10px; font-size: 10px;">Polars</span></div></div></td>
+    <td colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border"><div><span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2025-03-27|22:08:21</span><div style="padding-top: 10px; padding-bottom: 5px;"><span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 10px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 10px 2px 10px; font-size: 10px;">Polars</span></div></div></td>
   </tr>
 <tr class="gt_col_headings">
   <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-status_color"></th>
@@ -370,8 +370,8 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     <td style="height: 40px; background-color: #4CA64C; color: transparent;font-size: 0px;" class="gt_row gt_left">#4CA64C</td>
     <td style="height: 40px; color: #666666;font-size: 13px;font-weight: bold;" class="gt_row gt_right">1</td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left">
-        <div style="margin:0;padding:0;display:inline-block;height:30px;vertical-align:middle;">
-        <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
+        <div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
+            <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
 <svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink">
     <title>col_vals_lt</title>
     <g id="All-Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -382,7 +382,10 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     </g>
 </svg>
         </div>
-        <span style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size:11px;"> col_vals_lt()</span>
+        <div style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size: 11px; display: inline-block; vertical-align: middle;">
+            <div>col_vals_lt()</div>
+        </div>
+        <div style="font-size: 9px; font-family: 'IBM Plex Sans'; text-wrap: balance; margin-top: 3px;"></div>
         </td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">item_revenue</td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">200</td>
@@ -408,8 +411,8 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     <td style="height: 40px; background-color: #4CA64C; color: transparent;font-size: 0px;" class="gt_row gt_left">#4CA64C</td>
     <td style="height: 40px; color: #666666;font-size: 13px;font-weight: bold;" class="gt_row gt_right">2</td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left">
-        <div style="margin:0;padding:0;display:inline-block;height:30px;vertical-align:middle;">
-        <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
+        <div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
+            <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
 <svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink">
     <title>col_vals_gt</title>
     <g id="All-Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -420,7 +423,10 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     </g>
 </svg>
         </div>
-        <span style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size:11px;"> col_vals_gt()</span>
+        <div style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size: 11px; display: inline-block; vertical-align: middle;">
+            <div>col_vals_gt()</div>
+        </div>
+        <div style="font-size: 9px; font-family: 'IBM Plex Sans'; text-wrap: balance; margin-top: 3px;"></div>
         </td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">item_revenue</td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">0</td>
@@ -446,8 +452,8 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     <td style="height: 40px; background-color: #4CA64C66; color: transparent;font-size: 0px;" class="gt_row gt_left">#4CA64C66</td>
     <td style="height: 40px; color: #666666;font-size: 13px;font-weight: bold;" class="gt_row gt_right">3</td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left">
-        <div style="margin:0;padding:0;display:inline-block;height:30px;vertical-align:middle;">
-        <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
+        <div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
+            <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
 <svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink">
     <title>col_vals_gt</title>
     <g id="All-Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -458,7 +464,10 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     </g>
 </svg>
         </div>
-        <span style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size:11px;"> col_vals_gt()</span>
+        <div style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size: 11px; display: inline-block; vertical-align: middle;">
+            <div>col_vals_gt()</div>
+        </div>
+        <div style="font-size: 9px; font-family: 'IBM Plex Sans'; text-wrap: balance; margin-top: 3px;"></div>
         </td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">session_duration</td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">5</td>
@@ -484,8 +493,8 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     <td style="height: 40px; background-color: #4CA64C; color: transparent;font-size: 0px;" class="gt_row gt_left">#4CA64C</td>
     <td style="height: 40px; color: #666666;font-size: 13px;font-weight: bold;" class="gt_row gt_right">4</td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left">
-        <div style="margin:0;padding:0;display:inline-block;height:30px;vertical-align:middle;">
-        <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
+        <div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
+            <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
 <svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink">
     <title>col_vals_in_set</title>
     <g id="All-Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -496,7 +505,10 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     </g>
 </svg>
         </div>
-        <span style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size:11px;"> col_vals_in_set()</span>
+        <div style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size: 11px; display: inline-block; vertical-align: middle;">
+            <div>col_vals_in_set()</div>
+        </div>
+        <div style="font-size: 9px; font-family: 'IBM Plex Sans'; text-wrap: balance; margin-top: 3px;"></div>
         </td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">item_type</td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">iap, ad</td>
@@ -522,8 +534,8 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     <td style="height: 40px; background-color: #4CA64C; color: transparent;font-size: 0px;" class="gt_row gt_left">#4CA64C</td>
     <td style="height: 40px; color: #666666;font-size: 13px;font-weight: bold;" class="gt_row gt_right">5</td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left">
-        <div style="margin:0;padding:0;display:inline-block;height:30px;vertical-align:middle;">
-        <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
+        <div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
+            <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
 <svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink">
     <title>col_vals_regex</title>
     <g id="All-Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -537,7 +549,10 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     </g>
 </svg>
         </div>
-        <span style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size:11px;"> col_vals_regex()</span>
+        <div style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size: 11px; display: inline-block; vertical-align: middle;">
+            <div>col_vals_regex()</div>
+        </div>
+        <div style="font-size: 9px; font-family: 'IBM Plex Sans'; text-wrap: balance; margin-top: 3px;"></div>
         </td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">player_id</td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">[A-Z]{12}[0-9]{3}</td>
@@ -563,7 +578,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
   <tfoot class="gt_sourcenotes">
   
   <tr>
-    <td class="gt_sourcenote" colspan="14"><div style="margin-top: 5px; margin-bottom: 5px;"><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin-left: 10px; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2025-03-27 17:30:53 UTC</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">&lt; 1 s</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 1px 5px -1px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2025-03-27 17:30:53 UTC</span></div></td>
+    <td class="gt_sourcenote" colspan="14"><div style="margin-top: 5px; margin-bottom: 5px;"><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin-left: 10px; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2025-03-27 22:08:21 UTC</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">&lt; 1 s</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 1px 5px -1px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2025-03-27 22:08:21 UTC</span></div></td>
   </tr>
 
 </tfoot>
@@ -575,7 +590,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 </div>
 <p>The validation table shows that step 3 (checking for <code>session_duration</code> greater than <code>5</code>) has 18 failing test units. This means that 18 rows in the table are problematic. We’d like to see the rows that failed this validation step and we can do that with the <a href="../reference/Validate.get_data_extracts.html#pointblank.Validate.get_data_extracts"><code>get_data_extracts()</code></a> method.</p>
-<div id="3533981a" class="cell" data-execution_count="2">
+<div id="eadcf5eb" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>pb.preview(validation.get_data_extracts(i<span class="op">=</span><span class="dv">3</span>, frame<span class="op">=</span><span class="va">True</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="2">
 <div id="pb_preview_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">

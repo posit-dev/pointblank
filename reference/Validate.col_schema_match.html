@@ -258,9 +258,9 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <dd>
 <p>Optional actions to take when the validation step meets or exceeds any set threshold levels. If provided, the <a href="../reference/Actions.html#pointblank.Actions"><code>Actions</code></a> class should be used to define the actions.</p>
 </dd>
-<dt><code><span class="parameter-name"><strong>brief</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><code>str</code> | None</span> <span class="parameter-default-sep">=</span> <span class="parameter-default">None</span></code></dt>
+<dt><code><span class="parameter-name"><strong>brief</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><code>str</code> | <code>bool</code> | None</span> <span class="parameter-default-sep">=</span> <span class="parameter-default">None</span></code></dt>
 <dd>
-<p>An optional brief description of the validation step. The templating elements <code>"{col}"</code> and <code>"{step}"</code> can be used to insert the column name and step number, respectively.</p>
+<p>An optional brief description of the validation step that will be displayed in the reporting table. You can use the templating elements like <code>"{step}"</code> to insert the step number, or <code>"{auto}"</code> to include an automatically generated brief. If <code>True</code> the entire brief will be automatically generated. If <code>None</code> (the default) then there won’t be a brief.</p>
 </dd>
 <dt><code><span class="parameter-name"><strong>active</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><code>bool</code></span> <span class="parameter-default-sep">=</span> <span class="parameter-default">True</span></code></dt>
 <dd>
@@ -280,7 +280,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="examples" class="level2 doc-section doc-section-examples">
 <h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>For the examples here, we’ll use a simple Polars DataFrame with three columns (string, integer, and float). The table is shown below:</p>
-<div id="0654cdc1" class="cell" data-execution_count="2">
+<div id="dd2af5e8" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -396,13 +396,13 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 </div>
 <p>Let’s validate that the columns in the table match a predefined schema. A schema can be defined using the <a href="../reference/Schema.html#pointblank.Schema"><code>Schema</code></a> class.</p>
-<div id="e94a049e" class="cell" data-execution_count="3">
+<div id="7870977c" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    columns<span class="op">=</span>[(<span class="st">"a"</span>, <span class="st">"String"</span>), (<span class="st">"b"</span>, <span class="st">"Int64"</span>), (<span class="st">"c"</span>, <span class="st">"Float64"</span>)]</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>You can print the schema object to verify that the expected schema is as intended.</p>
-<div id="a77b6f97" class="cell" data-execution_count="4">
+<div id="e91aeba0" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(schema)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Pointblank Schema
@@ -412,7 +412,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 </div>
 <p>Now, we’ll use the <code>col_schema_match()</code> method to validate the table against the expected <code>schema</code> object. There is a single test unit for this validation step (whether the schema matches the table or not).</p>
-<div id="987eee0b" class="cell" data-execution_count="5">
+<div id="18990eed" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    .col_schema_match(schema<span class="op">=</span>schema)</span>
@@ -513,8 +513,8 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     <td style="height: 40px; background-color: #4CA64C; color: transparent;font-size: 0px;" class="gt_row gt_left">#4CA64C</td>
     <td style="height: 40px; color: #666666;font-size: 13px;font-weight: bold;" class="gt_row gt_right">1</td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left">
-        <div style="margin:0;padding:0;display:inline-block;height:30px;vertical-align:middle;">
-        <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
+        <div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
+            <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
 <svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink">
     <title>col_schema_match</title>
     <g id="All-Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -530,7 +530,10 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     </g>
 </svg>
         </div>
-        <span style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size:10px;"> col_schema_match()</span>
+        <div style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size: 10px; display: inline-block; vertical-align: middle;">
+            <div>col_schema_match()</div>
+        </div>
+        <div style="font-size: 9px; font-family: 'IBM Plex Sans'; text-wrap: balance; margin-top: 3px;"></div>
         </td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">—</td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">SCHEMA</td>

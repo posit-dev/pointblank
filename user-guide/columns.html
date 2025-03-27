@@ -344,7 +344,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <p>Most of the validation methods included in Pointblank perform column-level checks. As such, they provide the common argument <code>columns=</code>. The pluralization in the name indicates that multiple columns can be provided. And it goes further than that, as column selectors can be used in <code>columns=</code> to resolve columns.</p>
 <p>Why do this? It can often be the case that you’d want to perform a validation check of a certain common type (e.g., checking that numerical values are all positive) across a number of columns. Rather than define the same rules across multiple invocations of the same validation method (one for each column), we can simply map the validation rules across those columns.</p>
 <p>We’ll run through several examples below, and all of them will use the <code>game_revenue</code> dataset. Here’s a preview of it:</p>
-<div id="5fc684b4" class="cell" data-execution_count="2">
+<div id="9ff39447" class="cell" data-execution_count="2">
 <div class="cell-output cell-output-display" data-execution_count="2">
 <div id="pb_preview_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>
@@ -586,7 +586,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="using-a-list-of-column-names" class="level2">
 <h2 class="anchored" data-anchor-id="using-a-list-of-column-names">Using a List of Column Names</h2>
 <p>The <code>columns=</code> parameter (in every validation method that has that argument) can accept a list of column names. In the <code>game_revenue</code> dataset, there are two columns that contain numerical data: <code>item_revenue</code> and <code>session_duration</code>. Suppose we expect that data in both columns should be greater than <code>0</code>, providing a list of those two columns will create two validation steps from a single invocation of <a href="https://posit-dev.github.io/pointblank/reference/Validate.col_vals_gt.html"><code>col_vals_gt()</code></a>:</p>
-<div id="2690c7c2" class="cell" data-execution_count="3">
+<div id="daf06d40" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>(</span>
@@ -687,8 +687,8 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     <td style="height: 40px; background-color: #4CA64C; color: transparent;font-size: 0px;" class="gt_row gt_left">#4CA64C</td>
     <td style="height: 40px; color: #666666;font-size: 13px;font-weight: bold;" class="gt_row gt_right">1</td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left">
-        <div style="margin:0;padding:0;display:inline-block;height:30px;vertical-align:middle;">
-        <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
+        <div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
+            <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
 <svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink">
     <title>col_vals_gt</title>
     <g id="All-Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -699,7 +699,10 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     </g>
 </svg>
         </div>
-        <span style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size:11px;"> col_vals_gt()</span>
+        <div style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size: 11px; display: inline-block; vertical-align: middle;">
+            <div>col_vals_gt()</div>
+        </div>
+        <div style="font-size: 9px; font-family: 'IBM Plex Sans'; text-wrap: balance; margin-top: 3px;"></div>
         </td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">item_revenue</td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">0</td>
@@ -725,8 +728,8 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     <td style="height: 40px; background-color: #4CA64C; color: transparent;font-size: 0px;" class="gt_row gt_left">#4CA64C</td>
     <td style="height: 40px; color: #666666;font-size: 13px;font-weight: bold;" class="gt_row gt_right">2</td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left">
-        <div style="margin:0;padding:0;display:inline-block;height:30px;vertical-align:middle;">
-        <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
+        <div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
+            <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
 <svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink">
     <title>col_vals_gt</title>
     <g id="All-Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -737,7 +740,10 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     </g>
 </svg>
         </div>
-        <span style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size:11px;"> col_vals_gt()</span>
+        <div style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size: 11px; display: inline-block; vertical-align: middle;">
+            <div>col_vals_gt()</div>
+        </div>
+        <div style="font-size: 9px; font-family: 'IBM Plex Sans'; text-wrap: balance; margin-top: 3px;"></div>
         </td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">session_duration</td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">0</td>
@@ -770,7 +776,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 <p>The validation report table indeed shows that two validation steps were created! Further to this, the interrogation results show that all values in the two columns are greater than <code>0</code>.</p>
 <p>It’s important to note that all validation parameters are shared across all generated steps. So if <code>thresholds=</code> were to be set, those threshold values would be cloned and used in each and every step generated (one step per column provided):</p>
-<div id="5b34df65" class="cell" data-execution_count="4">
+<div id="1aac7a13" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>(</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>pb.load_dataset(<span class="st">"game_revenue"</span>))</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_gt(</span>
@@ -873,8 +879,8 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     <td style="height: 40px; background-color: #4CA64C; color: transparent;font-size: 0px;" class="gt_row gt_left">#4CA64C</td>
     <td style="height: 40px; color: #666666;font-size: 13px;font-weight: bold;" class="gt_row gt_right">1</td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left">
-        <div style="margin:0;padding:0;display:inline-block;height:30px;vertical-align:middle;">
-        <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
+        <div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
+            <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
 <svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink">
     <title>col_vals_gt</title>
     <g id="All-Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -885,7 +891,10 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     </g>
 </svg>
         </div>
-        <span style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size:11px;"> col_vals_gt()</span>
+        <div style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size: 11px; display: inline-block; vertical-align: middle;">
+            <div>col_vals_gt()</div>
+        </div>
+        <div style="font-size: 9px; font-family: 'IBM Plex Sans'; text-wrap: balance; margin-top: 3px;"></div>
         </td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">item_revenue</td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">0</td>
@@ -911,8 +920,8 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     <td style="height: 40px; background-color: #4CA64C; color: transparent;font-size: 0px;" class="gt_row gt_left">#4CA64C</td>
     <td style="height: 40px; color: #666666;font-size: 13px;font-weight: bold;" class="gt_row gt_right">2</td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left">
-        <div style="margin:0;padding:0;display:inline-block;height:30px;vertical-align:middle;">
-        <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
+        <div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
+            <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
 <svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink">
     <title>col_vals_gt</title>
     <g id="All-Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -923,7 +932,10 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     </g>
 </svg>
         </div>
-        <span style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size:11px;"> col_vals_gt()</span>
+        <div style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size: 11px; display: inline-block; vertical-align: middle;">
+            <div>col_vals_gt()</div>
+        </div>
+        <div style="font-size: 9px; font-family: 'IBM Plex Sans'; text-wrap: balance; margin-top: 3px;"></div>
         </td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">session_duration</td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">0</td>
@@ -966,7 +978,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </ul>
 <p>Two common ones, <a href="https://posit-dev.github.io/pointblank/reference/starts_with.html"><code>starts_with()</code></a> and <a href="https://posit-dev.github.io/pointblank/reference/ends_with.html"><code>ends_with()</code></a>, resolve columns based on starting and ending text in column names.</p>
 <p>The <code>game_revenue</code> dataset has three columns starting with the text ‘item’: <code>item_type</code>, <code>item_name</code>, and <code>item_revenue</code>. Let’s look at an example where we can succinctly express a validation plan checking that these columns contain no missing values:</p>
-<div id="12f58ebd" class="cell" data-execution_count="5">
+<div id="1104d346" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>(</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>pb.load_dataset(<span class="st">"game_revenue"</span>))</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_not_null(columns<span class="op">=</span>pb.starts_with(<span class="st">"item"</span>))</span>
@@ -1065,8 +1077,8 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     <td style="height: 40px; background-color: #4CA64C; color: transparent;font-size: 0px;" class="gt_row gt_left">#4CA64C</td>
     <td style="height: 40px; color: #666666;font-size: 13px;font-weight: bold;" class="gt_row gt_right">1</td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left">
-        <div style="margin:0;padding:0;display:inline-block;height:30px;vertical-align:middle;">
-        <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
+        <div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
+            <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
 <svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink">
     <title>col_vals_not_null</title>
     <g id="All-Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -1079,7 +1091,10 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     </g>
 </svg>
         </div>
-        <span style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size:10px;"> col_vals_not_null()</span>
+        <div style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size: 10px; display: inline-block; vertical-align: middle;">
+            <div>col_vals_not_null()</div>
+        </div>
+        <div style="font-size: 9px; font-family: 'IBM Plex Sans'; text-wrap: balance; margin-top: 3px;"></div>
         </td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">item_type</td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">—</td>
@@ -1105,8 +1120,8 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     <td style="height: 40px; background-color: #4CA64C; color: transparent;font-size: 0px;" class="gt_row gt_left">#4CA64C</td>
     <td style="height: 40px; color: #666666;font-size: 13px;font-weight: bold;" class="gt_row gt_right">2</td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left">
-        <div style="margin:0;padding:0;display:inline-block;height:30px;vertical-align:middle;">
-        <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
+        <div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
+            <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
 <svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink">
     <title>col_vals_not_null</title>
     <g id="All-Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -1119,7 +1134,10 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     </g>
 </svg>
         </div>
-        <span style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size:10px;"> col_vals_not_null()</span>
+        <div style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size: 10px; display: inline-block; vertical-align: middle;">
+            <div>col_vals_not_null()</div>
+        </div>
+        <div style="font-size: 9px; font-family: 'IBM Plex Sans'; text-wrap: balance; margin-top: 3px;"></div>
         </td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">item_name</td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">—</td>
@@ -1145,8 +1163,8 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     <td style="height: 40px; background-color: #4CA64C; color: transparent;font-size: 0px;" class="gt_row gt_left">#4CA64C</td>
     <td style="height: 40px; color: #666666;font-size: 13px;font-weight: bold;" class="gt_row gt_right">3</td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left">
-        <div style="margin:0;padding:0;display:inline-block;height:30px;vertical-align:middle;">
-        <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
+        <div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
+            <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
 <svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink">
     <title>col_vals_not_null</title>
     <g id="All-Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -1159,7 +1177,10 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     </g>
 </svg>
         </div>
-        <span style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size:10px;"> col_vals_not_null()</span>
+        <div style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size: 10px; display: inline-block; vertical-align: middle;">
+            <div>col_vals_not_null()</div>
+        </div>
+        <div style="font-size: 9px; font-family: 'IBM Plex Sans'; text-wrap: balance; margin-top: 3px;"></div>
         </td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">item_revenue</td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">—</td>
@@ -1213,12 +1234,12 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <li><code>~</code> (<em>not</em>)</li>
 </ul>
 <p>Taken together, if you wanted to select all columns except the first four, you would use this <a href="https://posit-dev.github.io/pointblank/reference/col.html"><code>col()</code></a> expression:</p>
-<div id="cf3c3735" class="cell" data-execution_count="6">
+<div id="6f8c421d" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>col_selection <span class="op">=</span> pb.col(pb.everything() <span class="op">-</span> pb.first_n(<span class="dv">4</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>The logic here is that <a href="https://posit-dev.github.io/pointblank/reference/everything.html"><code>everything()</code></a> selects every column and the <code>- pb.first_n(4)</code> part then removes the first four columns from that selection.</p>
 <p>Let’s try using the <code>col_selection</code> object in a validation of the <code>game_revenue</code> table, checking multiple columns for missing values:</p>
-<div id="bbe4de5c" class="cell" data-execution_count="7">
+<div id="ffa241e9" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>(</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>pb.load_dataset(<span class="st">"game_revenue"</span>))</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_not_null(columns<span class="op">=</span>col_selection, thresholds<span class="op">=</span>(<span class="dv">1</span>, <span class="fl">0.05</span>, <span class="fl">0.1</span>))</span>
@@ -1317,8 +1338,8 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     <td style="height: 40px; background-color: #4CA64C; color: transparent;font-size: 0px;" class="gt_row gt_left">#4CA64C</td>
     <td style="height: 40px; color: #666666;font-size: 13px;font-weight: bold;" class="gt_row gt_right">1</td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left">
-        <div style="margin:0;padding:0;display:inline-block;height:30px;vertical-align:middle;">
-        <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
+        <div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
+            <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
 <svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink">
     <title>col_vals_not_null</title>
     <g id="All-Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -1331,7 +1352,10 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     </g>
 </svg>
         </div>
-        <span style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size:10px;"> col_vals_not_null()</span>
+        <div style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size: 10px; display: inline-block; vertical-align: middle;">
+            <div>col_vals_not_null()</div>
+        </div>
+        <div style="font-size: 9px; font-family: 'IBM Plex Sans'; text-wrap: balance; margin-top: 3px;"></div>
         </td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">item_type</td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">—</td>
@@ -1357,8 +1381,8 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     <td style="height: 40px; background-color: #4CA64C; color: transparent;font-size: 0px;" class="gt_row gt_left">#4CA64C</td>
     <td style="height: 40px; color: #666666;font-size: 13px;font-weight: bold;" class="gt_row gt_right">2</td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left">
-        <div style="margin:0;padding:0;display:inline-block;height:30px;vertical-align:middle;">
-        <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
+        <div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
+            <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
 <svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink">
     <title>col_vals_not_null</title>
     <g id="All-Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -1371,7 +1395,10 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     </g>
 </svg>
         </div>
-        <span style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size:10px;"> col_vals_not_null()</span>
+        <div style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size: 10px; display: inline-block; vertical-align: middle;">
+            <div>col_vals_not_null()</div>
+        </div>
+        <div style="font-size: 9px; font-family: 'IBM Plex Sans'; text-wrap: balance; margin-top: 3px;"></div>
         </td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">item_name</td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">—</td>
@@ -1397,8 +1424,8 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     <td style="height: 40px; background-color: #4CA64C; color: transparent;font-size: 0px;" class="gt_row gt_left">#4CA64C</td>
     <td style="height: 40px; color: #666666;font-size: 13px;font-weight: bold;" class="gt_row gt_right">3</td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left">
-        <div style="margin:0;padding:0;display:inline-block;height:30px;vertical-align:middle;">
-        <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
+        <div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
+            <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
 <svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink">
     <title>col_vals_not_null</title>
     <g id="All-Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -1411,7 +1438,10 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     </g>
 </svg>
         </div>
-        <span style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size:10px;"> col_vals_not_null()</span>
+        <div style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size: 10px; display: inline-block; vertical-align: middle;">
+            <div>col_vals_not_null()</div>
+        </div>
+        <div style="font-size: 9px; font-family: 'IBM Plex Sans'; text-wrap: balance; margin-top: 3px;"></div>
         </td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">item_revenue</td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">—</td>
@@ -1437,8 +1467,8 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     <td style="height: 40px; background-color: #4CA64C; color: transparent;font-size: 0px;" class="gt_row gt_left">#4CA64C</td>
     <td style="height: 40px; color: #666666;font-size: 13px;font-weight: bold;" class="gt_row gt_right">4</td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left">
-        <div style="margin:0;padding:0;display:inline-block;height:30px;vertical-align:middle;">
-        <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
+        <div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
+            <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
 <svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink">
     <title>col_vals_not_null</title>
     <g id="All-Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -1451,7 +1481,10 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     </g>
 </svg>
         </div>
-        <span style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size:10px;"> col_vals_not_null()</span>
+        <div style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size: 10px; display: inline-block; vertical-align: middle;">
+            <div>col_vals_not_null()</div>
+        </div>
+        <div style="font-size: 9px; font-family: 'IBM Plex Sans'; text-wrap: balance; margin-top: 3px;"></div>
         </td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">session_duration</td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">—</td>
@@ -1477,8 +1510,8 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     <td style="height: 40px; background-color: #4CA64C; color: transparent;font-size: 0px;" class="gt_row gt_left">#4CA64C</td>
     <td style="height: 40px; color: #666666;font-size: 13px;font-weight: bold;" class="gt_row gt_right">5</td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left">
-        <div style="margin:0;padding:0;display:inline-block;height:30px;vertical-align:middle;">
-        <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
+        <div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
+            <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
 <svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink">
     <title>col_vals_not_null</title>
     <g id="All-Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -1491,7 +1524,10 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     </g>
 </svg>
         </div>
-        <span style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size:10px;"> col_vals_not_null()</span>
+        <div style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size: 10px; display: inline-block; vertical-align: middle;">
+            <div>col_vals_not_null()</div>
+        </div>
+        <div style="font-size: 9px; font-family: 'IBM Plex Sans'; text-wrap: balance; margin-top: 3px;"></div>
         </td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">start_day</td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">—</td>
@@ -1517,8 +1553,8 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     <td style="height: 40px; background-color: #4CA64C; color: transparent;font-size: 0px;" class="gt_row gt_left">#4CA64C</td>
     <td style="height: 40px; color: #666666;font-size: 13px;font-weight: bold;" class="gt_row gt_right">6</td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left">
-        <div style="margin:0;padding:0;display:inline-block;height:30px;vertical-align:middle;">
-        <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
+        <div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
+            <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
 <svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink">
     <title>col_vals_not_null</title>
     <g id="All-Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -1531,7 +1567,10 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     </g>
 </svg>
         </div>
-        <span style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size:10px;"> col_vals_not_null()</span>
+        <div style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size: 10px; display: inline-block; vertical-align: middle;">
+            <div>col_vals_not_null()</div>
+        </div>
+        <div style="font-size: 9px; font-family: 'IBM Plex Sans'; text-wrap: balance; margin-top: 3px;"></div>
         </td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">acquisition</td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">—</td>
@@ -1557,8 +1596,8 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     <td style="height: 40px; background-color: #4CA64C; color: transparent;font-size: 0px;" class="gt_row gt_left">#4CA64C</td>
     <td style="height: 40px; color: #666666;font-size: 13px;font-weight: bold;" class="gt_row gt_right">7</td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left">
-        <div style="margin:0;padding:0;display:inline-block;height:30px;vertical-align:middle;">
-        <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
+        <div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
+            <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
 <svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink">
     <title>col_vals_not_null</title>
     <g id="All-Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -1571,7 +1610,10 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     </g>
 </svg>
         </div>
-        <span style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size:10px;"> col_vals_not_null()</span>
+        <div style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size: 10px; display: inline-block; vertical-align: middle;">
+            <div>col_vals_not_null()</div>
+        </div>
+        <div style="font-size: 9px; font-family: 'IBM Plex Sans'; text-wrap: balance; margin-top: 3px;"></div>
         </td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">country</td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">—</td>
@@ -1617,7 +1659,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <li><code>string()</code></li>
 </ul>
 <p>We support the use of these selectors for any input DataFrame that is supported by Narwhals (i.e., is in the aforementioned list). Here’s an example using the <code>numeric()</code> selector to select all numeric columns in <code>game_revenue</code>:</p>
-<div id="a900a184" class="cell" data-execution_count="8">
+<div id="ef818bb1" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> narwhals.selectors <span class="im">as</span> ncs</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>(</span>
@@ -1718,8 +1760,8 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     <td style="height: 40px; background-color: #4CA64C; color: transparent;font-size: 0px;" class="gt_row gt_left">#4CA64C</td>
     <td style="height: 40px; color: #666666;font-size: 13px;font-weight: bold;" class="gt_row gt_right">1</td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left">
-        <div style="margin:0;padding:0;display:inline-block;height:30px;vertical-align:middle;">
-        <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
+        <div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
+            <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
 <svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink">
     <title>col_vals_gt</title>
     <g id="All-Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -1730,7 +1772,10 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     </g>
 </svg>
         </div>
-        <span style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size:11px;"> col_vals_gt()</span>
+        <div style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size: 11px; display: inline-block; vertical-align: middle;">
+            <div>col_vals_gt()</div>
+        </div>
+        <div style="font-size: 9px; font-family: 'IBM Plex Sans'; text-wrap: balance; margin-top: 3px;"></div>
         </td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">item_revenue</td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">0</td>
@@ -1756,8 +1801,8 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     <td style="height: 40px; background-color: #4CA64C; color: transparent;font-size: 0px;" class="gt_row gt_left">#4CA64C</td>
     <td style="height: 40px; color: #666666;font-size: 13px;font-weight: bold;" class="gt_row gt_right">2</td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left">
-        <div style="margin:0;padding:0;display:inline-block;height:30px;vertical-align:middle;">
-        <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
+        <div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
+            <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
 <svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink">
     <title>col_vals_gt</title>
     <g id="All-Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -1768,7 +1813,10 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     </g>
 </svg>
         </div>
-        <span style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size:11px;"> col_vals_gt()</span>
+        <div style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size: 11px; display: inline-block; vertical-align: middle;">
+            <div>col_vals_gt()</div>
+        </div>
+        <div style="font-size: 9px; font-family: 'IBM Plex Sans'; text-wrap: balance; margin-top: 3px;"></div>
         </td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">session_duration</td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">0</td>
@@ -1800,7 +1848,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 </div>
 <p>Narwhals selectors can also use operators to combine multiple selectors. Here is an example of using the <code>string()</code> and <code>matches()</code> selectors together to select all string columns matching the text ‘item_’:</p>
-<div id="816318f6" class="cell" data-execution_count="9">
+<div id="d26b93da" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>(</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>pb.load_dataset(<span class="st">"game_revenue"</span>))</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_not_null(columns<span class="op">=</span>pb.col(ncs.string() <span class="op">&amp;</span> ncs.matches(<span class="st">"item_"</span>)))</span>
@@ -1899,8 +1947,8 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     <td style="height: 40px; background-color: #4CA64C; color: transparent;font-size: 0px;" class="gt_row gt_left">#4CA64C</td>
     <td style="height: 40px; color: #666666;font-size: 13px;font-weight: bold;" class="gt_row gt_right">1</td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left">
-        <div style="margin:0;padding:0;display:inline-block;height:30px;vertical-align:middle;">
-        <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
+        <div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
+            <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
 <svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink">
     <title>col_vals_not_null</title>
     <g id="All-Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -1913,7 +1961,10 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     </g>
 </svg>
         </div>
-        <span style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size:10px;"> col_vals_not_null()</span>
+        <div style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size: 10px; display: inline-block; vertical-align: middle;">
+            <div>col_vals_not_null()</div>
+        </div>
+        <div style="font-size: 9px; font-family: 'IBM Plex Sans'; text-wrap: balance; margin-top: 3px;"></div>
         </td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">item_type</td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">—</td>
@@ -1939,8 +1990,8 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     <td style="height: 40px; background-color: #4CA64C; color: transparent;font-size: 0px;" class="gt_row gt_left">#4CA64C</td>
     <td style="height: 40px; color: #666666;font-size: 13px;font-weight: bold;" class="gt_row gt_right">2</td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left">
-        <div style="margin:0;padding:0;display:inline-block;height:30px;vertical-align:middle;">
-        <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
+        <div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
+            <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
 <svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink">
     <title>col_vals_not_null</title>
     <g id="All-Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -1953,7 +2004,10 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     </g>
 </svg>
         </div>
-        <span style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size:10px;"> col_vals_not_null()</span>
+        <div style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size: 10px; display: inline-block; vertical-align: middle;">
+            <div>col_vals_not_null()</div>
+        </div>
+        <div style="font-size: 9px; font-family: 'IBM Plex Sans'; text-wrap: balance; margin-top: 3px;"></div>
         </td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">item_name</td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">—</td>
@@ -1991,7 +2045,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <p>Provided there is systematic column naming already in place, using column selectors like <a href="https://posit-dev.github.io/pointblank/reference/starts_with.html"><code>starts_with()</code></a> can be very convenient. This is especially true as column counts become larger.</p>
 <p>A slight disadvantage to this approach is some uncertainty on whether those columns being checked actually exist. You might resolve fewer columns than anticipated or no columns at all due to errors in using the column selectors or through misunderstanding in the columns’ naming conventions.</p>
 <p>Should the use of a column selector yield no columns the interrogation process itself won’t fail, however, the validation report table will strongly signal that there was an evaluation issue:</p>
-<div id="3557ea0a" class="cell" data-execution_count="10">
+<div id="19314471" class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>(</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>pb.load_dataset(<span class="st">"game_revenue"</span>))</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_not_null(columns<span class="op">=</span>pb.starts_with(<span class="st">"items"</span>))</span>
@@ -2090,8 +2144,8 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     <td style="height: 40px; background-color: #4CA64C66; color: transparent;font-size: 0px; background-color: #F2F2F2; background-color: #FFC1C159;" class="gt_row gt_left">#4CA64C66</td>
     <td style="height: 40px; color: #666666;font-size: 13px;font-weight: bold; background-color: #F2F2F2; background-color: #FFC1C159;" class="gt_row gt_right">1</td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; background-color: #F2F2F2; background-color: #FFC1C159;" class="gt_row gt_left">
-        <div style="margin:0;padding:0;display:inline-block;height:30px;vertical-align:middle;">
-        <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
+        <div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
+            <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
 <svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink">
     <title>col_vals_not_null</title>
     <g id="All-Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -2104,7 +2158,10 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     </g>
 </svg>
         </div>
-        <span style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size:10px;"> col_vals_not_null()</span>
+        <div style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size: 10px; display: inline-block; vertical-align: middle;">
+            <div>col_vals_not_null()</div>
+        </div>
+        <div style="font-size: 9px; font-family: 'IBM Plex Sans'; text-wrap: balance; margin-top: 3px;"></div>
         </td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; background-color: #F2F2F2; background-color: #FFC1C159; color: #B22222;" class="gt_row gt_left">StartsWith(text='items', case_sensitive=False)</td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; background-color: #F2F2F2; background-color: #FFC1C159;" class="gt_row gt_left">—</td>

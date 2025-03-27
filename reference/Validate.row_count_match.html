@@ -244,9 +244,9 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <dd>
 <p>Optional actions to take when the validation step meets or exceeds any set threshold levels. If provided, the <a href="../reference/Actions.html#pointblank.Actions"><code>Actions</code></a> class should be used to define the actions.</p>
 </dd>
-<dt><code><span class="parameter-name"><strong>brief</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><code>str</code> | None</span> <span class="parameter-default-sep">=</span> <span class="parameter-default">None</span></code></dt>
+<dt><code><span class="parameter-name"><strong>brief</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><code>str</code> | <code>bool</code> | None</span> <span class="parameter-default-sep">=</span> <span class="parameter-default">None</span></code></dt>
 <dd>
-<p>An optional brief description of the validation step. The templating elements <code>"{col}"</code> and <code>"{step}"</code> can be used to insert the column name and step number, respectively.</p>
+<p>An optional brief description of the validation step that will be displayed in the reporting table. You can use the templating elements like <code>"{step}"</code> to insert the step number, or <code>"{auto}"</code> to include an automatically generated brief. If <code>True</code> the entire brief will be automatically generated. If <code>None</code> (the default) then there won’t be a brief.</p>
 </dd>
 <dt><code><span class="parameter-name"><strong>active</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><code>bool</code></span> <span class="parameter-default-sep">=</span> <span class="parameter-default">True</span></code></dt>
 <dd>
@@ -266,7 +266,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="examples" class="level2 doc-section doc-section-examples">
 <h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>For the examples here, we’ll use the built in dataset <code>"small_table"</code>. The table can be obtained by calling <code>load_dataset("small_table")</code>.</p>
-<div id="9fbf74fa" class="cell" data-execution_count="2">
+<div id="99a55cd0" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>small_table <span class="op">=</span> pb.load_dataset(<span class="st">"small_table"</span>)</span>
@@ -474,7 +474,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 </div>
 <p>Let’s validate that the number of rows in the table matches a fixed value. In this case, we will use the value <code>13</code> as the expected row count.</p>
-<div id="6d78b8e2" class="cell" data-execution_count="3">
+<div id="42476c21" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>small_table)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    .row_count_match(count<span class="op">=</span><span class="dv">13</span>)</span>
@@ -575,8 +575,8 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     <td style="height: 40px; background-color: #4CA64C; color: transparent;font-size: 0px;" class="gt_row gt_left">#4CA64C</td>
     <td style="height: 40px; color: #666666;font-size: 13px;font-weight: bold;" class="gt_row gt_right">1</td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left">
-        <div style="margin:0;padding:0;display:inline-block;height:30px;vertical-align:middle;">
-        <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
+        <div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
+            <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
 <svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink">
     <title>row_count_match</title>
     <g id="All-Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -592,7 +592,10 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     </g>
 </svg>
         </div>
-        <span style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size:11px;"> row_count_match()</span>
+        <div style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size: 11px; display: inline-block; vertical-align: middle;">
+            <div>row_count_match()</div>
+        </div>
+        <div style="font-size: 9px; font-family: 'IBM Plex Sans'; text-wrap: balance; margin-top: 3px;"></div>
         </td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">—</td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">13</td>
@@ -625,7 +628,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 <p>The validation table shows that the expectation value of <code>13</code> matches the actual count of rows in the target table. So, the single test unit passed.</p>
 <p>Let’s modify our example to show the different ways we can allow some tolerance to our validation by using the <code>tol</code> argument.</p>
-<div id="ab22d423" class="cell" data-execution_count="4">
+<div id="1271f3df" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>smaller_small_table <span class="op">=</span> small_table.sample(n <span class="op">=</span> <span class="dv">12</span>) <span class="co"># within the lower bound</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>smaller_small_table)</span>
@@ -742,8 +745,8 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     <td style="height: 40px; background-color: #4CA64C66; color: transparent;font-size: 0px;" class="gt_row gt_left">#4CA64C66</td>
     <td style="height: 40px; color: #666666;font-size: 13px;font-weight: bold;" class="gt_row gt_right">1</td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left">
-        <div style="margin:0;padding:0;display:inline-block;height:30px;vertical-align:middle;">
-        <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
+        <div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
+            <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
 <svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink">
     <title>row_count_match</title>
     <g id="All-Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -759,7 +762,10 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     </g>
 </svg>
         </div>
-        <span style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size:11px;"> row_count_match()</span>
+        <div style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size: 11px; display: inline-block; vertical-align: middle;">
+            <div>row_count_match()</div>
+        </div>
+        <div style="font-size: 9px; font-family: 'IBM Plex Sans'; text-wrap: balance; margin-top: 3px;"></div>
         </td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">—</td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">13</td>
