@@ -178,6 +178,8 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
   <ul>
   <li><a href="#parameters" id="toc-parameters" class="nav-link active" data-scroll-target="#parameters">Parameters</a></li>
   <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
+  <li><a href="#preprocessing" id="toc-preprocessing" class="nav-link" data-scroll-target="#preprocessing">Preprocessing</a></li>
+  <li><a href="#thresholds" id="toc-thresholds" class="nav-link" data-scroll-target="#thresholds">Thresholds</a></li>
   <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
   </ul>
 </nav>
@@ -248,11 +250,11 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </dd>
 <dt><code><span class="parameter-name"><strong>pre</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><code>Callable</code> | None</span> <span class="parameter-default-sep">=</span> <span class="parameter-default">None</span></code></dt>
 <dd>
-<p>A optional preprocessing function or lambda to apply to the data table during interrogation.</p>
+<p>A optional preprocessing function or lambda to apply to the data table during interrogation. This function should take a table as input and return a modified table. Have a look at the <em>Preprocessing</em> section for more information on how to use this argument.</p>
 </dd>
 <dt><code><span class="parameter-name"><strong>thresholds</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><code>int</code> | <code>float</code> | <code>bool</code> | <code>tuple</code> | <code>dict</code> | <a href="../reference/Thresholds.html#pointblank.Thresholds">Thresholds</a></span> <span class="parameter-default-sep">=</span> <span class="parameter-default">None</span></code></dt>
 <dd>
-<p>Optional failure threshold levels for the validation step(s), so that the interrogation can react accordingly when exceeding the set levels for different states (‘warning’, ‘error’, and ‘critical’). This can be created using the <a href="../reference/Thresholds.html#pointblank.Thresholds"><code>Thresholds</code></a> class or more simply as (1) an integer or float denoting the absolute number or fraction of failing test units for the ‘warn’ level, (2) a tuple of 1-3 values, or (3) a dictionary of 1-3 entries.</p>
+<p>Set threshold failure levels for reporting and reacting to exceedences of the levels. The thresholds are set at the step level and will override any global thresholds set in <code>Validate(thresholds=...)</code>. The default is <code>None</code>, which means that no thresholds will be set locally and global thresholds (if any) will take effect. Look at the <em>Thresholds</em> section for information on how to set threshold levels.</p>
 </dd>
 <dt><code><span class="parameter-name"><strong>actions</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><a href="../reference/Actions.html#pointblank.Actions">Actions</a> | None</span> <span class="parameter-default-sep">=</span> <span class="parameter-default">None</span></code></dt>
 <dd>
@@ -277,10 +279,29 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </dd>
 </dl>
 </section>
+<section id="preprocessing" class="level2 doc-section doc-section-preprocessing">
+<h2 class="doc-section doc-section-preprocessing anchored" data-anchor-id="preprocessing">Preprocessing</h2>
+<p>The <code>pre=</code> argument allows for a preprocessing function or lambda to be applied to the data table during interrogation. This function should take a table as input and return a modified table. This is useful for performing any necessary transformations or filtering on the data before the validation step is applied.</p>
+<p>The preprocessing function can be any callable that takes a table as input and returns a modified table. Regarding the lifetime of the transformed table, it only exists during the validation step and is not stored in the <code>Validate</code> object or used in subsequent validation steps.</p>
+</section>
+<section id="thresholds" class="level2 doc-section doc-section-thresholds">
+<h2 class="doc-section doc-section-thresholds anchored" data-anchor-id="thresholds">Thresholds</h2>
+<p>The <code>thresholds=</code> parameter is used to set the failure-condition levels for the validation step. If they are set here at the step level, these thresholds will override any thresholds set at the global level in <code>Validate(thresholds=...)</code>.</p>
+<p>There are three threshold levels: ‘warning’, ‘error’, and ‘critical’. The threshold values can either be set as a proportion failing of all test units (a value between <code>0</code> to <code>1</code>), or, the absolute number of failing test units (as integer that’s <code>1</code> or greater).</p>
+<p>Thresholds can be defined using one of these input schemes:</p>
+<ol type="1">
+<li>with the <a href="../reference/Thresholds.html#pointblank.Thresholds"><code>Thresholds</code></a> class, which is the most common way to create thresholds</li>
+<li>using a tuple of 1-3 values, where position <code>0</code> is the ‘warning’ level, position <code>1</code> is the ‘error’ level, and position <code>2</code> is the ‘critical’ level.</li>
+<li>a single integer/float value denoting absolute number or fraction of failing test units for the ‘warn’ level only</li>
+<li>a dictionary of 1-3 entries, where the valid keys are ‘warning’, ‘error’, and ‘critical’ and the values are the corresponding threshold values.</li>
+</ol>
+<p>If the number of failing test units exceeds set thresholds, the validation step will be marked as ‘warning’, ‘error’, or ‘critical’. All of the threshold levels don’t need to be set, you’re free to set any combination of them.</p>
+<p>Aside from reporting failure conditions, thresholds can be used to determine the actions to take for each level of failure (using the <code>actions=</code> parameter).</p>
+</section>
 <section id="examples" class="level2 doc-section doc-section-examples">
 <h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>For the examples here, we’ll use a simple Polars DataFrame with three columns (string, integer, and float). The table is shown below:</p>
-<div id="1d345fe9" class="cell" data-execution_count="2">
+<div id="3a751b49" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -396,13 +417,13 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 </div>
 <p>Let’s validate that the columns in the table match a predefined schema. A schema can be defined using the <a href="../reference/Schema.html#pointblank.Schema"><code>Schema</code></a> class.</p>
-<div id="02c939ec" class="cell" data-execution_count="3">
+<div id="bc9d33ec" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    columns<span class="op">=</span>[(<span class="st">"a"</span>, <span class="st">"String"</span>), (<span class="st">"b"</span>, <span class="st">"Int64"</span>), (<span class="st">"c"</span>, <span class="st">"Float64"</span>)]</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>You can print the schema object to verify that the expected schema is as intended.</p>
-<div id="6575c80b" class="cell" data-execution_count="4">
+<div id="d580a264" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(schema)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Pointblank Schema
@@ -412,7 +433,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 </div>
 <p>Now, we’ll use the <code>col_schema_match()</code> method to validate the table against the expected <code>schema</code> object. There is a single test unit for this validation step (whether the schema matches the table or not).</p>
-<div id="6b2c861d" class="cell" data-execution_count="5">
+<div id="b4b3a9e9" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    .col_schema_match(schema<span class="op">=</span>schema)</span>
