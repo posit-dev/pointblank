@@ -29,7 +29,7 @@ jobs:
           pip install -e '.[dev]'
       - name: Install test dependencies
         run: |
-          pip install pytest pytest-cov pytest-snapshot pandas polars ibis-framework[duckdb,mysql,postgres,sqlite]>=9.5.0 chatlas shiny
+          pip install pytest pytest-randomly pytest-cov pytest-snapshot pandas polars ibis-framework[duckdb,mysql,postgres,sqlite]>=9.5.0 chatlas shiny hypothesis
       - name: pytest unit tests
         run: |
           make test

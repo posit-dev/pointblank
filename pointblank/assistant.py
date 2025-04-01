@@ -176,9 +176,7 @@ def assistant(
     if data is not None:
         scan = DataScan(data=data)
 
-        scan_dict = scan.to_dict()
-
-        tbl_type = scan_dict["tbl_type"]
+        tbl_type: str = scan.profile.implementation.name.lower()
         tbl_json = scan.to_json()
 
         if tbl_name is not None:

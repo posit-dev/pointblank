@@ -1,7 +1,17 @@
 from __future__ import annotations
 
+from typing import Any
+
+from great_tables import html
+
 from pointblank._constants import TABLE_TYPE_STYLES
 from pointblank._utils import _format_to_integer_value
+
+
+def _make_sublabel(major: str, minor: str) -> Any:
+    return html(
+        f'{major!s}<span style="font-size: 0.75em; vertical-align: sub; position: relative; line-height: 0.5em;">{minor!s}</span>'
+    )
 
 
 def _create_table_type_html(
