@@ -95,6 +95,10 @@ class Interrogator:
             import ibis
 
             if isinstance(self.compare, ColumnLiteral):
+                #
+                # Ibis column-to-column comparison
+                #
+
                 tbl = self.x.mutate(
                     pb_is_good_1=(self.x[self.column].isnull() | self.x[self.compare.name].isnull())
                     & ibis.literal(self.na_pass),
@@ -110,6 +114,10 @@ class Interrogator:
                 )
 
             else:
+                #
+                # Ibis column-to-literal comparison
+                #
+
                 tbl = self.x.mutate(
                     pb_is_good_1=self.x[self.column].isnull() & ibis.literal(self.na_pass),
                     pb_is_good_2=self.x[self.column] > ibis.literal(self.compare),
@@ -126,6 +134,10 @@ class Interrogator:
         # Local backends (Narwhals) ---------------------------------
 
         compare_expr = _get_compare_expr_nw(compare=self.compare)
+
+        compare_expr = _modify_datetime_compare_val(
+            tgt_column=self.x[self.column], compare_val=compare_expr
+        )
 
         return (
             self.x.with_columns(
@@ -158,6 +170,10 @@ class Interrogator:
             import ibis
 
             if isinstance(self.compare, Column):
+                #
+                # Ibis column-to-column comparison
+                #
+
                 tbl = self.x.mutate(
                     pb_is_good_1=(self.x[self.column].isnull() | self.x[self.compare.name].isnull())
                     & ibis.literal(self.na_pass),
@@ -173,6 +189,10 @@ class Interrogator:
                 )
 
             else:
+                #
+                # Ibis column-to-literal comparison
+                #
+
                 tbl = self.x.mutate(
                     pb_is_good_1=self.x[self.column].isnull() & ibis.literal(self.na_pass),
                     pb_is_good_2=self.x[self.column] < ibis.literal(self.compare),
@@ -189,6 +209,10 @@ class Interrogator:
         # Local backends (Narwhals) ---------------------------------
 
         compare_expr = _get_compare_expr_nw(compare=self.compare)
+
+        compare_expr = _modify_datetime_compare_val(
+            tgt_column=self.x[self.column], compare_val=compare_expr
+        )
 
         return (
             self.x.with_columns(
@@ -221,6 +245,10 @@ class Interrogator:
             import ibis
 
             if isinstance(self.compare, Column):
+                #
+                # Ibis column-to-column comparison
+                #
+
                 tbl = self.x.mutate(
                     pb_is_good_1=(self.x[self.column].isnull() | self.x[self.compare.name].isnull())
                     & ibis.literal(self.na_pass),
@@ -236,6 +264,10 @@ class Interrogator:
                 )
 
             else:
+                #
+                # Ibis column-to-literal comparison
+                #
+
                 tbl = self.x.mutate(
                     pb_is_good_1=self.x[self.column].isnull() & ibis.literal(self.na_pass),
                     pb_is_good_2=self.x[self.column] == ibis.literal(self.compare),
@@ -296,6 +328,10 @@ class Interrogator:
         else:
             compare_expr = _get_compare_expr_nw(compare=self.compare)
 
+            compare_expr = _modify_datetime_compare_val(
+                tgt_column=self.x[self.column], compare_val=compare_expr
+            )
+
             tbl = self.x.with_columns(
                 pb_is_good_1=nw.col(self.column).is_null() & self.na_pass,
                 pb_is_good_2=(
@@ -328,6 +364,10 @@ class Interrogator:
             import ibis
 
             if isinstance(self.compare, Column):
+                #
+                # Ibis column-to-column comparison
+                #
+
                 tbl = self.x.mutate(
                     pb_is_good_1=(self.x[self.column].isnull() | self.x[self.compare.name].isnull())
                     & ibis.literal(self.na_pass),
@@ -342,6 +382,9 @@ class Interrogator:
                     "pb_is_good_1", "pb_is_good_2"
                 )
 
+            #
+            # Ibis column-to-literal comparison
+            #
             tbl = self.x.mutate(
                 pb_is_good_1=self.x[self.column].isnull() & ibis.literal(self.na_pass),
                 pb_is_good_2=ibis.ifelse(
@@ -377,8 +420,12 @@ class Interrogator:
                 ).to_native()
 
             else:
+                compare_expr = _modify_datetime_compare_val(
+                    tgt_column=self.x[self.column], compare_val=self.compare
+                )
+
                 return self.x.with_columns(
-                    pb_is_good_=nw.col(self.column) != nw.lit(self.compare),
+                    pb_is_good_=nw.col(self.column) != nw.lit(compare_expr),
                 ).to_native()
 
         # If either column has null values, we need to handle the comparison
@@ -496,10 +543,14 @@ class Interrogator:
             if ref_col_has_null_vals:
                 # Create individual cases for Pandas and Polars
 
+                compare_expr = _modify_datetime_compare_val(
+                    tgt_column=self.x[self.column], compare_val=self.compare
+                )
+
                 if is_pandas_dataframe(self.x.to_native()):
                     tbl = self.x.with_columns(
                         pb_is_good_1=nw.col(self.column).is_null(),
-                        pb_is_good_2=nw.lit(self.column) != nw.lit(self.compare),
+                        pb_is_good_2=nw.lit(self.column) != nw.lit(compare_expr),
                     )
 
                     if not self.na_pass:
@@ -519,7 +570,7 @@ class Interrogator:
                         pb_is_good_2=nw.lit(self.na_pass),  # Pass if any Null in val or compare
                     )
 
-                    tbl = tbl.with_columns(pb_is_good_3=nw.col(self.column) != nw.lit(self.compare))
+                    tbl = tbl.with_columns(pb_is_good_3=nw.col(self.column) != nw.lit(compare_expr))
 
                     tbl = tbl.with_columns(
                         pb_is_good_=(
@@ -539,6 +590,10 @@ class Interrogator:
             import ibis
 
             if isinstance(self.compare, Column):
+                #
+                # Ibis column-to-column comparison
+                #
+
                 tbl = self.x.mutate(
                     pb_is_good_1=(self.x[self.column].isnull() | self.x[self.compare.name].isnull())
                     & ibis.literal(self.na_pass),
@@ -553,6 +608,9 @@ class Interrogator:
                     "pb_is_good_1", "pb_is_good_2"
                 )
 
+            #
+            # Ibis column-to-literal comparison
+            #
             tbl = self.x.mutate(
                 pb_is_good_1=self.x[self.column].isnull() & ibis.literal(self.na_pass),
                 pb_is_good_2=self.x[self.column] >= ibis.literal(self.compare),
@@ -569,6 +627,10 @@ class Interrogator:
         # Local backends (Narwhals) ---------------------------------
 
         compare_expr = _get_compare_expr_nw(compare=self.compare)
+
+        compare_expr = _modify_datetime_compare_val(
+            tgt_column=self.x[self.column], compare_val=compare_expr
+        )
 
         tbl = (
             self.x.with_columns(
@@ -601,6 +663,10 @@ class Interrogator:
             import ibis
 
             if isinstance(self.compare, Column):
+                #
+                # Ibis column-to-column comparison
+                #
+
                 tbl = self.x.mutate(
                     pb_is_good_1=(self.x[self.column].isnull() | self.x[self.compare.name].isnull())
                     & ibis.literal(self.na_pass),
@@ -615,6 +681,9 @@ class Interrogator:
                     "pb_is_good_1", "pb_is_good_2"
                 )
 
+            #
+            # Ibis column-to-literal comparison
+            #
             tbl = self.x.mutate(
                 pb_is_good_1=self.x[self.column].isnull() & ibis.literal(self.na_pass),
                 pb_is_good_2=self.x[self.column] <= ibis.literal(self.compare),
@@ -631,6 +700,10 @@ class Interrogator:
         # Local backends (Narwhals) ---------------------------------
 
         compare_expr = _get_compare_expr_nw(compare=self.compare)
+
+        compare_expr = _modify_datetime_compare_val(
+            tgt_column=self.x[self.column], compare_val=compare_expr
+        )
 
         return (
             self.x.with_columns(
@@ -663,6 +736,10 @@ class Interrogator:
             import ibis
 
             if isinstance(self.low, Column) or isinstance(self.high, Column):
+                #
+                # Ibis column-to-column/column or column-to-column/literal comparison
+                #
+
                 if isinstance(self.low, Column):
                     low_val = self.x[self.low.name]
                 else:
@@ -718,6 +795,10 @@ class Interrogator:
                 ).drop("pb_is_good_1", "pb_is_good_2", "pb_is_good_3")
 
             else:
+                #
+                # Ibis column-to-literal/literal comparison
+                #
+
                 low_val = ibis.literal(self.low)
                 high_val = ibis.literal(self.high)
 
@@ -751,6 +832,11 @@ class Interrogator:
 
         low_val = _get_compare_expr_nw(compare=self.low)
         high_val = _get_compare_expr_nw(compare=self.high)
+
+        low_val = _modify_datetime_compare_val(tgt_column=self.x[self.column], compare_val=low_val)
+        high_val = _modify_datetime_compare_val(
+            tgt_column=self.x[self.column], compare_val=high_val
+        )
 
         tbl = self.x.with_columns(
             pb_is_good_1=nw.col(self.column).is_null(),  # val is Null in Column
@@ -819,6 +905,10 @@ class Interrogator:
             import ibis
 
             if isinstance(self.low, Column) or isinstance(self.high, Column):
+                #
+                # Ibis column-to-column/column or column-to-column/literal comparison
+                #
+
                 if isinstance(self.low, Column):
                     low_val = self.x[self.low.name]
                 else:
@@ -898,6 +988,9 @@ class Interrogator:
                     pb_is_good_=tbl.pb_is_good_1 | (tbl.pb_is_good_2 | tbl.pb_is_good_3)
                 ).drop("pb_is_good_1", "pb_is_good_2", "pb_is_good_3")
 
+            #
+            # Ibis column-to-literal/literal comparison
+            #
             low_val = ibis.literal(self.low)
             high_val = ibis.literal(self.high)
 
@@ -931,6 +1024,11 @@ class Interrogator:
 
         low_val = _get_compare_expr_nw(compare=self.low)
         high_val = _get_compare_expr_nw(compare=self.high)
+
+        low_val = _modify_datetime_compare_val(tgt_column=self.x[self.column], compare_val=low_val)
+        high_val = _modify_datetime_compare_val(
+            tgt_column=self.x[self.column], compare_val=high_val
+        )
 
         tbl = self.x.with_columns(
             pb_is_good_1=nw.col(self.column).is_null(),  # val is Null in Column
@@ -1919,3 +2017,51 @@ def _column_has_null_values(table: FrameT, column: str) -> bool:
         return False
 
     return True
+
+
+def _modify_datetime_compare_val(tgt_column: any, compare_val: any) -> any:
+    tgt_col_dtype_str = str(tgt_column.dtype).lower()
+
+    if compare_val is isinstance(compare_val, Column):
+        return compare_val
+
+    # Get the type of `compare_expr` and convert, if necessary, to the type of the column
+    compare_type_str = str(type(compare_val)).lower()
+
+    if "datetime.datetime" in compare_type_str:
+        compare_type = "datetime"
+    elif "datetime.date" in compare_type_str:
+        compare_type = "date"
+    elif "datetime.timedelta" in compare_type_str:
+        compare_type = "timedelta"
+    else:
+        compare_type = "other"
+
+    if "datetime" in tgt_col_dtype_str:
+        tgt_col_dtype = "datetime"
+    elif "date" in tgt_col_dtype_str or "object" in tgt_col_dtype_str:
+        # Object type is used for date columns in the Pandas
+        tgt_col_dtype = "date"
+    elif "timedelta" in tgt_col_dtype_str:
+        tgt_col_dtype = "timedelta"
+    else:
+        tgt_col_dtype = "other"
+
+    # Handle each combination of `compare_type` and `tgt_col_dtype`, coercing only the
+    # `compare_expr` to the type of the column
+    if compare_type == "datetime" and tgt_col_dtype == "date":
+        # Assume that `compare_expr` is a datetime.datetime object and strip the time part
+        # to get a date object
+        compare_expr = compare_val.date()
+
+    elif compare_type == "date" and tgt_col_dtype == "datetime":
+        import datetime
+
+        # Assume that `compare_expr` is a `datetime.date` object so add in the time part
+        # to get a `datetime.datetime` object
+        compare_expr = datetime.datetime.combine(compare_val, datetime.datetime.min.time())
+
+    else:
+        return compare_val
+
+    return compare_expr

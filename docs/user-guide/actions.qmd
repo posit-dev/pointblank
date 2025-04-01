@@ -70,7 +70,7 @@ considered optional. Put another way, you can set various thresholds and various
 and the interrogation phase will determine whether all the requirements are met for executing
 an action.
 
-## Ways to Express Actions: Text or Custom Functions
+## Expressing Actions with a String
 
 There are a few options in how to define the actions:
 
@@ -99,10 +99,9 @@ Here's an example where we prepare a console message with a number of value plac
 (`action_str`) and use it globally at `Actions(critical=)`:
 
 ```{python}
-
 action_str = "[{LEVEL}: {TYPE}]: Step {step} has failed validation. ({time})"
 
-validation = (
+validation_2 = (
     pb.Validate(
         data=pb.load_dataset(dataset="game_revenue", tbl_type="duckdb"),
         thresholds=pb.Thresholds(warning=0.05, error=0.10, critical=0.15),
@@ -113,6 +112,8 @@ validation = (
     .col_vals_ge(columns="session_duration", value=15)
     .interrogate()
 )
+
+validation_2
 ```
 
 What we get here are two messages in the console, corresponding to critical failures in steps 2 and
@@ -121,16 +122,19 @@ resulting text is capitalized (e.g., `"CRITICAL"`, `"COL_VALS_GT"`, etc.) and th
 capitalized the placeholder text itself. Have a look at the documentation article of
 [`Actions`](https://posit-dev.github.io/pointblank/reference/Actions.html) for more details on this.
 
+## Making Actions with Callables
+
 Aside from strings, any callable can be used as an action value. Here's an example where we use a
 custom function as part of an action:
 
 ```{python}
-def dq_issue():
+def duration_issue():
     from datetime import datetime
 
     print(f"Data quality issue found ({datetime.now()}).")
 
-validation = (
+
+validation_3 = (
     pb.Validate(
         data=pb.load_dataset(dataset="game_revenue", tbl_type="duckdb"),
         thresholds=pb.Thresholds(warning=0.05, error=0.10, critical=0.15),
@@ -140,12 +144,12 @@ validation = (
     .col_vals_gt(
         columns="session_duration",
         value=15,
-        actions=pb.Actions(warning=dq_issue),
+        actions=pb.Actions(warning=duration_issue),
     )
     .interrogate()
 )
 
-validation
+validation_3
 ```
 
 In this case, the 'warning' action is set to call the user's `dq_issue()` function. This action is

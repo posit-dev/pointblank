@@ -1,11 +1,13 @@
 from __future__ import annotations
 
 import base64
+import contextlib
 import copy
 import datetime
 import inspect
 import json
 import re
+import threading
 from dataclasses import dataclass
 from importlib.metadata import version
 from typing import TYPE_CHECKING, Any, Callable, Literal
@@ -13,7 +15,7 @@ from zipfile import ZipFile
 
 import commonmark
 import narwhals as nw
-from great_tables import GT, from_column, google_font, html, loc, style, vals
+from great_tables import GT, from_column, google_font, html, loc, md, style, vals
 from importlib_resources import files
 from narwhals.typing import FrameT
 
@@ -24,6 +26,7 @@ from pointblank._constants import (
     COMPATIBLE_DTYPES,
     CROSS_MARK_SPAN,
     IBIS_BACKENDS,
+    LOG_LEVELS_MAP,
     METHOD_CATEGORY_MAP,
     REPORTING_LANGUAGES,
     ROW_BASED_VALIDATION_TYPES,
@@ -32,7 +35,7 @@ from pointblank._constants import (
     SVG_ICONS_FOR_TBL_STATUS,
     VALIDATION_REPORT_FIELDS,
 )
-from pointblank._constants_expect_fail import EXPECT_FAIL_TEXT
+from pointblank._constants_translations import EXPECT_FAIL_TEXT, VALIDATION_REPORT_TEXT
 from pointblank._interrogation import (
     ColCountMatch,
     ColExistsHasType,
@@ -63,7 +66,6 @@ from pointblank._utils_check_args import (
     _check_pre,
     _check_set_types,
     _check_thresholds,
-    _check_value_float_int,
 )
 from pointblank._utils_html import _create_table_dims_html, _create_table_type_html
 from pointblank.column import Column, ColumnLiteral, ColumnSelector, ColumnSelectorNarwhals, col
@@ -86,7 +88,92 @@ __all__ = [
     "missing_vals_tbl",
     "get_column_count",
     "get_row_count",
+    "get_action_metadata",
 ]
+
+# Create a thread-local storage for the metadata
+_action_context = threading.local()
+
+
+@contextlib.contextmanager
+def _action_context_manager(metadata):
+    """Context manager for storing metadata during action execution."""
+    _action_context.metadata = metadata
+    try:
+        yield
+    finally:
+        # Clean up after execution
+        if hasattr(_action_context, "metadata"):
+            delattr(_action_context, "metadata")
+
+
+def get_action_metadata():
+    """Access step-level metadata when authoring custom actions.
+
+    Get the metadata for the validation step where an action was triggered. This can be called by
+    user functions to get the metadata for the current action.
+
+    Returns
+    -------
+    dict
+        A dictionary containing the metadata for the current step.
+
+    Description of the Metadata Fields
+    ----------------------------------
+    The metadata dictionary contains the following fields for a given validation step:
+
+    - `step`: The step number.
+    - `column`: The column name.
+    - `value`: The value being compared (only available in certain validation steps).
+    - `type`: The assertion type (e.g., `"col_vals_gt"`, etc.).
+    - `time`: The time the validation step was executed (in ISO format).
+    - `level`: The severity level (`"warning"`, `"error"`, or `"critical"`).
+    - `level_num`: The severity level as a numeric value (`30`, `40`, or `50`).
+    - `autobrief`: A localized and brief statement of the expectation for the step.
+    - `failure_text`: Localized text that explains how the validation step failed.
+
+    Examples
+    --------
+    When creating a custom action, you can access the metadata for the current step using the
+    `get_action_metadata()` function. Here's an example of a custom action that logs the metadata
+    for the current step:
+
+    ```{python}
+    import pointblank as pb
+
+    def log_issue():
+        metadata = pb.get_action_metadata()
+        print(f"Type: {metadata['type']}, Step: {metadata['step']}")
+
+    validation = (
+        pb.Validate(
+            data=pb.load_dataset(dataset="game_revenue", tbl_type="duckdb"),
+            thresholds=pb.Thresholds(warning=0.05, error=0.10, critical=0.15),
+            actions=pb.Actions(warning=log_issue),
+        )
+        .col_vals_regex(columns="player_id", pattern=r"[A-Z]{12}\d{3}")
+        .col_vals_gt(columns="item_revenue", value=0.05)
+        .col_vals_gt(
+            columns="session_duration",
+            value=15,
+        )
+        .interrogate()
+    )
+
+    validation
+    ```
+
+    Key pieces to note in the above example:
+
+    - `log_issue()` (the custom action) collects `metadata` by calling `get_action_metadata()`
+    - the `metadata` is a dictionary that is used to craft the log message
+    - the action is passed as a bare function to the `Actions` object within the `Validate` object
+    (placing it within `Validate(actions=)` ensures it's set as an action for every validation step)
+    """
+    if hasattr(_action_context, "metadata"):  # pragma: no cover
+        return _action_context.metadata  # pragma: no cover
+    else:
+        return None  # pragma: no cover
 
 
 @dataclass
@@ -100,7 +187,11 @@ class PointblankConfig:
     preview_incl_header: bool = True
 
     def __repr__(self):
-        return f"PointblankConfig(report_incl_header={self.report_incl_header}, report_incl_footer={self.report_incl_footer}, preview_incl_header={self.preview_incl_header})"
+        return (
+            f"PointblankConfig(report_incl_header={self.report_incl_header}, "
+            f"report_incl_footer={self.report_incl_footer}, "
+            f"preview_incl_header={self.preview_incl_header})"
+        )
 
 
 # Global configuration instance
@@ -305,9 +396,10 @@ def preview(
     columns_subset: str | list[str] | Column | None = None,
     n_head: int = 5,
     n_tail: int = 5,
-    limit: int | None = 50,
+    limit: int = 50,
     show_row_numbers: bool = True,
-    max_col_width: int | None = 250,
+    max_col_width: int = 250,
+    min_tbl_width: int = 500,
     incl_header: bool = None,
 ) -> GT:
     """
@@ -344,12 +436,18 @@ def preview(
         The number of rows to show from the end of the table. Set to `5` by default.
     limit
         The limit value for the sum of `n_head=` and `n_tail=` (the total number of rows shown).
-        If the sum of `n_head=` and `n_tail=` exceeds the limit, an error is raised.
+        If the sum of `n_head=` and `n_tail=` exceeds the limit, an error is raised. The default
+        value is `50`.
     show_row_numbers
         Should row numbers be shown? The numbers shown reflect the row numbers of the head and tail
-        in the full table.
+        in the input `data=` table. By default, this is set to `True`.
     max_col_width
-        The maximum width of the columns in pixels. This is `250` (`"250px"`) by default.
+        The maximum width of the columns (in pixels) before the text is truncated. The default value
+        is `250` (`"250px"`).
+    min_tbl_width
+        The minimum width of the table in pixels. If the sum of the column widths is less than this
+        value, the all columns are sized up to reach this minimum width value. The default value is
+        `500` (`"500px"`).
     incl_header
         Should the table include a header with the table type and table dimensions? Set to `True` by
         default.
@@ -455,6 +553,7 @@ def preview(
         limit=limit,
         show_row_numbers=show_row_numbers,
         max_col_width=max_col_width,
+        min_tbl_width=min_tbl_width,
         incl_header=incl_header,
         mark_missing_values=True,
     )
@@ -467,7 +566,8 @@ def _generate_display_table(
     n_tail: int = 5,
     limit: int | None = 50,
     show_row_numbers: bool = True,
-    max_col_width: int | None = 250,
+    max_col_width: int = 250,
+    min_tbl_width: int = 500,
     incl_header: bool = None,
     mark_missing_values: bool = True,
     row_number_list: list[int] | None = None,
@@ -532,6 +632,10 @@ def _generate_display_table(
                 "The `columns_subset=` value doesn't resolve to any columns in the table."
             )
 
+        # Add back the row number column if it was removed
+        if has_leading_row_num_col:
+            resolved_columns = ["_row_num_"] + resolved_columns
+
         # Select the columns to display in the table with the `resolved_columns` value
         data = _select_columns(
             data, resolved_columns=resolved_columns, ibis_tbl=ibis_tbl, tbl_type=tbl_type
@@ -543,6 +647,8 @@ def _generate_display_table(
     # - get the row numbers for the table
     # - convert the table to a Polars or Pandas DF
     if ibis_tbl:
+        import ibis
+
         # Get the Schema of the table
         tbl_schema = Schema(tbl=data)
 
@@ -558,13 +664,15 @@ def _generate_display_table(
             if row_number_list is None:
                 row_number_list = range(1, n_rows + 1)
         else:
-            # Get the first and last n rows of the table
+            # Get the first n and last n rows of the table
             data_head = data.head(n_head)
-            row_numbers_head = range(1, n_head + 1)
-            data_tail = data[(n_rows - n_tail) : n_rows]
-            row_numbers_tail = range(n_rows - n_tail + 1, n_rows + 1)
+            data_tail = data.filter(
+                [ibis.row_number() >= (n_rows - n_tail), ibis.row_number() <= n_rows]
+            )
             data_subset = data_head.union(data_tail)
 
+            row_numbers_head = range(1, n_head + 1)
+            row_numbers_tail = range(n_rows - n_tail + 1, n_rows + 1)
             if row_number_list is None:
                 row_number_list = list(row_numbers_head) + list(row_numbers_tail)
 
@@ -661,13 +769,36 @@ def _generate_display_table(
     length_data_types = [len(dtype) for dtype in col_dtype_dict_short.values()]
 
     # Comparing the length of the column names, the data types, and the max length of the
-    # column values, prefer the largest of these for the column widths (by column)
+    # column values, prefer the largest of these for the column widths (by column);
+    # the `7.8` factor is an approximation of the average width of a character in the
+    # monospace font chosen for the table
     col_widths = [
-        f"{round(min(max(7.8 * max_length_col_vals[i] + 10, 7.8 * length_col_names[i] + 10, 7.8 * length_data_types[i] + 10), max_col_width))}px"
+        round(
+            min(
+                max(
+                    7.8 * max_length_col_vals[i] + 10,  # 1. largest column value
+                    7.8 * length_col_names[i] + 10,  # 2. characters in column name
+                    7.8 * length_data_types[i] + 10,  # 3. characters in data type
+                ),
+                max_col_width,
+            )
+        )
         for i in range(len(col_dtype_dict.keys()))
     ]
 
-    # Set the column width to the `col_widths`` list
+    sum_col_widths = sum(col_widths)
+
+    # In situations where the sum of the column widths is less than the minimum width,
+    # divide up the remaining space between the columns
+    if sum_col_widths < min_tbl_width:
+        remaining_width = min_tbl_width - sum_col_widths
+        n_remaining_cols = len(col_widths)
+        col_widths = [width + remaining_width // n_remaining_cols for width in col_widths]
+
+    # Add the `px` suffix to each of the column widths, stringifying them
+    col_widths = [f"{width}px" for width in col_widths]
+
+    # Create a dictionary of column names and their corresponding widths
     col_width_dict = {k: v for k, v in zip(col_names, col_widths)}
 
     # For each of the values in the dictionary, prepend the column name to the data type
@@ -1555,6 +1686,8 @@ class _ValidationInfo:
         Whether the number of failing test units is beyond the 'error' threshold level.
     critical
         Whether the number of failing test units is beyond the 'critical' threshold level.
+    failure_text
+        Localized text explaining the failure. Only set if any threshold is exceeded.
     tbl_checked
         The data table in its native format that has been checked for the validation step. It wil
         include a new column called `pb_is_good_` that is a boolean column that indicates whether
@@ -1595,6 +1728,7 @@ class _ValidationInfo:
     warning: bool | None = None
     error: bool | None = None
     critical: bool | None = None
+    failure_text: str | None = None
     tbl_checked: FrameT | None = None
     extract: FrameT | None = None
     val_info: dict[str, any] | None = None
@@ -1655,8 +1789,14 @@ class Validate:
         [`Thresholds`](`pointblank.Thresholds`) object.
     actions
         The actions to take when validation steps meet or exceed any set threshold levels. This
-        should be provided in the form of an `Actions` object. If `None` then no default actions
+        should be provided in the form of an `Actions` object. If `None` then no global actions
         will be set.
+    brief
+        A global setting for briefs, which are optional brief descriptions for validation steps
+        (they be displayed in the reporting table). For such a global setting, templating elements
+        like `"{step}"` (to insert the step number) or `"{auto}"` (to include an automatically
+        generated brief) are useful. If `True` then each brief will be automatically generated. If
+        `None` (the default) then briefs aren't globally set.
     lang
         The language to use for automatic creation of briefs (short descriptions for each validation
         step). By default, `None` will create English (`"en"`) text. Other options include French
@@ -1693,7 +1833,7 @@ class Validate:
 
     Examples
     --------
-    ## Creating a validation plan and interrogating
+    ### Creating a validation plan and interrogating
 
     Let's walk through a data quality analysis of an extremely small table. It's actually called
     `"small_table"` and it's accessible through the [`load_dataset()`](`pointblank.load_dataset`)
@@ -1759,11 +1899,72 @@ class Validate:
     [`get_tabular_report()`](`pointblank.Validate.get_tabular_report`) method, which contains
     options for modifying the display of the table.
 
-    Furthermore, post-interrogation methods such as
-    [`get_step_report()`](`pointblank.Validate.get_step_report`),
-    [`get_data_extracts()`](`pointblank.Validate.get_data_extracts`), and
-    [`get_sundered_data()`](`pointblank.Validate.get_sundered_data`) allow you to generate
-    additional reporting or extract useful data for downstream analysis from a `Validate` object.
+    ### Adding briefs
+
+    Briefs are short descriptions of the validation steps. While they can be set for each step
+    individually, they can also be set globally. The global setting is done by using the
+    `brief=` argument in `Validate`. The global setting can be as simple as `True` to have
+    automatically-generated briefs for each step. Alternatively, we can use templating elements
+    like `"{step}"` (to insert the step number) or `"{auto}"` (to include an automatically generated
+    brief). Here's an example of a global setting for briefs:
+
+    ```{python}
+    validation = (
+        pb.Validate(
+            data=pb.load_dataset(),
+            tbl_name="small_table",
+            label="Validation example with briefs",
+            brief="Step {step}: {auto}",
+        )
+        .col_vals_gt(columns="d", value=100)
+        .col_vals_between(columns="c", left=3, right=10, na_pass=True)
+        .col_vals_regex(
+            columns="b",
+            pattern=r"[0-9]-[a-z]{3}-[0-9]{3}",
+            brief="Regex check for column {col}"
+        )
+        .interrogate()
+    )
+
+    validation
+    ```
+
+    We see the text of the briefs appear in the `STEP` column of the reporting table. Furthermore,
+    the global brief's template (`"Step {step}: {auto}"`) is applied to all steps except for the
+    final step, where the step-level `brief=` argument provided an override.
+
+    If you should want to cancel the globally-defined brief for one or more validation steps, you
+    can set `brief=False` in those particular steps.
+
+    ### Post-interrogation methods
+
+    The `Validate` class has a number of post-interrogation methods that can be used to extract
+    useful information from the validation results. For example, the
+    [`get_data_extracts()`](`pointblank.Validate.get_data_extracts`) method can be used to get
+    the data extracts for each validation step.
+
+    ```{python}
+    validation.get_data_extracts()
+    ```
+
+    We can also view step reports for each validation step using the
+    [`get_step_report()`](`pointblank.Validate.get_step_report`) method. This method adapts to the
+    type of validation step and shows the relevant information for a step's validation.
+
+    ```{python}
+    validation.get_step_report(i=2)
+    ```
+
+    The `Validate` class also has a method for getting the sundered data, which is the data that
+    passed or failed the validation steps. This can be done using the
+    [`get_sundered_data()`](`pointblank.Validate.get_sundered_data`) method.
+
+    ```{python}
+    pb.preview(validation.get_sundered_data())
+    ```
+
+    The sundered data is a DataFrame that contains the rows that passed or failed the validation.
+    The default behavior is to return the rows that failed the validation, as shown above.
     """
 
     data: FrameT | Any
@@ -1771,6 +1972,7 @@ class Validate:
     label: str | None = None
     thresholds: int | float | bool | tuple | dict | Thresholds | None = None
     actions: Actions | None = None
+    brief: str | bool | None = None
     lang: str | None = None
     locale: str | None = None
 
@@ -1782,11 +1984,15 @@ class Validate:
         self.thresholds = _normalize_thresholds_creation(self.thresholds)
 
         # Normalize the reporting language identifier and error if invalid
-        self.lang = _normalize_reporting_language(lang=self.lang)
+        if self.lang not in ["zh-Hans", "zh-Hant"]:
+            self.lang = _normalize_reporting_language(lang=self.lang)
 
         # Set the `locale` to the `lang` value if `locale` isn't set
         if self.locale is None:
             self.locale = self.lang
+
+        # Transform any shorthands of `brief` to string representations
+        self.brief = _transform_auto_brief(brief=self.brief)
 
         # TODO: Add functionality to obtain the column names and types from the table
         self.col_names = None
@@ -1808,7 +2014,7 @@ class Validate:
         pre: Callable | None = None,
         thresholds: int | float | bool | tuple | dict | Thresholds = None,
         actions: Actions | None = None,
-        brief: str | None = None,
+        brief: str | bool | None = None,
         active: bool = True,
     ) -> Validate:
         """
@@ -1850,8 +2056,11 @@ class Validate:
             levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
             define the actions.
         brief
-            An optional brief description of the validation step. The templating elements `"{col}"`
-            and `"{step}"` can be used to insert the column name and step number, respectively.
+            An optional brief description of the validation step that will be displayed in the
+            reporting table. You can use the templating elements like `"{step}"` to insert
+            the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+            the entire brief will be automatically generated. If `None` (the default) then there
+            won't be a brief.
         active
             A boolean value indicating whether the validation step should be active. Using `False`
             will make the validation step inactive (still reporting its presence and keeping indexes
@@ -1930,7 +2139,7 @@ class Validate:
         assertion_type = _get_fn_name()
 
         _check_column(column=columns)
-        _check_value_float_int(value=value)
+        # _check_value_float_int(value=value)
         _check_pre(pre=pre)
         _check_thresholds(thresholds=thresholds)
         _check_boolean_input(param=na_pass, param_name="na_pass")
@@ -1949,6 +2158,9 @@ class Validate:
         # If `columns` is Column value or a string, place it in a list for iteration
         if isinstance(columns, (Column, str)):
             columns = [columns]
+
+        # Determine brief to use (global or local) and transform any shorthands of `brief=`
+        brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
 
         # Iterate over the columns and create a validation step for each
         for column in columns:
@@ -1976,7 +2188,7 @@ class Validate:
         pre: Callable | None = None,
         thresholds: int | float | bool | tuple | dict | Thresholds = None,
         actions: Actions | None = None,
-        brief: str | None = None,
+        brief: str | bool | None = None,
         active: bool = True,
     ) -> Validate:
         """
@@ -2018,8 +2230,11 @@ class Validate:
             levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
             define the actions.
         brief
-            An optional brief description of the validation step. The templating elements `"{col}"`
-            and `"{step}"` can be used to insert the column name and step number, respectively.
+            An optional brief description of the validation step that will be displayed in the
+            reporting table. You can use the templating elements like `"{step}"` to insert
+            the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+            the entire brief will be automatically generated. If `None` (the default) then there
+            won't be a brief.
         active
             A boolean value indicating whether the validation step should be active. Using `False`
             will make the validation step inactive (still reporting its presence and keeping indexes
@@ -2097,7 +2312,7 @@ class Validate:
         assertion_type = _get_fn_name()
 
         _check_column(column=columns)
-        _check_value_float_int(value=value)
+        # _check_value_float_int(value=value)
         _check_pre(pre=pre)
         _check_thresholds(thresholds=thresholds)
         _check_boolean_input(param=na_pass, param_name="na_pass")
@@ -2116,6 +2331,9 @@ class Validate:
         # If `columns` is Column value or a string, place it in a list for iteration
         if isinstance(columns, (Column, str)):
             columns = [columns]
+
+        # Determine brief to use (global or local) and transform any shorthands of `brief=`
+        brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
 
         # Iterate over the columns and create a validation step for each
         for column in columns:
@@ -2143,7 +2361,7 @@ class Validate:
         pre: Callable | None = None,
         thresholds: int | float | bool | tuple | dict | Thresholds = None,
         actions: Actions | None = None,
-        brief: str | None = None,
+        brief: str | bool | None = None,
         active: bool = True,
     ) -> Validate:
         """
@@ -2185,8 +2403,11 @@ class Validate:
             levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
             define the actions.
         brief
-            An optional brief description of the validation step. The templating elements `"{col}"`
-            and `"{step}"` can be used to insert the column name and step number, respectively.
+            An optional brief description of the validation step that will be displayed in the
+            reporting table. You can use the templating elements like `"{step}"` to insert
+            the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+            the entire brief will be automatically generated. If `None` (the default) then there
+            won't be a brief.
         active
             A boolean value indicating whether the validation step should be active. Using `False`
             will make the validation step inactive (still reporting its presence and keeping indexes
@@ -2263,7 +2484,7 @@ class Validate:
         assertion_type = _get_fn_name()
 
         _check_column(column=columns)
-        _check_value_float_int(value=value)
+        # _check_value_float_int(value=value)
         _check_pre(pre=pre)
         _check_thresholds(thresholds=thresholds)
         _check_boolean_input(param=na_pass, param_name="na_pass")
@@ -2282,6 +2503,9 @@ class Validate:
         # If `columns` is Column value or a string, place it in a list for iteration
         if isinstance(columns, (Column, str)):
             columns = [columns]
+
+        # Determine brief to use (global or local) and transform any shorthands of `brief=`
+        brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
 
         # Iterate over the columns and create a validation step for each
         for column in columns:
@@ -2309,7 +2533,7 @@ class Validate:
         pre: Callable | None = None,
         thresholds: int | float | bool | tuple | dict | Thresholds = None,
         actions: Actions | None = None,
-        brief: str | None = None,
+        brief: str | bool | None = None,
         active: bool = True,
     ) -> Validate:
         """
@@ -2351,8 +2575,11 @@ class Validate:
             levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
             define the actions.
         brief
-            An optional brief description of the validation step. The templating elements `"{col}"`
-            and `"{step}"` can be used to insert the column name and step number, respectively.
+            An optional brief description of the validation step that will be displayed in the
+            reporting table. You can use the templating elements like `"{step}"` to insert
+            the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+            the entire brief will be automatically generated. If `None` (the default) then there
+            won't be a brief.
         active
             A boolean value indicating whether the validation step should be active. Using `False`
             will make the validation step inactive (still reporting its presence and keeping indexes
@@ -2427,7 +2654,7 @@ class Validate:
         assertion_type = _get_fn_name()
 
         _check_column(column=columns)
-        _check_value_float_int(value=value)
+        # _check_value_float_int(value=value)
         _check_pre(pre=pre)
         _check_thresholds(thresholds=thresholds)
         _check_boolean_input(param=na_pass, param_name="na_pass")
@@ -2446,6 +2673,9 @@ class Validate:
         # If `columns` is Column value or a string, place it in a list for iteration
         if isinstance(columns, (Column, str)):
             columns = [columns]
+
+        # Determine brief to use (global or local) and transform any shorthands of `brief=`
+        brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
 
         # Iterate over the columns and create a validation step for each
         for column in columns:
@@ -2473,7 +2703,7 @@ class Validate:
         pre: Callable | None = None,
         thresholds: int | float | bool | tuple | dict | Thresholds = None,
         actions: Actions | None = None,
-        brief: str | None = None,
+        brief: str | bool | None = None,
         active: bool = True,
     ) -> Validate:
         """
@@ -2515,8 +2745,11 @@ class Validate:
             levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
             define the actions.
         brief
-            An optional brief description of the validation step. The templating elements `"{col}"`
-            and `"{step}"` can be used to insert the column name and step number, respectively.
+            An optional brief description of the validation step that will be displayed in the
+            reporting table. You can use the templating elements like `"{step}"` to insert
+            the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+            the entire brief will be automatically generated. If `None` (the default) then there
+            won't be a brief.
         active
             A boolean value indicating whether the validation step should be active. Using `False`
             will make the validation step inactive (still reporting its presence and keeping indexes
@@ -2595,7 +2828,7 @@ class Validate:
         assertion_type = _get_fn_name()
 
         _check_column(column=columns)
-        _check_value_float_int(value=value)
+        # _check_value_float_int(value=value)
         _check_pre(pre=pre)
         _check_thresholds(thresholds=thresholds)
         _check_boolean_input(param=na_pass, param_name="na_pass")
@@ -2614,6 +2847,9 @@ class Validate:
         # If `columns` is Column value or a string, place it in a list for iteration
         if isinstance(columns, (Column, str)):
             columns = [columns]
+
+        # Determine brief to use (global or local) and transform any shorthands of `brief=`
+        brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
 
         # Iterate over the columns and create a validation step for each
         for column in columns:
@@ -2641,7 +2877,7 @@ class Validate:
         pre: Callable | None = None,
         thresholds: int | float | bool | tuple | dict | Thresholds = None,
         actions: Actions | None = None,
-        brief: str | None = None,
+        brief: str | bool | None = None,
         active: bool = True,
     ) -> Validate:
         """
@@ -2683,8 +2919,11 @@ class Validate:
             levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
             define the actions.
         brief
-            An optional brief description of the validation step. The templating elements `"{col}"`
-            and `"{step}"` can be used to insert the column name and step number, respectively.
+            An optional brief description of the validation step that will be displayed in the
+            reporting table. You can use the templating elements like `"{step}"` to insert
+            the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+            the entire brief will be automatically generated. If `None` (the default) then there
+            won't be a brief.
         active
             A boolean value indicating whether the validation step should be active. Using `False`
             will make the validation step inactive (still reporting its presence and keeping indexes
@@ -2763,7 +3002,7 @@ class Validate:
         assertion_type = _get_fn_name()
 
         _check_column(column=columns)
-        _check_value_float_int(value=value)
+        # _check_value_float_int(value=value)
         _check_pre(pre=pre)
         _check_thresholds(thresholds=thresholds)
         _check_boolean_input(param=na_pass, param_name="na_pass")
@@ -2782,6 +3021,9 @@ class Validate:
         # If `columns` is Column value or a string, place it in a list for iteration
         if isinstance(columns, (Column, str)):
             columns = [columns]
+
+        # Determine brief to use (global or local) and transform any shorthands of `brief=`
+        brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
 
         # Iterate over the columns and create a validation step for each
         for column in columns:
@@ -2811,7 +3053,7 @@ class Validate:
         pre: Callable | None = None,
         thresholds: int | float | bool | tuple | dict | Thresholds = None,
         actions: Actions | None = None,
-        brief: str | None = None,
+        brief: str | bool | None = None,
         active: bool = True,
     ) -> Validate:
         """
@@ -2862,8 +3104,11 @@ class Validate:
             levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
             define the actions.
         brief
-            An optional brief description of the validation step. The templating elements `"{col}"`
-            and `"{step}"` can be used to insert the column name and step number, respectively.
+            An optional brief description of the validation step that will be displayed in the
+            reporting table. You can use the templating elements like `"{step}"` to insert
+            the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+            the entire brief will be automatically generated. If `None` (the default) then there
+            won't be a brief.
         active
             A boolean value indicating whether the validation step should be active. Using `False`
             will make the validation step inactive (still reporting its presence and keeping indexes
@@ -2950,8 +3195,8 @@ class Validate:
         assertion_type = _get_fn_name()
 
         _check_column(column=columns)
-        _check_value_float_int(value=left)
-        _check_value_float_int(value=right)
+        # _check_value_float_int(value=left)
+        # _check_value_float_int(value=right)
         _check_pre(pre=pre)
         _check_thresholds(thresholds=thresholds)
         _check_boolean_input(param=na_pass, param_name="na_pass")
@@ -2973,6 +3218,9 @@ class Validate:
         # If `columns` is Column value or a string, place it in a list for iteration
         if isinstance(columns, (Column, str)):
             columns = [columns]
+
+        # Determine brief to use (global or local) and transform any shorthands of `brief=`
+        brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
 
         # Iterate over the columns and create a validation step for each
         for column in columns:
@@ -3003,7 +3251,7 @@ class Validate:
         pre: Callable | None = None,
         thresholds: int | float | bool | tuple | dict | Thresholds = None,
         actions: Actions | None = None,
-        brief: str | None = None,
+        brief: str | bool | None = None,
         active: bool = True,
     ) -> Validate:
         """
@@ -3054,8 +3302,11 @@ class Validate:
             levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
             define the actions.
         brief
-            An optional brief description of the validation step. The templating elements `"{col}"`
-            and `"{step}"` can be used to insert the column name and step number, respectively.
+            An optional brief description of the validation step that will be displayed in the
+            reporting table. You can use the templating elements like `"{step}"` to insert
+            the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+            the entire brief will be automatically generated. If `None` (the default) then there
+            won't be a brief.
         active
             A boolean value indicating whether the validation step should be active. Using `False`
             will make the validation step inactive (still reporting its presence and keeping indexes
@@ -3142,8 +3393,8 @@ class Validate:
         assertion_type = _get_fn_name()
 
         _check_column(column=columns)
-        _check_value_float_int(value=left)
-        _check_value_float_int(value=right)
+        # _check_value_float_int(value=left)
+        # _check_value_float_int(value=right)
         _check_pre(pre=pre)
         _check_thresholds(thresholds=thresholds)
         _check_boolean_input(param=na_pass, param_name="na_pass")
@@ -3168,6 +3419,9 @@ class Validate:
         # If `columns` is Column value or a string, place it in a list for iteration
         if isinstance(columns, (Column, str)):
             columns = [columns]
+
+        # Determine brief to use (global or local) and transform any shorthands of `brief=`
+        brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
 
         # Iterate over the columns and create a validation step for each
         for column in columns:
@@ -3195,7 +3449,7 @@ class Validate:
         pre: Callable | None = None,
         thresholds: int | float | bool | tuple | dict | Thresholds = None,
         actions: Actions | None = None,
-        brief: str | None = None,
+        brief: str | bool | None = None,
         active: bool = True,
     ) -> Validate:
         """
@@ -3230,8 +3484,11 @@ class Validate:
             levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
             define the actions.
         brief
-            An optional brief description of the validation step. The templating elements `"{col}"`
-            and `"{step}"` can be used to insert the column name and step number, respectively.
+            An optional brief description of the validation step that will be displayed in the
+            reporting table. You can use the templating elements like `"{step}"` to insert
+            the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+            the entire brief will be automatically generated. If `None` (the default) then there
+            won't be a brief.
         active
             A boolean value indicating whether the validation step should be active. Using `False`
             will make the validation step inactive (still reporting its presence and keeping indexes
@@ -3323,6 +3580,9 @@ class Validate:
         if isinstance(columns, (Column, str)):
             columns = [columns]
 
+        # Determine brief to use (global or local) and transform any shorthands of `brief=`
+        brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
+
         # Iterate over the columns and create a validation step for each
         for column in columns:
             val_info = _ValidationInfo(
@@ -3347,7 +3607,7 @@ class Validate:
         pre: Callable | None = None,
         thresholds: int | float | bool | tuple | dict | Thresholds = None,
         actions: Actions | None = None,
-        brief: str | None = None,
+        brief: str | bool | None = None,
         active: bool = True,
     ) -> Validate:
         """
@@ -3382,10 +3642,15 @@ class Validate:
             levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
             define the actions.
         brief
-            An optional brief description of the validation step. The templating elements `"{col}"`
-            and `"{step}"` can be used to insert the column name and step number, respectively.
+            An optional brief description of the validation step that will be displayed in the
+            reporting table. You can use the templating elements like `"{step}"` to insert
+            the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+            the entire brief will be automatically generated. If `None` (the default) then there
+            won't be a brief.
         active
             A boolean value indicating whether the validation step should be active. Using `False`
+            will make the validation step inactive (still reporting its presence and keeping indexes
+            for the steps unchanged).
 
         Returns
         -------
@@ -3474,6 +3739,9 @@ class Validate:
         if isinstance(columns, (Column, str)):
             columns = [columns]
 
+        # Determine brief to use (global or local) and transform any shorthands of `brief=`
+        brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
+
         # Iterate over the columns and create a validation step for each
         for column in columns:
             val_info = _ValidationInfo(
@@ -3497,7 +3765,7 @@ class Validate:
         pre: Callable | None = None,
         thresholds: int | float | bool | tuple | dict | Thresholds = None,
         actions: Actions | None = None,
-        brief: str | None = None,
+        brief: str | bool | None = None,
         active: bool = True,
     ) -> Validate:
         """
@@ -3529,8 +3797,11 @@ class Validate:
             levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
             define the actions.
         brief
-            An optional brief description of the validation step. The templating elements `"{col}"`
-            and `"{step}"` can be used to insert the column name and step number, respectively.
+            An optional brief description of the validation step that will be displayed in the
+            reporting table. You can use the templating elements like `"{step}"` to insert
+            the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+            the entire brief will be automatically generated. If `None` (the default) then there
+            won't be a brief.
         active
             A boolean value indicating whether the validation step should be active. Using `False`
             will make the validation step inactive (still reporting its presence and keeping indexes
@@ -3619,6 +3890,9 @@ class Validate:
         if isinstance(columns, (Column, str)):
             columns = [columns]
 
+        # Determine brief to use (global or local) and transform any shorthands of `brief=`
+        brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
+
         # Iterate over the columns and create a validation step for each
         for column in columns:
             val_info = _ValidationInfo(
@@ -3641,7 +3915,7 @@ class Validate:
         pre: Callable | None = None,
         thresholds: int | float | bool | tuple | dict | Thresholds = None,
         actions: Actions | None = None,
-        brief: str | None = None,
+        brief: str | bool | None = None,
         active: bool = True,
     ) -> Validate:
         """
@@ -3673,8 +3947,11 @@ class Validate:
             levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
             define the actions.
         brief
-            An optional brief description of the validation step. The templating elements `"{col}"`
-            and `"{step}"` can be used to insert the column name and step number, respectively.
+            An optional brief description of the validation step that will be displayed in the
+            reporting table. You can use the templating elements like `"{step}"` to insert
+            the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+            the entire brief will be automatically generated. If `None` (the default) then there
+            won't be a brief.
         active
             A boolean value indicating whether the validation step should be active. Using `False`
             will make the validation step inactive (still reporting its presence and keeping indexes
@@ -3763,6 +4040,9 @@ class Validate:
         if isinstance(columns, (Column, str)):
             columns = [columns]
 
+        # Determine brief to use (global or local) and transform any shorthands of `brief=`
+        brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
+
         # Iterate over the columns and create a validation step for each
         for column in columns:
             val_info = _ValidationInfo(
@@ -3787,7 +4067,7 @@ class Validate:
         pre: Callable | None = None,
         thresholds: int | float | bool | tuple | dict | Thresholds = None,
         actions: Actions | None = None,
-        brief: str | None = None,
+        brief: str | bool | None = None,
         active: bool = True,
     ) -> Validate:
         """
@@ -3825,8 +4105,11 @@ class Validate:
             levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
             define the actions.
         brief
-            An optional brief description of the validation step. The templating elements `"{col}"`
-            and `"{step}"` can be used to insert the column name and step number, respectively.
+            An optional brief description of the validation step that will be displayed in the
+            reporting table. You can use the templating elements like `"{step}"` to insert
+            the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+            the entire brief will be automatically generated. If `None` (the default) then there
+            won't be a brief.
         active
             A boolean value indicating whether the validation step should be active. Using `False`
             will make the validation step inactive (still reporting its presence and keeping indexes
@@ -3918,6 +4201,9 @@ class Validate:
         if isinstance(columns, (Column, str)):
             columns = [columns]
 
+        # Determine brief to use (global or local) and transform any shorthands of `brief=`
+        brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
+
         # Iterate over the columns and create a validation step for each
         for column in columns:
             val_info = _ValidationInfo(
@@ -3942,7 +4228,7 @@ class Validate:
         pre: Callable | None = None,
         thresholds: int | float | bool | tuple | dict | Thresholds = None,
         actions: Actions | None = None,
-        brief: str | None = None,
+        brief: str | bool | None = None,
         active: bool = True,
     ) -> Validate:
         """
@@ -3975,8 +4261,11 @@ class Validate:
             levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
             define the actions.
         brief
-            An optional brief description of the validation step. The templating elements `"{col}"`
-            and `"{step}"` can be used to insert the column name and step number, respectively.
+            An optional brief description of the validation step that will be displayed in the
+            reporting table. You can use the templating elements like `"{step}"` to insert
+            the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+            the entire brief will be automatically generated. If `None` (the default) then there
+            won't be a brief.
         active
             A boolean value indicating whether the validation step should be active. Using `False`
             will make the validation step inactive (still reporting its presence and keeping indexes
@@ -4044,6 +4333,9 @@ class Validate:
             self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
         )
 
+        # Determine brief to use (global or local) and transform any shorthands of `brief=`
+        brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
+
         val_info = _ValidationInfo(
             assertion_type=assertion_type,
             column=None,
@@ -4064,7 +4356,7 @@ class Validate:
         columns: str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals,
         thresholds: int | float | bool | tuple | dict | Thresholds = None,
         actions: Actions | None = None,
-        brief: str | None = None,
+        brief: str | bool | None = None,
         active: bool = True,
     ) -> Validate:
         """
@@ -4093,8 +4385,11 @@ class Validate:
             levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
             define the actions.
         brief
-            An optional brief description of the validation step. The templating elements `"{col}"`
-            and `"{step}"` can be used to insert the column name and step number, respectively.
+            An optional brief description of the validation step that will be displayed in the
+            reporting table. You can use the templating elements like `"{step}"` to insert
+            the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+            the entire brief will be automatically generated. If `None` (the default) then there
+            won't be a brief.
         active
             A boolean value indicating whether the validation step should be active. Using `False`
             will make the validation step inactive (still reporting its presence and keeping indexes
@@ -4184,6 +4479,9 @@ class Validate:
         if isinstance(columns, (Column, str)):
             columns = [columns]
 
+        # Determine brief to use (global or local) and transform any shorthands of `brief=`
+        brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
+
         # Iterate over the columns and create a validation step for each
         for column in columns:
             val_info = _ValidationInfo(
@@ -4206,7 +4504,7 @@ class Validate:
         pre: Callable | None = None,
         thresholds: int | float | bool | tuple | dict | Thresholds = None,
         actions: Actions | None = None,
-        brief: str | None = None,
+        brief: str | bool | None = None,
         active: bool = True,
     ) -> Validate:
         """
@@ -4238,8 +4536,11 @@ class Validate:
             levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
             define the actions.
         brief
-            An optional brief description of the validation step. The templating elements `"{col}"`
-            and `"{step}"` can be used to insert the column name and step number, respectively.
+            An optional brief description of the validation step that will be displayed in the
+            reporting table. You can use the templating elements like `"{step}"` to insert
+            the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+            the entire brief will be automatically generated. If `None` (the default) then there
+            won't be a brief.
         active
             A boolean value indicating whether the validation step should be active. Using `False`
             will make the validation step inactive (still reporting its presence and keeping indexes
@@ -4328,6 +4629,9 @@ class Validate:
 
         # TODO: incorporate Column object
 
+        # Determine brief to use (global or local) and transform any shorthands of `brief=`
+        brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
+
         val_info = _ValidationInfo(
             assertion_type=assertion_type,
             column=columns_subset,
@@ -4353,7 +4657,7 @@ class Validate:
         pre: Callable | None = None,
         thresholds: int | float | bool | tuple | dict | Thresholds = None,
         actions: Actions | None = None,
-        brief: str | None = None,
+        brief: str | bool | None = None,
         active: bool = True,
     ) -> Validate:
         """
@@ -4406,8 +4710,11 @@ class Validate:
             levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
             define the actions.
         brief
-            An optional brief description of the validation step. The templating elements `"{col}"`
-            and `"{step}"` can be used to insert the column name and step number, respectively.
+            An optional brief description of the validation step that will be displayed in the
+            reporting table. You can use the templating elements like `"{step}"` to insert
+            the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+            the entire brief will be automatically generated. If `None` (the default) then there
+            won't be a brief.
         active
             A boolean value indicating whether the validation step should be active. Using `False`
             will make the validation step inactive (still reporting its presence and keeping indexes
@@ -4504,6 +4811,9 @@ class Validate:
             "full_match_dtypes": full_match_dtypes,
         }
 
+        # Determine brief to use (global or local) and transform any shorthands of `brief=`
+        brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
+
         val_info = _ValidationInfo(
             assertion_type=assertion_type,
             values=values,
@@ -4526,7 +4836,7 @@ class Validate:
         pre: Callable | None = None,
         thresholds: int | float | bool | tuple | dict | Thresholds = None,
         actions: Actions | None = None,
-        brief: str | None = None,
+        brief: str | bool | None = None,
         active: bool = True,
     ) -> Validate:
         """
@@ -4572,8 +4882,11 @@ class Validate:
             levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
             define the actions.
         brief
-            An optional brief description of the validation step. The templating elements `"{col}"`
-            and `"{step}"` can be used to insert the column name and step number, respectively.
+            An optional brief description of the validation step that will be displayed in the
+            reporting table. You can use the templating elements like `"{step}"` to insert
+            the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+            the entire brief will be automatically generated. If `None` (the default) then there
+            won't be a brief.
         active
             A boolean value indicating whether the validation step should be active. Using `False`
             will make the validation step inactive (still reporting its presence and keeping indexes
@@ -4675,6 +4988,9 @@ class Validate:
         # Package up the `count=` and boolean params into a dictionary for later interrogation
         values = {"count": count, "inverse": inverse, "abs_tol_bounds": bounds}
 
+        # Determine brief to use (global or local) and transform any shorthands of `brief=`
+        brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
+
         val_info = _ValidationInfo(
             assertion_type=assertion_type,
             values=values,
@@ -4696,7 +5012,7 @@ class Validate:
         pre: Callable | None = None,
         thresholds: int | float | bool | tuple | dict | Thresholds = None,
         actions: Actions | None = None,
-        brief: str | None = None,
+        brief: str | bool | None = None,
         active: bool = True,
     ) -> Validate:
         """
@@ -4734,8 +5050,11 @@ class Validate:
             levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
             define the actions.
         brief
-            An optional brief description of the validation step. The templating elements `"{col}"`
-            and `"{step}"` can be used to insert the column name and step number, respectively.
+            An optional brief description of the validation step that will be displayed in the
+            reporting table. You can use the templating elements like `"{step}"` to insert
+            the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+            the entire brief will be automatically generated. If `None` (the default) then there
+            won't be a brief.
         active
             A boolean value indicating whether the validation step should be active. Using `False`
             will make the validation step inactive (still reporting its presence and keeping indexes
@@ -4803,6 +5122,9 @@ class Validate:
         # Package up the `count=` and boolean params into a dictionary for later interrogation
         values = {"count": count, "inverse": inverse}
 
+        # Determine brief to use (global or local) and transform any shorthands of `brief=`
+        brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
+
         val_info = _ValidationInfo(
             assertion_type=assertion_type,
             values=values,
@@ -4824,7 +5146,7 @@ class Validate:
         get_first_n: int | None = None,
         sample_n: int | None = None,
         sample_frac: int | float | None = None,
-        sample_limit: int = 5000,
+        extract_limit: int = 500,
     ) -> Validate:
         """
         Execute each validation step against the table and store the results.
@@ -4835,8 +5157,8 @@ class Validate:
 
         The interrogation process will collect extracts of failing rows if the `collect_extracts=`
         option is set to `True` (the default). We can control the number of rows collected using the
-        `get_first_n=`, `sample_n=`, and `sample_frac=` options. The `sample_limit=` option will
-        enforce a hard limit on the number of rows collected when using the `sample_frac=` option.
+        `get_first_n=`, `sample_n=`, and `sample_frac=` options. The `extract_limit=` option will
+        enforce a hard limit on the number of rows collected when `collect_extracts=True`.
 
         After interrogation is complete, the `Validate` object will have gathered information, and
         we can use methods like [`n_passed()`](`pointblank.Validate.n_passed`),
@@ -4855,9 +5177,9 @@ class Validate:
             The processed data frames produced by executing the validation steps is collected and
             stored in the `Validate` object if `collect_tbl_checked=True`. This information is
             necessary for some methods (e.g.,
-            [`get_sundered_data()`](`pointblank.Validate.get_sundered_data`)), but it potentially
-            makes the object grow to a large size. To opt out of attaching this data, set this
-            argument to `False`.
+            [`get_sundered_data()`](`pointblank.Validate.get_sundered_data`)), but it can
+            potentially make the object grow to a large size. To opt out of attaching this data, set
+            this to `False`.
         get_first_n
             If the option to collect rows where test units is chosen, there is the option here to
             collect the first `n` rows. Supply an integer number of rows to extract from the top of
@@ -4871,11 +5193,15 @@ class Validate:
         sample_frac
             If the option to collect non-passing rows is chosen, this option allows for the sampling
             of a fraction of those rows. Provide a number in the range of `0` and `1`. The number of
-            rows to return could be very large, however, the `sample_limit=` option will apply a
+            rows to return could be very large, however, the `extract_limit=` option will apply a
             hard limit to the returned rows.
-        sample_limit
-            A value that limits the possible number of rows returned when sampling non-passing rows
-            using the `sample_frac=` option.
+        extract_limit
+            A value that limits the possible number of rows returned when extracting non-passing
+            rows. The default is `500` rows. This limit is applied after any sampling or limiting
+            options are applied. If the number of rows to be returned is greater than this limit,
+            then the number of rows returned will be limited to this value. This is useful for
+            preventing the collection of too many rows when the number of non-passing rows is very
+            large.
 
         Returns
         -------
@@ -4971,8 +5297,12 @@ class Validate:
             # Generate the autobrief description for the validation step; it's important to perform
             # that here since text components like the column and the value(s) have been resolved
             # at this point
-            autobrief = _create_autobrief(
-                assertion_type=assertion_type, lang=self.lang, column=column, values=value
+            autobrief = _create_autobrief_or_failure_text(
+                assertion_type=assertion_type,
+                lang=self.lang,
+                column=column,
+                values=value,
+                for_failure=False,
             )
 
             validation.autobrief = autobrief
@@ -5234,17 +5564,35 @@ class Validate:
                     ),
                 )
 
+            # If there is any threshold level that has been exceeded, then produce and
+            # set the general failure text for the validation step
+            if validation.warning or validation.error or validation.critical:
+                # Generate failure text for the validation step
+                failure_text = _create_autobrief_or_failure_text(
+                    assertion_type=assertion_type,
+                    lang=self.lang,
+                    column=column,
+                    values=value,
+                    for_failure=True,
+                )
+
+                # Set the failure text in the validation step
+                validation.failure_text = failure_text
+
             # Include the results table that has a new column called `pb_is_good_`; that
             # is a boolean column that indicates whether the row passed the validation or not
             if collect_tbl_checked and results_tbl is not None:
                 validation.tbl_checked = results_tbl
 
-            # Perform any necessary actions if threshold levels are exceeded for each
-            # of the severity levels ('warning', 'error', 'critical')
-            for level in ["warning", "error", "critical"]:
+            # Perform any necessary actions if threshold levels are exceeded for each of
+            # the severity levels (in descending order of 'critical', 'error', and 'warning')
+            for level in ["critical", "error", "warning"]:
                 if getattr(validation, level) and (
                     self.actions is not None or validation.actions is not None
                 ):
+                    # Translate the severity level to a number
+                    level_num = LOG_LEVELS_MAP[level]
+
                     #
                     # If step-level actions are set, prefer those over actions set globally
                     #
@@ -5274,7 +5622,25 @@ class Validate:
 
                                     print(act)
                                 elif callable(act):
-                                    act()
+                                    # Expose dictionary of values to the action function
+                                    metadata = {
+                                        "step": validation.i,
+                                        "column": column,
+                                        "value": value,
+                                        "type": assertion_type,
+                                        "time": str(start_time),
+                                        "level": level,
+                                        "level_num": level_num,
+                                        "autobrief": autobrief,
+                                        "failure_text": failure_text,
+                                    }
+
+                                    # Execute the action within the context manager
+                                    with _action_context_manager(metadata):
+                                        act()
+
+                        if validation.actions.highest_only:
+                            break
 
                     elif self.actions is not None:
                         # Action execution on the global level
@@ -5299,7 +5665,25 @@ class Validate:
 
                                     print(act)
                                 elif callable(act):
-                                    act()
+                                    # Expose dictionary of values to the action function
+                                    metadata = {
+                                        "step": validation.i,
+                                        "column": column,
+                                        "value": value,
+                                        "type": assertion_type,
+                                        "time": str(start_time),
+                                        "level": level,
+                                        "level_num": level_num,
+                                        "autobrief": autobrief,
+                                        "failure_text": failure_text,
+                                    }
+
+                                    # Execute the action within the context manager
+                                    with _action_context_manager(metadata):
+                                        act()
+
+                        if self.actions.highest_only:
+                            break
 
             # If this is a row-based validation step, then extract the rows that failed
             # TODO: Add support for extraction of rows for Ibis backends
@@ -5327,9 +5711,9 @@ class Validate:
                 elif sample_frac is not None:
                     validation_extract_nw = validation_extract_nw.sample(fraction=sample_frac)
 
-                    # Ensure a limit is set on the number of rows to extract
-                    if len(validation_extract_nw) > sample_limit:
-                        validation_extract_nw = validation_extract_nw.head(sample_limit)
+                # Ensure a limit is set on the number of rows to extract
+                if len(validation_extract_nw) > extract_limit:
+                    validation_extract_nw = validation_extract_nw.head(extract_limit)
 
                 validation.extract = nw.to_native(validation_extract_nw)
 
@@ -6655,6 +7039,12 @@ class Validate:
         # Get the thresholds object
         thresholds = self.thresholds
 
+        # Get the language for the report
+        lang = self.lang
+
+        # Get the locale for the report
+        locale = self.locale
+
         # Determine if there are any validation steps
         no_validation_steps = len(self.validation_info) == 0
 
@@ -6663,7 +7053,10 @@ class Validate:
         if no_validation_steps:
             # Create the title text
             title_text = _get_title_text(
-                title=title, tbl_name=self.tbl_name, interrogation_performed=False
+                title=title,
+                tbl_name=self.tbl_name,
+                interrogation_performed=False,
+                lang=lang,
             )
 
             # Create the label, table type, and thresholds HTML fragments
@@ -6686,7 +7079,7 @@ class Validate:
                 {
                     "status_color": "",
                     "i": "",
-                    "type_upd": "NO VALIDATION STEPS",
+                    "type_upd": "NO VALIDATION STEPS",  # TODO: Provide translation for this text
                     "columns_upd": "",
                     "values_upd": "",
                     "tbl": "",
@@ -6722,9 +7115,9 @@ class Validate:
                     cases={
                         "status_color": "",
                         "i": "",
-                        "type_upd": "STEP",
-                        "columns_upd": "COLUMNS",
-                        "values_upd": "VALUES",
+                        "type_upd": VALIDATION_REPORT_TEXT["report_col_step"][lang],
+                        "columns_upd": VALIDATION_REPORT_TEXT["report_col_columns"][lang],
+                        "values_upd": VALIDATION_REPORT_TEXT["report_col_values"][lang],
                         "tbl": "TBL",
                         "eval": "EVAL",
                         "test_units": "UNITS",
@@ -6809,8 +7202,16 @@ class Validate:
 
         # Add the `type_upd` entry to the dictionary
         validation_info_dict["type_upd"] = _transform_assertion_str(
-            assertion_str=validation_info_dict["assertion_type"]
+            assertion_str=validation_info_dict["assertion_type"],
+            brief_str=validation_info_dict["brief"],
+            autobrief_str=validation_info_dict["autobrief"],
         )
+
+        # Remove the `brief` entry from the dictionary
+        validation_info_dict.pop("brief")
+
+        # Remove the `autobrief` entry from the dictionary
+        validation_info_dict.pop("autobrief")
 
         # ------------------------------------------------
         # Process the `columns_upd` entry
@@ -6960,6 +7361,7 @@ class Validate:
             test_units=validation_info_dict["n"],
             interrogation_performed=interrogation_performed,
             active=active,
+            locale=locale,
         )
 
         # ------------------------------------------------
@@ -6974,6 +7376,7 @@ class Validate:
             f_passed_failed=validation_info_dict["f_passed"],
             interrogation_performed=interrogation_performed,
             active=active,
+            locale=locale,
         )
 
         validation_info_dict["fail"] = _transform_passed_failed(
@@ -6981,6 +7384,7 @@ class Validate:
             f_passed_failed=validation_info_dict["f_failed"],
             interrogation_performed=interrogation_performed,
             active=active,
+            locale=locale,
         )
 
         # ------------------------------------------------
@@ -7134,7 +7538,6 @@ class Validate:
         # Drop other keys from the dictionary
         validation_info_dict.pop("na_pass")
         validation_info_dict.pop("label")
-        validation_info_dict.pop("brief")
         validation_info_dict.pop("active")
         validation_info_dict.pop("all_passed")
 
@@ -7148,7 +7551,10 @@ class Validate:
 
         # Create the title text
         title_text = _get_title_text(
-            title=title, tbl_name=self.tbl_name, interrogation_performed=interrogation_performed
+            title=title,
+            tbl_name=self.tbl_name,
+            interrogation_performed=interrogation_performed,
+            lang=lang,
         )
 
         # Create the label, table type, and thresholds HTML fragments
@@ -7263,9 +7669,9 @@ class Validate:
                 cases={
                     "status_color": "",
                     "i": "",
-                    "type_upd": "STEP",
-                    "columns_upd": "COLUMNS",
-                    "values_upd": "VALUES",
+                    "type_upd": VALIDATION_REPORT_TEXT["report_col_step"][lang],
+                    "columns_upd": VALIDATION_REPORT_TEXT["report_col_columns"][lang],
+                    "values_upd": VALIDATION_REPORT_TEXT["report_col_values"][lang],
                     "tbl": "TBL",
                     "eval": "EVAL",
                     "test_units": "UNITS",
@@ -7367,12 +7773,18 @@ class Validate:
 
         return gt_tbl
 
-    def get_step_report(self, i: int) -> GT:
+    def get_step_report(
+        self,
+        i: int,
+        columns_subset: str | list[str] | Column | None = None,
+        header: str = ":default:",
+        limit: int | None = 10,
+    ) -> GT:
         """
         Get a detailed report for a single validation step.
 
-        The `get_step_report()` method returns a report of what went well, or what failed
-        spectacularly, for a given validation step. The report includes a summary of the validation
+        The `get_step_report()` method returns a report of what went well---or what failed
+        spectacularly---for a given validation step. The report includes a summary of the validation
         step and a detailed breakdown of the interrogation results. The report is presented as a GT
         table object, which can be displayed in a notebook or exported to an HTML file.
 
@@ -7384,7 +7796,24 @@ class Validate:
         Parameters
         ----------
         i
-            The step number for which to get a detailed report.
+            The step number for which to get the report.
+        columns_subset
+            The columns to display in a step report that shows errors in the input table. By default
+            all columns are shown (`None`). If a subset of columns is desired, we can provide a list
+            of column names, a string with a single column name, a `Column` object, or a
+            `ColumnSelector` object. The last two options allow for more flexible column selection
+            using column selector functions. Errors are raised if the column names provided don't
+            match any columns in the table (when provided as a string or list of strings) or if
+            column selector expressions don't resolve to any columns.
+        header
+            Options for customizing the header of the step report. The default is the `":default:"`
+            value which produces a generic header. Aside from this default, text can be provided for
+            the header. This will be interpreted as Markdown text and transformed internally to
+            HTML.
+        limit
+            The number of rows to display for those validation steps that check values in rows (the
+            `col_vals_*()` validation steps). The default is `10` rows and the limit can be removed
+            entirely by setting `limit=None`.
 
         Returns
         -------
@@ -7446,6 +7875,25 @@ class Validate:
         ```{python}
         validation.get_step_report(i=4)
         ```
+
+        If you'd like to trim down the number of columns shown in the report, you can provide a
+        subset of columns to display. For example, if you only want to see the columns `a`, `b`, and
+        `c`, you can provide those column names as a list.
+
+        ```{python}
+        validation.get_step_report(i=1, columns_subset=["a", "b", "c"])
+        ```
+
+        If you'd like to increase or reduce the maximum number of rows shown in the report, you can
+        provide a different value for the `limit` parameter. For example, if you'd like to see only
+        up to 5 rows, you can set `limit=5`.
+
+        ```{python}
+        validation.get_step_report(i=3, limit=5)
+        ```
+
+        Step 3 actually had 7 failing test units, but only the first 5 rows are shown in the step
+        report because of the `limit=5` parameter.
         """
 
         # If the step number is `-99` then enter the debug mode
@@ -7459,6 +7907,10 @@ class Validate:
         # If the step number is not valid, raise an error
         if i not in self._get_validation_dict(i=None, attr="i") and not debug_return_df:
             raise ValueError(f"Step {i} does not exist in the validation plan.")
+
+        # If limit is `0` or less, raise an error
+        if limit is not None and limit <= 0:
+            raise ValueError("The limit must be an integer value greater than 0.")
 
         # Convert the `validation_info` object to a dictionary
         validation_info_dict = _validation_info_as_dict(validation_info=self.validation_info)
@@ -7499,7 +7951,15 @@ class Validate:
             return "This validation step is inactive."
 
         # Create a table with a sample of ten rows, highlighting the column of interest
-        tbl_preview = preview(data=self.data, n_head=5, n_tail=5, limit=10, incl_header=False)
+        tbl_preview = preview(
+            data=self.data,
+            columns_subset=columns_subset,
+            n_head=5,
+            n_tail=5,
+            limit=10,
+            min_tbl_width=600,
+            incl_header=False,
+        )
 
         # If no rows were extracted, create a message to indicate that no rows were extracted
         # if get_row_count(extract) == 0:
@@ -7514,6 +7974,7 @@ class Validate:
                 i=i,
                 column=column,
                 column_position=column_position,
+                columns_subset=columns_subset,
                 values=values,
                 inclusive=inclusive,
                 n=n,
@@ -7521,6 +7982,8 @@ class Validate:
                 all_passed=all_passed,
                 extract=extract,
                 tbl_preview=tbl_preview,
+                header=header,
+                limit=limit,
             )
 
         elif assertion_type == "col_schema_match":
@@ -7533,13 +7996,13 @@ class Validate:
             # CASE I: where ordering of columns is required (`in_order=True`)
             if in_order:
                 step_report = _step_report_schema_in_order(
-                    step=i, schema_info=val_info, debug_return_df=debug_return_df
+                    step=i, schema_info=val_info, header=header, debug_return_df=debug_return_df
                 )
 
             # CASE II: where ordering of columns is not required (`in_order=False`)
             if not in_order:
                 step_report = _step_report_schema_any_order(
-                    step=i, schema_info=val_info, debug_return_df=debug_return_df
+                    step=i, schema_info=val_info, header=header, debug_return_df=debug_return_df
                 )
 
         else:
@@ -7704,6 +8167,16 @@ def _process_brief(brief: str | None, step: int, col: str | list[str] | None) ->
     return brief
 
 
+def _transform_auto_brief(brief: str | bool | None) -> str | None:
+    if isinstance(brief, bool):
+        if brief:
+            return "{auto}"
+        else:
+            return None
+    else:
+        return brief
+
+
 def _process_action_str(
     action_str: str,
     step: int,
@@ -7721,6 +8194,10 @@ def _process_action_str(
     # If a `col` value is available for the validation step *and* the action string contains a
     # placeholder for the column name then replace with `col`; placeholders are: {col} and {column}
     if col is not None:
+        # If a list of columns is provided, then join the columns into a comma-separated string
+        if isinstance(col, list):
+            col = ", ".join(col)
+
         action_str = action_str.replace("{col}", col)
         action_str = action_str.replace("{column}", col)
 
@@ -7753,8 +8230,8 @@ def _process_action_str(
     return action_str
 
 
-def _create_autobrief(
-    assertion_type: str, lang: str, column: str | None, values: str | None
+def _create_autobrief_or_failure_text(
+    assertion_type: str, lang: str, column: str | None, values: str | None, for_failure: bool
 ) -> str:
     if assertion_type in [
         "col_vals_gt",
@@ -7764,61 +8241,128 @@ def _create_autobrief(
         "col_vals_eq",
         "col_vals_ne",
     ]:
-        return _create_autobrief_comparison(
-            assertion_type=assertion_type, lang=lang, column=column, values=values
+        return _create_text_comparison(
+            assertion_type=assertion_type,
+            lang=lang,
+            column=column,
+            values=values,
+            for_failure=for_failure,
         )
 
     if assertion_type == "col_vals_between":
-        return _create_autobrief_between(
-            lang=lang, column=column, value_1=values[0], value_2=values[1]
+        return _create_text_between(
+            lang=lang,
+            column=column,
+            value_1=values[0],
+            value_2=values[1],
+            for_failure=for_failure,
         )
 
     if assertion_type == "col_vals_outside":
-        return _create_autobrief_between(
-            lang=lang, column=column, value_1=values[0], value_2=values[1], not_=True
+        return _create_text_between(
+            lang=lang,
+            column=column,
+            value_1=values[0],
+            value_2=values[1],
+            not_=True,
+            for_failure=for_failure,
         )
 
     if assertion_type == "col_vals_in_set":
-        return _create_autobrief_set(lang=lang, column=column, values=values)
+        return _create_text_set(
+            lang=lang,
+            column=column,
+            values=values,
+            for_failure=for_failure,
+        )
 
     if assertion_type == "col_vals_not_in_set":
-        return _create_autobrief_set(lang=lang, column=column, values=values, not_=True)
+        return _create_text_set(
+            lang=lang,
+            column=column,
+            values=values,
+            not_=True,
+            for_failure=for_failure,
+        )
 
     if assertion_type == "col_vals_null":
-        return _create_autobrief_null(lang=lang, column=column)
+        return _create_text_null(
+            lang=lang,
+            column=column,
+            for_failure=for_failure,
+        )
 
     if assertion_type == "col_vals_not_null":
-        return _create_autobrief_null(lang=lang, column=column, not_=True)
+        return _create_text_null(
+            lang=lang,
+            column=column,
+            not_=True,
+            for_failure=for_failure,
+        )
 
     if assertion_type == "col_vals_regex":
-        return _create_autobrief_regex(lang=lang, column=column, pattern=values)
+        return _create_text_regex(
+            lang=lang,
+            column=column,
+            pattern=values,
+            for_failure=for_failure,
+        )
 
     if assertion_type == "col_vals_expr":
-        return _create_autobrief_expr(lang=lang)
+        return _create_text_expr(
+            lang=lang,
+            for_failure=for_failure,
+        )
 
     if assertion_type == "col_exists":
-        return _create_autobrief_col_exists(lang=lang, column=column)
+        return _create_text_col_exists(
+            lang=lang,
+            column=column,
+            for_failure=for_failure,
+        )
 
     if assertion_type == "col_schema_match":
-        return _create_autobrief_col_schema_match(lang=lang)
+        return _create_text_col_schema_match(
+            lang=lang,
+            for_failure=for_failure,
+        )
 
     if assertion_type == "rows_distinct":
-        return _create_autobrief_rows_distinct(lang=lang, columns_subset=column)
+        return _create_text_rows_distinct(
+            lang=lang,
+            columns_subset=column,
+            for_failure=for_failure,
+        )
 
     if assertion_type == "row_count_match":
-        return _create_autobrief_row_count_match(lang=lang, value=values)
+        return _create_text_row_count_match(
+            lang=lang,
+            value=values,
+            for_failure=for_failure,
+        )
 
     if assertion_type == "col_count_match":
-        return _create_autobrief_col_count_match(lang=lang, value=values)
+        return _create_text_col_count_match(
+            lang=lang,
+            value=values,
+            for_failure=for_failure,
+        )
 
     return None
 
 
-def _create_autobrief_comparison(
-    assertion_type: str, lang: str, column: str | None, values: str | None
+def _expect_failure_type(for_failure: bool) -> str:
+    return "failure" if for_failure else "expectation"
+
+
+def _create_text_comparison(
+    assertion_type: str,
+    lang: str,
+    column: str | list[str] | None,
+    values: str | None,
+    for_failure: bool = False,
 ) -> str:
-    # For now `column_computed_text` is an empty string
-    column_computed_text = ""
+    type_ = _expect_failure_type(for_failure=for_failure)
 
     operator = COMPARISON_OPERATORS[assertion_type]
 
@@ -7826,23 +8370,24 @@ def _create_autobrief_comparison(
 
     values_text = _prep_values_text(values=values, lang=lang, limit=3)
 
-    compare_expectation_text = EXPECT_FAIL_TEXT["compare_expectation_text"][lang]
+    compare_expectation_text = EXPECT_FAIL_TEXT[f"compare_{type_}_text"][lang]
 
-    autobrief = compare_expectation_text.format(
+    return compare_expectation_text.format(
         column_text=column_text,
-        column_computed_text=column_computed_text,
         operator=operator,
         values_text=values_text,
     )
 
-    return autobrief
 
-
-def _create_autobrief_between(
-    lang: str, column: str | None, value_1: str, value_2: str, not_: bool = False
+def _create_text_between(
+    lang: str,
+    column: str | None,
+    value_1: str,
+    value_2: str,
+    not_: bool = False,
+    for_failure: bool = False,
 ) -> str:
-    # For now `column_computed_text` is an empty string
-    column_computed_text = ""
+    type_ = _expect_failure_type(for_failure=for_failure)
 
     column_text = _prep_column_text(column=column)
 
@@ -7850,140 +8395,137 @@ def _create_autobrief_between(
     value_2_text = _prep_values_text(values=value_2, lang=lang, limit=3)
 
     if not not_:
-        autobrief = EXPECT_FAIL_TEXT["between_expectation_text"][lang].format(
+        text = EXPECT_FAIL_TEXT[f"between_{type_}_text"][lang].format(
             column_text=column_text,
-            column_computed_text=column_computed_text,
             value_1=value_1_text,
             value_2=value_2_text,
         )
     else:
-        autobrief = EXPECT_FAIL_TEXT["not_between_expectation_text"][lang].format(
+        text = EXPECT_FAIL_TEXT[f"not_between_{type_}_text"][lang].format(
             column_text=column_text,
-            column_computed_text=column_computed_text,
             value_1=value_1_text,
             value_2=value_2_text,
         )
 
-    return autobrief
+    return text
 
 
-def _create_autobrief_set(
-    lang: str, column: str | None, values: list[any], not_: bool = False
+def _create_text_set(
+    lang: str, column: str | None, values: list[any], not_: bool = False, for_failure: bool = False
 ) -> str:
-    # For now `column_computed_text` is an empty string
-    column_computed_text = ""
+    type_ = _expect_failure_type(for_failure=for_failure)
 
     values_text = _prep_values_text(values=values, lang=lang, limit=3)
 
     column_text = _prep_column_text(column=column)
 
     if not not_:
-        autobrief = EXPECT_FAIL_TEXT["in_set_expectation_text"][lang].format(
+        text = EXPECT_FAIL_TEXT[f"in_set_{type_}_text"][lang].format(
             column_text=column_text,
-            column_computed_text=column_computed_text,
             values_text=values_text,
         )
     else:
-        autobrief = EXPECT_FAIL_TEXT["not_in_set_expectation_text"][lang].format(
+        text = EXPECT_FAIL_TEXT[f"not_in_set_{type_}_text"][lang].format(
             column_text=column_text,
-            column_computed_text=column_computed_text,
             values_text=values_text,
         )
 
-    return autobrief
+    return text
 
 
-def _create_autobrief_null(lang: str, column: str | None, not_: bool = False) -> str:
-    # For now `column_computed_text` is an empty string
-    column_computed_text = ""
+def _create_text_null(
+    lang: str, column: str | None, not_: bool = False, for_failure: bool = False
+) -> str:
+    type_ = _expect_failure_type(for_failure=for_failure)
 
     column_text = _prep_column_text(column=column)
 
     if not not_:
-        autobrief = EXPECT_FAIL_TEXT["null_expectation_text"][lang].format(
-            column_text=column_text, column_computed_text=column_computed_text
+        text = EXPECT_FAIL_TEXT[f"null_{type_}_text"][lang].format(
+            column_text=column_text,
         )
     else:
-        autobrief = EXPECT_FAIL_TEXT["not_null_expectation_text"][lang].format(
-            column_text=column_text, column_computed_text=column_computed_text
+        text = EXPECT_FAIL_TEXT[f"not_null_{type_}_text"][lang].format(
+            column_text=column_text,
         )
 
-    return autobrief
+    return text
 
 
-def _create_autobrief_regex(lang: str, column: str | None, pattern: str) -> str:
-    # For now `column_computed_text` is an empty string
-    column_computed_text = ""
+def _create_text_regex(
+    lang: str, column: str | None, pattern: str, for_failure: bool = False
+) -> str:
+    type_ = _expect_failure_type(for_failure=for_failure)
 
     column_text = _prep_column_text(column=column)
 
-    autobrief = EXPECT_FAIL_TEXT["regex_expectation_text"][lang].format(
+    return EXPECT_FAIL_TEXT[f"regex_{type_}_text"][lang].format(
         column_text=column_text,
-        column_computed_text=column_computed_text,
         values_text=pattern,
     )
 
-    return autobrief
+
+def _create_text_expr(lang: str, for_failure: bool) -> str:
+    type_ = _expect_failure_type(for_failure=for_failure)
+
+    return EXPECT_FAIL_TEXT[f"col_vals_expr_{type_}_text"][lang]
 
 
-def _create_autobrief_expr(lang: str) -> str:
-    autobrief = EXPECT_FAIL_TEXT["col_vals_expr_expectation_text"][lang]
+def _create_text_col_exists(lang: str, column: str | None, for_failure: bool = False) -> str:
+    type_ = _expect_failure_type(for_failure=for_failure)
 
-    return autobrief
-
-
-def _create_autobrief_col_exists(lang: str, column: str | None) -> str:
     column_text = _prep_column_text(column=column)
 
-    autobrief = EXPECT_FAIL_TEXT["col_exists_expectation_text"][lang].format(
-        column_text=column_text
-    )
-
-    return autobrief
+    return EXPECT_FAIL_TEXT[f"col_exists_{type_}_text"][lang].format(column_text=column_text)
 
 
-def _create_autobrief_col_schema_match(lang: str) -> str:
-    autobrief = EXPECT_FAIL_TEXT["col_schema_match_expectation_text"][lang]
+def _create_text_col_schema_match(lang: str, for_failure: bool) -> str:
+    type_ = _expect_failure_type(for_failure=for_failure)
 
-    return autobrief
+    return EXPECT_FAIL_TEXT[f"col_schema_match_{type_}_text"][lang]
 
 
-def _create_autobrief_rows_distinct(lang: str, columns_subset: list[str] | None) -> str:
+def _create_text_rows_distinct(
+    lang: str, columns_subset: list[str] | None, for_failure: bool = False
+) -> str:
+    type_ = _expect_failure_type(for_failure=for_failure)
+
     if columns_subset is None:
-        autobrief = EXPECT_FAIL_TEXT["all_row_distinct_expectation_text"][lang]
+        text = EXPECT_FAIL_TEXT[f"all_row_distinct_{type_}_text"][lang]
 
     else:
         column_text = _prep_values_text(values=columns_subset, lang=lang, limit=3)
 
-        autobrief = EXPECT_FAIL_TEXT["across_row_distinct_expectation_text"][lang].format(
+        text = EXPECT_FAIL_TEXT[f"across_row_distinct_{type_}_text"][lang].format(
             column_text=column_text
         )
 
-    return autobrief
+    return text
 
 
-def _create_autobrief_row_count_match(lang: str, value: int) -> str:
+def _create_text_row_count_match(lang: str, value: int, for_failure: bool = False) -> str:
+    type_ = _expect_failure_type(for_failure=for_failure)
+
     values_text = _prep_values_text(value["count"], lang=lang)
 
-    autobrief = EXPECT_FAIL_TEXT["row_count_match_n_expectation_text"][lang].format(
-        values_text=values_text
-    )
-
-    return autobrief
+    return EXPECT_FAIL_TEXT[f"row_count_match_n_{type_}_text"][lang].format(values_text=values_text)
 
 
-def _create_autobrief_col_count_match(lang: str, value: int) -> str:
+def _create_text_col_count_match(lang: str, value: int, for_failure: bool = False) -> str:
+    type_ = _expect_failure_type(for_failure=for_failure)
+
     values_text = _prep_values_text(value["count"], lang=lang)
 
-    autobrief = EXPECT_FAIL_TEXT["col_count_match_n_expectation_text"][lang].format(
-        values_text=values_text
-    )
-
-    return autobrief
+    return EXPECT_FAIL_TEXT[f"col_count_match_n_{type_}_text"][lang].format(values_text=values_text)
 
 
-def _prep_column_text(column: list[str]) -> str:
-    return "`" + str(column[0]) + "`"
+def _prep_column_text(column: str | list[str]) -> str:
+    if isinstance(column, list):
+        return "`" + str(column[0]) + "`"
+    elif isinstance(column, str):
+        return "`" + column + "`"
+    else:
+        return ""
 
 
 def _prep_values_text(
@@ -8066,6 +8608,7 @@ def _validation_info_as_dict(validation_info: _ValidationInfo) -> dict:
         "pre",
         "label",
         "brief",
+        "autobrief",
         "active",
         "eval_error",
         "all_passed",
@@ -8116,8 +8659,10 @@ def _replace_svg_dimensions(svg: list[str], height_width: int | float) -> list[s
     return svg
 
 
-def _get_title_text(title: str | None, tbl_name: str | None, interrogation_performed: bool) -> str:
-    title = _process_title_text(title=title, tbl_name=tbl_name)
+def _get_title_text(
+    title: str | None, tbl_name: str | None, interrogation_performed: bool, lang: str
+) -> str:
+    title = _process_title_text(title=title, tbl_name=tbl_name, lang=lang)
 
     if interrogation_performed:
         return title
@@ -8139,11 +8684,13 @@ def _get_title_text(title: str | None, tbl_name: str | None, interrogation_perfo
     return html_str
 
 
-def _process_title_text(title: str | None, tbl_name: str | None) -> str:
+def _process_title_text(title: str | None, tbl_name: str | None, lang: str) -> str:
+    default_title_text = VALIDATION_REPORT_TEXT["pointblank_validation_title_text"][lang]
+
     if title is None:
         title_text = ""
     elif title == ":default:":
-        title_text = _get_default_title_text()
+        title_text = default_title_text
     elif title == ":none:":
         title_text = ""
     elif title == ":tbl_name:":
@@ -8155,10 +8702,6 @@ def _process_title_text(title: str | None, tbl_name: str | None) -> str:
         title_text = commonmark.commonmark(title)
 
     return title_text
-
-
-def _get_default_title_text() -> str:
-    return "Pointblank Validation"
 
 
 def _transform_tbl_preprocessed(pre: str, interrogation_performed: bool) -> list[str]:
@@ -8213,7 +8756,7 @@ def _transform_eval(
 
 
 def _transform_test_units(
-    test_units: list[int], interrogation_performed: bool, active: list[bool]
+    test_units: list[int], interrogation_performed: bool, active: list[bool], locale: str
 ) -> list[str]:
     # If no interrogation was performed, return a list of empty strings
     if not interrogation_performed:
@@ -8224,7 +8767,7 @@ def _transform_test_units(
             (
                 str(test_units[i])
                 if test_units[i] < 10000
-                else str(vals.fmt_number(test_units[i], n_sigfig=3, compact=True)[0])
+                else str(vals.fmt_number(test_units[i], n_sigfig=3, compact=True, locale=locale)[0])
             )
             if active[i]
             else "&mdash;"
@@ -8233,8 +8776,8 @@ def _transform_test_units(
     ]
 
 
-def _fmt_lg(value: int) -> str:
-    return vals.fmt_number(value, n_sigfig=3, compact=True)[0]
+def _fmt_lg(value: int, locale: str) -> str:
+    return vals.fmt_number(value, n_sigfig=3, compact=True, locale=locale)[0]
 
 
 def _transform_passed_failed(
@@ -8242,14 +8785,15 @@ def _transform_passed_failed(
     f_passed_failed: list[float],
     interrogation_performed: bool,
     active: list[bool],
+    locale: str,
 ) -> list[str]:
     if not interrogation_performed:
         return ["" for _ in range(len(n_passed_failed))]
 
     passed_failed = [
         (
-            f"{n_passed_failed[i] if n_passed_failed[i] < 10000 else _fmt_lg(n_passed_failed[i])}"
-            f"<br />{vals.fmt_number(f_passed_failed[i], decimals=2)[0]}"
+            f"{n_passed_failed[i] if n_passed_failed[i] < 10000 else _fmt_lg(n_passed_failed[i], locale=locale)}"
+            f"<br />{vals.fmt_number(f_passed_failed[i], decimals=2, locale=locale)[0]}"
             if active[i]
             else "&mdash;"
         )
@@ -8280,12 +8824,28 @@ def _transform_w_s_n(values, color, interrogation_performed):
     ]
 
 
-def _transform_assertion_str(assertion_str: list[str]) -> list[str]:
+def _transform_assertion_str(
+    assertion_str: list[str], brief_str: list[str | None], autobrief_str: list[str]
+) -> list[str]:
     # Get the SVG icons for the assertion types
     svg_icon = _get_assertion_icon(icon=assertion_str)
-
     # Append `()` to the `assertion_str`
     assertion_str = [x + "()" for x in assertion_str]
+
+    # Make every None value in `brief_str` an empty string
+    brief_str = ["" if x is None else x for x in brief_str]
+
+    # If the template text `{auto}` is in the `brief_str` then replace it with the corresponding
+    # `autobrief_str` entry
+    brief_str = [
+        brief_str[i].replace("{auto}", autobrief_str[i])
+        if "{auto}" in brief_str[i]
+        else brief_str[i]
+        for i in range(len(brief_str))
+    ]
+
+    # Use Markdown-to-HTML conversion to format the `brief_str` text
+    brief_str = [commonmark.commonmark(x) for x in brief_str]
 
     # Obtain the number of characters contained in the assertion
     # string; this is important for sizing components appropriately
@@ -8294,15 +8854,26 @@ def _transform_assertion_str(assertion_str: list[str]) -> list[str]:
     # Declare the text size based on the length of `assertion_str`
     text_size = [10 if nchar + 2 >= 20 else 11 for nchar in assertion_type_nchar]
 
-    # Create the assertion type update using a list comprehension
+    # Define the brief's HTML div tag for each row
+    brief_divs = [
+        f"<div style=\"font-size: 9px; font-family: 'IBM Plex Sans'; text-wrap: balance; margin-top: 3px;\">{brief}</div>"
+        if brief.strip()
+        else ""
+        for brief in brief_str
+    ]
+
+    # Create the assertion `type_upd` strings
     type_upd = [
         f"""
-        <div style="margin:0;padding:0;display:inline-block;height:30px;vertical-align:middle;">
-        <!--?xml version="1.0" encoding="UTF-8"?-->{svg}
+        <div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
+            <!--?xml version="1.0" encoding="UTF-8"?-->{svg}
         </div>
-        <span style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size:{size}px;"> {assertion}</span>
+        <div style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size: {size}px; display: inline-block; vertical-align: middle;">
+            <div>{assertion}</div>
+        </div>
+        {brief_div}
         """
-        for assertion, svg, size in zip(assertion_str, svg_icon, text_size)
+        for assertion, svg, size, brief_div in zip(assertion_str, svg_icon, text_size, brief_divs)
     ]
 
     return type_upd
@@ -8466,6 +9037,7 @@ def _step_report_row_based(
     i: int,
     column: str,
     column_position: int,
+    columns_subset: list[str] | None,
     values: any,
     inclusive: tuple[bool, bool] | None,
     n: int,
@@ -8473,6 +9045,8 @@ def _step_report_row_based(
     all_passed: bool,
     extract: any,
     tbl_preview: GT,
+    header: str,
+    limit: int | None,
 ):
     # Get the length of the extracted data for the step
     extract_length = get_row_count(extract)
@@ -8512,8 +9086,36 @@ def _step_report_row_based(
         text = f"<code style='color: #303030; font-family: monospace; font-size: smaller;'>{column}</code> is not <code style='color: #303030; font-family: monospace; font-size: smaller;'>Null</code>"
 
     if all_passed:
-        step_report = (
-            tbl_preview.tab_header(
+        # Style the target column in green and add borders but only if that column is present
+        # in the `tbl_preview` (i.e., it may not be present if `columns_subset=` didn't include it)
+        preview_tbl_columns = tbl_preview._boxhead._get_columns()
+        preview_tbl_has_target_column = column in preview_tbl_columns
+
+        if preview_tbl_has_target_column:
+            step_report = tbl_preview.tab_style(
+                style=[
+                    style.text(color="#006400"),
+                    style.fill(color="#4CA64C33"),
+                    style.borders(
+                        sides=["left", "right"],
+                        color="#1B4D3E80",
+                        style="solid",
+                        weight="2px",
+                    ),
+                ],
+                locations=loc.body(columns=column),
+            ).tab_style(
+                style=style.borders(
+                    sides=["left", "right"], color="#1B4D3E80", style="solid", weight="2px"
+                ),
+                locations=loc.column_labels(columns=column),
+            )
+
+        else:
+            step_report = tbl_preview
+
+        if header == ":default:":
+            step_report = step_report.tab_header(
                 title=html(f"Report for Validation Step {i} {CHECK_MARK_SPAN}"),
                 subtitle=html(
                     "<div>"
@@ -8526,56 +9128,43 @@ def _step_report_row_based(
                     "</div></div>"
                 ),
             )
-            .tab_style(
-                style=[
-                    style.text(color="#006400"),
-                    style.fill(color="#4CA64C33"),
-                    style.borders(
-                        sides=["left", "right"],
-                        color="#1B4D3E80",
-                        style="solid",
-                        weight="2px",
-                    ),
-                ],
-                locations=loc.body(columns=column),
+
+        else:
+            step_report = step_report.tab_header(
+                title=md(header),
             )
-            .tab_style(
-                style=style.borders(
-                    sides=["left", "right"], color="#1B4D3E80", style="solid", weight="2px"
-                ),
-                locations=loc.column_labels(columns=column),
-            )
-        )
 
     else:
+        if limit is None:
+            limit = extract_length
+
         # Create a preview of the extracted data
         extract_tbl = _generate_display_table(
             data=extract,
-            n_head=1000,
-            n_tail=1000,
-            limit=2000,
+            columns_subset=columns_subset,
+            n_head=limit,
+            n_tail=0,
+            limit=limit,
+            min_tbl_width=600,
             incl_header=False,
             mark_missing_values=False,
         )
 
-        step_report = (
-            extract_tbl.tab_header(
-                title=f"Report for Validation Step {i}",
-                subtitle=html(
-                    "<div>"
-                    "ASSERTION <span style='border-style: solid; border-width: thin; "
-                    "border-color: lightblue; padding-left: 2px; padding-right: 2px;'>"
-                    f"<code style='color: #303030;'>{text}</code></span><br>"
-                    f"<div style='padding-top: 3px;'><strong>{n_failed}</strong> / "
-                    f"<strong>{n}</strong> TEST UNIT FAILURES "
-                    f"IN COLUMN <strong>{column_position}</strong></div>"
-                    "<div style='padding-top: 10px;'>EXTRACT OF "
-                    f"<strong>{extract_length}</strong> ROWS WITH "
-                    "<span style='color: #B22222;'>TEST UNIT FAILURES IN RED</span>:"
-                    "</div></div>"
-                ),
-            )
-            .tab_style(
+        if limit < extract_length:
+            extract_length_resolved = limit
+            extract_of_x_rows = "FIRST"
+
+        else:
+            extract_length_resolved = extract_length
+            extract_of_x_rows = "ALL"
+
+        # Style the target column in green and add borders but only if that column is present
+        # in the `extract_tbl` (i.e., it may not be present if `columns_subset=` didn't include it)
+        extract_tbl_columns = extract_tbl._boxhead._get_columns()
+        extract_tbl_has_target_column = column in extract_tbl_columns
+
+        if extract_tbl_has_target_column:
+            step_report = extract_tbl.tab_style(
                 style=[
                     style.text(color="#B22222"),
                     style.fill(color="#FFC1C159"),
@@ -8584,20 +9173,47 @@ def _step_report_row_based(
                     ),
                 ],
                 locations=loc.body(columns=column),
-            )
-            .tab_style(
+            ).tab_style(
                 style=style.borders(
                     sides=["left", "right"], color="black", style="solid", weight="2px"
                 ),
                 locations=loc.column_labels(columns=column),
             )
-        )
+
+            not_shown = ""
+            shown_failures = "WITH <span style='color: #B22222;'>TEST UNIT FAILURES IN RED</span>"
+        else:
+            step_report = extract_tbl
+            not_shown = " (NOT SHOWN)"
+            shown_failures = ""
+
+        if header == ":default:":
+            step_report = step_report.tab_header(
+                title=f"Report for Validation Step {i}",
+                subtitle=html(
+                    "<div>"
+                    "ASSERTION <span style='border-style: solid; border-width: thin; "
+                    "border-color: lightblue; padding-left: 2px; padding-right: 2px;'>"
+                    f"<code style='color: #303030;'>{text}</code></span><br>"
+                    f"<div style='padding-top: 3px;'><strong>{n_failed}</strong> / "
+                    f"<strong>{n}</strong> TEST UNIT FAILURES "
+                    f"IN COLUMN <strong>{column_position}</strong>{not_shown}</div>"
+                    f"<div style='padding-top: 10px;'>EXTRACT OF {extract_of_x_rows} "
+                    f"<strong>{extract_length_resolved}</strong> ROWS {shown_failures}:"
+                    "</div></div>"
+                ),
+            )
+
+        else:
+            step_report = step_report.tab_header(
+                title=md(header),
+            )
 
     return step_report
 
 
 def _step_report_schema_in_order(
-    step: int, schema_info: dict, debug_return_df: bool = False
+    step: int, schema_info: dict, header: str, debug_return_df: bool = False
 ) -> GT | any:
     """
     This is the case for schema validation where the schema is supposed to have the same column
@@ -8775,10 +9391,6 @@ def _step_report_schema_in_order(
 
     step_report = (
         GT(schema_combined, id="pb_step_tbl")
-        .tab_header(
-            title=html(f"Report for Validation Step {step} {passing_symbol}"),
-            subtitle=html(col_schema_match_params_html),
-        )
         .fmt_markdown(columns=None)
         .opt_table_font(font=google_font(name="IBM Plex Sans"))
         .opt_align_table_header(align="left")
@@ -8865,6 +9477,15 @@ def _step_report_schema_in_order(
         .tab_options(source_notes_font_size="12px")
     )
 
+    if header == ":default:":
+        step_report = step_report.tab_header(
+            title=html(f"Report for Validation Step {step} {passing_symbol}"),
+            subtitle=html(col_schema_match_params_html),
+        )
+
+    else:
+        step_report = step_report.tab_header(title=md(header))
+
     if schema_length == "shorter":
         # Add background color to the missing column on the exp side
         step_report = step_report.tab_style(
@@ -8909,7 +9530,7 @@ def _step_report_schema_in_order(
 
 
 def _step_report_schema_any_order(
-    step: int, schema_info: dict, debug_return_df: bool = False
+    step: int, schema_info: dict, header: str, debug_return_df: bool = False
 ) -> GT | any:
     """
     This is the case for schema validation where the schema is permitted to not have to be in the
@@ -9189,10 +9810,6 @@ def _step_report_schema_any_order(
 
     step_report = (
         GT(schema_combined, id="pb_step_tbl")
-        .tab_header(
-            title=html(f"Report for Validation Step {step} {passing_symbol}"),
-            subtitle=html(col_schema_match_params_html),
-        )
         .fmt_markdown(columns=None)
         .opt_table_font(font=google_font(name="IBM Plex Sans"))
         .opt_align_table_header(align="left")
@@ -9279,6 +9896,15 @@ def _step_report_schema_any_order(
         )
         .tab_options(source_notes_font_size="12px")
     )
+
+    if header == ":default:":
+        step_report = step_report.tab_header(
+            title=html(f"Report for Validation Step {step} {passing_symbol}"),
+            subtitle=html(col_schema_match_params_html),
+        )
+
+    else:
+        step_report = step_report.tab_header(title=md(header))
 
     # Add background color to signify limits of target table schema (on LHS side)
     if len(colnames_exp_unmatched) > 0:

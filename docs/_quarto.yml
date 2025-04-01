@@ -171,19 +171,26 @@ quartodoc:
         The *Inspection and Assistance* group contains functions that are helpful for getting to
         grips on a new data table. Use the `DataScan` class to get a quick overview of the data,
         `preview()` to see the first and last few rows of a table, `col_summary_tbl()` for a
-        column-level summary of a table, `missing_vals_tbl()` to see where there are missing values
-        in a table, and `get_column_count()`/`get_row_count()` to get the number of columns and rows
-        in a table. Several datasets included in the package can be accessed via the
-        `load_dataset()` function. Finally, the `config()` utility lets us set global configuration
-        parameters. Want to chat with an assistant? Use the `assistant()` function to get help with
-        Pointblank.
+        column-level summary of a table, and `missing_vals_tbl()` to see where there are missing
+        values in a table. Several datasets included in the package can be accessed via the
+        `load_dataset()` function. On the assistance side, the `assistant()` function can be used to
+        get help with Pointblank.
       contents:
         - name: DataScan
         - name: preview
         - name: col_summary_tbl
         - name: missing_vals_tbl
+        - name: assistant
+        - name: load_dataset
+    - title: Utility Functions
+      desc: >
+        The *Utility Functions* group contains functions that are useful accessing metadata about
+        the target data. Use `get_column_count()` or `get_row_count()` to get the number of columns
+        or rows in a table. The `get_action_metadata()` function is useful when building custom
+        actions since it returns metadata about the validation step that's triggering the action.
+        Lastly, the `config()` utility lets us set global configuration parameters.
+      contents:
         - name: get_column_count
         - name: get_row_count
-        - name: load_dataset
+        - name: get_action_metadata
         - name: config
-        - name: assistant

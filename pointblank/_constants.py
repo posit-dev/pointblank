@@ -13,8 +13,8 @@ COMPATIBLE_DTYPES = {
     "ne": ["numeric", "datetime"],
     "ge": ["numeric", "datetime"],
     "le": ["numeric", "datetime"],
-    "between": ["numeric"],
-    "outside": ["numeric"],
+    "between": ["numeric", "datetime"],
+    "outside": ["numeric", "datetime"],
     "in_set": ["numeric", "str"],
     "not_in_set": ["numeric", "str"],
     "regex": ["str"],
@@ -175,6 +175,8 @@ SEVERITY_LEVEL_COLORS = {
     "critical": "#FF3300",
     "green": "#4CA64C",
 }
+
+LOG_LEVELS_MAP = {"warning": 30, "error": 40, "critical": 50}
 
 CHECK_MARK_SPAN = "<span style='color: #4CA64C;'>&check;</span>"
 CROSS_MARK_SPAN = "<span style='color: #CF142B;'>&cross;</span>"

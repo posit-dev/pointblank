@@ -11,7 +11,7 @@ failure thresholds (using the `Thresholds` class or through shorthands for this 
 `Validate` class has numerous methods for defining validation steps and for obtaining
 post-interrogation metrics and data.
 
-Validate(data: 'FrameT | Any', tbl_name: 'str | None' = None, label: 'str | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, lang: 'str | None' = None, locale: 'str | None' = None) -> None
+Validate(data: 'FrameT | Any', tbl_name: 'str | None' = None, label: 'str | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, lang: 'str | None' = None, locale: 'str | None' = None) -> None
 
     Workflow for defining a set of validations on a table and interrogating for results.
 
@@ -60,8 +60,14 @@ Validate(data: 'FrameT | Any', tbl_name: 'str | None' = None, label: 'str | None
         [`Thresholds`](`pointblank.Thresholds`) object.
     actions
         The actions to take when validation steps meet or exceed any set threshold levels. This
-        should be provided in the form of an `Actions` object. If `None` then no default actions
+        should be provided in the form of an `Actions` object. If `None` then no global actions
         will be set.
+    brief
+        A global setting for briefs, which are optional brief descriptions for validation steps
+        (they be displayed in the reporting table). For such a global setting, templating elements
+        like `"{step}"` (to insert the step number) or `"{auto}"` (to include an automatically
+        generated brief) are useful. If `True` then each brief will be automatically generated. If
+        `None` (the default) then briefs aren't globally set.
     lang
         The language to use for automatic creation of briefs (short descriptions for each validation
         step). By default, `None` will create English (`"en"`) text. Other options include French
@@ -98,7 +104,7 @@ Validate(data: 'FrameT | Any', tbl_name: 'str | None' = None, label: 'str | None
 
     Examples
     --------
-    ## Creating a validation plan and interrogating
+    ### Creating a validation plan and interrogating
 
     Let's walk through a data quality analysis of an extremely small table. It's actually called
     `"small_table"` and it's accessible through the [`load_dataset()`](`pointblank.load_dataset`)
@@ -164,11 +170,72 @@ Validate(data: 'FrameT | Any', tbl_name: 'str | None' = None, label: 'str | None
     [`get_tabular_report()`](`pointblank.Validate.get_tabular_report`) method, which contains
     options for modifying the display of the table.
 
-    Furthermore, post-interrogation methods such as
-    [`get_step_report()`](`pointblank.Validate.get_step_report`),
-    [`get_data_extracts()`](`pointblank.Validate.get_data_extracts`), and
-    [`get_sundered_data()`](`pointblank.Validate.get_sundered_data`) allow you to generate
-    additional reporting or extract useful data for downstream analysis from a `Validate` object.
+    ### Adding briefs
+
+    Briefs are short descriptions of the validation steps. While they can be set for each step
+    individually, they can also be set globally. The global setting is done by using the
+    `brief=` argument in `Validate`. The global setting can be as simple as `True` to have
+    automatically-generated briefs for each step. Alternatively, we can use templating elements
+    like `"{step}"` (to insert the step number) or `"{auto}"` (to include an automatically generated
+    brief). Here's an example of a global setting for briefs:
+
+    ```python
+    validation = (
+        pb.Validate(
+            data=pb.load_dataset(),
+            tbl_name="small_table",
+            label="Validation example with briefs",
+            brief="Step {step}: {auto}",
+        )
+        .col_vals_gt(columns="d", value=100)
+        .col_vals_between(columns="c", left=3, right=10, na_pass=True)
+        .col_vals_regex(
+            columns="b",
+            pattern=r"[0-9]-[a-z]{3}-[0-9]{3}",
+            brief="Regex check for column {col}"
+        )
+        .interrogate()
+    )
+
+    validation
+    ```
+
+    We see the text of the briefs appear in the `STEP` column of the reporting table. Furthermore,
+    the global brief's template (`"Step {step}: {auto}"`) is applied to all steps except for the
+    final step, where the step-level `brief=` argument provided an override.
+
+    If you should want to cancel the globally-defined brief for one or more validation steps, you
+    can set `brief=False` in those particular steps.
+
+    ### Post-interrogation methods
+
+    The `Validate` class has a number of post-interrogation methods that can be used to extract
+    useful information from the validation results. For example, the
+    [`get_data_extracts()`](`pointblank.Validate.get_data_extracts`) method can be used to get
+    the data extracts for each validation step.
+
+    ```python
+    validation.get_data_extracts()
+    ```
+
+    We can also view step reports for each validation step using the
+    [`get_step_report()`](`pointblank.Validate.get_step_report`) method. This method adapts to the
+    type of validation step and shows the relevant information for a step's validation.
+
+    ```python
+    validation.get_step_report(i=2)
+    ```
+
+    The `Validate` class also has a method for getting the sundered data, which is the data that
+    passed or failed the validation steps. This can be done using the
+    [`get_sundered_data()`](`pointblank.Validate.get_sundered_data`) method.
+
+    ```python
+    pb.preview(validation.get_sundered_data())
+    ```
+
+    The sundered data is a DataFrame that contains the rows that passed or failed the validation.
+    The default behavior is to return the rows that failed the validation, as shown above.
 
 
 Thresholds(warning: 'int | float | bool | None' = None, error: 'int | float | bool | None' = None, critical: 'int | float | bool | None' = None) -> None
@@ -250,7 +317,7 @@ Thresholds(warning: 'int | float | bool | None' = None, error: 'int | float | bo
     (in the [`Validate`](`pointblank.Validate`) class).
 
 
-Actions(warning: 'str | Callable | list[str | Callable] | None' = None, error: 'str | Callable | list[str | Callable] | None' = None, critical: 'str | Callable | list[str | Callable] | None' = None) -> None
+Actions(warning: 'str | Callable | list[str | Callable] | None' = None, error: 'str | Callable | list[str | Callable] | None' = None, critical: 'str | Callable | list[str | Callable] | None' = None, default: 'str | Callable | list[str | Callable] | None' = None, highest_only: 'bool' = True) -> None
 
     Definition of action values.
 
@@ -263,7 +330,9 @@ Actions(warning: 'str | Callable | list[str | Callable] | None' = None, error: '
     to different levels of severity when a threshold is reached. Those thresholds can be defined
     using the [`Thresholds`](`pointblank.Thresholds`) class or various shorthand forms. Actions
     don't have to be defined for all threshold levels; if an action is not defined for a level in
-    exceedance, no action will be taken.
+    exceedance, no action will be taken. Likewise, there is no negative consequence (other than a
+    no-op) for defining actions for thresholds that don't exist (e.g., setting an action for the
+    'critical' level when no corresponding 'critical' threshold has been set).
 
     Parameters
     ----------
@@ -276,6 +345,14 @@ Actions(warning: 'str | Callable | list[str | Callable] | None' = None, error: '
     critical
         A string, `Callable`, or list of `Callable`/string values for the 'critical' level. Using
         `None` means no action should be performed at the 'critical' level.
+    default
+        A string, `Callable`, or list of `Callable`/string values for all threshold levels. This
+        parameter can be used to set the same action for all threshold levels. If an action is
+        defined for a specific threshold level, it will override the action set for all levels.
+    highest_only
+        A boolean value that, when set to `True` (the default), results in executing only the action
+        for the highest threshold level that is exceeded. Useful when you want to ensure that only
+        the most severe action is taken when multiple threshold levels are exceeded.
 
     Returns
     -------
@@ -816,7 +893,7 @@ Validation steps can be thought of as sequential validations on the target
 data. We call `Validate`'s validation methods to build up a validation plan: a collection of steps
 that, in the aggregate, provides good validation coverage.
 
-col_vals_gt(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', value: 'float | int | Column', na_pass: 'bool' = False, pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | None' = None, active: 'bool' = True) -> 'Validate'
+col_vals_gt(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', value: 'float | int | Column', na_pass: 'bool' = False, pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
 
         Are column data greater than a fixed value or data in another column?
 
@@ -856,8 +933,11 @@ col_vals_gt(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSe
             levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
             define the actions.
         brief
-            An optional brief description of the validation step. The templating elements `"{col}"`
-            and `"{step}"` can be used to insert the column name and step number, respectively.
+            An optional brief description of the validation step that will be displayed in the
+            reporting table. You can use the templating elements like `"{step}"` to insert
+            the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+            the entire brief will be automatically generated. If `None` (the default) then there
+            won't be a brief.
         active
             A boolean value indicating whether the validation step should be active. Using `False`
             will make the validation step inactive (still reporting its presence and keeping indexes
@@ -927,7 +1007,7 @@ col_vals_gt(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSe
         - Row 3: `c` is `2` and `b` is `2`.
 
 
-col_vals_lt(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', value: 'float | int | Column', na_pass: 'bool' = False, pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | None' = None, active: 'bool' = True) -> 'Validate'
+col_vals_lt(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', value: 'float | int | Column', na_pass: 'bool' = False, pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
 
         Are column data less than a fixed value or data in another column?
 
@@ -967,8 +1047,11 @@ col_vals_lt(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSe
             levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
             define the actions.
         brief
-            An optional brief description of the validation step. The templating elements `"{col}"`
-            and `"{step}"` can be used to insert the column name and step number, respectively.
+            An optional brief description of the validation step that will be displayed in the
+            reporting table. You can use the templating elements like `"{step}"` to insert
+            the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+            the entire brief will be automatically generated. If `None` (the default) then there
+            won't be a brief.
         active
             A boolean value indicating whether the validation step should be active. Using `False`
             will make the validation step inactive (still reporting its presence and keeping indexes
@@ -1038,7 +1121,7 @@ col_vals_lt(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSe
         - Row 2: `b` is `1` and `c` is `1`.
 
 
-col_vals_ge(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', value: 'float | int | Column', na_pass: 'bool' = False, pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | None' = None, active: 'bool' = True) -> 'Validate'
+col_vals_ge(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', value: 'float | int | Column', na_pass: 'bool' = False, pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
 
         Are column data greater than or equal to a fixed value or data in another column?
 
@@ -1078,8 +1161,11 @@ col_vals_ge(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSe
             levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
             define the actions.
         brief
-            An optional brief description of the validation step. The templating elements `"{col}"`
-            and `"{step}"` can be used to insert the column name and step number, respectively.
+            An optional brief description of the validation step that will be displayed in the
+            reporting table. You can use the templating elements like `"{step}"` to insert
+            the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+            the entire brief will be automatically generated. If `None` (the default) then there
+            won't be a brief.
         active
             A boolean value indicating whether the validation step should be active. Using `False`
             will make the validation step inactive (still reporting its presence and keeping indexes
@@ -1149,7 +1235,7 @@ col_vals_ge(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSe
         - Row 4: `b` is `3` and `c` is `4`.
 
 
-col_vals_le(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', value: 'float | int | Column', na_pass: 'bool' = False, pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | None' = None, active: 'bool' = True) -> 'Validate'
+col_vals_le(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', value: 'float | int | Column', na_pass: 'bool' = False, pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
 
         Are column data less than or equal to a fixed value or data in another column?
 
@@ -1189,8 +1275,11 @@ col_vals_le(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSe
             levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
             define the actions.
         brief
-            An optional brief description of the validation step. The templating elements `"{col}"`
-            and `"{step}"` can be used to insert the column name and step number, respectively.
+            An optional brief description of the validation step that will be displayed in the
+            reporting table. You can use the templating elements like `"{step}"` to insert
+            the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+            the entire brief will be automatically generated. If `None` (the default) then there
+            won't be a brief.
         active
             A boolean value indicating whether the validation step should be active. Using `False`
             will make the validation step inactive (still reporting its presence and keeping indexes
@@ -1260,7 +1349,7 @@ col_vals_le(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSe
         - Row 4: `c` is `3` and `b` is `2`.
 
 
-col_vals_eq(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', value: 'float | int | Column', na_pass: 'bool' = False, pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | None' = None, active: 'bool' = True) -> 'Validate'
+col_vals_eq(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', value: 'float | int | Column', na_pass: 'bool' = False, pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
 
         Are column data equal to a fixed value or data in another column?
 
@@ -1300,8 +1389,11 @@ col_vals_eq(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSe
             levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
             define the actions.
         brief
-            An optional brief description of the validation step. The templating elements `"{col}"`
-            and `"{step}"` can be used to insert the column name and step number, respectively.
+            An optional brief description of the validation step that will be displayed in the
+            reporting table. You can use the templating elements like `"{step}"` to insert
+            the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+            the entire brief will be automatically generated. If `None` (the default) then there
+            won't be a brief.
         active
             A boolean value indicating whether the validation step should be active. Using `False`
             will make the validation step inactive (still reporting its presence and keeping indexes
@@ -1369,7 +1461,7 @@ col_vals_eq(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSe
         - Row 5: `a` is `5` and `b` is `4`.
 
 
-col_vals_ne(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', value: 'float | int | Column', na_pass: 'bool' = False, pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | None' = None, active: 'bool' = True) -> 'Validate'
+col_vals_ne(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', value: 'float | int | Column', na_pass: 'bool' = False, pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
 
         Are column data not equal to a fixed value or data in another column?
 
@@ -1409,8 +1501,11 @@ col_vals_ne(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSe
             levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
             define the actions.
         brief
-            An optional brief description of the validation step. The templating elements `"{col}"`
-            and `"{step}"` can be used to insert the column name and step number, respectively.
+            An optional brief description of the validation step that will be displayed in the
+            reporting table. You can use the templating elements like `"{step}"` to insert
+            the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+            the entire brief will be automatically generated. If `None` (the default) then there
+            won't be a brief.
         active
             A boolean value indicating whether the validation step should be active. Using `False`
             will make the validation step inactive (still reporting its presence and keeping indexes
@@ -1476,7 +1571,7 @@ col_vals_ne(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSe
         0 and 4, where `a` is `5` and `b` is `5` in both cases (i.e., they are equal to each other).
 
 
-col_vals_between(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', left: 'float | int | Column', right: 'float | int | Column', inclusive: 'tuple[bool, bool]' = (True, True), na_pass: 'bool' = False, pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | None' = None, active: 'bool' = True) -> 'Validate'
+col_vals_between(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', left: 'float | int | Column', right: 'float | int | Column', inclusive: 'tuple[bool, bool]' = (True, True), na_pass: 'bool' = False, pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
 
         Do column data lie between two specified values or data in other columns?
 
@@ -1525,8 +1620,11 @@ col_vals_between(self, columns: 'str | list[str] | Column | ColumnSelector | Col
             levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
             define the actions.
         brief
-            An optional brief description of the validation step. The templating elements `"{col}"`
-            and `"{step}"` can be used to insert the column name and step number, respectively.
+            An optional brief description of the validation step that will be displayed in the
+            reporting table. You can use the templating elements like `"{step}"` to insert
+            the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+            the entire brief will be automatically generated. If `None` (the default) then there
+            won't be a brief.
         active
             A boolean value indicating whether the validation step should be active. Using `False`
             will make the validation step inactive (still reporting its presence and keeping indexes
@@ -1604,7 +1702,7 @@ col_vals_between(self, columns: 'str | list[str] | Column | ColumnSelector | Col
         - Row 4: `b` is `8` but the bounds are `3` (`a`) and `7` (`c`).
 
 
-col_vals_outside(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', left: 'float | int | Column', right: 'float | int | Column', inclusive: 'tuple[bool, bool]' = (True, True), na_pass: 'bool' = False, pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | None' = None, active: 'bool' = True) -> 'Validate'
+col_vals_outside(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', left: 'float | int | Column', right: 'float | int | Column', inclusive: 'tuple[bool, bool]' = (True, True), na_pass: 'bool' = False, pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
 
         Do column data lie outside of two specified values or data in other columns?
 
@@ -1653,8 +1751,11 @@ col_vals_outside(self, columns: 'str | list[str] | Column | ColumnSelector | Col
             levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
             define the actions.
         brief
-            An optional brief description of the validation step. The templating elements `"{col}"`
-            and `"{step}"` can be used to insert the column name and step number, respectively.
+            An optional brief description of the validation step that will be displayed in the
+            reporting table. You can use the templating elements like `"{step}"` to insert
+            the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+            the entire brief will be automatically generated. If `None` (the default) then there
+            won't be a brief.
         active
             A boolean value indicating whether the validation step should be active. Using `False`
             will make the validation step inactive (still reporting its presence and keeping indexes
@@ -1732,7 +1833,7 @@ col_vals_outside(self, columns: 'str | list[str] | Column | ColumnSelector | Col
         - Row 5: `b` is `6` and the bounds are `5` (`a`) and `7` (`c`).
 
 
-col_vals_in_set(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', set: 'list[float | int]', pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | None' = None, active: 'bool' = True) -> 'Validate'
+col_vals_in_set(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', set: 'list[float | int]', pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
 
         Validate whether column values are in a set of values.
 
@@ -1765,8 +1866,11 @@ col_vals_in_set(self, columns: 'str | list[str] | Column | ColumnSelector | Colu
             levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
             define the actions.
         brief
-            An optional brief description of the validation step. The templating elements `"{col}"`
-            and `"{step}"` can be used to insert the column name and step number, respectively.
+            An optional brief description of the validation step that will be displayed in the
+            reporting table. You can use the templating elements like `"{step}"` to insert
+            the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+            the entire brief will be automatically generated. If `None` (the default) then there
+            won't be a brief.
         active
             A boolean value indicating whether the validation step should be active. Using `False`
             will make the validation step inactive (still reporting its presence and keeping indexes
@@ -1830,7 +1934,7 @@ col_vals_in_set(self, columns: 'str | list[str] | Column | ColumnSelector | Colu
         column `b` values of `8` and `1`, which are not in the set of `[2, 3, 4, 5, 6]`.
 
 
-col_vals_not_in_set(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', set: 'list[float | int]', pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | None' = None, active: 'bool' = True) -> 'Validate'
+col_vals_not_in_set(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', set: 'list[float | int]', pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
 
         Validate whether column values are not in a set of values.
 
@@ -1863,10 +1967,15 @@ col_vals_not_in_set(self, columns: 'str | list[str] | Column | ColumnSelector | 
             levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
             define the actions.
         brief
-            An optional brief description of the validation step. The templating elements `"{col}"`
-            and `"{step}"` can be used to insert the column name and step number, respectively.
+            An optional brief description of the validation step that will be displayed in the
+            reporting table. You can use the templating elements like `"{step}"` to insert
+            the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+            the entire brief will be automatically generated. If `None` (the default) then there
+            won't be a brief.
         active
             A boolean value indicating whether the validation step should be active. Using `False`
+            will make the validation step inactive (still reporting its presence and keeping indexes
+            for the steps unchanged).
 
         Returns
         -------
@@ -1927,7 +2036,7 @@ col_vals_not_in_set(self, columns: 'str | list[str] | Column | ColumnSelector | 
         column `b` values of `2` and `6`, both of which are in the set of `[2, 3, 4, 5, 6]`.
 
 
-col_vals_null(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | None' = None, active: 'bool' = True) -> 'Validate'
+col_vals_null(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
 
         Validate whether values in a column are NULL.
 
@@ -1957,8 +2066,11 @@ col_vals_null(self, columns: 'str | list[str] | Column | ColumnSelector | Column
             levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
             define the actions.
         brief
-            An optional brief description of the validation step. The templating elements `"{col}"`
-            and `"{step}"` can be used to insert the column name and step number, respectively.
+            An optional brief description of the validation step that will be displayed in the
+            reporting table. You can use the templating elements like `"{step}"` to insert
+            the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+            the entire brief will be automatically generated. If `None` (the default) then there
+            won't be a brief.
         active
             A boolean value indicating whether the validation step should be active. Using `False`
             will make the validation step inactive (still reporting its presence and keeping indexes
@@ -2021,7 +2133,7 @@ col_vals_null(self, columns: 'str | list[str] | Column | ColumnSelector | Column
         two non-Null values in column `b`.
 
 
-col_vals_not_null(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | None' = None, active: 'bool' = True) -> 'Validate'
+col_vals_not_null(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
 
         Validate whether values in a column are not NULL.
 
@@ -2051,8 +2163,11 @@ col_vals_not_null(self, columns: 'str | list[str] | Column | ColumnSelector | Co
             levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
             define the actions.
         brief
-            An optional brief description of the validation step. The templating elements `"{col}"`
-            and `"{step}"` can be used to insert the column name and step number, respectively.
+            An optional brief description of the validation step that will be displayed in the
+            reporting table. You can use the templating elements like `"{step}"` to insert
+            the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+            the entire brief will be automatically generated. If `None` (the default) then there
+            won't be a brief.
         active
             A boolean value indicating whether the validation step should be active. Using `False`
             will make the validation step inactive (still reporting its presence and keeping indexes
@@ -2115,7 +2230,7 @@ col_vals_not_null(self, columns: 'str | list[str] | Column | ColumnSelector | Co
         two Null values in column `b`.
 
 
-col_vals_regex(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', pattern: 'str', na_pass: 'bool' = False, pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | None' = None, active: 'bool' = True) -> 'Validate'
+col_vals_regex(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', pattern: 'str', na_pass: 'bool' = False, pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
 
         Validate whether column values match a regular expression pattern.
 
@@ -2151,8 +2266,11 @@ col_vals_regex(self, columns: 'str | list[str] | Column | ColumnSelector | Colum
             levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
             define the actions.
         brief
-            An optional brief description of the validation step. The templating elements `"{col}"`
-            and `"{step}"` can be used to insert the column name and step number, respectively.
+            An optional brief description of the validation step that will be displayed in the
+            reporting table. You can use the templating elements like `"{step}"` to insert
+            the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+            the entire brief will be automatically generated. If `None` (the default) then there
+            won't be a brief.
         active
             A boolean value indicating whether the validation step should be active. Using `False`
             will make the validation step inactive (still reporting its presence and keeping indexes
@@ -2216,7 +2334,7 @@ col_vals_regex(self, columns: 'str | list[str] | Column | ColumnSelector | Colum
         string values of rows 1 and 2 in column `b`.
 
 
-col_vals_expr(self, expr: 'any', pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | None' = None, active: 'bool' = True) -> 'Validate'
+col_vals_expr(self, expr: 'any', pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
 
         Validate column values using a custom expression.
 
@@ -2247,8 +2365,11 @@ col_vals_expr(self, expr: 'any', pre: 'Callable | None' = None, thresholds: 'int
             levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
             define the actions.
         brief
-            An optional brief description of the validation step. The templating elements `"{col}"`
-            and `"{step}"` can be used to insert the column name and step number, respectively.
+            An optional brief description of the validation step that will be displayed in the
+            reporting table. You can use the templating elements like `"{step}"` to insert
+            the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+            the entire brief will be automatically generated. If `None` (the default) then there
+            won't be a brief.
         active
             A boolean value indicating whether the validation step should be active. Using `False`
             will make the validation step inactive (still reporting its presence and keeping indexes
@@ -2297,7 +2418,7 @@ col_vals_expr(self, expr: 'any', pre: 'Callable | None' = None, thresholds: 'int
         by using `col_vals_expr()`. All test units passed, with no failing test units.
 
 
-col_exists(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', thresholds: 'int | float | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | None' = None, active: 'bool' = True) -> 'Validate'
+col_exists(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', thresholds: 'int | float | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
 
         Validate whether one or more columns exist in the table.
 
@@ -2324,8 +2445,11 @@ col_exists(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSel
             levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
             define the actions.
         brief
-            An optional brief description of the validation step. The templating elements `"{col}"`
-            and `"{step}"` can be used to insert the column name and step number, respectively.
+            An optional brief description of the validation step that will be displayed in the
+            reporting table. You can use the templating elements like `"{step}"` to insert
+            the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+            the entire brief will be automatically generated. If `None` (the default) then there
+            won't be a brief.
         active
             A boolean value indicating whether the validation step should be active. Using `False`
             will make the validation step inactive (still reporting its presence and keeping indexes
@@ -2389,7 +2513,7 @@ col_exists(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSel
         failing validation step (the check for column `c`, which doesn't exist).
 
 
-rows_distinct(self, columns_subset: 'str | list[str] | None' = None, pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | None' = None, active: 'bool' = True) -> 'Validate'
+rows_distinct(self, columns_subset: 'str | list[str] | None' = None, pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
 
         Validate whether rows in the table are distinct.
 
@@ -2419,8 +2543,11 @@ rows_distinct(self, columns_subset: 'str | list[str] | None' = None, pre: 'Calla
             levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
             define the actions.
         brief
-            An optional brief description of the validation step. The templating elements `"{col}"`
-            and `"{step}"` can be used to insert the column name and step number, respectively.
+            An optional brief description of the validation step that will be displayed in the
+            reporting table. You can use the templating elements like `"{step}"` to insert
+            the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+            the entire brief will be automatically generated. If `None` (the default) then there
+            won't be a brief.
         active
             A boolean value indicating whether the validation step should be active. Using `False`
             will make the validation step inactive (still reporting its presence and keeping indexes
@@ -2487,7 +2614,7 @@ rows_distinct(self, columns_subset: 'str | list[str] | None' = None, pre: 'Calla
         others.
 
 
-col_schema_match(self, schema: 'Schema', complete: 'bool' = True, in_order: 'bool' = True, case_sensitive_colnames: 'bool' = True, case_sensitive_dtypes: 'bool' = True, full_match_dtypes: 'bool' = True, pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | None' = None, active: 'bool' = True) -> 'Validate'
+col_schema_match(self, schema: 'Schema', complete: 'bool' = True, in_order: 'bool' = True, case_sensitive_colnames: 'bool' = True, case_sensitive_dtypes: 'bool' = True, full_match_dtypes: 'bool' = True, pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
 
         Do columns in the table (and their types) match a predefined schema?
 
@@ -2538,8 +2665,11 @@ col_schema_match(self, schema: 'Schema', complete: 'bool' = True, in_order: 'boo
             levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
             define the actions.
         brief
-            An optional brief description of the validation step. The templating elements `"{col}"`
-            and `"{step}"` can be used to insert the column name and step number, respectively.
+            An optional brief description of the validation step that will be displayed in the
+            reporting table. You can use the templating elements like `"{step}"` to insert
+            the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+            the entire brief will be automatically generated. If `None` (the default) then there
+            won't be a brief.
         active
             A boolean value indicating whether the validation step should be active. Using `False`
             will make the validation step inactive (still reporting its presence and keeping indexes
@@ -2603,7 +2733,7 @@ col_schema_match(self, schema: 'Schema', complete: 'bool' = True, in_order: 'boo
         since the table columns and their types match the schema.
 
 
-row_count_match(self, count: 'int | FrameT | Any', tol: 'Tolerance' = 0, inverse: 'bool' = False, pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | None' = None, active: 'bool' = True) -> 'Validate'
+row_count_match(self, count: 'int | FrameT | Any', tol: 'Tolerance' = 0, inverse: 'bool' = False, pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
 
         Validate whether the row count of the table matches a specified count.
 
@@ -2647,8 +2777,11 @@ row_count_match(self, count: 'int | FrameT | Any', tol: 'Tolerance' = 0, inverse
             levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
             define the actions.
         brief
-            An optional brief description of the validation step. The templating elements `"{col}"`
-            and `"{step}"` can be used to insert the column name and step number, respectively.
+            An optional brief description of the validation step that will be displayed in the
+            reporting table. You can use the templating elements like `"{step}"` to insert
+            the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+            the entire brief will be automatically generated. If `None` (the default) then there
+            won't be a brief.
         active
             A boolean value indicating whether the validation step should be active. Using `False`
             will make the validation step inactive (still reporting its presence and keeping indexes
@@ -2712,7 +2845,7 @@ row_count_match(self, count: 'int | FrameT | Any', tol: 'Tolerance' = 0, inverse
 
 
 
-col_count_match(self, count: 'int | FrameT | Any', inverse: 'bool' = False, pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | None' = None, active: 'bool' = True) -> 'Validate'
+col_count_match(self, count: 'int | FrameT | Any', inverse: 'bool' = False, pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
 
         Validate whether the column count of the table matches a specified count.
 
@@ -2748,8 +2881,11 @@ col_count_match(self, count: 'int | FrameT | Any', inverse: 'bool' = False, pre:
             levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
             define the actions.
         brief
-            An optional brief description of the validation step. The templating elements `"{col}"`
-            and `"{step}"` can be used to insert the column name and step number, respectively.
+            An optional brief description of the validation step that will be displayed in the
+            reporting table. You can use the templating elements like `"{step}"` to insert
+            the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+            the entire brief will be automatically generated. If `None` (the default) then there
+            won't be a brief.
         active
             A boolean value indicating whether the validation step should be active. Using `False`
             will make the validation step inactive (still reporting its presence and keeping indexes
@@ -4094,7 +4230,7 @@ validation steps, (3) `interrogate()`. After interrogation of the data, we can v
 report table (by printing the object or using `get_tabular_report()`), extract key metrics, or we
 can split the data based on the validation results (with `get_sundered_data()`).
 
-interrogate(self, collect_extracts: 'bool' = True, collect_tbl_checked: 'bool' = True, get_first_n: 'int | None' = None, sample_n: 'int | None' = None, sample_frac: 'int | float | None' = None, sample_limit: 'int' = 5000) -> 'Validate'
+interrogate(self, collect_extracts: 'bool' = True, collect_tbl_checked: 'bool' = True, get_first_n: 'int | None' = None, sample_n: 'int | None' = None, sample_frac: 'int | float | None' = None, extract_limit: 'int' = 500) -> 'Validate'
 
         Execute each validation step against the table and store the results.
 
@@ -4104,8 +4240,8 @@ interrogate(self, collect_extracts: 'bool' = True, collect_tbl_checked: 'bool' =
 
         The interrogation process will collect extracts of failing rows if the `collect_extracts=`
         option is set to `True` (the default). We can control the number of rows collected using the
-        `get_first_n=`, `sample_n=`, and `sample_frac=` options. The `sample_limit=` option will
-        enforce a hard limit on the number of rows collected when using the `sample_frac=` option.
+        `get_first_n=`, `sample_n=`, and `sample_frac=` options. The `extract_limit=` option will
+        enforce a hard limit on the number of rows collected when `collect_extracts=True`.
 
         After interrogation is complete, the `Validate` object will have gathered information, and
         we can use methods like [`n_passed()`](`pointblank.Validate.n_passed`),
@@ -4124,9 +4260,9 @@ interrogate(self, collect_extracts: 'bool' = True, collect_tbl_checked: 'bool' =
             The processed data frames produced by executing the validation steps is collected and
             stored in the `Validate` object if `collect_tbl_checked=True`. This information is
             necessary for some methods (e.g.,
-            [`get_sundered_data()`](`pointblank.Validate.get_sundered_data`)), but it potentially
-            makes the object grow to a large size. To opt out of attaching this data, set this
-            argument to `False`.
+            [`get_sundered_data()`](`pointblank.Validate.get_sundered_data`)), but it can
+            potentially make the object grow to a large size. To opt out of attaching this data, set
+            this to `False`.
         get_first_n
             If the option to collect rows where test units is chosen, there is the option here to
             collect the first `n` rows. Supply an integer number of rows to extract from the top of
@@ -4140,11 +4276,15 @@ interrogate(self, collect_extracts: 'bool' = True, collect_tbl_checked: 'bool' =
         sample_frac
             If the option to collect non-passing rows is chosen, this option allows for the sampling
             of a fraction of those rows. Provide a number in the range of `0` and `1`. The number of
-            rows to return could be very large, however, the `sample_limit=` option will apply a
+            rows to return could be very large, however, the `extract_limit=` option will apply a
             hard limit to the returned rows.
-        sample_limit
-            A value that limits the possible number of rows returned when sampling non-passing rows
-            using the `sample_frac=` option.
+        extract_limit
+            A value that limits the possible number of rows returned when extracting non-passing
+            rows. The default is `500` rows. This limit is applied after any sampling or limiting
+            options are applied. If the number of rows to be returned is greater than this limit,
+            then the number of rows returned will be limited to this value. This is useful for
+            preventing the collection of too many rows when the number of non-passing rows is very
+            large.
 
         Returns
         -------
@@ -4268,12 +4408,12 @@ get_tabular_report(self, title: 'str | None' = ':default:', incl_header: 'bool' 
         to provide a more descriptive title for the report.
 
 
-get_step_report(self, i: 'int') -> 'GT'
+get_step_report(self, i: 'int', columns_subset: 'str | list[str] | Column | None' = None, header: 'str' = ':default:', limit: 'int | None' = 10) -> 'GT'
 
         Get a detailed report for a single validation step.
 
-        The `get_step_report()` method returns a report of what went well, or what failed
-        spectacularly, for a given validation step. The report includes a summary of the validation
+        The `get_step_report()` method returns a report of what went well---or what failed
+        spectacularly---for a given validation step. The report includes a summary of the validation
         step and a detailed breakdown of the interrogation results. The report is presented as a GT
         table object, which can be displayed in a notebook or exported to an HTML file.
 
@@ -4285,7 +4425,24 @@ get_step_report(self, i: 'int') -> 'GT'
         Parameters
         ----------
         i
-            The step number for which to get a detailed report.
+            The step number for which to get the report.
+        columns_subset
+            The columns to display in a step report that shows errors in the input table. By default
+            all columns are shown (`None`). If a subset of columns is desired, we can provide a list
+            of column names, a string with a single column name, a `Column` object, or a
+            `ColumnSelector` object. The last two options allow for more flexible column selection
+            using column selector functions. Errors are raised if the column names provided don't
+            match any columns in the table (when provided as a string or list of strings) or if
+            column selector expressions don't resolve to any columns.
+        header
+            Options for customizing the header of the step report. The default is the `":default:"`
+            value which produces a generic header. Aside from this default, text can be provided for
+            the header. This will be interpreted as Markdown text and transformed internally to
+            HTML.
+        limit
+            The number of rows to display for those validation steps that check values in rows (the
+            `col_vals_*()` validation steps). The default is `10` rows and the limit can be removed
+            entirely by setting `limit=None`.
 
         Returns
         -------
@@ -4341,6 +4498,25 @@ get_step_report(self, i: 'int') -> 'GT'
         ```python
         validation.get_step_report(i=4)
         ```
+
+        If you'd like to trim down the number of columns shown in the report, you can provide a
+        subset of columns to display. For example, if you only want to see the columns `a`, `b`, and
+        `c`, you can provide those column names as a list.
+
+        ```python
+        validation.get_step_report(i=1, columns_subset=["a", "b", "c"])
+        ```
+
+        If you'd like to increase or reduce the maximum number of rows shown in the report, you can
+        provide a different value for the `limit` parameter. For example, if you'd like to see only
+        up to 5 rows, you can set `limit=5`.
+
+        ```python
+        validation.get_step_report(i=3, limit=5)
+        ```
+
+        Step 3 actually had 7 failing test units, but only the first 5 rows are shown in the step
+        report because of the `limit=5` parameter.
 
 
 get_json_report(self, use_fields: 'list[str] | None' = None, exclude_fields: 'list[str] | None' = None) -> 'str'
@@ -5435,7 +5611,7 @@ DataScan(data: 'FrameT | Any', tbl_name: 'str | None' = None) -> None
         A DataScan object.
 
 
-preview(data: 'FrameT | Any', columns_subset: 'str | list[str] | Column | None' = None, n_head: 'int' = 5, n_tail: 'int' = 5, limit: 'int | None' = 50, show_row_numbers: 'bool' = True, max_col_width: 'int | None' = 250, incl_header: 'bool' = None) -> 'GT'
+preview(data: 'FrameT | Any', columns_subset: 'str | list[str] | Column | None' = None, n_head: 'int' = 5, n_tail: 'int' = 5, limit: 'int' = 50, show_row_numbers: 'bool' = True, max_col_width: 'int' = 250, min_tbl_width: 'int' = 500, incl_header: 'bool' = None) -> 'GT'
 
     Display a table preview that shows some rows from the top, some from the bottom.
 
@@ -5470,12 +5646,18 @@ preview(data: 'FrameT | Any', columns_subset: 'str | list[str] | Column | None' 
         The number of rows to show from the end of the table. Set to `5` by default.
     limit
         The limit value for the sum of `n_head=` and `n_tail=` (the total number of rows shown).
-        If the sum of `n_head=` and `n_tail=` exceeds the limit, an error is raised.
+        If the sum of `n_head=` and `n_tail=` exceeds the limit, an error is raised. The default
+        value is `50`.
     show_row_numbers
         Should row numbers be shown? The numbers shown reflect the row numbers of the head and tail
-        in the full table.
+        in the input `data=` table. By default, this is set to `True`.
     max_col_width
-        The maximum width of the columns in pixels. This is `250` (`"250px"`) by default.
+        The maximum width of the columns (in pixels) before the text is truncated. The default value
+        is `250` (`"250px"`).
+    min_tbl_width
+        The minimum width of the table in pixels. If the sum of the column widths is less than this
+        value, the all columns are sized up to reach this minimum width value. The default value is
+        `500` (`"500px"`).
     incl_header
         Should the table include a header with the table type and table dimensions? Set to `True` by
         default.

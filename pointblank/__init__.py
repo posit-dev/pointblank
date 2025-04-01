@@ -28,6 +28,7 @@ from pointblank.thresholds import Actions, Thresholds
 from pointblank.validate import (
     Validate,
     config,
+    get_action_metadata,
     get_column_count,
     get_row_count,
     load_dataset,
@@ -57,6 +58,7 @@ __all__ = [
     "config",
     "preview",
     "missing_vals_tbl",
+    "get_action_metadata",
     "get_column_count",
     "get_row_count",
 ]

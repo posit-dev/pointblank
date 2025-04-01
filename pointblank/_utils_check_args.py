@@ -58,6 +58,7 @@ def _check_column(column: str | list[str]):
         raise ValueError("`column=` must be a string.")
 
 
+# TODO: allow for checking of dates/datetimes
 def _check_value_float_int(value: float | int | any):
     """
     Check that input value of the `value=` parameter is a float or integer.

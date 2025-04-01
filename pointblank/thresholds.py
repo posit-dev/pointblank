@@ -304,7 +304,9 @@ class Actions:
     to different levels of severity when a threshold is reached. Those thresholds can be defined
     using the [`Thresholds`](`pointblank.Thresholds`) class or various shorthand forms. Actions
     don't have to be defined for all threshold levels; if an action is not defined for a level in
-    exceedance, no action will be taken.
+    exceedance, no action will be taken. Likewise, there is no negative consequence (other than a
+    no-op) for defining actions for thresholds that don't exist (e.g., setting an action for the
+    'critical' level when no corresponding 'critical' threshold has been set).
 
     Parameters
     ----------
@@ -317,6 +319,14 @@ class Actions:
     critical
         A string, `Callable`, or list of `Callable`/string values for the 'critical' level. Using
         `None` means no action should be performed at the 'critical' level.
+    default
+        A string, `Callable`, or list of `Callable`/string values for all threshold levels. This
+        parameter can be used to set the same action for all threshold levels. If an action is
+        defined for a specific threshold level, it will override the action set for all levels.
+    highest_only
+        A boolean value that, when set to `True` (the default), results in executing only the action
+        for the highest threshold level that is exceeded. Useful when you want to ensure that only
+        the most severe action is taken when multiple threshold levels are exceeded.
 
     Returns
     -------
@@ -438,11 +448,24 @@ class Actions:
     warning: str | Callable | list[str | Callable] | None = None
     error: str | Callable | list[str | Callable] | None = None
     critical: str | Callable | list[str | Callable] | None = None
+    default: str | Callable | list[str | Callable] | None = None
+    highest_only: bool = True
 
     def __post_init__(self):
         self.warning = self._ensure_list(self.warning)
         self.error = self._ensure_list(self.error)
         self.critical = self._ensure_list(self.critical)
+
+        if self.default is not None:
+            self.default = self._ensure_list(self.default)
+
+        # For any unset threshold level, set the default action
+        if self.warning is None:
+            self.warning = self.default
+        if self.error is None:
+            self.error = self.default
+        if self.critical is None:
+            self.critical = self.default
 
     def _ensure_list(
         self, value: str | Callable | list[str | Callable] | None

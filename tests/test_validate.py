@@ -15,13 +15,13 @@ import contextlib
 import pandas as pd
 import polars as pl
 import ibis
-from datetime import datetime
 
 import great_tables as GT
 import narwhals as nw
 
 from pointblank.validate import (
     Actions,
+    get_action_metadata,
     get_column_count,
     get_row_count,
     load_dataset,
@@ -32,8 +32,8 @@ from pointblank.validate import (
     _create_table_time_html,
     _create_table_type_html,
     _fmt_lg,
-    _get_default_title_text,
     _normalize_reporting_language,
+    _prep_column_text,
     _process_action_str,
     _process_brief,
     _process_title_text,
@@ -85,6 +85,7 @@ TBL_DATES_TIMES_TEXT_LIST = [
 TBL_TRUE_DATES_TIMES_LIST = [
     "tbl_true_dates_times_pd",
     "tbl_true_dates_times_pl",
+    "tbl_true_dates_times_duckdb",
 ]
 
 
@@ -111,7 +112,7 @@ def tbl_dates_times_text_pd():
 
 @pytest.fixture
 def tbl_true_dates_times_pd():
-    return pd.DataFrame(
+    df = pd.DataFrame(
         {
             "date_1": pd.to_datetime(["2021-01-01", "2021-02-01"]),
             "date_2": pd.to_datetime(["2021-02-01", "2021-03-01"]),
@@ -119,6 +120,11 @@ def tbl_true_dates_times_pd():
             "dttm_2": pd.to_datetime(["2021-02-01 03:30:00", "2021-03-01 03:30:00"]),
         }
     )
+
+    df["date_1"] = df["date_1"].dt.date
+    df["date_2"] = df["date_2"].dt.date
+
+    return df
 
 
 @pytest.fixture
@@ -197,6 +203,12 @@ def tbl_missing_duckdb():
 def tbl_dates_times_text_duckdb():
     file_path = pathlib.Path.cwd() / "tests" / "tbl_files" / "tbl_dates_times_text.ddb"
     return ibis.connect(f"duckdb://{file_path}").table("tbl_dates_times_text")
+
+
+@pytest.fixture
+def tbl_true_dates_times_duckdb():
+    file_path = pathlib.Path.cwd() / "tests" / "tbl_files" / "tbl_true_dates_times.ddb"
+    return ibis.connect(f"duckdb://{file_path}").table("tbl_true_dates_times")
 
 
 @pytest.fixture
@@ -349,6 +361,7 @@ def test_validation_info():
         warning=None,
         error=None,
         critical=None,
+        failure_text=None,
         time_processed="2021-08-01T00:00:00",
         proc_duration_s=0.0,
     )
@@ -377,6 +390,7 @@ def test_validation_info():
     assert v.warning is None
     assert v.error is None
     assert v.critical is None
+    assert v.failure_text is None
 
     assert isinstance(v.time_processed, str)
     assert isinstance(v.proc_duration_s, float)
@@ -457,6 +471,7 @@ def test_validation_plan_and_interrogation(request, tbl_fixture):
         "warning",
         "error",
         "critical",
+        "failure_text",
         "tbl_checked",
         "extract",
         "val_info",
@@ -487,6 +502,7 @@ def test_validation_plan_and_interrogation(request, tbl_fixture):
     assert val_info.warning is None
     assert val_info.error is None
     assert val_info.critical is None
+    assert val_info.failure_text is None
     assert val_info.tbl_checked is None
     assert val_info.extract is None
     assert val_info.val_info is None
@@ -534,6 +550,7 @@ def test_validation_plan_and_interrogation(request, tbl_fixture):
         "warning",
         "error",
         "critical",
+        "failure_text",
         "tbl_checked",
         "extract",
         "val_info",
@@ -563,6 +580,7 @@ def test_validation_plan_and_interrogation(request, tbl_fixture):
     assert val_info.warning is None
     assert val_info.error is None
     assert val_info.critical is None
+    assert val_info.failure_text is None
     assert val_info.tbl_checked is not None
     assert val_info.val_info is None
     assert isinstance(val_info.time_processed, str)
@@ -1554,6 +1572,253 @@ def test_validation_actions_step_only_none(request, tbl_fixture, capsys):
     # Capture the output and verify that nothing was printed to the console
     captured = capsys.readouterr()
     assert captured.out == ""
+
+
+@pytest.mark.parametrize("tbl_type", ["pandas", "polars", "duckdb"])
+def test_validation_actions_global_highest(tbl_type, capsys):
+    (
+        Validate(
+            data=load_dataset(dataset="small_table", tbl_type=tbl_type),
+            thresholds=Thresholds(warning=1, error=2, critical=3),
+            actions=Actions(
+                warning="W_global", error="E_global", critical="C_global", highest_only=True
+            ),
+        )
+        .col_vals_gt(columns="d", value=10000)
+        .interrogate()
+    )
+
+    # Capture the output and verify that only the highest priority level
+    # message printed to the console
+    captured = capsys.readouterr()
+    assert "C_global" in captured.out
+    assert "E_global" not in captured.out
+    assert "W_global" not in captured.out
+
+
+@pytest.mark.parametrize("tbl_type", ["pandas", "polars", "duckdb"])
+def test_validation_actions_global_all(tbl_type, capsys):
+    (
+        Validate(
+            data=load_dataset(dataset="small_table", tbl_type=tbl_type),
+            thresholds=Thresholds(warning=1, error=2, critical=3),
+            actions=Actions(
+                warning="W_global", error="E_global", critical="C_global", highest_only=False
+            ),
+        )
+        .col_vals_gt(columns="d", value=10000)
+        .interrogate()
+    )
+
+    # Capture the output and verify that all three level messages are printed to the console
+    captured = capsys.readouterr()
+    assert "C_global" in captured.out
+    assert "E_global" in captured.out
+    assert "W_global" in captured.out
+
+
+@pytest.mark.parametrize("tbl_type", ["pandas", "polars", "duckdb"])
+def test_validation_actions_local_highest(tbl_type, capsys):
+    (
+        Validate(
+            data=load_dataset(dataset="small_table", tbl_type=tbl_type),
+            thresholds=Thresholds(warning=1, error=2, critical=3),
+            actions=Actions(
+                warning="W_global", error="E_global", critical="C_global", highest_only=False
+            ),
+        )
+        .col_vals_gt(
+            columns="d",
+            value=10000,
+            actions=Actions(
+                warning="W_local", error="E_local", critical="C_local", highest_only=True
+            ),
+        )
+        .interrogate()
+    )
+
+    # Capture the output and verify that only the highest priority level
+    # message printed to the console
+    captured = capsys.readouterr()
+    assert "C_local" in captured.out
+    assert "E_local" not in captured.out
+    assert "W_local" not in captured.out
+
+
+@pytest.mark.parametrize("tbl_type", ["pandas", "polars", "duckdb"])
+def test_validation_actions_local_all(tbl_type, capsys):
+    (
+        Validate(
+            data=load_dataset(dataset="small_table", tbl_type=tbl_type),
+            thresholds=Thresholds(warning=1, error=2, critical=3),
+            actions=Actions(
+                warning="W_global", error="E_global", critical="C_global", highest_only=True
+            ),
+        )
+        .col_vals_gt(
+            columns="d",
+            value=10000,
+            actions=Actions(
+                warning="W_local", error="E_local", critical="C_local", highest_only=False
+            ),
+        )
+        .interrogate()
+    )
+
+    # Capture the output and verify that all three level messages are printed to the console
+    captured = capsys.readouterr()
+    assert "C_local" in captured.out
+    assert "E_local" in captured.out
+    assert "W_local" in captured.out
+
+
+@pytest.mark.parametrize("tbl_type", ["pandas", "polars", "duckdb"])
+def test_validation_actions_default_global(tbl_type, capsys):
+    (
+        Validate(
+            data=load_dataset(dataset="small_table", tbl_type=tbl_type),
+            thresholds=Thresholds(warning=1, error=2, critical=3),
+            actions=Actions(default="{level} default_action", highest_only=False),
+        )
+        .col_vals_gt(columns="d", value=10000)
+        .interrogate()
+    )
+
+    # Capture the output and verify that all three level messages are printed to the console
+    captured = capsys.readouterr()
+    assert "critical default_action" in captured.out
+    assert "error default_action" in captured.out
+    assert "warning default_action" in captured.out
+
+
+@pytest.mark.parametrize("tbl_type", ["pandas", "polars", "duckdb"])
+def test_validation_actions_default_global_override(tbl_type, capsys):
+    (
+        Validate(
+            data=load_dataset(dataset="small_table", tbl_type=tbl_type),
+            thresholds=Thresholds(warning=1, error=2, critical=3),
+            actions=Actions(
+                warning="warning override", default="{level} default_action", highest_only=False
+            ),
+        )
+        .col_vals_gt(columns="d", value=10000)
+        .interrogate()
+    )
+
+    # Capture the output and verify that all three level messages are printed to the console
+    captured = capsys.readouterr()
+    assert "critical default_action" in captured.out
+    assert "error default_action" in captured.out
+    assert "warning override" in captured.out
+
+
+@pytest.mark.parametrize("tbl_type", ["pandas", "polars", "duckdb"])
+def test_validation_actions_default_local(tbl_type, capsys):
+    (
+        Validate(
+            data=load_dataset(dataset="small_table", tbl_type=tbl_type),
+            thresholds=Thresholds(warning=1, error=2, critical=3),
+            actions=Actions(default="{level} default_action_global", highest_only=False),
+        )
+        .col_vals_gt(
+            columns="d",
+            value=10000,
+            actions=Actions(default="{level} default_action_local", highest_only=False),
+        )
+        .interrogate()
+    )
+
+    # Capture the output and verify that all three level messages are printed to the console
+    captured = capsys.readouterr()
+    assert "critical default_action_local" in captured.out
+    assert "error default_action_local" in captured.out
+    assert "warning default_action_local" in captured.out
+
+
+@pytest.mark.parametrize("tbl_type", ["pandas", "polars", "duckdb"])
+def test_validation_actions_default_local_override(tbl_type, capsys):
+    (
+        Validate(
+            data=load_dataset(dataset="small_table", tbl_type=tbl_type),
+            thresholds=Thresholds(warning=1, error=2, critical=3),
+            actions=Actions(
+                warning="warning override_global",
+                default="{level} default_action_global",
+                highest_only=False,
+            ),
+        )
+        .col_vals_gt(
+            columns="d",
+            value=10000,
+            actions=Actions(
+                warning="warning override_local",
+                default="{level} default_action_local",
+                highest_only=False,
+            ),
+        )
+        .interrogate()
+    )
+
+    # Capture the output and verify that all three level messages are printed to the console
+    captured = capsys.readouterr()
+    assert "critical default_action_local" in captured.out
+    assert "error default_action_local" in captured.out
+    assert "warning override_local" in captured.out
+
+
+@pytest.mark.parametrize("tbl_type", ["pandas", "polars", "duckdb"])
+def test_validation_actions_get_action_metadata(tbl_type, capsys):
+    def log_issue():
+        metadata = get_action_metadata()
+        print(f"Step: {metadata['step']}, Type: {metadata['type']}, Column: {metadata['column']}, ")
+
+    (
+        Validate(
+            data=load_dataset(dataset="small_table", tbl_type=tbl_type),
+            thresholds=Thresholds(warning=1, error=0.10, critical=0.15),
+            actions=Actions(warning=log_issue),
+        )
+        .col_vals_lt(columns="c", value=0)  # 1
+        .col_vals_eq(columns="a", value=3)  # 2
+        .col_vals_ne(columns="c", value=10)  # 3
+        .col_vals_le(columns="a", value=7)  # 4
+        .col_vals_ge(columns="d", value=500, na_pass=True)  # 5
+        .col_vals_between(columns="c", left=0, right=5, na_pass=True)  # 6
+        .col_vals_outside(columns="a", left=0, right=9, inclusive=(False, True))  # 7
+        .col_vals_eq(columns="a", value=1)  # 8
+        .col_vals_in_set(columns="f", set=["lows", "mids", "highs"])  # 9
+        .col_vals_not_in_set(columns="f", set=["low", "mid", "high"])  # 10
+        .col_vals_null(columns="c")  # 11
+        .col_vals_not_null(columns="c")  # 12
+        .col_vals_regex(columns="f", pattern=r"[0-9]-[a-z]{3}-[0-9]{3}")  # 13
+        .col_exists(columns="z")  # 14
+        .rows_distinct()  # 15
+        .rows_distinct(columns_subset=["a", "b", "c"])  # 16
+        .col_count_match(count=14)  # 17
+        .row_count_match(count=20)  # 18
+        .interrogate()
+    )
+
+    # Capture the output and verify that several lines were printed to the console
+    captured = capsys.readouterr()
+    assert "Step: 1, Type: col_vals_lt, Column: c" in captured.out
+    assert "Step: 2, Type: col_vals_eq, Column: a" in captured.out
+    assert "Step: 3, Type: col_vals_ne, Column: c" in captured.out
+    assert "Step: 4, Type: col_vals_le, Column: a" in captured.out
+    assert "Step: 5, Type: col_vals_ge, Column: d" in captured.out
+    assert "Step: 6, Type: col_vals_between, Column: c" in captured.out
+    assert "Step: 7, Type: col_vals_outside, Column: a" in captured.out
+    assert "Step: 8, Type: col_vals_eq, Column: a" in captured.out
+    assert "Step: 9, Type: col_vals_in_set, Column: f" in captured.out
+    assert "Step: 10, Type: col_vals_not_in_set, Column: f" in captured.out
+    assert "Step: 11, Type: col_vals_null, Column: c" in captured.out
+    assert "Step: 12, Type: col_vals_not_null, Column: c" in captured.out
+    assert "Step: 13, Type: col_vals_regex, Column: f" in captured.out
+    assert "Step: 14, Type: col_exists, Column: z" in captured.out
+    assert "Step: 15, Type: rows_distinct, Column: None" in captured.out
+    assert "Step: 16, Type: rows_distinct, Column: ['a', 'b', 'c']" in captured.out
+    assert "Step: 17, Type: col_count_match, Column: None" in captured.out
+    assert "Step: 18, Type: row_count_match, Column: None" in captured.out
 
 
 def test_validation_with_preprocessing_pd(tbl_pd):
@@ -4105,13 +4370,6 @@ def test_col_schema_match_columns_only():
 
 @pytest.mark.parametrize("tbl_fixture", TBL_TRUE_DATES_TIMES_LIST)
 def test_date_validation_across_cols(request, tbl_fixture):
-    # {
-    #     "date_1": pd.to_datetime(["2021-01-01", "2021-02-01"]),
-    #     "date_2": pd.to_datetime(["2021-02-01", "2021-03-01"]),
-    #     "dttm_1": pd.to_datetime(["2021-01-01 02:30:00", "2021-02-01 02:30:00"]),
-    #     "dttm_2": pd.to_datetime(["2021-02-01 03:30:00", "2021-03-01 03:30:00"]),
-    # }
-
     tbl = request.getfixturevalue(tbl_fixture)
 
     assert (
@@ -4182,14 +4440,529 @@ def test_date_validation_across_cols(request, tbl_fixture):
 
 
 @pytest.mark.parametrize("tbl_fixture", TBL_TRUE_DATES_TIMES_LIST)
-def test_datetime_validation_across_cols(request, tbl_fixture):
-    # {
-    #     "date_1": pd.to_datetime(["2021-01-01", "2021-02-01"]),
-    #     "date_2": pd.to_datetime(["2021-02-01", "2021-03-01"]),
-    #     "dttm_1": pd.to_datetime(["2021-01-01 02:30:00", "2021-02-01 02:30:00"]),
-    #     "dttm_2": pd.to_datetime(["2021-02-01 03:30:00", "2021-03-01 03:30:00"]),
-    # }
+def test_date_validation_fixed_date(request, tbl_fixture):
+    import datetime
 
+    tbl = request.getfixturevalue(tbl_fixture)
+
+    date_left = datetime.date(2021, 1, 1)
+    date_right = datetime.date(2021, 3, 1)
+
+    assert (
+        Validate(data=tbl)
+        .col_vals_gt(
+            columns="date_1",
+            value=date_left,
+        )
+        .interrogate()
+        .n_passed(i=1, scalar=True)
+        == 1
+    )
+
+    assert (
+        Validate(data=tbl)
+        .col_vals_ge(
+            columns="date_1",
+            value=date_left,
+        )
+        .interrogate()
+        .n_passed(i=1, scalar=True)
+        == 2
+    )
+
+    assert (
+        Validate(data=tbl)
+        .col_vals_eq(
+            columns="date_1",
+            value=date_left,
+        )
+        .interrogate()
+        .n_passed(i=1, scalar=True)
+        == 1
+    )
+
+    assert (
+        Validate(data=tbl)
+        .col_vals_ne(
+            columns="date_1",
+            value=date_left,
+        )
+        .interrogate()
+        .n_passed(i=1, scalar=True)
+        == 1
+    )
+
+    assert (
+        Validate(data=tbl)
+        .col_vals_lt(
+            columns="date_1",
+            value=date_left,
+        )
+        .interrogate()
+        .n_passed(i=1, scalar=True)
+        == 0
+    )
+
+    assert (
+        Validate(data=tbl)
+        .col_vals_le(
+            columns="date_1",
+            value=date_left,
+        )
+        .interrogate()
+        .n_passed(i=1, scalar=True)
+        == 1
+    )
+
+    assert (
+        Validate(data=tbl)
+        .col_vals_between(
+            columns="date_1",
+            left=date_left,
+            right=date_right,
+        )
+        .interrogate()
+        .n_passed(i=1, scalar=True)
+        == 2
+    )
+
+    assert (
+        Validate(data=tbl)
+        .col_vals_between(
+            columns="date_1",
+            left=date_left,
+            right=date_right,
+            inclusive=(False, False),
+        )
+        .interrogate()
+        .n_passed(i=1, scalar=True)
+        == 1
+    )
+
+    assert (
+        Validate(data=tbl)
+        .col_vals_outside(
+            columns="date_1",
+            left=date_left,
+            right=date_right,
+        )
+        .interrogate()
+        .n_passed(i=1, scalar=True)
+        == 0
+    )
+
+    assert (
+        Validate(data=tbl)
+        .col_vals_outside(
+            columns="date_1",
+            left=date_left,
+            right=date_right,
+            inclusive=(False, False),
+        )
+        .interrogate()
+        .n_passed(i=1, scalar=True)
+        == 1
+    )
+
+
+@pytest.mark.parametrize("tbl_fixture", TBL_TRUE_DATES_TIMES_LIST)
+def test_date_validation_fixed_datetime(request, tbl_fixture):
+    import datetime
+
+    tbl = request.getfixturevalue(tbl_fixture)
+
+    datetime_left = datetime.datetime(2021, 1, 1)
+    datetime_right = datetime.datetime(2021, 3, 1)
+
+    assert (
+        Validate(data=tbl)
+        .col_vals_gt(
+            columns="dttm_1",
+            value=datetime_left,
+        )
+        .interrogate()
+        .n_passed(i=1, scalar=True)
+        == 2
+    )
+
+    assert (
+        Validate(data=tbl)
+        .col_vals_ge(
+            columns="dttm_1",
+            value=datetime_left,
+        )
+        .interrogate()
+        .n_passed(i=1, scalar=True)
+        == 2
+    )
+
+    assert (
+        Validate(data=tbl)
+        .col_vals_eq(
+            columns="dttm_1",
+            value=datetime_left,
+        )
+        .interrogate()
+        .n_passed(i=1, scalar=True)
+        == 0
+    )
+
+    assert (
+        Validate(data=tbl)
+        .col_vals_ne(
+            columns="dttm_1",
+            value=datetime_left,
+        )
+        .interrogate()
+        .n_passed(i=1, scalar=True)
+        == 2
+    )
+
+    assert (
+        Validate(data=tbl)
+        .col_vals_lt(
+            columns="dttm_1",
+            value=datetime_right,
+        )
+        .interrogate()
+        .n_passed(i=1, scalar=True)
+        == 2
+    )
+
+    assert (
+        Validate(data=tbl)
+        .col_vals_le(
+            columns="dttm_1",
+            value=datetime_right,
+        )
+        .interrogate()
+        .n_passed(i=1, scalar=True)
+        == 2
+    )
+
+    assert (
+        Validate(data=tbl)
+        .col_vals_between(
+            columns="dttm_1",
+            left=datetime_left,
+            right=datetime_right,
+        )
+        .interrogate()
+        .n_passed(i=1, scalar=True)
+        == 2
+    )
+
+    assert (
+        Validate(data=tbl)
+        .col_vals_outside(
+            columns="dttm_1",
+            left=datetime_left,
+            right=datetime_right,
+        )
+        .interrogate()
+        .n_passed(i=1, scalar=True)
+        == 0
+    )
+
+
+@pytest.mark.parametrize("tbl_fixture", TBL_TRUE_DATES_TIMES_LIST)
+def test_date_validation_fixed_date_ddtm_col(request, tbl_fixture):
+    import datetime
+
+    tbl = request.getfixturevalue(tbl_fixture)
+
+    date_left = datetime.date(2021, 1, 1)
+    date_right = datetime.date(2021, 3, 1)
+
+    assert (
+        Validate(data=tbl)
+        .col_vals_gt(
+            columns="dttm_1",
+            value=date_left,
+        )
+        .interrogate()
+        .n_passed(i=1, scalar=True)
+        == 2
+    )
+
+    assert (
+        Validate(data=tbl)
+        .col_vals_ge(
+            columns="dttm_1",
+            value=date_left,
+        )
+        .interrogate()
+        .n_passed(i=1, scalar=True)
+        == 2
+    )
+
+    assert (
+        Validate(data=tbl)
+        .col_vals_eq(
+            columns="dttm_1",
+            value=date_left,
+        )
+        .interrogate()
+        .n_passed(i=1, scalar=True)
+        == 0
+    )
+
+    assert (
+        Validate(data=tbl)
+        .col_vals_ne(
+            columns="dttm_1",
+            value=date_left,
+        )
+        .interrogate()
+        .n_passed(i=1, scalar=True)
+        == 2
+    )
+
+    assert (
+        Validate(data=tbl)
+        .col_vals_lt(
+            columns="dttm_1",
+            value=date_left,
+        )
+        .interrogate()
+        .n_passed(i=1, scalar=True)
+        == 0
+    )
+
+    assert (
+        Validate(data=tbl)
+        .col_vals_lt(
+            columns="dttm_1",
+            value=date_right,
+        )
+        .interrogate()
+        .n_passed(i=1, scalar=True)
+        == 2
+    )
+
+    assert (
+        Validate(data=tbl)
+        .col_vals_le(
+            columns="dttm_1",
+            value=date_left,
+        )
+        .interrogate()
+        .n_passed(i=1, scalar=True)
+        == 0
+    )
+
+    assert (
+        Validate(data=tbl)
+        .col_vals_le(
+            columns="dttm_1",
+            value=date_right,
+        )
+        .interrogate()
+        .n_passed(i=1, scalar=True)
+        == 2
+    )
+
+    assert (
+        Validate(data=tbl)
+        .col_vals_between(
+            columns="dttm_1",
+            left=date_left,
+            right=date_right,
+        )
+        .interrogate()
+        .n_passed(i=1, scalar=True)
+        == 2
+    )
+
+    assert (
+        Validate(data=tbl)
+        .col_vals_between(
+            columns="dttm_1",
+            left=date_left,
+            right=date_right,
+            inclusive=(False, False),
+        )
+        .interrogate()
+        .n_passed(i=1, scalar=True)
+        == 2
+    )
+
+    assert (
+        Validate(data=tbl)
+        .col_vals_outside(
+            columns="dttm_1",
+            left=date_left,
+            right=date_right,
+        )
+        .interrogate()
+        .n_passed(i=1, scalar=True)
+        == 0
+    )
+
+    assert (
+        Validate(data=tbl)
+        .col_vals_outside(
+            columns="dttm_1",
+            left=date_left,
+            right=date_right,
+            inclusive=(False, False),
+        )
+        .interrogate()
+        .n_passed(i=1, scalar=True)
+        == 0
+    )
+
+
+@pytest.mark.parametrize("tbl_fixture", TBL_TRUE_DATES_TIMES_LIST)
+def test_date_validation_fixed_datetime_date_col(request, tbl_fixture):
+    import datetime
+
+    tbl = request.getfixturevalue(tbl_fixture)
+
+    datetime_left = datetime.datetime(2021, 1, 1)
+    datetime_right = datetime.datetime(2021, 3, 1)
+
+    assert (
+        Validate(data=tbl)
+        .col_vals_gt(
+            columns="date_1",
+            value=datetime_left,
+        )
+        .interrogate()
+        .n_passed(i=1, scalar=True)
+        == 1
+    )
+
+    assert (
+        Validate(data=tbl)
+        .col_vals_ge(
+            columns="date_1",
+            value=datetime_left,
+        )
+        .interrogate()
+        .n_passed(i=1, scalar=True)
+        == 2
+    )
+
+    assert (
+        Validate(data=tbl)
+        .col_vals_eq(
+            columns="date_1",
+            value=datetime_left,
+        )
+        .interrogate()
+        .n_passed(i=1, scalar=True)
+        == 1
+    )
+
+    assert (
+        Validate(data=tbl)
+        .col_vals_ne(
+            columns="date_1",
+            value=datetime_left,
+        )
+        .interrogate()
+        .n_passed(i=1, scalar=True)
+        == 1
+    )
+
+    assert (
+        Validate(data=tbl)
+        .col_vals_lt(
+            columns="date_1",
+            value=datetime_left,
+        )
+        .interrogate()
+        .n_passed(i=1, scalar=True)
+        == 0
+    )
+
+    assert (
+        Validate(data=tbl)
+        .col_vals_lt(
+            columns="date_1",
+            value=datetime_right,
+        )
+        .interrogate()
+        .n_passed(i=1, scalar=True)
+        == 2
+    )
+
+    assert (
+        Validate(data=tbl)
+        .col_vals_le(
+            columns="date_1",
+            value=datetime_left,
+        )
+        .interrogate()
+        .n_passed(i=1, scalar=True)
+        == 1
+    )
+
+    assert (
+        Validate(data=tbl)
+        .col_vals_le(
+            columns="date_1",
+            value=datetime_right,
+        )
+        .interrogate()
+        .n_passed(i=1, scalar=True)
+        == 2
+    )
+
+    assert (
+        Validate(data=tbl)
+        .col_vals_between(
+            columns="date_1",
+            left=datetime_left,
+            right=datetime_right,
+        )
+        .interrogate()
+        .n_passed(i=1, scalar=True)
+        == 2
+    )
+
+    assert (
+        Validate(data=tbl)
+        .col_vals_between(
+            columns="date_1",
+            left=datetime_left,
+            right=datetime_right,
+            inclusive=(False, False),
+        )
+        .interrogate()
+        .n_passed(i=1, scalar=True)
+        == 1
+    )
+
+    assert (
+        Validate(data=tbl)
+        .col_vals_outside(
+            columns="date_1",
+            left=datetime_left,
+            right=datetime_right,
+        )
+        .interrogate()
+        .n_passed(i=1, scalar=True)
+        == 0
+    )
+
+    assert (
+        Validate(data=tbl)
+        .col_vals_outside(
+            columns="date_1",
+            left=datetime_left,
+            right=datetime_right,
+            inclusive=(False, False),
+        )
+        .interrogate()
+        .n_passed(i=1, scalar=True)
+        == 1
+    )
+
+
+@pytest.mark.parametrize("tbl_fixture", TBL_TRUE_DATES_TIMES_LIST)
+def test_datetime_validation_across_cols(request, tbl_fixture):
     tbl = request.getfixturevalue(tbl_fixture)
 
     assert (
@@ -4809,6 +5582,55 @@ def test_interrogate_sample_n(request, tbl_fixture):
         assert len(nw.from_native(validation.get_data_extracts(i=1, frame=True)).columns) == 4
 
 
+def test_interrogate_sample_n_limit():
+    game_revenue = load_dataset(dataset="game_revenue", tbl_type="polars")
+
+    validation_default_limit = (
+        Validate(game_revenue).col_vals_gt(columns="item_revenue", value=10000).interrogate()
+    )
+
+    assert (
+        len(nw.from_native(validation_default_limit.get_data_extracts(i=1, frame=True)).rows())
+        == 500
+    )
+
+    validation_set_n_limit = (
+        Validate(game_revenue)
+        .col_vals_gt(columns="item_revenue", value=10000)
+        .interrogate(get_first_n=10)
+    )
+
+    assert (
+        len(nw.from_native(validation_set_n_limit.get_data_extracts(i=1, frame=True)).rows()) == 10
+    )
+
+    validation_set_n_no_limit_break = (
+        Validate(game_revenue)
+        .col_vals_gt(columns="item_revenue", value=10000)
+        .interrogate(get_first_n=750)
+    )
+
+    assert (
+        len(
+            nw.from_native(
+                validation_set_n_no_limit_break.get_data_extracts(i=1, frame=True)
+            ).rows()
+        )
+        == 500
+    )
+
+    validation_set_n_adj_limit = (
+        Validate(game_revenue)
+        .col_vals_gt(columns="item_revenue", value=10000)
+        .interrogate(get_first_n=750, extract_limit=1000)
+    )
+
+    assert (
+        len(nw.from_native(validation_set_n_adj_limit.get_data_extracts(i=1, frame=True)).rows())
+        == 750
+    )
+
+
 @pytest.mark.parametrize(
     "tbl_fixture, sample_frac, expected",
     [
@@ -4848,7 +5670,7 @@ def test_interrogate_sample_frac_with_sample_limit(request, tbl_fixture):
     validation = (
         Validate(tbl)
         .col_vals_regex(columns="text", pattern=r"^[a-z]{3}")
-        .interrogate(sample_frac=0.8, sample_limit=1)
+        .interrogate(sample_frac=0.8, extract_limit=1)
     )
 
     # Expect that the extracts table has 2 entries out of 3 failures
@@ -5155,6 +5977,63 @@ def test_comprehensive_validation_report_html_snap(snapshot):
     snapshot.assert_match(edited_report_html_str, "comprehensive_validation_report.html")
 
 
+def test_validation_report_briefs_html(snapshot):
+    validation = (
+        Validate(
+            data=load_dataset(),
+            tbl_name="small_table",
+            label="Validation example with briefs",
+            thresholds=Thresholds(warning=0.10, error=0.25, critical=0.35),
+        )
+        .col_vals_eq(columns="a", value=3)  # no brief
+        .col_vals_lt(columns="c", value=5, brief=False)  # same as `brief=None` (no brief)
+        .col_vals_gt(columns="d", value=100, brief=True)  # automatically generated brief
+        .col_vals_le(columns="a", value=7, brief="This is a custom brief for the assertion")
+        .col_vals_ge(columns="d", value=500, na_pass=True, brief="**Step** {step}: {brief}")
+        .interrogate()
+    )
+
+    html_str = validation.get_tabular_report().as_raw_html()
+
+    # Define the regex pattern to match the entire <td> tag with class "gt_sourcenote"
+    pattern = r'<tfoot class="gt_sourcenotes">.*?</tfoot>'
+
+    # Use re.sub to remove the tag
+    edited_report_html_str = re.sub(pattern, "", html_str, flags=re.DOTALL)
+
+    # Use the snapshot fixture to create and save the snapshot
+    snapshot.assert_match(edited_report_html_str, "validation_report_with_briefs.html")
+
+
+def test_validation_report_briefs_global_local_html(snapshot):
+    validation = (
+        Validate(
+            data=load_dataset(),
+            tbl_name="small_table",
+            label="Validation example with briefs",
+            thresholds=Thresholds(warning=0.10, error=0.25, critical=0.35),
+            brief="**Global Brief**: {auto}",
+        )
+        .col_vals_eq(columns="a", value=3)  # global brief
+        .col_vals_lt(columns="c", value=5, brief=False)  # no brief (global brief cancelled)
+        .col_vals_gt(columns="d", value=100, brief=True)  # local brief, default auto-generated one
+        .col_vals_le(columns="a", value=7, brief="This is a custom local brief for the assertion")
+        .col_vals_ge(columns="d", value=500, na_pass=True, brief="**Step** {step}: {auto}")
+        .interrogate()
+    )
+
+    html_str = validation.get_tabular_report().as_raw_html()
+
+    # Define the regex pattern to match the entire <td> tag with class "gt_sourcenote"
+    pattern = r'<tfoot class="gt_sourcenotes">.*?</tfoot>'
+
+    # Use re.sub to remove the tag
+    edited_report_html_str = re.sub(pattern, "", html_str, flags=re.DOTALL)
+
+    # Use the snapshot fixture to create and save the snapshot
+    snapshot.assert_match(edited_report_html_str, "validation_report_briefs_global_local.html")
+
+
 def test_no_interrogation_validation_report_html_snap(snapshot):
     validation = (
         Validate(
@@ -5289,7 +6168,9 @@ def test_process_brief():
 
 
 def test_process_action_str():
-    datetime_val = str(datetime(2025, 1, 1, 0, 0, 0, 0))
+    import datetime
+
+    datetime_val = str(datetime.datetime(2025, 1, 1, 0, 0, 0, 0))
 
     partial_process_action_str = partial(
         _process_action_str,
@@ -5321,12 +6202,19 @@ def test_process_action_str():
 
 
 def test_process_title_text():
-    assert _process_title_text(title=None, tbl_name=None) == ""
-    assert _process_title_text(title=":default:", tbl_name=None) == _get_default_title_text()
-    assert _process_title_text(title=":none:", tbl_name=None) == ""
-    assert _process_title_text(title=":tbl_name:", tbl_name="tbl_name") == "<code>tbl_name</code>"
-    assert _process_title_text(title=":tbl_name:", tbl_name=None) == ""
-    assert _process_title_text(title="*Title*", tbl_name=None) == "<p><em>Title</em></p>\n"
+    assert _process_title_text(title=None, tbl_name=None, lang="en") == ""
+    assert (
+        _process_title_text(title=":default:", tbl_name=None, lang="en") == "Pointblank Validation"
+    )
+    assert _process_title_text(title=":none:", tbl_name=None, lang="en") == ""
+    assert (
+        _process_title_text(title=":tbl_name:", tbl_name="tbl_name", lang="en")
+        == "<code>tbl_name</code>"
+    )
+    assert _process_title_text(title=":tbl_name:", tbl_name=None, lang="en") == ""
+    assert (
+        _process_title_text(title="*Title*", tbl_name=None, lang="en") == "<p><em>Title</em></p>\n"
+    )
 
 
 @pytest.mark.parametrize(
@@ -5352,12 +6240,14 @@ def test_process_title_text():
     ],
 )
 def test_fmt_lg(input_value, expected_output):
-    assert _fmt_lg(input_value) == expected_output
+    assert _fmt_lg(input_value, locale="en") == expected_output
 
 
 def test_create_table_time_html():
-    datetime_0 = datetime(2021, 1, 1, 0, 0, 0, 0)
-    datetime_1_min_later = datetime(2021, 1, 1, 0, 1, 0, 0)
+    import datetime
+
+    datetime_0 = datetime.datetime(2021, 1, 1, 0, 0, 0, 0)
+    datetime_1_min_later = datetime.datetime(2021, 1, 1, 0, 1, 0, 0)
 
     assert _create_table_time_html(time_start=None, time_end=None) == ""
     assert "div" in _create_table_time_html(time_start=datetime_0, time_end=datetime_1_min_later)
@@ -5649,8 +6539,73 @@ def test_get_step_report_no_fail(tbl_type):
         .interrogate()
     )
 
+    # Test every step report and ensure it's a GT object
     for i in range(1, 18):
         assert isinstance(validation.get_step_report(i=i), GT.GT)
+
+    # Test with a fixed limit of `2`
+    for i in range(1, 18):
+        assert isinstance(validation.get_step_report(i=i, limit=2), GT.GT)
+
+    # Test with `limit=None`
+    for i in range(1, 18):
+        assert isinstance(validation.get_step_report(i=i, limit=None), GT.GT)
+
+    # Test with a custom header
+    for i in range(1, 18):
+        assert isinstance(validation.get_step_report(i=i, header="Custom header"), GT.GT)
+
+    #
+    # Tests with a subset of columns
+    #
+
+    # All passing cases
+
+    # Single column (target)
+    assert isinstance(validation.get_step_report(i=1, columns_subset="a"), GT.GT)
+
+    # Single column (non-target)
+    assert isinstance(validation.get_step_report(i=1, columns_subset="b"), GT.GT)
+
+    # Multiple columns (including target)
+    assert isinstance(validation.get_step_report(i=1, columns_subset=["a", "b"]), GT.GT)
+
+    # Multiple columns (excluding target)
+    assert isinstance(validation.get_step_report(i=1, columns_subset=["b", "c"]), GT.GT)
+
+    # Using single selector
+    assert isinstance(validation.get_step_report(i=1, columns_subset=col("a")), GT.GT)
+    assert isinstance(validation.get_step_report(i=1, columns_subset=col(matches("a"))), GT.GT)
+    assert isinstance(validation.get_step_report(i=1, columns_subset=col(starts_with("a"))), GT.GT)
+
+    # Using multiple selectors
+    assert isinstance(
+        validation.get_step_report(i=1, columns_subset=col(starts_with("a") | matches("b"))), GT.GT
+    )
+
+    # Failing cases
+
+    # Single column (target)
+    assert isinstance(validation.get_step_report(i=3, columns_subset="a"), GT.GT)
+
+    # Single column (non-target)
+    assert isinstance(validation.get_step_report(i=3, columns_subset="b"), GT.GT)
+
+    # Multiple columns (including target)
+    assert isinstance(validation.get_step_report(i=3, columns_subset=["a", "b"]), GT.GT)
+
+    # Multiple columns (excluding target)
+    assert isinstance(validation.get_step_report(i=3, columns_subset=["b", "c"]), GT.GT)
+
+    # Using single selector
+    assert isinstance(validation.get_step_report(i=3, columns_subset=col("a")), GT.GT)
+    assert isinstance(validation.get_step_report(i=3, columns_subset=col(matches("a"))), GT.GT)
+    assert isinstance(validation.get_step_report(i=3, columns_subset=col(starts_with("a"))), GT.GT)
+
+    # Using multiple selectors
+    assert isinstance(
+        validation.get_step_report(i=3, columns_subset=col(starts_with("a") | matches("b"))), GT.GT
+    )
 
 
 def test_get_step_report_failing_inputs():
@@ -5664,13 +6619,19 @@ def test_get_step_report_failing_inputs():
     with pytest.raises(ValueError):
         validation.get_step_report(i=2)
 
+    with pytest.raises(ValueError):
+        validation.get_step_report(i=1, limit=0)
+
+    with pytest.raises(ValueError):
+        validation.get_step_report(i=1, limit=-5)
+
 
 def test_get_step_report_inactive_step():
     small_table = load_dataset(dataset="small_table", tbl_type="pandas")
 
     validation = Validate(small_table).col_vals_gt(columns="a", value=0, active=False).interrogate()
 
-    validation.get_step_report(i=1) == "This validation step is inactive."
+    assert validation.get_step_report(i=1) == "This validation step is inactive."
 
 
 def test_get_step_report_non_supported_steps():
@@ -8355,5 +9316,7 @@ def test_assert_passing_example() -> None:
     passing_validation.assert_passing()
 
 
-if __name__ == "__main__":
-    test_missing_vals_tbl_no_polars()
+def test_prep_column_text():
+    assert _prep_column_text(column="column") == "`column`"
+    assert _prep_column_text(column=["column_a", "column_b"]) == "`column_a`"
+    assert _prep_column_text(column=3) == ""

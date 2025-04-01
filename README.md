@@ -96,6 +96,13 @@ You can install Pointblank using pip:
 pip install pointblank
 ```
 
+You can also install [Pointblank from Conda-Forge](https://anaconda.org/conda-forge/pointblank) by
+using:
+
+```bash
+conda install conda-forge::pointblank
+```
+
 If you don't have Polars or Pandas installed, you'll need to install one of them to use Pointblank.
 
 ```bash

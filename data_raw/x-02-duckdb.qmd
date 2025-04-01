@@ -9,9 +9,7 @@ import polars as pl
 import duckdb
 
 tbl_xyz = pl.DataFrame({"x": [1, 2, 3, 4], "y": [4, 5, 6, 7], "z": [8, 8, 8, 8]})
-tbl_xyz_missing = pl.DataFrame(
-    {"x": [1, 2, None, 4], "y": [4, None, 6, 7], "z": [8, None, 8, 8]}
-)
+tbl_xyz_missing = pl.DataFrame({"x": [1, 2, None, 4], "y": [4, None, 6, 7], "z": [8, None, 8, 8]})
 tbl_dates_times_text = pl.DataFrame(
     {
         "date": ["2021-01-01", "2021-02-01", None],
@@ -19,6 +17,22 @@ tbl_dates_times_text = pl.DataFrame(
         "text": [None, "5-egh-163", "8-kdg-938"],
     }
 )
+tbl_true_dates_times = pl.DataFrame(
+    {
+        "date_1": ["2021-01-01", "2021-02-01"],
+        "date_2": ["2021-02-01", "2021-03-01"],
+        "dttm_1": ["2021-01-01 02:30:00", "2021-02-01 02:30:00"],
+        "dttm_2": ["2021-02-01 03:30:00", "2021-03-01 03:30:00"],
+    }
+).with_columns(
+    [
+        pl.col("date_1").str.to_date(),
+        pl.col("date_2").str.to_date(),
+        pl.col("dttm_1").str.to_datetime(),
+        pl.col("dttm_2").str.to_datetime(),
+    ]
+)
+
 small_table = pb.load_dataset(dataset="small_table", tbl_type="polars")
 game_revenue = pb.load_dataset(dataset="game_revenue", tbl_type="polars")
 nycflights = pb.load_dataset(dataset="nycflights", tbl_type="polars")
@@ -44,6 +58,13 @@ with duckdb.connect(database="tbl_xyz_missing.ddb", read_only=False) as con:
 with duckdb.connect(database="tbl_dates_times_text.ddb", read_only=False) as con:
     con.execute(f"""
         CREATE TABLE IF NOT EXISTS 'tbl_dates_times_text' AS SELECT * FROM tbl_dates_times_text;
+    """)
+```
+
+```{python}
+with duckdb.connect(database="tbl_true_dates_times.ddb", read_only=False) as con:
+    con.execute(f"""
+        CREATE TABLE IF NOT EXISTS 'tbl_true_dates_times' AS SELECT * FROM tbl_true_dates_times;
     """)
 ```
 
