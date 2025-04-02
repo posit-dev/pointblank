@@ -334,7 +334,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="creating-a-validation-plan-and-interrogating" class="level3">
 <h3 class="anchored" data-anchor-id="creating-a-validation-plan-and-interrogating">Creating a validation plan and interrogating</h3>
 <p>Let’s walk through a data quality analysis of an extremely small table. It’s actually called <code>"small_table"</code> and it’s accessible through the <a href="../reference/load_dataset.html#pointblank.load_dataset"><code>load_dataset()</code></a> function.</p>
-<div id="8e23e77f" class="cell" data-execution_count="1">
+<div id="1a5665d7" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Load the small_table dataset</span></span>
@@ -544,11 +544,11 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 </div>
 <p>We ought to think about what’s tolerable in terms of data quality so let’s designate proportional failure thresholds to the ‘warning’, ‘error’, and ‘critical’ states. This can be done by using the <a href="../reference/Thresholds.html#pointblank.Thresholds"><code>Thresholds</code></a> class.</p>
-<div id="9ad8f6cc" class="cell" data-execution_count="2">
+<div id="c82f22ef" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>thresholds <span class="op">=</span> pb.Thresholds(warning<span class="op">=</span><span class="fl">0.10</span>, error<span class="op">=</span><span class="fl">0.25</span>, critical<span class="op">=</span><span class="fl">0.35</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Now, we use the <code>Validate</code> class and give it the <code>thresholds</code> object (which serves as a default for all validation steps but can be overridden). The static thresholds provided in <code>thresholds=</code> will make the reporting a bit more useful. We also need to provide a target table and we’ll use <code>small_table</code> for this.</p>
-<div id="86377d36" class="cell" data-execution_count="3">
+<div id="b090d00d" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>        data<span class="op">=</span>small_table,</span>
@@ -559,7 +559,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Then, as with any <code>Validate</code> object, we can add steps to the validation plan by using as many validation methods as we want. To conclude the process (and actually query the data table), we use the <a href="../reference/Validate.interrogate.html#pointblank.Validate.interrogate"><code>interrogate()</code></a> method.</p>
-<div id="dc019677" class="cell" data-execution_count="4">
+<div id="c245a826" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    validation</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_gt(columns<span class="op">=</span><span class="st">"d"</span>, value<span class="op">=</span><span class="dv">100</span>)</span>
@@ -571,7 +571,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>The <code>validation</code> object can be printed as a reporting table.</p>
-<div id="6822474b" class="cell" data-execution_count="5">
+<div id="3f60b970" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>validation</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="5">
 <div id="pb_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
@@ -923,7 +923,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
   <tfoot class="gt_sourcenotes">
   
   <tr>
-    <td class="gt_sourcenote" colspan="14"><div style="margin-top: 5px; margin-bottom: 5px;"><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin-left: 10px; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2025-04-02 05:34:04 UTC</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">&lt; 1 s</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 1px 5px -1px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2025-04-02 05:34:04 UTC</span></div></td>
+    <td class="gt_sourcenote" colspan="14"><div style="margin-top: 5px; margin-bottom: 5px;"><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin-left: 10px; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2025-04-02 15:43:47 UTC</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">&lt; 1 s</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 1px 5px -1px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2025-04-02 15:43:47 UTC</span></div></td>
   </tr>
 
 </tfoot>
@@ -939,7 +939,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="adding-briefs" class="level3">
 <h3 class="anchored" data-anchor-id="adding-briefs">Adding briefs</h3>
 <p>Briefs are short descriptions of the validation steps. While they can be set for each step individually, they can also be set globally. The global setting is done by using the <code>brief=</code> argument in <code>Validate</code>. The global setting can be as simple as <code>True</code> to have automatically-generated briefs for each step. Alternatively, we can use templating elements like <code>"{step}"</code> (to insert the step number) or <code>"{auto}"</code> (to include an automatically generated brief). Here’s an example of a global setting for briefs:</p>
-<div id="a148145a" class="cell" data-execution_count="6">
+<div id="956b719e" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>        data<span class="op">=</span>pb.load_dataset(),</span>
@@ -1186,7 +1186,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
   <tfoot class="gt_sourcenotes">
   
   <tr>
-    <td class="gt_sourcenote" colspan="14"><div style="margin-top: 5px; margin-bottom: 5px;"><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin-left: 10px; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2025-04-02 05:34:04 UTC</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">&lt; 1 s</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 1px 5px -1px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2025-04-02 05:34:04 UTC</span></div></td>
+    <td class="gt_sourcenote" colspan="14"><div style="margin-top: 5px; margin-bottom: 5px;"><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin-left: 10px; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2025-04-02 15:43:47 UTC</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">&lt; 1 s</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 1px 5px -1px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2025-04-02 15:43:47 UTC</span></div></td>
   </tr>
 
 </tfoot>
@@ -1203,7 +1203,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="post-interrogation-methods" class="level3">
 <h3 class="anchored" data-anchor-id="post-interrogation-methods">Post-interrogation methods</h3>
 <p>The <code>Validate</code> class has a number of post-interrogation methods that can be used to extract useful information from the validation results. For example, the <a href="../reference/Validate.get_data_extracts.html#pointblank.Validate.get_data_extracts"><code>get_data_extracts()</code></a> method can be used to get the data extracts for each validation step.</p>
-<div id="0b384368" class="cell" data-execution_count="7">
+<div id="5397499b" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>validation.get_data_extracts()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="7">
 <pre><code>{1: shape: (0, 9)
@@ -1231,7 +1231,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 </div>
 <p>We can also view step reports for each validation step using the <a href="../reference/Validate.get_step_report.html#pointblank.Validate.get_step_report"><code>get_step_report()</code></a> method. This method adapts to the type of validation step and shows the relevant information for a step’s validation.</p>
-<div id="a7aa60d5" class="cell" data-execution_count="8">
+<div id="0b47654e" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>validation.get_step_report(i<span class="op">=</span><span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="8">
 <div id="pb_preview_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
@@ -1339,7 +1339,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 </div>
 <p>The <code>Validate</code> class also has a method for getting the sundered data, which is the data that passed or failed the validation steps. This can be done using the <a href="../reference/Validate.get_sundered_data.html#pointblank.Validate.get_sundered_data"><code>get_sundered_data()</code></a> method.</p>
-<div id="a9c932a3" class="cell" data-execution_count="9">
+<div id="555a588e" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>pb.preview(validation.get_sundered_data())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="9">
 <div id="pb_preview_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
