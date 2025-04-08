@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>validate.all_passed – Pointblank</title>
+<title>get_validation_summary – Pointblank</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -177,77 +177,106 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#returns" id="toc-returns" class="nav-link active" data-scroll-target="#returns">Returns</a></li>
+  <li><a href="#pointblank.get_validation_summary" id="toc-pointblank.get_validation_summary" class="nav-link active" data-scroll-target="#pointblank.get_validation_summary">get_validation_summary</a>
+  <ul class="collapse">
+  <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
+  <li><a href="#description-of-the-summary-fields" id="toc-description-of-the-summary-fields" class="nav-link" data-scroll-target="#description-of-the-summary-fields">Description of the Summary Fields</a></li>
   <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
+  </ul></li>
   </ul>
 </nav>
     </div>
 <!-- main -->
-<main class="content" id="quarto-document-content">
-
-<header id="title-block-header" class="quarto-title-block default">
-<div class="quarto-title">
-<h1 class="title">Validate.all_passed</h1>
-</div>
+<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"></header>
 
 
 
-<div class="quarto-title-meta">
 
-    
-  
-    
-  </div>
-  
-
-
-</header>
-
-
-<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>Validate.all_passed()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Determine if every validation step passed perfectly, with no failing test units.</p>
-<p>The <code>all_passed()</code> method determines if every validation step passed perfectly, with no failing test units. This method is useful for quickly checking if the table passed all validation steps with flying colors. If there’s even a single failing test unit in any validation step, this method will return <code>False</code>.</p>
-<p>This validation metric might be overly stringent for some validation plans where failing test units are generally expected (and the strategy is to monitor data quality over time). However, the value of <code>all_passed()</code> could be suitable for validation plans designed to ensure that every test unit passes perfectly (e.g., checks for column presence, null-checking tests, etc.).</p>
+<section id="pointblank.get_validation_summary" class="level1">
+<h1>get_validation_summary</h1>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>get_validation_summary()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Access validation summary information when authoring final actions.</p>
+<p>This function provides a convenient way to access summary information about the validation process within a final action. It returns a dictionary with key metrics from the validation process.</p>
 <section id="returns" class="level2 doc-section doc-section-returns">
 <h2 class="doc-section doc-section-returns anchored" data-anchor-id="returns">Returns</h2>
 <dl>
-<dt><code><span class="parameter-name"></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><code>bool</code></span></code></dt>
+<dt><code><span class="parameter-name"></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><code>dict</code> | None</span></code></dt>
 <dd>
-<p><code>True</code> if all validation steps had no failing test units, <code>False</code> otherwise.</p>
+<p>A dictionary containing validation metrics, or None if called outside a final action.</p>
 </dd>
 </dl>
 </section>
+<section id="description-of-the-summary-fields" class="level2 doc-section doc-section-description-of-the-summary-fields">
+<h2 class="doc-section doc-section-description-of-the-summary-fields anchored" data-anchor-id="description-of-the-summary-fields">Description of the Summary Fields</h2>
+<p>The summary dictionary contains the following fields:</p>
+<ul>
+<li><code>n_steps</code> (<code>int</code>): The total number of validation steps.</li>
+<li><code>n_passing_steps</code> (<code>int</code>): The number of validation steps where all test units passed.</li>
+<li><code>n_failing_steps</code> (<code>int</code>): The number of validation steps that had some failing test units.</li>
+<li><code>n_warning_steps</code> (<code>int</code>): The number of steps that exceeded a ‘warning’ threshold.</li>
+<li><code>n_error_steps</code> (<code>int</code>): The number of steps that exceeded an ‘error’ threshold.</li>
+<li><code>n_critical_steps</code> (<code>int</code>): The number of steps that exceeded a ‘critical’ threshold.</li>
+<li><code>list_passing_steps</code> (<code>list[int]</code>): List of step numbers where all test units passed.</li>
+<li><code>list_failing_steps</code> (<code>list[int]</code>): List of step numbers for steps having failing test units.</li>
+<li><code>dict_n</code> (<code>dict</code>): The number of test units for each validation step.</li>
+<li><code>dict_n_passed</code> (<code>dict</code>): The number of test units that passed for each validation step.</li>
+<li><code>dict_n_failed</code> (<code>dict</code>): The number of test units that failed for each validation step.</li>
+<li><code>dict_f_passed</code> (<code>dict</code>): The fraction of test units that passed for each validation step.</li>
+<li><code>dict_f_failed</code> (<code>dict</code>): The fraction of test units that failed for each validation step.</li>
+<li><code>dict_warning</code> (<code>dict</code>): The ‘warning’ level status for each validation step.</li>
+<li><code>dict_error</code> (<code>dict</code>): The ‘error’ level status for each validation step.</li>
+<li><code>dict_critical</code> (<code>dict</code>): The ‘critical’ level status for each validation step.</li>
+<li><code>all_passed</code> (<code>bool</code>): Whether or not every validation step had no failing test units.</li>
+<li><code>highest_severity</code> (<code>str</code>): The highest severity level encountered during validation. This can be one of the following: <code>"warning"</code>, <code>"error"</code>, or <code>"critical"</code>, <code>"some failing"</code>, or <code>"all passed"</code>.</li>
+<li><code>tbl_row_count</code> (<code>int</code>): The number of rows in the target table.</li>
+<li><code>tbl_column_count</code> (<code>int</code>): The number of columns in the target table.</li>
+<li><code>tbl_name</code> (<code>str</code>): The name of the target table.</li>
+<li><code>validation_duration</code> (<code>float</code>): The duration of the validation in seconds.</li>
+</ul>
+<p>Note that the summary dictionary is only available within the context of a final action. If called outside of a final action (i.e., when no final action is being executed), this function will return <code>None</code>.</p>
+</section>
 <section id="examples" class="level2 doc-section doc-section-examples">
 <h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
-<p>In the example below, we’ll use a simple Polars DataFrame with three columns (<code>a</code>, <code>b</code>, and <code>c</code>). There will be three validation steps, and the second step will have a failing test unit (the value <code>10</code> isn’t less than <code>9</code>). After interrogation, the <code>all_passed()</code> method is used to determine if all validation steps passed perfectly.</p>
-<div id="644b0899" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>tbl <span class="op">=</span> pl.DataFrame(</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    {</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>        <span class="st">"a"</span>: [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">9</span>, <span class="dv">5</span>],</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>        <span class="st">"b"</span>: [<span class="dv">5</span>, <span class="dv">6</span>, <span class="dv">10</span>, <span class="dv">3</span>],</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>        <span class="st">"c"</span>: [<span class="st">"a"</span>, <span class="st">"b"</span>, <span class="st">"a"</span>, <span class="st">"a"</span>],</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    }</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>)</span>
+<p>Final actions are executed after the completion of all validation steps. They provide an opportunity to take appropriate actions based on the overall validation results. Here’s an example of a final action function (<code>send_report()</code>) that sends an alert when critical validation failures are detected:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> send_report():</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    summary <span class="op">=</span> pb.get_validation_summary()</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> summary[<span class="st">"highest_severity"</span>] <span class="op">==</span> <span class="st">"critical"</span>:</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Send an alert email</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>        send_alert_email(</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>            subject<span class="op">=</span><span class="ss">f"CRITICAL validation failures in </span><span class="sc">{</span>summary[<span class="st">'tbl_name'</span>]<span class="sc">}</span><span class="ss">"</span>,</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>            body<span class="op">=</span><span class="ss">f"</span><span class="sc">{</span>summary[<span class="st">'n_critical_steps'</span>]<span class="sc">}</span><span class="ss"> steps failed with critical severity."</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>        )</span>
 <span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    .col_vals_gt(columns<span class="op">=</span><span class="st">"a"</span>, value<span class="op">=</span><span class="dv">0</span>)</span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    .col_vals_lt(columns<span class="op">=</span><span class="st">"b"</span>, value<span class="op">=</span><span class="dv">9</span>)</span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>    .col_vals_in_set(columns<span class="op">=</span><span class="st">"c"</span>, <span class="bu">set</span><span class="op">=</span>[<span class="st">"a"</span>, <span class="st">"b"</span>])</span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>validation.all_passed()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="1">
-<pre><code>False</code></pre>
-</div>
-</div>
-<p>The returned value is <code>False</code> since the second validation step had a failing test unit. If it weren’t for that one failing test unit, the return value would have been <code>True</code>.</p>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    pb.Validate(</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>        data<span class="op">=</span>my_data,</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>        final_actions<span class="op">=</span>pb.FinalActions(send_report)</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>    .col_vals_gt(columns<span class="op">=</span><span class="st">"revenue"</span>, value<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Note that <code>send_alert_email()</code> in the example above is a placeholder function that would be implemented by the user to send email alerts. This function is not provided by the Pointblank package.</p>
+<p>The <code>get_validation_summary()</code> function can also be used to create custom reporting for validation results:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> log_validation_results():</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    summary <span class="op">=</span> pb.get_validation_summary()</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Validation completed with status: </span><span class="sc">{</span>summary[<span class="st">'highest_severity'</span>]<span class="sc">.</span>upper()<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Steps: </span><span class="sc">{</span>summary[<span class="st">'n_steps'</span>]<span class="sc">}</span><span class="ss"> total"</span>)</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  - </span><span class="sc">{</span>summary[<span class="st">'n_passing_steps'</span>]<span class="sc">}</span><span class="ss"> passing, </span><span class="sc">{</span>summary[<span class="st">'n_failing_steps'</span>]<span class="sc">}</span><span class="ss"> failing"</span>)</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>        <span class="ss">f"  - Severity: </span><span class="sc">{</span>summary[<span class="st">'n_warning_steps'</span>]<span class="sc">}</span><span class="ss"> warnings, "</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>        <span class="ss">f"</span><span class="sc">{</span>summary[<span class="st">'n_error_steps'</span>]<span class="sc">}</span><span class="ss"> errors, "</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>        <span class="ss">f"</span><span class="sc">{</span>summary[<span class="st">'n_critical_steps'</span>]<span class="sc">}</span><span class="ss"> critical"</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> summary[<span class="st">'highest_severity'</span>] <span class="kw">in</span> [<span class="st">"error"</span>, <span class="st">"critical"</span>]:</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">"⚠️ Action required: Please review failing validation steps!"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Final actions work well with both simple logging and more complex notification systems, allowing you to integrate validation results into your broader data quality workflows.</p>
 
 
+</section>
 </section>
 
 </main> <!-- /main -->
