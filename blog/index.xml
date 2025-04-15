@@ -50,7 +50,7 @@ Note
 <section id="the-data-validation-workflow" class="level2">
 <h2 class="anchored" data-anchor-id="the-data-validation-workflow">The Data Validation Workflow</h2>
 <p>Let’s get right to performing a basic check of a Polars DataFrame. We’ll make use of the included <code>small_table</code> dataset.</p>
-<div id="93393a2b" class="cell" data-execution_count="1">
+<div id="76c858e4" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><span class="im" style="color: #00769E;
 background-color: null;
 font-style: inherit;">import</span> pointblank <span class="im" style="color: #00769E;
@@ -411,7 +411,7 @@ font-style: inherit;">$"</span>)</span>
   <tfoot class="gt_sourcenotes">
   
   <tr>
-    <td class="gt_sourcenote" colspan="14" style="text-align: left;"><div style="margin-top: 5px; margin-bottom: 5px;"><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin-left: 10px; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2025-04-11 20:52:10 UTC</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">&lt; 1 s</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 1px 5px -1px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2025-04-11 20:52:10 UTC</span></div></td>
+    <td class="gt_sourcenote" colspan="14" style="text-align: left;"><div style="margin-top: 5px; margin-bottom: 5px;"><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin-left: 10px; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2025-04-15 04:22:57 UTC</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">&lt; 1 s</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 1px 5px -1px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2025-04-15 04:22:57 UTC</span></div></td>
   </tr>
 
 </tfoot>
@@ -435,7 +435,7 @@ font-style: inherit;">$"</span>)</span>
 <p>All of those numbers under the <code>UNITS</code>, <code>PASS</code>, and <code>FAIL</code> columns have to do with test units, a measure of central importance in Pointblank. Each validation step will execute a type of validation test on the target table. For example, a <a href="https://posit-dev.github.io/pointblank/reference/Validate.col_vals_lt.html"><code>col_vals_lt()</code></a> validation step can test that each value in a column is less than a specified number. The key finding that’s reported as a result of this test is the number of test units that pass or fail. This little diagram explains what those numbers mean:</p>
 <p><img src="https://posit-dev.github.io/pointblank/blog/intro-pointblank/validation-test-units.png" class="img-fluid" data-text-align="center"></p>
 <p>Failing test units can be tied to threshold levels, which can provide a better indication of whether failures should raise some basic awareness or spur you into action. Here’s a validation workflow that sets three failure threshold levels that signal the severity of data quality problems:</p>
-<div id="2ee7cd20" class="cell" data-execution_count="2">
+<div id="70c3226a" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><span class="im" style="color: #00769E;
 background-color: null;
 font-style: inherit;">import</span> pointblank <span class="im" style="color: #00769E;
@@ -1070,7 +1070,7 @@ font-style: inherit;"># STEP 10</span></span>
     <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" class="gt_row gt_center"><span style="color: #AAAAAA;">●</span></td>
     <td style="height: 40px; background-color: #FCFCFC;" class="gt_row gt_center"><span style="color: #EBBC14;">●</span></td>
     <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" class="gt_row gt_center"><span style="color: #FF3300;">○</span></td>
-    <td style="height: 40px;" class="gt_row gt_center">—</td>
+    <td style="height: 40px;" class="gt_row gt_center"><a href="data:text/csv;base64,X3Jvd19udW1fLHBsYXllcl9pZCxzZXNzaW9uX2lkLHRpbWUKMzUzLFBaQk5SS1NNVUxIWDIxMyxQWkJOUktTTVVMSFgyMTMtbTJuNnRrMWksMjAxNS0wMS0wOFQxNDozODowNi4wMDAwMDArMDAwMAozNTQsUFpCTlJLU01VTEhYMjEzLFBaQk5SS1NNVUxIWDIxMy1tMm42dGsxaSwyMDE1LTAxLTA4VDE0OjM4OjA2LjAwMDAwMCswMDAwCjQwMCxRRFVaSklFVENBR1c2NTQsUURVWkpJRVRDQUdXNjU0LWdtaTZib2YxLDIwMTUtMDEtMDlUMDM6MTA6MDUuMDAwMDAwKzAwMDAKNDAxLFFEVVpKSUVUQ0FHVzY1NCxRRFVaSklFVENBR1c2NTQtZ21pNmJvZjEsMjAxNS0wMS0wOVQwMzoxMDowNS4wMDAwMDArMDAwMAo1NTMsSlZCWkNQS1hIRk1VNDkxLEpWQlpDUEtYSEZNVTQ5MS1uOXdzMnRsMSwyMDE1LTAxLTEwVDE5OjA1OjE4LjAwMDAwMCswMDAwCjU1NCxKVkJaQ1BLWEhGTVU0OTEsSlZCWkNQS1hIRk1VNDkxLW45d3MydGwxLDIwMTUtMDEtMTBUMTk6MDU6MTguMDAwMDAwKzAwMDAKNjQxLEJGTkxVUklTSlhUSDY0NyxCRk5MVVJJU0pYVEg2NDctZnVjcTFlbTgsMjAxNS0wMS0xMVQxMTozNDo1MS4wMDAwMDArMDAwMAo2NDIsQkZOTFVSSVNKWFRINjQ3LEJGTkxVUklTSlhUSDY0Ny1mdWNxMWVtOCwyMDE1LTAxLTExVDExOjM0OjUxLjAwMDAwMCswMDAwCjY2MCxHQVlJQkxVQ09FREo3MzIsR0FZSUJMVUNPRURKNzMyLWdidmVtNDg1LDIwMTUtMDEtMTFUMTU6MTQ6NTYuMDAwMDAwKzAwMDAKNjYxLEdBWUlCTFVDT0VESjczMixHQVlJQkxVQ09FREo3MzItZ2J2ZW00ODUsMjAxNS0wMS0xMVQxNToxNDo1Ni4wMDAwMDArMDAwMAo3MDAsR1NRSlhJT0tZTUVBNzEyLEdTUUpYSU9LWU1FQTcxMi0ycXhudHN3YywyMDE1LTAxLTEyVDAwOjQ2OjU1LjAwMDAwMCswMDAwCjcwMSxHU1FKWElPS1lNRUE3MTIsR1NRSlhJT0tZTUVBNzEyLTJxeG50c3djLDIwMTUtMDEtMTJUMDA6NDY6NTUuMDAwMDAwKzAwMDAKODI1LE9NQ1ZVQUlLU0RUUjY1MSxPTUNWVUFJS1NEVFI2NTEtdm9rcjQ1ODIsMjAxNS0wMS0xM1QwMjozMTo1NC4wMDAwMDArMDAwMAo4MjYsT01DVlVBSUtTRFRSNjUxLE9NQ1ZVQUlLU0RUUjY1MS12b2tyNDU4MiwyMDE1LTAxLTEzVDAyOjMxOjU0LjAwMDAwMCswMDAwCjkzMCxIRFNBTVBUT0xCV0M0MzgsSERTQU1QVE9MQldDNDM4LWFpNG02amNoLDIwMTUtMDEtMTRUMDE6MzI6MDIuMDAwMDAwKzAwMDAKOTMxLEhEU0FNUFRPTEJXQzQzOCxIRFNBTVBUT0xCV0M0MzgtYWk0bTZqY2gsMjAxNS0wMS0xNFQwMTozMjowMi4wMDAwMDArMDAwMAoxMDIwLEdBWUlCTFVDT0VESjczMixHQVlJQkxVQ09FREo3MzItbHBrdXdncjQsMjAxNS0wMS0xNFQxNDo1OToyMC4wMDAwMDArMDAwMAoxMDIxLEdBWUlCTFVDT0VESjczMixHQVlJQkxVQ09FREo3MzItbHBrdXdncjQsMjAxNS0wMS0xNFQxNDo1OToyMC4wMDAwMDArMDAwMAoxMDIzLEdBWUlCTFVDT0VESjczMixHQVlJQkxVQ09FREo3MzItbHBrdXdncjQsMjAxNS0wMS0xNFQxNToxMjowMi4wMDAwMDArMDAwMAoxMDI0LEdBWUlCTFVDT0VESjczMixHQVlJQkxVQ09FREo3MzItbHBrdXdncjQsMjAxNS0wMS0xNFQxNToxMjowMi4wMDAwMDArMDAwMAoxMjkxLFpQVElITlNWRllBUTE0NixaUFRJSE5TVkZZQVExNDYtdThjNG5xNzUsMjAxNS0wMS0xNlQxMjozMToyMy4wMDAwMDArMDAwMAoxMjkyLFpQVElITlNWRllBUTE0NixaUFRJSE5TVkZZQVExNDYtdThjNG5xNzUsMjAxNS0wMS0xNlQxMjozMToyMy4wMDAwMDArMDAwMAo=" download="extract_0008.csv"><button style="background-color: #67C2DC; color: #FFFFFF; border: none; padding: 5px; font-weight: bold; cursor: pointer; border-radius: 4px;">CSV</button></a></td>
   </tr>
   <tr>
     <td style="height: 40px; background-color: #4CA64C; color: transparent;font-size: 0px;" class="gt_row gt_left">#4CA64C</td>
@@ -1164,7 +1164,7 @@ font-style: inherit;"># STEP 10</span></span>
   <tfoot class="gt_sourcenotes">
   
   <tr>
-    <td class="gt_sourcenote" colspan="14" style="text-align: left;"><div style="margin-top: 5px; margin-bottom: 5px;"><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin-left: 10px; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2025-04-11 20:52:10 UTC</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">&lt; 1 s</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 1px 5px -1px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2025-04-11 20:52:10 UTC</span></div></td>
+    <td class="gt_sourcenote" colspan="14" style="text-align: left;"><div style="margin-top: 5px; margin-bottom: 5px;"><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin-left: 10px; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2025-04-15 04:22:57 UTC</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">&lt; 1 s</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 1px 5px -1px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2025-04-15 04:22:57 UTC</span></div></td>
   </tr>
 
 </tfoot>
@@ -1182,7 +1182,7 @@ font-style: inherit;"># STEP 10</span></span>
 <h2 class="anchored" data-anchor-id="reporting-for-individual-validation-steps">Reporting for Individual Validation Steps</h2>
 <p>The second validation step of the previous data validation showed 18 failing test units. That translates to 18 spots in a 2,000 row DataFrame where a data quality assertion failed. We often would like to know exactly what that failing data is; it’s usually the next step toward addressing data quality issues.</p>
 <p>Pointblank offers a method that gives you a tabular report on a specific step: <a href="https://posit-dev.github.io/pointblank/reference/Validate.get_step_report.html"><code>get_step_report()</code></a>. The previous tables you’ve seen (the validation report table) dealt with providing a summary of all validation steps. In contrast, a focused report on a single step can help to get to the heart of a data quality issue. Here’s how that looks for Step 2:</p>
-<div id="d7384c5f" class="cell" data-execution_count="3">
+<div id="f9b80a63" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1">validation_2.get_step_report(i<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
@@ -1427,7 +1427,7 @@ font-style: inherit;">2</span>)</span></code></pre></div>
 </div>
 <p>This report provides the 18 rows where the failure occurred. If you scroll the table to the right you’ll see the column that underwent testing (<code>session_duration</code>) is highlighted in red. All of these values are <code>5.0</code> or less, which is in violation of the assertion (in the header) that <code>session_duration &gt; 5</code>.</p>
 <p>These types of bespoke reports are useful for finding a needle in a haystack. Another good use for a step report is when validating a table schema. Using the <a href="https://posit-dev.github.io/pointblank/reference/Validate.col_schema_match.html"><code>col_schema_match()</code></a> validation method with a table schema prepared with the <a href="https://posit-dev.github.io/pointblank/reference/Schema.html"><code>Schema</code></a> class allows us to verify our understanding of the table structure. Here is a validation that performs a schema validation with the <code>small_table</code> dataset prepared as a DuckDB table:</p>
-<div id="475227aa" class="cell" data-execution_count="4">
+<div id="ae123229" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb5" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><span class="im" style="color: #00769E;
 background-color: null;
 font-style: inherit;">import</span> pointblank <span class="im" style="color: #00769E;
@@ -1665,7 +1665,7 @@ font-style: inherit;">=</span>schema)</span>
   <tfoot class="gt_sourcenotes">
   
   <tr>
-    <td class="gt_sourcenote" colspan="14" style="text-align: left;"><div style="margin-top: 5px; margin-bottom: 5px;"><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin-left: 10px; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2025-04-11 20:52:11 UTC</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">&lt; 1 s</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 1px 5px -1px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2025-04-11 20:52:11 UTC</span></div></td>
+    <td class="gt_sourcenote" colspan="14" style="text-align: left;"><div style="margin-top: 5px; margin-bottom: 5px;"><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin-left: 10px; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2025-04-15 04:22:58 UTC</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">&lt; 1 s</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 1px 5px -1px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2025-04-15 04:22:58 UTC</span></div></td>
   </tr>
 
 </tfoot>
@@ -1677,7 +1677,7 @@ font-style: inherit;">=</span>schema)</span>
 </div>
 </div>
 <p>This step fails, but the validation report table doesn’t tell us how (or where). Using <a href="https://posit-dev.github.io/pointblank/reference/Validate.get_step_report.html">`get_step_report()</a> will show us what the underlying issues are:</p>
-<div id="3b58f476" class="cell" data-execution_count="5">
+<div id="13c499cc" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb6" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1">validation_3.get_step_report(i<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
