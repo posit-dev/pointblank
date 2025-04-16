@@ -282,7 +282,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="examples" class="level2 doc-section doc-section-examples">
 <h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>For the examples here, we’ll use a simple Polars DataFrame with three numeric columns (<code>a</code>, <code>b</code>, and <code>c</code>). The table is shown below:</p>
-<div id="8c2566df" class="cell" data-execution_count="2">
+<div id="b6c29aed" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -416,7 +416,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <li>The sum of <code>a</code> and <code>b</code> should be less than the value in column <code>c</code></li>
 </ol>
 <p>We’ll use <code>conjointly()</code> to check all these conditions together:</p>
-<div id="8df51eca" class="cell" data-execution_count="3">
+<div id="b9b04eb1" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    .conjointly(</span>
@@ -569,7 +569,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 <p>The validation table shows that not all rows satisfy all three conditions together. For a row to pass the conjoint validation, all three conditions must be true for that row.</p>
 <p>We can also use preprocessing to filter the data before applying the conjoint validation:</p>
-<div id="01b3476f" class="cell" data-execution_count="4">
+<div id="2d51e906" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    .conjointly(</span>
@@ -725,7 +725,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 <p>This allows for more complex validation scenarios where the data is first prepared and then validated against multiple conditions simultaneously.</p>
 <p>Or, you can use the backend-agnostic column expression helper <a href="../reference/expr_col.html#pointblank.expr_col"><code>expr_col()</code></a> to write expressions that work across different table backends:</p>
-<div id="c26b6037" class="cell" data-execution_count="5">
+<div id="c13c18f0" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>tbl <span class="op">=</span> pl.DataFrame(</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    {</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"a"</span>: [<span class="dv">5</span>, <span class="dv">7</span>, <span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">9</span>, <span class="dv">4</span>],</span>
