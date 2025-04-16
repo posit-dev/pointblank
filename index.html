@@ -177,11 +177,13 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#getting-started" id="toc-getting-started" class="nav-link active" data-scroll-target="#getting-started">Getting Started</a></li>
+  <li><a href="#getting-started-in-30-seconds" id="toc-getting-started-in-30-seconds" class="nav-link active" data-scroll-target="#getting-started-in-30-seconds">Getting Started in 30 Seconds</a></li>
   <li><a href="#real-world-example" id="toc-real-world-example" class="nav-link" data-scroll-target="#real-world-example">Real-World Example</a></li>
+  <li><a href="#join-the-community" id="toc-join-the-community" class="nav-link" data-scroll-target="#join-the-community">Join the Community</a></li>
   <li><a href="#installation" id="toc-installation" class="nav-link" data-scroll-target="#installation">Installation</a></li>
-  <li><a href="#getting-in-touch" id="toc-getting-in-touch" class="nav-link" data-scroll-target="#getting-in-touch">Getting in Touch</a></li>
+  <li><a href="#technical-details" id="toc-technical-details" class="nav-link" data-scroll-target="#technical-details">Technical Details</a></li>
   <li><a href="#contributing-to-pointblank" id="toc-contributing-to-pointblank" class="nav-link" data-scroll-target="#contributing-to-pointblank">Contributing to Pointblank</a></li>
+  <li><a href="#roadmap" id="toc-roadmap" class="nav-link" data-scroll-target="#roadmap">Roadmap</a></li>
   <li><a href="#code-of-conduct" id="toc-code-of-conduct" class="nav-link" data-scroll-target="#code-of-conduct">Code of Conduct</a></li>
   <li><a href="#license" id="toc-license" class="nav-link" data-scroll-target="#license">📄 License</a></li>
   <li><a href="#governance" id="toc-governance" class="nav-link" data-scroll-target="#governance">🏛️ Governance</a></li>
@@ -200,20 +202,23 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 <p>Pointblank is a modern data validation framework for Python that helps you trust your data with confidence. It provides a fluent, expressive API to validate your data against a wide range of constraints and presents results in beautiful, interactive reports.</p>
 <p>Whether you’re a data scientist, data engineer, or analyst, Pointblank helps you catch data quality issues before they impact your analyses or downstream systems.</p>
-<section id="getting-started" class="level2">
-<h2 class="anchored" data-anchor-id="getting-started">Getting Started</h2>
-<p>Let’s take a Polars DataFrame and validate it against a set of constraints. We do that by using the <code>Validate</code> class along with adding validation steps:</p>
+<section id="getting-started-in-30-seconds" class="level2">
+<h2 class="anchored" data-anchor-id="getting-started-in-30-seconds">Getting Started in 30 Seconds</h2>
 <div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>pb.load_dataset(dataset<span class="op">=</span><span class="st">"small_table"</span>)) <span class="co"># Use Validate() to start</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    .col_vals_gt(columns<span class="op">=</span><span class="st">"d"</span>, value<span class="op">=</span><span class="dv">100</span>)       <span class="co"># STEP 1      |</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    .col_vals_le(columns<span class="op">=</span><span class="st">"c"</span>, value<span class="op">=</span><span class="dv">5</span>)         <span class="co"># STEP 2      | &lt;-- Build up a validation plan</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    .col_exists(columns<span class="op">=</span>[<span class="st">"date"</span>, <span class="st">"date_time"</span>]) <span class="co"># STEPS 3 &amp; 4 |</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    .interrogate() <span class="co"># This will execute all validation steps and collect intel</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>   pb.Validate(data<span class="op">=</span>pb.load_dataset(dataset<span class="op">=</span><span class="st">"small_table"</span>))</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>   .col_vals_gt(columns<span class="op">=</span><span class="st">"d"</span>, value<span class="op">=</span><span class="dv">100</span>)             <span class="co"># Validate values &gt; 100</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>   .col_vals_le(columns<span class="op">=</span><span class="st">"c"</span>, value<span class="op">=</span><span class="dv">5</span>)               <span class="co"># Validate values &lt;= 5</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>   .col_exists(columns<span class="op">=</span>[<span class="st">"date"</span>, <span class="st">"date_time"</span>])       <span class="co"># Check columns exist</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>   .interrogate()                                   <span class="co"># Execute and collect results</span></span>
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>validation</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Get the validation report from the REPL with:</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>validation.get_tabular_report().show()</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="co"># From a notebook simply use:</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>validation</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div style="text-align: center;">
 <p><img src="./assets/pointblank-tabular-report.png" class="img-fluid" style="width:100.0%"></p>
 </div>
@@ -275,6 +280,15 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <p><img src="./assets/pointblank-step-report.png" class="img-fluid" style="width:100.0%"></p>
 </div>
 </section>
+<section id="join-the-community" class="level2">
+<h2 class="anchored" data-anchor-id="join-the-community">Join the Community</h2>
+<p>We’d love to hear from you! Connect with us:</p>
+<ul>
+<li><a href="https://github.com/posit-dev/pointblank/issues">GitHub Issues</a> for bug reports and feature requests</li>
+<li><a href="https://discord.com/invite/YH7CybCNCQ"><em>Discord server</em></a> for discussions and help</li>
+<li><a href="https://github.com/posit-dev/pointblank/blob/main/CONTRIBUTING.md">Contributing guidelines</a> if you’d like to help improve Pointblank</li>
+</ul>
+</section>
 <section id="installation" class="level2">
 <h2 class="anchored" data-anchor-id="installation">Installation</h2>
 <p>You can install Pointblank using pip:</p>
@@ -290,16 +304,29 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span class="st">"pointblank[postgres]"</span> <span class="co"># Install Pointblank with Ibis + PostgreSQL</span></span>
 <span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span class="st">"pointblank[sqlite]"</span>   <span class="co"># Install Pointblank with Ibis + SQLite</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
-<section id="getting-in-touch" class="level2">
-<h2 class="anchored" data-anchor-id="getting-in-touch">Getting in Touch</h2>
-<p>If you encounter a bug, have usage questions, or want to share ideas to make this package better, please feel free to file an <a href="https://github.com/posit-dev/pointblank/issues">issue</a>.</p>
-<p>Wanna talk about data validation in a more relaxed setting? Join our <a href="https://discord.com/invite/YH7CybCNCQ"><em>Discord server</em></a>! This is a great option for asking about the development of Pointblank, pitching ideas that may become features, and just sharing your ideas!</p>
-<p><a href="https://discord.com/invite/YH7CybCNCQ"><img src="https://img.shields.io/badge/Discord-Chat%20with%20us-blue?style=social&amp;logo=discord&amp;logoColor=purple.png" class="img-fluid"></a></p>
+<section id="technical-details" class="level2">
+<h2 class="anchored" data-anchor-id="technical-details">Technical Details</h2>
+<p>Pointblank uses <a href="https://github.com/narwhals-dev/narwhals">Narwhals</a> to work with Polars and Pandas DataFrames, and integrates with <a href="https://github.com/ibis-project/ibis">Ibis</a> for database and file format support. This architecture provides a consistent API for validating tabular data from various sources.</p>
 </section>
 <section id="contributing-to-pointblank" class="level2">
 <h2 class="anchored" data-anchor-id="contributing-to-pointblank">Contributing to Pointblank</h2>
 <p>There are many ways to contribute to the ongoing development of Pointblank. Some contributions can be simple (like fixing typos, improving documentation, filing issues for feature requests or problems, etc.) and others might take more time and care (like answering questions and submitting PRs with code changes). Just know that anything you can do to help would be very much appreciated!</p>
 <p>Please read over the <a href="https://github.com/posit-dev/pointblank/blob/main/CONTRIBUTING.md">contributing guidelines</a> for information on how to get started.</p>
+</section>
+<section id="roadmap" class="level2">
+<h2 class="anchored" data-anchor-id="roadmap">Roadmap</h2>
+<p>We’re actively working on enhancing Pointblank with:</p>
+<ol type="1">
+<li>Additional validation methods for comprehensive data quality checks</li>
+<li>Advanced logging capabilities</li>
+<li>Messaging actions (Slack, email) for threshold exceedances</li>
+<li>LLM-powered validation suggestions and data dictionary generation</li>
+<li>JSON/YAML configuration for pipeline portability</li>
+<li>CLI utility for validation from the command line</li>
+<li>Expanded backend support and certification</li>
+<li>High-quality documentation and examples</li>
+</ol>
+<p>If you have any ideas for features or improvements, don’t hesitate to share them with us! We are always looking for ways to make Pointblank better.</p>
 </section>
 <section id="code-of-conduct" class="level2">
 <h2 class="anchored" data-anchor-id="code-of-conduct">Code of Conduct</h2>
