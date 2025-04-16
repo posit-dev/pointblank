@@ -179,11 +179,9 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
   <ul>
   <li><a href="#getting-started" id="toc-getting-started" class="nav-link active" data-scroll-target="#getting-started">Getting Started</a></li>
   <li><a href="#real-world-example" id="toc-real-world-example" class="nav-link" data-scroll-target="#real-world-example">Real-World Example</a></li>
-  <li><a href="#features" id="toc-features" class="nav-link" data-scroll-target="#features">Features</a></li>
   <li><a href="#installation" id="toc-installation" class="nav-link" data-scroll-target="#installation">Installation</a></li>
   <li><a href="#getting-in-touch" id="toc-getting-in-touch" class="nav-link" data-scroll-target="#getting-in-touch">Getting in Touch</a></li>
   <li><a href="#contributing-to-pointblank" id="toc-contributing-to-pointblank" class="nav-link" data-scroll-target="#contributing-to-pointblank">Contributing to Pointblank</a></li>
-  <li><a href="#roadmap" id="toc-roadmap" class="nav-link" data-scroll-target="#roadmap">Roadmap</a></li>
   <li><a href="#code-of-conduct" id="toc-code-of-conduct" class="nav-link" data-scroll-target="#code-of-conduct">Code of Conduct</a></li>
   <li><a href="#license" id="toc-license" class="nav-link" data-scroll-target="#license">📄 License</a></li>
   <li><a href="#governance" id="toc-governance" class="nav-link" data-scroll-target="#governance">🏛️ Governance</a></li>
@@ -254,26 +252,29 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get an HTML report you can share with your team</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>validation.get_tabular_report().show(<span class="st">"browser"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div style="text-align: center;">
 <p><img src="./assets/pointblank-real-world-example.png" class="img-fluid" style="width:100.0%"></p>
+</div>
 <div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get a report of failing records from a specific step</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>validation.get_step_report(i<span class="op">=</span><span class="dv">3</span>).show(<span class="st">"browser"</span>)  <span class="co"># Get failing records from step 3</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div style="text-align: center;">
 <p><img src="./assets/pointblank-step-report.png" class="img-fluid" style="width:100.0%"></p>
-</section>
-<section id="features" class="level2">
-<h2 class="anchored" data-anchor-id="features">Features</h2>
-<p>Here’s a short list of what we think makes Pointblank a great tool for data validation:</p>
-<ul>
-<li><strong>Flexible</strong>: We support tables from Polars, Pandas, Duckdb, MySQL, PostgreSQL, SQLite, and Parquet</li>
-<li><strong>Beautiful Reports</strong>: Generate beautiful HTML table reports of your data validation results</li>
-<li><strong>Functional Output</strong>: Easily pull the specific data validation outputs you need for further processing</li>
-<li><strong>Easy to Use</strong>: Get started quickly with a straightforward API and clear documentation examples</li>
-<li><strong>Powerful</strong>: You can make complex data validation rules with flexible options for composition</li>
-</ul>
+</div>
 </section>
 <section id="installation" class="level2">
 <h2 class="anchored" data-anchor-id="installation">Installation</h2>
 <p>You can install Pointblank using pip:</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install pointblank</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>You can also install Pointblank from Conda-Forge by using:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">conda</span> install conda-forge::pointblank</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>If you don’t have Polars or Pandas installed, you’ll need to install one of them to use Pointblank.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span class="st">"pointblank[pl]"</span> <span class="co"># Install Pointblank with Polars</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span class="st">"pointblank[pd]"</span> <span class="co"># Install Pointblank with Pandas</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>To use Pointblank with DuckDB, MySQL, PostgreSQL, or SQLite, install Ibis with the appropriate backend:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span class="st">"pointblank[duckdb]"</span>   <span class="co"># Install Pointblank with Ibis + DuckDB</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span class="st">"pointblank[mysql]"</span>    <span class="co"># Install Pointblank with Ibis + MySQL</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span class="st">"pointblank[postgres]"</span> <span class="co"># Install Pointblank with Ibis + PostgreSQL</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span class="st">"pointblank[sqlite]"</span>   <span class="co"># Install Pointblank with Ibis + SQLite</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section id="getting-in-touch" class="level2">
 <h2 class="anchored" data-anchor-id="getting-in-touch">Getting in Touch</h2>
@@ -285,24 +286,6 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <h2 class="anchored" data-anchor-id="contributing-to-pointblank">Contributing to Pointblank</h2>
 <p>There are many ways to contribute to the ongoing development of Pointblank. Some contributions can be simple (like fixing typos, improving documentation, filing issues for feature requests or problems, etc.) and others might take more time and care (like answering questions and submitting PRs with code changes). Just know that anything you can do to help would be very much appreciated!</p>
 <p>Please read over the <a href="https://github.com/posit-dev/pointblank/blob/main/CONTRIBUTING.md">contributing guidelines</a> for information on how to get started.</p>
-</section>
-<section id="roadmap" class="level2">
-<h2 class="anchored" data-anchor-id="roadmap">Roadmap</h2>
-<p>There is much to do to make Pointblank a dependable and useful tool for data validation. To that end, we have a roadmap that will serve as a guide for the development of the library. Here are some of the things we are working on or plan to work on in the near future:</p>
-<ol type="1">
-<li>more validation methods to cover a wider range of data validation needs</li>
-<li>easy-to-use but powerful logging functionality</li>
-<li>messaging actions (e.g., Slack, emailing, etc.) to better react to threshold exceedances</li>
-<li>additional functionality for building more complex validations via LLMs (extension of ideas from the current <code>DraftValidation</code> class)</li>
-<li>a feature for quickly obtaining summary information on any dataset (tying together existing and future dataset summary-generation pieces)</li>
-<li>ensuring there are text/dict/JSON/HTML versions of all reports</li>
-<li>supporting the writing and reading of YAML validation config files</li>
-<li>a cli utility for Pointblank that can be used to run validations from the command line</li>
-<li>complete testing of validations across all compatible backends (for certification of those backends as fully supported)</li>
-<li>completion of the <strong>User Guide</strong> in the project website</li>
-<li>functionality for creating and publishing data dictionaries, which could: (a) use LLMs to more quickly draft column-level descriptions, and (b) incorporate templating features to make it easier to keep descriptions consistent and up to date</li>
-</ol>
-<p>If you have any ideas for features or improvements, don’t hesitate to share them with us! We are always looking for ways to make Pointblank better.</p>
 </section>
 <section id="code-of-conduct" class="level2">
 <h2 class="anchored" data-anchor-id="code-of-conduct">Code of Conduct</h2>
