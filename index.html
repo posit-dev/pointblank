@@ -178,6 +178,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
    
   <ul>
   <li><a href="#getting-started" id="toc-getting-started" class="nav-link active" data-scroll-target="#getting-started">Getting Started</a></li>
+  <li><a href="#real-world-example" id="toc-real-world-example" class="nav-link" data-scroll-target="#real-world-example">Real-World Example</a></li>
   <li><a href="#features" id="toc-features" class="nav-link" data-scroll-target="#features">Features</a></li>
   <li><a href="#installation" id="toc-installation" class="nav-link" data-scroll-target="#installation">Installation</a></li>
   <li><a href="#getting-in-touch" id="toc-getting-in-touch" class="nav-link" data-scroll-target="#getting-in-touch">Getting in Touch</a></li>
@@ -197,9 +198,10 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 
 <div style="text-align: center;">
 <p><img src="./assets/pointblank_logo.svg" class="img-fluid" style="width:75.0%"></p>
-<p><em>Find out if your data is what you think it is</em></p>
+<p><em>Data validation made beautiful and powerful</em></p>
 </div>
-<p>Pointblank is a table validation and testing library for Python. It helps you ensure that your tabular data meets certain expectations and constraints and it presents the results in a beautiful validation report table.</p>
+<p>Pointblank is a modern data validation framework for Python that helps you trust your data with confidence. It provides a fluent, expressive API to validate your data against a wide range of constraints and presents results in beautiful, interactive reports.</p>
+<p>Whether you’re a data scientist, data engineer, or analyst, Pointblank helps you catch data quality issues before they impact your analyses or downstream systems.</p>
 <section id="getting-started" class="level2">
 <h2 class="anchored" data-anchor-id="getting-started">Getting Started</h2>
 <p>Let’s take a Polars DataFrame and validate it against a set of constraints. We do that by using the <code>Validate</code> class along with adding validation steps:</p>
@@ -217,19 +219,45 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <div style="text-align: center;">
 <p><img src="./assets/pointblank-tabular-report.png" class="img-fluid" style="width:100.0%"></p>
 </div>
-<p>The rows in the validation report table correspond to each of the validation steps. One of the key concepts is that validation steps can be broken down into atomic test cases (test units), where each of these test units is given either of pass/fail status based on the validation constraints. You’ll see these tallied up in the reporting table (in the <code>UNITS</code>, <code>PASS</code>, and <code>FAIL</code> columns).</p>
-<p>The tabular reporting view is just one way to see the results. You can also obtain fine-grained results of the interrogation as individual step reports or via methods that provide key metrics. It’s also possible to use the validation results for downstream processing, such as filtering the input table based on the pass/fail status of the rows.</p>
-<p>On the input side, we can use the following types of tables:</p>
-<ul>
-<li>Polars DataFrame</li>
-<li>Pandas DataFrame</li>
-<li>DuckDB table</li>
-<li>MySQL table</li>
-<li>PostgreSQL table</li>
-<li>SQLite table</li>
-<li>Parquet</li>
-</ul>
-<p>To make this all work seamlessly, we use <a href="https://github.com/narwhals-dev/narwhals">Narwhals</a> to work with Polars and Pandas DataFrames. We also integrate with <a href="https://github.com/ibis-project/ibis">Ibis</a> to enable the use of DuckDB, MySQL, PostgreSQL, SQLite, Parquet, and more! In doing all of this, we can provide an ergonomic and consistent API for validating tabular data from various sources.</p>
+</section>
+<section id="real-world-example" class="level2">
+<h2 class="anchored" data-anchor-id="real-world-example">Real-World Example</h2>
+<div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Load your data</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>sales_data <span class="op">=</span> pl.read_csv(<span class="st">"sales_data.csv"</span>)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a comprehensive validation</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>sales_data)</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    .col_vals_between(            <span class="co"># Check numeric ranges with precision</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>        columns<span class="op">=</span>[<span class="st">"price"</span>, <span class="st">"quantity"</span>],</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>        left<span class="op">=</span><span class="dv">0</span>, right<span class="op">=</span><span class="dv">1000</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    .col_vals_not_null(           <span class="co"># Ensure required fields don't have nulls</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>        columns<span class="op">=</span>[<span class="st">"product_id"</span>, <span class="st">"customer_id"</span>, <span class="st">"timestamp"</span>]</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>    .col_vals_regex(              <span class="co"># Validate patterns with regex</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>        columns<span class="op">=</span><span class="st">"email"</span>,</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>        pattern<span class="op">=</span><span class="st">"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+</span><span class="ch">\\</span><span class="st">.[a-zA-Z]{2,}$"</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>    .col_vals_in_set(             <span class="co"># Check categorical values</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>        columns<span class="op">=</span><span class="st">"status"</span>,</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>        <span class="bu">set</span><span class="op">=</span>[<span class="st">"pending"</span>, <span class="st">"shipped"</span>, <span class="st">"delivered"</span>, <span class="st">"returned"</span>]</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>    .conjointly(                  <span class="co"># Combine multiple conditions</span></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>        <span class="kw">lambda</span> df: pb.expr_col(<span class="st">"revenue"</span>) <span class="op">==</span> pb.expr_col(<span class="st">"price"</span>) <span class="op">*</span> pb.expr_col(<span class="st">"quantity"</span>),</span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>        <span class="kw">lambda</span> df: pb.expr_col(<span class="st">"tax"</span>) <span class="op">&gt;=</span> pb.expr_col(<span class="st">"revenue"</span>) <span class="op">*</span> <span class="fl">0.05</span></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get an HTML report you can share with your team</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>validation.get_tabular_report().show(<span class="st">"browser"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><img src="./assets/pointblank-real-world-example.png" class="img-fluid" style="width:100.0%"></p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get a report of failing records from a specific step</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>validation.get_step_report(i<span class="op">=</span><span class="dv">3</span>).show(<span class="st">"browser"</span>)  <span class="co"># Get failing records from step 3</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><img src="./assets/pointblank-step-report.png" class="img-fluid" style="width:100.0%"></p>
 </section>
 <section id="features" class="level2">
 <h2 class="anchored" data-anchor-id="features">Features</h2>
@@ -245,7 +273,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="installation" class="level2">
 <h2 class="anchored" data-anchor-id="installation">Installation</h2>
 <p>You can install Pointblank using pip:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install pointblank</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install pointblank</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section id="getting-in-touch" class="level2">
 <h2 class="anchored" data-anchor-id="getting-in-touch">Getting in Touch</h2>
