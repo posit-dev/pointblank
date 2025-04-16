@@ -245,34 +245,35 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>         pb.send_slack_notification(</span>
 <span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>            webhook_url<span class="op">=</span><span class="st">"https://hooks.slack.com/services/your/webhook/url"</span></span>
 <span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>         )</span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>      )</span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>   )</span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>   .col_vals_between(            <span class="co"># Check numeric ranges with precision</span></span>
-<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>      columns<span class="op">=</span>[<span class="st">"price"</span>, <span class="st">"quantity"</span>],</span>
-<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>      left<span class="op">=</span><span class="dv">0</span>, right<span class="op">=</span><span class="dv">1000</span></span>
-<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>   )</span>
-<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>   .col_vals_not_null(           <span class="co"># Ensure that columns ending with '_id' don't have null values</span></span>
-<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>      columns<span class="op">=</span>pb.ends_with(<span class="st">"_id"</span>)</span>
-<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>   )</span>
-<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>   .col_vals_regex(              <span class="co"># Validate patterns with regex</span></span>
-<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>      columns<span class="op">=</span><span class="st">"email"</span>,</span>
-<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>      pattern<span class="op">=</span><span class="st">"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+</span><span class="ch">\\</span><span class="st">.[a-zA-Z]{2,}$"</span></span>
-<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>   )</span>
-<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>   .col_vals_in_set(             <span class="co"># Check categorical values</span></span>
-<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>      columns<span class="op">=</span><span class="st">"status"</span>,</span>
-<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>      <span class="bu">set</span><span class="op">=</span>[<span class="st">"pending"</span>, <span class="st">"shipped"</span>, <span class="st">"delivered"</span>, <span class="st">"returned"</span>]</span>
-<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>   )</span>
-<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>   .conjointly(                  <span class="co"># Combine multiple conditions</span></span>
-<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>      <span class="kw">lambda</span> df: pb.expr_col(<span class="st">"revenue"</span>) <span class="op">==</span> pb.expr_col(<span class="st">"price"</span>) <span class="op">*</span> pb.expr_col(<span class="st">"quantity"</span>),</span>
-<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>      <span class="kw">lambda</span> df: pb.expr_col(<span class="st">"tax"</span>) <span class="op">&gt;=</span> pb.expr_col(<span class="st">"revenue"</span>) <span class="op">*</span> <span class="fl">0.05</span></span>
-<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>   )</span>
-<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>   .interrogate()</span>
-<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>      ),</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>      brief<span class="op">=</span><span class="va">True</span>,                      <span class="co"># Add automatically-generated briefs for each step</span></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>   )</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>   .col_vals_between(            <span class="co"># Check numeric ranges with precision</span></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>      columns<span class="op">=</span>[<span class="st">"price"</span>, <span class="st">"quantity"</span>],</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>      left<span class="op">=</span><span class="dv">0</span>, right<span class="op">=</span><span class="dv">1000</span></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>   )</span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>   .col_vals_not_null(           <span class="co"># Ensure that columns ending with '_id' don't have null values</span></span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>      columns<span class="op">=</span>pb.ends_with(<span class="st">"_id"</span>)</span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>   )</span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>   .col_vals_regex(              <span class="co"># Validate patterns with regex</span></span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>      columns<span class="op">=</span><span class="st">"email"</span>,</span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>      pattern<span class="op">=</span><span class="st">"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+</span><span class="ch">\\</span><span class="st">.[a-zA-Z]{2,}$"</span></span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>   )</span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>   .col_vals_in_set(             <span class="co"># Check categorical values</span></span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>      columns<span class="op">=</span><span class="st">"status"</span>,</span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>      <span class="bu">set</span><span class="op">=</span>[<span class="st">"pending"</span>, <span class="st">"shipped"</span>, <span class="st">"delivered"</span>, <span class="st">"returned"</span>]</span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>   )</span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>   .conjointly(                  <span class="co"># Combine multiple conditions</span></span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>      <span class="kw">lambda</span> df: pb.expr_col(<span class="st">"revenue"</span>) <span class="op">==</span> pb.expr_col(<span class="st">"price"</span>) <span class="op">*</span> pb.expr_col(<span class="st">"quantity"</span>),</span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>      <span class="kw">lambda</span> df: pb.expr_col(<span class="st">"tax"</span>) <span class="op">&gt;=</span> pb.expr_col(<span class="st">"revenue"</span>) <span class="op">*</span> <span class="fl">0.05</span></span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>   )</span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a>   .interrogate()</span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <pre><code>Major data quality issue found in step 7 (2025-04-16 15:03:04.685612+00:00).</code></pre>
 <div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get an HTML report you can share with your team</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>validation.get_tabular_report().show(<span class="st">"browser"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div style="text-align: center;">
-<p><img src="./assets/pointblank-sales-data-example.png" class="img-fluid" style="width:100.0%"></p>
+<p><img src="./assets/pointblank-sales-data.png" class="img-fluid" style="width:100.0%"></p>
 </div>
 <div class="sourceCode" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get a report of failing records from a specific step</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>validation.get_step_report(i<span class="op">=</span><span class="dv">3</span>).show(<span class="st">"browser"</span>)  <span class="co"># Get failing records from step 3</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
