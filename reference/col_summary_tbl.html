@@ -73,7 +73,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-d4d76bf8491c20bad77d141916dc28e1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-7a20cca8b90711b4aa27f23ac0648a9c.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-265fea0c9f88305fd98966a10e6c6846.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -277,7 +277,7 @@ Warning
 <section id="examples" class="level2 doc-section doc-section-examples">
 <h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>It’s easy to get a column-level summary of a table using the <code>col_summary_tbl()</code> function. Here’s an example using the <code>small_table</code> dataset (itself loaded using the <a href="../reference/load_dataset.html#pointblank.load_dataset"><code>load_dataset()</code></a> function):</p>
-<div id="0809f909" class="cell" data-execution_count="1">
+<div id="c74a53c9" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>small_table_polars <span class="op">=</span> pb.load_dataset(dataset<span class="op">=</span><span class="st">"small_table"</span>, tbl_type<span class="op">=</span><span class="st">"polars"</span>)</span>
@@ -607,7 +607,7 @@ Warning
 </div>
 </div>
 <p>This table used above was a Polars DataFrame, but the <code>col_summary_tbl()</code> function works with any table supported by <code>pointblank</code>, including Pandas DataFrames and Ibis backend tables. Here’s an example using a DuckDB table handled by Ibis:</p>
-<div id="4f13b88f" class="cell" data-execution_count="2">
+<div id="9bedeb75" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>small_table_duckdb <span class="op">=</span> pb.load_dataset(dataset<span class="op">=</span><span class="st">"nycflights"</span>, tbl_type<span class="op">=</span><span class="st">"duckdb"</span>)</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>pb.col_summary_tbl(data<span class="op">=</span>small_table_duckdb, tbl_name<span class="op">=</span><span class="st">"nycflights"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -752,7 +752,7 @@ Warning
     <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">3.41</td>
     <td style="font-family: IBM Plex Mono; font-size: 10px; white-space: pre; overflow-x: visible; border-left: 1px solid #D3D3D3;" class="gt_row gt_right">1.00</td>
     <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">1.00</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">4.00</td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">3.98</td>
     <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">7.00</td>
     <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">9.28</td>
     <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">12.0</td>
@@ -944,7 +944,7 @@ Warning
     <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">−17.0</td>
     <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">−5.00</td>
     <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">13.8</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">91.2</td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">91.4</td>
     <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">1272</td>
     <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px solid #D3D3D3; background-color: #FCFCFC;" class="gt_row gt_right">31.0</td>
   </tr>
@@ -998,7 +998,7 @@ Warning
     <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">558</td>
     <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">1496</td>
     <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">3465</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">4703</td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">4722</td>
     <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">8500</td>
     <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px solid #D3D3D3; background-color: #FCFCFC;" class="gt_row gt_right">2912</td>
   </tr>
@@ -1130,7 +1130,7 @@ Warning
     <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">733</td>
     <td style="font-family: IBM Plex Mono; font-size: 10px; white-space: pre; overflow-x: visible; border-left: 1px solid #D3D3D3;" class="gt_row gt_right">17.0</td>
     <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">198</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">509</td>
+    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">507</td>
     <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">872</td>
     <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">1389</td>
     <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">2477</td>
