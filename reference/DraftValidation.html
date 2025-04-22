@@ -281,7 +281,7 @@ OPENAI_API_KEY="your_openai_api_key_here"</code></pre>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> pb.load_dataset(dataset<span class="op">=</span><span class="st">"nycflights"</span>, tbl_type<span class="op">=</span><span class="st">"duckdb"</span>)</span>
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Draft a validation plan for the "nycflights" table</span></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>pb.DraftValidation(data<span class="op">=</span>nycflights, model<span class="op">=</span><span class="st">"anthropic:claude-3-5-sonnet-latest"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>pb.DraftValidation(data<span class="op">=</span>data, model<span class="op">=</span><span class="st">"anthropic:claude-3-5-sonnet-latest"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>The output will be a drafted validation plan for the <code>"nycflights"</code> table and this will appear in the console.</p>
 <pre class="plaintext"><code>```python
 import pointblank as pb
