@@ -182,6 +182,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
   <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
   <li><a href="#description-of-the-summary-fields" id="toc-description-of-the-summary-fields" class="nav-link" data-scroll-target="#description-of-the-summary-fields">Description of the Summary Fields</a></li>
   <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
+  <li><a href="#see-also" id="toc-see-also" class="nav-link" data-scroll-target="#see-also">See Also</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -196,13 +197,13 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <h1>get_validation_summary</h1>
 <div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>get_validation_summary()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Access validation summary information when authoring final actions.</p>
-<p>This function provides a convenient way to access summary information about the validation process within a final action. It returns a dictionary with key metrics from the validation process.</p>
+<p>This function provides a convenient way to access summary information about the validation process within a final action. It returns a dictionary with key metrics from the validation process. This function can only be used within callables crafted for the <a href="../reference/FinalActions.html#pointblank.FinalActions"><code>FinalActions</code></a> class.</p>
 <section id="returns" class="level2 doc-section doc-section-returns">
 <h2 class="doc-section doc-section-returns anchored" data-anchor-id="returns">Returns</h2>
 <dl>
 <dt><code><span class="parameter-name"></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><code>dict</code> | None</span></code></dt>
 <dd>
-<p>A dictionary containing validation metrics, or None if called outside a final action.</p>
+<p>A dictionary containing validation metrics. If called outside of an final action context, this function will return <code>None</code>.</p>
 </dd>
 </dl>
 </section>
@@ -274,6 +275,10 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> summary[<span class="st">'highest_severity'</span>] <span class="kw">in</span> [<span class="st">"error"</span>, <span class="st">"critical"</span>]:</span>
 <span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">"⚠️ Action required: Please review failing validation steps!"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Final actions work well with both simple logging and more complex notification systems, allowing you to integrate validation results into your broader data quality workflows.</p>
+</section>
+<section id="see-also" class="level2 doc-section doc-section-see-also">
+<h2 class="doc-section doc-section-see-also anchored" data-anchor-id="see-also">See Also</h2>
+<p>Have a look at <a href="../reference/FinalActions.html#pointblank.FinalActions"><code>FinalActions</code></a> for more information on how to create custom actions that are executed after all validation steps have been completed.</p>
 
 
 </section>
