@@ -17,6 +17,12 @@ p a {
     text-underline-offset: 4px;
 }
 
+dt {
+    height: 32px;
+    overflow-x: scroll;
+    margin-left: -4px;
+}
+
 .table td {
     padding-left: 0px;
 }
