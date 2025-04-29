@@ -179,34 +179,50 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#pointblank.Validate.get_json_report" id="toc-pointblank.Validate.get_json_report" class="nav-link active" data-scroll-target="#pointblank.Validate.get_json_report">Validate.get_json_report</a>
-  <ul class="collapse">
-  <li><a href="#parameters" id="toc-parameters" class="nav-link" data-scroll-target="#parameters">Parameters</a></li>
+  <li><a href="#parameters" id="toc-parameters" class="nav-link active" data-scroll-target="#parameters">Parameters</a></li>
   <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
-  </ul></li>
+  <li><a href="#available-report-fields" id="toc-available-report-fields" class="nav-link" data-scroll-target="#available-report-fields">Available Report Fields</a></li>
+  <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
+  <li><a href="#see-also" id="toc-see-also" class="nav-link" data-scroll-target="#see-also">See Also</a></li>
   </ul>
 </nav>
     </div>
 <!-- main -->
-<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"></header>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Validate.get_json_report</h1>
+</div>
 
 
 
+<div class="quarto-title-meta">
 
-<section id="pointblank.Validate.get_json_report" class="level1">
-<h1>Validate.get_json_report</h1>
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
 <div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>Validate.get_json_report(use_fields<span class="op">=</span><span class="va">None</span>, exclude_fields<span class="op">=</span><span class="va">None</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Get a report of the validation results as a JSON-formatted string.</p>
+<p>The <code>get_json_report()</code> method provides a machine-readable report of validation results in JSON format. This is particularly useful for programmatic processing, storing validation results, or integrating with other systems. The report includes detailed information about each validation step, such as assertion type, columns validated, threshold values, test results, and more.</p>
+<p>By default, all available validation information fields are included in the report. However, you can customize the fields to include or exclude using the <code>use_fields=</code> and <code>exclude_fields=</code> parameters.</p>
 <section id="parameters" class="level2 doc-section doc-section-parameters">
 <h2 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters">Parameters</h2>
 <dl>
 <dt><code><span class="parameter-name"><strong>use_fields</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><code>list</code>[<code>str</code>] | None</span> <span class="parameter-default-sep">=</span> <span class="parameter-default">None</span></code></dt>
 <dd>
-<p>A list of fields to include in the report. If <code>None</code>, all fields are included.</p>
+<p>An optional list of specific fields to include in the report. If provided, only these fields will be included in the JSON output. If <code>None</code> (the default), all standard validation report fields are included. Have a look at the <em>Available Report Fields</em> section below for a list of fields that can be included in the report.</p>
 </dd>
 <dt><code><span class="parameter-name"><strong>exclude_fields</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><code>list</code>[<code>str</code>] | None</span> <span class="parameter-default-sep">=</span> <span class="parameter-default">None</span></code></dt>
 <dd>
-<p>A list of fields to exclude from the report. If <code>None</code>, no fields are excluded.</p>
+<p>An optional list of fields to exclude from the report. If provided, these fields will be omitted from the JSON output. If <code>None</code> (the default), no fields are excluded. This parameter cannot be used together with <code>use_fields=</code>. The <em>Available Report Fields</em> provides a listing of fields that can be excluded from the report.</p>
 </dd>
 </dl>
 </section>
@@ -215,12 +231,211 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <dl>
 <dt><code><span class="parameter-name"></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><code>str</code></span></code></dt>
 <dd>
-<p>A JSON-formatted string representing the validation report.</p>
+<p>A JSON-formatted string representing the validation report, with each validation step as an object in the report array.</p>
 </dd>
 </dl>
-
-
 </section>
+<section id="available-report-fields" class="level2 doc-section doc-section-available-report-fields">
+<h2 class="doc-section doc-section-available-report-fields anchored" data-anchor-id="available-report-fields">Available Report Fields</h2>
+<p>The JSON report can include any of the standard validation report fields, including:</p>
+<ul>
+<li><code>i</code>: the step number (1-indexed)</li>
+<li><code>i_o</code>: the original step index from the validation plan (pre-expansion)</li>
+<li><code>assertion_type</code>: the type of validation assertion (e.g., <code>"col_vals_gt"</code>, etc.)</li>
+<li><code>column</code>: the column being validated (or columns used in certain validations)</li>
+<li><code>values</code>: the comparison values or parameters used in the validation</li>
+<li><code>inclusive</code>: whether the comparison is inclusive (for range-based validations)</li>
+<li><code>na_pass</code>: whether <code>NA</code>/<code>Null</code> values are considered passing (for certain validations)</li>
+<li><code>pre</code>: preprocessing function applied before validation</li>
+<li><code>segments</code>: data segments to which the validation was applied</li>
+<li><code>thresholds</code>: threshold level statement that was used for the validation step</li>
+<li><code>label</code>: custom label for the validation step</li>
+<li><code>brief</code>: a brief description of the validation step</li>
+<li><code>active</code>: whether the validation step is active</li>
+<li><code>all_passed</code>: whether all test units passed in the step</li>
+<li><code>n</code>: total number of test units</li>
+<li><code>n_passed</code>, <code>n_failed</code>: number of test units that passed and failed</li>
+<li><code>f_passed</code>, <code>f_failed</code>: Fraction of test units that passed and failed</li>
+<li><code>warning</code>, <code>error</code>, <code>critical</code>: whether the namesake threshold level was exceeded (is <code>null</code> if threshold not set)</li>
+<li><code>time_processed</code>: when the validation step was processed (ISO 8601 format)</li>
+<li><code>proc_duration_s</code>: the processing duration in seconds</li>
+</ul>
+</section>
+<section id="examples" class="level2 doc-section doc-section-examples">
+<h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
+<p>Let’s create a validation plan with a few validation steps and generate a JSON report of the results:</p>
+<div id="79dcc6d9" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a sample DataFrame</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>tbl <span class="op">=</span> pl.DataFrame({</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"a"</span>: [<span class="dv">5</span>, <span class="dv">7</span>, <span class="dv">8</span>, <span class="dv">9</span>],</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">"b"</span>: [<span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">2</span>, <span class="dv">1</span>]</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Create and execute a validation plan</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    .col_vals_gt(columns<span class="op">=</span><span class="st">"a"</span>, value<span class="op">=</span><span class="dv">6</span>)</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    .col_vals_lt(columns<span class="op">=</span><span class="st">"b"</span>, value<span class="op">=</span><span class="dv">4</span>)</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Get the full JSON report</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>json_report <span class="op">=</span> validation.get_json_report()</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(json_report)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[
+    {
+        "i": 1,
+        "i_o": 1,
+        "assertion_type": "col_vals_gt",
+        "column": "a",
+        "values": 6,
+        "inclusive": null,
+        "na_pass": false,
+        "pre": null,
+        "segments": null,
+        "thresholds": "Thresholds(warning=None, error=None, critical=None)",
+        "label": null,
+        "brief": null,
+        "active": true,
+        "all_passed": false,
+        "n": 4,
+        "n_passed": 3,
+        "n_failed": 1,
+        "f_passed": 0.75,
+        "f_failed": 0.25,
+        "warning": null,
+        "error": null,
+        "critical": null,
+        "time_processed": "2025-04-29T15:32:25.158+00:00",
+        "proc_duration_s": 0.006501
+    },
+    {
+        "i": 2,
+        "i_o": 2,
+        "assertion_type": "col_vals_lt",
+        "column": "b",
+        "values": 4,
+        "inclusive": null,
+        "na_pass": false,
+        "pre": null,
+        "segments": null,
+        "thresholds": "Thresholds(warning=None, error=None, critical=None)",
+        "label": null,
+        "brief": null,
+        "active": true,
+        "all_passed": false,
+        "n": 4,
+        "n_passed": 3,
+        "n_failed": 1,
+        "f_passed": 0.75,
+        "f_failed": 0.25,
+        "warning": null,
+        "error": null,
+        "critical": null,
+        "time_processed": "2025-04-29T15:32:25.161+00:00",
+        "proc_duration_s": 0.002169
+    }
+]</code></pre>
+</div>
+</div>
+<p>You can also customize which fields to include:</p>
+<div id="c85f075d" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>json_report <span class="op">=</span> validation.get_json_report(</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    use_fields<span class="op">=</span>[<span class="st">"i"</span>, <span class="st">"assertion_type"</span>, <span class="st">"column"</span>, <span class="st">"n_passed"</span>, <span class="st">"n_failed"</span>]</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(json_report)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[
+    {
+        "i": 1,
+        "assertion_type": "col_vals_gt",
+        "column": "a",
+        "n_passed": 3,
+        "n_failed": 1
+    },
+    {
+        "i": 2,
+        "assertion_type": "col_vals_lt",
+        "column": "b",
+        "n_passed": 3,
+        "n_failed": 1
+    }
+]</code></pre>
+</div>
+</div>
+<p>Or which fields to exclude:</p>
+<div id="b4c03bbf" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>json_report <span class="op">=</span> validation.get_json_report(</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    exclude_fields<span class="op">=</span>[</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"i_o"</span>, <span class="st">"thresholds"</span>, <span class="st">"pre"</span>, <span class="st">"segments"</span>, <span class="st">"values"</span>,</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>        <span class="st">"na_pass"</span>, <span class="st">"inclusive"</span>, <span class="st">"label"</span>, <span class="st">"brief"</span>, <span class="st">"active"</span>,</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>        <span class="st">"time_processed"</span>, <span class="st">"proc_duration_s"</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    ]</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(json_report)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[
+    {
+        "i": 1,
+        "assertion_type": "col_vals_gt",
+        "column": "a",
+        "all_passed": false,
+        "n": 4,
+        "n_passed": 3,
+        "n_failed": 1,
+        "f_passed": 0.75,
+        "f_failed": 0.25,
+        "warning": null,
+        "error": null,
+        "critical": null
+    },
+    {
+        "i": 2,
+        "assertion_type": "col_vals_lt",
+        "column": "b",
+        "all_passed": false,
+        "n": 4,
+        "n_passed": 3,
+        "n_failed": 1,
+        "f_passed": 0.75,
+        "f_failed": 0.25,
+        "warning": null,
+        "error": null,
+        "critical": null
+    }
+]</code></pre>
+</div>
+</div>
+<p>The JSON output can be further processed or analyzed programmatically:</p>
+<div id="96d0dd0f" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Parse the JSON report</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>report_data <span class="op">=</span> json.loads(validation.get_json_report())</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract and analyze validation results</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>failing_steps <span class="op">=</span> [step <span class="cf">for</span> step <span class="kw">in</span> report_data <span class="cf">if</span> step[<span class="st">"n_failed"</span>] <span class="op">&gt;</span> <span class="dv">0</span>]</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Number of failing validation steps: </span><span class="sc">{</span><span class="bu">len</span>(failing_steps)<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Number of failing validation steps: 2</code></pre>
+</div>
+</div>
+</section>
+<section id="see-also" class="level2 doc-section doc-section-see-also">
+<h2 class="doc-section doc-section-see-also anchored" data-anchor-id="see-also">See Also</h2>
+<ul>
+<li><a href="../reference/Validate.get_tabular_report.html#pointblank.Validate.get_tabular_report"><code>get_tabular_report()</code></a>: Get a formatted HTML report as a GT table</li>
+<li><a href="../reference/Validate.get_data_extracts.html#pointblank.Validate.get_data_extracts"><code>get_data_extracts()</code></a>: Get rows that failed validation</li>
+</ul>
+
+
 </section>
 
 </main> <!-- /main -->
