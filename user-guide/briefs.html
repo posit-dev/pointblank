@@ -338,6 +338,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
   <li><a href="#disabling-briefs" id="toc-disabling-briefs" class="nav-link" data-scroll-target="#disabling-briefs">Disabling Briefs</a></li>
   <li><a href="#best-practices-for-using-briefs" id="toc-best-practices-for-using-briefs" class="nav-link" data-scroll-target="#best-practices-for-using-briefs">Best Practices for Using Briefs</a></li>
   <li><a href="#example-comprehensive-validation-with-briefs" id="toc-example-comprehensive-validation-with-briefs" class="nav-link" data-scroll-target="#example-comprehensive-validation-with-briefs">Example: Comprehensive Validation with Briefs</a></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion">Conclusion</a></li>
   </ul>
 </nav>
     </div>
@@ -363,19 +364,20 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </header>
 
 
-<p>When validating data with Pointblank, it’s often helpful to have descriptive labels for each validation step. This is where <strong>briefs</strong> come in. A brief is a short description of what a validation step is checking and it appears in the <code>STEP</code> column of the validation report table. Briefs make your validation reports more readable and they help others understand what each step is verifying without needing to look at the code.</p>
+<p>When validating data with Pointblank, it’s often helpful to have descriptive labels for each validation step. This is where <em>briefs</em> come in. A brief is a short description of what a validation step is checking and it appears in the <code>STEP</code> column of the validation report table. Briefs make your validation reports more readable and they help others understand what each step is verifying without needing to look at the code.</p>
 <section id="types-of-briefs" class="level2">
 <h2 class="anchored" data-anchor-id="types-of-briefs">Types of Briefs</h2>
 <p>Briefs can be set in two ways in Pointblank:</p>
 <ol type="1">
-<li><strong>Globally</strong>: applied to all validation steps via the <code>brief=</code> parameter in <code>Validate()</code></li>
+<li><strong>Globally</strong>: applied to all validation steps via the <code>brief=</code> parameter in <a href="https://posit-dev.github.io/pointblank/reference/Validate.html"><code>Validate()</code></a></li>
 <li><strong>Locally</strong>: set for individual validation steps via the <code>brief=</code> parameter in each validation method</li>
 </ol>
+<p>Understanding these two approaches to adding briefs gives you flexibility in how you document your validation process. Global briefs provide consistency across all steps and save time when you want similar descriptions throughout, while step-level briefs allow for precise customization when specific validations need more detailed or unique explanations. In practice, many validation workflows will combine both approaches (i.e., setting a useful global brief template while overriding it for steps that require special attention).</p>
 </section>
 <section id="global-briefs" class="level2">
 <h2 class="anchored" data-anchor-id="global-briefs">Global Briefs</h2>
-<p>To set a global brief that applies to all validation steps, use the <code>brief=</code> parameter when creating a <code>Validate</code> object:</p>
-<div id="c4f6d082" class="cell" data-execution_count="2">
+<p>To set a global brief that applies to all validation steps, use the <code>Validate(brief=)</code> parameter when creating a <code>Validate</code> object:</p>
+<div id="7cc4eef5" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -474,7 +476,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     <td colspan="14" class="gt_heading gt_title gt_font_normal" style="color: #444444;font-size: 28px;text-align: left;font-weight: bold; text-align: left;">Pointblank Validation</td>
   </tr>
   <tr class="gt_heading">
-    <td colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style="text-align: left;"><div><span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2025-04-30|16:32:35</span><div style="padding-top: 10px; padding-bottom: 5px;"><span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 15px 2px 15px; font-size: 10px;">Polars</span><span style="background-color: none; color: #222222; padding: 0.5em 0.5em; position: inherit; margin: 5px 10px 5px -4px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 15px 2px 15px; font-size: 10px;">example_data</span></div></div></td>
+    <td colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style="text-align: left;"><div><span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2025-04-30|20:38:21</span><div style="padding-top: 10px; padding-bottom: 5px;"><span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 15px 2px 15px; font-size: 10px;">Polars</span><span style="background-color: none; color: #222222; padding: 0.5em 0.5em; position: inherit; margin: 5px 10px 5px -4px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 15px 2px 15px; font-size: 10px;">example_data</span></div></div></td>
   </tr>
 <tr class="gt_col_headings">
   <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-status_color"></th>
@@ -588,11 +590,12 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 </div>
 <p>In this example, every validation step will have a brief description that follows the pattern <code>"Step X: [auto-generated description]"</code>.</p>
+<p>This is a simple example of template-based briefs. Later in this guide, we’ll explore the full range of templating elements available for creating custom brief descriptions that precisely communicate what each validation step is checking.</p>
 </section>
 <section id="step-level-briefs" class="level2">
 <h2 class="anchored" data-anchor-id="step-level-briefs">Step-level Briefs</h2>
 <p>You can also set briefs for individual validation steps:</p>
-<div id="0c7d7020" class="cell" data-execution_count="3">
+<div id="41fdb5e2" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>validation_2 <span class="op">=</span> (</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>data, tbl_name<span class="op">=</span><span class="st">"example_data"</span>)</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_gt(</span>
@@ -684,7 +687,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     <td colspan="14" class="gt_heading gt_title gt_font_normal" style="color: #444444;font-size: 28px;text-align: left;font-weight: bold; text-align: left;">Pointblank Validation</td>
   </tr>
   <tr class="gt_heading">
-    <td colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style="text-align: left;"><div><span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2025-04-30|16:32:35</span><div style="padding-top: 10px; padding-bottom: 5px;"><span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 15px 2px 15px; font-size: 10px;">Polars</span><span style="background-color: none; color: #222222; padding: 0.5em 0.5em; position: inherit; margin: 5px 10px 5px -4px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 15px 2px 15px; font-size: 10px;">example_data</span></div></div></td>
+    <td colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style="text-align: left;"><div><span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2025-04-30|20:38:21</span><div style="padding-top: 10px; padding-bottom: 5px;"><span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 15px 2px 15px; font-size: 10px;">Polars</span><span style="background-color: none; color: #222222; padding: 0.5em 0.5em; position: inherit; margin: 5px 10px 5px -4px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 15px 2px 15px; font-size: 10px;">example_data</span></div></div></td>
   </tr>
 <tr class="gt_col_headings">
   <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-status_color"></th>
@@ -812,18 +815,18 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <li><code>{threshold}</code>: the threshold values defined for the validation step (if any)</li>
 </ul>
 <p>Here’s how to use these templates:</p>
-<div id="97815e76" class="cell" data-execution_count="4">
+<div id="dc4e61d9" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>validation_3 <span class="op">=</span> (</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>data, tbl_name<span class="op">=</span><span class="st">"example_data"</span>)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_gt(</span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>        columns<span class="op">=</span><span class="st">"value"</span>,</span>
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>        value<span class="op">=</span><span class="dv">5</span>,</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>        brief<span class="op">=</span><span class="st">"Step </span><span class="sc">{step}</span><span class="st">: Checking column '</span><span class="sc">{col}</span><span class="st">' for values &gt; 5"</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>        brief<span class="op">=</span><span class="st">"Step </span><span class="sc">{step}</span><span class="st">: Checking column '</span><span class="sc">{col}</span><span class="st">' for values `&gt; 5`"</span></span>
 <span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    )</span>
 <span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    .col_vals_in_set(</span>
 <span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>        columns<span class="op">=</span><span class="st">"category"</span>,</span>
 <span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>        <span class="bu">set</span><span class="op">=</span>[<span class="st">"A"</span>, <span class="st">"B"</span>, <span class="st">"C"</span>],</span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>        brief<span class="op">=</span><span class="st">"</span><span class="sc">{auto}</span><span class="st"> (Step </span><span class="sc">{step}</span><span class="st">)"</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>        brief<span class="op">=</span><span class="st">"</span><span class="sc">{auto}</span><span class="st"> **(Step </span><span class="sc">{step}</span><span class="st">)**"</span></span>
 <span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    )</span>
 <span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
 <span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>)</span>
@@ -904,7 +907,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     <td colspan="14" class="gt_heading gt_title gt_font_normal" style="color: #444444;font-size: 28px;text-align: left;font-weight: bold; text-align: left;">Pointblank Validation</td>
   </tr>
   <tr class="gt_heading">
-    <td colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style="text-align: left;"><div><span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2025-04-30|16:32:35</span><div style="padding-top: 10px; padding-bottom: 5px;"><span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 15px 2px 15px; font-size: 10px;">Polars</span><span style="background-color: none; color: #222222; padding: 0.5em 0.5em; position: inherit; margin: 5px 10px 5px -4px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 15px 2px 15px; font-size: 10px;">example_data</span></div></div></td>
+    <td colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style="text-align: left;"><div><span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2025-04-30|20:38:22</span><div style="padding-top: 10px; padding-bottom: 5px;"><span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 15px 2px 15px; font-size: 10px;">Polars</span><span style="background-color: none; color: #222222; padding: 0.5em 0.5em; position: inherit; margin: 5px 10px 5px -4px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 15px 2px 15px; font-size: 10px;">example_data</span></div></div></td>
   </tr>
 <tr class="gt_col_headings">
   <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-status_color"></th>
@@ -943,7 +946,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
         <div style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size: 11px; display: inline-block; vertical-align: middle;">
             <div>col_vals_gt()</div>
         </div>
-        <div style="font-size: 9px; font-family: 'IBM Plex Sans'; text-wrap: balance; margin-top: 3px;"><p>Step 1: Checking column 'value' for values &gt; 5</p>
+        <div style="font-size: 9px; font-family: 'IBM Plex Sans'; text-wrap: balance; margin-top: 3px;"><p>Step 1: Checking column 'value' for values <code>&gt; 5</code></p>
 </div>
         </td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">value</td>
@@ -985,7 +988,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
         <div style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size: 11px; display: inline-block; vertical-align: middle;">
             <div>col_vals_in_set()</div>
         </div>
-        <div style="font-size: 9px; font-family: 'IBM Plex Sans'; text-wrap: balance; margin-top: 3px;"><p>Expect that values in <code>category</code> should be in the set of <code>A</code>, <code>B</code>, <code>C</code>. (Step 2)</p>
+        <div style="font-size: 9px; font-family: 'IBM Plex Sans'; text-wrap: balance; margin-top: 3px;"><p>Expect that values in <code>category</code> should be in the set of <code>A</code>, <code>B</code>, <code>C</code>. <strong>(Step 2)</strong></p>
 </div>
         </td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">category</td>
@@ -1018,12 +1021,13 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 </div>
 <p>These template elements make briefs highly flexible and customizable. You can combine multiple templating elements in a single brief to create descriptive yet concise validation step descriptions. The templates help maintain consistency across your validation reports while providing enough detail to understand what each step is checking.</p>
-<p>Note that not all templating elements will be relevant for every validation step. For instance, <code>{set}</code> is only applicable to validation functions like <code>col_vals_in_set()</code> that use a set of values, while <code>{value}</code> would be used in comparisons like <code>col_vals_gt()</code>. If you include a templating element that isn’t relevant to a particular step, it will simply be ignored.</p>
+<p>Note that not all templating elements will be relevant for every validation step. For instance, <code>{set}</code> is only applicable to validation functions like <a href="https://posit-dev.github.io/pointblank/reference/Validate.col_vals_in_set.html"><code>col_vals_in_set()</code></a> that use a set of values, while <code>{value}</code> would be used in comparisons like <a href="https://posit-dev.github.io/pointblank/reference/Validate.col_vals_gt.html"><code>col_vals_gt()</code></a>. If you include a templating element that isn’t relevant to a particular step, it will simply be ignored.</p>
+<p>Briefs support the use of Markdown formatting, allowing you to add emphasis with <strong>bold</strong> or <em>italic</em> text, include <code>inline code</code> formatting, or other Markdown elements to make your briefs more visually distinctive and informative. This can be especially helpful when you want certain parts of your briefs to stand out in the validation report.</p>
 </section>
 <section id="automatic-briefs" class="level2">
 <h2 class="anchored" data-anchor-id="automatic-briefs">Automatic Briefs</h2>
 <p>If you want Pointblank to generate briefs for you automatically, you can set <code>brief=True</code>. Here, we’ll make that setting at the global level (by using <code>Validate(brief=True)</code>):</p>
-<div id="939710fa" class="cell" data-execution_count="5">
+<div id="2709069a" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>validation_4 <span class="op">=</span> (</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>        data<span class="op">=</span>data,</span>
@@ -1117,7 +1121,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     <td colspan="14" class="gt_heading gt_title gt_font_normal" style="color: #444444;font-size: 28px;text-align: left;font-weight: bold; text-align: left;">Pointblank Validation</td>
   </tr>
   <tr class="gt_heading">
-    <td colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style="text-align: left;"><div><span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2025-04-30|16:32:35</span><div style="padding-top: 10px; padding-bottom: 5px;"><span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 15px 2px 15px; font-size: 10px;">Polars</span><span style="background-color: none; color: #222222; padding: 0.5em 0.5em; position: inherit; margin: 5px 10px 5px -4px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 15px 2px 15px; font-size: 10px;">example_data</span></div></div></td>
+    <td colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style="text-align: left;"><div><span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2025-04-30|20:38:22</span><div style="padding-top: 10px; padding-bottom: 5px;"><span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 15px 2px 15px; font-size: 10px;">Polars</span><span style="background-color: none; color: #222222; padding: 0.5em 0.5em; position: inherit; margin: 5px 10px 5px -4px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 15px 2px 15px; font-size: 10px;">example_data</span></div></div></td>
   </tr>
 <tr class="gt_col_headings">
   <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-status_color"></th>
@@ -1234,8 +1238,8 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </section>
 <section id="briefs-localized-to-a-specified-language" class="level2">
 <h2 class="anchored" data-anchor-id="briefs-localized-to-a-specified-language">Briefs Localized to a Specified Language</h2>
-<p>When using the <code>lang=</code> parameter in <code>Validate()</code>, automatically generated briefs will be created in the specified language:</p>
-<div id="727a4782" class="cell" data-execution_count="6">
+<p>When using the <code>lang=</code> parameter in <code>Validate()</code>, automatically generated briefs will be created in the specified language (along with other elements of the validation report table):</p>
+<div id="4a05337b" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>validation_5 <span class="op">=</span> (</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>        data<span class="op">=</span>data,</span>
@@ -1324,7 +1328,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     <td colspan="14" class="gt_heading gt_title gt_font_normal" style="color: #444444;font-size: 28px;text-align: left;font-weight: bold; text-align: left;">Validación de Pointblank</td>
   </tr>
   <tr class="gt_heading">
-    <td colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style="text-align: left;"><div><span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2025-04-30|16:32:35</span><div style="padding-top: 10px; padding-bottom: 5px;"><span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 15px 2px 15px; font-size: 10px;">Polars</span><span style="background-color: none; color: #222222; padding: 0.5em 0.5em; position: inherit; margin: 5px 10px 5px -4px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 15px 2px 15px; font-size: 10px;">example_data</span></div></div></td>
+    <td colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style="text-align: left;"><div><span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2025-04-30|20:38:22</span><div style="padding-top: 10px; padding-bottom: 5px;"><span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 15px 2px 15px; font-size: 10px;">Polars</span><span style="background-color: none; color: #222222; padding: 0.5em 0.5em; position: inherit; margin: 5px 10px 5px -4px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 15px 2px 15px; font-size: 10px;">example_data</span></div></div></td>
   </tr>
 <tr class="gt_col_headings">
   <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-status_color"></th>
@@ -1437,11 +1441,13 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
         
 </div>
 </div>
+<p>When using the <code>lang=</code> parameter in combination with the <code>{auto}</code> templating element, the auto-generated portion of the brief will also be translated to the specified language. This makes it possible to create fully localized validation reports where both custom text and auto-generated descriptions appear in the same language.</p>
+<p>Pointblank supports several languages for localized briefs, including French (<code>"fr"</code>), German (<code>"de"</code>), Spanish (<code>"es"</code>), Italian (<code>"it"</code>), and Portuguese (<code>"pt"</code>). For the complete list of supported languages, refer to the <a href="https://posit-dev.github.io/pointblank/reference/Validate.html"><code>Validate()</code></a> documentation.</p>
 </section>
 <section id="disabling-briefs" class="level2">
 <h2 class="anchored" data-anchor-id="disabling-briefs">Disabling Briefs</h2>
 <p>If you’ve set a global brief but want to disable it for specific validation steps, you can set <code>brief=False</code>:</p>
-<div id="c544de50" class="cell" data-execution_count="7">
+<div id="e52aa685" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>validation_6 <span class="op">=</span> (</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>        data<span class="op">=</span>data,</span>
@@ -1533,7 +1539,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     <td colspan="14" class="gt_heading gt_title gt_font_normal" style="color: #444444;font-size: 28px;text-align: left;font-weight: bold; text-align: left;">Pointblank Validation</td>
   </tr>
   <tr class="gt_heading">
-    <td colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style="text-align: left;"><div><span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2025-04-30|16:32:36</span><div style="padding-top: 10px; padding-bottom: 5px;"><span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 15px 2px 15px; font-size: 10px;">Polars</span><span style="background-color: none; color: #222222; padding: 0.5em 0.5em; position: inherit; margin: 5px 10px 5px -4px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 15px 2px 15px; font-size: 10px;">example_data</span></div></div></td>
+    <td colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style="text-align: left;"><div><span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2025-04-30|20:38:22</span><div style="padding-top: 10px; padding-bottom: 5px;"><span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 15px 2px 15px; font-size: 10px;">Polars</span><span style="background-color: none; color: #222222; padding: 0.5em 0.5em; position: inherit; margin: 5px 10px 5px -4px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 15px 2px 15px; font-size: 10px;">example_data</span></div></div></td>
   </tr>
 <tr class="gt_col_headings">
   <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-status_color"></th>
@@ -1648,18 +1654,27 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </section>
 <section id="best-practices-for-using-briefs" class="level2">
 <h2 class="anchored" data-anchor-id="best-practices-for-using-briefs">Best Practices for Using Briefs</h2>
+<p>Well-crafted briefs can significantly enhance the readability and usefulness of your validation reports. Here are some guidelines to follow:</p>
 <ol type="1">
 <li><p><strong>Be concise</strong>: briefs should be short and to the point; they’re meant to quickly communicate the purpose of a validation step</p></li>
 <li><p><strong>Be specific</strong>: include relevant details or conditions that make the validation meaningful</p></li>
 <li><p><strong>Use templates consistently</strong>: if you’re using template elements like <code>"{step}"</code> or <code>"{col}"</code>, try to use them consistently across all briefs for a cleaner look</p></li>
 <li><p><strong>Use auto-generated briefs as a starting point</strong>: you can start with <code>Validate(brief=True)</code> to see what Pointblank generates automatically, then customize as needed</p></li>
-<li><p><strong>For complex validations</strong>: custom briefs are especially useful for complex validations where the purpose might not be immediately obvious from the code</p></li>
+<li><p><strong>Add custom briefs for complex validations</strong>: custom briefs are especially useful for complex validations where the purpose might not be immediately obvious from the code</p></li>
 </ol>
+<p>Following these best practices will help ensure your validation reports are easy to understand for everyone who needs to review them.</p>
 </section>
 <section id="example-comprehensive-validation-with-briefs" class="level2">
 <h2 class="anchored" data-anchor-id="example-comprehensive-validation-with-briefs">Example: Comprehensive Validation with Briefs</h2>
-<p>Here’s an example that demonstrates different brief options in a more comprehensive validation scenario:</p>
-<div id="4d3d38c2" class="cell" data-execution_count="8">
+<p>In real-world data validation scenarios, you’ll likely work with more complex datasets and apply various types of validation checks. This final example brings together many of the brief-generating techniques we’ve covered, showing how you can mix different approaches in a single validation workflow.</p>
+<p>The example below demonstrates:</p>
+<ul>
+<li>custom text briefs with direct messages</li>
+<li>template-based briefs with Markdown formatting</li>
+<li>automatically generated briefs</li>
+</ul>
+<p>By combining these different brief styles, you can create validation reports that are informative, consistent, and tailored to your specific data quality requirements.</p>
+<div id="5456b5e5" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a more complex dataset</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>complex_data <span class="op">=</span> pl.DataFrame({</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"id"</span>: [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">6</span>, <span class="dv">7</span>, <span class="dv">8</span>],</span>
@@ -1927,6 +1942,9 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
         
 </div>
 </div>
+</section>
+<section id="conclusion" class="level2">
+<h2 class="anchored" data-anchor-id="conclusion">Conclusion</h2>
 <p>Briefs help make validation reports more readable and understandable. By using global briefs, step-level briefs, or a combination of both, you can create validation reports that clearly communicate what each validation step is checking.</p>
 <p>Whether you want automatically generated descriptions or precisely tailored custom messages, the brief system provides the flexibility to make your data validation work more transparent and easier to interpret for all stakeholders.</p>
 
