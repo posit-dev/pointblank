@@ -370,7 +370,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 
 
 <p>The collection of validation methods in Pointblank allows you to express all sorts of checks on your DataFrames and database tables. We’ll use the <code>small_table</code> dataset for all of the examples shown here. Here’s a preview of it:</p>
-<div id="928780db" class="cell" data-execution_count="2">
+<div id="f48edab3" class="cell" data-execution_count="2">
 <div class="cell-output cell-output-display" data-execution_count="2">
 <div id="pb_preview_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>
@@ -618,7 +618,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </ul>
 <p>These types of checks are typically numerical checks, so the column supplied in <code>columns=</code> will be numeric along with the value or column referenced in <code>value=</code>.</p>
 <p>Here’s an example using <a href="https://posit-dev.github.io/pointblank/reference/Validate.col_vals_gt.html"><code>col_vals_gt()</code></a>, which checks if the values in a column are greater than a specified value.</p>
-<div id="10008b81" class="cell" data-execution_count="3">
+<div id="bfc994b0" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>(</span>
@@ -766,7 +766,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 </div>
 <p>If you’re checking data in a column that contains null/<code>None</code>/<code>NA</code> values and you’d like to disregard those values (i.e., let them pass validation), you can use <code>na_pass=True</code>. The following example checks values in column <code>c</code> of <code>small_table</code>, which contains two <code>None</code> values:</p>
-<div id="d5ee3a23" class="cell" data-execution_count="4">
+<div id="13160098" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>(</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>pb.load_dataset(<span class="st">"small_table"</span>))</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_le(columns<span class="op">=</span><span class="st">"c"</span>, value<span class="op">=</span><span class="dv">10</span>, na_pass<span class="op">=</span><span class="va">True</span>)</span>
@@ -913,7 +913,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 <p>In the above validation table, we see that all test units passed. If we didn’t use <code>na_pass=True</code> there would be 2 failing test units, one for each <code>None</code> value in the <code>c</code> column.</p>
 <p>It’s possible to check against column values against values in an adjacent column. To do this, supply the <code>value=</code> argument with the column name within the <code>col()</code> helper function. Here’s an example of that:</p>
-<div id="4c6dcebd" class="cell" data-execution_count="5">
+<div id="655a7157" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>(</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>pb.load_dataset(<span class="st">"small_table"</span>))</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_lt(columns<span class="op">=</span><span class="st">"a"</span>, value<span class="op">=</span>pb.col(<span class="st">"c"</span>))</span>
@@ -1063,7 +1063,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="column-value-range-checks" class="level3">
 <h3 class="anchored" data-anchor-id="column-value-range-checks">Column Value Range Checks</h3>
 <p>A range check determines whether values in a column are within a fixed range or a range that depends on values in adjacent columns. The <a href="https://posit-dev.github.io/pointblank/reference/Validate.col_vals_between.html"><code>col_vals_between()</code></a> validation method makes this type of check possible. Here is an example of its use:</p>
-<div id="cbee85a5" class="cell" data-execution_count="6">
+<div id="30cb868f" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>(</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>pb.load_dataset(<span class="st">"small_table"</span>))</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_between(columns<span class="op">=</span><span class="st">"a"</span>, left<span class="op">=</span><span class="dv">2</span>, right<span class="op">=</span><span class="dv">10</span>)</span>
@@ -1210,7 +1210,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 <p>Note that in the validation report, we can see <code>[2, 10]</code> in the <code>VALUES</code> column. This notation with square brackets indicates that the bounds of the range are inclusive. If this is not what you want, the inclusivity of both bounds can be modified via the <code>inclusive=</code> parameter.</p>
 <p>The <code>left=</code> and <code>right=</code> arguments can accept fixed values or references to other columns in the table via the <a href="https://posit-dev.github.io/pointblank/reference/col.html"><code>col()</code></a> helper function. In this example, we can illustrate three variations of this:</p>
-<div id="433eb78b" class="cell" data-execution_count="7">
+<div id="a9db995f" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>(</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>pb.load_dataset(<span class="st">"small_table"</span>))</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_between(columns<span class="op">=</span><span class="st">"a"</span>, left<span class="op">=</span>pb.col(<span class="st">"c"</span>), right<span class="op">=</span><span class="dv">10</span>)</span>
@@ -1440,7 +1440,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 </div>
 <p>There is a related validation method that checks whether column values lie <em>outside</em> a range. That one is called <a href="https://posit-dev.github.io/pointblank/reference/Validate.col_vals_outside.html"><code>col_vals_outside()</code></a>:</p>
-<div id="fb9b3bf0" class="cell" data-execution_count="8">
+<div id="9d16df68" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>(</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>pb.load_dataset(<span class="st">"small_table"</span>))</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_outside(columns<span class="op">=</span><span class="st">"a"</span>, left<span class="op">=</span><span class="dv">1</span>, right<span class="op">=</span><span class="dv">4</span>)</span>
@@ -1594,7 +1594,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="set-membership-validations" class="level3">
 <h3 class="anchored" data-anchor-id="set-membership-validations">Set Membership Validations</h3>
 <p>The set membership validation method <a href="https://posit-dev.github.io/pointblank/reference/Validate.col_vals_in_set.html"><code>col_vals_in_set()</code></a> checks whether values in a column are part of a specified set. Here’s an example where the expectation is that values in column <code>a</code> can only have numeric values in the set of <code>[1, 2, 3, 4, 5]</code>:</p>
-<div id="fb87ba0c" class="cell" data-execution_count="9">
+<div id="e232427b" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>(</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>pb.load_dataset(<span class="st">"small_table"</span>))</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_in_set(columns<span class="op">=</span><span class="st">"a"</span>, <span class="bu">set</span><span class="op">=</span>[<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>])</span>
@@ -1740,7 +1740,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 </div>
 <p>The above example operates on a numeric column. We can also perform a set membership check on a string-based column. Here’s an example that checks string values in the <code>f</code> column of <code>small_table</code>:</p>
-<div id="85ec0cbb" class="cell" data-execution_count="10">
+<div id="87288ecb" class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>(</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>pb.load_dataset(<span class="st">"small_table"</span>))</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_in_set(columns<span class="op">=</span><span class="st">"f"</span>, <span class="bu">set</span><span class="op">=</span>[<span class="st">"low"</span>, <span class="st">"mid"</span>, <span class="st">"high"</span>])</span>
@@ -1886,7 +1886,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 </div>
 <p>The <a href="https://posit-dev.github.io/pointblank/reference/Validate.col_vals_not_in_set.html"><code>col_vals_not_in_set()</code></a> validation method does what you might expect, which is checking whether values in a column are <em>not</em> part of a fixed set. Here’s an example of its use:</p>
-<div id="c55ad33c" class="cell" data-execution_count="11">
+<div id="985ea721" class="cell" data-execution_count="11">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>(</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>pb.load_dataset(<span class="st">"small_table"</span>))</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_in_set(columns<span class="op">=</span><span class="st">"f"</span>, <span class="bu">set</span><span class="op">=</span>[<span class="st">"small"</span>, <span class="st">"large"</span>])</span>
@@ -2041,7 +2041,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <li><a href="https://posit-dev.github.io/pointblank/reference/Validate.col_vals_not_null.html"><code>col_vals_not_null()</code></a></li>
 </ul>
 <p>Let’s look at an example that checks that there should not be any missing values:</p>
-<div id="6ab14c6f" class="cell" data-execution_count="12">
+<div id="26557ab3" class="cell" data-execution_count="12">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>(</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>pb.load_dataset(<span class="st">"small_table"</span>))</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_not_null(columns<span class="op">=</span><span class="st">"a"</span>)</span>
@@ -2193,7 +2193,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="validation-of-table-structure" class="level3">
 <h3 class="anchored" data-anchor-id="validation-of-table-structure">Validation of Table Structure</h3>
 <p>Schema validation can be performed with the <a href="https://posit-dev.github.io/pointblank/reference/Validate.col_schema_match.html"><code>col_schema_match()</code></a> validation method and the goal is to check whether the structure of a table matches an expected schema. To define an expected table schema, we need to use the <a href="https://posit-dev.github.io/pointblank/reference/Schema.html"><code>Schema</code></a> class. Here is a simple example that (1) prepares a schema consisting of column names, (2) using that <code>schema</code> object in a <a href="https://posit-dev.github.io/pointblank/reference/Validate.col_schema_match.html"><code>col_schema_match()</code></a> validation step:</p>
-<div id="fe166d86" class="cell" data-execution_count="13">
+<div id="a6f9c50e" class="cell" data-execution_count="13">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(columns<span class="op">=</span>[<span class="st">"date_time"</span>, <span class="st">"date"</span>, <span class="st">"a"</span>, <span class="st">"b"</span>, <span class="st">"c"</span>, <span class="st">"d"</span>, <span class="st">"e"</span>, <span class="st">"f"</span>])</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>(</span>
@@ -2347,7 +2347,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 <p>Any <a href="https://posit-dev.github.io/pointblank/reference/Validate.col_schema_match.html"><code>col_schema_match()</code></a> validation step will only have a single test unit (signifying pass or fail). We can see in the above validation report that the column schema validation passed.</p>
 <p>More often a schema will be defined using column names and column types. We can do that by using a list of tuples in the <code>columns=</code> parameter of <a href="https://posit-dev.github.io/pointblank/reference/Schema.html"><code>Schema</code></a>. Here’s an example of that approach in action:</p>
-<div id="2ccb6cbd" class="cell" data-execution_count="14">
+<div id="30df2c1f" class="cell" data-execution_count="14">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    columns<span class="op">=</span>[</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>        (<span class="st">"date_time"</span>, <span class="st">"Datetime(time_unit='us', time_zone=None)"</span>),</span>
@@ -2519,7 +2519,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </ul>
 <p>All of these are <code>True</code> by default but modifying these settings can make for more convenient checks when absolute strictness isn’t practical.</p>
 <p>Should you need to check for the presence of individual columns (regardless of type), the <a href="https://posit-dev.github.io/pointblank/reference/Validate.col_exists.html"><code>col_exists()</code></a> validation method is useful. In this example, we check whether the <code>date</code> column is present in the table:</p>
-<div id="31131e6d" class="cell" data-execution_count="15">
+<div id="d5dade3b" class="cell" data-execution_count="15">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>(</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>pb.load_dataset(<span class="st">"small_table"</span>))</span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    .col_exists(columns<span class="op">=</span><span class="st">"date"</span>)</span>
@@ -2671,7 +2671,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <h3 class="anchored" data-anchor-id="row-and-column-count-validations">Row and Column Count Validations</h3>
 <p>Row and column count validations check the number of rows and columns in a table.</p>
 <p>Using <a href="https://posit-dev.github.io/pointblank/reference/Validate.row_count_match.html"><code>row_count_match()</code></a> checks whether the number of rows in a table matches a specified count.</p>
-<div id="7305d527" class="cell" data-execution_count="16">
+<div id="d76ed950" class="cell" data-execution_count="16">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>(</span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>pb.load_dataset(<span class="st">"small_table"</span>))</span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>    .row_count_match(count<span class="op">=</span><span class="dv">13</span>)</span>
@@ -2822,7 +2822,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 </div>
 <p>The <a href="https://posit-dev.github.io/pointblank/reference/Validate.col_count_match.html"><code>col_count_match()</code></a> validation method checks if the number of columns in a table matches a specified count.</p>
-<div id="96c713a5" class="cell" data-execution_count="17">
+<div id="465aaa6e" class="cell" data-execution_count="17">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>(</span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>pb.load_dataset(<span class="st">"small_table"</span>))</span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>    .col_count_match(count<span class="op">=</span><span class="dv">8</span>)</span>
@@ -2977,7 +2977,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="distinct-row-validations" class="level3">
 <h3 class="anchored" data-anchor-id="distinct-row-validations">Distinct Row Validations</h3>
 <p>We can check for duplicate rows in a table with <a href="https://posit-dev.github.io/pointblank/reference/Validate.rows_distinct.html"><code>rows_distinct()</code></a>.</p>
-<div id="05fdb41e" class="cell" data-execution_count="18">
+<div id="7cb2a47a" class="cell" data-execution_count="18">
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>(</span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>pb.load_dataset(<span class="st">"small_table"</span>))</span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>    .rows_distinct()</span>
@@ -3127,7 +3127,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 </div>
 <p>We can also adapt the <a href="https://posit-dev.github.io/pointblank/reference/Validate.rows_distinct.html"><code>rows_distinct()</code></a> check to use a single column or a subset of columns. To do that, we need to use the <code>columns_subset=</code> parameter. Here’s an example of that:</p>
-<div id="cb0f9d79" class="cell" data-execution_count="19">
+<div id="c0504689" class="cell" data-execution_count="19">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>(</span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>pb.load_dataset(<span class="st">"small_table"</span>))</span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>    .rows_distinct(columns_subset<span class="op">=</span><span class="st">"b"</span>)</span>
@@ -3281,7 +3281,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="checking-strings-in-a-column-with-a-regular-expression" class="level3">
 <h3 class="anchored" data-anchor-id="checking-strings-in-a-column-with-a-regular-expression">Checking Strings in a Column with a Regular Expression</h3>
 <p>A regular expression (regex) validation via the <a href="https://posit-dev.github.io/pointblank/reference/Validate.col_vals_regex.html"><code>col_vals_regex()</code></a> validation method checks if values in a column match a specified pattern. Here’s an example with two validation steps:</p>
-<div id="cd90377a" class="cell" data-execution_count="20">
+<div id="f8077757" class="cell" data-execution_count="20">
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>(</span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>pb.load_dataset(<span class="st">"small_table"</span>))</span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_regex(columns<span class="op">=</span><span class="st">"b"</span>, pattern<span class="op">=</span><span class="vs">r"</span><span class="dv">^\d</span><span class="vs">-</span><span class="pp">[a-z]</span><span class="op">{3}</span><span class="vs">-</span><span class="dv">\d</span><span class="op">{3}</span><span class="dv">$</span><span class="vs">"</span>)</span>
