@@ -338,6 +338,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
   <li><a href="#segmentation-vs.-multiple-validation-steps" id="toc-segmentation-vs.-multiple-validation-steps" class="nav-link" data-scroll-target="#segmentation-vs.-multiple-validation-steps">Segmentation vs.&nbsp;Multiple Validation Steps</a></li>
   <li><a href="#practical-example-validating-sales-data-by-region-and-product-type" id="toc-practical-example-validating-sales-data-by-region-and-product-type" class="nav-link" data-scroll-target="#practical-example-validating-sales-data-by-region-and-product-type">Practical Example: Validating Sales Data by Region and Product Type</a></li>
   <li><a href="#best-practices-for-segmentation" id="toc-best-practices-for-segmentation" class="nav-link" data-scroll-target="#best-practices-for-segmentation">Best Practices for Segmentation</a></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion">Conclusion</a></li>
   </ul>
 </nav>
     </div>
@@ -377,11 +378,12 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </section>
 <section id="basic-segmentation-by-column-values" class="level2">
 <h2 class="anchored" data-anchor-id="basic-segmentation-by-column-values">Basic Segmentation by Column Values</h2>
-<p>The simplest way to segment data is by the unique values in a column. For the upcoming demo, we’ll use the <code>small_table</code> dataset, which contains a categorical-value column called <code>f</code>.</p>
+<p>The simplest way to segment data is by the unique values in a column. For the upcoming example, we’ll use the <code>small_table</code> dataset, which contains a categorical-value column called <code>f</code>.</p>
 <p>First, let’s preview the dataset:</p>
-<div id="47657a5f" class="cell" data-execution_count="2">
+<div id="57e757d7" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>table <span class="op">=</span> pb.load_dataset()</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>pb.preview(table)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>pb.preview(table)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="2">
 <div id="pb_preview_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>
@@ -584,7 +586,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 </div>
 <p>Now, let’s validate that values in column <code>d</code> are greater than <code>100</code>, but we’ll also segment the validation by the categorical values in column <code>f</code>:</p>
-<div id="79ffe7f3" class="cell" data-execution_count="3">
+<div id="0ec234d7" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>validation_1 <span class="op">=</span> (</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>        data<span class="op">=</span>pb.load_dataset(),</span>
@@ -830,12 +832,12 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
         
 </div>
 </div>
-<p>In the validation report, notice that instead of a single validation step, we have multiple steps: one for each unique value in the <code>f</code> column. This allows us to examine data quality separately for each category.</p>
+<p>In the validation report, notice that instead of a single validation step, we have multiple steps: one for each unique value in the <code>f</code> column. The segmentation is clearly indicated in the <code>STEP</code> column with labels like <code>SEGMENT  f / high</code>, making it easy to identify which segment each validation result belongs to. This clear labeling helps when reviewing reports, especially with complex validations that use multiple segmentation criteria.</p>
 </section>
 <section id="segmenting-on-specific-values" class="level2">
 <h2 class="anchored" data-anchor-id="segmenting-on-specific-values">Segmenting on Specific Values</h2>
 <p>Sometimes you don’t want to segment on all unique values in a column, but only on specific ones of interest. You can do this by providing a tuple with the column name and a list of values:</p>
-<div id="9898f4e7" class="cell" data-execution_count="4">
+<div id="27573bc3" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>validation_2 <span class="op">=</span> (</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>        data<span class="op">=</span>pb.load_dataset(),</span>
@@ -1044,7 +1046,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="multiple-segmentation-criteria" class="level2">
 <h2 class="anchored" data-anchor-id="multiple-segmentation-criteria">Multiple Segmentation Criteria</h2>
 <p>For more complex segmentation, you can provide a list of columns or column-value tuples. This creates segments based on combinations of criteria:</p>
-<div id="5e514691" class="cell" data-execution_count="5">
+<div id="c684d9a4" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>validation_3 <span class="op">=</span> (</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>        data<span class="op">=</span>pb.load_dataset(),</span>
@@ -1379,7 +1381,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="segmentation-with-preprocessing" class="level2">
 <h2 class="anchored" data-anchor-id="segmentation-with-preprocessing">Segmentation with Preprocessing</h2>
 <p>You can combine segmentation with preprocessing for powerful and flexible validations. All preprocessing is applied before segmentation occurs, which means you can create derived columns to segment on:</p>
-<div id="49df6149" class="cell" data-execution_count="6">
+<div id="2117d54b" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>validation_4 <span class="op">=</span> (</span>
@@ -1594,11 +1596,12 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <h2 class="anchored" data-anchor-id="when-to-use-segmentation">When to Use Segmentation</h2>
 <p>Segmentation is particularly useful when:</p>
 <ol type="1">
-<li><p><strong>Data quality standards vary by group</strong>: different regions, product lines, or customer segments might have different acceptable thresholds</p></li>
-<li><p><strong>Identifying problem areas</strong>: segmentation helps pinpoint exactly where data quality issues exist, rather than just knowing that some issue exists somewhere in the data</p></li>
-<li><p><strong>Generating detailed reports</strong>: by segmenting, you get more granular reporting that can be shared with different stakeholders responsible for different parts of the data</p></li>
-<li><p><strong>Tracking improvements over time</strong>: segmented validations make it easier to see if data quality is improving in specific areas that were previously problematic</p></li>
+<li><strong>Data quality standards vary by group</strong>: different regions, product lines, or customer segments might have different acceptable thresholds</li>
+<li><strong>Identifying problem areas</strong>: segmentation helps pinpoint exactly where data quality issues exist, rather than just knowing that some issue exists somewhere in the data</li>
+<li><strong>Generating detailed reports</strong>: by segmenting, you get more granular reporting that can be shared with different stakeholders responsible for different parts of the data</li>
+<li><strong>Tracking improvements over time</strong>: segmented validations make it easier to see if data quality is improving in specific areas that were previously problematic</li>
 </ol>
+<p>By using segmentation strategically in these scenarios, you can transform your data validation from a simple pass/fail system into a much more nuanced diagnostic tool that provides actionable insights about data quality across different dimensions. This targeted approach not only helps identify issues more precisely but also enables more effective communication of data quality metrics to relevant stakeholders.</p>
 </section>
 <section id="segmentation-vs.-multiple-validation-steps" class="level2">
 <h2 class="anchored" data-anchor-id="segmentation-vs.-multiple-validation-steps">Segmentation vs.&nbsp;Multiple Validation Steps</h2>
@@ -1609,11 +1612,12 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <li><strong>Clarity</strong>: the validation report will clearly organize results by segment (with extra labeling)</li>
 <li><strong>Convenience</strong>: there’s no need to manually extract and filter subsets of your data</li>
 </ol>
+<p>Segmentation can end of simplifying your validation code while also providing more structured and informative reporting about different portions of your data.</p>
 </section>
 <section id="practical-example-validating-sales-data-by-region-and-product-type" class="level2">
 <h2 class="anchored" data-anchor-id="practical-example-validating-sales-data-by-region-and-product-type">Practical Example: Validating Sales Data by Region and Product Type</h2>
 <p>Let’s see a more realistic example where we validate sales data segmented by both region and product type:</p>
-<div id="33aba01b" class="cell" data-execution_count="7">
+<div id="b9e2a234" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1825,7 +1829,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 </div>
 <p>Now, let’s validate that profit margins are above 20% across different regions and product types:</p>
-<div id="fee67852" class="cell" data-execution_count="8">
+<div id="4a22a81d" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>validation_5 <span class="op">=</span> (</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>        data<span class="op">=</span>sales_data,</span>
@@ -2258,6 +2262,11 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <li><p><strong>Combine with actions</strong>: for critical segments, define segment-specific actions using the <code>actions=</code> parameter to respond to validation failures.</p></li>
 </ol>
 <p>By implementing these best practices, you’ll create more targeted, maintainable, and actionable data validations. Segmentation becomes most powerful when it aligns with natural divisions in your data and analytical processes, allowing for more precise identification of quality issues while maintaining a unified validation framework.</p>
+</section>
+<section id="conclusion" class="level2">
+<h2 class="anchored" data-anchor-id="conclusion">Conclusion</h2>
+<p>Data segmentation can make your validations more targeted and informative. By dividing your data into meaningful segments, you can identify quality issues with greater precision, apply appropriate validation standards to different parts of your data, and generate more actionable reports.</p>
+<p>The <code>segments=</code> parameter transforms validation from a monolithic process into a granular assessment of data quality across various dimensions of your dataset. Whether you’re dealing with regional differences, product categories, time periods, or any other meaningful divisions in your data, segmentation makes it possible to validate each portion according to its specific requirements while maintaining the simplicity of a unified validation framework.</p>
 
 
 </section>
