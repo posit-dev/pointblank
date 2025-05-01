@@ -66,7 +66,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
 <link href="../user-guide/sundering.html" rel="next">
-<link href="../user-guide/briefs.html" rel="prev">
+<link href="../user-guide/step-reports.html" rel="prev">
 <link href="../assets/fav-logo.png" rel="icon" type="image/png">
 <script src="../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
@@ -179,7 +179,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../user-guide/extracts.html">Post Interrogation</a></li><li class="breadcrumb-item"><a href="../user-guide/extracts.html">Data Extracts</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../user-guide/step-reports.html">Post Interrogation</a></li><li class="breadcrumb-item"><a href="../user-guide/extracts.html">Data Extracts</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -278,6 +278,12 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
       <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../user-guide/step-reports.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Step Reports: Diagnosing Validation Results in Detail</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../user-guide/extracts.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">Data Extracts</span></a>
   </div>
@@ -339,7 +345,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../user-guide/extracts.html">Post Interrogation</a></li><li class="breadcrumb-item"><a href="../user-guide/extracts.html">Data Extracts</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../user-guide/step-reports.html">Post Interrogation</a></li><li class="breadcrumb-item"><a href="../user-guide/extracts.html">Data Extracts</a></li></ol></nav>
 <div class="quarto-title">
 <h1 class="title">Data Extracts</h1>
 </div>
@@ -387,7 +393,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="data-extracts-as-csv-data-in-the-validation-report" class="level2">
 <h2 class="anchored" data-anchor-id="data-extracts-as-csv-data-in-the-validation-report">Data Extracts as CSV Data in the Validation Report</h2>
 <p>Data extracts are embedded within validation report tables. Let’s look at an example, using the <code>small_table</code> dataset, where data extracts are collected in a single validation step due to failing test units:</p>
-<div id="5810dd10" class="cell" data-execution_count="2">
+<div id="9589ceff" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
@@ -547,7 +553,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="using-the-get_data_extracts-method-to-collect" class="level2">
 <h2 class="anchored" data-anchor-id="using-the-get_data_extracts-method-to-collect">Using the <code>get_data_extracts()</code> Method to Collect</h2>
 <p>Aside from the low-tech <code>CSV</code> buttons in validation report tables, we can more directly pull out the data extracts from the <code>validation</code> object created above. We do that with the <a href="https://posit-dev.github.io/pointblank/reference/Validate.get_data_extracts.html"><code>get_data_extracts()</code></a> method, supplying the step number (<code>1</code>) to the <code>i=</code> parameter:</p>
-<div id="70a87a44" class="cell" data-execution_count="3">
+<div id="760d7741" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>extract_1 <span class="op">=</span> validation.get_data_extracts(i<span class="op">=</span><span class="dv">1</span>, frame<span class="op">=</span><span class="va">True</span>)</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>extract_1</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -569,7 +575,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="viewing-data-extracts-with-preview" class="level2">
 <h2 class="anchored" data-anchor-id="viewing-data-extracts-with-preview">Viewing Data Extracts with <code>preview()</code></h2>
 <p>To get a consistent HTML representation of any data extract (regardless of the table type), we can use the <a href="https://posit-dev.github.io/pointblank/reference/preview.html"><code>preview()</code></a> function:</p>
-<div id="bb8779f6" class="cell" data-execution_count="4">
+<div id="33c97ebb" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>pb.preview(data<span class="op">=</span>extract_1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="4">
 <div id="pb_preview_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
@@ -1114,8 +1120,8 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
   </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../user-guide/briefs.html" class="pagination-link" aria-label="Enhancing Validation Reports with Briefs">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Enhancing Validation Reports with Briefs</span>
+      <a href="../user-guide/step-reports.html" class="pagination-link" aria-label="Step Reports: Diagnosing Validation Results in Detail">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Step Reports: Diagnosing Validation Results in Detail</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
