@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.7.29">
+<meta name="generator" content="quarto-1.7.30">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -72,7 +72,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-0815c480559380816a4d1ea211a47e91.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-de070a7b0ab54f8780927367ac907214.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="../site_libs/bootstrap/bootstrap-1dec5c2fef7f1f93b464a6639e84b1a5.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
@@ -242,19 +242,19 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="examples" class="level2 doc-section doc-section-examples">
 <h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>In a data validation workflow, you can set thresholds for the number of failing test units at different levels. For example, you can set a threshold for the ‘warning’ level when the number of failing test units exceeds 10% of the total number of test units:</p>
-<div id="9b00af36" class="cell" data-execution_count="2">
+<div id="664deb86" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>thresholds_1 <span class="op">=</span> pb.Thresholds(warning<span class="op">=</span><span class="fl">0.1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>You can also set thresholds for the ‘error’ and ‘critical’ levels:</p>
-<div id="bed9bad8" class="cell" data-execution_count="3">
+<div id="6ac781f0" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>thresholds_2 <span class="op">=</span> pb.Thresholds(warning<span class="op">=</span><span class="fl">0.1</span>, error<span class="op">=</span><span class="fl">0.2</span>, critical<span class="op">=</span><span class="fl">0.05</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Thresholds can also be set as absolute counts. Here’s an example where the ‘warning’ level is set to <code>5</code> failing test units:</p>
-<div id="fd92f411" class="cell" data-execution_count="4">
+<div id="cc1887be" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>thresholds_3 <span class="op">=</span> pb.Thresholds(warning<span class="op">=</span><span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>The <code>thresholds</code> object can be used to set global thresholds for all validation steps. Or, you can set thresholds for individual validation steps, which will override the global thresholds. Here’s a data validation workflow example where we set global thresholds and then override with different thresholds at the <a href="../reference/Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt"><code>col_vals_gt()</code></a> step:</p>
-<div id="4295b872" class="cell" data-execution_count="5">
+<div id="ddfee38b" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>        data<span class="op">=</span>pb.load_dataset(dataset<span class="op">=</span><span class="st">"small_table"</span>),</span>

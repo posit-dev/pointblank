@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>col – Pointblank</title>
+<title>validate.specially – Pointblank</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -184,11 +184,16 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
   <ul>
   <li><a href="#parameters" id="toc-parameters" class="nav-link active" data-scroll-target="#parameters">Parameters</a></li>
   <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
-  <li><a href="#usage-with-the-columns-argument" id="toc-usage-with-the-columns-argument" class="nav-link" data-scroll-target="#usage-with-the-columns-argument">Usage with the <code>columns=</code> Argument</a></li>
-  <li><a href="#usage-with-the-value-left-and-right-arguments" id="toc-usage-with-the-value-left-and-right-arguments" class="nav-link" data-scroll-target="#usage-with-the-value-left-and-right-arguments">Usage with the <code>value=</code>, <code>left=</code>, and <code>right=</code> Arguments</a></li>
-  <li><a href="#available-selectors" id="toc-available-selectors" class="nav-link" data-scroll-target="#available-selectors">Available Selectors</a></li>
-  <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
-  <li><a href="#see-also" id="toc-see-also" class="nav-link" data-scroll-target="#see-also">See Also</a></li>
+  <li><a href="#preprocessing" id="toc-preprocessing" class="nav-link" data-scroll-target="#preprocessing">Preprocessing</a></li>
+  <li><a href="#thresholds" id="toc-thresholds" class="nav-link" data-scroll-target="#thresholds">Thresholds</a></li>
+  <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a>
+  <ul class="collapse">
+  <li><a href="#simple-validation-with-direct-table-access" id="toc-simple-validation-with-direct-table-access" class="nav-link" data-scroll-target="#simple-validation-with-direct-table-access">Simple validation with direct table access</a></li>
+  <li><a href="#advanced-validation-with-closure-variables-for-parameters" id="toc-advanced-validation-with-closure-variables-for-parameters" class="nav-link" data-scroll-target="#advanced-validation-with-closure-variables-for-parameters">Advanced validation with closure variables for parameters</a></li>
+  <li><a href="#validation-function-returning-a-list-of-booleans" id="toc-validation-function-returning-a-list-of-booleans" class="nav-link" data-scroll-target="#validation-function-returning-a-list-of-booleans">Validation function returning a list of booleans</a></li>
+  <li><a href="#table-level-validation-returning-a-single-boolean" id="toc-table-level-validation-returning-a-single-boolean" class="nav-link" data-scroll-target="#table-level-validation-returning-a-single-boolean">Table-level validation returning a single boolean</a></li>
+  <li><a href="#environment-validation-that-doesnt-use-the-data-table" id="toc-environment-validation-that-doesnt-use-the-data-table" class="nav-link" data-scroll-target="#environment-validation-that-doesnt-use-the-data-table">Environment validation that doesn’t use the data table</a></li>
+  </ul></li>
   </ul>
 </nav>
     </div>
@@ -197,7 +202,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">col</h1>
+<h1 class="title">Validate.specially</h1>
 </div>
 
 
@@ -214,116 +219,281 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </header>
 
 
-<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>col(exprs)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Helper function for referencing a column in the input table.</p>
-<p>Many of the validation methods (i.e., <code>col_vals_*()</code> methods) in Pointblank have a <code>value=</code> argument. These validations are comparisons between column values and a literal value, or, between column values and adjacent values in another column. The <code>col()</code> helper function is used to specify that it is a column being referenced, not a literal value.</p>
-<p>The <code>col()</code> doesn’t check that the column exists in the input table. It acts to signal that the value being compared is a column value. During validation (i.e., when <a href="../reference/Validate.interrogate.html#pointblank.Validate.interrogate"><code>interrogate()</code></a> is called), Pointblank will then check that the column exists in the input table.</p>
-<p>For creating expressions to use with the <code>conjointly()</code> validation method, use the <a href="../reference/expr_col.html#pointblank.expr_col"><code>expr_col()</code></a> function instead.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>Validate.specially(</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    expr,</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    pre<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    thresholds<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    actions<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    brief<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    active<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Perform a specialized validation with customized logic.</p>
+<p>The <code>specially()</code> validation method allows for the creation of specialized validation expressions that can be used to validate specific conditions or logic in the data. This method provides maximum flexibility by accepting a custom callable that encapsulates your validation logic.</p>
+<p>The callable function can have one of two signatures:</p>
+<ul>
+<li>a function accepting a single parameter (the data table): <code>def validate(data): ...</code></li>
+<li>a function with no parameters: <code>def validate(): ...</code></li>
+</ul>
+<p>The second form is particularly useful for environment validations that don’t need to inspect the data table.</p>
+<p>The callable function must ultimately return one of:</p>
+<ol type="1">
+<li>a single boolean value or boolean list</li>
+<li>a table where the final column contains boolean values (column name is unimportant)</li>
+</ol>
+<p>The validation will operate over the number of test units that is equal to the number of rows in the data table (if returning a table with boolean values). If returning a scalar boolean value, the validation will operate over a single test unit. For a return of a list of boolean values, the length of the list constitutes the number of test units.</p>
 <section id="parameters" class="level2 doc-section doc-section-parameters">
 <h2 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters">Parameters</h2>
 <dl>
-<dt><code><span class="parameter-name"><strong>exprs</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><code>str</code> | <code>ColumnSelector</code> | <code>ColumnSelectorNarwhals</code></span></code></dt>
+<dt><code><span class="parameter-name"><strong>expr</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><code>Callable</code></span></code></dt>
 <dd>
-<p>Either the name of a single column in the target table, provided as a string, or, an expression involving column selector functions (e.g., <code>starts_with("a")</code>, <code>ends_with("e") \| starts_with("a")</code>, etc.).</p>
+<p>A callable function that defines the specialized validation logic. This function should: - accept the target data table as its single argument (though it may ignore it), or - take no parameters at all (for environment validations) The function must ultimately return boolean values representing validation results. Design your function to incorporate any custom parameters directly within the function itself using closure variables or default parameters.</p>
+</dd>
+<dt><code><span class="parameter-name"><strong>pre</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><code>Callable</code> | None</span> <span class="parameter-default-sep">=</span> <span class="parameter-default">None</span></code></dt>
+<dd>
+<p>An optional preprocessing function or lambda to apply to the data table during interrogation. This function should take a table as input and return a modified table. Have a look at the <em>Preprocessing</em> section for more information on how to use this argument.</p>
+</dd>
+<dt><code><span class="parameter-name"><strong>thresholds</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><code>int</code> | <code>float</code> | <code>bool</code> | <code>tuple</code> | <code>dict</code> | <a href="../reference/Thresholds.html#pointblank.Thresholds">Thresholds</a></span> <span class="parameter-default-sep">=</span> <span class="parameter-default">None</span></code></dt>
+<dd>
+<p>Set threshold failure levels for reporting and reacting to exceedences of the levels. The thresholds are set at the step level and will override any global thresholds set in <code>Validate(thresholds=...)</code>. The default is <code>None</code>, which means that no thresholds will be set locally and global thresholds (if any) will take effect. Look at the <em>Thresholds</em> section for information on how to set threshold levels.</p>
+</dd>
+<dt><code><span class="parameter-name"><strong>actions</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><a href="../reference/Actions.html#pointblank.Actions">Actions</a> | None</span> <span class="parameter-default-sep">=</span> <span class="parameter-default">None</span></code></dt>
+<dd>
+<p>Optional actions to take when the validation step meets or exceeds any set threshold levels. If provided, the <a href="../reference/Actions.html#pointblank.Actions"><code>Actions</code></a> class should be used to define the actions.</p>
+</dd>
+<dt><code><span class="parameter-name"><strong>brief</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><code>str</code> | <code>bool</code> | None</span> <span class="parameter-default-sep">=</span> <span class="parameter-default">None</span></code></dt>
+<dd>
+<p>An optional brief description of the validation step that will be displayed in the reporting table. You can use the templating elements like <code>"{step}"</code> to insert the step number, or <code>"{auto}"</code> to include an automatically generated brief. If <code>True</code> the entire brief will be automatically generated. If <code>None</code> (the default) then there won’t be a brief.</p>
+</dd>
+<dt><code><span class="parameter-name"><strong>active</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><code>bool</code></span> <span class="parameter-default-sep">=</span> <span class="parameter-default">True</span></code></dt>
+<dd>
+<p>A boolean value indicating whether the validation step should be active. Using <code>False</code> will make the validation step inactive (still reporting its presence and keeping indexes for the steps unchanged).</p>
 </dd>
 </dl>
 </section>
 <section id="returns" class="level2 doc-section doc-section-returns">
 <h2 class="doc-section doc-section-returns anchored" data-anchor-id="returns">Returns</h2>
 <dl>
-<dt><code><span class="parameter-name"></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation">Column | ColumnLiteral | ColumnSelectorNarwhals:</span></code></dt>
+<dt><code><span class="parameter-name"></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><a href="../reference/Validate.html#pointblank.Validate">Validate</a></span></code></dt>
 <dd>
-<p>A column object or expression representing the column reference.</p>
+<p>The <code>Validate</code> object with the added validation step.</p>
 </dd>
 </dl>
 </section>
-<section id="usage-with-the-columns-argument" class="level2 doc-section doc-section-usage-with-the-columns-argument">
-<h2 class="doc-section doc-section-usage-with-the-columns-argument anchored" data-anchor-id="usage-with-the-columns-argument">Usage with the <code>columns=</code> Argument</h2>
-<p>The <code>col()</code> function can be used in the <code>columns=</code> argument of the following validation methods:</p>
-<ul>
-<li><a href="../reference/Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt"><code>col_vals_gt()</code></a></li>
-<li><a href="../reference/Validate.col_vals_lt.html#pointblank.Validate.col_vals_lt"><code>col_vals_lt()</code></a></li>
-<li><a href="../reference/Validate.col_vals_ge.html#pointblank.Validate.col_vals_ge"><code>col_vals_ge()</code></a></li>
-<li><a href="../reference/Validate.col_vals_le.html#pointblank.Validate.col_vals_le"><code>col_vals_le()</code></a></li>
-<li><a href="../reference/Validate.col_vals_eq.html#pointblank.Validate.col_vals_eq"><code>col_vals_eq()</code></a></li>
-<li><a href="../reference/Validate.col_vals_ne.html#pointblank.Validate.col_vals_ne"><code>col_vals_ne()</code></a></li>
-<li><a href="../reference/Validate.col_vals_between.html#pointblank.Validate.col_vals_between"><code>col_vals_between()</code></a></li>
-<li><a href="../reference/Validate.col_vals_outside.html#pointblank.Validate.col_vals_outside"><code>col_vals_outside()</code></a></li>
-<li><a href="../reference/Validate.col_vals_in_set.html#pointblank.Validate.col_vals_in_set"><code>col_vals_in_set()</code></a></li>
-<li><a href="../reference/Validate.col_vals_not_in_set.html#pointblank.Validate.col_vals_not_in_set"><code>col_vals_not_in_set()</code></a></li>
-<li><a href="../reference/Validate.col_vals_null.html#pointblank.Validate.col_vals_null"><code>col_vals_null()</code></a></li>
-<li><a href="../reference/Validate.col_vals_not_null.html#pointblank.Validate.col_vals_not_null"><code>col_vals_not_null()</code></a></li>
-<li><a href="../reference/Validate.col_vals_regex.html#pointblank.Validate.col_vals_regex"><code>col_vals_regex()</code></a></li>
-<li><a href="../reference/Validate.col_exists.html#pointblank.Validate.col_exists"><code>col_exists()</code></a></li>
-</ul>
-<p>If specifying a single column with certainty (you have the exact name), <code>col()</code> is not necessary since you can just pass the column name as a string (though it is still valid to use <code>col("column_name")</code>, if preferred). However, if you want to select columns based on complex logic involving multiple column selector functions (e.g., columns that start with <code>"a"</code> but don’t end with <code>"e"</code>), you need to use <code>col()</code> to wrap expressions involving column selector functions and logical operators such as <code>&amp;</code>, <code>|</code>, <code>-</code>, and <code>~</code>.</p>
-<p>Here is an example of such usage with the <a href="../reference/Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt"><code>col_vals_gt()</code></a> validation method:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>col_vals_gt(columns<span class="op">=</span>col(starts_with(<span class="st">"a"</span>) <span class="op">&amp;</span> <span class="op">~</span>ends_with(<span class="st">"e"</span>)), value<span class="op">=</span><span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>If using only a single column selector function, you can pass the function directly to the <code>columns=</code> argument of the validation method, or, you can use <code>col()</code> to wrap the function (either is valid though the first is more concise). Here is an example of that simpler usage:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>col_vals_gt(columns<span class="op">=</span>starts_with(<span class="st">"a"</span>), value<span class="op">=</span><span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="preprocessing" class="level2 doc-section doc-section-preprocessing">
+<h2 class="doc-section doc-section-preprocessing anchored" data-anchor-id="preprocessing">Preprocessing</h2>
+<p>The <code>pre=</code> argument allows for a preprocessing function or lambda to be applied to the data table during interrogation. This function should take a table as input and return a modified table. This is useful for performing any necessary transformations or filtering on the data before the validation step is applied.</p>
+<p>The preprocessing function can be any callable that takes a table as input and returns a modified table. For example, you could use a lambda function to filter the table based on certain criteria or to apply a transformation to the data. Regarding the lifetime of the transformed table, it only exists during the validation step and is not stored in the <code>Validate</code> object or used in subsequent validation steps.</p>
 </section>
-<section id="usage-with-the-value-left-and-right-arguments" class="level2 doc-section doc-section-usage-with-the-value-left-and-right-arguments">
-<h2 class="doc-section doc-section-usage-with-the-value-left-and-right-arguments anchored" data-anchor-id="usage-with-the-value-left-and-right-arguments">Usage with the <code>value=</code>, <code>left=</code>, and <code>right=</code> Arguments</h2>
-<p>The <code>col()</code> function can be used in the <code>value=</code> argument of the following validation methods</p>
-<ul>
-<li><a href="../reference/Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt"><code>col_vals_gt()</code></a></li>
-<li><a href="../reference/Validate.col_vals_lt.html#pointblank.Validate.col_vals_lt"><code>col_vals_lt()</code></a></li>
-<li><a href="../reference/Validate.col_vals_ge.html#pointblank.Validate.col_vals_ge"><code>col_vals_ge()</code></a></li>
-<li><a href="../reference/Validate.col_vals_le.html#pointblank.Validate.col_vals_le"><code>col_vals_le()</code></a></li>
-<li><a href="../reference/Validate.col_vals_eq.html#pointblank.Validate.col_vals_eq"><code>col_vals_eq()</code></a></li>
-<li><a href="../reference/Validate.col_vals_ne.html#pointblank.Validate.col_vals_ne"><code>col_vals_ne()</code></a></li>
-</ul>
-<p>and in the <code>left=</code> and <code>right=</code> arguments (either or both) of these two validation methods</p>
-<ul>
-<li><a href="../reference/Validate.col_vals_between.html#pointblank.Validate.col_vals_between"><code>col_vals_between()</code></a></li>
-<li><a href="../reference/Validate.col_vals_outside.html#pointblank.Validate.col_vals_outside"><code>col_vals_outside()</code></a></li>
-</ul>
-<p>You cannot use column selector functions such as <a href="../reference/starts_with.html#pointblank.starts_with"><code>starts_with()</code></a> in either of the <code>value=</code>, <code>left=</code>, or <code>right=</code> arguments since there would be no guarantee that a single column will be resolved from the target table with this approach. The <code>col()</code> function is used to signal that the value being compared is a column value and not a literal value.</p>
-</section>
-<section id="available-selectors" class="level2 doc-section doc-section-available-selectors">
-<h2 class="doc-section doc-section-available-selectors anchored" data-anchor-id="available-selectors">Available Selectors</h2>
-<p>There is a collection of selectors available in pointblank, allowing you to select columns based on attributes of column names and positions. The selectors are:</p>
-<ul>
-<li><a href="../reference/starts_with.html#pointblank.starts_with"><code>starts_with()</code></a></li>
-<li><a href="../reference/ends_with.html#pointblank.ends_with"><code>ends_with()</code></a></li>
-<li><a href="../reference/contains.html#pointblank.contains"><code>contains()</code></a></li>
-<li><a href="../reference/matches.html#pointblank.matches"><code>matches()</code></a></li>
-<li><a href="../reference/everything.html#pointblank.everything"><code>everything()</code></a></li>
-<li><a href="../reference/first_n.html#pointblank.first_n"><code>first_n()</code></a></li>
-<li><a href="../reference/last_n.html#pointblank.last_n"><code>last_n()</code></a></li>
-</ul>
-<p>Alternatively, we support selectors from the Narwhals library! Those selectors can additionally take advantage of the data types of the columns. The selectors are:</p>
-<ul>
-<li><code>boolean()</code></li>
-<li><code>by_dtype()</code></li>
-<li><code>categorical()</code></li>
-<li><code>matches()</code></li>
-<li><code>numeric()</code></li>
-<li><code>string()</code></li>
-</ul>
-<p>Have a look at the <a href="https://narwhals-dev.github.io/narwhals/api-reference/selectors/">Narwhals API documentation on selectors</a> for more information.</p>
+<section id="thresholds" class="level2 doc-section doc-section-thresholds">
+<h2 class="doc-section doc-section-thresholds anchored" data-anchor-id="thresholds">Thresholds</h2>
+<p>The <code>thresholds=</code> parameter is used to set the failure-condition levels for the validation step. If they are set here at the step level, these thresholds will override any thresholds set at the global level in <code>Validate(thresholds=...)</code>.</p>
+<p>There are three threshold levels: ‘warning’, ‘error’, and ‘critical’. The threshold values can either be set as a proportion failing of all test units (a value between <code>0</code> to <code>1</code>), or, the absolute number of failing test units (as integer that’s <code>1</code> or greater).</p>
+<p>Thresholds can be defined using one of these input schemes:</p>
+<ol type="1">
+<li>use the <a href="../reference/Thresholds.html#pointblank.Thresholds"><code>Thresholds</code></a> class (the most direct way to create thresholds)</li>
+<li>provide a tuple of 1-3 values, where position <code>0</code> is the ‘warning’ level, position <code>1</code> is the ‘error’ level, and position <code>2</code> is the ‘critical’ level</li>
+<li>create a dictionary of 1-3 value entries; the valid keys: are ‘warning’, ‘error’, and ‘critical’</li>
+<li>a single integer/float value denoting absolute number or fraction of failing test units for the ‘warning’ level only</li>
+</ol>
+<p>If the number of failing test units exceeds set thresholds, the validation step will be marked as ‘warning’, ‘error’, or ‘critical’. All of the threshold levels don’t need to be set, you’re free to set any combination of them.</p>
+<p>Aside from reporting failure conditions, thresholds can be used to determine the actions to take for each level of failure (using the <code>actions=</code> parameter).</p>
 </section>
 <section id="examples" class="level2 doc-section doc-section-examples">
 <h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
-<p>Suppose we have a table with columns <code>a</code> and <code>b</code> and we’d like to validate that the values in column <code>a</code> are greater than the values in column <code>b</code>. We can use the <code>col()</code> helper function to reference the comparison column when creating the validation step.</p>
-<div id="d36d10d1" class="cell" data-execution_count="2">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>tbl <span class="op">=</span> pl.DataFrame(</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    {</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>        <span class="st">"a"</span>: [<span class="dv">5</span>, <span class="dv">6</span>, <span class="dv">5</span>, <span class="dv">7</span>, <span class="dv">6</span>, <span class="dv">5</span>],</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>        <span class="st">"b"</span>: [<span class="dv">4</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">3</span>],</span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    }</span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>    .col_vals_gt(columns<span class="op">=</span><span class="st">"a"</span>, value<span class="op">=</span>pb.col(<span class="st">"b"</span>))</span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>validation</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>The <code>specially()</code> method offers maximum flexibility for validation, allowing you to create custom validation logic that fits your specific needs. The following examples demonstrate different patterns and use cases for this powerful validation approach.</p>
+<section id="simple-validation-with-direct-table-access" class="level3">
+<h3 class="anchored" data-anchor-id="simple-validation-with-direct-table-access">Simple validation with direct table access</h3>
+<p>This example shows the most straightforward use case where we create a function that directly checks if the sum of two columns is positive.</p>
+<div id="bf087fdf" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>simple_tbl <span class="op">=</span> pl.DataFrame({</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"a"</span>: [<span class="dv">5</span>, <span class="dv">7</span>, <span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">9</span>, <span class="dv">4</span>],</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"b"</span>: [<span class="dv">6</span>, <span class="dv">3</span>, <span class="dv">0</span>, <span class="dv">5</span>, <span class="dv">8</span>, <span class="dv">2</span>]</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Simple function that validates directly on the table</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> validate_sum_positive(data):</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> data.select(pl.col(<span class="st">"a"</span>) <span class="op">+</span> pl.col(<span class="st">"b"</span>) <span class="op">&gt;</span> <span class="dv">0</span>)</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>(</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>simple_tbl)</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    .specially(expr<span class="op">=</span>validate_sum_positive)</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div id="pb_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap');
+#pb_tbl table {
+          font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+        }
+
+#pb_tbl thead, tbody, tfoot, tr, td, th { border-style: none; }
+ tr { background-color: transparent; }
+#pb_tbl p { margin: 0; padding: 0; }
+ #pb_tbl .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 90%; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: auto; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
+ #pb_tbl .gt_caption { padding-top: 4px; padding-bottom: 4px; }
+ #pb_tbl .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
+ #pb_tbl .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
+ #pb_tbl .gt_heading { background-color: #FFFFFF; text-align: left; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #pb_tbl .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #pb_tbl .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #pb_tbl .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
+ #pb_tbl .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
+ #pb_tbl .gt_column_spanner_outer:first-child { padding-left: 0; }
+ #pb_tbl .gt_column_spanner_outer:last-child { padding-right: 0; }
+ #pb_tbl .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
+ #pb_tbl .gt_spanner_row { border-bottom-style: hidden; }
+ #pb_tbl .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
+ #pb_tbl .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
+ #pb_tbl .gt_from_md> :first-child { margin-top: 0; }
+ #pb_tbl .gt_from_md> :last-child { margin-bottom: 0; }
+ #pb_tbl .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
+ #pb_tbl .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
+ #pb_tbl .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
+ #pb_tbl .gt_row_group_first td { border-top-width: 2px; }
+ #pb_tbl .gt_row_group_first th { border-top-width: 2px; }
+ #pb_tbl .gt_striped { background-color: rgba(128,128,128,0.05); }
+ #pb_tbl .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #pb_tbl .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #pb_tbl .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #pb_tbl .gt_left { text-align: left; }
+ #pb_tbl .gt_center { text-align: center; }
+ #pb_tbl .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
+ #pb_tbl .gt_font_normal { font-weight: normal; }
+ #pb_tbl .gt_font_bold { font-weight: bold; }
+ #pb_tbl .gt_font_italic { font-style: italic; }
+ #pb_tbl .gt_super { font-size: 65%; }
+ #pb_tbl .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
+ #pb_tbl .gt_asterisk { font-size: 100%; vertical-align: 0; }
+ 
+</style>
+<table style="table-layout: fixed;; width: 0px" class="gt_table" data-quarto-disable-processing="true" data-quarto-bootstrap="false">
+<colgroup>
+  <col style="width:4px;">
+  <col style="width:35px;">
+  <col style="width:190px;">
+  <col style="width:120px;">
+  <col style="width:120px;">
+  <col style="width:50px;">
+  <col style="width:50px;">
+  <col style="width:60px;">
+  <col style="width:60px;">
+  <col style="width:60px;">
+  <col style="width:30px;">
+  <col style="width:30px;">
+  <col style="width:30px;">
+  <col style="width:65px;">
+</colgroup>
+
+<thead>
+
+  <tr class="gt_heading">
+    <td colspan="14" class="gt_heading gt_title gt_font_normal" style="color: #444444;font-size: 28px;text-align: left;font-weight: bold; text-align: left;">Pointblank Validation</td>
+  </tr>
+  <tr class="gt_heading">
+    <td colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style="text-align: left;"><div><span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2025-05-06|02:05:51</span><div style="padding-top: 10px; padding-bottom: 5px;"><span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 10px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 10px 2px 10px; font-size: 10px;">Polars</span></div></div></td>
+  </tr>
+<tr class="gt_col_headings">
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-status_color"></th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-i"></th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-type_upd">STEP</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-columns_upd">COLUMNS</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-values_upd">VALUES</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-tbl">TBL</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-eval">EVAL</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-test_units">UNITS</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-pass">PASS</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-fail">FAIL</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-w_upd">W</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-e_upd">E</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-c_upd">C</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-extract_upd">EXT</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+  <tr>
+    <td style="height: 40px; background-color: #4CA64C; color: transparent;font-size: 0px;" class="gt_row gt_left">#4CA64C</td>
+    <td style="height: 40px; color: #666666;font-size: 13px;font-weight: bold;" class="gt_row gt_right">1</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left">
+        <div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
+            <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
+<svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink">
+    <title>specially</title>
+    <g id="All-Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="specially" transform="translate(0.000000, 0.206897)">
+            <path d="M56.712234,1 C59.1975153,1 61.4475153,2.00735931 63.076195,3.63603897 C64.7048747,5.26471863 65.712234,7.51471863 65.712234,10 L65.712234,10 L65.712234,65 L10.712234,65 C8.22695259,65 5.97695259,63.9926407 4.34827294,62.363961 C2.71959328,60.7352814 1.71223397,58.4852814 1.71223397,56 L1.71223397,56 L1.71223397,10 C1.71223397,7.51471863 2.71959328,5.26471863 4.34827294,3.63603897 C5.97695259,2.00735931 8.22695259,1 10.712234,1 L10.712234,1 Z" id="rectangle" stroke="#000000" stroke-width="2" fill="#FFFFFF"></path>
+            <g id="star" transform="translate(8.500000, 8.500000)" fill="#000000" fill-rule="nonzero">
+                <path d="M25,0 C24.5874484,0 24.2174517,0.254002847 24.068359,0.6386719 L17.902344,16.535156 L0.94921875,17.400391 C0.536124409,17.4213013 0.17852458,17.6943523 0.0495446395,18.0873515 C-0.0794353012,18.4803507 0.046820452,18.9122002 0.3671875,19.173828 L13.568359,29.966797 L9.2324219,46.34375 C9.12646963,46.7428009 9.27663058,47.1659433 9.61042698,47.4089402 C9.94422338,47.651937 10.3930345,47.664834 10.740234,47.441406 L25,38.289062 L39.259766,47.441406 C39.6069655,47.6648339 40.0557766,47.6519369 40.3895729,47.4089401 C40.7233693,47.1659432 40.8735302,46.7428009 40.767578,46.34375 L36.431641,29.966797 L49.632812,19.173828 C49.953179,18.9122002 50.0794348,18.4803507 49.9504549,18.0873516 C49.821475,17.6943524 49.4638753,17.4213014 49.050781,17.400391 L32.097656,16.535156 L25.931641,0.6386719 C25.7825483,0.254002847 25.4125516,0 25,0 Z M25,3.7636719 L30.466797,17.861328 C30.609689,18.2291416 30.9554962,18.4785515 31.349609,18.498047 L46.359375,19.265625 L34.667969,28.826172 C34.3646054,29.0742114 34.2340493,29.4765679 34.333984,29.855469 L38.175781,44.369141 L25.541016,36.257812 C25.2114789,36.0458536 24.7885211,36.0458536 24.458984,36.257812 L11.824219,44.369141 L15.666016,29.855469 C15.7659507,29.4765679 15.6353946,29.0742114 15.332031,28.826172 L3.640625,19.265625 L18.650391,18.498047 C19.0445038,18.4785515 19.390311,18.2291416 19.533203,17.861328 L25,3.7636719 Z" id="Shape"></path>
+            </g>
+        </g>
+    </g>
+</svg>
+        </div>
+        <div style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size: 11px; display: inline-block; vertical-align: middle;">
+            <div>specially()</div>
+        </div>
+        
+        </td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left"></td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">EXPR</td>
+    <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" class="gt_row gt_center"><svg width="25px" height="25px" viewbox="0 0 25 25" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="vertical-align: middle;">
+    <g id="unchanged" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="unchanged" transform="translate(0.500000, 0.570147)">
+            <rect id="Rectangle" x="0.125132506" y="0" width="23.749735" height="23.7894737"></rect>
+            <path d="M5.80375046,8.18194736 C3.77191832,8.18194736 2.11875046,9.83495328 2.11875046,11.8669474 C2.11875046,13.8989414 3.77191832,15.5519474 5.80375046,15.5519474 C7.8355826,15.5519474 9.48875046,13.8989414 9.48875046,11.8669474 C9.48875046,9.83495328 7.83552863,8.18194736 5.80375046,8.18194736 Z M5.80375046,14.814915 C4.17821997,14.814915 2.85578285,13.4924778 2.85578285,11.8669474 C2.85578285,10.2414169 4.17821997,8.91897975 5.80375046,8.91897975 C7.42928095,8.91897975 8.75171807,10.2414169 8.75171807,11.8669474 C8.75171807,13.4924778 7.42928095,14.814915 5.80375046,14.814915 Z" id="Shape" fill="#000000" fill-rule="nonzero"></path>
+            <path d="M13.9638189,8.699335 C13.9364621,8.70430925 13.9091059,8.71176968 13.8842359,8.71923074 C13.7822704,8.73663967 13.6877654,8.77643115 13.6056956,8.83860518 L10.2433156,11.3852598 C10.0766886,11.5046343 9.97720993,11.6986181 9.97720993,11.9025491 C9.97720993,12.1064807 10.0766886,12.3004639 10.2433156,12.4198383 L13.6056956,14.966493 C13.891697,15.1803725 14.2970729,15.1231721 14.5109517,14.8371707 C14.7248313,14.5511692 14.6676309,14.145794 14.3816294,13.9319145 L12.5313257,12.5392127 L21.8812495,12.5392127 L21.8812495,11.2658854 L12.5313257,11.2658854 L14.3816294,9.87318364 C14.6377872,9.71650453 14.7497006,9.40066014 14.6477351,9.11714553 C14.5482564,8.83363156 14.262255,8.65954352 13.9638189,8.699335 Z" id="arrow" fill="#000000" transform="translate(15.929230, 11.894737) rotate(-180.000000) translate(-15.929230, -11.894737) "></path>
+        </g>
+    </g>
+</svg></td>
+    <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" class="gt_row gt_center"><span style="color:#4CA64C;">✓</span></td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_right">6</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">6<br>1.00</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">0<br>0.00</td>
+    <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" class="gt_row gt_center">—</td>
+    <td style="height: 40px; background-color: #FCFCFC;" class="gt_row gt_center">—</td>
+    <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" class="gt_row gt_center">—</td>
+    <td style="height: 40px;" class="gt_row gt_center">—</td>
+  </tr>
+</tbody>
+  <tfoot class="gt_sourcenotes">
+  
+  <tr>
+    <td class="gt_sourcenote" colspan="14" style="text-align: left;"><div style="margin-top: 5px; margin-bottom: 5px;"><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin-left: 10px; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2025-05-06 02:05:51 UTC</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">&lt; 1 s</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 1px 5px -1px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2025-05-06 02:05:51 UTC</span></div></td>
+  </tr>
+
+</tfoot>
+
+</table>
+
+</div>
+        
+</div>
+</div>
+<p>The function returns a Polars DataFrame with a single boolean column indicating whether the sum of columns <code>a</code> and <code>b</code> is positive for each row. Each row in the resulting DataFrame is a distinct test unit. This pattern works well for simple validations where you don’t need configurable parameters.</p>
+</section>
+<section id="advanced-validation-with-closure-variables-for-parameters" class="level3">
+<h3 class="anchored" data-anchor-id="advanced-validation-with-closure-variables-for-parameters">Advanced validation with closure variables for parameters</h3>
+<p>When you need to make your validation configurable, you can use the function factory pattern (also known as closures) to create parameterized validations:</p>
+<div id="6254877a" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a parameterized validation function using closures</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> make_column_ratio_validator(col1, col2, min_ratio):</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> validate_column_ratio(data):</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> data.select((pl.col(col1) <span class="op">/</span> pl.col(col2)) <span class="op">&gt;</span> min_ratio)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> validate_column_ratio</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>(</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>simple_tbl)</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    .specially(</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>        expr<span class="op">=</span>make_column_ratio_validator(col1<span class="op">=</span><span class="st">"a"</span>, col2<span class="op">=</span><span class="st">"b"</span>, min_ratio<span class="op">=</span><span class="fl">0.5</span>)</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="2">
 <div id="pb_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>
@@ -395,6 +565,12 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 
 <thead>
 
+  <tr class="gt_heading">
+    <td colspan="14" class="gt_heading gt_title gt_font_normal" style="color: #444444;font-size: 28px;text-align: left;font-weight: bold; text-align: left;">Pointblank Validation</td>
+  </tr>
+  <tr class="gt_heading">
+    <td colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style="text-align: left;"><div><span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2025-05-06|02:05:51</span><div style="padding-top: 10px; padding-bottom: 5px;"><span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 10px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 10px 2px 10px; font-size: 10px;">Polars</span></div></div></td>
+  </tr>
 <tr class="gt_col_headings">
   <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-status_color"></th>
   <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-i"></th>
@@ -420,22 +596,24 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
         <div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
             <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
 <svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink">
-    <title>col_vals_gt</title>
+    <title>specially</title>
     <g id="All-Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="col_vals_gt" transform="translate(0.000000, 0.724138)">
+        <g id="specially" transform="translate(0.000000, 0.206897)">
             <path d="M56.712234,1 C59.1975153,1 61.4475153,2.00735931 63.076195,3.63603897 C64.7048747,5.26471863 65.712234,7.51471863 65.712234,10 L65.712234,10 L65.712234,65 L10.712234,65 C8.22695259,65 5.97695259,63.9926407 4.34827294,62.363961 C2.71959328,60.7352814 1.71223397,58.4852814 1.71223397,56 L1.71223397,56 L1.71223397,10 C1.71223397,7.51471863 2.71959328,5.26471863 4.34827294,3.63603897 C5.97695259,2.00735931 8.22695259,1 10.712234,1 L10.712234,1 Z" id="rectangle" stroke="#000000" stroke-width="2" fill="#FFFFFF"></path>
-            <path d="M49.7099609,12 L17.7099609,12 C14.9499609,12 12.7099609,14.24 12.7099609,17 L12.7099609,49 C12.7099609,51.76 14.9499609,54 17.7099609,54 L49.7099609,54 C52.4699609,54 54.7099609,51.76 54.7099609,49 L54.7099609,17 C54.7099609,14.24 52.4699609,12 49.7099609,12 Z M27.2799609,44.82 L26.1399609,43.18 L40.9499609,33 L26.1399609,22.82 L27.2799609,21.18 L44.4799609,33 L27.2799609,44.82 Z" id="greater_than" fill="#000000" fill-rule="nonzero"></path>
+            <g id="star" transform="translate(8.500000, 8.500000)" fill="#000000" fill-rule="nonzero">
+                <path d="M25,0 C24.5874484,0 24.2174517,0.254002847 24.068359,0.6386719 L17.902344,16.535156 L0.94921875,17.400391 C0.536124409,17.4213013 0.17852458,17.6943523 0.0495446395,18.0873515 C-0.0794353012,18.4803507 0.046820452,18.9122002 0.3671875,19.173828 L13.568359,29.966797 L9.2324219,46.34375 C9.12646963,46.7428009 9.27663058,47.1659433 9.61042698,47.4089402 C9.94422338,47.651937 10.3930345,47.664834 10.740234,47.441406 L25,38.289062 L39.259766,47.441406 C39.6069655,47.6648339 40.0557766,47.6519369 40.3895729,47.4089401 C40.7233693,47.1659432 40.8735302,46.7428009 40.767578,46.34375 L36.431641,29.966797 L49.632812,19.173828 C49.953179,18.9122002 50.0794348,18.4803507 49.9504549,18.0873516 C49.821475,17.6943524 49.4638753,17.4213014 49.050781,17.400391 L32.097656,16.535156 L25.931641,0.6386719 C25.7825483,0.254002847 25.4125516,0 25,0 Z M25,3.7636719 L30.466797,17.861328 C30.609689,18.2291416 30.9554962,18.4785515 31.349609,18.498047 L46.359375,19.265625 L34.667969,28.826172 C34.3646054,29.0742114 34.2340493,29.4765679 34.333984,29.855469 L38.175781,44.369141 L25.541016,36.257812 C25.2114789,36.0458536 24.7885211,36.0458536 24.458984,36.257812 L11.824219,44.369141 L15.666016,29.855469 C15.7659507,29.4765679 15.6353946,29.0742114 15.332031,28.826172 L3.640625,19.265625 L18.650391,18.498047 C19.0445038,18.4785515 19.390311,18.2291416 19.533203,17.861328 L25,3.7636719 Z" id="Shape"></path>
+            </g>
         </g>
     </g>
 </svg>
         </div>
         <div style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size: 11px; display: inline-block; vertical-align: middle;">
-            <div>col_vals_gt()</div>
+            <div>specially()</div>
         </div>
         
         </td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">a</td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">b</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left"></td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">EXPR</td>
     <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" class="gt_row gt_center"><svg width="25px" height="25px" viewbox="0 0 25 25" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="vertical-align: middle;">
     <g id="unchanged" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="unchanged" transform="translate(0.500000, 0.570147)">
@@ -455,7 +633,13 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     <td style="height: 40px;" class="gt_row gt_center">—</td>
   </tr>
 </tbody>
+  <tfoot class="gt_sourcenotes">
+  
+  <tr>
+    <td class="gt_sourcenote" colspan="14" style="text-align: left;"><div style="margin-top: 5px; margin-bottom: 5px;"><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin-left: 10px; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2025-05-06 02:05:51 UTC</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">&lt; 1 s</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 1px 5px -1px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2025-05-06 02:05:51 UTC</span></div></td>
+  </tr>
 
+</tfoot>
 
 </table>
 
@@ -463,25 +647,56 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
         
 </div>
 </div>
-<p>From results of the validation table it can be seen that values in <code>a</code> were greater than values in <code>b</code> for every row (or test unit). Using <code>value=pb.col("b")</code> specified that the greater-than comparison is across columns, not with a fixed literal value.</p>
-<p>If you want to select an arbitrary set of columns upon which to base a validation, you can use column selector functions (e.g., <a href="../reference/starts_with.html#pointblank.starts_with"><code>starts_with()</code></a>, <a href="../reference/ends_with.html#pointblank.ends_with"><code>ends_with()</code></a>, etc.) to specify columns in the <code>columns=</code> argument of a validation method. Let’s use the <a href="../reference/starts_with.html#pointblank.starts_with"><code>starts_with()</code></a> column selector function to select columns that start with <code>"paid"</code> and validate that the values in those columns are greater than <code>10</code>.</p>
-<div id="067cd76a" class="cell" data-execution_count="3">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>tbl <span class="op">=</span> pl.DataFrame(</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    {</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"name"</span>: [<span class="st">"Alice"</span>, <span class="st">"Bob"</span>, <span class="st">"Charlie"</span>],</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>        <span class="st">"paid_2021"</span>: [<span class="fl">16.32</span>, <span class="fl">16.25</span>, <span class="fl">15.75</span>],</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>        <span class="st">"paid_2022"</span>: [<span class="fl">18.62</span>, <span class="fl">16.95</span>, <span class="fl">18.25</span>],</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>        <span class="st">"person_id"</span>: [<span class="st">"A123"</span>, <span class="st">"B456"</span>, <span class="st">"C789"</span>],</span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    }</span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>    .col_vals_gt(columns<span class="op">=</span>pb.col(pb.starts_with(<span class="st">"paid"</span>)), value<span class="op">=</span><span class="dv">10</span>)</span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>validation</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>This approach allows you to create reusable validation functions that can be configured with different parameters without modifying the function itself.</p>
+</section>
+<section id="validation-function-returning-a-list-of-booleans" class="level3">
+<h3 class="anchored" data-anchor-id="validation-function-returning-a-list-of-booleans">Validation function returning a list of booleans</h3>
+<p>This example demonstrates how to create a validation function that returns a list of boolean values, where each element represents a separate test unit:</p>
+<div id="86e9768e" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> random</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Create sample data</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>transaction_tbl <span class="op">=</span> pl.DataFrame({</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">"transaction_id"</span>: [<span class="ss">f"TX</span><span class="sc">{</span>i<span class="sc">:04d}</span><span class="ss">"</span> <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">11</span>)],</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">"amount"</span>: [<span class="fl">120.50</span>, <span class="fl">85.25</span>, <span class="fl">50.00</span>, <span class="fl">240.75</span>, <span class="fl">35.20</span>, <span class="fl">150.00</span>, <span class="fl">85.25</span>, <span class="fl">65.00</span>, <span class="fl">210.75</span>, <span class="fl">90.50</span>],</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">"category"</span>: [<span class="st">"food"</span>, <span class="st">"shopping"</span>, <span class="st">"entertainment"</span>, <span class="st">"travel"</span>, <span class="st">"utilities"</span>,</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>                <span class="st">"food"</span>, <span class="st">"shopping"</span>, <span class="st">"entertainment"</span>, <span class="st">"travel"</span>, <span class="st">"utilities"</span>]</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Define a validation function that returns a list of booleans</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> validate_transaction_rules(data):</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Create a list to store individual test results</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>    test_results <span class="op">=</span> []</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Check each row individually against multiple business rules</span></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> row <span class="kw">in</span> data.iter_rows(named<span class="op">=</span><span class="va">True</span>):</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Rule: transaction IDs must start with "TX" and be 6 chars long</span></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>        valid_id <span class="op">=</span> row[<span class="st">"transaction_id"</span>].startswith(<span class="st">"TX"</span>) <span class="kw">and</span> <span class="bu">len</span>(row[<span class="st">"transaction_id"</span>]) <span class="op">==</span> <span class="dv">6</span></span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Rule: Amounts must be appropriate for their category</span></span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>        valid_amount <span class="op">=</span> <span class="va">True</span></span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> row[<span class="st">"category"</span>] <span class="op">==</span> <span class="st">"food"</span> <span class="kw">and</span> (row[<span class="st">"amount"</span>] <span class="op">&lt;</span> <span class="dv">10</span> <span class="kw">or</span> row[<span class="st">"amount"</span>] <span class="op">&gt;</span> <span class="dv">200</span>):</span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>            valid_amount <span class="op">=</span> <span class="va">False</span></span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elif</span> row[<span class="st">"category"</span>] <span class="op">==</span> <span class="st">"utilities"</span> <span class="kw">and</span> (row[<span class="st">"amount"</span>] <span class="op">&lt;</span> <span class="dv">20</span> <span class="kw">or</span> row[<span class="st">"amount"</span>] <span class="op">&gt;</span> <span class="dv">300</span>):</span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>            valid_amount <span class="op">=</span> <span class="va">False</span></span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elif</span> row[<span class="st">"category"</span>] <span class="op">==</span> <span class="st">"entertainment"</span> <span class="kw">and</span> row[<span class="st">"amount"</span>] <span class="op">&gt;</span> <span class="dv">100</span>:</span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>            valid_amount <span class="op">=</span> <span class="va">False</span></span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>        <span class="co"># A transaction passes if it satisfies both rules</span></span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a>        test_results.append(valid_id <span class="kw">and</span> valid_amount)</span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> test_results</span>
+<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a>(</span>
+<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>transaction_tbl)</span>
+<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a>    .specially(</span>
+<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a>        expr<span class="op">=</span>validate_transaction_rules,</span>
+<span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a>        brief<span class="op">=</span><span class="st">"Validate transaction IDs and amounts by category."</span></span>
+<span id="cb4-42"><a href="#cb4-42" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb4-43"><a href="#cb4-43" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
+<span id="cb4-44"><a href="#cb4-44" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="3">
 <div id="pb_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>
@@ -553,6 +768,12 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 
 <thead>
 
+  <tr class="gt_heading">
+    <td colspan="14" class="gt_heading gt_title gt_font_normal" style="color: #444444;font-size: 28px;text-align: left;font-weight: bold; text-align: left;">Pointblank Validation</td>
+  </tr>
+  <tr class="gt_heading">
+    <td colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style="text-align: left;"><div><span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2025-05-06|02:05:51</span><div style="padding-top: 10px; padding-bottom: 5px;"><span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 10px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 10px 2px 10px; font-size: 10px;">Polars</span></div></div></td>
+  </tr>
 <tr class="gt_col_headings">
   <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-status_color"></th>
   <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-i"></th>
@@ -578,22 +799,25 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
         <div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
             <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
 <svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink">
-    <title>col_vals_gt</title>
+    <title>specially</title>
     <g id="All-Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="col_vals_gt" transform="translate(0.000000, 0.724138)">
+        <g id="specially" transform="translate(0.000000, 0.206897)">
             <path d="M56.712234,1 C59.1975153,1 61.4475153,2.00735931 63.076195,3.63603897 C64.7048747,5.26471863 65.712234,7.51471863 65.712234,10 L65.712234,10 L65.712234,65 L10.712234,65 C8.22695259,65 5.97695259,63.9926407 4.34827294,62.363961 C2.71959328,60.7352814 1.71223397,58.4852814 1.71223397,56 L1.71223397,56 L1.71223397,10 C1.71223397,7.51471863 2.71959328,5.26471863 4.34827294,3.63603897 C5.97695259,2.00735931 8.22695259,1 10.712234,1 L10.712234,1 Z" id="rectangle" stroke="#000000" stroke-width="2" fill="#FFFFFF"></path>
-            <path d="M49.7099609,12 L17.7099609,12 C14.9499609,12 12.7099609,14.24 12.7099609,17 L12.7099609,49 C12.7099609,51.76 14.9499609,54 17.7099609,54 L49.7099609,54 C52.4699609,54 54.7099609,51.76 54.7099609,49 L54.7099609,17 C54.7099609,14.24 52.4699609,12 49.7099609,12 Z M27.2799609,44.82 L26.1399609,43.18 L40.9499609,33 L26.1399609,22.82 L27.2799609,21.18 L44.4799609,33 L27.2799609,44.82 Z" id="greater_than" fill="#000000" fill-rule="nonzero"></path>
+            <g id="star" transform="translate(8.500000, 8.500000)" fill="#000000" fill-rule="nonzero">
+                <path d="M25,0 C24.5874484,0 24.2174517,0.254002847 24.068359,0.6386719 L17.902344,16.535156 L0.94921875,17.400391 C0.536124409,17.4213013 0.17852458,17.6943523 0.0495446395,18.0873515 C-0.0794353012,18.4803507 0.046820452,18.9122002 0.3671875,19.173828 L13.568359,29.966797 L9.2324219,46.34375 C9.12646963,46.7428009 9.27663058,47.1659433 9.61042698,47.4089402 C9.94422338,47.651937 10.3930345,47.664834 10.740234,47.441406 L25,38.289062 L39.259766,47.441406 C39.6069655,47.6648339 40.0557766,47.6519369 40.3895729,47.4089401 C40.7233693,47.1659432 40.8735302,46.7428009 40.767578,46.34375 L36.431641,29.966797 L49.632812,19.173828 C49.953179,18.9122002 50.0794348,18.4803507 49.9504549,18.0873516 C49.821475,17.6943524 49.4638753,17.4213014 49.050781,17.400391 L32.097656,16.535156 L25.931641,0.6386719 C25.7825483,0.254002847 25.4125516,0 25,0 Z M25,3.7636719 L30.466797,17.861328 C30.609689,18.2291416 30.9554962,18.4785515 31.349609,18.498047 L46.359375,19.265625 L34.667969,28.826172 C34.3646054,29.0742114 34.2340493,29.4765679 34.333984,29.855469 L38.175781,44.369141 L25.541016,36.257812 C25.2114789,36.0458536 24.7885211,36.0458536 24.458984,36.257812 L11.824219,44.369141 L15.666016,29.855469 C15.7659507,29.4765679 15.6353946,29.0742114 15.332031,28.826172 L3.640625,19.265625 L18.650391,18.498047 C19.0445038,18.4785515 19.390311,18.2291416 19.533203,17.861328 L25,3.7636719 Z" id="Shape"></path>
+            </g>
         </g>
     </g>
 </svg>
         </div>
         <div style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size: 11px; display: inline-block; vertical-align: middle;">
-            <div>col_vals_gt()</div>
+            <div>specially()</div>
         </div>
-        
+        <div style="font-size: 9px; font-family: 'IBM Plex Sans'; text-wrap: balance; margin-top: 3px;"><p>Validate transaction IDs and amounts by category.</p>
+</div>
         </td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">paid_2021</td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">10</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left"></td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">EXPR</td>
     <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" class="gt_row gt_center"><svg width="25px" height="25px" viewbox="0 0 25 25" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="vertical-align: middle;">
     <g id="unchanged" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="unchanged" transform="translate(0.500000, 0.570147)">
@@ -604,49 +828,8 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     </g>
 </svg></td>
     <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" class="gt_row gt_center"><span style="color:#4CA64C;">✓</span></td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_right">3</td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">3<br>1.00</td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">0<br>0.00</td>
-    <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" class="gt_row gt_center">—</td>
-    <td style="height: 40px; background-color: #FCFCFC;" class="gt_row gt_center">—</td>
-    <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" class="gt_row gt_center">—</td>
-    <td style="height: 40px;" class="gt_row gt_center">—</td>
-  </tr>
-  <tr>
-    <td style="height: 40px; background-color: #4CA64C; color: transparent;font-size: 0px;" class="gt_row gt_left">#4CA64C</td>
-    <td style="height: 40px; color: #666666;font-size: 13px;font-weight: bold;" class="gt_row gt_right">2</td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left">
-        <div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
-            <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
-<svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink">
-    <title>col_vals_gt</title>
-    <g id="All-Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="col_vals_gt" transform="translate(0.000000, 0.724138)">
-            <path d="M56.712234,1 C59.1975153,1 61.4475153,2.00735931 63.076195,3.63603897 C64.7048747,5.26471863 65.712234,7.51471863 65.712234,10 L65.712234,10 L65.712234,65 L10.712234,65 C8.22695259,65 5.97695259,63.9926407 4.34827294,62.363961 C2.71959328,60.7352814 1.71223397,58.4852814 1.71223397,56 L1.71223397,56 L1.71223397,10 C1.71223397,7.51471863 2.71959328,5.26471863 4.34827294,3.63603897 C5.97695259,2.00735931 8.22695259,1 10.712234,1 L10.712234,1 Z" id="rectangle" stroke="#000000" stroke-width="2" fill="#FFFFFF"></path>
-            <path d="M49.7099609,12 L17.7099609,12 C14.9499609,12 12.7099609,14.24 12.7099609,17 L12.7099609,49 C12.7099609,51.76 14.9499609,54 17.7099609,54 L49.7099609,54 C52.4699609,54 54.7099609,51.76 54.7099609,49 L54.7099609,17 C54.7099609,14.24 52.4699609,12 49.7099609,12 Z M27.2799609,44.82 L26.1399609,43.18 L40.9499609,33 L26.1399609,22.82 L27.2799609,21.18 L44.4799609,33 L27.2799609,44.82 Z" id="greater_than" fill="#000000" fill-rule="nonzero"></path>
-        </g>
-    </g>
-</svg>
-        </div>
-        <div style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size: 11px; display: inline-block; vertical-align: middle;">
-            <div>col_vals_gt()</div>
-        </div>
-        
-        </td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">paid_2022</td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">10</td>
-    <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" class="gt_row gt_center"><svg width="25px" height="25px" viewbox="0 0 25 25" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="vertical-align: middle;">
-    <g id="unchanged" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="unchanged" transform="translate(0.500000, 0.570147)">
-            <rect id="Rectangle" x="0.125132506" y="0" width="23.749735" height="23.7894737"></rect>
-            <path d="M5.80375046,8.18194736 C3.77191832,8.18194736 2.11875046,9.83495328 2.11875046,11.8669474 C2.11875046,13.8989414 3.77191832,15.5519474 5.80375046,15.5519474 C7.8355826,15.5519474 9.48875046,13.8989414 9.48875046,11.8669474 C9.48875046,9.83495328 7.83552863,8.18194736 5.80375046,8.18194736 Z M5.80375046,14.814915 C4.17821997,14.814915 2.85578285,13.4924778 2.85578285,11.8669474 C2.85578285,10.2414169 4.17821997,8.91897975 5.80375046,8.91897975 C7.42928095,8.91897975 8.75171807,10.2414169 8.75171807,11.8669474 C8.75171807,13.4924778 7.42928095,14.814915 5.80375046,14.814915 Z" id="Shape" fill="#000000" fill-rule="nonzero"></path>
-            <path d="M13.9638189,8.699335 C13.9364621,8.70430925 13.9091059,8.71176968 13.8842359,8.71923074 C13.7822704,8.73663967 13.6877654,8.77643115 13.6056956,8.83860518 L10.2433156,11.3852598 C10.0766886,11.5046343 9.97720993,11.6986181 9.97720993,11.9025491 C9.97720993,12.1064807 10.0766886,12.3004639 10.2433156,12.4198383 L13.6056956,14.966493 C13.891697,15.1803725 14.2970729,15.1231721 14.5109517,14.8371707 C14.7248313,14.5511692 14.6676309,14.145794 14.3816294,13.9319145 L12.5313257,12.5392127 L21.8812495,12.5392127 L21.8812495,11.2658854 L12.5313257,11.2658854 L14.3816294,9.87318364 C14.6377872,9.71650453 14.7497006,9.40066014 14.6477351,9.11714553 C14.5482564,8.83363156 14.262255,8.65954352 13.9638189,8.699335 Z" id="arrow" fill="#000000" transform="translate(15.929230, 11.894737) rotate(-180.000000) translate(-15.929230, -11.894737) "></path>
-        </g>
-    </g>
-</svg></td>
-    <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" class="gt_row gt_center"><span style="color:#4CA64C;">✓</span></td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_right">3</td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">3<br>1.00</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_right">10</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">10<br>1.00</td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">0<br>0.00</td>
     <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" class="gt_row gt_center">—</td>
     <td style="height: 40px; background-color: #FCFCFC;" class="gt_row gt_center">—</td>
@@ -654,7 +837,13 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     <td style="height: 40px;" class="gt_row gt_center">—</td>
   </tr>
 </tbody>
+  <tfoot class="gt_sourcenotes">
+  
+  <tr>
+    <td class="gt_sourcenote" colspan="14" style="text-align: left;"><div style="margin-top: 5px; margin-bottom: 5px;"><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin-left: 10px; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2025-05-06 02:05:51 UTC</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">&lt; 1 s</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 1px 5px -1px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2025-05-06 02:05:51 UTC</span></div></td>
+  </tr>
 
+</tfoot>
 
 </table>
 
@@ -662,30 +851,33 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
         
 </div>
 </div>
-<p>In the above example the <code>col()</code> function contains the invocation of the <a href="../reference/starts_with.html#pointblank.starts_with"><code>starts_with()</code></a> column selector function. This is not strictly necessary when using a single column selector function, so <code>columns=pb.starts_with("paid")</code> would be equivalent usage here. However, the use of <code>col()</code> is required when using multiple column selector functions with logical operators. Here is an example of that more complex usage:</p>
-<div id="49b44206" class="cell" data-execution_count="4">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>tbl <span class="op">=</span> pl.DataFrame(</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    {</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"name"</span>: [<span class="st">"Alice"</span>, <span class="st">"Bob"</span>, <span class="st">"Charlie"</span>],</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>        <span class="st">"hours_2022"</span>: [<span class="dv">160</span>, <span class="dv">180</span>, <span class="dv">160</span>],</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>        <span class="st">"hours_2023"</span>: [<span class="dv">182</span>, <span class="dv">168</span>, <span class="dv">175</span>],</span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>        <span class="st">"hours_2024"</span>: [<span class="dv">200</span>, <span class="dv">165</span>, <span class="dv">190</span>],</span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>        <span class="st">"paid_2022"</span>: [<span class="fl">18.62</span>, <span class="fl">16.95</span>, <span class="fl">18.25</span>],</span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>        <span class="st">"paid_2023"</span>: [<span class="fl">19.29</span>, <span class="fl">17.75</span>, <span class="fl">18.35</span>],</span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>        <span class="st">"paid_2024"</span>: [<span class="fl">20.73</span>, <span class="fl">18.35</span>, <span class="fl">20.10</span>],</span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    }</span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
-<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>    .col_vals_gt(</span>
-<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>        columns<span class="op">=</span>pb.col(pb.starts_with(<span class="st">"paid"</span>) <span class="op">&amp;</span> pb.matches(<span class="st">"2023|2024"</span>)),</span>
-<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>        value<span class="op">=</span><span class="dv">10</span></span>
-<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
-<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>validation</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>This example shows how to create a validation function that applies multiple business rules to each row and returns a list of boolean results. Each boolean in the list represents a separate test unit, and a test unit passes only if all rules are satisfied for a given row.</p>
+<p>The function iterates through each row in the data table, checking:</p>
+<ol type="1">
+<li>if transaction IDs follow the required format</li>
+<li>if transaction amounts are appropriate for their respective categories</li>
+</ol>
+<p>This approach is powerful when you need to apply complex, conditional logic that can’t be easily expressed using the built-in validation functions.</p>
+</section>
+<section id="table-level-validation-returning-a-single-boolean" class="level3">
+<h3 class="anchored" data-anchor-id="table-level-validation-returning-a-single-boolean">Table-level validation returning a single boolean</h3>
+<p>Sometimes you need to validate properties of the entire table rather than row-by-row. In these cases, your function can return a single boolean value:</p>
+<div id="34afa081" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> validate_table_properties(data):</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Check if table has at least one row with column 'a' &gt; 10</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    has_large_values <span class="op">=</span> data.<span class="bu">filter</span>(pl.col(<span class="st">"a"</span>) <span class="op">&gt;</span> <span class="dv">10</span>).height <span class="op">&gt;</span> <span class="dv">0</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Check if mean of column 'b' is positive</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    has_positive_mean <span class="op">=</span> data.select(pl.mean(<span class="st">"b"</span>)).item() <span class="op">&gt;</span> <span class="dv">0</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Return a single boolean for the entire table</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> has_large_values <span class="kw">and</span> has_positive_mean</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>(</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>simple_tbl)</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>    .specially(expr<span class="op">=</span>validate_table_properties)</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="4">
 <div id="pb_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>
@@ -757,6 +949,12 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 
 <thead>
 
+  <tr class="gt_heading">
+    <td colspan="14" class="gt_heading gt_title gt_font_normal" style="color: #444444;font-size: 28px;text-align: left;font-weight: bold; text-align: left;">Pointblank Validation</td>
+  </tr>
+  <tr class="gt_heading">
+    <td colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style="text-align: left;"><div><span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2025-05-06|02:05:51</span><div style="padding-top: 10px; padding-bottom: 5px;"><span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 10px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 10px 2px 10px; font-size: 10px;">Polars</span></div></div></td>
+  </tr>
 <tr class="gt_col_headings">
   <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-status_color"></th>
   <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-i"></th>
@@ -776,28 +974,30 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </thead>
 <tbody class="gt_table_body">
   <tr>
-    <td style="height: 40px; background-color: #4CA64C; color: transparent;font-size: 0px;" class="gt_row gt_left">#4CA64C</td>
+    <td style="height: 40px; background-color: #4CA64C66; color: transparent;font-size: 0px;" class="gt_row gt_left">#4CA64C66</td>
     <td style="height: 40px; color: #666666;font-size: 13px;font-weight: bold;" class="gt_row gt_right">1</td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left">
         <div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
             <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
 <svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink">
-    <title>col_vals_gt</title>
+    <title>specially</title>
     <g id="All-Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="col_vals_gt" transform="translate(0.000000, 0.724138)">
+        <g id="specially" transform="translate(0.000000, 0.206897)">
             <path d="M56.712234,1 C59.1975153,1 61.4475153,2.00735931 63.076195,3.63603897 C64.7048747,5.26471863 65.712234,7.51471863 65.712234,10 L65.712234,10 L65.712234,65 L10.712234,65 C8.22695259,65 5.97695259,63.9926407 4.34827294,62.363961 C2.71959328,60.7352814 1.71223397,58.4852814 1.71223397,56 L1.71223397,56 L1.71223397,10 C1.71223397,7.51471863 2.71959328,5.26471863 4.34827294,3.63603897 C5.97695259,2.00735931 8.22695259,1 10.712234,1 L10.712234,1 Z" id="rectangle" stroke="#000000" stroke-width="2" fill="#FFFFFF"></path>
-            <path d="M49.7099609,12 L17.7099609,12 C14.9499609,12 12.7099609,14.24 12.7099609,17 L12.7099609,49 C12.7099609,51.76 14.9499609,54 17.7099609,54 L49.7099609,54 C52.4699609,54 54.7099609,51.76 54.7099609,49 L54.7099609,17 C54.7099609,14.24 52.4699609,12 49.7099609,12 Z M27.2799609,44.82 L26.1399609,43.18 L40.9499609,33 L26.1399609,22.82 L27.2799609,21.18 L44.4799609,33 L27.2799609,44.82 Z" id="greater_than" fill="#000000" fill-rule="nonzero"></path>
+            <g id="star" transform="translate(8.500000, 8.500000)" fill="#000000" fill-rule="nonzero">
+                <path d="M25,0 C24.5874484,0 24.2174517,0.254002847 24.068359,0.6386719 L17.902344,16.535156 L0.94921875,17.400391 C0.536124409,17.4213013 0.17852458,17.6943523 0.0495446395,18.0873515 C-0.0794353012,18.4803507 0.046820452,18.9122002 0.3671875,19.173828 L13.568359,29.966797 L9.2324219,46.34375 C9.12646963,46.7428009 9.27663058,47.1659433 9.61042698,47.4089402 C9.94422338,47.651937 10.3930345,47.664834 10.740234,47.441406 L25,38.289062 L39.259766,47.441406 C39.6069655,47.6648339 40.0557766,47.6519369 40.3895729,47.4089401 C40.7233693,47.1659432 40.8735302,46.7428009 40.767578,46.34375 L36.431641,29.966797 L49.632812,19.173828 C49.953179,18.9122002 50.0794348,18.4803507 49.9504549,18.0873516 C49.821475,17.6943524 49.4638753,17.4213014 49.050781,17.400391 L32.097656,16.535156 L25.931641,0.6386719 C25.7825483,0.254002847 25.4125516,0 25,0 Z M25,3.7636719 L30.466797,17.861328 C30.609689,18.2291416 30.9554962,18.4785515 31.349609,18.498047 L46.359375,19.265625 L34.667969,28.826172 C34.3646054,29.0742114 34.2340493,29.4765679 34.333984,29.855469 L38.175781,44.369141 L25.541016,36.257812 C25.2114789,36.0458536 24.7885211,36.0458536 24.458984,36.257812 L11.824219,44.369141 L15.666016,29.855469 C15.7659507,29.4765679 15.6353946,29.0742114 15.332031,28.826172 L3.640625,19.265625 L18.650391,18.498047 C19.0445038,18.4785515 19.390311,18.2291416 19.533203,17.861328 L25,3.7636719 Z" id="Shape"></path>
+            </g>
         </g>
     </g>
 </svg>
         </div>
         <div style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size: 11px; display: inline-block; vertical-align: middle;">
-            <div>col_vals_gt()</div>
+            <div>specially()</div>
         </div>
         
         </td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">paid_2023</td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">10</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left"></td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">EXPR</td>
     <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" class="gt_row gt_center"><svg width="25px" height="25px" viewbox="0 0 25 25" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="vertical-align: middle;">
     <g id="unchanged" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="unchanged" transform="translate(0.500000, 0.570147)">
@@ -808,57 +1008,22 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     </g>
 </svg></td>
     <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" class="gt_row gt_center"><span style="color:#4CA64C;">✓</span></td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_right">3</td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">3<br>1.00</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_right">1</td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">0<br>0.00</td>
-    <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" class="gt_row gt_center">—</td>
-    <td style="height: 40px; background-color: #FCFCFC;" class="gt_row gt_center">—</td>
-    <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" class="gt_row gt_center">—</td>
-    <td style="height: 40px;" class="gt_row gt_center">—</td>
-  </tr>
-  <tr>
-    <td style="height: 40px; background-color: #4CA64C; color: transparent;font-size: 0px;" class="gt_row gt_left">#4CA64C</td>
-    <td style="height: 40px; color: #666666;font-size: 13px;font-weight: bold;" class="gt_row gt_right">2</td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left">
-        <div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
-            <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
-<svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink">
-    <title>col_vals_gt</title>
-    <g id="All-Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="col_vals_gt" transform="translate(0.000000, 0.724138)">
-            <path d="M56.712234,1 C59.1975153,1 61.4475153,2.00735931 63.076195,3.63603897 C64.7048747,5.26471863 65.712234,7.51471863 65.712234,10 L65.712234,10 L65.712234,65 L10.712234,65 C8.22695259,65 5.97695259,63.9926407 4.34827294,62.363961 C2.71959328,60.7352814 1.71223397,58.4852814 1.71223397,56 L1.71223397,56 L1.71223397,10 C1.71223397,7.51471863 2.71959328,5.26471863 4.34827294,3.63603897 C5.97695259,2.00735931 8.22695259,1 10.712234,1 L10.712234,1 Z" id="rectangle" stroke="#000000" stroke-width="2" fill="#FFFFFF"></path>
-            <path d="M49.7099609,12 L17.7099609,12 C14.9499609,12 12.7099609,14.24 12.7099609,17 L12.7099609,49 C12.7099609,51.76 14.9499609,54 17.7099609,54 L49.7099609,54 C52.4699609,54 54.7099609,51.76 54.7099609,49 L54.7099609,17 C54.7099609,14.24 52.4699609,12 49.7099609,12 Z M27.2799609,44.82 L26.1399609,43.18 L40.9499609,33 L26.1399609,22.82 L27.2799609,21.18 L44.4799609,33 L27.2799609,44.82 Z" id="greater_than" fill="#000000" fill-rule="nonzero"></path>
-        </g>
-    </g>
-</svg>
-        </div>
-        <div style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size: 11px; display: inline-block; vertical-align: middle;">
-            <div>col_vals_gt()</div>
-        </div>
-        
-        </td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">paid_2024</td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">10</td>
-    <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" class="gt_row gt_center"><svg width="25px" height="25px" viewbox="0 0 25 25" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="vertical-align: middle;">
-    <g id="unchanged" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="unchanged" transform="translate(0.500000, 0.570147)">
-            <rect id="Rectangle" x="0.125132506" y="0" width="23.749735" height="23.7894737"></rect>
-            <path d="M5.80375046,8.18194736 C3.77191832,8.18194736 2.11875046,9.83495328 2.11875046,11.8669474 C2.11875046,13.8989414 3.77191832,15.5519474 5.80375046,15.5519474 C7.8355826,15.5519474 9.48875046,13.8989414 9.48875046,11.8669474 C9.48875046,9.83495328 7.83552863,8.18194736 5.80375046,8.18194736 Z M5.80375046,14.814915 C4.17821997,14.814915 2.85578285,13.4924778 2.85578285,11.8669474 C2.85578285,10.2414169 4.17821997,8.91897975 5.80375046,8.91897975 C7.42928095,8.91897975 8.75171807,10.2414169 8.75171807,11.8669474 C8.75171807,13.4924778 7.42928095,14.814915 5.80375046,14.814915 Z" id="Shape" fill="#000000" fill-rule="nonzero"></path>
-            <path d="M13.9638189,8.699335 C13.9364621,8.70430925 13.9091059,8.71176968 13.8842359,8.71923074 C13.7822704,8.73663967 13.6877654,8.77643115 13.6056956,8.83860518 L10.2433156,11.3852598 C10.0766886,11.5046343 9.97720993,11.6986181 9.97720993,11.9025491 C9.97720993,12.1064807 10.0766886,12.3004639 10.2433156,12.4198383 L13.6056956,14.966493 C13.891697,15.1803725 14.2970729,15.1231721 14.5109517,14.8371707 C14.7248313,14.5511692 14.6676309,14.145794 14.3816294,13.9319145 L12.5313257,12.5392127 L21.8812495,12.5392127 L21.8812495,11.2658854 L12.5313257,11.2658854 L14.3816294,9.87318364 C14.6377872,9.71650453 14.7497006,9.40066014 14.6477351,9.11714553 C14.5482564,8.83363156 14.262255,8.65954352 13.9638189,8.699335 Z" id="arrow" fill="#000000" transform="translate(15.929230, 11.894737) rotate(-180.000000) translate(-15.929230, -11.894737) "></path>
-        </g>
-    </g>
-</svg></td>
-    <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" class="gt_row gt_center"><span style="color:#4CA64C;">✓</span></td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_right">3</td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">3<br>1.00</td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">0<br>0.00</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">1<br>1.00</td>
     <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" class="gt_row gt_center">—</td>
     <td style="height: 40px; background-color: #FCFCFC;" class="gt_row gt_center">—</td>
     <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" class="gt_row gt_center">—</td>
     <td style="height: 40px;" class="gt_row gt_center">—</td>
   </tr>
 </tbody>
+  <tfoot class="gt_sourcenotes">
+  
+  <tr>
+    <td class="gt_sourcenote" colspan="14" style="text-align: left;"><div style="margin-top: 5px; margin-bottom: 5px;"><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin-left: 10px; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2025-05-06 02:05:51 UTC</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">&lt; 1 s</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 1px 5px -1px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2025-05-06 02:05:51 UTC</span></div></td>
+  </tr>
 
+</tfoot>
 
 </table>
 
@@ -866,30 +1031,38 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
         
 </div>
 </div>
-<p>In the above example the <code>col()</code> function contains the invocation of the <a href="../reference/starts_with.html#pointblank.starts_with"><code>starts_with()</code></a> and <a href="../reference/matches.html#pointblank.matches"><code>matches()</code></a> column selector functions, combined with the <code>&amp;</code> operator. This is necessary to specify the set of columns that start with <code>"paid"</code> <em>and</em> match the text <code>"2023"</code> or <code>"2024"</code>.</p>
-<p>If you’d like to take advantage of Narwhals selectors, that’s also possible. Here is an example of using the <code>numeric()</code> column selector function to select all numeric columns for validation, checking that their values are greater than <code>0</code>.</p>
-<div id="dbc6073c" class="cell" data-execution_count="5">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> narwhals.selectors <span class="im">as</span> ncs</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>tbl <span class="op">=</span> pl.DataFrame(</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    {</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>        <span class="st">"name"</span>: [<span class="st">"Alice"</span>, <span class="st">"Bob"</span>, <span class="st">"Charlie"</span>],</span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>        <span class="st">"hours_2022"</span>: [<span class="dv">160</span>, <span class="dv">180</span>, <span class="dv">160</span>],</span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>        <span class="st">"hours_2023"</span>: [<span class="dv">182</span>, <span class="dv">168</span>, <span class="dv">175</span>],</span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>        <span class="st">"hours_2024"</span>: [<span class="dv">200</span>, <span class="dv">165</span>, <span class="dv">190</span>],</span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>        <span class="st">"paid_2022"</span>: [<span class="fl">18.62</span>, <span class="fl">16.95</span>, <span class="fl">18.25</span>],</span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>        <span class="st">"paid_2023"</span>: [<span class="fl">19.29</span>, <span class="fl">17.75</span>, <span class="fl">18.35</span>],</span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>        <span class="st">"paid_2024"</span>: [<span class="fl">20.73</span>, <span class="fl">18.35</span>, <span class="fl">20.10</span>],</span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>    }</span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
-<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
-<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>    .col_vals_ge(columns<span class="op">=</span>pb.col(ncs.numeric()), value<span class="op">=</span><span class="dv">0</span>)</span>
-<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
-<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>validation</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>This example demonstrates how to perform multiple checks on the table as a whole and combine them into a single validation result.</p>
+</section>
+<section id="environment-validation-that-doesnt-use-the-data-table" class="level3">
+<h3 class="anchored" data-anchor-id="environment-validation-that-doesnt-use-the-data-table">Environment validation that doesn’t use the data table</h3>
+<p>The <code>specially()</code> validation method can even be used to validate aspects of your environment that are completely independent of the data:</p>
+<div id="a435c73c" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> validate_pointblank_version():</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">try</span>:</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>        <span class="im">import</span> importlib.metadata</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>        version <span class="op">=</span> importlib.metadata.version(<span class="st">"pointblank"</span>)</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>        version_parts <span class="op">=</span> version.split(<span class="st">"."</span>)</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Get major and minor components regardless of how many parts there are</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>        major <span class="op">=</span> <span class="bu">int</span>(version_parts[<span class="dv">0</span>])</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>        minor <span class="op">=</span> <span class="bu">int</span>(version_parts[<span class="dv">1</span>])</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Check both major and minor components for version `0.9+`</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> (major <span class="op">&gt;</span> <span class="dv">0</span>) <span class="kw">or</span> (major <span class="op">==</span> <span class="dv">0</span> <span class="kw">and</span> minor <span class="op">&gt;=</span> <span class="dv">9</span>)</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">except</span> <span class="pp">Exception</span> <span class="im">as</span> e:</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>        <span class="co"># More specific error handling could be added here</span></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"Version check failed: </span><span class="sc">{</span>e<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">False</span></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>(</span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>simple_tbl)</span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>    .specially(</span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>        expr<span class="op">=</span>validate_pointblank_version,</span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>        brief<span class="op">=</span><span class="st">"Check Pointblank version `&gt;=0.9.0`."</span></span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="5">
 <div id="pb_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>
@@ -961,6 +1134,12 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 
 <thead>
 
+  <tr class="gt_heading">
+    <td colspan="14" class="gt_heading gt_title gt_font_normal" style="color: #444444;font-size: 28px;text-align: left;font-weight: bold; text-align: left;">Pointblank Validation</td>
+  </tr>
+  <tr class="gt_heading">
+    <td colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style="text-align: left;"><div><span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2025-05-06|02:05:51</span><div style="padding-top: 10px; padding-bottom: 5px;"><span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 10px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 10px 2px 10px; font-size: 10px;">Polars</span></div></div></td>
+  </tr>
 <tr class="gt_col_headings">
   <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-status_color"></th>
   <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-i"></th>
@@ -980,28 +1159,31 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </thead>
 <tbody class="gt_table_body">
   <tr>
-    <td style="height: 40px; background-color: #4CA64C; color: transparent;font-size: 0px;" class="gt_row gt_left">#4CA64C</td>
+    <td style="height: 40px; background-color: #4CA64C66; color: transparent;font-size: 0px;" class="gt_row gt_left">#4CA64C66</td>
     <td style="height: 40px; color: #666666;font-size: 13px;font-weight: bold;" class="gt_row gt_right">1</td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left">
         <div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
             <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
 <svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink">
-    <title>col_vals_ge</title>
+    <title>specially</title>
     <g id="All-Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="col_vals_ge" transform="translate(0.000000, 0.241379)">
+        <g id="specially" transform="translate(0.000000, 0.206897)">
             <path d="M56.712234,1 C59.1975153,1 61.4475153,2.00735931 63.076195,3.63603897 C64.7048747,5.26471863 65.712234,7.51471863 65.712234,10 L65.712234,10 L65.712234,65 L10.712234,65 C8.22695259,65 5.97695259,63.9926407 4.34827294,62.363961 C2.71959328,60.7352814 1.71223397,58.4852814 1.71223397,56 L1.71223397,56 L1.71223397,10 C1.71223397,7.51471863 2.71959328,5.26471863 4.34827294,3.63603897 C5.97695259,2.00735931 8.22695259,1 10.712234,1 L10.712234,1 Z" id="rectangle" stroke="#000000" stroke-width="2" fill="#FFFFFF"></path>
-            <path d="M49.712234,12 L17.712234,12 C14.952234,12 12.712234,14.24 12.712234,17 L12.712234,49 C12.712234,51.76 14.952234,54 17.712234,54 L49.712234,54 C52.472234,54 54.712234,51.76 54.712234,49 L54.712234,17 C54.712234,14.24 52.472234,12 49.712234,12 Z M44.712234,47 L22.712234,47 L22.712234,45 L44.712234,45 L44.712234,47 Z M24.182234,40.88 L23.242234,39.12 L40.562234,30 L23.242234,20.88 L24.182234,19.12 L44.862234,30 L24.182234,40.88 Z" id="greater_than_equal" fill="#000000" fill-rule="nonzero"></path>
+            <g id="star" transform="translate(8.500000, 8.500000)" fill="#000000" fill-rule="nonzero">
+                <path d="M25,0 C24.5874484,0 24.2174517,0.254002847 24.068359,0.6386719 L17.902344,16.535156 L0.94921875,17.400391 C0.536124409,17.4213013 0.17852458,17.6943523 0.0495446395,18.0873515 C-0.0794353012,18.4803507 0.046820452,18.9122002 0.3671875,19.173828 L13.568359,29.966797 L9.2324219,46.34375 C9.12646963,46.7428009 9.27663058,47.1659433 9.61042698,47.4089402 C9.94422338,47.651937 10.3930345,47.664834 10.740234,47.441406 L25,38.289062 L39.259766,47.441406 C39.6069655,47.6648339 40.0557766,47.6519369 40.3895729,47.4089401 C40.7233693,47.1659432 40.8735302,46.7428009 40.767578,46.34375 L36.431641,29.966797 L49.632812,19.173828 C49.953179,18.9122002 50.0794348,18.4803507 49.9504549,18.0873516 C49.821475,17.6943524 49.4638753,17.4213014 49.050781,17.400391 L32.097656,16.535156 L25.931641,0.6386719 C25.7825483,0.254002847 25.4125516,0 25,0 Z M25,3.7636719 L30.466797,17.861328 C30.609689,18.2291416 30.9554962,18.4785515 31.349609,18.498047 L46.359375,19.265625 L34.667969,28.826172 C34.3646054,29.0742114 34.2340493,29.4765679 34.333984,29.855469 L38.175781,44.369141 L25.541016,36.257812 C25.2114789,36.0458536 24.7885211,36.0458536 24.458984,36.257812 L11.824219,44.369141 L15.666016,29.855469 C15.7659507,29.4765679 15.6353946,29.0742114 15.332031,28.826172 L3.640625,19.265625 L18.650391,18.498047 C19.0445038,18.4785515 19.390311,18.2291416 19.533203,17.861328 L25,3.7636719 Z" id="Shape"></path>
+            </g>
         </g>
     </g>
 </svg>
         </div>
         <div style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size: 11px; display: inline-block; vertical-align: middle;">
-            <div>col_vals_ge()</div>
+            <div>specially()</div>
         </div>
-        
+        <div style="font-size: 9px; font-family: 'IBM Plex Sans'; text-wrap: balance; margin-top: 3px;"><p>Check Pointblank version <code>&gt;=0.9.0</code>.</p>
+</div>
         </td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">hours_2022</td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">0</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left"></td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">EXPR</td>
     <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" class="gt_row gt_center"><svg width="25px" height="25px" viewbox="0 0 25 25" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="vertical-align: middle;">
     <g id="unchanged" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="unchanged" transform="translate(0.500000, 0.570147)">
@@ -1012,221 +1194,22 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     </g>
 </svg></td>
     <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" class="gt_row gt_center"><span style="color:#4CA64C;">✓</span></td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_right">3</td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">3<br>1.00</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_right">1</td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">0<br>0.00</td>
-    <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" class="gt_row gt_center">—</td>
-    <td style="height: 40px; background-color: #FCFCFC;" class="gt_row gt_center">—</td>
-    <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" class="gt_row gt_center">—</td>
-    <td style="height: 40px;" class="gt_row gt_center">—</td>
-  </tr>
-  <tr>
-    <td style="height: 40px; background-color: #4CA64C; color: transparent;font-size: 0px;" class="gt_row gt_left">#4CA64C</td>
-    <td style="height: 40px; color: #666666;font-size: 13px;font-weight: bold;" class="gt_row gt_right">2</td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left">
-        <div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
-            <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
-<svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink">
-    <title>col_vals_ge</title>
-    <g id="All-Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="col_vals_ge" transform="translate(0.000000, 0.241379)">
-            <path d="M56.712234,1 C59.1975153,1 61.4475153,2.00735931 63.076195,3.63603897 C64.7048747,5.26471863 65.712234,7.51471863 65.712234,10 L65.712234,10 L65.712234,65 L10.712234,65 C8.22695259,65 5.97695259,63.9926407 4.34827294,62.363961 C2.71959328,60.7352814 1.71223397,58.4852814 1.71223397,56 L1.71223397,56 L1.71223397,10 C1.71223397,7.51471863 2.71959328,5.26471863 4.34827294,3.63603897 C5.97695259,2.00735931 8.22695259,1 10.712234,1 L10.712234,1 Z" id="rectangle" stroke="#000000" stroke-width="2" fill="#FFFFFF"></path>
-            <path d="M49.712234,12 L17.712234,12 C14.952234,12 12.712234,14.24 12.712234,17 L12.712234,49 C12.712234,51.76 14.952234,54 17.712234,54 L49.712234,54 C52.472234,54 54.712234,51.76 54.712234,49 L54.712234,17 C54.712234,14.24 52.472234,12 49.712234,12 Z M44.712234,47 L22.712234,47 L22.712234,45 L44.712234,45 L44.712234,47 Z M24.182234,40.88 L23.242234,39.12 L40.562234,30 L23.242234,20.88 L24.182234,19.12 L44.862234,30 L24.182234,40.88 Z" id="greater_than_equal" fill="#000000" fill-rule="nonzero"></path>
-        </g>
-    </g>
-</svg>
-        </div>
-        <div style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size: 11px; display: inline-block; vertical-align: middle;">
-            <div>col_vals_ge()</div>
-        </div>
-        
-        </td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">hours_2023</td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">0</td>
-    <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" class="gt_row gt_center"><svg width="25px" height="25px" viewbox="0 0 25 25" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="vertical-align: middle;">
-    <g id="unchanged" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="unchanged" transform="translate(0.500000, 0.570147)">
-            <rect id="Rectangle" x="0.125132506" y="0" width="23.749735" height="23.7894737"></rect>
-            <path d="M5.80375046,8.18194736 C3.77191832,8.18194736 2.11875046,9.83495328 2.11875046,11.8669474 C2.11875046,13.8989414 3.77191832,15.5519474 5.80375046,15.5519474 C7.8355826,15.5519474 9.48875046,13.8989414 9.48875046,11.8669474 C9.48875046,9.83495328 7.83552863,8.18194736 5.80375046,8.18194736 Z M5.80375046,14.814915 C4.17821997,14.814915 2.85578285,13.4924778 2.85578285,11.8669474 C2.85578285,10.2414169 4.17821997,8.91897975 5.80375046,8.91897975 C7.42928095,8.91897975 8.75171807,10.2414169 8.75171807,11.8669474 C8.75171807,13.4924778 7.42928095,14.814915 5.80375046,14.814915 Z" id="Shape" fill="#000000" fill-rule="nonzero"></path>
-            <path d="M13.9638189,8.699335 C13.9364621,8.70430925 13.9091059,8.71176968 13.8842359,8.71923074 C13.7822704,8.73663967 13.6877654,8.77643115 13.6056956,8.83860518 L10.2433156,11.3852598 C10.0766886,11.5046343 9.97720993,11.6986181 9.97720993,11.9025491 C9.97720993,12.1064807 10.0766886,12.3004639 10.2433156,12.4198383 L13.6056956,14.966493 C13.891697,15.1803725 14.2970729,15.1231721 14.5109517,14.8371707 C14.7248313,14.5511692 14.6676309,14.145794 14.3816294,13.9319145 L12.5313257,12.5392127 L21.8812495,12.5392127 L21.8812495,11.2658854 L12.5313257,11.2658854 L14.3816294,9.87318364 C14.6377872,9.71650453 14.7497006,9.40066014 14.6477351,9.11714553 C14.5482564,8.83363156 14.262255,8.65954352 13.9638189,8.699335 Z" id="arrow" fill="#000000" transform="translate(15.929230, 11.894737) rotate(-180.000000) translate(-15.929230, -11.894737) "></path>
-        </g>
-    </g>
-</svg></td>
-    <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" class="gt_row gt_center"><span style="color:#4CA64C;">✓</span></td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_right">3</td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">3<br>1.00</td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">0<br>0.00</td>
-    <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" class="gt_row gt_center">—</td>
-    <td style="height: 40px; background-color: #FCFCFC;" class="gt_row gt_center">—</td>
-    <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" class="gt_row gt_center">—</td>
-    <td style="height: 40px;" class="gt_row gt_center">—</td>
-  </tr>
-  <tr>
-    <td style="height: 40px; background-color: #4CA64C; color: transparent;font-size: 0px;" class="gt_row gt_left">#4CA64C</td>
-    <td style="height: 40px; color: #666666;font-size: 13px;font-weight: bold;" class="gt_row gt_right">3</td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left">
-        <div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
-            <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
-<svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink">
-    <title>col_vals_ge</title>
-    <g id="All-Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="col_vals_ge" transform="translate(0.000000, 0.241379)">
-            <path d="M56.712234,1 C59.1975153,1 61.4475153,2.00735931 63.076195,3.63603897 C64.7048747,5.26471863 65.712234,7.51471863 65.712234,10 L65.712234,10 L65.712234,65 L10.712234,65 C8.22695259,65 5.97695259,63.9926407 4.34827294,62.363961 C2.71959328,60.7352814 1.71223397,58.4852814 1.71223397,56 L1.71223397,56 L1.71223397,10 C1.71223397,7.51471863 2.71959328,5.26471863 4.34827294,3.63603897 C5.97695259,2.00735931 8.22695259,1 10.712234,1 L10.712234,1 Z" id="rectangle" stroke="#000000" stroke-width="2" fill="#FFFFFF"></path>
-            <path d="M49.712234,12 L17.712234,12 C14.952234,12 12.712234,14.24 12.712234,17 L12.712234,49 C12.712234,51.76 14.952234,54 17.712234,54 L49.712234,54 C52.472234,54 54.712234,51.76 54.712234,49 L54.712234,17 C54.712234,14.24 52.472234,12 49.712234,12 Z M44.712234,47 L22.712234,47 L22.712234,45 L44.712234,45 L44.712234,47 Z M24.182234,40.88 L23.242234,39.12 L40.562234,30 L23.242234,20.88 L24.182234,19.12 L44.862234,30 L24.182234,40.88 Z" id="greater_than_equal" fill="#000000" fill-rule="nonzero"></path>
-        </g>
-    </g>
-</svg>
-        </div>
-        <div style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size: 11px; display: inline-block; vertical-align: middle;">
-            <div>col_vals_ge()</div>
-        </div>
-        
-        </td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">hours_2024</td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">0</td>
-    <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" class="gt_row gt_center"><svg width="25px" height="25px" viewbox="0 0 25 25" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="vertical-align: middle;">
-    <g id="unchanged" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="unchanged" transform="translate(0.500000, 0.570147)">
-            <rect id="Rectangle" x="0.125132506" y="0" width="23.749735" height="23.7894737"></rect>
-            <path d="M5.80375046,8.18194736 C3.77191832,8.18194736 2.11875046,9.83495328 2.11875046,11.8669474 C2.11875046,13.8989414 3.77191832,15.5519474 5.80375046,15.5519474 C7.8355826,15.5519474 9.48875046,13.8989414 9.48875046,11.8669474 C9.48875046,9.83495328 7.83552863,8.18194736 5.80375046,8.18194736 Z M5.80375046,14.814915 C4.17821997,14.814915 2.85578285,13.4924778 2.85578285,11.8669474 C2.85578285,10.2414169 4.17821997,8.91897975 5.80375046,8.91897975 C7.42928095,8.91897975 8.75171807,10.2414169 8.75171807,11.8669474 C8.75171807,13.4924778 7.42928095,14.814915 5.80375046,14.814915 Z" id="Shape" fill="#000000" fill-rule="nonzero"></path>
-            <path d="M13.9638189,8.699335 C13.9364621,8.70430925 13.9091059,8.71176968 13.8842359,8.71923074 C13.7822704,8.73663967 13.6877654,8.77643115 13.6056956,8.83860518 L10.2433156,11.3852598 C10.0766886,11.5046343 9.97720993,11.6986181 9.97720993,11.9025491 C9.97720993,12.1064807 10.0766886,12.3004639 10.2433156,12.4198383 L13.6056956,14.966493 C13.891697,15.1803725 14.2970729,15.1231721 14.5109517,14.8371707 C14.7248313,14.5511692 14.6676309,14.145794 14.3816294,13.9319145 L12.5313257,12.5392127 L21.8812495,12.5392127 L21.8812495,11.2658854 L12.5313257,11.2658854 L14.3816294,9.87318364 C14.6377872,9.71650453 14.7497006,9.40066014 14.6477351,9.11714553 C14.5482564,8.83363156 14.262255,8.65954352 13.9638189,8.699335 Z" id="arrow" fill="#000000" transform="translate(15.929230, 11.894737) rotate(-180.000000) translate(-15.929230, -11.894737) "></path>
-        </g>
-    </g>
-</svg></td>
-    <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" class="gt_row gt_center"><span style="color:#4CA64C;">✓</span></td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_right">3</td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">3<br>1.00</td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">0<br>0.00</td>
-    <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" class="gt_row gt_center">—</td>
-    <td style="height: 40px; background-color: #FCFCFC;" class="gt_row gt_center">—</td>
-    <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" class="gt_row gt_center">—</td>
-    <td style="height: 40px;" class="gt_row gt_center">—</td>
-  </tr>
-  <tr>
-    <td style="height: 40px; background-color: #4CA64C; color: transparent;font-size: 0px;" class="gt_row gt_left">#4CA64C</td>
-    <td style="height: 40px; color: #666666;font-size: 13px;font-weight: bold;" class="gt_row gt_right">4</td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left">
-        <div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
-            <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
-<svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink">
-    <title>col_vals_ge</title>
-    <g id="All-Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="col_vals_ge" transform="translate(0.000000, 0.241379)">
-            <path d="M56.712234,1 C59.1975153,1 61.4475153,2.00735931 63.076195,3.63603897 C64.7048747,5.26471863 65.712234,7.51471863 65.712234,10 L65.712234,10 L65.712234,65 L10.712234,65 C8.22695259,65 5.97695259,63.9926407 4.34827294,62.363961 C2.71959328,60.7352814 1.71223397,58.4852814 1.71223397,56 L1.71223397,56 L1.71223397,10 C1.71223397,7.51471863 2.71959328,5.26471863 4.34827294,3.63603897 C5.97695259,2.00735931 8.22695259,1 10.712234,1 L10.712234,1 Z" id="rectangle" stroke="#000000" stroke-width="2" fill="#FFFFFF"></path>
-            <path d="M49.712234,12 L17.712234,12 C14.952234,12 12.712234,14.24 12.712234,17 L12.712234,49 C12.712234,51.76 14.952234,54 17.712234,54 L49.712234,54 C52.472234,54 54.712234,51.76 54.712234,49 L54.712234,17 C54.712234,14.24 52.472234,12 49.712234,12 Z M44.712234,47 L22.712234,47 L22.712234,45 L44.712234,45 L44.712234,47 Z M24.182234,40.88 L23.242234,39.12 L40.562234,30 L23.242234,20.88 L24.182234,19.12 L44.862234,30 L24.182234,40.88 Z" id="greater_than_equal" fill="#000000" fill-rule="nonzero"></path>
-        </g>
-    </g>
-</svg>
-        </div>
-        <div style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size: 11px; display: inline-block; vertical-align: middle;">
-            <div>col_vals_ge()</div>
-        </div>
-        
-        </td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">paid_2022</td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">0</td>
-    <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" class="gt_row gt_center"><svg width="25px" height="25px" viewbox="0 0 25 25" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="vertical-align: middle;">
-    <g id="unchanged" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="unchanged" transform="translate(0.500000, 0.570147)">
-            <rect id="Rectangle" x="0.125132506" y="0" width="23.749735" height="23.7894737"></rect>
-            <path d="M5.80375046,8.18194736 C3.77191832,8.18194736 2.11875046,9.83495328 2.11875046,11.8669474 C2.11875046,13.8989414 3.77191832,15.5519474 5.80375046,15.5519474 C7.8355826,15.5519474 9.48875046,13.8989414 9.48875046,11.8669474 C9.48875046,9.83495328 7.83552863,8.18194736 5.80375046,8.18194736 Z M5.80375046,14.814915 C4.17821997,14.814915 2.85578285,13.4924778 2.85578285,11.8669474 C2.85578285,10.2414169 4.17821997,8.91897975 5.80375046,8.91897975 C7.42928095,8.91897975 8.75171807,10.2414169 8.75171807,11.8669474 C8.75171807,13.4924778 7.42928095,14.814915 5.80375046,14.814915 Z" id="Shape" fill="#000000" fill-rule="nonzero"></path>
-            <path d="M13.9638189,8.699335 C13.9364621,8.70430925 13.9091059,8.71176968 13.8842359,8.71923074 C13.7822704,8.73663967 13.6877654,8.77643115 13.6056956,8.83860518 L10.2433156,11.3852598 C10.0766886,11.5046343 9.97720993,11.6986181 9.97720993,11.9025491 C9.97720993,12.1064807 10.0766886,12.3004639 10.2433156,12.4198383 L13.6056956,14.966493 C13.891697,15.1803725 14.2970729,15.1231721 14.5109517,14.8371707 C14.7248313,14.5511692 14.6676309,14.145794 14.3816294,13.9319145 L12.5313257,12.5392127 L21.8812495,12.5392127 L21.8812495,11.2658854 L12.5313257,11.2658854 L14.3816294,9.87318364 C14.6377872,9.71650453 14.7497006,9.40066014 14.6477351,9.11714553 C14.5482564,8.83363156 14.262255,8.65954352 13.9638189,8.699335 Z" id="arrow" fill="#000000" transform="translate(15.929230, 11.894737) rotate(-180.000000) translate(-15.929230, -11.894737) "></path>
-        </g>
-    </g>
-</svg></td>
-    <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" class="gt_row gt_center"><span style="color:#4CA64C;">✓</span></td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_right">3</td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">3<br>1.00</td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">0<br>0.00</td>
-    <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" class="gt_row gt_center">—</td>
-    <td style="height: 40px; background-color: #FCFCFC;" class="gt_row gt_center">—</td>
-    <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" class="gt_row gt_center">—</td>
-    <td style="height: 40px;" class="gt_row gt_center">—</td>
-  </tr>
-  <tr>
-    <td style="height: 40px; background-color: #4CA64C; color: transparent;font-size: 0px;" class="gt_row gt_left">#4CA64C</td>
-    <td style="height: 40px; color: #666666;font-size: 13px;font-weight: bold;" class="gt_row gt_right">5</td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left">
-        <div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
-            <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
-<svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink">
-    <title>col_vals_ge</title>
-    <g id="All-Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="col_vals_ge" transform="translate(0.000000, 0.241379)">
-            <path d="M56.712234,1 C59.1975153,1 61.4475153,2.00735931 63.076195,3.63603897 C64.7048747,5.26471863 65.712234,7.51471863 65.712234,10 L65.712234,10 L65.712234,65 L10.712234,65 C8.22695259,65 5.97695259,63.9926407 4.34827294,62.363961 C2.71959328,60.7352814 1.71223397,58.4852814 1.71223397,56 L1.71223397,56 L1.71223397,10 C1.71223397,7.51471863 2.71959328,5.26471863 4.34827294,3.63603897 C5.97695259,2.00735931 8.22695259,1 10.712234,1 L10.712234,1 Z" id="rectangle" stroke="#000000" stroke-width="2" fill="#FFFFFF"></path>
-            <path d="M49.712234,12 L17.712234,12 C14.952234,12 12.712234,14.24 12.712234,17 L12.712234,49 C12.712234,51.76 14.952234,54 17.712234,54 L49.712234,54 C52.472234,54 54.712234,51.76 54.712234,49 L54.712234,17 C54.712234,14.24 52.472234,12 49.712234,12 Z M44.712234,47 L22.712234,47 L22.712234,45 L44.712234,45 L44.712234,47 Z M24.182234,40.88 L23.242234,39.12 L40.562234,30 L23.242234,20.88 L24.182234,19.12 L44.862234,30 L24.182234,40.88 Z" id="greater_than_equal" fill="#000000" fill-rule="nonzero"></path>
-        </g>
-    </g>
-</svg>
-        </div>
-        <div style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size: 11px; display: inline-block; vertical-align: middle;">
-            <div>col_vals_ge()</div>
-        </div>
-        
-        </td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">paid_2023</td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">0</td>
-    <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" class="gt_row gt_center"><svg width="25px" height="25px" viewbox="0 0 25 25" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="vertical-align: middle;">
-    <g id="unchanged" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="unchanged" transform="translate(0.500000, 0.570147)">
-            <rect id="Rectangle" x="0.125132506" y="0" width="23.749735" height="23.7894737"></rect>
-            <path d="M5.80375046,8.18194736 C3.77191832,8.18194736 2.11875046,9.83495328 2.11875046,11.8669474 C2.11875046,13.8989414 3.77191832,15.5519474 5.80375046,15.5519474 C7.8355826,15.5519474 9.48875046,13.8989414 9.48875046,11.8669474 C9.48875046,9.83495328 7.83552863,8.18194736 5.80375046,8.18194736 Z M5.80375046,14.814915 C4.17821997,14.814915 2.85578285,13.4924778 2.85578285,11.8669474 C2.85578285,10.2414169 4.17821997,8.91897975 5.80375046,8.91897975 C7.42928095,8.91897975 8.75171807,10.2414169 8.75171807,11.8669474 C8.75171807,13.4924778 7.42928095,14.814915 5.80375046,14.814915 Z" id="Shape" fill="#000000" fill-rule="nonzero"></path>
-            <path d="M13.9638189,8.699335 C13.9364621,8.70430925 13.9091059,8.71176968 13.8842359,8.71923074 C13.7822704,8.73663967 13.6877654,8.77643115 13.6056956,8.83860518 L10.2433156,11.3852598 C10.0766886,11.5046343 9.97720993,11.6986181 9.97720993,11.9025491 C9.97720993,12.1064807 10.0766886,12.3004639 10.2433156,12.4198383 L13.6056956,14.966493 C13.891697,15.1803725 14.2970729,15.1231721 14.5109517,14.8371707 C14.7248313,14.5511692 14.6676309,14.145794 14.3816294,13.9319145 L12.5313257,12.5392127 L21.8812495,12.5392127 L21.8812495,11.2658854 L12.5313257,11.2658854 L14.3816294,9.87318364 C14.6377872,9.71650453 14.7497006,9.40066014 14.6477351,9.11714553 C14.5482564,8.83363156 14.262255,8.65954352 13.9638189,8.699335 Z" id="arrow" fill="#000000" transform="translate(15.929230, 11.894737) rotate(-180.000000) translate(-15.929230, -11.894737) "></path>
-        </g>
-    </g>
-</svg></td>
-    <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" class="gt_row gt_center"><span style="color:#4CA64C;">✓</span></td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_right">3</td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">3<br>1.00</td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">0<br>0.00</td>
-    <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" class="gt_row gt_center">—</td>
-    <td style="height: 40px; background-color: #FCFCFC;" class="gt_row gt_center">—</td>
-    <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" class="gt_row gt_center">—</td>
-    <td style="height: 40px;" class="gt_row gt_center">—</td>
-  </tr>
-  <tr>
-    <td style="height: 40px; background-color: #4CA64C; color: transparent;font-size: 0px;" class="gt_row gt_left">#4CA64C</td>
-    <td style="height: 40px; color: #666666;font-size: 13px;font-weight: bold;" class="gt_row gt_right">6</td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left">
-        <div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
-            <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
-<svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink">
-    <title>col_vals_ge</title>
-    <g id="All-Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="col_vals_ge" transform="translate(0.000000, 0.241379)">
-            <path d="M56.712234,1 C59.1975153,1 61.4475153,2.00735931 63.076195,3.63603897 C64.7048747,5.26471863 65.712234,7.51471863 65.712234,10 L65.712234,10 L65.712234,65 L10.712234,65 C8.22695259,65 5.97695259,63.9926407 4.34827294,62.363961 C2.71959328,60.7352814 1.71223397,58.4852814 1.71223397,56 L1.71223397,56 L1.71223397,10 C1.71223397,7.51471863 2.71959328,5.26471863 4.34827294,3.63603897 C5.97695259,2.00735931 8.22695259,1 10.712234,1 L10.712234,1 Z" id="rectangle" stroke="#000000" stroke-width="2" fill="#FFFFFF"></path>
-            <path d="M49.712234,12 L17.712234,12 C14.952234,12 12.712234,14.24 12.712234,17 L12.712234,49 C12.712234,51.76 14.952234,54 17.712234,54 L49.712234,54 C52.472234,54 54.712234,51.76 54.712234,49 L54.712234,17 C54.712234,14.24 52.472234,12 49.712234,12 Z M44.712234,47 L22.712234,47 L22.712234,45 L44.712234,45 L44.712234,47 Z M24.182234,40.88 L23.242234,39.12 L40.562234,30 L23.242234,20.88 L24.182234,19.12 L44.862234,30 L24.182234,40.88 Z" id="greater_than_equal" fill="#000000" fill-rule="nonzero"></path>
-        </g>
-    </g>
-</svg>
-        </div>
-        <div style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size: 11px; display: inline-block; vertical-align: middle;">
-            <div>col_vals_ge()</div>
-        </div>
-        
-        </td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">paid_2024</td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">0</td>
-    <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" class="gt_row gt_center"><svg width="25px" height="25px" viewbox="0 0 25 25" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="vertical-align: middle;">
-    <g id="unchanged" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="unchanged" transform="translate(0.500000, 0.570147)">
-            <rect id="Rectangle" x="0.125132506" y="0" width="23.749735" height="23.7894737"></rect>
-            <path d="M5.80375046,8.18194736 C3.77191832,8.18194736 2.11875046,9.83495328 2.11875046,11.8669474 C2.11875046,13.8989414 3.77191832,15.5519474 5.80375046,15.5519474 C7.8355826,15.5519474 9.48875046,13.8989414 9.48875046,11.8669474 C9.48875046,9.83495328 7.83552863,8.18194736 5.80375046,8.18194736 Z M5.80375046,14.814915 C4.17821997,14.814915 2.85578285,13.4924778 2.85578285,11.8669474 C2.85578285,10.2414169 4.17821997,8.91897975 5.80375046,8.91897975 C7.42928095,8.91897975 8.75171807,10.2414169 8.75171807,11.8669474 C8.75171807,13.4924778 7.42928095,14.814915 5.80375046,14.814915 Z" id="Shape" fill="#000000" fill-rule="nonzero"></path>
-            <path d="M13.9638189,8.699335 C13.9364621,8.70430925 13.9091059,8.71176968 13.8842359,8.71923074 C13.7822704,8.73663967 13.6877654,8.77643115 13.6056956,8.83860518 L10.2433156,11.3852598 C10.0766886,11.5046343 9.97720993,11.6986181 9.97720993,11.9025491 C9.97720993,12.1064807 10.0766886,12.3004639 10.2433156,12.4198383 L13.6056956,14.966493 C13.891697,15.1803725 14.2970729,15.1231721 14.5109517,14.8371707 C14.7248313,14.5511692 14.6676309,14.145794 14.3816294,13.9319145 L12.5313257,12.5392127 L21.8812495,12.5392127 L21.8812495,11.2658854 L12.5313257,11.2658854 L14.3816294,9.87318364 C14.6377872,9.71650453 14.7497006,9.40066014 14.6477351,9.11714553 C14.5482564,8.83363156 14.262255,8.65954352 13.9638189,8.699335 Z" id="arrow" fill="#000000" transform="translate(15.929230, 11.894737) rotate(-180.000000) translate(-15.929230, -11.894737) "></path>
-        </g>
-    </g>
-</svg></td>
-    <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" class="gt_row gt_center"><span style="color:#4CA64C;">✓</span></td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_right">3</td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">3<br>1.00</td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">0<br>0.00</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">1<br>1.00</td>
     <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" class="gt_row gt_center">—</td>
     <td style="height: 40px; background-color: #FCFCFC;" class="gt_row gt_center">—</td>
     <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" class="gt_row gt_center">—</td>
     <td style="height: 40px;" class="gt_row gt_center">—</td>
   </tr>
 </tbody>
+  <tfoot class="gt_sourcenotes">
+  
+  <tr>
+    <td class="gt_sourcenote" colspan="14" style="text-align: left;"><div style="margin-top: 5px; margin-bottom: 5px;"><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin-left: 10px; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2025-05-06 02:05:51 UTC</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">&lt; 1 s</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 1px 5px -1px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2025-05-06 02:05:51 UTC</span></div></td>
+  </tr>
 
+</tfoot>
 
 </table>
 
@@ -1234,215 +1217,11 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
         
 </div>
 </div>
-<p>In the above example the <code>col()</code> function contains the invocation of the <code>numeric()</code> column selector function from Narwhals. As with the other selectors, this is not strictly necessary when using a single column selector, so <code>columns=ncs.numeric()</code> would also be fine here.</p>
-<p>Narwhals selectors can also use operators to combine multiple selectors. Here is an example of using the <code>numeric()</code> and <a href="../reference/matches.html#pointblank.matches"><code>matches()</code></a> selectors together to select all numeric columns that fit a specific pattern.</p>
-<div id="fbca56ce" class="cell" data-execution_count="6">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>tbl <span class="op">=</span> pl.DataFrame(</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    {</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"name"</span>: [<span class="st">"Alice"</span>, <span class="st">"Bob"</span>, <span class="st">"Charlie"</span>],</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>        <span class="st">"2022_status"</span>: [<span class="st">"ft"</span>, <span class="st">"ft"</span>, <span class="st">"pt"</span>],</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>        <span class="st">"2023_status"</span>: [<span class="st">"ft"</span>, <span class="st">"pt"</span>, <span class="st">"ft"</span>],</span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>        <span class="st">"2024_status"</span>: [<span class="st">"ft"</span>, <span class="st">"pt"</span>, <span class="st">"ft"</span>],</span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>        <span class="st">"2022_pay_total"</span>: [<span class="fl">18.62</span>, <span class="fl">16.95</span>, <span class="fl">18.25</span>],</span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>        <span class="st">"2023_pay_total"</span>: [<span class="fl">19.29</span>, <span class="fl">17.75</span>, <span class="fl">18.35</span>],</span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>        <span class="st">"2024_pay_total"</span>: [<span class="fl">20.73</span>, <span class="fl">18.35</span>, <span class="fl">20.10</span>],</span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>    }</span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
-<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
-<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>    .col_vals_lt(columns<span class="op">=</span>pb.col(ncs.numeric() <span class="op">&amp;</span> ncs.matches(<span class="st">"2023|2024"</span>)), value<span class="op">=</span><span class="dv">30</span>)</span>
-<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
-<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>validation</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="6">
-<div id="pb_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap');
-#pb_tbl table {
-          font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
-          -webkit-font-smoothing: antialiased;
-          -moz-osx-font-smoothing: grayscale;
-        }
-
-#pb_tbl thead, tbody, tfoot, tr, td, th { border-style: none; }
- tr { background-color: transparent; }
-#pb_tbl p { margin: 0; padding: 0; }
- #pb_tbl .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 90%; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: auto; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
- #pb_tbl .gt_caption { padding-top: 4px; padding-bottom: 4px; }
- #pb_tbl .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
- #pb_tbl .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
- #pb_tbl .gt_heading { background-color: #FFFFFF; text-align: left; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
- #pb_tbl .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
- #pb_tbl .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
- #pb_tbl .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
- #pb_tbl .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
- #pb_tbl .gt_column_spanner_outer:first-child { padding-left: 0; }
- #pb_tbl .gt_column_spanner_outer:last-child { padding-right: 0; }
- #pb_tbl .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
- #pb_tbl .gt_spanner_row { border-bottom-style: hidden; }
- #pb_tbl .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
- #pb_tbl .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
- #pb_tbl .gt_from_md> :first-child { margin-top: 0; }
- #pb_tbl .gt_from_md> :last-child { margin-bottom: 0; }
- #pb_tbl .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
- #pb_tbl .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
- #pb_tbl .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
- #pb_tbl .gt_row_group_first td { border-top-width: 2px; }
- #pb_tbl .gt_row_group_first th { border-top-width: 2px; }
- #pb_tbl .gt_striped { background-color: rgba(128,128,128,0.05); }
- #pb_tbl .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
- #pb_tbl .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
- #pb_tbl .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
- #pb_tbl .gt_left { text-align: left; }
- #pb_tbl .gt_center { text-align: center; }
- #pb_tbl .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
- #pb_tbl .gt_font_normal { font-weight: normal; }
- #pb_tbl .gt_font_bold { font-weight: bold; }
- #pb_tbl .gt_font_italic { font-style: italic; }
- #pb_tbl .gt_super { font-size: 65%; }
- #pb_tbl .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
- #pb_tbl .gt_asterisk { font-size: 100%; vertical-align: 0; }
- 
-</style>
-<table style="table-layout: fixed;; width: 0px" class="gt_table" data-quarto-disable-processing="true" data-quarto-bootstrap="false">
-<colgroup>
-  <col style="width:4px;">
-  <col style="width:35px;">
-  <col style="width:190px;">
-  <col style="width:120px;">
-  <col style="width:120px;">
-  <col style="width:50px;">
-  <col style="width:50px;">
-  <col style="width:60px;">
-  <col style="width:60px;">
-  <col style="width:60px;">
-  <col style="width:30px;">
-  <col style="width:30px;">
-  <col style="width:30px;">
-  <col style="width:65px;">
-</colgroup>
-
-<thead>
-
-<tr class="gt_col_headings">
-  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-status_color"></th>
-  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-i"></th>
-  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-type_upd">STEP</th>
-  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-columns_upd">COLUMNS</th>
-  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-values_upd">VALUES</th>
-  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-tbl">TBL</th>
-  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-eval">EVAL</th>
-  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-test_units">UNITS</th>
-  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-pass">PASS</th>
-  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-fail">FAIL</th>
-  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-w_upd">W</th>
-  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-e_upd">E</th>
-  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-c_upd">C</th>
-  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-extract_upd">EXT</th>
-</tr>
-</thead>
-<tbody class="gt_table_body">
-  <tr>
-    <td style="height: 40px; background-color: #4CA64C; color: transparent;font-size: 0px;" class="gt_row gt_left">#4CA64C</td>
-    <td style="height: 40px; color: #666666;font-size: 13px;font-weight: bold;" class="gt_row gt_right">1</td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left">
-        <div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
-            <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
-<svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink">
-    <title>col_vals_lt</title>
-    <g id="All-Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="col_vals_lt" transform="translate(0.000000, 0.310345)">
-            <path d="M56.712234,1 C59.1975153,1 61.4475153,2.00735931 63.076195,3.63603897 C64.7048747,5.26471863 65.712234,7.51471863 65.712234,10 L65.712234,10 L65.712234,65 L10.712234,65 C8.22695259,65 5.97695259,63.9926407 4.34827294,62.363961 C2.71959328,60.7352814 1.71223397,58.4852814 1.71223397,56 L1.71223397,56 L1.71223397,10 C1.71223397,7.51471863 2.71959328,5.26471863 4.34827294,3.63603897 C5.97695259,2.00735931 8.22695259,1 10.712234,1 L10.712234,1 Z" id="rectangle" stroke="#000000" stroke-width="2" fill="#FFFFFF"></path>
-            <path d="M52.712234,11 L14.712234,11 C13.05989,11 11.712234,12.347656 11.712234,14 L11.712234,52 C11.712234,53.652344 13.05989,55 14.712234,55 L52.712234,55 C54.364578,55 55.712234,53.652344 55.712234,52 L55.712234,14 C55.712234,12.347656 54.364578,11 52.712234,11 Z M40.419265,46.292969 L39.005203,47.707031 L24.298172,33 L39.005203,18.292969 L40.419265,19.707031 L27.126297,33 L40.419265,46.292969 Z" id="less_than" fill="#000000" fill-rule="nonzero"></path>
-        </g>
-    </g>
-</svg>
-        </div>
-        <div style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size: 11px; display: inline-block; vertical-align: middle;">
-            <div>col_vals_lt()</div>
-        </div>
-        
-        </td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">2023_pay_total</td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">30</td>
-    <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" class="gt_row gt_center"><svg width="25px" height="25px" viewbox="0 0 25 25" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="vertical-align: middle;">
-    <g id="unchanged" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="unchanged" transform="translate(0.500000, 0.570147)">
-            <rect id="Rectangle" x="0.125132506" y="0" width="23.749735" height="23.7894737"></rect>
-            <path d="M5.80375046,8.18194736 C3.77191832,8.18194736 2.11875046,9.83495328 2.11875046,11.8669474 C2.11875046,13.8989414 3.77191832,15.5519474 5.80375046,15.5519474 C7.8355826,15.5519474 9.48875046,13.8989414 9.48875046,11.8669474 C9.48875046,9.83495328 7.83552863,8.18194736 5.80375046,8.18194736 Z M5.80375046,14.814915 C4.17821997,14.814915 2.85578285,13.4924778 2.85578285,11.8669474 C2.85578285,10.2414169 4.17821997,8.91897975 5.80375046,8.91897975 C7.42928095,8.91897975 8.75171807,10.2414169 8.75171807,11.8669474 C8.75171807,13.4924778 7.42928095,14.814915 5.80375046,14.814915 Z" id="Shape" fill="#000000" fill-rule="nonzero"></path>
-            <path d="M13.9638189,8.699335 C13.9364621,8.70430925 13.9091059,8.71176968 13.8842359,8.71923074 C13.7822704,8.73663967 13.6877654,8.77643115 13.6056956,8.83860518 L10.2433156,11.3852598 C10.0766886,11.5046343 9.97720993,11.6986181 9.97720993,11.9025491 C9.97720993,12.1064807 10.0766886,12.3004639 10.2433156,12.4198383 L13.6056956,14.966493 C13.891697,15.1803725 14.2970729,15.1231721 14.5109517,14.8371707 C14.7248313,14.5511692 14.6676309,14.145794 14.3816294,13.9319145 L12.5313257,12.5392127 L21.8812495,12.5392127 L21.8812495,11.2658854 L12.5313257,11.2658854 L14.3816294,9.87318364 C14.6377872,9.71650453 14.7497006,9.40066014 14.6477351,9.11714553 C14.5482564,8.83363156 14.262255,8.65954352 13.9638189,8.699335 Z" id="arrow" fill="#000000" transform="translate(15.929230, 11.894737) rotate(-180.000000) translate(-15.929230, -11.894737) "></path>
-        </g>
-    </g>
-</svg></td>
-    <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" class="gt_row gt_center"><span style="color:#4CA64C;">✓</span></td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_right">3</td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">3<br>1.00</td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">0<br>0.00</td>
-    <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" class="gt_row gt_center">—</td>
-    <td style="height: 40px; background-color: #FCFCFC;" class="gt_row gt_center">—</td>
-    <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" class="gt_row gt_center">—</td>
-    <td style="height: 40px;" class="gt_row gt_center">—</td>
-  </tr>
-  <tr>
-    <td style="height: 40px; background-color: #4CA64C; color: transparent;font-size: 0px;" class="gt_row gt_left">#4CA64C</td>
-    <td style="height: 40px; color: #666666;font-size: 13px;font-weight: bold;" class="gt_row gt_right">2</td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left">
-        <div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
-            <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
-<svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink">
-    <title>col_vals_lt</title>
-    <g id="All-Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="col_vals_lt" transform="translate(0.000000, 0.310345)">
-            <path d="M56.712234,1 C59.1975153,1 61.4475153,2.00735931 63.076195,3.63603897 C64.7048747,5.26471863 65.712234,7.51471863 65.712234,10 L65.712234,10 L65.712234,65 L10.712234,65 C8.22695259,65 5.97695259,63.9926407 4.34827294,62.363961 C2.71959328,60.7352814 1.71223397,58.4852814 1.71223397,56 L1.71223397,56 L1.71223397,10 C1.71223397,7.51471863 2.71959328,5.26471863 4.34827294,3.63603897 C5.97695259,2.00735931 8.22695259,1 10.712234,1 L10.712234,1 Z" id="rectangle" stroke="#000000" stroke-width="2" fill="#FFFFFF"></path>
-            <path d="M52.712234,11 L14.712234,11 C13.05989,11 11.712234,12.347656 11.712234,14 L11.712234,52 C11.712234,53.652344 13.05989,55 14.712234,55 L52.712234,55 C54.364578,55 55.712234,53.652344 55.712234,52 L55.712234,14 C55.712234,12.347656 54.364578,11 52.712234,11 Z M40.419265,46.292969 L39.005203,47.707031 L24.298172,33 L39.005203,18.292969 L40.419265,19.707031 L27.126297,33 L40.419265,46.292969 Z" id="less_than" fill="#000000" fill-rule="nonzero"></path>
-        </g>
-    </g>
-</svg>
-        </div>
-        <div style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size: 11px; display: inline-block; vertical-align: middle;">
-            <div>col_vals_lt()</div>
-        </div>
-        
-        </td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">2024_pay_total</td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">30</td>
-    <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" class="gt_row gt_center"><svg width="25px" height="25px" viewbox="0 0 25 25" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="vertical-align: middle;">
-    <g id="unchanged" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="unchanged" transform="translate(0.500000, 0.570147)">
-            <rect id="Rectangle" x="0.125132506" y="0" width="23.749735" height="23.7894737"></rect>
-            <path d="M5.80375046,8.18194736 C3.77191832,8.18194736 2.11875046,9.83495328 2.11875046,11.8669474 C2.11875046,13.8989414 3.77191832,15.5519474 5.80375046,15.5519474 C7.8355826,15.5519474 9.48875046,13.8989414 9.48875046,11.8669474 C9.48875046,9.83495328 7.83552863,8.18194736 5.80375046,8.18194736 Z M5.80375046,14.814915 C4.17821997,14.814915 2.85578285,13.4924778 2.85578285,11.8669474 C2.85578285,10.2414169 4.17821997,8.91897975 5.80375046,8.91897975 C7.42928095,8.91897975 8.75171807,10.2414169 8.75171807,11.8669474 C8.75171807,13.4924778 7.42928095,14.814915 5.80375046,14.814915 Z" id="Shape" fill="#000000" fill-rule="nonzero"></path>
-            <path d="M13.9638189,8.699335 C13.9364621,8.70430925 13.9091059,8.71176968 13.8842359,8.71923074 C13.7822704,8.73663967 13.6877654,8.77643115 13.6056956,8.83860518 L10.2433156,11.3852598 C10.0766886,11.5046343 9.97720993,11.6986181 9.97720993,11.9025491 C9.97720993,12.1064807 10.0766886,12.3004639 10.2433156,12.4198383 L13.6056956,14.966493 C13.891697,15.1803725 14.2970729,15.1231721 14.5109517,14.8371707 C14.7248313,14.5511692 14.6676309,14.145794 14.3816294,13.9319145 L12.5313257,12.5392127 L21.8812495,12.5392127 L21.8812495,11.2658854 L12.5313257,11.2658854 L14.3816294,9.87318364 C14.6377872,9.71650453 14.7497006,9.40066014 14.6477351,9.11714553 C14.5482564,8.83363156 14.262255,8.65954352 13.9638189,8.699335 Z" id="arrow" fill="#000000" transform="translate(15.929230, 11.894737) rotate(-180.000000) translate(-15.929230, -11.894737) "></path>
-        </g>
-    </g>
-</svg></td>
-    <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" class="gt_row gt_center"><span style="color:#4CA64C;">✓</span></td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_right">3</td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">3<br>1.00</td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">0<br>0.00</td>
-    <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" class="gt_row gt_center">—</td>
-    <td style="height: 40px; background-color: #FCFCFC;" class="gt_row gt_center">—</td>
-    <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" class="gt_row gt_center">—</td>
-    <td style="height: 40px;" class="gt_row gt_center">—</td>
-  </tr>
-</tbody>
+<p>This pattern shows how to validate external dependencies or environment conditions as part of your validation workflow. Notice that the function doesn’t take any parameters at all, which makes it cleaner when the validation doesn’t need to access the data table.</p>
+<p>By combining these patterns, you can create sophisticated validation workflows that address virtually any data quality requirement in your organization.</p>
 
 
-</table>
-
-</div>
-        
-</div>
-</div>
-<p>In the above example the <code>col()</code> function contains the invocation of the <code>numeric()</code> and <a href="../reference/matches.html#pointblank.matches"><code>matches()</code></a> column selector functions from Narwhals, combined with the <code>&amp;</code> operator. This is necessary to specify the set of columns that are numeric <em>and</em> match the text <code>"2023"</code> or <code>"2024"</code>.</p>
 </section>
-<section id="see-also" class="level2 doc-section doc-section-see-also">
-<h2 class="doc-section doc-section-see-also anchored" data-anchor-id="see-also">See Also</h2>
-<p>Create a column expression for use in <code>conjointly()</code> validation with the <a href="../reference/expr_col.html#pointblank.expr_col"><code>expr_col()</code></a> function.</p>
-
-
 </section>
 
 </main> <!-- /main -->

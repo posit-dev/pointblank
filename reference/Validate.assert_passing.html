@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.7.29">
+<meta name="generator" content="quarto-1.7.30">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -72,7 +72,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-0815c480559380816a4d1ea211a47e91.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-de070a7b0ab54f8780927367ac907214.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="../site_libs/bootstrap/bootstrap-1dec5c2fef7f1f93b464a6639e84b1a5.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
@@ -221,7 +221,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="examples" class="level2 doc-section doc-section-examples">
 <h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>In the example below, we’ll use a simple Polars DataFrame with three columns (<code>a</code>, <code>b</code>, and <code>c</code>). There will be three validation steps, and the second step will have a failing test unit (the value <code>10</code> isn’t less than <code>9</code>). After interrogation, the <code>assert_passing()</code> method is used to assert that all validation steps passed perfectly.</p>
-<div id="674f4b02" class="cell" data-execution_count="1">
+<div id="3ecf016f" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -246,7 +246,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <div class="ansi-escaped-output">
 <pre><span class="ansi-red-fg">---------------------------------------------------------------------------</span>
 <span class="ansi-red-fg">AssertionError</span>                            Traceback (most recent call last)
-<span class="ansi-green-fg">/tmp/ipykernel_3628/335715443.py</span> in <span class="ansi-cyan-fg">?</span><span class="ansi-blue-fg">()</span>
+<span class="ansi-green-fg">/tmp/ipykernel_3632/335715443.py</span> in <span class="ansi-cyan-fg">?</span><span class="ansi-blue-fg">()</span>
 <span class="ansi-green-fg ansi-bold">     16</span>     <span class="ansi-blue-fg">.</span>col_vals_in_set<span class="ansi-blue-fg">(</span>columns<span class="ansi-blue-fg">=</span><span class="ansi-blue-fg">"c"</span><span class="ansi-blue-fg">,</span> set<span class="ansi-blue-fg">=</span><span class="ansi-blue-fg">[</span><span class="ansi-blue-fg">"a"</span><span class="ansi-blue-fg">,</span> <span class="ansi-blue-fg">"b"</span><span class="ansi-blue-fg">]</span><span class="ansi-blue-fg">)</span>
 <span class="ansi-green-fg ansi-bold">     17</span>     <span class="ansi-blue-fg">.</span>interrogate<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span>
 <span class="ansi-green-fg ansi-bold">     18</span> )
@@ -254,11 +254,11 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <span class="ansi-green-fg">---&gt; 20</span><span class="ansi-red-fg"> </span>validation<span class="ansi-blue-fg">.</span>assert_passing<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span>
 
 <span class="ansi-green-fg">/opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/pointblank/validate.py</span> in <span class="ansi-cyan-fg">?</span><span class="ansi-blue-fg">(self)</span>
-<span class="ansi-green-fg ansi-bold">   8421</span>             ]
-<span class="ansi-green-fg ansi-bold">   8422</span>             msg = "The following assertions failed:\n" + "\n".join(
-<span class="ansi-green-fg ansi-bold">   8423</span>                 <span class="ansi-blue-fg">[</span><span class="ansi-blue-fg">f"- Step {i + 1}: {autobrief}"</span> <span class="ansi-green-fg">for</span> i<span class="ansi-blue-fg">,</span> autobrief <span class="ansi-green-fg">in</span> failed_steps<span class="ansi-blue-fg">]</span>
-<span class="ansi-green-fg ansi-bold">   8424</span>             )
-<span class="ansi-green-fg">-&gt; 8425</span><span class="ansi-red-fg">             </span><span class="ansi-green-fg">raise</span> AssertionError<span class="ansi-blue-fg">(</span>msg<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-fg ansi-bold">   8790</span>             ]
+<span class="ansi-green-fg ansi-bold">   8791</span>             msg = "The following assertions failed:\n" + "\n".join(
+<span class="ansi-green-fg ansi-bold">   8792</span>                 <span class="ansi-blue-fg">[</span><span class="ansi-blue-fg">f"- Step {i + 1}: {autobrief}"</span> <span class="ansi-green-fg">for</span> i<span class="ansi-blue-fg">,</span> autobrief <span class="ansi-green-fg">in</span> failed_steps<span class="ansi-blue-fg">]</span>
+<span class="ansi-green-fg ansi-bold">   8793</span>             )
+<span class="ansi-green-fg">-&gt; 8794</span><span class="ansi-red-fg">             </span><span class="ansi-green-fg">raise</span> AssertionError<span class="ansi-blue-fg">(</span>msg<span class="ansi-blue-fg">)</span>
 
 <span class="ansi-red-fg">AssertionError</span>: The following assertions failed:
 - Step 2: Expect that values in `b` should be &lt; `9`.</pre>
