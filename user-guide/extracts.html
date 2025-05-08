@@ -411,7 +411,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <p>Let’s explore each approach using examples.</p>
 <p><em>Data Extracts as CSV Data in the Validation Report</em></p>
 <p>Data extracts are embedded within validation report tables. Let’s look at an example, using the <code>small_table</code> dataset, where data extracts are collected in a single validation step due to failing test units:</p>
-<div id="bf83214f" class="cell" data-execution_count="2">
+<div id="118f5daa" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
@@ -572,7 +572,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <p>Access to CSV data for the row-based errors is useful when the validation report is shared with other data quality stakeholders, since it is easily accessible and doesn’t require further use of Pointblank. The stakeholder can simply open the downloaded CSV in their preferred spreadsheet software, import it into a different analysis environment like R or Julia, or process it with any tool that supports CSV files. This cross-platform compatibility makes the CSV export particularly valuable in mixed-language data teams where different members might be working with different tools.</p>
 <p><em>Using the <code>get_data_extracts()</code> Method</em></p>
 <p>For programmatic access to data extracts, Pointblank provides the <a href="https://posit-dev.github.io/pointblank/reference/Validate.get_data_extracts.html"><code>get_data_extracts()</code></a> method. This allows you to work with extract data directly in your Python workflow:</p>
-<div id="56944aac" class="cell" data-execution_count="3">
+<div id="af42eb07" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get data extracts from step 1</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>extract_1 <span class="op">=</span> validation.get_data_extracts(i<span class="op">=</span><span class="dv">1</span>, frame<span class="op">=</span><span class="va">True</span>)</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -598,7 +598,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </ul>
 <p><em>Direct Access via Step Reports</em></p>
 <p>Step reports provide another way to access and visualize failing data. When you generate a step report for a validation step that has failing rows, those failing rows are displayed directly in the report:</p>
-<div id="ca2cef50" class="cell" data-execution_count="4">
+<div id="f231775f" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get a step report for the first validation step</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>step_report <span class="op">=</span> validation.get_step_report(i<span class="op">=</span><span class="dv">1</span>)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -745,7 +745,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <li>include additional metadata about the validation step and failure statistics</li>
 </ol>
 <p>For steps with many failures, you can customize how many rows to display:</p>
-<div id="911d85c2" class="cell" data-execution_count="5">
+<div id="67ded5ec" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Limit to just 2 rows of failing data</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>limited_report <span class="op">=</span> validation.get_step_report(i<span class="op">=</span><span class="dv">1</span>, limit<span class="op">=</span><span class="dv">2</span>)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -868,7 +868,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="viewing-data-extracts-with-preview" class="level2">
 <h2 class="anchored" data-anchor-id="viewing-data-extracts-with-preview">Viewing Data Extracts with <code>preview()</code></h2>
 <p>To get a consistent HTML representation of any data extract (regardless of the table type), we can use the <a href="https://posit-dev.github.io/pointblank/reference/preview.html"><code>preview()</code></a> function:</p>
-<div id="d3eed9e3" class="cell" data-execution_count="6">
+<div id="a3b8e53a" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>pb.preview(data<span class="op">=</span>extract_1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="6">
 <div id="pb_preview_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
@@ -1011,7 +1011,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="working-with-multiple-validation-steps" class="level2">
 <h2 class="anchored" data-anchor-id="working-with-multiple-validation-steps">Working with Multiple Validation Steps</h2>
 <p>When validating data with multiple steps, you can extract failing rows from any step:</p>
-<div id="a38097d0" class="cell" data-execution_count="7">
+<div id="0d26f55f" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a validation with multiple steps</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>multi_validation <span class="op">=</span> (</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>pb.load_dataset(dataset<span class="op">=</span><span class="st">"small_table"</span>, tbl_type<span class="op">=</span><span class="st">"polars"</span>))</span>
@@ -1247,7 +1247,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 </div>
 <p>You can then access extracts from any specific step:</p>
-<div id="0614e19c" class="cell" data-execution_count="8">
+<div id="8dcf4e27" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get extracts from step 2 (`d &lt; 3000` validation)</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>less_than_failures <span class="op">=</span> multi_validation.get_data_extracts(i<span class="op">=</span><span class="dv">2</span>, frame<span class="op">=</span><span class="va">True</span>)</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1264,7 +1264,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 </div>
 <p>If a step has no failing rows, an empty DataFrame will be returned:</p>
-<div id="4a2eeb37" class="cell" data-execution_count="9">
+<div id="7a292636" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get extracts from step 3 (regex check)</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>regex_failures <span class="op">=</span> multi_validation.get_data_extracts(i<span class="op">=</span><span class="dv">3</span>, frame<span class="op">=</span><span class="va">True</span>)</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1284,7 +1284,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="analyzing-patterns-in-failing-data" class="level2">
 <h2 class="anchored" data-anchor-id="analyzing-patterns-in-failing-data">Analyzing Patterns in Failing Data</h2>
 <p>Once you have data extracts, you can perform additional analysis to identify patterns in the failing data:</p>
-<div id="bc10c4d5" class="cell" data-execution_count="10">
+<div id="1ac23ea8" class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get extracts from step 2</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>d_value_failures <span class="op">=</span> multi_validation.get_data_extracts(i<span class="op">=</span><span class="dv">2</span>, frame<span class="op">=</span><span class="va">True</span>)</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1303,7 +1303,7 @@ Mean failing value: 5151.6775</code></pre>
 <section id="combining-extracts-from-multiple-steps" class="level2">
 <h2 class="anchored" data-anchor-id="combining-extracts-from-multiple-steps">Combining Extracts from Multiple Steps</h2>
 <p>You might want to find rows that failed multiple validation checks:</p>
-<div id="2bb99342" class="cell" data-execution_count="11">
+<div id="0a8e70a4" class="cell" data-execution_count="11">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get row numbers from each extract</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>step1_rows <span class="op">=</span> <span class="bu">set</span>(multi_validation.get_data_extracts(i<span class="op">=</span><span class="dv">1</span>, frame<span class="op">=</span><span class="va">True</span>)[<span class="st">"_row_num_"</span>])</span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>step2_rows <span class="op">=</span> <span class="bu">set</span>(multi_validation.get_data_extracts(i<span class="op">=</span><span class="dv">2</span>, frame<span class="op">=</span><span class="va">True</span>)[<span class="st">"_row_num_"</span>])</span>
@@ -1326,7 +1326,7 @@ Mean failing value: 5151.6775</code></pre>
 <li><strong>Pattern Recognition</strong>: identifying systemic issues by analyzing groups of failing records</li>
 </ol>
 <p>Here’s an example of using extracts to create a corrective action plan:</p>
-<div id="0f4d19e2" class="cell" data-execution_count="12">
+<div id="a42a29e4" class="cell" data-execution_count="12">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a new sample of an extract DF</span></span>
