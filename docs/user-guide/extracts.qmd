@@ -1,6 +1,7 @@
 ---
-title: Working with Data Extracts
+title: Data Extracts
 jupyter: python3
+toc-expand: 2
 html-table-processing: none
 ---
 
@@ -23,15 +24,6 @@ This article will cover:
 - multiple ways to access and work with data extracts
 - practical examples of using extracts for data quality improvement
 - advanced techniques for analyzing extract patterns
-
-## Understanding Data Extracts
-
-When Pointblank validates data, it evaluates individual values (test units) according to specific
-rules. For example, when using `col_vals_gt(columns="value", value=0)`, each value in the `value`
-column is a test unit that either passes or fails the 'greater than zero' test.
-
-When any test unit fails in a row, that entire row is marked for extraction. This approach gives you
-complete context around failing values rather than just the problematic cells in isolation.
 
 ## The Validation Methods that Work with Data Extracts
 
@@ -65,13 +57,13 @@ than row values.
 
 There are three primary ways to access data extracts in Pointblank:
 
-1. **CSV buttons in validation reports**
-2. **the [`get_data_extracts()`](https://posit-dev.github.io/pointblank/reference/Validate.get_data_extracts.html) method**
-3. **direct access via step reports**
+1. the **CSV** buttons in validation reports
+2. through the [`get_data_extracts()`](https://posit-dev.github.io/pointblank/reference/Validate.get_data_extracts.html) method
+3. inspecting a subset of failed rows in step reports
 
 Let's explore each approach using examples.
 
-*Data Extracts as CSV Data in the Validation Report*
+### CSV Data from Validation Reports
 
 Data extracts are embedded within validation report tables. Let's look at an example, using the
 `small_table` dataset, where data extracts are collected in a single validation step due to failing
@@ -111,7 +103,7 @@ software, import it into a different analysis environment like R or Julia, or pr
 tool that supports CSV files. This cross-platform compatibility makes the CSV export particularly
 valuable in mixed-language data teams where different members might be working with different tools.
 
-*Using the `get_data_extracts()` Method*
+### `get_data_extracts()`
 
 For programmatic access to data extracts, Pointblank provides the
 [`get_data_extracts()`](https://posit-dev.github.io/pointblank/reference/Validate.get_data_extracts.html)
@@ -138,7 +130,7 @@ is a single integer)
 - the extract includes all columns from the original data, not just the column being validated
 - an additional `_row_num_` column is added to identify the original row positions
 
-*Direct Access via Step Reports*
+### Step Reports
 
 Step reports provide another way to access and visualize failing data. When you generate a step
 report for a validation step that has failing rows, those failing rows are displayed directly in the
@@ -189,7 +181,8 @@ overflow the display.
 
 ## Working with Multiple Validation Steps
 
-When validating data with multiple steps, you can extract failing rows from any step:
+When validating data with multiple steps, you can extract failing rows from any step or combine
+extracts from multiple steps:
 
 ```{python}
 # Create a validation with multiple steps
@@ -204,7 +197,9 @@ multi_validation = (
 multi_validation
 ```
 
-You can then access extracts from any specific step:
+### Extracting Data from a Specific Step
+
+You can access extracts from any specific validation step:
 
 ```{python}
 # Get extracts from step 2 (`d < 3000` validation)
@@ -212,6 +207,8 @@ less_than_failures = multi_validation.get_data_extracts(i=2, frame=True)
 
 less_than_failures
 ```
+
+Using `frame=True` means that returned value will be a DataFrame (not a dictionary that contains a single DataFrame).
 
 If a step has no failing rows, an empty DataFrame will be returned:
 
@@ -222,10 +219,77 @@ regex_failures = multi_validation.get_data_extracts(i=3, frame=True)
 regex_failures
 ```
 
-## Analyzing Patterns in Failing Data
+### Getting All Extracts at Once
 
-Once you have data extracts, you can perform additional analysis to identify patterns in the failing
-data:
+To retrieve extracts from all steps with failures in one command:
+
+```{python}
+# Get all extracts ()
+all_extracts = multi_validation.get_data_extracts()
+
+# Display the step numbers that have extracts
+print(f"Steps with data extracts: {list(all_extracts.keys())}")
+```
+
+A dictionary of DataFrames is returned and only steps with failures will appear in this dictionary.
+
+### Getting Specific Extracts
+
+You can also retrieve data extracts from several specified steps as a dictionary:
+
+```{python}
+# Get extracts from steps 1 and 2 as a dictionary
+extract_dict = multi_validation.get_data_extracts(i=[1, 2])
+
+# The keys are the step numbers
+print(f"Dictionary keys: {list(extract_dict.keys())}")
+
+# Get the number of failing rows in each extract
+for step, extract in extract_dict.items():
+    print(f"Step {step}: {len(extract)} failing rows")
+```
+
+Note that `frame=True` cannot be used when retrieving multiple extracts.
+
+## Applications of Data Extracts
+
+Once you have extracted the failing data, there are numerous ways to analyze and use this
+information to improve data quality. Let's explore some practical applications.
+
+### Finding Patterns Across Validation Steps
+
+You can analyze patterns across different validation steps by combining extracts:
+
+```{python}
+# Get a consolidated view of all rows that failed any validation
+all_failure_rows = set()
+for step, extract in all_extracts.items():
+    if len(extract) > 0:
+        all_failure_rows.update(extract["_row_num_"])
+
+print(f"Total unique rows with failures: {len(all_failure_rows)}")
+print(f"Row numbers with failures: {sorted(all_failure_rows)}")
+```
+
+### Identifying Rows with Multiple Failures
+
+You might want to find rows that failed multiple validation checks, as these often represent more
+serious data quality issues:
+
+```{python}
+# Get row numbers from each extract
+step1_rows = set(multi_validation.get_data_extracts(i=1, frame=True)["_row_num_"])
+step2_rows = set(multi_validation.get_data_extracts(i=2, frame=True)["_row_num_"])
+
+# Find rows that failed both validations
+common_failures = step1_rows.intersection(step2_rows)
+print(f"Rows failing both step 1 and step 2: {common_failures}")
+```
+
+### Statistical Analysis of Failing Values
+
+Once you have data extracts, you can perform statistical analysis to identify patterns in the
+failing data:
 
 ```{python}
 # Get extracts from step 2
@@ -238,19 +302,42 @@ if len(d_value_failures) > 0:
     print(f"Mean failing value: {d_value_failures['d'].mean()}")
 ```
 
-## Combining Extracts from Multiple Steps
+These analysis techniques help you thoroughly investigate data quality issues by examining failing
+data from multiple perspectives. Rather than treating failures as isolated incidents, you can
+identify patterns that might indicate systematic problems in your data pipeline.
 
-You might want to find rows that failed multiple validation checks:
+### Detailed Analysis with `col_summary_tbl()`
+
+For a more comprehensive view of the statistical properties of your extract data, you can use the [`col_summary_tbl()`](https://posit-dev.github.io/pointblank/reference/col_summary_tbl.html)
+function:
 
 ```{python}
-# Get row numbers from each extract
-step1_rows = set(multi_validation.get_data_extracts(i=1, frame=True)["_row_num_"])
-step2_rows = set(multi_validation.get_data_extracts(i=2, frame=True)["_row_num_"])
+# Get extracts from step 2
+d_value_failures = multi_validation.get_data_extracts(i=2, frame=True)
 
-# Find rows that failed both validations
-common_failures = step1_rows.intersection(step2_rows)
-print(f"Rows failing both step 1 and step 2: {common_failures}")
+# Generate a comprehensive statistical summary of the failing data
+pb.col_summary_tbl(d_value_failures)
 ```
+
+This statistical overview provides:
+
+1. Count of values (including missing values)
+2. Type information for each column
+3. Distribution metrics like min, max, mean, and quartiles for numeric columns
+4. Frequency of common values for categorical columns
+5. Missing value counts and proportions
+
+Using [`col_summary_tbl()`](https://posit-dev.github.io/pointblank/reference/col_summary_tbl.html)
+on data extracts lets you quickly understand the characteristics of failing data without writing
+custom analysis code. This approach is particularly valuable when:
+
+- You need to understand the statistical properties of failing records
+- You want to compare distributions of failing vs passing data
+- You're looking for anomalies or unexpected patterns within the failing rows
+
+For example, if values failing a validation check are concentrated at certain quantiles or have an
+unusual distribution shape, this might indicate a systematic data collection or processing issue
+rather than random errors.
 
 ## Using Extracts for Data Quality Improvement
 
@@ -271,7 +358,10 @@ sample_extract = pl.DataFrame({
     "id": range(1, 11),
     "value": [3500, 4200, 3800, 9800, 5500, 7200, 8300, 4100, 7600, 3200],
     "category": ["A", "B", "A", "C", "B", "A", "C", "B", "A", "B"],
-    "region": ["South", "South", "North", "East", "South", "South", "East", "South", "West", "South"]
+    "region": [
+        "South", "South", "North", "East", "South",
+        "South", "East", "South", "West", "South"
+    ]
 })
 
 # Identify which regions have the most failures

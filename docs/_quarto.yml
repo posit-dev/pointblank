@@ -55,12 +55,13 @@ website:
         - section: "Getting Started"
           contents:
             - user-guide/index.qmd
-            - user-guide/thresholds.qmd
-            - user-guide/actions.qmd
-        - section: "Defining Validation Steps"
+            - user-guide/installation.qmd
+        - section: "Validation Steps"
           contents:
             - user-guide/types.qmd
             - user-guide/columns.qmd
+            - user-guide/thresholds.qmd
+            - user-guide/actions.qmd
             - user-guide/preprocessing.qmd
             - user-guide/segmentation.qmd
             - user-guide/briefs.qmd

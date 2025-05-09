@@ -1,0 +1,191 @@
+---
+title: Installation
+jupyter: python3
+toc-expand: 2
+html-table-processing: none
+---
+
+# Installing Pointblank
+
+Pointblank can be installed using various package managers. The base installation gives you the core
+validation functionality, with optional dependencies for working with different data sources.
+
+## Basic Installation
+
+You can install Pointblank using your preferred package manager:
+
+::: {.panel-tabset}
+## pip
+
+```bash
+pip install pointblank
+```
+
+## uv
+
+```bash
+uv pip install pointblank
+```
+
+## conda
+
+```bash
+conda install -c conda-forge pointblank
+```
+:::
+
+## DataFrame Libraries
+
+Pointblank requires a DataFrame library but doesn't include one by default, giving you the
+flexibility to choose either Pandas or Polars:
+
+::: {.panel-tabset}
+## Polars
+
+```bash
+# Using pip
+pip install pointblank[pl]
+
+# Or manually
+pip install polars>=1.24.0
+```
+
+## Pandas
+
+```bash
+# Using pip
+pip install pointblank[pd]
+
+# Or manually
+pip install pandas>=2.2.3
+```
+:::
+
+Pointblank works seamlessly with both libraries, and you can choose the one that best fits your
+workflow and performance requirements.
+
+## Optional Dependencies
+
+### Ibis Backends
+
+To work with various database systems through Ibis, you can install additional backends:
+
+::: {.panel-tabset}
+## pip
+
+```bash
+pip install pointblank[sqlite]      # SQLite
+pip install pointblank[duckdb]      # DuckDB
+pip install pointblank[postgres]    # PostgreSQL
+pip install pointblank[mysql]       # MySQL
+pip install pointblank[mssql]       # Microsoft SQL Server
+pip install pointblank[pyspark]     # Apache Spark
+pip install pointblank[databricks]  # Databricks
+pip install pointblank[snowflake]   # Snowflake
+
+# Example of installing multiple backends
+pip install pointblank[duckdb,postgres,sqlite]
+```
+
+## uv
+
+```bash
+uv pip install pointblank[sqlite]      # SQLite
+uv pip install pointblank[duckdb]      # DuckDB
+uv pip install pointblank[postgres]    # PostgreSQL
+uv pip install pointblank[mysql]       # MySQL
+uv pip install pointblank[mssql]       # Microsoft SQL Server
+uv pip install pointblank[pyspark]     # Apache Spark
+uv pip install pointblank[databricks]  # Databricks
+uv pip install pointblank[snowflake]   # Snowflake
+
+# Example of installing multiple backends
+uv pip install pointblank[duckdb,postgres,sqlite]
+```
+
+## conda
+
+```bash
+conda install -c conda-forge pointblank-sqlite      # SQLite
+conda install -c conda-forge pointblank-duckdb      # DuckDB
+conda install -c conda-forge pointblank-postgres    # PostgreSQL
+conda install -c conda-forge pointblank-mysql       # MySQL
+conda install -c conda-forge pointblank-mssql       # Microsoft SQL Server
+conda install -c conda-forge pointblank-pyspark     # Apache Spark
+conda install -c conda-forge pointblank-databricks  # Databricks
+conda install -c conda-forge pointblank-snowflake   # Snowflake
+
+# Example of installing multiple backends
+conda install -c conda-forge pointblank-duckdb pointblank-postgres pointblank-sqlite
+```
+:::
+
+::: {.callout-note}
+Even when using exclusively Ibis backends, you still need either Pandas or Polars installed since
+Pointblank's reporting functionality (powered by Great Tables) requires a DataFrame library for
+rendering tabular reporting results.
+:::
+
+### AI-Assisted Validation (Experimental)
+
+Pointblank includes experimental support for AI-assisted validation plan generation:
+
+```bash
+pip install pointblank[generate]
+```
+
+This installs the necessary dependencies for working with LLM providers to help generate validation
+plans.
+
+### Development Version
+
+If you want the latest development version with the newest features, you can install directly from
+GitHub:
+
+```bash
+pip install git+https://github.com/posit-dev/pointblank.git
+```
+
+## Verifying Your Installation
+
+You can verify your installation by importing Pointblank and checking the version:
+
+```python
+import pointblank as pb
+print(pb.__version__)
+```
+
+## System Requirements
+
+- Python 3.10 or higher
+- A supported DataFrame library (Pandas or Polars)
+- Optional: Ibis (for database connectivity)
+
+## Next Steps
+
+Now that you've installed Pointblank, you're ready to start validating your data. If you haven't
+read the [Introduction](index.qmd) yet, consider starting there to learn the basic concepts.
+
+If you encounter any installation issues, please
+[open an issue on GitHub](https://github.com/posit-dev/pointblank/issues/new) with details about
+your system and the specific error messages you're seeing. The maintainers actively monitor these
+issues and can help troubleshoot problems.
+
+For a quick test of your installation, try running a simple validation:
+
+```python
+import pointblank as pb
+
+# Load a small dataset
+data = pb.load_dataset("small_table")
+
+# Create a simple validation
+validation = (
+    pb.Validate(data=data)
+    .col_exists(columns=["a", "b", "c"])
+    .interrogate()
+)
+
+# Display the validation results
+validation
+```

@@ -1,6 +1,7 @@
 ---
 title: Validation Types
 jupyter: python3
+toc-expand: 2
 html-table-processing: none
 ---
 
@@ -10,6 +11,15 @@ html-table-processing: none
 import pointblank as pb
 pb.config(report_incl_header=False, report_incl_footer=False)
 ```
+
+Pointblank provides a comprehensive suite of validation methods designed to help you verify
+different aspects of your data. This article introduces the main categories of validation methods,
+explains their purpose, and demonstrates how to use them with practical examples.
+
+From checking individual column values against thresholds to validating table structure and
+detecting duplicates, these validation methods form the foundation of any data quality workflow.
+Each method is specifically designed to address common data quality concerns and can be combined to
+create robust validation plans.
 
 The collection of validation methods in Pointblank allows you to express all sorts of checks on your
 DataFrames and database tables. We'll use the `small_table` dataset for all of the examples shown
@@ -45,10 +55,7 @@ import pointblank as pb
 
 (
     pb.Validate(data=pb.load_dataset("small_table"))
-    .col_vals_gt(
-        columns="a",
-        value=5
-    )
+    .col_vals_gt(columns="a", value=5)
     .interrogate()
 )
 ```
@@ -60,11 +67,7 @@ example checks values in column `c` of `small_table`, which contains two `None` 
 ```{python}
 (
     pb.Validate(data=pb.load_dataset("small_table"))
-    .col_vals_le(
-        columns="c",
-        value=10,
-        na_pass=True
-    )
+    .col_vals_le(columns="c", value=10, na_pass=True)
     .interrogate()
 )
 ```
@@ -79,10 +82,7 @@ example of that:
 ```{python}
 (
     pb.Validate(data=pb.load_dataset("small_table"))
-    .col_vals_lt(
-        columns="a",
-        value=pb.col("c")
-    )
+    .col_vals_lt(columns="a", value=pb.col("c"))
     .interrogate()
 )
 ```
@@ -99,11 +99,7 @@ validation method makes this type of check possible. Here is an example of its u
 ```{python}
 (
     pb.Validate(data=pb.load_dataset("small_table"))
-    .col_vals_between(
-        columns="a",
-        left=2,
-        right=10
-    )
+    .col_vals_between(columns="a", left=2, right=10)
     .interrogate()
 )
 ```
@@ -119,21 +115,9 @@ In this example, we can illustrate three variations of this:
 ```{python}
 (
     pb.Validate(data=pb.load_dataset("small_table"))
-    .col_vals_between(
-        columns="a",
-        left=pb.col("c"),
-        right=10
-    )
-    .col_vals_between(
-        columns="a",
-        left=2,
-        right=pb.col("d")
-    )
-    .col_vals_between(
-        columns="a",
-        left=pb.col("c"),
-        right=pb.col("d")
-    )
+    .col_vals_between(columns="a", left=pb.col("c"), right=10)
+    .col_vals_between(columns="a", left=2, right=pb.col("d"))
+    .col_vals_between(columns="a", left=pb.col("c"), right=pb.col("d"))
     .interrogate()
 )
 ```
@@ -145,11 +129,7 @@ one is called
 ```{python}
 (
     pb.Validate(data=pb.load_dataset("small_table"))
-    .col_vals_outside(
-        columns="a",
-        left=1,
-        right=4
-    )
+    .col_vals_outside(columns="a", left=1, right=4)
     .interrogate()
 )
 ```
@@ -171,10 +151,7 @@ expectation is that values in column `a` can only have numeric values in the set
 ```{python}
 (
     pb.Validate(data=pb.load_dataset("small_table"))
-    .col_vals_in_set(
-        columns="a",
-        set=[1, 2, 3, 4, 5]
-    )
+    .col_vals_in_set(columns="a", set=[1, 2, 3, 4, 5])
     .interrogate()
 )
 ```
@@ -185,10 +162,7 @@ string-based column. Here's an example that checks string values in the `f` colu
 ```{python}
 (
     pb.Validate(data=pb.load_dataset("small_table"))
-    .col_vals_in_set(
-        columns="f",
-        set=["low", "mid", "high"]
-    )
+    .col_vals_in_set(columns="f", set=["low", "mid", "high"])
     .interrogate()
 )
 ```
@@ -200,10 +174,7 @@ validation method does what you might expect, which is checking whether values i
 ```{python}
 (
     pb.Validate(data=pb.load_dataset("small_table"))
-    .col_vals_in_set(
-        columns="f",
-        set=["small", "large"]
-    )
+    .col_vals_in_set(columns="f", set=["small", "large"])
     .interrogate()
 )
 ```
@@ -229,6 +200,30 @@ Let's look at an example that checks that there should not be any missing values
 ```
 
 Column `a` has no missing values and the above validation proves this.
+
+### Checking Strings in a Column with a Regular Expression
+
+A regular expression (regex) validation via the
+[`col_vals_regex()`](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_regex.html)
+validation method checks if values in a column match a specified pattern. Here's an example with
+two validation steps:
+
+```{python}
+(
+    pb.Validate(data=pb.load_dataset("small_table"))
+    .col_vals_regex(
+        columns="b",
+        pattern=r"^\d-[a-z]{3}-\d{3}$"
+    )
+    .col_vals_regex(
+        columns="f",
+        pattern=r"high|low|mid"
+    )
+    .interrogate()
+)
+```
+
+Both of these regular expression checks resulted in complete matches down columns `b` and `f`.
 
 ### Validation of Table Structure
 
@@ -284,15 +279,16 @@ schema = pb.Schema(
 The [`col_schema_match()`](https://posit-dev.github.io/pointblank/reference/Validate.col_schema_match.html)
 validation method has several boolean parameters for making the checks less stringent:
 
-- `complete=`
-- `in_order=`
-- `case_sensitive_colnames=`
-- `case_sensitive_dtypes=`
+- `complete=`: requires exact column matching (all expected columns must exist, no extra columns allowed)
+- `in_order=`: enforces that columns appear in the same order as defined in the schema
+- `case_sensitive_colnames=`: column names must match with exact letter case
+- `case_sensitive_dtypes=`: data type strings must match with exact letter case
 
-All of these are `True` by default but modifying these settings can make for more convenient checks
-when absolute strictness isn't practical.
+These parameters all default to `True`, providing strict schema validation. Setting any to `False`
+relaxes the validation requirements, making the checks more flexible when exact matching isn't
+necessary or practical for your use case.
 
-Should you need to check for the presence of individual columns (regardless of type), the
+Should you need to check for the presence of individual columns (regardless of data type), the
 [`col_exists()`](https://posit-dev.github.io/pointblank/reference/Validate.col_exists.html)
 validation method is useful. In this example, we check whether the `date` column is present in the
 table:
@@ -364,32 +360,81 @@ check to use a single column or a subset of columns. To do that, we need to use 
 
 In both validations (with entire rows or the partial case), a duplicate was found.
 
-### Checking Strings in a Column with a Regular Expression
+### Complete Row Validations
 
-A regular expression (regex) validation via the
-[`col_vals_regex()`](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_regex.html)
-validation method checks if values in a column match a specified pattern. Here's an example with
-two validation steps:
+Another important validation is checking for complete rows: rows that have no missing values across
+all columns or a specified subset of columns. The
+[`rows_complete()`](https://posit-dev.github.io/pointblank/reference/Validate.rows_complete.html)
+validation method performs this check.
+
+Here's an example checking if all rows in the table are complete (have no missing values in any
+column):
 
 ```{python}
 (
     pb.Validate(data=pb.load_dataset("small_table"))
-    .col_vals_regex(
-        columns="b",
-        pattern=r"^\d-[a-z]{3}-\d{3}$"
-    )
-    .col_vals_regex(
-        columns="f",
-        pattern=r"high|low|mid"
-    )
+    .rows_complete()
     .interrogate()
 )
 ```
 
-Both of these regular expression checks resulted in complete matches down columns `b` and `f`.
+As the report indicates, there are some incomplete rows in the table. We can narrow our check to
+specific columns using the `columns_subset=` parameter:
 
-## More Information
+```{python}
+(
+    pb.Validate(data=pb.load_dataset("small_table"))
+    .rows_complete(columns_subset=["a", "b", "f"])
+    .interrogate()
+)
+```
 
-These are just a few examples of the many validation methods available in Pointblank. For more
-detailed information, check out the individual reference pages in the
-[API Reference](https://posit-dev.github.io/pointblank/reference/).
+This validation checks if every row has non-Null values for the columns `a`, `b`, and `f`. Since
+these particular columns don't have any missing values, all test units pass.
+
+The [`rows_complete()`](https://posit-dev.github.io/pointblank/reference/Validate.rows_complete.html)
+method is particularly useful for identifying data completeness issues that might affect downstream
+analysis or processing, especially when certain columns must have values for the data to be useful.
+
+## Summary and Next Steps
+
+In this article, we've explored the various types of validation methods that Pointblank offers for
+ensuring data quality:
+
+- **Column value validations** to check individual values against thresholds
+([`col_vals_gt()`](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_gt.html),
+[`col_vals_lt()`](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_lt.html),
+etc.)
+- **Range validations** to verify values fall within acceptable bounds
+([`col_vals_between()`](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_between.html), [`col_vals_outside()`](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_outside.html))
+- **Set membership validations** to confirm values belong to predefined sets
+([`col_vals_in_set()`](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_in_set.html))
+- **Missing value validations** to detect or require Null values
+([`col_vals_null()`](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_null.html),
+[`col_vals_not_null()`](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_not_null.html))
+- **String pattern validations** using regular expressions
+([`col_vals_regex()`](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_regex.html))
+- **Table structure validations** to verify schemas and column presence
+([`col_schema_match()`](https://posit-dev.github.io/pointblank/reference/Validate.col_schema_match.html),
+[`col_exists()`](https://posit-dev.github.io/pointblank/reference/Validate.col_exists.html))
+- **Row and column count validations** to confirm expected dimensions
+([`row_count_match()`](https://posit-dev.github.io/pointblank/reference/Validate.row_count_match.html),
+[`col_count_match()`](https://posit-dev.github.io/pointblank/reference/Validate.col_count_match.html))
+- **Row-based validations** to check for duplicates or completeness
+([`rows_distinct()`](https://posit-dev.github.io/pointblank/reference/Validate.rows_distinct.html),
+[`rows_complete()`](https://posit-dev.github.io/pointblank/reference/Validate.rows_complete.html))
+
+Each validation method can be combined with others to build a comprehensive data quality plan
+tailored to your specific requirements. As your validation needs grow more complex, you can enhance
+these methods with:
+
+- [Column selection patterns](columns.qmd) for targeting multiple columns efficiently
+- [Thresholds](thresholds.qmd) to set acceptable failure levels
+- [Actions](actions.qmd) to respond to validation failures
+- [Preprocessing](preprocessing.qmd) to transform data before validation
+- [Segmentation](segmentation.qmd) to apply validations to specific data subsets
+
+For a complete reference of all validation methods with detailed parameter descriptions and
+examples, see the [API Reference](https://posit-dev.github.io/pointblank/reference/). The next
+article in this guide covers [column selection patterns](columns.qmd) to help you target validation
+methods at multiple columns efficiently.
