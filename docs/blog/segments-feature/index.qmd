@@ -1,0 +1,297 @@
+---
+jupyter: python3
+html-table-processing: none
+title: "Beyond Simple Validations: Segmenting Your Data with Pointblank"
+author: Rich Iannone
+date: 2025-05-08
+freeze: true
+---
+
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_footer=False)
+```
+
+I'd like to share the story behind one of my favorite features in the Pointblank package: data
+segmentation.
+
+This feature came about after a recent workshop I gave at Apple just a few weeks ago. I was
+presenting Pointblank to their data team, demonstrating validation workflows and showing how the
+package could handle various data quality checks. During the Q&A session, someone asked a question
+that would end up reshaping the package: "Is there a way to split the validations into pieces so we
+can perform quality checks separately for different segments of our data?".
+
+At that moment, I didn't have a great answer (this capability wasn't in the package yet). But their
+question immediately resonated with me. In their large-scale data operations, they needed to
+validate different sections of their data according to different rules and requirements.
+
+Inspired by this real-world need, I went back to work and quickly implemented the `segments=`
+parameter. The feature allows users to slice their dataset into meaningful chunks before validation,
+running the same checks on different segments separately and getting individualized results.
+
+This blog post is dedicated to the Apple data team and their insightful request. Their practical
+question about what's useful in real-world data validation led to what I consider one of
+Pointblank's most powerful features. Now let me show you how it works!
+
+## What is Data Segmentation?
+
+Think of data segmentation as slicing your dataset into meaningful chunks before validation. Instead
+of running a single validation across your entire table, you can validate each segment separately
+and get individualized results.
+
+For example, maybe your sales data quality requirements differ by region, or perhaps your product
+data has different validation rules depending on the category. With the `segments=` parameter, you
+can easily handle these nuanced validation scenarios.
+
+## Why Segment Your Data?
+
+There are several compelling reasons to segment your validations:
+
+1. **find problems with surgical precision**: instead of just knowing 'something's wrong somewhere',
+you can pinpoint exactly which segment has issues
+2. **apply different standards to different data subsets**: what's acceptable in one business unit
+might not be in another
+3. **create detailed reports for different stakeholders**: send tailored validation results to the
+teams responsible for specific data segments
+4. **track improvements over time**: see if your data quality initiatives are working in the areas
+that matter most
+
+## How to Use Segments in Pointblank
+
+Let's walk through some practical examples of how to use the `segments=` parameter in Pointblank.
+For these examples, we'll use the `global_sales` dataset, a comprehensive business dataset with
+hierarchical categories ideal for demonstrating segmentation.
+
+First, let's take a look at what this dataset contains:
+
+```{python}
+import pointblank as pb
+
+# Load the global_sales dataset
+global_sales = pb.load_dataset(dataset="global_sales")
+
+# Show a preview
+pb.preview(global_sales)
+```
+
+The `global_sales` dataset contains sales transactions with rich categorical data like:
+
+- geographic hierarchy (`region`, `country`, `city`)
+- business categories (`product_category`, `customer_segment`)
+- temporal data (`quarter`, `month`, `year`)
+- order details (`status`, `payment_method`, `sales_channel`)
+
+This makes it perfect for demonstrating different segmentation approaches since we can segment by
+business dimensions, location, time periods, or any combination of these.
+
+### Basic Segmentation by Column
+
+The simplest approach is to segment by all unique values in a column. Let's choose the `region`
+column as it contains three segmentation values: `"Asia Pacific"`, `"Europe"`, and
+`"North America"`.
+
+```{python}
+(
+    pb.Validate(data=global_sales)
+    .col_vals_gt(
+        columns="revenue",
+        value=25,
+        segments="region",
+        brief="Revenue > ${value} check for the {segment_value} region.",
+    )
+    .interrogate()
+)
+```
+
+This will run the validation separately for each unique region in your dataset. The validation
+report will clearly label each segment (like `"SEGMENT region / North America"`). Also, we took
+advantage of templating options when creating a brief to include the segmentation value.
+
+The templating variables concerned with segments are:
+
+- `{segment}`: the segmentation column and value (in the format '"(column) / (value)"')
+- `{segment_column}`: the column from which the segmentation value is drawn
+- `{segment_value}`: the categorical value from the segmentation column
+
+### Segmenting on Specific Values
+
+Sometimes you only care about certain segments. No problem! Just use a tuple with the column name
+and a list of values:
+
+```{python}
+(
+    pb.Validate(data=global_sales)
+    .rows_complete(
+        segments=("product_category", ["Manufacturing", "Technology"]),
+        brief="Check for complete records in the `{segment_value}` product category.",
+    )
+    .interrogate()
+)
+```
+
+Using a tuple of the form `(column_name, [value1, value2, ...])` lets you target validation to
+specific categories within a column. This is particularly useful when you only need to validate
+certain segments of your data while ignoring others.
+
+This runs the validation only on the `Manufacturing` and `Technology` segments, ignoring other
+categories. You could apply this pattern to any categorical column. So you might check specific
+sales channels, customer segments, or countries within a region.
+
+### Multiple Segmentation Criteria
+
+We made it so that when you're defining segments, you have *a lot* of flexibility. So if you need
+a more complex sort of segmentation, you can provide a list of columns or column-value tuples:
+
+```{python}
+(
+    pb.Validate(data=global_sales)
+    .col_vals_gt(
+        columns="revenue",
+        value=25,
+        segments=["region", ("quarter", ["2021-Q1", "2021-Q2"])],
+        brief="Revenue > ${value} check for the `{segment}` segment."
+    )
+    .interrogate()
+)
+```
+
+This creates separate validation sets: first by each unique region, and then separately by the
+specified quarters.
+
+Let's break down the syntax for this case:
+
+1. `segments=["region", ("quarter", ["2021-Q1", "2021-Q2"])]`: this is a list containing two
+separate segmentation criteria:
+   - `"region"`: creates segments for each unique value in the region column (`"North America"`,
+   `"Europe"`, `"Asia Pacific"`)
+   - `("quarter", ["2021-Q1", "2021-Q2"])`: creates segments for the specified quarters
+
+2. Important clarification: When you provide a list of segmentation criteria like this, Pointblank
+processes them serially, not as combinations. You'll get:
+   - A segment for North America
+   - A segment for Europe
+   - A segment for Asia Pacific
+   - A segment for 2021-Q1
+   - A segment for 2021-Q2
+
+3. If you actually want to validate combinations (like 'North America in Q1'), you'll need to use
+the preprocessing approach described in the next section to create a combined segment column first.
+
+This approach gives you the flexibility to segment your validations along multiple dimensions, but
+understanding how these segments are created is really important for correctly interpreting your
+validation results.
+
+### Creating Custom Segments with Preprocessing
+
+My personal favorite approach is combining preprocessing with segmentation. This lets you create
+custom segments on the fly:
+
+```{python}
+import polars as pl
+
+(
+    pb.Validate(
+        data=global_sales,
+        thresholds=(0.1, 0.2, 0.3)
+    )
+    .col_vals_expr(
+        expr=pl.col("revenue") + pl.col("tax") == pl.col("total"),
+        pre=lambda df: df.with_columns(
+            revenue_tier=pl.when(pl.col("revenue") > 1000)
+                .then(pl.lit("high"))
+                .when(pl.col("revenue") > 500)
+                .then(pl.lit("medium"))
+                .otherwise(pl.lit("low"))
+        ),
+        segments="revenue_tier"  # Segment by the derived column
+    )
+    .interrogate()
+)
+```
+
+Let's break down what's happening in this example:
+
+1. In the `pre=` parameter, we're using a Polars expression to create a new categorical column
+called `revenue_tier` that classifies each transaction as `"high"` (>$1000), `"medium"` (>$500), or
+`"low"` revenue.
+
+2. In the `expr=` parameter, we're using another Polars expression to check if the mathematical
+relationship `revenue + tax = total` holds true for each row. This validates that the totals have
+been calculated correctly.
+
+3. We then segment the validation by our newly created `revenue_tier` column, which gives us three
+segments for high, medium, and low revenue transactions.
+
+4. The `thresholds=(0.1, 0.2, 0.3)` parameter sets increasing failure thresholds for the
+validation: 'warning' at 10%, 'error' at 20%, and 'critical' at 30% failure rates.
+
+What makes this approach powerful is the combination of Polars expressions in both preprocessing and
+validation logic. You can create sophisticated derived segments using the full power of Polars'
+expressive API, then validate complex conditions using those same expressions. This example is
+checking if our financial calculations are accurate across different revenue tiers, which might
+reveal patterns like "high-value transactions have more calculation errors than low-value ones."
+
+## Segmentation vs. Multiple Validation Steps
+
+You may or may not be wondering: "why not just create separate validation steps with filters instead
+of using segmentation?". Great question! You can do that. But, segmentation offers several key
+advantages:
+
+1. **write once, validate many times**: define your validation logic once and apply it consistently
+across segments
+2. **cleaner validation code**: no need for repetitive validation steps with different filters
+3. **better organization**: the validation report clearly labels and organizes results by segment
+4. **simplified maintenance**: when validation rules change, update them in one place rather than in
+multiple steps
+5. **dynamic messaging**: use templating in the `brief=` parameter with `{segment}`,
+`{segment_column}`,  and `{segment_value}` to create context-aware validation messages
+
+Segmentation isn't just a feature, it's a whole new way to approach data validation that helps you
+discover insights that would remain hidden with traditional whole-table validations.
+
+## Best Practices for Effective Segmentation
+
+After working with segmentation for a little while, I've found these practices to be helpful:
+
+1. **choose meaningful segments**: segment by dimensions that matter to your business (regions,
+product lines, customer types)
+2. **don't over-segment**: too many tiny segments can make reports unwieldy... instead, aim for a
+balance!
+3. **use derived segments when needed**: If your raw data doesn't have good segmentation columns,
+create them through preprocessing
+4. **combine with actions**: for critical segments, use the `actions=` parameter to trigger
+notifications when validations fail
+5. **document your segments**: use the `brief=` parameter to clearly explain what each segmented
+validation is checking
+
+By following these practices, you'll be able to create a validation system that not only catches
+data issues but also communicates them in a way that makes sense to everyone in your organization
+(from data engineers to business stakeholders).
+
+## Wrapping Up
+
+Data segmentation in Pointblank transforms your validation workflow from a blunt instrument to a
+precision tool. It helps you find data quality issues with greater accuracy, apply appropriate
+standards to different data segments, and generate more actionable reports for stakeholders.
+
+Segmentation is particularly powerful for uncovering systematic data issues that might otherwise go
+unnoticed. For instance:
+
+- When combining data from multiple sources or third-party providers, quality often varies
+significantly, so segmentation by data source can quickly identify which providers deliver lower
+quality data
+- After process changes or methodology updates, segmentation by time period (year, quarter) can
+reveal exactly when and how data patterns shifted
+- In complex ETL pipelines, certain data transformations might affect specific categories
+differently: segmentation helps isolate these effects
+
+Next time you're setting up data validations, consider whether segmentation could help you gain more
+nuanced insights into your data quality. The `segments=` parameter is there waiting to help you dive
+deeper into your data and uncover insights that might otherwise remain hidden!
+
+I'd like to give special thanks to Rami Krispin at Apple for his interest in Pointblank and
+thoughtful questions by his team that led to this feature. If you're interested in more data science
+insights, check out [Rami's Data Newsletter](https://ramikrispin.substack.com) where he shares
+valuable perspectives on data engineering, LLMs, and analytics.
