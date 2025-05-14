@@ -75,7 +75,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-e1a5c8363afafaef2c763b6775fbf3ca.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-a0938f0952d31e12fdde909fc93c2347.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-b3a3f0431126c7e8c477b326e3ee3944.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -209,6 +209,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>Validate.assert_passing()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Raise an <code>AssertionError</code> if all tests are not passing.</p>
 <p>The <code>assert_passing()</code> method will raise an <code>AssertionError</code> if a test does not pass. This method simply wraps <code>all_passed</code> for more ready use in test suites. The step number and assertion made is printed in the <code>AssertionError</code> message if a failure occurs, ensuring some details are preserved.</p>
+<p>If the validation has not yet been interrogated, this method will automatically call <a href="../reference/Validate.interrogate.html#pointblank.Validate.interrogate"><code>interrogate()</code></a> with default parameters before checking for passing tests.</p>
 <section id="raises" class="level2 doc-section doc-section-raises">
 <h2 class="doc-section doc-section-raises anchored" data-anchor-id="raises">Raises</h2>
 <dl>
@@ -220,8 +221,8 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </section>
 <section id="examples" class="level2 doc-section doc-section-examples">
 <h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
-<p>In the example below, we’ll use a simple Polars DataFrame with three columns (<code>a</code>, <code>b</code>, and <code>c</code>). There will be three validation steps, and the second step will have a failing test unit (the value <code>10</code> isn’t less than <code>9</code>). After interrogation, the <code>assert_passing()</code> method is used to assert that all validation steps passed perfectly.</p>
-<div id="11fd2380" class="cell" data-execution_count="1">
+<p>In the example below, we’ll use a simple Polars DataFrame with three columns (<code>a</code>, <code>b</code>, and <code>c</code>). There will be three validation steps, and the second step will have a failing test unit (the value <code>10</code> isn’t less than <code>9</code>). The <code>assert_passing()</code> method is used to assert that all validation steps passed perfectly, automatically performing the interrogation if needed.</p>
+<div id="c048ba74" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -238,27 +239,27 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    .col_vals_gt(columns<span class="op">=</span><span class="st">"a"</span>, value<span class="op">=</span><span class="dv">0</span>)</span>
 <span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    .col_vals_lt(columns<span class="op">=</span><span class="st">"b"</span>, value<span class="op">=</span><span class="dv">9</span>) <span class="co"># this assertion is false</span></span>
 <span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>    .col_vals_in_set(columns<span class="op">=</span><span class="st">"c"</span>, <span class="bu">set</span><span class="op">=</span>[<span class="st">"a"</span>, <span class="st">"b"</span>])</span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a><span class="co"># No need to call [`interrogate()`](`pointblank.Validate.interrogate`) explicitly</span></span>
 <span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>validation.assert_passing()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-error">
 <div class="ansi-escaped-output">
 <pre><span class="ansi-red-fg">---------------------------------------------------------------------------</span>
 <span class="ansi-red-fg">AssertionError</span>                            Traceback (most recent call last)
-<span class="ansi-green-fg">/tmp/ipykernel_3883/335715443.py</span> in <span class="ansi-cyan-fg">?</span><span class="ansi-blue-fg">()</span>
+<span class="ansi-green-fg">/tmp/ipykernel_3071/2424908189.py</span> in <span class="ansi-cyan-fg">?</span><span class="ansi-blue-fg">()</span>
 <span class="ansi-green-fg ansi-bold">     16</span>     <span class="ansi-blue-fg">.</span>col_vals_in_set<span class="ansi-blue-fg">(</span>columns<span class="ansi-blue-fg">=</span><span class="ansi-blue-fg">"c"</span><span class="ansi-blue-fg">,</span> set<span class="ansi-blue-fg">=</span><span class="ansi-blue-fg">[</span><span class="ansi-blue-fg">"a"</span><span class="ansi-blue-fg">,</span> <span class="ansi-blue-fg">"b"</span><span class="ansi-blue-fg">]</span><span class="ansi-blue-fg">)</span>
-<span class="ansi-green-fg ansi-bold">     17</span>     <span class="ansi-blue-fg">.</span>interrogate<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span>
-<span class="ansi-green-fg ansi-bold">     18</span> )
-<span class="ansi-green-fg ansi-bold">     19</span> 
+<span class="ansi-green-fg ansi-bold">     17</span> )
+<span class="ansi-green-fg ansi-bold">     18</span> 
+<span class="ansi-green-fg ansi-bold">     19</span> <span class="ansi-red-fg"># No need to call [`interrogate()`](`pointblank.Validate.interrogate`) explicitly</span>
 <span class="ansi-green-fg">---&gt; 20</span><span class="ansi-red-fg"> </span>validation<span class="ansi-blue-fg">.</span>assert_passing<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span>
 
 <span class="ansi-green-fg">/opt/hostedtoolcache/Python/3.10.17/x64/lib/python3.10/site-packages/pointblank/validate.py</span> in <span class="ansi-cyan-fg">?</span><span class="ansi-blue-fg">(self)</span>
-<span class="ansi-green-fg ansi-bold">   8818</span>             ]
-<span class="ansi-green-fg ansi-bold">   8819</span>             msg = "The following assertions failed:\n" + "\n".join(
-<span class="ansi-green-fg ansi-bold">   8820</span>                 <span class="ansi-blue-fg">[</span><span class="ansi-blue-fg">f"- Step {i + 1}: {autobrief}"</span> <span class="ansi-green-fg">for</span> i<span class="ansi-blue-fg">,</span> autobrief <span class="ansi-green-fg">in</span> failed_steps<span class="ansi-blue-fg">]</span>
-<span class="ansi-green-fg ansi-bold">   8821</span>             )
-<span class="ansi-green-fg">-&gt; 8822</span><span class="ansi-red-fg">             </span><span class="ansi-green-fg">raise</span> AssertionError<span class="ansi-blue-fg">(</span>msg<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-fg ansi-bold">   8827</span>             ]
+<span class="ansi-green-fg ansi-bold">   8828</span>             msg = "The following assertions failed:\n" + "\n".join(
+<span class="ansi-green-fg ansi-bold">   8829</span>                 <span class="ansi-blue-fg">[</span><span class="ansi-blue-fg">f"- Step {i + 1}: {autobrief}"</span> <span class="ansi-green-fg">for</span> i<span class="ansi-blue-fg">,</span> autobrief <span class="ansi-green-fg">in</span> failed_steps<span class="ansi-blue-fg">]</span>
+<span class="ansi-green-fg ansi-bold">   8830</span>             )
+<span class="ansi-green-fg">-&gt; 8831</span><span class="ansi-red-fg">             </span><span class="ansi-green-fg">raise</span> AssertionError<span class="ansi-blue-fg">(</span>msg<span class="ansi-blue-fg">)</span>
 
 <span class="ansi-red-fg">AssertionError</span>: The following assertions failed:
 - Step 2: Expect that values in `b` should be &lt; `9`.</pre>
