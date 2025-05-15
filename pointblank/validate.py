@@ -8831,7 +8831,7 @@ class Validate:
             raise AssertionError(msg)
 
     def assert_below_threshold(
-        self, level: str = "warning", i: int = None, message: str = None
+        self, level: str = "warning", i: int | None = None, message: str | None = None
     ) -> None:
         """
         Raise an `AssertionError` if validation steps exceed a specified threshold level.
@@ -8940,12 +8940,12 @@ class Validate:
 
         See Also
         --------
-        - [`warning()`](`pointblank.Validate.warning`): Get the 'warning' status for each validation
+        - [`warning()`](`pointblank.Validate.warning`): get the 'warning' status for each validation
         step
-        - [`error()`](`pointblank.Validate.error`): Get the 'error' status for each validation step
-        - [`critical()`](`pointblank.Validate.critical`): Get the 'critical' status for each
+        - [`error()`](`pointblank.Validate.error`): get the 'error' status for each validation step
+        - [`critical()`](`pointblank.Validate.critical`): get the 'critical' status for each
         validation step
-        - [`assert_passing()`](`pointblank.Validate.assert_passing`): Assert all validations pass
+        - [`assert_passing()`](`pointblank.Validate.assert_passing`): assert all validations pass
         completely
         """
         # Check if validation has been interrogated
@@ -8990,6 +8990,133 @@ class Validate:
                     failures
                 )
             raise AssertionError(msg)
+
+    def has_threshold_exceedances(self, level: str = "warning", i: int | None = None) -> bool:
+        """
+        Check if any validation steps exceed a specified threshold level.
+
+        The `has_threshold_exceedances()` method checks whether validation steps exceed a given
+        threshold level. This provides a non-exception-based alternative to
+        [`assert_below_threshold()`](`pointblank.Validate.assert_below_threshold`) for conditional
+        workflow control based on validation results.
+
+        This method is useful in scenarios where you want to check if any validation steps failed
+        beyond a certain threshold without raising an exception, allowing for more flexible
+        programmatic responses to validation issues.
+
+        Parameters
+        ----------
+        level
+            The threshold level to check against. Valid options are: `"warning"` (the least severe
+            threshold level), `"error"` (the middle severity threshold level), and `"critical"` (the
+            most severe threshold level). The default is `"warning"`.
+        i
+            Specific validation step number(s) to check. If a single integer, checks only that step.
+            If a list of integers, checks all specified steps. If `None` (the default), checks all
+            validation steps. Step numbers are 1-based (first step is `1`, not `0`).
+
+        Returns
+        -------
+        bool
+            `True` if any of the specified validation steps exceed the given threshold level,
+            `False` otherwise.
+
+        Raises
+        ------
+        ValueError
+            If an invalid threshold level is provided.
+
+        Examples
+        --------
+        ```{python}
+        #| echo: false
+        #| output: false
+        import pointblank as pb
+        pb.config(report_incl_header=False, report_incl_footer=False, preview_incl_header=False)
+        ```
+        Let's create a validation plan with some steps and thresholds. We'll then check if any steps
+        exceed the 'warning' threshold.
+
+        ```{python}
+        import pointblank as pb
+        import polars as pl
+
+        tbl = pl.DataFrame({
+            "values": [1, 2, 3, 4, 5, 0, -1]
+        })
+
+        validation = (
+            pb.Validate(data=tbl, thresholds=(0.1, 0.2, 0.3))
+            .col_vals_gt(columns="values", value=0)
+            .col_vals_lt(columns="values", value=10)
+            .interrogate()
+        )
+
+        validation
+        ```
+
+        Check if any steps exceed warning threshold with the `has_threshold_exceedances()` method
+        and print a message if that's the case:
+
+        ```{python}
+        if validation.has_threshold_exceedances(level="warning"):
+            print("Some steps have exceeded the warning threshold")
+        ```
+
+        Check if only steps 1 and 3 exceed the 'error' threshold (by using the `i=` argument):
+
+        ```{python}
+        if validation.has_threshold_exceedances(level="error", i=[1, 3]):
+            print("Steps 1 and/or 3 have exceeded the error threshold")
+        ```
+
+        You can use this in a workflow to conditionally trigger processes. Here's a snippet of how
+        you might use this in a function:
+
+        ```python
+        def process_data(validation_obj):
+            # Only continue processing if validation passes critical thresholds
+            if not validation_obj.has_threshold_exceedances(level="critical"):
+                # Continue with processing
+                print("Data meets critical quality thresholds, proceeding...")
+                return True
+            else:
+                # Log failure and stop processing
+                print("Data fails critical quality checks, aborting...")
+                return False
+        ```
+
+        See Also
+        --------
+        - [`assert_below_threshold()`](`pointblank.Validate.assert_below_threshold`): a similar
+        method that raises an exception if thresholds are exceeded
+        - [`warning()`](`pointblank.Validate.warning`): get the 'warning' status for each validation
+        step
+        - [`error()`](`pointblank.Validate.error`): get the 'error' status for each validation step
+        - [`critical()`](`pointblank.Validate.critical`): get the 'critical' status for each
+        validation step
+        """
+        # Ensure validation has been run
+        if not hasattr(self, "time_start") or self.time_start is None:
+            return False
+
+        # Validate the level parameter
+        level = level.lower()
+        if level not in ["warning", "error", "critical"]:
+            raise ValueError(
+                f"Invalid threshold level: {level}. Must be one of 'warning', 'error', or 'critical'."
+            )
+
+        # Get the threshold status using the appropriate method
+        if level == "warning":
+            status = self.warning(i=i)
+        elif level == "error":
+            status = self.error(i=i)
+        elif level == "critical":
+            status = self.critical(i=i)
+
+        # Return True if any steps exceeded the threshold
+        return any(status.values())
 
     def n(self, i: int | list[int] | None = None, scalar: bool = False) -> dict[int, int] | int:
         """
