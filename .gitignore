@@ -124,3 +124,9 @@ datasets/
 /*.parquet
 /*.csv
 .ruff_cache
+
+# Benchmark results and reports
+benchmark/results/
+benchmark/reports/
+benchmark/data/*.csv.gz
+benchmark/data/*.json
