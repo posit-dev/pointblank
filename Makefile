@@ -57,3 +57,67 @@ docs-build:
 
 install: dist ## install the package to the active Python's site-packages
 	python3 -m pip install --force-reinstall dist/pointblank*.whl
+
+.PHONY: benchmark benchmark-small benchmark-medium benchmark-large benchmark-xlarge benchmark-generate-data
+
+# Default benchmark with small dataset
+benchmark: benchmark-small
+
+# Generate benchmark datasets
+benchmark-generate-data:
+	@echo "Generating benchmark datasets..."
+	@mkdir -p benchmark/data
+	@python benchmark/generate_data.py
+
+# Small benchmark dataset generation (1K, 10K rows)
+benchmark-generate-small:
+	@echo "Generating small benchmark datasets..."
+	@mkdir -p benchmark/data
+	@python benchmark/generate_data.py --sizes 1000 10000 --columns 10
+
+# Medium benchmark dataset generation (10K, 100K rows)
+benchmark-generate-medium:
+	@echo "Generating medium benchmark datasets..."
+	@mkdir -p benchmark/data
+	@python benchmark/generate_data.py --sizes 10000 100000 --columns 10 20
+
+# Large benchmark dataset generation (100K, 1M rows)
+benchmark-generate-large:
+	@echo "Generating large benchmark datasets..."
+	@mkdir -p benchmark/data
+	@python benchmark/generate_data.py --sizes 100000 1000000 --columns 10 20 50
+
+# Extra large benchmark dataset generation (1M, 10M rows)
+benchmark-generate-xlarge:
+	@echo "Generating extra large benchmark datasets..."
+	@mkdir -p benchmark/data
+	@python benchmark/generate_data.py --sizes 1000000 10000000 --columns 10 20
+
+# Quick benchmark with small datasets
+benchmark-small:
+	@echo "Running small benchmark..."
+	@mkdir -p benchmark/results
+	@python benchmark/benchmark.py --config small
+
+# Medium-sized benchmark
+benchmark-medium:
+	@echo "Running medium benchmark..."
+	@mkdir -p benchmark/results
+	@python benchmark/benchmark.py --config medium
+
+# Large dataset benchmark
+benchmark-large:
+	@echo "Running large benchmark suite (this may take a while)..."
+	@mkdir -p benchmark/results
+	@python benchmark/benchmark.py --config large
+
+# Extra large dataset benchmark
+benchmark-xlarge:
+	@echo "Running extra large benchmark suite (this will take a long time)..."
+	@mkdir -p benchmark/results
+	@python benchmark/benchmark.py --config xlarge
+
+benchmark-report:
+	@echo "Generating benchmark report..."
+	@mkdir -p benchmark/reports
+	@python benchmark/report.py
