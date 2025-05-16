@@ -1,0 +1,451 @@
+---
+title: Draft Validation
+jupyter: python3
+toc-expand: 2
+html-table-processing: none
+---
+
+Draft Validation in Pointblank leverages large language models (LLMs) to automatically generate
+validation plans for your data. This feature is especially useful when starting validation on a new
+dataset or when you need to quickly establish baseline validation coverage.
+
+The
+[`DraftValidation`](https://posit-dev.github.io/pointblank/reference/DraftValidation.html) class
+connects to various LLM providers to analyze your data's characteristics and generate a complete
+validation plan tailored to its structure and content.
+
+## How `DraftValidation` Works
+
+When you use
+[`DraftValidation`](https://posit-dev.github.io/pointblank/reference/DraftValidation.html), the
+process works through these steps:
+
+1. a statistical summary of your data is generated using the
+[`DataScan`](https://posit-dev.github.io/pointblank/reference/DataScan.html) class
+2. this summary is converted to JSON format and sent to your selected LLM provider
+3. the LLM uses the summary along with knowledge about Pointblank's validation capabilities to
+generate a validation plan
+4. the result is returned as executable Python code that you can use directly or modify as needed
+
+The entire process happens without sending your actual data to the LLM provider, only a summary that
+includes column names, data types, basic statistics, and a small sample of values.
+
+## Requirements and Setup
+
+To use the [`DraftValidation`](https://posit-dev.github.io/pointblank/reference/DraftValidation.html)
+feature, you'll need:
+
+1. an API key from a supported LLM provider
+2. the required Python packages installed
+
+You can install all necessary dependencies with:
+
+```bash
+pip install pointblank[generate]
+```
+
+This will install the `chatlas` package and other dependencies required for
+[`DraftValidation`](https://posit-dev.github.io/pointblank/reference/DraftValidation.html).
+
+### Supported LLM Providers
+
+The [`DraftValidation`](https://posit-dev.github.io/pointblank/reference/DraftValidation.html) class
+supports multiple LLM providers:
+
+- **Anthropic** (Claude models)
+- **OpenAI** (GPT models)
+- **Ollama** (local LLMs)
+- **Amazon Bedrock** (AWS-hosted models)
+
+Each provider has different capabilities and performance characteristics, but all can be used to
+generate validation plans through a consistent interface.
+
+## Basic Usage
+
+The simplest way to use
+[`DraftValidation`](https://posit-dev.github.io/pointblank/reference/DraftValidation.html) is to
+provide your data and specify an LLM model. Let's try it out with the `global_sales` dataset.
+
+```python
+import pointblank as pb
+
+# Load a dataset
+data = pb.load_dataset(dataset="global_sales", tbl_type="polars")
+
+# Generate a validation plan
+pb.DraftValidation(
+    data=data,
+    model="anthropic:claude-3-7-sonnet-latest",
+    api_key="your_api_key_here"  # Replace with your actual API key
+)
+```
+
+````plaintext
+```python
+import pointblank as pb
+
+# Define schema based on column names and dtypes
+schema = pb.Schema(columns=[
+    ("product_id", "String"),
+    ("product_category", "String"),
+    ("customer_id", "String"),
+    ("customer_segment", "String"),
+    ("region", "String"),
+    ("country", "String"),
+    ("city", "String"),
+    ("timestamp", "Datetime(time_unit='us', time_zone=None)"),
+    ("quarter", "String"),
+    ("month", "Int64"),
+    ("year", "Int64"),
+    ("price", "Float64"),
+    ("quantity", "Int64"),
+    ("status", "String"),
+    ("email", "String"),
+    ("revenue", "Float64"),
+    ("tax", "Float64"),
+    ("total", "Float64"),
+    ("payment_method", "String"),
+    ("sales_channel", "String")
+])
+
+# The validation plan
+validation = (
+    pb.Validate(
+        data=your_data,  # Replace your_data with the actual data variable
+        label="Draft Validation",
+        thresholds=pb.Thresholds(warning=0.10, error=0.25, critical=0.35)
+    )
+    .col_schema_match(schema=schema)
+    .col_vals_not_null(columns=[
+        "product_category", "customer_segment", "region", "country",
+        "price", "quantity", "status", "email", "revenue", "tax",
+        "total", "payment_method", "sales_channel"
+    ])
+    .col_vals_between(columns="month", left=1, right=12, na_pass=True)
+    .col_vals_between(columns="year", left=2021, right=2023, na_pass=True)
+    .col_vals_gt(columns="price", value=0)
+    .col_vals_gt(columns="quantity", value=0)
+    .col_vals_gt(columns="revenue", value=0)
+    .col_vals_gt(columns="tax", value=0)
+    .col_vals_gt(columns="total", value=0)
+    .col_vals_in_set(columns="product_category", set=[
+        "Manufacturing", "Retail", "Healthcare"
+    ])
+    .col_vals_in_set(columns="customer_segment", set=[
+        "Government", "Consumer", "SMB"
+    ])
+    .col_vals_in_set(columns="region", set=[
+        "Asia Pacific", "Europe", "North America"
+    ])
+    .col_vals_in_set(columns="status", set=[
+        "returned", "shipped", "delivered"
+    ])
+    .col_vals_in_set(columns="payment_method", set=[
+        "Apple Pay", "PayPal", "Bank Transfer", "Credit Card"
+    ])
+    .col_vals_in_set(columns="sales_channel", set=[
+        "Partner", "Distributor", "Phone"
+    ])
+    .row_count_match(count=50000)
+    .col_count_match(count=20)
+    .rows_distinct()
+    .interrogate()
+)
+
+validation
+```
+````
+
+### Managing API Keys
+
+While you can directly provide API keys as shown above, there are more secure approaches:
+
+```python
+import os
+
+# Get API key from environment variable
+api_key = os.getenv("ANTHROPIC_API_KEY")
+
+draft_validation = pb.DraftValidation(
+    data=data,
+    model="anthropic:claude-3-7-sonnet-latest",
+    api_key=api_key
+)
+```
+
+You can also store API keys in a `.env` file in your project's root directory:
+
+```
+# Contents of .env file
+ANTHROPIC_API_KEY=your_anthropic_api_key_here
+OPENAI_API_KEY=your_openai_api_key_here
+```
+
+If your API keys have standard names (like `ANTHROPIC_API_KEY` or `OPENAI_API_KEY`),
+[`DraftValidation`](https://posit-dev.github.io/pointblank/reference/DraftValidation.html) will
+automatically find and use them:
+
+```python
+# No API key needed if stored in .env with standard names
+draft_validation = pb.DraftValidation(
+    data=data,
+    model="anthropic:claude-3-7-sonnet-latest"
+)
+```
+
+## Example Output for `nycflights`
+
+Here's an example of a validation plan that might be generated by
+[`DraftValidation`](https://posit-dev.github.io/pointblank/reference/DraftValidation.html) for the
+`nycflights` dataset:
+
+```python
+pb.DraftValidation(
+    pb.load_dataset(dataset="nycflights", tbl_type="duckdb",
+    model="anthropic:claude-3-7-sonnet-latest"
+)
+```
+
+````plaintext
+```python
+import pointblank as pb
+
+# Define schema based on column names and dtypes
+schema = pb.Schema(columns=[
+    ("year", "int64"),
+    ("month", "int64"),
+    ("day", "int64"),
+    ("dep_time", "int64"),
+    ("sched_dep_time", "int64"),
+    ("dep_delay", "int64"),
+    ("arr_time", "int64"),
+    ("sched_arr_time", "int64"),
+    ("arr_delay", "int64"),
+    ("carrier", "string"),
+    ("flight", "int64"),
+    ("tailnum", "string"),
+    ("origin", "string"),
+    ("dest", "string"),
+    ("air_time", "int64"),
+    ("distance", "int64"),
+    ("hour", "int64"),
+    ("minute", "int64")
+])
+
+# The validation plan
+validation = (
+    pb.Validate(
+        data=your_data,  # Replace your_data with the actual data variable
+        label="Draft Validation",
+        thresholds=pb.Thresholds(warning=0.10, error=0.25, critical=0.35)
+    )
+    .col_schema_match(schema=schema)
+    .col_vals_not_null(columns=[
+        "year", "month", "day", "sched_dep_time", "carrier", "flight",
+        "origin", "dest", "distance", "hour", "minute"
+    ])
+    .col_vals_between(columns="month", left=1, right=12)
+    .col_vals_between(columns="day", left=1, right=31)
+    .col_vals_between(columns="sched_dep_time", left=106, right=2359)
+    .col_vals_between(columns="dep_delay", left=-43, right=1301, na_pass=True)
+    .col_vals_between(columns="air_time", left=20, right=695, na_pass=True)
+    .col_vals_between(columns="distance", left=17, right=4983)
+    .col_vals_between(columns="hour", left=1, right=23)
+    .col_vals_between(columns="minute", left=0, right=59)
+    .col_vals_in_set(columns="origin", set=["EWR", "LGA", "JFK"])
+    .col_count_match(count=18)
+    .row_count_match(count=336776)
+    .rows_distinct()
+    .interrogate()
+)
+
+validation
+```
+````
+
+Notice how the generated plan includes:
+
+1. A schema validation with appropriate data types
+2. Not-null checks for required columns
+3. Range validations for numerical data
+4. Set membership checks for categorical data
+5. Row and column count validations
+6. Appropriate handling of missing values with `na_pass=True`
+
+## Working with Model Providers
+
+### Specifying Models
+
+When using [`DraftValidation`](https://posit-dev.github.io/pointblank/reference/DraftValidation.html),
+you specify the model in the format `"provider:model_name"`:
+
+```python
+# Using Anthropic's Claude model
+pb.DraftValidation(data=data, model="anthropic:claude-3-7-sonnet-latest")
+
+# Using OpenAI's GPT model
+pb.DraftValidation(data=data, model="openai:gpt-4-turbo")
+
+# Using a local model with Ollama
+pb.DraftValidation(data=data, model="ollama:llama3:latest")
+
+# Using Amazon Bedrock
+pb.DraftValidation(data=data, model="bedrock:anthropic.claude-3-sonnet-20240229-v1:0")
+```
+
+### Model Performance and Privacy
+
+Different models have different capabilities when it comes to generating validation plans:
+
+- **Anthropic Claude 3.7 Sonnet** generally provides the most comprehensive and accurate validation
+plans
+- **OpenAI GPT-4** models also perform well
+- **Local models** through Ollama can be useful for private data but may have reduced capabilities
+
+A key advantage of
+[`DraftValidation`](https://posit-dev.github.io/pointblank/reference/DraftValidation.html) is that
+your actual dataset is not sent to the LLM provider. Instead, only a summary is transmitted, which
+includes:
+
+- the number of rows and columns
+- column names and data types
+- basic statistics (min, max, mean, median, missing values count)
+- a small sample of values from each column (usually 5-10 values)
+
+This approach protects your data while still providing enough context for the LLM to generate
+relevant validation rules.
+
+## Customizing Generated Plans
+
+The validation plan generated by
+[`DraftValidation`](https://posit-dev.github.io/pointblank/reference/DraftValidation.html) is just a
+starting point. You'll typically want to:
+
+1. review the generated code for correctness
+2. replace `your_data` with your actual data variable name that exists in your workspace
+3. ensure the data object referenced is actually present in your workspace
+4. adjust thresholds and validation parameters
+5. add domain-specific validation rules
+6. remove any unnecessary checks
+
+For example, you might start by capturing the text representation of your draft validation. This
+will give you the raw Python code that you can copy into a new code cell in your notebook or script.
+From there, you can customize it by modifying thresholds to match your organization's data quality
+standards, adding business-specific validation rules that require domain knowledge, or removing
+checks that aren't relevant to your use case. Once you've made your modifications, you can execute
+the customized validation plan as you would any other Pointblank validation.
+
+## Under the Hood
+
+### The Generated Data Summary
+
+To understand what the LLM works with, here's an example of the data summary format that's sent:
+
+```json
+{
+  "table_info": {
+    "rows": 336776,
+    "columns": 18,
+    "table_type": "duckdb"
+  },
+  "column_info": [
+    {
+      "column_name": "year",
+      "column_type": "int64",
+      "missing_values": 0,
+      "min": 2013,
+      "max": 2013,
+      "mean": 2013.0,
+      "median": 2013,
+      "sample_values": [2013, 2013, 2013, 2013, 2013]
+    },
+    {
+      "column_name": "month",
+      "column_type": "int64",
+      "missing_values": 0,
+      "min": 1,
+      "max": 12,
+      "mean": 6.548819,
+      "median": 7,
+      "sample_values": [1, 1, 1, 1, 1]
+    },
+    // Additional columns...
+  ]
+}
+```
+
+### The Prompt Strategy
+
+The [`DraftValidation`](https://posit-dev.github.io/pointblank/reference/DraftValidation.html) class
+uses a carefully crafted prompt that instructs the LLM to:
+
+1. use the schema information to create a
+[`Schema`](https://posit-dev.github.io/pointblank/reference/Schema.html) object
+2. include
+[`col_vals_not_null()`](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_not_null.html)
+for columns with no missing values
+3. add appropriate range validations based on min/max values
+4. include row and column count validations
+5. format the output as clean, executable Python code
+
+The prompt also contains constraints to ensure consistent, high-quality results, such as using line
+breaks in long lists for readability, applying `na_pass=True` for columns with missing values, and
+avoiding duplicate validations.
+
+## Best Practices and Troubleshooting
+
+### When to Use `DraftValidation`
+
+Drafting a validation is most useful when:
+
+- working with a new dataset for the first time
+- needing to quickly establish baseline validation
+- exploring potential validation rules before formalizing them
+- validating columns with consistent patterns (numeric ranges, categories, etc.)
+
+Consider writing validation plans manually when you need very specific business rules, are working
+with sensitive data, need complex validation logic, or need to validate relationships between
+columns.
+
+### Recommended Workflow
+
+A recommended workflow incorporating
+[`DraftValidation`](https://posit-dev.github.io/pointblank/reference/DraftValidation.html):
+
+1. generate an initial plan with
+[`DraftValidation`](https://posit-dev.github.io/pointblank/reference/DraftValidation.html)
+2. review the generated validations for relevance
+3. adjust thresholds and parameters as needed
+4. add specific business logic and cross-column validations
+5. store the final validation plan in version control
+
+### Common Issues
+
+- **Authentication Errors**: ensure your API key is valid and correctly passed to
+[`DraftValidation`](https://posit-dev.github.io/pointblank/reference/DraftValidation.html)
+- **Package Not Found**: make sure you've installed the required packages with
+`pip install pointblank[generate]`
+- **Unsupported Model**: verify you're using the correct `provider:model` format
+- **Poor Quality Plans**: try a more capable model or provide better context
+
+Be aware that LLM providers typically have rate limits. If you're generating many validation plans,
+consider using local models through Ollama, implementing rate limiting in your code, or caching
+generated plans for datasets that don't change frequently.
+
+## Conclusion
+
+[`DraftValidation`](https://posit-dev.github.io/pointblank/reference/DraftValidation.html) provides
+a powerful way to jumpstart your data validation process by leveraging LLMs to generate
+context-aware validation plans. By analyzing your data's structure and content,
+[`DraftValidation`](https://posit-dev.github.io/pointblank/reference/DraftValidation.html) can
+create comprehensive validation rules that would otherwise take significant time to develop
+manually.
+
+The feature balances privacy (by sending only data summaries) with utility (by generating executable
+validation code). While the generated plans should always be reviewed and refined, they provide an
+excellent starting point for ensuring your data meets your quality requirements.
+
+By understanding how
+[`DraftValidation`](https://posit-dev.github.io/pointblank/reference/DraftValidation.html) works and
+how to customize its output, you can significantly accelerate your data validation workflows and
+improve the quality of your data throughout your projects.

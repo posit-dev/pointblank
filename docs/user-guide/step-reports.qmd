@@ -1,6 +1,7 @@
 ---
-title: "Step Reports: Diagnosing Validation Results in Detail"
+title: "Step Reports"
 jupyter: python3
+toc-expand: 2
 html-table-processing: none
 ---
 
@@ -64,6 +65,10 @@ In this example, we first create and interrogate a validation object with two st
 generate a step report for the second validation step (`i=2`), which checks if the values in the
 `category` column are in the set `["A", "B", "C"]`.
 
+Note that step numbers in Pointblank start at `1`, matching what you see in the validation report's
+`STEP` column (i.e., not 0-based indexing). So the first step is referred to with `i=1`, the second
+step with `i=2`, and so on.
+
 ## Understanding Step Report Components
 
 A step report consists of several key components that provide detailed information about the
@@ -105,19 +110,106 @@ of validation being performed and display relevant information in the most appro
 you're working with different validation types, expect to see different step report layouts
 optimized for each context.
 
-## Getting Reports for Specific Validation Steps
+### Value-Based Validation Step Reports
 
-You can get a step report for any validation step by specifying its step number in the
-[`get_step_report()`](https://posit-dev.github.io/pointblank/reference/Validate.get_step_report.html)
-method:
+Value-based step reports focus on showing individual rows where values in the target column failed
+the validation check. These reports highlight the specific column being validated and clearly
+display which values violated the condition.
 
 ```{python}
-validation.get_step_report(i=1)
+# Create sample data with some validation failures
+data = pl.DataFrame({
+    "id": range(1, 8),
+    "value": [120, 85, 47, 210, 30, 10, 5],
+    "category": ["A", "B", "C", "A", "D", "B", "E"]
+})
+
+# Create a validation with a value-based check
+validation_values = (
+    pb.Validate(data=data, tbl_name="sales_data")
+    .col_vals_gt(
+        columns="value",
+        value=50,
+        brief="Sales values should exceed $50"
+    )
+    .interrogate()
+)
+
+# Display the step report for the value-based validation
+validation_values.get_step_report(i=1)
 ```
 
-Note that step numbers in Pointblank start at `1`, matching what you see in the validation report's
-`STEP` column (i.e., not 0-based indexing). So the first step is referred to with `i=1`, the second
-step with `i=2`, and so on.
+This report clearly identifies which rows contain values that don't meet our threshold, making it
+easy to investigate these specific data points.
+
+### Uniqueness Validation Step Reports
+
+Uniqueness checks produce a different type of step report that groups duplicate records together.
+This format makes it easy to identify patterns in duplicate data.
+
+```{python}
+# Create sample data with some duplicate rows based on the combination of columns
+data = pl.DataFrame({
+    "customer_id": [101, 102, 103, 101, 104, 105, 102],
+    "order_date": ["2023-01-15", "2023-01-16", "2023-01-16",
+                   "2023-01-15", "2023-01-17", "2023-01-18", "2023-01-19"],
+    "product": ["Laptop", "Phone", "Tablet", "Laptop",
+                "Monitor", "Keyboard", "Headphones"]
+})
+
+# Create a validation checking for unique customer-product combinations
+validation_duplicates = (
+    pb.Validate(data=data, tbl_name="order_data")
+    .rows_distinct(
+        columns_subset=["customer_id", "product"],
+        brief="Customer should not order the same product twice"
+    )
+    .interrogate()
+)
+
+# Display the step report for the uniqueness validation
+validation_duplicates.get_step_report(i=1)
+```
+
+The report organizes duplicate records together, making it easy to see which combinations are
+repeated and how many times they appear.
+
+### Schema Validation Step Reports
+
+Schema validation step reports have a completely different structure, comparing expected versus
+actual column data types and presence.
+
+```{python}
+schema = pb.Schema(
+    columns=[
+        ("date_time", "timestamp"),
+        ("dates", "date"),
+        ("a", "int64"),
+        ("b",),
+        ("c",),
+        ("d", "float64"),
+        ("e", ["bool", "boolean"]),
+        ("f", "str"),
+    ]
+)
+
+validation_schema = (
+    pb.Validate(
+        data=pb.load_dataset(dataset="small_table", tbl_type="duckdb"),
+        tbl_name="small_table",
+        label="Step report for a schema check"
+    )
+    .col_schema_match(schema=schema)
+    .interrogate()
+)
+
+# Display the step report for the schema validation
+validation_schema.get_step_report(i=1)
+```
+
+This report style focuses on comparing the expected schema against the actual table structure,
+highlighting mismatches in data types or missing/extra columns. The table format makes it easy to
+see exactly where the schema expectations differ from reality.
 
 ## Customizing Step Reports
 

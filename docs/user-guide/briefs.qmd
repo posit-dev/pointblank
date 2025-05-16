@@ -1,6 +1,7 @@
 ---
-title: Enhancing Validation Reports with Briefs
+title: Briefs
 jupyter: python3
+toc-expand: 2
 html-table-processing: none
 ---
 
@@ -226,43 +227,12 @@ If you've set a global brief but want to disable it for specific validation step
 )
 ```
 
-## Best Practices for Using Briefs
-
-Well-crafted briefs can significantly enhance the readability and usefulness of your validation
-reports. Here are some guidelines to follow:
-
-1. **Be concise**: briefs should be short and to the point; they're meant to quickly communicate the
-purpose of a validation step
-
-2. **Be specific**: include relevant details or conditions that make the validation meaningful
-
-3. **Use templates consistently**: if you're using template elements like `"{step}"` or `"{col}"`,
-try to use them consistently across all briefs for a cleaner look
-
-4. **Use auto-generated briefs as a starting point**: you can start with `Validate(brief=True)` to
-see what Pointblank generates automatically, then customize as needed
-
-5. **Add custom briefs for complex validations**: custom briefs are especially useful for complex
-validations where the purpose might not be immediately obvious from the code
-
-Following these best practices will help ensure your validation reports are easy to understand for
-everyone who needs to review them.
-
-## Example: Comprehensive Validation with Briefs
+## Practical Example: Comprehensive Validation with Briefs
 
 In real-world data validation scenarios, you'll likely work with more complex datasets and apply
 various types of validation checks. This final example brings together many of the brief-generating
 techniques we've covered, showing how you can mix different approaches in a single validation
 workflow.
-
-The example below demonstrates:
-
-- custom text briefs with direct messages
-- template-based briefs with Markdown formatting
-- automatically generated briefs
-
-By combining these different brief styles, you can create validation reports that are informative,
-consistent, and tailored to your specific data quality requirements.
 
 ```{python}
 # Create a more complex dataset
@@ -301,6 +271,37 @@ complex_data = pl.DataFrame({
     .interrogate()
 )
 ```
+
+The example above demonstrates:
+
+- plaintext briefs with direct messages
+- template-based briefs with Markdown formatting
+- automatically generated briefs (`brief=True`)
+
+By combining these different brief styles, you can create validation reports that are informative,
+consistent, and tailored to your specific data quality requirements.
+
+## Best Practices for Using Briefs
+
+Well-crafted briefs can significantly enhance the readability and usefulness of your validation
+reports. Here are some guidelines to follow:
+
+1. **Be concise**: briefs should be short and to the point; they're meant to quickly communicate the
+purpose of a validation step
+
+2. **Be specific**: include relevant details or conditions that make the validation meaningful
+
+3. **Use templates consistently**: if you're using template elements like `"{step}"` or `"{col}"`,
+try to use them consistently across all briefs for a cleaner look
+
+4. **Use auto-generated briefs as a starting point**: you can start with `Validate(brief=True)` to
+see what Pointblank generates automatically, then customize as needed
+
+5. **Add custom briefs for complex validations**: custom briefs are especially useful for complex
+validations where the purpose might not be immediately obvious from the code
+
+Following these best practices will help ensure your validation reports are easy to understand for
+everyone who needs to review them.
 
 ## Conclusion
 

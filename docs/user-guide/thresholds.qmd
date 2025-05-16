@@ -1,6 +1,7 @@
 ---
-title: Setting Failure Thresholds
+title: Thresholds
 jupyter: python3
+toc-expand: 2
 html-table-processing: none
 ---
 
@@ -11,137 +12,303 @@ import pointblank as pb
 pb.config(report_incl_footer=False)
 ```
 
-Thresholds enable you to signal failure at different severity levels. They also allow for the
-triggering of custom actions, a topic which is covered in the next section. For instance you might
-be testing a column for null/missing values. When doing so, you'd want to know when there are at
-least 10% missing values in the column. Alternatively, it could be the case that even a single
-missing value is critical to your work. Threshold settings in Pointblank give you the flexibility to
-devise data-failure signaling to whatever tolerances are important to you.
+Thresholds are a key concept in Pointblank that allow you to define acceptable limits for failing
+validation tests. Rather than a simple pass/fail model, thresholds enable you to signal failure at
+different severity levels ('warning', 'error', and 'critical'), giving you fine-grained control over
+how data quality issues are reported and handled.
 
-Let's start with the basics though. Here's an example of a simple validation where threshold values
-are set in the [`col_vals_not_null()`](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_not_null.html)
-validation step (this type of validation expects that there are no null/missing values in a
-particular column):
+When used with Actions (covered in the next section), thresholds create a robust system for
+responding to data quality issues based on their severity. This approach allows you to:
+
+- set different tolerance levels for different types of validation checks
+- escalate responses based on the severity of data quality issues
+- configure different notification strategies for different threshold levels
+- create a more nuanced data validation workflow than simple pass/fail tests
+
+## A Simple Example
+
+Let's start with a basic example that demonstrates how thresholds work in practice:
 
 ```{python}
 import pointblank as pb
 
-validation_1 = (
+(
     pb.Validate(data=pb.load_dataset(dataset="small_table", tbl_type="polars"))
     .col_vals_not_null(
         columns="c",
-        thresholds=(1, 0.2)
+
+        # Set thresholds for the validation step ---
+        thresholds=pb.Thresholds(warning=1, error=0.2)
     )
     .interrogate()
 )
-
-validation_1
 ```
 
-The code uses `thresholds=(1, 0.2)` to set a 'warning' threshold of `1` and an 'error' threshold of
-`0.2` (which is 20%) failing test units. You might notice the following in the validation table:
+In this example, we're validating that column `c` contains no Null values. We've set:
 
-- The `FAIL` column shows that 2 tests units have failed
-- The `W` column (short for 'warning') shows a filled gray circle indicating it's reached its
-threshold level
-- The `E` ('error') column shows an open yellow circle indicating it's below the threshold
-level
+- A 'warning' threshold of `1` (triggers when 1 or more values are Null)
+- An 'error' threshold of `0.2` (triggers when 20% or more values are Null)
 
-The one final threshold, `C` ('critical'), wasn't set so appears on the validation table as a dash.
+Looking at the results:
 
-## Two Types of Threshold Values: Proportional and Absolute
+- the `FAIL` column shows that 2 test units have failed
+- the `W` column (for 'warning') shows a filled gray circle, indicating the warning threshold has
+been exceeded
+- the `E` column (for 'error') shows an open yellow circle, indicating the error threshold has not
+been exceeded
+- the `C` column (for 'critical') shows a dash since we didn't set a critical threshold
 
-Threshold values can be specified in two ways:
+## Types of Threshold Values
 
-- proportional: a decimal value like 0.1 is taken to mean 10% of all test units failed
-- absolute: a whole number represents a fixed number of test units failed
+Thresholds in Pointblank can be specified in two different ways:
 
-Threshold values act as cutoffs and are inclusive. So, any value of failing test units greater than
-or equal to the threshold value will result in exceeding the threshold. So if a threshold is defined
-with a value of `5`, then 5 failing test units will result in an exceedance.
+### Absolute Thresholds
 
-## Using the `Validation(thresholds=)` Argument
-
-We can also define thresholds globally (within the `Validate` call). This means that every
-validation step will re-use the same set of threshold values.
+Absolute thresholds are specified as integers and represent a fixed number of failing test units:
 
 ```python
-import pointblank as pb
+# Warning threshold of exactly 5 failing test units
+thresholds_absolute = pb.Thresholds(warning=5)
+```
 
-validation_2 = (
+With this configuration, the 'warning' threshold would be triggered if 5 or more test units fail.
+
+### Proportional Thresholds
+
+Proportional thresholds are specified as decimals between 0 and 1, representing a percentage of the
+total test units:
+
+```python
+# Error threshold of 10% of test units failing
+thresholds_proportional = pb.Thresholds(error=0.1)
+```
+
+With this configuration, the 'error' threshold would be triggered if 10% or more of the test units
+fail.
+
+## Understanding Severity Levels
+
+The three threshold levels in Pointblank ('warning', 'error', and 'critical') are inspired by
+traditional logging levels used in software development. These names suggest a progression of
+severity:
+
+- **'warning'** (level `30`): indicates potential issues that don't necessarily prevent normal
+operation
+- **'error'** (level `40`): suggests more serious problems that might impact data quality
+- **'critical'** (level `50`): represents the most severe issues that likely require immediate
+attention
+
+These numerical values (`30`, `40`, `50`) are used internally by Pointblank when determining
+threshold hierarchy and can be accessed through the `{level_num}` field in action metadata (covered
+in the next **User Guide** article).
+
+While these names imply certain severity levels, they're ultimately just convenient labels for
+different thresholds. You have complete flexibility in how you use them:
+
+- you could use 'warning' for issues that should block a pipeline
+- you might configure 'critical' for minor issues that just need documentation
+- the 'error' level could trigger informational emails rather than actual error handling
+
+The naming is primarily a suggestion to help organize your validation strategy. What matters most is
+how you configure actions for each threshold level to suit your specific data quality requirements.
+
+## Threshold Behavior
+
+It's important to understand a few key behaviors of thresholds:
+
+- thresholds are **inclusive**: a value equal to or exceeding the threshold will trigger the
+associated level
+- thresholds can be **mixed**: you can use absolute values for some levels and proportional for
+others
+- threshold levels are **hierarchical**: 'critical' is more severe than 'error', which is more
+severe than 'warning'
+- when a test fails, **all** applicable threshold levels are marked in the report (though actions
+may only execute for the highest level by default)
+
+## Setting Global Thresholds
+
+You can set thresholds globally for all validation steps in a workflow using the `thresholds=`
+parameter in [`Validate`](https://posit-dev.github.io/pointblank/reference/Validate.html):
+
+```{python}
+(
     pb.Validate(
         data=pb.load_dataset(dataset="small_table", tbl_type="polars"),
-        thresholds=(1, 0.1)
+
+        # Setting thresholds for all validation steps ---
+        thresholds=pb.Thresholds(warning=1, error=0.1)
+    )
+    .col_vals_not_null(columns="a")
+    .col_vals_gt(columns="a", value=2)
+    .interrogate()
+)
+```
+
+With this approach, the same thresholds are applied to every validation step in the workflow.
+
+## Overriding Thresholds for Specific Steps
+
+You can override global thresholds for specific validation steps by providing the `thresholds=`
+parameter in individual validation methods:
+
+```{python}
+(
+    pb.Validate(
+        data=pb.load_dataset(dataset="small_table", tbl_type="polars"),
+
+        # Setting global thresholds ---
+        thresholds=pb.Thresholds(warning=1, error=0.1)
     )
     .col_vals_not_null(columns="a")
     .col_vals_gt(
-        columns="b",
-        value=2
+        columns="a", value=2,
+
+        # Step-specific threshold that overrides global ---
+        thresholds=pb.Thresholds(warning=3)
     )
     .interrogate()
 )
-
-validation_2
 ```
 
-In this, both the [`col_vals_not_null()`](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_not_null.html)
-and [`col_vals_gt()`](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_gt.html)
-steps will use the `thresholds=` value set in the
-[`Validate`](https://posit-dev.github.io/pointblank/reference/Validate.html) call. Now, if you want
-to override these global threshold values for a given validation step, you can always use the
-`thresholds=` argument when calling a validation method (this argument is present within every
-validation method).
+In this example, the second validation step uses its own 'warning' threshold of `3`, overriding the
+global setting of `1`.
 
 ## Ways to Define Thresholds
 
-There are more than a few ways to set threshold levels. We provide this flexibility because it's
-often useful to have simple shorthand methods for such a common task.
+Pointblank offers multiple ways to define thresholds to accommodate different coding styles and
+requirements.
 
-### Using a Tuple or a Single Value
+### 1. Using the `Thresholds` Class (Recommended)
 
-The fastest way to define a threshold is to use a tuple with positional entries for the 'warning',
-'error', and 'critical' levels.
+The most explicit and flexible approach is using the
+[`Thresholds`](https://posit-dev.github.io/pointblank/reference/Thresholds.html) class:
 
-```python
-thresholds_tuple = (1, 0.1, 0.25) # (warning, error, critical)
+```{python}
+# Set individual thresholds for different levels
+thresholds_all_levels = pb.Thresholds(warning=0.05, error=0.1, critical=0.25)
+
+# Set only specific levels
+thresholds_error_only = pb.Thresholds(error=0.15)
 ```
 
-Note that a shorter tuple is also allowed:
+This approach allows you to:
 
-- `(1, )`: 'warning' state at 1 failing test unit
-- `(1, 0.1)`: 'warning' state at 1 failing test unit, `error` state at 10% failing test units
+- set any combination of threshold levels
+- use descriptive parameter names for clarity
+- skip levels you don't need to set
 
-You can even use a scalar value (float between `0` and `1` or an integer). That single value
-represents the threshold value for the 'warning' level:
+### 2. Using a Tuple
 
-```python
-thresholds_single = 1
+For concise code, you can use a tuple where positions represent 'warning', 'error', and 'critical'
+levels in that order:
+
+```{python}
+# (warning, error, critical)
+thresholds_tuple = (1, 0.1, 0.25)
+
+# Shorter tuples are also allowed
+thresholds_tuple_warning = (3,)            # Only the 'warning' threshold
+thresholds_tuple_warning_error = (3, 0.2)  # Both 'warning' and 'error' thresholds
 ```
 
-While using a tuple or a scalar can be very succinct, a problem that arises is that the ordering of
-values always begins at the 'warning' level. This means you cannot define a threshold level for just
-the 'error' level, for example. This is fine for many cases, however, there are other ways to
-express thresholds without these constraints.
+While concise, this approach requires you to start with the 'warning' level and add levels in order.
 
-### Using the `Thresholds` Class
+### 3. Using a Dictionary
 
-Using the [`Thresholds`](https://posit-dev.github.io/pointblank/reference/Thresholds.html) class
-lets you define the threshold levels using the `warning=`, `error=`, and `critical=` arguments. And
-unlike the method of setting thresholds with a tuple, any of the threshold levels can be left unset.
-Here's an example where you might want to set the 'error' and 'critical' levels (leaving the
-'warning' level unset):
+You can also use a dictionary with keys that match the threshold level names:
 
-```python
-thresholds_class = pb.Thresholds(error=0.3, critical=0.5)
+```{python}
+# Can use any combination of threshold levels
+thresholds_dict = {"warning": 1, "critical": 0.15}
 ```
 
-### Using a Dictionary to Set Thresholds
+The dictionary must use the exact keys `"warning"`, `"error"`, and/or `"critical"`.
 
-A specially-crafted dictionary is acceptable as input to any `thresholds=` argument. You need to
-ensure that the keys are named using either `"warning"`, `"error"`, or `"critical"`. Any combination
-of keys is fine, but be careful to use only the aforementioned names (otherwise, you'll receive a
-`ValueError`). Here's an example that sets the 'warning' and 'critical' levels:
+### 4. Using a Single Value
 
-```python
-thresholds_dict = {"warning": 1, "critical": 0.1}
+The simplest approach is using a single numeric value, which sets just the 'warning' threshold:
+
+```{python}
+# Sets 'warning' threshold to `5`
+thresholds_single = 5
 ```
+
+This is equivalent to `pb.Thresholds(warning=5)`.
+
+## Thresholds and Validation Steps
+
+Let's look at a more complete validation workflow that demonstrates different threshold
+configurations:
+
+```{python}
+# Create a validation workflow with global and step-specific thresholds
+(
+    pb.Validate(
+        data=pb.load_dataset(dataset="small_table", tbl_type="polars"),
+
+        # Global thresholds applied to all steps unless overridden ---
+        thresholds=pb.Thresholds(warning=0.05, error=0.1, critical=0.2)
+    )
+
+    # Step 1: Uses global thresholds ---
+    .col_vals_not_null(columns="b")
+
+    # Step 2: Overrides with step-specific thresholds ---
+    .col_vals_gt(
+        columns="a", value=2,
+        thresholds=pb.Thresholds(warning=1, critical=0.3) # No 'error' threshold
+    )
+
+    # Step 3: Uses a simplified tuple notation ---
+    .col_vals_not_null(columns="c", thresholds=(2, 0.15))
+
+    .interrogate()
+)
+```
+
+## Thresholds and Actions
+
+While thresholds by themselves provide visual indicators of validation severity in reports, their
+real power emerges when combined with Actions. The Actions system (covered in the next article)
+allows you to specify what happens when a threshold is exceeded.
+
+For example, you might configure:
+
+- A 'warning' threshold that logs a message
+- An 'error' threshold that sends an email notification
+- A 'critical' threshold that blocks a data pipeline
+
+Here's a simple preview of how thresholds and actions work together:
+
+```{python}
+(
+    pb.Validate(
+        data=pb.load_dataset(dataset="small_table", tbl_type="polars"),
+
+        # Define thresholds for all three severity levels ---
+        thresholds=pb.Thresholds(warning=1, error=2, critical=3),
+
+        # Define actions for different threshold levels ---
+        actions=pb.Actions(
+            warning="Warning: {step} has {FAIL} failing values",
+            error="ERROR: Step {step} exceeded the 'error' threshold",
+            critical="CRITICAL: Data quality issue in column {col}"
+        )
+    )
+    .col_vals_not_null(columns="c")
+    .interrogate()
+)
+```
+
+## Conclusion
+
+Thresholds are a powerful feature that transform Pointblank from a simple validation tool into a
+sophisticated data quality monitoring system. By setting appropriate thresholds, you can:
+
+1. Define different severity levels for data quality issues
+2. Customize tolerance levels for different types of validation checks
+3. Create a more nuanced approach to data validation than binary pass/fail
+4. Enable targeted actions based on the severity of issues detected
+
+In the next article, we'll explore the Actions system in depth, showing you how to define automatic
+responses when thresholds are exceeded.

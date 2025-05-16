@@ -1,6 +1,7 @@
 ---
-title: Triggering Actions
+title: Actions
 jupyter: python3
+toc-expand: 2
 html-table-processing: none
 ---
 
@@ -11,11 +12,18 @@ import pointblank as pb
 pb.config(report_incl_footer=False)
 ```
 
-Actions are meant to be combined with thresholds and they allow you easily write text to the console
-or execute custom functions. As an example, when testing a column for values that should always be
-greater than `2` you might want some text emitted to the console when any failing test units are
-found. To do that, you need to pair a threshold level with an associated action (and that action
-could take the form of a console message).
+Actions transform data validation from passive reporting to active response by automatically
+executing code when quality issues arise. They bridge the gap between detection and intervention,
+enabling immediate notifications and comprehensive logging when thresholds are exceeded.
+
+Whether you need simple console messages for interactive analysis or complex alerting for production
+pipelines, Actions provide the framework to make your validation workflows responsive. For example,
+when validating revenue values, you can configure immediate alerts if failures exceed acceptable
+thresholds, ensuring data issues are addressed promptly rather than discovered later.
+
+In this article, we'll explore how to use Actions to respond to threshold violations during data
+validation, and Final Actions to execute code after all validation steps are complete, giving you
+powerful tools to monitor, alert, and report on your data's quality.
 
 ## How Actions Work
 
@@ -29,18 +37,17 @@ the `thresholds=` and `actions=` parameters are set using
 ```{python}
 import pointblank as pb
 
-validation_1 = (
+(
     pb.Validate(data=pb.load_dataset(dataset="small_table"))
     .col_vals_gt(
-        columns="c",
-        value=2,
+        columns="c", value=2,
         thresholds=pb.Thresholds(warning=1, error=5),
+
+        # Emit a console message when the warning threshold is exceeded ---
         actions=pb.Actions(warning="WARNING: failing test found.")
     )
     .interrogate()
 )
-
-validation_1
 ```
 
 The code uses `thresholds=pb.Thresholds(warning=1, error=5)` to set a 'warning' threshold of `1` and
@@ -70,7 +77,11 @@ considered optional. Put another way, you can set various thresholds and various
 and the interrogation phase will determine whether all the requirements are met for executing
 an action.
 
-## Expressing Actions with a String
+## Defining Actions
+
+Actions can be defined in several ways, providing flexibility for different notification needs.
+
+### Using String Messages
 
 There are a few options in how to define the actions:
 
@@ -101,28 +112,19 @@ Here's an example where we prepare a console message with a number of value plac
 ```{python}
 action_str = "[{LEVEL}: {TYPE}]: Step {step} has failed validation. ({time})"
 
-validation_2 = (
+(
     pb.Validate(
         data=pb.load_dataset(dataset="game_revenue", tbl_type="duckdb"),
         thresholds=pb.Thresholds(warning=0.05, error=0.10, critical=0.15),
+
+        # Use `action_str` for any critical thresholds exceeded ---
         actions=pb.Actions(critical=action_str),
     )
-    .col_vals_regex(
-        columns="player_id",
-        pattern=r"[A-Z]{12}\d{3}"
-    )
-    .col_vals_gt(
-        columns="item_revenue",
-        value=0.10
-    )
-    .col_vals_ge(
-        columns="session_duration",
-        value=15
-    )
+    .col_vals_regex(columns="player_id", pattern=r"[A-Z]{12}\d{3}")
+    .col_vals_gt(columns="item_revenue", value=0.10)
+    .col_vals_ge(columns="session_duration", value=15)
     .interrogate()
 )
-
-validation_2
 ```
 
 What we get here are two messages in the console, corresponding to critical failures in steps 2 and
@@ -131,7 +133,7 @@ resulting text is capitalized (e.g., `"CRITICAL"`, `"COL_VALS_GT"`, etc.) and th
 capitalized the placeholder text itself. Have a look at the documentation article of
 [`Actions`](https://posit-dev.github.io/pointblank/reference/Actions.html) for more details on this.
 
-## Making Actions with Callables
+### Using Callable Functions
 
 Aside from strings, any callable can be used as an action value. Here's an example where we use a
 custom function as part of an action:
@@ -139,32 +141,23 @@ custom function as part of an action:
 ```{python}
 def duration_issue():
     from datetime import datetime
-
     print(f"Data quality issue found ({datetime.now()}).")
 
-
-validation_3 = (
+(
     pb.Validate(
         data=pb.load_dataset(dataset="game_revenue", tbl_type="duckdb"),
         thresholds=pb.Thresholds(warning=0.05, error=0.10, critical=0.15),
     )
-    .col_vals_regex(
-        columns="player_id",
-        pattern=r"[A-Z]{12}\d{3}"
-    )
+    .col_vals_regex(columns="player_id", pattern=r"[A-Z]{12}\d{3}")
+    .col_vals_gt(columns="item_revenue", value=0.05)
     .col_vals_gt(
-        columns="item_revenue",
-        value=0.05
-    )
-    .col_vals_gt(
-        columns="session_duration",
-        value=15,
+        columns="session_duration", value=15,
+
+        # Use the `duration_issue()` function as an action for this step ---
         actions=pb.Actions(warning=duration_issue),
     )
     .interrogate()
 )
-
-validation_3
 ```
 
 In this case, the 'warning' action is set to call the user's `dq_issue()` function. This action is
@@ -179,60 +172,60 @@ level (i.e., set in the [`Validate`](https://posit-dev.github.io/pointblank/refe
 call) or at the step level. The key thing to be aware of is that step-level settings of thresholds
 and actions take precedence.
 
-## Using `get_action_metadata()` to Access Metadata When Building an Action Callable
+## Accessing Context in Actions
+
+While string templates provide helpful placeholders to access information about validation steps,
+callable functions offer more flexibility through access to detailed metadata. When using functions
+as actions, you can retrieve comprehensive information about the validation context, allowing for
+complex logic and dynamic responses to validation issues.
+
+### Using `get_action_metadata()` in Callables
 
 To access information about the validation step where an action was triggered, we can call
 [`get_action_metadata()`](https://posit-dev.github.io/pointblank/reference/get_action_metadata.html)
-in the body of a function to be used within `Actions`. The dictionary that's returned by that
-function allows us to make more generalized actions that could react accordingly to different
-failure states.
-
-In the following example, we'll make a function called `print_problem()` that prints information to
-the console about the failure state for a validation step. In this case, the action will be applied
-to any threshold level being exceeded (by using `Actions(default=print_problem)`). And only the most
-severe level exceeded per step will execute `print_problem()` since `Actions(highest_only=True)` by
-default.
+in the body of a function to be used within
+[`Actions`](https://posit-dev.github.io/pointblank/reference/Actions.html). This provides useful
+context about the validation step that triggered the action.
 
 ```{python}
 def print_problem():
     m = pb.get_action_metadata()
     print(f"{m['level']} ({m['level_num']}) for Step {m['step']}: {m['failure_text']}")
 
-
-validation = (
+(
     pb.Validate(
         data=pb.load_dataset(dataset="game_revenue", tbl_type="duckdb"),
         thresholds=pb.Thresholds(warning=0.05, error=0.10, critical=0.15),
+
+        # Use the `print_problem()` function as the action ---
         actions=pb.Actions(default=print_problem),
         brief=True,
     )
-    .col_vals_regex(
-        columns="player_id",
-        pattern=r"[A-Z]{12}\d{3}"
-    )
-    .col_vals_gt(
-        columns="item_revenue",
-        value=0.05
-    )
-    .col_vals_gt(
-        columns="session_duration",
-        value=15,
-    )
+    .col_vals_regex(columns="player_id", pattern=r"[A-Z]{12}\d{3}")
+    .col_vals_gt(columns="item_revenue", value=0.05)
+    .col_vals_gt(columns="session_duration", value=15)
     .interrogate()
 )
-
-validation
 ```
 
+In this example, we're creating a function called `print_problem()` that prints information about
+each validation step that fails. We then apply this function as the default action for all threshold
+levels using `actions=pb.Actions(default=print_problem)`. (Note that the `default=` and
+`highest_only=` parameters will be covered in more detail in following sections.)
+
 We end up seeing two messages printed for failures in Steps 2 and 3. And though those steps had more
-than one threshold exceeded, only the most severe level in each yielded a console message.
+than one threshold exceeded, only the most severe level in each yielded a console message (due to
+the default `highest_only=True` behavior).
 
-Alse note that we set the action in `Validate(actions=)` so that the action would apply to all
-validation steps where thresholds are exceeded. This obviated the need to set `actions=` at every
-validation step (though you can do this as a local override, even setting `actions=None` to disable
-globally set actions).
+By setting the action in `Validate(actions=)`, we applied it to all validation steps where
+thresholds are exceeded. This eliminates the need to set `actions=` at every validation step (though
+you can do this as a local override, even setting `actions=None` to disable globally set actions).
 
-The metadata dictionary contains the following fields for a given validation step:
+### Available Metadata Fields
+
+The dictionary returned by
+[`get_action_metadata()`](https://posit-dev.github.io/pointblank/reference/get_action_metadata.html)
+contains the following fields:
 
 - `step`: The step number.
 - `column`: The column name.
@@ -244,7 +237,131 @@ The metadata dictionary contains the following fields for a given validation ste
 - `autobrief`: A localized and brief statement of the expectation for the step.
 - `failure_text`: Localized text that explains how the validation step failed.
 
-## Final Actions with `FinalActions`
+## Customizing Action Behavior
+
+The [`Actions`](https://posit-dev.github.io/pointblank/reference/Actions.html) class has two
+additional parameters that provide more control over how actions are executed:
+
+### Setting Default Actions with `default=`
+
+Instead of specifying actions separately for each threshold level, you can use the `default`
+parameter to set a common action for all levels:
+
+```{python}
+def log_all_issues():
+    m = pb.get_action_metadata()
+    print(f"[{m['level'].upper()}] Validation failed in step {m['step']} with level {m['level']}")
+
+(
+    pb.Validate(
+        data=pb.load_dataset(dataset="game_revenue", tbl_type="duckdb"),
+        thresholds=pb.Thresholds(warning=0.05, error=0.10, critical=0.15),
+
+        # The `log_all_issues()` callable is set to every threshold ---
+        actions=pb.Actions(default=log_all_issues),
+    )
+    .col_vals_regex(columns="player_id", pattern=r"[A-Z]{12}\d{3}")
+    .col_vals_gt(columns="item_revenue", value=0.05)
+    .col_vals_gt(columns="session_duration", value=15)
+    .interrogate()
+)
+```
+
+The `default=` parameter sets the same action for all threshold levels. If you later specify an
+action for a specific level, it will override this default for that level only.
+
+When using the `default=` parameter, be aware that your action (whether a string template or
+callable function) needs to work across all validation steps where thresholds might be exceeded. Not
+all validation methods provide the same context for string templates or in the metadata dictionary
+returned by
+[`get_action_metadata()`](https://posit-dev.github.io/pointblank/reference/get_action_metadata.html).
+
+For example, some validation steps like
+[`col_vals_gt()`](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_gt.html)
+provide a `value` field that can be accessed with `{value}` in string templates, while others like
+[`col_exists()`](https://posit-dev.github.io/pointblank/reference/Validate.col_exists.html) don't
+have this concept. When creating default actions, either use only the universally available
+placeholders (`{step}`, `{level}`, `{type}`, and `{time}`), or include conditional logic in your
+callable functions to handle different validation types appropriately.
+
+### Controlling Action Execution with `highest_only=`
+
+By default, Pointblank only executes the action for the most severe threshold level that's been
+exceeded. If you want actions for all exceeded thresholds to be executed, you can set
+`highest_only=False`:
+
+```{python}
+(
+    pb.Validate(
+        data=pb.load_dataset(dataset="game_revenue", tbl_type="duckdb"),
+        thresholds=pb.Thresholds(warning=0.05, error=0.10, critical=0.15),
+        actions=pb.Actions(
+            warning="Warning threshold exceeded in step {step}",
+            error="Error threshold exceeded in step {step}",
+            critical="Critical threshold exceeded in step {step}",
+
+            # Execute all applicable actions ---
+            highest_only=False
+        ),
+    )
+    .col_vals_gt(columns="session_duration", value=15)
+    .interrogate()
+)
+```
+
+In this example, if all three thresholds are exceeded in a step, you'll see all three messages
+printed, rather than just the critical one.
+
+The default behavior (`highest_only=True`) helps prevent notification fatigue by limiting the number
+of actions executed when multiple thresholds are exceeded in the same validation step. For example,
+if a validation step fails with 60% of rows not passing, it would exceed 'warning', 'error', and
+'critical' thresholds simultaneously. With `highest_only=True`, only the critical action would
+execute.
+
+You might want to set `highest_only=False` when:
+
+- different threshold levels need to trigger different types of notifications (e.g., warnings to
+Slack, errors to email, critical to urgent notifications)
+- you need comprehensive logging of all severity levels for audit purposes
+- you're building a dashboard that displays counts of issues at each severity level
+
+## Using Multiple Actions for a Threshold
+
+You can specify multiple actions to be executed for a single threshold level by providing a list:
+
+```{python}
+def send_notification():
+    print("📧 Notification sent to data team")
+
+def log_to_system():
+    print("📝 Issue logged in system")
+
+(
+    pb.Validate(
+        data=pb.load_dataset(dataset="game_revenue", tbl_type="duckdb"),
+        thresholds=pb.Thresholds(critical=0.15),
+
+        # Set multiple actions for the critical threshold exceedance ---
+        actions=pb.Actions(
+            critical=[
+                "CRITICAL: Data validation failed",  # First action: display message
+                send_notification,                   # Second action: call function
+                log_to_system                        # Third action: call another function
+            ]
+        ),
+    )
+    .col_vals_gt(columns="session_duration", value=15)
+    .interrogate()
+)
+```
+
+When providing a list of actions, they will be executed in sequence when the threshold is exceeded.
+This allows you to combine different types of actions such as displaying messages, sending
+notifications, and logging events.
+
+## Final Actions
+
+### Creating Final Actions
 
 When you need to execute actions after all validation steps are complete, Pointblank provides the
 [`FinalActions`](https://posit-dev.github.io/pointblank/reference/FinalActions.html) class. Unlike
@@ -257,35 +374,27 @@ Here's how to use
 [`FinalActions`](https://posit-dev.github.io/pointblank/reference/FinalActions.html):
 
 ```{python}
-import pointblank as pb
-
 def send_alert():
     summary = pb.get_validation_summary()
     if summary["highest_severity"] == "critical":
         print(f"ALERT: Critical validation failures found in `{summary['tbl_name']}`")
 
-validation_with_final = (
+(
     pb.Validate(
         data=pb.load_dataset(dataset="game_revenue", tbl_type="duckdb"),
         tbl_name="game_revenue",
         thresholds=pb.Thresholds(warning=0.05, error=0.10, critical=0.15),
+
+        # Set final actions to be executed after all interrogations ---
         final_actions=pb.FinalActions(
-            "Validation complete.",  # a string message
-            send_alert               # a callable function
+            "Validation complete.",  # 1. a string message
+            send_alert               # 2. a callable function
         )
     )
-    .col_vals_regex(
-        columns="player_id",
-        pattern=r"[A-Z]{12}\d{3}"
-    )
-    .col_vals_gt(
-        columns="item_revenue",
-        value=0.10
-    )
+    .col_vals_regex(columns="player_id", pattern=r"[A-Z]{12}\d{3}")
+    .col_vals_gt(columns="item_revenue", value=0.10)
     .interrogate()
 )
-
-validation_with_final
 ```
 
 In this example:
@@ -296,8 +405,6 @@ In this example:
 
 Because the 'critical' threshold was exceeded in Step 2, we see the printed alert of `send_alert()`
 after the simple string message.
-
-### Creating Final Actions
 
 [`FinalActions`](https://posit-dev.github.io/pointblank/reference/FinalActions.html) accepts any
 number of actions as positional arguments. Each argument can be:
@@ -327,7 +434,8 @@ def comprehensive_report():
 
     # Take additional actions based on results
     if summary["n_failing_steps"] > 0:
-        # Create and execute a Slack notification
+
+        # Create a Slack notification function ---
         notify = pb.send_slack_notification(
             webhook_url="https://hooks.slack.com/services/your/webhook/url",
             summary_msg="""
@@ -338,56 +446,42 @@ def comprehensive_report():
             • Time: {time}
             """,
         )
-        notify()  # Execute the notification function
 
+        # Execute the notification function
+        notify()
 
-validation = (
+(
     pb.Validate(
         data=pb.load_dataset(dataset="game_revenue", tbl_type="duckdb"),
         tbl_name="game_revenue",
         final_actions=pb.FinalActions(comprehensive_report),
     )
-    .col_vals_regex(
-        columns="player_id",
-        pattern=r"[A-Z]{12}\d{3}"
-    )
-    .col_vals_gt(
-        columns="item_revenue",
-        value=0.05
-    )
+    .col_vals_regex(columns="player_id", pattern=r"[A-Z]{12}\d{3}")
+    .col_vals_gt(columns="item_revenue", value=0.05)
     .interrogate()
 )
-
-validation
 ```
 
 ```{python}
 # | echo: false
 
-validation = (
+(
     pb.Validate(
         data=pb.load_dataset(dataset="game_revenue", tbl_type="duckdb"),
         tbl_name="game_revenue",
     )
-    .col_vals_regex(
-        columns="player_id",
-        pattern=r"[A-Z]{12}\d{3}"
-    )
-    .col_vals_gt(
-        columns="item_revenue",
-        value=0.05
-    )
+    .col_vals_regex(columns="player_id", pattern=r"[A-Z]{12}\d{3}")
+    .col_vals_gt(columns="item_revenue", value=0.05)
     .interrogate()
 )
-
-validation
 ```
 
 Here we used the [`send_slack_notification()`](https://posit-dev.github.io/pointblank/reference/send_slack_notification.html)
 function, which is available in Pointblank as a pre-built action. It can be used by itself in
-`final_actions=` but here it's integrated into the user's `comprehensive_report()` function.
+`final_actions=` but here it's integrated into the user's `comprehensive_report()` function to
+provide finer control with conditional logic.
 
-### Combining the Two Types of Actions
+### Combining Step-level and Final Actions
 
 You can use both [`Actions`](https://posit-dev.github.io/pointblank/reference/Actions.html) and
 [`FinalActions`](https://posit-dev.github.io/pointblank/reference/FinalActions.html) together for
@@ -407,32 +501,52 @@ def generate_summary():
     total_units = sum(summary["dict_n"].values())
     print(f"Validation complete: {total_failed} failures out of {total_units} tests")
 
-
-validation_combined = (
+(
     pb.Validate(
         data=pb.load_dataset(dataset="game_revenue", tbl_type="duckdb"),
         thresholds=pb.Thresholds(warning=0.05, error=0.10),
+
+        # Set an action for each step (highest threshold exceeded) ---
         actions=pb.Actions(default=log_step_failure),
+
+        # Set a final action to get a summary of the validation process ---
         final_actions=pb.FinalActions(generate_summary),
     )
-    .col_vals_regex(
-        columns="player_id",
-        pattern=r"[A-Z]{12}\d{3}"
-    )
-    .col_vals_gt(
-        columns="item_revenue",
-        value=0.05
-    )
+    .col_vals_regex(columns="player_id", pattern=r"[A-Z]{12}\d{3}")
+    .col_vals_gt(columns="item_revenue", value=0.05)
     .interrogate()
 )
 ```
 
 This approach allows you to:
 
-1. Log individual step failures during the validation process using
+1. log individual step failures during the validation process using
 [`Actions`](https://posit-dev.github.io/pointblank/reference/Actions.html)
-2. Generate a comprehensive report after all validation steps are complete using
+2. generate a comprehensive report after all validation steps are complete using
 [`FinalActions`](https://posit-dev.github.io/pointblank/reference/FinalActions.html)
 
 Using both action types gives you fine-grained control over when and how notifications and other
 actions are triggered in your validation workflow.
+
+## Conclusion
+
+Actions provide a powerful mechanism for responding to data validation results in Pointblank. By
+combining threshold settings with appropriate actions, you can create sophisticated data quality
+workflows that:
+
+- provide immediate feedback through console messages
+- execute custom functions when validation thresholds are exceeded
+- customize notifications based on severity levels
+- generate comprehensive reports after validation is complete
+- automate responses to data quality issues
+
+The flexible design of [`Actions`](https://posit-dev.github.io/pointblank/reference/Actions.html)
+and [`FinalActions`](https://posit-dev.github.io/pointblank/reference/FinalActions.html) allows you
+to start simple with basic console messages and gradually build up to complex validation workflows
+with conditional logic, custom reporting, and integrations with other systems like Slack, email, or
+logging services.
+
+When designing your validation strategy, consider leveraging both step-level actions for immediate
+responses and final actions for holistic reporting. This combination provides comprehensive control
+over your data validation process and helps ensure that data quality issues are detected, reported,
+and addressed efficiently.

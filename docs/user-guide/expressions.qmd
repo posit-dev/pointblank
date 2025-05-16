@@ -1,0 +1,191 @@
+---
+title: Expression-Based Validation
+jupyter: python3
+toc-expand: 2
+html-table-processing: none
+---
+
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_footer=False)
+```
+
+While Pointblank offers many specialized validation functions for common data quality checks,
+sometimes you need more flexibility for complex validation requirements. This is where
+expression-based validation with
+[`col_vals_expr()`](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_expr.html)
+comes in.
+
+The [`col_vals_expr()`](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_expr.html)
+method allows you to:
+
+- combine multiple conditions in a single validation step
+- access row-wise values across multiple columns
+
+Now let's explore how to use these capabilities through a collection of examples!
+
+## Basic Usage
+
+At its core,
+[`col_vals_expr()`](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_expr.html)
+validates whether an expression evaluates to `True` for each row in your data. Here's a simple
+example:
+
+```{python}
+import pointblank as pb
+import polars as pl
+
+# Load small_table dataset as a Polars DataFrame
+small_table_pl = pb.load_dataset(dataset="small_table", tbl_type="polars")
+
+(
+    pb.Validate(data=small_table_pl)
+    .col_vals_expr(
+
+        # Use Polars expression syntax ---
+        expr=pl.col("d") > pl.col("a") * 50,
+        brief="Column `d` should be at least 50 times larger than `a`."
+    )
+    .interrogate()
+)
+```
+
+In this example, we're validating that for each row, the value in column `d` is at least 50 times
+larger than the value in column `a`.
+
+## Notes on Expression Syntax
+
+The expression syntax depends on your table type:
+
+- **Polars**: uses Polars expression syntax with `pl.col("column_name")`
+- **Pandas**: uses standard Python/NumPy syntax
+
+The expression should:
+
+- evaluate to a boolean result for each row
+- reference columns using the appropriate syntax for your table type
+- use standard operators (`+`, `-`, `*`, `/`, `>`, `<`, `==`, etc.)
+- not include assignments
+
+## Complex Expressions
+
+The real power of
+[`col_vals_expr()`](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_expr.html)
+comes with complex expressions that would be difficult to represent using the standard validation
+functions:
+
+```{python}
+# Load game_revenue dataset as a Polars DataFrame
+game_revenue_pl = pb.load_dataset(dataset="game_revenue", tbl_type="polars")
+
+(
+    pb.Validate(data=game_revenue_pl)
+    .col_vals_expr(
+
+        # Use Polars expression syntax ---
+        expr=(pl.col("session_duration") > 20) | (pl.col("item_revenue") > 10),
+        brief="Sessions should be either long (>20 min) or high-value (>$10)."
+    )
+    .interrogate()
+)
+```
+
+This validates that either the session duration is longer than 20 minutes OR the item revenue is
+greater than $10.
+
+## Example: Multiple Conditions
+
+You can create sophisticated validations with multiple conditions:
+
+```{python}
+# Create a simple Polars DataFrame
+employee_df = pl.DataFrame({
+    "age": [25, 30, 15, 40, 35],
+    "income": [50000, 75000, 0, 100000, 60000],
+    "years_experience": [3, 8, 0, 15, 7]
+})
+
+(
+    pb.Validate(data=employee_df, tbl_name="employee_data")
+    .col_vals_expr(
+        # Complex condition with multiple comparisons
+        expr=(
+            (pl.col("age") >= 18) &
+            (pl.col("income") / (pl.col("years_experience") + 1) <= 25000)
+        ),
+        brief="Adults should have reasonable income-to-experience ratios."
+    )
+    .interrogate()
+)
+```
+
+## Example: Handling Null Values
+
+When working with expressions, consider how to handle null/missing values:
+
+```{python}
+(
+    pb.Validate(data=small_table_pl)
+    .col_vals_expr(
+        # Check for nulls before division
+        expr=(pl.col("c").is_not_null()) & ((pl.col("c") / pl.col("a")) > 1.5),
+        brief="Ratio of `c`/`a` should exceed 1.5 (when `c` is not null)."
+    )
+    .interrogate()
+)
+```
+
+## Best Practices
+
+Here are some tips and tricks for effectively using expression-based validation with
+[`col_vals_expr()`](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_expr.html).
+
+### Document Your Expressions
+
+Always provide clear documentation in the `brief=` parameter:
+
+```{python}
+(
+    pb.Validate(data=small_table_pl)
+    .col_vals_expr(
+        expr=pl.col("d") > pl.col("a") * 1.5,
+        # Document which columns are being compared
+        brief="Column `d` should be at least 1.5 times larger than column `a`."
+    )
+    .interrogate()
+)
+```
+
+### Handle Edge Cases
+
+Consider potential edge cases like division by zero or nulls:
+
+```{python}
+(
+    pb.Validate(data=small_table_pl)
+    .col_vals_expr(
+        # Check denominator before division
+        expr=(pl.col("a") != 0) & (pl.col("d") / pl.col("a") > 1.5),
+        brief="Ratio of `d`/`a` should exceed 1.5 (avoiding division by zero)."
+    )
+    .interrogate()
+)
+```
+
+### Test on Small Datasets First
+
+When developing complex expressions, test on a small sample of your data first to ensure your logic
+is correct before applying it to large datasets.
+
+## Conclusion
+
+The [`col_vals_expr()`](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_expr.html)
+method provides a powerful way to implement complex validation logic in Pointblank when standard
+validation methods aren't sufficient. By leveraging expressions, you can create sophisticated data
+quality checks tailored to your specific requirements, combining conditions across multiple columns
+and applying transformations as needed.
+
+This flexibility makes expression-based validation an essential tool for addressing complex data
+quality scenarios in your validation workflows.

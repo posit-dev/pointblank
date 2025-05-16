@@ -1,0 +1,296 @@
+---
+title: Overview
+jupyter: python3
+toc-expand: 2
+html-table-processing: none
+---
+
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_footer=False)
+```
+
+This article provides a quick overview of the data validation features in Pointblank. It introduces
+the key concepts and shows examples of the main functionality, giving you a foundation for using the
+library effectively.
+
+Later articles in the **User Guide** will expand on each section covered here, providing more
+explanations and examples.
+
+## Validation Methods
+
+Pointblank's core functionality revolves around validation steps, which are individual checks that
+verify different aspects of your data. These steps are created by calling validation methods from
+the [`Validate`](https://posit-dev.github.io/pointblank/reference/Validate.html) class. When
+combined they create a comprehensive validation plan for your data.
+
+Here's an example of a validation that incorporates three different validation methods:
+
+```{python}
+import pointblank as pb
+import polars as pl
+
+(
+    pb.Validate(
+        data=pb.load_dataset(dataset="small_table", tbl_type="polars"),
+        label="Three different validation methods."
+    )
+    .col_vals_gt(columns="a", value=0)
+    .rows_distinct()
+    .col_exists(columns="date")
+    .interrogate()
+)
+```
+
+This example showcases how you can combine different types of validations in a single validation
+plan:
+
+- a column value validation with
+[`col_vals_gt()`](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_gt.html)
+- a row-based validation with
+[`rows_distinct()`](https://posit-dev.github.io/pointblank/reference/Validate.rows_distinct.html)
+- a table structure validation with
+[`col_exists()`](https://posit-dev.github.io/pointblank/reference/Validate.col_exists.html)
+
+Most validation methods share common parameters that enhance their flexibility and power. These
+shared parameters (overviewed in the next few sections) create a consistent interface across all
+validation steps while allowing you to customize validation behavior for specific needs.
+
+## Column Selection Patterns
+
+You can apply the same validation logic to multiple columns at once through use of column selection
+patterns (used in the `columns=` parameter). This reduces repetitive code and makes your validation
+plans more maintainable:
+
+```{python}
+import narwhals.selectors as nws
+
+# Map validations across multiple columns
+(
+    pb.Validate(
+        data=pb.load_dataset(dataset="small_table", tbl_type="polars"),
+        label="Applying column mapping in `columns`."
+    )
+
+    # Apply validation rules to multiple columns ---
+    .col_vals_not_null(
+        columns=["a", "b", "c"]
+    )
+
+    # Apply to numeric columns only with a Narwhals selector ---
+    .col_vals_gt(
+        columns=nws.numeric(),
+        value=0
+    )
+    .interrogate()
+)
+```
+
+This technique is particularly valuable when working with wide datasets containing many
+similarly-structured columns or when applying standard quality checks across an entire table. It
+also ensures consistency in how validation rules are applied across related data columns.
+
+## Preprocessing
+
+Preprocessing (with the `pre=` parameter) allows you to transform or modify your data before
+applying validation checks, enabling you to validate derived or modified data without altering the
+original dataset:
+
+```{python}
+import polars as pl
+
+(
+    pb.Validate(
+        data=pb.load_dataset(dataset="small_table", tbl_type="polars"),
+        label="Preprocessing validation steps via `pre=`."
+    )
+    .col_vals_gt(
+        columns="a", value=5,
+
+        # Apply transformation before validation ---
+        pre=lambda df: df.with_columns(
+            pl.col("a") * 2  # Double values before checking
+        )
+    )
+    .col_vals_lt(
+        columns="c", value=100,
+
+        # Apply more complex transformation ---
+        pre=lambda df: df.with_columns(
+            pl.col("c").pow(2)  # Square values before checking
+        )
+    )
+    .interrogate()
+)
+```
+
+Preprocessing enables validation of transformed data without modifying your original dataset, making
+it ideal for checking derived metrics, or validating normalized values. This approach keeps your
+validation code clean while allowing for sophisticated data quality checks on calculated results.
+
+## Segmentation
+
+Segmentation (through the `segments=` parameter) allows you to validate data across different
+groups, enabling you to identify segment-specific quality issues that might be hidden in aggregate
+analyses:
+
+```{python}
+(
+    pb.Validate(
+        data=pb.load_dataset(dataset="small_table", tbl_type="polars"),
+        label="Segmenting validation steps via `segments=`."
+    )
+    .col_vals_gt(
+        columns="c", value=3,
+
+        # Split into steps by categorical values in column 'f' ---
+        segments="f"
+    )
+    .interrogate()
+)
+```
+
+Segmentation is powerful for detecting patterns of quality issues that may exist only in specific
+data subsets, such as certain time periods, categories, or geographical regions. It helps ensure
+that all significant segments of your data meet quality standards, not just the data as a whole.
+
+## Thresholds
+
+Thresholds (set through the `thresholds=` parameter) let you set acceptable levels of failure before
+triggering warnings, errors, or critical notifications for individual validation steps:
+
+```{python}
+(
+    pb.Validate(
+        data=pb.load_dataset(dataset="small_table", tbl_type="polars"),
+        label="Using thresholds."
+    )
+
+    # Add validation steps with different thresholds ---
+    .col_vals_gt(
+        columns="a", value=1,
+        thresholds=pb.Thresholds(warning=0.1, error=0.2, critical=0.3)
+    )
+
+    # Add another step with stricter thresholds ---
+    .col_vals_lt(
+        columns="c", value=10,
+        thresholds=pb.Thresholds(warning=0.05, error=0.1)
+    )
+    .interrogate()
+)
+```
+
+Thresholds provide a nuanced way to monitor data quality, allowing you to set different severity
+levels based on the importance of each validation and your organization's tolerance for specific
+types of data issues.
+
+## Actions
+
+Actions (which can be configured in the `actions=` parameter) allow you to define specific responses
+when validation thresholds are crossed. You can use simple string messages or custom functions for
+more complex behavior:
+
+```{python}
+# Example 1: Action with a string message ---
+
+(
+    pb.Validate(
+        data=pb.load_dataset(dataset="small_table", tbl_type="polars"),
+        label="Using actions with a string message."
+    )
+    .col_vals_gt(
+        columns="c", value=2,
+        thresholds=pb.Thresholds(warning=0.1, error=0.2),
+
+        # Add a print-to-console action for the 'warning' threshold ---
+        actions=pb.Actions(
+            warning="WARNING: Values below `{value}` detected in column 'c'."
+        )
+    )
+    .interrogate()
+)
+```
+
+```{python}
+# Example 2: Action with a callable function ---
+
+def custom_action():
+    from datetime import datetime
+    print(f"Data quality issue found ({datetime.now()}).")
+
+(
+    pb.Validate(
+        data=pb.load_dataset(dataset="small_table", tbl_type="polars"),
+        label="Using actions with a callable function."
+    )
+    .col_vals_gt(
+        columns="a", value=5,
+        thresholds=pb.Thresholds(warning=0.1, error=0.2),
+
+        # Apply the function to the 'error' threshold ---
+        actions=pb.Actions(error=custom_action)
+    )
+    .interrogate()
+)
+```
+
+With custom action functions, you can implement sophisticated responses like sending notifications
+or logging to external systems.
+
+## Briefs
+
+Briefs (which can be set through the `brief=` parameter) allow you to customize descriptions
+associated with validation steps, making validation results more understandable to stakeholders.
+Briefs can be either automatically generated by setting `brief=True` or defined as custom messages
+for more specific explanations:
+
+```{python}
+(
+    pb.Validate(
+        data=pb.load_dataset(dataset="small_table", tbl_type="polars"),
+        label="Using `brief=` for displaying brief messages."
+    )
+    .col_vals_gt(
+        columns="a", value=0,
+
+        # Use `True` for automatic generation of briefs ---
+        brief=True
+    )
+    .col_exists(
+        columns=["date", "date_time"],
+
+        # Add a custom brief for this validation step ---
+        brief="Verify required date columns exist for time-series analysis"
+    )
+    .interrogate()
+)
+```
+
+Briefs make validation results more meaningful by providing context about why each check matters.
+They're particularly valuable in shared reports where stakeholders from various disciplines need to
+understand validation results in domain-specific terms.
+
+## Getting More Information
+
+Each validation step can be further customized and has additional options. See these pages for more
+information:
+
+- [Validation Methods](validation-methods.qmd): A closer look at the more common validation methods
+- [Column Selection Patterns](column-selection-patterns.qmd): Techniques for targeting specific columns
+- [Preprocessing](preprocessing.qmd): Transform data before validation
+- [Segmentation](segmentation.qmd): Apply validations to specific segments of your data
+- [Thresholds](thresholds.qmd): Set quality standards and trigger severity levels
+- [Actions](actions.qmd): Respond to threshold exceedances with notifications or custom functions
+- [Briefs](briefs.qmd): Add context to validation steps
+
+## Conclusion
+
+Validation steps are the building blocks of data validation in Pointblank. By combining steps from
+different categories and leveraging common features like thresholds, actions, and preprocessing, you
+can create comprehensive data quality checks tailored to your specific needs.
+
+The next sections of this guide will dive deeper into each of these topics, providing detailed
+explanations and examples.
