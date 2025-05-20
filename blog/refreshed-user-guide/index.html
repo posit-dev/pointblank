@@ -6,8 +6,10 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="author" content="Rich Iannone and Michael Chow">
+<meta name="dcterms.date" content="2025-05-20">
 
-<title>validate.f_passed – Pointblank</title>
+<title>Overhauling Pointblank’s User Guide – Pointblank</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -20,62 +22,27 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
-/* CSS for syntax highlighting */
-html { -webkit-text-size-adjust: 100%; }
-pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
-pre > code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-div.sourceCode { margin: 1em 0; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
-}
-@media print {
-pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
-}
-pre.numberSource code
-  { counter-reset: source-line 0; }
-pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-  }
-pre.numberSource { margin-left: 3em;  padding-left: 4px; }
-div.sourceCode
-  {   }
-@media screen {
-pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
-}
 </style>
 
 
-<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="../site_libs/quarto-nav/headroom.min.js"></script>
-<script src="../site_libs/clipboard/clipboard.min.js"></script>
-<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="../site_libs/quarto-search/fuse.min.js"></script>
-<script src="../site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="../">
-<link href="../assets/fav-logo.png" rel="icon" type="image/png">
-<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
-<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
-<script src="../site_libs/quarto-html/popper.min.js"></script>
-<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="../site_libs/quarto-html/anchor.min.js"></script>
-<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-e1a5c8363afafaef2c763b6775fbf3ca.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-b3a3f0431126c7e8c477b326e3ee3944.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../assets/fav-logo.png" rel="icon" type="image/png">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-e1a5c8363afafaef2c763b6775fbf3ca.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-b3a3f0431126c7e8c477b326e3ee3944.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -114,7 +81,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </script>
 
 
-<link rel="stylesheet" href="../styles.css">
+<link rel="stylesheet" href="../../styles.css">
 <link rel="stylesheet" href="reference/_styles-quartodoc.css">
 </head>
 
@@ -125,7 +92,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a class="navbar-brand" href="../index.html">
+    <a class="navbar-brand" href="../../index.html">
     <span class="navbar-title">Pointblank</span>
     </a>
   </div>
@@ -136,19 +103,19 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link" href="../user-guide/index.html"> 
+    <a class="nav-link" href="../../user-guide/index.html"> 
 <span class="menu-text">User Guide</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../demos/index.html"> 
+    <a class="nav-link" href="../../demos/index.html"> 
 <span class="menu-text">Examples</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../reference/index.html"> 
+    <a class="nav-link" href="../../reference/index.html"> 
 <span class="menu-text">API Reference</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../blog/index.html"> 
+    <a class="nav-link" href="../../blog/index.html"> 
 <span class="menu-text">Pointblog</span></a>
   </li>  
 </ul>
@@ -179,9 +146,15 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#parameters" id="toc-parameters" class="nav-link active" data-scroll-target="#parameters">Parameters</a></li>
-  <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
-  <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
+  <li><a href="#introduction-embracing-the-spiral-sequence" id="toc-introduction-embracing-the-spiral-sequence" class="nav-link active" data-scroll-target="#introduction-embracing-the-spiral-sequence">Introduction: Embracing the Spiral Sequence</a></li>
+  <li><a href="#improving-examples" id="toc-improving-examples" class="nav-link" data-scroll-target="#improving-examples">Improving Examples</a></li>
+  <li><a href="#rounding-out-api-coverage" id="toc-rounding-out-api-coverage" class="nav-link" data-scroll-target="#rounding-out-api-coverage">Rounding Out API Coverage</a></li>
+  <li><a href="#surfacing-advanced-topics" id="toc-surfacing-advanced-topics" class="nav-link" data-scroll-target="#surfacing-advanced-topics">Surfacing Advanced Topics</a>
+  <ul class="collapse">
+  <li><a href="#segmentation" id="toc-segmentation" class="nav-link" data-scroll-target="#segmentation">Segmentation</a></li>
+  <li><a href="#step-report" id="toc-step-report" class="nav-link" data-scroll-target="#step-report">Step Report</a></li>
+  </ul></li>
+  <li><a href="#looking-forward" id="toc-looking-forward" class="nav-link" data-scroll-target="#looking-forward">Looking Forward</a></li>
   </ul>
 </nav>
     </div>
@@ -190,14 +163,26 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Validate.f_passed</h1>
+<h1 class="title">Overhauling Pointblank’s User Guide</h1>
 </div>
 
 
 
 <div class="quarto-title-meta">
 
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Rich Iannone and Michael Chow </p>
+          </div>
+  </div>
     
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">May 20, 2025</p>
+    </div>
+  </div>
   
     
   </div>
@@ -207,70 +192,80 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </header>
 
 
-<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>Validate.f_passed(i<span class="op">=</span><span class="va">None</span>, scalar<span class="op">=</span><span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Provides a dictionary of the fraction of test units that passed for each validation step.</p>
-<p>A measure of the fraction of test units that passed is provided by the <code>f_passed</code> attribute. This is the fraction of test units that passed the validation step over the total number of test units. Given this is a fractional value, it will always be in the range of <code>0</code> to <code>1</code>.</p>
-<p>Test units are the atomic units of the validation process. Different validations can have different numbers of test units. For example, a validation that checks for the presence of a column in a table will have a single test unit. A validation that checks for the presence of a value in a column will have as many test units as there are rows in the table.</p>
-<p>This method provides a dictionary of the fraction of passing test units for each validation step. If the <code>scalar=True</code> argument is provided and <code>i=</code> is a scalar, the value is returned as a scalar instead of a dictionary. Furthermore, a value obtained here will be the complement to the analogous value returned by the <a href="../reference/Validate.f_failed.html#pointblank.Validate.f_failed"><code>f_failed()</code></a> method (i.e., <code>1 - f_failed()</code>).</p>
-<section id="parameters" class="level2 doc-section doc-section-parameters">
-<h2 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters">Parameters</h2>
-<dl>
-<dt><code><span class="parameter-name"><strong>i</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><code>int</code> | <code>list</code>[<code>int</code>] | None</span> <span class="parameter-default-sep">=</span> <span class="parameter-default">None</span></code></dt>
-<dd>
-<p>The validation step number(s) from which the fraction of passing test units is obtained. Can be provided as a list of integers or a single integer. If <code>None</code>, all steps are included.</p>
-</dd>
-<dt><code><span class="parameter-name"><strong>scalar</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><code>bool</code></span> <span class="parameter-default-sep">=</span> <span class="parameter-default">False</span></code></dt>
-<dd>
-<p>If <code>True</code> and <code>i=</code> is a scalar, return the value as a scalar instead of a dictionary.</p>
-</dd>
-</dl>
+<p>The Pointblank documentation just got a major upgrade! We’ve completely overhauled our <strong>User Guide</strong>. Our goal was to enable readers to start fast on validation and work through the many pieces needed in realistic situations.</p>
+<p>We realized that at the core of Pointblank is the validation plan. Its made up of rules, results, and steps.</p>
+<p><img src="validation-three-things.png" class="img-fluid" style="width:80.0%"></p>
+<p>For example, the first row is a step that checks whether values in column ‘a’ are less than <code>10</code>. The <code>COLUMNS</code> and <code>VALUES</code> column contain the rules used to configure the step. The <code>PASS</code> column for the first row indicates that all 13 values in the column passed.</p>
+<p>In this post, we’ll cover:</p>
+<ul>
+<li>using a spiral sequence to balance introductory breadth with subsequent depth</li>
+<li>improving examples with direct explanatory text</li>
+<li>rounding out API coverage for cross-linking</li>
+<li>surfacing advanced topics</li>
+</ul>
+<p>Let us walk you through the key improvements in our refreshed <strong>User Guide</strong>!</p>
+<section id="introduction-embracing-the-spiral-sequence" class="level2">
+<h2 class="anchored" data-anchor-id="introduction-embracing-the-spiral-sequence">Introduction: Embracing the Spiral Sequence</h2>
+<p>We chose to use a spiral sequence for our <a href="../../user-guide/index.html">Introduction</a> and <em>Validation Plan</em> section. The <a href="../../user-guide/index.html">Introduction</a> quickly covers parts of validation plan, while each article of the <em>Validation Plan</em> section dives deeper into different aspects of defining validation rules.</p>
+<div style="text-align: center;">
+<p><img src="breadth-and-depth.png" class="img-fluid" style="width:50.0%"></p>
+</div>
+<p>The introduction does a broad pass on the validation plan table diagram, identifying the core pieces of the output and then giving a quick overview of the code that produced it. This sets people up for the <em>Validation Plan</em> section in the guide, where each concept is discussed in depth.</p>
 </section>
-<section id="returns" class="level2 doc-section doc-section-returns">
-<h2 class="doc-section doc-section-returns anchored" data-anchor-id="returns">Returns</h2>
-<dl>
-<dt><code><span class="parameter-name"></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><code>dict</code>[<code>int</code>, <code>float</code>] | <code>float</code></span></code></dt>
-<dd>
-<p>A dictionary of the fraction of passing test units for each validation step or a scalar value.</p>
-</dd>
-</dl>
+<section id="improving-examples" class="level2">
+<h2 class="anchored" data-anchor-id="improving-examples">Improving Examples</h2>
+<p>Examples are everywhere in the <strong>User Guide</strong>. We’ve tightened up our approach to examples by:</p>
+<ul>
+<li>presenting example code, output, or both, early in each section</li>
+<li>showing the actual output you’ll see in your environment</li>
+<li>following up with explanatory text that guides attention to specific places in the output</li>
+</ul>
+<p>This approach makes learning more intuitive. Here’s an excerpt that shows this in practice.</p>
+<p><img src="explanation-of-visual.png" class="img-fluid" style="width:80.0%"></p>
+<p>The blue arrow marks the flow of reading and the red arrows map where we anticipate people will look from the text to the output. Focusing explicitly on where we think attention will go forces us to think carefully about exactly what readers will get from the output. The hope is that readers get to work more quickly on new concepts.</p>
 </section>
-<section id="examples" class="level2 doc-section doc-section-examples">
-<h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
-<p>In the example below, we’ll use a simple Polars DataFrame with three columns (<code>a</code>, <code>b</code>, and <code>c</code>). There will be three validation steps, all having some failing test units. After interrogation, the <code>f_passed()</code> method is used to determine the fraction of passing test units for each validation step.</p>
-<div id="7fb79252" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>tbl <span class="op">=</span> pl.DataFrame(</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    {</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>        <span class="st">"a"</span>: [<span class="dv">7</span>, <span class="dv">4</span>, <span class="dv">9</span>, <span class="dv">7</span>, <span class="dv">12</span>, <span class="dv">3</span>, <span class="dv">10</span>],</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>        <span class="st">"b"</span>: [<span class="dv">9</span>, <span class="dv">8</span>, <span class="dv">10</span>, <span class="dv">5</span>, <span class="dv">10</span>, <span class="dv">6</span>, <span class="dv">2</span>],</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>        <span class="st">"c"</span>: [<span class="st">"a"</span>, <span class="st">"b"</span>, <span class="st">"c"</span>, <span class="st">"a"</span>, <span class="st">"b"</span>, <span class="st">"d"</span>, <span class="st">"c"</span>]</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    }</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    .col_vals_gt(columns<span class="op">=</span><span class="st">"a"</span>, value<span class="op">=</span><span class="dv">5</span>)</span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    .col_vals_gt(columns<span class="op">=</span><span class="st">"b"</span>, value<span class="op">=</span>pb.col(<span class="st">"a"</span>))</span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>    .col_vals_in_set(columns<span class="op">=</span><span class="st">"c"</span>, <span class="bu">set</span><span class="op">=</span>[<span class="st">"a"</span>, <span class="st">"b"</span>])</span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>validation.f_passed()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="1">
-<pre><code>{1: 0.7142857142857143, 2: 0.5714285714285714, 3: 0.5714285714285714}</code></pre>
+<section id="rounding-out-api-coverage" class="level2">
+<h2 class="anchored" data-anchor-id="rounding-out-api-coverage">Rounding Out API Coverage</h2>
+<p>Documentation has to balance jobs between a user guide and an API Reference:</p>
+<ul>
+<li>User Guide: explains concepts that cut across functions (like common arguments across <a href="../../user-guide/validation-methods.html">validation methods</a>)</li>
+<li>API Reference: explains each individual function</li>
+</ul>
+<p>Importantly, user guides often link to the API reference so, as part of this work, we made sure that all individual API entries are well-documented and linked to from the guide. Here’s an excerpt from the User Guide that shows links marked:</p>
+<p><img src="links-in-guide.png" class="img-fluid" style="width:80.0%"></p>
+</section>
+<section id="surfacing-advanced-topics" class="level2">
+<h2 class="anchored" data-anchor-id="surfacing-advanced-topics">Surfacing Advanced Topics</h2>
+<p>There’s a lot of potential slicing and dicing involved in validation, as well as work after validation (post interrogation) to make sense of the results. We added pages to the user guide for some core situations. In this section, I’ll highlight two advanced topics we added pages for:</p>
+<ul>
+<li>segmentation: splitting a column into groups, and validating each group</li>
+<li>step reports: view failing cases (e.g., view rows of data that failed validation)</li>
+</ul>
+<p>These are marked in the <strong>User Guide</strong> sidebar screenshot below:</p>
+<div style="text-align: center;">
+<p><img src="advanced-in-sidebar.png" class="img-fluid" style="width:35.0%"></p>
 </div>
-</div>
-<p>The returned dictionary shows the fraction of passing test units for each validation step. The values are all less than <code>1</code> since there were failing test units in each step.</p>
-<p>If we wanted to check the fraction of passing test units for a single validation step, we can provide the step number. Also, we could have the value returned as a scalar by setting <code>scalar=True</code> (ensuring that <code>i=</code> is a scalar).</p>
-<div id="2a7c6bcb" class="cell" data-execution_count="2">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>validation.f_passed(i<span class="op">=</span><span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="2">
-<pre><code>{1: 0.7142857142857143}</code></pre>
-</div>
-</div>
-<p>The returned value is the proportion of passing test units for the first validation step (5 passing test units out of 7 total test units).</p>
+<section id="segmentation" class="level3">
+<h3 class="anchored" data-anchor-id="segmentation">Segmentation</h3>
+<p>Here’s a screenshot of a validation report with two validation steps, one for each segment (<code>"low"</code> and <code>"high"</code>) in the <code>f</code> column of the <code>small_table</code> dataset.</p>
+<p><img src="segments.png" class="img-fluid" style="width:80.0%"></p>
+<p>Notice that segments split columns into groups and apply the same validation to each of the groups. Each group is given its own step.</p>
+<p>Each of the 20+ validation methods accept a <code>segment=</code> argument. The value of the Segments page in the User Guide is to describe this cross-cutting behavior in a single place.</p>
+<p>Compare the <code>segments=</code> parameter in the API Reference (e.g., look at <a href="../../reference/Validate.col_vals_gt.html"><code>col_vals_gt()</code></a>) and the <a href="../../user-guide/segmentation.html">Segmentation article in the User Guide</a> to get a feel for how each location documents the segments feature.</p>
+</section>
+<section id="step-report" class="level3">
+<h3 class="anchored" data-anchor-id="step-report">Step Report</h3>
+<p>Step reports display failing cases (e.g., rows) for a validation step, so you can dig deeper into validation failures. Here’s a screenshot of a step report for some validation step 2:</p>
+<p><img src="step-report.png" class="img-fluid" style="width:80.0%"></p>
+<p>Notice the arrow pointing to ‘Step 2’ in the title. Failing values are highlighted in red. Once we know we have failures, it’s important to take action and discover <em>why</em> data is failing. Looking at failing cases in step reports often uncovers obvious causes behind failures.</p>
+<p>The <code>get_step_report()</code> entry is one of 50 in the API Reference. Here it is listed the API Reference, in the <a href="../../reference/index.html#interrogation-and-reporting">Interrogation and Reporting section</a>. Critically, it’s only one of 20 entries in the <a href="../../user-guide/index.html">User Guide</a>, which emphasizes its importance in validation workflows.</p>
+</section>
+</section>
+<section id="looking-forward" class="level2">
+<h2 class="anchored" data-anchor-id="looking-forward">Looking Forward</h2>
+<p>The refreshed <strong>User Guide</strong> is just the beginning of our documentation improvements. We’re committed to continuously enhancing our documentation to support your data validation needs.</p>
+<p>Michael Chow gave feedback on this <strong>User Guide</strong> in preparation for his <a href="https://cfp.scipy.org/scipy2025/talk/NRMNDX/">upcoming talk at SciPy 2025</a>.</p>
+<p>We’d love to hear your feedback on the new User Guide! Feel free to open an issue on our <a href="https://github.com/posit-dev/pointblank/issues">GitHub repository</a> with suggestions, corrections, or requests for additional topics you’d like to see covered. You can also join our community discussions in the dedicated <code>#Documentation</code> channel on our <a href="https://discord.com/invite/YH7CybCNCQ">Discord server</a>, where you can share ideas, ask questions, and get help directly from the Pointblank team and other users.</p>
 
 
 </section>
