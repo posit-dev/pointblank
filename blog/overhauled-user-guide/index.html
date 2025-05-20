@@ -192,7 +192,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </header>
 
 
-<p>The Pointblank documentation just got a major upgrade! We’ve completely overhauled our <strong>User Guide</strong>. Our goal was to enable readers to start fast on validation and work through the many pieces needed in realistic situations.</p>
+<p>The Pointblank documentation just got a major upgrade! We’ve completely overhauled our <a href="../../user-guide/index.html"><strong>User Guide</strong></a>. Our goal was to enable readers to start fast on validation and work through the many pieces needed in realistic situations.</p>
 <p>We realized that at the core of Pointblank is the validation plan. Its made up of rules, results, and steps.</p>
 <p><img src="validation-three-things.png" class="img-fluid" style="width:80.0%"></p>
 <p>For example, the first row is a step that checks whether values in column ‘a’ are less than <code>10</code>. The <code>COLUMNS</code> and <code>VALUES</code> column contain the rules used to configure the step. The <code>PASS</code> column for the first row indicates that all 13 values in the column passed.</p>
@@ -203,7 +203,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <li>rounding out API coverage for cross-linking</li>
 <li>surfacing advanced topics</li>
 </ul>
-<p>Let us walk you through the key improvements in our refreshed <strong>User Guide</strong>!</p>
+<p>Let us walk you through the key improvements in our refreshed <a href="../../user-guide/index.html"><strong>User Guide</strong></a>!</p>
 <section id="introduction-embracing-the-spiral-sequence" class="level2">
 <h2 class="anchored" data-anchor-id="introduction-embracing-the-spiral-sequence">Introduction: Embracing the Spiral Sequence</h2>
 <p>We chose to use a spiral sequence for our <a href="../../user-guide/index.html">Introduction</a> and <em>Validation Plan</em> section. The <a href="../../user-guide/index.html">Introduction</a> quickly covers parts of validation plan, while each article of the <em>Validation Plan</em> section dives deeper into different aspects of defining validation rules.</p>
@@ -214,7 +214,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </section>
 <section id="improving-examples" class="level2">
 <h2 class="anchored" data-anchor-id="improving-examples">Improving Examples</h2>
-<p>Examples are everywhere in the <strong>User Guide</strong>. We’ve tightened up our approach to examples by:</p>
+<p>Examples are everywhere in the <a href="../../user-guide/index.html"><strong>User Guide</strong></a>. We’ve tightened up our approach to examples by:</p>
 <ul>
 <li>presenting example code, output, or both, early in each section</li>
 <li>showing the actual output you’ll see in your environment</li>
@@ -231,17 +231,17 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <li>User Guide: explains concepts that cut across functions (like common arguments across <a href="../../user-guide/validation-methods.html">validation methods</a>)</li>
 <li>API Reference: explains each individual function</li>
 </ul>
-<p>Importantly, user guides often link to the API reference so, as part of this work, we made sure that all individual API entries are well-documented and linked to from the guide. Here’s an excerpt from the User Guide that shows links marked:</p>
+<p>Importantly, user guides often link to the API reference so, as part of this work, we made sure that all individual API entries are well-documented and linked to from the guide. Here’s an excerpt from the <a href="../../user-guide/index.html"><strong>User Guide</strong></a> that shows links marked:</p>
 <p><img src="links-in-guide.png" class="img-fluid" style="width:80.0%"></p>
 </section>
 <section id="surfacing-advanced-topics" class="level2">
 <h2 class="anchored" data-anchor-id="surfacing-advanced-topics">Surfacing Advanced Topics</h2>
-<p>There’s a lot of potential slicing and dicing involved in validation, as well as work after validation (post interrogation) to make sense of the results. We added pages to the user guide for some core situations. In this section, I’ll highlight two advanced topics we added pages for:</p>
+<p>There’s a lot of potential slicing and dicing involved in validation, as well as work after validation (post interrogation) to make sense of the results. We added pages to the <a href="../../user-guide/index.html"><strong>User Guide</strong></a> for some core situations. In this section, I’ll highlight two advanced topics we added pages for:</p>
 <ul>
 <li>segmentation: splitting a column into groups, and validating each group</li>
 <li>step reports: view failing cases (e.g., view rows of data that failed validation)</li>
 </ul>
-<p>These are marked in the <strong>User Guide</strong> sidebar screenshot below:</p>
+<p>These are marked in the <a href="../../user-guide/index.html"><strong>User Guide</strong></a> sidebar screenshot below:</p>
 <div style="text-align: center;">
 <p><img src="advanced-in-sidebar.png" class="img-fluid" style="width:35.0%"></p>
 </div>
@@ -250,8 +250,8 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <p>Here’s a screenshot of a validation report with two validation steps, one for each segment (<code>"low"</code> and <code>"high"</code>) in the <code>f</code> column of the <code>small_table</code> dataset.</p>
 <p><img src="segments.png" class="img-fluid" style="width:80.0%"></p>
 <p>Notice that segments split columns into groups and apply the same validation to each of the groups. Each group is given its own step.</p>
-<p>Each of the 20+ validation methods accept a <code>segment=</code> argument. The value of the Segments page in the User Guide is to describe this cross-cutting behavior in a single place.</p>
-<p>Compare the <code>segments=</code> parameter in the API Reference (e.g., look at <a href="../../reference/Validate.col_vals_gt.html"><code>col_vals_gt()</code></a>) and the <a href="../../user-guide/segmentation.html">Segmentation article in the User Guide</a> to get a feel for how each location documents the segments feature.</p>
+<p>Each of the 20+ validation methods accept a <code>segment=</code> argument. The value of the <a href="../../user-guide/segmentation.html">Segmentation article in the User Guide</a> is to describe this cross-cutting behavior in a single place.</p>
+<p>Compare the <code>segments=</code> parameter in the API Reference (e.g., look at <a href="../../reference/Validate.col_vals_gt.html"><code>col_vals_gt()</code></a>) and the <a href="../../user-guide/segmentation.html">Segmentation article</a> to get a feel for how each location documents the segments feature.</p>
 </section>
 <section id="step-report" class="level3">
 <h3 class="anchored" data-anchor-id="step-report">Step Report</h3>
