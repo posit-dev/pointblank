@@ -431,7 +431,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 
 <p>Schema validation in Pointblank allows you to verify that your data conforms to an expected structure and type specification. This is particularly useful when ensuring data consistency across systems or validating incoming data against predefined requirements.</p>
 <p>Let’s first look at the dataset we’ll use for the first example:</p>
-<div id="8091d452" class="cell" data-execution_count="2">
+<div id="34a588bc" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Preview the small_table dataset we'll use throughout this guide</span></span>
@@ -640,7 +640,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="schema-definition-and-validation" class="level2">
 <h2 class="anchored" data-anchor-id="schema-definition-and-validation">Schema Definition and Validation</h2>
 <p>A schema in Pointblank is created using the <a href="https://posit-dev.github.io/pointblank/reference/Schema.html"><code>Schema</code></a> class which defines the expected structure of a table. Once created, you apply schema validation through the <a href="https://posit-dev.github.io/pointblank/reference/Validate.col_schema_match.html"><code>col_schema_match()</code></a> validation step.</p>
-<div id="6e19d2a0" class="cell" data-execution_count="3">
+<div id="6b0545b7" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a schema definition matching small_table structure</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    columns<span class="op">=</span>[</span>
@@ -818,7 +818,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 <p>The output shows the validation passed successfully. When all columns have the correct names and types as specified in the schema, the validation passes with a single passing test unit. If there were discrepancies, this would fail, but the basic output wouldn’t show specific issues.</p>
 <p>For detailed information about validation results, use <a href="https://posit-dev.github.io/pointblank/reference/Validate.get_step_report.html"><code>get_step_report()</code></a>:</p>
-<div id="bc17752d" class="cell" data-execution_count="4">
+<div id="45b42fd9" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>small_table_validation.get_step_report(i<span class="op">=</span><span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="4">
 <div id="pb_step_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
@@ -1029,7 +1029,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="discovering-column-types" class="level2">
 <h2 class="anchored" data-anchor-id="discovering-column-types">Discovering Column Types</h2>
 <p>To easily determine the correct type string for columns in your data, Pointblank provides two helpful functions:</p>
-<div id="eb2c45e3" class="cell" data-execution_count="5">
+<div id="9baa4548" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> datetime <span class="im">import</span> date</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1040,7 +1040,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">"join_date"</span>: [date(<span class="dv">2020</span>, <span class="dv">1</span>, <span class="dv">1</span>), date(<span class="dv">2021</span>, <span class="dv">3</span>, <span class="dv">15</span>), date(<span class="dv">2022</span>, <span class="dv">7</span>, <span class="dv">10</span>)]</span>
 <span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="20f9ebc1" class="cell" data-execution_count="6">
+<div id="65c5bb66" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Method 1: Using `preview()` with `show_types=True` to see column types</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>pb.preview(sample_df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="6">
@@ -1142,7 +1142,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
         
 </div>
 </div>
-<div id="0c448d06" class="cell" data-execution_count="7">
+<div id="23570c4e" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Method 2: Using `col_summary_tbl()` which shows column types and other details</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>pb.col_summary_tbl(sample_df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="7">
@@ -1337,7 +1337,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="using-a-list-of-tuples-with-columns" class="level3">
 <h3 class="anchored" data-anchor-id="using-a-list-of-tuples-with-columns">1. Using a List of Tuples with <code>columns=</code></h3>
 <p>This approach allows for mixed validation: some columns checked for both name and type, others only for name:</p>
-<div id="ed4a5cf7" class="cell" data-execution_count="8">
+<div id="7db68a4e" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>schema_tuples <span class="op">=</span> pb.Schema(</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    <span class="co"># List of tuples approach: flexible for mixed type/name checking ---</span></span>
@@ -1361,7 +1361,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="using-a-dictionary-with-columns" class="level3">
 <h3 class="anchored" data-anchor-id="using-a-dictionary-with-columns">2. Using a Dictionary with <code>columns=</code></h3>
 <p>This approach is often the most readable when defining a schema manually, especially for larger schemas:</p>
-<div id="c806bc18" class="cell" data-execution_count="9">
+<div id="41d0e03d" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>schema_dict <span class="op">=</span> pb.Schema(</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Dictionary approach (keys are column names, values are data types) ---</span></span>
@@ -1387,7 +1387,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="using-keyword-arguments" class="level3">
 <h3 class="anchored" data-anchor-id="using-keyword-arguments">3. Using Keyword Arguments</h3>
 <p>For more readable code with a small number of columns:</p>
-<div id="0c1f5df6" class="cell" data-execution_count="10">
+<div id="a69975ba" class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>schema_kwargs <span class="op">=</span> pb.Schema(</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Keyword arguments approach (more readable for simple schemas) ---</span></span>
@@ -1409,7 +1409,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="extracting-from-an-existing-table-with-tbl" class="level3">
 <h3 class="anchored" data-anchor-id="extracting-from-an-existing-table-with-tbl">4. Extracting from an Existing Table with <code>tbl=</code></h3>
 <p>You can automatically extract a schema from an existing table:</p>
-<div id="1c39821a" class="cell" data-execution_count="11">
+<div id="e3c1ee37" class="cell" data-execution_count="11">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a sample dataframe</span></span>
@@ -1436,7 +1436,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="multiple-data-types-for-a-column" class="level2">
 <h2 class="anchored" data-anchor-id="multiple-data-types-for-a-column">Multiple Data Types for a Column</h2>
 <p>You can specify multiple acceptable types for a column by providing a list of types:</p>
-<div id="1310b974" class="cell" data-execution_count="12">
+<div id="95fa2271" class="cell" data-execution_count="12">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Schema with multiple possible types for a column</span></span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>schema_multi_types <span class="op">=</span> pb.Schema(</span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>    columns<span class="op">=</span>{</span>
@@ -1503,7 +1503,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="controlling-column-presence" class="level3">
 <h3 class="anchored" data-anchor-id="controlling-column-presence">Controlling Column Presence</h3>
 <p>By default, <a href="https://posit-dev.github.io/pointblank/reference/Validate.col_schema_match.html"><code>col_schema_match()</code></a> requires a complete match between the schema’s columns and the table’s columns. You can make this more flexible:</p>
-<div id="43690c92" class="cell" data-execution_count="13">
+<div id="52622bcb" class="cell" data-execution_count="13">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a sample table</span></span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>users_table_extra <span class="op">=</span> pl.DataFrame({</span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"id"</span>: [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>],</span>
@@ -1677,7 +1677,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="column-order-enforcement" class="level3">
 <h3 class="anchored" data-anchor-id="column-order-enforcement">Column Order Enforcement</h3>
 <p>You can control whether column order matters in your validation:</p>
-<div id="488475c5" class="cell" data-execution_count="14">
+<div id="504b78d2" class="cell" data-execution_count="14">
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a sample table</span></span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>users_table <span class="op">=</span> pl.DataFrame({</span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"id"</span>: [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>],</span>
@@ -1840,7 +1840,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="case-sensitivity" class="level3">
 <h3 class="anchored" data-anchor-id="case-sensitivity">Case Sensitivity</h3>
 <p>Control whether column names and data types are case-sensitive:</p>
-<div id="5ef13e07" class="cell" data-execution_count="15">
+<div id="c318843a" class="cell" data-execution_count="15">
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create schema with different case charactistics</span></span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>case_schema <span class="op">=</span> pb.Schema(</span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>    columns<span class="op">=</span>{<span class="st">"ID"</span>: <span class="st">"int64"</span>, <span class="st">"NAME"</span>: <span class="st">"string"</span>, <span class="st">"AGE"</span>: <span class="st">"int64"</span>}</span>
@@ -1999,7 +1999,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="type-matching-precision" class="level3">
 <h3 class="anchored" data-anchor-id="type-matching-precision">Type Matching Precision</h3>
 <p>Control how strictly data types must match:</p>
-<div id="c5ea6ab8" class="cell" data-execution_count="16">
+<div id="f94bf9de" class="cell" data-execution_count="16">
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create schema with simplified type names</span></span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>type_schema <span class="op">=</span> pb.Schema(</span>
 <span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2168,7 +2168,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="structural-validation-only" class="level3">
 <h3 class="anchored" data-anchor-id="structural-validation-only">Structural Validation Only</h3>
 <p>When you only care about column names but not their types:</p>
-<div id="76ddc02f" class="cell" data-execution_count="17">
+<div id="a66267b1" class="cell" data-execution_count="17">
 <div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a schema with only column names</span></span>
 <span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>structure_schema <span class="op">=</span> pb.Schema(</span>
 <span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>    columns<span class="op">=</span>[<span class="st">"id"</span>, <span class="st">"name"</span>, <span class="st">"age"</span>, <span class="st">"extra_col"</span>]</span>
@@ -2329,7 +2329,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="mixed-validation" class="level3">
 <h3 class="anchored" data-anchor-id="mixed-validation">Mixed Validation</h3>
 <p>Validate types for critical columns but just presence for others:</p>
-<div id="753311b7" class="cell" data-execution_count="18">
+<div id="79dd26ff" class="cell" data-execution_count="18">
 <div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Mixed validation for different columns</span></span>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>mixed_schema <span class="op">=</span> pb.Schema(</span>
 <span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>    columns<span class="op">=</span>[</span>
@@ -2495,7 +2495,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="progressive-schema-evolution" class="level3">
 <h3 class="anchored" data-anchor-id="progressive-schema-evolution">Progressive Schema Evolution</h3>
 <p>As your data evolves, you might need to adapt your validation approach:</p>
-<div id="102efc3b" class="cell" data-execution_count="19">
+<div id="6f1ef48b" class="cell" data-execution_count="19">
 <div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Original schema</span></span>
 <span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>original_schema <span class="op">=</span> pb.Schema(</span>
 <span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>    columns<span class="op">=</span>{</span>
@@ -2672,7 +2672,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="integrating-with-larger-validation-workflows" class="level2">
 <h2 class="anchored" data-anchor-id="integrating-with-larger-validation-workflows">Integrating with Larger Validation Workflows</h2>
 <p>Schema validation is often just one part of a comprehensive data validation strategy. You can combine schema checks with other validation steps:</p>
-<div id="8690821e" class="cell" data-execution_count="20">
+<div id="cb1557e8" class="cell" data-execution_count="20">
 <div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define a schema</span></span>
 <span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
 <span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>    columns<span class="op">=</span>{</span>
