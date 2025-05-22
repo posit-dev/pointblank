@@ -239,6 +239,11 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <li>MySQL table (<code>"mysql"</code>)*</li>
 <li>PostgreSQL table (<code>"postgresql"</code>)*</li>
 <li>SQLite table (<code>"sqlite"</code>)*</li>
+<li>Microsoft SQL Server table (<code>"mssql"</code>)*</li>
+<li>Snowflake table (<code>"snowflake"</code>)*</li>
+<li>Databricks table (<code>"databricks"</code>)*</li>
+<li>PySpark table (<code>"pyspark"</code>)*</li>
+<li>BigQuery table (<code>"bigquery"</code>)*</li>
 <li>Parquet table (<code>"parquet"</code>)*</li>
 </ul>
 <p>The table types marked with an asterisk need to be prepared as Ibis tables (with type of <code>ibis.expr.types.relations.Table</code>). Furthermore, using <code>get_column_count()</code> with these types of tables requires the Ibis library (<code>v9.5.0</code> or above) to be installed. If the input table is a Polars or Pandas DataFrame, the availability of Ibis is not needed.</p>
@@ -246,7 +251,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="examples" class="level2 doc-section doc-section-examples">
 <h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>To get the number of columns in a table, we can use the <code>get_column_count()</code> function. Here’s an example using the <code>small_table</code> dataset (itself loaded using the <a href="../reference/load_dataset.html#pointblank.load_dataset"><code>load_dataset()</code></a> function):</p>
-<div id="0ec74f32" class="cell" data-execution_count="1">
+<div id="ea911826" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>small_table_polars <span class="op">=</span> pb.load_dataset(<span class="st">"small_table"</span>)</span>
@@ -257,7 +262,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 </div>
 <p>This table is a Polars DataFrame, but the <code>get_column_count()</code> function works with any table supported by <code>pointblank</code>, including Pandas DataFrames and Ibis backend tables. Here’s an example using a DuckDB table handled by Ibis:</p>
-<div id="30698240" class="cell" data-execution_count="2">
+<div id="c3aca925" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>small_table_duckdb <span class="op">=</span> pb.load_dataset(<span class="st">"small_table"</span>, tbl_type<span class="op">=</span><span class="st">"duckdb"</span>)</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>pb.get_column_count(small_table_duckdb)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
