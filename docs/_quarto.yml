@@ -19,6 +19,9 @@ filters:
 
 interlinks:
   fast: true
+  autolink: true
+  aliases:
+    pointblank: null
   sources:
     numpy:
       url: https://numpy.org/doc/stable/

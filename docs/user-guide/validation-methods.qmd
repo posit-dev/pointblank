@@ -92,41 +92,30 @@ We'll cover most of these common arguments in their own dedicated sections later
 
 These methods check individual values within columns against specific criteria:
 
-- **Comparison checks**
-([`col_vals_gt()`](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_gt.html),
-[`col_vals_lt()`](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_lt.html), etc.)
-for comparing values to thresholds or other columns
+- **Comparison checks** (`Validate.col_vals_gt()`, `Validate.col_vals_lt()`, etc.) for comparing
+values to thresholds or other columns
 
-- **Range checks**
-([`col_vals_between()`](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_between.html),
-[`col_vals_outside()`](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_outside.html))
-for verifying values fall within or outside specific ranges
+- **Range checks** (`Validate.col_vals_between()`, `Validate.col_vals_outside()`) for verifying
+that values fall within or outside specific ranges
 
-- **Set membership checks**
-([`col_vals_in_set()`](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_in_set.html),
-[`col_vals_not_in_set()`](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_not_in_set.html))
-for validating values against predefined sets
+- **Set membership checks** (`Validate.col_vals_in_set()`, `Validate.col_vals_not_in_set()`) for
+validating values against predefined sets
 
-- **Null value checks**
-([`col_vals_null()`](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_null.html),
-[`col_vals_not_null()`](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_not_null.html))
-for testing presence or absence of null values
+- **Null value checks** (`Validate.col_vals_null()`, `Validate.col_vals_not_null()`) for testing
+presence or absence of null values
 
-- **Pattern matching checks**
-([`col_vals_regex()`](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_regex.html))
-for validating text patterns with regular expressions
+- **Pattern matching checks** (`Validate.col_vals_regex()`) for validating text patterns with
+regular expressions
 
-- **Custom expression checks**
-([`col_vals_expr()`](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_expr.html))
-for complex validations using custom expressions
+- **Custom expression checks** (`Validate.col_vals_expr()`) for complex validations using custom
+expressions
 
 Now let's look at some key examples from select categories of column value validations.
 
 ### Comparison Checks
 
-Let's start with a simple example of how
-[`col_vals_gt()`](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_gt.html) might
-be used to check if the values in a column are greater than a specified value.
+Let's start with a simple example of how `Validate.col_vals_gt()` might be used to check if the
+values in a column are greater than a specified value.
 
 ```{python}
 (
@@ -168,7 +157,7 @@ This validation checks that values in column `a` are less than values in column 
 ### Checking of Missing Values
 
 A very common thing to validate is that there are no Null/NA/missing values in a column. The
-`col_vals_not_null()` method checks for the presence of missing values:
+`Validate.col_vals_not_null()` method checks for the presence of missing values:
 
 ```{python}
 (
@@ -182,10 +171,9 @@ Column `a` has no missing values and the above validation proves this.
 
 ### Checking Strings with Regexes
 
-A regular expression (regex) validation via the
-[`col_vals_regex()`](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_regex.html)
-validation method checks if values in a column match a specified pattern. Here's an example with
-two validation steps, each checking text values in a column:
+A regular expression (regex) validation via the `Validate.col_vals_regex()` validation method checks
+if values in a column match a specified pattern. Here's an example with two validation steps, each
+checking text values in a column:
 
 ```{python}
 (
@@ -223,18 +211,15 @@ Row-based validations focus on examining properties that span across entire rows
 individual columns. These are essential for detecting issues that can't be found by looking at
 columns in isolation:
 
-- [`rows_distinct()`](https://posit-dev.github.io/pointblank/reference/Validate.rows_distinct.html):
-ensures no duplicate rows exist in the table
-- [`rows_complete()`](https://posit-dev.github.io/pointblank/reference/Validate.rows_complete.html):
-verifies that no rows contain any missing values
+- `Validate.rows_distinct()`: ensures no duplicate rows exist in the table
+- `Validate.rows_complete()`: verifies that no rows contain any missing values
 
 These row-level validations are particularly valuable for ensuring data integrity and completeness
 at the record level, which is crucial for many analytical and operational data applications.
 
 ### Checking Row Distinctness
 
-Here's an example where we check for duplicate rows with
-[`rows_distinct()`](https://posit-dev.github.io/pointblank/reference/Validate.rows_distinct.html):
+Here's an example where we check for duplicate rows with `Validate.rows_distinct()`:
 
 ```{python}
 (
@@ -244,10 +229,8 @@ Here's an example where we check for duplicate rows with
 )
 ```
 
-We can also adapt the
-[`rows_distinct()`](https://posit-dev.github.io/pointblank/reference/Validate.rows_distinct.html)
-check to use a single column or a subset of columns. To do that, we need to use the
-`columns_subset=` parameter. Here's an example of that:
+We can also adapt the `Validate.rows_distinct()` check to use a single column or a subset of
+columns. To do that, we need to use the `columns_subset=` parameter. Here's an example of that:
 
 ```{python}
 (
@@ -260,9 +243,8 @@ check to use a single column or a subset of columns. To do that, we need to use 
 ### Checking Row Completeness
 
 Another important validation is checking for complete rows: rows that have no missing values across
-all columns or a specified subset of columns. The
-[`rows_complete()`](https://posit-dev.github.io/pointblank/reference/Validate.rows_complete.html)
-validation method performs this check.
+all columns or a specified subset of columns. The `Validate.rows_complete()` validation method
+performs this check.
 
 Here's an example checking if all rows in the table are complete (have no missing values in any
 column):
@@ -282,24 +264,18 @@ As the report indicates, there are some incomplete rows in the table.
 Table structure validations ensure that the overall architecture of your data meets expectations.
 These structural checks form a foundation for more detailed data quality assessments:
 
-- [`col_exists()`](https://posit-dev.github.io/pointblank/reference/Validate.col_exists.html):
-verifies a column exists in the table
-- [`col_schema_match()`](https://posit-dev.github.io/pointblank/reference/Validate.col_schema_match.html):
-ensures table matches a defined schema
-- [`col_count_match()`](https://posit-dev.github.io/pointblank/reference/Validate.col_count_match.html):
- confirms the table has the expected number of columns
-- [`row_count_match()`](https://posit-dev.github.io/pointblank/reference/Validate.row_count_match.html):
-verifies the table has the expected number of rows
+- `Validate.col_exists()`: verifies a column exists in the table
+- `Validate.col_schema_match()`: ensures table matches a defined schema
+- `Validate.col_count_match()`: confirms the table has the expected number of columns
+- `Validate.row_count_match()`: verifies the table has the expected number of rows
 
 These structural validations provide essential checks on the fundamental organization of your data
 tables, ensuring they have the expected dimensions and components needed for reliable data analysis.
 
 ### Checking Column Presence
 
-If you need to check for the presence of individual columns, the
-[`col_exists()`](https://posit-dev.github.io/pointblank/reference/Validate.col_exists.html)
-validation method is useful. In this example, we check whether the `date` column is present in the
-table:
+If you need to check for the presence of individual columns, the `Validate.col_exists()` validation
+method is useful. In this example, we check whether the `date` column is present in the table:
 
 ```{python}
 (
@@ -314,13 +290,10 @@ That column is present, so the single test unit of this validation step is a pas
 ### Checking the Table Schema
 
 For deeper checks of table structure, a schema validation can be performed with the
-[`col_schema_match()`](https://posit-dev.github.io/pointblank/reference/Validate.col_schema_match.html)
-validation method, where the goal is to check whether the structure of a table matches an expected
-schema. To define an expected table schema, we need to use the
-[`Schema`](https://posit-dev.github.io/pointblank/reference/Schema.html) class. Here is a simple
-example that (1) prepares a schema consisting of column names, (2) using that `schema` object in a
-[`col_schema_match()`](https://posit-dev.github.io/pointblank/reference/Validate.col_schema_match.html)
-validation step:
+`Validate.col_schema_match()` validation method, where the goal is to check whether the structure of
+a table matches an expected schema. To define an expected table schema, we need to use the `Schema`
+class. Here is a simple example that (1) prepares a schema consisting of column names, (2) uses that
+`schema` object in a `Validate.col_schema_match()` validation step:
 
 ```{python}
 schema = pb.Schema(columns=["date_time", "date", "a", "b", "c", "d", "e", "f"])
@@ -332,14 +305,12 @@ schema = pb.Schema(columns=["date_time", "date", "a", "b", "c", "d", "e", "f"])
 )
 ```
 
-The [`col_schema_match()`](https://posit-dev.github.io/pointblank/reference/Validate.col_schema_match.html)
-validation step will only have a single test unit (signifying pass or fail). We can see in the above
-validation report that the column schema validation passed.
+The `Validate.col_schema_match()` validation step will only have a single test unit (signifying pass
+or fail). We can see in the above validation report that the column schema validation passed.
 
 More often, a schema will be defined using column names and column types. We can do that by using a
-list of tuples in the `columns=` parameter of
-[`Schema`](https://posit-dev.github.io/pointblank/reference/Schema.html). Here's an example of that
-approach in action:
+list of tuples in the `columns=` parameter of `Schema`. Here's an example of that approach in
+action:
 
 ```{python}
 schema = pb.Schema(
@@ -362,8 +333,8 @@ schema = pb.Schema(
 )
 ```
 
-The [`col_schema_match()`](https://posit-dev.github.io/pointblank/reference/Validate.col_schema_match.html)
-validation method has several boolean parameters for making the checks less stringent:
+The `Validate.col_schema_match()` validation method has several boolean parameters for making the
+checks less stringent:
 
 - `complete=`: requires exact column matching (all expected columns must exist, no extra columns allowed)
 - `in_order=`: enforces that columns appear in the same order as defined in the schema
@@ -378,8 +349,8 @@ necessary or practical for your use case.
 
 Row and column count validations check the number of rows and columns in a table.
 
-Using [`row_count_match()`](https://posit-dev.github.io/pointblank/reference/Validate.row_count_match.html)
-checks whether the number of rows in a table matches a specified count.
+Using `Validate.row_count_match()` checks whether the number of rows in a table matches a specified
+count.
 
 ```{python}
 (
@@ -389,8 +360,8 @@ checks whether the number of rows in a table matches a specified count.
 )
 ```
 
-The [`col_count_match()`](https://posit-dev.github.io/pointblank/reference/Validate.col_count_match.html)
-validation method checks if the number of columns in a table matches a specified count.
+The `Validate.col_count_match()` validation method checks if the number of columns in a table
+matches a specified count.
 
 ```{python}
 (

@@ -23,8 +23,7 @@ explanations and examples.
 
 Pointblank's core functionality revolves around validation steps, which are individual checks that
 verify different aspects of your data. These steps are created by calling validation methods from
-the [`Validate`](https://posit-dev.github.io/pointblank/reference/Validate.html) class. When
-combined they create a comprehensive validation plan for your data.
+the `Validate` class. When combined they create a comprehensive validation plan for your data.
 
 Here's an example of a validation that incorporates three different validation methods:
 
@@ -47,12 +46,9 @@ import polars as pl
 This example showcases how you can combine different types of validations in a single validation
 plan:
 
-- a column value validation with
-[`col_vals_gt()`](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_gt.html)
-- a row-based validation with
-[`rows_distinct()`](https://posit-dev.github.io/pointblank/reference/Validate.rows_distinct.html)
-- a table structure validation with
-[`col_exists()`](https://posit-dev.github.io/pointblank/reference/Validate.col_exists.html)
+- a column value validation with `Validate.col_vals_gt()`
+- a row-based validation with `Validate.rows_distinct()`
+- a table structure validation with `Validate.col_exists()`
 
 Most validation methods share common parameters that enhance their flexibility and power. These
 shared parameters (overviewed in the next few sections) create a consistent interface across all
