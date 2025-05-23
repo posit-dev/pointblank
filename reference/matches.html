@@ -216,7 +216,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <p>Select columns that match a specified regular expression pattern.</p>
 <p>Many validation methods have a <code>columns=</code> argument that can be used to specify the columns for validation (e.g., <a href="../reference/Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt"><code>col_vals_gt()</code></a>, <a href="../reference/Validate.col_vals_regex.html#pointblank.Validate.col_vals_regex"><code>col_vals_regex()</code></a>, etc.). The <code>matches()</code> selector function can be used to select one or more columns matching a provided regular expression pattern. So if the set of table columns consists of</p>
 <p><code>[rev_01, rev_02, profit_01, profit_02, age]</code></p>
-<p>and you want to validate columns that have two digits at the end of the name, you can use <code>columns=matches(r"\d{2}$")</code>. This will select the <code>rev_01</code>, <code>rev_02</code>, <code>profit_01</code>, and <code>profit_02</code> columns.</p>
+<p>and you want to validate columns that have two digits at the end of the name, you can use <code>columns=matches(r"[0-9]{2}$")</code>. This will select the <code>rev_01</code>, <code>rev_02</code>, <code>profit_01</code>, and <code>profit_02</code> columns.</p>
 <p>There will be a validation step created for every resolved column. Note that if there aren’t any columns resolved from using <code>matches()</code> (or any other expression using selector functions), the validation step will fail to be evaluated during the interrogation process. Such a failure to evaluate will be reported in the validation results but it won’t affect the interrogation process overall (i.e., the process won’t be halted).</p>
 <section id="parameters" class="level2 doc-section doc-section-parameters">
 <h2 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters">Parameters</h2>
@@ -264,7 +264,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="additional-flexibilty-through-composition-with-other-column-selectors" class="level2 doc-section doc-section-additional-flexibilty-through-composition-with-other-column-selectors">
 <h2 class="doc-section doc-section-additional-flexibilty-through-composition-with-other-column-selectors anchored" data-anchor-id="additional-flexibilty-through-composition-with-other-column-selectors">Additional Flexibilty through Composition with Other Column Selectors</h2>
 <p>The <code>matches()</code> function can be composed with other column selectors to create fine-grained column selections. For example, to select columns that have the text starting with five digits and end with <code>"_id"</code>, you can use the <code>matches()</code> and <a href="../reference/ends_with.html#pointblank.ends_with"><code>ends_with()</code></a> functions together. The only condition is that the expressions are wrapped in the <a href="../reference/col.html#pointblank.col"><code>col()</code></a> function, like this:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>col(matches(<span class="vs">r"</span><span class="dv">^\d</span><span class="op">{5}</span><span class="vs">"</span>) <span class="op">&amp;</span> ends_with(<span class="st">"_id"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>col(matches(<span class="vs">r"</span><span class="dv">^</span><span class="pp">[0-9]</span><span class="op">{5}</span><span class="vs">"</span>) <span class="op">&amp;</span> ends_with(<span class="st">"_id"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>There are four operators that can be used to compose column selectors:</p>
 <ul>
 <li><code>&amp;</code> (<em>and</em>)</li>
@@ -277,7 +277,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="examples" class="level2 doc-section doc-section-examples">
 <h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Suppose we have a table with columns <code>name</code>, <code>id_old</code>, <code>new_identifier</code>, and <code>pay_2021</code> and we’d like to validate that text values in columns having <code>"id"</code> or <code>"identifier"</code> in the name have a specific syntax. We can use the <code>matches()</code> column selector function to specify the columns that match the pattern.</p>
-<div id="4398f627" class="cell" data-execution_count="2">
+<div id="cb03a261" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -292,7 +292,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>    .col_vals_regex(columns<span class="op">=</span>pb.matches(<span class="st">"id|identifier"</span>), pattern<span class="op">=</span><span class="vs">r"ID</span><span class="dv">\d</span><span class="op">{4}</span><span class="vs">"</span>)</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>    .col_vals_regex(columns<span class="op">=</span>pb.matches(<span class="st">"id|identifier"</span>), pattern<span class="op">=</span><span class="vs">r"ID</span><span class="pp">[0-9]</span><span class="op">{4}</span><span class="vs">"</span>)</span>
 <span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
 <span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a></span>
@@ -411,7 +411,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
         
         </td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">id_old</td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">ID\d{4}</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">ID[0-9]{4}</td>
     <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" class="gt_row gt_center"><svg width="25px" height="25px" viewbox="0 0 25 25" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="vertical-align: middle;">
     <g id="unchanged" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="unchanged" transform="translate(0.500000, 0.570147)">
@@ -455,7 +455,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
         
         </td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">new_identifier</td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">ID\d{4}</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">ID[0-9]{4}</td>
     <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" class="gt_row gt_center"><svg width="25px" height="25px" viewbox="0 0 25 25" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="vertical-align: middle;">
     <g id="unchanged" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="unchanged" transform="translate(0.500000, 0.570147)">
@@ -483,9 +483,9 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
         
 </div>
 </div>
-<p>From the results of the validation table we get two validation steps, one for <code>id_old</code> and one for <code>new_identifier</code>. The values in both columns all match the pattern <code>"ID\d{4}"</code>.</p>
+<p>From the results of the validation table we get two validation steps, one for <code>id_old</code> and one for <code>new_identifier</code>. The values in both columns all match the pattern <code>"ID[0-9]{4}"</code>.</p>
 <p>We can also use the <code>matches()</code> function in combination with other column selectors (within <a href="../reference/col.html#pointblank.col"><code>col()</code></a>) to create more complex column selection criteria (i.e., to select columns that satisfy multiple conditions). For example, to select columns that contain <code>"pay"</code> and match the text <code>"2023"</code> or <code>"2024"</code>, we can use the <code>&amp;</code> operator to combine column selectors.</p>
-<div id="08bf6ca7" class="cell" data-execution_count="3">
+<div id="021355ed" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>tbl <span class="op">=</span> pl.DataFrame(</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    {</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"name"</span>: [<span class="st">"Alice"</span>, <span class="st">"Bob"</span>, <span class="st">"Charlie"</span>],</span>
