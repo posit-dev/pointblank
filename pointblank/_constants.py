@@ -105,6 +105,7 @@ ROW_BASED_VALIDATION_TYPES = [
     "col_vals_regex",
     "col_vals_null",
     "col_vals_not_null",
+    "col_vals_expr",
     "conjointly",
 ]
 
