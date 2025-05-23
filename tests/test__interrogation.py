@@ -208,6 +208,7 @@ def test_col_vals_regex(request, tbl_fixture):
         data_tbl=tbl,
         column="y",
         pattern=r"^[0-9]$",
+        inverse=False,
         na_pass=True,
         threshold=10,
         allowed_types=["str"],
