@@ -5714,6 +5714,7 @@ class Validate:
         self,
         columns: str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals,
         pattern: str,
+        inverse: bool = False,
         na_pass: bool = False,
         pre: Callable | None = None,
         segments: SegmentSpec | None = None,
@@ -5739,6 +5740,9 @@ class Validate:
             generated for each column.
         pattern
             A regular expression pattern to compare against.
+        inverse
+            Should the validation step be inverted? If `False`, the expectation is to find a
+            regex match. If `True`, the expectation is find no match.
         na_pass
             Should any encountered None, NA, or Null values be considered as passing test units? By
             default, this is `False`. Set to `True` to pass test units with missing values.
@@ -5923,6 +5927,7 @@ class Validate:
         # TODO: add check for segments
         # _check_segments(segments=segments)
         _check_thresholds(thresholds=thresholds)
+        _check_boolean_input(param=inverse, param_name="inverse")
         _check_boolean_input(param=na_pass, param_name="na_pass")
         _check_boolean_input(param=active, param_name="active")
 
@@ -5943,12 +5948,15 @@ class Validate:
         # Determine brief to use (global or local) and transform any shorthands of `brief=`
         brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
 
+        # Bundle together pattern and inverse kwarg
+        values = {"pattern": pattern, "inverse": inverse}
+
         # Iterate over the columns and create a validation step for each
         for column in columns:
             val_info = _ValidationInfo(
                 assertion_type=assertion_type,
                 column=column,
-                values=pattern,
+                values=values,
                 na_pass=na_pass,
                 pre=pre,
                 segments=segments,
@@ -8334,7 +8342,8 @@ class Validate:
                 results_tbl = ColValsRegex(
                     data_tbl=data_tbl_step,
                     column=column,
-                    pattern=value,
+                    pattern=value["pattern"],
+                    inverse=value["inverse"],
                     na_pass=na_pass,
                     threshold=threshold,
                     allowed_types=compatible_dtypes,

@@ -5751,7 +5751,7 @@ def test_validation_with_selector_helper_functions(request, tbl_fixture):
         4e7,
         ["apple", "banana"],
         (10, 15),
-        "a",
+        {"pattern": "a", "inverse": False},
     ]
 
     # Check that all validation steps are active
