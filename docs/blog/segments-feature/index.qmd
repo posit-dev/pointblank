@@ -1,0 +1,44 @@
+---
+jupyter: python3
+html-table-processing: none
+title: "Pointblank Workshops"
+author: Rich Iannone
+date: 2025-05-23
+freeze: true
+---
+
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_footer=False)
+```
+
+Pointblank's [data segmentation](../../user-guide/segmentation.qmd) feature came about after a
+recent workshop I gave to one of Apple's data teams just a few weeks ago. During the Q&A session,
+someone asked whether there was perform essentially the same validation on different pieces of a
+table. At that moment this capability wasn't yet present in the package yet but it was something
+that immediately resonated with me.
+
+So, inspired by this need, I went back to work and implemented the `segments=` parameter into all
+of Pointblank's validation methods. The feature allows users to slice their dataset into meaningful
+chunks before validation, running the same checks on different segments separately and getting
+individualized results.
+
+Check out the [Data Segmentation article in the **User Guide**](../../user-guide/segmentation.qmd)
+for many examples on how this feature can be used.
+
+## An Invitation
+
+We are excited about how things are going with the Pointblank project and are *always up* for
+providing a workshop to data teams (at no cost). If this sounds interesting to you please feel
+free to contact me through email (at rich@posit.co), or, get in touch through
+[our Discord server](https://discord.com/invite/YH7CybCNCQ). Just know that if you have a need for
+data validation, we're here to help!
+
+## An Acknowledgment
+
+I'd like to give special thanks to Rami Krispin for his interest in Pointblank and for facilitating
+the workshop. If you're interested in more data science insights, check out
+[Rami's Data Newsletter](https://ramikrispin.substack.com) where he shares valuable perspectives
+on data engineering, LLMs, and analytics.
