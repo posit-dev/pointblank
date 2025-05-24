@@ -140,19 +140,30 @@ def test_schema_from_parquet_table(tbl_parquet):
     assert str(type(schema.tbl)) == "<class 'ibis.expr.types.relations.Table'>"
 
 
-@pytest.mark.xfail
 def test_schema_from_duckdb_table():
     schema = Schema(tbl=load_dataset(dataset="small_table", tbl_type="duckdb"))
-    assert schema.columns == [
-        ("date_time", "timestamp(6)"),
-        ("date", "date"),
-        ("a", "int64"),
-        ("b", "string"),
-        ("c", "int64"),
-        ("d", "float64"),
-        ("e", "boolean"),
-        ("f", "string"),
-    ]
+
+    target_types: dict[str, tuple[str | tuple[str, ...], ...]] = {
+        "date_time": ("timestamp(6)", "timestamp"),
+        "date": "date",
+        "a": "int64",
+        "b": "string",
+        "c": "int64",
+        "d": "float64",
+        "e": "boolean",
+        "f": "string",
+    }
+
+    for target, real in zip(target_types, schema.columns):
+        # check if the column name is in the target_types dict
+        if target in target_types:
+            # check if the real type is in the expected types
+            if isinstance(target_types[target], tuple):
+                assert real[1] in target_types[target]
+            else:
+                assert real[1] == target_types[target]
+        else:
+            raise AssertionError
 
     assert str(type(schema.tbl)) == "<class 'ibis.expr.types.relations.Table'>"
 
@@ -229,12 +240,11 @@ def test_get_dtype_list_small_table_pl():
     ]
 
 
-@pytest.mark.xfail
 def test_get_dtype_list_small_table_duckdb():
     schema = Schema(tbl=load_dataset(dataset="small_table", tbl_type="duckdb"))
 
-    assert schema.get_dtype_list() == [
-        "timestamp(6)",
+    target_types: tuple[str | tuple[str, ...], ...] = (
+        ("timestamp(6)", "timestamp"),
         "date",
         "int64",
         "string",
@@ -242,7 +252,13 @@ def test_get_dtype_list_small_table_duckdb():
         "float64",
         "boolean",
         "string",
-    ]
+    )
+
+    for target, real in zip(target_types, schema.get_dtype_list()):
+        if isinstance(target, tuple):
+            assert real in target
+        else:
+            assert real == target
 
 
 def test_get_dtype_list_game_revenue_pd():
@@ -414,3 +430,7 @@ def test_schema_input_errors(request, tbl_fixture):
 
     with pytest.raises(ValueError):
         Schema(columns=(1, "int"))
+
+
+if __name__ == "__main__":
+    pytest.main([__file__])

@@ -1,24 +1,31 @@
 from __future__ import annotations
 
+import contextlib
 import json
-from dataclasses import dataclass, field
 from importlib.metadata import version
-from math import floor, log10
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import narwhals as nw
 from great_tables import GT, google_font, html, loc, style
-from great_tables.vals import fmt_integer, fmt_number, fmt_scientific
+from narwhals.dataframe import LazyFrame
 from narwhals.typing import FrameT
 
-from pointblank._constants import SVG_ICONS_FOR_DATA_TYPES
-from pointblank._utils import _get_tbl_type, _select_df_lib
-from pointblank._utils_html import _create_table_dims_html, _create_table_type_html
+from pointblank._utils_html import _create_table_dims_html, _create_table_type_html, _fmt_frac
+from pointblank.scan_profile import ColumnProfile, _as_physical, _DataProfile, _TypeMap
+from pointblank.scan_profile_stats import COLUMN_ORDER_REGISTRY
+
+if TYPE_CHECKING:
+    from collections.abc import Mapping, Sequence
+
+    from narwhals.dataframe import DataFrame
+    from narwhals.typing import Frame, IntoFrameT
+
+    from pointblank.scan_profile_stats import StatGroup
+
 
 __all__ = ["DataScan", "col_summary_tbl"]
 
 
-@dataclass
 class DataScan:
     """
     Get a summary of a dataset.
@@ -113,565 +120,92 @@ class DataScan:
         A DataScan object.
     """
 
-    data: FrameT | Any
-    tbl_name: str | None = None
-    data_alt: Any | None = field(init=False)
-    tbl_category: str = field(init=False)
-    tbl_type: str = field(init=False)
-    profile: dict = field(init=False)
+    # TODO: This needs to be generically typed at the class level, ie. DataScan[T]
+    def __init__(self, data: IntoFrameT, tbl_name: str | None = None) -> None:
+        as_native = nw.from_native(data)
 
-    def __post_init__(self):
-        # Determine if the data is a DataFrame that could be handled by Narwhals,
-        # or an Ibis Table
-        self.tbl_type = _get_tbl_type(data=self.data)
-        ibis_tbl = "ibis.expr.types.relations.Table" in str(type(self.data))
-        pl_pd_tbl = "polars" in self.tbl_type or "pandas" in self.tbl_type
+        if as_native.implementation.name == "IBIS" and as_native._level == "lazy":
+            assert isinstance(as_native, LazyFrame)  # help mypy
 
-        # Set the table category based on the type of table (this will be used to determine
-        # how to handle the data)
-        if ibis_tbl:
-            self.tbl_category = "ibis"
-        else:
-            self.tbl_category = "dataframe"
+            ibis_native = as_native.to_native()
 
-        # If the data is DataFrame, convert it to a Narwhals DataFrame
-        if pl_pd_tbl:
-            self.data_alt = nw.from_native(self.data)
-        else:
-            self.data_alt = None
-
-        # Generate the profile based on the `tbl_category` value
-        if self.tbl_category == "dataframe":
-            self.profile = self._generate_profile_df()
-
-        if self.tbl_category == "ibis":
-            self.profile = self._generate_profile_ibis()
-
-    def _generate_profile_df(self) -> dict:
-        profile = {}
-
-        if self.tbl_name:
-            profile["tbl_name"] = self.tbl_name
-
-        row_count = self.data_alt.shape[0]
-        column_count = self.data_alt.shape[1]
-
-        profile.update(
-            {
-                "tbl_type": self.tbl_type,
-                "dimensions": {"rows": row_count, "columns": column_count},
-                "columns": [],
-            }
-        )
-
-        for idx, column in enumerate(self.data_alt.columns):
-            col_data = self.data_alt[column]
-            native_dtype = str(self.data[column].dtype)
-
-            #
-            # Collection of sample data
-            #
-            if "date" in str(col_data.dtype).lower():
-                sample_data = col_data.drop_nulls().head(5).cast(nw.String).to_list()
-                sample_data = [str(x) for x in sample_data]
+            valid_conversion_methods = ("to_pyarrow", "to_pandas", "to_polars")
+            for conv_method in valid_conversion_methods:
+                try:
+                    valid_native = getattr(ibis_native, conv_method)()
+                except (NotImplementedError, ImportError, ModuleNotFoundError):
+                    continue
+                break
             else:
-                sample_data = col_data.drop_nulls().head(5).to_list()
-
-            n_missing_vals = int(col_data.is_null().sum())
-            n_unique_vals = int(col_data.n_unique())
-
-            # If there are missing values, subtract 1 from the number of unique values
-            # to account for the missing value which shouldn't be included in the count
-            if (n_missing_vals > 0) and (n_unique_vals > 0):
-                n_unique_vals = n_unique_vals - 1
-
-            f_missing_vals = _round_to_sig_figs(n_missing_vals / row_count, 3)
-            f_unique_vals = _round_to_sig_figs(n_unique_vals / row_count, 3)
-
-            col_profile = {
-                "column_name": column,
-                "column_type": native_dtype,
-                "column_number": idx + 1,
-                "n_missing_values": n_missing_vals,
-                "f_missing_values": f_missing_vals,
-                "n_unique_values": n_unique_vals,
-                "f_unique_values": f_unique_vals,
-            }
-
-            #
-            # Numerical columns
-            #
-            if "int" in str(col_data.dtype).lower() or "float" in str(col_data.dtype).lower():
-                n_negative_vals = int(col_data.is_between(-1e26, -1e-26).sum())
-                f_negative_vals = _round_to_sig_figs(n_negative_vals / row_count, 3)
-
-                n_zero_vals = int(col_data.is_between(0, 0).sum())
-                f_zero_vals = _round_to_sig_figs(n_zero_vals / row_count, 3)
-
-                n_positive_vals = row_count - n_missing_vals - n_negative_vals - n_zero_vals
-                f_positive_vals = _round_to_sig_figs(n_positive_vals / row_count, 3)
-
-                col_profile_additional = {
-                    "n_negative_values": n_negative_vals,
-                    "f_negative_values": f_negative_vals,
-                    "n_zero_values": n_zero_vals,
-                    "f_zero_values": f_zero_vals,
-                    "n_positive_values": n_positive_vals,
-                    "f_positive_values": f_positive_vals,
-                    "sample_data": sample_data,
-                }
-                col_profile.update(col_profile_additional)
-
-                col_profile_stats = {
-                    "statistics": {
-                        "numerical": {
-                            "descriptive": {
-                                "mean": round(float(col_data.mean()), 2),
-                                "std_dev": round(float(col_data.std()), 4),
-                            },
-                            "quantiles": {
-                                "min": float(col_data.min()),
-                                "p05": round(
-                                    float(col_data.quantile(0.05, interpolation="linear")), 2
-                                ),
-                                "q_1": round(
-                                    float(col_data.quantile(0.25, interpolation="linear")), 2
-                                ),
-                                "med": float(col_data.median()),
-                                "q_3": round(
-                                    float(col_data.quantile(0.75, interpolation="linear")), 2
-                                ),
-                                "p95": round(
-                                    float(col_data.quantile(0.95, interpolation="linear")), 2
-                                ),
-                                "max": float(col_data.max()),
-                                "iqr": round(
-                                    float(col_data.quantile(0.75, interpolation="linear"))
-                                    - float(col_data.quantile(0.25, interpolation="linear")),
-                                    2,
-                                ),
-                            },
-                        }
-                    }
-                }
-                col_profile.update(col_profile_stats)
-
-            #
-            # String columns
-            #
-            elif (
-                "string" in str(col_data.dtype).lower()
-                or "categorical" in str(col_data.dtype).lower()
-            ):
-                col_profile_additional = {
-                    "sample_data": sample_data,
-                }
-                col_profile.update(col_profile_additional)
-
-                # Transform `col_data` to a column of string lengths
-                col_str_len_data = col_data.str.len_chars()
-
-                col_profile_stats = {
-                    "statistics": {
-                        "string_lengths": {
-                            "descriptive": {
-                                "mean": round(float(col_str_len_data.mean()), 2),
-                                "std_dev": round(float(col_str_len_data.std()), 4),
-                            },
-                            "quantiles": {
-                                "min": int(col_str_len_data.min()),
-                                "p05": int(col_str_len_data.quantile(0.05, interpolation="linear")),
-                                "q_1": int(col_str_len_data.quantile(0.25, interpolation="linear")),
-                                "med": int(col_str_len_data.median()),
-                                "q_3": int(col_str_len_data.quantile(0.75, interpolation="linear")),
-                                "p95": int(col_str_len_data.quantile(0.95, interpolation="linear")),
-                                "max": int(col_str_len_data.max()),
-                                "iqr": int(col_str_len_data.quantile(0.75, interpolation="linear"))
-                                - int(col_str_len_data.quantile(0.25, interpolation="linear")),
-                            },
-                        }
-                    }
-                }
-                col_profile.update(col_profile_stats)
-
-            #
-            # Date and datetime columns
-            #
-            elif "date" in str(col_data.dtype).lower():
-                col_profile_additional = {
-                    "sample_data": sample_data,
-                }
-                col_profile.update(col_profile_additional)
-
-                min_date = str(col_data.min())
-                max_date = str(col_data.max())
-
-                col_profile_stats = {
-                    "statistics": {
-                        "datetime": {
-                            "min": min_date,
-                            "max": max_date,
-                        }
-                    }
-                }
-                col_profile.update(col_profile_stats)
-
-            #
-            # Boolean columns
-            #
-            elif "bool" in str(col_data.dtype).lower():
-                col_profile_additional = {
-                    "sample_data": sample_data,
-                }
-                col_profile.update(col_profile_additional)
-
-                n_true_values = int(col_data.sum())
-                f_true_values = _round_to_sig_figs(n_true_values / row_count, 3)
-
-                n_false_values = row_count - n_missing_vals - n_true_values
-                f_false_values = _round_to_sig_figs(n_false_values / row_count, 3)
-
-                col_profile_stats = {
-                    "statistics": {
-                        "boolean": {
-                            "n_true_values": n_true_values,
-                            "f_true_values": f_true_values,
-                            "n_false_values": n_false_values,
-                            "f_false_values": f_false_values,
-                        }
-                    }
-                }
-                col_profile.update(col_profile_stats)
-
-            profile["columns"].append(col_profile)
-
-        return profile
-
-    def _generate_profile_ibis(self) -> dict:
-        profile = {}
-
-        if self.tbl_name:
-            profile["tbl_name"] = self.tbl_name
-
-        from pointblank.validate import get_row_count
-
-        row_count = get_row_count(data=self.data)
-        column_count = len(self.data.columns)
-
-        profile.update(
-            {
-                "tbl_type": self.tbl_type,
-                "dimensions": {"rows": row_count, "columns": column_count},
-                "columns": [],
-            }
-        )
-
-        # Determine which DataFrame library is available
-        df_lib = _select_df_lib(preference="polars")
-        df_lib_str = str(df_lib)
-
-        if "polars" in df_lib_str:
-            df_lib_use = "polars"
-        else:
-            df_lib_use = "pandas"
-
-        column_dtypes = list(self.data.schema().items())
-
-        for idx, column in enumerate(self.data.columns):
-            dtype_str = str(column_dtypes[idx][1])
-
-            col_data = self.data[column]
-            col_data_no_null = self.data.drop_null().head(5)[column]
-
-            #
-            # Collection of sample data
-            #
-            if "date" in dtype_str.lower() or "timestamp" in dtype_str.lower():
-                if df_lib_use == "polars":
-                    import polars as pl
-
-                    sample_data = col_data_no_null.to_polars().cast(pl.String).to_list()
-                else:
-                    sample_data = col_data_no_null.to_pandas().astype(str).to_list()
-            else:
-                if df_lib_use == "polars":
-                    sample_data = col_data_no_null.to_polars().to_list()
-                else:
-                    sample_data = col_data_no_null.to_pandas().to_list()
-
-            n_missing_vals = int(_to_df_lib(col_data.isnull().sum(), df_lib=df_lib_use))
-            n_unique_vals = int(_to_df_lib(col_data.nunique(), df_lib=df_lib_use))
-
-            # If there are missing values, subtract 1 from the number of unique values
-            # to account for the missing value which shouldn't be included in the count
-            if (n_missing_vals > 0) and (n_unique_vals > 0):
-                n_unique_vals = n_unique_vals - 1
-
-            f_missing_vals = _round_to_sig_figs(n_missing_vals / row_count, 3)
-            f_unique_vals = _round_to_sig_figs(n_unique_vals / row_count, 3)
-
-            col_profile = {
-                "column_name": column,
-                "column_type": dtype_str,
-                "column_number": idx + 1,
-                "n_missing_values": n_missing_vals,
-                "f_missing_values": f_missing_vals,
-                "n_unique_values": n_unique_vals,
-                "f_unique_values": f_unique_vals,
-            }
-
-            #
-            # Numerical columns
-            #
-            if "int" in dtype_str.lower() or "float" in dtype_str.lower():
-                n_negative_vals = int(
-                    _to_df_lib(col_data.between(-1e26, -1e-26).sum(), df_lib=df_lib_use)
+                msg = (
+                    "To use `ibis` as input, you must have one of arrow, pandas, polars or numpy "
+                    "available in the process. Until `ibis` is fully supported by Narwhals, this is "
+                    "necessary. Additionally, the data must be collected in order to calculate some "
+                    "structural statistics, which may be performance detrimental."
                 )
-                f_negative_vals = _round_to_sig_figs(n_negative_vals / row_count, 3)
+                raise ImportError(msg)
+            as_native = nw.from_native(valid_native)
 
-                n_zero_vals = int(_to_df_lib(col_data.between(0, 0).sum(), df_lib=df_lib_use))
-                f_zero_vals = _round_to_sig_figs(n_zero_vals / row_count, 3)
+        self.nw_data: Frame = nw.from_native(as_native)
 
-                n_positive_vals = row_count - n_missing_vals - n_negative_vals - n_zero_vals
-                f_positive_vals = _round_to_sig_figs(n_positive_vals / row_count, 3)
+        self.tbl_name: str | None = tbl_name
+        self.profile: _DataProfile = self._generate_profile_df()
 
-                col_profile_additional = {
-                    "n_negative_values": n_negative_vals,
-                    "f_negative_values": f_negative_vals,
-                    "n_zero_values": n_zero_vals,
-                    "f_zero_values": f_zero_vals,
-                    "n_positive_values": n_positive_vals,
-                    "f_positive_values": f_positive_vals,
-                    "sample_data": sample_data,
-                }
-                col_profile.update(col_profile_additional)
+    def _generate_profile_df(self) -> _DataProfile:
+        columns: list[str] = self.nw_data.columns
 
-                col_profile_stats = {
-                    "statistics": {
-                        "numerical": {
-                            "descriptive": {
-                                "mean": round(_to_df_lib(col_data.mean(), df_lib=df_lib_use), 2),
-                                "std_dev": round(_to_df_lib(col_data.std(), df_lib=df_lib_use), 4),
-                            },
-                            "quantiles": {
-                                "min": _to_df_lib(col_data.min(), df_lib=df_lib_use),
-                                "p05": round(
-                                    _to_df_lib(col_data.approx_quantile(0.05), df_lib=df_lib_use),
-                                    2,
-                                ),
-                                "q_1": round(
-                                    _to_df_lib(col_data.approx_quantile(0.25), df_lib=df_lib_use),
-                                    2,
-                                ),
-                                "med": _to_df_lib(col_data.median(), df_lib=df_lib_use),
-                                "q_3": round(
-                                    _to_df_lib(col_data.approx_quantile(0.75), df_lib=df_lib_use),
-                                    2,
-                                ),
-                                "p95": round(
-                                    _to_df_lib(col_data.approx_quantile(0.95), df_lib=df_lib_use),
-                                    2,
-                                ),
-                                "max": _to_df_lib(col_data.max(), df_lib=df_lib_use),
-                                "iqr": round(
-                                    _to_df_lib(col_data.quantile(0.75), df_lib=df_lib_use)
-                                    - _to_df_lib(col_data.quantile(0.25), df_lib=df_lib_use),
-                                    2,
-                                ),
-                            },
-                        }
-                    }
-                }
-                col_profile.update(col_profile_stats)
+        profile = _DataProfile(
+            table_name=self.tbl_name,
+            columns=columns,
+            implementation=self.nw_data.implementation,
+        )
+        schema: Mapping[str, Any] = self.nw_data.schema
+        for column in columns:
+            col_data: DataFrame = self.nw_data.select(column)
 
-            #
-            # String columns
-            #
-            elif "string" in dtype_str.lower() or "char" in dtype_str.lower():
-                col_profile_additional = {
-                    "sample_data": sample_data,
-                }
-                col_profile.update(col_profile_additional)
+            ## Handle dtyping:
+            native_dtype = schema[column]
+            if _TypeMap.is_illegal(native_dtype):
+                continue
+            try:
+                prof: type[ColumnProfile] = _TypeMap.fetch_profile(native_dtype)
+            except NotImplementedError:
+                continue
 
-                # Transform `col_data` to a column of string lengths
-                col_str_len_data = col_data.length()
+            col_profile = ColumnProfile(colname=column, coltype=native_dtype)
 
-                col_profile_stats = {
-                    "statistics": {
-                        "string_lengths": {
-                            "descriptive": {
-                                "mean": round(
-                                    float(_to_df_lib(col_str_len_data.mean(), df_lib=df_lib_use)), 2
-                                ),
-                                "std_dev": round(
-                                    float(_to_df_lib(col_str_len_data.std(), df_lib=df_lib_use)), 4
-                                ),
-                            },
-                            "quantiles": {
-                                "min": int(_to_df_lib(col_str_len_data.min(), df_lib=df_lib_use)),
-                                "p05": int(
-                                    _to_df_lib(
-                                        col_str_len_data.approx_quantile(0.05),
-                                        df_lib=df_lib_use,
-                                    )
-                                ),
-                                "q_1": int(
-                                    _to_df_lib(
-                                        col_str_len_data.approx_quantile(0.25),
-                                        df_lib=df_lib_use,
-                                    )
-                                ),
-                                "med": int(
-                                    _to_df_lib(col_str_len_data.median(), df_lib=df_lib_use)
-                                ),
-                                "q_3": int(
-                                    _to_df_lib(
-                                        col_str_len_data.approx_quantile(0.75),
-                                        df_lib=df_lib_use,
-                                    )
-                                ),
-                                "p95": int(
-                                    _to_df_lib(
-                                        col_str_len_data.approx_quantile(0.95),
-                                        df_lib=df_lib_use,
-                                    )
-                                ),
-                                "max": int(_to_df_lib(col_str_len_data.max(), df_lib=df_lib_use)),
-                                "iqr": int(
-                                    _to_df_lib(
-                                        col_str_len_data.approx_quantile(0.75),
-                                        df_lib=df_lib_use,
-                                    )
-                                )
-                                - int(
-                                    _to_df_lib(
-                                        col_str_len_data.approx_quantile(0.25),
-                                        df_lib=df_lib_use,
-                                    )
-                                ),
-                            },
-                        }
-                    }
-                }
-                col_profile.update(col_profile_stats)
+            ## Collect Sample Data:
+            ## This is the most consistent way (i think) to get the samples out of the data.
+            ## We can avoid writing our own logic to determine operations and rely on narwhals.
+            raw_vals: list[Any] = (
+                _as_physical(col_data.drop_nulls().head(5)).to_dict()[column].to_list()
+            )
+            col_profile.sample_data = [str(x) for x in raw_vals]
 
-            #
-            # Date and datetime columns
-            #
-            elif "date" in dtype_str.lower() or "timestamp" in dtype_str.lower():
-                col_profile_additional = {
-                    "sample_data": sample_data,
-                }
-                col_profile.update(col_profile_additional)
+            col_profile.calc_stats(col_data)
 
-                min_date = _to_df_lib(col_data.min(), df_lib=df_lib_use)
-                max_date = _to_df_lib(col_data.max(), df_lib=df_lib_use)
+            sub_profile: ColumnProfile = col_profile.spawn_profile(prof)
+            sub_profile.calc_stats(col_data)
 
-                col_profile_stats = {
-                    "statistics": {
-                        "datetime": {
-                            "min": str(min_date),
-                            "max": str(max_date),
-                        }
-                    }
-                }
-                col_profile.update(col_profile_stats)
+            profile.column_profiles.append(sub_profile)
 
-            #
-            # Boolean columns
-            #
-            elif "bool" in dtype_str.lower():
-                col_profile_additional = {
-                    "sample_data": sample_data,
-                }
-                col_profile.update(col_profile_additional)
-
-                n_true_values = _to_df_lib(col_data.cast(int).sum(), df_lib=df_lib)
-                f_true_values = _round_to_sig_figs(n_true_values / row_count, 3)
-
-                n_false_values = row_count - n_missing_vals - n_true_values
-                f_false_values = _round_to_sig_figs(n_false_values / row_count, 3)
-
-                col_profile_stats = {
-                    "statistics": {
-                        "boolean": {
-                            "n_true_values": n_true_values,
-                            "f_true_values": f_true_values,
-                            "n_false_values": n_false_values,
-                            "f_false_values": f_false_values,
-                        }
-                    }
-                }
-                col_profile.update(col_profile_stats)
-
-            profile["columns"].append(col_profile)
+        profile.set_row_count(self.nw_data)
 
         return profile
 
-    def get_tabular_report(self) -> GT:
-        column_data = self.profile["columns"]
+    @property
+    def summary_data(self) -> IntoFrameT:
+        return self.profile.as_dataframe(strict=False).to_native()
 
-        tbl_name = self.tbl_name
-
-        stats_list = []
-        datetime_row_list = []
-
-        n_rows = self.profile["dimensions"]["rows"]
-        n_columns = self.profile["dimensions"]["columns"]
-
-        # Iterate over each column's data and obtain a dictionary of statistics for each column
-        for idx, col in enumerate(column_data):
-            if "statistics" in col and "numerical" in col["statistics"]:
-                col_dict = _process_numerical_column_data(col)
-            elif "statistics" in col and "string_lengths" in col["statistics"]:
-                col_dict = _process_string_column_data(col)
-            elif "statistics" in col and "datetime" in col["statistics"]:
-                col_dict = _process_datetime_column_data(col)
-                datetime_row_list.append(idx)
-            elif "statistics" in col and "boolean" in col["statistics"]:
-                col_dict = _process_boolean_column_data(col)
-            else:
-                col_dict = _process_other_column_data(col)
-
-            stats_list.append(col_dict)
-
-        # Determine which DataFrame library is available and construct the DataFrame
-        # based on the available library
-        df_lib = _select_df_lib(preference="polars")
-        df_lib_str = str(df_lib)
-
-        if "polars" in df_lib_str:
-            import polars as pl
-
-            stats_df = pl.DataFrame(stats_list)
-        else:
-            import pandas as pd
-
-            stats_df = pd.DataFrame(stats_list)
-
-        stats_df = pl.DataFrame(stats_list)
-
-        stat_columns = [
-            "missing_vals",
-            "unique_vals",
-            "mean",
-            "std_dev",
-            "min",
-            "p05",
-            "q_1",
-            "med",
-            "q_3",
-            "p95",
-            "max",
-            "iqr",
-        ]
-
+    def get_tabular_report(self, *, show_sample_data: bool = False) -> GT:
         # Create the label, table type, and thresholds HTML fragments
         table_type_html = _create_table_type_html(
-            tbl_type=self.tbl_type, tbl_name=tbl_name, font_size="10px"
+            tbl_type=str(self.profile.implementation), tbl_name=self.tbl_name, font_size="10px"
         )
 
-        tbl_dims_html = _create_table_dims_html(columns=n_columns, rows=n_rows, font_size="10px")
+        tbl_dims_html = _create_table_dims_html(
+            columns=len(self.profile.columns), rows=self.profile.row_count, font_size="10px"
+        )
 
         # Compose the subtitle HTML fragment
         combined_title = (
@@ -685,97 +219,243 @@ class DataScan:
 
         # TODO: Ensure width is 905px in total
 
+        data: DataFrame = self.profile.as_dataframe(strict=False)
+
+        ## Remove all null columns:
+        all_null: list[str] = []
+        for stat_name in data.iter_columns():
+            col_len = len(stat_name.drop_nulls())
+            if col_len == 0:
+                all_null.append(stat_name.name)
+        data = data.drop(all_null)
+
+        if not show_sample_data:
+            data = data.drop("sample_data")
+
+        # find what stat cols were used in the analysis
+        non_stat_cols = ("icon", "colname")  # TODO: need a better place for this
+        present_stat_cols: set[str] = set(data.columns) - set(non_stat_cols)
+        present_stat_cols.remove("coltype")
+        with contextlib.suppress(KeyError):
+            present_stat_cols.remove("freqs")  # TODO: currently used for html but no displayed?
+
+        ## Assemble the target order and find what columns need borders.
+        ## Borders should be placed to divide the stat "groups" and create a
+        ## generally more aesthetically pleasing experience.
+        target_order: list[str] = list(non_stat_cols)
+        right_border_cols: list[str] = [non_stat_cols[-1]]
+
+        last_group: StatGroup = COLUMN_ORDER_REGISTRY[0].group
+        for col in COLUMN_ORDER_REGISTRY:
+            if col.name in present_stat_cols:
+                cur_group: StatGroup = col.group
+                target_order.append(col.name)
+
+                start_new_group: bool = last_group != cur_group
+                if start_new_group:
+                    last_group = cur_group
+                    last_col_added = target_order[-2]  # -2 since we don't include the current
+                    right_border_cols.append(last_col_added)
+
+        right_border_cols.append(target_order[-1])  # add border to last stat col
+
+        label_map: dict[str, Any] = self._build_label_map(target_order)
+
+        ## Final Formatting:
+        formatted_data = data.with_columns(
+            colname=nw.concat_str(
+                nw.lit(
+                    "<div style='font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;'>"
+                ),
+                nw.col("colname"),
+                nw.lit("</div><div style='font-size: 11px; color: gray;'>"),
+                nw.col("coltype"),
+                nw.lit("</div>"),
+            ),
+            __frac_n_unique=nw.col("n_unique") / nw.lit(self.profile.row_count),
+            __frac_n_missing=nw.col("n_missing") / nw.lit(self.profile.row_count),
+        )
+
+        ## Pull out type indicies:
+        # TODO: The stat types should get an enum? or something?
+        # TODO: This all assumes the dates are separated by dashes, is that even true?
+        # TODO: This all assumes date_stats are strings already, not ints or anything else.
+        any_dates: bool = formatted_data.select(
+            __tmp_idx=nw.col("coltype").str.contains("Date", literal=True)
+        )["__tmp_idx"].any()
+        if any_dates:
+            date_stats = [c for c in present_stat_cols if c in ("min", "max")]
+
+            formatted_data = formatted_data.with_columns(
+                nw.when(nw.col("coltype").str.contains(r"\bDate\b", literal=False))
+                .then(nw.col(c).cast(nw.String).str.replace_all("-", "<br>"))
+                .otherwise(nw.col(c).cast(nw.String))
+                for c in date_stats
+            )
+
+        any_datetimes: bool = formatted_data.select(
+            __tmp_idx=nw.col("coltype").str.contains("Datetime", literal=True)
+        )["__tmp_idx"].any()
+        if any_datetimes:
+            datetime_idx = [c for c in present_stat_cols if c in ("min", "max")]
+            formatted_data = formatted_data.with_columns(
+                nw.when(nw.col("coltype").str.contains(r"\bDatetime\b", literal=False))
+                .then(nw.col(c).cast(nw.String).str.replace_all("-", "<br>"))
+                .otherwise(nw.col(c).cast(nw.String))
+                for c in datetime_idx
+            )
+
+        # format fractions:
+        # this is an anti-pattern but there's no serious alternative
+        for _fmt_col in ("__frac_n_unique", "__frac_n_missing"):
+            _formatted: list[str | None] = _fmt_frac(formatted_data[_fmt_col])
+            formatted: nw.Series = nw.new_series(
+                _fmt_col, values=_formatted, backend=self.profile.implementation
+            )
+            formatted_data = formatted_data.drop(_fmt_col)
+            formatted_data = formatted_data.with_columns(formatted.alias(_fmt_col))
+
+        formatted_data = (
+            # TODO: This is a temporary solution?
+            # Format the unique and missing pct strings
+            formatted_data.with_columns(
+                n_unique=nw.concat_str(
+                    nw.col("n_unique"),
+                    nw.lit("<br>"),
+                    nw.col("__frac_n_unique"),
+                ),
+                n_missing=nw.concat_str(
+                    nw.col("n_missing"),
+                    nw.lit("<br>"),
+                    nw.col("__frac_n_missing"),
+                ),
+            )
+            # TODO: Should be able to use selectors for this
+            .drop("__frac_n_unique", "__frac_n_missing", "coltype")
+        )
+
+        if "freqs" in formatted_data.columns:  # TODO: don't love this arbitrary check
+            # Extract HTML freqs:
+            try:
+                formatted_data = formatted_data.with_columns(
+                    __freq_true=nw.col("freqs").struct.field("True"),
+                    __freq_false=nw.col("freqs").struct.field("False"),
+                )
+            except Exception:  # TODO: should be narrowed if possible
+                # if no struct implimentation exists, it must be done manually
+                freq_ser: nw.Series = formatted_data["freqs"]
+                trues: list[int | None] = []
+                falses: list[int | None] = []
+                for freq in freq_ser:
+                    try:
+                        trues.append(freq["True"])
+                        falses.append(freq["False"])
+                    except (KeyError, TypeError):
+                        trues.append(None)
+                        falses.append(None)
+                true_ser: nw.Series = nw.new_series(
+                    name="__freq_true", values=trues, backend=self.profile.implementation
+                )
+                false_ser: nw.Series = nw.new_series(
+                    name="__freq_false", values=falses, backend=self.profile.implementation
+                )
+                formatted_data = formatted_data.with_columns(
+                    __freq_true=true_ser, __freq_false=false_ser
+                )
+
+            ## format pct true values
+            formatted_data = formatted_data.with_columns(
+                # for bools, UQs are represented as percentages
+                __pct_true=nw.col("__freq_true") / self.profile.row_count,
+                __pct_false=nw.col("__freq_false") / self.profile.row_count,
+            )
+            for _fmt_col in ("__pct_true", "__pct_false"):
+                _formatted: list[str | None] = _fmt_frac(formatted_data[_fmt_col])
+                formatted = nw.new_series(
+                    name=_fmt_col, values=_formatted, backend=self.profile.implementation
+                )
+                formatted_data = formatted_data.drop(_fmt_col)
+                formatted_data = formatted_data.with_columns(formatted.alias(_fmt_col))
+
+            formatted_data = (
+                formatted_data.with_columns(
+                    __bool_unique_html=nw.concat_str(
+                        nw.lit("<span style='font-weight: bold;'>T</span>"),
+                        nw.col("__pct_true"),
+                        nw.lit("<br><span style='font-weight: bold;'>F</span>"),
+                        nw.col("__pct_false"),
+                    ),
+                )
+                .with_columns(
+                    n_unique=nw.when(~nw.col("__bool_unique_html").is_null())
+                    .then(nw.col("__bool_unique_html"))
+                    .otherwise(nw.col("n_unique"))
+                )
+                .drop(
+                    "__freq_true",
+                    "__freq_false",
+                    "__bool_unique_html",
+                    "freqs",
+                    "__pct_true",
+                    "__pct_false",
+                )
+            )
+
+        ## Determine Value Formatting Selectors:
+        fmt_int: list[str] = formatted_data.select(nw.selectors.by_dtype(nw.dtypes.Int64)).columns
+        fmt_float: list[str] = formatted_data.select(
+            nw.selectors.by_dtype(nw.dtypes.Float64)
+        ).columns
+
+        ## GT Table:
         gt_tbl = (
-            GT(stats_df, id="col_summary")
+            GT(formatted_data.to_native())
             .tab_header(title=html(combined_title))
-            .cols_align(align="right", columns=stat_columns)
+            .tab_source_note(source_note="String columns statistics regard the string's length.")
+            .cols_align(align="right", columns=list(present_stat_cols))
             .opt_table_font(font=google_font("IBM Plex Sans"))
             .opt_align_table_header(align="left")
+            .tab_style(style=style.text(font=google_font("IBM Plex Mono")), locations=loc.body())
+            .cols_move_to_start(target_order)
+            ## Labeling
+            .cols_label(label_map)
+            .cols_label(icon="", colname="Column")
+            .cols_align("center", columns=list(present_stat_cols))
             .tab_style(
-                style=style.text(font=google_font("IBM Plex Mono")),
-                locations=loc.body(),
+                style=style.text(align="right"), locations=loc.body(columns=list(present_stat_cols))
             )
-            .tab_style(
-                style=style.text(size="10px"),
-                locations=loc.body(columns=stat_columns),
+            ## Value Formatting
+            .fmt_integer(columns=fmt_int)
+            .fmt_number(
+                columns=fmt_float,
+                decimals=2,
+                drop_trailing_dec_mark=True,
+                drop_trailing_zeros=True,
             )
+            ## Borders
             .tab_style(
-                style=style.text(size="14px"),
-                locations=loc.body(columns="column_number"),
-            )
-            .tab_style(
-                style=style.text(size="12px"),
-                locations=loc.body(columns="column_name"),
-            )
-            .tab_style(
-                style=style.css("white-space: pre; overflow-x: visible;"),
-                locations=loc.body(columns="min"),
-            )
-            .tab_style(
-                style=style.borders(sides="left", color="#D3D3D3", style="solid"),
-                locations=loc.body(columns=["missing_vals", "mean", "min", "iqr"]),
+                style=style.borders(sides="right", color="#D3D3D3", style="solid"),
+                locations=loc.body(columns=right_border_cols),
             )
             .tab_style(
                 style=style.borders(sides="left", color="#E5E5E5", style="dashed"),
-                locations=loc.body(columns=["std_dev", "p05", "q_1", "med", "q_3", "p95", "max"]),
+                locations=loc.body(columns=list(present_stat_cols)),
             )
+            ## Formatting
             .tab_style(
-                style=style.borders(sides="left", style="none"),
-                locations=loc.body(
-                    columns=["p05", "q_1", "med", "q_3", "p95", "max"],
-                    rows=datetime_row_list,
-                ),
+                style=style.text(size="10px"),
+                locations=loc.body(columns=list(present_stat_cols)),
             )
-            .tab_style(
-                style=style.fill(color="#FCFCFC"),
-                locations=loc.body(columns=["missing_vals", "unique_vals", "iqr"]),
-            )
-            .tab_style(
-                style=style.text(align="center"), locations=loc.column_labels(columns=stat_columns)
-            )
-            .cols_label(
-                column_number="",
-                icon="",
-                column_name="Column",
-                missing_vals="NA",
-                unique_vals="UQ",
-                mean="Mean",
-                std_dev="SD",
-                min="Min",
-                p05=html(
-                    'P<span style="font-size: 0.75em; vertical-align: sub; position: relative; line-height: 0.5em;">5</span>'
-                ),
-                q_1=html(
-                    'Q<span style="font-size: 0.75em; vertical-align: sub; position: relative; line-height: 0.5em;">1</span>'
-                ),
-                med="Med",
-                q_3=html(
-                    'Q<span style="font-size: 0.75em; vertical-align: sub; position: relative; line-height: 0.5em;">3</span>'
-                ),
-                p95=html(
-                    'P<span style="font-size: 0.75em; vertical-align: sub; position: relative; line-height: 0.5em;">95</span>'
-                ),
-                max="Max",
-                iqr="IQR",
-            )
+            .tab_style(style=style.text(size="12px"), locations=loc.body(columns="colname"))
             .cols_width(
-                column_number="40px",
-                icon="35px",
-                column_name="200px",
-                missing_vals="50px",
-                unique_vals="50px",
-                mean="50px",
-                std_dev="50px",
-                min="50px",
-                p05="50px",
-                q_1="50px",
-                med="50px",
-                q_3="50px",
-                p95="50px",
-                max="50px",
-                iqr="50px",  # 875 px total
+                icon="35px", colname="200px", **{stat_col: "60px" for stat_col in present_stat_cols}
             )
         )
+
+        if "PYARROW" != formatted_data.implementation.name:
+            # TODO: this is more proactive than it should be
+            gt_tbl = gt_tbl.sub_missing(missing_text="-")
+            # https://github.com/posit-dev/great-tables/issues/667
 
         # If the version of `great_tables` is `>=0.17.0` then disable Quarto table processing
         if version("great_tables") >= "0.17.0":
@@ -783,15 +463,28 @@ class DataScan:
 
         return gt_tbl
 
-    def to_dict(self) -> dict:
-        return self.profile
+    @staticmethod
+    def _build_label_map(cols: Sequence[str]) -> dict[str, Any]:
+        label_map: dict[str, Any] = {}
+        for target_col in cols:
+            try:
+                matching_stat = next(
+                    stat for stat in COLUMN_ORDER_REGISTRY if target_col == stat.name
+                )
+            except StopIteration:
+                continue
+            label_map[target_col] = matching_stat.label
+        return label_map
 
     def to_json(self) -> str:
-        return json.dumps(self.profile, indent=4)
+        prof_dict = self.profile.as_dataframe(strict=False).to_dict(as_series=False)
+
+        return json.dumps(prof_dict, indent=4, default=str)
 
     def save_to_json(self, output_file: str):
+        json_string: str = self.to_json()
         with open(output_file, "w") as f:
-            json.dump(self.profile, f, indent=4)
+            json.dump(json_string, f, indent=4)
 
 
 def col_summary_tbl(data: FrameT | Any, tbl_name: str | None = None) -> GT:
@@ -875,337 +568,3 @@ def col_summary_tbl(data: FrameT | Any, tbl_name: str | None = None) -> GT:
 
     scanner = DataScan(data=data, tbl_name=tbl_name)
     return scanner.get_tabular_report()
-
-
-def _to_df_lib(expr: any, df_lib: str) -> any:
-    if df_lib == "polars":
-        return expr.to_polars()
-    else:
-        return expr.to_pandas()
-
-
-def _round_to_sig_figs(value: float, sig_figs: int) -> float:
-    if value == 0:
-        return 0
-    return round(value, sig_figs - int(floor(log10(abs(value)))) - 1)
-
-
-def _compact_integer_fmt(value: float | int) -> str:
-    if value == 0:
-        formatted = "0"
-    elif abs(value) >= 1 and abs(value) < 10_000:
-        formatted = fmt_integer(value, use_seps=False)[0]
-    else:
-        formatted = fmt_scientific(value, decimals=1, exp_style="E1")[0]
-
-    return formatted
-
-
-def _compact_decimal_fmt(value: float | int) -> str:
-    if value == 0:
-        formatted = "0.00"
-    elif abs(value) < 1 and abs(value) >= 0.01:
-        formatted = fmt_number(value, decimals=2)[0]
-    elif abs(value) < 0.01:
-        formatted = fmt_scientific(value, decimals=1, exp_style="E1")[0]
-    elif abs(value) >= 1 and abs(value) < 10:
-        formatted = fmt_number(value, decimals=2, use_seps=False)[0]
-    elif abs(value) >= 10 and abs(value) < 1000:
-        formatted = fmt_number(value, n_sigfig=3)[0]
-    elif abs(value) >= 1000 and abs(value) < 10_000:
-        formatted = fmt_number(value, n_sigfig=4, use_seps=False)[0]
-    else:
-        formatted = fmt_scientific(value, decimals=1, exp_style="E1")[0]
-
-    return formatted
-
-
-def _compact_0_1_fmt(value: float | int) -> str:
-    if value == 0:
-        formatted = " 0.00"
-    elif value == 1:
-        formatted = " 1.00"
-    elif abs(value) < 0.01:
-        formatted = "<0.01"
-    elif abs(value) > 0.99 and abs(value) < 1.0:
-        formatted = ">0.99"
-    elif abs(value) <= 0.99 and abs(value) >= 0.01:
-        formatted = " " + fmt_number(value, decimals=2)[0]
-    else:
-        formatted = fmt_number(value, n_sigfig=3)[0]
-    return formatted
-
-
-def _process_numerical_column_data(column_data: dict) -> dict:
-    column_number = column_data["column_number"]
-    column_name = column_data["column_name"]
-    column_type = column_data["column_type"]
-
-    column_name_and_type = (
-        f"<div style='font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;'>{column_name}</div>"
-        f"<div style='font-size: 11px; color: gray;'>{column_type}</div>"
-    )
-
-    # Get the Missing and Unique value counts and fractions
-    missing_vals = column_data["n_missing_values"]
-    unique_vals = column_data["n_unique_values"]
-    missing_vals_frac = _compact_0_1_fmt(column_data["f_missing_values"])
-    unique_vals_frac = _compact_0_1_fmt(column_data["f_unique_values"])
-
-    missing_vals_str = f"{missing_vals}<br>{missing_vals_frac}"
-    unique_vals_str = f"{unique_vals}<br>{unique_vals_frac}"
-
-    # Get the descriptive and quantile statistics
-    descriptive_stats = column_data["statistics"]["numerical"]["descriptive"]
-    quantile_stats = column_data["statistics"]["numerical"]["quantiles"]
-
-    # Get all values from the descriptive and quantile stats into a single list
-    quantile_stats_vals = [v[1] for v in quantile_stats.items()]
-
-    # Determine if the quantile stats are all integerlike
-    integerlike = []
-
-    # Determine if the quantile stats are integerlike
-    for val in quantile_stats_vals:
-        # Check if a quantile value is a number and then if it is intergerlike
-        if not isinstance(val, (int, float)):
-            continue  # pragma: no cover
-        else:
-            integerlike.append(val % 1 == 0)
-    quantile_vals_integerlike = all(integerlike)
-
-    # Determine the formatter to use for the quantile values
-    if quantile_vals_integerlike:
-        q_formatter = _compact_integer_fmt
-    else:
-        q_formatter = _compact_decimal_fmt
-
-    # Format the descriptive statistics (mean and standard deviation)
-    for key, value in descriptive_stats.items():
-        descriptive_stats[key] = _compact_decimal_fmt(value=value)
-
-    # Format the quantile statistics
-    for key, value in quantile_stats.items():
-        quantile_stats[key] = q_formatter(value=value)
-
-    # Create a single dictionary with the statistics for the column
-    stats_dict = {
-        "column_number": column_number,
-        "icon": SVG_ICONS_FOR_DATA_TYPES["numeric"],
-        "column_name": column_name_and_type,
-        "missing_vals": missing_vals_str,
-        "unique_vals": unique_vals_str,
-        **descriptive_stats,
-        **quantile_stats,
-    }
-
-    return stats_dict
-
-
-def _process_string_column_data(column_data: dict) -> dict:
-    column_number = column_data["column_number"]
-    column_name = column_data["column_name"]
-    column_type = column_data["column_type"]
-
-    column_name_and_type = (
-        f"<div style='font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;'>{column_name}</div>"
-        f"<div style='font-size: 11px; color: gray;'>{column_type}</div>"
-    )
-
-    # Get the Missing and Unique value counts and fractions
-    missing_vals = column_data["n_missing_values"]
-    unique_vals = column_data["n_unique_values"]
-    missing_vals_frac = _compact_0_1_fmt(column_data["f_missing_values"])
-    unique_vals_frac = _compact_0_1_fmt(column_data["f_unique_values"])
-
-    missing_vals_str = f"{missing_vals}<br>{missing_vals_frac}"
-    unique_vals_str = f"{unique_vals}<br>{unique_vals_frac}"
-
-    # Get the descriptive and quantile statistics
-    descriptive_stats = column_data["statistics"]["string_lengths"]["descriptive"]
-    quantile_stats = column_data["statistics"]["string_lengths"]["quantiles"]
-
-    # Format the descriptive statistics (mean and standard deviation)
-    for key, value in descriptive_stats.items():
-        formatted_val = _compact_decimal_fmt(value=value)
-        descriptive_stats[key] = (
-            f'<div><div>{formatted_val}</div><div style="float: left; position: absolute;">'
-            '<div title="string length measure" style="font-size: 7px; color: #999; '
-            'font-style: italic; cursor: help;">SL</div></div></div>'
-        )
-
-    # Format the quantile statistics
-    for key, value in quantile_stats.items():
-        formatted_val = _compact_integer_fmt(value=value)
-        quantile_stats[key] = (
-            f'<div><div>{formatted_val}</div><div style="float: left; position: absolute;">'
-            '<div title="string length measure" style="font-size: 7px; color: #999; '
-            'font-style: italic; cursor: help;">SL</div></div></div>'
-        )
-
-    # Create a single dictionary with the statistics for the column
-    stats_dict = {
-        "column_number": column_number,
-        "icon": SVG_ICONS_FOR_DATA_TYPES["string"],
-        "column_name": column_name_and_type,
-        "missing_vals": missing_vals_str,
-        "unique_vals": unique_vals_str,
-        **descriptive_stats,
-        "min": quantile_stats["min"],
-        "p05": "&mdash;",
-        "q_1": "&mdash;",
-        "med": quantile_stats["med"],
-        "q_3": "&mdash;",
-        "p95": "&mdash;",
-        "max": quantile_stats["max"],
-        "iqr": "&mdash;",
-    }
-
-    return stats_dict
-
-
-def _process_datetime_column_data(column_data: dict) -> dict:
-    column_number = column_data["column_number"]
-    column_name = column_data["column_name"]
-    column_type = column_data["column_type"]
-
-    long_column_type = len(column_type) > 22
-
-    if long_column_type:
-        column_type_style = "font-size: 7.5px; color: gray; margin-top: 3px; margin-bottom: 2px;"
-    else:
-        column_type_style = "font-size: 11px; color: gray;"
-
-    column_name_and_type = (
-        f"<div style='font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;'>{column_name}</div>"
-        f"<div style='{column_type_style}'>{column_type}</div>"
-    )
-
-    # Get the Missing and Unique value counts and fractions
-    missing_vals = column_data["n_missing_values"]
-    unique_vals = column_data["n_unique_values"]
-    missing_vals_frac = _compact_0_1_fmt(column_data["f_missing_values"])
-    unique_vals_frac = _compact_0_1_fmt(column_data["f_unique_values"])
-
-    missing_vals_str = f"{missing_vals}<br>{missing_vals_frac}"
-    unique_vals_str = f"{unique_vals}<br>{unique_vals_frac}"
-
-    # Get the min and max date
-    min_date = column_data["statistics"]["datetime"]["min"]
-    max_date = column_data["statistics"]["datetime"]["max"]
-
-    # Format the dates so that they don't break across lines
-    min_max_date_str = f"<span style='text-align: left; white-space: nowrap; overflow-x: visible;'>&nbsp;{min_date} &ndash; {max_date}</span>"
-
-    # Create a single dictionary with the statistics for the column
-    stats_dict = {
-        "column_number": column_number,
-        "icon": SVG_ICONS_FOR_DATA_TYPES["date"],
-        "column_name": column_name_and_type,
-        "missing_vals": missing_vals_str,
-        "unique_vals": unique_vals_str,
-        "mean": "&mdash;",
-        "std_dev": "&mdash;",
-        "min": min_max_date_str,
-        "p05": "",
-        "q_1": "",
-        "med": "",
-        "q_3": "",
-        "p95": "",
-        "max": "",
-        "iqr": "&mdash;",
-    }
-
-    return stats_dict
-
-
-def _process_boolean_column_data(column_data: dict) -> dict:
-    column_number = column_data["column_number"]
-    column_name = column_data["column_name"]
-    column_type = column_data["column_type"]
-
-    column_name_and_type = (
-        f"<div style='font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;'>{column_name}</div>"
-        f"<div style='font-size: 11px; color: gray;'>{column_type}</div>"
-    )
-
-    # Get the missing value count and fraction
-    missing_vals = column_data["n_missing_values"]
-    missing_vals_frac = _compact_0_1_fmt(column_data["f_missing_values"])
-    missing_vals_str = f"{missing_vals}<br>{missing_vals_frac}"
-
-    # Get the fractions of True and False values
-    f_true_values = column_data["statistics"]["boolean"]["f_true_values"]
-    f_false_values = column_data["statistics"]["boolean"]["f_false_values"]
-
-    true_vals_frac_fmt = _compact_0_1_fmt(f_true_values)
-    false_vals_frac_fmt = _compact_0_1_fmt(f_false_values)
-
-    # Create an HTML string that combines fractions for the True and False values; this will be
-    # used in the Unique Vals column of the report table
-    true_false_vals_str = (
-        f"<span style='font-weight: bold;'>T</span>{true_vals_frac_fmt}<br>"
-        f"<span style='font-weight: bold;'>F</span>{false_vals_frac_fmt}"
-    )
-
-    # Create a single dictionary with the statistics for the column
-    stats_dict = {
-        "column_number": column_number,
-        "icon": SVG_ICONS_FOR_DATA_TYPES["boolean"],
-        "column_name": column_name_and_type,
-        "missing_vals": missing_vals_str,
-        "unique_vals": true_false_vals_str,
-        "mean": "&mdash;",
-        "std_dev": "&mdash;",
-        "min": "&mdash;",
-        "p05": "&mdash;",
-        "q_1": "&mdash;",
-        "med": "&mdash;",
-        "q_3": "&mdash;",
-        "p95": "&mdash;",
-        "max": "&mdash;",
-        "iqr": "&mdash;",
-    }
-
-    return stats_dict
-
-
-def _process_other_column_data(column_data: dict) -> dict:
-    column_number = column_data["column_number"]
-    column_name = column_data["column_name"]
-    column_type = column_data["column_type"]
-
-    column_name_and_type = (
-        f"<div style='font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;'>{column_name}</div>"
-        f"<div style='font-size: 11px; color: gray;'>{column_type}</div>"
-    )
-
-    # Get the Missing and Unique value counts and fractions
-    missing_vals = column_data["n_missing_values"]
-    unique_vals = column_data["n_unique_values"]
-    missing_vals_frac = _compact_decimal_fmt(column_data["f_missing_values"])
-    unique_vals_frac = _compact_decimal_fmt(column_data["f_unique_values"])
-
-    missing_vals_str = f"{missing_vals}<br>{missing_vals_frac}"
-    unique_vals_str = f"{unique_vals}<br>{unique_vals_frac}"
-
-    # Create a single dictionary with the statistics for the column
-    stats_dict = {
-        "column_number": column_number,
-        "icon": SVG_ICONS_FOR_DATA_TYPES["object"],
-        "column_name": column_name_and_type,
-        "missing_vals": missing_vals_str,
-        "unique_vals": unique_vals_str,
-        "mean": "&mdash;",
-        "std_dev": "&mdash;",
-        "min": "&mdash;",
-        "p05": "&mdash;",
-        "q_1": "&mdash;",
-        "med": "&mdash;",
-        "q_3": "&mdash;",
-        "p95": "&mdash;",
-        "max": "&mdash;",
-        "iqr": "&mdash;",
-    }
-
-    return stats_dict

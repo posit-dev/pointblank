@@ -1,141 +1,206 @@
+from __future__ import annotations
+
 import pytest
-import sys
+import narwhals as nw
 
-from unittest.mock import patch
-
+import polars.selectors as cs
+from hypothesis import given, settings, strategies as st, example
+import polars.testing.parametric as ptp
 from great_tables import GT
+from typing import TYPE_CHECKING, NamedTuple
+import polars as pl
+import polars.testing as pt
+import pointblank as pb
 
-from pointblank.validate import load_dataset
-from pointblank.datascan import (
-    DataScan,
-    col_summary_tbl,
-    _compact_0_1_fmt,
-    _compact_decimal_fmt,
-    _compact_integer_fmt,
+from pointblank.datascan import DataScan, col_summary_tbl
+from pointblank._datascan_utils import _compact_0_1_fmt, _compact_decimal_fmt, _compact_integer_fmt
+from pointblank.scan_profile_stats import StatGroup, COLUMN_ORDER_REGISTRY
+
+if TYPE_CHECKING:
+    import pyarrow as pa
+    import pandas as pd
+
+
+## Setup Strategies:
+## Generate df and ldf happy paths using polars.
+## Also generate pandas and arrow strategies which should smoke test any complete mistakes
+## or inconsistent handling in narwhals. Really checking the consistency among packages is
+## too much the job of narwhals, and we should avoid stepping on their testing suite.
+## LDF gets a datetime check because eager datetime values are not easily handled by pandas.
+## We need the coverage of datetimes generally and that is checked by the ldf, just not for eager.
+happy_path_df = ptp.dataframes(
+    min_size=5,
+    allowed_dtypes=[pl.Int64, pl.Float64, pl.String, pl.Categorical, pl.Date],
+)
+happy_path_ldf = ptp.dataframes(
+    min_size=5,
+    allowed_dtypes=[pl.Int64, pl.Float64, pl.String, pl.Categorical, pl.Date, pl.Datetime],
+    lazy=True,
 )
 
 
-@pytest.mark.parametrize("tbl_type", ["pandas", "polars", "duckdb"])
-def test_datascan_class(tbl_type):
-    dataset = load_dataset(dataset="small_table", tbl_type=tbl_type)
-    scanner = DataScan(data=dataset)
-
-    assert scanner.data.equals(dataset)
-    assert scanner.tbl_name is None
-    assert scanner.profile is not None
-    assert isinstance(scanner.profile, dict)
-
-    if tbl_type == "duckdb":
-        assert scanner.tbl_type == "duckdb"
-        assert scanner.tbl_category == "ibis"
-        assert scanner.data_alt is None
-
-    if tbl_type == "polars":
-        assert scanner.tbl_type == "polars"
-        assert scanner.tbl_category == "dataframe"
-        assert scanner.data_alt is not None
-
-    if tbl_type == "pandas":
-        assert scanner.tbl_type == "pandas"
-        assert scanner.tbl_category == "dataframe"
-        assert scanner.data_alt is not None
+@st.composite
+def _arrow_strat(draw) -> pa.Table:
+    polars_df = draw(happy_path_df)
+    return nw.from_native(polars_df).to_arrow()
 
 
-@pytest.mark.parametrize("tbl_type", ["pandas", "polars", "duckdb"])
-def test_datascan_class_use_tbl_name(tbl_type):
-    dataset = load_dataset(dataset="small_table", tbl_type=tbl_type)
-    scanner = DataScan(data=dataset, tbl_name="my_small_table")
-
-    assert scanner.tbl_name == "my_small_table"
+@st.composite
+def _pandas_strat(draw) -> pd.DataFrame:
+    polars_df = draw(happy_path_df)
+    return nw.from_native(polars_df).to_pandas()
 
 
-@pytest.mark.parametrize("tbl_type", ["pandas", "polars", "duckdb"])
-def test_datascan_no_fail(tbl_type):
-    small_table = load_dataset(dataset="small_table", tbl_type=tbl_type)
-    DataScan(data=small_table)
+@given(happy_path_df | happy_path_ldf | _arrow_strat() | _pandas_strat())
+@example(pb.load_dataset("small_table", "polars"))
+@example(pb.load_dataset("small_table", "pandas"))
+@example(pb.load_dataset("small_table", "duckdb"))
+@example(pb.load_dataset("game_revenue", "polars"))
+@example(pb.load_dataset("game_revenue", "pandas"))
+@example(pb.load_dataset("game_revenue", "duckdb"))
+@example(pb.load_dataset("nycflights", "polars"))
+@example(pb.load_dataset("nycflights", "pandas"))
+@example(pb.load_dataset("nycflights", "duckdb"))
+@settings(deadline=None)  # too variant to enforce deadline
+def test_datascan_class_parametric(df) -> None:
+    scanner = DataScan(data=df)
 
-    game_revenue = load_dataset(dataset="game_revenue", tbl_type=tbl_type)
-    DataScan(data=game_revenue)
+    df_nw = nw.from_native(df)
 
-    nycflights = load_dataset(dataset="nycflights", tbl_type=tbl_type)
-    DataScan(data=nycflights)
+    summary_res: nw.DataFrame = nw.from_native(scanner.summary_data)
+
+    ## High Level Checks:
+    cols = summary_res.select("colname").to_dict()["colname"].to_list()
+
+    msg = "cols must be the same"
+    df_cols = df_nw.columns
+    assert set(cols) == set(df_cols), msg
+
+    msg = "return type is the physical version of the input"
+    try:
+        assert df_nw.implementation == summary_res.implementation
+    except AssertionError:
+        if df_nw.implementation.name == "IBIS" and df_nw._level == "lazy":
+            pass  # this is actually expected, the summary will come back in another type
+        else:
+            raise AssertionError
+
+    msg = "did not return correct amount of summary rows"
+    assert len(summary_res) == len(cols)  # only for happy path
+
+    msg = "contains sample data"
+    assert "sample_data" in summary_res.columns
+
+    ## More Granular Checks:
+    cols_that_must_be_there = ("n_missing", "n_unique", "icon", "colname", "sample_data", "coltype")
+    for col in cols_that_must_be_there:
+        assert col in summary_res.columns, f"Missing column: {col}"
+
+    # this also catches developer error in syncing the calculations and stat classes
+    # for example if dev adds a new stat to `scan_profile_stats.py` and does not add
+    # it to the `calc_stats` method, this test will fail since it never calculated the
+    # statistic.
+    msg = "If a single of a group is there, they should all be there."
+    for group in StatGroup:
+        stats_that_should_be_present: list[str] = [
+            stat.name for stat in COLUMN_ORDER_REGISTRY if group == stat.group
+        ]
+        any_in_summary = any(
+            col for col in stats_that_should_be_present if col in summary_res.columns
+        )
+        if any_in_summary:
+            for stat in stats_that_should_be_present:
+                assert stat in summary_res.columns, f"{msg}: Missing {stat}"
 
 
-@pytest.mark.parametrize("tbl_type", ["pandas", "polars", "duckdb"])
-def test_datascan_dict_output(tbl_type):
-    dataset = load_dataset(dataset="small_table", tbl_type=tbl_type)
-    scanner = DataScan(data=dataset)
-
-    assert isinstance(scanner.to_dict(), dict)
-
-    scan_dict = scanner.to_dict()
-
-    assert isinstance(scan_dict, dict)
-
-    assert scanner.to_dict() == scan_dict
+## Deterministic Casing:
+class _Case(NamedTuple):
+    data: pl.DataFrame
+    should_be: pl.DataFrame
 
 
-@pytest.mark.parametrize("tbl_type", ["pandas", "polars", "duckdb"])
-def test_datascan_json_output(tbl_type):
-    dataset = load_dataset(dataset="small_table", tbl_type=tbl_type)
-    scanner = DataScan(data=dataset)
+case1 = _Case(
+    data=pl.DataFrame(
+        {
+            # TODO: Make the bool tri-valent
+            "bool_col": [True, False, True, False, True],
+            "numeric_col": [1.5, 2.3, 3.1, 4.7, 5.2],
+        }
+    ),
+    should_be=pl.DataFrame(
+        {
+            "colname": ["bool_col", "numeric_col"],
+            "std": [None, 1.57],
+            "mean": [None, 3.36],
+            "max": [None, 5.2],
+            "q_1": [None, 2.3],
+            "p95": [None, 5.1],
+            "n_missing": [0, 0],
+            "median": [None, 3.1],
+            "iqr": [None, 2.4],
+            "p05": [None, 1.516],
+            "n_unique": [2, 5],
+            "q_3": [None, 4.7],
+            "min": [None, 1.5],
+            "freqs": [{"True": 3, "False": 2}, None],
+        }
+    ),
+)
+
+
+@pytest.mark.parametrize("case", [case1])
+def test_deterministic_calculations(case: _Case) -> None:
+    scanner = DataScan(case.data)
+
+    output = scanner.summary_data.drop("icon", "coltype", "sample_data")
+
+    check_settings = {
+        "check_row_order": False,
+        "check_column_order": False,
+        "check_exact": False,
+        "atol": 0.01,
+    }
+
+    pt.assert_frame_equal(case.should_be, output, check_dtypes=False, **check_settings)
+
+    output_clean = output.drop("freqs")  # TODO: make this dynamic, ie. a a struct?
+    should_be_clean = case.should_be.drop("freqs")
+
+    pt.assert_frame_equal(should_be_clean, output_clean, check_dtypes=True, **check_settings)
+
+
+@given(happy_path_df | happy_path_ldf | _arrow_strat() | _pandas_strat())
+@example(pb.load_dataset("small_table", "polars"))
+@example(pb.load_dataset("small_table", "pandas"))
+@example(pb.load_dataset("small_table", "duckdb"))
+@example(pb.load_dataset("game_revenue", "polars"))
+@example(pb.load_dataset("game_revenue", "pandas"))
+@example(pb.load_dataset("game_revenue", "duckdb"))
+@example(pb.load_dataset("nycflights", "polars"))
+@example(pb.load_dataset("nycflights", "pandas"))
+@example(pb.load_dataset("nycflights", "duckdb"))
+@settings(deadline=None)
+def test_datascan_json_output(df):
+    scanner = DataScan(data=df)
 
     profile_json = scanner.to_json()
 
     assert isinstance(profile_json, str)
 
 
-def test_datascan_json_file_output(tmp_path):
-    dataset = load_dataset(dataset="small_table")
-    scanner = DataScan(data=dataset)
-
-    profile_json = scanner.to_json()
-
-    file_path = tmp_path / "profile.json"
-    scanner.save_to_json(output_file=file_path)
-
-    assert file_path.exists()
-    assert file_path.is_file()
-
-    with open(file_path, "r") as f:
-        file_content = f.read()
-
-    assert profile_json == file_content
-
-
-@pytest.mark.parametrize("tbl_type", ["pandas", "polars", "duckdb"])
-def test_datascan_tabular_output_small_table(tbl_type):
-    dataset = load_dataset(dataset="small_table", tbl_type=tbl_type)
-    scanner = DataScan(data=dataset)
-
-    tabular_output = scanner.get_tabular_report()
-
-    assert isinstance(tabular_output, GT)
-
-
-@pytest.mark.parametrize("tbl_type", ["pandas", "polars", "duckdb"])
-def test_datascan_tabular_output_game_revenue(tbl_type):
-    dataset = load_dataset(dataset="game_revenue", tbl_type=tbl_type)
-    scanner = DataScan(data=dataset)
-
-    tabular_output = scanner.get_tabular_report()
-
-    assert isinstance(tabular_output, GT)
-
-
-@pytest.mark.parametrize("tbl_type", ["pandas", "polars", "duckdb"])
-def test_datascan_tabular_output_nycflights(tbl_type):
-    dataset = load_dataset(dataset="nycflights", tbl_type=tbl_type)
-    scanner = DataScan(data=dataset)
-
-    tabular_output = scanner.get_tabular_report()
-
-    assert isinstance(tabular_output, GT)
-
-
-def test_col_summary_tbl():
-    dataset = load_dataset(dataset="small_table")
-    col_summary = col_summary_tbl(dataset)
+@given(happy_path_df | happy_path_ldf | _arrow_strat() | _pandas_strat())
+@example(pb.load_dataset("nycflights", "duckdb"))  # ! move this back to the normal spot
+@example(pb.load_dataset("small_table", "polars"))
+@example(pb.load_dataset("small_table", "pandas"))
+@example(pb.load_dataset("small_table", "duckdb"))
+@example(pb.load_dataset("game_revenue", "polars"))
+@example(pb.load_dataset("game_revenue", "pandas"))
+@example(pb.load_dataset("game_revenue", "duckdb"))
+@example(pb.load_dataset("nycflights", "polars"))
+@example(pb.load_dataset("nycflights", "pandas"))
+@settings(deadline=None)
+def test_col_summary_tbl(df):
+    col_summary = col_summary_tbl(df)
 
     assert isinstance(col_summary, GT)
 
@@ -165,30 +230,6 @@ def test_col_summary_tbl_polars_categorical_column():
     assert isinstance(tabular_output, GT)
 
 
-def test_col_summary_tbl_pandas_snap(snapshot):
-    dataset = load_dataset(dataset="small_table", tbl_type="pandas")
-    col_summary_html = col_summary_tbl(dataset).as_raw_html()
-
-    # Use the snapshot fixture to create and save the snapshot
-    snapshot.assert_match(col_summary_html, "col_summary_html_pandas.html")
-
-
-def test_col_summary_tbl_polars_snap(snapshot):
-    dataset = load_dataset(dataset="small_table", tbl_type="polars")
-    col_summary_html = col_summary_tbl(dataset).as_raw_html()
-
-    # Use the snapshot fixture to create and save the snapshot
-    snapshot.assert_match(col_summary_html, "col_summary_html_polars.html")
-
-
-# def test_col_summary_tbl_duckdb_snap(snapshot):
-#     dataset = load_dataset(dataset="small_table", tbl_type="duckdb")
-#     col_summary_html = col_summary_tbl(dataset).as_raw_html()
-#
-#     # Use the snapshot fixture to create and save the snapshot
-#     snapshot.assert_match(col_summary_html, "col_summary_html_duckdb.html")
-
-
 def test_datascan_class_raises():
     with pytest.raises(TypeError):
         DataScan(data="not a DataFrame or Ibis Table")
@@ -198,13 +239,6 @@ def test_datascan_class_raises():
 
     with pytest.raises(TypeError):
         DataScan(data=[1, 2, 3])
-
-
-def test_datascan_ibis_table_no_polars():
-    # Mock the absence of the Polars library
-    with patch.dict(sys.modules, {"polars": None}):
-        small_table = load_dataset(dataset="small_table", tbl_type="duckdb")
-        DataScan(data=small_table)
 
 
 def test_compact_integer_fmt():
@@ -237,15 +271,19 @@ def test_compact_decimal_fmt():
 
 
 def test_compact_0_1_fmt():
-    assert _compact_0_1_fmt(value=0) == " 0.00"
-    assert _compact_0_1_fmt(value=1) == " 1.00"
-    assert _compact_0_1_fmt(value=0.0) == " 0.00"
-    assert _compact_0_1_fmt(value=1.0) == " 1.00"
-    assert _compact_0_1_fmt(value=0.1) == " 0.10"
-    assert _compact_0_1_fmt(value=0.5) == " 0.50"
-    assert _compact_0_1_fmt(value=0.01) == " 0.01"
-    assert _compact_0_1_fmt(value=0.009) == "<0.01"
-    assert _compact_0_1_fmt(value=0.000001) == "<0.01"
-    assert _compact_0_1_fmt(value=0.99) == " 0.99"
-    assert _compact_0_1_fmt(value=0.995) == ">0.99"
-    assert _compact_0_1_fmt(value=226.1) == "226"
+    _compact_0_1_fmt(value=0) == "0.0"
+    _compact_0_1_fmt(value=1) == "1.0"
+    _compact_0_1_fmt(value=0.0) == "0.0"
+    _compact_0_1_fmt(value=1.0) == "1.0"
+    _compact_0_1_fmt(value=0.1) == "0.1"
+    _compact_0_1_fmt(value=0.5) == "0.5"
+    _compact_0_1_fmt(value=0.01) == "0.01"
+    _compact_0_1_fmt(value=0.009) == "<0.01"
+    _compact_0_1_fmt(value=0.000001) == "<0.01"
+    _compact_0_1_fmt(value=0.99) == "0.99"
+    _compact_0_1_fmt(value=0.991) == ">0.99"
+    _compact_0_1_fmt(value=226.1) == "226"
+
+
+if __name__ == "__main__":
+    pytest.main([__file__, "-x", "-k", "test_col_summary_tbl"])

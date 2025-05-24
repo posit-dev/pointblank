@@ -47,7 +47,12 @@ requires-python = ">=3.10"
 [project.optional-dependencies]
 pd = ["pandas>=2.2.3"]
 pl = ["polars>=1.24.0"]
-generate = ["chatlas>=0.3.0", "anthropic[bedrock]>=0.45.2", "openai>=1.63.0", "shiny>=1.3.0"]
+generate = [
+    "chatlas>=0.3.0",
+    "anthropic[bedrock]>=0.45.2",
+    "openai>=1.63.0",
+    "shiny>=1.3.0",
+]
 bigquery = ["ibis-framework[bigquery]>=9.5.0"]
 databricks = ["ibis-framework[databricks]>=9.5.0"]
 duckdb = ["ibis-framework[duckdb]>=9.5.0"]
@@ -71,6 +76,7 @@ dev = [
     "chatlas>=0.6.1",
     "duckdb>=1.1.3",
     "griffe==0.38.1",
+    "hypothesis>=6.129.2",
     "ibis-framework[duckdb,mysql,postgres,sqlite]>=9.5.0",
     "jupyter",
     "nbclient>=0.10.0",
@@ -79,14 +85,17 @@ dev = [
     "polars>=1.17.1",
     "pre-commit==2.15.0",
     "pyarrow",
+    "pyarrow-stubs>=19.4",
     "pytest>=3",
     "pytest-cov",
     "pytest-randomly>=3.16.0",
     "pytest-rerunfailures>=15.0",
     "pytest-snapshot",
     "pytest-xdist>=3.6.1",
+    "pytest-xdist>=3.6.1",
     "quartodoc>=0.8.1; python_version >= '3.9'",
     "ruff>=0.9.9",
+    "shiny>=1.4.0",
 ]
 
 [project.urls]
@@ -113,6 +122,4 @@ ignore = [
 ]
 
 [tool.coverage.report]
-exclude_also = [
-    "if TYPE_CHECKING:"
-]
+exclude_also = ["if TYPE_CHECKING:"]

@@ -2,7 +2,7 @@
 
 .PHONY: test
 test:
-	@pytest \
+	@uv run pytest \
 		--cov=pointblank \
 		--cov-report=term-missing \
 		--randomly-seed 123 \

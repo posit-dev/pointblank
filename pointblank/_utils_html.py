@@ -1,7 +1,47 @@
 from __future__ import annotations
 
+from typing import Any
+
+from great_tables import html
+
 from pointblank._constants import TABLE_TYPE_STYLES
 from pointblank._utils import _format_to_integer_value
+
+
+def _fmt_frac(vec) -> list[str | None]:
+    res: list[str | None] = []
+    for x in vec:
+        if x is None:
+            res.append(x)
+            continue
+
+        if x == 0:
+            res.append("0")
+            continue
+
+        if x < 0.01:
+            res.append("<.01")
+            continue
+
+        try:
+            intx: int = int(x)
+        except ValueError:  # generic object, ie. NaN
+            res.append(str(x))
+            continue
+
+        if intx == x:  # can remove trailing 0s w/o loss
+            res.append(str(intx))
+            continue
+
+        res.append(str(round(x, 2)))
+
+    return res
+
+
+def _make_sublabel(major: str, minor: str) -> Any:
+    return html(
+        f'{major!s}<span style="font-size: 0.75em; vertical-align: sub; position: relative; line-height: 0.5em;">{minor!s}</span>'
+    )
 
 
 def _create_table_type_html(

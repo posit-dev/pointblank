@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import inspect
 import re
+from collections import defaultdict
 from typing import TYPE_CHECKING, Any
 
 import narwhals as nw
@@ -12,7 +13,26 @@ from narwhals.typing import FrameT
 from pointblank._constants import ASSERTION_TYPE_METHOD_MAP, GENERAL_COLUMN_TYPES
 
 if TYPE_CHECKING:
+    from collections.abc import Mapping
+
     from pointblank._typing import AbsoluteBounds, Tolerance
+
+
+def transpose_dicts(list_of_dicts: list[dict[str, Any]]) -> dict[str, list[Any]]:
+    if not list_of_dicts:
+        return {}
+
+    # Get all unique keys across all dictionaries
+    all_keys = set()
+    for d in list_of_dicts:
+        all_keys.update(d.keys())
+
+    result = defaultdict(list)
+    for d in list_of_dicts:
+        for key in all_keys:
+            result[key].append(d.get(key))  # None is default for missing keys
+
+    return dict(result)
 
 
 def _derive_single_bound(ref: int, tol: int | float) -> int:
@@ -784,3 +804,14 @@ def _format_to_float_value(
     formatted_vals = _get_column_of_values(gt, column_name="x", context="html")
 
     return formatted_vals[0]
+
+
+def _pivot_to_dict(col_dict: Mapping[str, Any]):  # TODO : Type hint and unit test
+    result_dict = {}
+    for col, sub_dict in col_dict.items():
+        for key, value in sub_dict.items():
+            # add columns fields not present
+            if key not in result_dict:
+                result_dict[key] = [None] * len(col_dict)
+            result_dict[key][list(col_dict.keys()).index(col)] = value
+    return result_dict
