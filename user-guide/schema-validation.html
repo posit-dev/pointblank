@@ -431,7 +431,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 
 <p>Schema validation in Pointblank allows you to verify that your data conforms to an expected structure and type specification. This is particularly useful when ensuring data consistency across systems or validating incoming data against predefined requirements.</p>
 <p>Let’s first look at the dataset we’ll use for the first example:</p>
-<div id="665539bd" class="cell" data-execution_count="2">
+<div id="982bbd97" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Preview the small_table dataset we'll use throughout this guide</span></span>
@@ -640,7 +640,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="schema-definition-and-validation" class="level2">
 <h2 class="anchored" data-anchor-id="schema-definition-and-validation">Schema Definition and Validation</h2>
 <p>A schema in Pointblank is created using the <a href="https://posit-dev.github.io/pointblank/reference/Schema.html"><code>Schema</code></a> class which defines the expected structure of a table. Once created, you apply schema validation through the <a href="https://posit-dev.github.io/pointblank/reference/Validate.col_schema_match.html"><code>col_schema_match()</code></a> validation step.</p>
-<div id="8f21116f" class="cell" data-execution_count="3">
+<div id="09281d66" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a schema definition matching small_table structure</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    columns<span class="op">=</span>[</span>
@@ -818,7 +818,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 <p>The output shows the validation passed successfully. When all columns have the correct names and types as specified in the schema, the validation passes with a single passing test unit. If there were discrepancies, this would fail, but the basic output wouldn’t show specific issues.</p>
 <p>For detailed information about validation results, use <a href="https://posit-dev.github.io/pointblank/reference/Validate.get_step_report.html"><code>get_step_report()</code></a>:</p>
-<div id="52d1345a" class="cell" data-execution_count="4">
+<div id="78bdca68" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>small_table_validation.get_step_report(i<span class="op">=</span><span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="4">
 <div id="pb_step_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
@@ -1029,7 +1029,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="discovering-column-types" class="level2">
 <h2 class="anchored" data-anchor-id="discovering-column-types">Discovering Column Types</h2>
 <p>To easily determine the correct type string for columns in your data, Pointblank provides two helpful functions:</p>
-<div id="e6325abc" class="cell" data-execution_count="5">
+<div id="0e51b0ba" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> datetime <span class="im">import</span> date</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1040,7 +1040,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">"join_date"</span>: [date(<span class="dv">2020</span>, <span class="dv">1</span>, <span class="dv">1</span>), date(<span class="dv">2021</span>, <span class="dv">3</span>, <span class="dv">15</span>), date(<span class="dv">2022</span>, <span class="dv">7</span>, <span class="dv">10</span>)]</span>
 <span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="3c59bdfe" class="cell" data-execution_count="6">
+<div id="69b29637" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Method 1: Using `preview()` with `show_types=True` to see column types</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>pb.preview(sample_df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="6">
@@ -1142,105 +1142,102 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
         
 </div>
 </div>
-<div id="5dc3404a" class="cell" data-execution_count="7">
+<div id="93cf8648" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Method 2: Using `col_summary_tbl()` which shows column types and other details</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>pb.col_summary_tbl(sample_df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="7">
-<div id="col_summary" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="mwxrynrgzn" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap');
-#col_summary table {
+#mwxrynrgzn table {
           font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
           -webkit-font-smoothing: antialiased;
           -moz-osx-font-smoothing: grayscale;
         }
 
-#col_summary thead, tbody, tfoot, tr, td, th { border-style: none; }
+#mwxrynrgzn thead, tbody, tfoot, tr, td, th { border-style: none; }
  tr { background-color: transparent; }
-#col_summary p { margin: 0; padding: 0; }
- #col_summary .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 16px; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: auto; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
- #col_summary .gt_caption { padding-top: 4px; padding-bottom: 4px; }
- #col_summary .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
- #col_summary .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
- #col_summary .gt_heading { background-color: #FFFFFF; text-align: left; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
- #col_summary .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
- #col_summary .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
- #col_summary .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
- #col_summary .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
- #col_summary .gt_column_spanner_outer:first-child { padding-left: 0; }
- #col_summary .gt_column_spanner_outer:last-child { padding-right: 0; }
- #col_summary .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
- #col_summary .gt_spanner_row { border-bottom-style: hidden; }
- #col_summary .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
- #col_summary .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
- #col_summary .gt_from_md> :first-child { margin-top: 0; }
- #col_summary .gt_from_md> :last-child { margin-bottom: 0; }
- #col_summary .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
- #col_summary .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
- #col_summary .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
- #col_summary .gt_row_group_first td { border-top-width: 2px; }
- #col_summary .gt_row_group_first th { border-top-width: 2px; }
- #col_summary .gt_striped { background-color: rgba(128,128,128,0.05); }
- #col_summary .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
- #col_summary .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
- #col_summary .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
- #col_summary .gt_left { text-align: left; }
- #col_summary .gt_center { text-align: center; }
- #col_summary .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
- #col_summary .gt_font_normal { font-weight: normal; }
- #col_summary .gt_font_bold { font-weight: bold; }
- #col_summary .gt_font_italic { font-style: italic; }
- #col_summary .gt_super { font-size: 65%; }
- #col_summary .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
- #col_summary .gt_asterisk { font-size: 100%; vertical-align: 0; }
+#mwxrynrgzn p { margin: 0; padding: 0; }
+ #mwxrynrgzn .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 16px; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: auto; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
+ #mwxrynrgzn .gt_caption { padding-top: 4px; padding-bottom: 4px; }
+ #mwxrynrgzn .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
+ #mwxrynrgzn .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
+ #mwxrynrgzn .gt_heading { background-color: #FFFFFF; text-align: left; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #mwxrynrgzn .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #mwxrynrgzn .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #mwxrynrgzn .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
+ #mwxrynrgzn .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
+ #mwxrynrgzn .gt_column_spanner_outer:first-child { padding-left: 0; }
+ #mwxrynrgzn .gt_column_spanner_outer:last-child { padding-right: 0; }
+ #mwxrynrgzn .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
+ #mwxrynrgzn .gt_spanner_row { border-bottom-style: hidden; }
+ #mwxrynrgzn .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
+ #mwxrynrgzn .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
+ #mwxrynrgzn .gt_from_md> :first-child { margin-top: 0; }
+ #mwxrynrgzn .gt_from_md> :last-child { margin-bottom: 0; }
+ #mwxrynrgzn .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
+ #mwxrynrgzn .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
+ #mwxrynrgzn .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
+ #mwxrynrgzn .gt_row_group_first td { border-top-width: 2px; }
+ #mwxrynrgzn .gt_row_group_first th { border-top-width: 2px; }
+ #mwxrynrgzn .gt_striped { background-color: rgba(128,128,128,0.05); }
+ #mwxrynrgzn .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #mwxrynrgzn .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #mwxrynrgzn .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #mwxrynrgzn .gt_left { text-align: left; }
+ #mwxrynrgzn .gt_center { text-align: center; }
+ #mwxrynrgzn .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
+ #mwxrynrgzn .gt_font_normal { font-weight: normal; }
+ #mwxrynrgzn .gt_font_bold { font-weight: bold; }
+ #mwxrynrgzn .gt_font_italic { font-style: italic; }
+ #mwxrynrgzn .gt_super { font-size: 65%; }
+ #mwxrynrgzn .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
+ #mwxrynrgzn .gt_asterisk { font-size: 100%; vertical-align: 0; }
  
 </style>
 <table style="table-layout: fixed;; width: 0px" class="gt_table" data-quarto-disable-processing="true" data-quarto-bootstrap="false">
 <colgroup>
-  <col style="width:40px;">
   <col style="width:35px;">
   <col style="width:200px;">
-  <col style="width:50px;">
-  <col style="width:50px;">
-  <col style="width:50px;">
-  <col style="width:50px;">
-  <col style="width:50px;">
-  <col style="width:50px;">
-  <col style="width:50px;">
-  <col style="width:50px;">
-  <col style="width:50px;">
-  <col style="width:50px;">
-  <col style="width:50px;">
-  <col style="width:50px;">
+  <col style="width:60px;">
+  <col style="width:60px;">
+  <col style="width:60px;">
+  <col style="width:60px;">
+  <col style="width:60px;">
+  <col style="width:60px;">
+  <col style="width:60px;">
+  <col style="width:60px;">
+  <col style="width:60px;">
+  <col style="width:60px;">
+  <col style="width:60px;">
+  <col style="width:60px;">
 </colgroup>
 
 <thead>
 
   <tr class="gt_heading">
-    <td colspan="15" class="gt_heading gt_title gt_font_normal"><div><div style="padding-top: 0; padding-bottom: 7px;"><span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 10px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 10px 2px 10px; font-size: 10px;">Polars</span><span style="background-color: #eecbff; color: #333333; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 5px; font-weight: bold; border: solid 1px #eecbff; padding: 2px 15px 2px 15px; font-size: 10px;">Rows</span><span style="background-color: none; color: #333333; padding: 0.5em 0.5em; position: inherit; margin: 5px 0px 5px -4px; font-weight: bold; border: solid 1px #eecbff; padding: 2px 15px 2px 15px; font-size: 10px;">3</span><span style="background-color: #BDE7B4; color: #333333; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 3px; font-weight: bold; border: solid 1px #BDE7B4; padding: 2px 15px 2px 15px; font-size: 10px;">Columns</span><span style="background-color: none; color: #333333; padding: 0.5em 0.5em; position: inherit; margin: 5px 0px 5px -4px; font-weight: bold; border: solid 1px #BDE7B4; padding: 2px 15px 2px 15px; font-size: 10px;">3</span></div></div></td>
+    <td colspan="14" class="gt_heading gt_title gt_font_normal"><div><div style="padding-top: 0; padding-bottom: 7px;"><span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 10px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 10px 2px 10px; font-size: 10px;">Polars</span><span style="background-color: #eecbff; color: #333333; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 5px; font-weight: bold; border: solid 1px #eecbff; padding: 2px 15px 2px 15px; font-size: 10px;">Rows</span><span style="background-color: none; color: #333333; padding: 0.5em 0.5em; position: inherit; margin: 5px 0px 5px -4px; font-weight: bold; border: solid 1px #eecbff; padding: 2px 15px 2px 15px; font-size: 10px;">3</span><span style="background-color: #BDE7B4; color: #333333; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 3px; font-weight: bold; border: solid 1px #BDE7B4; padding: 2px 15px 2px 15px; font-size: 10px;">Columns</span><span style="background-color: none; color: #333333; padding: 0.5em 0.5em; position: inherit; margin: 5px 0px 5px -4px; font-weight: bold; border: solid 1px #BDE7B4; padding: 2px 15px 2px 15px; font-size: 10px;">3</span></div></div></td>
   </tr>
 <tr class="gt_col_headings">
-  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="col_summary-column_number"></th>
-  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="col_summary-icon"></th>
-  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="col_summary-column_name">Column</th>
-  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="text-align: center;" scope="col" id="col_summary-missing_vals">NA</th>
-  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="text-align: center;" scope="col" id="col_summary-unique_vals">UQ</th>
-  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="text-align: center;" scope="col" id="col_summary-mean">Mean</th>
-  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="text-align: center;" scope="col" id="col_summary-std_dev">SD</th>
-  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="text-align: center;" scope="col" id="col_summary-min">Min</th>
-  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="text-align: center;" scope="col" id="col_summary-p05">P<span style="font-size: 0.75em; vertical-align: sub; position: relative; line-height: 0.5em;">5</span></th>
-  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="text-align: center;" scope="col" id="col_summary-q_1">Q<span style="font-size: 0.75em; vertical-align: sub; position: relative; line-height: 0.5em;">1</span></th>
-  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="text-align: center;" scope="col" id="col_summary-med">Med</th>
-  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="text-align: center;" scope="col" id="col_summary-q_3">Q<span style="font-size: 0.75em; vertical-align: sub; position: relative; line-height: 0.5em;">3</span></th>
-  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="text-align: center;" scope="col" id="col_summary-p95">P<span style="font-size: 0.75em; vertical-align: sub; position: relative; line-height: 0.5em;">95</span></th>
-  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="text-align: center;" scope="col" id="col_summary-max">Max</th>
-  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="text-align: center;" scope="col" id="col_summary-iqr">IQR</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="icon"></th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="colname">Column</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="n_missing">NA</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="n_unique">UQ</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="mean">Mean</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="std">SD</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="min">Min</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="p05">P<span style="font-size: 0.75em; vertical-align: sub; position: relative; line-height: 0.5em;">5</span></th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="q_1">Q<span style="font-size: 0.75em; vertical-align: sub; position: relative; line-height: 0.5em;">1</span></th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="median">Med</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="q_3">Q<span style="font-size: 0.75em; vertical-align: sub; position: relative; line-height: 0.5em;">3</span></th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="p95">P<span style="font-size: 0.75em; vertical-align: sub; position: relative; line-height: 0.5em;">95</span></th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="max">Max</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="iqr">IQR</th>
 </tr>
 </thead>
 <tbody class="gt_table_body">
   <tr>
-    <td style="font-family: IBM Plex Mono; font-size: 14px;" class="gt_row gt_right">1</td>
     <td style="font-family: IBM Plex Mono;" class="gt_row gt_left"><svg width="24px" viewbox="0 0 180 181" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF; display: block; vertical-align: middle; margin: auto; padding-top: 0.5px;">
     <title>numeric</title>
     <g id="icon" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -1252,22 +1249,21 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
         </g>
     </g>
 </svg></td>
-    <td style="font-family: IBM Plex Mono; font-size: 12px;" class="gt_row gt_left"><div style="font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">id</div><div style="font-size: 11px; color: gray;">Int64</div></td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px solid #D3D3D3; background-color: #FCFCFC;" class="gt_row gt_right">0<br> 0.00</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; background-color: #FCFCFC;" class="gt_row gt_right">3<br> 1.00</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px solid #D3D3D3;" class="gt_row gt_right">2.00</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">1.00</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; white-space: pre; overflow-x: visible; border-left: 1px solid #D3D3D3;" class="gt_row gt_right">1.00</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">1.10</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">1.50</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">2.00</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">2.50</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">2.90</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">3.00</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px solid #D3D3D3; background-color: #FCFCFC;" class="gt_row gt_right">1.00</td>
+    <td style="font-family: IBM Plex Mono; border-right: 1px solid #D3D3D3; font-size: 12px;" class="gt_row gt_left"><div style="font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">id</div><div style="font-size: 11px; color: gray;">Int64</div></td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">0<br>0</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">3<br>1</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">2</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">1</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">1</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">1.01</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">1.5</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">2</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">2.5</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">2.9</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">3</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">1</td>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono; font-size: 14px;" class="gt_row gt_right">2</td>
     <td style="font-family: IBM Plex Mono;" class="gt_row gt_left"><svg width="24px" viewbox="0 0 180 181" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF; display: block; vertical-align: middle; margin: auto; padding-top: 0.5px;">
     <title>string</title>
     <g id="icon" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -1279,22 +1275,21 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
         </g>
     </g>
 </svg></td>
-    <td style="font-family: IBM Plex Mono; font-size: 12px;" class="gt_row gt_left"><div style="font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">name</div><div style="font-size: 11px; color: gray;">String</div></td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px solid #D3D3D3; background-color: #FCFCFC;" class="gt_row gt_right">0<br> 0.00</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; background-color: #FCFCFC;" class="gt_row gt_right">3<br> 1.00</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px solid #D3D3D3;" class="gt_row gt_right"><div><div>5.00</div><div style="float: left; position: absolute;"><div title="string length measure" style="font-size: 7px; color: #999; font-style: italic; cursor: help;">SL</div></div></div></td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right"><div><div>2.00</div><div style="float: left; position: absolute;"><div title="string length measure" style="font-size: 7px; color: #999; font-style: italic; cursor: help;">SL</div></div></div></td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; white-space: pre; overflow-x: visible; border-left: 1px solid #D3D3D3;" class="gt_row gt_right"><div><div>3</div><div style="float: left; position: absolute;"><div title="string length measure" style="font-size: 7px; color: #999; font-style: italic; cursor: help;">SL</div></div></div></td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">—</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">—</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right"><div><div>5</div><div style="float: left; position: absolute;"><div title="string length measure" style="font-size: 7px; color: #999; font-style: italic; cursor: help;">SL</div></div></div></td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">—</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">—</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right"><div><div>7</div><div style="float: left; position: absolute;"><div title="string length measure" style="font-size: 7px; color: #999; font-style: italic; cursor: help;">SL</div></div></div></td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px solid #D3D3D3; background-color: #FCFCFC;" class="gt_row gt_right">—</td>
+    <td style="font-family: IBM Plex Mono; border-right: 1px solid #D3D3D3; font-size: 12px;" class="gt_row gt_left"><div style="font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">name</div><div style="font-size: 11px; color: gray;">String</div></td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">0<br>0</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">3<br>1</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">5</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">2</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">3</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">3.02</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">4</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">5</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">6</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">6.8</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">7</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">2</td>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono; font-size: 14px;" class="gt_row gt_right">3</td>
     <td style="font-family: IBM Plex Mono;" class="gt_row gt_left"><svg width="24px" viewbox="0 0 180 181" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF; display: block; vertical-align: middle; margin: auto; padding-top: 0.5px;">
     <title>date</title>
     <g id="icon" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -1306,22 +1301,28 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
         </g>
     </g>
 </svg></td>
-    <td style="font-family: IBM Plex Mono; font-size: 12px;" class="gt_row gt_left"><div style="font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">join_date</div><div style="font-size: 11px; color: gray;">Date</div></td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px solid #D3D3D3; background-color: #FCFCFC;" class="gt_row gt_right">0<br> 0.00</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; background-color: #FCFCFC;" class="gt_row gt_right">3<br> 1.00</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px solid #D3D3D3;" class="gt_row gt_right">—</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">—</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; white-space: pre; overflow-x: visible; border-left: 1px solid #D3D3D3;" class="gt_row gt_right"><span style="text-align: left; white-space: nowrap; overflow-x: visible;">&nbsp;2020-01-01 – 2022-07-10</span></td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5; border-left: 1px none #000000;" class="gt_row gt_right"></td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5; border-left: 1px none #000000;" class="gt_row gt_right"></td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5; border-left: 1px none #000000;" class="gt_row gt_right"></td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5; border-left: 1px none #000000;" class="gt_row gt_right"></td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5; border-left: 1px none #000000;" class="gt_row gt_right"></td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5; border-left: 1px none #000000;" class="gt_row gt_right"></td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px solid #D3D3D3; background-color: #FCFCFC;" class="gt_row gt_right">—</td>
+    <td style="font-family: IBM Plex Mono; border-right: 1px solid #D3D3D3; font-size: 12px;" class="gt_row gt_left"><div style="font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">join_date</div><div style="font-size: 11px; color: gray;">Date</div></td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">0<br>0</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">3<br>1</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">-</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">-</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">2020<br>01<br>01</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">-</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">-</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">-</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">-</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">-</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">2022<br>07<br>10</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">-</td>
   </tr>
 </tbody>
+  <tfoot class="gt_sourcenotes">
+  
+  <tr>
+    <td class="gt_sourcenote" colspan="14">String columns statistics regard the string's length.</td>
+  </tr>
 
+</tfoot>
 
 </table>
 
@@ -1337,7 +1338,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="using-a-list-of-tuples-with-columns" class="level3">
 <h3 class="anchored" data-anchor-id="using-a-list-of-tuples-with-columns">1. Using a List of Tuples with <code>columns=</code></h3>
 <p>This approach allows for mixed validation: some columns checked for both name and type, others only for name:</p>
-<div id="49be0f6f" class="cell" data-execution_count="8">
+<div id="62b49dbe" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>schema_tuples <span class="op">=</span> pb.Schema(</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    <span class="co"># List of tuples approach: flexible for mixed type/name checking ---</span></span>
@@ -1361,7 +1362,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="using-a-dictionary-with-columns" class="level3">
 <h3 class="anchored" data-anchor-id="using-a-dictionary-with-columns">2. Using a Dictionary with <code>columns=</code></h3>
 <p>This approach is often the most readable when defining a schema manually, especially for larger schemas:</p>
-<div id="32de3c62" class="cell" data-execution_count="9">
+<div id="65d726b3" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>schema_dict <span class="op">=</span> pb.Schema(</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Dictionary approach (keys are column names, values are data types) ---</span></span>
@@ -1387,7 +1388,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="using-keyword-arguments" class="level3">
 <h3 class="anchored" data-anchor-id="using-keyword-arguments">3. Using Keyword Arguments</h3>
 <p>For more readable code with a small number of columns:</p>
-<div id="c755e5bf" class="cell" data-execution_count="10">
+<div id="a3fbc419" class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>schema_kwargs <span class="op">=</span> pb.Schema(</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Keyword arguments approach (more readable for simple schemas) ---</span></span>
@@ -1409,7 +1410,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="extracting-from-an-existing-table-with-tbl" class="level3">
 <h3 class="anchored" data-anchor-id="extracting-from-an-existing-table-with-tbl">4. Extracting from an Existing Table with <code>tbl=</code></h3>
 <p>You can automatically extract a schema from an existing table:</p>
-<div id="748ee61a" class="cell" data-execution_count="11">
+<div id="6cf8aee0" class="cell" data-execution_count="11">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a sample dataframe</span></span>
@@ -1436,7 +1437,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="multiple-data-types-for-a-column" class="level2">
 <h2 class="anchored" data-anchor-id="multiple-data-types-for-a-column">Multiple Data Types for a Column</h2>
 <p>You can specify multiple acceptable types for a column by providing a list of types:</p>
-<div id="85e43bb3" class="cell" data-execution_count="12">
+<div id="f47c44fd" class="cell" data-execution_count="12">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Schema with multiple possible types for a column</span></span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>schema_multi_types <span class="op">=</span> pb.Schema(</span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>    columns<span class="op">=</span>{</span>
@@ -1503,7 +1504,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="controlling-column-presence" class="level3">
 <h3 class="anchored" data-anchor-id="controlling-column-presence">Controlling Column Presence</h3>
 <p>By default, <a href="https://posit-dev.github.io/pointblank/reference/Validate.col_schema_match.html"><code>col_schema_match()</code></a> requires a complete match between the schema’s columns and the table’s columns. You can make this more flexible:</p>
-<div id="d6d967dd" class="cell" data-execution_count="13">
+<div id="4cda17c6" class="cell" data-execution_count="13">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a sample table</span></span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>users_table_extra <span class="op">=</span> pl.DataFrame({</span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"id"</span>: [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>],</span>
@@ -1677,7 +1678,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="column-order-enforcement" class="level3">
 <h3 class="anchored" data-anchor-id="column-order-enforcement">Column Order Enforcement</h3>
 <p>You can control whether column order matters in your validation:</p>
-<div id="83aaf47f" class="cell" data-execution_count="14">
+<div id="c7acfdfc" class="cell" data-execution_count="14">
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a sample table</span></span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>users_table <span class="op">=</span> pl.DataFrame({</span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"id"</span>: [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>],</span>
@@ -1840,7 +1841,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="case-sensitivity" class="level3">
 <h3 class="anchored" data-anchor-id="case-sensitivity">Case Sensitivity</h3>
 <p>Control whether column names and data types are case-sensitive:</p>
-<div id="6c8279f2" class="cell" data-execution_count="15">
+<div id="0d39fa1b" class="cell" data-execution_count="15">
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create schema with different case charactistics</span></span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>case_schema <span class="op">=</span> pb.Schema(</span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>    columns<span class="op">=</span>{<span class="st">"ID"</span>: <span class="st">"int64"</span>, <span class="st">"NAME"</span>: <span class="st">"string"</span>, <span class="st">"AGE"</span>: <span class="st">"int64"</span>}</span>
@@ -1999,7 +2000,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="type-matching-precision" class="level3">
 <h3 class="anchored" data-anchor-id="type-matching-precision">Type Matching Precision</h3>
 <p>Control how strictly data types must match:</p>
-<div id="513e3940" class="cell" data-execution_count="16">
+<div id="7a356831" class="cell" data-execution_count="16">
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create schema with simplified type names</span></span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>type_schema <span class="op">=</span> pb.Schema(</span>
 <span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2168,7 +2169,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="structural-validation-only" class="level3">
 <h3 class="anchored" data-anchor-id="structural-validation-only">Structural Validation Only</h3>
 <p>When you only care about column names but not their types:</p>
-<div id="70de2a0f" class="cell" data-execution_count="17">
+<div id="e16700fe" class="cell" data-execution_count="17">
 <div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a schema with only column names</span></span>
 <span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>structure_schema <span class="op">=</span> pb.Schema(</span>
 <span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>    columns<span class="op">=</span>[<span class="st">"id"</span>, <span class="st">"name"</span>, <span class="st">"age"</span>, <span class="st">"extra_col"</span>]</span>
@@ -2329,7 +2330,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="mixed-validation" class="level3">
 <h3 class="anchored" data-anchor-id="mixed-validation">Mixed Validation</h3>
 <p>Validate types for critical columns but just presence for others:</p>
-<div id="144e2ad1" class="cell" data-execution_count="18">
+<div id="4cae5788" class="cell" data-execution_count="18">
 <div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Mixed validation for different columns</span></span>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>mixed_schema <span class="op">=</span> pb.Schema(</span>
 <span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>    columns<span class="op">=</span>[</span>
@@ -2495,7 +2496,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="progressive-schema-evolution" class="level3">
 <h3 class="anchored" data-anchor-id="progressive-schema-evolution">Progressive Schema Evolution</h3>
 <p>As your data evolves, you might need to adapt your validation approach:</p>
-<div id="65b72791" class="cell" data-execution_count="19">
+<div id="95c4ca81" class="cell" data-execution_count="19">
 <div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Original schema</span></span>
 <span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>original_schema <span class="op">=</span> pb.Schema(</span>
 <span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>    columns<span class="op">=</span>{</span>
@@ -2672,7 +2673,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="integrating-with-larger-validation-workflows" class="level2">
 <h2 class="anchored" data-anchor-id="integrating-with-larger-validation-workflows">Integrating with Larger Validation Workflows</h2>
 <p>Schema validation is often just one part of a comprehensive data validation strategy. You can combine schema checks with other validation steps:</p>
-<div id="cc2d7441" class="cell" data-execution_count="20">
+<div id="807025ae" class="cell" data-execution_count="20">
 <div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define a schema</span></span>
 <span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
 <span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>    columns<span class="op">=</span>{</span>

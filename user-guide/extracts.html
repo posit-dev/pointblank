@@ -468,7 +468,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="csv-data-from-validation-reports" class="level3">
 <h3 class="anchored" data-anchor-id="csv-data-from-validation-reports">CSV Data from Validation Reports</h3>
 <p>Data extracts are embedded within validation report tables. Let’s look at an example, using the <code>small_table</code> dataset, where data extracts are collected in a single validation step due to failing test units:</p>
-<div id="ff22a141" class="cell" data-execution_count="2">
+<div id="42903ae8" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
@@ -631,7 +631,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="get_data_extracts" class="level3">
 <h3 class="anchored" data-anchor-id="get_data_extracts"><code>get_data_extracts()</code></h3>
 <p>For programmatic access to data extracts, Pointblank provides the <a href="https://posit-dev.github.io/pointblank/reference/Validate.get_data_extracts.html"><code>get_data_extracts()</code></a> method. This allows you to work with extract data directly in your Python workflow:</p>
-<div id="65df1c4d" class="cell" data-execution_count="3">
+<div id="b2bfbe0f" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get data extracts from step 1</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>extract_1 <span class="op">=</span> validation.get_data_extracts(i<span class="op">=</span><span class="dv">1</span>, frame<span class="op">=</span><span class="va">True</span>)</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -659,7 +659,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="step-reports" class="level3">
 <h3 class="anchored" data-anchor-id="step-reports">Step Reports</h3>
 <p>Step reports provide another way to access and visualize failing data. When you generate a step report for a validation step that has failing rows, those failing rows are displayed directly in the report:</p>
-<div id="69b71ad3" class="cell" data-execution_count="4">
+<div id="9cc2cb26" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get a step report for the first validation step</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>step_report <span class="op">=</span> validation.get_step_report(i<span class="op">=</span><span class="dv">1</span>)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -806,7 +806,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <li>include additional metadata about the validation step and failure statistics</li>
 </ol>
 <p>For steps with many failures, you can customize how many rows to display:</p>
-<div id="51fac94b" class="cell" data-execution_count="5">
+<div id="2cf0e314" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Limit to just 2 rows of failing data</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>limited_report <span class="op">=</span> validation.get_step_report(i<span class="op">=</span><span class="dv">1</span>, limit<span class="op">=</span><span class="dv">2</span>)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -930,7 +930,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="viewing-data-extracts-with-preview" class="level2">
 <h2 class="anchored" data-anchor-id="viewing-data-extracts-with-preview">Viewing Data Extracts with <code>preview()</code></h2>
 <p>To get a consistent HTML representation of any data extract (regardless of the table type), we can use the <a href="https://posit-dev.github.io/pointblank/reference/preview.html"><code>preview()</code></a> function:</p>
-<div id="18c0b336" class="cell" data-execution_count="6">
+<div id="c52d5b2c" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>pb.preview(data<span class="op">=</span>extract_1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="6">
 <div id="pb_preview_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
@@ -1073,7 +1073,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="working-with-multiple-validation-steps" class="level2">
 <h2 class="anchored" data-anchor-id="working-with-multiple-validation-steps">Working with Multiple Validation Steps</h2>
 <p>When validating data with multiple steps, you can extract failing rows from any step or combine extracts from multiple steps:</p>
-<div id="ad3855af" class="cell" data-execution_count="7">
+<div id="29855292" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a validation with multiple steps</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>multi_validation <span class="op">=</span> (</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>pb.load_dataset(dataset<span class="op">=</span><span class="st">"small_table"</span>, tbl_type<span class="op">=</span><span class="st">"polars"</span>))</span>
@@ -1311,7 +1311,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="extracting-data-from-a-specific-step" class="level3">
 <h3 class="anchored" data-anchor-id="extracting-data-from-a-specific-step">Extracting Data from a Specific Step</h3>
 <p>You can access extracts from any specific validation step:</p>
-<div id="3b157ee5" class="cell" data-execution_count="8">
+<div id="4a0b9e20" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get extracts from step 2 (`d &lt; 3000` validation)</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>less_than_failures <span class="op">=</span> multi_validation.get_data_extracts(i<span class="op">=</span><span class="dv">2</span>, frame<span class="op">=</span><span class="va">True</span>)</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1329,7 +1329,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 <p>Using <code>frame=True</code> means that returned value will be a DataFrame (not a dictionary that contains a single DataFrame).</p>
 <p>If a step has no failing rows, an empty DataFrame will be returned:</p>
-<div id="29901ec6" class="cell" data-execution_count="9">
+<div id="6387a1a8" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get extracts from step 3 (regex check)</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>regex_failures <span class="op">=</span> multi_validation.get_data_extracts(i<span class="op">=</span><span class="dv">3</span>, frame<span class="op">=</span><span class="va">True</span>)</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1349,7 +1349,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="getting-all-extracts-at-once" class="level3">
 <h3 class="anchored" data-anchor-id="getting-all-extracts-at-once">Getting All Extracts at Once</h3>
 <p>To retrieve extracts from all steps with failures in one command:</p>
-<div id="a4e36693" class="cell" data-execution_count="10">
+<div id="7b1a38a7" class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get all extracts ()</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>all_extracts <span class="op">=</span> multi_validation.get_data_extracts()</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1364,7 +1364,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="getting-specific-extracts" class="level3">
 <h3 class="anchored" data-anchor-id="getting-specific-extracts">Getting Specific Extracts</h3>
 <p>You can also retrieve data extracts from several specified steps as a dictionary:</p>
-<div id="074a5d55" class="cell" data-execution_count="11">
+<div id="b2838a98" class="cell" data-execution_count="11">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get extracts from steps 1 and 2 as a dictionary</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>extract_dict <span class="op">=</span> multi_validation.get_data_extracts(i<span class="op">=</span>[<span class="dv">1</span>, <span class="dv">2</span>])</span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1389,7 +1389,7 @@ Step 2: 4 failing rows</code></pre>
 <section id="finding-patterns-across-validation-steps" class="level3">
 <h3 class="anchored" data-anchor-id="finding-patterns-across-validation-steps">Finding Patterns Across Validation Steps</h3>
 <p>You can analyze patterns across different validation steps by combining extracts:</p>
-<div id="64387caf" class="cell" data-execution_count="12">
+<div id="33998ef8" class="cell" data-execution_count="12">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get a consolidated view of all rows that failed any validation</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>all_failure_rows <span class="op">=</span> <span class="bu">set</span>()</span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> step, extract <span class="kw">in</span> all_extracts.items():</span>
@@ -1407,7 +1407,7 @@ Row numbers with failures: [1, 2, 4, 6, 9, 10, 12, 13]</code></pre>
 <section id="identifying-rows-with-multiple-failures" class="level3">
 <h3 class="anchored" data-anchor-id="identifying-rows-with-multiple-failures">Identifying Rows with Multiple Failures</h3>
 <p>You might want to find rows that failed multiple validation checks, as these often represent more serious data quality issues:</p>
-<div id="63e3fa00" class="cell" data-execution_count="13">
+<div id="8bd7c12b" class="cell" data-execution_count="13">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get row numbers from each extract</span></span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>step1_rows <span class="op">=</span> <span class="bu">set</span>(multi_validation.get_data_extracts(i<span class="op">=</span><span class="dv">1</span>, frame<span class="op">=</span><span class="va">True</span>)[<span class="st">"_row_num_"</span>])</span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>step2_rows <span class="op">=</span> <span class="bu">set</span>(multi_validation.get_data_extracts(i<span class="op">=</span><span class="dv">2</span>, frame<span class="op">=</span><span class="va">True</span>)[<span class="st">"_row_num_"</span>])</span>
@@ -1423,7 +1423,7 @@ Row numbers with failures: [1, 2, 4, 6, 9, 10, 12, 13]</code></pre>
 <section id="statistical-analysis-of-failing-values" class="level3">
 <h3 class="anchored" data-anchor-id="statistical-analysis-of-failing-values">Statistical Analysis of Failing Values</h3>
 <p>Once you have data extracts, you can perform statistical analysis to identify patterns in the failing data:</p>
-<div id="034a5824" class="cell" data-execution_count="14">
+<div id="62c674df" class="cell" data-execution_count="14">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get extracts from step 2</span></span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>d_value_failures <span class="op">=</span> multi_validation.get_data_extracts(i<span class="op">=</span><span class="dv">2</span>, frame<span class="op">=</span><span class="va">True</span>)</span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1443,108 +1443,105 @@ Mean failing value: 5151.6775</code></pre>
 <section id="detailed-analysis-with-col_summary_tbl" class="level3">
 <h3 class="anchored" data-anchor-id="detailed-analysis-with-col_summary_tbl">Detailed Analysis with <code>col_summary_tbl()</code></h3>
 <p>For a more comprehensive view of the statistical properties of your extract data, you can use the <a href="https://posit-dev.github.io/pointblank/reference/col_summary_tbl.html"><code>col_summary_tbl()</code></a> function:</p>
-<div id="bcdbd9ff" class="cell" data-execution_count="15">
+<div id="8e2a48e1" class="cell" data-execution_count="15">
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get extracts from step 2</span></span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>d_value_failures <span class="op">=</span> multi_validation.get_data_extracts(i<span class="op">=</span><span class="dv">2</span>, frame<span class="op">=</span><span class="va">True</span>)</span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate a comprehensive statistical summary of the failing data</span></span>
 <span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>pb.col_summary_tbl(d_value_failures)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="15">
-<div id="col_summary" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="fkwueqqyqs" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap');
-#col_summary table {
+#fkwueqqyqs table {
           font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
           -webkit-font-smoothing: antialiased;
           -moz-osx-font-smoothing: grayscale;
         }
 
-#col_summary thead, tbody, tfoot, tr, td, th { border-style: none; }
+#fkwueqqyqs thead, tbody, tfoot, tr, td, th { border-style: none; }
  tr { background-color: transparent; }
-#col_summary p { margin: 0; padding: 0; }
- #col_summary .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 16px; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: auto; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
- #col_summary .gt_caption { padding-top: 4px; padding-bottom: 4px; }
- #col_summary .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
- #col_summary .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
- #col_summary .gt_heading { background-color: #FFFFFF; text-align: left; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
- #col_summary .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
- #col_summary .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
- #col_summary .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
- #col_summary .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
- #col_summary .gt_column_spanner_outer:first-child { padding-left: 0; }
- #col_summary .gt_column_spanner_outer:last-child { padding-right: 0; }
- #col_summary .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
- #col_summary .gt_spanner_row { border-bottom-style: hidden; }
- #col_summary .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
- #col_summary .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
- #col_summary .gt_from_md> :first-child { margin-top: 0; }
- #col_summary .gt_from_md> :last-child { margin-bottom: 0; }
- #col_summary .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
- #col_summary .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
- #col_summary .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
- #col_summary .gt_row_group_first td { border-top-width: 2px; }
- #col_summary .gt_row_group_first th { border-top-width: 2px; }
- #col_summary .gt_striped { background-color: rgba(128,128,128,0.05); }
- #col_summary .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
- #col_summary .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
- #col_summary .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
- #col_summary .gt_left { text-align: left; }
- #col_summary .gt_center { text-align: center; }
- #col_summary .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
- #col_summary .gt_font_normal { font-weight: normal; }
- #col_summary .gt_font_bold { font-weight: bold; }
- #col_summary .gt_font_italic { font-style: italic; }
- #col_summary .gt_super { font-size: 65%; }
- #col_summary .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
- #col_summary .gt_asterisk { font-size: 100%; vertical-align: 0; }
+#fkwueqqyqs p { margin: 0; padding: 0; }
+ #fkwueqqyqs .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 16px; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: auto; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
+ #fkwueqqyqs .gt_caption { padding-top: 4px; padding-bottom: 4px; }
+ #fkwueqqyqs .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
+ #fkwueqqyqs .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
+ #fkwueqqyqs .gt_heading { background-color: #FFFFFF; text-align: left; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #fkwueqqyqs .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #fkwueqqyqs .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #fkwueqqyqs .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
+ #fkwueqqyqs .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
+ #fkwueqqyqs .gt_column_spanner_outer:first-child { padding-left: 0; }
+ #fkwueqqyqs .gt_column_spanner_outer:last-child { padding-right: 0; }
+ #fkwueqqyqs .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
+ #fkwueqqyqs .gt_spanner_row { border-bottom-style: hidden; }
+ #fkwueqqyqs .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
+ #fkwueqqyqs .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
+ #fkwueqqyqs .gt_from_md> :first-child { margin-top: 0; }
+ #fkwueqqyqs .gt_from_md> :last-child { margin-bottom: 0; }
+ #fkwueqqyqs .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
+ #fkwueqqyqs .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
+ #fkwueqqyqs .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
+ #fkwueqqyqs .gt_row_group_first td { border-top-width: 2px; }
+ #fkwueqqyqs .gt_row_group_first th { border-top-width: 2px; }
+ #fkwueqqyqs .gt_striped { background-color: rgba(128,128,128,0.05); }
+ #fkwueqqyqs .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #fkwueqqyqs .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #fkwueqqyqs .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #fkwueqqyqs .gt_left { text-align: left; }
+ #fkwueqqyqs .gt_center { text-align: center; }
+ #fkwueqqyqs .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
+ #fkwueqqyqs .gt_font_normal { font-weight: normal; }
+ #fkwueqqyqs .gt_font_bold { font-weight: bold; }
+ #fkwueqqyqs .gt_font_italic { font-style: italic; }
+ #fkwueqqyqs .gt_super { font-size: 65%; }
+ #fkwueqqyqs .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
+ #fkwueqqyqs .gt_asterisk { font-size: 100%; vertical-align: 0; }
  
 </style>
 <table style="table-layout: fixed;; width: 0px" class="gt_table" data-quarto-disable-processing="true" data-quarto-bootstrap="false">
 <colgroup>
-  <col style="width:40px;">
   <col style="width:35px;">
   <col style="width:200px;">
-  <col style="width:50px;">
-  <col style="width:50px;">
-  <col style="width:50px;">
-  <col style="width:50px;">
-  <col style="width:50px;">
-  <col style="width:50px;">
-  <col style="width:50px;">
-  <col style="width:50px;">
-  <col style="width:50px;">
-  <col style="width:50px;">
-  <col style="width:50px;">
-  <col style="width:50px;">
+  <col style="width:60px;">
+  <col style="width:60px;">
+  <col style="width:60px;">
+  <col style="width:60px;">
+  <col style="width:60px;">
+  <col style="width:60px;">
+  <col style="width:60px;">
+  <col style="width:60px;">
+  <col style="width:60px;">
+  <col style="width:60px;">
+  <col style="width:60px;">
+  <col style="width:60px;">
 </colgroup>
 
 <thead>
 
   <tr class="gt_heading">
-    <td colspan="15" class="gt_heading gt_title gt_font_normal"><div><div style="padding-top: 0; padding-bottom: 7px;"><span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 10px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 10px 2px 10px; font-size: 10px;">Polars</span><span style="background-color: #eecbff; color: #333333; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 5px; font-weight: bold; border: solid 1px #eecbff; padding: 2px 15px 2px 15px; font-size: 10px;">Rows</span><span style="background-color: none; color: #333333; padding: 0.5em 0.5em; position: inherit; margin: 5px 0px 5px -4px; font-weight: bold; border: solid 1px #eecbff; padding: 2px 15px 2px 15px; font-size: 10px;">4</span><span style="background-color: #BDE7B4; color: #333333; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 3px; font-weight: bold; border: solid 1px #BDE7B4; padding: 2px 15px 2px 15px; font-size: 10px;">Columns</span><span style="background-color: none; color: #333333; padding: 0.5em 0.5em; position: inherit; margin: 5px 0px 5px -4px; font-weight: bold; border: solid 1px #BDE7B4; padding: 2px 15px 2px 15px; font-size: 10px;">9</span></div></div></td>
+    <td colspan="14" class="gt_heading gt_title gt_font_normal"><div><div style="padding-top: 0; padding-bottom: 7px;"><span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 10px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 10px 2px 10px; font-size: 10px;">Polars</span><span style="background-color: #eecbff; color: #333333; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 5px; font-weight: bold; border: solid 1px #eecbff; padding: 2px 15px 2px 15px; font-size: 10px;">Rows</span><span style="background-color: none; color: #333333; padding: 0.5em 0.5em; position: inherit; margin: 5px 0px 5px -4px; font-weight: bold; border: solid 1px #eecbff; padding: 2px 15px 2px 15px; font-size: 10px;">4</span><span style="background-color: #BDE7B4; color: #333333; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 3px; font-weight: bold; border: solid 1px #BDE7B4; padding: 2px 15px 2px 15px; font-size: 10px;">Columns</span><span style="background-color: none; color: #333333; padding: 0.5em 0.5em; position: inherit; margin: 5px 0px 5px -4px; font-weight: bold; border: solid 1px #BDE7B4; padding: 2px 15px 2px 15px; font-size: 10px;">9</span></div></div></td>
   </tr>
 <tr class="gt_col_headings">
-  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="col_summary-column_number"></th>
-  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="col_summary-icon"></th>
-  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="col_summary-column_name">Column</th>
-  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="text-align: center;" scope="col" id="col_summary-missing_vals">NA</th>
-  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="text-align: center;" scope="col" id="col_summary-unique_vals">UQ</th>
-  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="text-align: center;" scope="col" id="col_summary-mean">Mean</th>
-  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="text-align: center;" scope="col" id="col_summary-std_dev">SD</th>
-  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="text-align: center;" scope="col" id="col_summary-min">Min</th>
-  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="text-align: center;" scope="col" id="col_summary-p05">P<span style="font-size: 0.75em; vertical-align: sub; position: relative; line-height: 0.5em;">5</span></th>
-  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="text-align: center;" scope="col" id="col_summary-q_1">Q<span style="font-size: 0.75em; vertical-align: sub; position: relative; line-height: 0.5em;">1</span></th>
-  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="text-align: center;" scope="col" id="col_summary-med">Med</th>
-  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="text-align: center;" scope="col" id="col_summary-q_3">Q<span style="font-size: 0.75em; vertical-align: sub; position: relative; line-height: 0.5em;">3</span></th>
-  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="text-align: center;" scope="col" id="col_summary-p95">P<span style="font-size: 0.75em; vertical-align: sub; position: relative; line-height: 0.5em;">95</span></th>
-  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="text-align: center;" scope="col" id="col_summary-max">Max</th>
-  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="text-align: center;" scope="col" id="col_summary-iqr">IQR</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="icon"></th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="colname">Column</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="n_missing">NA</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="n_unique">UQ</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="mean">Mean</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="std">SD</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="min">Min</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="p05">P<span style="font-size: 0.75em; vertical-align: sub; position: relative; line-height: 0.5em;">5</span></th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="q_1">Q<span style="font-size: 0.75em; vertical-align: sub; position: relative; line-height: 0.5em;">1</span></th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="median">Med</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="q_3">Q<span style="font-size: 0.75em; vertical-align: sub; position: relative; line-height: 0.5em;">3</span></th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="p95">P<span style="font-size: 0.75em; vertical-align: sub; position: relative; line-height: 0.5em;">95</span></th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="max">Max</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="iqr">IQR</th>
 </tr>
 </thead>
 <tbody class="gt_table_body">
   <tr>
-    <td style="font-family: IBM Plex Mono; font-size: 14px;" class="gt_row gt_right">1</td>
     <td style="font-family: IBM Plex Mono;" class="gt_row gt_left"><svg width="24px" viewbox="0 0 180 181" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF; display: block; vertical-align: middle; margin: auto; padding-top: 0.5px;">
     <title>numeric</title>
     <g id="icon" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -1556,22 +1553,21 @@ Mean failing value: 5151.6775</code></pre>
         </g>
     </g>
 </svg></td>
-    <td style="font-family: IBM Plex Mono; font-size: 12px;" class="gt_row gt_left"><div style="font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">_row_num_</div><div style="font-size: 11px; color: gray;">UInt32</div></td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px solid #D3D3D3; background-color: #FCFCFC;" class="gt_row gt_right">0<br> 0.00</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; background-color: #FCFCFC;" class="gt_row gt_right">4<br> 1.00</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px solid #D3D3D3;" class="gt_row gt_right">3.25</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">2.22</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; white-space: pre; overflow-x: visible; border-left: 1px solid #D3D3D3;" class="gt_row gt_right">1.00</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">1.15</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">1.75</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">3.00</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">4.50</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">5.70</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">6.00</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px solid #D3D3D3; background-color: #FCFCFC;" class="gt_row gt_right">2.75</td>
+    <td style="font-family: IBM Plex Mono; border-right: 1px solid #D3D3D3; font-size: 12px;" class="gt_row gt_left"><div style="font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">_row_num_</div><div style="font-size: 11px; color: gray;">UInt32</div></td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">0<br>0</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">4<br>1</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">3.25</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">2.22</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">1</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">1.01</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">1.75</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">3</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">4.5</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">5.7</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">6</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">2.75</td>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono; font-size: 14px;" class="gt_row gt_right">2</td>
     <td style="font-family: IBM Plex Mono;" class="gt_row gt_left"><svg width="24px" viewbox="0 0 180 181" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF; display: block; vertical-align: middle; margin: auto; padding-top: 0.5px;">
     <title>date</title>
     <g id="icon" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -1583,22 +1579,21 @@ Mean failing value: 5151.6775</code></pre>
         </g>
     </g>
 </svg></td>
-    <td style="font-family: IBM Plex Mono; font-size: 12px;" class="gt_row gt_left"><div style="font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">date_time</div><div style="font-size: 7.5px; color: gray; margin-top: 3px; margin-bottom: 2px;">Datetime(time_unit='us', time_zone=None)</div></td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px solid #D3D3D3; background-color: #FCFCFC;" class="gt_row gt_right">0<br> 0.00</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; background-color: #FCFCFC;" class="gt_row gt_right">4<br> 1.00</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px solid #D3D3D3;" class="gt_row gt_right">—</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">—</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; white-space: pre; overflow-x: visible; border-left: 1px solid #D3D3D3;" class="gt_row gt_right"><span style="text-align: left; white-space: nowrap; overflow-x: visible;">&nbsp;2016-01-04 00:32:00 – 2016-01-11 06:15:00</span></td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5; border-left: 1px none #000000;" class="gt_row gt_right"></td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5; border-left: 1px none #000000;" class="gt_row gt_right"></td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5; border-left: 1px none #000000;" class="gt_row gt_right"></td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5; border-left: 1px none #000000;" class="gt_row gt_right"></td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5; border-left: 1px none #000000;" class="gt_row gt_right"></td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5; border-left: 1px none #000000;" class="gt_row gt_right"></td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px solid #D3D3D3; background-color: #FCFCFC;" class="gt_row gt_right">—</td>
+    <td style="font-family: IBM Plex Mono; border-right: 1px solid #D3D3D3; font-size: 12px;" class="gt_row gt_left"><div style="font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">date_time</div><div style="font-size: 11px; color: gray;">Datetime(time_unit='us', time_zone=None)</div></td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">0<br>0</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">4<br>1</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">-</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">-</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">2016<br>01<br>04 00:32:00</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">-</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">-</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">-</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">-</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">-</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">2016<br>01<br>11 06:15:00</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">-</td>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono; font-size: 14px;" class="gt_row gt_right">3</td>
     <td style="font-family: IBM Plex Mono;" class="gt_row gt_left"><svg width="24px" viewbox="0 0 180 181" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF; display: block; vertical-align: middle; margin: auto; padding-top: 0.5px;">
     <title>date</title>
     <g id="icon" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -1610,22 +1605,21 @@ Mean failing value: 5151.6775</code></pre>
         </g>
     </g>
 </svg></td>
-    <td style="font-family: IBM Plex Mono; font-size: 12px;" class="gt_row gt_left"><div style="font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">date</div><div style="font-size: 11px; color: gray;">Date</div></td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px solid #D3D3D3; background-color: #FCFCFC;" class="gt_row gt_right">0<br> 0.00</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; background-color: #FCFCFC;" class="gt_row gt_right">3<br> 0.75</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px solid #D3D3D3;" class="gt_row gt_right">—</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">—</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; white-space: pre; overflow-x: visible; border-left: 1px solid #D3D3D3;" class="gt_row gt_right"><span style="text-align: left; white-space: nowrap; overflow-x: visible;">&nbsp;2016-01-04 – 2016-01-11</span></td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5; border-left: 1px none #000000;" class="gt_row gt_right"></td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5; border-left: 1px none #000000;" class="gt_row gt_right"></td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5; border-left: 1px none #000000;" class="gt_row gt_right"></td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5; border-left: 1px none #000000;" class="gt_row gt_right"></td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5; border-left: 1px none #000000;" class="gt_row gt_right"></td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5; border-left: 1px none #000000;" class="gt_row gt_right"></td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px solid #D3D3D3; background-color: #FCFCFC;" class="gt_row gt_right">—</td>
+    <td style="font-family: IBM Plex Mono; border-right: 1px solid #D3D3D3; font-size: 12px;" class="gt_row gt_left"><div style="font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">date</div><div style="font-size: 11px; color: gray;">Date</div></td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">0<br>0</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">3<br>0.75</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">-</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">-</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">2016<br>01<br>04</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">-</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">-</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">-</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">-</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">-</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">2016<br>01<br>11</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">-</td>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono; font-size: 14px;" class="gt_row gt_right">4</td>
     <td style="font-family: IBM Plex Mono;" class="gt_row gt_left"><svg width="24px" viewbox="0 0 180 181" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF; display: block; vertical-align: middle; margin: auto; padding-top: 0.5px;">
     <title>numeric</title>
     <g id="icon" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -1637,22 +1631,21 @@ Mean failing value: 5151.6775</code></pre>
         </g>
     </g>
 </svg></td>
-    <td style="font-family: IBM Plex Mono; font-size: 12px;" class="gt_row gt_left"><div style="font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">a</div><div style="font-size: 11px; color: gray;">Int64</div></td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px solid #D3D3D3; background-color: #FCFCFC;" class="gt_row gt_right">0<br> 0.00</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; background-color: #FCFCFC;" class="gt_row gt_right">3<br> 0.75</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px solid #D3D3D3;" class="gt_row gt_right">2.75</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">0.96</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; white-space: pre; overflow-x: visible; border-left: 1px solid #D3D3D3;" class="gt_row gt_right">2.00</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">2.00</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">2.00</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">2.50</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">3.25</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">3.85</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">4.00</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px solid #D3D3D3; background-color: #FCFCFC;" class="gt_row gt_right">1.25</td>
+    <td style="font-family: IBM Plex Mono; border-right: 1px solid #D3D3D3; font-size: 12px;" class="gt_row gt_left"><div style="font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">a</div><div style="font-size: 11px; color: gray;">Int64</div></td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">0<br>0</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">3<br>0.75</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">2.75</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">0.96</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">2</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">2</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">2</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">2.5</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">3.25</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">3.85</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">4</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">1.25</td>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono; font-size: 14px;" class="gt_row gt_right">5</td>
     <td style="font-family: IBM Plex Mono;" class="gt_row gt_left"><svg width="24px" viewbox="0 0 180 181" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF; display: block; vertical-align: middle; margin: auto; padding-top: 0.5px;">
     <title>string</title>
     <g id="icon" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -1664,22 +1657,21 @@ Mean failing value: 5151.6775</code></pre>
         </g>
     </g>
 </svg></td>
-    <td style="font-family: IBM Plex Mono; font-size: 12px;" class="gt_row gt_left"><div style="font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">b</div><div style="font-size: 11px; color: gray;">String</div></td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px solid #D3D3D3; background-color: #FCFCFC;" class="gt_row gt_right">0<br> 0.00</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; background-color: #FCFCFC;" class="gt_row gt_right">4<br> 1.00</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px solid #D3D3D3;" class="gt_row gt_right"><div><div>9.00</div><div style="float: left; position: absolute;"><div title="string length measure" style="font-size: 7px; color: #999; font-style: italic; cursor: help;">SL</div></div></div></td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right"><div><div>0.00</div><div style="float: left; position: absolute;"><div title="string length measure" style="font-size: 7px; color: #999; font-style: italic; cursor: help;">SL</div></div></div></td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; white-space: pre; overflow-x: visible; border-left: 1px solid #D3D3D3;" class="gt_row gt_right"><div><div>9</div><div style="float: left; position: absolute;"><div title="string length measure" style="font-size: 7px; color: #999; font-style: italic; cursor: help;">SL</div></div></div></td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">—</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">—</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right"><div><div>9</div><div style="float: left; position: absolute;"><div title="string length measure" style="font-size: 7px; color: #999; font-style: italic; cursor: help;">SL</div></div></div></td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">—</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">—</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right"><div><div>9</div><div style="float: left; position: absolute;"><div title="string length measure" style="font-size: 7px; color: #999; font-style: italic; cursor: help;">SL</div></div></div></td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px solid #D3D3D3; background-color: #FCFCFC;" class="gt_row gt_right">—</td>
+    <td style="font-family: IBM Plex Mono; border-right: 1px solid #D3D3D3; font-size: 12px;" class="gt_row gt_left"><div style="font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">b</div><div style="font-size: 11px; color: gray;">String</div></td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">0<br>0</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">4<br>1</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">9</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">0</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">9</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">9</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">9</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">9</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">9</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">9</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">9</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">0</td>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono; font-size: 14px;" class="gt_row gt_right">6</td>
     <td style="font-family: IBM Plex Mono;" class="gt_row gt_left"><svg width="24px" viewbox="0 0 180 181" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF; display: block; vertical-align: middle; margin: auto; padding-top: 0.5px;">
     <title>numeric</title>
     <g id="icon" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -1691,22 +1683,21 @@ Mean failing value: 5151.6775</code></pre>
         </g>
     </g>
 </svg></td>
-    <td style="font-family: IBM Plex Mono; font-size: 12px;" class="gt_row gt_left"><div style="font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">c</div><div style="font-size: 11px; color: gray;">Int64</div></td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px solid #D3D3D3; background-color: #FCFCFC;" class="gt_row gt_right">1<br> 0.25</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; background-color: #FCFCFC;" class="gt_row gt_right">3<br> 0.75</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px solid #D3D3D3;" class="gt_row gt_right">5.00</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">2.65</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; white-space: pre; overflow-x: visible; border-left: 1px solid #D3D3D3;" class="gt_row gt_right">3.00</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">3.10</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">3.50</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">4.00</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">6.00</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">7.60</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">8.00</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px solid #D3D3D3; background-color: #FCFCFC;" class="gt_row gt_right">2.50</td>
+    <td style="font-family: IBM Plex Mono; border-right: 1px solid #D3D3D3; font-size: 12px;" class="gt_row gt_left"><div style="font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">c</div><div style="font-size: 11px; color: gray;">Int64</div></td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">1<br>0.25</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">4<br>1</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">5</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">2.65</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">3</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">3.01</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">3.5</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">4</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">6</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">7.6</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">8</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">2.5</td>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono; font-size: 14px;" class="gt_row gt_right">7</td>
     <td style="font-family: IBM Plex Mono;" class="gt_row gt_left"><svg width="24px" viewbox="0 0 180 181" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF; display: block; vertical-align: middle; margin: auto; padding-top: 0.5px;">
     <title>numeric</title>
     <g id="icon" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -1718,22 +1709,21 @@ Mean failing value: 5151.6775</code></pre>
         </g>
     </g>
 </svg></td>
-    <td style="font-family: IBM Plex Mono; font-size: 12px;" class="gt_row gt_left"><div style="font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">d</div><div style="font-size: 11px; color: gray;">Float64</div></td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px solid #D3D3D3; background-color: #FCFCFC;" class="gt_row gt_right">0<br> 0.00</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; background-color: #FCFCFC;" class="gt_row gt_right">4<br> 1.00</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px solid #D3D3D3;" class="gt_row gt_right">5152</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">3242</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; white-space: pre; overflow-x: visible; border-left: 1px solid #D3D3D3;" class="gt_row gt_right">3291</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">3311</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">3390</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">3658</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">5419</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">9084</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">10000</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px solid #D3D3D3; background-color: #FCFCFC;" class="gt_row gt_right">2029</td>
+    <td style="font-family: IBM Plex Mono; border-right: 1px solid #D3D3D3; font-size: 12px;" class="gt_row gt_left"><div style="font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">d</div><div style="font-size: 11px; color: gray;">Float64</div></td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">0<br>0</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">4<br>1</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">5,151.68</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">3,242.49</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">3291.03</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">3,293.01</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">3,390.22</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">3,657.85</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">5,419.3</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">9,083.85</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">9999.99</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">2,029.07</td>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono; font-size: 14px;" class="gt_row gt_right">8</td>
     <td style="font-family: IBM Plex Mono;" class="gt_row gt_left"><svg width="24px" viewbox="0 0 180 181" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF; display: block; vertical-align: middle; margin: auto; padding-top: 0.5px;">
     <title>boolean</title>
     <g id="icon" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -1749,22 +1739,21 @@ Mean failing value: 5151.6775</code></pre>
         </g>
     </g>
 </svg></td>
-    <td style="font-family: IBM Plex Mono; font-size: 12px;" class="gt_row gt_left"><div style="font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">e</div><div style="font-size: 11px; color: gray;">Boolean</div></td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px solid #D3D3D3; background-color: #FCFCFC;" class="gt_row gt_right">0<br> 0.00</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; background-color: #FCFCFC;" class="gt_row gt_right"><span style="font-weight: bold;">T</span> 0.75<br><span style="font-weight: bold;">F</span> 0.25</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px solid #D3D3D3;" class="gt_row gt_right">—</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">—</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; white-space: pre; overflow-x: visible; border-left: 1px solid #D3D3D3;" class="gt_row gt_right">—</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">—</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">—</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">—</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">—</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">—</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">—</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px solid #D3D3D3; background-color: #FCFCFC;" class="gt_row gt_right">—</td>
+    <td style="font-family: IBM Plex Mono; border-right: 1px solid #D3D3D3; font-size: 12px;" class="gt_row gt_left"><div style="font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">e</div><div style="font-size: 11px; color: gray;">Boolean</div></td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">0<br>0</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center"><span style="font-weight: bold;">T</span>0.75<br><span style="font-weight: bold;">F</span>0.25</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">-</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">-</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">-</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">-</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">-</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">-</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">-</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">-</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">-</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">-</td>
   </tr>
   <tr>
-    <td style="font-family: IBM Plex Mono; font-size: 14px;" class="gt_row gt_right">9</td>
     <td style="font-family: IBM Plex Mono;" class="gt_row gt_left"><svg width="24px" viewbox="0 0 180 181" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF; display: block; vertical-align: middle; margin: auto; padding-top: 0.5px;">
     <title>string</title>
     <g id="icon" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -1776,22 +1765,28 @@ Mean failing value: 5151.6775</code></pre>
         </g>
     </g>
 </svg></td>
-    <td style="font-family: IBM Plex Mono; font-size: 12px;" class="gt_row gt_left"><div style="font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">f</div><div style="font-size: 11px; color: gray;">String</div></td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px solid #D3D3D3; background-color: #FCFCFC;" class="gt_row gt_right">0<br> 0.00</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; background-color: #FCFCFC;" class="gt_row gt_right">3<br> 0.75</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px solid #D3D3D3;" class="gt_row gt_right"><div><div>3.25</div><div style="float: left; position: absolute;"><div title="string length measure" style="font-size: 7px; color: #999; font-style: italic; cursor: help;">SL</div></div></div></td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right"><div><div>0.50</div><div style="float: left; position: absolute;"><div title="string length measure" style="font-size: 7px; color: #999; font-style: italic; cursor: help;">SL</div></div></div></td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; white-space: pre; overflow-x: visible; border-left: 1px solid #D3D3D3;" class="gt_row gt_right"><div><div>3</div><div style="float: left; position: absolute;"><div title="string length measure" style="font-size: 7px; color: #999; font-style: italic; cursor: help;">SL</div></div></div></td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">—</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">—</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right"><div><div>3</div><div style="float: left; position: absolute;"><div title="string length measure" style="font-size: 7px; color: #999; font-style: italic; cursor: help;">SL</div></div></div></td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">—</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">—</td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right"><div><div>4</div><div style="float: left; position: absolute;"><div title="string length measure" style="font-size: 7px; color: #999; font-style: italic; cursor: help;">SL</div></div></div></td>
-    <td style="font-family: IBM Plex Mono; font-size: 10px; border-left: 1px solid #D3D3D3; background-color: #FCFCFC;" class="gt_row gt_right">—</td>
+    <td style="font-family: IBM Plex Mono; border-right: 1px solid #D3D3D3; font-size: 12px;" class="gt_row gt_left"><div style="font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">f</div><div style="font-size: 11px; color: gray;">String</div></td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">0<br>0</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">3<br>0.75</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">3.25</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">0.5</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">3</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">3</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">3</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">3</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">3.25</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">3.85</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">4</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">0.25</td>
   </tr>
 </tbody>
+  <tfoot class="gt_sourcenotes">
+  
+  <tr>
+    <td class="gt_sourcenote" colspan="14">String columns statistics regard the string's length.</td>
+  </tr>
 
+</tfoot>
 
 </table>
 
@@ -1826,7 +1821,7 @@ Mean failing value: 5151.6775</code></pre>
 <li><strong>Pattern Recognition</strong>: identifying systemic issues by analyzing groups of failing records</li>
 </ol>
 <p>Here’s an example of using extracts to create a corrective action plan:</p>
-<div id="ee31e2ae" class="cell" data-execution_count="16">
+<div id="2bd8edd4" class="cell" data-execution_count="16">
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a new sample of an extract DF</span></span>
@@ -1857,7 +1852,7 @@ Mean failing value: 5151.6775</code></pre>
   white-space: pre-wrap;
 }
 </style>
-<small>shape: (4, 2)</small><table class="dataframe table table-sm table-striped small"><thead><tr><th>region</th><th>failure_count</th></tr><tr><td>str</td><td>u32</td></tr></thead><tbody><tr><td>"South"</td><td>6</td></tr><tr><td>"East"</td><td>2</td></tr><tr><td>"West"</td><td>1</td></tr><tr><td>"North"</td><td>1</td></tr></tbody></table></div>
+<small>shape: (4, 2)</small><table class="dataframe table table-sm table-striped small"><thead><tr><th>region</th><th>failure_count</th></tr><tr><td>str</td><td>u32</td></tr></thead><tbody><tr><td>"South"</td><td>6</td></tr><tr><td>"East"</td><td>2</td></tr><tr><td>"North"</td><td>1</td></tr><tr><td>"West"</td><td>1</td></tr></tbody></table></div>
 </div>
 </div>
 <p>Analysis shows that 6 out of 10 failing records (60%) are from the <code>"South"</code> region, making it the highest priority area for data quality investigation. This suggests a potential systemic issue with data collection or processing in that specific region.</p>
