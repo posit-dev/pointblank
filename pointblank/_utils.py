@@ -72,10 +72,8 @@ def _get_tbl_type(data: FrameT | Any) -> str:
         elif re.search(r"pandas", df_ns_str, re.IGNORECASE):
             return "pandas"
 
-    # If ibis is present, then get the table's backend name
-    ibis_present = _is_lib_present(lib_name="ibis")
-
-    if ibis_present:
+    # If the table is an ibis table and the library is present, get the table's backend name
+    if ibis_tbl and _is_lib_present(lib_name="ibis"):
         import ibis
 
         # TODO: Getting the backend 'name' is currently a bit brittle right now; as it is,

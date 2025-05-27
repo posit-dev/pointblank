@@ -1725,7 +1725,10 @@ def get_column_count(data: FrameT | Any) -> int:
         return data.shape[1]
 
     elif "narwhals" in str(type(data)):
-        return len(data.columns)
+        if _is_lazy_frame(data):
+            return len(data.collect().columns)
+        else:
+            return len(data.columns)
 
     else:
         raise ValueError("The input table type supplied in `data=` is not supported.")
@@ -1821,7 +1824,10 @@ def get_row_count(data: FrameT | Any) -> int:
         return data.shape[0]
 
     elif "narwhals" in str(type(data)):
-        return data.shape[0]
+        if _is_lazy_frame(data):
+            return data.collect().shape[0]
+        else:
+            return data.shape[0]
 
     else:
         raise ValueError("The input table type supplied in `data=` is not supported.")
@@ -2373,6 +2379,14 @@ class Validate:
 
         # Transform any shorthands of `brief` to string representations
         self.brief = _transform_auto_brief(brief=self.brief)
+
+        # # Check that type of the `data` and determine if the table is an Ibis table
+        # type_str = str(type(self.data))
+        # ibis_tbl = "ibis.expr.types.relations.Table" in type_str
+
+        # # Transform Ibis table to a Narwhals table
+        # if ibis_tbl and _is_lib_present(lib_name="ibis"):
+        #     self.data = nw.from_native(self.data)
 
         # TODO: Add functionality to obtain the column names and types from the table
         self.col_names = None
@@ -8296,8 +8310,17 @@ class Validate:
             # Determine table type and `collect()` if needed
             # ------------------------------------------------
 
-            if tbl_type not in IBIS_BACKENDS:
-                tbl_type = "local"
+            # if tbl_type not in IBIS_BACKENDS:
+            # Remove the `tbl_type` variable once all methods don't require it
+            tbl_type = "local"
+
+            ## Transform an Ibis table to a Narwhals table
+            ## NOTE: maybe do this instead in each of the interrogation methods
+            # Check that type of the `data` and determine if the table is an Ibis table
+            # type_str = str(type(data_tbl_step))
+            # ibis_tbl = "ibis.expr.types.relations.Table" in type_str
+            # if ibis_tbl and _is_lib_present(lib_name="ibis"):
+            #    data_tbl_step = nw.from_native(data_tbl_step)
 
             # If the table is a lazy frame, we need to collect it
             if _is_lazy_frame(data_tbl_step):
@@ -8307,9 +8330,7 @@ class Validate:
             # Set the number of test units
             # ------------------------------------------------
 
-            validation.n = NumberOfTestUnits(df=data_tbl_step, column=column).get_test_units(
-                tbl_type=tbl_type
-            )
+            validation.n = NumberOfTestUnits(df=data_tbl_step, column=column).get_test_units()
 
             # ------------------------------------------------
             # Validation stage
@@ -8324,7 +8345,6 @@ class Validate:
                     threshold=threshold,
                     assertion_method=assertion_method,
                     allowed_types=compatible_dtypes,
-                    tbl_type=tbl_type,
                 ).get_test_results()
 
             if assertion_category == "COMPARE_TWO":
@@ -8338,7 +8358,6 @@ class Validate:
                     threshold=threshold,
                     assertion_method=assertion_method,
                     allowed_types=compatible_dtypes,
-                    tbl_type=tbl_type,
                 ).get_test_results()
 
             if assertion_category == "COMPARE_SET":
@@ -8351,7 +8370,6 @@ class Validate:
                     threshold=threshold,
                     inside=inside,
                     allowed_types=compatible_dtypes,
-                    tbl_type=tbl_type,
                 ).get_test_results()
 
             if assertion_category == "COMPARE_REGEX":
@@ -8362,7 +8380,6 @@ class Validate:
                     na_pass=na_pass,
                     threshold=threshold,
                     allowed_types=compatible_dtypes,
-                    tbl_type=tbl_type,
                 ).get_test_results()
 
             if assertion_category == "COMPARE_EXPR":
@@ -8370,7 +8387,6 @@ class Validate:
                     data_tbl=data_tbl_step,
                     expr=value,
                     threshold=threshold,
-                    tbl_type=tbl_type,
                 ).get_test_results()
 
             if assertion_category == "ROWS_DISTINCT":
@@ -8378,7 +8394,6 @@ class Validate:
                     data_tbl=data_tbl_step,
                     columns_subset=column,
                     threshold=threshold,
-                    tbl_type=tbl_type,
                 ).get_test_results()
 
             if assertion_category == "ROWS_COMPLETE":
@@ -8386,7 +8401,6 @@ class Validate:
                     data_tbl=data_tbl_step,
                     columns_subset=column,
                     threshold=threshold,
-                    tbl_type=tbl_type,
                 ).get_test_results()
 
             if assertion_category == "COL_EXISTS_HAS_TYPE":
@@ -8395,7 +8409,6 @@ class Validate:
                     column=column,
                     threshold=threshold,
                     assertion_method="exists",
-                    tbl_type=tbl_type,
                 ).get_test_results()
 
                 validation.all_passed = result_bool
@@ -8445,7 +8458,6 @@ class Validate:
                     inverse=value["inverse"],
                     threshold=threshold,
                     abs_tol_bounds=value["abs_tol_bounds"],
-                    tbl_type=tbl_type,
                 ).get_test_results()
 
                 validation.all_passed = result_bool
@@ -8461,7 +8473,6 @@ class Validate:
                     count=value["count"],
                     inverse=value["inverse"],
                     threshold=threshold,
-                    tbl_type=tbl_type,
                 ).get_test_results()
 
                 validation.all_passed = result_bool
@@ -8512,8 +8523,11 @@ class Validate:
             # called `pb_is_good_` that contains boolean values; we can then use this table to
             # determine the number of test units that passed and failed
             if results_tbl is not None:
+                # Determine if the `results_tbl` is an Ibis table
+                ibis_tbl = "ibis.expr.types.relations.Table" in str(type(data_tbl_step))
+
                 # Extract the `pb_is_good_` column from the table as a results list
-                if tbl_type in IBIS_BACKENDS:
+                if ibis_tbl:
                     # Select the DataFrame library to use for getting the results list
                     df_lib = _select_df_lib(preference="polars")
                     df_lib_name = df_lib.__name__
@@ -8688,7 +8702,7 @@ class Validate:
                 collect_extracts
                 and assertion_type
                 in ROW_BASED_VALIDATION_TYPES + ["rows_distinct", "rows_complete"]
-                and tbl_type not in IBIS_BACKENDS
+                and not ibis_tbl
             ):
                 # Add row numbers to the results table
                 validation_extract_nw = (
