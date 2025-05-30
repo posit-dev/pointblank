@@ -56,30 +56,6 @@ summary::marker {
   font-size: 1.5em;
 }
 
-[id^=validation-steps] td a:after {
-    content: "()"
-}
-
-[id^=column-selection] td a:after {
-    content: "()"
-}
-
-[id^=interrogation-and-reporting] td a:after {
-    content: "()"
-}
-
-[id^=inspection-and-assistance] td a:after {
-    content: "()"
-}
-
-[id^=utility-functions] td a:after {
-    content: "()"
-}
-
-[id^=prebuilt-actions] td a:after {
-    content: "()"
-}
-
 .parameter-name {
     margin-right: -10px;
 }

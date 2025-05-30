@@ -40,7 +40,7 @@ ul.task-list li input[type="checkbox"] {
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-e1a5c8363afafaef2c763b6775fbf3ca.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-b3a3f0431126c7e8c477b326e3ee3944.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-163b3d65f110c20398c9be181c3bc6fb.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -144,8 +144,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#api-reference" id="toc-api-reference" class="nav-link active" data-scroll-target="#api-reference">API Reference</a>
-  <ul class="collapse">
+  
   <li><a href="#validate" id="toc-validate" class="nav-link" data-scroll-target="#validate">Validate</a></li>
   <li><a href="#validation-steps" id="toc-validation-steps" class="nav-link" data-scroll-target="#validation-steps">Validation Steps</a></li>
   <li><a href="#column-selection" id="toc-column-selection" class="nav-link" data-scroll-target="#column-selection">Column Selection</a></li>
@@ -153,7 +152,6 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
   <li><a href="#inspection-and-assistance" id="toc-inspection-and-assistance" class="nav-link" data-scroll-target="#inspection-and-assistance">Inspection and Assistance</a></li>
   <li><a href="#utility-functions" id="toc-utility-functions" class="nav-link" data-scroll-target="#utility-functions">Utility Functions</a></li>
   <li><a href="#prebuilt-actions" id="toc-prebuilt-actions" class="nav-link" data-scroll-target="#prebuilt-actions">Prebuilt Actions</a></li>
-  </ul></li>
   </ul>
 </nav>
     </div>
@@ -168,326 +166,266 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="validate" class="level2">
 <h2 class="anchored" data-anchor-id="validate">Validate</h2>
 <p>When performing data validation, you’ll need the <code>Validate</code> class to get the process started. It’s given the target table and you can optionally provide some metadata and/or failure thresholds (using the <code>Thresholds</code> class or through shorthands for this task). The <code>Validate</code> class has numerous methods for defining validation steps and for obtaining post-interrogation metrics and data.</p>
-<table class="caption-top table">
-<tbody>
-<tr class="odd">
-<td><a href="../reference/Validate.html#pointblank.Validate">Validate</a></td>
-<td>Workflow for defining a set of validations on a table and interrogating for results.</td>
-</tr>
-<tr class="even">
-<td><a href="../reference/Thresholds.html#pointblank.Thresholds">Thresholds</a></td>
-<td>Definition of threshold values.</td>
-</tr>
-<tr class="odd">
-<td><a href="../reference/Actions.html#pointblank.Actions">Actions</a></td>
-<td>Definition of action values.</td>
-</tr>
-<tr class="even">
-<td><a href="../reference/FinalActions.html#pointblank.FinalActions">FinalActions</a></td>
-<td>Define actions to be taken after validation is complete.</td>
-</tr>
-<tr class="odd">
-<td><a href="../reference/Schema.html#pointblank.Schema">Schema</a></td>
-<td>Definition of a schema object.</td>
-</tr>
-<tr class="even">
-<td><a href="../reference/DraftValidation.html#pointblank.DraftValidation">DraftValidation</a></td>
-<td>Draft a validation plan for a given table using an LLM.</td>
-</tr>
-</tbody>
-</table>
+<div class="caption-top table" style="border-top-style: dashed; border-bottom-style: dashed;">
+<dl style="margin-top: 10px;">
+
+<dt><a href="../reference/Validate.html#pointblank.Validate">Validate</a></dt>
+<dd style="text-indent: 20px; margin-top: -3px;">Workflow for defining a set of validations on a table and interrogating for results.</dd>
+
+<dt><a href="../reference/Thresholds.html#pointblank.Thresholds">Thresholds</a></dt>
+<dd style="text-indent: 20px; margin-top: -3px;">Definition of threshold values.</dd>
+
+<dt><a href="../reference/Actions.html#pointblank.Actions">Actions</a></dt>
+<dd style="text-indent: 20px; margin-top: -3px;">Definition of action values.</dd>
+
+<dt><a href="../reference/FinalActions.html#pointblank.FinalActions">FinalActions</a></dt>
+<dd style="text-indent: 20px; margin-top: -3px;">Define actions to be taken after validation is complete.</dd>
+
+<dt><a href="../reference/Schema.html#pointblank.Schema">Schema</a></dt>
+<dd style="text-indent: 20px; margin-top: -3px;">Definition of a schema object.</dd>
+
+<dt><a href="../reference/DraftValidation.html#pointblank.DraftValidation">DraftValidation</a></dt>
+<dd style="text-indent: 20px; margin-top: -3px;">Draft a validation plan for a given table using an LLM.</dd>
+
+</dl>
+</div>
 </section>
 <section id="validation-steps" class="level2">
 <h2 class="anchored" data-anchor-id="validation-steps">Validation Steps</h2>
 <p>Validation steps can be thought of as sequential validations on the target data. We call <code>Validate</code>’s validation methods to build up a validation plan: a collection of steps that, in the aggregate, provides good validation coverage.</p>
-<table class="caption-top table">
-<tbody>
-<tr class="odd">
-<td><a href="../reference/Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt">Validate.col_vals_gt</a></td>
-<td>Are column data greater than a fixed value or data in another column?</td>
-</tr>
-<tr class="even">
-<td><a href="../reference/Validate.col_vals_lt.html#pointblank.Validate.col_vals_lt">Validate.col_vals_lt</a></td>
-<td>Are column data less than a fixed value or data in another column?</td>
-</tr>
-<tr class="odd">
-<td><a href="../reference/Validate.col_vals_ge.html#pointblank.Validate.col_vals_ge">Validate.col_vals_ge</a></td>
-<td>Are column data greater than or equal to a fixed value or data in another column?</td>
-</tr>
-<tr class="even">
-<td><a href="../reference/Validate.col_vals_le.html#pointblank.Validate.col_vals_le">Validate.col_vals_le</a></td>
-<td>Are column data less than or equal to a fixed value or data in another column?</td>
-</tr>
-<tr class="odd">
-<td><a href="../reference/Validate.col_vals_eq.html#pointblank.Validate.col_vals_eq">Validate.col_vals_eq</a></td>
-<td>Are column data equal to a fixed value or data in another column?</td>
-</tr>
-<tr class="even">
-<td><a href="../reference/Validate.col_vals_ne.html#pointblank.Validate.col_vals_ne">Validate.col_vals_ne</a></td>
-<td>Are column data not equal to a fixed value or data in another column?</td>
-</tr>
-<tr class="odd">
-<td><a href="../reference/Validate.col_vals_between.html#pointblank.Validate.col_vals_between">Validate.col_vals_between</a></td>
-<td>Do column data lie between two specified values or data in other columns?</td>
-</tr>
-<tr class="even">
-<td><a href="../reference/Validate.col_vals_outside.html#pointblank.Validate.col_vals_outside">Validate.col_vals_outside</a></td>
-<td>Do column data lie outside of two specified values or data in other columns?</td>
-</tr>
-<tr class="odd">
-<td><a href="../reference/Validate.col_vals_in_set.html#pointblank.Validate.col_vals_in_set">Validate.col_vals_in_set</a></td>
-<td>Validate whether column values are in a set of values.</td>
-</tr>
-<tr class="even">
-<td><a href="../reference/Validate.col_vals_not_in_set.html#pointblank.Validate.col_vals_not_in_set">Validate.col_vals_not_in_set</a></td>
-<td>Validate whether column values are not in a set of values.</td>
-</tr>
-<tr class="odd">
-<td><a href="../reference/Validate.col_vals_null.html#pointblank.Validate.col_vals_null">Validate.col_vals_null</a></td>
-<td>Validate whether values in a column are NULL.</td>
-</tr>
-<tr class="even">
-<td><a href="../reference/Validate.col_vals_not_null.html#pointblank.Validate.col_vals_not_null">Validate.col_vals_not_null</a></td>
-<td>Validate whether values in a column are not NULL.</td>
-</tr>
-<tr class="odd">
-<td><a href="../reference/Validate.col_vals_regex.html#pointblank.Validate.col_vals_regex">Validate.col_vals_regex</a></td>
-<td>Validate whether column values match a regular expression pattern.</td>
-</tr>
-<tr class="even">
-<td><a href="../reference/Validate.col_vals_expr.html#pointblank.Validate.col_vals_expr">Validate.col_vals_expr</a></td>
-<td>Validate column values using a custom expression.</td>
-</tr>
-<tr class="odd">
-<td><a href="../reference/Validate.rows_distinct.html#pointblank.Validate.rows_distinct">Validate.rows_distinct</a></td>
-<td>Validate whether rows in the table are distinct.</td>
-</tr>
-<tr class="even">
-<td><a href="../reference/Validate.rows_complete.html#pointblank.Validate.rows_complete">Validate.rows_complete</a></td>
-<td>Validate whether row data are complete by having no missing values.</td>
-</tr>
-<tr class="odd">
-<td><a href="../reference/Validate.col_exists.html#pointblank.Validate.col_exists">Validate.col_exists</a></td>
-<td>Validate whether one or more columns exist in the table.</td>
-</tr>
-<tr class="even">
-<td><a href="../reference/Validate.col_schema_match.html#pointblank.Validate.col_schema_match">Validate.col_schema_match</a></td>
-<td>Do columns in the table (and their types) match a predefined schema?</td>
-</tr>
-<tr class="odd">
-<td><a href="../reference/Validate.row_count_match.html#pointblank.Validate.row_count_match">Validate.row_count_match</a></td>
-<td>Validate whether the row count of the table matches a specified count.</td>
-</tr>
-<tr class="even">
-<td><a href="../reference/Validate.col_count_match.html#pointblank.Validate.col_count_match">Validate.col_count_match</a></td>
-<td>Validate whether the column count of the table matches a specified count.</td>
-</tr>
-<tr class="odd">
-<td><a href="../reference/Validate.conjointly.html#pointblank.Validate.conjointly">Validate.conjointly</a></td>
-<td>Perform multiple row-wise validations for joint validity.</td>
-</tr>
-<tr class="even">
-<td><a href="../reference/Validate.specially.html#pointblank.Validate.specially">Validate.specially</a></td>
-<td>Perform a specialized validation with customized logic.</td>
-</tr>
-</tbody>
-</table>
+<div class="caption-top table" style="border-top-style: dashed; border-bottom-style: dashed;">
+<dl style="margin-top: 10px;">
+
+<dt><a href="../reference/Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt">Validate.col_vals_gt()</a></dt>
+<dd style="text-indent: 20px; margin-top: -3px;">Are column data greater than a fixed value or data in another column?</dd>
+
+<dt><a href="../reference/Validate.col_vals_lt.html#pointblank.Validate.col_vals_lt">Validate.col_vals_lt()</a></dt>
+<dd style="text-indent: 20px; margin-top: -3px;">Are column data less than a fixed value or data in another column?</dd>
+
+<dt><a href="../reference/Validate.col_vals_ge.html#pointblank.Validate.col_vals_ge">Validate.col_vals_ge()</a></dt>
+<dd style="text-indent: 20px; margin-top: -3px;">Are column data greater than or equal to a fixed value or data in another column?</dd>
+
+<dt><a href="../reference/Validate.col_vals_le.html#pointblank.Validate.col_vals_le">Validate.col_vals_le()</a></dt>
+<dd style="text-indent: 20px; margin-top: -3px;">Are column data less than or equal to a fixed value or data in another column?</dd>
+
+<dt><a href="../reference/Validate.col_vals_eq.html#pointblank.Validate.col_vals_eq">Validate.col_vals_eq()</a></dt>
+<dd style="text-indent: 20px; margin-top: -3px;">Are column data equal to a fixed value or data in another column?</dd>
+
+<dt><a href="../reference/Validate.col_vals_ne.html#pointblank.Validate.col_vals_ne">Validate.col_vals_ne()</a></dt>
+<dd style="text-indent: 20px; margin-top: -3px;">Are column data not equal to a fixed value or data in another column?</dd>
+
+<dt><a href="../reference/Validate.col_vals_between.html#pointblank.Validate.col_vals_between">Validate.col_vals_between()</a></dt>
+<dd style="text-indent: 20px; margin-top: -3px;">Do column data lie between two specified values or data in other columns?</dd>
+
+<dt><a href="../reference/Validate.col_vals_outside.html#pointblank.Validate.col_vals_outside">Validate.col_vals_outside()</a></dt>
+<dd style="text-indent: 20px; margin-top: -3px;">Do column data lie outside of two specified values or data in other columns?</dd>
+
+<dt><a href="../reference/Validate.col_vals_in_set.html#pointblank.Validate.col_vals_in_set">Validate.col_vals_in_set()</a></dt>
+<dd style="text-indent: 20px; margin-top: -3px;">Validate whether column values are in a set of values.</dd>
+
+<dt><a href="../reference/Validate.col_vals_not_in_set.html#pointblank.Validate.col_vals_not_in_set">Validate.col_vals_not_in_set()</a></dt>
+<dd style="text-indent: 20px; margin-top: -3px;">Validate whether column values are not in a set of values.</dd>
+
+<dt><a href="../reference/Validate.col_vals_null.html#pointblank.Validate.col_vals_null">Validate.col_vals_null()</a></dt>
+<dd style="text-indent: 20px; margin-top: -3px;">Validate whether values in a column are NULL.</dd>
+
+<dt><a href="../reference/Validate.col_vals_not_null.html#pointblank.Validate.col_vals_not_null">Validate.col_vals_not_null()</a></dt>
+<dd style="text-indent: 20px; margin-top: -3px;">Validate whether values in a column are not NULL.</dd>
+
+<dt><a href="../reference/Validate.col_vals_regex.html#pointblank.Validate.col_vals_regex">Validate.col_vals_regex()</a></dt>
+<dd style="text-indent: 20px; margin-top: -3px;">Validate whether column values match a regular expression pattern.</dd>
+
+<dt><a href="../reference/Validate.col_vals_expr.html#pointblank.Validate.col_vals_expr">Validate.col_vals_expr()</a></dt>
+<dd style="text-indent: 20px; margin-top: -3px;">Validate column values using a custom expression.</dd>
+
+<dt><a href="../reference/Validate.rows_distinct.html#pointblank.Validate.rows_distinct">Validate.rows_distinct()</a></dt>
+<dd style="text-indent: 20px; margin-top: -3px;">Validate whether rows in the table are distinct.</dd>
+
+<dt><a href="../reference/Validate.rows_complete.html#pointblank.Validate.rows_complete">Validate.rows_complete()</a></dt>
+<dd style="text-indent: 20px; margin-top: -3px;">Validate whether row data are complete by having no missing values.</dd>
+
+<dt><a href="../reference/Validate.col_exists.html#pointblank.Validate.col_exists">Validate.col_exists()</a></dt>
+<dd style="text-indent: 20px; margin-top: -3px;">Validate whether one or more columns exist in the table.</dd>
+
+<dt><a href="../reference/Validate.col_schema_match.html#pointblank.Validate.col_schema_match">Validate.col_schema_match()</a></dt>
+<dd style="text-indent: 20px; margin-top: -3px;">Do columns in the table (and their types) match a predefined schema?</dd>
+
+<dt><a href="../reference/Validate.row_count_match.html#pointblank.Validate.row_count_match">Validate.row_count_match()</a></dt>
+<dd style="text-indent: 20px; margin-top: -3px;">Validate whether the row count of the table matches a specified count.</dd>
+
+<dt><a href="../reference/Validate.col_count_match.html#pointblank.Validate.col_count_match">Validate.col_count_match()</a></dt>
+<dd style="text-indent: 20px; margin-top: -3px;">Validate whether the column count of the table matches a specified count.</dd>
+
+<dt><a href="../reference/Validate.conjointly.html#pointblank.Validate.conjointly">Validate.conjointly()</a></dt>
+<dd style="text-indent: 20px; margin-top: -3px;">Perform multiple row-wise validations for joint validity.</dd>
+
+<dt><a href="../reference/Validate.specially.html#pointblank.Validate.specially">Validate.specially()</a></dt>
+<dd style="text-indent: 20px; margin-top: -3px;">Perform a specialized validation with customized logic.</dd>
+
+</dl>
+</div>
 </section>
 <section id="column-selection" class="level2">
 <h2 class="anchored" data-anchor-id="column-selection">Column Selection</h2>
 <p>A flexible way to select columns for validation is to use the <code>col()</code> function along with column selection helper functions. A combination of <code>col()</code> + <code>starts_with()</code>, <code>matches()</code>, etc., allows for the selection of multiple target columns (mapping a validation across many steps). Furthermore, the <code>col()</code> function can be used to declare a comparison column (e.g., for the <code>value=</code> argument in many <code>col_vals_*()</code> methods) when you can’t use a fixed value for comparison.</p>
-<table class="caption-top table">
-<tbody>
-<tr class="odd">
-<td><a href="../reference/col.html#pointblank.col">col</a></td>
-<td>Helper function for referencing a column in the input table.</td>
-</tr>
-<tr class="even">
-<td><a href="../reference/starts_with.html#pointblank.starts_with">starts_with</a></td>
-<td>Select columns that start with specified text.</td>
-</tr>
-<tr class="odd">
-<td><a href="../reference/ends_with.html#pointblank.ends_with">ends_with</a></td>
-<td>Select columns that end with specified text.</td>
-</tr>
-<tr class="even">
-<td><a href="../reference/contains.html#pointblank.contains">contains</a></td>
-<td>Select columns that contain specified text.</td>
-</tr>
-<tr class="odd">
-<td><a href="../reference/matches.html#pointblank.matches">matches</a></td>
-<td>Select columns that match a specified regular expression pattern.</td>
-</tr>
-<tr class="even">
-<td><a href="../reference/everything.html#pointblank.everything">everything</a></td>
-<td>Select all columns.</td>
-</tr>
-<tr class="odd">
-<td><a href="../reference/first_n.html#pointblank.first_n">first_n</a></td>
-<td>Select the first <code>n</code> columns in the column list.</td>
-</tr>
-<tr class="even">
-<td><a href="../reference/last_n.html#pointblank.last_n">last_n</a></td>
-<td>Select the last <code>n</code> columns in the column list.</td>
-</tr>
-<tr class="odd">
-<td><a href="../reference/expr_col.html#pointblank.expr_col">expr_col</a></td>
-<td>Create a column expression for use in <code>conjointly()</code> validation.</td>
-</tr>
-</tbody>
-</table>
+<div class="caption-top table" style="border-top-style: dashed; border-bottom-style: dashed;">
+<dl style="margin-top: 10px;">
+
+<dt><a href="../reference/col.html#pointblank.col">col()</a></dt>
+<dd style="text-indent: 20px; margin-top: -3px;">Helper function for referencing a column in the input table.</dd>
+
+<dt><a href="../reference/starts_with.html#pointblank.starts_with">starts_with()</a></dt>
+<dd style="text-indent: 20px; margin-top: -3px;">Select columns that start with specified text.</dd>
+
+<dt><a href="../reference/ends_with.html#pointblank.ends_with">ends_with()</a></dt>
+<dd style="text-indent: 20px; margin-top: -3px;">Select columns that end with specified text.</dd>
+
+<dt><a href="../reference/contains.html#pointblank.contains">contains()</a></dt>
+<dd style="text-indent: 20px; margin-top: -3px;">Select columns that contain specified text.</dd>
+
+<dt><a href="../reference/matches.html#pointblank.matches">matches()</a></dt>
+<dd style="text-indent: 20px; margin-top: -3px;">Select columns that match a specified regular expression pattern.</dd>
+
+<dt><a href="../reference/everything.html#pointblank.everything">everything()</a></dt>
+<dd style="text-indent: 20px; margin-top: -3px;">Select all columns.</dd>
+
+<dt><a href="../reference/first_n.html#pointblank.first_n">first_n()</a></dt>
+<dd style="text-indent: 20px; margin-top: -3px;">Select the first <code>n</code> columns in the column list.</dd>
+
+<dt><a href="../reference/last_n.html#pointblank.last_n">last_n()</a></dt>
+<dd style="text-indent: 20px; margin-top: -3px;">Select the last <code>n</code> columns in the column list.</dd>
+
+<dt><a href="../reference/expr_col.html#pointblank.expr_col">expr_col()</a></dt>
+<dd style="text-indent: 20px; margin-top: -3px;">Create a column expression for use in <code>conjointly()</code> validation.</dd>
+
+</dl>
+</div>
 </section>
 <section id="interrogation-and-reporting" class="level2">
 <h2 class="anchored" data-anchor-id="interrogation-and-reporting">Interrogation and Reporting</h2>
 <p>The validation plan is put into action when <code>interrogate()</code> is called. The workflow for performing a comprehensive validation is then: (1) <code>Validate()</code>, (2) adding validation steps, (3) <code>interrogate()</code>. After interrogation of the data, we can view a validation report table (by printing the object or using <code>get_tabular_report()</code>), extract key metrics, or we can split the data based on the validation results (with <code>get_sundered_data()</code>).</p>
-<table class="caption-top table">
-<tbody>
-<tr class="odd">
-<td><a href="../reference/Validate.interrogate.html#pointblank.Validate.interrogate">Validate.interrogate</a></td>
-<td>Execute each validation step against the table and store the results.</td>
-</tr>
-<tr class="even">
-<td><a href="../reference/Validate.get_tabular_report.html#pointblank.Validate.get_tabular_report">Validate.get_tabular_report</a></td>
-<td>Validation report as a GT table.</td>
-</tr>
-<tr class="odd">
-<td><a href="../reference/Validate.get_step_report.html#pointblank.Validate.get_step_report">Validate.get_step_report</a></td>
-<td>Get a detailed report for a single validation step.</td>
-</tr>
-<tr class="even">
-<td><a href="../reference/Validate.get_json_report.html#pointblank.Validate.get_json_report">Validate.get_json_report</a></td>
-<td>Get a report of the validation results as a JSON-formatted string.</td>
-</tr>
-<tr class="odd">
-<td><a href="../reference/Validate.get_sundered_data.html#pointblank.Validate.get_sundered_data">Validate.get_sundered_data</a></td>
-<td>Get the data that passed or failed the validation steps.</td>
-</tr>
-<tr class="even">
-<td><a href="../reference/Validate.get_data_extracts.html#pointblank.Validate.get_data_extracts">Validate.get_data_extracts</a></td>
-<td>Get the rows that failed for each validation step.</td>
-</tr>
-<tr class="odd">
-<td><a href="../reference/Validate.all_passed.html#pointblank.Validate.all_passed">Validate.all_passed</a></td>
-<td>Determine if every validation step passed perfectly, with no failing test units.</td>
-</tr>
-<tr class="even">
-<td><a href="../reference/Validate.assert_passing.html#pointblank.Validate.assert_passing">Validate.assert_passing</a></td>
-<td>Raise an <code>AssertionError</code> if all tests are not passing.</td>
-</tr>
-<tr class="odd">
-<td><a href="../reference/Validate.assert_below_threshold.html#pointblank.Validate.assert_below_threshold">Validate.assert_below_threshold</a></td>
-<td>Raise an <code>AssertionError</code> if validation steps exceed a specified threshold level.</td>
-</tr>
-<tr class="even">
-<td><a href="../reference/Validate.above_threshold.html#pointblank.Validate.above_threshold">Validate.above_threshold</a></td>
-<td>Check if any validation steps exceed a specified threshold level.</td>
-</tr>
-<tr class="odd">
-<td><a href="../reference/Validate.n.html#pointblank.Validate.n">Validate.n</a></td>
-<td>Provides a dictionary of the number of test units for each validation step.</td>
-</tr>
-<tr class="even">
-<td><a href="../reference/Validate.n_passed.html#pointblank.Validate.n_passed">Validate.n_passed</a></td>
-<td>Provides a dictionary of the number of test units that passed for each validation step.</td>
-</tr>
-<tr class="odd">
-<td><a href="../reference/Validate.n_failed.html#pointblank.Validate.n_failed">Validate.n_failed</a></td>
-<td>Provides a dictionary of the number of test units that failed for each validation step.</td>
-</tr>
-<tr class="even">
-<td><a href="../reference/Validate.f_passed.html#pointblank.Validate.f_passed">Validate.f_passed</a></td>
-<td>Provides a dictionary of the fraction of test units that passed for each validation step.</td>
-</tr>
-<tr class="odd">
-<td><a href="../reference/Validate.f_failed.html#pointblank.Validate.f_failed">Validate.f_failed</a></td>
-<td>Provides a dictionary of the fraction of test units that failed for each validation step.</td>
-</tr>
-<tr class="even">
-<td><a href="../reference/Validate.warning.html#pointblank.Validate.warning">Validate.warning</a></td>
-<td>Get the ‘warning’ level status for each validation step.</td>
-</tr>
-<tr class="odd">
-<td><a href="../reference/Validate.error.html#pointblank.Validate.error">Validate.error</a></td>
-<td>Get the ‘error’ level status for each validation step.</td>
-</tr>
-<tr class="even">
-<td><a href="../reference/Validate.critical.html#pointblank.Validate.critical">Validate.critical</a></td>
-<td>Get the ‘critical’ level status for each validation step.</td>
-</tr>
-</tbody>
-</table>
+<div class="caption-top table" style="border-top-style: dashed; border-bottom-style: dashed;">
+<dl style="margin-top: 10px;">
+
+<dt><a href="../reference/Validate.interrogate.html#pointblank.Validate.interrogate">Validate.interrogate()</a></dt>
+<dd style="text-indent: 20px; margin-top: -3px;">Execute each validation step against the table and store the results.</dd>
+
+<dt><a href="../reference/Validate.get_tabular_report.html#pointblank.Validate.get_tabular_report">Validate.get_tabular_report()</a></dt>
+<dd style="text-indent: 20px; margin-top: -3px;">Validation report as a GT table.</dd>
+
+<dt><a href="../reference/Validate.get_step_report.html#pointblank.Validate.get_step_report">Validate.get_step_report()</a></dt>
+<dd style="text-indent: 20px; margin-top: -3px;">Get a detailed report for a single validation step.</dd>
+
+<dt><a href="../reference/Validate.get_json_report.html#pointblank.Validate.get_json_report">Validate.get_json_report()</a></dt>
+<dd style="text-indent: 20px; margin-top: -3px;">Get a report of the validation results as a JSON-formatted string.</dd>
+
+<dt><a href="../reference/Validate.get_sundered_data.html#pointblank.Validate.get_sundered_data">Validate.get_sundered_data()</a></dt>
+<dd style="text-indent: 20px; margin-top: -3px;">Get the data that passed or failed the validation steps.</dd>
+
+<dt><a href="../reference/Validate.get_data_extracts.html#pointblank.Validate.get_data_extracts">Validate.get_data_extracts()</a></dt>
+<dd style="text-indent: 20px; margin-top: -3px;">Get the rows that failed for each validation step.</dd>
+
+<dt><a href="../reference/Validate.all_passed.html#pointblank.Validate.all_passed">Validate.all_passed()</a></dt>
+<dd style="text-indent: 20px; margin-top: -3px;">Determine if every validation step passed perfectly, with no failing test units.</dd>
+
+<dt><a href="../reference/Validate.assert_passing.html#pointblank.Validate.assert_passing">Validate.assert_passing()</a></dt>
+<dd style="text-indent: 20px; margin-top: -3px;">Raise an <code>AssertionError</code> if all tests are not passing.</dd>
+
+<dt><a href="../reference/Validate.assert_below_threshold.html#pointblank.Validate.assert_below_threshold">Validate.assert_below_threshold()</a></dt>
+<dd style="text-indent: 20px; margin-top: -3px;">Raise an <code>AssertionError</code> if validation steps exceed a specified threshold level.</dd>
+
+<dt><a href="../reference/Validate.above_threshold.html#pointblank.Validate.above_threshold">Validate.above_threshold()</a></dt>
+<dd style="text-indent: 20px; margin-top: -3px;">Check if any validation steps exceed a specified threshold level.</dd>
+
+<dt><a href="../reference/Validate.n.html#pointblank.Validate.n">Validate.n()</a></dt>
+<dd style="text-indent: 20px; margin-top: -3px;">Provides a dictionary of the number of test units for each validation step.</dd>
+
+<dt><a href="../reference/Validate.n_passed.html#pointblank.Validate.n_passed">Validate.n_passed()</a></dt>
+<dd style="text-indent: 20px; margin-top: -3px;">Provides a dictionary of the number of test units that passed for each validation step.</dd>
+
+<dt><a href="../reference/Validate.n_failed.html#pointblank.Validate.n_failed">Validate.n_failed()</a></dt>
+<dd style="text-indent: 20px; margin-top: -3px;">Provides a dictionary of the number of test units that failed for each validation step.</dd>
+
+<dt><a href="../reference/Validate.f_passed.html#pointblank.Validate.f_passed">Validate.f_passed()</a></dt>
+<dd style="text-indent: 20px; margin-top: -3px;">Provides a dictionary of the fraction of test units that passed for each validation step.</dd>
+
+<dt><a href="../reference/Validate.f_failed.html#pointblank.Validate.f_failed">Validate.f_failed()</a></dt>
+<dd style="text-indent: 20px; margin-top: -3px;">Provides a dictionary of the fraction of test units that failed for each validation step.</dd>
+
+<dt><a href="../reference/Validate.warning.html#pointblank.Validate.warning">Validate.warning()</a></dt>
+<dd style="text-indent: 20px; margin-top: -3px;">Get the ‘warning’ level status for each validation step.</dd>
+
+<dt><a href="../reference/Validate.error.html#pointblank.Validate.error">Validate.error()</a></dt>
+<dd style="text-indent: 20px; margin-top: -3px;">Get the ‘error’ level status for each validation step.</dd>
+
+<dt><a href="../reference/Validate.critical.html#pointblank.Validate.critical">Validate.critical()</a></dt>
+<dd style="text-indent: 20px; margin-top: -3px;">Get the ‘critical’ level status for each validation step.</dd>
+
+</dl>
+</div>
 </section>
 <section id="inspection-and-assistance" class="level2">
 <h2 class="anchored" data-anchor-id="inspection-and-assistance">Inspection and Assistance</h2>
 <p>The <em>Inspection and Assistance</em> group contains functions that are helpful for getting to grips on a new data table. Use the <code>DataScan</code> class to get a quick overview of the data, <code>preview()</code> to see the first and last few rows of a table, <code>col_summary_tbl()</code> for a column-level summary of a table, and <code>missing_vals_tbl()</code> to see where there are missing values in a table. Several datasets included in the package can be accessed via the <code>load_dataset()</code> function. On the assistance side, the <code>assistant()</code> function can be used to get help with Pointblank.</p>
-<table class="caption-top table">
-<tbody>
-<tr class="odd">
-<td><a href="../reference/DataScan.html#pointblank.DataScan">DataScan</a></td>
-<td>Get a summary of a dataset.</td>
-</tr>
-<tr class="even">
-<td><a href="../reference/preview.html#pointblank.preview">preview</a></td>
-<td>Display a table preview that shows some rows from the top, some from the bottom.</td>
-</tr>
-<tr class="odd">
-<td><a href="../reference/col_summary_tbl.html#pointblank.col_summary_tbl">col_summary_tbl</a></td>
-<td>Generate a column-level summary table of a dataset.</td>
-</tr>
-<tr class="even">
-<td><a href="../reference/missing_vals_tbl.html#pointblank.missing_vals_tbl">missing_vals_tbl</a></td>
-<td>Display a table that shows the missing values in the input table.</td>
-</tr>
-<tr class="odd">
-<td><a href="../reference/assistant.html#pointblank.assistant">assistant</a></td>
-<td>Chat with the PbA (Pointblank Assistant) about your data validation needs.</td>
-</tr>
-<tr class="even">
-<td><a href="../reference/load_dataset.html#pointblank.load_dataset">load_dataset</a></td>
-<td>Load a dataset hosted in the library as specified table type.</td>
-</tr>
-</tbody>
-</table>
+<div class="caption-top table" style="border-top-style: dashed; border-bottom-style: dashed;">
+<dl style="margin-top: 10px;">
+
+<dt><a href="../reference/DataScan.html#pointblank.DataScan">DataScan</a></dt>
+<dd style="text-indent: 20px; margin-top: -3px;">Get a summary of a dataset.</dd>
+
+<dt><a href="../reference/preview.html#pointblank.preview">preview()</a></dt>
+<dd style="text-indent: 20px; margin-top: -3px;">Display a table preview that shows some rows from the top, some from the bottom.</dd>
+
+<dt><a href="../reference/col_summary_tbl.html#pointblank.col_summary_tbl">col_summary_tbl()</a></dt>
+<dd style="text-indent: 20px; margin-top: -3px;">Generate a column-level summary table of a dataset.</dd>
+
+<dt><a href="../reference/missing_vals_tbl.html#pointblank.missing_vals_tbl">missing_vals_tbl()</a></dt>
+<dd style="text-indent: 20px; margin-top: -3px;">Display a table that shows the missing values in the input table.</dd>
+
+<dt><a href="../reference/assistant.html#pointblank.assistant">assistant()</a></dt>
+<dd style="text-indent: 20px; margin-top: -3px;">Chat with the PbA (Pointblank Assistant) about your data validation needs.</dd>
+
+<dt><a href="../reference/load_dataset.html#pointblank.load_dataset">load_dataset()</a></dt>
+<dd style="text-indent: 20px; margin-top: -3px;">Load a dataset hosted in the library as specified table type.</dd>
+
+</dl>
+</div>
 </section>
 <section id="utility-functions" class="level2">
 <h2 class="anchored" data-anchor-id="utility-functions">Utility Functions</h2>
 <p>The <em>Utility Functions</em> group contains functions that are useful accessing metadata about the target data. Use <code>get_column_count()</code> or <code>get_row_count()</code> to get the number of columns or rows in a table. The <code>get_action_metadata()</code> function is useful when building custom actions since it returns metadata about the validation step that’s triggering the action. Lastly, the <code>config()</code> utility lets us set global configuration parameters.</p>
-<table class="caption-top table">
-<tbody>
-<tr class="odd">
-<td><a href="../reference/get_column_count.html#pointblank.get_column_count">get_column_count</a></td>
-<td>Get the number of columns in a table.</td>
-</tr>
-<tr class="even">
-<td><a href="../reference/get_row_count.html#pointblank.get_row_count">get_row_count</a></td>
-<td>Get the number of rows in a table.</td>
-</tr>
-<tr class="odd">
-<td><a href="../reference/get_action_metadata.html#pointblank.get_action_metadata">get_action_metadata</a></td>
-<td>Access step-level metadata when authoring custom actions.</td>
-</tr>
-<tr class="even">
-<td><a href="../reference/get_validation_summary.html#pointblank.get_validation_summary">get_validation_summary</a></td>
-<td>Access validation summary information when authoring final actions.</td>
-</tr>
-<tr class="odd">
-<td><a href="../reference/config.html#pointblank.config">config</a></td>
-<td>Configuration settings for the Pointblank library.</td>
-</tr>
-</tbody>
-</table>
+<div class="caption-top table" style="border-top-style: dashed; border-bottom-style: dashed;">
+<dl style="margin-top: 10px;">
+
+<dt><a href="../reference/get_column_count.html#pointblank.get_column_count">get_column_count()</a></dt>
+<dd style="text-indent: 20px; margin-top: -3px;">Get the number of columns in a table.</dd>
+
+<dt><a href="../reference/get_row_count.html#pointblank.get_row_count">get_row_count()</a></dt>
+<dd style="text-indent: 20px; margin-top: -3px;">Get the number of rows in a table.</dd>
+
+<dt><a href="../reference/get_action_metadata.html#pointblank.get_action_metadata">get_action_metadata()</a></dt>
+<dd style="text-indent: 20px; margin-top: -3px;">Access step-level metadata when authoring custom actions.</dd>
+
+<dt><a href="../reference/get_validation_summary.html#pointblank.get_validation_summary">get_validation_summary()</a></dt>
+<dd style="text-indent: 20px; margin-top: -3px;">Access validation summary information when authoring final actions.</dd>
+
+<dt><a href="../reference/config.html#pointblank.config">config()</a></dt>
+<dd style="text-indent: 20px; margin-top: -3px;">Configuration settings for the Pointblank library.</dd>
+
+</dl>
+</div>
 </section>
 <section id="prebuilt-actions" class="level2">
 <h2 class="anchored" data-anchor-id="prebuilt-actions">Prebuilt Actions</h2>
 <p>The <em>Prebuilt Actions</em> group contains a function that can be used to send a Slack notification when validation steps exceed failure threshold levels or just to provide a summary of the validation results, including the status, number of steps, passing and failing steps, table information, and timing details.</p>
-<table class="caption-top table">
-<tbody>
-<tr class="odd">
-<td><a href="../reference/send_slack_notification.html#pointblank.send_slack_notification">send_slack_notification</a></td>
-<td>Create a Slack notification function using a webhook URL.</td>
-</tr>
-</tbody>
-</table>
+<div class="caption-top table" style="border-top-style: dashed; border-bottom-style: dashed;">
+<dl style="margin-top: 10px;">
+
+<dt><a href="../reference/send_slack_notification.html#pointblank.send_slack_notification">send_slack_notification()</a></dt>
+<dd style="text-indent: 20px; margin-top: -3px;">Create a Slack notification function using a webhook URL.</dd>
+
+</dl>
+</div>
 
 
 </section>
