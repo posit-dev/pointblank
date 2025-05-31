@@ -70,6 +70,9 @@ class Interrogator:
         The type of table to use for the assertion. This is used to determine the backend for the
         assertion. The default is 'local' but it can also be any of the table types in the
         `IBIS_BACKENDS` constant.
+    inverse
+        A boolean flag to inverse the check result. This currently works with:
+        - `regex`
 
     Returns
     -------
@@ -88,6 +91,7 @@ class Interrogator:
     inclusive: tuple[bool, bool] = None
     na_pass: bool = False
     tbl_type: str = "local"
+    inverse: bool = False
 
     def gt(self) -> FrameT | Any:
         # Ibis backends ---------------------------------------------
@@ -1131,14 +1135,14 @@ class Interrogator:
                 pb_is_good_1=self.x[self.column].isnull() & ibis.literal(self.na_pass),
                 pb_is_good_2=self.x[self.column].re_search(self.pattern),
             )
+            expr = tbl.pb_is_good_1 | tbl.pb_is_good_2
+            if self.inverse is True:
+                expr = expr.negate()
 
-            return tbl.mutate(pb_is_good_=tbl.pb_is_good_1 | tbl.pb_is_good_2).drop(
-                "pb_is_good_1", "pb_is_good_2"
-            )
+            return tbl.mutate(pb_is_good_=expr).drop("pb_is_good_1", "pb_is_good_2")
 
         # Local backends (Narwhals) ---------------------------------
-
-        return (
+        expr = (
             self.x.with_columns(
                 pb_is_good_1=nw.col(self.column).is_null() & self.na_pass,
                 pb_is_good_2=nw.when(~nw.col(self.column).is_null())
@@ -1147,8 +1151,11 @@ class Interrogator:
             )
             .with_columns(pb_is_good_=nw.col("pb_is_good_1") | nw.col("pb_is_good_2"))
             .drop("pb_is_good_1", "pb_is_good_2")
-            .to_native()
         )
+        if self.inverse is True:
+            expr = ~expr
+
+        return expr.to_native()
 
     def null(self) -> FrameT | Any:
         # Ibis backends ---------------------------------------------
@@ -1595,6 +1602,8 @@ class ColValsRegex:
         The column to check.
     pattern
         The regular expression pattern to check against.
+    inverse
+        `False` to check if a match exists, `True` to check if no match exists.
     na_pass
         `True` to pass test units with missing values, `False` otherwise.
     threshold
@@ -1614,6 +1623,7 @@ class ColValsRegex:
     data_tbl: FrameT
     column: str
     pattern: str
+    inverse: bool
     na_pass: bool
     threshold: int
     allowed_types: list[str]
@@ -1641,6 +1651,7 @@ class ColValsRegex:
             pattern=self.pattern,
             na_pass=self.na_pass,
             tbl_type=self.tbl_type,
+            inverse=self.inverse
         ).regex()
 
     def get_test_results(self):
