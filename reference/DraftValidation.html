@@ -176,7 +176,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
         <nav id="TOC" role="doc-toc" class="toc-active">
-    <h2 id="toc-title">On this page</h2>
+    <h3 id="toc-title">On this page</h3>
    
   <ul>
   <li><a href="#pointblank.DraftValidation" id="toc-pointblank.DraftValidation" class="nav-link active" data-scroll-target="#pointblank.DraftValidation">DraftValidation</a>
@@ -198,7 +198,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 
 
 <section id="pointblank.DraftValidation" class="level1">
-<h1 style="font-family: SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace; font-size: 1.25rem;">DraftValidation<span style="font-size: 0.75rem; border-style: solid; border-width: 2px; border-color: darkgreen; background-color: #E3FEE3; margin-left: 12px;"><code style="background-color: transparent; color: darkgreen;">class</code></span></h1>
+<h1 style="font-family: SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace; font-size: 1.25rem;">DraftValidation</h1>
 <div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>DraftValidation(data, model, api_key<span class="op">=</span><span class="va">None</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p style="font-size: 20px; font-style: italic;">Draft a validation plan for a given table using an LLM.</p>
 <p>By using a large language model (LLM) to draft a validation plan, you can quickly generate a starting point for validating a table. This can be useful when you have a new table and you want to get a sense of how to validate it (and adjustments could always be made later). The <code>DraftValidation</code> class uses the <code>chatlas</code> package to draft a validation plan for a given table using an LLM from either the <code>"anthropic"</code>, <code>"openai"</code>, <code>"ollama"</code> or <code>"bedrock"</code> provider. You can install all requirements for the class through an optional ‘generate’ install of Pointblank via <code>pip install pointblank[generate]</code>.</p>
@@ -216,8 +216,8 @@ Warning
 </div>
 </div>
 <section id="parameters" class="level2 doc-section doc-section-parameters">
-<h2 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters">Parameters</h2>
-<dl>
+<h3 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters">Parameters</h3>
+<dl style="border-style: solid; border-width: 2px; border-color: #00AC1480; padding: 1rem;">
 <dt><code><span class="parameter-name"><strong>data</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><code>FrameT</code> | <code>Any</code></span></code></dt>
 <dd>
 <p>The data to be used for drafting a validation plan.</p>
@@ -233,8 +233,8 @@ Warning
 </dl>
 </section>
 <section id="returns" class="level2 doc-section doc-section-returns">
-<h2 class="doc-section doc-section-returns anchored" data-anchor-id="returns">Returns</h2>
-<dl>
+<h3 class="doc-section doc-section-returns anchored" data-anchor-id="returns">Returns</h3>
+<dl style="border-style: solid; border-width: 2px; border-color: #0059AC80; padding: 1rem;">
 <dt><code><span class="parameter-name"></span> <span class="parameter-annotation-sep" style="margin-left: -8px;"></span> <span class="parameter-annotation"><code>str</code></span></code></dt>
 <dd>
 <p>The drafted validation plan.</p>
@@ -242,7 +242,7 @@ Warning
 </dl>
 </section>
 <section id="constructing-the-model-argument" class="level2 doc-section doc-section-constructing-the-model-argument">
-<h2 class="doc-section doc-section-constructing-the-model-argument anchored" data-anchor-id="constructing-the-model-argument">Constructing the <code>model</code> Argument</h2>
+<h3 class="doc-section doc-section-constructing-the-model-argument anchored" data-anchor-id="constructing-the-model-argument">Constructing the <code>model</code> Argument</h3>
 <p>The <code>model=</code> argument should be constructed using the provider and model name separated by a colon (<code>provider:model</code>). The provider text can any of:</p>
 <ul>
 <li><code>"anthropic"</code> (Anthropic)</li>
@@ -253,7 +253,7 @@ Warning
 <p>The model name should be the specific model to be used from the provider. Model names are subject to change so consult the provider’s documentation for the most up-to-date model names.</p>
 </section>
 <section id="notes-on-authentication" class="level2 doc-section doc-section-notes-on-authentication">
-<h2 class="doc-section doc-section-notes-on-authentication anchored" data-anchor-id="notes-on-authentication">Notes on Authentication</h2>
+<h3 class="doc-section doc-section-notes-on-authentication anchored" data-anchor-id="notes-on-authentication">Notes on Authentication</h3>
 <p>Providing a valid API key as a string in the <code>api_key</code> argument is adequate for getting started but you should consider using a more secure method for handling API keys.</p>
 <p>One way to do this is to load the API key from an environent variable and retrieve it using the <code>os</code> module (specifically the <code>os.getenv()</code> function). Places to store the API key might include <code>.bashrc</code>, <code>.bash_profile</code>, <code>.zshrc</code>, or <code>.zsh_profile</code>.</p>
 <p>Another solution is to store one or more model provider API keys in an <code>.env</code> file (in the root of your project). If the API keys have correct names (e.g., <code>ANTHROPIC_API_KEY</code> or <code>OPENAI_API_KEY</code>) then DraftValidation will automatically load the API key from the <code>.env</code> file and there’s no need to provide the <code>api_key</code> argument. An <code>.env</code> file might look like this:</p>
@@ -262,7 +262,7 @@ OPENAI_API_KEY="your_openai_api_key_here"</code></pre>
 <p>There’s no need to have the <code>python-dotenv</code> package installed when using <code>.env</code> files in this way.</p>
 </section>
 <section id="notes-on-data-sent-to-the-model-provider" class="level2 doc-section doc-section-notes-on-data-sent-to-the-model-provider">
-<h2 class="doc-section doc-section-notes-on-data-sent-to-the-model-provider anchored" data-anchor-id="notes-on-data-sent-to-the-model-provider">Notes on Data Sent to the Model Provider</h2>
+<h3 class="doc-section doc-section-notes-on-data-sent-to-the-model-provider anchored" data-anchor-id="notes-on-data-sent-to-the-model-provider">Notes on Data Sent to the Model Provider</h3>
 <p>The data sent to the model provider is a JSON summary of the table. This data summary is generated internally by <code>DraftValidation</code> using the <code>DataScan</code> class. The summary includes the following information:</p>
 <ul>
 <li>the number of rows and columns in the table</li>
@@ -275,7 +275,7 @@ OPENAI_API_KEY="your_openai_api_key_here"</code></pre>
 <p>The Amazon Bedrock is a special case since it is a self-hosted model and security controls are in place to ensure that data is kept within the user’s AWS environment. If using an Ollama model all data is handled locally, though only a few models are capable enough to perform the task of drafting a validation plan.</p>
 </section>
 <section id="examples" class="level2 doc-section doc-section-examples">
-<h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
+<h3 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h3>
 <p>Let’s look at how the <code>DraftValidation</code> class can be used to draft a validation plan for a table. The table to be used is <code>"nycflights"</code>, which is available here via the <a href="../reference/load_dataset.html#pointblank.load_dataset"><code>load_dataset()</code></a> function. The model to be used is <code>"anthropic:claude-3-5-sonnet-latest"</code> (which performs very well compared to other LLMs). The example assumes that the API key is stored in an <code>.env</code> file as <code>ANTHROPIC_API_KEY</code>.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>

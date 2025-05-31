@@ -176,7 +176,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
         <nav id="TOC" role="doc-toc" class="toc-active">
-    <h2 id="toc-title">On this page</h2>
+    <h3 id="toc-title">On this page</h3>
    
   <ul>
   <li><a href="#pointblank.FinalActions" id="toc-pointblank.FinalActions" class="nav-link active" data-scroll-target="#pointblank.FinalActions">FinalActions</a>
@@ -198,13 +198,13 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 
 
 <section id="pointblank.FinalActions" class="level1">
-<h1 style="font-family: SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace; font-size: 1.25rem;">FinalActions<span style="font-size: 0.75rem; border-style: solid; border-width: 2px; border-color: darkgreen; background-color: #E3FEE3; margin-left: 12px;"><code style="background-color: transparent; color: darkgreen;">class</code></span></h1>
+<h1 style="font-family: SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace; font-size: 1.25rem;">FinalActions</h1>
 <div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>FinalActions(<span class="op">*</span>args)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p style="font-size: 20px; font-style: italic;">Define actions to be taken after validation is complete.</p>
 <p>Final actions are executed after all validation steps have been completed. They provide a mechanism to respond to the overall validation results, such as sending alerts when critical failures are detected or generating summary reports.</p>
 <section id="parameters" class="level2 doc-section doc-section-parameters">
-<h2 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters">Parameters</h2>
-<dl>
+<h3 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters">Parameters</h3>
+<dl style="border-style: solid; border-width: 2px; border-color: #00AC1480; padding: 1rem;">
 <dt><code><span class="parameter-name">*<strong>actions</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"></span></code></dt>
 <dd>
 <p>One or more actions to execute after validation. An action can be (1) a callable function that will be executed with no arguments, or (2) a string message that will be printed to the console.</p>
@@ -212,8 +212,8 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </dl>
 </section>
 <section id="returns" class="level2 doc-section doc-section-returns">
-<h2 class="doc-section doc-section-returns anchored" data-anchor-id="returns">Returns</h2>
-<dl>
+<h3 class="doc-section doc-section-returns anchored" data-anchor-id="returns">Returns</h3>
+<dl style="border-style: solid; border-width: 2px; border-color: #0059AC80; padding: 1rem;">
 <dt><code><span class="parameter-name"></span> <span class="parameter-annotation-sep" style="margin-left: -8px;"></span> <span class="parameter-annotation"><a href="../reference/FinalActions.html#pointblank.FinalActions">FinalActions</a></span></code></dt>
 <dd>
 <p>An <code>FinalActions</code> object. This can be used when using the <a href="../reference/Validate.html#pointblank.Validate"><code>Validate</code></a> class (to set final actions for the validation workflow).</p>
@@ -221,7 +221,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </dl>
 </section>
 <section id="types-of-actions" class="level2 doc-section doc-section-types-of-actions">
-<h2 class="doc-section doc-section-types-of-actions anchored" data-anchor-id="types-of-actions">Types of Actions</h2>
+<h3 class="doc-section doc-section-types-of-actions anchored" data-anchor-id="types-of-actions">Types of Actions</h3>
 <p>Final actions can be defined in two different ways:</p>
 <ol type="1">
 <li><strong>String</strong>: A message to be displayed when the validation is complete.</li>
@@ -230,11 +230,11 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <p>The actions are executed at the end of the validation workflow. When providing a string, it will simply be printed to the console. A callable will also be executed at the time of validation completion. Several strings and callables can be provided to the <code>FinalActions</code> class, and they will be executed in the order they are provided.</p>
 </section>
 <section id="crafting-callables-with-get_validation_summary" class="level2 doc-section doc-section-crafting-callables-with-getvalidationsummary">
-<h2 class="doc-section doc-section-crafting-callables-with-getvalidationsummary anchored" data-anchor-id="crafting-callables-with-get_validation_summary">Crafting Callables with <code>get_validation_summary()</code></h2>
+<h3 class="doc-section doc-section-crafting-callables-with-getvalidationsummary anchored" data-anchor-id="crafting-callables-with-get_validation_summary">Crafting Callables with <code>get_validation_summary()</code></h3>
 <p>When creating a callable function to be used as a final action, you can use the <a href="../reference/get_validation_summary.html#pointblank.get_validation_summary"><code>get_validation_summary()</code></a> function to retrieve the summary of the validation results. This summary contains information about the validation workflow, including the number of test units, the number of failing test units, and the threshold levels that were exceeded. You can use this information to craft your final action message or to take specific actions based on the validation results.</p>
 </section>
 <section id="examples" class="level2 doc-section doc-section-examples">
-<h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
+<h3 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h3>
 <p>Final actions provide a powerful way to respond to the overall results of a validation workflow. They’re especially useful for sending notifications, generating reports, or taking corrective actions based on the complete validation outcome.</p>
 <p>The following example shows how to create a final action that checks for critical failures and sends an alert:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
@@ -268,7 +268,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section id="see-also" class="level2 doc-section doc-section-see-also">
-<h2 class="doc-section doc-section-see-also anchored" data-anchor-id="see-also">See Also</h2>
+<h3 class="doc-section doc-section-see-also anchored" data-anchor-id="see-also">See Also</h3>
 <p>The <a href="../reference/get_validation_summary.html#pointblank.get_validation_summary"><code>get_validation_summary()</code></a> function, which can be used to retrieve the summary of the validation results.</p>
 
 

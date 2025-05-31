@@ -176,7 +176,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
         <nav id="TOC" role="doc-toc" class="toc-active">
-    <h2 id="toc-title">On this page</h2>
+    <h3 id="toc-title">On this page</h3>
    
   <ul>
   <li><a href="#pointblank.get_validation_summary" id="toc-pointblank.get_validation_summary" class="nav-link active" data-scroll-target="#pointblank.get_validation_summary">get_validation_summary</a>
@@ -196,13 +196,13 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 
 
 <section id="pointblank.get_validation_summary" class="level1">
-<h1 style="font-family: SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace; font-size: 1.25rem;">get_validation_summary<span style="font-size: 0.75rem; border-style: solid; border-width: 2px; border-color: darkorange; background-color: #FFF1E0; margin-left: 12px;"><code style="background-color: transparent; color: darkorange;">function</code></span></h1>
+<h1 style="font-family: SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace; font-size: 1.25rem;">get_validation_summary</h1>
 <div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>get_validation_summary()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p style="font-size: 20px; font-style: italic;">Access validation summary information when authoring final actions.</p>
 <p>This function provides a convenient way to access summary information about the validation process within a final action. It returns a dictionary with key metrics from the validation process. This function can only be used within callables crafted for the <a href="../reference/FinalActions.html#pointblank.FinalActions"><code>FinalActions</code></a> class.</p>
 <section id="returns" class="level2 doc-section doc-section-returns">
-<h2 class="doc-section doc-section-returns anchored" data-anchor-id="returns">Returns</h2>
-<dl>
+<h3 class="doc-section doc-section-returns anchored" data-anchor-id="returns">Returns</h3>
+<dl style="border-style: solid; border-width: 2px; border-color: #00AC1480; padding: 1rem;">
 <dt><code><span class="parameter-name"></span> <span class="parameter-annotation-sep" style="margin-left: -8px;"></span> <span class="parameter-annotation"><code>dict</code> | None</span></code></dt>
 <dd>
 <p>A dictionary containing validation metrics. If called outside of an final action context, this function will return <code>None</code>.</p>
@@ -210,7 +210,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </dl>
 </section>
 <section id="description-of-the-summary-fields" class="level2 doc-section doc-section-description-of-the-summary-fields">
-<h2 class="doc-section doc-section-description-of-the-summary-fields anchored" data-anchor-id="description-of-the-summary-fields">Description of the Summary Fields</h2>
+<h3 class="doc-section doc-section-description-of-the-summary-fields anchored" data-anchor-id="description-of-the-summary-fields">Description of the Summary Fields</h3>
 <p>The summary dictionary contains the following fields:</p>
 <ul>
 <li><code>n_steps</code> (<code>int</code>): The total number of validation steps.</li>
@@ -239,7 +239,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <p>Note that the summary dictionary is only available within the context of a final action. If called outside of a final action (i.e., when no final action is being executed), this function will return <code>None</code>.</p>
 </section>
 <section id="examples" class="level2 doc-section doc-section-examples">
-<h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
+<h3 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h3>
 <p>Final actions are executed after the completion of all validation steps. They provide an opportunity to take appropriate actions based on the overall validation results. Here’s an example of a final action function (<code>send_report()</code>) that sends an alert when critical validation failures are detected:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -279,7 +279,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <p>Final actions work well with both simple logging and more complex notification systems, allowing you to integrate validation results into your broader data quality workflows.</p>
 </section>
 <section id="see-also" class="level2 doc-section doc-section-see-also">
-<h2 class="doc-section doc-section-see-also anchored" data-anchor-id="see-also">See Also</h2>
+<h3 class="doc-section doc-section-see-also anchored" data-anchor-id="see-also">See Also</h3>
 <p>Have a look at <a href="../reference/FinalActions.html#pointblank.FinalActions"><code>FinalActions</code></a> for more information on how to create custom actions that are executed after all validation steps have been completed.</p>
 
 

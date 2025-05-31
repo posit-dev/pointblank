@@ -179,7 +179,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
         <nav id="TOC" role="doc-toc" class="toc-active">
-    <h2 id="toc-title">On this page</h2>
+    <h3 id="toc-title">On this page</h3>
    
   <ul>
   <li><a href="#parameters" id="toc-parameters" class="nav-link active" data-scroll-target="#parameters">Parameters</a></li>
@@ -215,8 +215,8 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <p style="font-size: 20px; font-style: italic;">Create a column expression for use in <code>conjointly()</code> validation.</p>
 <p>This function returns a ColumnExpression object that supports operations like <code>&gt;</code>, <code>&lt;</code>, <code>+</code>, etc. for use in <a href="../reference/Validate.conjointly.html#pointblank.Validate.conjointly"><code>conjointly()</code></a> validation expressions.</p>
 <section id="parameters" class="level2 doc-section doc-section-parameters">
-<h2 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters">Parameters</h2>
-<dl>
+<h3 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters">Parameters</h3>
+<dl style="border-style: solid; border-width: 2px; border-color: #00AC1480; padding: 1rem;">
 <dt><code><span class="parameter-name"><strong>column_name</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><code>str</code></span></code></dt>
 <dd>
 <p>The name of the column to reference.</p>
@@ -224,8 +224,8 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </dl>
 </section>
 <section id="returns" class="level2 doc-section doc-section-returns">
-<h2 class="doc-section doc-section-returns anchored" data-anchor-id="returns">Returns</h2>
-<dl>
+<h3 class="doc-section doc-section-returns anchored" data-anchor-id="returns">Returns</h3>
+<dl style="border-style: solid; border-width: 2px; border-color: #0059AC80; padding: 1rem;">
 <dt><code><span class="parameter-name"></span> <span class="parameter-annotation-sep" style="margin-left: -8px;"></span> <span class="parameter-annotation"><code>ColumnExpression</code></span></code></dt>
 <dd>
 <p>A column expression that can be used in comparisons and operations.</p>
@@ -233,7 +233,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </dl>
 </section>
 <section id="examples" class="level2 doc-section doc-section-examples">
-<h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
+<h3 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h3>
 <p>Let’s say we have a table with three columns: <code>a</code>, <code>b</code>, and <code>c</code>. We want to validate that:</p>
 <ul>
 <li>The values in column <code>a</code> are greater than <code>2</code>.</li>
@@ -241,7 +241,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <li>The sum of columns <code>a</code> and <code>b</code> is less than the values in column <code>c</code>.</li>
 </ul>
 <p>We can use the <code>expr_col()</code> function to create a column expression for each of these conditions.</p>
-<div id="3bd3f87b" class="cell" data-execution_count="2">
+<div id="3efbd48c" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -407,7 +407,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <p>The above code creates a validation object that checks the specified conditions using the <code>expr_col()</code> function. The resulting validation table will show whether each condition was satisfied for each row in the table.</p>
 </section>
 <section id="see-also" class="level2 doc-section doc-section-see-also">
-<h2 class="doc-section doc-section-see-also anchored" data-anchor-id="see-also">See Also</h2>
+<h3 class="doc-section doc-section-see-also anchored" data-anchor-id="see-also">See Also</h3>
 <p>The <a href="../reference/Validate.conjointly.html#pointblank.Validate.conjointly"><code>conjointly()</code></a> validation method, which is where this function should be used.</p>
 
 

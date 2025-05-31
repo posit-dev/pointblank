@@ -176,7 +176,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
         <nav id="TOC" role="doc-toc" class="toc-active">
-    <h2 id="toc-title">On this page</h2>
+    <h3 id="toc-title">On this page</h3>
    
   <ul>
   <li><a href="#pointblank.send_slack_notification" id="toc-pointblank.send_slack_notification" class="nav-link active" data-scroll-target="#pointblank.send_slack_notification">send_slack_notification</a>
@@ -198,7 +198,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 
 
 <section id="pointblank.send_slack_notification" class="level1">
-<h1 style="font-family: SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace; font-size: 1.25rem;">send_slack_notification<span style="font-size: 0.75rem; border-style: solid; border-width: 2px; border-color: darkorange; background-color: #FFF1E0; margin-left: 12px;"><code style="background-color: transparent; color: darkorange;">function</code></span></h1>
+<h1 style="font-family: SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace; font-size: 1.25rem;">send_slack_notification</h1>
 <div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>send_slack_notification(</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    webhook_url<span class="op">=</span><span class="va">None</span>,</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    step_msg<span class="op">=</span><span class="va">None</span>,</span>
@@ -213,8 +213,8 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </ol>
 <p>The function creates a callable that sends notifications through a Slack webhook. Message formatting can be customized using templates for both individual steps and summary reports.</p>
 <section id="parameters" class="level2 doc-section doc-section-parameters">
-<h2 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters">Parameters</h2>
-<dl>
+<h3 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters">Parameters</h3>
+<dl style="border-style: solid; border-width: 2px; border-color: #00AC1480; padding: 1rem;">
 <dt><code><span class="parameter-name"><strong>webhook_url</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><code>str</code> | None</span> <span class="parameter-default-sep">=</span> <span class="parameter-default">None</span></code></dt>
 <dd>
 <p>The Slack webhook URL. If <code>None</code> (and <code>debug=True</code>), a dry run is performed (see the <em>Offline Testing</em> section below for information on this).</p>
@@ -234,8 +234,8 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </dl>
 </section>
 <section id="returns" class="level2 doc-section doc-section-returns">
-<h2 class="doc-section doc-section-returns anchored" data-anchor-id="returns">Returns</h2>
-<dl>
+<h3 class="doc-section doc-section-returns anchored" data-anchor-id="returns">Returns</h3>
+<dl style="border-style: solid; border-width: 2px; border-color: #0059AC80; padding: 1rem;">
 <dt><code><span class="parameter-name"></span> <span class="parameter-annotation-sep" style="margin-left: -8px;"></span> <span class="parameter-annotation"><code>Callable</code></span></code></dt>
 <dd>
 <p>A function that sends notifications to Slack.</p>
@@ -243,7 +243,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </dl>
 </section>
 <section id="available-template-variables-for-step-notifications" class="level2 doc-section doc-section-available-template-variables-for-step-notifications">
-<h2 class="doc-section doc-section-available-template-variables-for-step-notifications anchored" data-anchor-id="available-template-variables-for-step-notifications">Available Template Variables for Step Notifications</h2>
+<h3 class="doc-section doc-section-available-template-variables-for-step-notifications anchored" data-anchor-id="available-template-variables-for-step-notifications">Available Template Variables for Step Notifications</h3>
 <p>When creating a custom template for validation step alerts (<code>step_msg=</code>), the following templating strings can be used:</p>
 <ul>
 <li><code>"{step}"</code>: The step number.</li>
@@ -269,7 +269,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <p>This template will be filled with the relevant information when a validation step fails. The placeholders will be replaced with actual values when the Slack notification is sent.</p>
 </section>
 <section id="available-template-variables-for-summary-notifications" class="level2 doc-section doc-section-available-template-variables-for-summary-notifications">
-<h2 class="doc-section doc-section-available-template-variables-for-summary-notifications anchored" data-anchor-id="available-template-variables-for-summary-notifications">Available Template Variables for Summary Notifications</h2>
+<h3 class="doc-section doc-section-available-template-variables-for-summary-notifications anchored" data-anchor-id="available-template-variables-for-summary-notifications">Available Template Variables for Summary Notifications</h3>
 <p>When creating a custom template for a validation summary (<code>summary_msg=</code>), the following templating strings can be used:</p>
 <ul>
 <li><code>"{n_steps}"</code>: The total number of validation steps.</li>
@@ -311,7 +311,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <p>This template will be filled with the relevant information when the validation summary is generated. The placeholders will be replaced with actual values when the Slack notification is sent.</p>
 </section>
 <section id="offline-testing" class="level2 doc-section doc-section-offline-testing">
-<h2 class="doc-section doc-section-offline-testing anchored" data-anchor-id="offline-testing">Offline Testing</h2>
+<h3 class="doc-section doc-section-offline-testing anchored" data-anchor-id="offline-testing">Offline Testing</h3>
 <p>If you want to test the function without sending actual notifications, you can leave the <code>webhook_url=</code> as <code>None</code> and set <code>debug=True</code>. This will print the message to the console instead of sending it to Slack. This is useful for debugging and ensuring that your templates are formatted correctly. Furthermore, the function could be run globally (i.e., outside of the context of a validation plan) to show the message templates with all possible variables. Here’s an example of how to do this:</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -345,7 +345,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <p>These templates will be used with sample data when the function is called. The combination of <code>webhook_url=None</code> and <code>debug=True</code> allows you to test your custom templates without having to send actual notifications to Slack.</p>
 </section>
 <section id="examples" class="level2 doc-section doc-section-examples">
-<h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
+<h3 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h3>
 <p>When using an action with one or more validation steps, you typically provide callables that fire when a matched threshold of failed test units is exceeded. The callable can be a function or a lambda. The <code>send_slack_notification()</code> function creates a callable that sends a Slack notification when the validation step fails. Here is how it can be set up to work for multiple validation steps by using of <a href="../reference/Actions.html#pointblank.Actions">Actions</a>:</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>

@@ -176,7 +176,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
         <nav id="TOC" role="doc-toc" class="toc-active">
-    <h2 id="toc-title">On this page</h2>
+    <h3 id="toc-title">On this page</h3>
    
   <ul>
   <li><a href="#pointblank.DataScan" id="toc-pointblank.DataScan" class="nav-link active" data-scroll-target="#pointblank.DataScan">DataScan</a>
@@ -198,7 +198,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 
 
 <section id="pointblank.DataScan" class="level1">
-<h1 style="font-family: SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace; font-size: 1.25rem;">DataScan<span style="font-size: 0.75rem; border-style: solid; border-width: 2px; border-color: darkgreen; background-color: #E3FEE3; margin-left: 12px;"><code style="background-color: transparent; color: darkgreen;">class</code></span></h1>
+<h1 style="font-family: SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace; font-size: 1.25rem;">DataScan</h1>
 <div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>DataScan(data, tbl_name<span class="op">=</span><span class="va">None</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p style="font-size: 20px; font-style: italic;">Get a summary of a dataset.</p>
 <p>The <code>DataScan</code> class provides a way to get a summary of a dataset. The summary includes the following information:</p>
@@ -231,8 +231,8 @@ Warning
 </div>
 </div>
 <section id="parameters" class="level2 doc-section doc-section-parameters">
-<h2 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters">Parameters</h2>
-<dl>
+<h3 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters">Parameters</h3>
+<dl style="border-style: solid; border-width: 2px; border-color: #00AC1480; padding: 1rem;">
 <dt><code><span class="parameter-name"><strong>data</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><code>IntoFrameT</code></span></code></dt>
 <dd>
 <p>The data to scan and summarize.</p>
@@ -244,7 +244,7 @@ Warning
 </dl>
 </section>
 <section id="measures-of-missingness-and-distinctness" class="level2 doc-section doc-section-measures-of-missingness-and-distinctness">
-<h2 class="doc-section doc-section-measures-of-missingness-and-distinctness anchored" data-anchor-id="measures-of-missingness-and-distinctness">Measures of Missingness and Distinctness</h2>
+<h3 class="doc-section doc-section-measures-of-missingness-and-distinctness anchored" data-anchor-id="measures-of-missingness-and-distinctness">Measures of Missingness and Distinctness</h3>
 <p>For each column, the following measures are provided:</p>
 <ul>
 <li><code>n_missing_values</code>: the number of missing values in the column</li>
@@ -255,7 +255,7 @@ Warning
 <p>The fractions are calculated as the ratio of the measure to the total number of rows in the dataset.</p>
 </section>
 <section id="counts-and-fractions-of-negative-zero-and-positive-values" class="level2 doc-section doc-section-counts-and-fractions-of-negative-zero-and-positive-values">
-<h2 class="doc-section doc-section-counts-and-fractions-of-negative-zero-and-positive-values anchored" data-anchor-id="counts-and-fractions-of-negative-zero-and-positive-values">Counts and Fractions of Negative, Zero, and Positive Values</h2>
+<h3 class="doc-section doc-section-counts-and-fractions-of-negative-zero-and-positive-values anchored" data-anchor-id="counts-and-fractions-of-negative-zero-and-positive-values">Counts and Fractions of Negative, Zero, and Positive Values</h3>
 <p>For numerical columns, the following measures are provided:</p>
 <ul>
 <li><code>n_negative_values</code>: the number of negative values in the column</li>
@@ -268,7 +268,7 @@ Warning
 <p>The fractions are calculated as the ratio of the measure to the total number of rows in the dataset.</p>
 </section>
 <section id="statistics-for-numerical-and-string-columns" class="level2 doc-section doc-section-statistics-for-numerical-and-string-columns">
-<h2 class="doc-section doc-section-statistics-for-numerical-and-string-columns anchored" data-anchor-id="statistics-for-numerical-and-string-columns">Statistics for Numerical and String Columns</h2>
+<h3 class="doc-section doc-section-statistics-for-numerical-and-string-columns anchored" data-anchor-id="statistics-for-numerical-and-string-columns">Statistics for Numerical and String Columns</h3>
 <p>For numerical and string columns, several statistical measures are provided. Please note that for string columms, the statistics are based on the lengths of the strings in the column.</p>
 <p>The following descriptive statistics are provided:</p>
 <ul>
@@ -288,7 +288,7 @@ Warning
 </ul>
 </section>
 <section id="statistics-for-date-and-datetime-columns" class="level2 doc-section doc-section-statistics-for-date-and-datetime-columns">
-<h2 class="doc-section doc-section-statistics-for-date-and-datetime-columns anchored" data-anchor-id="statistics-for-date-and-datetime-columns">Statistics for Date and Datetime Columns</h2>
+<h3 class="doc-section doc-section-statistics-for-date-and-datetime-columns anchored" data-anchor-id="statistics-for-date-and-datetime-columns">Statistics for Date and Datetime Columns</h3>
 <p>For date/datetime columns, the following statistics are provided:</p>
 <ul>
 <li><code>min</code>: the minimum date/datetime in the column</li>
@@ -296,8 +296,8 @@ Warning
 </ul>
 </section>
 <section id="returns" class="level2 doc-section doc-section-returns">
-<h2 class="doc-section doc-section-returns anchored" data-anchor-id="returns">Returns</h2>
-<dl>
+<h3 class="doc-section doc-section-returns anchored" data-anchor-id="returns">Returns</h3>
+<dl style="border-style: solid; border-width: 2px; border-color: #0059AC80; padding: 1rem;">
 <dt><code><span class="parameter-name"></span> <span class="parameter-annotation-sep" style="margin-left: -8px;"></span> <span class="parameter-annotation"><a href="../reference/DataScan.html#pointblank.DataScan">DataScan</a></span></code></dt>
 <dd>
 <p>A DataScan object.</p>
