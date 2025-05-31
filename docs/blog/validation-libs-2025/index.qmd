@@ -1,0 +1,386 @@
+---
+jupyter: python3
+html-table-processing: none
+title: "Validation Libraries for Polars (2025 Edition)"
+author: Rich Iannone
+date: 2025-06-01
+freeze: true
+---
+
+Data validation is a very important part of any data pipeline. And with Polars gaining popularity as
+a superfast DataFrame library, developers need validation tools that work seamlessly with it. In
+this survey (conducted halfway through 2025) we'll explore four Python validation libraries that
+support Polars DataFrames. Each one is sufficiently different enough from another, and so they each
+bring their own strengths and ideal use cases to the table.
+
+The Python libraries we're covering are:
+
+1. Pandera
+2. Patito
+3. Pointblank
+4. Validoopsie
+
+We'll run through a number of examples with each of the libraries, using this Polars DataFrame as
+the table to validate:
+
+```{python}
+import polars as pl
+
+# Standard dataset for all validation examples
+user_data = pl.DataFrame({
+    "user_id": [1, 2, 3, 4, 5],
+    "age": [25, 30, 22, 45, 95],  # <- includes a very high age
+    "email": [
+        "user1@example.com", "user2@example.com", "invalid-email",  # <- has an invalid email
+        "user4@example.com", "user5@example.com"
+    ],
+    "score": [85.5, 92.0, 78.3, 88.7, 95.2]
+})
+```
+
+We'll try to run the same data validation across the surveyed libraries, so we'll check:
+
+- the schema
+- that `user_id` values are greater than `0`
+- that `age` values are between `18` and `80` (inclusive)
+- that `email` strings match to an email-checking regex
+- that `score` is between `0` and `100` (again with inclusive bounds)
+
+Now let's begin by looking at Pandera.
+
+## 1. Pandera: Schema-First Validation with Statistical Checks
+
+Pandera is a statistical data validation toolkit designed to provide a flexible and expressive API
+for performing data validation on dataframe-like objects. The library centers on schema-first
+validation, where you define the expected structure and constraints of your data upfront. You can
+enable both runtime validation and static type checking integration. Pandera added Polars support in
+version `0.19.0` (early 2024).
+
+### Example
+
+```{python}
+import pandera.polars as pa
+
+# Define schema using our standard dataset
+schema = pa.DataFrameSchema({
+    "user_id": pa.Column(pl.Int64, checks=pa.Check.gt(0)),
+    "age": pa.Column(pl.Int64, checks=[pa.Check.ge(18), pa.Check.le(80)]),
+    "email": pa.Column(pl.Utf8, checks=pa.Check.str_matches(r"^[^@]+@[^@]+\.[^@]+$")),
+    "score": pa.Column(pl.Float64, checks=pa.Check.in_range(0, 100))
+})
+
+# Validate the schema
+try:
+    validated_data = schema.validate(user_data)
+    print("Validation successful!")
+except pa.errors.SchemaError as e:
+    print(f"Validation failed: {e}")
+```
+
+This example demonstrates Pandera's declarative approach, where you define what your data should
+look like rather than writing imperative validation logic. The schema acts as both documentation and
+as a validation contract. Notice how multiple checks can be applied to a single column (here, the
+`age` column receives two checks), and the validation either succeeds completely or provides
+error information about what failed.
+
+### Comparisons
+
+Both Pandera and Patito use declarative, schema-first approaches, but differ in their design
+philosophies:
+
+- Pandera uses a dictionary-like schema structure with Column objects, focusing on statistical
+validation capabilities
+- Patito uses Pydantic model classes, focusing on integration with existing Pydantic workflows
+- a key behavioral difference: Patito reports all validation errors in a single pass, while Pandera
+stops at the first failure
+
+The choice between them often comes down to whether you prefer Pandera's statistical focus or
+Patito's Pydantic integration.
+
+Unlike Pointblank's step-by-step validation reporting, Pandera validates the entire schema at once.
+Compared to Patito's model-based approach, Pandera focuses more on statistical validation
+capabilities. Unlike Validoopsie's and Pointblank's functional composition, Pandera uses a more
+declarative, schema-centric approach.
+
+### Unique Strengths and When to Use
+
+Here are some of stand-out features that Pandera has:
+
+- type-safe schema definitions with `mypy` integration
+- statistical hypothesis testing for data distributions
+- excellent integration with Pandas, Polars, and Arrow support
+- declarative schema syntax that serves as documentation
+- built-in support for data coercion and transformation
+
+Data practitioners should choose Pandera when building type-safe data pipelines where schema
+validation is critical, especially in data science workflows that require statistical validation.
+It's ideal for users that value static type checking, need to validate statistical properties of
+their data, or want schemas that double as documentation.
+
+Pandera also excels in environments where data contracts between teams are important and where the
+statistical properties of data matter as much as basic type checking.
+
+## 2. Patito: Pydantic-Style Data Models for DataFrames
+
+Patito brings Pydantic's well-received model-based validation approach to DataFrame validation,
+creating a bridge between API data validation and DataFrame processing. The library's primary goal
+is to provide a familiar, Pydantic-style interface for defining and validating DataFrame schemas,
+making it particularly appealing to developers already using Pydantic in their applications.
+
+Patito launched with Polars support from the beginning (in late 2022). Native Polars integration is
+touted as one of its core features, reflecting the growing adoption of Polars in the Python
+ecosystem.
+
+### Example
+
+```{python}
+import patito as pt
+from typing import Annotated
+
+class UserModel(pt.Model):
+    user_id: int = pt.Field(gt=0)
+    age: Annotated[int, pt.Field(ge=18, le=80)]
+    email: str = pt.Field(pattern=r"^[^@]+@[^@]+\.[^@]+$")
+    score: float = pt.Field(ge=0.0, le=100.0)
+
+# Validate using the model
+try:
+    UserModel.validate(user_data)
+    print("Validation successful!")
+except pt.exceptions.DataFrameValidationError as e:
+    print(f"Validation failed: {e}")
+```
+
+This example showcases Patito's model-centric approach where validation rules are embedded in class
+definitions. The use of Python's type hints and Pydantic's Field syntax makes the validation rules
+self-documenting. Notably, Patito reports all validation errors at once, providing a fairly
+comprehensive view of data quality issues, whereas other libraries (e.g., Pandera) stop at the first
+failure.
+
+### Column Validation Approaches: Pandera vs Patito
+
+**Pandera offers a much more extensive and flexible system for column validation** compared to
+Patito's field-based approach. While Patito provides a solid set of built-in field constraints
+(like `gt`, `le`, `regex`, `unique`, etc.) that cover common validation scenarios, Pandera's Check
+system is designed for both simple and highly sophisticated validation logic.
+
+The key architectural difference seems to lie in extensibility and complexity. Pandera's `Check`
+objects accept arbitrary functions, allowing you to write custom validation logic that can be as
+simple as `lambda s: s > 0` or as complex as statistical hypothesis tests using scipy. You can
+create vectorized checks that operate on entire Series objects for performance, element-wise checks
+for atomic validation, and even grouped checks that validate subsets of data based on other columns.
+Patito's `Field` constraints, while clean and declarative, are more limited to the predefined
+validation types that Pydantic and Patito provide.
+
+Pandera also supports advanced validation patterns that Patito doesn't directly offer, such as
+wide-form data checks (validating relationships across multiple columns), grouped validation (where
+checks are applied to subsets of data based on grouping columns), and the ability to raise warnings
+instead of errors for non-critical validation failures. While Patito does support custom constraints
+through Polars expressions via the `constraints` parameter, this requires knowledge of Polars
+expression syntax and, depending on where you're coming from, could be less intuitive than Pandera's
+function-based approach.
+
+For most common validation scenarios, Patito's field-based validation is simpler and more readable,
+especially for teams already familiar with Pydantic. However, for complex data validation
+requirements, statistical validation, or when you need maximum flexibility in defining validation
+logic, Pandera's Check system provides significantly more power and extensibility.
+
+### Unique Strengths and When to Use
+
+- Pydantic-style model definitions with familiar syntax for Pydantic users
+- automatic serialization/deserialization between formats
+- rich type system integration with Python's typing system
+- model inheritance and composition for complex data structures
+- seamless integration with existing Pydantic-based applications
+- built-in support for nested data structures and complex types
+
+People should choose Patito when they're already using Pydantic in their applications and want
+consistent validation patterns across APIs and data processing. It's good for teams building data
+applications where DataFrame validation needs to integrate with web APIs, or when you need to
+serialize/deserialize data between different formats while maintaining validation guarantees.
+Patito is also great for model-driven development workflows where data models serve multiple
+purposes beyond just validation.
+
+## 3. Pointblank: Comprehensive Validation with Beautiful Reports
+
+Pointblank is a comprehensive data validation framework designed to make data quality assessment
+both thorough and accessible to stakeholders. Originally inspired by the R package of the same name,
+Pointblank's primary mission is to provide validation workflows that generate beautiful, interactive
+reports that can be shared with both technical and non-technical team members.
+
+Pointblank launched with Polars support as a core feature from its initial Python release in late
+2024, built on top of the Narwhals and Ibis compatibility layers to provide consistent DataFrame
+operations across multiple backends including Polars, Pandas, and database connections.
+
+### Example
+
+```{python}
+import pointblank as pb
+
+schema = pb.Schema(
+    columns=[("user_id", "Int64"), ("age", "Int64"), ("email", "String"), ("score", "Float64")]
+)
+
+validation = (
+    pb.Validate(data=user_data, label="An example.", tbl_name="users", thresholds=(0.1, 0.2, 0.3))
+    .col_vals_gt(columns="user_id", value=0)
+    .col_vals_between(columns="age", left=18, right=80)
+    .col_vals_regex(columns="email", pattern=r"^[^@]+@[^@]+\.[^@]+$")
+    .col_vals_between(columns="score", left=0, right=100)
+    .col_schema_match(schema=schema)
+    .interrogate()
+)
+
+validation
+```
+
+This example demonstrates Pointblank's chainable validation approach where each validation step is
+clearly defined and can be configured with different threshold levels. The resulting validation
+object provides rich, interactive reporting that shows not just what passed or failed, but detailed
+statistics about the validation process. The threshold system allows for nuanced responses to data
+quality issues.
+
+### Comparisons
+
+Unlike Pandera's schema-first approach, Pointblank focuses on step-by-step validation with detailed
+reporting. Compared to the other frameworks surveyed here, Pointblank provides much richer reporting
+and analysis capabilities. And while the API shares much with Validoopsie's compositional approach,
+Pointblank emphasizes stakeholder communication through reporting and comprehensive data quality
+assessment.
+
+### Unique Strengths and When to Use
+
+- beautiful, interactive HTML reports perfect for sharing with stakeholders
+- threshold-based alerting system with configurable actions
+- segmented validation for analyzing subsets of data
+- LLM-powered validation suggestions via `DraftValidation`
+- comprehensive data inspection tools and summary tables
+- step-by-step validation reporting with detailed failure analysis (via `.get_step_report()`)
+
+Data practitioners might want to choose Pointblank when stakeholder communication and comprehensive
+data quality reporting are priorities. Because of the reporting tables it can generate, it's
+well-suited for data teams that need to regularly report on data quality to relevant stakeholders.
+Pointblank also excels in production data monitoring scenarios, data observability workflows, and
+situations where understanding the nuances of data quality issues matters more than simple pass/fail
+validation.
+
+## 4. Validoopsie: Composable Checks
+
+Validoopsie is built around composable validation principles, providing a toolkit for creating
+reusable validation functions organized into logical modules. The library's emphasizes the building
+of validation logic from modular, testable components that can be combined in flexible ways to
+create complex validation workflows. Like Pointblank, Validoopsie had Polars support from the very
+first release (early-2025).
+
+### Example
+
+```{python}
+from validoopsie import Validate
+from narwhals.dtypes import Int64, Float64, String
+
+# Composable validation checks using our standard dataset
+validation = (
+    Validate(user_data)
+    .ValuesValidation.ColumnValuesToBeBetween(
+        column="user_id",
+        min_value=0
+    )
+    .ValuesValidation.ColumnValuesToBeBetween(
+        column="age",
+        min_value=18,
+        max_value=80
+    )
+    .StringValidation.PatternMatch(
+        column="email",
+        pattern=r"^[^@]+@[^@]+\.[^@]+$"
+    )
+    .ValuesValidation.ColumnValuesToBeBetween(
+        column="score",
+        min_value=0,
+        max_value=100
+    )
+    .TypeValidation.TypeCheck(
+        frame_schema_definition={
+            "user_id": Int64,
+            "age": Int64,
+            "email": String,
+            "score": Float64
+        }
+    )
+)
+
+# Check if validation passed
+try:
+    validation.validate()
+    print("Validation successful!")
+except Exception as e:
+    print(f"Validation failed: {e}")
+```
+
+This example showcases Validoopsie's modular approach where validation rules are organized into
+namespaced categories (`ValuesValidation`, `StringValidation`, `TypeValidation`). Each validation
+type is grouped logically, making it easy to discover and use the right validation for your needs.
+The modular design promotes code organization and reusability across different validation scenarios.
+
+### Comparisons
+
+Validoopsie's functional approach contrasts with Pandera's schema-first methodology and Patito's
+object-oriented models. Unlike Pointblank's comprehensive reporting focus, Validoopsie emphasizes
+simplicity and composability. The library is more lightweight than the others but still provides a
+generous suite of validation checks.
+
+### Unique Strengths and When to Use
+
+- highly composable validation rules that can be mixed and matched
+- custom validator creation with a simple, consistent API
+- pipeline-friendly design that integrates well with data processing workflows
+- minimal dependencies and lightweight footprint
+- excellent support for creating domain-specific validation libraries
+
+Data practitioners should choose Validoopsie when they prefer a composable approach, need
+flexibility for custom validation logic, or want to build reusable validation components that can be
+shared across projects. It's great for teams that value simplicity, testability, and the ability to
+compose complex validation workflows from simple building blocks.
+
+### Comparisons
+
+Patito differs from Pandera in several key ways beyond just the Pydantic compatibility. A crucial
+difference is in error reporting behavior: Patito provides all validation errors in a single pass,
+while Pandera stops at the first validation failure. This means with Patito, you can see all the
+data quality issues at once (both the age constraint violation and the invalid email), whereas
+Pandera requires you to fix issues iteratively, running validation multiple times to discover all
+problems. This makes Patito more efficient for debugging data quality issues in development and
+testing scenarios.
+
+## Choosing the Right Library
+
+Each validation library excels in different scenarios. Here's a quick reference guide to help you
+pick the right tool for your specific needs:
+
+| Use Case                        | Recommended Library | Why?                                                |
+|---------------------------------|---------------------|-----------------------------------------------------|
+| Type-safe pipelines             | Pandera             | Strong typing, mypy integration, statistical checks |
+| Stakeholder reporting           | Pointblank          | Beautiful interactive reports, threshold management |
+| API data validation             | Patito              | Pydantic integration, serialization support         |
+| Statistical validation          | Pandera             | Hypothesis testing, distribution checks             |
+| Comprehensive data quality      | Pointblank          | Full validation workflow, segmentation, alerting    |
+| Custom validation logic         | Validoopsie         | Highly customizable, functional composition         |
+
+The way I see it is that you probably shouldn't feel locked into one choice. Many teams use
+different libraries for different parts of their data pipeline, leveraging each tool's strengths
+where they most matter. So, by extension, it's conceivable that the use of different validation
+libraries could work across projects and even within individual projects.
+
+## Summary and Wrapping Up
+
+The Python ecosystem offers truly excellent options for validating Polars DataFrames! Choosing is
+always tough but this is how one could make the decision based on specific needs:
+
+- for type-safe, statistical validation, Pandera is ideal
+- for model-driven API validation, go with Patito
+- for functional, composable validation, Validoopsie fits well
+- for data quality reporting and stakeholder communication, Pointblank is a great choice
+
+Each library has evolved to serve different aspects of the data validation ecosystem. Try them all
+and, with a little understanding of their strengths, you'll get good and picking the right
+validation tool for your specific use case.
