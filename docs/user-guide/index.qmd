@@ -76,12 +76,11 @@ Note these three key pieces in the code:
 
 - **data**: the `Validate(data=)` argument takes a DataFrame or database table that you want to validate
 - **steps**: the methods starting with `col_vals_` specify validation steps that run on specific columns
-- **execution**: the [`interrogate()`](https://posit-dev.github.io/pointblank/reference/Validate.interrogate.html)
-method executes the validation plan on the table
+- **execution**: the `Validate.interrogate()` method executes the validation plan on the table
 
 This common pattern is used in a validation workflow, where
-[`Validate`](https://posit-dev.github.io/pointblank/reference/Validate.html) and
-[`interrogate()`](https://posit-dev.github.io/pointblank/reference/Validate.interrogate.html)
+`Validate` and
+[`.interrogate()`](https://posit-dev.github.io/pointblank/reference/Validate.interrogate.html)
 bookend a validation plan generated through calling validation methods.
 
 In the next few sections we'll go a bit further by understanding how we can measure data quality and
