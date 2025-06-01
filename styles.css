@@ -179,3 +179,30 @@ a.sidebar-item-text.sidebar-link.text-start > span {
 .shrink-example .cell-output table {
     zoom: 60%;
 }
+
+.nav-footer {
+    background: linear-gradient(-45deg,
+        rgba(4, 119, 139, 0.15),
+        rgba(28, 127, 240, 0.2),
+        rgba(0, 108, 147, 0.12),
+        rgba(5, 97, 76, 0.18),
+        rgba(173, 216, 230, 0.25));
+    background-size: 400% 400%;
+    animation: footerGradient 15s ease infinite;
+    padding-top: 20px;
+    border-top-color: rgba(4, 119, 139, 0.4);
+    border-top-style: solid;
+    border-top-width: 2px;
+}
+
+@keyframes footerGradient {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
