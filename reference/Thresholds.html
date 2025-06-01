@@ -242,19 +242,19 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="examples" class="level2 doc-section doc-section-examples">
 <h3 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h3>
 <p>In a data validation workflow, you can set thresholds for the number of failing test units at different levels. For example, you can set a threshold for the ‘warning’ level when the number of failing test units exceeds 10% of the total number of test units:</p>
-<div id="13fac7da" class="cell" data-execution_count="2">
+<div id="27baee7b" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>thresholds_1 <span class="op">=</span> pb.Thresholds(warning<span class="op">=</span><span class="fl">0.1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>You can also set thresholds for the ‘error’ and ‘critical’ levels:</p>
-<div id="5661f2cd" class="cell" data-execution_count="3">
+<div id="f7df7bc4" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>thresholds_2 <span class="op">=</span> pb.Thresholds(warning<span class="op">=</span><span class="fl">0.1</span>, error<span class="op">=</span><span class="fl">0.2</span>, critical<span class="op">=</span><span class="fl">0.05</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Thresholds can also be set as absolute counts. Here’s an example where the ‘warning’ level is set to <code>5</code> failing test units:</p>
-<div id="e00ee817" class="cell" data-execution_count="4">
+<div id="e0638021" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>thresholds_3 <span class="op">=</span> pb.Thresholds(warning<span class="op">=</span><span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>The <code>thresholds</code> object can be used to set global thresholds for all validation steps. Or, you can set thresholds for individual validation steps, which will override the global thresholds. Here’s a data validation workflow example where we set global thresholds and then override with different thresholds at the <a href="../reference/Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt"><code>col_vals_gt()</code></a> step:</p>
-<div id="d3a7c233" class="cell" data-execution_count="5">
+<div id="782f3d61" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>        data<span class="op">=</span>pb.load_dataset(dataset<span class="op">=</span><span class="st">"small_table"</span>),</span>
@@ -909,7 +909,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <footer class="footer">
   <div class="nav-footer">
     <div class="nav-footer-left">
-<p>Proudly supported by <a href="https://www.posit.co/" class="no-icon"><img src="../images/posit-logo-black.svg" alt="Posit" width="80" style="padding-left: 3px;vertical-align:text-top;"></a></p>
+<p>Proudly supported by <a href="https://www.posit.co/" class="no-icon"><img src="../assets/posit-logo-black.svg" alt="Posit" width="80" style="padding-left: 3px;vertical-align:text-top;"></a></p>
 </div>   
     <div class="nav-footer-center">
       &nbsp;
