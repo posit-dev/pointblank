@@ -172,6 +172,13 @@ a.sidebar-item-text.sidebar-link.text-start > span {
 	}
 }
 
+.nav-link.active {
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-decoration-color: rgba(101, 180, 237, 0.75);
+    text-underline-offset: 4px;
+}
+
 #navbarCollapse > ul.navbar-nav.navbar-nav-scroll.ms-auto > li {
     padding-right: 5px
 }
@@ -193,6 +200,14 @@ a.sidebar-item-text.sidebar-link.text-start > span {
     border-top-color: rgba(4, 119, 139, 0.4);
     border-top-style: solid;
     border-top-width: 2px;
+}
+
+.nav-footer-left {
+    color: rgb(48, 48, 48);
+}
+
+.nav-footer-right {
+    color: rgb(48, 48, 48);
 }
 
 @keyframes footerGradient {

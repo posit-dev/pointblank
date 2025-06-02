@@ -199,8 +199,11 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 
 <section id="pointblank.assistant" class="level1">
 <h1 style="font-family: SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace; font-size: 1.25rem;">assistant</h1>
-<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>assistant(model, data<span class="op">=</span><span class="va">None</span>, tbl_name<span class="op">=</span><span class="va">None</span>, api_key<span class="op">=</span><span class="va">None</span>, display<span class="op">=</span><span class="va">None</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+
 <p style="font-size: 20px; font-style: italic;">Chat with the PbA (Pointblank Assistant) about your data validation needs.</p>
+
+<p style="font-size: 12px; color: rgb(170, 170, 170); margin-bottom: -14px;">USAGE</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>assistant(model, data<span class="op">=</span><span class="va">None</span>, tbl_name<span class="op">=</span><span class="va">None</span>, api_key<span class="op">=</span><span class="va">None</span>, display<span class="op">=</span><span class="va">None</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>The <code>assistant()</code> function provides an interactive chat session with the PbA (Pointblank Assistant) to help you with your data validation needs. The PbA can help you with constructing validation plans, suggesting validation methods, and providing code snippets for using the Pointblank Python package. Feel free to ask the PbA about any aspect of the Pointblank package and it will do its best to assist you.</p>
 <p>The PbA can also help you with constructing validation plans for your data tables. If you provide a data table to the PbA, it will internally generate a JSON summary of the table and use that information to suggest validation methods that can be used with the Pointblank package. If using a Polars table as the data source, the PbA will be knowledgeable about the Polars API and can smartly suggest validation steps that use aggregate measures with up-to-date Polars methods.</p>
 <p>The PbA can be used with models from the following providers:</p>

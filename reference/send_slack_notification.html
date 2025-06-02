@@ -199,13 +199,16 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 
 <section id="pointblank.send_slack_notification" class="level1">
 <h1 style="font-family: SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace; font-size: 1.25rem;">send_slack_notification</h1>
+
+<p style="font-size: 20px; font-style: italic;">Create a Slack notification function using a webhook URL.</p>
+
+<p style="font-size: 12px; color: rgb(170, 170, 170); margin-bottom: -14px;">USAGE</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>send_slack_notification(</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    webhook_url<span class="op">=</span><span class="va">None</span>,</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    step_msg<span class="op">=</span><span class="va">None</span>,</span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    summary_msg<span class="op">=</span><span class="va">None</span>,</span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    debug<span class="op">=</span><span class="va">False</span>,</span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p style="font-size: 20px; font-style: italic;">Create a Slack notification function using a webhook URL.</p>
 <p>This function can be used in two ways:</p>
 <ol type="1">
 <li>With <a href="../reference/Actions.html#pointblank.Actions"><code>Actions</code></a> to notify about individual validation step failures</li>
