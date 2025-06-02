@@ -210,7 +210,27 @@ a.sidebar-item-text.sidebar-link.text-start > span {
     color: rgb(48, 48, 48);
 }
 
+#examples {
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-top: 1px;
+    padding-bottom: 10px;
+    background-color: rgb(241, 252, 243);
+}
+
 @keyframes footerGradient {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+@keyframes examplesGradient {
     0% {
         background-position: 0% 50%;
     }
