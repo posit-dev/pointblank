@@ -257,6 +257,13 @@ class _DataProfile:  # TODO: feels redundant and weird
         self.implementation = implementation
         self.column_profiles: list[ColumnProfile] = []
 
+    def __getitem__(self, colname: str) -> ColumnProfile:
+        """Get a column profile by its name."""
+        for prof in self.column_profiles:
+            if prof.colname == colname:
+                return prof
+        raise KeyError(f"Column profile for '{colname}' not found.")
+
     def set_row_count(self, data: Frame) -> None:
         assert self.columns  # internal: cols should already be set
 
