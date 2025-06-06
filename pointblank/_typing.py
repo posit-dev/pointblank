@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import datetime
 import sys
+from collections.abc import Container
 from typing import List, Tuple, Union
 
 # Check Python version for TypeAlias support
@@ -15,6 +17,12 @@ if sys.version_info >= (3, 10):
     SegmentTuple: TypeAlias = Tuple[str, SegmentValue]
     SegmentItem: TypeAlias = Union[str, SegmentTuple]
     SegmentSpec: TypeAlias = Union[str, SegmentTuple, List[SegmentItem]]
+
+    _CompliantValue: TypeAlias = Union[str, int, float, datetime.datetime, datetime.date]
+    """A compliant value that pointblank can use in a validation step"""
+    _CompliantValues: TypeAlias = Container[_CompliantValue]
+    """A collection of compliant values that pointblank can use in a validation step"""
+
 else:
     # Python 3.8 and 3.9 compatible type aliases
     AbsoluteBounds = Tuple[int, int]
@@ -24,6 +32,10 @@ else:
     SegmentTuple = Tuple[str, SegmentValue]
     SegmentItem = Union[str, SegmentTuple]
     SegmentSpec = Union[str, SegmentTuple, List[SegmentItem]]
+    _CompliantValue = Union[str, int, float, datetime.datetime, datetime.date]
+    """A compliant value that pointblank can use in a validation step"""
+    _CompliantValues = Container[_CompliantValue]
+    """A collection of compliant values that pointblank can use in a validation step"""
 
 # Add docstrings for better IDE support
 AbsoluteBounds.__doc__ = "Absolute bounds (i.e., plus or minus)"
