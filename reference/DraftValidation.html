@@ -204,7 +204,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 
 <p style="font-size: 12px; color: rgb(170, 170, 170); margin-bottom: -14px;">USAGE</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>DraftValidation(data, model, api_key<span class="op">=</span><span class="va">None</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>By using a large language model (LLM) to draft a validation plan, you can quickly generate a starting point for validating a table. This can be useful when you have a new table and you want to get a sense of how to validate it (and adjustments could always be made later). The <code>DraftValidation</code> class uses the <code>chatlas</code> package to draft a validation plan for a given table using an LLM from either the <code>"anthropic"</code>, <code>"openai"</code>, <code>"ollama"</code> or <code>"bedrock"</code> provider. You can install all requirements for the class through an optional ‘generate’ install of Pointblank via <code>pip install pointblank[generate]</code>.</p>
+<p>By using a large language model (LLM) to draft a validation plan, you can quickly generate a starting point for validating a table. This can be useful when you have a new table and you want to get a sense of how to validate it (and adjustments could always be made later). The <a href="../reference/DraftValidation.html#pointblank.DraftValidation" title="0"><code>DraftValidation</code></a> class uses the <code>chatlas</code> package to draft a validation plan for a given table using an LLM from either the <code>"anthropic"</code>, <code>"openai"</code>, <code>"ollama"</code> or <code>"bedrock"</code> provider. You can install all requirements for the class through an optional ‘generate’ install of Pointblank via <code>pip install pointblank[generate]</code>.</p>
 <div class="callout callout-style-default callout-warning callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -215,7 +215,7 @@ Warning
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>The <code>DraftValidation</code> class is still experimental. Please report any issues you encounter in the <a href="https://github.com/posit-dev/pointblank/issues">Pointblank issue tracker</a>.</p>
+<p>The <a href="../reference/DraftValidation.html#pointblank.DraftValidation" title="0"><code>DraftValidation</code></a> class is still experimental. Please report any issues you encounter in the <a href="https://github.com/posit-dev/pointblank/issues">Pointblank issue tracker</a>.</p>
 </div>
 </div>
 <section id="parameters" class="level2 doc-section doc-section-parameters">
@@ -266,7 +266,7 @@ OPENAI_API_KEY="your_openai_api_key_here"</code></pre>
 </section>
 <section id="notes-on-data-sent-to-the-model-provider" class="level2 doc-section doc-section-notes-on-data-sent-to-the-model-provider">
 <h3 class="doc-section doc-section-notes-on-data-sent-to-the-model-provider anchored" data-anchor-id="notes-on-data-sent-to-the-model-provider">Notes on Data Sent to the Model Provider</h3>
-<p>The data sent to the model provider is a JSON summary of the table. This data summary is generated internally by <code>DraftValidation</code> using the <code>DataScan</code> class. The summary includes the following information:</p>
+<p>The data sent to the model provider is a JSON summary of the table. This data summary is generated internally by <a href="../reference/DraftValidation.html#pointblank.DraftValidation" title="0"><code>DraftValidation</code></a> using the <a href="../reference/DataScan.html#pointblank.DataScan" title="0"><code>DataScan</code></a> class. The summary includes the following information:</p>
 <ul>
 <li>the number of rows and columns in the table</li>
 <li>the type of dataset (e.g., Polars, DuckDB, Pandas, etc.)</li>
@@ -274,7 +274,7 @@ OPENAI_API_KEY="your_openai_api_key_here"</code></pre>
 <li>column level statistics such as the number of missing values, min, max, mean, and median, etc.</li>
 <li>a short list of data values in each column</li>
 </ul>
-<p>The JSON summary is used to provide the model with the necessary information to draft a validation plan. As such, even very large tables can be used with the <code>DraftValidation</code> class since the contents of the table are not sent to the model provider.</p>
+<p>The JSON summary is used to provide the model with the necessary information to draft a validation plan. As such, even very large tables can be used with the <a href="../reference/DraftValidation.html#pointblank.DraftValidation" title="0"><code>DraftValidation</code></a> class since the contents of the table are not sent to the model provider.</p>
 <p>The Amazon Bedrock is a special case since it is a self-hosted model and security controls are in place to ensure that data is kept within the user’s AWS environment. If using an Ollama model all data is handled locally, though only a few models are capable enough to perform the task of drafting a validation plan.</p>
 </section>
 <section id="examples" class="level2 doc-section doc-section-examples">
@@ -297,7 +297,7 @@ OPENAI_API_KEY="your_openai_api_key_here"</code></pre>
         margin: 10px 0;
         border-radius: 2px;
     ">
-<p>Let’s look at how the <code>DraftValidation</code> class can be used to draft a validation plan for a table. The table to be used is <code>"nycflights"</code>, which is available here via the <a href="../reference/load_dataset.html#pointblank.load_dataset"><code>load_dataset()</code></a> function. The model to be used is <code>"anthropic:claude-3-5-sonnet-latest"</code> (which performs very well compared to other LLMs). The example assumes that the API key is stored in an <code>.env</code> file as <code>ANTHROPIC_API_KEY</code>.</p>
+<p>Let’s look at how the <a href="../reference/DraftValidation.html#pointblank.DraftValidation" title="0"><code>DraftValidation</code></a> class can be used to draft a validation plan for a table. The table to be used is <code>"nycflights"</code>, which is available here via the <a href="../reference/load_dataset.html#pointblank.load_dataset"><span><code>load_dataset()</code></span></a> function. The model to be used is <code>"anthropic:claude-3-5-sonnet-latest"</code> (which performs very well compared to other LLMs). The example assumes that the API key is stored in an <code>.env</code> file as <code>ANTHROPIC_API_KEY</code>.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Load the "nycflights" dataset as a DuckDB table</span></span>
@@ -361,7 +361,7 @@ validation = (
 validation
 ```</code></pre>
 <p>The drafted validation plan can be copied and pasted into a Python script or notebook for further use. In other words, the generated plan can be adjusted as needed to suit the specific requirements of the table being validated.</p>
-<p>Note that the output does not know how the data was obtained, so it uses the placeholder <code>your_data</code> in the <code>data=</code> argument of the <code>Validate</code> class. When adapted for use, this should be replaced with the actual data variable.</p>
+<p>Note that the output does not know how the data was obtained, so it uses the placeholder <code>your_data</code> in the <code>data=</code> argument of the <a href="../reference/Validate.html#pointblank.Validate" title="0"><code>Validate</code></a> class. When adapted for use, this should be replaced with the actual data variable.</p>
 
 
 </section>

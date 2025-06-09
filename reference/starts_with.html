@@ -217,10 +217,10 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 
 <p style="font-size: 12px; color: rgb(170, 170, 170); margin-bottom: -14px;">USAGE</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>starts_with(text, case_sensitive<span class="op">=</span><span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Many validation methods have a <code>columns=</code> argument that can be used to specify the columns for validation (e.g., <a href="../reference/Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt"><code>col_vals_gt()</code></a>, <a href="../reference/Validate.col_vals_regex.html#pointblank.Validate.col_vals_regex"><code>col_vals_regex()</code></a>, etc.). The <code>starts_with()</code> selector function can be used to select one or more columns that start with some specified text. So if the set of table columns consists of</p>
+<p>Many validation methods have a <code>columns=</code> argument that can be used to specify the columns for validation (e.g., <a href="../reference/Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt"><code>col_vals_gt()</code></a>, <a href="../reference/Validate.col_vals_regex.html#pointblank.Validate.col_vals_regex"><code>col_vals_regex()</code></a>, etc.). The <a href="../reference/starts_with.html#pointblank.starts_with" title="0"><code>starts_with()</code></a> selector function can be used to select one or more columns that start with some specified text. So if the set of table columns consists of</p>
 <p><code>[name_first, name_last, age, address]</code></p>
 <p>and you want to validate columns that start with <code>"name"</code>, you can use <code>columns=starts_with("name")</code>. This will select the <code>name_first</code> and <code>name_last</code> columns.</p>
-<p>There will be a validation step created for every resolved column. Note that if there aren’t any columns resolved from using <code>starts_with()</code> (or any other expression using selector functions), the validation step will fail to be evaluated during the interrogation process. Such a failure to evaluate will be reported in the validation results but it won’t affect the interrogation process overall (i.e., the process won’t be halted).</p>
+<p>There will be a validation step created for every resolved column. Note that if there aren’t any columns resolved from using <a href="../reference/starts_with.html#pointblank.starts_with" title="0"><code>starts_with()</code></a> (or any other expression using selector functions), the validation step will fail to be evaluated during the interrogation process. Such a failure to evaluate will be reported in the validation results but it won’t affect the interrogation process overall (i.e., the process won’t be halted).</p>
 <section id="parameters" class="level2 doc-section doc-section-parameters">
 <h3 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters">Parameters</h3>
 <dl style="border-style: solid; border-width: 2px; border-color: #00AC1480; padding: 1rem; padding-bottom: 0.25rem;">
@@ -244,7 +244,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </dl>
 </section>
 <section id="relevant-validation-methods-where-starts_with-can-be-used" class="level2 doc-section doc-section-relevant-validation-methods-where-startswith-can-be-used">
-<h3 class="doc-section doc-section-relevant-validation-methods-where-startswith-can-be-used anchored" data-anchor-id="relevant-validation-methods-where-starts_with-can-be-used">Relevant Validation Methods where <code>starts_with()</code> can be Used</h3>
+<h3 class="doc-section doc-section-relevant-validation-methods-where-startswith-can-be-used anchored" data-anchor-id="relevant-validation-methods-where-starts_with-can-be-used">Relevant Validation Methods where <a href="../reference/starts_with.html#pointblank.starts_with" title="0"><code>starts_with()</code></a> can be Used</h3>
 <p>This selector function can be used in the <code>columns=</code> argument of the following validation methods:</p>
 <ul>
 <li><a href="../reference/Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt"><code>col_vals_gt()</code></a></li>
@@ -262,11 +262,11 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <li><a href="../reference/Validate.col_vals_regex.html#pointblank.Validate.col_vals_regex"><code>col_vals_regex()</code></a></li>
 <li><a href="../reference/Validate.col_exists.html#pointblank.Validate.col_exists"><code>col_exists()</code></a></li>
 </ul>
-<p>The <code>starts_with()</code> selector function doesn’t need to be used in isolation. Read the next section for information on how to compose it with other column selectors for more refined ways to select columns.</p>
+<p>The <a href="../reference/starts_with.html#pointblank.starts_with" title="0"><code>starts_with()</code></a> selector function doesn’t need to be used in isolation. Read the next section for information on how to compose it with other column selectors for more refined ways to select columns.</p>
 </section>
 <section id="additional-flexibilty-through-composition-with-other-column-selectors" class="level2 doc-section doc-section-additional-flexibilty-through-composition-with-other-column-selectors">
 <h3 class="doc-section doc-section-additional-flexibilty-through-composition-with-other-column-selectors anchored" data-anchor-id="additional-flexibilty-through-composition-with-other-column-selectors">Additional Flexibilty through Composition with Other Column Selectors</h3>
-<p>The <code>starts_with()</code> function can be composed with other column selectors to create fine-grained column selections. For example, to select columns that start with <code>"a"</code> and end with <code>"e"</code>, you can use the <code>starts_with()</code> and <a href="../reference/ends_with.html#pointblank.ends_with"><code>ends_with()</code></a> functions together. The only condition is that the expressions are wrapped in the <a href="../reference/col.html#pointblank.col"><code>col()</code></a> function, like this:</p>
+<p>The <a href="../reference/starts_with.html#pointblank.starts_with" title="0"><code>starts_with()</code></a> function can be composed with other column selectors to create fine-grained column selections. For example, to select columns that start with <code>"a"</code> and end with <code>"e"</code>, you can use the <a href="../reference/starts_with.html#pointblank.starts_with" title="0"><code>starts_with()</code></a> and <a href="../reference/ends_with.html#pointblank.ends_with"><span><code>ends_with()</code></span></a> functions together. The only condition is that the expressions are wrapped in the <a href="../reference/col.html#pointblank.col"><span><code>col()</code></span></a> function, like this:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>col(starts_with(<span class="st">"a"</span>) <span class="op">&amp;</span> ends_with(<span class="st">"e"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>There are four operators that can be used to compose column selectors:</p>
 <ul>
@@ -297,8 +297,8 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
         margin: 10px 0;
         border-radius: 2px;
     ">
-<p>Suppose we have a table with columns <code>name</code>, <code>paid_2021</code>, <code>paid_2022</code>, and <code>person_id</code> and we’d like to validate that the values in columns that start with <code>"paid"</code> are greater than <code>10</code>. We can use the <code>starts_with()</code> column selector function to specify the columns that start with <code>"paid"</code> as the columns to validate.</p>
-<div id="d79c7c01" class="cell" data-execution_count="2">
+<p>Suppose we have a table with columns <code>name</code>, <code>paid_2021</code>, <code>paid_2022</code>, and <code>person_id</code> and we’d like to validate that the values in columns that start with <code>"paid"</code> are greater than <code>10</code>. We can use the <a href="../reference/starts_with.html#pointblank.starts_with" title="0"><code>starts_with()</code></a> column selector function to specify the columns that start with <code>"paid"</code> as the columns to validate.</p>
+<div id="90de1881" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -499,8 +499,8 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 </div>
 <p>From the results of the validation table we get two validation steps, one for <code>paid_2021</code> and one for <code>paid_2022</code>. The values in both columns were all greater than <code>10</code>.</p>
-<p>We can also use the <code>starts_with()</code> function in combination with other column selectors (within <a href="../reference/col.html#pointblank.col"><code>col()</code></a>) to create more complex column selection criteria (i.e., to select columns that satisfy multiple conditions). For example, to select columns that start with <code>"paid"</code> and match the text <code>"2023"</code> or <code>"2024"</code>, we can use the <code>&amp;</code> operator to combine column selectors.</p>
-<div id="ed639b0c" class="cell" data-execution_count="3">
+<p>We can also use the <a href="../reference/starts_with.html#pointblank.starts_with" title="0"><code>starts_with()</code></a> function in combination with other column selectors (within <a href="../reference/col.html#pointblank.col"><span><code>col()</code></span></a>) to create more complex column selection criteria (i.e., to select columns that satisfy multiple conditions). For example, to select columns that start with <code>"paid"</code> and match the text <code>"2023"</code> or <code>"2024"</code>, we can use the <code>&amp;</code> operator to combine column selectors.</p>
+<div id="2f33da31" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>tbl <span class="op">=</span> pl.DataFrame(</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    {</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"name"</span>: [<span class="st">"Alice"</span>, <span class="st">"Bob"</span>, <span class="st">"Charlie"</span>],</span>

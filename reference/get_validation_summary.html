@@ -202,7 +202,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 
 <p style="font-size: 12px; color: rgb(170, 170, 170); margin-bottom: -14px;">USAGE</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>get_validation_summary()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>This function provides a convenient way to access summary information about the validation process within a final action. It returns a dictionary with key metrics from the validation process. This function can only be used within callables crafted for the <a href="../reference/FinalActions.html#pointblank.FinalActions"><code>FinalActions</code></a> class.</p>
+<p>This function provides a convenient way to access summary information about the validation process within a final action. It returns a dictionary with key metrics from the validation process. This function can only be used within callables crafted for the <a href="../reference/FinalActions.html#pointblank.FinalActions"><span><code>FinalActions</code></span></a> class.</p>
 <section id="returns" class="level2 doc-section doc-section-returns">
 <h3 class="doc-section doc-section-returns anchored" data-anchor-id="returns">Returns</h3>
 <dl style="border-style: solid; border-width: 2px; border-color: #00AC1480; padding: 1rem; padding-bottom: 0.25rem;">
@@ -282,7 +282,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
 <span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Note that <code>send_alert_email()</code> in the example above is a placeholder function that would be implemented by the user to send email alerts. This function is not provided by the Pointblank package.</p>
-<p>The <code>get_validation_summary()</code> function can also be used to create custom reporting for validation results:</p>
+<p>The <a href="../reference/get_validation_summary.html#pointblank.get_validation_summary" title="0"><code>get_validation_summary()</code></a> function can also be used to create custom reporting for validation results:</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> log_validation_results():</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    summary <span class="op">=</span> pb.get_validation_summary()</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -301,7 +301,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </section>
 <section id="see-also" class="level2 doc-section doc-section-see-also">
 <h3 class="doc-section doc-section-see-also anchored" data-anchor-id="see-also">See Also</h3>
-<p>Have a look at <a href="../reference/FinalActions.html#pointblank.FinalActions"><code>FinalActions</code></a> for more information on how to create custom actions that are executed after all validation steps have been completed.</p>
+<p>Have a look at <a href="../reference/FinalActions.html#pointblank.FinalActions"><span><code>FinalActions</code></span></a> for more information on how to create custom actions that are executed after all validation steps have been completed.</p>
 
 
 </section>

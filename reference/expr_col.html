@@ -261,8 +261,8 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <li>The values in column <code>b</code> are less than <code>7</code>.</li>
 <li>The sum of columns <code>a</code> and <code>b</code> is less than the values in column <code>c</code>.</li>
 </ul>
-<p>We can use the <code>expr_col()</code> function to create a column expression for each of these conditions.</p>
-<div id="ee4b3a27" class="cell" data-execution_count="2">
+<p>We can use the <a href="../reference/expr_col.html#pointblank.expr_col" title="0"><code>expr_col()</code></a> function to create a column expression for each of these conditions.</p>
+<div id="6cb0272f" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -425,7 +425,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
         
 </div>
 </div>
-<p>The above code creates a validation object that checks the specified conditions using the <code>expr_col()</code> function. The resulting validation table will show whether each condition was satisfied for each row in the table.</p>
+<p>The above code creates a validation object that checks the specified conditions using the <a href="../reference/expr_col.html#pointblank.expr_col" title="0"><code>expr_col()</code></a> function. The resulting validation table will show whether each condition was satisfied for each row in the table.</p>
 </section>
 <section id="see-also" class="level2 doc-section doc-section-see-also">
 <h3 class="doc-section doc-section-see-also anchored" data-anchor-id="see-also">See Also</h3>

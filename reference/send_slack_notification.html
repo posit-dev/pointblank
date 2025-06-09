@@ -211,8 +211,8 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>This function can be used in two ways:</p>
 <ol type="1">
-<li>With <a href="../reference/Actions.html#pointblank.Actions"><code>Actions</code></a> to notify about individual validation step failures</li>
-<li>With <a href="../reference/FinalActions.html#pointblank.FinalActions"><code>FinalActions</code></a> to provide a summary notification after all validation steps have undergone interrogation</li>
+<li>With <a href="../reference/Actions.html#pointblank.Actions"><span><code>Actions</code></span></a> to notify about individual validation step failures</li>
+<li>With <a href="../reference/FinalActions.html#pointblank.FinalActions"><span><code>FinalActions</code></span></a> to provide a summary notification after all validation steps have undergone interrogation</li>
 </ol>
 <p>The function creates a callable that sends notifications through a Slack webhook. Message formatting can be customized using templates for both individual steps and summary reports.</p>
 <section id="parameters" class="level2 doc-section doc-section-parameters">
@@ -367,7 +367,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
         margin: 10px 0;
         border-radius: 2px;
     ">
-<p>When using an action with one or more validation steps, you typically provide callables that fire when a matched threshold of failed test units is exceeded. The callable can be a function or a lambda. The <code>send_slack_notification()</code> function creates a callable that sends a Slack notification when the validation step fails. Here is how it can be set up to work for multiple validation steps by using of <a href="../reference/Actions.html#pointblank.Actions">Actions</a>:</p>
+<p>When using an action with one or more validation steps, you typically provide callables that fire when a matched threshold of failed test units is exceeded. The callable can be a function or a lambda. The <a href="../reference/send_slack_notification.html#pointblank.send_slack_notification" title="0"><code>send_slack_notification()</code></a> function creates a callable that sends a Slack notification when the validation step fails. Here is how it can be set up to work for multiple validation steps by using of <a href="../reference/Actions.html#pointblank.Actions">Actions</a>:</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a Slack notification function</span></span>
@@ -389,7 +389,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>validation</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>By placing the <code>notify_slack()</code> function in the <code>Validate(actions=Actions(critical=))</code> argument, you can ensure that the notification is sent whenever the ‘critical’ threshold is reached (as set here, when 15% or more of the test units fail). The notification will include information about the validation step that triggered the alert.</p>
-<p>When using a <a href="../reference/FinalActions.html#pointblank.FinalActions"><code>FinalActions</code></a> object, the notification will be sent after all validation steps have been completed. This is useful for providing a summary of the validation process. Here is an example of how to set up a summary notification:</p>
+<p>When using a <a href="../reference/FinalActions.html#pointblank.FinalActions"><span><code>FinalActions</code></span></a> object, the notification will be sent after all validation steps have been completed. This is useful for providing a summary of the validation process. Here is an example of how to set up a summary notification:</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a Slack notification function</span></span>
@@ -409,7 +409,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
 <span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>In this case, the same <code>notify_slack()</code> function is used, but it is placed in <code>Validate(final_actions=FinalActions())</code>. This results in the summary notification being sent after all validation steps are completed, regardless of whether any steps failed or not.</p>
-<p>This simplicity is possible because the <code>send_slack_notification()</code> function creates a callable that can be used in both contexts. The function will automatically determine whether to send a step notification or a summary notification based on the context in which it is called.</p>
+<p>This simplicity is possible because the <a href="../reference/send_slack_notification.html#pointblank.send_slack_notification" title="0"><code>send_slack_notification()</code></a> function creates a callable that can be used in both contexts. The function will automatically determine whether to send a step notification or a summary notification based on the context in which it is called.</p>
 <p>We can customize the message templates for both step and summary notifications. In that way, it’s possible to create a more informative and visually appealing message. For example, we can use Markdown formatting to make the message more readable and visually appealing. Here is an example of how to customize the templates:</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a Slack notification function</span></span>

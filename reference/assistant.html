@@ -204,7 +204,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 
 <p style="font-size: 12px; color: rgb(170, 170, 170); margin-bottom: -14px;">USAGE</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>assistant(model, data<span class="op">=</span><span class="va">None</span>, tbl_name<span class="op">=</span><span class="va">None</span>, api_key<span class="op">=</span><span class="va">None</span>, display<span class="op">=</span><span class="va">None</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>The <code>assistant()</code> function provides an interactive chat session with the PbA (Pointblank Assistant) to help you with your data validation needs. The PbA can help you with constructing validation plans, suggesting validation methods, and providing code snippets for using the Pointblank Python package. Feel free to ask the PbA about any aspect of the Pointblank package and it will do its best to assist you.</p>
+<p>The <a href="../reference/assistant.html#pointblank.assistant" title="0"><code>assistant()</code></a> function provides an interactive chat session with the PbA (Pointblank Assistant) to help you with your data validation needs. The PbA can help you with constructing validation plans, suggesting validation methods, and providing code snippets for using the Pointblank Python package. Feel free to ask the PbA about any aspect of the Pointblank package and it will do its best to assist you.</p>
 <p>The PbA can also help you with constructing validation plans for your data tables. If you provide a data table to the PbA, it will internally generate a JSON summary of the table and use that information to suggest validation methods that can be used with the Pointblank package. If using a Polars table as the data source, the PbA will be knowledgeable about the Polars API and can smartly suggest validation steps that use aggregate measures with up-to-date Polars methods.</p>
 <p>The PbA can be used with models from the following providers:</p>
 <ul>
@@ -224,7 +224,7 @@ Warning
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>The <code>assistant()</code> function is still experimental. Please report any issues you encounter in the <a href="https://github.com/posit-dev/pointblank/issues">Pointblank issue tracker</a>.</p>
+<p>The <a href="../reference/assistant.html#pointblank.assistant" title="0"><code>assistant()</code></a> function is still experimental. Please report any issues you encounter in the <a href="https://github.com/posit-dev/pointblank/issues">Pointblank issue tracker</a>.</p>
 </div>
 </div>
 <section id="parameters" class="level2 doc-section doc-section-parameters">
@@ -283,7 +283,7 @@ OPENAI_API_KEY="your_openai_api_key_here"</code></pre>
 </section>
 <section id="notes-on-data-sent-to-the-model-provider" class="level2 doc-section doc-section-notes-on-data-sent-to-the-model-provider">
 <h3 class="doc-section doc-section-notes-on-data-sent-to-the-model-provider anchored" data-anchor-id="notes-on-data-sent-to-the-model-provider">Notes on Data Sent to the Model Provider</h3>
-<p>If <code>data=</code> is provided then that data is sent to the model provider is a JSON summary of the table. This data summary is generated internally by use of the <code>DataScan</code> class. The summary includes the following information:</p>
+<p>If <code>data=</code> is provided then that data is sent to the model provider is a JSON summary of the table. This data summary is generated internally by use of the <a href="../reference/DataScan.html#pointblank.DataScan" title="0"><code>DataScan</code></a> class. The summary includes the following information:</p>
 <ul>
 <li>the number of rows and columns in the table</li>
 <li>the type of dataset (e.g., Polars, DuckDB, Pandas, etc.)</li>
@@ -306,7 +306,7 @@ OPENAI_API_KEY="your_openai_api_key_here"</code></pre>
 <li>SQLite table (<code>"sqlite"</code>)*</li>
 <li>Parquet table (<code>"parquet"</code>)*</li>
 </ul>
-<p>The table types marked with an asterisk need to be prepared as Ibis tables (with type of <code>ibis.expr.types.relations.Table</code>). Furthermore, using <code>preview()</code> with these types of tables requires the Ibis library (<code>v9.5.0</code> or above) to be installed. If the input table is a Polars or Pandas DataFrame, the availability of Ibis is not needed.</p>
+<p>The table types marked with an asterisk need to be prepared as Ibis tables (with type of <code>ibis.expr.types.relations.Table</code>). Furthermore, using <a href="../reference/preview.html#pointblank.preview" title="0"><code>preview()</code></a> with these types of tables requires the Ibis library (<code>v9.5.0</code> or above) to be installed. If the input table is a Polars or Pandas DataFrame, the availability of Ibis is not needed.</p>
 
 
 </section>

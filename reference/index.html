@@ -165,7 +165,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <h1 class="doc doc-index">API Reference</h1>
 <section id="validate" class="level2">
 <h2 class="anchored" data-anchor-id="validate">Validate</h2>
-<p>When performing data validation, you’ll need the <code>Validate</code> class to get the process started. It’s given the target table and you can optionally provide some metadata and/or failure thresholds (using the <code>Thresholds</code> class or through shorthands for this task). The <code>Validate</code> class has numerous methods for defining validation steps and for obtaining post-interrogation metrics and data.</p>
+<p>When performing data validation, you’ll need the <a href="../reference/Validate.html#pointblank.Validate" title="0"><code>Validate</code></a> class to get the process started. It’s given the target table and you can optionally provide some metadata and/or failure thresholds (using the <a href="../reference/Thresholds.html#pointblank.Thresholds" title="0"><code>Thresholds</code></a> class or through shorthands for this task). The <a href="../reference/Validate.html#pointblank.Validate" title="0"><code>Validate</code></a> class has numerous methods for defining validation steps and for obtaining post-interrogation metrics and data.</p>
 <div class="caption-top table" style="border-top-style: dashed; border-bottom-style: dashed;">
 <dl style="margin-top: 10px;">
 
@@ -192,7 +192,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </section>
 <section id="validation-steps" class="level2">
 <h2 class="anchored" data-anchor-id="validation-steps">Validation Steps</h2>
-<p>Validation steps can be thought of as sequential validations on the target data. We call <code>Validate</code>’s validation methods to build up a validation plan: a collection of steps that, in the aggregate, provides good validation coverage.</p>
+<p>Validation steps can be thought of as sequential validations on the target data. We call <a href="../reference/Validate.html#pointblank.Validate" title="0"><code>Validate</code></a>’s validation methods to build up a validation plan: a collection of steps that, in the aggregate, provides good validation coverage.</p>
 <div class="caption-top table" style="border-top-style: dashed; border-bottom-style: dashed;">
 <dl style="margin-top: 10px;">
 
@@ -267,7 +267,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </section>
 <section id="column-selection" class="level2">
 <h2 class="anchored" data-anchor-id="column-selection">Column Selection</h2>
-<p>A flexible way to select columns for validation is to use the <code>col()</code> function along with column selection helper functions. A combination of <code>col()</code> + <code>starts_with()</code>, <code>matches()</code>, etc., allows for the selection of multiple target columns (mapping a validation across many steps). Furthermore, the <code>col()</code> function can be used to declare a comparison column (e.g., for the <code>value=</code> argument in many <code>col_vals_*()</code> methods) when you can’t use a fixed value for comparison.</p>
+<p>A flexible way to select columns for validation is to use the <a href="../reference/col.html#pointblank.col" title="0"><code>col()</code></a> function along with column selection helper functions. A combination of <a href="../reference/col.html#pointblank.col" title="0"><code>col()</code></a> + <a href="../reference/starts_with.html#pointblank.starts_with" title="0"><code>starts_with()</code></a>, <a href="../reference/matches.html#pointblank.matches" title="0"><code>matches()</code></a>, etc., allows for the selection of multiple target columns (mapping a validation across many steps). Furthermore, the <a href="../reference/col.html#pointblank.col" title="0"><code>col()</code></a> function can be used to declare a comparison column (e.g., for the <code>value=</code> argument in many <code>col_vals_*()</code> methods) when you can’t use a fixed value for comparison.</p>
 <div class="caption-top table" style="border-top-style: dashed; border-bottom-style: dashed;">
 <dl style="margin-top: 10px;">
 
@@ -303,7 +303,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </section>
 <section id="interrogation-and-reporting" class="level2">
 <h2 class="anchored" data-anchor-id="interrogation-and-reporting">Interrogation and Reporting</h2>
-<p>The validation plan is put into action when <code>interrogate()</code> is called. The workflow for performing a comprehensive validation is then: (1) <code>Validate()</code>, (2) adding validation steps, (3) <code>interrogate()</code>. After interrogation of the data, we can view a validation report table (by printing the object or using <code>get_tabular_report()</code>), extract key metrics, or we can split the data based on the validation results (with <code>get_sundered_data()</code>).</p>
+<p>The validation plan is put into action when <code>interrogate()</code> is called. The workflow for performing a comprehensive validation is then: (1) <a href="../reference/Validate.html#pointblank.Validate" title="0"><code>Validate()</code></a>, (2) adding validation steps, (3) <code>interrogate()</code>. After interrogation of the data, we can view a validation report table (by printing the object or using <code>get_tabular_report()</code>), extract key metrics, or we can split the data based on the validation results (with <code>get_sundered_data()</code>).</p>
 <div class="caption-top table" style="border-top-style: dashed; border-bottom-style: dashed;">
 <dl style="margin-top: 10px;">
 
@@ -366,7 +366,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </section>
 <section id="inspection-and-assistance" class="level2">
 <h2 class="anchored" data-anchor-id="inspection-and-assistance">Inspection and Assistance</h2>
-<p>The <em>Inspection and Assistance</em> group contains functions that are helpful for getting to grips on a new data table. Use the <code>DataScan</code> class to get a quick overview of the data, <code>preview()</code> to see the first and last few rows of a table, <code>col_summary_tbl()</code> for a column-level summary of a table, and <code>missing_vals_tbl()</code> to see where there are missing values in a table. Several datasets included in the package can be accessed via the <code>load_dataset()</code> function. On the assistance side, the <code>assistant()</code> function can be used to get help with Pointblank.</p>
+<p>The <em>Inspection and Assistance</em> group contains functions that are helpful for getting to grips on a new data table. Use the <a href="../reference/DataScan.html#pointblank.DataScan" title="0"><code>DataScan</code></a> class to get a quick overview of the data, <a href="../reference/preview.html#pointblank.preview" title="0"><code>preview()</code></a> to see the first and last few rows of a table, <a href="../reference/col_summary_tbl.html#pointblank.col_summary_tbl" title="0"><code>col_summary_tbl()</code></a> for a column-level summary of a table, and <a href="../reference/missing_vals_tbl.html#pointblank.missing_vals_tbl" title="0"><code>missing_vals_tbl()</code></a> to see where there are missing values in a table. Several datasets included in the package can be accessed via the <a href="../reference/load_dataset.html#pointblank.load_dataset" title="0"><code>load_dataset()</code></a> function. On the assistance side, the <a href="../reference/assistant.html#pointblank.assistant" title="0"><code>assistant()</code></a> function can be used to get help with Pointblank.</p>
 <div class="caption-top table" style="border-top-style: dashed; border-bottom-style: dashed;">
 <dl style="margin-top: 10px;">
 
@@ -393,7 +393,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </section>
 <section id="utility-functions" class="level2">
 <h2 class="anchored" data-anchor-id="utility-functions">Utility Functions</h2>
-<p>The <em>Utility Functions</em> group contains functions that are useful accessing metadata about the target data. Use <code>get_column_count()</code> or <code>get_row_count()</code> to get the number of columns or rows in a table. The <code>get_action_metadata()</code> function is useful when building custom actions since it returns metadata about the validation step that’s triggering the action. Lastly, the <code>config()</code> utility lets us set global configuration parameters.</p>
+<p>The <em>Utility Functions</em> group contains functions that are useful accessing metadata about the target data. Use <a href="../reference/get_column_count.html#pointblank.get_column_count" title="0"><code>get_column_count()</code></a> or <a href="../reference/get_row_count.html#pointblank.get_row_count" title="0"><code>get_row_count()</code></a> to get the number of columns or rows in a table. The <a href="../reference/get_action_metadata.html#pointblank.get_action_metadata" title="0"><code>get_action_metadata()</code></a> function is useful when building custom actions since it returns metadata about the validation step that’s triggering the action. Lastly, the <a href="../reference/config.html#pointblank.config" title="0"><code>config()</code></a> utility lets us set global configuration parameters.</p>
 <div class="caption-top table" style="border-top-style: dashed; border-bottom-style: dashed;">
 <dl style="margin-top: 10px;">
 
