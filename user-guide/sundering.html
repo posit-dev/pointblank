@@ -379,7 +379,12 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
   <li><a href="#a-simple-example-where-data-is-torn-asunder" id="toc-a-simple-example-where-data-is-torn-asunder" class="nav-link active" data-scroll-target="#a-simple-example-where-data-is-torn-asunder">A Simple Example Where Data is Torn Asunder</a></li>
   <li><a href="#using-get_sundered_data-with-a-more-comprehensive-validation" id="toc-using-get_sundered_data-with-a-more-comprehensive-validation" class="nav-link" data-scroll-target="#using-get_sundered_data-with-a-more-comprehensive-validation">Using <code>get_sundered_data()</code> with a More Comprehensive Validation</a></li>
   <li><a href="#the-validation-methods-considered-when-sundering" id="toc-the-validation-methods-considered-when-sundering" class="nav-link" data-scroll-target="#the-validation-methods-considered-when-sundering">The Validation Methods Considered When Sundering</a></li>
-  <li><a href="#practical-applications-of-sundering" id="toc-practical-applications-of-sundering" class="nav-link" data-scroll-target="#practical-applications-of-sundering">Practical Applications of Sundering</a></li>
+  <li><a href="#practical-applications-of-sundering" id="toc-practical-applications-of-sundering" class="nav-link" data-scroll-target="#practical-applications-of-sundering">Practical Applications of Sundering</a>
+  <ul class="collapse">
+  <li><a href="#creating-clean-datasets-for-analysis" id="toc-creating-clean-datasets-for-analysis" class="nav-link" data-scroll-target="#creating-clean-datasets-for-analysis">1. Creating Clean Datasets for Analysis</a></li>
+  <li><a href="#creating-parallel-workflows-for-clean-and-problematic-data" id="toc-creating-parallel-workflows-for-clean-and-problematic-data" class="nav-link" data-scroll-target="#creating-parallel-workflows-for-clean-and-problematic-data">2. Creating Parallel Workflows for Clean and Problematic Data</a></li>
+  <li><a href="#data-quality-monitoring-and-improvement" id="toc-data-quality-monitoring-and-improvement" class="nav-link" data-scroll-target="#data-quality-monitoring-and-improvement">3. Data Quality Monitoring and Improvement</a></li>
+  </ul></li>
   <li><a href="#best-practices-for-using-sundered-data" id="toc-best-practices-for-using-sundered-data" class="nav-link" data-scroll-target="#best-practices-for-using-sundered-data">Best Practices for Using Sundered Data</a></li>
   <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion">Conclusion</a></li>
   </ul>
@@ -420,7 +425,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <li>create pipelines that handle good and bad data differently</li>
 </ul>
 <p>Let’s use the <code>small_table</code> in our examples to show just how sundering is done. Here’s that table:</p>
-<div id="39947da0" class="cell" data-execution_count="2">
+<div id="8039847f" class="cell" data-execution_count="2">
 <div class="cell-output cell-output-display" data-execution_count="2">
 <div id="pb_preview_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>
@@ -658,19 +663,16 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="a-simple-example-where-data-is-torn-asunder" class="level2">
 <h2 class="anchored" data-anchor-id="a-simple-example-where-data-is-torn-asunder">A Simple Example Where Data is Torn Asunder</h2>
 <p>We’ll begin with a very simple validation plan, having only a single step. There <em>will be</em> failing test units here.</p>
-<div id="be1bc458" class="cell" data-execution_count="3">
+<div id="4c5d7aa1" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>pb.load_dataset(dataset<span class="op">=</span><span class="st">"small_table"</span>))</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    .col_vals_ge(</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>        columns<span class="op">=</span><span class="st">"d"</span>,</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>        value<span class="op">=</span><span class="dv">1000</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>validation</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    .col_vals_ge(columns<span class="op">=</span><span class="st">"d"</span>, value<span class="op">=</span><span class="dv">1000</span>)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>validation</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="3">
 <div id="pb_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>
@@ -810,8 +812,8 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
         
 </div>
 </div>
-<p>We see six failing test units in <code>FAIL</code> column of the above validation report table. There is a data extract (collection of failing rows) available. Let’s use the <a href="https://posit-dev.github.io/pointblank/reference/Validate.get_data_extracts.html"><code>get_data_extracts()</code></a> method to have a look at it.</p>
-<div id="83e9d3be" class="cell" data-execution_count="4">
+<p>We see six failing test units in <code>FAIL</code> column of the above validation report table. There is a data extract (collection of failing rows) available. Let’s use the <a href="../reference/Validate.get_data_extracts.html#pointblank.Validate.get_data_extracts" title="0"><code>get_data_extracts()</code></a> method to have a look at it.</p>
+<div id="a37ee578" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>validation.get_data_extracts(i<span class="op">=</span><span class="dv">1</span>, frame<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="4">
 <div><style>
@@ -824,8 +826,8 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <small>shape: (6, 9)</small><table class="dataframe table table-sm table-striped small"><thead><tr><th>_row_num_</th><th>date_time</th><th>date</th><th>a</th><th>b</th><th>c</th><th>d</th><th>e</th><th>f</th></tr><tr><td>u32</td><td>datetime[μs]</td><td>date</td><td>i64</td><td>str</td><td>i64</td><td>f64</td><td>bool</td><td>str</td></tr></thead><tbody><tr><td>5</td><td>2016-01-09 12:36:00</td><td>2016-01-09</td><td>8</td><td>"3-ldm-038"</td><td>7</td><td>283.94</td><td>true</td><td>"low"</td></tr><tr><td>7</td><td>2016-01-15 18:46:00</td><td>2016-01-15</td><td>7</td><td>"1-knw-093"</td><td>3</td><td>843.34</td><td>true</td><td>"high"</td></tr><tr><td>9</td><td>2016-01-20 04:30:00</td><td>2016-01-20</td><td>3</td><td>"5-bce-642"</td><td>9</td><td>837.93</td><td>false</td><td>"high"</td></tr><tr><td>10</td><td>2016-01-20 04:30:00</td><td>2016-01-20</td><td>3</td><td>"5-bce-642"</td><td>9</td><td>837.93</td><td>false</td><td>"high"</td></tr><tr><td>11</td><td>2016-01-26 20:07:00</td><td>2016-01-26</td><td>4</td><td>"2-dmx-010"</td><td>7</td><td>833.98</td><td>true</td><td>"low"</td></tr><tr><td>12</td><td>2016-01-28 02:51:00</td><td>2016-01-28</td><td>2</td><td>"7-dmx-010"</td><td>8</td><td>108.34</td><td>false</td><td>"low"</td></tr></tbody></table></div>
 </div>
 </div>
-<p>This is six rows of data that had failing test units in column <code>d</code>. Indeed we can see that all values in that column are less than <code>1000</code> (and we asserted that values should be greater than or equal to <code>1000</code>). This is the ‘bad’ data, if you will. Using the <a href="https://posit-dev.github.io/pointblank/reference/Validate.get_sundered_data.html"><code>get_sundered_data()</code></a> method, we get the ‘good’ part:</p>
-<div id="523be611" class="cell" data-execution_count="5">
+<p>This is six rows of data that had failing test units in column <code>d</code>. Indeed we can see that all values in that column are less than <code>1000</code> (and we asserted that values should be greater than or equal to <code>1000</code>). This is the ‘bad’ data, if you will. Using the <a href="../reference/Validate.get_sundered_data.html#pointblank.Validate.get_sundered_data" title="0"><code>get_sundered_data()</code></a> method, we get the ‘good’ part:</p>
+<div id="d2c6fa0c" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>validation.get_sundered_data()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="5">
 <div><style>
@@ -839,8 +841,8 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 </div>
 <p>This is a Polars DataFrame of seven rows. All values in <code>d</code> were passing test units (i.e., fulfilled the expectation outlined in the validation step) and, in many ways, this is like a ‘good extract’.</p>
-<p>You can always collect the failing rows with <a href="https://posit-dev.github.io/pointblank/reference/Validate.get_sundered_data.html"><code>get_sundered_data()</code></a> by using the <code>type="fail"</code> option. Let’s try that here:</p>
-<div id="11767513" class="cell" data-execution_count="6">
+<p>You can always collect the failing rows with <a href="../reference/Validate.get_sundered_data.html#pointblank.Validate.get_sundered_data" title="0"><code>get_sundered_data()</code></a> by using the <code>type="fail"</code> option. Let’s try that here:</p>
+<div id="895f14b5" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>validation.get_sundered_data(<span class="bu">type</span><span class="op">=</span><span class="st">"fail"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="6">
 <div><style>
@@ -853,7 +855,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <small>shape: (6, 8)</small><table class="dataframe table table-sm table-striped small"><thead><tr><th>date_time</th><th>date</th><th>a</th><th>b</th><th>c</th><th>d</th><th>e</th><th>f</th></tr><tr><td>datetime[μs]</td><td>date</td><td>i64</td><td>str</td><td>i64</td><td>f64</td><td>bool</td><td>str</td></tr></thead><tbody><tr><td>2016-01-09 12:36:00</td><td>2016-01-09</td><td>8</td><td>"3-ldm-038"</td><td>7</td><td>283.94</td><td>true</td><td>"low"</td></tr><tr><td>2016-01-15 18:46:00</td><td>2016-01-15</td><td>7</td><td>"1-knw-093"</td><td>3</td><td>843.34</td><td>true</td><td>"high"</td></tr><tr><td>2016-01-20 04:30:00</td><td>2016-01-20</td><td>3</td><td>"5-bce-642"</td><td>9</td><td>837.93</td><td>false</td><td>"high"</td></tr><tr><td>2016-01-20 04:30:00</td><td>2016-01-20</td><td>3</td><td>"5-bce-642"</td><td>9</td><td>837.93</td><td>false</td><td>"high"</td></tr><tr><td>2016-01-26 20:07:00</td><td>2016-01-26</td><td>4</td><td>"2-dmx-010"</td><td>7</td><td>833.98</td><td>true</td><td>"low"</td></tr><tr><td>2016-01-28 02:51:00</td><td>2016-01-28</td><td>2</td><td>"7-dmx-010"</td><td>8</td><td>108.34</td><td>false</td><td>"low"</td></tr></tbody></table></div>
 </div>
 </div>
-<p>It gives us the same rows as in the DataFrame obtained from using <code>validation.get_data_extracts(i=1, frame=True)</code>. Two important things to know about <a href="https://posit-dev.github.io/pointblank/reference/Validate.get_sundered_data.html"><code>get_sundered_data()</code></a> is that the table rows returned from <code>type=pass</code> (the default) and <code>type=fail</code> are:</p>
+<p>It gives us the same rows as in the DataFrame obtained from using <code>validation.get_data_extracts(i=1, frame=True)</code>. Two important things to know about <a href="../reference/Validate.get_sundered_data.html#pointblank.Validate.get_sundered_data" title="0"><code>get_sundered_data()</code></a> are that the table rows returned from <code>type=pass</code> (the default) and <code>type=fail</code> are:</p>
 <ul>
 <li>the sum of rows across these returned tables will be equal to that of the original table</li>
 <li>the rows in each split table are mutually exclusive (i.e., you won’t find the same row in both)</li>
@@ -862,8 +864,8 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </section>
 <section id="using-get_sundered_data-with-a-more-comprehensive-validation" class="level2">
 <h2 class="anchored" data-anchor-id="using-get_sundered_data-with-a-more-comprehensive-validation">Using <code>get_sundered_data()</code> with a More Comprehensive Validation</h2>
-<p>The previous example used exactly one validation step. You’re likely to use more than that in standard practice so let’s see how <a href="https://posit-dev.github.io/pointblank/reference/Validate.get_sundered_data.html"><code>get_sundered_data()</code></a> works in those common situations. Here’s a validation with three steps:</p>
-<div id="3e10eb4d" class="cell" data-execution_count="7">
+<p>The previous example used exactly one validation step. You’re likely to use more than that in standard practice so let’s see how <a href="../reference/Validate.get_sundered_data.html#pointblank.Validate.get_sundered_data" title="0"><code>get_sundered_data()</code></a> works in those common situations. Here’s a validation with three steps:</p>
+<div id="c34f052f" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>validation_2 <span class="op">=</span> (</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>pb.load_dataset(dataset<span class="op">=</span><span class="st">"small_table"</span>))</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_ge(</span>
@@ -1102,8 +1104,8 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
         
 </div>
 </div>
-<p>There are quite a few failures here across the three validation steps. In the <code>FAIL</code> column of the validation report table, there are 12 failing test units if we were to tally them up. So if the input table has 13 rows in total, does this mean there would be one row in the table returned by <a href="https://posit-dev.github.io/pointblank/reference/Validate.get_sundered_data.html"><code>get_sundered_data()</code></a>? Not so:</p>
-<div id="20ddb253" class="cell" data-execution_count="8">
+<p>There are quite a few failures here across the three validation steps. In the <code>FAIL</code> column of the validation report table, there are 12 failing test units if we were to tally them up. So if the input table has 13 rows in total, does this mean there would be one row in the table returned by <a href="../reference/Validate.get_sundered_data.html#pointblank.Validate.get_sundered_data" title="0"><code>get_sundered_data()</code></a>? Not so:</p>
+<div id="3245893b" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>validation_2.get_sundered_data()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="8">
 <div><style>
@@ -1126,22 +1128,23 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <h2 class="anchored" data-anchor-id="the-validation-methods-considered-when-sundering">The Validation Methods Considered When Sundering</h2>
 <p>The sundering procedure relies on row-level validation types to be used. This makes sense as it’s impossible to judge the quality of a row when using the <a href="https://posit-dev.github.io/pointblank/reference/Validate.col_exists.html"><code>col_exists()</code></a> validation method, for example. Luckily, we have many row-level validation methods; here’s a list:</p>
 <ul>
-<li><a href="https://posit-dev.github.io/pointblank/reference/Validate.col_vals_gt.html"><code>col_vals_gt()</code></a></li>
-<li><a href="https://posit-dev.github.io/pointblank/reference/Validate.col_vals_lt.html"><code>col_vals_lt()</code></a></li>
-<li><a href="https://posit-dev.github.io/pointblank/reference/Validate.col_vals_ge.html"><code>col_vals_ge()</code></a></li>
-<li><a href="https://posit-dev.github.io/pointblank/reference/Validate.col_vals_le.html"><code>col_vals_le()</code></a></li>
-<li><a href="https://posit-dev.github.io/pointblank/reference/Validate.col_vals_eq.html"><code>col_vals_eq()</code></a></li>
-<li><a href="https://posit-dev.github.io/pointblank/reference/Validate.col_vals_ne.html"><code>col_vals_ne()</code></a></li>
-<li><a href="https://posit-dev.github.io/pointblank/reference/Validate.col_vals_between.html"><code>col_vals_between()</code></a></li>
-<li><a href="https://posit-dev.github.io/pointblank/reference/Validate.col_vals_outside.html"><code>col_vals_outside()</code></a></li>
-<li><a href="https://posit-dev.github.io/pointblank/reference/Validate.col_vals_in_set.html"><code>col_vals_in_set()</code></a></li>
-<li><a href="https://posit-dev.github.io/pointblank/reference/Validate.col_vals_not_in_set.html"><code>col_vals_not_in_set()</code></a></li>
-<li><a href="https://posit-dev.github.io/pointblank/reference/Validate.col_vals_null.html"><code>col_vals_null()</code></a></li>
-<li><a href="https://posit-dev.github.io/pointblank/reference/Validate.col_vals_not_null.html"><code>col_vals_not_null()</code></a></li>
-<li><a href="https://posit-dev.github.io/pointblank/reference/Validate.col_vals_regex.html"><code>col_vals_regex()</code></a></li>
-<li><a href="https://posit-dev.github.io/pointblank/reference/Validate.rows_distinct.html"><code>rows_distinct()</code></a></li>
-<li><a href="https://posit-dev.github.io/pointblank/reference/Validate.rows_complete.html"><code>rows_complete()</code></a></li>
-<li><a href="https://posit-dev.github.io/pointblank/reference/Validate.conjointly.html"><code>conjointly()</code></a></li>
+<li><a href="../reference/Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt" title="0"><code>col_vals_gt()</code></a></li>
+<li><a href="../reference/Validate.col_vals_lt.html#pointblank.Validate.col_vals_lt" title="0"><code>col_vals_lt()</code></a></li>
+<li><a href="../reference/Validate.col_vals_ge.html#pointblank.Validate.col_vals_ge" title="0"><code>col_vals_ge()</code></a></li>
+<li><a href="../reference/Validate.col_vals_le.html#pointblank.Validate.col_vals_le" title="0"><code>col_vals_le()</code></a></li>
+<li><a href="../reference/Validate.col_vals_eq.html#pointblank.Validate.col_vals_eq" title="0"><code>col_vals_eq()</code></a></li>
+<li><a href="../reference/Validate.col_vals_ne.html#pointblank.Validate.col_vals_ne" title="0"><code>col_vals_ne()</code></a></li>
+<li><a href="../reference/Validate.col_vals_between.html#pointblank.Validate.col_vals_between" title="0"><code>col_vals_between()</code></a></li>
+<li><a href="../reference/Validate.col_vals_outside.html#pointblank.Validate.col_vals_outside" title="0"><code>col_vals_outside()</code></a></li>
+<li><a href="../reference/Validate.col_vals_in_set.html#pointblank.Validate.col_vals_in_set" title="0"><code>col_vals_in_set()</code></a></li>
+<li><a href="../reference/Validate.col_vals_not_in_set.html#pointblank.Validate.col_vals_not_in_set" title="0"><code>col_vals_not_in_set()</code></a></li>
+<li><a href="../reference/Validate.col_vals_null.html#pointblank.Validate.col_vals_null" title="0"><code>col_vals_null()</code></a></li>
+<li><a href="../reference/Validate.col_vals_not_null.html#pointblank.Validate.col_vals_not_null" title="0"><code>col_vals_not_null()</code></a></li>
+<li><a href="../reference/Validate.col_vals_regex.html#pointblank.Validate.col_vals_regex" title="0"><code>col_vals_regex()</code></a></li>
+<li><a href="../reference/Validate.col_vals_expr.html#pointblank.Validate.col_vals_expr" title="0"><code>col_vals_expr()</code></a></li>
+<li><a href="../reference/Validate.rows_distinct.html#pointblank.Validate.rows_distinct" title="0"><code>rows_distinct()</code></a></li>
+<li><a href="../reference/Validate.rows_complete.html#pointblank.Validate.rows_complete" title="0"><code>rows_complete()</code></a></li>
+<li><a href="../reference/Validate.conjointly.html#pointblank.Validate.conjointly" title="0"><code>conjointly()</code></a></li>
 </ul>
 <p>This is the same list of validation methods that are considered when creating data extracts.</p>
 <p>There are some additional caveats though. Even if using a validation method drawn from the set above, the validation step won’t be used for sundering if:</p>
@@ -1153,9 +1156,10 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </section>
 <section id="practical-applications-of-sundering" class="level2">
 <h2 class="anchored" data-anchor-id="practical-applications-of-sundering">Practical Applications of Sundering</h2>
-<p><em>1. Creating Clean Datasets for Analysis</em></p>
+<section id="creating-clean-datasets-for-analysis" class="level3">
+<h3 class="anchored" data-anchor-id="creating-clean-datasets-for-analysis">1. Creating Clean Datasets for Analysis</h3>
 <p>One of the most common use cases for sundering is preparing validated data for downstream analysis:</p>
-<div id="daa0eee7" class="cell" data-execution_count="9">
+<div id="bd4368ca" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Comprehensive validation for analysis-ready data</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>analysis_validation <span class="op">=</span> (</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>pb.load_dataset(dataset<span class="op">=</span><span class="st">"small_table"</span>))</span>
@@ -1372,9 +1376,11 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 </div>
 <p>This approach ensures that any subsequent analysis is based on data that meets your quality standards, reducing the risk of misleading results or spurious conclusions due to problematic records. By making validation an explicit step in your analytical workflow, you create a natural quality gate that prevents invalid data from influencing your findings.</p>
-<p><em>2. Creating Parallel Workflows for Clean and Problematic Data</em></p>
+</section>
+<section id="creating-parallel-workflows-for-clean-and-problematic-data" class="level3">
+<h3 class="anchored" data-anchor-id="creating-parallel-workflows-for-clean-and-problematic-data">2. Creating Parallel Workflows for Clean and Problematic Data</h3>
 <p>You can use sundering to create parallel processing paths:</p>
-<div id="50752992" class="cell" data-execution_count="10">
+<div id="d70325f9" class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get both clean and problematic data</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>clean_data <span class="op">=</span> analysis_validation.get_sundered_data(<span class="bu">type</span><span class="op">=</span><span class="st">"pass"</span>)</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>problem_data <span class="op">=</span> analysis_validation.get_sundered_data(<span class="bu">type</span><span class="op">=</span><span class="st">"fail"</span>)</span>
@@ -1390,9 +1396,11 @@ Problematic data size: 2 rows</code></pre>
 </div>
 </div>
 <p>This approach enables you to build robust data processing pathways with separate handling for clean and problematic data. In production environments, you could save problematic records to a separate location for further investigation, generate detailed logs of validation failures, and trigger automated notifications to data stewards when issues arise. By establishing clear protocols for handling both data streams, you create a systematic approach to data quality that balances immediate analytical needs with longer-term data improvement goals.</p>
-<p><em>3. Data Quality Monitoring and Improvement</em></p>
+</section>
+<section id="data-quality-monitoring-and-improvement" class="level3">
+<h3 class="anchored" data-anchor-id="data-quality-monitoring-and-improvement">3. Data Quality Monitoring and Improvement</h3>
 <p>Tracking the ratio of passing to failing rows over time can help monitor data quality trends:</p>
-<div id="5c74087a" class="cell" data-execution_count="11">
+<div id="1d874f81" class="cell" data-execution_count="11">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate data quality metrics</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>total_rows <span class="op">=</span> <span class="bu">len</span>(pb.load_dataset(dataset<span class="op">=</span><span class="st">"small_table"</span>))</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>passing_rows <span class="op">=</span> <span class="bu">len</span>(clean_data)</span>
@@ -1407,16 +1415,17 @@ Passing rows: 11 out of 13</code></pre>
 </div>
 <p>By tracking these metrics over time, you can measure the impact of your data quality improvement efforts and communicate progress to stakeholders. This approach transforms sundering from a one-time filtering tool into an ongoing data quality management system, where improving the ratio of passing rows becomes a measurable business objective aligned with broader data governance goals.</p>
 </section>
+</section>
 <section id="best-practices-for-using-sundered-data" class="level2">
 <h2 class="anchored" data-anchor-id="best-practices-for-using-sundered-data">Best Practices for Using Sundered Data</h2>
 <p>When incorporating data sundering into your workflow, consider these best practices:</p>
 <ol type="1">
-<li><p><strong>Be comprehensive in your validation</strong>: the more validation steps you include (assuming they’re meaningful), the more confidence you can have in your passing dataset</p></li>
-<li><p><strong>Document your validation criteria</strong>: when sharing sundered data with others, always document the criteria used to determine passing rows</p></li>
-<li><p><strong>Consider traceability</strong>: for audit purposes, it may be valuable to add a column indicating whether a record was originally in the passing or failing set</p></li>
-<li><p><strong>Balance strictness and practicality</strong>: if you’re too strict with validation rules, you might end up with very few passing rows; consider the appropriate level of strictness for your use case</p></li>
-<li><p><strong>Use sundering as part of a pipeline</strong>: automate the process of validation, sundering, and subsequent handling of the two resulting datasets</p></li>
-<li><p><strong>Continually refine validation rules</strong>: as you learn more about your data and domain, update your validation rules to improve the accuracy of your sundering process</p></li>
+<li><p>Be comprehensive in your validation: the more validation steps you include (assuming they’re meaningful), the more confidence you can have in your passing dataset</p></li>
+<li><p>Document your validation criteria: when sharing sundered data with others, always document the criteria used to determine passing rows</p></li>
+<li><p>Consider traceability: for audit purposes, it may be valuable to add a column indicating whether a record was originally in the passing or failing set</p></li>
+<li><p>Balance strictness and practicality: if you’re too strict with validation rules, you might end up with very few passing rows; consider the appropriate level of strictness for your use case</p></li>
+<li><p>Use sundering as part of a pipeline: automate the process of validation, sundering, and subsequent handling of the two resulting datasets</p></li>
+<li><p>Continually refine validation rules: as you learn more about your data and domain, update your validation rules to improve the accuracy of your sundering process</p></li>
 </ol>
 <p>By following these best practices, data scientists and engineers can transform sundering from a simple utility into a strategic component of their data quality framework. When implemented thoughtfully, sundering enables a shift from reactive data cleaning to proactive quality management, where validation criteria evolve alongside your understanding of the data.</p>
 <p>The ultimate goal isn’t just to separate good data from bad, but to gradually improve your entire dataset over time by addressing the root causes of validation failures that appear in the failing set. This approach turns data validation from a gatekeeper function into a continuous improvement process.</p>

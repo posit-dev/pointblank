@@ -425,7 +425,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="basic-assertion-workflow" class="level2">
 <h2 class="anchored" data-anchor-id="basic-assertion-workflow">Basic Assertion Workflow</h2>
 <p>The assertion workflow uses your familiar validation steps with assertion methods to check that validations meet your requirements:</p>
-<div id="8ec1f832" class="cell" data-execution_count="2">
+<div id="8202c04d" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -451,13 +451,13 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <h2 class="anchored" data-anchor-id="assertion-methods">Assertion Methods</h2>
 <p>Pointblank offers two types of assertions:</p>
 <ol type="1">
-<li><strong>Full Passing Assertions</strong>: using <a href="https://posit-dev.github.io/pointblank/reference/Validate.assert_passing.html"><code>assert_passing()</code></a> to verify that every single test unit passes</li>
-<li><strong>Threshold-Based Assertions</strong>: using <a href="https://posit-dev.github.io/pointblank/reference/Validate.assert_below_threshold.html"><code>assert_below_threshold()</code></a> to verify that failure rates stay within acceptable thresholds</li>
+<li>Full Passing Assertions: using <a href="../reference/Validate.assert_passing.html#pointblank.Validate.assert_passing" title="0"><code>assert_passing()</code></a> to verify that every single test unit passes</li>
+<li>Threshold-Based Assertions: using <a href="../reference/Validate.assert_below_threshold.html#pointblank.Validate.assert_below_threshold" title="0"><code>assert_below_threshold()</code></a> to verify that failure rates stay within acceptable thresholds</li>
 </ol>
 <section id="assert_passing" class="level3">
 <h3 class="anchored" data-anchor-id="assert_passing"><code>assert_passing()</code></h3>
-<p>The <a href="https://posit-dev.github.io/pointblank/reference/Validate.assert_passing.html"><code>assert_passing()</code></a> method is the strictest form of assertion, requiring every single validation test unit to pass:</p>
-<div id="177d813d" class="cell" data-execution_count="3">
+<p>The <a href="../reference/Validate.assert_passing.html#pointblank.Validate.assert_passing" title="0"><code>assert_passing()</code></a> method is the strictest form of assertion, requiring every single validation test unit to pass:</p>
+<div id="72478600" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="cf">try</span>:</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    (</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>        pb.Validate(data<span class="op">=</span>sample_data)</span>
@@ -476,13 +476,13 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </section>
 <section id="assert_below_threshold" class="level3">
 <h3 class="anchored" data-anchor-id="assert_below_threshold"><code>assert_below_threshold()</code></h3>
-<p>The <a href="https://posit-dev.github.io/pointblank/reference/Validate.assert_below_threshold.html"><code>assert_below_threshold()</code></a> method is more flexible as it allows some failures as long as they stay below specified threshold levels. Pointblank uses three severity thresholds that increase in order of seriousness:</p>
+<p>The <a href="../reference/Validate.assert_below_threshold.html#pointblank.Validate.assert_below_threshold" title="0"><code>assert_below_threshold()</code></a> method is more flexible as it allows some failures as long as they stay below specified threshold levels. Pointblank uses three severity thresholds that increase in order of seriousness:</p>
 <ul>
 <li><strong>‘warning’</strong> (least severe): the first threshold that gets triggered when failures exceed this level</li>
 <li><strong>‘error’</strong> (more severe): the middle threshold indicating more serious data quality issues</li>
 <li><strong>‘critical’</strong> (most severe): the highest threshold indicating critical data quality problems</li>
 </ul>
-<div id="e18e74aa" class="cell" data-execution_count="4">
+<div id="35127756" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a two-column DataFrame for this example</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>tbl_pl <span class="op">=</span> pl.DataFrame({</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"a"</span>: [<span class="dv">4</span>, <span class="dv">6</span>, <span class="dv">9</span>, <span class="dv">7</span>, <span class="dv">12</span>, <span class="dv">8</span>, <span class="dv">7</span>, <span class="dv">12</span>, <span class="dv">10</span>, <span class="dv">7</span>],</span>
@@ -575,7 +575,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     <td colspan="14" class="gt_heading gt_title gt_font_normal" style="color: #444444;font-size: 28px;text-align: left;font-weight: bold; text-align: left;">Pointblank Validation</td>
   </tr>
   <tr class="gt_heading">
-    <td colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style="text-align: left;"><div><span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2025-06-09|20:50:39</span><div style="padding-top: 10px; padding-bottom: 5px;"><span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 10px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 10px 2px 10px; font-size: 10px;">Polars</span><span><span style="background-color: #AAAAAA; color: white; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 5px; border: solid 1px #AAAAAA; font-weight: bold; padding: 2px 15px 2px 15px; font-size: smaller;">WARNING</span><span style="background-color: none; color: #333333; padding: 0.5em 0.5em; position: inherit; margin: 5px 0px 5px -4px; font-weight: bold; border: solid 1px #AAAAAA; padding: 2px 15px 2px 15px; font-size: smaller; margin-right: 5px;">0.2</span><span style="background-color: #EBBC14; color: white; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 1px; border: solid 1px #EBBC14; font-weight: bold; padding: 2px 15px 2px 15px; font-size: smaller;">ERROR</span><span style="background-color: none; color: #333333; padding: 0.5em 0.5em; position: inherit; margin: 5px 0px 5px -4px; font-weight: bold; border: solid 1px #EBBC14; padding: 2px 15px 2px 15px; font-size: smaller; margin-right: 5px;">0.3</span><span style="background-color: #FF3300; color: white; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 1px; border: solid 1px #FF3300; font-weight: bold; padding: 2px 15px 2px 15px; font-size: smaller;">CRITICAL</span><span style="background-color: none; color: #333333; padding: 0.5em 0.5em; position: inherit; margin: 5px 0px 5px -4px; font-weight: bold; border: solid 1px #FF3300; padding: 2px 15px 2px 15px; font-size: smaller;">0.4</span></span></div></div></td>
+    <td colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style="text-align: left;"><div><span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2025-06-10|20:37:02</span><div style="padding-top: 10px; padding-bottom: 5px;"><span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 10px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 10px 2px 10px; font-size: 10px;">Polars</span><span><span style="background-color: #AAAAAA; color: white; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 5px; border: solid 1px #AAAAAA; font-weight: bold; padding: 2px 15px 2px 15px; font-size: smaller;">WARNING</span><span style="background-color: none; color: #333333; padding: 0.5em 0.5em; position: inherit; margin: 5px 0px 5px -4px; font-weight: bold; border: solid 1px #AAAAAA; padding: 2px 15px 2px 15px; font-size: smaller; margin-right: 5px;">0.2</span><span style="background-color: #EBBC14; color: white; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 1px; border: solid 1px #EBBC14; font-weight: bold; padding: 2px 15px 2px 15px; font-size: smaller;">ERROR</span><span style="background-color: none; color: #333333; padding: 0.5em 0.5em; position: inherit; margin: 5px 0px 5px -4px; font-weight: bold; border: solid 1px #EBBC14; padding: 2px 15px 2px 15px; font-size: smaller; margin-right: 5px;">0.3</span><span style="background-color: #FF3300; color: white; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 1px; border: solid 1px #FF3300; font-weight: bold; padding: 2px 15px 2px 15px; font-size: smaller;">CRITICAL</span><span style="background-color: none; color: #333333; padding: 0.5em 0.5em; position: inherit; margin: 5px 0px 5px -4px; font-weight: bold; border: solid 1px #FF3300; padding: 2px 15px 2px 15px; font-size: smaller;">0.4</span></span></div></div></td>
   </tr>
 <tr class="gt_col_headings">
   <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-status_color"></th>
@@ -733,8 +733,8 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <li>yellow circles in the <code>E</code> column indicate the ‘error’ threshold</li>
 <li>red circles in the <code>C</code> column indicate the ‘critical’ threshold</li>
 </ul>
-<p>This won’t pass the <a href="https://posit-dev.github.io/pointblank/reference/Validate.assert_below_threshold.html"><code>assert_below_threshold()</code></a> assertion for the ‘error’ level because step 3 exceeds this threshold (30% failure rate matches the error threshold):</p>
-<div id="80b33da9" class="cell" data-execution_count="5">
+<p>This won’t pass the <a href="../reference/Validate.assert_below_threshold.html#pointblank.Validate.assert_below_threshold" title="0"><code>assert_below_threshold()</code></a> assertion for the ‘error’ level because step 3 exceeds this threshold (30% failure rate matches the error threshold):</p>
+<div id="e515fbf6" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="cf">try</span>:</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    validation.assert_below_threshold(level<span class="op">=</span><span class="st">"error"</span>)</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="cf">except</span> <span class="pp">AssertionError</span> <span class="im">as</span> e:</span>
@@ -745,11 +745,11 @@ Step 3: Expect that values in `b` should be &gt;= `8`.</code></pre>
 </div>
 </div>
 <p>We can check against the ‘error’ threshold for specific steps with the <code>i=</code> parameter:</p>
-<div id="f2d73acd" class="cell" data-execution_count="6">
+<div id="bc62dc5e" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>validation.assert_below_threshold(level<span class="op">=</span><span class="st">"error"</span>, i<span class="op">=</span>[<span class="dv">1</span>, <span class="dv">2</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>This passes because the highest threshold exceeded in steps 1 and 2 is ‘warning’.</p>
-<p>The <a href="https://posit-dev.github.io/pointblank/reference/Validate.assert_below_threshold.html"><code>assert_below_threshold()</code></a> method takes these parameters:</p>
+<p>The <a href="../reference/Validate.assert_below_threshold.html#pointblank.Validate.assert_below_threshold" title="0"><code>assert_below_threshold()</code></a> method takes these parameters:</p>
 <ul>
 <li><code>level=</code>: threshold level to check against (<code>"warning"</code>, <code>"error"</code>, or <code>"critical"</code>)</li>
 <li><code>i=</code>: optional specific step number(s) to check</li>
@@ -771,7 +771,7 @@ Note
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Assertion methods like <a href="https://posit-dev.github.io/pointblank/reference/Validate.assert_passing.html"><code>assert_passing()</code></a> and <a href="https://posit-dev.github.io/pointblank/reference/Validate.assert_below_threshold.html"><code>assert_below_threshold()</code></a> will automatically call <a href="https://posit-dev.github.io/pointblank/reference/Validate.interrogate.html"><code>interrogate()</code></a> if needed, so you don’t have to explicitly include this step when using assertions directly.</p>
+<p>Assertion methods like <a href="../reference/Validate.assert_passing.html#pointblank.Validate.assert_passing" title="0"><code>assert_passing()</code></a> and <a href="../reference/Validate.assert_below_threshold.html#pointblank.Validate.assert_below_threshold" title="0"><code>assert_below_threshold()</code></a> will automatically call <a href="../reference/Validate.interrogate.html#pointblank.Validate.interrogate" title="0"><code>interrogate()</code></a> if needed, so you don’t have to explicitly include this step when using assertions directly.</p>
 </div>
 </div>
 </section>
@@ -781,8 +781,8 @@ Note
 <p>In addition to assertion methods that raise exceptions, Pointblank provides status check methods that return boolean values:</p>
 <section id="all_passed" class="level3">
 <h3 class="anchored" data-anchor-id="all_passed"><code>all_passed()</code></h3>
-<p>The <a href="https://posit-dev.github.io/pointblank/reference/Validate.all_passed.html"><code>all_passed()</code></a> method will return <code>True</code> only if every single test unit in every validation step passed:</p>
-<div id="488aa91e" class="cell" data-execution_count="7">
+<p>The <a href="../reference/Validate.all_passed.html#pointblank.Validate.all_passed" title="0"><code>all_passed()</code></a> method will return <code>True</code> only if every single test unit in every validation step passed:</p>
+<div id="2a5b0129" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>sample_data)</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_gt(columns<span class="op">=</span><span class="st">"value"</span>, value<span class="op">=</span><span class="dv">0</span>)</span>
@@ -798,9 +798,9 @@ Note
 </section>
 <section id="warning-error-and-critical" class="level3">
 <h3 class="anchored" data-anchor-id="warning-error-and-critical"><code>warning()</code>, <code>error()</code>, and <code>critical()</code></h3>
-<p>The methods (<a href="https://posit-dev.github.io/pointblank/reference/Validate.warning.html"><code>warning()</code></a>, <a href="https://posit-dev.github.io/pointblank/reference/Validate.error.html"><code>error()</code></a>, and <a href="https://posit-dev.github.io/pointblank/reference/Validate.critical.html"><code>critical()</code></a>) return information about whether validation steps exceeded that specific threshold level.</p>
+<p>The methods <a href="../reference/Validate.warning.html#pointblank.Validate.warning" title="0"><code>warning()</code></a>, <a href="../reference/Validate.error.html#pointblank.Validate.error" title="0"><code>error()</code></a>, and <a href="../reference/Validate.critical.html#pointblank.Validate.critical" title="0"><code>critical()</code></a> all return information about whether validation steps exceeded that specific threshold level.</p>
 <p>While assertion methods raise exceptions to halt execution when thresholds are exceeded, these status methods give you fine-grained control to implement custom logic based on different validation quality levels.</p>
-<div id="5460b7e0" class="cell" data-execution_count="8">
+<div id="39e96f39" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>sample_data, thresholds<span class="op">=</span>(<span class="fl">0.05</span>, <span class="fl">0.10</span>, <span class="fl">0.20</span>))</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_gt(columns<span class="op">=</span><span class="st">"value"</span>, value<span class="op">=</span><span class="dv">0</span>)  <span class="co"># Some values are negative</span></span>
@@ -883,7 +883,7 @@ Note
     <td colspan="14" class="gt_heading gt_title gt_font_normal" style="color: #444444;font-size: 28px;text-align: left;font-weight: bold; text-align: left;">Pointblank Validation</td>
   </tr>
   <tr class="gt_heading">
-    <td colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style="text-align: left;"><div><span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2025-06-09|20:50:40</span><div style="padding-top: 10px; padding-bottom: 5px;"><span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 10px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 10px 2px 10px; font-size: 10px;">Polars</span><span><span style="background-color: #AAAAAA; color: white; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 5px; border: solid 1px #AAAAAA; font-weight: bold; padding: 2px 15px 2px 15px; font-size: smaller;">WARNING</span><span style="background-color: none; color: #333333; padding: 0.5em 0.5em; position: inherit; margin: 5px 0px 5px -4px; font-weight: bold; border: solid 1px #AAAAAA; padding: 2px 15px 2px 15px; font-size: smaller; margin-right: 5px;">0.05</span><span style="background-color: #EBBC14; color: white; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 1px; border: solid 1px #EBBC14; font-weight: bold; padding: 2px 15px 2px 15px; font-size: smaller;">ERROR</span><span style="background-color: none; color: #333333; padding: 0.5em 0.5em; position: inherit; margin: 5px 0px 5px -4px; font-weight: bold; border: solid 1px #EBBC14; padding: 2px 15px 2px 15px; font-size: smaller; margin-right: 5px;">0.1</span><span style="background-color: #FF3300; color: white; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 1px; border: solid 1px #FF3300; font-weight: bold; padding: 2px 15px 2px 15px; font-size: smaller;">CRITICAL</span><span style="background-color: none; color: #333333; padding: 0.5em 0.5em; position: inherit; margin: 5px 0px 5px -4px; font-weight: bold; border: solid 1px #FF3300; padding: 2px 15px 2px 15px; font-size: smaller;">0.2</span></span></div></div></td>
+    <td colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style="text-align: left;"><div><span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2025-06-10|20:37:02</span><div style="padding-top: 10px; padding-bottom: 5px;"><span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 10px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 10px 2px 10px; font-size: 10px;">Polars</span><span><span style="background-color: #AAAAAA; color: white; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 5px; border: solid 1px #AAAAAA; font-weight: bold; padding: 2px 15px 2px 15px; font-size: smaller;">WARNING</span><span style="background-color: none; color: #333333; padding: 0.5em 0.5em; position: inherit; margin: 5px 0px 5px -4px; font-weight: bold; border: solid 1px #AAAAAA; padding: 2px 15px 2px 15px; font-size: smaller; margin-right: 5px;">0.05</span><span style="background-color: #EBBC14; color: white; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 1px; border: solid 1px #EBBC14; font-weight: bold; padding: 2px 15px 2px 15px; font-size: smaller;">ERROR</span><span style="background-color: none; color: #333333; padding: 0.5em 0.5em; position: inherit; margin: 5px 0px 5px -4px; font-weight: bold; border: solid 1px #EBBC14; padding: 2px 15px 2px 15px; font-size: smaller; margin-right: 5px;">0.1</span><span style="background-color: #FF3300; color: white; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 1px; border: solid 1px #FF3300; font-weight: bold; padding: 2px 15px 2px 15px; font-size: smaller;">CRITICAL</span><span style="background-color: none; color: #333333; padding: 0.5em 0.5em; position: inherit; margin: 5px 0px 5px -4px; font-weight: bold; border: solid 1px #FF3300; padding: 2px 15px 2px 15px; font-size: smaller;">0.2</span></span></div></div></td>
   </tr>
 <tr class="gt_col_headings">
   <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-status_color"></th>
@@ -953,8 +953,8 @@ Note
         
 </div>
 </div>
-<p>The <a href="https://posit-dev.github.io/pointblank/reference/Validate.warning.html"><code>warning()</code></a> method returns a dictionary mapping step numbers to boolean values. A <code>True</code> value means that step exceeds the warning threshold:</p>
-<div id="ac7be759" class="cell" data-execution_count="9">
+<p>The <a href="../reference/Validate.warning.html#pointblank.Validate.warning" title="0"><code>warning()</code></a> method returns a dictionary mapping step numbers to boolean values. A <code>True</code> value means that step exceeds the warning threshold:</p>
+<div id="a43515ef" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get dictionary of warning status for each step</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>warning_status <span class="op">=</span> validation.warning()</span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Warning status: </span><span class="sc">{</span>warning_status<span class="sc">}</span><span class="ss">"</span>)  <span class="co"># {1: True} means step 1 exceeds warning threshold</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -963,7 +963,7 @@ Note
 </div>
 </div>
 <p>You can check a specific step using the <code>i=</code> parameter, and get a single boolean with <code>scalar=True</code>:</p>
-<div id="3716fb42" class="cell" data-execution_count="10">
+<div id="0509a4b7" class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check error threshold for specific step</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>has_errors <span class="op">=</span> validation.error(i<span class="op">=</span><span class="dv">1</span>, scalar<span class="op">=</span><span class="va">True</span>)</span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -974,7 +974,7 @@ Note
 </div>
 </div>
 <p>Similarly, we can check if any steps exceed the ‘critical’ threshold:</p>
-<div id="6b27b360" class="cell" data-execution_count="11">
+<div id="5f0240b9" class="cell" data-execution_count="11">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check against critical threshold</span></span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>critical_status <span class="op">=</span> validation.critical()</span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Critical status: </span><span class="sc">{</span>critical_status<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -984,10 +984,10 @@ Note
 </div>
 <p>These methods are particularly useful for:</p>
 <ol type="1">
-<li><strong>Conditional logic</strong>: taking different actions based on threshold severity</li>
-<li><strong>Reporting</strong>: generating summary reports about validation quality</li>
-<li><strong>Monitoring</strong>: tracking data quality trends over time</li>
-<li><strong>Graceful degradation</strong>: implementing fallback logic when quality decreases</li>
+<li>Conditional logic: taking different actions based on threshold severity</li>
+<li>Reporting: generating summary reports about validation quality</li>
+<li>Monitoring: tracking data quality trends over time</li>
+<li>Graceful degradation: implementing fallback logic when quality decreases</li>
 </ol>
 <p>Each method has these options:</p>
 <ul>
@@ -1001,7 +1001,7 @@ Note
 <section id="customizing-error-messages" class="level2">
 <h2 class="anchored" data-anchor-id="customizing-error-messages">Customizing Error Messages</h2>
 <p>You can provide custom error messages when assertions fail to make them more meaningful in your specific workflow context:</p>
-<div id="662f4ce7" class="cell" data-execution_count="12">
+<div id="9a22bffe" class="cell" data-execution_count="12">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a validation with potential failures</span></span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>sample_data, thresholds<span class="op">=</span>(<span class="fl">0.2</span>, <span class="fl">0.3</span>, <span class="fl">0.4</span>))</span>
@@ -1086,7 +1086,7 @@ Note
     <td colspan="14" class="gt_heading gt_title gt_font_normal" style="color: #444444;font-size: 28px;text-align: left;font-weight: bold; text-align: left;">Pointblank Validation</td>
   </tr>
   <tr class="gt_heading">
-    <td colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style="text-align: left;"><div><span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2025-06-09|20:50:40</span><div style="padding-top: 10px; padding-bottom: 5px;"><span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 10px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 10px 2px 10px; font-size: 10px;">Polars</span><span><span style="background-color: #AAAAAA; color: white; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 5px; border: solid 1px #AAAAAA; font-weight: bold; padding: 2px 15px 2px 15px; font-size: smaller;">WARNING</span><span style="background-color: none; color: #333333; padding: 0.5em 0.5em; position: inherit; margin: 5px 0px 5px -4px; font-weight: bold; border: solid 1px #AAAAAA; padding: 2px 15px 2px 15px; font-size: smaller; margin-right: 5px;">0.2</span><span style="background-color: #EBBC14; color: white; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 1px; border: solid 1px #EBBC14; font-weight: bold; padding: 2px 15px 2px 15px; font-size: smaller;">ERROR</span><span style="background-color: none; color: #333333; padding: 0.5em 0.5em; position: inherit; margin: 5px 0px 5px -4px; font-weight: bold; border: solid 1px #EBBC14; padding: 2px 15px 2px 15px; font-size: smaller; margin-right: 5px;">0.3</span><span style="background-color: #FF3300; color: white; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 1px; border: solid 1px #FF3300; font-weight: bold; padding: 2px 15px 2px 15px; font-size: smaller;">CRITICAL</span><span style="background-color: none; color: #333333; padding: 0.5em 0.5em; position: inherit; margin: 5px 0px 5px -4px; font-weight: bold; border: solid 1px #FF3300; padding: 2px 15px 2px 15px; font-size: smaller;">0.4</span></span></div></div></td>
+    <td colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style="text-align: left;"><div><span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2025-06-10|20:37:02</span><div style="padding-top: 10px; padding-bottom: 5px;"><span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 10px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 10px 2px 10px; font-size: 10px;">Polars</span><span><span style="background-color: #AAAAAA; color: white; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 5px; border: solid 1px #AAAAAA; font-weight: bold; padding: 2px 15px 2px 15px; font-size: smaller;">WARNING</span><span style="background-color: none; color: #333333; padding: 0.5em 0.5em; position: inherit; margin: 5px 0px 5px -4px; font-weight: bold; border: solid 1px #AAAAAA; padding: 2px 15px 2px 15px; font-size: smaller; margin-right: 5px;">0.2</span><span style="background-color: #EBBC14; color: white; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 1px; border: solid 1px #EBBC14; font-weight: bold; padding: 2px 15px 2px 15px; font-size: smaller;">ERROR</span><span style="background-color: none; color: #333333; padding: 0.5em 0.5em; position: inherit; margin: 5px 0px 5px -4px; font-weight: bold; border: solid 1px #EBBC14; padding: 2px 15px 2px 15px; font-size: smaller; margin-right: 5px;">0.3</span><span style="background-color: #FF3300; color: white; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 1px; border: solid 1px #FF3300; font-weight: bold; padding: 2px 15px 2px 15px; font-size: smaller;">CRITICAL</span><span style="background-color: none; color: #333333; padding: 0.5em 0.5em; position: inherit; margin: 5px 0px 5px -4px; font-weight: bold; border: solid 1px #FF3300; padding: 2px 15px 2px 15px; font-size: smaller;">0.4</span></span></div></div></td>
   </tr>
 <tr class="gt_col_headings">
   <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-status_color"></th>
@@ -1157,7 +1157,7 @@ Note
 </div>
 </div>
 <p>When you need to customize the error message that appears when an assertion fails, use the <code>message=</code> parameter:</p>
-<div id="c900c6ea" class="cell" data-execution_count="13">
+<div id="57a8d21c" class="cell" data-execution_count="13">
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="cf">try</span>:</span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Custom message for threshold assertion</span></span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>    validation.assert_below_threshold(</span>
@@ -1176,11 +1176,11 @@ Note
 <h2 class="anchored" data-anchor-id="combining-assertions-with-actions">Combining Assertions with Actions</h2>
 <p>Actions and assertions serve complementary but distinct purposes in data validation workflows:</p>
 <ul>
-<li><strong>Actions</strong> trigger during validation but shouldn’t raise errors (as this would halt report generation)</li>
-<li><strong>Assertions</strong> are designed to raise errors based on specific conditions, making them ideal for flow control after validation completes</li>
+<li>Actions trigger during validation but shouldn’t raise errors (as this would halt report generation)</li>
+<li>Assertions are designed to raise errors based on specific conditions, making them ideal for flow control after validation completes</li>
 </ul>
 <p>Here’s a simplified example showing how to use them together. The print statements simulate logging or monitoring that would be valuable in production data pipelines:</p>
-<div id="7c6f3f5c" class="cell" data-execution_count="14">
+<div id="d28084f5" class="cell" data-execution_count="14">
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define a simple action function (won't raise errors)</span></span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> notify_quality_issue(message<span class="op">=</span><span class="st">"Data quality issue detected"</span>):</span>
 <span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"ACTION TRIGGERED: </span><span class="sc">{</span>message<span class="sc">}</span><span class="ss">"</span>)</span>
@@ -1234,8 +1234,8 @@ Implementing fallback process...</code></pre>
 <ol type="1">
 <li><p><strong>Choose the right assertion type</strong>:</p>
 <ul>
-<li>use <a href="https://posit-dev.github.io/pointblank/reference/Validate.assert_passing.html"><code>assert_passing()</code></a> for critical validations where any failure is unacceptable</li>
-<li>use <a href="https://posit-dev.github.io/pointblank/reference/Validate.assert_below_threshold.html"><code>assert_below_threshold()</code></a> for validations where some failure rate is acceptable</li>
+<li>use <a href="../reference/Validate.assert_passing.html#pointblank.Validate.assert_passing" title="0"><code>assert_passing()</code></a> for critical validations where any failure is unacceptable</li>
+<li>use <a href="../reference/Validate.assert_below_threshold.html#pointblank.Validate.assert_below_threshold" title="0"><code>assert_below_threshold()</code></a> for validations where some failure rate is acceptable</li>
 </ul></li>
 <li><p><strong>Set appropriate thresholds</strong> that match your data quality requirements:</p>
 <div class="sourceCode" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Example threshold strategy</span></span>
@@ -1262,9 +1262,9 @@ Implementing fallback process...</code></pre>
 <h2 class="anchored" data-anchor-id="conclusion">Conclusion</h2>
 <p>Pointblank’s assertion methods give you flexible options for enforcing data quality requirements:</p>
 <ul>
-<li><a href="https://posit-dev.github.io/pointblank/reference/Validate.assert_passing.html"><code>assert_passing()</code></a> for strict validation where every test unit must pass</li>
-<li><a href="https://posit-dev.github.io/pointblank/reference/Validate.assert_below_threshold.html"><code>assert_below_threshold()</code></a> for more flexible validation where some failures are tolerable</li>
-<li>Status methods (<a href="https://posit-dev.github.io/pointblank/reference/Validate.warning.html"><code>warning()</code></a>, <a href="https://posit-dev.github.io/pointblank/reference/Validate.error.html"><code>error()</code></a>, and <a href="https://posit-dev.github.io/pointblank/reference/Validate.critical.html"><code>critical()</code></a>) for programmatic threshold checking</li>
+<li><a href="../reference/Validate.assert_passing.html#pointblank.Validate.assert_passing" title="0"><code>assert_passing()</code></a> for strict validation where every test unit must pass</li>
+<li><a href="../reference/Validate.assert_below_threshold.html#pointblank.Validate.assert_below_threshold" title="0"><code>assert_below_threshold()</code></a> for more flexible validation where some failures are tolerable</li>
+<li>Status methods (<a href="../reference/Validate.warning.html#pointblank.Validate.warning" title="0"><code>warning()</code></a>, <a href="../reference/Validate.error.html#pointblank.Validate.error" title="0"><code>error()</code></a>, and <a href="../reference/Validate.critical.html#pointblank.Validate.critical" title="0"><code>critical()</code></a>) for programmatic threshold checking</li>
 </ul>
 <p>By using these assertion methods appropriately, you can build robust data pipelines with different levels of quality enforcement (from strict validation of critical data properties to more lenient checks for less critical aspects). This graduated approach to data quality helps create systems that are both reliable and practical in real-world data environments.</p>
 

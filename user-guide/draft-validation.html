@@ -373,7 +373,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#how-draftvalidation-works" id="toc-how-draftvalidation-works" class="nav-link active" data-scroll-target="#how-draftvalidation-works">How <code>DraftValidation</code> Works</a></li>
+  <li><a href="#how-draftvalidation-works" id="toc-how-draftvalidation-works" class="nav-link active" data-scroll-target="#how-draftvalidation-works">How <code class="qd-no-link">DraftValidation</code> Works</a></li>
   <li><a href="#requirements-and-setup" id="toc-requirements-and-setup" class="nav-link" data-scroll-target="#requirements-and-setup">Requirements and Setup</a>
   <ul class="collapse">
   <li><a href="#supported-llm-providers" id="toc-supported-llm-providers" class="nav-link" data-scroll-target="#supported-llm-providers">Supported LLM Providers</a></li>
@@ -396,9 +396,8 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
   </ul></li>
   <li><a href="#best-practices-and-troubleshooting" id="toc-best-practices-and-troubleshooting" class="nav-link" data-scroll-target="#best-practices-and-troubleshooting">Best Practices and Troubleshooting</a>
   <ul class="collapse">
-  <li><a href="#when-to-use-draftvalidation" id="toc-when-to-use-draftvalidation" class="nav-link" data-scroll-target="#when-to-use-draftvalidation">When to Use <code>DraftValidation</code></a></li>
-  <li><a href="#recommended-workflow" id="toc-recommended-workflow" class="nav-link" data-scroll-target="#recommended-workflow">Recommended Workflow</a></li>
-  <li><a href="#common-issues" id="toc-common-issues" class="nav-link" data-scroll-target="#common-issues">Common Issues</a></li>
+  <li><a href="#when-to-use-draftvalidation" id="toc-when-to-use-draftvalidation" class="nav-link" data-scroll-target="#when-to-use-draftvalidation">When to Use <code class="qd-no-link">DraftValidation</code></a></li>
+  <li><a href="#recommended-workflow-and-common-issues" id="toc-recommended-workflow-and-common-issues" class="nav-link" data-scroll-target="#recommended-workflow-and-common-issues">Recommended Workflow and Common Issues</a></li>
   </ul></li>
   <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion">Conclusion</a></li>
   </ul>
@@ -427,31 +426,31 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 
 
 <p>Draft Validation in Pointblank leverages large language models (LLMs) to automatically generate validation plans for your data. This feature is especially useful when starting validation on a new dataset or when you need to quickly establish baseline validation coverage.</p>
-<p>The <a href="https://posit-dev.github.io/pointblank/reference/DraftValidation.html"><span><code>DraftValidation</code></span></a> class connects to various LLM providers to analyze your data’s characteristics and generate a complete validation plan tailored to its structure and content.</p>
+<p>The <a href="../reference/DraftValidation.html#pointblank.DraftValidation" title="0"><code>DraftValidation</code></a> class connects to various LLM providers to analyze your data’s characteristics and generate a complete validation plan tailored to its structure and content.</p>
 <section id="how-draftvalidation-works" class="level2">
-<h2 class="anchored" data-anchor-id="how-draftvalidation-works">How <a href="../reference/DraftValidation.html#pointblank.DraftValidation" title="0"><code>DraftValidation</code></a> Works</h2>
-<p>When you use <a href="https://posit-dev.github.io/pointblank/reference/DraftValidation.html"><span><code>DraftValidation</code></span></a>, the process works through these steps:</p>
+<h2 class="anchored" data-anchor-id="how-draftvalidation-works">How <code class="qd-no-link">DraftValidation</code> Works</h2>
+<p>When you use <a href="../reference/DraftValidation.html#pointblank.DraftValidation" title="0"><code>DraftValidation</code></a>, the process works through these steps:</p>
 <ol type="1">
-<li>a statistical summary of your data is generated using the <a href="https://posit-dev.github.io/pointblank/reference/DataScan.html"><span><code>DataScan</code></span></a> class</li>
+<li>a statistical summary of your data is generated using the <a href="../reference/DataScan.html#pointblank.DataScan" title="0"><code>DataScan</code></a> class</li>
 <li>this summary is converted to JSON format and sent to your selected LLM provider</li>
 <li>the LLM uses the summary along with knowledge about Pointblank’s validation capabilities to generate a validation plan</li>
 <li>the result is returned as executable Python code that you can use directly or modify as needed</li>
 </ol>
-<p>The entire process happens without sending your actual data to the LLM provider, only a summary that includes column names, data types, basic statistics, and a small sample of values.</p>
+<p>The entire process happens without sending all of the data to the LLM provider, but only a summary that includes column names, data types, basic statistics, and a small sample of values.</p>
 </section>
 <section id="requirements-and-setup" class="level2">
 <h2 class="anchored" data-anchor-id="requirements-and-setup">Requirements and Setup</h2>
-<p>To use the <a href="https://posit-dev.github.io/pointblank/reference/DraftValidation.html"><span><code>DraftValidation</code></span></a> feature, you’ll need:</p>
+<p>To use the <a href="../reference/DraftValidation.html#pointblank.DraftValidation" title="0"><code>DraftValidation</code></a> feature, you’ll need:</p>
 <ol type="1">
 <li>an API key from a supported LLM provider</li>
 <li>the required Python packages installed</li>
 </ol>
 <p>You can install all necessary dependencies with:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install pointblank<span class="pp">[</span><span class="ss">generate</span><span class="pp">]</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>This will install the <code>chatlas</code> package and other dependencies required for <a href="https://posit-dev.github.io/pointblank/reference/DraftValidation.html"><span><code>DraftValidation</code></span></a>.</p>
+<p>This will install the <code>chatlas</code> package and other dependencies required for <a href="../reference/DraftValidation.html#pointblank.DraftValidation" title="0"><code>DraftValidation</code></a>.</p>
 <section id="supported-llm-providers" class="level3">
 <h3 class="anchored" data-anchor-id="supported-llm-providers">Supported LLM Providers</h3>
-<p>The <a href="https://posit-dev.github.io/pointblank/reference/DraftValidation.html"><span><code>DraftValidation</code></span></a> class supports multiple LLM providers:</p>
+<p>The <a href="../reference/DraftValidation.html#pointblank.DraftValidation" title="0"><code>DraftValidation</code></a> class supports multiple LLM providers:</p>
 <ul>
 <li><strong>Anthropic</strong> (Claude models)</li>
 <li><strong>OpenAI</strong> (GPT models)</li>
@@ -463,7 +462,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </section>
 <section id="basic-usage" class="level2">
 <h2 class="anchored" data-anchor-id="basic-usage">Basic Usage</h2>
-<p>The simplest way to use <a href="https://posit-dev.github.io/pointblank/reference/DraftValidation.html"><span><code>DraftValidation</code></span></a> is to provide your data and specify an LLM model. Let’s try it out with the <code>global_sales</code> dataset.</p>
+<p>The simplest way to use <a href="../reference/DraftValidation.html#pointblank.DraftValidation" title="0"><code>DraftValidation</code></a> is to provide your data and specify an LLM model. Let’s try it out with the <code>global_sales</code> dataset.</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Load a dataset</span></span>
@@ -565,7 +564,7 @@ validation
 <pre><code># Contents of .env file
 ANTHROPIC_API_KEY=your_anthropic_api_key_here
 OPENAI_API_KEY=your_openai_api_key_here</code></pre>
-<p>If your API keys have standard names (like <code>ANTHROPIC_API_KEY</code> or <code>OPENAI_API_KEY</code>), <a href="https://posit-dev.github.io/pointblank/reference/DraftValidation.html"><span><code>DraftValidation</code></span></a> will automatically find and use them:</p>
+<p>If your API keys have standard names (like <code>ANTHROPIC_API_KEY</code> or <code>OPENAI_API_KEY</code>), <a href="../reference/DraftValidation.html#pointblank.DraftValidation" title="0"><code>DraftValidation</code></a> will automatically find and use them:</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># No API key needed if stored in .env with standard names</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>draft_validation <span class="op">=</span> pb.DraftValidation(</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    data<span class="op">=</span>data,</span>
@@ -575,7 +574,7 @@ OPENAI_API_KEY=your_openai_api_key_here</code></pre>
 </section>
 <section id="example-output-for-nycflights" class="level2">
 <h2 class="anchored" data-anchor-id="example-output-for-nycflights">Example Output for <code>nycflights</code></h2>
-<p>Here’s an example of a validation plan that might be generated by <a href="https://posit-dev.github.io/pointblank/reference/DraftValidation.html"><span><code>DraftValidation</code></span></a> for the <code>nycflights</code> dataset:</p>
+<p>Here’s an example of a validation plan that might be generated by <a href="../reference/DraftValidation.html#pointblank.DraftValidation" title="0"><code>DraftValidation</code></a> for the <code>nycflights</code> dataset:</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>pb.DraftValidation(</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    pb.load_dataset(dataset<span class="op">=</span><span class="st">"nycflights"</span>, tbl_type<span class="op">=</span><span class="st">"duckdb"</span>,</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    model<span class="op">=</span><span class="st">"anthropic:claude-3-7-sonnet-latest"</span></span>
@@ -648,7 +647,7 @@ validation
 <h2 class="anchored" data-anchor-id="working-with-model-providers">Working with Model Providers</h2>
 <section id="specifying-models" class="level3">
 <h3 class="anchored" data-anchor-id="specifying-models">Specifying Models</h3>
-<p>When using <a href="https://posit-dev.github.io/pointblank/reference/DraftValidation.html"><span><code>DraftValidation</code></span></a>, you specify the model in the format <code>"provider:model_name"</code>:</p>
+<p>When using <a href="../reference/DraftValidation.html#pointblank.DraftValidation" title="0"><code>DraftValidation</code></a>, you specify the model in the format <code>"provider:model_name"</code>:</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Using Anthropic's Claude model</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>pb.DraftValidation(data<span class="op">=</span>data, model<span class="op">=</span><span class="st">"anthropic:claude-3-7-sonnet-latest"</span>)</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -665,11 +664,11 @@ validation
 <h3 class="anchored" data-anchor-id="model-performance-and-privacy">Model Performance and Privacy</h3>
 <p>Different models have different capabilities when it comes to generating validation plans:</p>
 <ul>
-<li><strong>Anthropic Claude 3.7 Sonnet</strong> generally provides the most comprehensive and accurate validation plans</li>
-<li><strong>OpenAI GPT-4</strong> models also perform well</li>
-<li><strong>Local models</strong> through Ollama can be useful for private data but may have reduced capabilities</li>
+<li>Anthropic Claude 3.7 Sonnet generally provides the most comprehensive and accurate validation plans</li>
+<li>OpenAI GPT-4 models also perform well</li>
+<li>Local models through Ollama can be useful for private data but they currently have reduced capabilities here</li>
 </ul>
-<p>A key advantage of <a href="https://posit-dev.github.io/pointblank/reference/DraftValidation.html"><span><code>DraftValidation</code></span></a> is that your actual dataset is not sent to the LLM provider. Instead, only a summary is transmitted, which includes:</p>
+<p>A key advantage of <a href="../reference/DraftValidation.html#pointblank.DraftValidation" title="0"><code>DraftValidation</code></a> is that your actual dataset is not sent to the LLM provider. Instead, only a summary is transmitted, which includes:</p>
 <ul>
 <li>the number of rows and columns</li>
 <li>column names and data types</li>
@@ -681,7 +680,7 @@ validation
 </section>
 <section id="customizing-generated-plans" class="level2">
 <h2 class="anchored" data-anchor-id="customizing-generated-plans">Customizing Generated Plans</h2>
-<p>The validation plan generated by <a href="https://posit-dev.github.io/pointblank/reference/DraftValidation.html"><span><code>DraftValidation</code></span></a> is just a starting point. You’ll typically want to:</p>
+<p>The validation plan generated by <a href="../reference/DraftValidation.html#pointblank.DraftValidation" title="0"><code>DraftValidation</code></a> is just a starting point. You’ll typically want to:</p>
 <ol type="1">
 <li>review the generated code for correctness</li>
 <li>replace <code>your_data</code> with your actual data variable name that exists in your workspace</li>
@@ -730,10 +729,10 @@ validation
 </section>
 <section id="the-prompt-strategy" class="level3">
 <h3 class="anchored" data-anchor-id="the-prompt-strategy">The Prompt Strategy</h3>
-<p>The <a href="https://posit-dev.github.io/pointblank/reference/DraftValidation.html"><span><code>DraftValidation</code></span></a> class uses a carefully crafted prompt that instructs the LLM to:</p>
+<p>The <a href="../reference/DraftValidation.html#pointblank.DraftValidation" title="0"><code>DraftValidation</code></a> class uses a carefully crafted prompt that instructs the LLM to:</p>
 <ol type="1">
-<li>use the schema information to create a <a href="https://posit-dev.github.io/pointblank/reference/Schema.html"><span><code>Schema</code></span></a> object</li>
-<li>include <a href="https://posit-dev.github.io/pointblank/reference/Validate.col_vals_not_null.html"><code>col_vals_not_null()</code></a> for columns with no missing values</li>
+<li>use the schema information to create a <a href="../reference/Schema.html#pointblank.Schema" title="0"><code>Schema</code></a> object</li>
+<li>include <a href="../reference/Validate.col_vals_not_null.html#pointblank.Validate.col_vals_not_null" title="0"><code>col_vals_not_null()</code></a> for columns with no missing values</li>
 <li>add appropriate range validations based on min/max values</li>
 <li>include row and column count validations</li>
 <li>format the output as clean, executable Python code</li>
@@ -744,7 +743,7 @@ validation
 <section id="best-practices-and-troubleshooting" class="level2">
 <h2 class="anchored" data-anchor-id="best-practices-and-troubleshooting">Best Practices and Troubleshooting</h2>
 <section id="when-to-use-draftvalidation" class="level3">
-<h3 class="anchored" data-anchor-id="when-to-use-draftvalidation">When to Use <a href="../reference/DraftValidation.html#pointblank.DraftValidation" title="0"><code>DraftValidation</code></a></h3>
+<h3 class="anchored" data-anchor-id="when-to-use-draftvalidation">When to Use <code class="qd-no-link">DraftValidation</code></h3>
 <p>Drafting a validation is most useful when:</p>
 <ul>
 <li>working with a new dataset for the first time</li>
@@ -754,33 +753,30 @@ validation
 </ul>
 <p>Consider writing validation plans manually when you need very specific business rules, are working with sensitive data, need complex validation logic, or need to validate relationships between columns.</p>
 </section>
-<section id="recommended-workflow" class="level3">
-<h3 class="anchored" data-anchor-id="recommended-workflow">Recommended Workflow</h3>
-<p>A recommended workflow incorporating <a href="https://posit-dev.github.io/pointblank/reference/DraftValidation.html"><span><code>DraftValidation</code></span></a>:</p>
+<section id="recommended-workflow-and-common-issues" class="level3">
+<h3 class="anchored" data-anchor-id="recommended-workflow-and-common-issues">Recommended Workflow and Common Issues</h3>
+<p>Here’s a recommended workflow incorporating <a href="../reference/DraftValidation.html#pointblank.DraftValidation" title="0"><code>DraftValidation</code></a>:</p>
 <ol type="1">
-<li>generate an initial plan with <a href="https://posit-dev.github.io/pointblank/reference/DraftValidation.html"><span><code>DraftValidation</code></span></a></li>
+<li>generate an initial plan with <a href="../reference/DraftValidation.html#pointblank.DraftValidation" title="0"><code>DraftValidation</code></a></li>
 <li>review the generated validations for relevance</li>
 <li>adjust thresholds and parameters as needed</li>
 <li>add specific business logic and cross-column validations</li>
 <li>store the final validation plan in version control</li>
 </ol>
-</section>
-<section id="common-issues" class="level3">
-<h3 class="anchored" data-anchor-id="common-issues">Common Issues</h3>
+<p>It’s possible that you might bump up against some issues. Here are some common ones and solutions you might try:</p>
 <ul>
-<li><strong>Authentication Errors</strong>: ensure your API key is valid and correctly passed to <a href="https://posit-dev.github.io/pointblank/reference/DraftValidation.html"><span><code>DraftValidation</code></span></a></li>
-<li><strong>Package Not Found</strong>: make sure you’ve installed the required packages with <code>pip install pointblank[generate]</code></li>
-<li><strong>Unsupported Model</strong>: verify you’re using the correct <code>provider:model</code> format</li>
-<li><strong>Poor Quality Plans</strong>: try a more capable model or provide better context</li>
+<li>Authentication Errors: ensure your API key is valid and correctly passed to <a href="../reference/DraftValidation.html#pointblank.DraftValidation" title="0"><code>DraftValidation</code></a></li>
+<li>Package Not Found: make sure you’ve installed the required packages with <code>pip install pointblank[generate]</code></li>
+<li>Unsupported Model: verify you’re using the correct <code>provider:model</code> format</li>
+<li>Poor Quality Plans: try a more capable model</li>
 </ul>
-<p>Be aware that LLM providers typically have rate limits. If you’re generating many validation plans, consider using local models through Ollama, implementing rate limiting in your code, or caching generated plans for datasets that don’t change frequently.</p>
 </section>
 </section>
 <section id="conclusion" class="level2">
 <h2 class="anchored" data-anchor-id="conclusion">Conclusion</h2>
-<p><a href="https://posit-dev.github.io/pointblank/reference/DraftValidation.html"><span><code>DraftValidation</code></span></a> provides a powerful way to jumpstart your data validation process by leveraging LLMs to generate context-aware validation plans. By analyzing your data’s structure and content, <a href="https://posit-dev.github.io/pointblank/reference/DraftValidation.html"><span><code>DraftValidation</code></span></a> can create comprehensive validation rules that would otherwise take significant time to develop manually.</p>
+<p><a href="../reference/DraftValidation.html#pointblank.DraftValidation" title="0"><code>DraftValidation</code></a> provides a powerful way to jumpstart your data validation process by leveraging LLMs to generate context-aware validation plans. By analyzing your data’s structure and content, <a href="../reference/DraftValidation.html#pointblank.DraftValidation" title="0"><code>DraftValidation</code></a> can create comprehensive validation rules that would otherwise take significant time to develop manually.</p>
 <p>The feature balances privacy (by sending only data summaries) with utility (by generating executable validation code). While the generated plans should always be reviewed and refined, they provide an excellent starting point for ensuring your data meets your quality requirements.</p>
-<p>By understanding how <a href="https://posit-dev.github.io/pointblank/reference/DraftValidation.html"><span><code>DraftValidation</code></span></a> works and how to customize its output, you can significantly accelerate your data validation workflows and improve the quality of your data throughout your projects.</p>
+<p>By understanding how <a href="../reference/DraftValidation.html#pointblank.DraftValidation" title="0"><code>DraftValidation</code></a> works and how to customize its output, you can significantly accelerate your data validation workflows and improve the quality of your data throughout your projects.</p>
 
 
 </section>

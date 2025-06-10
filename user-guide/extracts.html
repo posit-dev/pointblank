@@ -383,7 +383,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
   <li><a href="#get_data_extracts" id="toc-get_data_extracts" class="nav-link" data-scroll-target="#get_data_extracts"><code>get_data_extracts()</code></a></li>
   <li><a href="#step-reports" id="toc-step-reports" class="nav-link" data-scroll-target="#step-reports">Step Reports</a></li>
   </ul></li>
-  <li><a href="#viewing-data-extracts-with-preview" id="toc-viewing-data-extracts-with-preview" class="nav-link" data-scroll-target="#viewing-data-extracts-with-preview">Viewing Data Extracts with <code>preview()</code></a></li>
+  <li><a href="#viewing-data-extracts-with-preview" id="toc-viewing-data-extracts-with-preview" class="nav-link" data-scroll-target="#viewing-data-extracts-with-preview">Viewing Data Extracts with <code class="qd-no-link">preview()</code></a></li>
   <li><a href="#working-with-multiple-validation-steps" id="toc-working-with-multiple-validation-steps" class="nav-link" data-scroll-target="#working-with-multiple-validation-steps">Working with Multiple Validation Steps</a>
   <ul class="collapse">
   <li><a href="#extracting-data-from-a-specific-step" id="toc-extracting-data-from-a-specific-step" class="nav-link" data-scroll-target="#extracting-data-from-a-specific-step">Extracting Data from a Specific Step</a></li>
@@ -395,7 +395,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
   <li><a href="#finding-patterns-across-validation-steps" id="toc-finding-patterns-across-validation-steps" class="nav-link" data-scroll-target="#finding-patterns-across-validation-steps">Finding Patterns Across Validation Steps</a></li>
   <li><a href="#identifying-rows-with-multiple-failures" id="toc-identifying-rows-with-multiple-failures" class="nav-link" data-scroll-target="#identifying-rows-with-multiple-failures">Identifying Rows with Multiple Failures</a></li>
   <li><a href="#statistical-analysis-of-failing-values" id="toc-statistical-analysis-of-failing-values" class="nav-link" data-scroll-target="#statistical-analysis-of-failing-values">Statistical Analysis of Failing Values</a></li>
-  <li><a href="#detailed-analysis-with-col_summary_tbl" id="toc-detailed-analysis-with-col_summary_tbl" class="nav-link" data-scroll-target="#detailed-analysis-with-col_summary_tbl">Detailed Analysis with <code>col_summary_tbl()</code></a></li>
+  <li><a href="#detailed-analysis-with-col_summary_tbl" id="toc-detailed-analysis-with-col_summary_tbl" class="nav-link" data-scroll-target="#detailed-analysis-with-col_summary_tbl">Detailed Analysis with <code class="qd-no-link">col_summary_tbl()</code></a></li>
   </ul></li>
   <li><a href="#using-extracts-for-data-quality-improvement" id="toc-using-extracts-for-data-quality-improvement" class="nav-link" data-scroll-target="#using-extracts-for-data-quality-improvement">Using Extracts for Data Quality Improvement</a></li>
   <li><a href="#best-practices-for-working-with-data-extracts" id="toc-best-practices-for-working-with-data-extracts" class="nav-link" data-scroll-target="#best-practices-for-working-with-data-extracts">Best Practices for Working with Data Extracts</a></li>
@@ -437,54 +437,51 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <h2 class="anchored" data-anchor-id="the-validation-methods-that-work-with-data-extracts">The Validation Methods that Work with Data Extracts</h2>
 <p>The following validation methods operate on column values and will have rows extracted when there are failing test units in those rows:</p>
 <ul>
-<li><a href="https://posit-dev.github.io/pointblank/reference/Validate.col_vals_gt.html"><code>col_vals_gt()</code></a></li>
-<li><a href="https://posit-dev.github.io/pointblank/reference/Validate.col_vals_lt.html"><code>col_vals_lt()</code></a></li>
-<li><a href="https://posit-dev.github.io/pointblank/reference/Validate.col_vals_ge.html"><code>col_vals_ge()</code></a></li>
-<li><a href="https://posit-dev.github.io/pointblank/reference/Validate.col_vals_le.html"><code>col_vals_le()</code></a></li>
-<li><a href="https://posit-dev.github.io/pointblank/reference/Validate.col_vals_eq.html"><code>col_vals_eq()</code></a></li>
-<li><a href="https://posit-dev.github.io/pointblank/reference/Validate.col_vals_ne.html"><code>col_vals_ne()</code></a></li>
-<li><a href="https://posit-dev.github.io/pointblank/reference/Validate.col_vals_between.html"><code>col_vals_between()</code></a></li>
-<li><a href="https://posit-dev.github.io/pointblank/reference/Validate.col_vals_outside.html"><code>col_vals_outside()</code></a></li>
-<li><a href="https://posit-dev.github.io/pointblank/reference/Validate.col_vals_in_set.html"><code>col_vals_in_set()</code></a></li>
-<li><a href="https://posit-dev.github.io/pointblank/reference/Validate.col_vals_not_in_set.html"><code>col_vals_not_in_set()</code></a></li>
-<li><a href="https://posit-dev.github.io/pointblank/reference/Validate.col_vals_null.html"><code>col_vals_null()</code></a></li>
-<li><a href="https://posit-dev.github.io/pointblank/reference/Validate.col_vals_not_null.html"><code>col_vals_not_null()</code></a></li>
-<li><a href="https://posit-dev.github.io/pointblank/reference/Validate.col_vals_regex.html"><code>col_vals_regex()</code></a></li>
-<li><a href="https://posit-dev.github.io/pointblank/reference/Validate.col_vals_expr.html"><code>col_vals_expr()</code></a></li>
-<li><a href="https://posit-dev.github.io/pointblank/reference/Validate.conjointly.html"><code>conjointly()</code></a></li>
+<li><a href="../reference/Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt" title="0"><code>col_vals_gt()</code></a></li>
+<li><a href="../reference/Validate.col_vals_lt.html#pointblank.Validate.col_vals_lt" title="0"><code>col_vals_lt()</code></a></li>
+<li><a href="../reference/Validate.col_vals_ge.html#pointblank.Validate.col_vals_ge" title="0"><code>col_vals_ge()</code></a></li>
+<li><a href="../reference/Validate.col_vals_le.html#pointblank.Validate.col_vals_le" title="0"><code>col_vals_le()</code></a></li>
+<li><a href="../reference/Validate.col_vals_eq.html#pointblank.Validate.col_vals_eq" title="0"><code>col_vals_eq()</code></a></li>
+<li><a href="../reference/Validate.col_vals_ne.html#pointblank.Validate.col_vals_ne" title="0"><code>col_vals_ne()</code></a></li>
+<li><a href="../reference/Validate.col_vals_between.html#pointblank.Validate.col_vals_between" title="0"><code>col_vals_between()</code></a></li>
+<li><a href="../reference/Validate.col_vals_outside.html#pointblank.Validate.col_vals_outside" title="0"><code>col_vals_outside()</code></a></li>
+<li><a href="../reference/Validate.col_vals_in_set.html#pointblank.Validate.col_vals_in_set" title="0"><code>col_vals_in_set()</code></a></li>
+<li><a href="../reference/Validate.col_vals_not_in_set.html#pointblank.Validate.col_vals_not_in_set" title="0"><code>col_vals_not_in_set()</code></a></li>
+<li><a href="../reference/Validate.col_vals_null.html#pointblank.Validate.col_vals_null" title="0"><code>col_vals_null()</code></a></li>
+<li><a href="../reference/Validate.col_vals_not_null.html#pointblank.Validate.col_vals_not_null" title="0"><code>col_vals_not_null()</code></a></li>
+<li><a href="../reference/Validate.col_vals_regex.html#pointblank.Validate.col_vals_regex" title="0"><code>col_vals_regex()</code></a></li>
+<li><a href="../reference/Validate.col_vals_expr.html#pointblank.Validate.col_vals_expr" title="0"><code>col_vals_expr()</code></a></li>
+<li><a href="../reference/Validate.conjointly.html#pointblank.Validate.conjointly" title="0"><code>conjointly()</code></a></li>
 </ul>
 <p>These row-based validation methods will also have rows extracted should there be failing rows:</p>
 <ul>
-<li><a href="https://posit-dev.github.io/pointblank/reference/Validate.rows_distinct.html"><code>rows_distinct()</code></a></li>
-<li><a href="https://posit-dev.github.io/pointblank/reference/Validate.rows_complete.html"><code>rows_complete()</code></a></li>
+<li><a href="../reference/Validate.rows_distinct.html#pointblank.Validate.rows_distinct" title="0"><code>rows_distinct()</code></a></li>
+<li><a href="../reference/Validate.rows_complete.html#pointblank.Validate.rows_complete" title="0"><code>rows_complete()</code></a></li>
 </ul>
-<p>Note that some validation methods like <a href="https://posit-dev.github.io/pointblank/reference/Validate.col_exists.html"><code>col_exists()</code></a> or <a href="https://posit-dev.github.io/pointblank/reference/Validate.col_schema_match.html"><code>col_schema_match()</code></a> don’t generate data extracts because they validate structural aspects of the table rather than checking column values.</p>
+<p>Note that some validation methods like <a href="../reference/Validate.col_exists.html#pointblank.Validate.col_exists" title="0"><code>col_exists()</code></a> and <a href="../reference/Validate.col_schema_match.html#pointblank.Validate.col_schema_match" title="0"><code>col_schema_match()</code></a> don’t generate data extracts because they validate structural aspects of the table rather than checking column values.</p>
 </section>
 <section id="accessing-data-extracts" class="level2">
 <h2 class="anchored" data-anchor-id="accessing-data-extracts">Accessing Data Extracts</h2>
 <p>There are three primary ways to access data extracts in Pointblank:</p>
 <ol type="1">
 <li>the <strong>CSV</strong> buttons in validation reports</li>
-<li>through the <a href="https://posit-dev.github.io/pointblank/reference/Validate.get_data_extracts.html"><code>get_data_extracts()</code></a> method</li>
+<li>through the <a href="../reference/Validate.get_data_extracts.html#pointblank.Validate.get_data_extracts" title="0"><code>get_data_extracts()</code></a> method</li>
 <li>inspecting a subset of failed rows in step reports</li>
 </ol>
 <p>Let’s explore each approach using examples.</p>
 <section id="csv-data-from-validation-reports" class="level3">
 <h3 class="anchored" data-anchor-id="csv-data-from-validation-reports">CSV Data from Validation Reports</h3>
 <p>Data extracts are embedded within validation report tables. Let’s look at an example, using the <code>small_table</code> dataset, where data extracts are collected in a single validation step due to failing test units:</p>
-<div id="191a981e" class="cell" data-execution_count="2">
+<div id="602b4754" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>pb.load_dataset(dataset<span class="op">=</span><span class="st">"small_table"</span>, tbl_type<span class="op">=</span><span class="st">"polars"</span>))</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    .col_vals_lt(</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>        columns<span class="op">=</span><span class="st">"d"</span>,</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>        value<span class="op">=</span><span class="dv">3000</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>validation</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    .col_vals_lt( columns<span class="op">=</span><span class="st">"d"</span>, value<span class="op">=</span><span class="dv">3000</span>)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>validation</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="2">
 <div id="pb_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>
@@ -634,8 +631,8 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </section>
 <section id="get_data_extracts" class="level3">
 <h3 class="anchored" data-anchor-id="get_data_extracts"><code>get_data_extracts()</code></h3>
-<p>For programmatic access to data extracts, Pointblank provides the <a href="https://posit-dev.github.io/pointblank/reference/Validate.get_data_extracts.html"><code>get_data_extracts()</code></a> method. This allows you to work with extract data directly in your Python workflow:</p>
-<div id="5e1fd188" class="cell" data-execution_count="3">
+<p>For programmatic access to data extracts, Pointblank provides the <a href="../reference/Validate.get_data_extracts.html#pointblank.Validate.get_data_extracts" title="0"><code>get_data_extracts()</code></a> method. This allows you to work with extract data directly in your Python workflow:</p>
+<div id="76983c1e" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get data extracts from step 1</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>extract_1 <span class="op">=</span> validation.get_data_extracts(i<span class="op">=</span><span class="dv">1</span>, frame<span class="op">=</span><span class="va">True</span>)</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -651,8 +648,8 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <small>shape: (4, 9)</small><table class="dataframe table table-sm table-striped small"><thead><tr><th>_row_num_</th><th>date_time</th><th>date</th><th>a</th><th>b</th><th>c</th><th>d</th><th>e</th><th>f</th></tr><tr><td>u32</td><td>datetime[μs]</td><td>date</td><td>i64</td><td>str</td><td>i64</td><td>f64</td><td>bool</td><td>str</td></tr></thead><tbody><tr><td>1</td><td>2016-01-04 11:00:00</td><td>2016-01-04</td><td>2</td><td>"1-bcd-345"</td><td>3</td><td>3423.29</td><td>true</td><td>"high"</td></tr><tr><td>2</td><td>2016-01-04 00:32:00</td><td>2016-01-04</td><td>3</td><td>"5-egh-163"</td><td>8</td><td>9999.99</td><td>true</td><td>"low"</td></tr><tr><td>4</td><td>2016-01-06 17:23:00</td><td>2016-01-06</td><td>2</td><td>"5-jdo-903"</td><td>null</td><td>3892.4</td><td>false</td><td>"mid"</td></tr><tr><td>6</td><td>2016-01-11 06:15:00</td><td>2016-01-11</td><td>4</td><td>"2-dhe-923"</td><td>4</td><td>3291.03</td><td>true</td><td>"mid"</td></tr></tbody></table></div>
 </div>
 </div>
-<p>The extracted table is of the same type (a Polars DataFrame) as the target table. Previously we used <a href="https://posit-dev.github.io/pointblank/reference/load_dataset.html"><span><code>load_dataset()</code></span></a> with the <code>tbl_type="polars"</code> option to fetch the dataset in that form.</p>
-<p>Note these important details about using <a href="https://posit-dev.github.io/pointblank/reference/Validate.get_data_extracts.html"><code>get_data_extracts()</code></a>:</p>
+<p>The extracted table is of the same type (a Polars DataFrame) as the target table. Previously we used <a href="../reference/load_dataset.html#pointblank.load_dataset" title="0"><code>load_dataset()</code></a> with the <code>tbl_type="polars"</code> option to fetch the dataset in that form.</p>
+<p>Note these important details about using <a href="../reference/Validate.get_data_extracts.html#pointblank.Validate.get_data_extracts" title="0"><code>get_data_extracts()</code></a>:</p>
 <ul>
 <li>the parameter <code>i=1</code> corresponds to the step number shown in the validation report (1-indexed, not 0-indexed)</li>
 <li>setting <code>frame=True</code> returns the data as a DataFrame rather than a dictionary (only works when <code>i</code> is a single integer)</li>
@@ -663,7 +660,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="step-reports" class="level3">
 <h3 class="anchored" data-anchor-id="step-reports">Step Reports</h3>
 <p>Step reports provide another way to access and visualize failing data. When you generate a step report for a validation step that has failing rows, those failing rows are displayed directly in the report:</p>
-<div id="861185a8" class="cell" data-execution_count="4">
+<div id="ec3e267b" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get a step report for the first validation step</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>step_report <span class="op">=</span> validation.get_step_report(i<span class="op">=</span><span class="dv">1</span>)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -810,7 +807,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <li>include additional metadata about the validation step and failure statistics</li>
 </ol>
 <p>For steps with many failures, you can customize how many rows to display:</p>
-<div id="0676b33f" class="cell" data-execution_count="5">
+<div id="c579b89f" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Limit to just 2 rows of failing data</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>limited_report <span class="op">=</span> validation.get_step_report(i<span class="op">=</span><span class="dv">1</span>, limit<span class="op">=</span><span class="dv">2</span>)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -932,9 +929,9 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </section>
 </section>
 <section id="viewing-data-extracts-with-preview" class="level2">
-<h2 class="anchored" data-anchor-id="viewing-data-extracts-with-preview">Viewing Data Extracts with <a href="../reference/preview.html#pointblank.preview" title="0"><code>preview()</code></a></h2>
-<p>To get a consistent HTML representation of any data extract (regardless of the table type), we can use the <a href="https://posit-dev.github.io/pointblank/reference/preview.html"><span><code>preview()</code></span></a> function:</p>
-<div id="8933957e" class="cell" data-execution_count="6">
+<h2 class="anchored" data-anchor-id="viewing-data-extracts-with-preview">Viewing Data Extracts with <code class="qd-no-link">preview()</code></h2>
+<p>To get a consistent HTML representation of any data extract (regardless of the table type), we can use the <a href="../reference/preview.html#pointblank.preview" title="0"><code>preview()</code></a> function:</p>
+<div id="53d3873f" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>pb.preview(data<span class="op">=</span>extract_1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="6">
 <div id="pb_preview_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
@@ -1072,12 +1069,12 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 </div>
 <p>The view is optimized for readability, with column names and data types displayed in a compact format. Notice that the <code>_row_num_</code> column is now part of the table stub and doesn’t steal focus from the table’s original columns.</p>
-<p>The <a href="https://posit-dev.github.io/pointblank/reference/preview.html"><span><code>preview()</code></span></a> function is designed to provide the head and tail (5 rows each) of the table so very large extracts won’t overflow the display.</p>
+<p>The <a href="../reference/preview.html#pointblank.preview" title="0"><code>preview()</code></a> function is designed to provide the head and tail (5 rows each) of the table so very large extracts won’t overflow the display.</p>
 </section>
 <section id="working-with-multiple-validation-steps" class="level2">
 <h2 class="anchored" data-anchor-id="working-with-multiple-validation-steps">Working with Multiple Validation Steps</h2>
 <p>When validating data with multiple steps, you can extract failing rows from any step or combine extracts from multiple steps:</p>
-<div id="bba1e6d5" class="cell" data-execution_count="7">
+<div id="f3210880" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a validation with multiple steps</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>multi_validation <span class="op">=</span> (</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>pb.load_dataset(dataset<span class="op">=</span><span class="st">"small_table"</span>, tbl_type<span class="op">=</span><span class="st">"polars"</span>))</span>
@@ -1315,7 +1312,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="extracting-data-from-a-specific-step" class="level3">
 <h3 class="anchored" data-anchor-id="extracting-data-from-a-specific-step">Extracting Data from a Specific Step</h3>
 <p>You can access extracts from any specific validation step:</p>
-<div id="e7a5c206" class="cell" data-execution_count="8">
+<div id="585d3077" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get extracts from step 2 (`d &lt; 3000` validation)</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>less_than_failures <span class="op">=</span> multi_validation.get_data_extracts(i<span class="op">=</span><span class="dv">2</span>, frame<span class="op">=</span><span class="va">True</span>)</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1333,7 +1330,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 <p>Using <code>frame=True</code> means that returned value will be a DataFrame (not a dictionary that contains a single DataFrame).</p>
 <p>If a step has no failing rows, an empty DataFrame will be returned:</p>
-<div id="1059d7e4" class="cell" data-execution_count="9">
+<div id="14241c7e" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get extracts from step 3 (regex check)</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>regex_failures <span class="op">=</span> multi_validation.get_data_extracts(i<span class="op">=</span><span class="dv">3</span>, frame<span class="op">=</span><span class="va">True</span>)</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1353,7 +1350,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="getting-all-extracts-at-once" class="level3">
 <h3 class="anchored" data-anchor-id="getting-all-extracts-at-once">Getting All Extracts at Once</h3>
 <p>To retrieve extracts from all steps with failures in one command:</p>
-<div id="7aad4388" class="cell" data-execution_count="10">
+<div id="8044e43a" class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get all extracts ()</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>all_extracts <span class="op">=</span> multi_validation.get_data_extracts()</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1368,7 +1365,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="getting-specific-extracts" class="level3">
 <h3 class="anchored" data-anchor-id="getting-specific-extracts">Getting Specific Extracts</h3>
 <p>You can also retrieve data extracts from several specified steps as a dictionary:</p>
-<div id="2422ad3c" class="cell" data-execution_count="11">
+<div id="5d254f9a" class="cell" data-execution_count="11">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get extracts from steps 1 and 2 as a dictionary</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>extract_dict <span class="op">=</span> multi_validation.get_data_extracts(i<span class="op">=</span>[<span class="dv">1</span>, <span class="dv">2</span>])</span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1393,7 +1390,7 @@ Step 2: 4 failing rows</code></pre>
 <section id="finding-patterns-across-validation-steps" class="level3">
 <h3 class="anchored" data-anchor-id="finding-patterns-across-validation-steps">Finding Patterns Across Validation Steps</h3>
 <p>You can analyze patterns across different validation steps by combining extracts:</p>
-<div id="c382c0c3" class="cell" data-execution_count="12">
+<div id="e72b74d0" class="cell" data-execution_count="12">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get a consolidated view of all rows that failed any validation</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>all_failure_rows <span class="op">=</span> <span class="bu">set</span>()</span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> step, extract <span class="kw">in</span> all_extracts.items():</span>
@@ -1411,7 +1408,7 @@ Row numbers with failures: [1, 2, 4, 6, 9, 10, 12, 13]</code></pre>
 <section id="identifying-rows-with-multiple-failures" class="level3">
 <h3 class="anchored" data-anchor-id="identifying-rows-with-multiple-failures">Identifying Rows with Multiple Failures</h3>
 <p>You might want to find rows that failed multiple validation checks, as these often represent more serious data quality issues:</p>
-<div id="3bc460aa" class="cell" data-execution_count="13">
+<div id="d02da971" class="cell" data-execution_count="13">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get row numbers from each extract</span></span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>step1_rows <span class="op">=</span> <span class="bu">set</span>(multi_validation.get_data_extracts(i<span class="op">=</span><span class="dv">1</span>, frame<span class="op">=</span><span class="va">True</span>)[<span class="st">"_row_num_"</span>])</span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>step2_rows <span class="op">=</span> <span class="bu">set</span>(multi_validation.get_data_extracts(i<span class="op">=</span><span class="dv">2</span>, frame<span class="op">=</span><span class="va">True</span>)[<span class="st">"_row_num_"</span>])</span>
@@ -1427,7 +1424,7 @@ Row numbers with failures: [1, 2, 4, 6, 9, 10, 12, 13]</code></pre>
 <section id="statistical-analysis-of-failing-values" class="level3">
 <h3 class="anchored" data-anchor-id="statistical-analysis-of-failing-values">Statistical Analysis of Failing Values</h3>
 <p>Once you have data extracts, you can perform statistical analysis to identify patterns in the failing data:</p>
-<div id="50cf8c70" class="cell" data-execution_count="14">
+<div id="826b04f0" class="cell" data-execution_count="14">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get extracts from step 2</span></span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>d_value_failures <span class="op">=</span> multi_validation.get_data_extracts(i<span class="op">=</span><span class="dv">2</span>, frame<span class="op">=</span><span class="va">True</span>)</span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1445,63 +1442,63 @@ Mean failing value: 5151.6775</code></pre>
 <p>These analysis techniques help you thoroughly investigate data quality issues by examining failing data from multiple perspectives. Rather than treating failures as isolated incidents, you can identify patterns that might indicate systematic problems in your data pipeline.</p>
 </section>
 <section id="detailed-analysis-with-col_summary_tbl" class="level3">
-<h3 class="anchored" data-anchor-id="detailed-analysis-with-col_summary_tbl">Detailed Analysis with <a href="../reference/col_summary_tbl.html#pointblank.col_summary_tbl" title="0"><code>col_summary_tbl()</code></a></h3>
-<p>For a more comprehensive view of the statistical properties of your extract data, you can use the <a href="https://posit-dev.github.io/pointblank/reference/col_summary_tbl.html"><span><code>col_summary_tbl()</code></span></a> function:</p>
-<div id="1c51c95e" class="cell" data-execution_count="15">
+<h3 class="anchored" data-anchor-id="detailed-analysis-with-col_summary_tbl">Detailed Analysis with <code class="qd-no-link">col_summary_tbl()</code></h3>
+<p>For a more comprehensive view of the statistical properties of your extract data, you can use the <a href="../reference/col_summary_tbl.html#pointblank.col_summary_tbl" title="0"><code>col_summary_tbl()</code></a> function:</p>
+<div id="67579989" class="cell" data-execution_count="15">
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get extracts from step 2</span></span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>d_value_failures <span class="op">=</span> multi_validation.get_data_extracts(i<span class="op">=</span><span class="dv">2</span>, frame<span class="op">=</span><span class="va">True</span>)</span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate a comprehensive statistical summary of the failing data</span></span>
 <span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>pb.col_summary_tbl(d_value_failures)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="15">
-<div id="rhzdlzosfv" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="exscyeysns" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap');
-#rhzdlzosfv table {
+#exscyeysns table {
           font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
           -webkit-font-smoothing: antialiased;
           -moz-osx-font-smoothing: grayscale;
         }
 
-#rhzdlzosfv thead, tbody, tfoot, tr, td, th { border-style: none; }
+#exscyeysns thead, tbody, tfoot, tr, td, th { border-style: none; }
  tr { background-color: transparent; }
-#rhzdlzosfv p { margin: 0; padding: 0; }
- #rhzdlzosfv .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 16px; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: auto; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
- #rhzdlzosfv .gt_caption { padding-top: 4px; padding-bottom: 4px; }
- #rhzdlzosfv .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
- #rhzdlzosfv .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
- #rhzdlzosfv .gt_heading { background-color: #FFFFFF; text-align: left; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
- #rhzdlzosfv .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
- #rhzdlzosfv .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
- #rhzdlzosfv .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
- #rhzdlzosfv .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
- #rhzdlzosfv .gt_column_spanner_outer:first-child { padding-left: 0; }
- #rhzdlzosfv .gt_column_spanner_outer:last-child { padding-right: 0; }
- #rhzdlzosfv .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
- #rhzdlzosfv .gt_spanner_row { border-bottom-style: hidden; }
- #rhzdlzosfv .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
- #rhzdlzosfv .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
- #rhzdlzosfv .gt_from_md> :first-child { margin-top: 0; }
- #rhzdlzosfv .gt_from_md> :last-child { margin-bottom: 0; }
- #rhzdlzosfv .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
- #rhzdlzosfv .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
- #rhzdlzosfv .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
- #rhzdlzosfv .gt_row_group_first td { border-top-width: 2px; }
- #rhzdlzosfv .gt_row_group_first th { border-top-width: 2px; }
- #rhzdlzosfv .gt_striped { background-color: rgba(128,128,128,0.05); }
- #rhzdlzosfv .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
- #rhzdlzosfv .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
- #rhzdlzosfv .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
- #rhzdlzosfv .gt_left { text-align: left; }
- #rhzdlzosfv .gt_center { text-align: center; }
- #rhzdlzosfv .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
- #rhzdlzosfv .gt_font_normal { font-weight: normal; }
- #rhzdlzosfv .gt_font_bold { font-weight: bold; }
- #rhzdlzosfv .gt_font_italic { font-style: italic; }
- #rhzdlzosfv .gt_super { font-size: 65%; }
- #rhzdlzosfv .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
- #rhzdlzosfv .gt_asterisk { font-size: 100%; vertical-align: 0; }
+#exscyeysns p { margin: 0; padding: 0; }
+ #exscyeysns .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 16px; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: auto; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
+ #exscyeysns .gt_caption { padding-top: 4px; padding-bottom: 4px; }
+ #exscyeysns .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
+ #exscyeysns .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
+ #exscyeysns .gt_heading { background-color: #FFFFFF; text-align: left; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #exscyeysns .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #exscyeysns .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #exscyeysns .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
+ #exscyeysns .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
+ #exscyeysns .gt_column_spanner_outer:first-child { padding-left: 0; }
+ #exscyeysns .gt_column_spanner_outer:last-child { padding-right: 0; }
+ #exscyeysns .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
+ #exscyeysns .gt_spanner_row { border-bottom-style: hidden; }
+ #exscyeysns .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
+ #exscyeysns .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
+ #exscyeysns .gt_from_md> :first-child { margin-top: 0; }
+ #exscyeysns .gt_from_md> :last-child { margin-bottom: 0; }
+ #exscyeysns .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
+ #exscyeysns .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
+ #exscyeysns .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
+ #exscyeysns .gt_row_group_first td { border-top-width: 2px; }
+ #exscyeysns .gt_row_group_first th { border-top-width: 2px; }
+ #exscyeysns .gt_striped { background-color: rgba(128,128,128,0.05); }
+ #exscyeysns .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #exscyeysns .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #exscyeysns .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #exscyeysns .gt_left { text-align: left; }
+ #exscyeysns .gt_center { text-align: center; }
+ #exscyeysns .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
+ #exscyeysns .gt_font_normal { font-weight: normal; }
+ #exscyeysns .gt_font_bold { font-weight: bold; }
+ #exscyeysns .gt_font_italic { font-style: italic; }
+ #exscyeysns .gt_super { font-size: 65%; }
+ #exscyeysns .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
+ #exscyeysns .gt_asterisk { font-size: 100%; vertical-align: 0; }
  
 </style>
 <table style="table-layout: fixed;; width: 0px" class="gt_table" data-quarto-disable-processing="true" data-quarto-bootstrap="false">
@@ -1800,13 +1797,13 @@ Mean failing value: 5151.6775</code></pre>
 </div>
 <p>This statistical overview provides:</p>
 <ol type="1">
-<li>Count of values (including missing values)</li>
-<li>Type information for each column</li>
-<li>Distribution metrics like min, max, mean, and quartiles for numeric columns</li>
-<li>Frequency of common values for categorical columns</li>
-<li>Missing value counts and proportions</li>
+<li>a count of values (including missing values)</li>
+<li>type information for each column</li>
+<li>distribution metrics like min, max, mean, and quartiles for numeric columns</li>
+<li>frequency of common values for categorical columns</li>
+<li>missing value counts and proportions</li>
 </ol>
-<p>Using <a href="https://posit-dev.github.io/pointblank/reference/col_summary_tbl.html"><span><code>col_summary_tbl()</code></span></a> on data extracts lets you quickly understand the characteristics of failing data without writing custom analysis code. This approach is particularly valuable when:</p>
+<p>Using <a href="../reference/col_summary_tbl.html#pointblank.col_summary_tbl" title="0"><code>col_summary_tbl()</code></a> on data extracts lets you quickly understand the characteristics of failing data without writing custom analysis code. This approach is particularly valuable when:</p>
 <ul>
 <li>You need to understand the statistical properties of failing records</li>
 <li>You want to compare distributions of failing vs passing data</li>
@@ -1825,7 +1822,7 @@ Mean failing value: 5151.6775</code></pre>
 <li><strong>Pattern Recognition</strong>: identifying systemic issues by analyzing groups of failing records</li>
 </ol>
 <p>Here’s an example of using extracts to create a corrective action plan:</p>
-<div id="6a6f7570" class="cell" data-execution_count="16">
+<div id="9de37fc7" class="cell" data-execution_count="16">
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a new sample of an extract DF</span></span>
@@ -1856,7 +1853,7 @@ Mean failing value: 5151.6775</code></pre>
   white-space: pre-wrap;
 }
 </style>
-<small>shape: (4, 2)</small><table class="dataframe table table-sm table-striped small"><thead><tr><th>region</th><th>failure_count</th></tr><tr><td>str</td><td>u32</td></tr></thead><tbody><tr><td>"South"</td><td>6</td></tr><tr><td>"East"</td><td>2</td></tr><tr><td>"North"</td><td>1</td></tr><tr><td>"West"</td><td>1</td></tr></tbody></table></div>
+<small>shape: (4, 2)</small><table class="dataframe table table-sm table-striped small"><thead><tr><th>region</th><th>failure_count</th></tr><tr><td>str</td><td>u32</td></tr></thead><tbody><tr><td>"South"</td><td>6</td></tr><tr><td>"East"</td><td>2</td></tr><tr><td>"West"</td><td>1</td></tr><tr><td>"North"</td><td>1</td></tr></tbody></table></div>
 </div>
 </div>
 <p>Analysis shows that 6 out of 10 failing records (60%) are from the <code>"South"</code> region, making it the highest priority area for data quality investigation. This suggests a potential systemic issue with data collection or processing in that specific region.</p>
@@ -1865,11 +1862,11 @@ Mean failing value: 5151.6775</code></pre>
 <h2 class="anchored" data-anchor-id="best-practices-for-working-with-data-extracts">Best Practices for Working with Data Extracts</h2>
 <p>When incorporating data extracts into your data quality workflow:</p>
 <ol type="1">
-<li><p><strong>Use extracts for investigation, not just reporting</strong>: the real value is in the insights you gain from analyzing the problematic data</p></li>
-<li><p><strong>Combine with other Pointblank features</strong>: data extracts work well with step reports and can inform threshold settings for future validations</p></li>
-<li><p><strong>Consider sampling for very large datasets</strong>: if your extracts contain thousands of rows, focus your investigation on a representative sample</p></li>
-<li><p><strong>Look beyond individual validation steps</strong>: cross-reference extracts from different steps to identify complex issues that span multiple validation rules</p></li>
-<li><p><strong>Document patterns in failing data</strong>: record and share insights about common failure modes to build organizational knowledge about data quality issues.</p></li>
+<li><p>Use extracts for investigation, not just reporting: the real value is in the insights you gain from analyzing the problematic data</p></li>
+<li><p>Combine with other Pointblank features: data extracts work well with step reports and can inform threshold settings for future validations</p></li>
+<li><p>Consider sampling for very large datasets: if your extracts contain thousands of rows, focus your investigation on a representative sample</p></li>
+<li><p>Look beyond individual validation steps: cross-reference extracts from different steps to identify complex issues that span multiple validation rules</p></li>
+<li><p>Document patterns in failing data: record and share insights about common failure modes to build organizational knowledge about data quality issues.</p></li>
 </ol>
 <p>By integrating these practices into your data validation workflow, you’ll transform data extracts from simple error lists into powerful diagnostic tools. The most successful data quality initiatives treat extracts as the starting point for investigation rather than the end result of validation. When systematically analyzed and documented, patterns in failing data can reveal underlying issues in data systems, collection methods, or business processes that might otherwise remain hidden. Remember that the ultimate goal isn’t just to identify problematic records, but to use that information to implement targeted improvements that prevent similar issues from occurring in the future.</p>
 </section>
@@ -1882,7 +1879,7 @@ Mean failing value: 5151.6775</code></pre>
 <li>develop targeted strategies for data cleanup and quality improvement</li>
 <li>communicate specific examples to stakeholders</li>
 </ul>
-<p>Whether you’re accessing extracts through CSV downloads, the <a href="https://posit-dev.github.io/pointblank/reference/Validate.get_data_extracts.html"><code>get_data_extracts()</code></a> method, or step reports, this feature provides the detail needed to move from identifying problems to implementing solutions.</p>
+<p>Whether you’re accessing extracts through CSV downloads, the <a href="../reference/Validate.get_data_extracts.html#pointblank.Validate.get_data_extracts" title="0"><code>get_data_extracts()</code></a> method, or step reports, this feature provides the detail needed to move from identifying problems to implementing solutions.</p>
 
 
 </section>
