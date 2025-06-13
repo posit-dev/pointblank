@@ -420,7 +420,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="creating-a-step-report" class="level2">
 <h2 class="anchored" data-anchor-id="creating-a-step-report">Creating a Step Report</h2>
 <p>To create a step report, you first need to run a validation and then use the <a href="../reference/Validate.get_step_report.html#pointblank.Validate.get_step_report" title="0"><code>get_step_report()</code></a> method, specifying which validation step you want to examine:</p>
-<div id="12c66a1e" class="cell" data-execution_count="2">
+<div id="a6cc7407" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -606,7 +606,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="value-based-validation-step-reports" class="level3">
 <h3 class="anchored" data-anchor-id="value-based-validation-step-reports">Value-Based Validation Step Reports</h3>
 <p>Value-based step reports focus on showing individual rows where values in the target column failed the validation check. These reports highlight the specific column being validated and clearly display which values violated the condition.</p>
-<div id="f66bd5ac" class="cell" data-execution_count="3">
+<div id="7f578af4" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create sample data with some validation failures</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> pl.DataFrame({</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"id"</span>: <span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">8</span>),</span>
@@ -737,7 +737,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="uniqueness-validation-step-reports" class="level3">
 <h3 class="anchored" data-anchor-id="uniqueness-validation-step-reports">Uniqueness Validation Step Reports</h3>
 <p>Uniqueness checks produce a different type of step report that groups duplicate records together. This format makes it easy to identify patterns in duplicate data.</p>
-<div id="3922a92f" class="cell" data-execution_count="4">
+<div id="194cbc51" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create sample data with some duplicate rows based on the combination of columns</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> pl.DataFrame({</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"customer_id"</span>: [<span class="dv">101</span>, <span class="dv">102</span>, <span class="dv">103</span>, <span class="dv">101</span>, <span class="dv">104</span>, <span class="dv">105</span>, <span class="dv">102</span>],</span>
@@ -853,7 +853,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="schema-validation-step-reports" class="level3">
 <h3 class="anchored" data-anchor-id="schema-validation-step-reports">Schema Validation Step Reports</h3>
 <p>Schema validation step reports have a completely different structure, comparing expected versus actual column data types and presence.</p>
-<div id="4efc61c0" class="cell" data-execution_count="5">
+<div id="8241a296" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    columns<span class="op">=</span>[</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>        (<span class="st">"date_time"</span>, <span class="st">"timestamp"</span>),</span>
@@ -1069,7 +1069,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <h2 class="anchored" data-anchor-id="customizing-step-reports">Customizing Step Reports</h2>
 <p>Step reports can be customized with several parameters to better focus your analysis and tailor the output to your specific needs. The <a href="../reference/Validate.get_step_report.html#pointblank.Validate.get_step_report" title="0"><code>get_step_report()</code></a> method offers multiple customization options to help you create more effective reports.</p>
 <p>When a dataset has many columns, you might want to focus on just those relevant to your analysis. You can create a step report containing only a subset of the columns in the target table:</p>
-<div id="81e4cb85" class="cell" data-execution_count="6">
+<div id="61a099c9" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>validation.get_step_report(</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    i<span class="op">=</span><span class="dv">2</span>,</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1189,7 +1189,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 <p>This approach makes step reports much easier to interpret by highlighting just the essential columns that help understand the validation failures.</p>
 <p>For large datasets with many failing rows, you might want to use <code>limit=</code> to set a cap on the number of rows shown in the report:</p>
-<div id="72b81ea3" class="cell" data-execution_count="7">
+<div id="e5650e8c" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>validation.get_step_report(</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    i<span class="op">=</span><span class="dv">2</span>,</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1298,7 +1298,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 </div>
 <p>The report header can also be extensively customized to provide more specific context. You can replace the default header with plain text or Markdown formatting:</p>
-<div id="67c0a2cf" class="cell" data-execution_count="8">
+<div id="53863fe0" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>validation.get_step_report(</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    i<span class="op">=</span><span class="dv">2</span>,</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    header<span class="op">=</span><span class="st">"Category Values Validation: *Critical Analysis*"</span></span>
@@ -1429,7 +1429,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 </div>
 <p>For more advanced header customization, you can use the templating system with the <code>{title}</code> and <code>{details}</code> elements to retain parts of the default header while adding your own content. The <code>{title}</code> template is the default title whereas <code>{details}</code> provides information on the assertion, number of failures, etc. Let’s move away from the default template of <code>{title}{details}</code> and provide a custom title to go with the details text:</p>
-<div id="cf5fc409" class="cell" data-execution_count="9">
+<div id="bd165280" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>validation.get_step_report(</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    i<span class="op">=</span><span class="dv">2</span>,</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    header<span class="op">=</span><span class="st">"Custom Category Validation Report </span><span class="sc">{details}</span><span class="st">"</span></span>
@@ -1560,7 +1560,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 </div>
 <p>We can keep <code>{title}</code> and <code>{details}</code> and add some more context in between the two:</p>
-<div id="8c9be330" class="cell" data-execution_count="10">
+<div id="573364a3" class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>validation.get_step_report(</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    i<span class="op">=</span><span class="dv">2</span>,</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    header<span class="op">=</span>(</span>
@@ -1697,7 +1697,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 </div>
 <p>You could always use more HTML and CSS to do <em>a lot</em> of customization:</p>
-<div id="c0e43f26" class="cell" data-execution_count="11">
+<div id="1fff07d8" class="cell" data-execution_count="11">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>validation.get_step_report(</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    i<span class="op">=</span><span class="dv">2</span>,</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    header<span class="op">=</span>(</span>
@@ -1837,7 +1837,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 </div>
 <p>If you prefer no header at all, simply set <code>header=None</code>:</p>
-<div id="c10f3885" class="cell" data-execution_count="12">
+<div id="8c7c3a71" class="cell" data-execution_count="12">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>validation.get_step_report(</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    i<span class="op">=</span><span class="dv">2</span>,</span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    header<span class="op">=</span><span class="va">None</span></span>
@@ -1965,7 +1965,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 </div>
 <p>These customization options can be combined to create highly focused reports tailored to specific needs:</p>
-<div id="d2918d56" class="cell" data-execution_count="13">
+<div id="c6589314" class="cell" data-execution_count="13">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>validation.get_step_report(</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    i<span class="op">=</span><span class="dv">2</span>,</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    columns_subset<span class="op">=</span>[<span class="st">"id"</span>, <span class="st">"category"</span>],</span>
@@ -2067,7 +2067,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="using-step-reports-for-data-investigation" class="level2">
 <h2 class="anchored" data-anchor-id="using-step-reports-for-data-investigation">Using Step Reports for Data Investigation</h2>
 <p>Step reports can be powerful tools for investigating data quality issues. Let’s look at a more complex example:</p>
-<div id="0f93215b" class="cell" data-execution_count="14">
+<div id="e0be9c8b" class="cell" data-execution_count="14">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a more complex dataset with multiple issues</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>complex_data <span class="op">=</span> pl.DataFrame({</span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"id"</span>: <span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">11</span>),</span>
@@ -2191,7 +2191,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="combining-step-reports-with-extracts" class="level2">
 <h2 class="anchored" data-anchor-id="combining-step-reports-with-extracts">Combining Step Reports with Extracts</h2>
 <p>For more advanced analysis, you can extract the actual data from a step report into a DataFrame:</p>
-<div id="2dad7e83" class="cell" data-execution_count="15">
+<div id="954c8863" class="cell" data-execution_count="15">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract the data from the step report</span></span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>failing_ratios <span class="op">=</span> validation_complex.get_data_extracts(i<span class="op">=</span><span class="dv">2</span>)</span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2221,7 +2221,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="step-reports-with-segmented-data" class="level2">
 <h2 class="anchored" data-anchor-id="step-reports-with-segmented-data">Step Reports with Segmented Data</h2>
 <p>When working with segmented validation, step reports become even more valuable as they allow you to investigate issues within specific segments:</p>
-<div id="d2b8e6e5" class="cell" data-execution_count="16">
+<div id="0a06a314" class="cell" data-execution_count="16">
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create data with different regions</span></span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>segmented_data <span class="op">=</span> pl.DataFrame({</span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"id"</span>: <span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">10</span>),</span>
