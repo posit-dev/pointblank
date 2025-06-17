@@ -308,19 +308,17 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <li>Parquet table (<code>"parquet"</code>)*</li>
 <li>CSV files (string path or <code>pathlib.Path</code> object with <code>.csv</code> extension)</li>
 <li>Parquet files (string path, <code>pathlib.Path</code> object, glob pattern, directory with <code>.parquet</code> extension, or partitioned dataset)</li>
-<li>Database connection strings (RFC 3986 URI format with optional table specification)</li>
+<li>Database connection strings (URI format with optional table specification)</li>
 </ul>
 <p>The table types marked with an asterisk need to be prepared as Ibis tables (with type of <code>ibis.expr.types.relations.Table</code>). Furthermore, the use of <a href="../reference/Validate.html#pointblank.Validate" title="0"><code>Validate</code></a> with such tables requires the Ibis library v9.5.0 and above to be installed. If the input table is a Polars or Pandas DataFrame, the Ibis library is not required.</p>
 <p>To use a CSV file, ensure that a string or <code>pathlib.Path</code> object with a <code>.csv</code> extension is provided. The file will be automatically detected and loaded using the best available DataFrame library. The loading preference is Polars first, then Pandas as a fallback.</p>
 <p>Connection strings follow database URL formats and must also specify a table using the <code>::table_name</code> suffix. Examples include:</p>
-<ul>
-<li><code>"duckdb:///path/to/database.ddb::table_name"</code></li>
-<li><code>"sqlite:///path/to/database.db::table_name"</code></li>
-<li><code>"postgresql://user:password@localhost:5432/database::table_name"</code></li>
-<li><code>"mysql://user:password@localhost:3306/database::table_name"</code></li>
-<li><code>"bigquery://project/dataset::table_name"</code></li>
-<li><code>"snowflake://user:password@account/database/schema::table_name"</code></li>
-</ul>
+<pre><code>"duckdb:///path/to/database.ddb::table_name"
+"sqlite:///path/to/database.db::table_name"
+"postgresql://user:password@localhost:5432/database::table_name"
+"mysql://user:password@localhost:3306/database::table_name"
+"bigquery://project/dataset::table_name"
+"snowflake://user:password@account/database/schema::table_name"</code></pre>
 <p>When using connection strings, the Ibis library with the appropriate backend driver is required.</p>
 </section>
 <section id="thresholds" class="level2 doc-section doc-section-thresholds">
@@ -343,45 +341,45 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <p><em>Step Actions</em></p>
 <p>The <code>actions=</code> parameter allows you to define actions that are triggered when validation steps exceed specific threshold levels (warning, error, or critical). These actions are executed during the interrogation process, right after each step is evaluated.</p>
 <p>Step actions should be provided using the <a href="../reference/Actions.html#pointblank.Actions"><span><code>Actions</code></span></a> class, which lets you specify different actions for different severity levels:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define an action that logs a message when warning threshold is exceeded</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> log_warning():</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    metadata <span class="op">=</span> pb.get_action_metadata()</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"WARNING: Step </span><span class="sc">{</span>metadata[<span class="st">'step'</span>]<span class="sc">}</span><span class="ss"> failed with type </span><span class="sc">{</span>metadata[<span class="st">'type'</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Define actions for different threshold levels</span></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>actions <span class="op">=</span> pb.Actions(</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    warning <span class="op">=</span> log_warning,</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    error <span class="op">=</span> <span class="kw">lambda</span>: send_email(<span class="st">"Error in validation"</span>),</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    critical <span class="op">=</span> <span class="st">"CRITICAL FAILURE DETECTED"</span></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Use in Validate</span></span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> pb.Validate(</span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    data<span class="op">=</span>my_data,</span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>    actions<span class="op">=</span>actions  <span class="co"># Global actions for all steps</span></span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define an action that logs a message when warning threshold is exceeded</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> log_warning():</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    metadata <span class="op">=</span> pb.get_action_metadata()</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"WARNING: Step </span><span class="sc">{</span>metadata[<span class="st">'step'</span>]<span class="sc">}</span><span class="ss"> failed with type </span><span class="sc">{</span>metadata[<span class="st">'type'</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Define actions for different threshold levels</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>actions <span class="op">=</span> pb.Actions(</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    warning <span class="op">=</span> log_warning,</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    error <span class="op">=</span> <span class="kw">lambda</span>: send_email(<span class="st">"Error in validation"</span>),</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    critical <span class="op">=</span> <span class="st">"CRITICAL FAILURE DETECTED"</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Use in Validate</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> pb.Validate(</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>    data<span class="op">=</span>my_data,</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>    actions<span class="op">=</span>actions  <span class="co"># Global actions for all steps</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>You can also provide step-specific actions in individual validation methods:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>validation.col_vals_gt(</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    columns<span class="op">=</span><span class="st">"revenue"</span>,</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    value<span class="op">=</span><span class="dv">0</span>,</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    actions<span class="op">=</span>pb.Actions(warning<span class="op">=</span>log_warning)  <span class="co"># Only applies to this step</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>validation.col_vals_gt(</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    columns<span class="op">=</span><span class="st">"revenue"</span>,</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    value<span class="op">=</span><span class="dv">0</span>,</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    actions<span class="op">=</span>pb.Actions(warning<span class="op">=</span>log_warning)  <span class="co"># Only applies to this step</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Step actions have access to step-specific context through the <a href="../reference/get_action_metadata.html#pointblank.get_action_metadata"><span><code>get_action_metadata()</code></span></a> function, which provides details about the current validation step that triggered the action.</p>
 <p><em>Final Actions</em></p>
 <p>The <code>final_actions=</code> parameter lets you define actions that execute after all validation steps have completed. These are useful for providing summaries, sending notifications based on overall validation status, or performing cleanup operations.</p>
 <p>Final actions should be provided using the <a href="../reference/FinalActions.html#pointblank.FinalActions"><span><code>FinalActions</code></span></a> class:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> send_report():</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    summary <span class="op">=</span> pb.get_validation_summary()</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> summary[<span class="st">"status"</span>] <span class="op">==</span> <span class="st">"CRITICAL"</span>:</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>        send_alert_email(</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>            subject<span class="op">=</span><span class="ss">f"CRITICAL validation failures in </span><span class="sc">{</span>summary[<span class="st">'table_name'</span>]<span class="sc">}</span><span class="ss">"</span>,</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>            body<span class="op">=</span><span class="ss">f"</span><span class="sc">{</span>summary[<span class="st">'critical_steps'</span>]<span class="sc">}</span><span class="ss"> steps failed with critical severity."</span></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>        )</span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> pb.Validate(</span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    data<span class="op">=</span>my_data,</span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    final_actions<span class="op">=</span>pb.FinalActions(send_report)</span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> send_report():</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    summary <span class="op">=</span> pb.get_validation_summary()</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> summary[<span class="st">"status"</span>] <span class="op">==</span> <span class="st">"CRITICAL"</span>:</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>        send_alert_email(</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>            subject<span class="op">=</span><span class="ss">f"CRITICAL validation failures in </span><span class="sc">{</span>summary[<span class="st">'table_name'</span>]<span class="sc">}</span><span class="ss">"</span>,</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>            body<span class="op">=</span><span class="ss">f"</span><span class="sc">{</span>summary[<span class="st">'critical_steps'</span>]<span class="sc">}</span><span class="ss"> steps failed with critical severity."</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> pb.Validate(</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>    data<span class="op">=</span>my_data,</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>    final_actions<span class="op">=</span>pb.FinalActions(send_report)</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Final actions have access to validation-wide summary information through the <a href="../reference/get_validation_summary.html#pointblank.get_validation_summary"><span><code>get_validation_summary()</code></span></a> function, which provides a comprehensive overview of the entire validation process.</p>
 <p>The combination of step actions and final actions provides a flexible system for responding to data quality issues at both the individual step level and the overall validation level.</p>
 </section>
@@ -440,14 +438,14 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="creating-a-validation-plan-and-interrogating" class="level3">
 <h4 class="anchored" data-anchor-id="creating-a-validation-plan-and-interrogating">Creating a validation plan and interrogating</h4>
 <p>Let’s walk through a data quality analysis of an extremely small table. It’s actually called <code>"small_table"</code> and it’s accessible through the <a href="../reference/load_dataset.html#pointblank.load_dataset"><span><code>load_dataset()</code></span></a> function.</p>
-<div id="094c052e" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Load the `small_table` dataset</span></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>small_table <span class="op">=</span> pb.load_dataset(dataset<span class="op">=</span><span class="st">"small_table"</span>, tbl_type<span class="op">=</span><span class="st">"polars"</span>)</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Preview the table</span></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>pb.preview(small_table)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="180f2e7c" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Load the `small_table` dataset</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>small_table <span class="op">=</span> pb.load_dataset(dataset<span class="op">=</span><span class="st">"small_table"</span>, tbl_type<span class="op">=</span><span class="st">"polars"</span>)</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Preview the table</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>pb.preview(small_table)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div id="pb_preview_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>
@@ -650,35 +648,35 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 </div>
 <p>We ought to think about what’s tolerable in terms of data quality so let’s designate proportional failure thresholds to the ‘warning’, ‘error’, and ‘critical’ states. This can be done by using the <a href="../reference/Thresholds.html#pointblank.Thresholds"><span><code>Thresholds</code></span></a> class.</p>
-<div id="952dcd3e" class="cell" data-execution_count="2">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>thresholds <span class="op">=</span> pb.Thresholds(warning<span class="op">=</span><span class="fl">0.10</span>, error<span class="op">=</span><span class="fl">0.25</span>, critical<span class="op">=</span><span class="fl">0.35</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="1452fc4d" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>thresholds <span class="op">=</span> pb.Thresholds(warning<span class="op">=</span><span class="fl">0.10</span>, error<span class="op">=</span><span class="fl">0.25</span>, critical<span class="op">=</span><span class="fl">0.35</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Now, we use the <a href="../reference/Validate.html#pointblank.Validate" title="0"><code>Validate</code></a> class and give it the <code>thresholds</code> object (which serves as a default for all validation steps but can be overridden). The static thresholds provided in <code>thresholds=</code> will make the reporting a bit more useful. We also need to provide a target table and we’ll use <code>small_table</code> for this.</p>
-<div id="746aa5a7" class="cell" data-execution_count="3">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>        data<span class="op">=</span>small_table,</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>        tbl_name<span class="op">=</span><span class="st">"small_table"</span>,</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>        label<span class="op">=</span><span class="st">"`Validate` example."</span>,</span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>        thresholds<span class="op">=</span>thresholds</span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="18556ad3" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>        data<span class="op">=</span>small_table,</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>        tbl_name<span class="op">=</span><span class="st">"small_table"</span>,</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>        label<span class="op">=</span><span class="st">"`Validate` example."</span>,</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>        thresholds<span class="op">=</span>thresholds</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Then, as with any <a href="../reference/Validate.html#pointblank.Validate" title="0"><code>Validate</code></a> object, we can add steps to the validation plan by using as many validation methods as we want. To conclude the process (and actually query the data table), we use the <a href="../reference/Validate.interrogate.html#pointblank.Validate.interrogate"><code>interrogate()</code></a> method.</p>
-<div id="268f7fc8" class="cell" data-execution_count="4">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    validation</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_gt(columns<span class="op">=</span><span class="st">"d"</span>, value<span class="op">=</span><span class="dv">100</span>)</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    .col_vals_le(columns<span class="op">=</span><span class="st">"c"</span>, value<span class="op">=</span><span class="dv">5</span>)</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    .col_vals_between(columns<span class="op">=</span><span class="st">"c"</span>, left<span class="op">=</span><span class="dv">3</span>, right<span class="op">=</span><span class="dv">10</span>, na_pass<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    .col_vals_regex(columns<span class="op">=</span><span class="st">"b"</span>, pattern<span class="op">=</span><span class="vs">r"</span><span class="pp">[0-9]</span><span class="vs">-</span><span class="pp">[a-z]</span><span class="op">{3}</span><span class="vs">-</span><span class="pp">[0-9]</span><span class="op">{3}</span><span class="vs">"</span>)</span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    .col_exists(columns<span class="op">=</span>[<span class="st">"date"</span>, <span class="st">"date_time"</span>])</span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="8b6530c2" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    validation</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_gt(columns<span class="op">=</span><span class="st">"d"</span>, value<span class="op">=</span><span class="dv">100</span>)</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    .col_vals_le(columns<span class="op">=</span><span class="st">"c"</span>, value<span class="op">=</span><span class="dv">5</span>)</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    .col_vals_between(columns<span class="op">=</span><span class="st">"c"</span>, left<span class="op">=</span><span class="dv">3</span>, right<span class="op">=</span><span class="dv">10</span>, na_pass<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    .col_vals_regex(columns<span class="op">=</span><span class="st">"b"</span>, pattern<span class="op">=</span><span class="vs">r"</span><span class="pp">[0-9]</span><span class="vs">-</span><span class="pp">[a-z]</span><span class="op">{3}</span><span class="vs">-</span><span class="pp">[0-9]</span><span class="op">{3}</span><span class="vs">"</span>)</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>    .col_exists(columns<span class="op">=</span>[<span class="st">"date"</span>, <span class="st">"date_time"</span>])</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>The <code>validation</code> object can be printed as a reporting table.</p>
-<div id="9236654c" class="cell" data-execution_count="5">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>validation</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="df02e058" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>validation</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="5">
 <div id="pb_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>
@@ -1029,7 +1027,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
   <tfoot class="gt_sourcenotes">
   
   <tr>
-    <td class="gt_sourcenote" colspan="14" style="text-align: left;"><div style="margin-top: 5px; margin-bottom: 5px;"><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin-left: 10px; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2025-06-17 01:14:55 UTC</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">&lt; 1 s</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 1px 5px -1px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2025-06-17 01:14:55 UTC</span></div></td>
+    <td class="gt_sourcenote" colspan="14" style="text-align: left;"><div style="margin-top: 5px; margin-bottom: 5px;"><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin-left: 10px; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2025-06-17 16:12:58 UTC</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">&lt; 1 s</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 1px 5px -1px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2025-06-17 16:12:58 UTC</span></div></td>
   </tr>
 
 </tfoot>
@@ -1045,25 +1043,25 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="adding-briefs" class="level3">
 <h4 class="anchored" data-anchor-id="adding-briefs">Adding briefs</h4>
 <p>Briefs are short descriptions of the validation steps. While they can be set for each step individually, they can also be set globally. The global setting is done by using the <code>brief=</code> argument in <a href="../reference/Validate.html#pointblank.Validate" title="0"><code>Validate</code></a>. The global setting can be as simple as <code>True</code> to have automatically-generated briefs for each step. Alternatively, we can use templating elements like <code>"{step}"</code> (to insert the step number) or <code>"{auto}"</code> (to include an automatically generated brief). Here’s an example of a global setting for briefs:</p>
-<div id="9a37f806" class="cell" data-execution_count="6">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>validation_2 <span class="op">=</span> (</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>        data<span class="op">=</span>pb.load_dataset(),</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>        tbl_name<span class="op">=</span><span class="st">"small_table"</span>,</span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>        label<span class="op">=</span><span class="st">"Validation example with briefs"</span>,</span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>        brief<span class="op">=</span><span class="st">"Step </span><span class="sc">{step}</span><span class="st">: </span><span class="sc">{auto}</span><span class="st">"</span>,</span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>    .col_vals_gt(columns<span class="op">=</span><span class="st">"d"</span>, value<span class="op">=</span><span class="dv">100</span>)</span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>    .col_vals_between(columns<span class="op">=</span><span class="st">"c"</span>, left<span class="op">=</span><span class="dv">3</span>, right<span class="op">=</span><span class="dv">10</span>, na_pass<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>    .col_vals_regex(</span>
-<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>        columns<span class="op">=</span><span class="st">"b"</span>,</span>
-<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>        pattern<span class="op">=</span><span class="vs">r"</span><span class="pp">[0-9]</span><span class="vs">-</span><span class="pp">[a-z]</span><span class="op">{3}</span><span class="vs">-</span><span class="pp">[0-9]</span><span class="op">{3}</span><span class="vs">"</span>,</span>
-<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>        brief<span class="op">=</span><span class="st">"Regex check for column </span><span class="sc">{col}</span><span class="st">"</span></span>
-<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
-<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>validation_2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="d365a5e4" class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>validation_2 <span class="op">=</span> (</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>        data<span class="op">=</span>pb.load_dataset(),</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>        tbl_name<span class="op">=</span><span class="st">"small_table"</span>,</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>        label<span class="op">=</span><span class="st">"Validation example with briefs"</span>,</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>        brief<span class="op">=</span><span class="st">"Step </span><span class="sc">{step}</span><span class="st">: </span><span class="sc">{auto}</span><span class="st">"</span>,</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>    .col_vals_gt(columns<span class="op">=</span><span class="st">"d"</span>, value<span class="op">=</span><span class="dv">100</span>)</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>    .col_vals_between(columns<span class="op">=</span><span class="st">"c"</span>, left<span class="op">=</span><span class="dv">3</span>, right<span class="op">=</span><span class="dv">10</span>, na_pass<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>    .col_vals_regex(</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>        columns<span class="op">=</span><span class="st">"b"</span>,</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>        pattern<span class="op">=</span><span class="vs">r"</span><span class="pp">[0-9]</span><span class="vs">-</span><span class="pp">[a-z]</span><span class="op">{3}</span><span class="vs">-</span><span class="pp">[0-9]</span><span class="op">{3}</span><span class="vs">"</span>,</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>        brief<span class="op">=</span><span class="st">"Regex check for column </span><span class="sc">{col}</span><span class="st">"</span></span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>validation_2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="6">
 <div id="pb_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>
@@ -1292,7 +1290,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
   <tfoot class="gt_sourcenotes">
   
   <tr>
-    <td class="gt_sourcenote" colspan="14" style="text-align: left;"><div style="margin-top: 5px; margin-bottom: 5px;"><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin-left: 10px; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2025-06-17 01:14:55 UTC</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">&lt; 1 s</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 1px 5px -1px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2025-06-17 01:14:55 UTC</span></div></td>
+    <td class="gt_sourcenote" colspan="14" style="text-align: left;"><div style="margin-top: 5px; margin-bottom: 5px;"><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin-left: 10px; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2025-06-17 16:12:58 UTC</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">&lt; 1 s</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 1px 5px -1px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2025-06-17 16:12:58 UTC</span></div></td>
   </tr>
 
 </tfoot>
@@ -1309,8 +1307,8 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="post-interrogation-methods" class="level3">
 <h4 class="anchored" data-anchor-id="post-interrogation-methods">Post-interrogation methods</h4>
 <p>The <a href="../reference/Validate.html#pointblank.Validate" title="0"><code>Validate</code></a> class has a number of post-interrogation methods that can be used to extract useful information from the validation results. For example, the <a href="../reference/Validate.get_data_extracts.html#pointblank.Validate.get_data_extracts"><code>get_data_extracts()</code></a> method can be used to get the data extracts for each validation step.</p>
-<div id="33e17446" class="cell" data-execution_count="7">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>validation_2.get_data_extracts()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="e4c3985a" class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>validation_2.get_data_extracts()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="7">
 <pre><code>{1: shape: (0, 9)
  ┌───────────┬──────────────┬──────┬─────┬───┬─────┬─────┬──────┬─────┐
@@ -1337,8 +1335,8 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 </div>
 <p>We can also view step reports for each validation step using the <a href="../reference/Validate.get_step_report.html#pointblank.Validate.get_step_report"><code>get_step_report()</code></a> method. This method adapts to the type of validation step and shows the relevant information for a step’s validation.</p>
-<div id="3eecda3d" class="cell" data-execution_count="8">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>validation_2.get_step_report(i<span class="op">=</span><span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="54cbcb8e" class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>validation_2.get_step_report(i<span class="op">=</span><span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="8">
 <div id="pb_preview_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>
@@ -1442,8 +1440,8 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 </div>
 <p>The <a href="../reference/Validate.html#pointblank.Validate" title="0"><code>Validate</code></a> class also has a method for getting the sundered data, which is the data that passed or failed the validation steps. This can be done using the <a href="../reference/Validate.get_sundered_data.html#pointblank.Validate.get_sundered_data"><code>get_sundered_data()</code></a> method.</p>
-<div id="116504a4" class="cell" data-execution_count="9">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>pb.preview(validation_2.get_sundered_data())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="09c23873" class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>pb.preview(validation_2.get_sundered_data())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="9">
 <div id="pb_preview_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>
@@ -1650,22 +1648,22 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="working-with-csv-files" class="level3">
 <h4 class="anchored" data-anchor-id="working-with-csv-files">Working with CSV Files</h4>
 <p>The <a href="../reference/Validate.html#pointblank.Validate" title="0"><code>Validate</code></a> class can directly accept CSV file paths, making it easy to validate data stored in CSV files without manual loading:</p>
-<div id="dd99088a" class="cell" data-execution_count="10">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get a path to a CSV file from the package data</span></span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>csv_path <span class="op">=</span> pb.get_data_path(<span class="st">"global_sales"</span>, <span class="st">"csv"</span>)</span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>validation_3 <span class="op">=</span> (</span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>    pb.Validate(</span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>        data<span class="op">=</span>csv_path,</span>
-<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>        label<span class="op">=</span><span class="st">"CSV validation example"</span></span>
-<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>    .col_exists([<span class="st">"customer_id"</span>, <span class="st">"product_id"</span>, <span class="st">"revenue"</span>])</span>
-<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>    .col_vals_not_null([<span class="st">"customer_id"</span>, <span class="st">"product_id"</span>])</span>
-<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>    .col_vals_gt(columns<span class="op">=</span><span class="st">"revenue"</span>, value<span class="op">=</span><span class="dv">0</span>)</span>
-<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
-<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>validation_3</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="4c184037" class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get a path to a CSV file from the package data</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>csv_path <span class="op">=</span> pb.get_data_path(<span class="st">"global_sales"</span>, <span class="st">"csv"</span>)</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>validation_3 <span class="op">=</span> (</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>    pb.Validate(</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>        data<span class="op">=</span>csv_path,</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>        label<span class="op">=</span><span class="st">"CSV validation example"</span></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>    .col_exists([<span class="st">"customer_id"</span>, <span class="st">"product_id"</span>, <span class="st">"revenue"</span>])</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>    .col_vals_not_null([<span class="st">"customer_id"</span>, <span class="st">"product_id"</span>])</span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>    .col_vals_gt(columns<span class="op">=</span><span class="st">"revenue"</span>, value<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>validation_3</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="10">
 <div id="pb_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>
@@ -2018,7 +2016,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
   <tfoot class="gt_sourcenotes">
   
   <tr>
-    <td class="gt_sourcenote" colspan="14" style="text-align: left;"><div style="margin-top: 5px; margin-bottom: 5px;"><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin-left: 10px; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2025-06-17 01:14:56 UTC</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">&lt; 1 s</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 1px 5px -1px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2025-06-17 01:14:56 UTC</span></div></td>
+    <td class="gt_sourcenote" colspan="14" style="text-align: left;"><div style="margin-top: 5px; margin-bottom: 5px;"><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin-left: 10px; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2025-06-17 16:12:59 UTC</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">&lt; 1 s</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 1px 5px -1px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2025-06-17 16:12:59 UTC</span></div></td>
   </tr>
 
 </tfoot>
@@ -2030,23 +2028,23 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 </div>
 <p>You can also use a Path object to specify the CSV file. Here’s an example of how to do that:</p>
-<div id="9121840a" class="cell" data-execution_count="11">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>csv_file <span class="op">=</span> Path(pb.get_data_path(<span class="st">"game_revenue"</span>, <span class="st">"csv"</span>))</span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>validation_4 <span class="op">=</span> (</span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>csv_file, label<span class="op">=</span><span class="st">"Game Revenue Validation"</span>)</span>
-<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>    .col_exists([<span class="st">"player_id"</span>, <span class="st">"session_id"</span>, <span class="st">"item_name"</span>])</span>
-<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>    .col_vals_regex(</span>
-<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>        columns<span class="op">=</span><span class="st">"session_id"</span>,</span>
-<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>        pattern<span class="op">=</span><span class="vs">r"</span><span class="pp">[A-Z0-9]</span><span class="op">{8}</span><span class="vs">-</span><span class="pp">[A-Z0-9]</span><span class="op">{4}</span><span class="vs">-</span><span class="pp">[A-Z0-9]</span><span class="op">{4}</span><span class="vs">-</span><span class="pp">[A-Z0-9]</span><span class="op">{4}</span><span class="vs">-</span><span class="pp">[A-Z0-9]</span><span class="op">{12}</span><span class="vs">"</span></span>
-<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>    .col_vals_gt(columns<span class="op">=</span><span class="st">"item_revenue"</span>, value<span class="op">=</span><span class="dv">0</span>, na_pass<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
-<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>validation_4</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="91d95be7" class="cell" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>csv_file <span class="op">=</span> Path(pb.get_data_path(<span class="st">"game_revenue"</span>, <span class="st">"csv"</span>))</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>validation_4 <span class="op">=</span> (</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>csv_file, label<span class="op">=</span><span class="st">"Game Revenue Validation"</span>)</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>    .col_exists([<span class="st">"player_id"</span>, <span class="st">"session_id"</span>, <span class="st">"item_name"</span>])</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>    .col_vals_regex(</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>        columns<span class="op">=</span><span class="st">"session_id"</span>,</span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>        pattern<span class="op">=</span><span class="vs">r"</span><span class="pp">[A-Z0-9]</span><span class="op">{8}</span><span class="vs">-</span><span class="pp">[A-Z0-9]</span><span class="op">{4}</span><span class="vs">-</span><span class="pp">[A-Z0-9]</span><span class="op">{4}</span><span class="vs">-</span><span class="pp">[A-Z0-9]</span><span class="op">{4}</span><span class="vs">-</span><span class="pp">[A-Z0-9]</span><span class="op">{12}</span><span class="vs">"</span></span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>    .col_vals_gt(columns<span class="op">=</span><span class="st">"item_revenue"</span>, value<span class="op">=</span><span class="dv">0</span>, na_pass<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a>validation_4</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="11">
 <div id="pb_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>
@@ -2357,7 +2355,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
   <tfoot class="gt_sourcenotes">
   
   <tr>
-    <td class="gt_sourcenote" colspan="14" style="text-align: left;"><div style="margin-top: 5px; margin-bottom: 5px;"><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin-left: 10px; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2025-06-17 01:14:56 UTC</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">&lt; 1 s</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 1px 5px -1px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2025-06-17 01:14:56 UTC</span></div></td>
+    <td class="gt_sourcenote" colspan="14" style="text-align: left;"><div style="margin-top: 5px; margin-bottom: 5px;"><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin-left: 10px; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2025-06-17 16:12:59 UTC</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">&lt; 1 s</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 1px 5px -1px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2025-06-17 16:12:59 UTC</span></div></td>
   </tr>
 
 </tfoot>
@@ -2373,21 +2371,21 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="working-with-parquet-files" class="level3">
 <h4 class="anchored" data-anchor-id="working-with-parquet-files">Working with Parquet Files</h4>
 <p>The <a href="../reference/Validate.html#pointblank.Validate" title="0"><code>Validate</code></a> class can directly accept Parquet files and datasets in various formats. The following examples illustrate how to validate Parquet files:</p>
-<div id="2985bfc8" class="cell" data-execution_count="12">
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Single Parquet file from package data</span></span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>parquet_path <span class="op">=</span> pb.get_data_path(<span class="st">"nycflights"</span>, <span class="st">"parquet"</span>)</span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>validation_5 <span class="op">=</span> (</span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>    pb.Validate(</span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>        data<span class="op">=</span>parquet_path,</span>
-<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>        tbl_name<span class="op">=</span><span class="st">"NYC Flights Data"</span></span>
-<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>    .col_vals_not_null([<span class="st">"carrier"</span>, <span class="st">"origin"</span>, <span class="st">"dest"</span>])</span>
-<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>    .col_vals_gt(columns<span class="op">=</span><span class="st">"distance"</span>, value<span class="op">=</span><span class="dv">0</span>)</span>
-<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
-<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>validation_5</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="3810ef0d" class="cell" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Single Parquet file from package data</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>parquet_path <span class="op">=</span> pb.get_data_path(<span class="st">"nycflights"</span>, <span class="st">"parquet"</span>)</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>validation_5 <span class="op">=</span> (</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>    pb.Validate(</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>        data<span class="op">=</span>parquet_path,</span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>        tbl_name<span class="op">=</span><span class="st">"NYC Flights Data"</span></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>    .col_vals_not_null([<span class="st">"carrier"</span>, <span class="st">"origin"</span>, <span class="st">"dest"</span>])</span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>    .col_vals_gt(columns<span class="op">=</span><span class="st">"distance"</span>, value<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>validation_5</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="12">
 <div id="pb_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>
@@ -2463,7 +2461,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     <td colspan="14" class="gt_heading gt_title gt_font_normal" style="color: #444444;font-size: 28px;text-align: left;font-weight: bold; text-align: left;">Pointblank Validation</td>
   </tr>
   <tr class="gt_heading">
-    <td colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style="text-align: left;"><div><span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2025-06-17|01:14:57</span><div style="padding-top: 10px; padding-bottom: 5px;"><span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 15px 2px 15px; font-size: 10px;">Polars</span><span style="background-color: none; color: #222222; padding: 0.5em 0.5em; position: inherit; margin: 5px 10px 5px -4px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 15px 2px 15px; font-size: 10px;">NYC Flights Data</span></div></div></td>
+    <td colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style="text-align: left;"><div><span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2025-06-17|16:13:00</span><div style="padding-top: 10px; padding-bottom: 5px;"><span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 15px 2px 15px; font-size: 10px;">Polars</span><span style="background-color: none; color: #222222; padding: 0.5em 0.5em; position: inherit; margin: 5px 10px 5px -4px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 15px 2px 15px; font-size: 10px;">NYC Flights Data</span></div></div></td>
   </tr>
 <tr class="gt_col_headings">
   <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-status_color"></th>
@@ -2657,7 +2655,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
   <tfoot class="gt_sourcenotes">
   
   <tr>
-    <td class="gt_sourcenote" colspan="14" style="text-align: left;"><div style="margin-top: 5px; margin-bottom: 5px;"><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin-left: 10px; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2025-06-17 01:14:57 UTC</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">&lt; 1 s</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 1px 5px -1px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2025-06-17 01:14:57 UTC</span></div></td>
+    <td class="gt_sourcenote" colspan="14" style="text-align: left;"><div style="margin-top: 5px; margin-bottom: 5px;"><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin-left: 10px; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2025-06-17 16:13:00 UTC</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">&lt; 1 s</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 1px 5px -1px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2025-06-17 16:13:00 UTC</span></div></td>
   </tr>
 
 </tfoot>
@@ -2674,18 +2672,18 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <li>load a Parquet-containing directory</li>
 <li>load a partitioned Parquet dataset</li>
 </ol>
-<div class="sourceCode" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Multiple Parquet files with glob patterns</span></span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>validation_6 <span class="op">=</span> pb.Validate(data<span class="op">=</span><span class="st">"data/sales_*.parquet"</span>)</span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Directory containing Parquet files</span></span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>validation_7 <span class="op">=</span> pb.Validate(data<span class="op">=</span><span class="st">"parquet_data/"</span>)</span>
-<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Partitioned Parquet dataset</span></span>
-<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>validation_8 <span class="op">=</span> (</span>
-<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span><span class="st">"sales_data/"</span>)  <span class="co"># Contains year=2023/quarter=Q1/region=US/sales.parquet</span></span>
-<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>    .col_exists([<span class="st">"transaction_id"</span>, <span class="st">"amount"</span>, <span class="st">"year"</span>, <span class="st">"quarter"</span>, <span class="st">"region"</span>])</span>
-<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
-<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Multiple Parquet files with glob patterns</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>validation_6 <span class="op">=</span> pb.Validate(data<span class="op">=</span><span class="st">"data/sales_*.parquet"</span>)</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Directory containing Parquet files</span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>validation_7 <span class="op">=</span> pb.Validate(data<span class="op">=</span><span class="st">"parquet_data/"</span>)</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Partitioned Parquet dataset</span></span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>validation_8 <span class="op">=</span> (</span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span><span class="st">"sales_data/"</span>)  <span class="co"># Contains year=2023/quarter=Q1/region=US/sales.parquet</span></span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>    .col_exists([<span class="st">"transaction_id"</span>, <span class="st">"amount"</span>, <span class="st">"year"</span>, <span class="st">"quarter"</span>, <span class="st">"region"</span>])</span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>When you point to a directory that contains a partitioned Parquet dataset (with subdirectories like <code>year=2023/quarter=Q1/region=US/</code>), Pointblank will automatically:</p>
 <ul>
 <li>discover all Parquet files recursively</li>
@@ -2698,21 +2696,21 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="working-with-database-connection-strings" class="level3">
 <h4 class="anchored" data-anchor-id="working-with-database-connection-strings">Working with Database Connection Strings</h4>
 <p>The <a href="../reference/Validate.html#pointblank.Validate" title="0"><code>Validate</code></a> class supports database connection strings for direct validation of database tables. Connection strings must specify a table using the <code>::table_name</code> suffix:</p>
-<div id="775a32c5" class="cell" data-execution_count="13">
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get path to a DuckDB database file from package data</span></span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>duckdb_path <span class="op">=</span> pb.get_data_path(<span class="st">"game_revenue"</span>, <span class="st">"duckdb"</span>)</span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>validation_9 <span class="op">=</span> (</span>
-<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>    pb.Validate(</span>
-<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>        data<span class="op">=</span><span class="ss">f"duckdb:///</span><span class="sc">{</span>duckdb_path<span class="sc">}</span><span class="ss">::game_revenue"</span>,</span>
-<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>        label<span class="op">=</span><span class="st">"DuckDB Game Revenue Validation"</span></span>
-<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>    .col_exists([<span class="st">"player_id"</span>, <span class="st">"session_id"</span>, <span class="st">"item_revenue"</span>])</span>
-<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>    .col_vals_gt(columns<span class="op">=</span><span class="st">"item_revenue"</span>, value<span class="op">=</span><span class="dv">0</span>)</span>
-<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
-<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>validation_9</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="6fc2987b" class="cell" data-execution_count="13">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get path to a DuckDB database file from package data</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>duckdb_path <span class="op">=</span> pb.get_data_path(<span class="st">"game_revenue"</span>, <span class="st">"duckdb"</span>)</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>validation_9 <span class="op">=</span> (</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>    pb.Validate(</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>        data<span class="op">=</span><span class="ss">f"duckdb:///</span><span class="sc">{</span>duckdb_path<span class="sc">}</span><span class="ss">::game_revenue"</span>,</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>        label<span class="op">=</span><span class="st">"DuckDB Game Revenue Validation"</span></span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>    .col_exists([<span class="st">"player_id"</span>, <span class="st">"session_id"</span>, <span class="st">"item_revenue"</span>])</span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>    .col_vals_gt(columns<span class="op">=</span><span class="st">"item_revenue"</span>, value<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a>validation_9</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="13">
 <div id="pb_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>
@@ -2979,7 +2977,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
   <tfoot class="gt_sourcenotes">
   
   <tr>
-    <td class="gt_sourcenote" colspan="14" style="text-align: left;"><div style="margin-top: 5px; margin-bottom: 5px;"><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin-left: 10px; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2025-06-17 01:14:57 UTC</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">&lt; 1 s</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 1px 5px -1px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2025-06-17 01:14:57 UTC</span></div></td>
+    <td class="gt_sourcenote" colspan="14" style="text-align: left;"><div style="margin-top: 5px; margin-bottom: 5px;"><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin-left: 10px; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2025-06-17 16:13:00 UTC</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">&lt; 1 s</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 1px 5px -1px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2025-06-17 16:13:00 UTC</span></div></td>
   </tr>
 
 </tfoot>

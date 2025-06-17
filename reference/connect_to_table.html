@@ -237,15 +237,13 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </section>
 <section id="supported-connection-string-formats" class="level2 doc-section doc-section-supported-connection-string-formats">
 <h3 class="doc-section doc-section-supported-connection-string-formats anchored" data-anchor-id="supported-connection-string-formats">Supported Connection String Formats</h3>
-<p>The <code>connection_string</code> parameter must include a valid connection string with a table name specified using the <code>::</code> syntax. For example:</p>
-<ul>
-<li>DuckDB: <code>"duckdb:///path/to/database.ddb::table_name"</code></li>
-<li>SQLite: <code>"sqlite:///path/to/database.db::table_name"</code></li>
-<li>PostgreSQL: <code>"postgresql://user:password@localhost:5432/database::table_name"</code></li>
-<li>MySQL: <code>"mysql://user:password@localhost:3306/database::table_name"</code></li>
-<li>BigQuery: <code>"bigquery://project/dataset::table_name"</code></li>
-<li>Snowflake: <code>"snowflake://user:password@account/database/schema::table_name"</code></li>
-</ul>
+<p>The <code>connection_string</code> parameter must include a valid connection string with a table name specified using the <code>::</code> syntax. Here are some examples on how to format connection strings for various backends:</p>
+<pre><code>DuckDB:     "duckdb:///path/to/database.ddb::table_name"
+SQLite:     "sqlite:///path/to/database.db::table_name"
+PostgreSQL: "postgresql://user:password@localhost:5432/database::table_name"
+MySQL:      "mysql://user:password@localhost:3306/database::table_name"
+BigQuery:   "bigquery://project/dataset::table_name"
+Snowflake:  "snowflake://user:password@account/database/schema::table_name"</code></pre>
 <p>If the connection string does not include a table name, the function will attempt to connect to the database and list available tables, providing guidance on how to specify a table.</p>
 </section>
 <section id="examples" class="level2 doc-section doc-section-examples">
@@ -269,17 +267,17 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
         border-radius: 2px;
     ">
 <p>Connect to a DuckDB table:</p>
-<div id="0ad5ddf8" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Get path to a DuckDB database file from package data</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>duckdb_path <span class="op">=</span> pb.get_data_path(<span class="st">"game_revenue"</span>, <span class="st">"duckdb"</span>)</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Connect to the `game_revenue` table in the DuckDB database</span></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>game_revenue <span class="op">=</span> pb.connect_to_table(<span class="ss">f"duckdb:///</span><span class="sc">{</span>duckdb_path<span class="sc">}</span><span class="ss">::game_revenue"</span>)</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Use with the `preview()` function</span></span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>pb.preview(game_revenue)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="31703d4b" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Get path to a DuckDB database file from package data</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>duckdb_path <span class="op">=</span> pb.get_data_path(<span class="st">"game_revenue"</span>, <span class="st">"duckdb"</span>)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Connect to the `game_revenue` table in the DuckDB database</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>game_revenue <span class="op">=</span> pb.connect_to_table(<span class="ss">f"duckdb:///</span><span class="sc">{</span>duckdb_path<span class="sc">}</span><span class="ss">::game_revenue"</span>)</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Use with the `preview()` function</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>pb.preview(game_revenue)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div id="pb_preview_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>
@@ -518,23 +516,23 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 </div>
 <p>Here are some backend-specific connection examples:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># PostgreSQL</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>pg_table <span class="op">=</span> pb.connect_to_table(</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"postgresql://user:password@localhost:5432/warehouse::customer_data"</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="co"># SQLite</span></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>sqlite_table <span class="op">=</span> pb.connect_to_table(<span class="st">"sqlite:///local_data.db::products"</span>)</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="co"># BigQuery</span></span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>bq_table <span class="op">=</span> pb.connect_to_table(<span class="st">"bigquery://my-project/analytics::daily_metrics"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># PostgreSQL</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>pg_table <span class="op">=</span> pb.connect_to_table(</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"postgresql://user:password@localhost:5432/warehouse::customer_data"</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="co"># SQLite</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>sqlite_table <span class="op">=</span> pb.connect_to_table(<span class="st">"sqlite:///local_data.db::products"</span>)</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="co"># BigQuery</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>bq_table <span class="op">=</span> pb.connect_to_table(<span class="st">"bigquery://my-project/analytics::daily_metrics"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>This function requires the Ibis library with appropriate backend drivers:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># You can install a set of common backends:</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span class="st">'ibis-framework[duckdb,postgres,mysql,sqlite]'</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co"># ...or specific backends as needed:</span></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span class="st">'ibis-framework[duckdb]'</span>    <span class="co"># for DuckDB</span></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span class="st">'ibis-framework[postgres]'</span>  <span class="co"># for PostgreSQL</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># You can install a set of common backends:</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span class="st">'ibis-framework[duckdb,postgres,mysql,sqlite]'</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co"># ...or specific backends as needed:</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span class="st">'ibis-framework[duckdb]'</span>    <span class="co"># for DuckDB</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span class="st">'ibis-framework[postgres]'</span>  <span class="co"># for PostgreSQL</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 
 
 </section>
