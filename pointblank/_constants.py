@@ -574,3 +574,11 @@ SVG_ICONS_FOR_DATA_TYPES = {
     </g>
 </svg>""",
 }
+
+DATAFRAME_LIB_INSTALL_MSG = (
+    "Install one of them using:\n"
+    "  pip install 'pointblank[pl]'  # for Polars\n"
+    "  pip install 'pointblank[pd]'  # for Pandas\n"
+    "Or install manually:\n"
+    "  pip install polars  # or pip install pandas"
+)
