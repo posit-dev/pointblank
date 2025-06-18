@@ -29,6 +29,7 @@ from pointblank._constants import (
     COMPARISON_OPERATORS_AR,
     COMPATIBLE_DTYPES,
     CROSS_MARK_SPAN,
+    DATAFRAME_LIB_INSTALL_MSG,
     IBIS_BACKENDS,
     LOG_LEVELS_MAP,
     METHOD_CATEGORY_MAP,
@@ -518,11 +519,25 @@ def load_dataset(
 
     data_path = files("pointblank.data") / f"{dataset}.zip"
 
+    # Special case: if user calls load_dataset() with default tbl_type="polars"
+    # but has neither library, provide helpful guidance
+    if tbl_type == "polars" and not _is_lib_present("polars") and not _is_lib_present("pandas"):
+        raise ImportError(
+            "No DataFrame library found! Pointblank needs either Polars or Pandas to work.\n"
+            "To get started quickly, install one using:\n"
+            "  pip install 'pointblank[pl]'  # for Polars (recommended)\n"
+            "  pip install 'pointblank[pd]'  # for Pandas\n"
+            "\n"
+            "Or if you already have one installed:\n"
+            "  pb.load_dataset(tbl_type='pandas')  # if you have pandas\n"
+            "  pb.load_dataset(tbl_type='polars')  # if you have polars"
+        )
+
     if tbl_type == "polars":
         if not _is_lib_present(lib_name="polars"):
             raise ImportError(
                 "The Polars library is not installed but is required when specifying "
-                '`tbl_type="polars".'
+                f'tbl_type="polars".\n{DATAFRAME_LIB_INSTALL_MSG}'
             )
 
         import polars as pl
@@ -533,7 +548,7 @@ def load_dataset(
         if not _is_lib_present(lib_name="pandas"):
             raise ImportError(
                 "The Pandas library is not installed but is required when specifying "
-                '`tbl_type="pandas".'
+                f'tbl_type="pandas".\n{DATAFRAME_LIB_INSTALL_MSG}'
             )
 
         import pandas as pd
@@ -551,7 +566,8 @@ def load_dataset(
         if not _is_lib_present(lib_name="ibis"):
             raise ImportError(
                 "The Ibis library is not installed but is required when specifying "
-                '`tbl_type="duckdb".'
+                'tbl_type="duckdb".\n'
+                "Install it with: pip install 'ibis-framework[duckdb]'"
             )
 
         import ibis
@@ -821,8 +837,8 @@ def _process_csv_input(data: FrameT | Any) -> FrameT | Any:
             raise RuntimeError(f"Failed to read CSV file with Pandas: {e}") from e
     else:
         raise ImportError(
-            "Neither Polars nor Pandas is available for reading CSV files. "
-            "Please install either 'polars' or 'pandas' to use CSV file inputs."
+            "Neither Polars nor Pandas is available for reading CSV files.\n"
+            f"{DATAFRAME_LIB_INSTALL_MSG}"
         )
 
 
@@ -963,8 +979,8 @@ def _process_parquet_input(data: FrameT | Any) -> FrameT | Any:
             raise RuntimeError(f"Failed to read Parquet file(s) with Pandas: {e}") from e
     else:
         raise ImportError(
-            "Neither Polars nor Pandas is available for reading Parquet files. "
-            "Please install either 'polars' or 'pandas' to use Parquet file inputs."
+            "Neither Polars nor Pandas is available for reading Parquet files.\n"
+            f"{DATAFRAME_LIB_INSTALL_MSG}"
         )
 
 
@@ -13907,7 +13923,10 @@ def _format_single_number_with_gt(
 
             df_lib = pd
         else:
-            raise ImportError("Neither Polars nor Pandas is available for formatting")
+            raise ImportError(
+                "Neither Polars nor Pandas is available for formatting.\n"
+                f"{DATAFRAME_LIB_INSTALL_MSG}"
+            )
 
     # Create a single-row, single-column DataFrame using the specified library
     df = df_lib.DataFrame({"value": [value]})
@@ -13978,7 +13997,10 @@ def _format_single_float_with_gt(
 
             df_lib = pd
         else:
-            raise ImportError("Neither Polars nor Pandas is available for formatting")
+            raise ImportError(
+                "Neither Polars nor Pandas is available for formatting.\n"
+                f"{DATAFRAME_LIB_INSTALL_MSG}"
+            )
 
     # Create a single-row, single-column DataFrame using the specified library
     df = df_lib.DataFrame({"value": [value]})
@@ -14239,7 +14261,10 @@ def _format_single_integer_with_gt(value: int, locale: str = "en", df_lib=None) 
 
             df_lib = pd
         else:
-            raise ImportError("Neither Polars nor Pandas is available for formatting")
+            raise ImportError(
+                "Neither Polars nor Pandas is available for formatting.\n"
+                f"{DATAFRAME_LIB_INSTALL_MSG}"
+            )
 
     # Create a single-row, single-column DataFrame using the specified library
     df = df_lib.DataFrame({"value": [value]})
@@ -14272,7 +14297,10 @@ def _format_single_float_with_gt_custom(
 
             df_lib = pd
         else:
-            raise ImportError("Neither Polars nor Pandas is available for formatting")
+            raise ImportError(
+                "Neither Polars nor Pandas is available for formatting.\n"
+                f"{DATAFRAME_LIB_INSTALL_MSG}"
+            )
 
     # Create a single-row, single-column DataFrame using the specified library
     df = df_lib.DataFrame({"value": [value]})
