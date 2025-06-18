@@ -8631,7 +8631,7 @@ def test_load_dataset_neither_polars_nor_pandas_available():
         # Mock both polars and pandas as not available
         mock_is_lib.return_value = False
 
-        with pytest.raises(ImportError, match="The Polars library is not installed"):
+        with pytest.raises(ImportError, match="No DataFrame library found"):
             load_dataset("small_table", tbl_type="polars")
 
 
