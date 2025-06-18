@@ -10,7 +10,11 @@ from great_tables import GT
 from great_tables.gt import _get_column_of_values
 from narwhals.typing import FrameT
 
-from pointblank._constants import ASSERTION_TYPE_METHOD_MAP, GENERAL_COLUMN_TYPES
+from pointblank._constants import (
+    ASSERTION_TYPE_METHOD_MAP,
+    DATAFRAME_LIB_INSTALL_MSG,
+    GENERAL_COLUMN_TYPES,
+)
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
@@ -156,8 +160,8 @@ def _check_any_df_lib(method_used: str) -> None:
     # If neither Pandas nor Polars is available, raise an ImportError
     if pd is None and pl is None:
         raise ImportError(
-            f"Using the `{method_used}()` method requires either the "
-            "Polars or the Pandas library to be installed."
+            f"Using the `{method_used}()` method requires either Polars or Pandas.\n"
+            f"{DATAFRAME_LIB_INSTALL_MSG}"
         )
 
 
@@ -185,12 +189,11 @@ def _select_df_lib(preference: str = "polars") -> Any:
     except ImportError:
         pl = None
 
-    # TODO: replace this with the `_check_any_df_lib()` function, introduce `method_used=` param
     # If neither Pandas nor Polars is available, raise an ImportError
     if pd is None and pl is None:
         raise ImportError(
-            "Generating a report with the `get_tabular_report()` method requires either the "
-            "Polars or the Pandas library to be installed."
+            "Pointblank requires either Polars or Pandas to work with DataFrames.\n"
+            f"{DATAFRAME_LIB_INSTALL_MSG}"
         )
 
     # Return the library based on preference, if both are available
