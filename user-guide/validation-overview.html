@@ -416,7 +416,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <h2 class="anchored" data-anchor-id="validation-methods">Validation Methods</h2>
 <p>Pointblank’s core functionality revolves around validation steps, which are individual checks that verify different aspects of your data. These steps are created by calling validation methods from the <a href="../reference/Validate.html#pointblank.Validate" title="0"><code>Validate</code></a> class. When combined they create a comprehensive validation plan for your data.</p>
 <p>Here’s an example of a validation that incorporates three different validation methods:</p>
-<div id="b9e3ec53" class="cell" data-execution_count="2">
+<div id="e3361f73" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -673,7 +673,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="column-selection-patterns" class="level2">
 <h2 class="anchored" data-anchor-id="column-selection-patterns">Column Selection Patterns</h2>
 <p>You can apply the same validation logic to multiple columns at once through use of column selection patterns (used in the <code>columns=</code> parameter). This reduces repetitive code and makes your validation plans more maintainable:</p>
-<div id="ee502f95" class="cell" data-execution_count="3">
+<div id="19e276e9" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> narwhals.selectors <span class="im">as</span> nws</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Map validations across multiple columns</span></span>
@@ -1056,7 +1056,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="preprocessing" class="level2">
 <h2 class="anchored" data-anchor-id="preprocessing">Preprocessing</h2>
 <p>Preprocessing (with the <code>pre=</code> parameter) allows you to transform or modify your data before applying validation checks, enabling you to validate derived or modified data without altering the original dataset:</p>
-<div id="739ac467" class="cell" data-execution_count="4">
+<div id="2908de55" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>(</span>
@@ -1277,7 +1277,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="segmentation" class="level2">
 <h2 class="anchored" data-anchor-id="segmentation">Segmentation</h2>
 <p>Segmentation (through the <code>segments=</code> parameter) allows you to validate data across different groups, enabling you to identify segment-specific quality issues that might be hidden in aggregate analyses:</p>
-<div id="7d87debf" class="cell" data-execution_count="5">
+<div id="4b46739c" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>(</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>        data<span class="op">=</span>pb.load_dataset(dataset<span class="op">=</span><span class="st">"small_table"</span>, tbl_type<span class="op">=</span><span class="st">"polars"</span>),</span>
@@ -1526,7 +1526,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="thresholds" class="level2">
 <h2 class="anchored" data-anchor-id="thresholds">Thresholds</h2>
 <p>Thresholds (set through the <code>thresholds=</code> parameter) let you set acceptable levels of failure before triggering warnings, errors, or critical notifications for individual validation steps:</p>
-<div id="0543efb6" class="cell" data-execution_count="6">
+<div id="7173fc5b" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>(</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>        data<span class="op">=</span>pb.load_dataset(dataset<span class="op">=</span><span class="st">"small_table"</span>, tbl_type<span class="op">=</span><span class="st">"polars"</span>),</span>
@@ -1737,7 +1737,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="actions" class="level2">
 <h2 class="anchored" data-anchor-id="actions">Actions</h2>
 <p>Actions (which can be configured in the <code>actions=</code> parameter) allow you to define specific responses when validation thresholds are crossed. You can use simple string messages or custom functions for more complex behavior:</p>
-<div id="b9d9062a" class="cell" data-execution_count="7">
+<div id="86b50eb0" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Example 1: Action with a string message ---</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>(</span>
@@ -1904,7 +1904,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
         
 </div>
 </div>
-<div id="a6ab7659" class="cell" data-execution_count="8">
+<div id="04e1cfe9" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Example 2: Action with a callable function ---</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> custom_action():</span>
@@ -1926,7 +1926,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
 <span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Data quality issue found (2025-06-18 13:24:51.764249).</code></pre>
+<pre><code>Data quality issue found (2025-06-18 13:32:28.198620).</code></pre>
 </div>
 <div class="cell-output cell-output-display" data-execution_count="8">
 <div id="pb_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
@@ -2078,7 +2078,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="briefs" class="level2">
 <h2 class="anchored" data-anchor-id="briefs">Briefs</h2>
 <p>Briefs (which can be set through the <code>brief=</code> parameter) allow you to customize descriptions associated with validation steps, making validation results more understandable to stakeholders. Briefs can be either automatically generated by setting <code>brief=True</code> or defined as custom messages for more specific explanations:</p>
-<div id="3f994690" class="cell" data-execution_count="9">
+<div id="fdf6893f" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>(</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>        data<span class="op">=</span>pb.load_dataset(dataset<span class="op">=</span><span class="st">"small_table"</span>, tbl_type<span class="op">=</span><span class="st">"polars"</span>),</span>
