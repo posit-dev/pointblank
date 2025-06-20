@@ -10,7 +10,7 @@ Set Theme "Dracula"
 
 Type "# Production CI/CD Data Validation Workflows"
 Enter
-Sleep 1s
+Sleep 2s
 
 Type ""
 Enter
@@ -20,7 +20,7 @@ Type "pb validate-simple small_table --check rows-distinct --exit-code"
 Enter
 Type "echo 'Pipeline result:' \$?"
 Enter
-Sleep 3s
+Sleep 5s
 
 Type ""
 Enter
@@ -30,7 +30,7 @@ Type "pb validate-simple small_table --check col-vals-not-null --column date_tim
 Enter
 Type "echo 'Validation status:' \$?"
 Enter
-Sleep 3s
+Sleep 5s
 
 Type ""
 Enter
@@ -40,7 +40,7 @@ Type "pb validate-simple small_table --check col-vals-gt --column a --value 0 --
 Enter
 Type "echo 'Business rule check:' \$?"
 Enter
-Sleep 3s
+Sleep 5s
 
 Type ""
 Enter
@@ -48,4 +48,4 @@ Type "# Use in GitHub Actions, GitLab CI, or any automation platform"
 Enter
 Type "echo 'Exit codes: 0 = success, 1 = validation failed'"
 Enter
-Sleep 2s
+Sleep 3s

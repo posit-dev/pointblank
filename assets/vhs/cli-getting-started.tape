@@ -10,7 +10,7 @@ Set Theme "Dracula"
 
 Type "# Getting Started with Pointblank CLI"
 Enter
-Sleep 1s
+Sleep 2s
 
 Type ""
 Enter
@@ -18,7 +18,7 @@ Type "# See all available commands"
 Enter
 Type "pb --help"
 Enter
-Sleep 4s
+Sleep 6s
 
 Type ""
 Enter
@@ -26,7 +26,7 @@ Type "# Quick validation options overview"
 Enter
 Type "pb validate-simple --help"
 Enter
-Sleep 4s
+Sleep 6s
 
 Type ""
 Enter
@@ -34,10 +34,10 @@ Type "# Your first validation - check for duplicates"
 Enter
 Type "pb validate-simple small_table --check rows-distinct"
 Enter
-Sleep 3s
+Sleep 5s
 
 Type ""
 Enter
 Type "echo 'Ready to validate any dataset - CSV, Parquet, or database!'"
 Enter
-Sleep 2s
+Sleep 3s

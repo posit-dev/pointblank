@@ -10,7 +10,7 @@ Set Theme "Dracula"
 
 Type "# Data Exploration & Profiling with Pointblank CLI"
 Enter
-Sleep 1s
+Sleep 2s
 
 Type ""
 Enter
@@ -18,7 +18,7 @@ Type "# 1. Quick data preview - see structure and sample rows"
 Enter
 Type "pb preview small_table"
 Enter
-Sleep 4s
+Sleep 6s
 
 Type ""
 Enter
@@ -26,7 +26,7 @@ Type "# 2. Missing values analysis - identify data gaps"
 Enter
 Type "pb missing small_table"
 Enter
-Sleep 4s
+Sleep 6s
 
 Type ""
 Enter
@@ -34,10 +34,10 @@ Type "# 3. Comprehensive data scan - statistical overview"
 Enter
 Type "pb scan small_table"
 Enter
-Sleep 5s
+Sleep 8s
 
 Type ""
 Enter
 Type "echo 'Complete data profiling in seconds - no Python required!'"
 Enter
-Sleep 2s
+Sleep 3s
