@@ -181,10 +181,9 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
   <ul>
   <li><a href="#getting-started-in-30-seconds" id="toc-getting-started-in-30-seconds" class="nav-link active" data-scroll-target="#getting-started-in-30-seconds">Getting Started in 30 Seconds</a></li>
   <li><a href="#real-world-example" id="toc-real-world-example" class="nav-link" data-scroll-target="#real-world-example">Real-World Example</a></li>
-  <li><a href="#command-line-interface-cli" id="toc-command-line-interface-cli" class="nav-link" data-scroll-target="#command-line-interface-cli">Command Line Interface (CLI)</a></li>
+  <li><a href="#command-line-interface" id="toc-command-line-interface" class="nav-link" data-scroll-target="#command-line-interface">Command Line Interface</a></li>
   <li><a href="#join-the-community" id="toc-join-the-community" class="nav-link" data-scroll-target="#join-the-community">Join the Community</a></li>
   <li><a href="#installation" id="toc-installation" class="nav-link" data-scroll-target="#installation">Installation</a></li>
-  <li><a href="#command-line-interface" id="toc-command-line-interface" class="nav-link" data-scroll-target="#command-line-interface">Command Line Interface</a></li>
   <li><a href="#technical-details" id="toc-technical-details" class="nav-link" data-scroll-target="#technical-details">Technical Details</a></li>
   <li><a href="#contributing-to-pointblank" id="toc-contributing-to-pointblank" class="nav-link" data-scroll-target="#contributing-to-pointblank">Contributing to Pointblank</a></li>
   <li><a href="#roadmap" id="toc-roadmap" class="nav-link" data-scroll-target="#roadmap">Roadmap</a></li>
@@ -285,8 +284,8 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <p><img src="./assets/pointblank-step-report.png" class="img-fluid" style="width:100.0%"></p>
 </div>
 </section>
-<section id="command-line-interface-cli" class="level2">
-<h2 class="anchored" data-anchor-id="command-line-interface-cli">Command Line Interface (CLI)</h2>
+<section id="command-line-interface" class="level2">
+<h2 class="anchored" data-anchor-id="command-line-interface">Command Line Interface</h2>
 <p>Pointblank includes a powerful CLI utility called <code>pb</code> that lets you run data validation workflows directly from the command line. Perfect for CI/CD pipelines, scheduled data quality checks, or quick validation tasks.</p>
 <div style="text-align: center;">
 <p><img src="./assets/vhs/cli-complete-workflow.gif" class="img-fluid" style="width:100.0%"></p>
@@ -337,25 +336,6 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span class="st">"pointblank[mysql]"</span>    <span class="co"># Install Pointblank with Ibis + MySQL</span></span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span class="st">"pointblank[postgres]"</span> <span class="co"># Install Pointblank with Ibis + PostgreSQL</span></span>
 <span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span class="st">"pointblank[sqlite]"</span>   <span class="co"># Install Pointblank with Ibis + SQLite</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</section>
-<section id="command-line-interface" class="level2">
-<h2 class="anchored" data-anchor-id="command-line-interface">Command Line Interface</h2>
-<p>Pointblank provides a powerful CLI for quick data validation without writing Python code. Now featuring enhanced validation checks including <code>col-vals-lt</code> and <code>col-vals-le</code>:</p>
-<div style="text-align: center; margin: 20px 0;">
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="assets/vhs/cli-features.gif" class="img-fluid figure-img"></p>
-<figcaption>CLI Quick Demo</figcaption>
-</figure>
-</div>
-</div>
-<div class="sourceCode" id="cb13"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Quick validation checks from the terminal</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate-simple data.csv <span class="at">--check</span> rows-distinct</span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate-simple sales.csv <span class="at">--check</span> col-vals-gt <span class="at">--column</span> revenue <span class="at">--value</span> 0</span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate-simple users.csv <span class="at">--check</span> col-vals-lt <span class="at">--column</span> age <span class="at">--value</span> 120  <span class="co"># NEW!</span></span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate-simple inventory.csv <span class="at">--check</span> col-vals-le <span class="at">--column</span> stock <span class="at">--value</span> 1000  <span class="co"># NEW!</span></span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate-simple users.csv <span class="at">--check</span> col-not-null <span class="at">--column</span> email <span class="at">--show-extract</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>The CLI is perfect for CI/CD pipelines, shell scripts, and exploratory data analysis. See the <a href="./user-guide/cli.html">CLI documentation</a> for complete details and <a href="./demos/cli-interactive/index.html">interactive demos</a> for live examples.</p>
 </section>
 <section id="technical-details" class="level2">
 <h2 class="anchored" data-anchor-id="technical-details">Technical Details</h2>
