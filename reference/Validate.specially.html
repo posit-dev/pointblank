@@ -325,7 +325,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="simple-validation-with-direct-table-access" class="level3">
 <h4 class="anchored" data-anchor-id="simple-validation-with-direct-table-access">Simple validation with direct table access</h4>
 <p>This example shows the most straightforward use case where we create a function that directly checks if the sum of two columns is positive.</p>
-<div id="8a6cc470" class="cell" data-execution_count="2">
+<div id="e9a30aae" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -489,7 +489,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="advanced-validation-with-closure-variables-for-parameters" class="level3">
 <h4 class="anchored" data-anchor-id="advanced-validation-with-closure-variables-for-parameters">Advanced validation with closure variables for parameters</h4>
 <p>When you need to make your validation configurable, you can use the function factory pattern (also known as closures) to create parameterized validations:</p>
-<div id="0d8c8c3f" class="cell" data-execution_count="3">
+<div id="7da8702f" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a parameterized validation function using closures</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> make_column_ratio_validator(col1, col2, min_ratio):</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> validate_column_ratio(data):</span>
@@ -649,7 +649,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="validation-function-returning-a-list-of-booleans" class="level3">
 <h4 class="anchored" data-anchor-id="validation-function-returning-a-list-of-booleans">Validation function returning a list of booleans</h4>
 <p>This example demonstrates how to create a validation function that returns a list of boolean values, where each element represents a separate test unit:</p>
-<div id="d822319a" class="cell" data-execution_count="4">
+<div id="fe05ff2c" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> random</span>
@@ -847,7 +847,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="table-level-validation-returning-a-single-boolean" class="level3">
 <h4 class="anchored" data-anchor-id="table-level-validation-returning-a-single-boolean">Table-level validation returning a single boolean</h4>
 <p>Sometimes you need to validate properties of the entire table rather than row-by-row. In these cases, your function can return a single boolean value:</p>
-<div id="4e8764f2" class="cell" data-execution_count="5">
+<div id="b80b10a4" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> validate_table_properties(data):</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Check if table has at least one row with column 'a' &gt; 10</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    has_large_values <span class="op">=</span> data.<span class="bu">filter</span>(pl.col(<span class="st">"a"</span>) <span class="op">&gt;</span> <span class="dv">10</span>).height <span class="op">&gt;</span> <span class="dv">0</span></span>
@@ -1009,7 +1009,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="environment-validation-that-doesnt-use-the-data-table" class="level3">
 <h4 class="anchored" data-anchor-id="environment-validation-that-doesnt-use-the-data-table">Environment validation that doesn’t use the data table</h4>
 <p>The <code>specially()</code> validation method can even be used to validate aspects of your environment that are completely independent of the data:</p>
-<div id="9f7a66a6" class="cell" data-execution_count="6">
+<div id="1865a260" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> validate_pointblank_version():</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">try</span>:</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>        <span class="im">import</span> importlib.metadata</span>

@@ -65,7 +65,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../user-guide/validation-overview.html" rel="next">
+<link href="../user-guide/cli.html" rel="next">
 <link href="../user-guide/index.html" rel="prev">
 <link href="../assets/fav-logo.png" rel="icon" type="image/png">
 <script src="../site_libs/quarto-html/quarto.js" type="module"></script>
@@ -207,6 +207,12 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
   <div class="sidebar-item-container"> 
   <a href="../user-guide/installation.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">Installation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../user-guide/cli.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Command Line Interface</span></a>
   </div>
 </li>
       </ul>
@@ -386,6 +392,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
   <li><a href="#verifying-your-installation" id="toc-verifying-your-installation" class="nav-link" data-scroll-target="#verifying-your-installation">Verifying Your Installation</a></li>
   <li><a href="#system-requirements" id="toc-system-requirements" class="nav-link" data-scroll-target="#system-requirements">System Requirements</a></li>
   <li><a href="#next-steps" id="toc-next-steps" class="nav-link" data-scroll-target="#next-steps">Next Steps</a></li>
+  <li><a href="#command-line-interface" id="toc-command-line-interface" class="nav-link" data-scroll-target="#command-line-interface">Command Line Interface</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -545,8 +552,8 @@ Note
 <h2 class="anchored" data-anchor-id="system-requirements">System Requirements</h2>
 <ul>
 <li>Python 3.10 or higher</li>
-<li>A supported DataFrame library (Pandas or Polars)</li>
-<li>Optional: Ibis (for database connectivity)</li>
+<li>a supported DataFrame library (Pandas or Polars)</li>
+<li>optional: Ibis (for database connectivity)</li>
 </ul>
 </section>
 <section id="next-steps" class="level2">
@@ -568,6 +575,38 @@ Note
 <span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Display the validation results</span></span>
 <span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>validation</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="command-line-interface" class="level2">
+<h2 class="anchored" data-anchor-id="command-line-interface">Command Line Interface</h2>
+<p>Once installed, Pointblank also provides a powerful command-line interface for quick data validation tasks:</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Test the CLI with a built-in dataset</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate-simple small_table <span class="at">--check</span> rows-distinct</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Check if a column exists</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate-simple small_table <span class="at">--check</span> col-exists <span class="at">--column</span> a</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Validate data ranges</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate-simple small_table <span class="at">--check</span> col-vals-lt <span class="at">--column</span> a <span class="at">--value</span> 10</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>The CLI is perfect for:</p>
+<ul>
+<li>quick data quality checks in CI/CD pipelines</li>
+<li>exploratory data analysis from the terminal</li>
+<li>integration with shell scripts and automation workflows</li>
+</ul>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+See the CLI in Action
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Watch our <a href="../demos/cli-interactive/index.html">interactive CLI demonstrations</a> to see these commands executing in real-time with actual output formatting.</p>
+</div>
+</div>
+<p>Learn more about the CLI capabilities in the <a href="../user-guide/cli.html">Command Line Interface</a> guide.</p>
 
 
 </section>
@@ -980,8 +1019,8 @@ Note
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../user-guide/validation-overview.html" class="pagination-link" aria-label="Overview">
-        <span class="nav-page-text">Overview</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../user-guide/cli.html" class="pagination-link" aria-label="Command Line Interface">
+        <span class="nav-page-text">Command Line Interface</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>
