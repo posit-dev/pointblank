@@ -389,22 +389,11 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
   <ul class="collapse">
   <li><a href="#data-completeness" id="toc-data-completeness" class="nav-link" data-scroll-target="#data-completeness">Data Completeness</a></li>
   <li><a href="#column-existence" id="toc-column-existence" class="nav-link" data-scroll-target="#column-existence">Column Existence</a></li>
-  <li><a href="#value-range-checks" id="toc-value-range-checks" class="nav-link" data-scroll-target="#value-range-checks">Value Range Checks</a></li>
-  <li><a href="#value-set-checks" id="toc-value-set-checks" class="nav-link" data-scroll-target="#value-set-checks">Value Set Checks</a></li>
+  <li><a href="#numeric-value-checks-within-columns" id="toc-numeric-value-checks-within-columns" class="nav-link" data-scroll-target="#numeric-value-checks-within-columns">Numeric Value Checks Within Columns</a></li>
+  <li><a href="#value-set-checks-within-columns" id="toc-value-set-checks-within-columns" class="nav-link" data-scroll-target="#value-set-checks-within-columns">Value Set Checks Within Columns</a></li>
   </ul></li>
-  <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a>
-  <ul class="collapse">
-  <li><a href="#basic-validation" id="toc-basic-validation" class="nav-link" data-scroll-target="#basic-validation">Basic Validation</a></li>
-  <li><a href="#range-validations" id="toc-range-validations" class="nav-link" data-scroll-target="#range-validations">Range Validations</a></li>
-  <li><a href="#set-membership" id="toc-set-membership" class="nav-link" data-scroll-target="#set-membership">Set Membership</a></li>
-  <li><a href="#debugging-failed-validations" id="toc-debugging-failed-validations" class="nav-link" data-scroll-target="#debugging-failed-validations">Debugging Failed Validations</a></li>
-  <li><a href="#exit-codes-for-automation" id="toc-exit-codes-for-automation" class="nav-link" data-scroll-target="#exit-codes-for-automation">Exit Codes for Automation</a></li>
-  </ul></li>
-  <li><a href="#output-examples" id="toc-output-examples" class="nav-link" data-scroll-target="#output-examples">Output Examples</a>
-  <ul class="collapse">
-  <li><a href="#successful-validation" id="toc-successful-validation" class="nav-link" data-scroll-target="#successful-validation">Successful Validation</a></li>
-  <li><a href="#failed-validation" id="toc-failed-validation" class="nav-link" data-scroll-target="#failed-validation">Failed Validation</a></li>
-  </ul></li>
+  <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
+  <li><a href="#output-examples" id="toc-output-examples" class="nav-link" data-scroll-target="#output-examples">Output Examples</a></li>
   <li><a href="#integration-with-cicd" id="toc-integration-with-cicd" class="nav-link" data-scroll-target="#integration-with-cicd">Integration with CI/CD</a></li>
   <li><a href="#getting-help" id="toc-getting-help" class="nav-link" data-scroll-target="#getting-help">Getting Help</a></li>
   <li><a href="#terminal-demonstrations" id="toc-terminal-demonstrations" class="nav-link" data-scroll-target="#terminal-demonstrations">Terminal Demonstrations</a></li>
@@ -423,10 +412,10 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <h1>Command Line Interface</h1>
 <p>Pointblank provides a powerful command-line interface (CLI) that allows you to perform data validation directly from the terminal without writing Python code. This is especially useful for:</p>
 <ul>
-<li>Quick data quality checks in CI/CD pipelines</li>
-<li>Exploratory data analysis</li>
-<li>Integration with shell scripts and automation workflows</li>
-<li>Non-Python users who want to leverage Pointblank’s validation capabilities</li>
+<li>quick data quality checks in CI/CD pipelines</li>
+<li>exploratory data analysis</li>
+<li>integration with shell scripts and automation workflows</li>
+<li>non-Python users who want to leverage Pointblank’s validation capabilities</li>
 </ul>
 <section id="installation" class="level2">
 <h2 class="anchored" data-anchor-id="installation">Installation</h2>
@@ -445,12 +434,14 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="data-sources" class="level2">
 <h2 class="anchored" data-anchor-id="data-sources">Data Sources</h2>
 <p>You can validate various types of data sources:</p>
-<ul>
-<li>CSV files: <code>pb validate-simple data.csv --check rows-distinct</code></li>
-<li>Parquet files: <code>pb validate-simple data.parquet --check col-vals-not-null --column age</code></li>
-<li>database tables: <code>pb validate-simple "duckdb:///path/to/db.ddb::table_name" --check rows-complete</code></li>
-<li>built-in datasets: <code>pb validate-simple small_table --check col-exists --column a</code></li>
-</ul>
+<p><em>CSV files</em></p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate-simple data.csv <span class="at">--check</span> rows-distinct</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><em>Parquet files</em></p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate-simple data.parquet <span class="at">--check</span> col-vals-not-null <span class="at">--column</span> age</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><em>Database tables</em></p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate-simple <span class="st">"duckdb:///path/to/db.ddb::table_name"</span> <span class="at">--check</span> rows-complete</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><em>built-in datasets</em></p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate-simple small_table <span class="at">--check</span> col-exists <span class="at">--column</span> a</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section id="available-validation-checks" class="level2">
 <h2 class="anchored" data-anchor-id="available-validation-checks">Available Validation Checks</h2>
@@ -459,7 +450,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <ul>
 <li><code>rows-distinct</code>: Check if all rows are unique (no duplicates)</li>
 <li><code>rows-complete</code>: Check if all rows are complete (no missing values)</li>
-<li><code>col-vals-not-null</code>: Check if a column has no null/missing values</li>
+<li><code>col-vals-not-null</code>: Check if a column has no Null/None/NA values</li>
 </ul>
 </section>
 <section id="column-existence" class="level3">
@@ -468,72 +459,72 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <li><code>col-exists</code>: Verify that a specific column exists in the dataset</li>
 </ul>
 </section>
-<section id="value-range-checks" class="level3">
-<h3 class="anchored" data-anchor-id="value-range-checks">Value Range Checks</h3>
+<section id="numeric-value-checks-within-columns" class="level3">
+<h3 class="anchored" data-anchor-id="numeric-value-checks-within-columns">Numeric Value Checks Within Columns</h3>
 <ul>
-<li><code>col-vals-gt</code>: Values greater than a threshold</li>
-<li><code>col-vals-ge</code>: Values greater than or equal to a threshold</li>
-<li><code>col-vals-lt</code>: Values less than a threshold</li>
-<li><code>col-vals-le</code>: Values less than or equal to a threshold</li>
+<li><code>col-vals-gt</code>: column values greater than a fixed value</li>
+<li><code>col-vals-ge</code>: column values greater than or equal to a fixed value</li>
+<li><code>col-vals-lt</code>: column values less than a fixed value</li>
+<li><code>col-vals-le</code>: column values less than or equal to a fixed value</li>
 </ul>
 </section>
-<section id="value-set-checks" class="level3">
-<h3 class="anchored" data-anchor-id="value-set-checks">Value Set Checks</h3>
+<section id="value-set-checks-within-columns" class="level3">
+<h3 class="anchored" data-anchor-id="value-set-checks-within-columns">Value Set Checks Within Columns</h3>
 <ul>
-<li><code>col-vals-in-set</code>: Values must be in an allowed set</li>
+<li><code>col-vals-in-set</code>: column values must be in an defined set</li>
 </ul>
 </section>
 </section>
 <section id="examples" class="level2">
 <h2 class="anchored" data-anchor-id="examples">Examples</h2>
-<section id="basic-validation" class="level3">
-<h3 class="anchored" data-anchor-id="basic-validation">Basic Validation</h3>
-<div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check for duplicate rows</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate-simple data.csv <span class="at">--check</span> rows-distinct</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Check if all values in 'age' column are not null</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate-simple data.csv <span class="at">--check</span> col-vals-not-null <span class="at">--column</span> age</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Check if all values in 'score' are greater than 50</span></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate-simple data.csv <span class="at">--check</span> col-vals-gt <span class="at">--column</span> score <span class="at">--value</span> 50</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="basic-validation" class="level4">
+<h4 class="anchored" data-anchor-id="basic-validation">Basic Validation</h4>
+<div class="sourceCode" id="cb7"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check for duplicate rows</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate-simple data.csv <span class="at">--check</span> rows-distinct</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Check if all values in 'age' column are not null</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate-simple data.csv <span class="at">--check</span> col-vals-not-null <span class="at">--column</span> age</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Check if all values in 'score' are greater than 50</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate-simple data.csv <span class="at">--check</span> col-vals-gt <span class="at">--column</span> score <span class="at">--value</span> 50</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
-<section id="range-validations" class="level3">
-<h3 class="anchored" data-anchor-id="range-validations">Range Validations</h3>
-<div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check if all ages are less than 100</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate-simple data.csv <span class="at">--check</span> col-vals-lt <span class="at">--column</span> age <span class="at">--value</span> 100</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Check if all prices are less than or equal to 1000</span></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate-simple data.csv <span class="at">--check</span> col-vals-le <span class="at">--column</span> price <span class="at">--value</span> 1000</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Check if all ratings are between 1 and 5 (using two commands)</span></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate-simple data.csv <span class="at">--check</span> col-vals-ge <span class="at">--column</span> rating <span class="at">--value</span> 1</span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate-simple data.csv <span class="at">--check</span> col-vals-le <span class="at">--column</span> rating <span class="at">--value</span> 5</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="range-validations" class="level4">
+<h4 class="anchored" data-anchor-id="range-validations">Range Validations</h4>
+<div class="sourceCode" id="cb8"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check if all ages are less than 100</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate-simple data.csv <span class="at">--check</span> col-vals-lt <span class="at">--column</span> age <span class="at">--value</span> 100</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Check if all prices are less than or equal to 1000</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate-simple data.csv <span class="at">--check</span> col-vals-le <span class="at">--column</span> price <span class="at">--value</span> 1000</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Check if all ratings are between 1 and 5 (using two commands)</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate-simple data.csv <span class="at">--check</span> col-vals-ge <span class="at">--column</span> rating <span class="at">--value</span> 1</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate-simple data.csv <span class="at">--check</span> col-vals-le <span class="at">--column</span> rating <span class="at">--value</span> 5</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
-<section id="set-membership" class="level3">
-<h3 class="anchored" data-anchor-id="set-membership">Set Membership</h3>
-<div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check if status values are in allowed set</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate-simple data.csv <span class="at">--check</span> col-vals-in-set <span class="at">--column</span> status <span class="at">--set</span> <span class="st">"active,inactive,pending"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="set-membership" class="level4">
+<h4 class="anchored" data-anchor-id="set-membership">Set Membership</h4>
+<div class="sourceCode" id="cb9"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check if status values are in allowed set</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate-simple data.csv <span class="at">--check</span> col-vals-in-set <span class="at">--column</span> status <span class="at">--set</span> <span class="st">"active,inactive,pending"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
-<section id="debugging-failed-validations" class="level3">
-<h3 class="anchored" data-anchor-id="debugging-failed-validations">Debugging Failed Validations</h3>
+<section id="debugging-failed-validations" class="level4">
+<h4 class="anchored" data-anchor-id="debugging-failed-validations">Debugging Failed Validations</h4>
 <p>Use <code>--show-extract</code> to see which rows are causing validation failures:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Show failing rows when validation fails</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate-simple data.csv <span class="at">--check</span> col-vals-lt <span class="at">--column</span> age <span class="at">--value</span> 65 <span class="at">--show-extract</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Limit the number of failing rows shown</span></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate-simple data.csv <span class="at">--check</span> col-vals-not-null <span class="at">--column</span> email <span class="at">--show-extract</span> <span class="at">--limit</span> 5</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Show failing rows when validation fails</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate-simple data.csv <span class="at">--check</span> col-vals-lt <span class="at">--column</span> age <span class="at">--value</span> 65 <span class="at">--show-extract</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Limit the number of failing rows shown</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate-simple data.csv <span class="at">--check</span> col-vals-not-null <span class="at">--column</span> email <span class="at">--show-extract</span> <span class="at">--limit</span> 5</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
-<section id="exit-codes-for-automation" class="level3">
-<h3 class="anchored" data-anchor-id="exit-codes-for-automation">Exit Codes for Automation</h3>
+<section id="exit-codes-for-automation" class="level4">
+<h4 class="anchored" data-anchor-id="exit-codes-for-automation">Exit Codes for Automation</h4>
 <p>Use <code>--exit-code</code> to make the command exit with a non-zero code when validation fails:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># For use in CI/CD pipelines</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate-simple data.csv <span class="at">--check</span> rows-distinct <span class="at">--exit-code</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># For use in CI/CD pipelines</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate-simple data.csv <span class="at">--check</span> rows-distinct <span class="at">--exit-code</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 </section>
 <section id="output-examples" class="level2">
 <h2 class="anchored" data-anchor-id="output-examples">Output Examples</h2>
-<section id="successful-validation" class="level3">
-<h3 class="anchored" data-anchor-id="successful-validation">Successful Validation</h3>
+<section id="successful-validation" class="level4">
+<h4 class="anchored" data-anchor-id="successful-validation">Successful Validation</h4>
 <pre><code>✓ Loaded data source: data.csv
 ✓ Col Vals Lt validation completed
 
@@ -555,8 +546,8 @@ Validation Result: Column Values Less Than
 │   'age' are &lt; 100.0 in data.csv                 │
 ╰─────────────────────────────────────────────────╯</code></pre>
 </section>
-<section id="failed-validation" class="level3">
-<h3 class="anchored" data-anchor-id="failed-validation">Failed Validation</h3>
+<section id="failed-validation" class="level4">
+<h4 class="anchored" data-anchor-id="failed-validation">Failed Validation</h4>
 <pre><code>✓ Loaded data source: data.csv
 ✓ Col Vals Lt validation completed
 
@@ -583,32 +574,32 @@ Validation Result: Column Values Less Than
 </section>
 <section id="integration-with-cicd" class="level2">
 <h2 class="anchored" data-anchor-id="integration-with-cicd">Integration with CI/CD</h2>
-<p>The CLI is perfect for integrating data validation into your CI/CD pipelines:</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Example GitHub Actions workflow</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="fu">name</span><span class="kw">:</span><span class="at"> Data Validation</span></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="fu">on</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">push</span><span class="kw">,</span><span class="at"> pull_request</span><span class="kw">]</span></span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="fu">jobs</span><span class="kw">:</span></span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">validate</span><span class="kw">:</span></span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">runs-on</span><span class="kw">:</span><span class="at"> ubuntu-latest</span></span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">steps</span><span class="kw">:</span></span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">uses</span><span class="kw">:</span><span class="at"> actions/checkout@v2</span></span>
-<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Set up Python</span></span>
-<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">uses</span><span class="kw">:</span><span class="at"> actions/setup-python@v2</span></span>
-<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">with</span><span class="kw">:</span></span>
-<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">python-version</span><span class="kw">:</span><span class="at"> </span><span class="st">'3.9'</span></span>
-<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Install dependencies</span></span>
-<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">run</span><span class="kw">:</span><span class="at"> pip install pointblank</span></span>
-<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Validate data quality</span></span>
-<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a><span class="fu">        run</span><span class="kw">: </span><span class="ch">|</span></span>
-<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>          pb validate-simple data/sales.csv --check rows-distinct --exit-code</span>
-<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>          pb validate-simple data/sales.csv --check col-vals-not-null --column customer_id --exit-code</span>
-<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>          pb validate-simple data/sales.csv --check col-vals-gt --column amount --value 0 --exit-code</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>The CLI is useful when integrating data validation into your CI/CD pipelines:</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Example GitHub Actions workflow</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="fu">name</span><span class="kw">:</span><span class="at"> Data Validation</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="fu">on</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">push</span><span class="kw">,</span><span class="at"> pull_request</span><span class="kw">]</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="fu">jobs</span><span class="kw">:</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">validate</span><span class="kw">:</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">runs-on</span><span class="kw">:</span><span class="at"> ubuntu-latest</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">steps</span><span class="kw">:</span></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">uses</span><span class="kw">:</span><span class="at"> actions/checkout@v2</span></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Set up Python</span></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">uses</span><span class="kw">:</span><span class="at"> actions/setup-python@v2</span></span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">with</span><span class="kw">:</span></span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">python-version</span><span class="kw">:</span><span class="at"> </span><span class="st">'3.9'</span></span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Install dependencies</span></span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">run</span><span class="kw">:</span><span class="at"> pip install pointblank</span></span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Validate data quality</span></span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a><span class="fu">        run</span><span class="kw">: </span><span class="ch">|</span></span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>          pb validate-simple data/sales.csv --check rows-distinct --exit-code</span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a>          pb validate-simple data/sales.csv --check col-vals-not-null --column customer_id --exit-code</span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a>          pb validate-simple data/sales.csv --check col-vals-gt --column amount --value 0 --exit-code</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section id="getting-help" class="level2">
 <h2 class="anchored" data-anchor-id="getting-help">Getting Help</h2>
 <p>Use the <code>--help</code> flag to see all available options:</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate-simple <span class="at">--help</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate-simple <span class="at">--help</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section id="terminal-demonstrations" class="level2">
 <h2 class="anchored" data-anchor-id="terminal-demonstrations">Terminal Demonstrations</h2>
