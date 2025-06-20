@@ -181,6 +181,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
   <ul>
   <li><a href="#getting-started-in-30-seconds" id="toc-getting-started-in-30-seconds" class="nav-link active" data-scroll-target="#getting-started-in-30-seconds">Getting Started in 30 Seconds</a></li>
   <li><a href="#real-world-example" id="toc-real-world-example" class="nav-link" data-scroll-target="#real-world-example">Real-World Example</a></li>
+  <li><a href="#command-line-interface-cli" id="toc-command-line-interface-cli" class="nav-link" data-scroll-target="#command-line-interface-cli">Command Line Interface (CLI)</a></li>
   <li><a href="#join-the-community" id="toc-join-the-community" class="nav-link" data-scroll-target="#join-the-community">Join the Community</a></li>
   <li><a href="#installation" id="toc-installation" class="nav-link" data-scroll-target="#installation">Installation</a></li>
   <li><a href="#command-line-interface" id="toc-command-line-interface" class="nav-link" data-scroll-target="#command-line-interface">Command Line Interface</a></li>
@@ -284,6 +285,35 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <p><img src="./assets/pointblank-step-report.png" class="img-fluid" style="width:100.0%"></p>
 </div>
 </section>
+<section id="command-line-interface-cli" class="level2">
+<h2 class="anchored" data-anchor-id="command-line-interface-cli">Command Line Interface (CLI)</h2>
+<p>Pointblank includes a powerful CLI utility called <code>pb</code> that lets you run data validation workflows directly from the command line. Perfect for CI/CD pipelines, scheduled data quality checks, or quick validation tasks.</p>
+<div style="text-align: center;">
+<p><img src="./assets/vhs/cli-complete-workflow.gif" class="img-fluid" style="width:100.0%"></p>
+</div>
+<p><strong>Explore Your Data</strong></p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get a quick preview of your data</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> preview small_table</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Check for missing values</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> missing small_table</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate column summaries</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> scan small_table</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Run Essential Validations</strong></p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check for duplicate rows</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate-simple small_table <span class="at">--check</span> rows-distinct</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Verify no null values</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate-simple small_table <span class="at">--check</span> col-vals-not-null <span class="at">--column</span> a</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract failing data for debugging</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate-simple small_table <span class="at">--check</span> col-vals-gt <span class="at">--column</span> a <span class="at">--value</span> 5 <span class="at">--show-extract</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Integrate with CI/CD</strong></p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Use exit codes for automation (0 = pass, 1 = fail)</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate-simple small_table <span class="at">--check</span> rows-distinct <span class="kw">&amp;&amp;</span> <span class="bu">echo</span> <span class="st">"✅ Quality checks passed"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Learn more in our <a href="https://posit-dev.github.io/pointblank/user-guide/cli.html">CLI documentation</a>.</p>
+</section>
 <section id="join-the-community" class="level2">
 <h2 class="anchored" data-anchor-id="join-the-community">Join the Community</h2>
 <p>We’d love to hear from you! Connect with us:</p>
@@ -296,17 +326,17 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="installation" class="level2">
 <h2 class="anchored" data-anchor-id="installation">Installation</h2>
 <p>You can install Pointblank using pip:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install pointblank</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install pointblank</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>You can also install Pointblank from Conda-Forge by using:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">conda</span> install conda-forge::pointblank</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ex">conda</span> install conda-forge::pointblank</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>If you don’t have Polars or Pandas installed, you’ll need to install one of them to use Pointblank.</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span class="st">"pointblank[pl]"</span> <span class="co"># Install Pointblank with Polars</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span class="st">"pointblank[pd]"</span> <span class="co"># Install Pointblank with Pandas</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span class="st">"pointblank[pl]"</span> <span class="co"># Install Pointblank with Polars</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span class="st">"pointblank[pd]"</span> <span class="co"># Install Pointblank with Pandas</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>To use Pointblank with DuckDB, MySQL, PostgreSQL, or SQLite, install Ibis with the appropriate backend:</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span class="st">"pointblank[duckdb]"</span>   <span class="co"># Install Pointblank with Ibis + DuckDB</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span class="st">"pointblank[mysql]"</span>    <span class="co"># Install Pointblank with Ibis + MySQL</span></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span class="st">"pointblank[postgres]"</span> <span class="co"># Install Pointblank with Ibis + PostgreSQL</span></span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span class="st">"pointblank[sqlite]"</span>   <span class="co"># Install Pointblank with Ibis + SQLite</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span class="st">"pointblank[duckdb]"</span>   <span class="co"># Install Pointblank with Ibis + DuckDB</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span class="st">"pointblank[mysql]"</span>    <span class="co"># Install Pointblank with Ibis + MySQL</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span class="st">"pointblank[postgres]"</span> <span class="co"># Install Pointblank with Ibis + PostgreSQL</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span class="st">"pointblank[sqlite]"</span>   <span class="co"># Install Pointblank with Ibis + SQLite</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section id="command-line-interface" class="level2">
 <h2 class="anchored" data-anchor-id="command-line-interface">Command Line Interface</h2>
@@ -319,12 +349,12 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </figure>
 </div>
 </div>
-<div class="sourceCode" id="cb10"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Quick validation checks from the terminal</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate-simple data.csv <span class="at">--check</span> rows-distinct</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate-simple sales.csv <span class="at">--check</span> col-vals-gt <span class="at">--column</span> revenue <span class="at">--value</span> 0</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate-simple users.csv <span class="at">--check</span> col-vals-lt <span class="at">--column</span> age <span class="at">--value</span> 120  <span class="co"># NEW!</span></span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate-simple inventory.csv <span class="at">--check</span> col-vals-le <span class="at">--column</span> stock <span class="at">--value</span> 1000  <span class="co"># NEW!</span></span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate-simple users.csv <span class="at">--check</span> col-not-null <span class="at">--column</span> email <span class="at">--show-extract</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Quick validation checks from the terminal</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate-simple data.csv <span class="at">--check</span> rows-distinct</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate-simple sales.csv <span class="at">--check</span> col-vals-gt <span class="at">--column</span> revenue <span class="at">--value</span> 0</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate-simple users.csv <span class="at">--check</span> col-vals-lt <span class="at">--column</span> age <span class="at">--value</span> 120  <span class="co"># NEW!</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate-simple inventory.csv <span class="at">--check</span> col-vals-le <span class="at">--column</span> stock <span class="at">--value</span> 1000  <span class="co"># NEW!</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate-simple users.csv <span class="at">--check</span> col-not-null <span class="at">--column</span> email <span class="at">--show-extract</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>The CLI is perfect for CI/CD pipelines, shell scripts, and exploratory data analysis. See the <a href="./user-guide/cli.html">CLI documentation</a> for complete details and <a href="./demos/cli-interactive/index.html">interactive demos</a> for live examples.</p>
 </section>
 <section id="technical-details" class="level2">
