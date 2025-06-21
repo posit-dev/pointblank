@@ -213,13 +213,13 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 
 <p style="font-size: 12px; color: rgb(170, 170, 170); margin-bottom: -14px;">USAGE</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>get_row_count(data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>The <a href="../reference/get_row_count.html#pointblank.get_row_count" title="0"><code>get_row_count()</code></a> function returns the number of rows in a table. The function works with any table that is supported by the <code>pointblank</code> library, including Pandas, Polars, and Ibis backend tables (e.g., DuckDB, MySQL, PostgreSQL, SQLite, Parquet, etc.).</p>
+<p>The <a href="../reference/get_row_count.html#pointblank.get_row_count" title="0"><code>get_row_count()</code></a> function returns the number of rows in a table. The function works with any table that is supported by the <code>pointblank</code> library, including Pandas, Polars, and Ibis backend tables (e.g., DuckDB, MySQL, PostgreSQL, SQLite, Parquet, etc.). It also supports direct input of CSV files, Parquet files, and database connection strings.</p>
 <section id="parameters" class="level2 doc-section doc-section-parameters">
 <h3 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters">Parameters</h3>
 <dl style="border-style: solid; border-width: 2px; border-color: #00AC1480; padding: 1rem; padding-bottom: 0.25rem;">
 <dt><code><span class="parameter-name"><strong>data</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><code>FrameT</code> | <code>Any</code></span></code></dt>
 <dd>
-<p>The table for which to get the row count, which could be a DataFrame object or an Ibis table object. Read the <em>Supported Input Table Types</em> section for details on the supported table types.</p>
+<p>The table for which to get the row count, which could be a DataFrame object, an Ibis table object, a CSV file path, a Parquet file path, or a database connection string. Read the <em>Supported Input Table Types</em> section for details on the supported table types.</p>
 </dd>
 </dl>
 </section>
@@ -248,8 +248,20 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <li>PySpark table (<code>"pyspark"</code>)*</li>
 <li>BigQuery table (<code>"bigquery"</code>)*</li>
 <li>Parquet table (<code>"parquet"</code>)*</li>
+<li>CSV files (string path or <code>pathlib.Path</code> object with <code>.csv</code> extension)</li>
+<li>Parquet files (string path, <code>pathlib.Path</code> object, glob pattern, directory with <code>.parquet</code> extension, or partitioned dataset)</li>
+<li>Database connection strings (URI format with optional table specification)</li>
 </ul>
 <p>The table types marked with an asterisk need to be prepared as Ibis tables (with type of <code>ibis.expr.types.relations.Table</code>). Furthermore, using <a href="../reference/get_row_count.html#pointblank.get_row_count" title="0"><code>get_row_count()</code></a> with these types of tables requires the Ibis library (<code>v9.5.0</code> or above) to be installed. If the input table is a Polars or Pandas DataFrame, the availability of Ibis is not needed.</p>
+<p>To use a CSV file, ensure that a string or <code>pathlib.Path</code> object with a <code>.csv</code> extension is provided. The file will be automatically detected and loaded using the best available DataFrame library. The loading preference is Polars first, then Pandas as a fallback.</p>
+<p>Connection strings follow database URL formats and must also specify a table using the <code>::table_name</code> suffix. Examples include:</p>
+<pre><code>"duckdb:///path/to/database.ddb::table_name"
+"sqlite:///path/to/database.db::table_name"
+"postgresql://user:password@localhost:5432/database::table_name"
+"mysql://user:password@localhost:3306/database::table_name"
+"bigquery://project/dataset::table_name"
+"snowflake://user:password@account/database/schema::table_name"</code></pre>
+<p>When using connection strings, the Ibis library with the appropriate backend driver is required.</p>
 </section>
 <section id="examples" class="level2 doc-section doc-section-examples">
 <h3 class="doc-section doc-section-examples anchored" data-anchor-id="examples"><span style="
@@ -272,28 +284,76 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
         border-radius: 2px;
     ">
 <p>Getting the number of rows in a table is easily done by using the <a href="../reference/get_row_count.html#pointblank.get_row_count" title="0"><code>get_row_count()</code></a> function. Here’s an example using the <code>game_revenue</code> dataset (itself loaded using the <a href="../reference/load_dataset.html#pointblank.load_dataset"><span><code>load_dataset()</code></span></a> function):</p>
-<div id="ffca56ed" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>game_revenue_polars <span class="op">=</span> pb.load_dataset(<span class="st">"game_revenue"</span>)</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>pb.get_row_count(game_revenue_polars)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="b3b766a0" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>game_revenue_polars <span class="op">=</span> pb.load_dataset(<span class="st">"game_revenue"</span>)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>pb.get_row_count(game_revenue_polars)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>2000</code></pre>
 </div>
 </div>
 <p>This table is a Polars DataFrame, but the <a href="../reference/get_row_count.html#pointblank.get_row_count" title="0"><code>get_row_count()</code></a> function works with any table supported by <code>pointblank</code>, including Pandas DataFrames and Ibis backend tables. Here’s an example using a DuckDB table handled by Ibis:</p>
-<div id="7a2d1537" class="cell" data-execution_count="2">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>game_revenue_duckdb <span class="op">=</span> pb.load_dataset(<span class="st">"game_revenue"</span>, tbl_type<span class="op">=</span><span class="st">"duckdb"</span>)</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>pb.get_row_count(game_revenue_duckdb)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="d83ba4ed" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>game_revenue_duckdb <span class="op">=</span> pb.load_dataset(<span class="st">"game_revenue"</span>, tbl_type<span class="op">=</span><span class="st">"duckdb"</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>pb.get_row_count(game_revenue_duckdb)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="2">
+<pre><code>2000</code></pre>
+</div>
+</div>
+<section id="working-with-csv-files" class="level4">
+<h4 class="anchored" data-anchor-id="working-with-csv-files">Working with CSV Files</h4>
+<p>The <a href="../reference/get_row_count.html#pointblank.get_row_count" title="0"><code>get_row_count()</code></a> function can directly accept CSV file paths:</p>
+<div id="b99d23b0" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get a path to a CSV file from the package data</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>csv_path <span class="op">=</span> pb.get_data_path(<span class="st">"global_sales"</span>, <span class="st">"csv"</span>)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>pb.get_row_count(csv_path)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="3">
+<pre><code>50000</code></pre>
+</div>
+</div>
+</section>
+<section id="working-with-parquet-files" class="level4">
+<h4 class="anchored" data-anchor-id="working-with-parquet-files">Working with Parquet Files</h4>
+<p>The function supports various Parquet input formats:</p>
+<div id="10324d37" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Single Parquet file from package data</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>parquet_path <span class="op">=</span> pb.get_data_path(<span class="st">"nycflights"</span>, <span class="st">"parquet"</span>)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>pb.get_row_count(parquet_path)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="4">
+<pre><code>336776</code></pre>
+</div>
+</div>
+<p>You can also use glob patterns and directories:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Multiple Parquet files with glob patterns</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>pb.get_row_count(<span class="st">"data/sales_*.parquet"</span>)</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Directory containing Parquet files</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>pb.get_row_count(<span class="st">"parquet_data/"</span>)</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Partitioned Parquet dataset</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>pb.get_row_count(<span class="st">"sales_data/"</span>)  <span class="co"># Auto-discovers partition columns</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="working-with-database-connection-strings" class="level4">
+<h4 class="anchored" data-anchor-id="working-with-database-connection-strings">Working with Database Connection Strings</h4>
+<p>The function supports database connection strings for direct access to database tables:</p>
+<div id="33322189" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get path to a DuckDB database file from package data</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>duckdb_path <span class="op">=</span> pb.get_data_path(<span class="st">"game_revenue"</span>, <span class="st">"duckdb"</span>)</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>pb.get_row_count(<span class="ss">f"duckdb:///</span><span class="sc">{</span>duckdb_path<span class="sc">}</span><span class="ss">::game_revenue"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="5">
 <pre><code>2000</code></pre>
 </div>
 </div>
 <p>The function always returns the number of rows in the table as an integer value, which is <code>2000</code> for the <code>game_revenue</code> dataset.</p>
 
 
+</section>
 </section>
 
 </main>

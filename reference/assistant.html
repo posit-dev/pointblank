@@ -236,7 +236,7 @@ Warning
 </dd>
 <dt><code><span class="parameter-name"><strong>data</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><code>FrameT</code> | <code>Any</code> | None</span> <span class="parameter-default-sep">=</span> <span class="parameter-default">None</span></code></dt>
 <dd>
-<p>An optional data table to focus on during discussion with the PbA, which could be a DataFrame object or an Ibis table object. Read the <em>Supported Input Table Types</em> section for details on the supported table types.</p>
+<p>An optional data table to focus on during discussion with the PbA, which could be a DataFrame object, an Ibis table object, a CSV file path, a Parquet file path, or a database connection string. Read the <em>Supported Input Table Types</em> section for details on the supported table types.</p>
 </dd>
 <dt><code><span class="parameter-name"><strong>tbl_name</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><code>str</code></span> <span class="parameter-default-sep">=</span> <span class="parameter-default">None</span></code></dt>
 <dd>
@@ -305,8 +305,11 @@ OPENAI_API_KEY="your_openai_api_key_here"</code></pre>
 <li>PostgreSQL table (<code>"postgresql"</code>)*</li>
 <li>SQLite table (<code>"sqlite"</code>)*</li>
 <li>Parquet table (<code>"parquet"</code>)*</li>
+<li>CSV files (string path or <code>pathlib.Path</code> object with <code>.csv</code> extension)</li>
+<li>Parquet files (string path, <code>pathlib.Path</code> object, glob pattern, directory with <code>.parquet</code> extension, or partitioned dataset)</li>
+<li>Database connection strings (URI format with optional table specification)</li>
 </ul>
-<p>The table types marked with an asterisk need to be prepared as Ibis tables (with type of <code>ibis.expr.types.relations.Table</code>). Furthermore, using <a href="../reference/preview.html#pointblank.preview" title="0"><code>preview()</code></a> with these types of tables requires the Ibis library (<code>v9.5.0</code> or above) to be installed. If the input table is a Polars or Pandas DataFrame, the availability of Ibis is not needed.</p>
+<p>The table types marked with an asterisk need to be prepared as Ibis tables (with type of <code>ibis.expr.types.relations.Table</code>). Furthermore, using <a href="../reference/assistant.html#pointblank.assistant" title="0"><code>assistant()</code></a> with these types of tables requires the Ibis library (<code>v9.5.0</code> or above) to be installed. If the input table is a Polars or Pandas DataFrame, the availability of Ibis is not needed.</p>
 
 
 </section>
