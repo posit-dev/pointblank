@@ -271,7 +271,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
         border-radius: 2px;
     ">
 <p>Below are some examples of how to use the <code>above_threshold()</code> method. First, we’ll create a simple Polars DataFrame with a single column (<code>values</code>).</p>
-<div id="060f3014" class="cell" data-execution_count="2">
+<div id="13d4027c" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>tbl <span class="op">=</span> pl.DataFrame({</span>
@@ -279,7 +279,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Then a validation plan will be created with thresholds (<code>warning=0.1</code>, <code>error=0.2</code>, <code>critical=0.3</code>). After interrogating, we display the validation report table:</p>
-<div id="1f07281b" class="cell" data-execution_count="3">
+<div id="ed9f70f7" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
@@ -513,7 +513,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 </div>
 <p>Let’s check if any steps exceed the ‘warning’ threshold with the <code>above_threshold()</code> method. A message will be printed if that’s the case:</p>
-<div id="35b72fbb" class="cell" data-execution_count="4">
+<div id="5fb6b15c" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> validation.above_threshold(level<span class="op">=</span><span class="st">"warning"</span>):</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Some steps have exceeded the warning threshold"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -521,7 +521,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 </div>
 <p>Check if only steps 2 and 3 exceed the ‘error’ threshold through use of the <code>i=</code> argument:</p>
-<div id="501704e8" class="cell" data-execution_count="5">
+<div id="5b88a5b6" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> validation.above_threshold(level<span class="op">=</span><span class="st">"error"</span>, i<span class="op">=</span>[<span class="dv">2</span>, <span class="dv">3</span>]):</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Steps 2 and/or 3 have exceeded the error threshold"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
