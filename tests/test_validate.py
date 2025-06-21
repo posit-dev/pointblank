@@ -12650,7 +12650,8 @@ def test_above_threshold_no_interrogation():
 def test_prep_column_text():
     assert _prep_column_text(column="column") == "`column`"
     assert _prep_column_text(column=["column_a", "column_b"]) == "`column_a`"
-    assert _prep_column_text(column=3) == ""
+    with pytest.raises(AssertionError):
+        _prep_column_text(column=3)
 
 
 def test_validate_csv_string_path_input():

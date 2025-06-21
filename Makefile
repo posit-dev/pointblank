@@ -18,6 +18,11 @@ lint: ## Run ruff formatter and linter
 	@uv run ruff format
 	@uv run ruff check --fix
 
+
+type: ## Run experimental(!) type checking
+	@uvx ty check pointblank
+
+
 check:
 	pyright --pythonversion 3.8 pointblank
 	pyright --pythonversion 3.9 pointblank
