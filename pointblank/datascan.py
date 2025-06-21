@@ -56,7 +56,8 @@ class DataScan:
     Parameters
     ----------
     data
-        The data to scan and summarize.
+        The data to scan and summarize. This could be a DataFrame object, an Ibis table object,
+        a CSV file path, a Parquet file path, or a database connection string.
     tbl_name
         Optionally, the name of the table could be provided as `tbl_name`.
 
@@ -122,6 +123,23 @@ class DataScan:
 
     # TODO: This needs to be generically typed at the class level, ie. DataScan[T]
     def __init__(self, data: IntoFrameT, tbl_name: str | None = None) -> None:
+        # Import processing functions from validate module
+        from pointblank.validate import (
+            _process_connection_string,
+            _process_csv_input,
+            _process_parquet_input,
+        )
+
+        # Process input data to handle different data source types
+        # Handle connection string input (e.g., "duckdb:///path/to/file.ddb::table_name")
+        data = _process_connection_string(data)
+
+        # Handle CSV file input (e.g., "data.csv" or Path("data.csv"))
+        data = _process_csv_input(data)
+
+        # Handle Parquet file input (e.g., "data.parquet", "data/*.parquet", "data/")
+        data = _process_parquet_input(data)
+
         as_native = nw.from_native(data)
 
         if as_native.implementation.name == "IBIS" and as_native._level == "lazy":
@@ -514,8 +532,9 @@ def col_summary_tbl(data: FrameT | Any, tbl_name: str | None = None) -> GT:
     Parameters
     ----------
     data
-        The table to summarize, which could be a DataFrame object or an Ibis table object. Read the
-        *Supported Input Table Types* section for details on the supported table types.
+        The table to summarize, which could be a DataFrame object, an Ibis table object, a CSV
+        file path, a Parquet file path, or a database connection string. Read the *Supported Input
+        Table Types* section for details on the supported table types.
     tbl_name
         Optionally, the name of the table could be provided as `tbl_name=`.
 
@@ -535,6 +554,10 @@ def col_summary_tbl(data: FrameT | Any, tbl_name: str | None = None) -> GT:
     - PostgreSQL table (`"postgresql"`)*
     - SQLite table (`"sqlite"`)*
     - Parquet table (`"parquet"`)*
+    - CSV files (string path or `pathlib.Path` object with `.csv` extension)
+    - Parquet files (string path, `pathlib.Path` object, glob pattern, directory with `.parquet`
+    extension, or partitioned dataset)
+    - Database connection strings (URI format with optional table specification)
 
     The table types marked with an asterisk need to be prepared as Ibis tables (with type of
     `ibis.expr.types.relations.Table`). Furthermore, using `col_summary_tbl()` with these types of
@@ -565,6 +588,23 @@ def col_summary_tbl(data: FrameT | Any, tbl_name: str | None = None) -> GT:
     pb.col_summary_tbl(data=nycflights, tbl_name="nycflights")
     ```
     """
+
+    # Import processing functions from validate module
+    from pointblank.validate import (
+        _process_connection_string,
+        _process_csv_input,
+        _process_parquet_input,
+    )
+
+    # Process input data to handle different data source types
+    # Handle connection string input (e.g., "duckdb:///path/to/file.ddb::table_name")
+    data = _process_connection_string(data)
+
+    # Handle CSV file input (e.g., "data.csv" or Path("data.csv"))
+    data = _process_csv_input(data)
+
+    # Handle Parquet file input (e.g., "data.parquet", "data/*.parquet", "data/")
+    data = _process_parquet_input(data)
 
     scanner = DataScan(data=data, tbl_name=tbl_name)
     return scanner.get_tabular_report()

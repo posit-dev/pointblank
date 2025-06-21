@@ -13,6 +13,7 @@ import polars.testing as pt
 import pointblank as pb
 
 from pointblank.datascan import DataScan, col_summary_tbl
+from pointblank.validate import get_data_path
 from pointblank._datascan_utils import _compact_0_1_fmt, _compact_decimal_fmt, _compact_integer_fmt
 from pointblank.scan_profile_stats import StatGroup, COLUMN_ORDER_REGISTRY
 
@@ -283,6 +284,100 @@ def test_compact_0_1_fmt():
     _compact_0_1_fmt(value=0.99) == "0.99"
     _compact_0_1_fmt(value=0.991) == ">0.99"
     _compact_0_1_fmt(value=226.1) == "226"
+
+
+def test_datascan_csv_input():
+    # Test with individual CSV file
+    csv_path = "data_raw/small_table.csv"
+    scanner = DataScan(data=csv_path)
+    assert scanner.summary_data is not None
+
+    # Test with another CSV file
+    csv_path2 = "data_raw/game_revenue.csv"
+    scanner2 = DataScan(data=csv_path2)
+    assert scanner2.summary_data is not None
+
+
+def test_datascan_parquet_input():
+    # Test with individual Parquet file
+    parquet_path = "tests/tbl_files/tbl_xyz.parquet"
+    scanner = DataScan(data=parquet_path)
+    assert scanner.summary_data is not None
+
+    # Test with another Parquet file
+    parquet_path2 = "tests/tbl_files/taxi_sample.parquet"
+    scanner2 = DataScan(data=parquet_path2)
+    assert scanner2.summary_data is not None
+
+
+def test_datascan_connection_string_input():
+    # Test with DuckDB connection string using get_data_path
+    duckdb_path = get_data_path("small_table", "duckdb")
+    duckdb_conn = f"duckdb:///{duckdb_path}::small_table"
+    scanner = DataScan(data=duckdb_conn)
+    assert scanner.summary_data is not None
+
+    # Test with SQLite connection string using absolute path
+    import os
+
+    sqlite_path = os.path.abspath("tests/tbl_files/tbl_xyz.sqlite")
+    sqlite_conn = f"sqlite:///{sqlite_path}::tbl_xyz"
+    scanner2 = DataScan(data=sqlite_conn)
+    assert scanner2.summary_data is not None
+
+
+def test_datascan_parquet_glob_patterns():
+    # Test with glob pattern for committed parquet files
+    parquet_glob = "tests/tbl_files/parquet_data/data_*.parquet"
+    scanner = DataScan(data=parquet_glob)
+    assert scanner.summary_data is not None
+
+
+def test_col_summary_tbl_csv_input():
+    # Test with individual CSV file
+    csv_path = "data_raw/small_table.csv"
+    result = col_summary_tbl(csv_path)
+    assert isinstance(result, GT)
+
+    # Test with another CSV file
+    csv_path2 = "data_raw/game_revenue.csv"
+    result2 = col_summary_tbl(csv_path2)
+    assert isinstance(result2, GT)
+
+
+def test_col_summary_tbl_parquet_input():
+    # Test with individual Parquet file
+    parquet_path = "tests/tbl_files/tbl_xyz.parquet"
+    result = col_summary_tbl(parquet_path)
+    assert isinstance(result, GT)
+
+    # Test with another Parquet file
+    parquet_path2 = "tests/tbl_files/taxi_sample.parquet"
+    result2 = col_summary_tbl(parquet_path2)
+    assert isinstance(result2, GT)
+
+
+def test_col_summary_tbl_connection_string_input():
+    # Test with DuckDB connection string using get_data_path
+    duckdb_path = get_data_path("small_table", "duckdb")
+    duckdb_conn = f"duckdb:///{duckdb_path}::small_table"
+    result = col_summary_tbl(duckdb_conn)
+    assert isinstance(result, GT)
+
+    # Test with SQLite connection string using absolute path
+    import os
+
+    sqlite_path = os.path.abspath("tests/tbl_files/tbl_xyz.sqlite")
+    sqlite_conn = f"sqlite:///{sqlite_path}::tbl_xyz"
+    result2 = col_summary_tbl(sqlite_conn)
+    assert isinstance(result2, GT)
+
+
+def test_col_summary_tbl_parquet_glob_patterns():
+    # Test with glob pattern for parquet files
+    parquet_glob = "tests/tbl_files/parquet_data/data_*.parquet"
+    result = col_summary_tbl(parquet_glob)
+    assert isinstance(result, GT)
 
 
 if __name__ == "__main__":

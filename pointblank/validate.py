@@ -1635,9 +1635,9 @@ def missing_vals_tbl(data: FrameT | Any) -> GT:
     Parameters
     ----------
     data
-        The table for which to display the missing values. This could be a DataFrame object or an
-        Ibis table object. Read the *Supported Input Table Types* section for details on the
-        supported table types.
+        The table for which to display the missing values. This could be a DataFrame object, an
+        Ibis table object, a CSV file path, a Parquet file path, or a database connection string.
+        Read the *Supported Input Table Types* section for details on the supported table types.
 
     Returns
     -------
@@ -1660,6 +1660,10 @@ def missing_vals_tbl(data: FrameT | Any) -> GT:
     - PySpark table (`"pyspark"`)*
     - BigQuery table (`"bigquery"`)*
     - Parquet table (`"parquet"`)*
+    - CSV files (string path or `pathlib.Path` object with `.csv` extension)
+    - Parquet files (string path, `pathlib.Path` object, glob pattern, directory with `.parquet`
+    extension, or partitioned dataset)
+    - Database connection strings (URI format with optional table specification)
 
     The table types marked with an asterisk need to be prepared as Ibis tables (with type of
     `ibis.expr.types.relations.Table`). Furthermore, using `missing_vals_tbl()` with these types of
@@ -1701,6 +1705,16 @@ def missing_vals_tbl(data: FrameT | Any) -> GT:
     for each column. The various shades of gray indicate the proportion of missing values in each
     sector. Many columns have no missing values at all, and those sectors are colored light blue.
     """
+
+    # Process input data to handle different data source types
+    # Handle connection string input (e.g., "duckdb:///path/to/file.ddb::table_name")
+    data = _process_connection_string(data)
+
+    # Handle CSV file input (e.g., "data.csv" or Path("data.csv"))
+    data = _process_csv_input(data)
+
+    # Handle Parquet file input (e.g., "data.parquet", "data/*.parquet", "data/")
+    data = _process_parquet_input(data)
 
     # Make a copy of the data to avoid modifying the original
     data = copy.deepcopy(data)
@@ -2164,14 +2178,15 @@ def get_column_count(data: FrameT | Any) -> int:
 
     The `get_column_count()` function returns the number of columns in a table. The function works
     with any table that is supported by the `pointblank` library, including Pandas, Polars, and Ibis
-    backend tables (e.g., DuckDB, MySQL, PostgreSQL, SQLite, Parquet, etc.).
+    backend tables (e.g., DuckDB, MySQL, PostgreSQL, SQLite, Parquet, etc.). It also supports
+    direct input of CSV files, Parquet files, and database connection strings.
 
     Parameters
     ----------
     data
-        The table for which to get the column count, which could be a DataFrame object or an Ibis
-        table object. Read the *Supported Input Table Types* section for details on the supported
-        table types.
+        The table for which to get the column count, which could be a DataFrame object, an Ibis
+        table object, a CSV file path, a Parquet file path, or a database connection string.
+        Read the *Supported Input Table Types* section for details on the supported table types.
 
     Returns
     -------
@@ -2194,11 +2209,33 @@ def get_column_count(data: FrameT | Any) -> int:
     - PySpark table (`"pyspark"`)*
     - BigQuery table (`"bigquery"`)*
     - Parquet table (`"parquet"`)*
+    - CSV files (string path or `pathlib.Path` object with `.csv` extension)
+    - Parquet files (string path, `pathlib.Path` object, glob pattern, directory with `.parquet`
+    extension, or partitioned dataset)
+    - Database connection strings (URI format with optional table specification)
 
     The table types marked with an asterisk need to be prepared as Ibis tables (with type of
     `ibis.expr.types.relations.Table`). Furthermore, using `get_column_count()` with these types of
     tables requires the Ibis library (`v9.5.0` or above) to be installed. If the input table is a
     Polars or Pandas DataFrame, the availability of Ibis is not needed.
+
+    To use a CSV file, ensure that a string or `pathlib.Path` object with a `.csv` extension is
+    provided. The file will be automatically detected and loaded using the best available DataFrame
+    library. The loading preference is Polars first, then Pandas as a fallback.
+
+    Connection strings follow database URL formats and must also specify a table using the
+    `::table_name` suffix. Examples include:
+
+    ```
+    "duckdb:///path/to/database.ddb::table_name"
+    "sqlite:///path/to/database.db::table_name"
+    "postgresql://user:password@localhost:5432/database::table_name"
+    "mysql://user:password@localhost:3306/database::table_name"
+    "bigquery://project/dataset::table_name"
+    "snowflake://user:password@account/database/schema::table_name"
+    ```
+
+    When using connection strings, the Ibis library with the appropriate backend driver is required.
 
     Examples
     --------
@@ -2224,9 +2261,73 @@ def get_column_count(data: FrameT | Any) -> int:
     pb.get_column_count(small_table_duckdb)
     ```
 
+    #### Working with CSV Files
+
+    The `get_column_count()` function can directly accept CSV file paths:
+
+    ```{python}
+    # Get a path to a CSV file from the package data
+    csv_path = pb.get_data_path("global_sales", "csv")
+
+    pb.get_column_count(csv_path)
+    ```
+
+    #### Working with Parquet Files
+
+    The function supports various Parquet input formats:
+
+    ```{python}
+    # Single Parquet file from package data
+    parquet_path = pb.get_data_path("nycflights", "parquet")
+
+    pb.get_column_count(parquet_path)
+    ```
+
+    You can also use glob patterns and directories:
+
+    ```python
+    # Multiple Parquet files with glob patterns
+    pb.get_column_count("data/sales_*.parquet")
+
+    # Directory containing Parquet files
+    pb.get_column_count("parquet_data/")
+
+    # Partitioned Parquet dataset
+    pb.get_column_count("sales_data/")  # Auto-discovers partition columns
+    ```
+
+    #### Working with Database Connection Strings
+
+    The function supports database connection strings for direct access to database tables:
+
+    ```{python}
+    # Get path to a DuckDB database file from package data
+    duckdb_path = pb.get_data_path("game_revenue", "duckdb")
+
+    pb.get_column_count(f"duckdb:///{duckdb_path}::game_revenue")
+    ```
+
     The function always returns the number of columns in the table as an integer value, which is
     `8` for the `small_table` dataset.
     """
+    from pathlib import Path
+
+    # Process different input types
+    if isinstance(data, str) or isinstance(data, Path):
+        if "::" in str(data):
+            data = _process_connection_string(data)
+        elif str(data).endswith(".csv") or str(data).endswith(".CSV"):
+            data = _process_csv_input(data)
+        elif (
+            str(data).endswith(".parquet")
+            or str(data).endswith(".PARQUET")
+            or "*" in str(data)
+            or Path(data).is_dir()
+        ):
+            data = _process_parquet_input(data)
+    elif isinstance(data, list):
+        # Handle list of file paths (likely Parquet files)
+        data = _process_parquet_input(data)
 
     if "ibis.expr.types.relations.Table" in str(type(data)):
         return len(data.columns)
@@ -2250,14 +2351,15 @@ def get_row_count(data: FrameT | Any) -> int:
 
     The `get_row_count()` function returns the number of rows in a table. The function works with
     any table that is supported by the `pointblank` library, including Pandas, Polars, and Ibis
-    backend tables (e.g., DuckDB, MySQL, PostgreSQL, SQLite, Parquet, etc.).
+    backend tables (e.g., DuckDB, MySQL, PostgreSQL, SQLite, Parquet, etc.). It also supports
+    direct input of CSV files, Parquet files, and database connection strings.
 
     Parameters
     ----------
     data
-        The table for which to get the row count, which could be a DataFrame object or an Ibis table
-        object. Read the *Supported Input Table Types* section for details on the supported table
-        types.
+        The table for which to get the row count, which could be a DataFrame object, an Ibis table
+        object, a CSV file path, a Parquet file path, or a database connection string.
+        Read the *Supported Input Table Types* section for details on the supported table types.
 
     Returns
     -------
@@ -2280,11 +2382,33 @@ def get_row_count(data: FrameT | Any) -> int:
     - PySpark table (`"pyspark"`)*
     - BigQuery table (`"bigquery"`)*
     - Parquet table (`"parquet"`)*
+    - CSV files (string path or `pathlib.Path` object with `.csv` extension)
+    - Parquet files (string path, `pathlib.Path` object, glob pattern, directory with `.parquet`
+    extension, or partitioned dataset)
+    - Database connection strings (URI format with optional table specification)
 
     The table types marked with an asterisk need to be prepared as Ibis tables (with type of
     `ibis.expr.types.relations.Table`). Furthermore, using `get_row_count()` with these types of
     tables requires the Ibis library (`v9.5.0` or above) to be installed. If the input table is a
     Polars or Pandas DataFrame, the availability of Ibis is not needed.
+
+    To use a CSV file, ensure that a string or `pathlib.Path` object with a `.csv` extension is
+    provided. The file will be automatically detected and loaded using the best available DataFrame
+    library. The loading preference is Polars first, then Pandas as a fallback.
+
+    Connection strings follow database URL formats and must also specify a table using the
+    `::table_name` suffix. Examples include:
+
+    ```
+    "duckdb:///path/to/database.ddb::table_name"
+    "sqlite:///path/to/database.db::table_name"
+    "postgresql://user:password@localhost:5432/database::table_name"
+    "mysql://user:password@localhost:3306/database::table_name"
+    "bigquery://project/dataset::table_name"
+    "snowflake://user:password@account/database/schema::table_name"
+    ```
+
+    When using connection strings, the Ibis library with the appropriate backend driver is required.
 
     Examples
     --------
@@ -2310,9 +2434,73 @@ def get_row_count(data: FrameT | Any) -> int:
     pb.get_row_count(game_revenue_duckdb)
     ```
 
+    #### Working with CSV Files
+
+    The `get_row_count()` function can directly accept CSV file paths:
+
+    ```{python}
+    # Get a path to a CSV file from the package data
+    csv_path = pb.get_data_path("global_sales", "csv")
+
+    pb.get_row_count(csv_path)
+    ```
+
+    #### Working with Parquet Files
+
+    The function supports various Parquet input formats:
+
+    ```{python}
+    # Single Parquet file from package data
+    parquet_path = pb.get_data_path("nycflights", "parquet")
+
+    pb.get_row_count(parquet_path)
+    ```
+
+    You can also use glob patterns and directories:
+
+    ```python
+    # Multiple Parquet files with glob patterns
+    pb.get_row_count("data/sales_*.parquet")
+
+    # Directory containing Parquet files
+    pb.get_row_count("parquet_data/")
+
+    # Partitioned Parquet dataset
+    pb.get_row_count("sales_data/")  # Auto-discovers partition columns
+    ```
+
+    #### Working with Database Connection Strings
+
+    The function supports database connection strings for direct access to database tables:
+
+    ```{python}
+    # Get path to a DuckDB database file from package data
+    duckdb_path = pb.get_data_path("game_revenue", "duckdb")
+
+    pb.get_row_count(f"duckdb:///{duckdb_path}::game_revenue")
+    ```
+
     The function always returns the number of rows in the table as an integer value, which is `2000`
     for the `game_revenue` dataset.
     """
+    from pathlib import Path
+
+    # Process different input types
+    if isinstance(data, str) or isinstance(data, Path):
+        if "::" in str(data):
+            data = _process_connection_string(data)
+        elif str(data).endswith(".csv") or str(data).endswith(".CSV"):
+            data = _process_csv_input(data)
+        elif (
+            str(data).endswith(".parquet")
+            or str(data).endswith(".PARQUET")
+            or "*" in str(data)
+            or Path(data).is_dir()
+        ):
+            data = _process_parquet_input(data)
+    elif isinstance(data, list):
+        # Handle list of file paths (likely Parquet files)
+        data = _process_parquet_input(data)
 
     if "ibis.expr.types.relations.Table" in str(type(data)):
         # Determine whether Pandas or Polars is available to get the row count
