@@ -195,21 +195,12 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#command-line-interface-interactive-demos" id="toc-command-line-interface-interactive-demos" class="nav-link active" data-scroll-target="#command-line-interface-interactive-demos">Command Line Interface: Interactive Demos</a>
-  <ul class="collapse">
-  <li><a href="#getting-started-with-the-cli" id="toc-getting-started-with-the-cli" class="nav-link" data-scroll-target="#getting-started-with-the-cli">Getting Started with the CLI</a></li>
+  <li><a href="#getting-started-with-the-cli" id="toc-getting-started-with-the-cli" class="nav-link active" data-scroll-target="#getting-started-with-the-cli">Getting Started with the CLI</a></li>
   <li><a href="#essential-data-quality-validations" id="toc-essential-data-quality-validations" class="nav-link" data-scroll-target="#essential-data-quality-validations">Essential Data Quality Validations</a></li>
   <li><a href="#data-exploration-without-python" id="toc-data-exploration-without-python" class="nav-link" data-scroll-target="#data-exploration-without-python">Data Exploration Without Python</a></li>
   <li><a href="#cicd-integration-automation" id="toc-cicd-integration-automation" class="nav-link" data-scroll-target="#cicd-integration-automation">CI/CD Integration &amp; Automation</a></li>
   <li><a href="#complete-data-quality-workflow" id="toc-complete-data-quality-workflow" class="nav-link" data-scroll-target="#complete-data-quality-workflow">Complete Data Quality Workflow</a></li>
-  <li><a href="#getting-started" id="toc-getting-started" class="nav-link" data-scroll-target="#getting-started">Getting Started</a>
-  <ul class="collapse">
-  <li><a href="#install-and-verify" id="toc-install-and-verify" class="nav-link" data-scroll-target="#install-and-verify">1. Install and Verify</a></li>
-  <li><a href="#explore-your-data" id="toc-explore-your-data" class="nav-link" data-scroll-target="#explore-your-data">2. Explore Your Data</a></li>
-  <li><a href="#run-essential-validations" id="toc-run-essential-validations" class="nav-link" data-scroll-target="#run-essential-validations">3. Run Essential Validations</a></li>
-  <li><a href="#integrate-with-cicd" id="toc-integrate-with-cicd" class="nav-link" data-scroll-target="#integrate-with-cicd">4. Integrate with CI/CD</a></li>
-  </ul></li>
-  </ul></li>
+  <li><a href="#getting-started" id="toc-getting-started" class="nav-link" data-scroll-target="#getting-started">Getting Started</a></li>
   </ul>
 </nav>
     </div>
@@ -235,8 +226,6 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </header>
 
 
-<section id="command-line-interface-interactive-demos" class="level1">
-<h1>Command Line Interface: Interactive Demos</h1>
 <p>These CLI demos showcase practical data quality workflows that you can use!</p>
 <div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -309,57 +298,45 @@ Prerequisites
 <section id="getting-started" class="level2">
 <h2 class="anchored" data-anchor-id="getting-started">Getting Started</h2>
 <p>Ready to implement data quality workflows? Here’s how to get started:</p>
-<section id="install-and-verify" class="level3">
-<h3 class="anchored" data-anchor-id="install-and-verify">1. Install and Verify</h3>
+<section id="install-and-verify" class="level4">
+<h4 class="anchored" data-anchor-id="install-and-verify">1. Install and Verify</h4>
 <div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install pointblank</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> <span class="at">--help</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
-<section id="explore-your-data" class="level3">
-<h3 class="anchored" data-anchor-id="explore-your-data">2. Explore Your Data</h3>
-<div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get a quick preview of your data</span></span>
+<section id="explore-various-data-sources" class="level4">
+<h4 class="anchored" data-anchor-id="explore-various-data-sources">2. Explore Various Data Sources</h4>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Built-in datasets</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> preview small_table</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Check for missing values</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> missing small_table</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate column summaries</span></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> scan small_table</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Local files with patterns</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> preview <span class="st">"data/*.parquet"</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> scan sales_data.csv</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="co"># GitHub repositories (no download required)</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> preview <span class="st">"https://github.com/user/repo/blob/main/data.csv"</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> missing <span class="st">"https://raw.githubusercontent.com/user/repo/main/sales.parquet"</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Database connections</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> info <span class="st">"duckdb:///warehouse/analytics.ddb::customers"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
-<section id="run-essential-validations" class="level3">
-<h3 class="anchored" data-anchor-id="run-essential-validations">3. Run Essential Validations</h3>
+<section id="run-essential-validations" class="level4">
+<h4 class="anchored" data-anchor-id="run-essential-validations">3. Run Essential Validations</h4>
 <div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check for duplicate rows</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate-simple small_table <span class="at">--check</span> rows-distinct</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Verify no null values</span></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate-simple small_table <span class="at">--check</span> col-vals-not-null <span class="at">--column</span> a</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract failing data for debugging</span></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate-simple small_table <span class="at">--check</span> col-vals-gt <span class="at">--column</span> a <span class="at">--value</span> 5 <span class="at">--show-extract</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Validate data from multiple sources</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate-simple <span class="st">"data/*.parquet"</span> <span class="at">--check</span> col-vals-not-null <span class="at">--column</span> customer_id</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate-simple <span class="st">"https://github.com/user/repo/blob/main/sales.csv"</span> <span class="at">--check</span> rows-distinct</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract failing data for debugging</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate-simple small_table <span class="at">--check</span> col-vals-gt <span class="at">--column</span> a <span class="at">--value</span> 5 <span class="at">--show-extract</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
-<section id="integrate-with-cicd" class="level3">
-<h3 class="anchored" data-anchor-id="integrate-with-cicd">4. Integrate with CI/CD</h3>
+<section id="integrate-with-cicd" class="level4">
+<h4 class="anchored" data-anchor-id="integrate-with-cicd">4. Integrate with CI/CD</h4>
 <div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Use exit codes for automation (0 = pass, 1 = fail)</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate-simple small_table <span class="at">--check</span> rows-distinct <span class="kw">&amp;&amp;</span> <span class="bu">echo</span> <span class="st">"✅ Quality checks passed"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="callout callout-style-default callout-tip callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Next Steps
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<ul>
-<li>visit the <a href="../../user-guide/cli.html">CLI User Guide</a> for detailed documentation</li>
-<li>use <code>pb validate-simple --help</code> for validation command options</li>
-<li>Combine exploration, validation, and profiling for robust data quality pipelines</li>
-</ul>
-</div>
-</div>
 
 
-</section>
 </section>
 </section>
 
