@@ -24,7 +24,7 @@ Type ""
 Enter
 Type "# Quick validation options overview"
 Enter
-Type "pb validate-simple --help"
+Type "pb validate --help"
 Enter
 Sleep 6s
 
@@ -32,7 +32,7 @@ Type ""
 Enter
 Type "# Your first validation - check for duplicates"
 Enter
-Type "pb validate-simple small_table --check rows-distinct"
+Type "pb validate small_table --check rows-distinct"
 Enter
 Sleep 5s
 

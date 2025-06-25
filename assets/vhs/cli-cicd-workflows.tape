@@ -16,7 +16,7 @@ Type ""
 Enter
 Type "# Pipeline Step 1: Data integrity check with exit codes"
 Enter
-Type "pb validate-simple small_table --check rows-distinct --exit-code"
+Type "pb validate small_table --check rows-distinct --exit-code"
 Enter
 Type "echo 'Pipeline result:' \$?"
 Enter
@@ -26,7 +26,7 @@ Type ""
 Enter
 Type "# Pipeline Step 2: Critical columns validation"
 Enter
-Type "pb validate-simple small_table --check col-vals-not-null --column date_time --exit-code"
+Type "pb validate small_table --check col-vals-not-null --column date_time --exit-code"
 Enter
 Type "echo 'Validation status:' \$?"
 Enter
@@ -36,7 +36,7 @@ Type ""
 Enter
 Type "# Pipeline Step 3: Business rules validation"
 Enter
-Type "pb validate-simple small_table --check col-vals-gt --column a --value 0 --exit-code"
+Type "pb validate small_table --check col-vals-gt --column a --value 0 --exit-code"
 Enter
 Type "echo 'Business rule check:' \$?"
 Enter
