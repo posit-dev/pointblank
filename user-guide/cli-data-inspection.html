@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>cli – Pointblank</title>
+<title>Data Inspection and Exploration – Pointblank</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -65,6 +65,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
+<link href="../user-guide/cli-data-validation.html" rel="next">
 <link href="../user-guide/missing-vals-tbl.html" rel="prev">
 <link href="../assets/fav-logo.png" rel="icon" type="image/png">
 <script src="../site_libs/quarto-html/quarto.js" type="module"></script>
@@ -176,7 +177,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
         <a class="flex-grow-1 no-decor" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
-          <h1 class="quarto-secondary-nav-title"></h1>
+          <h1 class="quarto-secondary-nav-title">Data Inspection and Exploration</h1>
         </a>     
     </div>
   </nav>
@@ -365,7 +366,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
- <span class="menu-text">CLI Utility</span></a>
+ <span class="menu-text">The Pointblank CLI</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -373,8 +374,14 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
       <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../user-guide/cli.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text">Command Line Interface</span></a>
+  <a href="../user-guide/cli-data-inspection.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Data Inspection and Exploration</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../user-guide/cli-data-validation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Data Validation and Automation</span></a>
   </div>
 </li>
       </ul>
@@ -389,294 +396,155 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#command-line-interface" id="toc-command-line-interface" class="nav-link active" data-scroll-target="#command-line-interface">Command Line Interface</a>
-  <ul class="collapse">
-  <li><a href="#installation" id="toc-installation" class="nav-link" data-scroll-target="#installation">Installation</a></li>
-  <li><a href="#terminal-demos" id="toc-terminal-demos" class="nav-link" data-scroll-target="#terminal-demos">Terminal Demos</a></li>
-  <li><a href="#basic-usage" id="toc-basic-usage" class="nav-link" data-scroll-target="#basic-usage">Basic Usage</a></li>
-  <li><a href="#data-sources" id="toc-data-sources" class="nav-link" data-scroll-target="#data-sources">Data Sources</a></li>
-  <li><a href="#enhanced-data-source-support" id="toc-enhanced-data-source-support" class="nav-link" data-scroll-target="#enhanced-data-source-support">Enhanced Data Source Support</a>
-  <ul class="collapse">
-  <li><a href="#github-integration" id="toc-github-integration" class="nav-link" data-scroll-target="#github-integration">GitHub Integration</a></li>
-  <li><a href="#advanced-file-patterns" id="toc-advanced-file-patterns" class="nav-link" data-scroll-target="#advanced-file-patterns">Advanced File Patterns</a></li>
-  <li><a href="#database-connections" id="toc-database-connections" class="nav-link" data-scroll-target="#database-connections">Database Connections</a></li>
-  <li><a href="#automatic-data-type-detection" id="toc-automatic-data-type-detection" class="nav-link" data-scroll-target="#automatic-data-type-detection">Automatic Data Type Detection</a></li>
-  </ul></li>
-  <li><a href="#available-validation-checks" id="toc-available-validation-checks" class="nav-link" data-scroll-target="#available-validation-checks">Available Validation Checks</a>
-  <ul class="collapse">
-  <li><a href="#data-completeness" id="toc-data-completeness" class="nav-link" data-scroll-target="#data-completeness">Data Completeness</a></li>
-  <li><a href="#column-existence" id="toc-column-existence" class="nav-link" data-scroll-target="#column-existence">Column Existence</a></li>
-  <li><a href="#numeric-value-checks-within-columns" id="toc-numeric-value-checks-within-columns" class="nav-link" data-scroll-target="#numeric-value-checks-within-columns">Numeric Value Checks Within Columns</a></li>
-  <li><a href="#value-set-checks-within-columns" id="toc-value-set-checks-within-columns" class="nav-link" data-scroll-target="#value-set-checks-within-columns">Value Set Checks Within Columns</a></li>
-  </ul></li>
-  <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
-  <li><a href="#output-examples" id="toc-output-examples" class="nav-link" data-scroll-target="#output-examples">Output Examples</a></li>
-  <li><a href="#integration-with-cicd" id="toc-integration-with-cicd" class="nav-link" data-scroll-target="#integration-with-cicd">Integration with CI/CD</a></li>
-  <li><a href="#getting-help" id="toc-getting-help" class="nav-link" data-scroll-target="#getting-help">Getting Help</a></li>
-  <li><a href="#terminal-demonstrations" id="toc-terminal-demonstrations" class="nav-link" data-scroll-target="#terminal-demonstrations">Terminal Demonstrations</a></li>
-  </ul></li>
+  <li><a href="#supported-data-sources" id="toc-supported-data-sources" class="nav-link active" data-scroll-target="#supported-data-sources">Supported Data Sources</a></li>
+  <li><a href="#quick-reference-for-the-data-inspection-commands" id="toc-quick-reference-for-the-data-inspection-commands" class="nav-link" data-scroll-target="#quick-reference-for-the-data-inspection-commands">Quick Reference for the Data Inspection Commands</a></li>
+  <li><a href="#pb-info-inspecting-data-structure" id="toc-pb-info-inspecting-data-structure" class="nav-link" data-scroll-target="#pb-info-inspecting-data-structure"><code>pb info</code>: Inspecting Data Structure</a></li>
+  <li><a href="#pb-preview-previewing-data" id="toc-pb-preview-previewing-data" class="nav-link" data-scroll-target="#pb-preview-previewing-data"><code>pb preview</code>: Previewing Data</a></li>
+  <li><a href="#pb-scan-column-summary-and-profiling" id="toc-pb-scan-column-summary-and-profiling" class="nav-link" data-scroll-target="#pb-scan-column-summary-and-profiling"><code>pb scan</code>: Column Summary and Profiling</a></li>
+  <li><a href="#pb-missing-missing-value-patterns" id="toc-pb-missing-missing-value-patterns" class="nav-link" data-scroll-target="#pb-missing-missing-value-patterns"><code>pb missing</code>: Missing Value Patterns</a></li>
+  <li><a href="#some-useful-tips-on-when-and-how-to-use" id="toc-some-useful-tips-on-when-and-how-to-use" class="nav-link" data-scroll-target="#some-useful-tips-on-when-and-how-to-use">Some Useful Tips on When and How to Use</a></li>
   </ul>
 </nav>
     </div>
 <!-- main -->
-<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"></header>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title d-none d-lg-block">Data Inspection and Exploration</h1>
+</div>
 
 
 
+<div class="quarto-title-meta">
 
-<section id="command-line-interface" class="level1">
-<h1>Command Line Interface</h1>
-<p>Pointblank provides a powerful command-line interface (CLI) that allows you to perform data validation directly from the terminal without writing Python code. This is especially useful for:</p>
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>Pointblank’s CLI makes it easy to inspect, preview, and explore your data before running validations. This is useful for understanding your data’s structure, checking for obvious issues, and confirming that your data source is being read correctly.</p>
+<section id="supported-data-sources" class="level2">
+<h2 class="anchored" data-anchor-id="supported-data-sources">Supported Data Sources</h2>
+<p>You can inspect a wide variety of data sources using the CLI:</p>
 <ul>
-<li>quick data quality checks in CI/CD pipelines</li>
-<li>exploratory data analysis</li>
-<li>integration with shell scripts and automation workflows</li>
-<li>non-Python users who want to leverage Pointblank’s validation capabilities</li>
-</ul>
-<section id="installation" class="level2">
-<h2 class="anchored" data-anchor-id="installation">Installation</h2>
-<p>The CLI is automatically available when you install Pointblank:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install pointblank</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</section>
-<section id="terminal-demos" class="level2">
-<h2 class="anchored" data-anchor-id="terminal-demos">Terminal Demos</h2>
-<p>Check out our <a href="../demos/cli-interactive/index.html">CLI terminal demos</a> to see the CLI in action with comprehensive command examples and real output.</p>
-</section>
-<section id="basic-usage" class="level2">
-<h2 class="anchored" data-anchor-id="basic-usage">Basic Usage</h2>
-<p>The main CLI command is <code>pb validate</code>, which performs single-step validations:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate <span class="pp">[</span><span class="ss">DATA_SOURCE</span><span class="pp">]</span> <span class="at">--check</span> <span class="pp">[</span><span class="ss">CHECK_TYPE</span><span class="pp">]</span> <span class="pp">[</span><span class="ss">OPTIONS</span><span class="pp">]</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</section>
-<section id="data-sources" class="level2">
-<h2 class="anchored" data-anchor-id="data-sources">Data Sources</h2>
-<p>You can validate various types of data sources:</p>
-<p><em>CSV files</em></p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate data.csv <span class="at">--check</span> rows-distinct</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p><em>Parquet files (including glob patterns and directories)</em></p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate data.parquet <span class="at">--check</span> col-vals-not-null <span class="at">--column</span> age</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate <span class="st">"data/*.parquet"</span> <span class="at">--check</span> rows-distinct</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate data/ <span class="at">--check</span> rows-complete  <span class="co"># directory of parquet files</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p><em>GitHub URLs (direct links to CSV or Parquet files)</em></p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate <span class="st">"https://github.com/user/repo/blob/main/data.csv"</span> <span class="at">--check</span> rows-distinct</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate <span class="st">"https://raw.githubusercontent.com/user/repo/main/data.parquet"</span> <span class="at">--check</span> col-exists <span class="at">--column</span> id</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p><em>Database tables (connection strings)</em></p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate <span class="st">"duckdb:///path/to/db.ddb::table_name"</span> <span class="at">--check</span> rows-complete</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p><em>Built-in datasets</em></p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate small_table <span class="at">--check</span> col-exists <span class="at">--column</span> a</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</section>
-<section id="enhanced-data-source-support" class="level2">
-<h2 class="anchored" data-anchor-id="enhanced-data-source-support">Enhanced Data Source Support</h2>
-<p>The CLI leverages Pointblank’s centralized data processing pipeline, providing comprehensive support for various data sources:</p>
-<section id="github-integration" class="level3">
-<h3 class="anchored" data-anchor-id="github-integration">GitHub Integration</h3>
-<p>Validate data directly from GitHub repositories without downloading files:</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Standard GitHub URLs (automatically converted to raw URLs)</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> preview <span class="st">"https://github.com/user/repo/blob/main/data.csv"</span></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate <span class="st">"https://github.com/user/repo/blob/main/sales.csv"</span> <span class="at">--check</span> rows-distinct</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Raw GitHub URLs (used directly)</span></span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> scan <span class="st">"https://raw.githubusercontent.com/user/repo/main/data.parquet"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</section>
-<section id="advanced-file-patterns" class="level3">
-<h3 class="anchored" data-anchor-id="advanced-file-patterns">Advanced File Patterns</h3>
-<p>Support for complex file patterns and directory structures:</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Glob patterns for multiple files</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate <span class="st">"data/*.parquet"</span> <span class="at">--check</span> col-vals-not-null <span class="at">--column</span> id</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> preview <span class="st">"sales_data_*.csv"</span></span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Entire directories of Parquet files</span></span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> scan data/partitioned_dataset/</span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> missing warehouse/daily_reports/</span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Partitioned datasets (automatically detects partition columns)</span></span>
-<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate partitioned_sales/ <span class="at">--check</span> rows-distinct</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</section>
-<section id="database-connections" class="level3">
-<h3 class="anchored" data-anchor-id="database-connections">Database Connections</h3>
-<p>Enhanced support for database connection strings:</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># DuckDB databases with table specification</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate <span class="st">"duckdb:///warehouse/analytics.ddb::customer_metrics"</span> <span class="at">--check</span> col-exists <span class="at">--column</span> customer_id</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Preview database tables</span></span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> preview <span class="st">"duckdb:///data/sales.ddb::transactions"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</section>
-<section id="automatic-data-type-detection" class="level3">
-<h3 class="anchored" data-anchor-id="automatic-data-type-detection">Automatic Data Type Detection</h3>
-<p>The CLI automatically detects and handles:</p>
-<ul>
-<li>CSV files: single files or glob patterns</li>
-<li>Parquet files: files, patterns, directories, and partitioned datasets</li>
-<li>GitHub URLs: both standard and raw URLs for CSV/Parquet files</li>
-<li>database connections: connection strings with table specifications</li>
-<li>built-in datasets: Pointblank’s included sample datasets</li>
-</ul>
-<p>This unified approach means you can use the same CLI commands regardless of where your data is stored.</p>
-</section>
-</section>
-<section id="available-validation-checks" class="level2">
-<h2 class="anchored" data-anchor-id="available-validation-checks">Available Validation Checks</h2>
-<section id="data-completeness" class="level3">
-<h3 class="anchored" data-anchor-id="data-completeness">Data Completeness</h3>
-<ul>
-<li><code>rows-distinct</code>: Check if all rows are unique (no duplicates)</li>
-<li><code>rows-complete</code>: Check if all rows are complete (no missing values)</li>
-<li><code>col-vals-not-null</code>: Check if a column has no Null/None/NA values</li>
+<li>CSV files: single files, glob patterns</li>
+<li>Parquet files: as single files, directories, or partitioned datasets</li>
+<li>GitHub URLs: for CSV/Parquet files as standard or raw URLs</li>
+<li>database tables: via connection strings</li>
+<li>built-in datasets: these are provided by Pointblank</li>
 </ul>
 </section>
-<section id="column-existence" class="level3">
-<h3 class="anchored" data-anchor-id="column-existence">Column Existence</h3>
+<section id="quick-reference-for-the-data-inspection-commands" class="level2 callout-info">
+<h2 class="anchored" data-anchor-id="quick-reference-for-the-data-inspection-commands">Quick Reference for the Data Inspection Commands</h2>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Command</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>pb info</code></td>
+<td>Show table type, dimensions, columns, types</td>
+</tr>
+<tr class="even">
+<td><code>pb preview</code></td>
+<td>Preview head/tail rows, select columns</td>
+</tr>
+<tr class="odd">
+<td><code>pb scan</code></td>
+<td>Full column summary/profile (stats, NA, etc)</td>
+</tr>
+<tr class="even">
+<td><code>pb missing</code></td>
+<td>Visualize missing value patterns</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="pb-info-inspecting-data-structure" class="level2">
+<h2 class="anchored" data-anchor-id="pb-info-inspecting-data-structure"><code>pb info</code>: Inspecting Data Structure</h2>
+<p>Use <code>pb info</code> to display basic information about your data source:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> info data.csv</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> info <span class="st">"data/*.parquet"</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> info <span class="st">"duckdb:///warehouse/analytics.ddb::customer_metrics"</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> info small_table</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>This command shows the</p>
 <ul>
-<li><code>col-exists</code>: Verify that a specific column exists in the dataset</li>
+<li>table type (e.g., pandas, polars, etc.)</li>
+<li>number of rows and columns</li>
+<li>data source path or identifier</li>
 </ul>
 </section>
-<section id="numeric-value-checks-within-columns" class="level3">
-<h3 class="anchored" data-anchor-id="numeric-value-checks-within-columns">Numeric Value Checks Within Columns</h3>
+<section id="pb-preview-previewing-data" class="level2">
+<h2 class="anchored" data-anchor-id="pb-preview-previewing-data"><code>pb preview</code>: Previewing Data</h2>
+<p>Use <code>pb preview</code> to view the first and last rows of your data, with flexible column selection:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> preview data.csv</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> preview <span class="st">"data/*.parquet"</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> preview <span class="st">"https://github.com/user/repo/blob/main/data.csv"</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> preview <span class="st">"duckdb:///path/to/db.ddb::table_name"</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> preview small_table</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Here are some useful options:</p>
 <ul>
-<li><code>col-vals-gt</code>: column values greater than a fixed value</li>
-<li><code>col-vals-ge</code>: column values greater than or equal to a fixed value</li>
-<li><code>col-vals-lt</code>: column values less than a fixed value</li>
-<li><code>col-vals-le</code>: column values less than or equal to a fixed value</li>
+<li><code>--rows N</code>: show N rows from the top, default: 5</li>
+<li><code>--columns "col1,col2"</code>: show only specified columns</li>
+<li><code>--col-range "1:10"</code>: show columns by position</li>
+<li><code>--col-first N</code>: show first N columns</li>
+<li><code>--col-last N</code>: show last N columns</li>
+<li><code>--no-row-numbers</code>: hide row numbers</li>
+<li><code>--output-html file.html</code>: save preview as an HTML file</li>
+</ul>
+<p>Here’s an example where only the <code>name</code>, <code>age</code>, and <code>email</code> columns from <code>data.csv</code> are shown (and we limit this to the top 10 rows):</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> preview data.csv <span class="at">--columns</span> <span class="st">"name,age,email"</span> <span class="at">--rows</span> 10</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="pb-scan-column-summary-and-profiling" class="level2">
+<h2 class="anchored" data-anchor-id="pb-scan-column-summary-and-profiling"><code>pb scan</code>: Column Summary and Profiling</h2>
+<p>Use <code>pb scan</code> for a comprehensive column summary, including:</p>
+<ul>
+<li>data types</li>
+<li>missing value counts</li>
+<li>unique value counts</li>
+<li>summary statistics (mean, standard deviation, min, max, quartiles)</li>
+</ul>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> scan data.csv</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> scan <span class="st">"data/*.parquet"</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> scan <span class="st">"duckdb:///warehouse/analytics.ddb::customer_metrics"</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> scan small_table</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Here are the options:</p>
+<ul>
+<li><code>--columns "col1,col2"</code> (scan only specified columns)</li>
+<li><code>--output-html file.html</code> (save scan as HTML report)</li>
 </ul>
 </section>
-<section id="value-set-checks-within-columns" class="level3">
-<h3 class="anchored" data-anchor-id="value-set-checks-within-columns">Value Set Checks Within Columns</h3>
+<section id="pb-missing-missing-value-patterns" class="level2">
+<h2 class="anchored" data-anchor-id="pb-missing-missing-value-patterns"><code>pb missing</code>: Missing Value Patterns</h2>
+<p>Use <code>pb missing</code> to generate a missing values report, visualizing missingness across columns and row sectors:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> missing data.csv</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> missing <span class="st">"data/*.parquet"</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> missing <span class="st">"duckdb:///warehouse/analytics.ddb::customer_metrics"</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> missing small_table</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>There’s an option here as well:</p>
 <ul>
-<li><code>col-vals-in-set</code>: column values must be in an defined set</li>
+<li><code>--output-html file.html</code> (save missing values report as HTML)</li>
 </ul>
 </section>
-</section>
-<section id="examples" class="level2">
-<h2 class="anchored" data-anchor-id="examples">Examples</h2>
-<section id="basic-validation" class="level4">
-<h4 class="anchored" data-anchor-id="basic-validation">Basic Validation</h4>
-<div class="sourceCode" id="cb11"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check for duplicate rows</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate data.csv <span class="at">--check</span> rows-distinct</span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Check if all values in 'age' column are not null</span></span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate data.csv <span class="at">--check</span> col-vals-not-null <span class="at">--column</span> age</span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Check if all values in 'score' are greater than 50</span></span>
-<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate data.csv <span class="at">--check</span> col-vals-gt <span class="at">--column</span> score <span class="at">--value</span> 50</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</section>
-<section id="range-validations" class="level4">
-<h4 class="anchored" data-anchor-id="range-validations">Range Validations</h4>
-<div class="sourceCode" id="cb12"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check if all ages are less than 100</span></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate data.csv <span class="at">--check</span> col-vals-lt <span class="at">--column</span> age <span class="at">--value</span> 100</span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Check if all prices are less than or equal to 1000</span></span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate data.csv <span class="at">--check</span> col-vals-le <span class="at">--column</span> price <span class="at">--value</span> 1000</span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Check if all ratings are between 1 and 5 (using two commands)</span></span>
-<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate data.csv <span class="at">--check</span> col-vals-ge <span class="at">--column</span> rating <span class="at">--value</span> 1</span>
-<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate data.csv <span class="at">--check</span> col-vals-le <span class="at">--column</span> rating <span class="at">--value</span> 5</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</section>
-<section id="set-membership" class="level4">
-<h4 class="anchored" data-anchor-id="set-membership">Set Membership</h4>
-<div class="sourceCode" id="cb13"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check if status values are in allowed set</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate data.csv <span class="at">--check</span> col-vals-in-set <span class="at">--column</span> status <span class="at">--set</span> <span class="st">"active,inactive,pending"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</section>
-<section id="debugging-failed-validations" class="level4">
-<h4 class="anchored" data-anchor-id="debugging-failed-validations">Debugging Failed Validations</h4>
-<p>Use <code>--show-extract</code> to see which rows are causing validation failures:</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Show failing rows when validation fails</span></span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate data.csv <span class="at">--check</span> col-vals-lt <span class="at">--column</span> age <span class="at">--value</span> 65 <span class="at">--show-extract</span></span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Limit the number of failing rows shown</span></span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate data.csv <span class="at">--check</span> col-vals-not-null <span class="at">--column</span> email <span class="at">--show-extract</span> <span class="at">--limit</span> 5</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</section>
-<section id="exit-codes-for-automation" class="level4">
-<h4 class="anchored" data-anchor-id="exit-codes-for-automation">Exit Codes for Automation</h4>
-<p>Use <code>--exit-code</code> to make the command exit with a non-zero code when validation fails:</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># For use in CI/CD pipelines</span></span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate data.csv <span class="at">--check</span> rows-distinct <span class="at">--exit-code</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</section>
-</section>
-<section id="output-examples" class="level2">
-<h2 class="anchored" data-anchor-id="output-examples">Output Examples</h2>
-<section id="successful-validation" class="level4">
-<h4 class="anchored" data-anchor-id="successful-validation">Successful Validation</h4>
-<pre><code>✓ Loaded data source: data.csv
-✓ Col Vals Lt validation completed
-
-Validation Result: Column Values Less Than
-
-  Property            Value
- ──────────────────────────────────────────────
-  Data Source         data.csv
-  Check Type          col-vals-lt
-  Column              age
-  Threshold           &lt; 100.0
-  Total Rows Tested   1,250
-  Passing Rows        1,250
-  Failing Rows        0
-  Result              ✓ PASSED
-
-╭─────────────────────────────────────────────────╮
-│ ✓ Validation PASSED: All values in column       │
-│   'age' are &lt; 100.0 in data.csv                 │
-╰─────────────────────────────────────────────────╯</code></pre>
-</section>
-<section id="failed-validation" class="level4">
-<h4 class="anchored" data-anchor-id="failed-validation">Failed Validation</h4>
-<pre><code>✓ Loaded data source: data.csv
-✓ Col Vals Lt validation completed
-
-Validation Result: Column Values Less Than
-
-  Property            Value
- ──────────────────────────────────────────────
-  Data Source         data.csv
-  Check Type          col-vals-lt
-  Column              age
-  Threshold           &lt; 65.0
-  Total Rows Tested   1,250
-  Passing Rows        1,180
-  Failing Rows        70
-  Result              ✗ FAILED
-
-╭─────────────────────────────────────────────────╮
-│ ✗ Validation FAILED: 70 values &gt;= 65.0 found    │
-│   in column 'age' in data.csv                   │
-│ 💡 Tip: Use --show-extract to see the failing   │
-│ rows                                            │
-╰─────────────────────────────────────────────────╯</code></pre>
-</section>
-</section>
-<section id="integration-with-cicd" class="level2">
-<h2 class="anchored" data-anchor-id="integration-with-cicd">Integration with CI/CD</h2>
-<p>The CLI is useful when integrating data validation into your CI/CD pipelines:</p>
-<div class="sourceCode" id="cb18"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Example GitHub Actions workflow</span></span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="fu">name</span><span class="kw">:</span><span class="at"> Data Validation</span></span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="fu">on</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">push</span><span class="kw">,</span><span class="at"> pull_request</span><span class="kw">]</span></span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="fu">jobs</span><span class="kw">:</span></span>
-<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">validate</span><span class="kw">:</span></span>
-<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">runs-on</span><span class="kw">:</span><span class="at"> ubuntu-latest</span></span>
-<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">steps</span><span class="kw">:</span></span>
-<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">uses</span><span class="kw">:</span><span class="at"> actions/checkout@v2</span></span>
-<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Set up Python</span></span>
-<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">uses</span><span class="kw">:</span><span class="at"> actions/setup-python@v2</span></span>
-<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">with</span><span class="kw">:</span></span>
-<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">python-version</span><span class="kw">:</span><span class="at"> </span><span class="st">'3.9'</span></span>
-<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Install dependencies</span></span>
-<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">run</span><span class="kw">:</span><span class="at"> pip install pointblank</span></span>
-<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Validate data quality</span></span>
-<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a><span class="fu">        run</span><span class="kw">: </span><span class="ch">|</span></span>
-<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a>          pb validate data/sales.csv --check rows-distinct --exit-code</span>
-<span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a>          pb validate data/sales.csv --check col-vals-not-null --column customer_id --exit-code</span>
-<span id="cb18-20"><a href="#cb18-20" aria-hidden="true" tabindex="-1"></a>          pb validate data/sales.csv --check col-vals-gt --column amount --value 0 --exit-code</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</section>
-<section id="getting-help" class="level2">
-<h2 class="anchored" data-anchor-id="getting-help">Getting Help</h2>
-<p>Use the <code>--help</code> flag to see all available options:</p>
-<div class="sourceCode" id="cb19"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate <span class="at">--help</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</section>
-<section id="terminal-demonstrations" class="level2">
-<h2 class="anchored" data-anchor-id="terminal-demonstrations">Terminal Demonstrations</h2>
-<p>Check out our <a href="../demos/cli-interactive/index.html">step-by-step terminal demos</a> that show real command execution with actual output.</p>
+<section id="some-useful-tips-on-when-and-how-to-use" class="level2">
+<h2 class="anchored" data-anchor-id="some-useful-tips-on-when-and-how-to-use">Some Useful Tips on When and How to Use</h2>
+<ul>
+<li>use <code>pb info</code> and before running validations to confirm your data source can be loaded.</li>
+<li>use <code>pb preview</code> to quickly understand what the data looks like.</li>
+<li>use <code>pb missing</code> to visualize and diagnose missing data patterns.</li>
+<li>use <code>pb scan</code> for a quick data profile and to spot outliers or data quality issues.</li>
+</ul>
 
 
-</section>
 </section>
 
 </main> <!-- /main -->
@@ -1086,6 +954,9 @@ Validation Result: Column Values Less Than
       </a>          
   </div>
   <div class="nav-page nav-page-next">
+      <a href="../user-guide/cli-data-validation.html" class="pagination-link" aria-label="Data Validation and Automation">
+        <span class="nav-page-text">Data Validation and Automation</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
   </div>
 </nav>
 </div> <!-- /content -->

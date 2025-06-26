@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Installation – Pointblank</title>
+<title>Data Validation and Automation – Pointblank</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -65,8 +65,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../user-guide/validation-overview.html" rel="next">
-<link href="../user-guide/index.html" rel="prev">
+<link href="../user-guide/cli-data-inspection.html" rel="prev">
 <link href="../assets/fav-logo.png" rel="icon" type="image/png">
 <script src="../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
@@ -177,7 +176,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
         <a class="flex-grow-1 no-decor" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
-          <h1 class="quarto-secondary-nav-title">Installation</h1>
+          <h1 class="quarto-secondary-nav-title">Data Validation and Automation</h1>
         </a>     
     </div>
   </nav>
@@ -205,7 +204,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../user-guide/installation.html" class="sidebar-item-text sidebar-link active">
+  <a href="../user-guide/installation.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Installation</span></a>
   </div>
 </li>
@@ -380,7 +379,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../user-guide/cli-data-validation.html" class="sidebar-item-text sidebar-link">
+  <a href="../user-guide/cli-data-validation.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">Data Validation and Automation</span></a>
   </div>
 </li>
@@ -396,21 +395,13 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#installing-pointblank" id="toc-installing-pointblank" class="nav-link active" data-scroll-target="#installing-pointblank">Installing Pointblank</a>
-  <ul class="collapse">
-  <li><a href="#basic-installation" id="toc-basic-installation" class="nav-link" data-scroll-target="#basic-installation">Basic Installation</a></li>
-  <li><a href="#dataframe-libraries" id="toc-dataframe-libraries" class="nav-link" data-scroll-target="#dataframe-libraries">DataFrame Libraries</a></li>
-  <li><a href="#optional-dependencies" id="toc-optional-dependencies" class="nav-link" data-scroll-target="#optional-dependencies">Optional Dependencies</a>
-  <ul class="collapse">
-  <li><a href="#ibis-backends" id="toc-ibis-backends" class="nav-link" data-scroll-target="#ibis-backends">Ibis Backends</a></li>
-  <li><a href="#ai-assisted-validation-experimental" id="toc-ai-assisted-validation-experimental" class="nav-link" data-scroll-target="#ai-assisted-validation-experimental">AI-Assisted Validation (Experimental)</a></li>
-  <li><a href="#development-version" id="toc-development-version" class="nav-link" data-scroll-target="#development-version">Development Version</a></li>
-  </ul></li>
-  <li><a href="#verifying-your-installation" id="toc-verifying-your-installation" class="nav-link" data-scroll-target="#verifying-your-installation">Verifying Your Installation</a></li>
-  <li><a href="#system-requirements" id="toc-system-requirements" class="nav-link" data-scroll-target="#system-requirements">System Requirements</a></li>
-  <li><a href="#next-steps" id="toc-next-steps" class="nav-link" data-scroll-target="#next-steps">Next Steps</a></li>
-  <li><a href="#command-line-interface" id="toc-command-line-interface" class="nav-link" data-scroll-target="#command-line-interface">Command Line Interface</a></li>
-  </ul></li>
+  <li><a href="#supported-data-sources" id="toc-supported-data-sources" class="nav-link active" data-scroll-target="#supported-data-sources">Supported Data Sources</a></li>
+  <li><a href="#quick-reference-for-the-data-validation-commands" id="toc-quick-reference-for-the-data-validation-commands" class="nav-link" data-scroll-target="#quick-reference-for-the-data-validation-commands">Quick Reference for the Data Validation Commands</a></li>
+  <li><a href="#pb-validate-run-validation-checks" id="toc-pb-validate-run-validation-checks" class="nav-link" data-scroll-target="#pb-validate-run-validation-checks"><code>pb validate</code>: Run Validation Checks</a></li>
+  <li><a href="#pb-run-run-python-validation-scripts" id="toc-pb-run-run-python-validation-scripts" class="nav-link" data-scroll-target="#pb-run-run-python-validation-scripts"><code>pb run</code>: Run Python Validation Scripts</a></li>
+  <li><a href="#pb-make-template-generate-a-validation-script-template" id="toc-pb-make-template-generate-a-validation-script-template" class="nav-link" data-scroll-target="#pb-make-template-generate-a-validation-script-template"><code>pb make-template</code>: Generate a Validation Script Template</a></li>
+  <li><a href="#integration-with-cicd" id="toc-integration-with-cicd" class="nav-link" data-scroll-target="#integration-with-cicd">Integration with CI/CD</a></li>
+  <li><a href="#some-useful-tips" id="toc-some-useful-tips" class="nav-link" data-scroll-target="#some-useful-tips">Some Useful Tips</a></li>
   </ul>
 </nav>
     </div>
@@ -419,7 +410,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title d-none d-lg-block">Installation</h1>
+<h1 class="title d-none d-lg-block">Data Validation and Automation</h1>
 </div>
 
 
@@ -436,197 +427,156 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </header>
 
 
-<section id="installing-pointblank" class="level1">
-<h1>Installing Pointblank</h1>
-<p>Pointblank can be installed using various package managers. The base installation gives you the core validation functionality, with optional dependencies for working with different data sources.</p>
-<section id="basic-installation" class="level2">
-<h2 class="anchored" data-anchor-id="basic-installation">Basic Installation</h2>
-<p>You can install Pointblank using your preferred package manager:</p>
-<div class="tabset-margin-container"></div><div class="panel-tabset">
-<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true">pip</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false">uv</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-3" role="tab" aria-controls="tabset-1-3" aria-selected="false">conda</a></li></ul>
-<div class="tab-content">
-<div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
-<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install pointblank</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
-<div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> pip install pointblank</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div id="tabset-1-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-3-tab">
-<div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">conda</span> install <span class="at">-c</span> conda-forge pointblank</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-</div>
-</div>
-</section>
-<section id="dataframe-libraries" class="level2">
-<h2 class="anchored" data-anchor-id="dataframe-libraries">DataFrame Libraries</h2>
-<p>Pointblank requires a DataFrame library but doesn’t include one by default, giving you the flexibility to choose either <a href="https://pandas.pydata.org">Pandas</a> or <a href="https://pola.rs">Polars</a>:</p>
-<div class="tabset-margin-container"></div><div class="panel-tabset">
-<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-2-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-1" role="tab" aria-controls="tabset-2-1" aria-selected="true">Polars</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-2" role="tab" aria-controls="tabset-2-2" aria-selected="false">Pandas</a></li></ul>
-<div class="tab-content">
-<div id="tabset-2-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-2-1-tab">
-<div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Using pip</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install pointblank<span class="pp">[</span><span class="ss">pl</span><span class="pp">]</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Or manually</span></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install polars<span class="op">&gt;</span>=1.24.0</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div id="tabset-2-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-2-tab">
-<div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Using pip</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install pointblank<span class="pp">[</span><span class="ss">pd</span><span class="pp">]</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Or manually</span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install pandas<span class="op">&gt;</span>=2.2.3</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-</div>
-</div>
-<p>Pointblank works seamlessly with both libraries, and you can choose the one that best fits your workflow and performance requirements.</p>
-</section>
-<section id="optional-dependencies" class="level2">
-<h2 class="anchored" data-anchor-id="optional-dependencies">Optional Dependencies</h2>
-<section id="ibis-backends" class="level3">
-<h3 class="anchored" data-anchor-id="ibis-backends">Ibis Backends</h3>
-<p>To work with various database systems through <a href="https://ibis-project.org">Ibis</a>, you can install additional backends:</p>
-<div class="tabset-margin-container"></div><div class="panel-tabset">
-<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-3-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-1" role="tab" aria-controls="tabset-3-1" aria-selected="true">pip</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-2" role="tab" aria-controls="tabset-3-2" aria-selected="false">uv</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-3" role="tab" aria-controls="tabset-3-3" aria-selected="false">conda</a></li></ul>
-<div class="tab-content">
-<div id="tabset-3-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-3-1-tab">
-<div class="sourceCode" id="cb6"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install pointblank<span class="pp">[</span><span class="ss">sqlite</span><span class="pp">]</span>      <span class="co"># SQLite</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install pointblank<span class="pp">[</span><span class="ss">duckdb</span><span class="pp">]</span>      <span class="co"># DuckDB</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install pointblank<span class="pp">[</span><span class="ss">postgres</span><span class="pp">]</span>    <span class="co"># PostgreSQL</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install pointblank<span class="pp">[</span><span class="ss">mysql</span><span class="pp">]</span>       <span class="co"># MySQL</span></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install pointblank<span class="pp">[</span><span class="ss">mssql</span><span class="pp">]</span>       <span class="co"># Microsoft SQL Server</span></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install pointblank<span class="pp">[</span><span class="ss">bigquery</span><span class="pp">]</span>    <span class="co"># BigQuery</span></span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install pointblank<span class="pp">[</span><span class="ss">pyspark</span><span class="pp">]</span>     <span class="co"># Apache Spark</span></span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install pointblank<span class="pp">[</span><span class="ss">databricks</span><span class="pp">]</span>  <span class="co"># Databricks</span></span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install pointblank<span class="pp">[</span><span class="ss">snowflake</span><span class="pp">]</span>   <span class="co"># Snowflake</span></span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Example of installing multiple backends</span></span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install pointblank<span class="pp">[</span><span class="ss">duckdb,postgres,sqlite</span><span class="pp">]</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div id="tabset-3-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-2-tab">
-<div class="sourceCode" id="cb7"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> pip install pointblank<span class="pp">[</span><span class="ss">sqlite</span><span class="pp">]</span>      <span class="co"># SQLite</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> pip install pointblank<span class="pp">[</span><span class="ss">duckdb</span><span class="pp">]</span>      <span class="co"># DuckDB</span></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> pip install pointblank<span class="pp">[</span><span class="ss">postgres</span><span class="pp">]</span>    <span class="co"># PostgreSQL</span></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> pip install pointblank<span class="pp">[</span><span class="ss">mysql</span><span class="pp">]</span>       <span class="co"># MySQL</span></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> pip install pointblank<span class="pp">[</span><span class="ss">mssql</span><span class="pp">]</span>       <span class="co"># Microsoft SQL Server</span></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> pip install pointblank<span class="pp">[</span><span class="ss">bigquery</span><span class="pp">]</span>    <span class="co"># BigQuery</span></span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> pip install pointblank<span class="pp">[</span><span class="ss">pyspark</span><span class="pp">]</span>     <span class="co"># Apache Spark</span></span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> pip install pointblank<span class="pp">[</span><span class="ss">databricks</span><span class="pp">]</span>  <span class="co"># Databricks</span></span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> pip install pointblank<span class="pp">[</span><span class="ss">snowflake</span><span class="pp">]</span>   <span class="co"># Snowflake</span></span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Example of installing multiple backends</span></span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> pip install pointblank<span class="pp">[</span><span class="ss">duckdb,postgres,sqlite</span><span class="pp">]</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div id="tabset-3-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-3-tab">
-<div class="sourceCode" id="cb8"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">conda</span> install <span class="at">-c</span> conda-forge pointblank-sqlite      <span class="co"># SQLite</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="ex">conda</span> install <span class="at">-c</span> conda-forge pointblank-duckdb      <span class="co"># DuckDB</span></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="ex">conda</span> install <span class="at">-c</span> conda-forge pointblank-postgres    <span class="co"># PostgreSQL</span></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="ex">conda</span> install <span class="at">-c</span> conda-forge pointblank-mysql       <span class="co"># MySQL</span></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="ex">conda</span> install <span class="at">-c</span> conda-forge pointblank-mssql       <span class="co"># Microsoft SQL Server</span></span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="ex">conda</span> install <span class="at">-c</span> conda-forge pointblank-bigquery    <span class="co"># BigQuery</span></span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="ex">conda</span> install <span class="at">-c</span> conda-forge pointblank-pyspark     <span class="co"># Apache Spark</span></span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="ex">conda</span> install <span class="at">-c</span> conda-forge pointblank-databricks  <span class="co"># Databricks</span></span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="ex">conda</span> install <span class="at">-c</span> conda-forge pointblank-snowflake   <span class="co"># Snowflake</span></span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Example of installing multiple backends</span></span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="ex">conda</span> install <span class="at">-c</span> conda-forge pointblank-duckdb pointblank-postgres pointblank-sqlite</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-</div>
-</div>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Note
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>Even when using exclusively Ibis backends, you still need either Pandas or Polars installed since Pointblank’s reporting functionality (powered by <a href="https://posit-dev.github.io/great-tables">Great Tables</a>) requires a DataFrame library for rendering tabular reporting results.</p>
-</div>
-</div>
-</section>
-<section id="ai-assisted-validation-experimental" class="level3">
-<h3 class="anchored" data-anchor-id="ai-assisted-validation-experimental">AI-Assisted Validation (Experimental)</h3>
-<p>Pointblank includes experimental support for AI-assisted validation plan generation:</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install pointblank<span class="pp">[</span><span class="ss">generate</span><span class="pp">]</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>This installs the necessary dependencies for working with LLM providers to help generate validation plans. See the <a href="../user-guide/draft-validation.html">Draft Validation</a> article for how to create validation plans from existing data.</p>
-</section>
-<section id="development-version" class="level3">
-<h3 class="anchored" data-anchor-id="development-version">Development Version</h3>
-<p>If you want the latest development version with the newest features, you can install directly from GitHub:</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install git+https://github.com/posit-dev/pointblank.git</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</section>
-</section>
-<section id="verifying-your-installation" class="level2">
-<h2 class="anchored" data-anchor-id="verifying-your-installation">Verifying Your Installation</h2>
-<p>You can verify your installation by importing Pointblank and checking the version:</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(pb.__version__)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</section>
-<section id="system-requirements" class="level2">
-<h2 class="anchored" data-anchor-id="system-requirements">System Requirements</h2>
+<p>Pointblank’s CLI makes it easy to validate your data directly from the terminal. This is ideal for quick checks, CI/CD pipelines, and automation workflows. The <code>pb run</code> command serves as a runner for validation scripts written with the Pointblank Python API, allowing you to execute more complex validation logic from the command line.</p>
+<section id="supported-data-sources" class="level2">
+<h2 class="anchored" data-anchor-id="supported-data-sources">Supported Data Sources</h2>
+<p>You can validate a wide variety of data sources using the CLI:</p>
 <ul>
-<li>Python 3.10 or higher</li>
-<li>a supported DataFrame library (Pandas or Polars)</li>
-<li>optional: Ibis (for database connectivity)</li>
+<li>CSV files: single files, glob patterns</li>
+<li>Parquet files: single files, directories, partitioned datasets</li>
+<li>GitHub URLs: for CSV/Parquet files (standard or raw URLs)</li>
+<li>database tables: via connection strings</li>
+<li>built-in datasets: provided by Pointblank</li>
 </ul>
 </section>
-<section id="next-steps" class="level2">
-<h2 class="anchored" data-anchor-id="next-steps">Next Steps</h2>
-<p>Now that you’ve installed Pointblank, you’re ready to start validating your data. If you haven’t read the <a href="../user-guide/index.html">Introduction</a> yet, consider starting there to learn the basic concepts.</p>
-<p>If you encounter any installation issues, please <a href="https://github.com/posit-dev/pointblank/issues/new">open an issue on GitHub</a> with details about your system and the specific error messages you’re seeing. The maintainers actively monitor these issues and can help troubleshoot problems.</p>
-<p>For a quick test of your installation, try running a simple validation:</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Load a small dataset</span></span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> pb.load_dataset(<span class="st">"small_table"</span>)</span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a simple validation</span></span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
-<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>data)</span>
-<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>    .col_exists(columns<span class="op">=</span>[<span class="st">"a"</span>, <span class="st">"b"</span>, <span class="st">"c"</span>])</span>
-<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
-<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Display the validation results</span></span>
-<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>validation</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="quick-reference-for-the-data-validation-commands" class="level2 callout-info">
+<h2 class="anchored" data-anchor-id="quick-reference-for-the-data-validation-commands">Quick Reference for the Data Validation Commands</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 23%">
+<col style="width: 76%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Command</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>pb validate</code></td>
+<td>Run validation checks on your data</td>
+</tr>
+<tr class="even">
+<td><code>pb run</code></td>
+<td>Run a Python validation script from the CLI</td>
+</tr>
+<tr class="odd">
+<td><code>pb make-template</code></td>
+<td>Generate a validation script template</td>
+</tr>
+</tbody>
+</table>
 </section>
-<section id="command-line-interface" class="level2">
-<h2 class="anchored" data-anchor-id="command-line-interface">Command Line Interface</h2>
-<p>Once installed, Pointblank also provides a powerful command-line interface for quick data validation tasks:</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Test the CLI with a built-in dataset</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate small_table <span class="at">--check</span> rows-distinct</span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Check if a column exists</span></span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate small_table <span class="at">--check</span> col-exists <span class="at">--column</span> a</span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Validate data ranges</span></span>
-<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate small_table <span class="at">--check</span> col-vals-lt <span class="at">--column</span> a <span class="at">--value</span> 10</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>The CLI is perfect for:</p>
+<section id="pb-validate-run-validation-checks" class="level2">
+<h2 class="anchored" data-anchor-id="pb-validate-run-validation-checks"><code>pb validate</code>: Run Validation Checks</h2>
+<p>Use <code>pb validate</code> to perform one or more validation checks on your data source. Here’s the basic usage pattern:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate <span class="pp">[</span><span class="ss">DATA_SOURCE</span><span class="pp">]</span> <span class="at">--check</span> <span class="pp">[</span><span class="ss">CHECK_TYPE</span><span class="pp">]</span> <span class="pp">[</span><span class="ss">OPTIONS</span><span class="pp">]</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Here are the supported checks and the required options in parentheses:</p>
 <ul>
-<li>quick data quality checks in CI/CD pipelines</li>
-<li>exploratory data analysis from the terminal</li>
-<li>integration with shell scripts and automation workflows</li>
+<li><code>rows-distinct</code>: check for duplicate rows (default)</li>
+<li><code>rows-complete</code>: check for missing values in any column</li>
+<li><code>col-exists</code>: check if a column exists (<code>--column</code>)</li>
+<li><code>col-vals-not-null</code>: check if a column has no null values (<code>--column</code>)</li>
+<li><code>col-vals-gt</code>: column values greater than a value (<code>--column</code>, <code>--value</code>)</li>
+<li><code>col-vals-ge</code>: column values greater than or equal to a value (<code>--column</code>, <code>--value</code>)</li>
+<li><code>col-vals-lt</code>: column values less than a value (<code>--column</code>, <code>--value</code>)</li>
+<li><code>col-vals-le</code>: column values less than or equal to a value (<code>--column</code>, <code>--value</code>)</li>
+<li><code>col-vals-in-set</code>: column values must be in a set (<code>--column</code>, <code>--set</code>)</li>
 </ul>
-<div class="callout callout-style-default callout-tip callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-See the CLI in Action
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>Watch our <a href="../demos/cli-interactive/index.html">interactive CLI demonstrations</a> to see these commands executing in real-time with actual output formatting.</p>
-</div>
-</div>
-<p>Learn more about the CLI capabilities in the <a href="cli.qmd">Command Line Interface</a> guide.</p>
-
-
+<p>Here are a few examples:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check for duplicate rows (default)</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate data.csv</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Check if all values in 'age' are not null</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate data.csv <span class="at">--check</span> col-vals-not-null <span class="at">--column</span> age</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Check if all values in 'score' are greater than 50</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate data.csv <span class="at">--check</span> col-vals-gt <span class="at">--column</span> score <span class="at">--value</span> 50</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Check if 'status' values are in a set</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate data.csv <span class="at">--check</span> col-vals-in-set <span class="at">--column</span> status <span class="at">--set</span> <span class="st">"active,inactive,pending"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Several consecutive checks can be performed in one command! To do this, use <code>--check</code> multiple times (along with the check type and its required options).</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Perform multiple checks in one command</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate data.csv <span class="at">--check</span> rows-distinct <span class="at">--check</span> col-vals-not-null <span class="at">--column</span> id</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>There are several useful options:</p>
+<ul>
+<li><code>--show-extract</code>: show failing rows if validation fails</li>
+<li>`–write-extract TEXT: save failing rows to a directory as CSV</li>
+<li><code>--limit INTEGER</code>: limit the number of failing rows shown/saved (default: 10)</li>
+<li><code>--exit-code</code>: exit with non-zero code if validation fails (for CI/CD)</li>
+<li><code>--list-checks</code>: list all available validation checks</li>
+</ul>
 </section>
+<section id="pb-run-run-python-validation-scripts" class="level2">
+<h2 class="anchored" data-anchor-id="pb-run-run-python-validation-scripts"><code>pb run</code>: Run Python Validation Scripts</h2>
+<p>Use <code>pb run</code> to execute a Python script containing Pointblank validation logic. This is useful for more complex validations or automation.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> run validation_script.py</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Here are the options:</p>
+<ul>
+<li><code>--data [DATA_SOURCE]</code>: override the data source in your script (available as <code>cli_data</code>)</li>
+<li><code>--output-html file.html</code>: save validation report as HTML</li>
+<li><code>--output-json file.json</code>: save validation summary as JSON</li>
+<li><code>--show-extract</code>: show failing rows for failed steps</li>
+<li><code>--write-extract TEXT</code>: save failing rows for each step as CSVs in a directory</li>
+<li><code>--limit INTEGER</code>: limit the number of failing rows shown/saved</li>
+<li><code>--fail-on [critical|error|warning|any]</code>: exit with error if any step meets/exceeds this severity</li>
+</ul>
+<p>Here’s an example where we:</p>
+<ul>
+<li>override the input data in the script</li>
+<li>output the validation report table to a file</li>
+<li>signal failure (i.e., exit with non-zero code) if any ‘error’ threshold is met</li>
+</ul>
+<div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> run my_validation.py <span class="at">--data</span> data.csv <span class="at">--output-html</span> report.html <span class="at">--fail-on</span> error</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>To scaffold a .py file for this, use <code>pb make-template</code>.</p>
+</section>
+<section id="pb-make-template-generate-a-validation-script-template" class="level2">
+<h2 class="anchored" data-anchor-id="pb-make-template-generate-a-validation-script-template"><code>pb make-template</code>: Generate a Validation Script Template</h2>
+<p>Use this command to create a starter Python script for Pointblank validation:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> make-template my_validation.py</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Edit the generated script to add your own data loading and validation rules, then run it with <code>pb run</code>.</p>
+</section>
+<section id="integration-with-cicd" class="level2">
+<h2 class="anchored" data-anchor-id="integration-with-cicd">Integration with CI/CD</h2>
+<p>Validation through the CLI provide opportunities for automation. The following features lend themselves well to automated processes:</p>
+<ul>
+<li>validation results are shown in a clear, color-coded table</li>
+<li><code>--show-extract</code> or <code>--write-extract</code> can be used to debug failing rows</li>
+<li>the <code>--exit-code</code> or <code>--fail-on</code> options are ideal for CI/CD integration.</li>
+</ul>
+<p>Here’s an example of how one might integrate data validation through the Pointblank CLI into a CI/CD pipeline:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Example GitHub Actions workflow</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">name</span><span class="kw">:</span><span class="at"> Data Validation</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="fu">on</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">push</span><span class="kw">,</span><span class="at"> pull_request</span><span class="kw">]</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="fu">jobs</span><span class="kw">:</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">validate</span><span class="kw">:</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">runs-on</span><span class="kw">:</span><span class="at"> ubuntu-latest</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">steps</span><span class="kw">:</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">uses</span><span class="kw">:</span><span class="at"> actions/checkout@v2</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Set up Python</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">uses</span><span class="kw">:</span><span class="at"> actions/setup-python@v2</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">with</span><span class="kw">:</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">python-version</span><span class="kw">:</span><span class="at"> </span><span class="st">'3.9'</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Install dependencies</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">run</span><span class="kw">:</span><span class="at"> pip install pointblank</span></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Validate data quality</span></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a><span class="fu">        run</span><span class="kw">: </span><span class="ch">|</span></span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>          pb validate data/sales.csv --check rows-distinct --exit-code</span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>          pb validate data/sales.csv --check col-vals-not-null --column customer_id --exit-code</span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>          pb validate data/sales.csv --check col-vals-gt --column amount --value 0 --exit-code</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="some-useful-tips" class="level2">
+<h2 class="anchored" data-anchor-id="some-useful-tips">Some Useful Tips</h2>
+<ul>
+<li>use <code>pb validate --list-checks</code> to see all available checks and usage examples.</li>
+<li>use <code>pb run</code> for advanced validation logic or when you need to chain multiple steps.</li>
+<li>use <code>pb make-template</code> to quickly scaffold new validation scripts.</li>
+</ul>
+<p>For more CLI usage examples and real terminal output, see the <a href="../demos/cli-interactive/index.html">CLI Demos</a>.</p>
+
+
 </section>
 
 </main> <!-- /main -->
@@ -1031,14 +981,11 @@ See the CLI in Action
   </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../user-guide/index.html" class="pagination-link" aria-label="Introduction">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Introduction</span>
+      <a href="../user-guide/cli-data-inspection.html" class="pagination-link" aria-label="Data Inspection and Exploration">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Data Inspection and Exploration</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../user-guide/validation-overview.html" class="pagination-link" aria-label="Overview">
-        <span class="nav-page-text">Overview</span> <i class="bi bi-arrow-right-short"></i>
-      </a>
   </div>
 </nav>
 </div> <!-- /content -->
