@@ -10,34 +10,42 @@ Set Theme "Dracula"
 
 Type "# Essential Data Validation with Pointblank CLI"
 Enter
-Sleep 2s
+Sleep 4s
 
 Type ""
 Enter
-Type "# 1. Check for duplicate rows (most common data quality issue)"
+Type "# 0. Get the table dimensions, just to know what you're working with"
 Enter
-Type "pb validate small_table --check rows-distinct"
-Enter
-Sleep 6s
-
-Type ""
-Enter
-Type "# 2. Find missing values in critical columns"
-Enter
-Type "pb validate small_table --check col-vals-not-null --column a"
-Enter
-Sleep 6s
-
-Type ""
-Enter
-Type "# 3. When validation fails, see exactly which rows are problematic"
-Enter
-Type "pb validate small_table --check col-vals-not-null --column b --show-extract"
+Type "pb info small_table"
 Enter
 Sleep 8s
 
 Type ""
 Enter
+Type "# 1. Check for duplicate rows (the most common data quality issue)"
+Enter
+Type "pb validate small_table --check rows-distinct"
+Enter
+Sleep 8s
+
+Type ""
+Enter
+Type "# 2. Find missing values in important columns"
+Enter
+Type "pb validate small_table --check col-vals-not-null --column c"
+Enter
+Sleep 8s
+
+Type ""
+Enter
+Type "# 3. When validation fails, see exactly which rows are problematic with --show-extract"
+Enter
+Type "pb validate small_table --check col-vals-not-null --column c --show-extract"
+Enter
+Sleep 10s
+
+Type ""
+Enter
 Type "echo 'Essential validations: duplicates, nulls, with data extracts'"
 Enter
-Sleep 3s
+Sleep 6s
