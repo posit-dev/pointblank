@@ -16,7 +16,7 @@ class AppContext:
     # Stores loaded DataFrames: {df_id: DataFrame}
     loaded_dataframes: Dict[str, pd.DataFrame] = field(default_factory=dict)
     # Stores active Pointblank Validators: {validator_id: Validate}
-    active_validators: Dict[str, pb.Validate] = field(default_factory=dict) # Changed Agent to Validate
+    active_validators: Dict[str, pb.Validate] = field(default_factory=dict)
 
 @asynccontextmanager
 async def app_lifespan(server: FastMCP) -> AsyncIterator[AppContext]:
@@ -136,8 +136,8 @@ def create_validator(
 
 
     validator_instance_params = {
-        "data": df, # Corrected from 'data' to 'table'
-        "tbl_name": actual_table_name, # Corrected from 'tbl_name' to 'name'
+        "data": df,
+        "tbl_name": actual_table_name,
         "label": actual_validator_label
     }
 
@@ -294,7 +294,7 @@ async def get_validation_step_output(
         # --- Logic for CSV output ---
         if output_format == ".csv":
             if step_index:
-                # --- CORRECTED LOGIC: Get extract for a SPECIFIC step ---
+                # --- Get extract for a SPECIFIC step ---
                 data_extract_df = validator.get_data_extracts(i=step_index, frame=True)
                 if data_extract_df is None:
                     message = f"No data extract available for step {step_index}. This may mean all rows passed validation."
