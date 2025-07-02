@@ -22,8 +22,8 @@ class AppContext:
 async def app_lifespan(server: FastMCP) -> AsyncIterator[AppContext]:
     context = AppContext()
     yield context
-    # context.loaded_dataframes.clear()
-    # context.active_validators.clear()
+    context.loaded_dataframes.clear()
+    context.active_validators.clear()
 
 mcp = FastMCP(
     "FlexiblePointblankMCP",

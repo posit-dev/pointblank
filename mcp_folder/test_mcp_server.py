@@ -182,3 +182,21 @@ async def test_get_validation_step_output_no_step_index(validator_context, mock_
         assert result["status"] == "success"
         assert Path(result["output_file"]).exists()
         assert "saved" in result["message"]
+
+@pytest.mark.asyncio
+async def test_app_context_lifespan():
+    mock_server = MagicMock()
+
+    # Test async context manager
+    async with app_lifespan(mock_server) as ctx:
+        assert isinstance(ctx, AppContext)
+        assert ctx.loaded_dataframes == {}
+        assert ctx.active_validators == {}
+
+        # Add some data
+        ctx.loaded_dataframes["test"] = pd.DataFrame()
+        ctx.active_validators["val"] = pb.Validate(data=pd.DataFrame())
+
+    # Verify cleanup
+    assert ctx.loaded_dataframes == {}
+    assert ctx.active_validators == {}
