@@ -43,6 +43,7 @@ def app_context(sample_df):
     ctx.loaded_dataframes[df_id] = sample_df
     return ctx
 
+
 @pytest.fixture
 def validator_context(app_context):
     validator_id = "test_validator"
@@ -168,11 +169,12 @@ async def test_get_validation_step_output_png(validator_context, mock_context, t
         result = await get_validation_step_output(
             validator_id,
             output_path,
-            step_index=2  # Use step 2 for the failing validation
+            step_index=2,  # Use step 2 for the failing validation
         )
 
         assert result["status"] == "success"
         assert Path(result["output_file"]).exists()
+
 
 @pytest.mark.asyncio
 async def test_get_validation_step_output_no_step_index(validator_context, mock_context, tmp_path):

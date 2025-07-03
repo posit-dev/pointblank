@@ -30,7 +30,7 @@ async def app_lifespan(server: FastMCP) -> AsyncIterator[AppContext]:
 mcp = FastMCP(
     "FlexiblePointblankMCP",
     lifespan=app_lifespan,
-    dependencies=["pandas", "pointblank", "openpyxl","great_tables","polars"]
+    dependencies=["pandas", "pointblank", "openpyxl","great_tables","polars"],
 )
 
 
@@ -117,7 +117,9 @@ def create_validator(
         )
 
     actual_table_name = table_name if table_name else f"table_for_{df_id}"
-    actual_validator_label = validator_label if validator_label else f"Validation for {actual_table_name}"
+    actual_validator_label = (
+        validator_label if validator_label else f"Validation for {actual_table_name}"
+    )
 
     # Construct Thresholds, Actions, FinalActions if dicts are provided
     pb_thresholds = None
@@ -173,6 +175,7 @@ def create_validator(
 
     return {"validator_id": effective_validator_id, "status": "Validator created successfully."}
 
+
 @mcp.tool()
 def add_validation_step(
     validator_id: str,
@@ -218,15 +221,12 @@ def add_validation_step(
         "col_vals_regex": validator.col_vals_regex,  # values match a regular expresion
         "col_vals_expr": validator.col_vals_expr,  # Validate column values using a custom expression
         "col_count_match": validator.col_count_match,  # Validate whether the column count of the table matches a specified count.
-
         # Check existence of a column
         "col_exists": validator.col_exists,
-
         # Row validations
         "rows_distinct": validator.rows_distinct,  # distinc rows in a table
         "rows_complete": validator.rows_complete,  # Check for no NAs in specified columns
-        "row_count_match": validator.row_count_match,  # Check if number of rows in the table matches a fixed valu
-
+        "row_count_match": validator.row_count_match,  # Check if number of rows in the table matches a fixed value
         # Other specialized validations
         "conjointly": validator.conjointly,  # For multiple column conditions
         "col_schema_match": validator.col_schema_match,  # Do columns in the table (and their types) match a predefined schema? columns=[("a", "String"), ("b", "Int64"), ("c", "Float64")]
@@ -386,6 +386,7 @@ async def get_validation_step_output(
     except Exception as e:
         raise RuntimeError(f"Error getting output for validator '{validator_id}': {e}")
 
+
 @mcp.tool()
 async def interrogate_validator(
     validator_id: str, report_file_path: Optional[str] = None
@@ -534,6 +535,7 @@ def prompt_add_validation_step_example() -> tuple:
             "Refer to the Pointblank Python API for the 'Validate' class for available `validation_type` (method names) and their specific `params`."
         ),
     )
+
 
 @mcp.prompt()
 def prompt_get_validation_step_output(
