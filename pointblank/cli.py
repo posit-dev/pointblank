@@ -274,7 +274,7 @@ def _format_dtype_compact(dtype_str: str) -> str:
     elif "str" in dtype_str:
         return "str"
 
-    # Unknown or complex types - truncate if too long
+    # Unknown or complex types: truncate if too long
     elif len(dtype_str) > 8:
         return dtype_str[:8] + "…"
     else:
@@ -395,7 +395,7 @@ def _rich_print_scan_table(
             # Clean up HTML formatting from the raw data
             str_val = str(value)
 
-            # Handle multi-line values with <br> tags FIRST - take the first line (absolute number)
+            # Handle multi-line values with <br> tags FIRST: take the first line (absolute number)
             if "<br>" in str_val:
                 str_val = str_val.split("<br>")[0].strip()
                 # For unique values, we want just the integer part
@@ -414,14 +414,14 @@ def _rich_print_scan_table(
                 # Clean up extra whitespace
                 str_val = re.sub(r"\s+", " ", str_val).strip()
 
-            # Handle values like "2<.01" - extract the first number
+            # Handle values like "2<.01": extract the first number
             if "<" in str_val and not (str_val.startswith("<") and str_val.endswith(">")):
                 # Extract number before the < symbol
                 before_lt = str_val.split("<")[0].strip()
                 if before_lt and before_lt.replace(".", "").replace("-", "").isdigit():
                     str_val = before_lt
 
-            # Handle boolean unique values like "T0.62F0.38" - extract the more readable format
+            # Handle boolean unique values like "T0.62F0.38": extract the more readable format
             if re.match(r"^[TF]\d+\.\d+[TF]\d+\.\d+$", str_val):
                 # Extract T and F values
                 t_match = re.search(r"T(\d+\.\d+)", str_val)
@@ -451,7 +451,7 @@ def _rich_print_scan_table(
                     # Simple integers under 10000
                     return str(int(num_val))
                 elif abs(num_val) >= 10000000 and abs(num_val) < 100000000:
-                    # Likely dates in YYYYMMDD format - format as date-like
+                    # Likely dates in YYYYMMDD format: format as date-like
                     int_val = int(num_val)
                     if 19000101 <= int_val <= 29991231:  # Reasonable date range
                         str_date = str(int_val)
@@ -463,29 +463,29 @@ def _rich_print_scan_table(
                     # Otherwise treat as large number
                     return f"{num_val / 1000000:.1f}M"
                 elif abs(num_val) >= 1000000:
-                    # Large numbers - use scientific notation or M/k notation
+                    # Large numbers: use scientific notation or M/k notation
 
                     if abs(num_val) >= 1000000000:
                         return f"{num_val:.1e}"
                     else:
                         return f"{num_val / 1000000:.1f}M"
                 elif abs(num_val) >= 10000:
-                    # Numbers >= 10k - use compact notation
+                    # Numbers >= 10k: use compact notation
                     return f"{num_val / 1000:.1f}k"
                 elif abs(num_val) >= 100:
-                    # Numbers 100-9999 - show with minimal decimals
+                    # Numbers 100-9999: show with minimal decimals
                     return f"{num_val:.1f}"
                 elif abs(num_val) >= 10:
-                    # Numbers 10-99 - show with one decimal
+                    # Numbers 10-99: show with one decimal
                     return f"{num_val:.1f}"
                 elif abs(num_val) >= 1:
-                    # Numbers 1-9 - show with two decimals
+                    # Numbers 1-9: show with two decimals
                     return f"{num_val:.2f}"
                 elif abs(num_val) >= 0.01:
-                    # Small numbers - show with appropriate precision
+                    # Small numbers: show with appropriate precision
                     return f"{num_val:.2f}"
                 else:
-                    # Very small numbers - use scientific notation
+                    # Very small numbers: use scientific notation
 
                     return f"{num_val:.1e}"
 
@@ -493,7 +493,7 @@ def _rich_print_scan_table(
                 # Not a number, handle as string
                 pass
 
-            # Handle date/datetime strings - show abbreviated format
+            # Handle date/datetime strings: show abbreviated format
             if len(str_val) > 10 and any(char in str_val for char in ["-", "/", ":"]):
                 # Likely a date/datetime, show abbreviated
                 if len(str_val) > max_width:
@@ -933,14 +933,19 @@ def _rich_print_gt_table(
 
 
 def _display_validation_summary(validation: Any) -> None:
-    """Display a validation summary in a Rich table format."""
+    """Display a validation summary in a compact Rich table format."""
     try:
         # Try to get the summary from the validation report
         if hasattr(validation, "validation_info") and validation.validation_info is not None:
             # Use the validation_info to create a summary
             info = validation.validation_info
             n_steps = len(info)
-            n_passed = sum(1 for step in info if step.all_passed)
+
+            # Count steps based on their threshold status
+            n_passed = sum(
+                1 for step in info if not step.warning and not step.error and not step.critical
+            )
+            n_all_passed = sum(1 for step in info if step.all_passed)
             n_failed = n_steps - n_passed
 
             # Calculate severity counts
@@ -950,64 +955,213 @@ def _display_validation_summary(validation: Any) -> None:
 
             all_passed = n_failed == 0
 
-            # Determine highest severity
+            # Determine highest severity and its color
             if n_critical > 0:
                 highest_severity = "critical"
+                severity_color = "red"
             elif n_error > 0:
                 highest_severity = "error"
+                severity_color = "yellow"
             elif n_warning > 0:
                 highest_severity = "warning"
-            elif n_failed > 0:
-                highest_severity = "some failing"
-            else:
+                severity_color = "bright_black"  # gray
+            elif n_all_passed == n_steps:
+                # All steps passed AND all steps had 100% pass rate
                 highest_severity = "all passed"
+                severity_color = "bold green"
+            else:
+                # Steps passed (no threshold exceedances) but some had failing test units
+                highest_severity = "passed"
+                severity_color = "green"
 
-            # Create a summary table
-            table = Table(title="Validation Summary", show_header=True, header_style="bold magenta")
-            table.add_column("Metric", style="cyan", no_wrap=True)
-            table.add_column("Value", style="green")
+            # Create compact summary header
+            # Format: Steps: 6 / P: 3 (3 AP) / W: 3 / E: 0 / C: 0 / warning
+            summary_header = (
+                f"Steps: {n_steps} / P: {n_passed} ({n_all_passed} AP) / "
+                f"W: {n_warning} / E: {n_error} / C: {n_critical} / "
+                f"[{severity_color}]{highest_severity}[/{severity_color}]"
+            )
 
-            # Add summary statistics
-            table.add_row("Total Steps", str(n_steps))
-            table.add_row("Passing Steps", str(n_passed))
-            table.add_row("Failing Steps", str(n_failed))
-            table.add_row("Warning Steps", str(n_warning))
-            table.add_row("Error Steps", str(n_error))
-            table.add_row("Critical Steps", str(n_critical))
-            table.add_row("All Passed", str(all_passed))
-            table.add_row("Highest Severity", highest_severity)
-
-            console.print(table)
+            # Print the report title and summary
+            console.print()
+            console.print("[blue]Validation Report[/blue]")
+            console.print(f"[white]{summary_header}[/white]")
 
             # Display step details
             if n_steps > 0:
+                from rich.box import SIMPLE_HEAD
+
                 steps_table = Table(
-                    title="Validation Steps", show_header=True, header_style="bold cyan"
+                    show_header=True,
+                    header_style="bold cyan",
+                    box=SIMPLE_HEAD,
                 )
-                steps_table.add_column("Step", style="dim")
-                steps_table.add_column("Type", style="white")
+                steps_table.add_column("", style="dim")
+                steps_table.add_column("Step", style="white")
                 steps_table.add_column("Column", style="cyan")
-                steps_table.add_column("Status", style="white")
-                steps_table.add_column("Passed/Total", style="green")
+                steps_table.add_column("Values", style="yellow")
+                steps_table.add_column("Units", style="blue")
+                steps_table.add_column("Pass", style="green")
+                steps_table.add_column("Fail", style="red")
+                steps_table.add_column("W", style="bright_black")
+                steps_table.add_column("E", style="yellow")
+                steps_table.add_column("C", style="red")
+                steps_table.add_column("Ext", style="blue", justify="center")
+
+                def format_units(n: int) -> str:
+                    """Format large numbers with K, M, B abbreviations for values above 10,000."""
+                    if n is None:
+                        return "—"
+                    if n >= 1000000000:  # Billions
+                        return f"{n / 1000000000:.1f}B"
+                    elif n >= 1000000:  # Millions
+                        return f"{n / 1000000:.1f}M"
+                    elif n >= 10000:  # Use K for 10,000 and above
+                        return f"{n / 1000:.0f}K"
+                    else:
+                        return str(n)
+
+                def format_pass_fail(passed: int, total: int) -> str:
+                    """Format pass/fail counts with abbreviated numbers and fractions."""
+                    if passed is None or total is None or total == 0:
+                        return "—/—"
+
+                    # Calculate fraction
+                    fraction = passed / total
+
+                    # Format fraction with special handling for very small and very large values
+                    if fraction == 0.0:
+                        fraction_str = "0.00"
+                    elif fraction == 1.0:
+                        fraction_str = "1.00"
+                    elif fraction < 0.005:  # Less than 0.005 rounds to 0.00
+                        fraction_str = "<0.01"
+                    elif fraction > 0.995:  # Greater than 0.995 rounds to 1.00
+                        fraction_str = ">0.99"
+                    else:
+                        fraction_str = f"{fraction:.2f}"
+
+                    # Format absolute number with abbreviations
+                    absolute_str = format_units(passed)
+
+                    return f"{absolute_str}/{fraction_str}"
 
                 for step in info:
-                    status_icon = "✓" if step.all_passed else "✗"
-                    status_color = "green" if step.all_passed else "red"
+                    # Extract values information for the Values column
+                    values_str = "—"  # Default to em dash if no values
 
-                    severity = ""
-                    if step.critical:
-                        severity = " [red](CRITICAL)[/red]"
-                    elif step.error:
-                        severity = " [red](ERROR)[/red]"
-                    elif step.warning:
-                        severity = " [yellow](WARNING)[/yellow]"
+                    # Handle different validation types
+                    if step.assertion_type == "col_schema_match":
+                        values_str = "—"  # Schema is too complex to display inline
+                    elif step.assertion_type == "col_vals_between":
+                        # For between validations, try to get left and right bounds
+                        if (
+                            hasattr(step, "left")
+                            and hasattr(step, "right")
+                            and step.left is not None
+                            and step.right is not None
+                        ):
+                            values_str = f"[{step.left}, {step.right}]"
+                        elif hasattr(step, "values") and step.values is not None:
+                            if isinstance(step.values, (list, tuple)) and len(step.values) >= 2:
+                                values_str = f"[{step.values[0]}, {step.values[1]}]"
+                            else:
+                                values_str = str(step.values)
+                    elif step.assertion_type in ["row_count_match", "col_count_match"]:
+                        # For count match validations, extract the 'count' value from the dictionary
+                        if hasattr(step, "values") and step.values is not None:
+                            if isinstance(step.values, dict) and "count" in step.values:
+                                values_str = str(step.values["count"])
+                            else:
+                                values_str = str(step.values)
+                        else:
+                            values_str = "—"
+                    elif step.assertion_type in ["col_vals_expr", "conjointly"]:
+                        values_str = "COLUMN EXPR"
+                    elif step.assertion_type == "specially":
+                        values_str = "EXPR"
+                    elif hasattr(step, "values") and step.values is not None:
+                        if isinstance(step.values, (list, tuple)):
+                            if len(step.values) <= 3:
+                                values_str = ", ".join(str(v) for v in step.values)
+                            else:
+                                values_str = f"{', '.join(str(v) for v in step.values[:3])}..."
+                        else:
+                            values_str = str(step.values)
+                    elif hasattr(step, "value") and step.value is not None:
+                        values_str = str(step.value)
+                    elif hasattr(step, "set") and step.set is not None:
+                        if isinstance(step.set, (list, tuple)):
+                            if len(step.set) <= 3:
+                                values_str = ", ".join(str(v) for v in step.set)
+                            else:
+                                values_str = f"{', '.join(str(v) for v in step.set[:3])}..."
+                        else:
+                            values_str = str(step.set)
+
+                    # Determine threshold status for W, E, C columns
+                    # Check if thresholds are set and whether they were exceeded
+
+                    # Warning threshold
+                    if (
+                        hasattr(step, "thresholds")
+                        and step.thresholds
+                        and hasattr(step.thresholds, "warning")
+                        and step.thresholds.warning is not None
+                    ):
+                        w_status = (
+                            "[bright_black]●[/bright_black]"
+                            if step.warning
+                            else "[bright_black]○[/bright_black]"
+                        )
+                    else:
+                        w_status = "—"
+
+                    # Error threshold
+                    if (
+                        hasattr(step, "thresholds")
+                        and step.thresholds
+                        and hasattr(step.thresholds, "error")
+                        and step.thresholds.error is not None
+                    ):
+                        e_status = "[yellow]●[/yellow]" if step.error else "[yellow]○[/yellow]"
+                    else:
+                        e_status = "—"
+
+                    # Critical threshold
+                    if (
+                        hasattr(step, "thresholds")
+                        and step.thresholds
+                        and hasattr(step.thresholds, "critical")
+                        and step.thresholds.critical is not None
+                    ):
+                        c_status = "[red]●[/red]" if step.critical else "[red]○[/red]"
+                    else:
+                        c_status = "—"
+
+                    # Extract status, here we check if the step has any extract data
+                    if (
+                        hasattr(step, "extract")
+                        and step.extract is not None
+                        and hasattr(step.extract, "__len__")
+                        and len(step.extract) > 0
+                    ):
+                        ext_status = "[blue]✓[/blue]"
+                    else:
+                        ext_status = "[bright_black]—[/bright_black]"
 
                     steps_table.add_row(
                         str(step.i),
                         step.assertion_type,
                         str(step.column) if step.column else "—",
-                        f"[{status_color}]{status_icon}[/{status_color}]{severity}",
-                        f"{step.n_passed}/{step.n}",
+                        values_str,
+                        format_units(step.n),
+                        format_pass_fail(step.n_passed, step.n),
+                        format_pass_fail(step.n - step.n_passed, step.n),
+                        w_status,
+                        e_status,
+                        c_status,
+                        ext_status,
                     )
 
                 console.print(steps_table)
@@ -1015,18 +1169,32 @@ def _display_validation_summary(validation: Any) -> None:
             # Display status with appropriate color
             if highest_severity == "all passed":
                 console.print(
-                    Panel("[green]✓ All validations passed![/green]", border_style="green")
+                    Panel(
+                        "[green]✓ All validations passed![/green]",
+                        border_style="green",
+                        expand=False,
+                    )
                 )
-            elif highest_severity == "some failing":
+            elif highest_severity == "passed":
                 console.print(
-                    Panel("[yellow]⚠ Some validations failed[/yellow]", border_style="yellow")
+                    Panel(
+                        "[dim green]⚠ Some steps had failing test units[/dim green]",
+                        border_style="dim green",
+                        expand=False,
+                    )
                 )
             elif highest_severity in ["warning", "error", "critical"]:
-                color = "yellow" if highest_severity == "warning" else "red"
+                if highest_severity == "warning":
+                    color = "bright_black"  # gray
+                elif highest_severity == "error":
+                    color = "yellow"
+                else:  # critical
+                    color = "red"
                 console.print(
                     Panel(
                         f"[{color}]✗ Validation failed with {highest_severity} severity[/{color}]",
                         border_style=color,
+                        expand=False,
                     )
                 )
         else:
@@ -1043,7 +1211,7 @@ def _display_validation_summary(validation: Any) -> None:
 @click.version_option(version=pb.__version__, prog_name="pb")
 def cli():
     """
-    Pointblank CLI - Data validation and quality tools for data engineers.
+    Pointblank CLI: Data validation and quality tools for data engineers.
 
     Use this CLI to run validation scripts, preview tables, and generate reports
     directly from the command line.
@@ -1791,7 +1959,7 @@ def validate(
 
         # Display results based on whether we have single or multiple checks
         if len(checks_list) == 1:
-            # Single check - use current display format
+            # Single check: use current display format
             _display_validation_result(
                 validation,
                 checks_list,
@@ -1806,7 +1974,7 @@ def validate(
                 limit,
             )
         else:
-            # Multiple checks - use stacked display format
+            # Multiple checks: use stacked display format
             any_failed = False
             for i in range(len(checks_list)):
                 console.print()  # Add spacing between results
@@ -1845,7 +2013,7 @@ def validate(
             console.print()
             console.print("[bold magenta]Common validation options:[/bold magenta]")
             console.print(
-                "  • [bold cyan]--check rows-complete[/bold cyan]        Check for rows with missing values"
+                "  • [bold cyan]--check rows-complete[/bold cyan]       Check for rows with missing values"
             )
             console.print(
                 "  • [bold cyan]--check col-vals-not-null[/bold cyan]   Check for null values in a column [bright_black](requires --column)[/bright_black]"
@@ -2070,7 +2238,7 @@ def _rich_print_scan_table(
             # Clean up HTML formatting from the raw data
             str_val = str(value)
 
-            # Handle multi-line values with <br> tags FIRST - take the first line (absolute number)
+            # Handle multi-line values with <br> tags FIRST: take the first line (absolute number)
             if "<br>" in str_val:
                 str_val = str_val.split("<br>")[0].strip()
                 # For unique values, we want just the integer part
@@ -2089,14 +2257,14 @@ def _rich_print_scan_table(
                 # Clean up extra whitespace
                 str_val = re.sub(r"\s+", " ", str_val).strip()
 
-            # Handle values like "2<.01" - extract the first number
+            # Handle values like "2<.01": extract the first number
             if "<" in str_val and not (str_val.startswith("<") and str_val.endswith(">")):
                 # Extract number before the < symbol
                 before_lt = str_val.split("<")[0].strip()
                 if before_lt and before_lt.replace(".", "").replace("-", "").isdigit():
                     str_val = before_lt
 
-            # Handle boolean unique values like "T0.62F0.38" - extract the more readable format
+            # Handle boolean unique values like "T0.62F0.38": extract the more readable format
             if re.match(r"^[TF]\d+\.\d+[TF]\d+\.\d+$", str_val):
                 # Extract T and F values
                 t_match = re.search(r"T(\d+\.\d+)", str_val)
@@ -2126,7 +2294,7 @@ def _rich_print_scan_table(
                     # Simple integers under 10000
                     return str(int(num_val))
                 elif abs(num_val) >= 10000000 and abs(num_val) < 100000000:
-                    # Likely dates in YYYYMMDD format - format as date-like
+                    # Likely dates in YYYYMMDD format: format as date-like
                     int_val = int(num_val)
                     if 19000101 <= int_val <= 29991231:  # Reasonable date range
                         str_date = str(int_val)
@@ -2138,29 +2306,29 @@ def _rich_print_scan_table(
                     # Otherwise treat as large number
                     return f"{num_val / 1000000:.1f}M"
                 elif abs(num_val) >= 1000000:
-                    # Large numbers - use scientific notation or M/k notation
+                    # Large numbers: use scientific notation or M/k notation
 
                     if abs(num_val) >= 1000000000:
                         return f"{num_val:.1e}"
                     else:
                         return f"{num_val / 1000000:.1f}M"
                 elif abs(num_val) >= 10000:
-                    # Numbers >= 10k - use compact notation
+                    # Numbers >= 10k: use compact notation
                     return f"{num_val / 1000:.1f}k"
                 elif abs(num_val) >= 100:
-                    # Numbers 100-9999 - show with minimal decimals
+                    # Numbers 100-9999: show with minimal decimals
                     return f"{num_val:.1f}"
                 elif abs(num_val) >= 10:
-                    # Numbers 10-99 - show with one decimal
+                    # Numbers 10-99: show with one decimal
                     return f"{num_val:.1f}"
                 elif abs(num_val) >= 1:
-                    # Numbers 1-9 - show with two decimals
+                    # Numbers 1-9: show with two decimals
                     return f"{num_val:.2f}"
                 elif abs(num_val) >= 0.01:
-                    # Small numbers - show with appropriate precision
+                    # Small numbers: show with appropriate precision
                     return f"{num_val:.2f}"
                 else:
-                    # Very small numbers - use scientific notation
+                    # Very small numbers: use scientific notation
 
                     return f"{num_val:.1e}"
 
@@ -2168,7 +2336,7 @@ def _rich_print_scan_table(
                 # Not a number, handle as string
                 pass
 
-            # Handle date/datetime strings - show abbreviated format
+            # Handle date/datetime strings: show abbreviated format
             if len(str_val) > 10 and any(char in str_val for char in ["-", "/", ":"]):
                 # Likely a date/datetime, show abbreviated
                 if len(str_val) > max_width:
@@ -2528,7 +2696,7 @@ def _display_validation_result(
 
     # Create friendly title for table
     if total_checks == 1:
-        # Single check - use original title format
+        # Single check: use original title format
         if check == "rows-distinct":
             table_title = "Validation Result: Rows Distinct"
         elif check == "col-vals-not-null":
@@ -2550,7 +2718,7 @@ def _display_validation_result(
         else:
             table_title = f"Validation Result: {check.replace('-', ' ').title()}"
     else:
-        # Multiple checks - add numbering
+        # Multiple checks: add numbering
         if check == "rows-distinct":
             base_title = "Rows Distinct"
         elif check == "col-vals-not-null":
@@ -2728,6 +2896,7 @@ def _display_validation_result(
                     Panel(
                         success_message,
                         border_style="green",
+                        expand=False,
                     )
                 )
             else:
@@ -2757,6 +2926,7 @@ def _display_validation_result(
                     Panel(
                         failure_message,
                         border_style="red",
+                        expand=False,
                     )
                 )
 
@@ -2837,7 +3007,7 @@ def _show_extract_for_multi_check(
         console.print()
         console.print(extract_message)
 
-    # Special handling for col-exists check - no rows to show when column doesn't exist
+    # Special handling for col-exists check: no rows to show when column doesn't exist
     if check == "col-exists":
         if show_extract:
             console.print(f"[dim]The column '{column}' was not found in the dataset.[/dim]")
@@ -2848,7 +3018,7 @@ def _show_extract_for_multi_check(
             console.print("[yellow]Cannot save failing rows when column doesn't exist[/yellow]")
     else:
         try:
-            # Get failing rows extract - use step_index + 1 since extracts are 1-indexed
+            # Get failing rows extract: use step_index + 1 since extracts are 1-indexed
             failing_rows = validation.get_data_extracts(i=step_index + 1, frame=True)
 
             if failing_rows is not None and len(failing_rows) > 0:
@@ -2997,7 +3167,7 @@ def _show_extract_and_summary(
         if show_extract:
             console.print(extract_message)
 
-        # Special handling for col-exists check - no rows to show when column doesn't exist
+        # Special handling for col-exists check: no rows to show when column doesn't exist
         if check == "col-exists" and not step_passed:
             if show_extract:
                 console.print(f"[dim]The column '{column}' was not found in the dataset.[/dim]")
@@ -3008,7 +3178,7 @@ def _show_extract_and_summary(
                 console.print("[yellow]Cannot save failing rows when column doesn't exist[/yellow]")
         else:
             try:
-                # Get failing rows extract - use step_index + 1 since extracts are 1-indexed
+                # Get failing rows extract: use step_index + 1 since extracts are 1-indexed
                 failing_rows = validation.get_data_extracts(i=step_index + 1, frame=True)
 
                 if failing_rows is not None and len(failing_rows) > 0:
@@ -3123,7 +3293,7 @@ def _show_extract_and_summary(
                 f"[green]✓ Validation PASSED: {check} check passed for {data_source}[/green]"
             )
 
-        console.print(Panel(success_message, border_style="green"))
+        console.print(Panel(success_message, border_style="green", expand=False))
     else:
         if step_info:
             if check == "rows-distinct":
@@ -3151,7 +3321,7 @@ def _show_extract_and_summary(
             if not show_extract and check != "col-exists":
                 failure_message += "\n[bright_blue]💡 Tip:[/bright_blue] [cyan]Use --show-extract to see the failing rows[/cyan]"
 
-            console.print(Panel(failure_message, border_style="red"))
+            console.print(Panel(failure_message, border_style="red", expand=False))
         else:
             if check == "rows-distinct":
                 failure_message = (
@@ -3170,7 +3340,7 @@ def _show_extract_and_summary(
             if not show_extract:
                 failure_message += "\n[bright_blue]💡 Tip:[/bright_blue] [cyan]Use --show-extract to see the failing rows[/cyan]"
 
-            console.print(Panel(failure_message, border_style="red"))
+            console.print(Panel(failure_message, border_style="red", expand=False))
 
 
 @cli.command()
@@ -3548,11 +3718,11 @@ def run(
         if output_html:
             try:
                 if len(validations) == 1:
-                    # Single validation - save directly
+                    # Single validation: save directly
                     html_content = validations[0]._repr_html_()
                     Path(output_html).write_text(html_content, encoding="utf-8")
                 else:
-                    # Multiple validations - combine them
+                    # Multiple validations: combine them
                     html_parts = []
                     html_parts.append("<html><body>")
                     html_parts.append("<h1>Pointblank Validation Report</h1>")
@@ -3572,11 +3742,11 @@ def run(
         if output_json:
             try:
                 if len(validations) == 1:
-                    # Single validation - save directly
+                    # Single validation: save directly
                     json_report = validations[0].get_json_report()
                     Path(output_json).write_text(json_report, encoding="utf-8")
                 else:
-                    # Multiple validations - combine them
+                    # Multiple validations: combine them
                     import json
 
                     combined_report = {"validations": []}
