@@ -30,7 +30,7 @@ async def app_lifespan(server: FastMCP) -> AsyncIterator[AppContext]:
 mcp = FastMCP(
     "FlexiblePointblankMCP",
     lifespan=app_lifespan,
-    dependencies=["pandas", "pointblank", "openpyxl","great_tables","polars"],
+    dependencies=["pandas", "pointblank", "openpyxl", "great_tables", "polars"],
 )
 
 
@@ -73,6 +73,7 @@ def load_dataframe(input_path: str, df_id: Optional[str] = None) -> Dict[str, An
         "shape": df.shape,
         "columns": list(df.columns),
     }
+
 
 @mcp.tool()
 def create_validator(
@@ -149,7 +150,6 @@ def create_validator(
             pb_final_actions = pb.FinalActions(**final_actions_dict)  # Placeholder
         except Exception as e:
             print(f"Could not create pb.FinalActions from final_actions_dict: {e}. Passing None.")
-
 
     validator_instance_params = {
         "data": df,
