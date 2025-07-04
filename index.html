@@ -310,8 +310,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate small_table <span class="at">--check</span> col-vals-gt <span class="at">--column</span> a <span class="at">--value</span> 5 <span class="at">--show-extract</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p><strong>Integrate with CI/CD</strong></p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Use exit codes for automation (0 = pass, 1 = fail)</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate small_table <span class="at">--check</span> rows-distinct <span class="kw">&amp;&amp;</span> <span class="bu">echo</span> <span class="st">"✅ Quality checks passed"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Learn more in our <a href="https://posit-dev.github.io/pointblank/user-guide/cli.html">CLI documentation</a>.</p>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate small_table <span class="at">--check</span> rows-distinct <span class="at">--exit-code</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section id="join-the-community" class="level2">
 <h2 class="anchored" data-anchor-id="join-the-community">Join the Community</h2>

@@ -5,10 +5,10 @@ Output cli-complete-workflow.gif
 
 Set FontSize 14
 Set Width 1200
-Set Height 900
+Set Height 1200
 Set Theme "Dracula"
 
-Type "# Complete Data Quality Workflow"
+Type "# This is a Demo of a Complete Data Quality Workflow Using the Pointblank CLI"
 Enter
 Sleep 2s
 
@@ -24,7 +24,7 @@ Type ""
 Enter
 Type "# Step 1: Quickly preview the dataset"
 Enter
-Type "pb preview worldcities.csv --head 3 --tail 2"
+Type "pb preview worldcities.csv"
 Enter
 Sleep 6s
 
@@ -34,7 +34,7 @@ Type "# Step 2: Scan for data quality patterns"
 Enter
 Type "pb scan worldcities.csv"
 Enter
-Sleep 12s
+Sleep 10s
 
 Type ""
 Enter
@@ -70,6 +70,30 @@ Sleep 10s
 
 Type ""
 Enter
-Type "echo 'Data quality workflow complete: 41K cities validated!'"
+Type "# Step 7: Create comprehensive validation script for production use"
+Enter
+Type "cat validation.py"
+Enter
+Sleep 8s
+
+Type ""
+Enter
+Type "# Step 8: Run comprehensive validation with thresholds and reporting"
+Enter
+Type "pb run validation.py"
+Enter
+Sleep 12s
+
+Type ""
+Enter
+Type "# Step 9: Generate validation report and extract failing rows"
+Enter
+Type "pb run validation.py --output-html validation_report.html --show-extract"
+Enter
+Sleep 12s
+
+Type ""
+Enter
+Type "# Complete workflow: from quick checks to validation for production use!"
 Enter
 Sleep 6s
