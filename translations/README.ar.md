@@ -201,10 +201,8 @@ pb validate small_table --check col-vals-gt --column a --value 5 --show-extract
 
 ```bash
 # استخدم أكواد الخروج للأتمتة (0 = نجح، 1 = فشل)
-pb validate small_table --check rows-distinct && echo "✅ فحوصات الجودة نجحت"
+pb validate small_table --check rows-distinct --exit-code
 ```
-
-تعلم المزيد في [وثائق CLI](https://posit-dev.github.io/pointblank/user-guide/cli.html).
 
 ## التوثيق والأمثلة
 

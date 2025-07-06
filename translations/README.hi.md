@@ -192,10 +192,8 @@ pb validate small_table --check col-vals-gt --column a --value 5 --show-extract
 
 ```bash
 # स्वचालन के लिए एक्जिट कोड का उपयोग करें (0 = पास, 1 = फेल)
-pb validate small_table --check rows-distinct && echo "✅ गुणवत्ता जांच सफल"
+pb validate small_table --check rows-distinct --exit-code
 ```
-
-हमारे [CLI डॉक्यूमेंटेशन](https://posit-dev.github.io/pointblank/user-guide/cli.html) में और जानें।
 
 ## विशेषताएं जो पॉइन्टब्लैंक को अलग बनाती हैं
 

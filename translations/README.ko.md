@@ -193,10 +193,8 @@ pb validate small_table --check col-vals-gt --column a --value 5 --show-extract
 
 ```bash
 # 자동화를 위한 종료 코드 사용 (0 = 통과, 1 = 실패)
-pb validate small_table --check rows-distinct && echo "✅ 품질 검사 통과"
+pb validate small_table --check rows-distinct --exit-code
 ```
-
-자세한 내용은 [CLI 문서](https://posit-dev.github.io/pointblank/user-guide/cli.html)에서 확인하세요.
 
 ## Pointblank을 차별화하는 기능
 

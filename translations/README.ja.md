@@ -193,10 +193,8 @@ pb validate small_table --check col-vals-gt --column a --value 5 --show-extract
 
 ```bash
 # 自動化のため終了コードを使用（0 = 成功、1 = 失敗）
-pb validate small_table --check rows-distinct && echo "✅ 品質チェック合格"
+pb validate small_table --check rows-distinct --exit-code
 ```
-
-詳しくは [CLI ドキュメント](https://posit-dev.github.io/pointblank/user-guide/cli.html) をご覧ください。
 
 ## Pointblank を際立たせる特徴
 

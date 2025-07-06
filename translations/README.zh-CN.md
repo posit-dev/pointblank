@@ -202,10 +202,8 @@ pb validate small_table --check col-vals-gt --column a --value 5 --show-extract
 
 ```bash
 # 使用退出代码进行自动化（0 = 通过，1 = 失败）
-pb validate small_table --check rows-distinct && echo "✅ 质量检查通过"
+pb validate small_table --check rows-distinct --exit-code
 ```
-
-在我们的 [CLI 文档](https://posit-dev.github.io/pointblank/user-guide/cli.html) 中了解更多。
 
 ## Pointblank 的突出特点
 

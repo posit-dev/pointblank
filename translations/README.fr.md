@@ -193,10 +193,8 @@ pb validate small_table --check col-vals-gt --column a --value 5 --show-extract
 
 ```bash
 # Utilisez les codes de sortie pour l'automatisation (0 = réussite, 1 = échec)
-pb validate small_table --check rows-distinct && echo "✅ Vérifications de qualité réussies"
+pb validate small_table --check rows-distinct --exit-code
 ```
-
-En savoir plus dans notre [documentation CLI](https://posit-dev.github.io/pointblank/user-guide/cli.html).
 
 ## Caractéristiques qui distinguent Pointblank
 
