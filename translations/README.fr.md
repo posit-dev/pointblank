@@ -69,11 +69,11 @@ validation
 
 ## Pourquoi choisir Pointblank?
 
-- **Fonctionne avec votre stack actuelle** - S'intègre parfaitement avec Polars, Pandas, DuckDB, MySQL, PostgreSQL, SQLite, Parquet, PySpark, Snowflake, et ben plus encore!
-- **Rapports interactifs ben beaux** - Résultats de validation clairs qui mettent en évidence les problèmes et aident à communiquer la qualité des données
-- **Pipeline de validation modulaire** - Enchaînez les étapes de validation dans un flux de travail complet de qualité de données
-- **Alertes basées sur des seuils** - Définissez des seuils 'avertissement', 'erreur' et 'critique' avec des actions personnalisées
-- **Sorties pratiques** - Utilisez les résultats pour filtrer les tables, extraire les données problématiques ou déclencher d'autres processus
+- **Fonctionne avec votre stack actuelle** : S'intègre parfaitement avec Polars, Pandas, DuckDB, MySQL, PostgreSQL, SQLite, Parquet, PySpark, Snowflake, et ben plus encore!
+- **Rapports interactifs ben beaux** : Résultats de validation clairs qui mettent en évidence les problèmes et aident à communiquer la qualité des données
+- **Pipeline de validation modulaire** : Enchaînez les étapes de validation dans un flux de travail complet de qualité de données
+- **Alertes basées sur des seuils** : Définissez des seuils 'avertissement', 'erreur' et 'critique' avec des actions personnalisées
+- **Sorties pratiques** : Utilisez les résultats pour filtrer les tables, extraire les données problématiques ou déclencher d'autres processus
 
 ## Exemple concret
 
@@ -198,12 +198,12 @@ pb validate small_table --check rows-distinct --exit-code
 
 ## Caractéristiques qui distinguent Pointblank
 
-- **Flux de travail de validation complet** - De l'accès aux données à la validation jusqu'au reporting dans un seul pipeline
-- **Conçu pour la collaboration** - Partagez les résultats avec vos collègues grâce à des rapports interactifs ben stylés
-- **Sorties pratiques** - Obtenez exactement ce que vous avez besoin: comptages, extraits, résumés ou rapports complets
-- **Déploiement flexible** - Utilisez-le dans des notebooks, des scripts ou des pipelines de données
-- **Personnalisable** - Adaptez les étapes de validation et les rapports selon vos besoins spécifiques
-- **Internationalisation** - Les rapports peuvent être générés dans plus de 20 langues, incluant l'anglais, l'espagnol, le français et l'allemand
+- **Flux de travail de validation complet** : De l'accès aux données à la validation jusqu'au reporting dans un seul pipeline
+- **Conçu pour la collaboration** : Partagez les résultats avec vos collègues grâce à des rapports interactifs ben stylés
+- **Sorties pratiques** : Obtenez exactement ce que vous avez besoin: comptages, extraits, résumés ou rapports complets
+- **Déploiement flexible** : Utilisez-le dans des notebooks, des scripts ou des pipelines de données
+- **Personnalisable** : Adaptez les étapes de validation et les rapports selon vos besoins spécifiques
+- **Internationalisation** : Les rapports peuvent être générés dans plus de 20 langues, incluant l'anglais, l'espagnol, le français et l'allemand
 
 ## Documentation et exemples
 

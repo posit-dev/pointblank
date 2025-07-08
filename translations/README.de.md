@@ -69,11 +69,11 @@ validation
 
 ## Warum Pointblank wählen?
 
-- **Funktioniert mit Ihrem bestehenden Stack** - Nahtlose Integration mit Polars, Pandas, DuckDB, MySQL, PostgreSQL, SQLite, Parquet, PySpark, Snowflake und mehr!
-- **Schöne, interaktive Berichte** - Kristallklare Validierungsergebnisse, die Probleme hervorheben und die Kommunikation der Datenqualität unterstützen
-- **Komponierbare Validierungs-Pipeline** - Verketten Sie Validierungsschritte zu einem vollständigen Datenqualitäts-Workflow
-- **Schwellenwertbasierte Warnungen** - Setzen Sie 'Warnung', 'Fehler' und 'Kritisch'-Schwellenwerte mit benutzerdefinierten Aktionen
-- **Praktische Ausgaben** - Nutzen Sie Validierungsergebnisse, um Tabellen zu filtern, problematische Daten zu extrahieren oder nachgelagerte Prozesse auszulösen
+- **Funktioniert mit Ihrem bestehenden Stack**: Nahtlose Integration mit Polars, Pandas, DuckDB, MySQL, PostgreSQL, SQLite, Parquet, PySpark, Snowflake und mehr!
+- **Schöne, interaktive Berichte**: Kristallklare Validierungsergebnisse, die Probleme hervorheben und die Kommunikation der Datenqualität unterstützen
+- **Komponierbare Validierungs-Pipeline**: Verketten Sie Validierungsschritte zu einem vollständigen Datenqualitäts-Workflow
+- **Schwellenwertbasierte Warnungen**: Setzen Sie 'Warnung', 'Fehler' und 'Kritisch'-Schwellenwerte mit benutzerdefinierten Aktionen
+- **Praktische Ausgaben**: Nutzen Sie Validierungsergebnisse, um Tabellen zu filtern, problematische Daten zu extrahieren oder nachgelagerte Prozesse auszulösen
 
 ## Praxisbeispiel
 
@@ -198,12 +198,12 @@ pb validate small_table --check rows-distinct --exit-code
 
 ## Funktionen, die Pointblank auszeichnen
 
-- **Vollständiger Validierungs-Workflow** - Von Datenzugriff über Validierung bis hin zur Berichterstattung in einer einzigen Pipeline
-- **Für die Zusammenarbeit konzipiert** - Teilen Sie Ergebnisse mit Kollegen durch schöne interaktive Berichte
-- **Praktische Ausgaben** - Erhalten Sie genau das, was Sie brauchen: Zählungen, Auszüge, Zusammenfassungen oder vollständige Berichte
-- **Flexible Einsatzmöglichkeiten** - Verwenden Sie es in Notebooks, Skripten oder Datenpipelines
-- **Anpassbar** - Passen Sie Validierungsschritte und Berichterstattung an Ihre spezifischen Anforderungen an
-- **Internationalisierung** - Berichte können in über 20 Sprachen generiert werden, darunter Englisch, Spanisch, Französisch und Deutsch
+- **Vollständiger Validierungs-Workflow**: Von Datenzugriff über Validierung bis hin zur Berichterstattung in einer einzigen Pipeline
+- **Für die Zusammenarbeit konzipiert**: Teilen Sie Ergebnisse mit Kollegen durch schöne interaktive Berichte
+- **Praktische Ausgaben**: Erhalten Sie genau das, was Sie brauchen: Zählungen, Auszüge, Zusammenfassungen oder vollständige Berichte
+- **Flexible Einsatzmöglichkeiten**: Verwenden Sie es in Notebooks, Skripten oder Datenpipelines
+- **Anpassbar**: Passen Sie Validierungsschritte und Berichterstattung an Ihre spezifischen Anforderungen an
+- **Internationalisierung**: Berichte können in über 20 Sprachen generiert werden, darunter Englisch, Spanisch, Französisch und Deutsch
 
 ## Dokumentation und Beispiele
 

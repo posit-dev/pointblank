@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import copy
 import sys
 from pathlib import Path
 from typing import Any
@@ -1623,10 +1624,11 @@ def missing(data_source: str, output_html: str | None):
 
 
 @cli.command(name="validate")
-@click.argument("data_source", type=str)
+@click.argument("data_source", type=str, required=False)
+@click.option("--list-checks", is_flag=True, help="List available validation checks and exit")
 @click.option(
     "--check",
-    "checks",  # Changed to collect multiple values
+    "checks",
     type=click.Choice(
         [
             "rows-distinct",
@@ -1640,25 +1642,25 @@ def missing(data_source: str, output_html: str | None):
             "col-vals-le",
         ]
     ),
+    metavar="CHECK_TYPE",
     multiple=True,  # Allow multiple --check options
     help="Type of validation check to perform. Can be used multiple times for multiple checks.",
 )
-@click.option("--list-checks", is_flag=True, help="List available validation checks and exit")
 @click.option(
     "--column",
-    "columns",  # Changed to collect multiple values
+    "columns",
     multiple=True,  # Allow multiple --column options
     help="Column name or integer position as #N (1-based index) for validation.",
 )
 @click.option(
     "--set",
-    "sets",  # Changed to collect multiple values
+    "sets",
     multiple=True,  # Allow multiple --set options
     help="Comma-separated allowed values for col-vals-in-set checks.",
 )
 @click.option(
     "--value",
-    "values",  # Changed to collect multiple values
+    "values",
     type=float,
     multiple=True,  # Allow multiple --value options
     help="Numeric value for comparison checks.",
@@ -1670,17 +1672,17 @@ def missing(data_source: str, output_html: str | None):
     "--write-extract", type=str, help="Save failing rows to folder. Provide base name for folder."
 )
 @click.option(
-    "--limit", "-l", default=10, help="Maximum number of failing rows to show/save (default: 10)"
+    "--limit", default=500, help="Maximum number of failing rows to save to CSV (default: 500)"
 )
 @click.option("--exit-code", is_flag=True, help="Exit with non-zero code if validation fails")
 @click.pass_context
 def validate(
     ctx: click.Context,
-    data_source: str,
-    checks: tuple[str, ...],  # Changed to tuple
-    columns: tuple[str, ...],  # Changed to tuple
-    sets: tuple[str, ...],  # Changed to tuple
-    values: tuple[float, ...],  # Changed to tuple
+    data_source: str | None,
+    checks: tuple[str, ...],
+    columns: tuple[str, ...],
+    sets: tuple[str, ...],
+    values: tuple[float, ...],
     show_extract: bool,
     write_extract: str | None,
     limit: int,
@@ -1702,21 +1704,21 @@ def validate(
     - Database connection string (e.g., duckdb:///path/to/db.ddb::table_name)
     - Dataset name from pointblank (small_table, game_revenue, nycflights, global_sales)
 
-    AVAILABLE CHECKS:
+    AVAILABLE CHECK_TYPES:
 
     Use --list-checks to see all available validation methods with examples.
 
-    The default check is 'rows-distinct' which checks for duplicate rows.
+    The default CHECK_TYPE is 'rows-distinct' which checks for duplicate rows.
 
     \b
     - rows-distinct: Check if all rows in the dataset are unique (no duplicates)
     - rows-complete: Check if all rows are complete (no missing values in any column)
     - col-exists: Check if a specific column exists in the dataset (requires --column)
     - col-vals-not-null: Check if all values in a column are not null/missing (requires --column)
-    - col-vals-gt: Check if all values in a column are greater than a threshold (requires --column and --value)
-    - col-vals-ge: Check if all values in a column are greater than or equal to a threshold (requires --column and --value)
-    - col-vals-lt: Check if all values in a column are less than a threshold (requires --column and --value)
-    - col-vals-le: Check if all values in a column are less than or equal to a threshold (requires --column and --value)
+    - col-vals-gt: Check if all values in a column are greater than a comparison value (requires --column and --value)
+    - col-vals-ge: Check if all values in a column are greater than or equal to a comparison value (requires --column and --value)
+    - col-vals-lt: Check if all values in a column are less than a comparison value (requires --column and --value)
+    - col-vals-le: Check if all values in a column are less than or equal to a comparison value (requires --column and --value)
     - col-vals-in-set: Check if all values in a column are in an allowed set (requires --column and --set)
 
     Examples:
@@ -1739,28 +1741,7 @@ def validate(
     pb validate data.csv --check col-vals-not-null --column email --check col-vals-gt --column age --value 18
     """
     try:
-        # Handle backward compatibility and parameter conversion
-        import sys
-
-        # Convert parameter tuples to lists, handling default case
-        if not checks:
-            # No --check options provided, use default
-            checks_list = ["rows-distinct"]
-            is_using_default_check = True
-        else:
-            checks_list = list(checks)
-            is_using_default_check = False
-
-        columns_list = list(columns) if columns else []
-        sets_list = list(sets) if sets else []
-        values_list = list(values) if values else []
-
-        # Map parameters to checks intelligently
-        mapped_columns, mapped_sets, mapped_values = _map_parameters_to_checks(
-            checks_list, columns_list, sets_list, values_list
-        )
-
-        # Handle --list-checks option
+        # Handle --list-checks option early (doesn't need data source)
         if list_checks:
             console.print("[bold bright_cyan]Available Validation Checks:[/bold bright_cyan]")
             console.print()
@@ -1784,14 +1765,16 @@ def validate(
                 "[bold magenta]Value comparison checks [bright_black](require --column and --value)[/bright_black]:[/bold magenta]"
             )
             console.print(
-                "  • [bold cyan]col-vals-gt[/bold cyan]       Values greater than threshold"
+                "  • [bold cyan]col-vals-gt[/bold cyan]       Values greater than comparison value"
             )
             console.print(
-                "  • [bold cyan]col-vals-ge[/bold cyan]       Values greater than or equal to threshold"
+                "  • [bold cyan]col-vals-ge[/bold cyan]       Values greater than or equal to comparison value"
             )
-            console.print("  • [bold cyan]col-vals-lt[/bold cyan]       Values less than threshold")
             console.print(
-                "  • [bold cyan]col-vals-le[/bold cyan]       Values less than or equal to threshold"
+                "  • [bold cyan]col-vals-lt[/bold cyan]       Values less than comparison value"
+            )
+            console.print(
+                "  • [bold cyan]col-vals-le[/bold cyan]       Values less than or equal to comparison value"
             )
             console.print()
             console.print(
@@ -1802,18 +1785,46 @@ def validate(
             )
             console.print()
             console.print("[bold bright_yellow]Examples:[/bold bright_yellow]")
+            console.print("  [bright_blue]pb validate data.csv --check rows-distinct[/bright_blue]")
             console.print(
-                f"  [bright_blue]pb validate {data_source} --check rows-distinct[/bright_blue]"
+                "  [bright_blue]pb validate data.csv --check col-vals-not-null --column price[/bright_blue]"
             )
             console.print(
-                f"  [bright_blue]pb validate {data_source} --check col-vals-not-null --column price[/bright_blue]"
-            )
-            console.print(
-                f"  [bright_blue]pb validate {data_source} --check col-vals-gt --column age --value 18[/bright_blue]"
+                "  [bright_blue]pb validate data.csv --check col-vals-gt --column age --value 18[/bright_blue]"
             )
             import sys
 
             sys.exit(0)
+
+        # Check if data_source is provided (required for all operations except --list-checks)
+        if data_source is None:
+            console.print("[red]Error:[/red] DATA_SOURCE is required")
+            console.print("Use 'pb validate --help' for usage information")
+            console.print("Or use 'pb validate --list-checks' to see available validation types")
+            import sys
+
+            sys.exit(1)
+
+        # Handle backward compatibility and parameter conversion
+        import sys
+
+        # Convert parameter tuples to lists, handling default case
+        if not checks:
+            # No --check options provided, use default
+            checks_list = ["rows-distinct"]
+            is_using_default_check = True
+        else:
+            checks_list = list(checks)
+            is_using_default_check = False
+
+        columns_list = list(columns) if columns else []
+        sets_list = list(sets) if sets else []
+        values_list = list(values) if values else []
+
+        # Map parameters to checks intelligently
+        mapped_columns, mapped_sets, mapped_values = _map_parameters_to_checks(
+            checks_list, columns_list, sets_list, values_list
+        )
 
         # Validate required parameters for different check types
         # Check parameters for each check in the list using mapped parameters
@@ -2785,7 +2796,7 @@ def _display_validation_result(
             operator = "<"
         elif check == "col-vals-le":
             operator = "<="
-        result_table.add_row("Threshold", f"{operator} {value}")
+        result_table.add_row("Comparison Value", f"{operator} {value}")
 
     # Get validation details
     if step_info:
@@ -3023,11 +3034,12 @@ def _show_extract_for_multi_check(
 
             if failing_rows is not None and len(failing_rows) > 0:
                 if show_extract:
-                    # Limit the number of rows shown
-                    if len(failing_rows) > limit:
-                        display_rows = failing_rows.head(limit)
+                    # Always limit to 10 rows for display, regardless of limit option
+                    display_limit = 10
+                    if len(failing_rows) > display_limit:
+                        display_rows = failing_rows.head(display_limit)
                         console.print(
-                            f"[dim]Showing first {limit} of {len(failing_rows)} {row_type}[/dim]"
+                            f"[dim]Showing first {display_limit} of {len(failing_rows)} {row_type}[/dim]"
                         )
                     else:
                         display_rows = failing_rows
@@ -3038,9 +3050,9 @@ def _show_extract_for_multi_check(
 
                     preview_table = pb.preview(
                         data=display_rows,
-                        n_head=min(limit, len(display_rows)),
+                        n_head=min(display_limit, len(display_rows)),
                         n_tail=0,
-                        limit=limit,
+                        limit=display_limit,
                         show_row_numbers=True,
                     )
 
@@ -3062,7 +3074,7 @@ def _show_extract_for_multi_check(
                         filename = f"step_{step_index + 1:02d}_{safe_check_type}.csv"
                         filepath = output_folder / filename
 
-                        # Limit the output if needed
+                        # Use limit option for write_extract
                         write_rows = failing_rows
                         if len(failing_rows) > limit:
                             write_rows = failing_rows.head(limit)
@@ -3183,11 +3195,12 @@ def _show_extract_and_summary(
 
                 if failing_rows is not None and len(failing_rows) > 0:
                     if show_extract:
-                        # Limit the number of rows shown
-                        if len(failing_rows) > limit:
-                            display_rows = failing_rows.head(limit)
+                        # Always limit to 10 rows for display, regardless of limit option
+                        display_limit = 10
+                        if len(failing_rows) > display_limit:
+                            display_rows = failing_rows.head(display_limit)
                             console.print(
-                                f"[dim]Showing first {limit} of {len(failing_rows)} {row_type}[/dim]"
+                                f"[dim]Showing first {display_limit} of {len(failing_rows)} {row_type}[/dim]"
                             )
                         else:
                             display_rows = failing_rows
@@ -3198,9 +3211,9 @@ def _show_extract_and_summary(
 
                         preview_table = pb.preview(
                             data=display_rows,
-                            n_head=min(limit, len(display_rows)),
+                            n_head=min(display_limit, len(display_rows)),
                             n_tail=0,
-                            limit=limit,
+                            limit=display_limit,
                             show_row_numbers=True,
                         )
 
@@ -3222,7 +3235,7 @@ def _show_extract_and_summary(
                             filename = f"step_{step_index + 1:02d}_{safe_check_type}.csv"
                             filepath = output_folder / filename
 
-                            # Limit the output if needed
+                            # Use limit option for write_extract
                             write_rows = failing_rows
                             if len(failing_rows) > limit:
                                 write_rows = failing_rows.head(limit)
@@ -3366,6 +3379,9 @@ Example Pointblank validation script.
 
 This script demonstrates how to create validation rules for your data.
 Modify the data loading and validation rules below to match your requirements.
+
+When using 'pb run' with --data option, the CLI will automatically replace
+the data source in your validation object with the provided data.
 """
 
 import pointblank as pb
@@ -3409,11 +3425,6 @@ validation = (
     # Finalize the validation
     .interrogate()
 )
-
-# The validation object will be automatically used by the CLI
-# You can also access results programmatically:
-# print(f"All passed: {validation.all_passed()}")
-# print(f"Failed steps: {validation.n_failed()}")
 '''
 
     Path(output_file).write_text(example_script)
@@ -3421,13 +3432,17 @@ validation = (
     console.print("\nEdit the template to add your data loading and validation rules, then run:")
     console.print(f"[cyan]pb run {output_file}[/cyan]")
     console.print(
-        f"[cyan]pb run {output_file} --data your_data.csv[/cyan]  [dim]# Override data source[/dim]"
+        f"[cyan]pb run {output_file} --data your_data.csv[/cyan]  [dim]# Replace data source automatically[/dim]"
     )
 
 
 @cli.command()
 @click.argument("validation_script", type=click.Path(exists=True))
-@click.option("--data", type=str, help="Optional data source to override script's data loading")
+@click.option(
+    "--data",
+    type=str,
+    help="Data source to replace in validation objects (single validation scripts only)",
+)
 @click.option("--output-html", type=click.Path(), help="Save HTML validation report to file")
 @click.option("--output-json", type=click.Path(), help="Save JSON validation summary to file")
 @click.option(
@@ -3439,7 +3454,7 @@ validation = (
     help="Save failing rows to folders (one CSV per step). Provide base name for folder.",
 )
 @click.option(
-    "--limit", "-l", default=10, help="Maximum number of failing rows to show/save (default: 10)"
+    "--limit", default=500, help="Maximum number of failing rows to save to CSV (default: 500)"
 )
 @click.option(
     "--fail-on",
@@ -3462,8 +3477,11 @@ def run(
     VALIDATION_SCRIPT should be a Python file that defines validation logic.
     The script should load its own data and create validation objects.
 
-    If --data is provided, it will be available as a 'cli_data' variable in the script,
-    allowing you to optionally override your script's data loading.
+    If --data is provided, it will automatically replace the data source in your
+    validation objects. This works with scripts containing a single validation.
+    For scripts with multiple validations, use separate script files or remove --data.
+
+    To get started quickly, use 'pb make-template' to create a validation script template.
 
     DATA can be:
 
@@ -3477,6 +3495,7 @@ def run(
     Examples:
 
     \b
+    pb make-template my_validation.py  # Create a template first
     pb run validation_script.py
     pb run validation_script.py --data data.csv
     pb run validation_script.py --data small_table --output-html report.html
@@ -3538,6 +3557,72 @@ def run(
                 )
 
         console.print(f"[green]✓[/green] Found {len(validations)} validation object(s)")
+
+        # Implement automatic data replacement for Validate objects if --data was provided
+        if cli_data is not None:
+            # Check if we have multiple validations (this is not supported)
+            if len(validations) > 1:
+                console.print(
+                    f"[red]Error: Found {len(validations)} validation objects in the script.[/red]"
+                )
+                console.print(
+                    "[yellow]The --data option replaces data in ALL validation objects,[/yellow]"
+                )
+                console.print(
+                    "[yellow]which may cause failures if validations expect different schemas.[/yellow]"
+                )
+                console.print("\n[cyan]Options:[/cyan]")
+                console.print("  1. Split your script into separate files with one validation each")
+                console.print(
+                    "  2. Remove the --data option to use each validation's original data"
+                )
+                sys.exit(1)
+
+            console.print(
+                f"[yellow]Replacing data in {len(validations)} validation object(s) with CLI data[/yellow]"
+            )
+
+            for idx, validation in enumerate(validations, 1):
+                # Check if it's a Validate object with data attribute
+                if hasattr(validation, "data") and hasattr(validation, "interrogate"):
+                    console.print("[cyan]Updating validation with new data source...[/cyan]")
+
+                    # Store the original validation_info as our "plan"
+                    original_validation_info = validation.validation_info.copy()
+
+                    # Replace the data
+                    validation.data = cli_data
+
+                    # Re-process the data (same as what happens in __post_init__)
+                    from pointblank.validate import _process_data
+
+                    validation.data = _process_data(validation.data)
+
+                    # Reset validation results but keep the plan
+                    validation.validation_info = []
+
+                    # Re-add each validation step from the original plan
+                    for val_info in original_validation_info:
+                        # Create a copy and reset any interrogation results
+                        new_val_info = copy.deepcopy(val_info)
+                        # Reset interrogation-specific attributes if they exist
+                        if hasattr(new_val_info, "n_passed"):
+                            new_val_info.n_passed = None
+                        if hasattr(new_val_info, "n_failed"):
+                            new_val_info.n_failed = None
+                        if hasattr(new_val_info, "all_passed"):
+                            new_val_info.all_passed = None
+                        if hasattr(new_val_info, "warning"):
+                            new_val_info.warning = None
+                        if hasattr(new_val_info, "error"):
+                            new_val_info.error = None
+                        if hasattr(new_val_info, "critical"):
+                            new_val_info.critical = None
+                        validation.validation_info.append(new_val_info)
+
+                    # Re-interrogate with the new data
+                    console.print("[cyan]Re-interrogating with new data...[/cyan]")
+                    validation.interrogate()
 
         # Process each validation
         overall_failed = False
@@ -3602,11 +3687,12 @@ def run(
                                     f"\n[cyan]Step {step_num}:[/cyan] {step_info.assertion_type}"
                                 )
 
-                                # Limit the number of rows shown
-                                if len(failing_rows) > limit:
-                                    display_rows = failing_rows.head(limit)
+                                # Always limit to 10 rows for display, regardless of limit option
+                                display_limit = 10
+                                if len(failing_rows) > display_limit:
+                                    display_rows = failing_rows.head(display_limit)
                                     console.print(
-                                        f"[dim]Showing first {limit} of {len(failing_rows)} failing rows[/dim]"
+                                        f"[dim]Showing first {display_limit} of {len(failing_rows)} failing rows[/dim]"
                                     )
                                 else:
                                     display_rows = failing_rows
@@ -3617,9 +3703,9 @@ def run(
                                 # Create a preview table using pointblank's preview function
                                 preview_table = pb.preview(
                                     data=display_rows,
-                                    n_head=min(limit, len(display_rows)),
+                                    n_head=min(display_limit, len(display_rows)),
                                     n_tail=0,
-                                    limit=limit,
+                                    limit=display_limit,
                                     show_row_numbers=True,
                                 )
 
@@ -3672,7 +3758,7 @@ def run(
                                     filename = f"step_{step_num:02d}_{safe_assertion_type}.csv"
                                     filepath = output_folder / filename
 
-                                    # Limit the output if needed
+                                    # Use limit for CSV output
                                     save_rows = failing_rows
                                     if hasattr(failing_rows, "head") and len(failing_rows) > limit:
                                         save_rows = failing_rows.head(limit)
@@ -3691,7 +3777,11 @@ def run(
                                         pd_data = pd.DataFrame(save_rows)
                                         pd_data.to_csv(str(filepath), index=False)
 
-                                    saved_files.append((filename, len(failing_rows)))
+                                    # Record the actual number of rows saved
+                                    rows_saved = (
+                                        len(save_rows) if hasattr(save_rows, "__len__") else limit
+                                    )
+                                    saved_files.append((filename, rows_saved))
 
                             except Exception as e:
                                 console.print(

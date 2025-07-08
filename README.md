@@ -70,11 +70,11 @@ validation
 
 ## Why Choose Pointblank?
 
-- **Works with your existing stack** - Seamlessly integrates with Polars, Pandas, DuckDB, MySQL, PostgreSQL, SQLite, Parquet, PySpark, Snowflake, and more!
-- **Beautiful, interactive reports** - Crystal-clear validation results that highlight issues and help communicate data quality
-- **Composable validation pipeline** - Chain validation steps into a complete data quality workflow
-- **Threshold-based alerts** - Set 'warning', 'error', and 'critical' thresholds with custom actions
-- **Practical outputs** - Use validation results to filter tables, extract problematic data, or trigger downstream processes
+- **Works with your existing stack**: Seamlessly integrates with Polars, Pandas, DuckDB, MySQL, PostgreSQL, SQLite, Parquet, PySpark, Snowflake, and more!
+- **Beautiful, interactive reports**: Crystal-clear validation results that highlight issues and help communicate data quality
+- **Composable validation pipeline**: Chain validation steps into a complete data quality workflow
+- **Threshold-based alerts**: Set 'warning', 'error', and 'critical' thresholds with custom actions
+- **Practical outputs**: Use validation results to filter tables, extract problematic data, or trigger downstream processes
 
 ## Real-World Example
 
@@ -154,7 +154,7 @@ validation.get_step_report(i=3).show("browser")  # Get failing records from step
 Pointblank includes a powerful CLI utility called `pb` that lets you run data validation workflows directly from the command line. Perfect for CI/CD pipelines, scheduled data quality checks, or quick validation tasks.
 
 <div align="center">
-<img src="https://posit-dev.github.io/pointblank/assets/vhs/cli-complete-workflow.gif" width="800px">
+<img src="https://posit-dev.github.io/pointblank/assets/vhs/cli-complete-workflow.gif" width="100%">
 </div>
 
 **Explore Your Data**
@@ -198,12 +198,12 @@ pb validate small_table --check rows-distinct --exit-code
 
 ## Features That Set Pointblank Apart
 
-- **Complete validation workflow** - From data access to validation to reporting in a single pipeline
-- **Built for collaboration** - Share results with colleagues through beautiful interactive reports
-- **Practical outputs** - Get exactly what you need: counts, extracts, summaries, or full reports
-- **Flexible deployment** - Use in notebooks, scripts, or data pipelines
-- **Customizable** - Tailor validation steps and reporting to your specific needs
-- **Internationalization** - Reports can be generated in over 20 languages, including English, Spanish, French, and German
+- **Complete validation workflow**: From data access to validation to reporting in a single pipeline
+- **Built for collaboration**: Share results with colleagues through beautiful interactive reports
+- **Practical outputs**: Get exactly what you need: counts, extracts, summaries, or full reports
+- **Flexible deployment**: Use in notebooks, scripts, or data pipelines
+- **Customizable**: Tailor validation steps and reporting to your specific needs
+- **Internationalization**: Reports can be generated in over 20 languages, including English, Spanish, French, and German
 
 ## Documentation and Examples
 

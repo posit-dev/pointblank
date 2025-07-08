@@ -69,11 +69,11 @@ validation
 
 ## Por que escolher o Pointblank?
 
-- **Funciona com sua stack atual** - Integra-se perfeitamente com Polars, Pandas, DuckDB, MySQL, PostgreSQL, SQLite, Parquet, PySpark, Snowflake e mais!
-- **Relatórios interativos bonitos** - Resultados de validação claros que destacam problemas e ajudam a comunicar a qualidade dos dados
-- **Pipeline de validação componível** - Encadeie etapas de validação em um fluxo de trabalho completo de qualidade de dados
-- **Alertas baseados em limites** - Defina limites de 'aviso', 'erro' e 'crítico' com ações personalizadas
-- **Saídas práticas** - Use resultados de validação para filtrar tabelas, extrair dados problemáticos ou acionar processos subsequentes
+- **Funciona com sua stack atual**: Integra-se perfeitamente com Polars, Pandas, DuckDB, MySQL, PostgreSQL, SQLite, Parquet, PySpark, Snowflake e mais!
+- **Relatórios interativos bonitos**: Resultados de validação claros que destacam problemas e ajudam a comunicar a qualidade dos dados
+- **Pipeline de validação componível**: Encadeie etapas de validação em um fluxo de trabalho completo de qualidade de dados
+- **Alertas baseados em limites**: Defina limites de 'aviso', 'erro' e 'crítico' com ações personalizadas
+- **Saídas práticas**: Use resultados de validação para filtrar tabelas, extrair dados problemáticos ou acionar processos subsequentes
 
 ## Exemplo do Mundo Real
 
@@ -198,12 +198,12 @@ pb validate small_table --check rows-distinct --exit-code
 
 ## Recursos que diferenciam o Pointblank
 
-- **Fluxo de trabalho de validação completo** - Do acesso aos dados à validação até a geração de relatórios em um único pipeline
-- **Construído para colaboração** - Compartilhe resultados com colegas através de relatórios interativos bonitos
-- **Saídas práticas** - Obtenha exatamente o que você precisa: contagens, extratos, resumos ou relatórios completos
-- **Implementação flexível** - Use em notebooks, scripts ou pipelines de dados
-- **Personalizável** - Adapte etapas de validação e relatórios às suas necessidades específicas
-- **Internacionalização** - Os relatórios podem ser gerados em mais de 20 idiomas, incluindo inglês, espanhol, francês e alemão
+- **Fluxo de trabalho de validação completo**: Do acesso aos dados à validação até a geração de relatórios em um único pipeline
+- **Construído para colaboração**: Compartilhe resultados com colegas através de relatórios interativos bonitos
+- **Saídas práticas**: Obtenha exatamente o que você precisa: contagens, extratos, resumos ou relatórios completos
+- **Implementação flexível**: Use em notebooks, scripts ou pipelines de dados
+- **Personalizável**: Adapte etapas de validação e relatórios às suas necessidades específicas
+- **Internacionalização**: Os relatórios podem ser gerados em mais de 20 idiomas, incluindo inglês, espanhol, francês e alemão
 
 ## Documentação e exemplos
 

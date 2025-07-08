@@ -69,11 +69,11 @@ validation
 
 ## Waarom kiezen voor Pointblank?
 
-- **Werkt met je bestaande stack** - Integreert naadloos met Polars, Pandas, DuckDB, MySQL, PostgreSQL, SQLite, Parquet, PySpark, Snowflake en meer!
-- **Mooie, interactieve rapporten** - Kristalheldere validatieresultaten die problemen markeren en helpen bij het communiceren van datakwaliteit
-- **Samenvoegbare validatiepipeline** - Schakel validatiestappen aaneen tot een complete datakwaliteitsworkflow
-- **Drempelgebaseerde waarschuwingen** - Stel 'waarschuwing', 'fout' en 'kritiek' drempels in met aangepaste acties
-- **Praktische uitvoer** - Gebruik validatieresultaten om tabellen te filteren, problematische data te extraheren of downstream processen te triggeren
+- **Werkt met je bestaande stack**: Integreert naadloos met Polars, Pandas, DuckDB, MySQL, PostgreSQL, SQLite, Parquet, PySpark, Snowflake en meer!
+- **Mooie, interactieve rapporten**: Kristalheldere validatieresultaten die problemen markeren en helpen bij het communiceren van datakwaliteit
+- **Samenvoegbare validatiepipeline**: Schakel validatiestappen aaneen tot een complete datakwaliteitsworkflow
+- **Drempelgebaseerde waarschuwingen**: Stel 'waarschuwing', 'fout' en 'kritiek' drempels in met aangepaste acties
+- **Praktische uitvoer**: Gebruik validatieresultaten om tabellen te filteren, problematische data te extraheren of downstream processen te triggeren
 
 ## Praktijkvoorbeeld
 
@@ -198,12 +198,12 @@ pb validate small_table --check rows-distinct --exit-code
 
 ## Kenmerken die Pointblank onderscheiden
 
-- **Complete validatieworkflow** - Van datatoegang tot validatie tot rapportage in één pipeline
-- **Gebouwd voor samenwerking** - Deel resultaten met collega's via mooie interactieve rapporten
-- **Praktische uitvoer** - Krijg precies wat je nodig hebt: aantallen, extracten, samenvattingen of volledige rapporten
-- **Flexibele implementatie** - Gebruik in notebooks, scripts of datapipelines
-- **Aanpasbaar** - Stem validatiestappen en rapportage af op jouw specifieke behoeften
-- **Internationalisatie** - Rapporten kunnen worden gegenereerd in meer dan 20 talen, waaronder Engels, Spaans, Frans en Duits
+- **Complete validatieworkflow**: Van datatoegang tot validatie tot rapportage in één pipeline
+- **Gebouwd voor samenwerking**: Deel resultaten met collega's via mooie interactieve rapporten
+- **Praktische uitvoer**: Krijg precies wat je nodig hebt: aantallen, extracten, samenvattingen of volledige rapporten
+- **Flexibele implementatie**: Gebruik in notebooks, scripts of datapipelines
+- **Aanpasbaar**: Stem validatiestappen en rapportage af op jouw specifieke behoeften
+- **Internationalisatie**: Rapporten kunnen worden gegenereerd in meer dan 20 talen, waaronder Engels, Spaans, Frans en Duits
 
 ## Documentatie en voorbeelden
 
