@@ -43,6 +43,11 @@ dependencies = [
     "requests>=2.31.0",
     "click>=8.0.0",
     "rich>=13.0.0",
+    "pytest>=8.4.1",
+    "mcp[cli]>=1.10.1",
+    "pytest-asyncio>=1.0.0",
+    "selenium>=4.34.0",
+    "pillow>=11.3.0",
 ]
 requires-python = ">=3.10"
 
