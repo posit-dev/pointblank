@@ -1,6 +1,3 @@
-# VHS tape for complete validation workflow
-# Shows realistic end-to-end data quality checking with world cities data
-
 Output cli-complete-workflow.gif
 
 Set FontSize 13
@@ -78,6 +75,6 @@ Sleep 8s
 
 Type ""
 Enter
-Type "# That was a complete workflow: moving from quick checks to more involved validation"
+Type "# That was a complete workflow, moving from quick checks to more involved validations"
 Enter
 Sleep 3s

@@ -1,6 +1,3 @@
-# VHS tape for CLI overview and getting started
-# Shows help and basic commands with custom prompt
-
 Output cli-getting-started.gif
 
 Set FontSize 16
@@ -14,7 +11,7 @@ Sleep 5s
 
 Type ""
 Enter
-Type "# See all available commands"
+Type "# See all available commands for the Pointblank CLI"
 Enter
 Type "pb --help"
 Enter
@@ -46,6 +43,6 @@ Sleep 10s
 
 Type ""
 Enter
-Type "# You are now ready to validate any dataset you like: CSV, Parquet, or a DB table"
+Type "# You can validate any sort of dataset you want: CSV, Parquet, or a DB table"
 Enter
 Sleep 5s
