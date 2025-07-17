@@ -564,7 +564,10 @@ def load_dataset(
 
             data_path = f"{tmp}/{dataset}.ddb"
 
-            dataset = ibis.connect(f"duckdb://{data_path}").table(dataset)
+            # Create connection and get table, then close connection
+            conn = ibis.connect(f"duckdb://{data_path}")
+            dataset = conn.table(dataset)
+            conn.disconnect()  # Explicitly close the connection
 
     return dataset
 
