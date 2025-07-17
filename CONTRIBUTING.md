@@ -25,11 +25,12 @@ Once there is consensus that a PR based on the issue would be helpful, adhering 
 
 ### Setting Up Your Development Environment
 
-To set up your development environment, you can follow these steps:
+To set up your development environment, first clone the posit-dev/pointblank repository.
 
-- Clone the posit-dev/pointblank repository
-- Create a virtual environment for the folder
-- Install the package in editable mode with `pip install -e .` from the root of the project folder
+If you're using UV, you may run `uv sync` and your environment is setup! If using pip or another package manager, keep following these steps:
+
+- Create a virtual environment for the folder.
+- Install the package in editable mode with `pip install -e .` from the root of the project folder.
 - Install the development dependencies with `pip install '.[dev]'` (have a look at the `pyproject.toml` file for the list of development dependencies)
 
 Our documentation uses `quartodoc` which in turn requires a local install of the Quarto CLI. To install Quarto, go to <https://quarto.org/docs/get-started/> to get the latest build for your platform.
@@ -43,3 +44,7 @@ Building the documentation can be done with `make docs-build` from the root of t
 The tests are located in the `tests` folder and we use `pytest` for running them. To run all of the tests, use `make test`. If you want to run a specific test file, you can use `pytest tests/test_file.py`.
 
 If you create new tests involving snapshots, please ensure that the resulting snapshots are relatively small. After adding snapshots, use `make test-update` (this runs `pytest --snapshot-update`). A subsequent use of `make test` should pass without any issues.
+
+### Linting and Type Checking
+
+We use `ruff` for linting, the settings used are fairly loose and objective. Linting is run in pre-commit in CI. You can run it locally with `make lint`. Type checking is currently not enforced, but we intend on gradually typing the codebase. You can run `make type` to run Astral's new experimental type checker `ty`. Feel free to leverage type hints and occasionally type checking but it's not obligatory at this time.

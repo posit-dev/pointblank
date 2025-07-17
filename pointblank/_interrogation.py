@@ -1911,7 +1911,7 @@ class ColSchemaMatch:
     """
 
     data_tbl: FrameT | Any
-    schema: any
+    schema: Any
     complete: bool
     in_order: bool
     case_sensitive_colnames: bool
@@ -2425,7 +2425,7 @@ def _check_nulls_across_columns_nw(table, columns_subset):
     return result
 
 
-def _modify_datetime_compare_val(tgt_column: any, compare_val: any) -> any:
+def _modify_datetime_compare_val(tgt_column: Any, compare_val: Any) -> Any:
     tgt_col_dtype_str = str(tgt_column.dtype).lower()
 
     if compare_val is isinstance(compare_val, Column):  # pragma: no cover
