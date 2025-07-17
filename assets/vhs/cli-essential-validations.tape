@@ -45,4 +45,4 @@ Type ""
 Enter
 Type "# That is just a sampling of the essentials with duplicates, nulls, with data extracts"
 Enter
-Sleep 5s
+Sleep 3s
