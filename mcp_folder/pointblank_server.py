@@ -1,13 +1,23 @@
+import json
+import uuid
 from contextlib import asynccontextmanager
 from dataclasses import dataclass, field
-from typing import AsyncIterator, Dict, Any, Optional, Union  # Keep Union for now
 from pathlib import Path
-import uuid
-import json
+from typing import (
+    Annotated,
+    Any,
+    AsyncIterator,
+    Dict,
+    Optional,
+    Union,
+)
+
 import pandas as pd
+from fastmcp import Context, FastMCP
+from fastmcp.prompts.prompt import Message
+from pydantic import Field
+
 import pointblank as pb
-from mcp.server.fastmcp import FastMCP, Context
-from mcp.server.fastmcp.prompts import base
 
 
 # --- Lifespan Context: manage DataFrames and Validators ---
@@ -30,7 +40,7 @@ async def app_lifespan(server: FastMCP) -> AsyncIterator[AppContext]:
 mcp = FastMCP(
     "FlexiblePointblankMCP",
     lifespan=app_lifespan,
-    dependencies=["pandas", "pointblank", "openpyxl", "great_tables", "polars"],
+    dependencies=["pandas", "pointblank", "openpyxl", "polars"],
 )
 
 
@@ -42,19 +52,42 @@ def _load_dataframe_from_path(input_path: str) -> pd.DataFrame:
         return pd.read_csv(p_path)
     elif p_path.suffix.lower() in [".xls", ".xlsx"]:
         return pd.read_excel(p_path, engine="openpyxl")
+    elif p_path.suffix.lower() == ".parquet":
+        return pd.read_parquet(p_path)
     else:
         raise ValueError(f"Unsupported file type: {p_path.suffix}. Please use CSV or Excel.")
 
 
-@mcp.tool()
-def load_dataframe(input_path: str, df_id: Optional[str] = None) -> Dict[str, Any]:
+@dataclass
+class DataFrameInfo:
+    df_id: str
+    shape: tuple
+    columns: list
+
+
+@mcp.tool(
+    name="load_dataframe",
+    description="Load a DataFrame from a CSV, Excel or Parquet file into the server's context.",
+    tags={"Data Management"},
+)
+async def load_dataframe(
+    ctx: Context,
+    input_path: Annotated[str, Field(description="Path to the input CSV, Excel or Parquet file.")],
+    df_id: Optional[
+        Annotated[
+            str,
+            Field(
+                description="Optional ID for the DataFrame. If not provided, a new ID will be generated."
+            ),
+        ]
+    ] = None,
+) -> DataFrameInfo:
     """
     Loads a DataFrame from the specified CSV or Excel file into the server's context.
     Assigns a unique ID to the DataFrame for later reference.
     If df_id is not provided, a new one will be generated.
     Returns the DataFrame ID and basic information (shape, columns).
     """
-    ctx: Context = mcp.get_context()
     app_ctx: AppContext = ctx.request_context.lifespan_context
     df = _load_dataframe_from_path(input_path)
 
@@ -67,29 +100,57 @@ def load_dataframe(input_path: str, df_id: Optional[str] = None) -> Dict[str, An
 
     app_ctx.loaded_dataframes[effective_df_id] = df
 
-    return {
-        "df_id": effective_df_id,
-        "status": "DataFrame loaded successfully.",
-        "shape": df.shape,
-        "columns": list(df.columns),
-    }
+    return DataFrameInfo(
+        df_id=effective_df_id,
+        shape=df.shape,
+        columns=list(df.columns),
+    )
 
 
-@mcp.tool()
+@dataclass
+class ValidatorInfo:
+    validator_id: str
+
+
+@mcp.tool(
+    name="create_validator",
+    description="Create a Pointblank Validator for a previously loaded DataFrame.",
+    tags={"Validation"},
+)
 def create_validator(
-    df_id: str,
-    validator_id: Optional[str] = None,
-    table_name: Optional[str] = None,  # Corresponds to 'name' in pb.Validate
-    validator_label: Optional[str] = None,  # Corresponds to 'label' in pb.Validate
-    thresholds_dict: Optional[
-        Dict[str, Union[int, float]]
-    ] = None,  # e.g. {"warning": 1, "error": 20, "critical": 0.10}
+    ctx: Context,
+    df_id: Annotated[str, Field(description="ID of the DataFrame to validate.")],
+    validator_id: Annotated[
+        Optional[str],
+        Field(
+            description="Optional ID for the Validator. If not provided, a new ID will be generated."
+        ),
+    ] = None,
+    table_name: Annotated[
+        Optional[str],
+        Field(
+            description="Optional name for the table within Pointblank reports. If not provided, a default name will be used."
+        ),
+    ] = None,
+    validator_label: Annotated[
+        Optional[str],
+        Field(
+            description="Optional descriptive label for the Validator. If not provided, a default label will be used."
+        ),
+    ] = None,  # Corresponds to 'label' in pb.Validate
+    thresholds_dict: Annotated[
+        Optional[Dict[str, Union[int, float]]],
+        Field(
+            description="Optional thresholds for validation failures. Example: {'warning': 0.1, 'error': 5, 'critical': 0.10}. "
+            "If not provided, no thresholds will be set."
+        ),
+    ] = None,  # Corresponds to 'thresholds' in pb.Validate, e.g. {"warning": 1, "error": 20, "critical": 0.10}
     actions_dict: Optional[Dict[str, Any]] = None,  # Simplified, for pb.Actions
     final_actions_dict: Optional[Dict[str, Any]] = None,  # Simplified, for pb.FinalActions
     brief: Optional[bool] = None,
     lang: Optional[str] = None,
     locale: Optional[str] = None,
-) -> Dict[str, str]:
+) -> ValidatorInfo:
     """
     Creates a Pointblank Validator for a previously loaded DataFrame.
     Assigns a unique ID to the Validator for adding validation steps.
@@ -100,7 +161,6 @@ def create_validator(
     'thresholds_dict' can be like {"warning": 0.1, "error": 5} to set failure thresholds.
     Returns the Validator ID.
     """
-    ctx: Context = mcp.get_context()
     app_ctx: AppContext = ctx.request_context.lifespan_context
 
     if df_id not in app_ctx.loaded_dataframes:
@@ -173,16 +233,37 @@ def create_validator(
     validator_instance = pb.Validate(**validator_instance_params)
     app_ctx.active_validators[effective_validator_id] = validator_instance
 
-    return {"validator_id": effective_validator_id, "status": "Validator created successfully."}
+    return ValidatorInfo(validator_id=effective_validator_id)
 
 
-@mcp.tool()
+@dataclass
+class ValidationStepInfo:
+    validator_id: str
+    status: str
+
+
+@mcp.tool(
+    name="add_validation_step",
+    description="Add a validation step to an existing Pointblank Validator.",
+    tags={"Validation"},
+)
 def add_validation_step(
-    validator_id: str,
-    validation_type: str,
-    params: Dict[str, Any],
+    ctx: Context,
+    validator_id: Annotated[str, Field(description="ID of the Validator to add a step to.")],
+    validation_type: Annotated[
+        str,
+        Field(
+            description="Type of validation to perform. Supported types include: 'col_vals_lt', 'col_vals_gt', 'col_vals_between', 'col_exists', 'rows_distinct', etc."
+        ),
+    ],
+    params: Annotated[
+        Dict[str, Any],
+        Field(
+            description="Parameters for the validation function. This should match the expected parameters for the Pointblank validation method."
+        ),
+    ],
     actions_config: Optional[Dict[str, Any]] = None,  # Placeholder for simplified action definition
-) -> Dict[str, str]:
+) -> ValidationStepInfo:
     """
     Adds a validation step to an existing Pointblank Validator.
     'validator_id' must refer to a validator created via 'create_validator'.
@@ -191,7 +272,6 @@ def add_validation_step(
     'params' is a dictionary of parameters for that validation function.
     'actions_config' (optional) can be used to define simple actions (currently basic support).
     """
-    ctx: Context = mcp.get_context()
     app_ctx: AppContext = ctx.request_context.lifespan_context
 
     if validator_id not in app_ctx.active_validators:
@@ -266,26 +346,49 @@ def add_validation_step(
             f"An unexpected error occurred while adding validation step '{validation_type}': {e}"
         )
 
-    return {
-        "validator_id": validator_id,
-        "status": f"Validation step '{validation_type}' added successfully.",
-    }
+    return ValidationStepInfo(
+        validator_id=validator_id,
+        status=f"Validation step '{validation_type}' added successfully.",
+    )
 
 
-@mcp.tool()
+@dataclass
+class ValidationOutput:
+    status: str
+    message: str
+    output_file: Optional[str] = None
+
+
+@mcp.tool(
+    name="get_validation_step_output",
+    description="Retrieve output for a validation step and save it to a CSV file.",
+    tags={"Validation"},
+)
 async def get_validation_step_output(
-    validator_id: str,
-    output_path: str,
-    step_index: Optional[int] = None,  # Made step_index optional
-    sundered_type: str = "fail",
-) -> Dict[str, Any]:
+    ctx: Context,
+    validator_id: Annotated[str, Field(description="ID of the Validator to retrieve output from.")],
+    output_path: Annotated[
+        str,
+        Field(description="Path to save the output file. Must end with .csv."),
+    ],
+    sundered_type: Annotated[
+        str,
+        Field(
+            description="Mode 2: Retrieve all 'pass' or 'fail' rows for the *entire* validation run. Only used if 'step_index' is not provided."
+        ),
+    ] = "fail",
+    step_index: Annotated[
+        Optional[int],
+        Field(
+            description="Mode 1: Retrieve data for a *specific* step by its index (starting from 0). If used, 'sundered_type' is ignored."
+        ),
+    ] = None,
+) -> ValidationOutput:
     """
-    Retrieves output for a validation and saves it to a file.
-    If 'step_index' is provided, it fetches the data extract for that specific step (e.g., failing rows).
-    If 'step_index' is NOT provided, it fetches all rows that failed ('fail') or passed ('pass') any step.
-    The output format is determined by the file extension of 'output_path' (.csv or .png).
+    Retrieves validation output and saves it to a CSV file. This function has two modes:
+    1.  Specific Step Extract: Provide a 'step_index' to get the data extract (e.g., failing rows) for that specific step.
+    2.  Overall Sundered Data: Omit 'step_index' and use 'sundered_type' ('pass' or 'fail') to get all rows that met that condition across all validation steps.
     """
-    ctx: Context = mcp.get_context()
     app_ctx: AppContext = ctx.request_context.lifespan_context
 
     if validator_id not in app_ctx.active_validators:
@@ -293,23 +396,13 @@ async def get_validation_step_output(
     validator = app_ctx.active_validators[validator_id]
 
     p_output_path = Path(output_path)
-    output_format = p_output_path.suffix.lower()
+    if p_output_path.suffix.lower() != ".csv":
+        raise ValueError(f"Unsupported file format '{p_output_path.suffix}'. Please use '.csv'.")
 
-    if not output_format:
-        if step_index:
-            # Default to PNG for specific step reports if no extension is given
-            output_format = ".png"
-            p_output_path = p_output_path.with_suffix(".png")
-        else:
-            # Default to CSV for sundered data
-            output_format = ".csv"
-            p_output_path = p_output_path.with_suffix(".csv")
-        await ctx.warning(
-            f"No file extension provided. Defaulting to {output_format}. Saving to: {p_output_path}"
-        )
+    if step_index is not None and step_index < 0:
+        raise ValueError("The 'step_index' cannot be a negative number.")
 
     try:
-        # Ensure validator has been interrogated.
         if not getattr(validator, "time_processed", None):
             await ctx.warning(
                 f"Validator '{validator_id}' has not been interrogated. Interrogating now."
@@ -319,84 +412,70 @@ async def get_validation_step_output(
         message = ""
         data_extract_df = None
 
-        # --- Logic for CSV output ---
-        if output_format == ".csv":
-            if step_index:
-                # --- Get extract for a SPECIFIC step ---
-                data_extract_df = validator.get_data_extracts(i=step_index, frame=True)
-                if data_extract_df is None:
-                    message = f"No data extract available for step {step_index}. This may mean all rows passed validation."
-                else:
-                    message = f"Data extract for step {step_index} retrieved."
+        # Pathway 1: Get data for a single, specific validation step.
+        if step_index is not None:
+            data_extract_df = validator.get_data_extracts(i=step_index, frame=True)
+            if data_extract_df is None or data_extract_df.empty:
+                message = f"No data extract available for step {step_index}. This may mean all rows passed this validation step."
+                data_extract_df = None  # Ensure it's None if empty
             else:
-                # --- Get all sundered data (pass or fail) ---
-                data_extract_df = validator.get_sundered_data(type=sundered_type)
-                if data_extract_df is None:
-                    message = f"No sundered data available for type '{sundered_type}'."
-                else:
-                    message = f"Sundered data for type '{sundered_type}' retrieved."
+                message = f"Data extract for step {step_index} retrieved."
 
-            if data_extract_df is None:
-                return {"status": "success", "message": message, "output_file": None}
-
-            # Save the retrieved dataframe
-            if isinstance(data_extract_df, (pd.DataFrame)):
-                data_extract_df.to_csv(p_output_path, index=False)
-                message = f"Data extract saved to {p_output_path.resolve()}"
-            else:
-                raise TypeError(
-                    f"Unsupported DataFrame type '{type(data_extract_df).__name__}' for CSV export."
-                )
-
-        # --- Logic for PNG output (requires a step_index) ---
-        elif output_format == ".png":
-            if not step_index:
-                raise ValueError(
-                    "A 'step_index' is required to generate a PNG report for a specific step."
-                )
-
-            step_report_obj = validator.get_step_report(i=step_index)
-
-            if step_report_obj is None:
-                num_steps = len(validator.n())
-                raise ValueError(
-                    f"No report found for step index {step_index}. Validator has {num_steps} step(s)."
-                )
-
-            if not hasattr(step_report_obj, "save"):
-                raise TypeError(
-                    "The visual report object for this step does not have a .save() method."
-                )
-
-            step_report_obj.save(str(p_output_path))
-            message = f"Visual report for step {step_index} saved to {p_output_path.resolve()}"
-
+        # Pathway 2: Get all 'fail' or 'pass' data from the entire validation run.
         else:
-            raise ValueError(
-                f"Unsupported file format '{output_format}'. Please use '.csv' or '.png'."
+            data_extract_df = validator.get_sundered_data(type=sundered_type)
+            if data_extract_df is None or data_extract_df.empty:
+                message = f"No sundered data available for type '{sundered_type}'."
+                data_extract_df = None  # Ensure it's None if empty
+            else:
+                message = f"Sundered data for type '{sundered_type}' retrieved."
+
+        if data_extract_df is None:
+            return ValidationOutput(
+                status="success",
+                message=message,
+                output_file=None,
+            )
+
+        if isinstance(data_extract_df, pd.DataFrame):
+            data_extract_df.to_csv(p_output_path, index=False)
+            message = f"Data extract saved to {p_output_path.resolve()}"
+        else:
+            raise TypeError(
+                f"Unsupported DataFrame type '{type(data_extract_df).__name__}' for CSV export."
             )
 
         await ctx.report_progress(100, 100, message)
-        return {
-            "status": "success",
-            "message": message,
-            "output_file": str(p_output_path.resolve()),
-        }
+
+        return ValidationOutput(
+            status="success",
+            message=message,
+            output_file=str(p_output_path.resolve()),
+        )
 
     except Exception as e:
         raise RuntimeError(f"Error getting output for validator '{validator_id}': {e}")
 
 
-@mcp.tool()
+@mcp.tool(
+    name="interrogate_validator",
+    description="Run validations and return a JSON summary. Optionally save the report to a CSV file.",
+    tags={"Validation"},
+)
 async def interrogate_validator(
-    validator_id: str, report_file_path: Optional[str] = None
+    ctx: Context,
+    validator_id: Annotated[str, Field(description="ID of the Validator to interrogate.")],
+    report_file_path: Annotated[
+        Optional[str],
+        Field(
+            description="Optional path to save the validation report. If provided, must end with .csv."
+        ),
+    ] = None,
 ) -> Dict[str, Any]:
     """
     Runs validations and returns a JSON summary.
-    Optionally saves the report to 'report_file_path'.
-    If path ends with .csv, saves as CSV. If .png, saves as PNG image.
+    Optionally saves the report to 'report_file_path' as a CSV file.
     """
-    ctx: Context = mcp.get_context()
     app_ctx: AppContext = ctx.request_context.lifespan_context
 
     if validator_id not in app_ctx.active_validators:
@@ -405,62 +484,30 @@ async def interrogate_validator(
     validator = app_ctx.active_validators[validator_id]
 
     try:
-        # interrogate() modifies the validator in place and returns self
         validator.interrogate()
         json_report_str = validator.get_json_report()
     except Exception as e:
         raise RuntimeError(f"Error during validator interrogation: {e}")
 
-    output_dict = {"validation_summary": json_report_str}
+    output_dict = {"validation_summary": json.loads(json_report_str)}
 
     if report_file_path:
         p_report_file_path = Path(report_file_path)
+
+        if not report_file_path.lower().endswith(".csv"):
+            err_msg = "Unsupported report file extension. Use .csv."
+            print(err_msg)
+            output_dict["report_save_error"] = err_msg
+            return output_dict
+
         p_report_file_path.parent.mkdir(parents=True, exist_ok=True)
-        file_saved_path = None
-
         try:
-            if report_file_path.lower().endswith(".csv"):
-                report_data = json.loads(json_report_str)
-                # The JSON report is a list of dicts, suitable for DataFrame
-                df_report = pd.DataFrame(report_data)
-                df_report.to_csv(p_report_file_path, index=False)
-                file_saved_path = str(p_report_file_path.resolve())
-                output_dict["csv_report_saved_to"] = file_saved_path
-
-            elif report_file_path.lower().endswith(".png"):
-                # Assumes get_tabular_report() returns a GreatTable-like object with .save()
-                tabular_report_obj = validator.get_tabular_report()
-                if hasattr(tabular_report_obj, "save"):
-                    tabular_report_obj.save(str(p_report_file_path))
-                    file_saved_path = str(p_report_file_path.resolve())
-                    output_dict["png_report_saved_to"] = file_saved_path
-                else:
-                    # Fallback if get_tabular_report() returns a DataFrame, try to use great_tables explicitly
-                    try:
-                        from great_tables import GT
-
-                        gt_table = GT(
-                            tabular_report_obj
-                        )  # Assumes tabular_report_obj is a DataFrame
-
-                        gt_table.save(file=str(p_report_file_path))
-                        file_saved_path = str(p_report_file_path.resolve())
-                        output_dict["png_report_saved_to"] = file_saved_path
-                    except ImportError:
-                        err_msg = "Package 'great_tables' not installed. Cannot save as PNG from DataFrame."
-                        print(err_msg)
-                        output_dict["report_save_error"] = err_msg
-                    except Exception as e_gt:
-                        err_msg = f"Failed to save PNG using great_tables from DataFrame: {e_gt}"
-                        print(err_msg)
-                        output_dict["report_save_error"] = err_msg
-            else:
-                err_msg = "Unsupported report file extension. Use .csv or .png."
-                print(err_msg)
-                output_dict["report_save_error"] = err_msg
-
-            if file_saved_path:
-                await ctx.report_progress(100, 100, f"Report saved to {file_saved_path}")
+            report_data = json.loads(json_report_str)
+            df_report = pd.DataFrame(report_data)
+            df_report.to_csv(p_report_file_path, index=False)
+            file_saved_path = str(p_report_file_path.resolve())
+            output_dict["csv_report_saved_to"] = file_saved_path
+            await ctx.report_progress(100, 100, f"Report saved to {file_saved_path}")
 
         except Exception as e:
             error_msg = f"Failed to save report to {report_file_path}: {e}"
@@ -470,26 +517,63 @@ async def interrogate_validator(
     return output_dict
 
 
-# --- Prompt Templates (Updated Terminology) ---
-@mcp.prompt()
-def prompt_load_dataframe(input_path: str, df_id: Optional[str] = "my_data") -> tuple:
+@mcp.prompt(
+    name="prompt_load_dataframe",
+    description="Prompt to load a DataFrame from a file into the server's context for validation.",
+    tags={"Data Management"},
+)
+def prompt_load_dataframe(
+    input_path: str = Field(description="Path to the input CSV, Excel or Parquet file."),
+    df_id: Optional[str] = Field(
+        default=None,
+        description="Optional ID for the DataFrame. If not provided, a new ID will be generated.",
+    ),
+) -> tuple:
     return (
-        base.AssistantMessage("I can load your data from a file into my context for validation."),
-        base.UserMessage(
+        Message(
+            "I can load your data from a file into my context for validation.",
+            role="assistant",
+        ),
+        Message(
             f"Please call `load_dataframe` with input_path='{input_path}'. "
             f"You can optionally provide a `df_id` (e.g., '{df_id}') to name this dataset, "
-            "or I will generate one for you. Make a note of the returned `df_id` for subsequent steps."
+            "or I will generate one for you. Make a note of the returned `df_id` for subsequent steps.",
+            role="user",
         ),
     )
 
 
-@mcp.prompt()
+@mcp.prompt(
+    name="prompt_create_validator",
+    description="Prompt to create a Pointblank Validator for a loaded DataFrame.",
+    tags={"Validation"},
+)
 def prompt_create_validator(
-    df_id: str,
-    validator_id: Optional[str] = "val_default",
-    table_name: Optional[str] = "data_table",
-    validator_label: Optional[str] = "My Validation",
-    thresholds_dict_example: Optional[Dict[str, Union[int, float]]] = None,  # For hint
+    df_id: Annotated[str, Field(description="ID of the DataFrame to validate.")] = "df_default",
+    validator_id: Annotated[
+        Optional[str],
+        Field(
+            description="Optional ID for the Validator. If not provided, a new ID will be generated."
+        ),
+    ] = "validator_default",
+    table_name: Annotated[
+        Optional[str],
+        Field(
+            description="Optional name for the table within Pointblank reports. If not provided, a default name will be used."
+        ),
+    ] = "data_table",
+    validator_label: Annotated[
+        Optional[str],
+        Field(
+            description="Optional descriptive label for the Validator. If not provided, a default label will be used."
+        ),
+    ] = "Validator",
+    thresholds_dict_example: Annotated[
+        Optional[Dict[str, Union[int, float]]],
+        Field(
+            description="Example thresholds for validation failures. If not provided, a default example will be used."
+        ),
+    ] = None,
 ) -> tuple:
     """
     Prompt guiding the LLM to create a Pointblank Validator object.
@@ -497,13 +581,14 @@ def prompt_create_validator(
     """
     thresholds_msg_example = (
         thresholds_dict_example if thresholds_dict_example else {"warning": 0.05, "error": 10}
-    )  # Default example
+    )
 
     return (
-        base.AssistantMessage(
-            "Once your data is loaded (using its `df_id`), I can create a 'Validator' object to define data quality checks."
+        Message(
+            "Once your data is loaded (using its `df_id`), I can create a 'Validator' object to define data quality checks.",
+            role="assistant",
         ),
-        base.UserMessage(
+        Message(
             f"Please call `create_validator` using the `df_id` of your loaded data (e.g., '{df_id}').\n"
             f"You can optionally provide:\n"
             f"- `validator_id` (e.g., '{validator_id}') to name this validator instance.\n"
@@ -511,20 +596,26 @@ def prompt_create_validator(
             f"- `validator_label` (e.g., '{validator_label}') for a descriptive label.\n"
             f"- `thresholds_dict` (e.g., {thresholds_msg_example}) to set global failure thresholds for validation steps.\n"
             f"- Other optional parameters like `actions_dict`, `final_actions_dict`, `brief`, `lang`, `locale` can also be specified if needed.\n"
-            "Make a note of the returned `validator_id` to use when adding validation steps."
+            "Make a note of the returned `validator_id` to use when adding validation steps.",
+            role="user",
         ),
     )
 
 
-@mcp.prompt()
+@mcp.prompt(
+    name="prompt_add_validation_step_example",
+    description="Prompt to add a validation step to a Pointblank Validator.",
+    tags={"Validation"},
+)
 def prompt_add_validation_step_example() -> tuple:
     return (
-        base.AssistantMessage(
+        Message(
             "I can add various validation steps to your validator. "
             "You'll need to specify the 'validator_id', 'validation_type', and 'params' for the step. "
-            "For example, to check if values in column 'age' are less than 100 for validator 'validator_123':"
+            "For example, to check if values in column 'age' are less than 100 for validator 'validator_123':",
+            role="assistant",
         ),
-        base.UserMessage(
+        Message(
             "Please call `add_validation_step` with validator_id='validator_123', "
             "validation_type='col_vals_lt', and params={'columns': 'age', 'value': 100}. "
             "Note: Parameter names within 'params' (like 'columns', 'value', 'left', 'right', 'set_', etc.) must exactly match what the specific Pointblank validation function expects.\n"
@@ -532,52 +623,83 @@ def prompt_add_validation_step_example() -> tuple:
             "- For 'col_vals_between': params={'columns': 'score', 'left': 0, 'right': 100, 'inclusive': [True, True]}\n"
             "- For 'col_vals_in_set': params={'columns': 'grade', 'set_': ['A', 'B', 'C']} (Note: Pointblank uses 'set_' for this method's list of values)\n"
             "- For 'col_exists': params={'columns': 'user_id'}\n"
-            "Refer to the Pointblank Python API for the 'Validate' class for available `validation_type` (method names) and their specific `params`."
+            "Refer to the Pointblank Python API for the 'Validate' class for available `validation_type` (method names) and their specific `params`.",
+            role="user",
         ),
     )
 
 
-@mcp.prompt()
+@mcp.prompt(
+    name="prompt_get_validation_step_output",
+    description="Prompt to get validation output by specifying either a step index or a sundered type.",
+    tags={"Validation"},
+)
 def prompt_get_validation_step_output(
-    validator_id: str, step_index: int = 1, output_path: str = "step_1_extract.csv"
+    validator_id: Annotated[
+        str, Field(description="Example ID of the Validator.")
+    ] = "validator_123",
+    step_index: Annotated[
+        Optional[int],
+        Field(description="Example step index for the first mode of operation."),
+    ] = 0,
+    sundered_type: Annotated[
+        Optional[str],
+        Field(
+            description="Example sundered type ('pass' or 'fail') for the second mode of operation."
+        ),
+    ] = "fail",
 ) -> tuple:
     """
-    Guides the LLM to get an output for a specific validation step,
-    explaining the choice between a CSV data extract and a PNG visual report.
+    Guides the LLM to get a validation output CSV by choosing one of two modes:
+    1.  By a specific step index.
+    2.  By the overall sundered data type ('pass' or 'fail').
     """
     return (
-        base.AssistantMessage(
-            "For any validation step, I can either extract the relevant data rows (e.g., the rows that failed) as a CSV file, "
-            "or I can generate a visual summary of the step as a PNG image."
+        Message(
+            "I can extract validation data in two different ways. You must choose one: "
+            "either get data for a *specific step* by its index, or get *all passed or failed rows* from the entire validation run.",
+            role="assistant",
         ),
-        base.UserMessage(
-            f"Please get the output for step number {step_index} from validator '{validator_id}'.\n"
-            f"To get the data extract, provide an `output_path` ending in `.csv` (e.g., 'step_{step_index}_failures.csv'). This is the default.\n"
-            f"To get the visual report, provide an `output_path` ending in `.png` (e.g., 'step_{step_index}_report.png').\n\n"
-            f"To proceed, call `get_validation_step_output` with the correct `validator_id`, `step_index`, and `output_path`."
+        Message(
+            f"Please call the `get_validation_step_output` tool using only **one** of the following mutually exclusive options:\n\n"
+            f"**OPTION 1: Get data for a specific step**\n"
+            f"To get the data extract for step number {step_index}, use the `step_index` parameter. For example:\n"
+            f"`get_validation_step_output(validator_id='{validator_id}', step_index={step_index}, output_path='step_{step_index}_data.csv')`\n\n"
+            f"**OPTION 2: Get all passed or failed data**\n"
+            f"To get all rows that '{sundered_type}' across all validation steps, use the `sundered_type` parameter. For example:\n"
+            f"`get_validation_step_output(validator_id='{validator_id}', sundered_type='{sundered_type}', output_path='all_{sundered_type}_rows.csv')`",
+            role="user",
         ),
     )
 
 
-@mcp.prompt()
+@mcp.prompt(
+    name="prompt_interrogate_validator",
+    description="Prompt to run validations and optionally save the report.",
+    tags={"Validation"},
+)
 def prompt_interrogate_validator(
-    validator_id: str, report_file_path: Optional[str] = "validation_summary.csv"
+    validator_id: Annotated[str, Field(description="ID of the Validator to interrogate.")],
+    report_file_path: Annotated[
+        Optional[str],
+        Field(description="Optional path to save the validation report as a CSV file."),
+    ] = "optional_report.csv",
 ) -> tuple:
     """
-    Prompt guiding the LLM to run validations and optionally save the report.
+    Prompt guiding the LLM to run validations and optionally save the report as a CSV file.
     """
     return (
-        base.AssistantMessage(
-            "After all desired validation steps have been added to a validator, I can run the interrogation process. This will execute all checks."
+        Message(
+            "After all desired validation steps have been added to a validator, I can run the interrogation process. This will execute all checks.",
+            role="assistant",
         ),
-        base.UserMessage(
+        Message(
             f"Please call `interrogate_validator` with the `validator_id` (e.g., '{validator_id}').\n"
-            f"The main result will be a JSON string summarizing all validation steps.\n"
-            f"Optionally, you can specify `report_file_path` to save the report to a file. "
-            f"For example:\n"
-            f"- To save as a CSV file: `report_file_path='{report_file_path}'`\n"
-            f"- To save as a PNG image: `report_file_path='validation_summary.png'`\n"
-            f"If `report_file_path` is not provided, the report will not be saved to a file."
+            f"The main result will be a JSON object summarizing all validation steps.\n"
+            f"Optionally, you can specify `report_file_path` to save the report to a CSV file. "
+            f"For example, to save as a CSV file: `report_file_path='{report_file_path}'`\n"
+            f"If `report_file_path` is not provided, the report will not be saved to a file.",
+            role="user",
         ),
     )
 
