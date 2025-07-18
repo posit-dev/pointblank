@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import copy
+import os
+import shutil
 import sys
 from pathlib import Path
 from typing import Any
@@ -32,6 +34,8 @@ class OrderedGroup(click.Group):
             "validate",
             "run",
             "make-template",
+            # Data Manipulation
+            "pl",
             # Utilities
             "datasets",
             "requirements",
@@ -89,6 +93,15 @@ def _load_data_source(data_source: str) -> Any:
     from pointblank.validate import _process_data
 
     return _process_data(data_source)
+
+
+def _is_piped_data_source(data_source: str) -> bool:
+    """Check if the data source is from a piped pb command."""
+    return (
+        data_source
+        and ("pb_pipe_" in data_source)
+        and (data_source.startswith("/var/folders/") or data_source.startswith("/tmp/"))
+    )
 
 
 def _format_cell_value(
@@ -558,9 +571,12 @@ def _rich_print_gt_table(
         gt_table: The GT table object to display
         preview_info: Optional dict with preview context info:
             - total_rows: Total rows in the dataset
+            - total_columns: Total columns in the dataset
             - head_rows: Number of head rows shown
             - tail_rows: Number of tail rows shown
             - is_complete: Whether the entire dataset is shown
+            - source_type: Type of data source (e.g., "External source: worldcities_new.csv")
+            - table_type: Type of table (e.g., "polars")
         show_summary: Whether to show the row count summary at the bottom
     """
     try:
@@ -592,6 +608,12 @@ def _rich_print_gt_table(
                 source_type = preview_info["source_type"]
                 table_type = preview_info["table_type"]
                 table_title = f"Data Preview / {source_type} / {table_type}"
+
+                # Add dimensions subtitle in gray if available
+                total_rows = preview_info.get("total_rows")
+                total_columns = preview_info.get("total_columns")
+                if total_rows is not None and total_columns is not None:
+                    table_title += f"\n[dim]{total_rows:,} rows / {total_columns} columns[/dim]"
 
             rich_table = Table(
                 title=table_title,
@@ -1209,20 +1231,31 @@ def _display_validation_summary(validation: Any) -> None:
 
 
 @click.group(cls=OrderedGroup)
-@click.version_option(version=pb.__version__, prog_name="pb")
+@click.version_option(pb.__version__, "-v", "--version", prog_name="pb")
+@click.help_option("-h", "--help")
 def cli():
     """
     Pointblank CLI: Data validation and quality tools for data engineers.
 
-    Use this CLI to run validation scripts, preview tables, and generate reports
-    directly from the command line.
+    Use this CLI to validate data quality, explore datasets, and generate comprehensive
+    reports for CSV, Parquet, and database sources. Suitable for data pipelines, ETL
+    validation, and exploratory data analysis from the command line.
+
+    Quick Examples:
+
+    \b
+      pb preview data.csv              Preview your data
+      pb scan data.csv                 Generate data profile
+      pb validate data.csv             Run basic validation
+
+    Use pb COMMAND --help for detailed help on any command.
     """
     pass
 
 
 @cli.command()
-@click.argument("data_source", type=str)
-def info(data_source: str):
+@click.argument("data_source", type=str, required=False)
+def info(data_source: str | None):
     """
     Display information about a data source.
 
@@ -1238,6 +1271,11 @@ def info(data_source: str):
     - Dataset name from pointblank (small_table, game_revenue, nycflights, global_sales)
     """
     try:
+        # Handle missing data_source with concise help
+        if data_source is None:
+            _show_concise_help("info", None)
+            return
+
         with console.status("[bold green]Loading data..."):
             # Load the data source using the centralized function
             data = _load_data_source(data_source)
@@ -1276,21 +1314,21 @@ def info(data_source: str):
 
 
 @cli.command()
-@click.argument("data_source", type=str)
-@click.option("--columns", "-c", help="Comma-separated list of columns to display")
+@click.argument("data_source", type=str, required=False)
+@click.option("--columns", help="Comma-separated list of columns to display")
 @click.option("--col-range", help="Column range like '1:10' or '5:' or ':15' (1-based indexing)")
 @click.option("--col-first", type=int, help="Show first N columns")
 @click.option("--col-last", type=int, help="Show last N columns")
-@click.option("--head", "-h", default=5, help="Number of rows from the top (default: 5)")
-@click.option("--tail", "-t", default=5, help="Number of rows from the bottom (default: 5)")
-@click.option("--limit", "-l", default=50, help="Maximum total rows to display (default: 50)")
+@click.option("--head", default=5, help="Number of rows from the top (default: 5)")
+@click.option("--tail", default=5, help="Number of rows from the bottom (default: 5)")
+@click.option("--limit", default=50, help="Maximum total rows to display (default: 50)")
 @click.option("--no-row-numbers", is_flag=True, help="Hide row numbers")
 @click.option("--max-col-width", default=250, help="Maximum column width in pixels (default: 250)")
 @click.option("--min-table-width", default=500, help="Minimum table width in pixels (default: 500)")
 @click.option("--no-header", is_flag=True, help="Hide table header")
 @click.option("--output-html", type=click.Path(), help="Save HTML output to file")
 def preview(
-    data_source: str,
+    data_source: str | None,
     columns: str | None,
     col_range: str | None,
     col_first: int | None,
@@ -1315,6 +1353,7 @@ def preview(
     - GitHub URL to CSV/Parquet (e.g., https://github.com/user/repo/blob/main/data.csv)
     - Database connection string (e.g., duckdb:///path/to/db.ddb::table_name)
     - Dataset name from pointblank (small_table, game_revenue, nycflights, global_sales)
+    - Piped data from pb pl command
 
     COLUMN SELECTION OPTIONS:
 
@@ -1329,11 +1368,52 @@ def preview(
     Tables with >15 columns automatically show first 7 and last 7 columns with indicators.
     """
     try:
+        import sys
+
+        # Handle piped input
+        if data_source is None:
+            if not sys.stdin.isatty():
+                # Data is being piped in - read the file path from stdin
+                piped_input = sys.stdin.read().strip()
+                if piped_input:
+                    data_source = piped_input
+
+                    # Determine the format from the file extension
+                    if piped_input.endswith(".parquet"):
+                        format_type = "Parquet"
+                    elif piped_input.endswith(".csv"):
+                        format_type = "CSV"
+                    else:
+                        format_type = "unknown"
+
+                    console.print(f"[dim]Using piped data source in {format_type} format.[/dim]")
+                else:
+                    console.print("[red]Error:[/red] No data provided via pipe")
+                    sys.exit(1)
+            else:
+                # Show concise help and exit
+                _show_concise_help("preview", None)
+                return
+
         with console.status("[bold green]Loading data..."):
             # Load the data source using the centralized function
             data = _load_data_source(data_source)
 
-            console.print(f"[green]✓[/green] Loaded data source: {data_source}")
+            # Check if this is a piped data source and create friendly display name
+            is_piped_data = _is_piped_data_source(data_source)
+
+            if is_piped_data:
+                if data_source.endswith(".parquet"):
+                    display_source = "Parquet file via `pb pl`"
+                elif data_source.endswith(".csv"):
+                    display_source = "CSV file via `pb pl`"
+                else:
+                    display_source = "File via `pb pl`"
+                console.print(
+                    f"[green]✓[/green] Loaded data source: {display_source} ({data_source})"
+                )
+            else:
+                console.print(f"[green]✓[/green] Loaded data source: {data_source}")
 
         # Parse columns if provided
         columns_list = None
@@ -1355,7 +1435,7 @@ def preview(
                 # If _row_num_ exists in data but not in user selection, add it at beginning
                 if all_columns and "_row_num_" in all_columns and "_row_num_" not in columns_list:
                     columns_list = ["_row_num_"] + columns_list
-            except Exception:  # pragma: no cover
+            except Exception:
                 # If we can't process the data, just use the user's column list as-is
                 pass
         elif col_range or col_first or col_last:
@@ -1430,7 +1510,14 @@ def preview(
                 total_dataset_columns = pb.get_column_count(processed_data)
 
                 # Determine source type and table type for enhanced preview title
-                if data_source in ["small_table", "game_revenue", "nycflights", "global_sales"]:
+                if is_piped_data:
+                    if data_source.endswith(".parquet"):
+                        source_type = "Polars expression (serialized to Parquet) from `pb pl`"
+                    elif data_source.endswith(".csv"):
+                        source_type = "Polars expression (serialized to CSV) from `pb pl`"
+                    else:
+                        source_type = "Polars expression from `pb pl`"
+                elif data_source in ["small_table", "game_revenue", "nycflights", "global_sales"]:
                     source_type = f"Pointblank dataset: {data_source}"
                 else:
                     source_type = f"External source: {data_source}"
@@ -1480,17 +1567,17 @@ def preview(
 
             _rich_print_gt_table(gt_table, preview_info)
 
-    except Exception as e:  # pragma: no cover
+    except Exception as e:
         console.print(f"[red]Error:[/red] {e}")
-        sys.exit(1)  # pragma: no cover
+        sys.exit(1)
 
 
 @cli.command()
-@click.argument("data_source", type=str)
+@click.argument("data_source", type=str, required=False)
 @click.option("--output-html", type=click.Path(), help="Save HTML scan report to file")
 @click.option("--columns", "-c", help="Comma-separated list of columns to scan")
 def scan(
-    data_source: str,
+    data_source: str | None,
     output_html: str | None,
     columns: str | None,
 ):
@@ -1513,17 +1600,58 @@ def scan(
     - GitHub URL to CSV/Parquet (e.g., https://github.com/user/repo/blob/main/data.csv)
     - Database connection string (e.g., duckdb:///path/to/db.ddb::table_name)
     - Dataset name from pointblank (small_table, game_revenue, nycflights, global_sales)
+    - Piped data from pb pl command
     """
     try:
+        import sys
         import time
 
         start_time = time.time()
+
+        # Handle piped input
+        if data_source is None:
+            if not sys.stdin.isatty():
+                # Data is being piped in - read the file path from stdin
+                piped_input = sys.stdin.read().strip()
+                if piped_input:
+                    data_source = piped_input
+
+                    # Determine the format from the file extension
+                    if piped_input.endswith(".parquet"):
+                        format_type = "Parquet"
+                    elif piped_input.endswith(".csv"):
+                        format_type = "CSV"
+                    else:
+                        format_type = "unknown"
+
+                    console.print(f"[dim]Using piped data source in {format_type} format.[/dim]")
+                else:
+                    console.print("[red]Error:[/red] No data provided via pipe")
+                    sys.exit(1)
+            else:
+                # Show concise help and exit
+                _show_concise_help("scan", None)
+                return
 
         with console.status("[bold green]Loading data..."):
             # Load the data source using the centralized function
             data = _load_data_source(data_source)
 
-            console.print(f"[green]✓[/green] Loaded data source: {data_source}")
+            # Check if this is a piped data source and create friendly display name
+            is_piped_data = _is_piped_data_source(data_source)
+
+            if is_piped_data:
+                if data_source.endswith(".parquet"):
+                    display_source = "Parquet file via `pb pl`"
+                elif data_source.endswith(".csv"):
+                    display_source = "CSV file via `pb pl`"
+                else:
+                    display_source = "File via `pb pl`"
+                console.print(
+                    f"[green]✓[/green] Loaded data source: {display_source} ({data_source})"
+                )
+            else:
+                console.print(f"[green]✓[/green] Loaded data source: {data_source}")
 
         # Parse columns if provided
         columns_list = None
@@ -1536,7 +1664,15 @@ def scan(
             # Data is already processed by _load_data_source
             scan_result = pb.col_summary_tbl(data=data)
 
-            if data_source in ["small_table", "game_revenue", "nycflights", "global_sales"]:
+            # Create friendly source type for display
+            if is_piped_data:
+                if data_source.endswith(".parquet"):
+                    source_type = "Polars expression (serialized to Parquet) from `pb pl`"
+                elif data_source.endswith(".csv"):
+                    source_type = "Polars expression (serialized to CSV) from `pb pl`"
+                else:
+                    source_type = "Polars expression from `pb pl`"
+            elif data_source in ["small_table", "game_revenue", "nycflights", "global_sales"]:
                 source_type = f"Pointblank dataset: {data_source}"
             else:
                 source_type = f"External source: {data_source}"
@@ -1568,7 +1704,12 @@ def scan(
             # Display detailed column summary using rich formatting
             try:
                 _rich_print_scan_table(
-                    scan_result, data_source, source_type, table_type, total_rows, total_columns
+                    scan_result,
+                    display_source if is_piped_data else data_source,
+                    source_type,
+                    table_type,
+                    total_rows,
+                    total_columns,
                 )
 
             except Exception as e:
@@ -1580,9 +1721,9 @@ def scan(
 
 
 @cli.command()
-@click.argument("data_source", type=str)
+@click.argument("data_source", type=str, required=False)
 @click.option("--output-html", type=click.Path(), help="Save HTML output to file")
-def missing(data_source: str, output_html: str | None):
+def missing(data_source: str | None, output_html: str | None):
     """
     Generate a missing values report for a data table.
 
@@ -1594,13 +1735,55 @@ def missing(data_source: str, output_html: str | None):
     - GitHub URL to CSV/Parquet (e.g., https://github.com/user/repo/blob/main/data.csv)
     - Database connection string (e.g., duckdb:///path/to/db.ddb::table_name)
     - Dataset name from pointblank (small_table, game_revenue, nycflights, global_sales)
+    - Piped data from pb pl command
     """
     try:
+        import sys
+
+        # Handle piped input
+        if data_source is None:
+            if not sys.stdin.isatty():
+                # Data is being piped in - read the file path from stdin
+                piped_input = sys.stdin.read().strip()
+                if piped_input:
+                    data_source = piped_input
+
+                    # Determine the format from the file extension
+                    if piped_input.endswith(".parquet"):
+                        format_type = "Parquet"
+                    elif piped_input.endswith(".csv"):
+                        format_type = "CSV"
+                    else:
+                        format_type = "unknown"
+
+                    console.print(f"[dim]Using piped data source in {format_type} format.[/dim]")
+                else:
+                    console.print("[red]Error:[/red] No data provided via pipe")
+                    sys.exit(1)
+            else:
+                # Show concise help and exit
+                _show_concise_help("missing", None)
+                return
+
         with console.status("[bold green]Loading data..."):
             # Load the data source using the centralized function
             data = _load_data_source(data_source)
 
-            console.print(f"[green]✓[/green] Loaded data source: {data_source}")
+            # Check if this is a piped data source and create friendly display name
+            is_piped_data = _is_piped_data_source(data_source)
+
+            if is_piped_data:
+                if data_source.endswith(".parquet"):
+                    display_source = "Parquet file via `pb pl`"
+                elif data_source.endswith(".csv"):
+                    display_source = "CSV file via `pb pl`"
+                else:
+                    display_source = "File via `pb pl`"
+                console.print(
+                    f"[green]✓[/green] Loaded data source: {display_source} ({data_source})"
+                )
+            else:
+                console.print(f"[green]✓[/green] Loaded data source: {data_source}")
 
         # Generate missing values table
         with console.status("[bold green]Analyzing missing values..."):
@@ -1616,7 +1799,38 @@ def missing(data_source: str, output_html: str | None):
             console.print(f"[green]✓[/green] Missing values report saved to: {output_html}")
         else:
             # Display in terminal with special missing values formatting
-            _rich_print_missing_table(gt_table, original_data)
+            # Create enhanced context info for missing table display
+            missing_info = {}
+            try:
+                # Determine source type and table type for enhanced preview title
+                if is_piped_data:
+                    if data_source.endswith(".parquet"):
+                        source_type = "Polars expression (serialized to Parquet) from `pb pl`"
+                    elif data_source.endswith(".csv"):
+                        source_type = "Polars expression (serialized to CSV) from `pb pl`"
+                    else:
+                        source_type = "Polars expression from `pb pl`"
+                elif data_source in ["small_table", "game_revenue", "nycflights", "global_sales"]:
+                    source_type = f"Pointblank dataset: {data_source}"
+                else:
+                    source_type = f"External source: {data_source}"
+
+                missing_info = {
+                    "source_type": source_type,
+                    "table_type": _get_tbl_type(original_data),
+                    "total_rows": pb.get_row_count(original_data),
+                    "total_columns": pb.get_column_count(original_data),
+                }
+            except Exception:
+                # Use defaults if metadata extraction fails
+                missing_info = {
+                    "source_type": f"Data source: {data_source}",
+                    "table_type": "unknown",
+                    "total_rows": None,
+                    "total_columns": None,
+                }
+
+            _rich_print_missing_table_enhanced(gt_table, original_data, missing_info)
 
     except Exception as e:
         console.print(f"[red]Error:[/red] {e}")
@@ -1741,6 +1955,8 @@ def validate(
     pb validate data.csv --check col-vals-not-null --column email --check col-vals-gt --column age --value 18
     """
     try:
+        import sys
+
         # Handle --list-checks option early (doesn't need data source)
         if list_checks:
             console.print("[bold bright_cyan]Available Validation Checks:[/bold bright_cyan]")
@@ -1797,13 +2013,31 @@ def validate(
             sys.exit(0)
 
         # Check if data_source is provided (required for all operations except --list-checks)
+        # or if we have piped input
         if data_source is None:
-            console.print("[red]Error:[/red] DATA_SOURCE is required")
-            console.print("Use 'pb validate --help' for usage information")
-            console.print("Or use 'pb validate --list-checks' to see available validation types")
-            import sys
+            # Check if we have piped input
+            if not sys.stdin.isatty():
+                # Data is being piped in: read the file path from stdin
+                piped_input = sys.stdin.read().strip()
+                if piped_input:
+                    data_source = piped_input
 
-            sys.exit(1)
+                    # Determine the format from the file extension
+                    if piped_input.endswith(".parquet"):
+                        format_type = "Parquet"
+                    elif piped_input.endswith(".csv"):
+                        format_type = "CSV"
+                    else:
+                        format_type = "unknown"
+
+                    console.print(f"[dim]Using piped data source in {format_type} format.[/dim]")
+                else:
+                    console.print("[red]Error:[/red] No data provided via pipe")
+                    sys.exit(1)
+            else:
+                # Show concise help and exit
+                _show_concise_help("validate", None)
+                return
 
         # Handle backward compatibility and parameter conversion
         import sys
@@ -1911,7 +2145,25 @@ def validate(
                 checks_list, columns_list, sets_list, values_list
             )
 
-            console.print(f"[green]✓[/green] Loaded data source: {data_source}")
+            # Check if this is a piped data source and create friendly display name
+            is_piped_data = (
+                data_source
+                and data_source.startswith("/var/folders/")
+                and ("pb_pipe_" in data_source or "/T/" in data_source)
+            )
+
+            if is_piped_data:
+                if data_source.endswith(".parquet"):
+                    display_source = "Parquet file via `pb pl`"
+                elif data_source.endswith(".csv"):
+                    display_source = "CSV file via `pb pl`"
+                else:
+                    display_source = "File via `pb pl`"
+                console.print(
+                    f"[green]✓[/green] Loaded data source: {display_source} ({data_source})"
+                )
+            else:
+                console.print(f"[green]✓[/green] Loaded data source: {data_source}")
 
         # Build a single validation object with chained checks
         with console.status(f"[bold green]Running {len(checks_list)} validation check(s)..."):
@@ -2132,6 +2384,209 @@ def requirements():
 
     console.print(table)
     console.print("\n[dim]Install missing packages to enable additional functionality.[/dim]")
+
+
+def _rich_print_missing_table_enhanced(
+    gt_table: Any, original_data: Any = None, missing_info: dict = None
+) -> None:
+    """Convert a missing values GT table to Rich table with enhanced formatting and metadata.
+
+    Args:
+        gt_table: The GT table object for missing values
+        original_data: The original data source to extract column types
+        missing_info: Dict with metadata including source_type, table_type, total_rows, total_columns
+    """
+    try:
+        # Extract the underlying data from the GT table
+        df = None
+
+        if hasattr(gt_table, "_tbl_data") and gt_table._tbl_data is not None:
+            df = gt_table._tbl_data
+        elif hasattr(gt_table, "_data") and gt_table._data is not None:
+            df = gt_table._data
+        elif hasattr(gt_table, "data") and gt_table.data is not None:
+            df = gt_table.data
+
+        if df is not None:
+            from rich.box import SIMPLE_HEAD
+
+            # Extract metadata from missing_info or use defaults
+            source_type = "Data source"
+            table_type = "unknown"
+            total_rows = None
+            total_columns = None
+
+            if missing_info:
+                source_type = missing_info.get("source_type", "Data source")
+                table_type = missing_info.get("table_type", "unknown")
+                total_rows = missing_info.get("total_rows")
+                total_columns = missing_info.get("total_columns")
+
+            # Create enhanced title matching the scan table format
+            title_text = f"Missing Values / {source_type} / {table_type}"
+
+            # Add dimensions subtitle in gray if available
+            if total_rows is not None and total_columns is not None:
+                title_text += f"\n[dim]{total_rows:,} rows / {total_columns} columns[/dim]"
+
+            # Get column names
+            columns = []
+            try:
+                if hasattr(df, "columns"):
+                    columns = list(df.columns)
+                elif hasattr(df, "schema"):
+                    columns = list(df.schema.names)
+            except Exception as e:
+                console.print(f"[red]Error getting columns:[/red] {e}")
+                columns = []
+
+            if not columns:
+                columns = [f"Column {i + 1}" for i in range(10)]  # Fallback
+
+            # Get original data to extract column types
+            column_types = {}
+            if original_data is not None:
+                try:
+                    # Get column types from original data
+                    if hasattr(original_data, "columns"):
+                        original_columns = list(original_data.columns)
+                        column_types = _get_column_dtypes(original_data, original_columns)
+                except Exception as e:
+                    console.print(f"[red]Error getting column types:[/red] {e}")
+                    pass  # Use empty dict as fallback
+
+            # Add columns to Rich table with special formatting for missing values table
+            sector_columns = [col for col in columns if col != "columns" and col.isdigit()]
+
+            # Print the title first
+            console.print()
+            console.print(f"[bold cyan]{title_text}[/bold cyan]")
+
+            # Show the custom spanner header if we have sector columns
+            if sector_columns:
+                # Create a custom header line that shows the spanner
+                header_parts = []
+                header_parts.append(" " * 20)  # Space for Column header
+                header_parts.append(" " * 10)  # Space for Type header
+
+                # Left-align "Row Sectors" with the first numbered column
+                row_sectors_text = "Row Sectors"
+                header_parts.append(row_sectors_text)
+
+                # Print the custom spanner header
+                console.print("[dim]" + "  ".join(header_parts) + "[/dim]")
+
+                # Add a horizontal rule below the spanner
+                rule_parts = []
+                rule_parts.append(" " * 20)  # Space for Column header
+                rule_parts.append(" " * 10)  # Space for Type header
+
+                # Use a fixed width horizontal rule for "Row Sectors"
+                horizontal_rule = "─" * 20
+                rule_parts.append(horizontal_rule)
+
+                # Print the horizontal rule
+                console.print("[dim]" + "  ".join(rule_parts) + "[/dim]")
+
+            # Create the missing values table WITHOUT the title (since we printed it above)
+            rich_table = Table(
+                show_header=True,
+                header_style="bold magenta",
+                box=SIMPLE_HEAD,
+            )
+
+            # Two separate columns: Column name (20 chars) and Data type (10 chars)
+            rich_table.add_column("Column", style="cyan", no_wrap=True, width=20)
+            rich_table.add_column("Type", style="yellow", no_wrap=True, width=10)
+
+            # Sector columns: All same width, optimized for "100%" (4 chars + padding)
+            for sector in sector_columns:
+                rich_table.add_column(
+                    sector,
+                    style="cyan",
+                    justify="center",
+                    no_wrap=True,
+                    width=5,  # Fixed width optimized for percentage values
+                )
+
+            # Convert data to rows with special formatting
+            rows = []
+            try:
+                if hasattr(df, "to_dicts"):
+                    data_dict = df.to_dicts()
+                elif hasattr(df, "to_dict"):
+                    data_dict = df.to_dict("records")
+                else:
+                    data_dict = []
+
+                for i, row in enumerate(data_dict):
+                    try:
+                        # Each row should have: [column_name, data_type, sector1, sector2, ...]
+                        column_name = str(row.get("columns", ""))
+
+                        # Truncate column name to 20 characters with ellipsis if needed
+                        if len(column_name) > 20:
+                            truncated_name = column_name[:17] + "…"
+                        else:
+                            truncated_name = column_name
+
+                        # Get data type for this column
+                        if column_name in column_types:
+                            dtype = column_types[column_name]
+                            if len(dtype) > 10:
+                                truncated_dtype = dtype[:9] + "…"
+                            else:
+                                truncated_dtype = dtype
+                        else:
+                            truncated_dtype = "?"
+
+                        # Start building the row with column name and type
+                        formatted_row = [truncated_name, truncated_dtype]
+
+                        # Add sector values (formatted percentages)
+                        for sector in sector_columns:
+                            value = row.get(sector, 0.0)
+                            if isinstance(value, (int, float)):
+                                formatted_row.append(_format_missing_percentage(float(value)))
+                            else:
+                                formatted_row.append(str(value))
+
+                        rows.append(formatted_row)
+
+                    except Exception as e:
+                        console.print(f"[red]Error processing row {i}:[/red] {e}")
+                        continue
+
+            except Exception as e:
+                console.print(f"[red]Error extracting data:[/red] {e}")
+                rows = [["Error extracting data", "?", *["" for _ in sector_columns]]]
+
+            # Add rows to Rich table
+            for row in rows:
+                try:
+                    rich_table.add_row(*row)
+                except Exception as e:
+                    console.print(f"[red]Error adding row:[/red] {e}")
+                    break
+
+            # Print the Rich table (without title since we already printed it)
+            console.print(rich_table)
+
+            footer_text = (
+                "[dim]Symbols: [green]●[/green] = no missing vals in sector, "
+                "[red]●[/red] = all vals completely missing, "
+                "[cyan]x%[/cyan] = percentage missing[/dim]"
+            )
+            console.print(footer_text)
+
+        else:
+            # Fallback to regular table display
+            _rich_print_gt_table(gt_table)
+
+    except Exception as e:
+        console.print(f"[red]Error rendering missing values table:[/red] {e}")
+        # Fallback to regular table display
+        _rich_print_gt_table(gt_table)
 
 
 def _rich_print_scan_table(
@@ -2423,8 +2878,36 @@ def _rich_print_missing_table(gt_table: Any, original_data: Any = None) -> None:
         if df is not None:
             from rich.box import SIMPLE_HEAD
 
-            # Create the missing values table
-            rich_table = Table(show_header=True, header_style="bold magenta", box=SIMPLE_HEAD)
+            # Get metadata for enhanced missing table title
+            total_rows = None
+            total_columns = None
+            source_type = "Data source"
+            table_type = "unknown"
+
+            if original_data is not None:
+                try:
+                    total_rows = pb.get_row_count(original_data)
+                    total_columns = pb.get_column_count(original_data)
+                    table_type = _get_tbl_type(original_data)
+                except Exception:
+                    pass
+
+            # Create enhanced title matching the scan table format
+            title_text = f"Missing Values / {source_type} / {table_type}"
+
+            # Add dimensions subtitle in gray if available
+            if total_rows is not None and total_columns is not None:
+                title_text += f"\n[dim]{total_rows:,} rows / {total_columns} columns[/dim]"
+
+            # Create the missing values table with enhanced title
+            rich_table = Table(
+                title=title_text,
+                show_header=True,
+                header_style="bold magenta",
+                box=SIMPLE_HEAD,
+                title_style="bold cyan",
+                title_justify="left",
+            )
 
             # Get column names
             columns = []
@@ -2556,12 +3039,12 @@ def _rich_print_missing_table(gt_table: Any, original_data: Any = None) -> None:
                 console.print("[dim]" + "  ".join(rule_parts) + "[/dim]")
 
             # Print the Rich table (will handle terminal width automatically)
+            console.print()
             console.print(rich_table)
             footer_text = (
-                "[dim]Symbols: [green]●[/green] = no missing values, "
-                "[red]●[/red] = completely missing, "
-                "<1% = less than 1% missing, "
-                ">99% = more than 99% missing[/dim]"
+                "[dim]Symbols: [green]●[/green] = no missing vals in sector, "
+                "[red]●[/red] = all vals completely missing, "
+                "[cyan]x%[/cyan] = percentage missing[/dim]"
             )
             console.print(footer_text)
 
@@ -2700,6 +3183,20 @@ def _display_validation_result(
     set_val = sets_list[step_index] if step_index < len(sets_list) else None
     value = values_list[step_index] if step_index < len(values_list) else None
 
+    # Check if this is piped data
+    is_piped_data = _is_piped_data_source(data_source)
+
+    # Create friendly display name for data source
+    if is_piped_data:
+        if data_source.endswith(".parquet"):
+            display_source = "Polars expression (serialized to Parquet) from `pb pl`"
+        elif data_source.endswith(".csv"):
+            display_source = "Polars expression (serialized to CSV) from `pb pl`"
+        else:
+            display_source = "Polars expression from `pb pl`"
+    else:
+        display_source = data_source
+
     # Get validation step info
     step_info = None
     if hasattr(validation, "validation_info") and len(validation.validation_info) > step_index:
@@ -2766,7 +3263,7 @@ def _display_validation_result(
     result_table.add_column("Value", style="white")
 
     # Add basic info
-    result_table.add_row("Data Source", data_source)
+    result_table.add_row("Data Source", display_source)
     result_table.add_row("Check Type", check)
 
     # Add column info for column-specific checks
@@ -3128,6 +3625,18 @@ def _show_extract_and_summary(
     """Show extract and summary for a validation step (used for single checks)."""
     step_passed = step_info.n_failed == 0 if step_info else True
 
+    # Get the friendly display name
+    is_piped_data = _is_piped_data_source(data_source)
+    if is_piped_data:
+        if data_source.endswith(".parquet"):
+            display_source = "Polars expression (serialized to Parquet) from `pb pl`"
+        elif data_source.endswith(".csv"):
+            display_source = "Polars expression (serialized to CSV) from `pb pl`"
+        else:
+            display_source = "Polars expression from `pb pl`"
+    else:
+        display_source = data_source
+
     # Show extract if requested and validation failed
     if (show_extract or write_extract) and not step_passed:
         console.print()
@@ -3281,54 +3790,54 @@ def _show_extract_and_summary(
     if step_passed:
         if check == "rows-distinct":
             success_message = (
-                f"[green]✓ Validation PASSED: No duplicate rows found in {data_source}[/green]"
+                f"[green]✓ Validation PASSED: No duplicate rows found in {display_source}[/green]"
             )
         elif check == "col-vals-not-null":
-            success_message = f"[green]✓ Validation PASSED: No null values found in column '{column}' in {data_source}[/green]"
+            success_message = f"[green]✓ Validation PASSED: No null values found in column '{column}' in {display_source}[/green]"
         elif check == "rows-complete":
-            success_message = f"[green]✓ Validation PASSED: All rows are complete (no missing values) in {data_source}[/green]"
+            success_message = f"[green]✓ Validation PASSED: All rows are complete (no missing values) in {display_source}[/green]"
         elif check == "col-exists":
             success_message = (
-                f"[green]✓ Validation PASSED: Column '{column}' exists in {data_source}[/green]"
+                f"[green]✓ Validation PASSED: Column '{column}' exists in {display_source}[/green]"
             )
         elif check == "col-vals-in-set":
-            success_message = f"[green]✓ Validation PASSED: All values in column '{column}' are in the allowed set in {data_source}[/green]"
+            success_message = f"[green]✓ Validation PASSED: All values in column '{column}' are in the allowed set in {display_source}[/green]"
         elif check == "col-vals-gt":
-            success_message = f"[green]✓ Validation PASSED: All values in column '{column}' are > {value} in {data_source}[/green]"
+            success_message = f"[green]✓ Validation PASSED: All values in column '{column}' are > {value} in {display_source}[/green]"
         elif check == "col-vals-ge":
-            success_message = f"[green]✓ Validation PASSED: All values in column '{column}' are >= {value} in {data_source}[/green]"
+            success_message = f"[green]✓ Validation PASSED: All values in column '{column}' are >= {value} in {display_source}[/green]"
         elif check == "col-vals-lt":
-            success_message = f"[green]✓ Validation PASSED: All values in column '{column}' are < {value} in {data_source}[/green]"
+            success_message = f"[green]✓ Validation PASSED: All values in column '{column}' are < {value} in {display_source}[/green]"
         elif check == "col-vals-le":
-            success_message = f"[green]✓ Validation PASSED: All values in column '{column}' are <= {value} in {data_source}[/green]"
+            success_message = f"[green]✓ Validation PASSED: All values in column '{column}' are <= {value} in {display_source}[/green]"
         else:
             success_message = (
-                f"[green]✓ Validation PASSED: {check} check passed for {data_source}[/green]"
+                f"[green]✓ Validation PASSED: {check} check passed for {display_source}[/green]"
             )
 
         console.print(Panel(success_message, border_style="green", expand=False))
     else:
         if step_info:
             if check == "rows-distinct":
-                failure_message = f"[red]✗ Validation FAILED: {step_info.n_failed:,} duplicate rows found in {data_source}[/red]"
+                failure_message = f"[red]✗ Validation FAILED: {step_info.n_failed:,} duplicate rows found in {display_source}[/red]"
             elif check == "col-vals-not-null":
-                failure_message = f"[red]✗ Validation FAILED: {step_info.n_failed:,} null values found in column '{column}' in {data_source}[/red]"
+                failure_message = f"[red]✗ Validation FAILED: {step_info.n_failed:,} null values found in column '{column}' in {display_source}[/red]"
             elif check == "rows-complete":
-                failure_message = f"[red]✗ Validation FAILED: {step_info.n_failed:,} incomplete rows found in {data_source}[/red]"
+                failure_message = f"[red]✗ Validation FAILED: {step_info.n_failed:,} incomplete rows found in {display_source}[/red]"
             elif check == "col-exists":
-                failure_message = f"[red]✗ Validation FAILED: Column '{column}' does not exist in {data_source}[/red]"
+                failure_message = f"[red]✗ Validation FAILED: Column '{column}' does not exist in {display_source}[/red]"
             elif check == "col-vals-in-set":
-                failure_message = f"[red]✗ Validation FAILED: {step_info.n_failed:,} invalid values found in column '{column}' in {data_source}[/red]"
+                failure_message = f"[red]✗ Validation FAILED: {step_info.n_failed:,} invalid values found in column '{column}' in {display_source}[/red]"
             elif check == "col-vals-gt":
-                failure_message = f"[red]✗ Validation FAILED: {step_info.n_failed:,} values <= {value} found in column '{column}' in {data_source}[/red]"
+                failure_message = f"[red]✗ Validation FAILED: {step_info.n_failed:,} values <= {value} found in column '{column}' in {display_source}[/red]"
             elif check == "col-vals-ge":
-                failure_message = f"[red]✗ Validation FAILED: {step_info.n_failed:,} values < {value} found in column '{column}' in {data_source}[/red]"
+                failure_message = f"[red]✗ Validation FAILED: {step_info.n_failed:,} values < {value} found in column '{column}' in {display_source}[/red]"
             elif check == "col-vals-lt":
-                failure_message = f"[red]✗ Validation FAILED: {step_info.n_failed:,} values >= {value} found in column '{column}' in {data_source}[/red]"
+                failure_message = f"[red]✗ Validation FAILED: {step_info.n_failed:,} values >= {value} found in column '{column}' in {display_source}[/red]"
             elif check == "col-vals-le":
-                failure_message = f"[red]✗ Validation FAILED: {step_info.n_failed:,} values > {value} found in column '{column}' in {data_source}[/red]"
+                failure_message = f"[red]✗ Validation FAILED: {step_info.n_failed:,} values > {value} found in column '{column}' in {display_source}[/red]"
             else:
-                failure_message = f"[red]✗ Validation FAILED: {step_info.n_failed:,} failing rows found in {data_source}[/red]"
+                failure_message = f"[red]✗ Validation FAILED: {step_info.n_failed:,} failing rows found in {display_source}[/red]"
 
             # Add hint about --show-extract if not already used (except for col-exists which has no rows to show)
             if not show_extract and check != "col-exists":
@@ -3338,15 +3847,15 @@ def _show_extract_and_summary(
         else:
             if check == "rows-distinct":
                 failure_message = (
-                    f"[red]✗ Validation FAILED: Duplicate rows found in {data_source}[/red]"
+                    f"[red]✗ Validation FAILED: Duplicate rows found in {display_source}[/red]"
                 )
             elif check == "rows-complete":
                 failure_message = (
-                    f"[red]✗ Validation FAILED: Incomplete rows found in {data_source}[/red]"
+                    f"[red]✗ Validation FAILED: Incomplete rows found in {display_source}[/red]"
                 )
             else:
                 failure_message = (
-                    f"[red]✗ Validation FAILED: {check} check failed for {data_source}[/red]"
+                    f"[red]✗ Validation FAILED: {check} check failed for {display_source}[/red]"
                 )
 
             # Add hint about --show-extract if not already used
@@ -3357,8 +3866,8 @@ def _show_extract_and_summary(
 
 
 @cli.command()
-@click.argument("output_file", type=click.Path())
-def make_template(output_file: str):
+@click.argument("output_file", type=click.Path(), required=False)
+def make_template(output_file: str | None):
     """
     Create a validation script template.
 
@@ -3374,6 +3883,11 @@ def make_template(output_file: str):
     pb make-template my_validation.py
     pb make-template validation_template.py
     """
+    # Handle missing output_file with concise help
+    if output_file is None:
+        _show_concise_help("make-template", None)
+        return
+
     example_script = '''"""
 Example Pointblank validation script.
 
@@ -3437,7 +3951,7 @@ validation = (
 
 
 @cli.command()
-@click.argument("validation_script", type=click.Path(exists=True))
+@click.argument("validation_script", type=click.Path(exists=True), required=False)
 @click.option(
     "--data",
     type=str,
@@ -3462,7 +3976,7 @@ validation = (
     help="Exit with non-zero code when validation reaches this threshold level",
 )
 def run(
-    validation_script: str,
+    validation_script: str | None,
     data: str | None,
     output_html: str | None,
     output_json: str | None,
@@ -3503,6 +4017,11 @@ def run(
     pb run validation_script.py --write-extract extracts_folder --fail-on critical
     """
     try:
+        # Handle missing validation_script with concise help
+        if validation_script is None:
+            _show_concise_help("run", None)
+            return
+
         # Load optional data override if provided
         cli_data = None
         if data:
@@ -3902,3 +4421,768 @@ def _format_missing_percentage(value: float) -> str:
         return ">99%"  # More than 99%
     else:
         return f"{int(round(value))}%"  # Round to nearest integer with % sign
+
+
+@cli.command()
+@click.argument("polars_expression", type=str, required=False)
+@click.option("--edit", "-e", is_flag=True, help="Open editor for multi-line input")
+@click.option("--file", "-f", type=click.Path(exists=True), help="Read query from file")
+@click.option(
+    "--editor", help="Editor to use for --edit mode (overrides $EDITOR and auto-detection)"
+)
+@click.option(
+    "--output-format",
+    "-o",
+    type=click.Choice(["preview", "scan", "missing", "info"]),
+    default="preview",
+    help="Output format for the result",
+)
+@click.option("--preview-head", default=5, help="Number of head rows for preview")
+@click.option("--preview-tail", default=5, help="Number of tail rows for preview")
+@click.option("--output-html", type=click.Path(), help="Save HTML output to file")
+@click.option(
+    "--pipe", is_flag=True, help="Output data in a format suitable for piping to other pb commands"
+)
+@click.option(
+    "--pipe-format",
+    type=click.Choice(["parquet", "csv"]),
+    default="parquet",
+    help="Format for piped output (default: parquet)",
+)
+def pl(
+    polars_expression: str | None,
+    edit: bool,
+    file: str | None,
+    editor: str | None,
+    output_format: str,
+    preview_head: int,
+    preview_tail: int,
+    output_html: str | None,
+    pipe: bool,
+    pipe_format: str,
+):
+    """
+    Execute Polars expressions and display results.
+
+    Execute Polars DataFrame operations from the command line and display
+    the results using Pointblank's visualization tools.
+
+    POLARS_EXPRESSION should be a valid Polars expression that returns a DataFrame.
+    The 'pl' module is automatically imported and available.
+
+    Examples:
+
+    \b
+    # Direct expression
+    pb pl "pl.read_csv('data.csv')"
+    pb pl "pl.read_csv('data.csv').select(['name', 'age'])"
+    pb pl "pl.read_csv('data.csv').filter(pl.col('age') > 25)"
+
+    # Multi-line with editor (supports multiple statements)
+    pb pl --edit
+
+    # Multi-statement code example in editor:
+    # csv = pl.read_csv('data.csv')
+    # result = csv.select(['name', 'age']).filter(pl.col('age') > 25)
+
+    # Multi-line with a specific editor
+    pb pl --edit --editor nano
+    pb pl --edit --editor code
+    pb pl --edit --editor micro
+
+    # From file
+    pb pl --file query.py
+
+    # Piping to other pb commands
+    pb pl "pl.read_csv('data.csv').filter(pl.col('age') > 25)" --pipe | pb validate --check rows-distinct
+    pb pl --edit --pipe | pb preview --head 10
+    pb pl --edit --pipe | pb scan --output-html report.html
+    pb pl --edit --pipe | pb missing --output-html missing_report.html
+
+    Use --output-format to change how results are displayed:
+
+    \b
+    pb pl "pl.read_csv('data.csv')" --output-format scan
+    pb pl "pl.read_csv('data.csv')" --output-format missing
+    pb pl "pl.read_csv('data.csv')" --output-format info
+
+    Note: For multi-statement code, assign your final result to a variable like
+    'result', 'df', 'data', or ensure it's the last expression.
+    """
+    try:
+        # Check if Polars is available
+        if not _is_lib_present("polars"):
+            console.print("[red]Error:[/red] Polars is not installed")
+            console.print("\nThe 'pb pl' command requires Polars to be installed.")
+            console.print("Install it with: [cyan]pip install polars[/cyan]")
+            console.print("\nTo check all dependency status, run: [cyan]pb requirements[/cyan]")
+            sys.exit(1)
+
+        import polars as pl
+
+        # Determine the source of the query
+        query_code = None
+
+        if file:
+            # Read from file
+            query_code = Path(file).read_text()
+        elif edit:
+            # Determine which editor to use
+            chosen_editor = editor or _get_best_editor()
+
+            # When piping, send editor message to stderr
+            if pipe:
+                print(f"Using editor: {chosen_editor}", file=sys.stderr)
+            else:
+                console.print(f"[dim]Using editor: {chosen_editor}[/dim]")
+
+            # Interactive editor with custom editor
+            if chosen_editor == "code":
+                # Special handling for VS Code
+                query_code = _edit_with_vscode()
+            else:
+                # Use click.edit() for terminal editors
+                query_code = click.edit(
+                    "# Enter your Polars query here\n"
+                    "# Example:\n"
+                    "# pl.read_csv('data.csv').select(['name', 'age'])\n"
+                    "# pl.read_csv('data.csv').filter(pl.col('age') > 25)\n"
+                    "# \n"
+                    "# The result should be a Polars DataFrame or LazyFrame\n"
+                    "\n",
+                    editor=chosen_editor,
+                )
+
+            if query_code is None:
+                if pipe:
+                    print("No query entered", file=sys.stderr)
+                else:
+                    console.print("[yellow]No query entered[/yellow]")
+                sys.exit(1)
+        elif polars_expression:
+            # Direct argument
+            query_code = polars_expression
+        else:
+            # Try to read from stdin (for piping)
+            if not sys.stdin.isatty():
+                # Data is being piped in
+                query_code = sys.stdin.read().strip()
+            else:
+                # No input provided and stdin is a terminal - show concise help
+                _show_concise_help("pl", None)
+                return
+
+        if not query_code or not query_code.strip():
+            console.print("[red]Error:[/red] Empty query")
+            sys.exit(1)
+
+        # Execute the query
+        with console.status("[bold green]Executing Polars expression..."):
+            namespace = {
+                "pl": pl,
+                "polars": pl,
+                "__builtins__": __builtins__,
+            }
+
+            try:
+                # Check if this is a single expression or multiple statements
+                if "\n" in query_code.strip() or any(
+                    keyword in query_code
+                    for keyword in [
+                        " = ",
+                        "import",
+                        "for ",
+                        "if ",
+                        "def ",
+                        "class ",
+                        "with ",
+                        "try:",
+                    ]
+                ):
+                    # Multiple statements - use exec()
+                    exec(query_code, namespace)
+
+                    # Look for the result in the namespace
+                    # Try common variable names first
+                    result = None
+                    for var_name in ["result", "df", "data", "table", "output"]:
+                        if var_name in namespace:
+                            result = namespace[var_name]
+                            break
+
+                    # If no common names found, look for any DataFrame/LazyFrame
+                    if result is None:
+                        for key, value in namespace.items():
+                            if (
+                                hasattr(value, "collect") or hasattr(value, "columns")
+                            ) and not key.startswith("_"):
+                                result = value
+                                break
+
+                    # If still no result, get the last assigned variable (excluding builtins)
+                    if result is None:
+                        # Get variables that were added to namespace (excluding our imports)
+                        user_vars = {
+                            k: v
+                            for k, v in namespace.items()
+                            if k not in ["pl", "polars", "__builtins__"] and not k.startswith("_")
+                        }
+                        if user_vars:
+                            # Get the last variable (this is a heuristic)
+                            last_var = list(user_vars.keys())[-1]
+                            result = user_vars[last_var]
+
+                    if result is None:
+                        if pipe:
+                            print(
+                                "[red]Error:[/red] Could not find result variable", file=sys.stderr
+                            )
+                            print(
+                                "[dim]Assign your final result to a variable like 'result', 'df', or 'data'[/dim]",
+                                file=sys.stderr,
+                            )
+                            print(
+                                "[dim]Or ensure your last line returns a DataFrame[/dim]",
+                                file=sys.stderr,
+                            )
+                        else:
+                            console.print("[red]Error:[/red] Could not find result variable")
+                            console.print(
+                                "[dim]Assign your final result to a variable like 'result', 'df', or 'data'[/dim]"
+                            )
+                            console.print("[dim]Or ensure your last line returns a DataFrame[/dim]")
+                        sys.exit(1)
+
+                else:
+                    # Single expression - use eval()
+                    result = eval(query_code, namespace)
+
+                # Validate result
+                if not hasattr(result, "collect") and not hasattr(result, "columns"):
+                    if pipe:
+                        print(
+                            "[red]Error:[/red] Expression must return a Polars DataFrame or LazyFrame",
+                            file=sys.stderr,
+                        )
+                        print(f"[dim]Got: {type(result)}[/dim]", file=sys.stderr)
+                    else:
+                        console.print(
+                            "[red]Error:[/red] Expression must return a Polars DataFrame or LazyFrame"
+                        )
+                        console.print(f"[dim]Got: {type(result)}[/dim]")
+                    sys.exit(1)
+
+            except Exception as e:
+                # When piping, send errors to stderr so they don't interfere with the pipe
+                if pipe:
+                    print(f"Error executing Polars expression: {e}", file=sys.stderr)
+                    print(file=sys.stderr)
+
+                    # Create a panel with the expression(s) for better readability
+                    if "\n" in query_code.strip():
+                        # Multi-line expression
+                        print(f"Expression(s) provided:\n{query_code}", file=sys.stderr)
+                    else:
+                        # Single line expression
+                        print(f"Expression provided: {query_code}", file=sys.stderr)
+                else:
+                    # Normal error handling when not piping
+                    console.print(f"[red]Error executing Polars expression:[/red] {e}")
+                    console.print()
+
+                    # Create a panel with the expression(s) for better readability
+                    if "\n" in query_code.strip():
+                        # Multi-line expression
+                        console.print(
+                            Panel(
+                                query_code,
+                                title="Expression(s) provided",
+                                border_style="red",
+                                expand=False,
+                                title_align="left",
+                            )
+                        )
+                    else:
+                        # Single line expression
+                        console.print(
+                            Panel(
+                                query_code,
+                                title="Expression provided",
+                                border_style="red",
+                                expand=False,
+                                title_align="left",
+                            )
+                        )
+
+                sys.exit(1)
+
+        # Only print success message when not piping (so it doesn't interfere with pipe output)
+        if not pipe:
+            console.print("[green]✓[/green] Polars expression executed successfully")
+
+        # Process output
+        if pipe:
+            # Output data for piping to other commands
+            _handle_pl_pipe(result, pipe_format)
+        elif output_format == "preview":
+            _handle_pl_preview(result, preview_head, preview_tail, output_html)
+        elif output_format == "scan":
+            _handle_pl_scan(result, query_code, output_html)
+        elif output_format == "missing":
+            _handle_pl_missing(result, query_code, output_html)
+        elif output_format == "info":
+            _handle_pl_info(result, query_code, output_html)
+        elif output_format == "validate":
+            console.print("[yellow]Validation output format not yet implemented[/yellow]")
+            console.print("Use 'pb validate' with a data file for now")
+
+    except Exception as e:
+        console.print(f"[red]Error:[/red] {e}")
+        sys.exit(1)
+
+
+def _handle_pl_preview(result: Any, head: int, tail: int, output_html: str | None) -> None:
+    """Handle preview output for Polars results."""
+    try:
+        # Create preview using existing preview function
+        gt_table = pb.preview(
+            data=result,
+            n_head=head,
+            n_tail=tail,
+            show_row_numbers=True,
+        )
+
+        if output_html:
+            html_content = gt_table.as_raw_html()
+            Path(output_html).write_text(html_content, encoding="utf-8")
+            console.print(f"[green]✓[/green] HTML saved to: {output_html}")
+        else:
+            # Get metadata for enhanced preview
+            try:
+                total_rows = pb.get_row_count(result)
+                total_columns = pb.get_column_count(result)
+                table_type = _get_tbl_type(result)
+
+                preview_info = {
+                    "total_rows": total_rows,
+                    "total_columns": total_columns,
+                    "head_rows": head,
+                    "tail_rows": tail,
+                    "is_complete": total_rows <= (head + tail),
+                    "source_type": "Polars expression",
+                    "table_type": table_type,
+                }
+
+                _rich_print_gt_table(gt_table, preview_info)
+            except Exception:
+                # Fallback to basic display
+                _rich_print_gt_table(gt_table)
+
+    except Exception as e:
+        console.print(f"[red]Error creating preview:[/red] {e}")
+        sys.exit(1)
+
+
+def _handle_pl_scan(result: Any, expression: str, output_html: str | None) -> None:
+    """Handle scan output for Polars results."""
+    try:
+        scan_result = pb.col_summary_tbl(data=result)
+
+        if output_html:
+            html_content = scan_result.as_raw_html()
+            Path(output_html).write_text(html_content, encoding="utf-8")
+            console.print(f"[green]✓[/green] Data scan report saved to: {output_html}")
+        else:
+            # Get metadata for enhanced scan display
+            try:
+                total_rows = pb.get_row_count(result)
+                total_columns = pb.get_column_count(result)
+                table_type = _get_tbl_type(result)
+
+                _rich_print_scan_table(
+                    scan_result,
+                    expression,
+                    "Polars expression",
+                    table_type,
+                    total_rows,
+                    total_columns,
+                )
+            except Exception as e:
+                console.print(f"[yellow]Could not display scan summary: {e}[/yellow]")
+
+    except Exception as e:
+        console.print(f"[red]Error creating scan:[/red] {e}")
+        sys.exit(1)
+
+
+def _handle_pl_missing(result: Any, expression: str, output_html: str | None) -> None:
+    """Handle missing values output for Polars results."""
+    try:
+        missing_table = pb.missing_vals_tbl(data=result)
+
+        if output_html:
+            html_content = missing_table.as_raw_html()
+            Path(output_html).write_text(html_content, encoding="utf-8")
+            console.print(f"[green]✓[/green] Missing values report saved to: {output_html}")
+        else:
+            _rich_print_missing_table(missing_table, result)
+
+    except Exception as e:
+        console.print(f"[red]Error creating missing values report:[/red] {e}")
+        sys.exit(1)
+
+
+def _handle_pl_info(result: Any, expression: str, output_html: str | None) -> None:
+    """Handle info output for Polars results."""
+    try:
+        # Get basic info
+        tbl_type = _get_tbl_type(result)
+        row_count = pb.get_row_count(result)
+        col_count = pb.get_column_count(result)
+
+        # Get column names and types
+        if hasattr(result, "columns"):
+            columns = list(result.columns)
+        elif hasattr(result, "schema"):
+            columns = list(result.schema.names)
+        else:
+            columns = []
+
+        dtypes_dict = _get_column_dtypes(result, columns)
+
+        if output_html:
+            # Create a simple HTML info page
+            # TODO: Implement an improved version of this in the Python API and then
+            # use that here
+            html_content = f"""
+            <html><body>
+            <h2>Polars Expression Info</h2>
+            <p><strong>Expression:</strong> {expression}</p>
+            <p><strong>Table Type:</strong> {tbl_type}</p>
+            <p><strong>Rows:</strong> {row_count:,}</p>
+            <p><strong>Columns:</strong> {col_count:,}</p>
+            <h3>Column Details</h3>
+            <ul>
+            {"".join(f"<li>{col}: {dtypes_dict.get(col, '?')}</li>" for col in columns)}
+            </ul>
+            </body></html>
+            """
+            Path(output_html).write_text(html_content, encoding="utf-8")
+            console.print(f"[green]✓[/green] HTML info saved to: {output_html}")
+        else:
+            # Display info table
+            from rich.box import SIMPLE_HEAD
+
+            info_table = Table(
+                title="Polars Expression Info",
+                show_header=True,
+                header_style="bold magenta",
+                box=SIMPLE_HEAD,
+                title_style="bold cyan",
+                title_justify="left",
+            )
+            info_table.add_column("Property", style="cyan", no_wrap=True)
+            info_table.add_column("Value", style="green")
+
+            info_table.add_row("Expression", expression)
+            # Capitalize "polars" to "Polars" for consistency with pb info command
+            display_tbl_type = (
+                tbl_type.replace("polars", "Polars") if "polars" in tbl_type.lower() else tbl_type
+            )
+            info_table.add_row("Table Type", display_tbl_type)
+            info_table.add_row("Rows", f"{row_count:,}")
+            info_table.add_row("Columns", f"{col_count:,}")
+
+            console.print()
+            console.print(info_table)
+
+            # Show column details
+            if columns:
+                console.print("\n[bold cyan]Column Details:[/bold cyan]")
+                for col in columns[:10]:  # Show first 10 columns
+                    dtype = dtypes_dict.get(col, "?")
+                    console.print(f"  • {col}: [yellow]{dtype}[/yellow]")
+
+                if len(columns) > 10:
+                    console.print(f"  ... and {len(columns) - 10} more columns")
+
+    except Exception as e:
+        console.print(f"[red]Error creating info:[/red] {e}")
+        sys.exit(1)
+
+
+def _handle_pl_pipe(result: Any, pipe_format: str) -> None:
+    """Handle piped output from Polars results."""
+    try:
+        import sys
+        import tempfile
+
+        # Create a temporary file to store the data
+        with tempfile.NamedTemporaryFile(
+            mode="w", suffix=f".{pipe_format}", prefix="pb_pipe_", delete=False
+        ) as temp_file:
+            temp_path = temp_file.name
+
+        # Write the data to the temporary file
+        if pipe_format == "parquet":
+            if hasattr(result, "write_parquet"):
+                # Polars
+                result.write_parquet(temp_path)
+            elif hasattr(result, "to_parquet"):
+                # Pandas
+                result.to_parquet(temp_path)
+            else:
+                # Convert to pandas and write
+                import pandas as pd
+
+                pd_result = pd.DataFrame(result)
+                pd_result.to_parquet(temp_path)
+        else:  # CSV
+            if hasattr(result, "write_csv"):
+                # Polars
+                result.write_csv(temp_path)
+            elif hasattr(result, "to_csv"):
+                # Pandas
+                result.to_csv(temp_path, index=False)
+            else:
+                # Convert to pandas and write
+                import pandas as pd
+
+                pd_result = pd.DataFrame(result)
+                pd_result.to_csv(temp_path, index=False)
+
+        # Output the temporary file path to stdout for the next command
+        print(temp_path)
+
+    except Exception as e:
+        print(f"[red]Error creating pipe output:[/red] {e}", file=sys.stderr)
+        sys.exit(1)
+
+
+def _get_best_editor() -> str:
+    """Detect the best available editor on the system."""
+
+    # Check environment variable first
+    if "EDITOR" in os.environ:
+        return os.environ["EDITOR"]
+
+    # Check for common editors in order of preference
+    editors = [
+        "code",  # VS Code
+        "micro",  # Modern terminal editor
+        "nano",  # User-friendly terminal editor
+        "vim",  # Vim
+        "vi",  # Vi (fallback)
+    ]
+
+    for editor in editors:
+        if shutil.which(editor):
+            return editor
+
+    # Ultimate fallback
+    return "nano"
+
+
+def _edit_with_vscode() -> str | None:
+    """Edit Polars query using VS Code."""
+    import subprocess
+    import tempfile
+
+    # Create a temporary Python file
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".py", prefix="pb_pl_", delete=False) as f:
+        f.write("import polars as pl\n")
+        f.write("\n")
+        f.write("# Enter your Polars query here\n")
+        f.write("# Examples:\n")
+        f.write("# \n")
+        f.write("# Single expression:\n")
+        f.write("# pl.read_csv('data.csv').select(['name', 'age'])\n")
+        f.write("# \n")
+        f.write("# Multiple statements:\n")
+        f.write("# csv = pl.read_csv('data.csv')\n")
+        f.write("# result = csv.select(['name', 'age']).filter(pl.col('age') > 25)\n")
+        f.write("# \n")
+        f.write("# For multi-statement code, assign your final result to a variable\n")
+        f.write("# like 'result', 'df', 'data', or just ensure it's the last line\n")
+        f.write("# \n")
+        f.write("# Save and then close this file in VS Code to execute the query\n")
+        f.write("\n")
+        temp_file = f.name
+
+    try:
+        # Open in VS Code and wait for it to close
+        result = subprocess.run(
+            ["code", "--wait", temp_file], capture_output=True, text=True, timeout=300
+        )
+
+        if result.returncode != 0:
+            console.print(f"[yellow]VS Code exited with code {result.returncode}[/yellow]")
+
+        # Read the edited content
+        with open(temp_file, "r") as f:
+            content = f.read()
+
+        # Remove comments, empty lines, and import statements for cleaner execution
+        lines = []
+        for line in content.split("\n"):
+            stripped = line.strip()
+            if (
+                stripped
+                and not stripped.startswith("#")
+                and not stripped.startswith("import polars")
+                and not stripped.startswith("import polars as pl")
+            ):
+                lines.append(line)
+
+        return "\n".join(lines) if lines else None
+
+    except subprocess.TimeoutExpired:
+        console.print("[red]Timeout:[/red] VS Code took too long to respond")
+        return None
+    except subprocess.CalledProcessError as e:
+        console.print(f"[red]Error:[/red] Could not open VS Code: {e}")
+        return None
+    except FileNotFoundError:
+        console.print("[red]Error:[/red] VS Code not found in PATH")
+        return None
+    finally:
+        # Clean up
+        Path(temp_file).unlink(missing_ok=True)
+
+
+def _show_concise_help(command_name: str, ctx: click.Context) -> None:
+    """Show concise help for a command when required arguments are missing."""
+
+    if command_name == "info":
+        console.print("[bold cyan]pb info[/bold cyan] - Display information about a data source")
+        console.print()
+        console.print("[bold yellow]Usage:[/bold yellow]")
+        console.print("  pb info data.csv")
+        console.print("  pb info small_table")
+        console.print()
+        console.print("[dim]Shows table type, dimensions, column names, and data types[/dim]")
+        console.print()
+        console.print(
+            "[dim]Use [bold]pb info --help[/bold] for complete options and examples[/dim]"
+        )
+
+    elif command_name == "preview":
+        console.print(
+            "[bold cyan]pb preview[/bold cyan] - Preview a data table showing head and tail rows"
+        )
+        console.print()
+        console.print("[bold yellow]Usage:[/bold yellow]")
+        console.print("  pb preview data.csv")
+        console.print("  pb preview data.parquet --head 10 --tail 5")
+        console.print()
+        console.print("[bold yellow]Key Options:[/bold yellow]")
+        console.print("  --head N          Number of rows from the top (default: 5)")
+        console.print("  --tail N          Number of rows from the bottom (default: 5)")
+        console.print("  --columns LIST    Comma-separated list of columns to display")
+        console.print("  --output-html     Save HTML output to file")
+        console.print()
+        console.print(
+            "[dim]Use [bold]pb preview --help[/bold] for complete options and examples[/dim]"
+        )
+
+    elif command_name == "scan":
+        console.print(
+            "[bold cyan]pb scan[/bold cyan] - Generate a comprehensive data profile report"
+        )
+        console.print()
+        console.print("[bold yellow]Usage:[/bold yellow]")
+        console.print("  pb scan data.csv")
+        console.print("  pb scan data.parquet --output-html report.html")
+        console.print()
+        console.print("[bold yellow]Key Options:[/bold yellow]")
+        console.print("  --output-html     Save HTML scan report to file")
+        console.print("  --columns LIST    Comma-separated list of columns to scan")
+        console.print()
+        console.print(
+            "[dim]Use [bold]pb scan --help[/bold] for complete options and examples[/dim]"
+        )
+
+    elif command_name == "missing":
+        console.print("[bold cyan]pb missing[/bold cyan] - Generate a missing values report")
+        console.print()
+        console.print("[bold yellow]Usage:[/bold yellow]")
+        console.print("  pb missing data.csv")
+        console.print("  pb missing data.parquet --output-html missing_report.html")
+        console.print()
+        console.print("[bold yellow]Key Options:[/bold yellow]")
+        console.print("  --output-html     Save HTML output to file")
+        console.print()
+        console.print(
+            "[dim]Use [bold]pb missing --help[/bold] for complete options and examples[/dim]"
+        )
+
+    elif command_name == "validate":
+        console.print("[bold cyan]pb validate[/bold cyan] - Perform data validation checks")
+        console.print()
+        console.print("[bold yellow]Usage:[/bold yellow]")
+        console.print("  pb validate data.csv")
+        console.print("  pb validate data.csv --check col-vals-not-null --column email")
+        console.print()
+        console.print("[bold yellow]Key Options:[/bold yellow]")
+        console.print("  --check TYPE      Validation check type (default: rows-distinct)")
+        console.print("  --column COL      Column name for column-specific checks")
+        console.print("  --show-extract    Show failing rows if validation fails")
+        console.print("  --list-checks     List all available validation checks")
+        console.print()
+        console.print(
+            "[dim]Use [bold]pb validate --help[/bold] for complete options and examples[/dim]"
+        )
+
+    elif command_name == "run":
+        console.print("[bold cyan]pb run[/bold cyan] - Run a Pointblank validation script")
+        console.print()
+        console.print("[bold yellow]Usage:[/bold yellow]")
+        console.print("  pb run validation_script.py")
+        console.print("  pb run validation_script.py --data data.csv")
+        console.print()
+        console.print("[bold yellow]Key Options:[/bold yellow]")
+        console.print("  --data SOURCE     Replace data source in validation objects")
+        console.print("  --output-html     Save HTML validation report to file")
+        console.print("  --show-extract    Show failing rows if validation fails")
+        console.print("  --fail-on LEVEL   Exit with error on critical/error/warning/any")
+        console.print()
+        console.print("[dim]Use [bold]pb run --help[/bold] for complete options and examples[/dim]")
+
+    elif command_name == "make-template":
+        console.print(
+            "[bold cyan]pb make-template[/bold cyan] - Create a validation script template"
+        )
+        console.print()
+        console.print("[bold yellow]Usage:[/bold yellow]")
+        console.print("  pb make-template my_validation.py")
+        console.print("  pb make-template validation_template.py")
+        console.print()
+        console.print("[dim]Creates a sample Python script with validation examples[/dim]")
+        console.print("[dim]Edit the template and run with [bold]pb run[/bold][/dim]")
+        console.print()
+        console.print(
+            "[dim]Use [bold]pb make-template --help[/bold] for complete options and examples[/dim]"
+        )
+
+    elif command_name == "pl":
+        console.print(
+            "[bold cyan]pb pl[/bold cyan] - Execute Polars expressions and display results"
+        )
+        console.print()
+        console.print("[bold yellow]Usage:[/bold yellow]")
+        console.print("  pb pl \"pl.read_csv('data.csv')\"")
+        console.print("  pb pl --edit")
+        console.print()
+        console.print("[bold yellow]Key Options:[/bold yellow]")
+        console.print("  --edit            Open editor for multi-line input")
+        console.print("  --file FILE       Read query from file")
+        console.print("  --output-format   Output format: preview, scan, missing, info")
+        console.print("  --pipe            Output for piping to other pb commands")
+        console.print()
+        console.print("[dim]Use [bold]pb pl --help[/bold] for complete options and examples[/dim]")
+
+    # Fix the exit call at the end
+    if ctx is not None:
+        ctx.exit(1)
+    else:
+        sys.exit(1)

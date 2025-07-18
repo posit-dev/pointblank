@@ -1,6 +1,3 @@
-# VHS tape for CI/CD integration workflows
-# Shows production-ready automation patterns
-
 Output cli-cicd-workflows.gif
 
 Set FontSize 16
@@ -8,9 +5,9 @@ Set Width 1200
 Set Height 700
 Set Theme "Dracula"
 
-Type "# Example of a Production CI/CD Data Validation Workflow"
+Type "# Example of a Production CI/CD Data Validation Workflow with the Pointblank CLI"
 Enter
-Sleep 2s
+Sleep 3s
 
 Type ""
 Enter
@@ -38,8 +35,8 @@ Sleep 10s
 
 Type ""
 Enter
-Type "# Use in GitHub Actions or any automation platform"
+Type "# Make use of --exit-code in GitHub Actions or any other automation platform"
 Enter
-Type "echo 'Exit codes: 0 = success, 1 = validation failed'"
+Type "# Exit codes: 0 = success, 1 = validation failed"
 Enter
-Sleep 8s
+Sleep 6s

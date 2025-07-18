@@ -196,6 +196,49 @@ pb validate small_table --check col-vals-gt --column a --value 5 --show-extract
 pb validate small_table --check rows-distinct --exit-code
 ```
 
+Click the following headings to see some video demonstrations of the CLI:
+
+<details>
+<summary>Getting Started with the Pointblank CLI</summary>
+
+<div align="center">
+<img src="https://posit-dev.github.io/pointblank/assets/vhs/cli-getting-started.gif" width="100%">
+</div>
+
+</details>
+<details>
+<summary>Doing Some Data Exploration</summary>
+
+<div align="center">
+<img src="https://posit-dev.github.io/pointblank/assets/vhs/cli-data-exploration.gif" width="100%">
+</div>
+
+</details>
+<details>
+<summary>Validating Data with the CLI</summary>
+
+<div align="center">
+<img src="https://posit-dev.github.io/pointblank/assets/vhs/cli-essential-validations.gif" width="100%">
+</div>
+
+</details>
+<details>
+<summary>Using Polars in the CLI</summary>
+
+<div align="center">
+<img src="https://posit-dev.github.io/pointblank/assets/vhs/cli-using-polars.gif" width="100%">
+</div>
+
+</details>
+<details>
+<summary>Integrating Pointblank with CI/CD</summary>
+
+<div align="center">
+<img src="https://posit-dev.github.io/pointblank/assets/vhs/cli-cicd-workflows.gif" width="100%">
+</div>
+
+</details>
+
 ## Features That Set Pointblank Apart
 
 - **Complete validation workflow**: From data access to validation to reporting in a single pipeline
@@ -262,6 +305,10 @@ There are many ways to contribute to the ongoing development of Pointblank. Some
 
 Please read over the [contributing guidelines](https://github.com/posit-dev/pointblank/blob/main/CONTRIBUTING.md) for
 information on how to get started.
+
+## Pointblank for R
+
+There's also a version of Pointblank for R, which has been around since 2017 and is widely used in the R community. You can find it at https://github.com/rstudio/pointblank.
 
 ## Roadmap
 
