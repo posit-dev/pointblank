@@ -87,6 +87,7 @@ from pointblank._utils_check_args import (
 from pointblank._utils_html import _create_table_dims_html, _create_table_type_html
 from pointblank.column import Column, ColumnLiteral, ColumnSelector, ColumnSelectorNarwhals, col
 from pointblank.schema import Schema, _get_schema_validation_info
+from pointblank.segments import SegmentGroup
 from pointblank.thresholds import (
     Actions,
     FinalActions,
@@ -13854,7 +13855,7 @@ def _prep_values_text(
     return values_str
 
 
-def _seg_expr_from_string(data_tbl: any, segments_expr: str) -> tuple[str, str]:
+def _seg_expr_from_string(data_tbl: any, segments_expr: str) -> list[tuple[str, str]]:
     """
     Obtain the segmentation categories from a table column.
 
@@ -13893,8 +13894,8 @@ def _seg_expr_from_string(data_tbl: any, segments_expr: str) -> tuple[str, str]:
     else:  # pragma: no cover
         raise ValueError(f"Unsupported table type: {tbl_type}")
 
-    # Ensure that the categories are sorted
-    seg_categories.sort()
+    # Ensure that the categories are sorted, and allow for None values
+    seg_categories.sort(key=lambda x: (x is None, x))
 
     # Place each category and each value in a list of tuples as: `(column, value)`
     seg_tuples = [(segments_expr, category) for category in seg_categories]
@@ -13902,7 +13903,7 @@ def _seg_expr_from_string(data_tbl: any, segments_expr: str) -> tuple[str, str]:
     return seg_tuples
 
 
-def _seg_expr_from_tuple(segments_expr: tuple) -> list[tuple[str, str]]:
+def _seg_expr_from_tuple(segments_expr: tuple) -> list[tuple[str, Any]]:
     """
     Normalize the segments expression to a list of tuples, given a single tuple.
 
@@ -13928,17 +13929,23 @@ def _seg_expr_from_tuple(segments_expr: tuple) -> list[tuple[str, str]]:
 
     Returns
     -------
-    list[tuple[str, str]]
+    list[tuple[str, Any]]
         A list of tuples representing pairings of a column name and a value in the column.
+        Values can be any type, including None.
     """
+    # Unpack the segments expression tuple for more convenient and explicit variable names
+    column, value = segments_expr
+
     # Check if the first element is a string
-    if isinstance(segments_expr[0], str):
-        # If the second element is a list, create a list of tuples
-        if isinstance(segments_expr[1], list):
-            seg_tuples = [(segments_expr[0], value) for value in segments_expr[1]]
+    if isinstance(column, str):
+        if isinstance(value, SegmentGroup):
+            seg_tuples = [(column, value.segments)]
+        # If the second element is a collection, expand into a list of tuples
+        elif isinstance(value, (list, set, tuple)):
+            seg_tuples = [(column, seg) for seg in value]
         # If the second element is not a list, create a single tuple
         else:
-            seg_tuples = [(segments_expr[0], segments_expr[1])]
+            seg_tuples = [(column, value)]
     # If the first element is not a string, raise an error
     else:  # pragma: no cover
         raise ValueError("The first element of the segments expression must be a string.")
@@ -13946,7 +13953,7 @@ def _seg_expr_from_tuple(segments_expr: tuple) -> list[tuple[str, str]]:
     return seg_tuples
 
 
-def _apply_segments(data_tbl: any, segments_expr: tuple[str, str]) -> any:
+def _apply_segments(data_tbl: any, segments_expr: tuple[str, Any]) -> any:
     """
     Apply the segments expression to the data table.
 
@@ -13969,6 +13976,9 @@ def _apply_segments(data_tbl: any, segments_expr: tuple[str, str]) -> any:
     # Get the table type
     tbl_type = _get_tbl_type(data=data_tbl)
 
+    # Unpack the segments expression tuple for more convenient and explicit variable names
+    column, value = segments_expr
+
     if tbl_type in ["pandas", "polars"]:
         # If the table is a Pandas or Polars DataFrame, transforming to a Narwhals table
         # and perform the filtering operation
@@ -13977,7 +13987,13 @@ def _apply_segments(data_tbl: any, segments_expr: tuple[str, str]) -> any:
         data_tbl_nw = nw.from_native(data_tbl)
 
         # Filter the data table based on the column name and value
-        data_tbl_nw = data_tbl_nw.filter(nw.col(segments_expr[0]) == segments_expr[1])
+        if value is None:
+            data_tbl_nw = data_tbl_nw.filter(nw.col(column).is_null())
+        # Check if the value is a segment group
+        elif isinstance(value, (list, set, tuple)):
+            data_tbl_nw = data_tbl_nw.filter(nw.col(column).is_in(value))
+        else:
+            data_tbl_nw = data_tbl_nw.filter(nw.col(column) == value)
 
         # Transform back to the original table type
         data_tbl = data_tbl_nw.to_native()
@@ -13986,7 +14002,12 @@ def _apply_segments(data_tbl: any, segments_expr: tuple[str, str]) -> any:
         # If the table is an Ibis backend table, perform the filtering operation directly
 
         # Filter the data table based on the column name and value
-        data_tbl = data_tbl[data_tbl[segments_expr[0]] == segments_expr[1]]
+        if value is None:
+            data_tbl = data_tbl[data_tbl[column].isnull()]
+        elif isinstance(value, (list, set, tuple)):
+            data_tbl = data_tbl[data_tbl[column].isin(value)]
+        else:
+            data_tbl = data_tbl[data_tbl[column] == value]
 
     return data_tbl
 
