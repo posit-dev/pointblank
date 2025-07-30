@@ -3869,26 +3869,121 @@ def _show_extract_and_summary(
 @click.argument("output_file", type=click.Path(), required=False)
 def make_template(output_file: str | None):
     """
-    Create a validation script template.
+    Create a validation script or YAML configuration template.
 
-    Creates a sample Python script with examples showing how to use Pointblank
-    for data validation. Edit the template to add your own data loading and
-    validation rules, then run it with 'pb run'.
+    Creates a sample Python script or YAML configuration with examples showing how to use Pointblank
+    for data validation. The template type is determined by the file extension:
+    - .py files create Python script templates
+    - .yaml/.yml files create YAML configuration templates
 
-    OUTPUT_FILE is the path where the template script will be created.
+    Edit the template to add your own data loading and validation rules, then run it with 'pb run'.
+
+    OUTPUT_FILE is the path where the template will be created.
 
     Examples:
 
     \b
-    pb make-template my_validation.py
-    pb make-template validation_template.py
+    pb make-template my_validation.py        # Creates Python script template
+    pb make-template my_validation.yaml      # Creates YAML config template
+    pb make-template validation_template.yml # Creates YAML config template
     """
     # Handle missing output_file with concise help
     if output_file is None:
         _show_concise_help("make-template", None)
         return
 
-    example_script = '''"""
+    # Detect file type based on extension
+    file_path = Path(output_file)
+    file_extension = file_path.suffix.lower()
+
+    is_yaml_file = file_extension in [".yaml", ".yml"]
+    is_python_file = file_extension == ".py"
+
+    if not is_yaml_file and not is_python_file:
+        console.print(
+            f"[yellow]Warning:[/yellow] Unknown file extension '{file_extension}'. "
+            "Creating Python template by default. Use .py, .yaml, or .yml extensions for specific template types."
+        )
+        is_python_file = True
+
+    if is_yaml_file:
+        # Create YAML template
+        example_yaml = """# Example Pointblank YAML validation configuration
+#
+# This YAML file demonstrates how to create validation rules for your data.
+# Modify the data source and validation steps below to match your requirements.
+#
+# When using 'pb run' with --data option, the CLI will automatically replace
+# the 'tbl' field with the provided data source.
+
+# Data source configuration
+tbl: small_table  # Replace with your data source
+                  # Can be: dataset name, CSV file, Parquet file, database connection, etc.
+
+# Optional: Table name for reporting (defaults to filename if not specified)
+tbl_name: "Example Validation"
+
+# Optional: Label for this validation run
+label: "Validation Template"
+
+# Optional: Validation thresholds (defaults shown below)
+# thresholds:
+#   warning: 0.05   # 5% failure rate triggers warning
+#   error: 0.10     # 10% failure rate triggers error
+#   critical: 0.15  # 15% failure rate triggers critical
+
+# Validation steps to perform
+steps:
+  # Check for duplicate rows across all columns
+  - rows_distinct
+
+  # Check that required columns exist
+  - col_exists:
+      columns: [column1, column2]  # Replace with your actual column names
+
+  # Check for null values in important columns
+  - col_vals_not_null:
+      columns: important_column    # Replace with your actual column name
+
+  # Check value ranges (uncomment and modify as needed)
+  # - col_vals_gt:
+  #     columns: amount
+  #     value: 0
+
+  # - col_vals_between:
+  #     columns: score
+  #     left: 0
+  #     right: 100
+
+  # Check string patterns (uncomment and modify as needed)
+  # - col_vals_regex:
+  #     columns: email
+  #     pattern: "^[\\w\\.-]+@[\\w\\.-]+\\.[a-zA-Z]{2,}$"
+
+  # Check for unique values (uncomment and modify as needed)
+  # - col_vals_unique:
+  #     columns: id
+
+  # Check values are in allowed set (uncomment and modify as needed)
+  # - col_vals_in_set:
+  #     columns: status
+  #     set: [active, inactive, pending]
+
+# Add more validation steps as needed
+# See the Pointblank documentation for the full list of available validation functions
+"""
+
+        Path(output_file).write_text(example_yaml)
+        console.print(f"[green]✓[/green] YAML validation template created: {output_file}")
+        console.print("\nEdit the template to add your data source and validation rules, then run:")
+        console.print(f"[cyan]pb run {output_file}[/cyan]")
+        console.print(
+            f"[cyan]pb run {output_file} --data your_data.csv[/cyan]  [dim]# Override data source[/dim]"
+        )
+
+    else:
+        # Create Python template
+        example_script = '''"""
 Example Pointblank validation script.
 
 This script demonstrates how to create validation rules for your data.
@@ -3941,21 +4036,23 @@ validation = (
 )
 '''
 
-    Path(output_file).write_text(example_script)
-    console.print(f"[green]✓[/green] Validation script template created: {output_file}")
-    console.print("\nEdit the template to add your data loading and validation rules, then run:")
-    console.print(f"[cyan]pb run {output_file}[/cyan]")
-    console.print(
-        f"[cyan]pb run {output_file} --data your_data.csv[/cyan]  [dim]# Replace data source automatically[/dim]"
-    )
+        Path(output_file).write_text(example_script)
+        console.print(f"[green]✓[/green] Python validation template created: {output_file}")
+        console.print(
+            "\nEdit the template to add your data loading and validation rules, then run:"
+        )
+        console.print(f"[cyan]pb run {output_file}[/cyan]")
+        console.print(
+            f"[cyan]pb run {output_file} --data your_data.csv[/cyan]  [dim]# Replace data source automatically[/dim]"
+        )
 
 
 @cli.command()
-@click.argument("validation_script", type=click.Path(exists=True), required=False)
+@click.argument("validation_file", type=click.Path(exists=True), required=False)
 @click.option(
     "--data",
     type=str,
-    help="Data source to replace in validation objects (single validation scripts only)",
+    help="Data source to replace in validation objects (Python scripts and YAML configs)",
 )
 @click.option("--output-html", type=click.Path(), help="Save HTML validation report to file")
 @click.option("--output-json", type=click.Path(), help="Save JSON validation summary to file")
@@ -3976,7 +4073,7 @@ validation = (
     help="Exit with non-zero code when validation reaches this threshold level",
 )
 def run(
-    validation_script: str | None,
+    validation_file: str | None,
     data: str | None,
     output_html: str | None,
     output_json: str | None,
@@ -3986,16 +4083,19 @@ def run(
     fail_on: str | None,
 ):
     """
-    Run a Pointblank validation script.
+    Run a Pointblank validation script or YAML configuration.
 
-    VALIDATION_SCRIPT should be a Python file that defines validation logic.
-    The script should load its own data and create validation objects.
+    VALIDATION_FILE can be:
+    - A Python file (.py) that defines validation logic
+    - A YAML configuration file (.yaml, .yml) that defines validation steps
+
+    Python scripts should load their own data and create validation objects.
+    YAML configurations define data sources and validation steps declaratively.
 
     If --data is provided, it will automatically replace the data source in your
-    validation objects. This works with scripts containing a single validation.
-    For scripts with multiple validations, use separate script files or remove --data.
+    validation objects (Python scripts) or override the 'tbl' field (YAML configs).
 
-    To get started quickly, use 'pb make-template' to create a validation script template.
+    To get started quickly, use 'pb make-template' to create templates.
 
     DATA can be:
 
@@ -4009,18 +4109,33 @@ def run(
     Examples:
 
     \b
-    pb make-template my_validation.py  # Create a template first
+    pb make-template my_validation.py  # Create a Python template
     pb run validation_script.py
+    pb run validation_config.yaml
     pb run validation_script.py --data data.csv
-    pb run validation_script.py --data small_table --output-html report.html
+    pb run validation_config.yaml --data small_table --output-html report.html
     pb run validation_script.py --show-extract --fail-on error
-    pb run validation_script.py --write-extract extracts_folder --fail-on critical
+    pb run validation_config.yaml --write-extract extracts_folder --fail-on critical
     """
     try:
-        # Handle missing validation_script with concise help
-        if validation_script is None:
+        # Handle missing validation_file with concise help
+        if validation_file is None:
             _show_concise_help("run", None)
             return
+
+        # Detect file type based on extension
+        file_path = Path(validation_file)
+        file_extension = file_path.suffix.lower()
+
+        is_yaml_file = file_extension in [".yaml", ".yml"]
+        is_python_file = file_extension == ".py"
+
+        if not is_yaml_file and not is_python_file:
+            console.print(
+                f"[red]Error:[/red] Unsupported file type '{file_extension}'. "
+                "Only .py (Python scripts) and .yaml/.yml (YAML configs) are supported."
+            )
+            sys.exit(1)
 
         # Load optional data override if provided
         cli_data = None
@@ -4029,60 +4144,94 @@ def run(
                 cli_data = _load_data_source(data)
                 console.print(f"[green]✓[/green] Loaded data override: {data}")
 
-        # Execute the validation script
-        with console.status("[bold green]Running validation script..."):
-            # Read and execute the validation script
-            script_content = Path(validation_script).read_text()
+        # Process based on file type
+        validations = []
 
-            # Create a namespace with pointblank and optional CLI data
-            namespace = {
-                "pb": pb,
-                "pointblank": pb,
-                "cli_data": cli_data,  # Available if --data was provided
-                "__name__": "__main__",
-                "__file__": str(Path(validation_script).resolve()),
-            }
+        if is_yaml_file:
+            # Handle YAML configuration file
+            from pointblank.yaml import YAMLValidationError, YAMLValidator, yaml_interrogate
 
-            # Execute the script
-            try:
-                exec(script_content, namespace)
-            except Exception as e:
-                console.print(f"[red]Error executing validation script:[/red] {e}")
-                sys.exit(1)
+            with console.status("[bold green]Running YAML validation..."):
+                try:
+                    if cli_data is not None:
+                        # Load and modify YAML config to use CLI data
+                        console.print(
+                            "[yellow]Replacing data source in YAML config with CLI data[/yellow]"
+                        )
 
-            # Look for validation objects in the namespace
-            validations = []
+                        validator = YAMLValidator()
+                        config = validator.load_config(validation_file)
 
-            # Look for the 'validation' variable specifically first
-            if "validation" in namespace:
-                validations.append(namespace["validation"])
+                        # Replace the 'tbl' field with our CLI data
+                        # Note: We pass the CLI data object directly instead of a string
+                        config["tbl"] = cli_data
 
-            # Also look for any other validation objects
-            for key, value in namespace.items():
-                if (
-                    key != "validation"
-                    and hasattr(value, "interrogate")
-                    and hasattr(value, "validation_info")
-                ):
-                    validations.append(value)
-                # Also check if it's a Validate object that has been interrogated
-                elif key != "validation" and str(type(value)).find("Validate") != -1:
-                    validations.append(value)
+                        # Build and execute validation with modified config
+                        validation = validator.execute_workflow(config)
 
-            if not validations:
-                raise ValueError(
-                    "No validation objects found in script. "
-                    "Script should create Validate objects and call .interrogate() on them."
-                )
+                    else:
+                        # Use YAML config as-is
+                        validation = yaml_interrogate(validation_file)
+
+                    validations.append(validation)
+
+                except YAMLValidationError as e:
+                    console.print(f"[red]YAML validation error:[/red] {e}")
+                    sys.exit(1)
+
+        else:
+            # Handle Python script file
+            with console.status("[bold green]Running Python validation script..."):
+                # Read and execute the validation script
+                script_content = Path(validation_file).read_text()
+
+                # Create a namespace with pointblank and optional CLI data
+                namespace = {
+                    "pb": pb,
+                    "pointblank": pb,
+                    "cli_data": cli_data,  # Available if --data was provided
+                    "__name__": "__main__",
+                    "__file__": str(Path(validation_file).resolve()),
+                }
+
+                # Execute the script
+                try:
+                    exec(script_content, namespace)
+                except Exception as e:
+                    console.print(f"[red]Error executing validation script:[/red] {e}")
+                    sys.exit(1)
+
+                # Look for validation objects in the namespace
+                # Look for the 'validation' variable specifically first
+                if "validation" in namespace:
+                    validations.append(namespace["validation"])
+
+                # Also look for any other validation objects
+                for key, value in namespace.items():
+                    if (
+                        key != "validation"
+                        and hasattr(value, "interrogate")
+                        and hasattr(value, "validation_info")
+                    ):
+                        validations.append(value)
+                    # Also check if it's a Validate object that has been interrogated
+                    elif key != "validation" and str(type(value)).find("Validate") != -1:
+                        validations.append(value)
+
+                if not validations:
+                    raise ValueError(
+                        "No validation objects found in script. "
+                        "Script should create Validate objects and call .interrogate() on them."
+                    )
 
         console.print(f"[green]✓[/green] Found {len(validations)} validation object(s)")
 
-        # Implement automatic data replacement for Validate objects if --data was provided
-        if cli_data is not None:
-            # Check if we have multiple validations (this is not supported)
+        # Implement automatic data replacement for Python scripts only (YAML configs handle this differently)
+        if cli_data is not None and is_python_file:
+            # Check if we have multiple validations (this is not supported for Python scripts)
             if len(validations) > 1:
                 console.print(
-                    f"[red]Error: Found {len(validations)} validation objects in the script.[/red]"
+                    f"[red]Error: Found {len(validations)} validation objects in the Python script.[/red]"
                 )
                 console.print(
                     "[yellow]The --data option replaces data in ALL validation objects,[/yellow]"
@@ -5150,14 +5299,14 @@ def _show_concise_help(command_name: str, ctx: click.Context) -> None:
 
     elif command_name == "make-template":
         console.print(
-            "[bold cyan]pb make-template[/bold cyan] - Create a validation script template"
+            "[bold cyan]pb make-template[/bold cyan] - Create a validation script or YAML template"
         )
         console.print()
         console.print("[bold yellow]Usage:[/bold yellow]")
-        console.print("  pb make-template my_validation.py")
-        console.print("  pb make-template validation_template.py")
+        console.print("  pb make-template my_validation.py    # Python script template")
+        console.print("  pb make-template my_validation.yaml  # YAML config template")
         console.print()
-        console.print("[dim]Creates a sample Python script with validation examples[/dim]")
+        console.print("[dim]Creates sample templates with validation examples[/dim]")
         console.print("[dim]Edit the template and run with [bold]pb run[/bold][/dim]")
         console.print()
         console.print(

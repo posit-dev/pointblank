@@ -1,0 +1,706 @@
+---
+title: YAML Validation Workflows
+jupyter: python3
+toc-expand: 2
+html-table-processing: none
+---
+
+Pointblank supports defining validation workflows using YAML configuration files, providing a
+declarative, readable, and maintainable approach to data validation. YAML workflows are particularly
+useful for teams, version control, automation pipelines, and scenarios where you want to separate
+validation logic from application code.
+
+YAML validation workflows offer several advantages: they're easy to read and write, can be version
+controlled alongside your data processing code, enable non-programmers to contribute to data quality
+definitions, and provide a clear separation between validation logic and execution code.
+
+The YAML approach complements Pointblank's Python API, giving you flexibility to choose the right
+tool for each situation. Simple, repetitive validations work well in YAML, while complex logic with
+custom functions might be better suited for the Python API.
+
+## Basic YAML Validation Structure
+
+A YAML validation workflow consists of a few key components:
+
+- `tbl`: specifies the data source (file path, dataset name, or Python expression)
+- `steps`: defines the validation checks to perform
+- Optional metadata: table name, label, thresholds, actions, and other configuration
+
+Here's a simple example validating the built-in `small_table` dataset:
+
+```yaml
+tbl: small_table
+df_library: polars                     # Optional: specify DataFrame library
+tbl_name: "Small Table Validation"
+label: "Basic data quality checks"
+steps:
+  - rows_distinct
+  - col_exists:
+      columns: [a, b, c, d]
+  - col_vals_not_null:
+      columns: [a, b]
+```
+
+You can save this configuration to a .yaml file and execute it using the `yaml_interrogate()`
+function:
+
+```{python}
+import pointblank as pb
+from pathlib import Path
+
+# Save the YAML configuration to a file
+yaml_content = """
+tbl: small_table
+df_library: polars
+tbl_name: "Small Table Validation"
+label: "Basic data quality checks"
+steps:
+  - rows_distinct
+  - col_exists:
+      columns: [a, b, c, d]
+  - col_vals_not_null:
+      columns: [a, b]
+"""
+
+yaml_file = Path("basic_validation.yaml")
+yaml_file.write_text(yaml_content)
+
+# Execute the validation from the file
+result = pb.yaml_interrogate(yaml_file)
+result
+```
+
+The validation table shows the results of each step, just as if you had written the equivalent
+Python code. You can also pass YAML content directly as a string for quick testing, but working
+with files is the recommended approach for production workflows.
+
+## Data Sources in YAML
+
+The `tbl` field supports various data source types, making it easy to work with different kinds of
+data. You can also control the DataFrame library used for loading data with the `df_library`
+parameter.
+
+### DataFrame Library Selection
+
+By default, Pointblank loads data as Polars DataFrames, but you can specify alternative libraries:
+
+```yaml
+# Load as Polars DataFrame (default)
+tbl: small_table
+df_library: polars
+
+# Load as Pandas DataFrame
+tbl: small_table
+df_library: pandas
+
+# Load as DuckDB table (via Ibis)
+tbl: small_table
+df_library: duckdb
+```
+
+This is particularly useful when using validation expressions that require specific DataFrame APIs:
+
+```yaml
+# Using Pandas-specific operations
+tbl: small_table
+df_library: pandas
+steps:
+  - specially:
+      expr: "lambda df: df.assign(total=df['a'] + df['d'])"
+
+# Using Polars-specific operations
+tbl: small_table
+df_library: polars
+steps:
+  - specially:
+      expr: "lambda df: df.select(pl.col('a') + pl.col('d') > 0)"
+```
+
+### File-based Sources
+
+```yaml
+# CSV files (respects df_library setting)
+tbl: "data/customers.csv"
+df_library: pandas
+
+# Parquet files
+tbl: "warehouse/sales.parquet"
+df_library: polars
+
+# Multiple files with patterns
+tbl: "logs/*.parquet"
+```
+
+### Built-in Datasets
+
+```yaml
+# Use Pointblank's built-in datasets
+tbl: small_table
+tbl: game_revenue
+tbl: nycflights
+```
+
+### Python Expressions for Complex Sources
+
+For more complex data loading, use the `python:` block syntax. This syntax can be used with several
+parameters throughout your YAML configuration:
+
+- `tbl`: For complex data source loading (as shown below)
+- `expr`: For custom validation expressions in `col_vals_expr`
+- `pre`: For data preprocessing before validation steps
+- `actions`: For callable action functions (`warning`, `error`, `critical`, and `default`)
+
+```yaml
+# Load data with custom Polars operations
+tbl:
+  python: |
+    pl.scan_csv("sales_data.csv")
+    .filter(pl.col("date") >= "2024-01-01")
+    .head(1000)
+
+# Load from a database connection
+tbl:
+  python: |
+    pl.read_database(
+        query="SELECT * FROM customers WHERE active = true",
+        connection="postgresql://user:pass@localhost/db"
+    )
+```
+
+## Validation Steps
+
+YAML supports all of Pointblank's validation methods. Here are some common patterns:
+
+### Column-based Validations
+
+```yaml
+tbl: worldcities.csv
+steps:
+  # Check for missing values
+  - col_vals_not_null:
+      columns: [city_name, country]
+
+  # Validate value ranges
+  - col_vals_between:
+      columns: latitude
+      left: -90
+      right: 90
+
+  # Check set membership
+  - col_vals_in_set:
+      columns: country_code
+      set: [US, CA, MX, UK, DE, FR]
+
+  # Regular expression validation
+  - col_vals_regex:
+      columns: postal_code
+      pattern: "^[0-9]{5}(-[0-9]{4})?$"
+```
+
+### Row-based Validations
+
+```yaml
+tbl: sales_data.csv
+steps:
+  # Check for duplicate rows
+  - rows_distinct
+
+  # Ensure complete rows (no missing values)
+  - rows_complete
+
+  # Check row count
+  - row_count_match:
+      count: 1000
+```
+
+### Schema Validations
+
+Schema validation ensures your data has the expected structure and column types. The
+`col_schema_match` validation method uses a `schema` key that contains a `columns` list, where each
+item in the list can specify a column name alone or a column name with its expected data type.
+
+Each `column` entry can be specified as:
+
+- `column_name`: column name as a scalar string (structure validation, no type checking)
+- `[column_name, "data_type"]`: column name with type validation (as a list with two elements)
+- `[column_name]`: column name in a single-item list (equivalent to scalar, for consistency)
+
+```yaml
+tbl: customer_data.csv
+steps:
+  # Complete schema validation (structure and types)
+  - col_schema_match:
+      schema:
+        columns:
+          - [customer_id, "int64"]
+          - [name, "object"]
+          - [email, "object"]
+          - [signup_date, "datetime64[ns]"]
+
+  # Structure-only validation (column names without types)
+  - col_schema_match:
+      schema:
+        columns:
+          - customer_id
+          - name
+          - email
+      complete: false
+      brief: "Check that core columns exist"
+```
+
+#### Schema Validation Options
+
+Schema validations support the full range of validation options:
+
+```yaml
+tbl: data_file.csv
+steps:
+  - col_schema_match:
+      schema:
+        columns:
+          - [id, "int64"]
+          - name
+      complete: false                  # Allow extra columns
+      in_order: false                  # Column order doesn't matter
+      case_sensitive_colnames: false   # Case-insensitive column names
+      case_sensitive_dtypes: false     # Case-insensitive type names
+      full_match_dtypes: false         # Allow partial type matching
+      brief: "Flexible schema validation"
+```
+
+#### Other Structure Validations
+
+```yaml
+tbl: customer_data.csv
+steps:
+  # Check column count
+  - col_count_match:
+      count: 4
+```
+
+## Thresholds and Severity Levels
+
+Thresholds determine when validation failures trigger different severity levels. You can set global
+thresholds for the entire workflow:
+
+```yaml
+tbl: sales_data.csv
+tbl_name: "Sales Data Quality Check"
+thresholds:
+  warning: 0.05    # 5% failure rate triggers warning
+  error: 0.10      # 10% failure rate triggers error
+  critical: 0.15   # 15% failure rate triggers critical
+steps:
+  - col_vals_not_null:
+      columns: [customer_id, amount]
+  - col_vals_gt:
+      columns: amount
+      value: 0
+```
+
+You can also set thresholds for individual validation steps:
+
+```yaml
+tbl: user_data.csv
+steps:
+  - col_vals_not_null:
+      columns: email
+      thresholds:
+        warning: 1      # Any missing email is a warning
+        error: 0.01     # 1% missing emails is an error
+
+  - col_vals_regex:
+      columns: email
+      pattern: "^[\\w\\.-]+@[\\w\\.-]+\\.[a-zA-Z]{2,}$"
+      thresholds:
+        error: 1        # Any invalid email format is an error
+```
+
+## Actions: Responding to Validation Failures
+
+Actions define what happens when validation thresholds are exceeded. You can use string templates
+with placeholder variables or callable functions.
+
+### String Template Actions
+
+```yaml
+tbl: orders.csv
+thresholds:
+  warning: 0.02
+  error: 0.05
+actions:
+  warning: "Warning: Step {step} found {n_failed} failures in {col} column"
+  error: "Error in {TYPE} validation: {n_failed}/{n} rows failed (Step {step})"
+  critical: "Critical failure detected at {time}"
+steps:
+  - col_vals_not_null:
+      columns: [order_id, customer_id]
+```
+
+Available template variables include:
+
+- `{step}`: validation step number
+- `{col}`: column name being validated
+- `{val}`: specific failing value (when applicable)
+- `{n_failed}`: number of failing rows
+- `{n}`: total number of rows checked
+- `{TYPE}`: validation method name (e.g., "COL_VALS_NOT_NULL")
+- `{LEVEL}`: severity level ("WARNING", "ERROR", "CRITICAL")
+- `{time}`: timestamp of the validation
+
+### Callable Actions
+
+For more complex responses, use Python callable functions:
+
+```yaml
+tbl: critical_data.csv
+thresholds:
+  error: 1
+actions:
+  error:
+    python: |
+      lambda: print("ALERT: Critical data validation failed!")
+  critical:
+    python: |
+      lambda: print("CRITICAL: Validation failure - manual intervention required!")
+steps:
+  - col_vals_not_null:
+      columns: [transaction_id, amount]
+```
+
+Note: The Python environment in YAML actions is restricted for security. You can use built-in
+functions like `print()`, basic operations, and available DataFrame libraries, but cannot import
+external modules like `requests` or `logging`. For external notifications, consider using string
+template actions or handling alerts in your application code after the validation completes.
+
+### Step-level Actions
+
+You can also define actions for individual validation steps:
+
+```yaml
+tbl: financial_data.csv
+steps:
+  - col_vals_not_null:
+      columns: account_balance
+      thresholds:
+        error: 1
+      actions:
+        error: "Missing account balance detected in step {step}."
+
+  - col_vals_gt:
+      columns: account_balance
+      value: 0
+      actions:
+        warning:
+          python: |
+            lambda: print("Negative balance warning triggered.")
+```
+
+## Advanced Features
+
+### Pre-processing with the `pre` Parameter
+
+You can apply data transformations before validation using the `pre` parameter:
+
+```yaml
+tbl: transactions.csv
+steps:
+  # Validate only recent transactions
+  - col_vals_gt:
+      columns: amount
+      value: 0
+      pre:
+        python: |
+          lambda df: df.filter(
+              pl.col("transaction_date") >= "2024-01-01"
+          )
+
+  # Check completeness for active customers only
+  - col_vals_not_null:
+      columns: [email, phone]
+      pre: |
+        lambda df: df.filter(pl.col("status") == "active")
+```
+
+Note that you can use either the explicit `python:` block syntax or the shortcut syntax (just
+`pre: |`) for the lambda expressions.
+
+### Complex Expressions
+
+For advanced validation logic, use a `col_vals_expr` step with custom expressions:
+
+```yaml
+tbl: sales_data.csv
+steps:
+  # Custom business logic validation
+  - col_vals_expr:
+      expr:
+        python: |
+          (
+            pl.when(pl.col("product_type") == "premium")
+            .then(pl.col("price") >= 100)
+            .when(pl.col("product_type") == "standard")
+            .then(pl.col("price").is_between(20, 99))
+            .otherwise(pl.col("price") <= 19)
+          )
+```
+
+### Brief Descriptions
+
+Add human-readable descriptions to validation steps. The `brief` parameter supports string
+templating and automatic generation:
+
+```yaml
+tbl: customer_data.csv
+brief: "Customer data quality validation for {auto}"
+steps:
+  - col_vals_not_null:
+      columns: customer_id
+      brief: "Ensure all customers have valid IDs"
+
+  - col_vals_regex:
+      columns: email
+      pattern: "^[\\w\\.-]+@[\\w\\.-]+\\.[a-zA-Z]{2,}$"
+      brief: "Validate email format compliance"
+
+  - col_vals_between:
+      columns: age
+      left: 13
+      right: 120
+      brief: "Check reasonable age ranges"
+
+  # Use automatic brief generation
+  - col_vals_not_null:
+      columns: phone_number
+      brief: true
+
+  # Template variables in briefs
+  - col_vals_in_set:
+      columns: status
+      set: [active, inactive, pending]
+      brief: "Column '{col}' must be one of: {set}"
+```
+
+Brief Templating Options:
+
+- custom strings: Write your own descriptive text
+- `true`: Automatically generates a brief based on the validation method and parameters
+- `{auto}`: Placeholder for auto-generated text within custom strings
+- template variables: Use the same variables available in actions:
+  - `{col}`: column name(s) being validated
+  - `{step}`: the step number in the validation plan
+  - `{value}`: the comparison value used in the validation (for single-value comparisons)
+  - `{pattern}`: for regex validations, the pattern being matched
+
+
+## Working with YAML Files
+
+### Loading from Files
+
+You can save your YAML configuration to files and load them:
+
+```{python}
+# Create a YAML file
+yaml_content = """
+tbl: small_table
+tbl_name: "File-based Validation"
+steps:
+  - col_vals_between:
+      columns: c
+      left: 1
+      right: 10
+  - col_vals_in_set:
+      columns: f
+      set: [low, mid, high]
+"""
+
+# Save to file
+from pathlib import Path
+yaml_file = Path("validation_config.yaml")
+yaml_file.write_text(yaml_content)
+
+# Load and execute
+result = pb.yaml_interrogate(yaml_file)
+result
+```
+
+### Converting YAML to Python
+
+Use `yaml_to_python()` to generate equivalent Python code from your YAML configuration:
+
+```{python}
+yaml_config = """
+tbl: small_table
+tbl_name: "Example Validation"
+thresholds:
+  warning: 0.1
+  error: 0.2
+actions:
+  warning: "Warning: {TYPE} validation failed"
+steps:
+  - col_vals_gt:
+      columns: a
+      value: 0
+  - col_vals_in_set:
+      columns: f
+      set: [low, mid, high]
+"""
+
+# Generate Python code
+python_code = pb.yaml_to_python(yaml_config)
+print(python_code)
+```
+
+This is useful for:
+
+- learning how YAML maps to Python API calls
+- transitioning from YAML to code-based workflows
+- generating documentation that shows both approaches
+- debugging YAML configurations
+
+## Practical Examples
+
+### Data Pipeline Validation
+
+Here's a comprehensive example for validating data in a processing pipeline:
+
+```yaml
+tbl:
+  python: |
+    (
+      pl.scan_csv("raw_data/customer_events.csv")
+      .filter(pl.col("event_date") >= "2024-01-01")
+    )
+
+tbl_name: "Customer Events Pipeline Validation"
+label: "Daily data quality check for customer events"
+
+thresholds:
+  warning: 0.01   # 1% failure rate
+  error: 0.05     # 5% failure rate
+
+actions:
+  warning: "Pipeline warning: {TYPE} validation found {n_failed} issues"
+  error:
+    python: |
+      lambda: print("ERROR: Pipeline validation failed - manual review required")
+
+steps:
+  # Schema validation
+  - col_schema_match:
+      schema:
+        columns:
+          - [customer_id, "int64"]
+          - [event_type, "object"]
+          - [event_date, "object"]
+          - [revenue, "float64"]
+      brief: "Validate table structure matches expected schema"
+
+  # Data completeness
+  - col_vals_not_null:
+      columns: [customer_id, event_type, event_date]
+      brief: "Critical fields must be complete"
+
+  # Business logic validation
+  - col_vals_in_set:
+      columns: event_type
+      set: [signup, purchase, cancellation, upgrade]
+      brief: "Event types must be from approved list"
+
+  # Data quality checks
+  - col_vals_gt:
+      columns: revenue
+      value: 0
+      na_pass: true
+      brief: "Revenue values must be positive when present"
+
+  # Temporal validation
+  - col_vals_expr:
+      expr:
+        python: |
+          pl.col("event_date").str.strptime(pl.Date, "%Y-%m-%d").is_not_null()
+      brief: "Event dates must be valid YYYY-MM-DD format"
+```
+
+### Quality Monitoring Dashboard
+
+For ongoing data quality monitoring:
+
+```yaml
+tbl: warehouse/daily_metrics.parquet
+tbl_name: "Daily Metrics Quality Check"
+
+thresholds:
+  warning: 5      # 5 failing rows
+  error: 50       # 50 failing rows
+  critical: 100   # 100 failing rows
+
+actions:
+  warning: "Quality check warning: {n_failed} rows failed {TYPE} validation"
+  error: "Quality degradation detected: Step {step} failed for {n_failed}/{n} rows"
+  critical:
+    python: |
+      lambda: print("CRITICAL: Data quality failure detected - immediate attention required")
+  highest_only: false
+
+steps:
+  - row_count_match:
+      count: 10000
+      brief: "Verify expected daily record count"
+
+  - col_vals_not_null:
+      columns: [date, metric_value, source_system]
+      brief: "Core fields must be complete"
+
+  - col_vals_between:
+      columns: metric_value
+      left: 0
+      right: 1000000
+      brief: "Metric values within reasonable range"
+
+  - rows_distinct:
+      columns_subset: [date, metric_name, source_system]
+      brief: "No duplicate metric records per day"
+```
+
+## Best Practices
+
+### Organization and Structure
+
+1. use descriptive names: give your validations clear `tbl_name` and `label` values
+2. add brief descriptions: document what each validation step checks
+3. group related validations: organize steps logically (schema, completeness, business rules)
+4. version control: store YAML files in git alongside your data processing code
+
+### Error Handling and Monitoring
+
+1. set appropriate thresholds: start conservative and adjust based on your data patterns
+2. use actions for alerting: set up notifications for critical failures
+3. document expected failures: some data quality issues might be acceptable
+4. monitor validation results: track validation performance over time
+
+### Performance Considerations
+
+1. use the `pre` parameter efficiently: apply filters early to reduce data volume
+2. order validations strategically: put fast, likely-to-fail checks first
+3. consider data source location: local files are faster than remote sources
+4. use appropriate column selections: only validate the columns you need
+
+## Wrapping Up
+
+YAML validation workflows provide a powerful, declarative approach to data validation in Pointblank.
+Such workflows are great at expressing common validation patterns in a readable format that can be
+easily shared, version controlled, and maintained by teams.
+
+Key advantages of YAML workflows:
+
+- readable: non-programmers can understand and contribute to validation logic
+- maintainable: easy to modify validation rules without changing application code
+- portable: YAML files can be shared between projects and teams
+- version controlled: track changes to validation logic over time
+- flexible: support for simple checks and complex custom logic
+
+Use YAML workflows when you want declarative, maintainable validation definitions, and fall back to
+the Python API when you need complex programmatic logic or tight integration with application code.
+The two approaches complement each other well and can be used together as your validation needs
+evolve.

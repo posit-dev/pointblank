@@ -11684,7 +11684,9 @@ class Validate:
         # Determine the rows that passed all validation steps by checking if all `pb_is_good_`
         # columns are `True`
         labeled_tbl_nw = (
-            labeled_tbl_nw.with_columns(pb_is_good_all=nw.all_horizontal(pb_is_good_cols))
+            labeled_tbl_nw.with_columns(
+                pb_is_good_all=nw.all_horizontal(pb_is_good_cols, ignore_nulls=True)
+            )
             .join(data_nw, on=index_name, how="left")
             .drop(index_name)
         )

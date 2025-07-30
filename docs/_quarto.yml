@@ -79,6 +79,10 @@ website:
             - user-guide/schema-validation.qmd
             - user-guide/assertions.qmd
             - user-guide/draft-validation.qmd
+        - section: "YAML"
+          contents:
+            - user-guide/yaml-validation-workflows.qmd
+            - user-guide/yaml-reference.qmd
         - section: "Post Interrogation"
           contents:
             - user-guide/step-reports.qmd
@@ -219,6 +223,15 @@ quartodoc:
         - name: load_dataset
         - name: get_data_path
         - name: connect_to_table
+    - title: YAML
+      desc: >
+        The *YAML* group contains functions that allow for the use of YAML to orchestrate validation
+        workflows. The `yaml_interrogate()` function can be used to run a validation workflow from
+        YAML strings or files. The `validate_yaml()` function checks if the YAML configuration
+        passes its own validity checks.
+      contents:
+        - name: yaml_interrogate
+        - name: validate_yaml
     - title: Utility Functions
       desc: >
         The *Utility Functions* group contains functions that are useful accessing metadata about
