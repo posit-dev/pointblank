@@ -38,6 +38,12 @@ code {
     color: rgb(18, 18, 18);
 }
 
+.blockquote {
+    font-size: 13px;
+    background-color: #E8E8E8;
+    border-left-color: #4682B4;
+}
+
 p,h1,h2,h3,#toc-title,#toc-function-reference,.nav-link,.table {
     font-family: "Open Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
