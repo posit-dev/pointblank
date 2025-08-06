@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>validate.col_vals_le – Pointblank</title>
+<title>seg_group – Pointblank</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -184,10 +184,6 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
   <ul>
   <li><a href="#parameters" id="toc-parameters" class="nav-link active" data-scroll-target="#parameters">Parameters</a></li>
   <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
-  <li><a href="#what-can-be-used-in-value" id="toc-what-can-be-used-in-value" class="nav-link" data-scroll-target="#what-can-be-used-in-value">What Can Be Used in <code>value=</code>?</a></li>
-  <li><a href="#preprocessing" id="toc-preprocessing" class="nav-link" data-scroll-target="#preprocessing">Preprocessing</a></li>
-  <li><a href="#segmentation" id="toc-segmentation" class="nav-link" data-scroll-target="#segmentation">Segmentation</a></li>
-  <li><a href="#thresholds" id="toc-thresholds" class="nav-link" data-scroll-target="#thresholds">Thresholds</a></li>
   <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
   </ul>
 </nav>
@@ -197,7 +193,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title" style="font-family: SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace; font-size: 1.25rem;">col_vals_le()<span style="font-size: 0.75rem; border-style: solid; border-width: 1px; border-color: steelblue; background-color: #E3F2FF; margin-left: 12px; vertical-align: 3.5px;"><code style="background-color: transparent; color: steelblue;">method</code></span></h1>
+<h1 class="title" style="font-family: SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace; font-size: 1.25rem;">seg_group()<span style="font-size: 0.75rem; border-style: solid; border-width: 1px; border-color: darkorange; background-color: #FFF1E0; margin-left: 12px; vertical-align: 3.5px;"><code style="background-color: transparent; color: darkorange;">function</code></span></h1>
 </div>
 
 
@@ -213,121 +209,36 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 
 </header>
 
-<p style="font-size: 1rem; font-style: italic; margin-top: -10px; line-height: 1;">Are column data less than or equal to a fixed value or data in another column?</p>
+<p style="font-size: 1rem; font-style: italic; margin-top: -10px; line-height: 1;">Group together values for segmentation.</p>
 
 
 
 <p style="font-size: 12px; color: rgb(170, 170, 170); margin-bottom: -14px;">USAGE</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>Validate.col_vals_le(</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    columns,</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    value,</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    na_pass<span class="op">=</span><span class="va">False</span>,</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    pre<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    segments<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    thresholds<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    actions<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    brief<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    active<span class="op">=</span><span class="va">True</span>,</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>The <code>col_vals_le()</code> validation method checks whether column values in a table are <em>less than or equal to</em> a specified <code>value=</code> (the exact comparison used in this function is <code>col_val &lt;= value</code>). The <code>value=</code> can be specified as a single, literal value or as a column name given in <a href="../reference/col.html#pointblank.col"><span><code>col()</code></span></a>. This validation will operate over the number of test units that is equal to the number of rows in the table (determined after any <code>pre=</code> mutation has been applied).</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>seg_group(values)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Many validation methods have a <code>segments=</code> argument that can be used to specify one or more columns, or certain values within a column, to create segments for validation (e.g., <a href="../reference/Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt"><code>col_vals_gt()</code></a>, <a href="../reference/Validate.col_vals_regex.html#pointblank.Validate.col_vals_regex"><code>col_vals_regex()</code></a>, etc.). When passing in a column, or a tuple with a column and certain values, a segment will be created for each individual value within the column or given values. The <a href="../reference/seg_group.html#pointblank.seg_group" title="0"><code>seg_group()</code></a> selector enables values to be grouped together into a segment. For example, if you were to create a segment for a column “region”, investigating just “North” and “South” regions, a typical segment would look like:</p>
+<p><code>segments=("region", ["North", "South"])</code></p>
+<p>This would create two validation steps, one for each of the regions. If you wanted to group these two regions into a single segment, you could use the <a href="../reference/seg_group.html#pointblank.seg_group" title="0"><code>seg_group()</code></a> function like this:</p>
+<p><code>segments=("region", pb.seg_group(["North", "South"]))</code></p>
+<p>You could create a second segment for “East” and “West” regions like this:</p>
+<p><code>segments=("region", pb.seg_group(["North", "South"], ["East", "West"]))</code></p>
+<p>There will be a validation step created for every segment. Note that if there aren’t any segments created using <a href="../reference/seg_group.html#pointblank.seg_group" title="0"><code>seg_group()</code></a> (or any other segment expression), the validation step will fail to be evaluated during the interrogation process. Such a failure to evaluate will be reported in the validation results but it won’t affect the interrogation process overall (i.e., the process won’t be halted).</p>
 <section id="parameters" class="level2 doc-section doc-section-parameters">
 <h3 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters">Parameters</h3>
 <dl style="border-style: solid; border-width: 2px; border-color: #00AC1480; padding: 1rem; padding-bottom: 0.25rem;">
-<dt><code><span class="parameter-name"><strong>columns</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><code>str</code> | <code>list</code>[<code>str</code>] | <code>Column</code> | <code>ColumnSelector</code> | <code>ColumnSelectorNarwhals</code></span></code></dt>
+<dt><code><span class="parameter-name"><strong>values</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><code>list</code>[<code>Any</code>]</span></code></dt>
 <dd>
-<p>A single column or a list of columns to validate. Can also use <a href="../reference/col.html#pointblank.col"><span><code>col()</code></span></a> with column selectors to specify one or more columns. If multiple columns are supplied or resolved, there will be a separate validation step generated for each column.</p>
-</dd>
-<dt><code><span class="parameter-name"><strong>value</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><code>float</code> | <code>int</code> | <code>Column</code></span></code></dt>
-<dd>
-<p>The value to compare against. This can be a single value or a single column name given in <a href="../reference/col.html#pointblank.col"><span><code>col()</code></span></a>. The latter option allows for a column-to-column comparison. For more information on which types of values are allowed, see the <em>What Can Be Used in <code>value=</code>?</em> section.</p>
-</dd>
-<dt><code><span class="parameter-name"><strong>na_pass</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><code>bool</code></span> <span class="parameter-default-sep">=</span> <span class="parameter-default">False</span></code></dt>
-<dd>
-<p>Should any encountered None, NA, or Null values be considered as passing test units? By default, this is <code>False</code>. Set to <code>True</code> to pass test units with missing values.</p>
-</dd>
-<dt><code><span class="parameter-name"><strong>pre</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><code>Callable</code> | None</span> <span class="parameter-default-sep">=</span> <span class="parameter-default">None</span></code></dt>
-<dd>
-<p>An optional preprocessing function or lambda to apply to the data table during interrogation. This function should take a table as input and return a modified table. Have a look at the <em>Preprocessing</em> section for more information on how to use this argument.</p>
-</dd>
-<dt><code><span class="parameter-name"><strong>segments</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><code>SegmentSpec</code> | None</span> <span class="parameter-default-sep">=</span> <span class="parameter-default">None</span></code></dt>
-<dd>
-<p>An optional directive on segmentation, which serves to split a validation step into multiple (one step per segment). Can be a single column name, a tuple that specifies a column name and its corresponding values to segment on, or a combination of both (provided as a list). Read the <em>Segmentation</em> section for usage information.</p>
-</dd>
-<dt><code><span class="parameter-name"><strong>thresholds</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><code>int</code> | <code>float</code> | <code>bool</code> | <code>tuple</code> | <code>dict</code> | <a href="../reference/Thresholds.html#pointblank.Thresholds">Thresholds</a></span> <span class="parameter-default-sep">=</span> <span class="parameter-default">None</span></code></dt>
-<dd>
-<p>Set threshold failure levels for reporting and reacting to exceedences of the levels. The thresholds are set at the step level and will override any global thresholds set in <code>Validate(thresholds=...)</code>. The default is <code>None</code>, which means that no thresholds will be set locally and global thresholds (if any) will take effect. Look at the <em>Thresholds</em> section for information on how to set threshold levels.</p>
-</dd>
-<dt><code><span class="parameter-name"><strong>actions</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><a href="../reference/Actions.html#pointblank.Actions">Actions</a> | None</span> <span class="parameter-default-sep">=</span> <span class="parameter-default">None</span></code></dt>
-<dd>
-<p>Optional actions to take when the validation step(s) meets or exceeds any set threshold levels. If provided, the <a href="../reference/Actions.html#pointblank.Actions"><span><code>Actions</code></span></a> class should be used to define the actions.</p>
-</dd>
-<dt><code><span class="parameter-name"><strong>brief</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><code>str</code> | <code>bool</code> | None</span> <span class="parameter-default-sep">=</span> <span class="parameter-default">None</span></code></dt>
-<dd>
-<p>An optional brief description of the validation step that will be displayed in the reporting table. You can use the templating elements like <code>"{step}"</code> to insert the step number, or <code>"{auto}"</code> to include an automatically generated brief. If <code>True</code> the entire brief will be automatically generated. If <code>None</code> (the default) then there won’t be a brief.</p>
-</dd>
-<dt><code><span class="parameter-name"><strong>active</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><code>bool</code></span> <span class="parameter-default-sep">=</span> <span class="parameter-default">True</span></code></dt>
-<dd>
-<p>A boolean value indicating whether the validation step should be active. Using <code>False</code> will make the validation step inactive (still reporting its presence and keeping indexes for the steps unchanged).</p>
+<p>A list of values to be grouped into a segment. This can be a single list or a list of lists.</p>
 </dd>
 </dl>
 </section>
 <section id="returns" class="level2 doc-section doc-section-returns">
 <h3 class="doc-section doc-section-returns anchored" data-anchor-id="returns">Returns</h3>
 <dl style="border-style: solid; border-width: 2px; border-color: #0059AC80; padding: 1rem; padding-bottom: 0.25rem;">
-<dt><code><span class="parameter-name"></span> <span class="parameter-annotation-sep" style="margin-left: -8px;"></span> <span class="parameter-annotation"><a href="../reference/Validate.html#pointblank.Validate">Validate</a></span></code></dt>
+<dt><code><span class="parameter-name"></span> <span class="parameter-annotation-sep" style="margin-left: -8px;"></span> <span class="parameter-annotation"><code>Segment</code></span></code></dt>
 <dd>
-<p>The <a href="../reference/Validate.html#pointblank.Validate" title="0"><code>Validate</code></a> object with the added validation step.</p>
+<p>A <code>Segment</code> object, which can be used to combine values into a segment.</p>
 </dd>
 </dl>
-</section>
-<section id="what-can-be-used-in-value" class="level2 doc-section doc-section-what-can-be-used-in-value">
-<h3 class="doc-section doc-section-what-can-be-used-in-value anchored" data-anchor-id="what-can-be-used-in-value">What Can Be Used in <code>value=</code>?</h3>
-<p>The <code>value=</code> argument allows for a variety of input types. The most common are:</p>
-<ul>
-<li>a single numeric value</li>
-<li>a single date or datetime value</li>
-<li>A <a href="../reference/col.html#pointblank.col"><span><code>col()</code></span></a> object that represents a column name</li>
-</ul>
-<p>When supplying a number as the basis of comparison, keep in mind that all resolved columns must also be numeric. Should you have columns that are of the date or datetime types, you can supply a date or datetime value as the <code>value=</code> argument. There is flexibility in how you provide the date or datetime value, as it can be:</p>
-<ul>
-<li>a string-based date or datetime (e.g., <code>"2023-10-01"</code>, <code>"2023-10-01 13:45:30"</code>, etc.)</li>
-<li>a date or datetime object using the <code>datetime</code> module (e.g., <code>datetime.date(2023, 10, 1)</code>, <code>datetime.datetime(2023, 10, 1, 13, 45, 30)</code>, etc.)</li>
-</ul>
-<p>Finally, when supplying a column name in the <code>value=</code> argument, it must be specified within <a href="../reference/col.html#pointblank.col"><span><code>col()</code></span></a>. This is a column-to-column comparison and, crucially, the columns being compared must be of the same type (e.g., both numeric, both date, etc.).</p>
-</section>
-<section id="preprocessing" class="level2 doc-section doc-section-preprocessing">
-<h3 class="doc-section doc-section-preprocessing anchored" data-anchor-id="preprocessing">Preprocessing</h3>
-<p>The <code>pre=</code> argument allows for a preprocessing function or lambda to be applied to the data table during interrogation. This function should take a table as input and return a modified table. This is useful for performing any necessary transformations or filtering on the data before the validation step is applied.</p>
-<p>The preprocessing function can be any callable that takes a table as input and returns a modified table. For example, you could use a lambda function to filter the table based on certain criteria or to apply a transformation to the data. Note that you can refer to columns via <code>columns=</code> and <code>value=col(...)</code> that are expected to be present in the transformed table, but may not exist in the table before preprocessing. Regarding the lifetime of the transformed table, it only exists during the validation step and is not stored in the <a href="../reference/Validate.html#pointblank.Validate" title="0"><code>Validate</code></a> object or used in subsequent validation steps.</p>
-</section>
-<section id="segmentation" class="level2 doc-section doc-section-segmentation">
-<h3 class="doc-section doc-section-segmentation anchored" data-anchor-id="segmentation">Segmentation</h3>
-<p>The <code>segments=</code> argument allows for the segmentation of a validation step into multiple segments. This is useful for applying the same validation step to different subsets of the data. The segmentation can be done based on a single column or specific fields within a column.</p>
-<p>Providing a single column name will result in a separate validation step for each unique value in that column. For example, if you have a column called <code>"region"</code> with values <code>"North"</code>, <code>"South"</code>, and <code>"East"</code>, the validation step will be applied separately to each region.</p>
-<p>Alternatively, you can provide a tuple that specifies a column name and its corresponding values to segment on. For example, if you have a column called <code>"date"</code> and you want to segment on only specific dates, you can provide a tuple like <code>("date", ["2023-01-01", "2023-01-02"])</code>. Any other values in the column will be disregarded (i.e., no validation steps will be created for them).</p>
-<p>A list with a combination of column names and tuples can be provided as well. This allows for more complex segmentation scenarios. The following inputs are both valid:</p>
-<pre><code># Segments from all unique values in the `region` column
-# and specific dates in the `date` column
-segments=["region", ("date", ["2023-01-01", "2023-01-02"])]
-
-# Segments from all unique values in the `region` and `date` columns
-segments=["region", "date"]</code></pre>
-<p>The segmentation is performed during interrogation, and the resulting validation steps will be numbered sequentially. Each segment will have its own validation step, and the results will be reported separately. This allows for a more granular analysis of the data and helps identify issues within specific segments.</p>
-<p>Importantly, the segmentation process will be performed after any preprocessing of the data table. Because of this, one can conceivably use the <code>pre=</code> argument to generate a column that can be used for segmentation. For example, you could create a new column called <code>"segment"</code> through use of <code>pre=</code> and then use that column for segmentation.</p>
-</section>
-<section id="thresholds" class="level2 doc-section doc-section-thresholds">
-<h3 class="doc-section doc-section-thresholds anchored" data-anchor-id="thresholds">Thresholds</h3>
-<p>The <code>thresholds=</code> parameter is used to set the failure-condition levels for the validation step. If they are set here at the step level, these thresholds will override any thresholds set at the global level in <code>Validate(thresholds=...)</code>.</p>
-<p>There are three threshold levels: ‘warning’, ‘error’, and ‘critical’. The threshold values can either be set as a proportion failing of all test units (a value between <code>0</code> to <code>1</code>), or, the absolute number of failing test units (as integer that’s <code>1</code> or greater).</p>
-<p>Thresholds can be defined using one of these input schemes:</p>
-<ol type="1">
-<li>use the <a href="../reference/Thresholds.html#pointblank.Thresholds"><span><code>Thresholds</code></span></a> class (the most direct way to create thresholds)</li>
-<li>provide a tuple of 1-3 values, where position <code>0</code> is the ‘warning’ level, position <code>1</code> is the ‘error’ level, and position <code>2</code> is the ‘critical’ level</li>
-<li>create a dictionary of 1-3 value entries; the valid keys: are ‘warning’, ‘error’, and ‘critical’</li>
-<li>a single integer/float value denoting absolute number or fraction of failing test units for the ‘warning’ level only</li>
-</ol>
-<p>If the number of failing test units exceeds set thresholds, the validation step will be marked as ‘warning’, ‘error’, or ‘critical’. All of the threshold levels don’t need to be set, you’re free to set any combination of them.</p>
-<p>Aside from reporting failure conditions, thresholds can be used to determine the actions to take for each level of failure (using the <code>actions=</code> parameter).</p>
 </section>
 <section id="examples" class="level2 doc-section doc-section-examples">
 <h3 class="doc-section doc-section-examples anchored" data-anchor-id="examples"><span style="
@@ -349,293 +260,53 @@ segments=["region", "date"]</code></pre>
         margin: 10px 0;
         border-radius: 2px;
     ">
-<p>For the examples here, we’ll use a simple Polars DataFrame with three numeric columns (<code>a</code>, <code>b</code>, and <code>c</code>). The table is shown below:</p>
-<div id="5f165f71" class="cell" data-execution_count="2">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>tbl <span class="op">=</span> pl.DataFrame(</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    {</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>        <span class="st">"a"</span>: [<span class="dv">5</span>, <span class="dv">6</span>, <span class="dv">5</span>, <span class="dv">9</span>, <span class="dv">7</span>, <span class="dv">5</span>],</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>        <span class="st">"b"</span>: [<span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">1</span>, <span class="dv">5</span>, <span class="dv">2</span>, <span class="dv">5</span>],</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>        <span class="st">"c"</span>: [<span class="dv">2</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">4</span>, <span class="dv">3</span>, <span class="dv">4</span>],</span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    }</span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>pb.preview(tbl)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Let’s say we’re analyzing sales from our local bookstore, and want to check the number of books sold for the month exceeds a certain threshold. We could pass in the argument <code>segments="genre"</code>, which would return a segment for each unique genre in the datasets. We could also pass in <code>segments=("genre", ["Fantasy", "Science Fiction"])</code>, to only create segments for those two genres. However, if we wanted to group these two genres into a single segment, we could use the <a href="../reference/seg_group.html#pointblank.seg_group" title="0"><code>seg_group()</code></a> function.</p>
+<div id="914220f8" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>tbl <span class="op">=</span> pl.DataFrame(</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    {</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>        <span class="st">"title"</span>: [</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>            <span class="st">"The Hobbit"</span>,</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>            <span class="st">"Harry Potter and the Sorcerer's Stone"</span>,</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>            <span class="st">"The Lord of the Rings"</span>,</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>            <span class="st">"A Game of Thrones"</span>,</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>            <span class="st">"The Name of the Wind"</span>,</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>            <span class="st">"The Girl with the Dragon Tattoo"</span>,</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>            <span class="st">"The Da Vinci Code"</span>,</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>            <span class="st">"The Hitchhiker's Guide to the Galaxy"</span>,</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>            <span class="st">"The Martian"</span>,</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>            <span class="st">"Brave New World"</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>        ],</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>        <span class="st">"genre"</span>: [</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>            <span class="st">"Fantasy"</span>,</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>            <span class="st">"Fantasy"</span>,</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>            <span class="st">"Fantasy"</span>,</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>            <span class="st">"Fantasy"</span>,</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>            <span class="st">"Fantasy"</span>,</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>            <span class="st">"Mystery"</span>,</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>            <span class="st">"Mystery"</span>,</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>            <span class="st">"Science Fiction"</span>,</span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>            <span class="st">"Science Fiction"</span>,</span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>            <span class="st">"Science Fiction"</span>,</span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>        ],</span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>        <span class="st">"units_sold"</span>: [<span class="dv">875</span>, <span class="dv">932</span>, <span class="dv">756</span>, <span class="dv">623</span>, <span class="dv">445</span>, <span class="dv">389</span>, <span class="dv">678</span>, <span class="dv">534</span>, <span class="dv">712</span>, <span class="dv">598</span>],</span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>    .col_vals_gt(</span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>        columns<span class="op">=</span><span class="st">"units_sold"</span>,</span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>        value<span class="op">=</span><span class="dv">500</span>,</span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>        segments<span class="op">=</span>(<span class="st">"genre"</span>, pb.seg_group([<span class="st">"Fantasy"</span>, <span class="st">"Science Fiction"</span>]))</span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a>validation</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="2">
-<div id="pb_preview_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans&display=swap');
-#pb_preview_tbl table {
-          font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
-          -webkit-font-smoothing: antialiased;
-          -moz-osx-font-smoothing: grayscale;
-        }
-
-#pb_preview_tbl thead, tbody, tfoot, tr, td, th { border-style: none; }
- tr { background-color: transparent; }
-#pb_preview_tbl p { margin: 0; padding: 0; }
- #pb_preview_tbl .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 16px; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: auto; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
- #pb_preview_tbl .gt_caption { padding-top: 4px; padding-bottom: 4px; }
- #pb_preview_tbl .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
- #pb_preview_tbl .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
- #pb_preview_tbl .gt_heading { background-color: #FFFFFF; text-align: left; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
- #pb_preview_tbl .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
- #pb_preview_tbl .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
- #pb_preview_tbl .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: solid; border-left-width: 1px; border-left-color: #F2F2F2; border-right-style: solid; border-right-width: 1px; border-right-color: #F2F2F2; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
- #pb_preview_tbl .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
- #pb_preview_tbl .gt_column_spanner_outer:first-child { padding-left: 0; }
- #pb_preview_tbl .gt_column_spanner_outer:last-child { padding-right: 0; }
- #pb_preview_tbl .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
- #pb_preview_tbl .gt_spanner_row { border-bottom-style: hidden; }
- #pb_preview_tbl .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
- #pb_preview_tbl .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
- #pb_preview_tbl .gt_from_md> :first-child { margin-top: 0; }
- #pb_preview_tbl .gt_from_md> :last-child { margin-bottom: 0; }
- #pb_preview_tbl .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: solid; border-left-width: 1px; border-left-color: #E9E9E9; border-right-style: solid; border-right-width: 1px; border-right-color: #E9E9E9; vertical-align: middle; overflow-x: hidden; }
- #pb_preview_tbl .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
- #pb_preview_tbl .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
- #pb_preview_tbl .gt_row_group_first td { border-top-width: 2px; }
- #pb_preview_tbl .gt_row_group_first th { border-top-width: 2px; }
- #pb_preview_tbl .gt_striped { background-color: rgba(128,128,128,0.05); }
- #pb_preview_tbl .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
- #pb_preview_tbl .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
- #pb_preview_tbl .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
- #pb_preview_tbl .gt_left { text-align: left; }
- #pb_preview_tbl .gt_center { text-align: center; }
- #pb_preview_tbl .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
- #pb_preview_tbl .gt_font_normal { font-weight: normal; }
- #pb_preview_tbl .gt_font_bold { font-weight: bold; }
- #pb_preview_tbl .gt_font_italic { font-style: italic; }
- #pb_preview_tbl .gt_super { font-size: 65%; }
- #pb_preview_tbl .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
- #pb_preview_tbl .gt_asterisk { font-size: 100%; vertical-align: 0; }
- 
-</style>
-<table style="table-layout: fixed;; width: 0px" class="gt_table" data-quarto-disable-processing="true" data-quarto-bootstrap="false">
-<colgroup>
-  <col style="width:17.8px;">
-  <col style="width:166px;">
-  <col style="width:166px;">
-  <col style="width:166px;">
-</colgroup>
-
-<thead>
-
-<tr class="gt_col_headings">
-  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="color: gray20;font-family: IBM Plex Mono;font-size: 12px;" scope="col" id="pb_preview_tbl-_row_num_"></th>
-  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="color: gray20;font-family: IBM Plex Mono;font-size: 12px;" scope="col" id="pb_preview_tbl-a"><div><div style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-bottom: 2px; margin-bottom: 2px;">a</div><div style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-top: 2px; margin-top: 2px;"><em>Int64</em></div></div></th>
-  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="color: gray20;font-family: IBM Plex Mono;font-size: 12px;" scope="col" id="pb_preview_tbl-b"><div><div style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-bottom: 2px; margin-bottom: 2px;">b</div><div style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-top: 2px; margin-top: 2px;"><em>Int64</em></div></div></th>
-  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="color: gray20;font-family: IBM Plex Mono;font-size: 12px;" scope="col" id="pb_preview_tbl-c"><div><div style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-bottom: 2px; margin-bottom: 2px;">c</div><div style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-top: 2px; margin-top: 2px;"><em>Int64</em></div></div></th>
-</tr>
-</thead>
-<tbody class="gt_table_body">
-  <tr>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; color: gray;font-family: IBM Plex Mono;font-size: 10px; border-right: 2px solid #6699CC80;" class="gt_row gt_right">1</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">5</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">1</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">2</td>
-  </tr>
-  <tr>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; color: gray;font-family: IBM Plex Mono;font-size: 10px; border-right: 2px solid #6699CC80;" class="gt_row gt_right">2</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">6</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">3</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">1</td>
-  </tr>
-  <tr>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; color: gray;font-family: IBM Plex Mono;font-size: 10px; border-right: 2px solid #6699CC80;" class="gt_row gt_right">3</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">5</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">1</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">1</td>
-  </tr>
-  <tr>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; color: gray;font-family: IBM Plex Mono;font-size: 10px; border-right: 2px solid #6699CC80;" class="gt_row gt_right">4</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">9</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">5</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">4</td>
-  </tr>
-  <tr>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; color: gray;font-family: IBM Plex Mono;font-size: 10px; border-right: 2px solid #6699CC80;" class="gt_row gt_right">5</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">7</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">2</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">3</td>
-  </tr>
-  <tr>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; color: gray;font-family: IBM Plex Mono;font-size: 10px; border-right: 2px solid #6699CC80;" class="gt_row gt_right">6</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">5</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">5</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">4</td>
-  </tr>
-</tbody>
-
-
-</table>
-
-</div>
-        
-</div>
-</div>
-<p>Let’s validate that values in column <code>a</code> are all less than or equal to the value of <code>9</code>. We’ll determine if this validation had any failing test units (there are six test units, one for each row).</p>
-<div id="f09716c3" class="cell" data-execution_count="3">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_le(columns<span class="op">=</span><span class="st">"a"</span>, value<span class="op">=</span><span class="dv">9</span>)</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>validation</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="3">
-<div id="pb_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans&display=swap');
-#pb_tbl table {
-          font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
-          -webkit-font-smoothing: antialiased;
-          -moz-osx-font-smoothing: grayscale;
-        }
-
-#pb_tbl thead, tbody, tfoot, tr, td, th { border-style: none; }
- tr { background-color: transparent; }
-#pb_tbl p { margin: 0; padding: 0; }
- #pb_tbl .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 90%; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: auto; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
- #pb_tbl .gt_caption { padding-top: 4px; padding-bottom: 4px; }
- #pb_tbl .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
- #pb_tbl .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
- #pb_tbl .gt_heading { background-color: #FFFFFF; text-align: left; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
- #pb_tbl .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
- #pb_tbl .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
- #pb_tbl .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
- #pb_tbl .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
- #pb_tbl .gt_column_spanner_outer:first-child { padding-left: 0; }
- #pb_tbl .gt_column_spanner_outer:last-child { padding-right: 0; }
- #pb_tbl .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
- #pb_tbl .gt_spanner_row { border-bottom-style: hidden; }
- #pb_tbl .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
- #pb_tbl .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
- #pb_tbl .gt_from_md> :first-child { margin-top: 0; }
- #pb_tbl .gt_from_md> :last-child { margin-bottom: 0; }
- #pb_tbl .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
- #pb_tbl .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
- #pb_tbl .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
- #pb_tbl .gt_row_group_first td { border-top-width: 2px; }
- #pb_tbl .gt_row_group_first th { border-top-width: 2px; }
- #pb_tbl .gt_striped { background-color: rgba(128,128,128,0.05); }
- #pb_tbl .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
- #pb_tbl .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
- #pb_tbl .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
- #pb_tbl .gt_left { text-align: left; }
- #pb_tbl .gt_center { text-align: center; }
- #pb_tbl .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
- #pb_tbl .gt_font_normal { font-weight: normal; }
- #pb_tbl .gt_font_bold { font-weight: bold; }
- #pb_tbl .gt_font_italic { font-style: italic; }
- #pb_tbl .gt_super { font-size: 65%; }
- #pb_tbl .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
- #pb_tbl .gt_asterisk { font-size: 100%; vertical-align: 0; }
- 
-</style>
-<table style="table-layout: fixed;; width: 0px" class="gt_table" data-quarto-disable-processing="true" data-quarto-bootstrap="false">
-<colgroup>
-  <col style="width:4px;">
-  <col style="width:35px;">
-  <col style="width:190px;">
-  <col style="width:120px;">
-  <col style="width:120px;">
-  <col style="width:50px;">
-  <col style="width:50px;">
-  <col style="width:60px;">
-  <col style="width:60px;">
-  <col style="width:60px;">
-  <col style="width:30px;">
-  <col style="width:30px;">
-  <col style="width:30px;">
-  <col style="width:65px;">
-</colgroup>
-
-<thead>
-
-<tr class="gt_col_headings">
-  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-status_color"></th>
-  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-i"></th>
-  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-type_upd">STEP</th>
-  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-columns_upd">COLUMNS</th>
-  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-values_upd">VALUES</th>
-  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-tbl">TBL</th>
-  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-eval">EVAL</th>
-  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-test_units">UNITS</th>
-  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-pass">PASS</th>
-  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-fail">FAIL</th>
-  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-w_upd">W</th>
-  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-e_upd">E</th>
-  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-c_upd">C</th>
-  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-extract_upd">EXT</th>
-</tr>
-</thead>
-<tbody class="gt_table_body">
-  <tr>
-    <td style="height: 40px; background-color: #4CA64C; color: transparent;font-size: 0px;" class="gt_row gt_left">#4CA64C</td>
-    <td style="height: 40px; color: #666666;font-size: 13px;font-weight: bold;" class="gt_row gt_right">1</td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left">
-        <div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
-            <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
-<svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink">
-    <title>col_vals_le</title>
-    <g id="All-Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="col_vals_le" transform="translate(0.000000, 0.793103)">
-            <path d="M56.712234,1 C59.1975153,1 61.4475153,2.00735931 63.076195,3.63603897 C64.7048747,5.26471863 65.712234,7.51471863 65.712234,10 L65.712234,10 L65.712234,65 L10.712234,65 C8.22695259,65 5.97695259,63.9926407 4.34827294,62.363961 C2.71959328,60.7352814 1.71223397,58.4852814 1.71223397,56 L1.71223397,56 L1.71223397,10 C1.71223397,7.51471863 2.71959328,5.26471863 4.34827294,3.63603897 C5.97695259,2.00735931 8.22695259,1 10.712234,1 L10.712234,1 Z" id="rectangle" stroke="#000000" stroke-width="2" fill="#FFFFFF"></path>
-            <path d="M53.712234,12 L13.712234,12 C13.157547,12 12.712234,12.449219 12.712234,13 L12.712234,53 C12.712234,53.550781 13.157547,54 13.712234,54 L53.712234,54 C54.266922,54 54.712234,53.550781 54.712234,53 L54.712234,13 C54.712234,12.449219 54.266922,12 53.712234,12 Z M42.227859,19.125 L43.196609,20.875 L26.770828,30 L43.196609,39.125 L42.227859,40.875 L22.65364,30 L42.227859,19.125 Z M44.712234,47 L22.712234,47 L22.712234,45 L44.712234,45 L44.712234,47 Z" id="less_than_equal" fill="#000000" fill-rule="nonzero"></path>
-        </g>
-    </g>
-</svg>
-        </div>
-        <div style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size: 11px; display: inline-block; vertical-align: middle;">
-            <div>col_vals_le()</div>
-        </div>
-        
-        </td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">a</td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">9</td>
-    <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" class="gt_row gt_center"><svg width="25px" height="25px" viewbox="0 0 25 25" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="vertical-align: middle;">
-    <g id="unchanged" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="unchanged" transform="translate(0.500000, 0.570147)">
-            <rect id="Rectangle" x="0.125132506" y="0" width="23.749735" height="23.7894737"></rect>
-            <path d="M5.80375046,8.18194736 C3.77191832,8.18194736 2.11875046,9.83495328 2.11875046,11.8669474 C2.11875046,13.8989414 3.77191832,15.5519474 5.80375046,15.5519474 C7.8355826,15.5519474 9.48875046,13.8989414 9.48875046,11.8669474 C9.48875046,9.83495328 7.83552863,8.18194736 5.80375046,8.18194736 Z M5.80375046,14.814915 C4.17821997,14.814915 2.85578285,13.4924778 2.85578285,11.8669474 C2.85578285,10.2414169 4.17821997,8.91897975 5.80375046,8.91897975 C7.42928095,8.91897975 8.75171807,10.2414169 8.75171807,11.8669474 C8.75171807,13.4924778 7.42928095,14.814915 5.80375046,14.814915 Z" id="Shape" fill="#000000" fill-rule="nonzero"></path>
-            <path d="M13.9638189,8.699335 C13.9364621,8.70430925 13.9091059,8.71176968 13.8842359,8.71923074 C13.7822704,8.73663967 13.6877654,8.77643115 13.6056956,8.83860518 L10.2433156,11.3852598 C10.0766886,11.5046343 9.97720993,11.6986181 9.97720993,11.9025491 C9.97720993,12.1064807 10.0766886,12.3004639 10.2433156,12.4198383 L13.6056956,14.966493 C13.891697,15.1803725 14.2970729,15.1231721 14.5109517,14.8371707 C14.7248313,14.5511692 14.6676309,14.145794 14.3816294,13.9319145 L12.5313257,12.5392127 L21.8812495,12.5392127 L21.8812495,11.2658854 L12.5313257,11.2658854 L14.3816294,9.87318364 C14.6377872,9.71650453 14.7497006,9.40066014 14.6477351,9.11714553 C14.5482564,8.83363156 14.262255,8.65954352 13.9638189,8.699335 Z" id="arrow" fill="#000000" transform="translate(15.929230, 11.894737) rotate(-180.000000) translate(-15.929230, -11.894737) "></path>
-        </g>
-    </g>
-</svg></td>
-    <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" class="gt_row gt_center"><span style="color:#4CA64C;">✓</span></td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_right">6</td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">6<br>1.00</td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">0<br>0.00</td>
-    <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" class="gt_row gt_center">—</td>
-    <td style="height: 40px; background-color: #FCFCFC;" class="gt_row gt_center">—</td>
-    <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" class="gt_row gt_center">—</td>
-    <td style="height: 40px;" class="gt_row gt_center">—</td>
-  </tr>
-</tbody>
-
-
-</table>
-
-</div>
-        
-</div>
-</div>
-<p>Printing the <code>validation</code> object shows the validation table in an HTML viewing environment. The validation table shows the single entry that corresponds to the validation step created by using <code>col_vals_le()</code>. All test units passed, and there are no failing test units.</p>
-<p>Aside from checking a column against a literal value, we can also use a column name in the <code>value=</code> argument (with the helper function <a href="../reference/col.html#pointblank.col"><span><code>col()</code></span></a> to perform a column-to-column comparison. For the next example, we’ll use <code>col_vals_le()</code> to check whether the values in column <code>c</code> are less than values in column <code>b</code>.</p>
-<div id="6535efcc" class="cell" data-execution_count="4">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_le(columns<span class="op">=</span><span class="st">"c"</span>, value<span class="op">=</span>pb.col(<span class="st">"b"</span>))</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>validation</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="4">
 <div id="pb_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap');
@@ -727,43 +398,44 @@ segments=["region", "date"]</code></pre>
   <tr>
     <td style="height: 40px; background-color: #4CA64C66; color: transparent;font-size: 0px;" class="gt_row gt_left">#4CA64C66</td>
     <td style="height: 40px; color: #666666;font-size: 13px;font-weight: bold;" class="gt_row gt_right">1</td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left">
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left"><div style="margin-top: 0px; margin-bottom: 0px; white-space: pre; font-size: 8px; color: darkblue; padding-bottom: 4px; "><strong><span style="font-family: Helvetica, arial, sans-serif;">SEGMENT&nbsp;&nbsp;</span></strong><span>genre / ['Fantasy', 'Science Fiction']</span></div> 
         <div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
             <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
 <svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink">
-    <title>col_vals_le</title>
+    <title>col_vals_gt</title>
     <g id="All-Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="col_vals_le" transform="translate(0.000000, 0.793103)">
+        <g id="col_vals_gt" transform="translate(0.000000, 0.724138)">
             <path d="M56.712234,1 C59.1975153,1 61.4475153,2.00735931 63.076195,3.63603897 C64.7048747,5.26471863 65.712234,7.51471863 65.712234,10 L65.712234,10 L65.712234,65 L10.712234,65 C8.22695259,65 5.97695259,63.9926407 4.34827294,62.363961 C2.71959328,60.7352814 1.71223397,58.4852814 1.71223397,56 L1.71223397,56 L1.71223397,10 C1.71223397,7.51471863 2.71959328,5.26471863 4.34827294,3.63603897 C5.97695259,2.00735931 8.22695259,1 10.712234,1 L10.712234,1 Z" id="rectangle" stroke="#000000" stroke-width="2" fill="#FFFFFF"></path>
-            <path d="M53.712234,12 L13.712234,12 C13.157547,12 12.712234,12.449219 12.712234,13 L12.712234,53 C12.712234,53.550781 13.157547,54 13.712234,54 L53.712234,54 C54.266922,54 54.712234,53.550781 54.712234,53 L54.712234,13 C54.712234,12.449219 54.266922,12 53.712234,12 Z M42.227859,19.125 L43.196609,20.875 L26.770828,30 L43.196609,39.125 L42.227859,40.875 L22.65364,30 L42.227859,19.125 Z M44.712234,47 L22.712234,47 L22.712234,45 L44.712234,45 L44.712234,47 Z" id="less_than_equal" fill="#000000" fill-rule="nonzero"></path>
+            <path d="M49.7099609,12 L17.7099609,12 C14.9499609,12 12.7099609,14.24 12.7099609,17 L12.7099609,49 C12.7099609,51.76 14.9499609,54 17.7099609,54 L49.7099609,54 C52.4699609,54 54.7099609,51.76 54.7099609,49 L54.7099609,17 C54.7099609,14.24 52.4699609,12 49.7099609,12 Z M27.2799609,44.82 L26.1399609,43.18 L40.9499609,33 L26.1399609,22.82 L27.2799609,21.18 L44.4799609,33 L27.2799609,44.82 Z" id="greater_than" fill="#000000" fill-rule="nonzero"></path>
         </g>
     </g>
 </svg>
         </div>
         <div style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size: 11px; display: inline-block; vertical-align: middle;">
-            <div>col_vals_le()</div>
+            <div>col_vals_gt()</div>
         </div>
         
         </td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">c</td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">b</td>
-    <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" class="gt_row gt_center"><svg width="25px" height="25px" viewbox="0 0 25 25" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="vertical-align: middle;">
-    <g id="unchanged" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="unchanged" transform="translate(0.500000, 0.570147)">
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">units_sold</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">500</td>
+    <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" class="gt_row gt_center"><svg width="24px" height="25px" viewbox="0 0 24 25" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="vertical-align: middle;">
+    <g id="segmented" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="segmented" transform="translate(0.000000, 0.570147)">
             <rect id="Rectangle" x="0.125132506" y="0" width="23.749735" height="23.7894737"></rect>
-            <path d="M5.80375046,8.18194736 C3.77191832,8.18194736 2.11875046,9.83495328 2.11875046,11.8669474 C2.11875046,13.8989414 3.77191832,15.5519474 5.80375046,15.5519474 C7.8355826,15.5519474 9.48875046,13.8989414 9.48875046,11.8669474 C9.48875046,9.83495328 7.83552863,8.18194736 5.80375046,8.18194736 Z M5.80375046,14.814915 C4.17821997,14.814915 2.85578285,13.4924778 2.85578285,11.8669474 C2.85578285,10.2414169 4.17821997,8.91897975 5.80375046,8.91897975 C7.42928095,8.91897975 8.75171807,10.2414169 8.75171807,11.8669474 C8.75171807,13.4924778 7.42928095,14.814915 5.80375046,14.814915 Z" id="Shape" fill="#000000" fill-rule="nonzero"></path>
-            <path d="M13.9638189,8.699335 C13.9364621,8.70430925 13.9091059,8.71176968 13.8842359,8.71923074 C13.7822704,8.73663967 13.6877654,8.77643115 13.6056956,8.83860518 L10.2433156,11.3852598 C10.0766886,11.5046343 9.97720993,11.6986181 9.97720993,11.9025491 C9.97720993,12.1064807 10.0766886,12.3004639 10.2433156,12.4198383 L13.6056956,14.966493 C13.891697,15.1803725 14.2970729,15.1231721 14.5109517,14.8371707 C14.7248313,14.5511692 14.6676309,14.145794 14.3816294,13.9319145 L12.5313257,12.5392127 L21.8812495,12.5392127 L21.8812495,11.2658854 L12.5313257,11.2658854 L14.3816294,9.87318364 C14.6377872,9.71650453 14.7497006,9.40066014 14.6477351,9.11714553 C14.5482564,8.83363156 14.262255,8.65954352 13.9638189,8.699335 Z" id="arrow" fill="#000000" transform="translate(15.929230, 11.894737) rotate(-180.000000) translate(-15.929230, -11.894737) "></path>
+            <path d="M18.4051095,14.3518889 C20.4405142,14.3518889 22.0905358,16.0019105 22.0905358,18.0373152 C22.0905358,20.07272 20.4405142,21.7227416 18.4051095,21.7227416 C16.3697047,21.7227416 14.7196831,20.07272 14.7196831,18.0373152 C14.7196831,16.0019105 16.3697047,14.3518889 18.4051095,14.3518889 Z M18.4051095,14.9787621 C16.7159172,14.9787621 15.3465563,16.348123 15.3465563,18.0373152 C15.3465563,18.7697385 15.604001,19.4420322 16.0333357,19.9686419 L20.3364361,15.6655415 C19.8098264,15.2362068 19.1375327,14.9787621 18.4051095,14.9787621 Z" id="Shape" fill="#000000" fill-rule="nonzero"></path>
+            <path d="M4.40094816,14.3498527 C2.36911602,14.3498527 0.715948163,16.0028586 0.715948163,18.0348527 C0.715948163,20.0668467 2.36911602,21.7198527 4.40094816,21.7198527 C6.43278031,21.7198527 8.08594816,20.0668467 8.08594816,18.0348527 C8.08594816,16.0028586 6.43272633,14.3498527 4.40094816,14.3498527 Z M4.40094816,20.9828203 C2.77541767,20.9828203 1.45298055,19.6603831 1.45298055,18.0348527 C1.45298055,16.4093222 2.77541767,15.086885 4.40094816,15.086885 C6.02647865,15.086885 7.34891578,16.4093222 7.34891578,18.0348527 C7.34891578,19.6603831 6.02647865,20.9828203 4.40094816,20.9828203 Z" id="Shape" fill="#000000" fill-rule="nonzero"></path>
+            <path d="M18.4333601,-0.640287588 L18.4333601,14.5882952 L9.52131131,14.5882952 L11.3716151,15.980997 C11.6576165,16.1948765 11.7148169,16.6002518 11.5009374,16.8862532 C11.2870585,17.1722546 10.8816827,17.229455 10.5956813,17.0155755 L10.5956813,17.0155755 L7.23330126,14.4689208 C7.06667429,14.3495464 6.96719559,14.1555632 6.96719559,13.9516316 C6.96719559,13.7477006 7.06667429,13.5537168 7.23330126,13.4343424 L7.23330126,13.4343424 L10.5956813,10.8876877 C10.677751,10.8255137 10.7722561,10.7857222 10.8742216,10.7683132 C10.8990916,10.7608522 10.9264478,10.7533918 10.9538046,10.7484175 C11.2522407,10.708626 11.5382421,10.8827141 11.6377208,11.166228 C11.7396863,11.4497426 11.6277729,11.765587 11.3716151,11.9222661 L11.3716151,11.9222661 L9.52131131,13.3149679 L17.1593533,13.3147124 L17.1594577,0.633614828 L6.9283533,0.633614828 L6.9283533,-0.640287588 L18.4333601,-0.640287588 Z" id="arrow" fill="#000000" transform="translate(12.680857, 8.252286) rotate(-90.000000) translate(-12.680857, -8.252286) "></path>
         </g>
     </g>
 </svg></td>
     <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" class="gt_row gt_center"><span style="color:#4CA64C;">✓</span></td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_right">6</td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">4<br>0.67</td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">2<br>0.33</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_right">8</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">7<br>0.88</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">1<br>0.12</td>
     <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" class="gt_row gt_center">—</td>
     <td style="height: 40px; background-color: #FCFCFC;" class="gt_row gt_center">—</td>
     <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" class="gt_row gt_center">—</td>
-    <td style="height: 40px;" class="gt_row gt_center"><a href="data:text/csv;base64,X3Jvd19udW1fLGEsYixjCjEsNSwxLDIKNSw3LDIsMwo=" download="extract_0001.csv"><button style="background-color: #67C2DC; color: #FFFFFF; border: none; padding: 5px; font-weight: bold; cursor: pointer; border-radius: 4px;">CSV</button></a></td>
+    <td style="height: 40px;" class="gt_row gt_center"><a href="data:text/csv;base64,X3Jvd19udW1fLHRpdGxlLGdlbnJlLHVuaXRzX3NvbGQKNSxUaGUgTmFtZSBvZiB0aGUgV2luZCxGYW50YXN5LDQ0NQo=" download="extract_0001.csv"><button style="background-color: #67C2DC; color: #FFFFFF; border: none; padding: 5px; font-weight: bold; cursor: pointer; border-radius: 4px;">CSV</button></a></td>
   </tr>
 </tbody>
 
@@ -774,11 +446,247 @@ segments=["region", "date"]</code></pre>
         
 </div>
 </div>
-<p>The validation table reports two failing test units. The specific failing cases are:</p>
-<ul>
-<li>Row 0: <code>c</code> is <code>2</code> and <code>b</code> is <code>1</code>.</li>
-<li>Row 4: <code>c</code> is <code>3</code> and <code>b</code> is <code>2</code>.</li>
-</ul>
+<p>What’s more, we can create multiple segments, combining the genres in different ways.</p>
+<div id="a33d4e5f" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_gt(</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>        columns<span class="op">=</span><span class="st">"units_sold"</span>,</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>        value<span class="op">=</span><span class="dv">500</span>,</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>        segments<span class="op">=</span>(<span class="st">"genre"</span>, pb.seg_group([</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>            [<span class="st">"Fantasy"</span>, <span class="st">"Science Fiction"</span>],</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>            [<span class="st">"Fantasy"</span>, <span class="st">"Mystery"</span>],</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>            [<span class="st">"Mystery"</span>, <span class="st">"Science Fiction"</span>]</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>        ]))</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>validation</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="3">
+<div id="pb_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans&display=swap');
+#pb_tbl table {
+          font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+        }
+
+#pb_tbl thead, tbody, tfoot, tr, td, th { border-style: none; }
+ tr { background-color: transparent; }
+#pb_tbl p { margin: 0; padding: 0; }
+ #pb_tbl .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 90%; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: auto; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
+ #pb_tbl .gt_caption { padding-top: 4px; padding-bottom: 4px; }
+ #pb_tbl .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
+ #pb_tbl .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
+ #pb_tbl .gt_heading { background-color: #FFFFFF; text-align: left; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #pb_tbl .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #pb_tbl .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #pb_tbl .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
+ #pb_tbl .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
+ #pb_tbl .gt_column_spanner_outer:first-child { padding-left: 0; }
+ #pb_tbl .gt_column_spanner_outer:last-child { padding-right: 0; }
+ #pb_tbl .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
+ #pb_tbl .gt_spanner_row { border-bottom-style: hidden; }
+ #pb_tbl .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
+ #pb_tbl .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
+ #pb_tbl .gt_from_md> :first-child { margin-top: 0; }
+ #pb_tbl .gt_from_md> :last-child { margin-bottom: 0; }
+ #pb_tbl .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
+ #pb_tbl .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
+ #pb_tbl .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
+ #pb_tbl .gt_row_group_first td { border-top-width: 2px; }
+ #pb_tbl .gt_row_group_first th { border-top-width: 2px; }
+ #pb_tbl .gt_striped { background-color: rgba(128,128,128,0.05); }
+ #pb_tbl .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #pb_tbl .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #pb_tbl .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #pb_tbl .gt_left { text-align: left; }
+ #pb_tbl .gt_center { text-align: center; }
+ #pb_tbl .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
+ #pb_tbl .gt_font_normal { font-weight: normal; }
+ #pb_tbl .gt_font_bold { font-weight: bold; }
+ #pb_tbl .gt_font_italic { font-style: italic; }
+ #pb_tbl .gt_super { font-size: 65%; }
+ #pb_tbl .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
+ #pb_tbl .gt_asterisk { font-size: 100%; vertical-align: 0; }
+ 
+</style>
+<table style="table-layout: fixed;; width: 0px" class="gt_table" data-quarto-disable-processing="true" data-quarto-bootstrap="false">
+<colgroup>
+  <col style="width:4px;">
+  <col style="width:35px;">
+  <col style="width:190px;">
+  <col style="width:120px;">
+  <col style="width:120px;">
+  <col style="width:50px;">
+  <col style="width:50px;">
+  <col style="width:60px;">
+  <col style="width:60px;">
+  <col style="width:60px;">
+  <col style="width:30px;">
+  <col style="width:30px;">
+  <col style="width:30px;">
+  <col style="width:65px;">
+</colgroup>
+
+<thead>
+
+<tr class="gt_col_headings">
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-status_color"></th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-i"></th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-type_upd">STEP</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-columns_upd">COLUMNS</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-values_upd">VALUES</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-tbl">TBL</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-eval">EVAL</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-test_units">UNITS</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-pass">PASS</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-fail">FAIL</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-w_upd">W</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-e_upd">E</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-c_upd">C</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-extract_upd">EXT</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+  <tr>
+    <td style="height: 40px; background-color: #4CA64C66; color: transparent;font-size: 0px;" class="gt_row gt_left">#4CA64C66</td>
+    <td style="height: 40px; color: #666666;font-size: 13px;font-weight: bold;" class="gt_row gt_right">1</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left"><div style="margin-top: 0px; margin-bottom: 0px; white-space: pre; font-size: 8px; color: darkblue; padding-bottom: 4px; "><strong><span style="font-family: Helvetica, arial, sans-serif;">SEGMENT&nbsp;&nbsp;</span></strong><span>genre / ['Fantasy', 'Science Fiction']</span></div> 
+        <div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
+            <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
+<svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink">
+    <title>col_vals_gt</title>
+    <g id="All-Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="col_vals_gt" transform="translate(0.000000, 0.724138)">
+            <path d="M56.712234,1 C59.1975153,1 61.4475153,2.00735931 63.076195,3.63603897 C64.7048747,5.26471863 65.712234,7.51471863 65.712234,10 L65.712234,10 L65.712234,65 L10.712234,65 C8.22695259,65 5.97695259,63.9926407 4.34827294,62.363961 C2.71959328,60.7352814 1.71223397,58.4852814 1.71223397,56 L1.71223397,56 L1.71223397,10 C1.71223397,7.51471863 2.71959328,5.26471863 4.34827294,3.63603897 C5.97695259,2.00735931 8.22695259,1 10.712234,1 L10.712234,1 Z" id="rectangle" stroke="#000000" stroke-width="2" fill="#FFFFFF"></path>
+            <path d="M49.7099609,12 L17.7099609,12 C14.9499609,12 12.7099609,14.24 12.7099609,17 L12.7099609,49 C12.7099609,51.76 14.9499609,54 17.7099609,54 L49.7099609,54 C52.4699609,54 54.7099609,51.76 54.7099609,49 L54.7099609,17 C54.7099609,14.24 52.4699609,12 49.7099609,12 Z M27.2799609,44.82 L26.1399609,43.18 L40.9499609,33 L26.1399609,22.82 L27.2799609,21.18 L44.4799609,33 L27.2799609,44.82 Z" id="greater_than" fill="#000000" fill-rule="nonzero"></path>
+        </g>
+    </g>
+</svg>
+        </div>
+        <div style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size: 11px; display: inline-block; vertical-align: middle;">
+            <div>col_vals_gt()</div>
+        </div>
+        
+        </td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">units_sold</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">500</td>
+    <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" class="gt_row gt_center"><svg width="24px" height="25px" viewbox="0 0 24 25" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="vertical-align: middle;">
+    <g id="segmented" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="segmented" transform="translate(0.000000, 0.570147)">
+            <rect id="Rectangle" x="0.125132506" y="0" width="23.749735" height="23.7894737"></rect>
+            <path d="M18.4051095,14.3518889 C20.4405142,14.3518889 22.0905358,16.0019105 22.0905358,18.0373152 C22.0905358,20.07272 20.4405142,21.7227416 18.4051095,21.7227416 C16.3697047,21.7227416 14.7196831,20.07272 14.7196831,18.0373152 C14.7196831,16.0019105 16.3697047,14.3518889 18.4051095,14.3518889 Z M18.4051095,14.9787621 C16.7159172,14.9787621 15.3465563,16.348123 15.3465563,18.0373152 C15.3465563,18.7697385 15.604001,19.4420322 16.0333357,19.9686419 L20.3364361,15.6655415 C19.8098264,15.2362068 19.1375327,14.9787621 18.4051095,14.9787621 Z" id="Shape" fill="#000000" fill-rule="nonzero"></path>
+            <path d="M4.40094816,14.3498527 C2.36911602,14.3498527 0.715948163,16.0028586 0.715948163,18.0348527 C0.715948163,20.0668467 2.36911602,21.7198527 4.40094816,21.7198527 C6.43278031,21.7198527 8.08594816,20.0668467 8.08594816,18.0348527 C8.08594816,16.0028586 6.43272633,14.3498527 4.40094816,14.3498527 Z M4.40094816,20.9828203 C2.77541767,20.9828203 1.45298055,19.6603831 1.45298055,18.0348527 C1.45298055,16.4093222 2.77541767,15.086885 4.40094816,15.086885 C6.02647865,15.086885 7.34891578,16.4093222 7.34891578,18.0348527 C7.34891578,19.6603831 6.02647865,20.9828203 4.40094816,20.9828203 Z" id="Shape" fill="#000000" fill-rule="nonzero"></path>
+            <path d="M18.4333601,-0.640287588 L18.4333601,14.5882952 L9.52131131,14.5882952 L11.3716151,15.980997 C11.6576165,16.1948765 11.7148169,16.6002518 11.5009374,16.8862532 C11.2870585,17.1722546 10.8816827,17.229455 10.5956813,17.0155755 L10.5956813,17.0155755 L7.23330126,14.4689208 C7.06667429,14.3495464 6.96719559,14.1555632 6.96719559,13.9516316 C6.96719559,13.7477006 7.06667429,13.5537168 7.23330126,13.4343424 L7.23330126,13.4343424 L10.5956813,10.8876877 C10.677751,10.8255137 10.7722561,10.7857222 10.8742216,10.7683132 C10.8990916,10.7608522 10.9264478,10.7533918 10.9538046,10.7484175 C11.2522407,10.708626 11.5382421,10.8827141 11.6377208,11.166228 C11.7396863,11.4497426 11.6277729,11.765587 11.3716151,11.9222661 L11.3716151,11.9222661 L9.52131131,13.3149679 L17.1593533,13.3147124 L17.1594577,0.633614828 L6.9283533,0.633614828 L6.9283533,-0.640287588 L18.4333601,-0.640287588 Z" id="arrow" fill="#000000" transform="translate(12.680857, 8.252286) rotate(-90.000000) translate(-12.680857, -8.252286) "></path>
+        </g>
+    </g>
+</svg></td>
+    <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" class="gt_row gt_center"><span style="color:#4CA64C;">✓</span></td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_right">8</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">7<br>0.88</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">1<br>0.12</td>
+    <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" class="gt_row gt_center">—</td>
+    <td style="height: 40px; background-color: #FCFCFC;" class="gt_row gt_center">—</td>
+    <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" class="gt_row gt_center">—</td>
+    <td style="height: 40px;" class="gt_row gt_center"><a href="data:text/csv;base64,X3Jvd19udW1fLHRpdGxlLGdlbnJlLHVuaXRzX3NvbGQKNSxUaGUgTmFtZSBvZiB0aGUgV2luZCxGYW50YXN5LDQ0NQo=" download="extract_0001.csv"><button style="background-color: #67C2DC; color: #FFFFFF; border: none; padding: 5px; font-weight: bold; cursor: pointer; border-radius: 4px;">CSV</button></a></td>
+  </tr>
+  <tr>
+    <td style="height: 40px; background-color: #4CA64C66; color: transparent;font-size: 0px;" class="gt_row gt_left">#4CA64C66</td>
+    <td style="height: 40px; color: #666666;font-size: 13px;font-weight: bold;" class="gt_row gt_right">2</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; overflow-x: visible; white-space: nowrap;" class="gt_row gt_left"><div style="margin-top: 0px; margin-bottom: 0px; white-space: pre; font-size: 8px; color: darkblue; padding-bottom: 4px; "><strong><span style="font-family: Helvetica, arial, sans-serif;">SEGMENT&nbsp;&nbsp;</span></strong><span>genre / ['Fantasy', 'Mystery']</span></div> 
+        <div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
+            <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
+<svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink">
+    <title>col_vals_gt</title>
+    <g id="All-Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="col_vals_gt" transform="translate(0.000000, 0.724138)">
+            <path d="M56.712234,1 C59.1975153,1 61.4475153,2.00735931 63.076195,3.63603897 C64.7048747,5.26471863 65.712234,7.51471863 65.712234,10 L65.712234,10 L65.712234,65 L10.712234,65 C8.22695259,65 5.97695259,63.9926407 4.34827294,62.363961 C2.71959328,60.7352814 1.71223397,58.4852814 1.71223397,56 L1.71223397,56 L1.71223397,10 C1.71223397,7.51471863 2.71959328,5.26471863 4.34827294,3.63603897 C5.97695259,2.00735931 8.22695259,1 10.712234,1 L10.712234,1 Z" id="rectangle" stroke="#000000" stroke-width="2" fill="#FFFFFF"></path>
+            <path d="M49.7099609,12 L17.7099609,12 C14.9499609,12 12.7099609,14.24 12.7099609,17 L12.7099609,49 C12.7099609,51.76 14.9499609,54 17.7099609,54 L49.7099609,54 C52.4699609,54 54.7099609,51.76 54.7099609,49 L54.7099609,17 C54.7099609,14.24 52.4699609,12 49.7099609,12 Z M27.2799609,44.82 L26.1399609,43.18 L40.9499609,33 L26.1399609,22.82 L27.2799609,21.18 L44.4799609,33 L27.2799609,44.82 Z" id="greater_than" fill="#000000" fill-rule="nonzero"></path>
+        </g>
+    </g>
+</svg>
+        </div>
+        <div style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size: 11px; display: inline-block; vertical-align: middle;">
+            <div>col_vals_gt()</div>
+        </div>
+        
+        </td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">units_sold</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">500</td>
+    <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" class="gt_row gt_center"><svg width="24px" height="25px" viewbox="0 0 24 25" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="vertical-align: middle;">
+    <g id="segmented" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="segmented" transform="translate(0.000000, 0.570147)">
+            <rect id="Rectangle" x="0.125132506" y="0" width="23.749735" height="23.7894737"></rect>
+            <path d="M18.4051095,14.3518889 C20.4405142,14.3518889 22.0905358,16.0019105 22.0905358,18.0373152 C22.0905358,20.07272 20.4405142,21.7227416 18.4051095,21.7227416 C16.3697047,21.7227416 14.7196831,20.07272 14.7196831,18.0373152 C14.7196831,16.0019105 16.3697047,14.3518889 18.4051095,14.3518889 Z M18.4051095,14.9787621 C16.7159172,14.9787621 15.3465563,16.348123 15.3465563,18.0373152 C15.3465563,18.7697385 15.604001,19.4420322 16.0333357,19.9686419 L20.3364361,15.6655415 C19.8098264,15.2362068 19.1375327,14.9787621 18.4051095,14.9787621 Z" id="Shape" fill="#000000" fill-rule="nonzero"></path>
+            <path d="M4.40094816,14.3498527 C2.36911602,14.3498527 0.715948163,16.0028586 0.715948163,18.0348527 C0.715948163,20.0668467 2.36911602,21.7198527 4.40094816,21.7198527 C6.43278031,21.7198527 8.08594816,20.0668467 8.08594816,18.0348527 C8.08594816,16.0028586 6.43272633,14.3498527 4.40094816,14.3498527 Z M4.40094816,20.9828203 C2.77541767,20.9828203 1.45298055,19.6603831 1.45298055,18.0348527 C1.45298055,16.4093222 2.77541767,15.086885 4.40094816,15.086885 C6.02647865,15.086885 7.34891578,16.4093222 7.34891578,18.0348527 C7.34891578,19.6603831 6.02647865,20.9828203 4.40094816,20.9828203 Z" id="Shape" fill="#000000" fill-rule="nonzero"></path>
+            <path d="M18.4333601,-0.640287588 L18.4333601,14.5882952 L9.52131131,14.5882952 L11.3716151,15.980997 C11.6576165,16.1948765 11.7148169,16.6002518 11.5009374,16.8862532 C11.2870585,17.1722546 10.8816827,17.229455 10.5956813,17.0155755 L10.5956813,17.0155755 L7.23330126,14.4689208 C7.06667429,14.3495464 6.96719559,14.1555632 6.96719559,13.9516316 C6.96719559,13.7477006 7.06667429,13.5537168 7.23330126,13.4343424 L7.23330126,13.4343424 L10.5956813,10.8876877 C10.677751,10.8255137 10.7722561,10.7857222 10.8742216,10.7683132 C10.8990916,10.7608522 10.9264478,10.7533918 10.9538046,10.7484175 C11.2522407,10.708626 11.5382421,10.8827141 11.6377208,11.166228 C11.7396863,11.4497426 11.6277729,11.765587 11.3716151,11.9222661 L11.3716151,11.9222661 L9.52131131,13.3149679 L17.1593533,13.3147124 L17.1594577,0.633614828 L6.9283533,0.633614828 L6.9283533,-0.640287588 L18.4333601,-0.640287588 Z" id="arrow" fill="#000000" transform="translate(12.680857, 8.252286) rotate(-90.000000) translate(-12.680857, -8.252286) "></path>
+        </g>
+    </g>
+</svg></td>
+    <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" class="gt_row gt_center"><span style="color:#4CA64C;">✓</span></td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_right">7</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">5<br>0.71</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">2<br>0.29</td>
+    <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" class="gt_row gt_center">—</td>
+    <td style="height: 40px; background-color: #FCFCFC;" class="gt_row gt_center">—</td>
+    <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" class="gt_row gt_center">—</td>
+    <td style="height: 40px;" class="gt_row gt_center"><a href="data:text/csv;base64,X3Jvd19udW1fLHRpdGxlLGdlbnJlLHVuaXRzX3NvbGQKNSxUaGUgTmFtZSBvZiB0aGUgV2luZCxGYW50YXN5LDQ0NQo2LFRoZSBHaXJsIHdpdGggdGhlIERyYWdvbiBUYXR0b28sTXlzdGVyeSwzODkK" download="extract_0002.csv"><button style="background-color: #67C2DC; color: #FFFFFF; border: none; padding: 5px; font-weight: bold; cursor: pointer; border-radius: 4px;">CSV</button></a></td>
+  </tr>
+  <tr>
+    <td style="height: 40px; background-color: #4CA64C66; color: transparent;font-size: 0px;" class="gt_row gt_left">#4CA64C66</td>
+    <td style="height: 40px; color: #666666;font-size: 13px;font-weight: bold;" class="gt_row gt_right">3</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; overflow-x: visible; white-space: nowrap;" class="gt_row gt_left"><div style="margin-top: 0px; margin-bottom: 0px; white-space: pre; font-size: 8px; color: darkblue; padding-bottom: 4px; "><strong><span style="font-family: Helvetica, arial, sans-serif;">SEGMENT&nbsp;&nbsp;</span></strong><span>genre / ['Mystery', 'Science Fiction']</span></div> 
+        <div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
+            <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
+<svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink">
+    <title>col_vals_gt</title>
+    <g id="All-Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="col_vals_gt" transform="translate(0.000000, 0.724138)">
+            <path d="M56.712234,1 C59.1975153,1 61.4475153,2.00735931 63.076195,3.63603897 C64.7048747,5.26471863 65.712234,7.51471863 65.712234,10 L65.712234,10 L65.712234,65 L10.712234,65 C8.22695259,65 5.97695259,63.9926407 4.34827294,62.363961 C2.71959328,60.7352814 1.71223397,58.4852814 1.71223397,56 L1.71223397,56 L1.71223397,10 C1.71223397,7.51471863 2.71959328,5.26471863 4.34827294,3.63603897 C5.97695259,2.00735931 8.22695259,1 10.712234,1 L10.712234,1 Z" id="rectangle" stroke="#000000" stroke-width="2" fill="#FFFFFF"></path>
+            <path d="M49.7099609,12 L17.7099609,12 C14.9499609,12 12.7099609,14.24 12.7099609,17 L12.7099609,49 C12.7099609,51.76 14.9499609,54 17.7099609,54 L49.7099609,54 C52.4699609,54 54.7099609,51.76 54.7099609,49 L54.7099609,17 C54.7099609,14.24 52.4699609,12 49.7099609,12 Z M27.2799609,44.82 L26.1399609,43.18 L40.9499609,33 L26.1399609,22.82 L27.2799609,21.18 L44.4799609,33 L27.2799609,44.82 Z" id="greater_than" fill="#000000" fill-rule="nonzero"></path>
+        </g>
+    </g>
+</svg>
+        </div>
+        <div style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size: 11px; display: inline-block; vertical-align: middle;">
+            <div>col_vals_gt()</div>
+        </div>
+        
+        </td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">units_sold</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">500</td>
+    <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" class="gt_row gt_center"><svg width="24px" height="25px" viewbox="0 0 24 25" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="vertical-align: middle;">
+    <g id="segmented" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="segmented" transform="translate(0.000000, 0.570147)">
+            <rect id="Rectangle" x="0.125132506" y="0" width="23.749735" height="23.7894737"></rect>
+            <path d="M18.4051095,14.3518889 C20.4405142,14.3518889 22.0905358,16.0019105 22.0905358,18.0373152 C22.0905358,20.07272 20.4405142,21.7227416 18.4051095,21.7227416 C16.3697047,21.7227416 14.7196831,20.07272 14.7196831,18.0373152 C14.7196831,16.0019105 16.3697047,14.3518889 18.4051095,14.3518889 Z M18.4051095,14.9787621 C16.7159172,14.9787621 15.3465563,16.348123 15.3465563,18.0373152 C15.3465563,18.7697385 15.604001,19.4420322 16.0333357,19.9686419 L20.3364361,15.6655415 C19.8098264,15.2362068 19.1375327,14.9787621 18.4051095,14.9787621 Z" id="Shape" fill="#000000" fill-rule="nonzero"></path>
+            <path d="M4.40094816,14.3498527 C2.36911602,14.3498527 0.715948163,16.0028586 0.715948163,18.0348527 C0.715948163,20.0668467 2.36911602,21.7198527 4.40094816,21.7198527 C6.43278031,21.7198527 8.08594816,20.0668467 8.08594816,18.0348527 C8.08594816,16.0028586 6.43272633,14.3498527 4.40094816,14.3498527 Z M4.40094816,20.9828203 C2.77541767,20.9828203 1.45298055,19.6603831 1.45298055,18.0348527 C1.45298055,16.4093222 2.77541767,15.086885 4.40094816,15.086885 C6.02647865,15.086885 7.34891578,16.4093222 7.34891578,18.0348527 C7.34891578,19.6603831 6.02647865,20.9828203 4.40094816,20.9828203 Z" id="Shape" fill="#000000" fill-rule="nonzero"></path>
+            <path d="M18.4333601,-0.640287588 L18.4333601,14.5882952 L9.52131131,14.5882952 L11.3716151,15.980997 C11.6576165,16.1948765 11.7148169,16.6002518 11.5009374,16.8862532 C11.2870585,17.1722546 10.8816827,17.229455 10.5956813,17.0155755 L10.5956813,17.0155755 L7.23330126,14.4689208 C7.06667429,14.3495464 6.96719559,14.1555632 6.96719559,13.9516316 C6.96719559,13.7477006 7.06667429,13.5537168 7.23330126,13.4343424 L7.23330126,13.4343424 L10.5956813,10.8876877 C10.677751,10.8255137 10.7722561,10.7857222 10.8742216,10.7683132 C10.8990916,10.7608522 10.9264478,10.7533918 10.9538046,10.7484175 C11.2522407,10.708626 11.5382421,10.8827141 11.6377208,11.166228 C11.7396863,11.4497426 11.6277729,11.765587 11.3716151,11.9222661 L11.3716151,11.9222661 L9.52131131,13.3149679 L17.1593533,13.3147124 L17.1594577,0.633614828 L6.9283533,0.633614828 L6.9283533,-0.640287588 L18.4333601,-0.640287588 Z" id="arrow" fill="#000000" transform="translate(12.680857, 8.252286) rotate(-90.000000) translate(-12.680857, -8.252286) "></path>
+        </g>
+    </g>
+</svg></td>
+    <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" class="gt_row gt_center"><span style="color:#4CA64C;">✓</span></td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_right">5</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">4<br>0.80</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">1<br>0.20</td>
+    <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" class="gt_row gt_center">—</td>
+    <td style="height: 40px; background-color: #FCFCFC;" class="gt_row gt_center">—</td>
+    <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" class="gt_row gt_center">—</td>
+    <td style="height: 40px;" class="gt_row gt_center"><a href="data:text/csv;base64,X3Jvd19udW1fLHRpdGxlLGdlbnJlLHVuaXRzX3NvbGQKMSxUaGUgR2lybCB3aXRoIHRoZSBEcmFnb24gVGF0dG9vLE15c3RlcnksMzg5Cg==" download="extract_0003.csv"><button style="background-color: #67C2DC; color: #FFFFFF; border: none; padding: 5px; font-weight: bold; cursor: pointer; border-radius: 4px;">CSV</button></a></td>
+  </tr>
+</tbody>
+
+
+</table>
+
+</div>
+        
+</div>
+</div>
 
 
 </section>
