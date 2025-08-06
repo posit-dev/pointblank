@@ -288,7 +288,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
         border-radius: 2px;
     ">
 <p>Let’s perform a series of validation steps on a Polars DataFrame. We’ll use the <a href="../reference/Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt"><code>col_vals_gt()</code></a> in the first step, <a href="../reference/Validate.col_vals_lt.html#pointblank.Validate.col_vals_lt"><code>col_vals_lt()</code></a> in the second step, and <a href="../reference/Validate.col_vals_ge.html#pointblank.Validate.col_vals_ge"><code>col_vals_ge()</code></a> in the third step. The <a href="../reference/Validate.interrogate.html#pointblank.Validate.interrogate"><code>interrogate()</code></a> method executes the validation; then, we can extract the rows that failed for each validation step.</p>
-<div id="3d3599cd" class="cell" data-execution_count="2">
+<div id="3583a6ef" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -342,7 +342,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <p>In the second step, the <a href="../reference/Validate.col_vals_lt.html#pointblank.Validate.col_vals_lt"><code>col_vals_lt()</code></a> method was used to check if the values in column <code>c</code> were less than <code>5</code>. In the extracted two-row table, we see that the values in column <code>c</code> are greater than <code>5</code>.</p>
 <p>The third step (<a href="../reference/Validate.col_vals_ge.html#pointblank.Validate.col_vals_ge"><code>col_vals_ge()</code></a>) checked if the values in column <code>b</code> were greater than or equal to <code>1</code>. There were no failing test units, so the extracted table is empty (i.e., has columns but no rows).</p>
 <p>The <code>i=</code> argument can be used to narrow down the extraction to one or more steps. For example, to extract the rows that failed in the first step only:</p>
-<div id="23d18199" class="cell" data-execution_count="3">
+<div id="f568aaca" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>validation.get_data_extracts(i<span class="op">=</span><span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="3">
 <pre><code>{1: shape: (2, 4)
@@ -358,7 +358,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 <p>Note that the first validation step is indexed at <code>1</code> (not <code>0</code>). This 1-based indexing is in place here to match the step numbers reported in the validation table. What we get back is still a dictionary, but it only contains one table (the one for the first step).</p>
 <p>If you want to get the extracted table as a DataFrame, set <code>frame=True</code> and provide a scalar value for <code>i</code>. For example, to get the extracted table for the second step as a DataFrame:</p>
-<div id="6d3436a7" class="cell" data-execution_count="4">
+<div id="a05fce18" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>pb.preview(validation.get_data_extracts(i<span class="op">=</span><span class="dv">2</span>, frame<span class="op">=</span><span class="va">True</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="4">
 <div id="pb_preview_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
