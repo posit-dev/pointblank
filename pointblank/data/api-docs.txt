@@ -43,13 +43,15 @@ Validate(data: 'FrameT | Any', tbl_name: 'str | None' = None, label: 'str | None
     ----------
     data
         The table to validate, which could be a DataFrame object, an Ibis table object, a CSV
-        file path, a Parquet file path, or a database connection string. When providing a CSV or
-        Parquet file path (as a string or `pathlib.Path` object), the file will be automatically
-        loaded using an available DataFrame library (Polars or Pandas). Parquet input also supports
-        glob patterns, directories containing .parquet files, and Spark-style partitioned datasets.
-        Connection strings enable direct database access via Ibis with optional table specification
-        using the `::table_name` suffix. Read the *Supported Input Table Types* section for details
-        on the supported table types.
+        file path, a Parquet file path, a GitHub URL pointing to a CSV or Parquet file, or a
+        database connection string. When providing a CSV or Parquet file path (as a string or
+        `pathlib.Path` object), the file will be automatically loaded using an available DataFrame
+        library (Polars or Pandas). Parquet input also supports glob patterns, directories
+        containing .parquet files, and Spark-style partitioned datasets. GitHub URLs are
+        automatically transformed to raw content URLs and downloaded. Connection strings enable
+        direct database access via Ibis with optional table specification using the `::table_name`
+        suffix. Read the *Supported Input Table Types* section for details on the supported table
+        types.
     tbl_name
         An optional name to assign to the input table object. If no value is provided, a name will
         be generated based on whatever information is available. This table name will be displayed
@@ -109,6 +111,7 @@ Validate(data: 'FrameT | Any', tbl_name: 'str | None' = None, label: 'str | None
 
     - Polars DataFrame (`"polars"`)
     - Pandas DataFrame (`"pandas"`)
+    - PySpark table (`"pyspark"`)
     - DuckDB table (`"duckdb"`)*
     - MySQL table (`"mysql"`)*
     - PostgreSQL table (`"postgresql"`)*
@@ -116,7 +119,6 @@ Validate(data: 'FrameT | Any', tbl_name: 'str | None' = None, label: 'str | None
     - Microsoft SQL Server table (`"mssql"`)*
     - Snowflake table (`"snowflake"`)*
     - Databricks table (`"databricks"`)*
-    - PySpark table (`"pyspark"`)*
     - BigQuery table (`"bigquery"`)*
     - Parquet table (`"parquet"`)*
     - CSV files (string path or `pathlib.Path` object with `.csv` extension)
@@ -948,10 +950,15 @@ Definition of a schema object.
 
     - Polars DataFrame (`"polars"`)
     - Pandas DataFrame (`"pandas"`)
+    - PySpark table (`"pyspark"`)
     - DuckDB table (`"duckdb"`)*
     - MySQL table (`"mysql"`)*
     - PostgreSQL table (`"postgresql"`)*
     - SQLite table (`"sqlite"`)*
+    - Microsoft SQL Server table (`"mssql"`)*
+    - Snowflake table (`"snowflake"`)*
+    - Databricks table (`"databricks"`)*
+    - BigQuery table (`"bigquery"`)*
     - Parquet table (`"parquet"`)*
 
     The table types marked with an asterisk need to be prepared as Ibis tables (with type of
@@ -7079,6 +7086,129 @@ expr_col(column_name: 'str') -> 'ColumnExpression'
     
 
 
+## The Segments family
+
+Combine multiple values into a single segment using `seg_*()` helper functions.
+
+seg_group(values: 'list[Any]') -> 'Segment'
+
+    Group together values for segmentation.
+
+    Many validation methods have a `segments=` argument that can be used to specify one or more
+    columns, or certain values within a column, to create segments for validation (e.g.,
+    [`col_vals_gt()`](`pointblank.Validate.col_vals_gt`),
+    [`col_vals_regex()`](`pointblank.Validate.col_vals_regex`), etc.). When passing in a column, or
+    a tuple with a column and certain values, a segment will be created for each individual value
+    within the column or given values. The `seg_group()` selector enables values to be grouped
+    together into a segment. For example, if you were to create a segment for a column "region",
+    investigating just "North" and "South" regions, a typical segment would look like:
+
+    `segments=("region", ["North", "South"])`
+
+    This would create two validation steps, one for each of the regions. If you wanted to group
+    these two regions into a single segment, you could use the `seg_group()` function like this:
+
+    `segments=("region", pb.seg_group(["North", "South"]))`
+
+    You could create a second segment for "East" and "West" regions like this:
+
+    `segments=("region", pb.seg_group([["North", "South"], ["East", "West"]]))`
+
+    There will be a validation step created for every segment. Note that if there aren't any
+    segments created using `seg_group()` (or any other segment expression), the validation step will
+    fail to be evaluated during the interrogation process. Such a failure to evaluate will be
+    reported in the validation results but it won't affect the interrogation process overall
+    (i.e., the process won't be halted).
+
+    Parameters
+    ----------
+    values
+        A list of values to be grouped into a segment. This can be a single list or a list of lists.
+
+    Returns
+    -------
+    Segment
+        A `Segment` object, which can be used to combine values into a segment.
+
+    Examples
+    --------
+    Let's say we're analyzing sales from our local bookstore, and want to check the number of books
+    sold for the month exceeds a certain threshold. We could pass in the argument
+    `segments="genre"`, which would return a segment for each unique genre in the datasets. We could
+    also pass in `segments=("genre", ["Fantasy", "Science Fiction"])`, to only create segments for
+    those two genres. However, if we wanted to group these two genres into a single segment, we
+    could use the `seg_group()` function.
+
+    ```python
+    import pointblank as pb
+    import polars as pl
+
+    tbl = pl.DataFrame(
+        {
+            "title": [
+                "The Hobbit",
+                "Harry Potter and the Sorcerer's Stone",
+                "The Lord of the Rings",
+                "A Game of Thrones",
+                "The Name of the Wind",
+                "The Girl with the Dragon Tattoo",
+                "The Da Vinci Code",
+                "The Hitchhiker's Guide to the Galaxy",
+                "The Martian",
+                "Brave New World"
+            ],
+            "genre": [
+                "Fantasy",
+                "Fantasy",
+                "Fantasy",
+                "Fantasy",
+                "Fantasy",
+                "Mystery",
+                "Mystery",
+                "Science Fiction",
+                "Science Fiction",
+                "Science Fiction",
+            ],
+            "units_sold": [875, 932, 756, 623, 445, 389, 678, 534, 712, 598],
+        }
+    )
+
+    validation = (
+        pb.Validate(data=tbl)
+        .col_vals_gt(
+            columns="units_sold",
+            value=500,
+            segments=("genre", pb.seg_group(["Fantasy", "Science Fiction"]))
+        )
+        .interrogate()
+    )
+
+    validation
+    ```
+
+    What's more, we can create multiple segments, combining the genres in different ways.
+
+    ```python
+    validation = (
+        pb.Validate(data=tbl)
+        .col_vals_gt(
+            columns="units_sold",
+            value=500,
+            segments=("genre", pb.seg_group([
+                ["Fantasy", "Science Fiction"],
+                ["Fantasy", "Mystery"],
+                ["Mystery", "Science Fiction"]
+            ]))
+        )
+        .interrogate()
+    )
+
+    validation
+    ```
+
+    
+
+
 ## The Interrogation and Reporting family
 
 The validation plan is put into action when `interrogate()` is called.
@@ -8826,7 +8956,9 @@ DataScan(data: 'IntoFrameT', tbl_name: 'str | None' = None) -> 'None'
     Parameters
     ----------
     data
-        The data to scan and summarize.
+        The data to scan and summarize. This could be a DataFrame object, an Ibis table object,
+        a CSV file path, a Parquet file path, a GitHub URL pointing to a CSV or Parquet file,
+        or a database connection string.
     tbl_name
         Optionally, the name of the table could be provided as `tbl_name`.
 
@@ -8958,6 +9090,7 @@ preview(data: 'FrameT | Any', columns_subset: 'str | list[str] | Column | None' 
 
     - Polars DataFrame (`"polars"`)
     - Pandas DataFrame (`"pandas"`)
+    - PySpark table (`"pyspark"`)
     - DuckDB table (`"duckdb"`)*
     - MySQL table (`"mysql"`)*
     - PostgreSQL table (`"postgresql"`)*
@@ -8965,7 +9098,6 @@ preview(data: 'FrameT | Any', columns_subset: 'str | list[str] | Column | None' 
     - Microsoft SQL Server table (`"mssql"`)*
     - Snowflake table (`"snowflake"`)*
     - Databricks table (`"databricks"`)*
-    - PySpark table (`"pyspark"`)*
     - BigQuery table (`"bigquery"`)*
     - Parquet table (`"parquet"`)*
     - CSV files (string path or `pathlib.Path` object with `.csv` extension)
@@ -9116,8 +9248,9 @@ col_summary_tbl(data: 'FrameT | Any', tbl_name: 'str | None' = None) -> 'GT'
     Parameters
     ----------
     data
-        The table to summarize, which could be a DataFrame object or an Ibis table object. Read the
-        *Supported Input Table Types* section for details on the supported table types.
+        The table to summarize, which could be a DataFrame object, an Ibis table object, a CSV
+        file path, a Parquet file path, or a database connection string. Read the *Supported Input
+        Table Types* section for details on the supported table types.
     tbl_name
         Optionally, the name of the table could be provided as `tbl_name=`.
 
@@ -9137,6 +9270,11 @@ col_summary_tbl(data: 'FrameT | Any', tbl_name: 'str | None' = None) -> 'GT'
     - PostgreSQL table (`"postgresql"`)*
     - SQLite table (`"sqlite"`)*
     - Parquet table (`"parquet"`)*
+    - CSV files (string path or `pathlib.Path` object with `.csv` extension)
+    - Parquet files (string path, `pathlib.Path` object, glob pattern, directory with `.parquet`
+    extension, or partitioned dataset)
+    - GitHub URLs (direct links to CSV or Parquet files on GitHub)
+    - Database connection strings (URI format with optional table specification)
 
     The table types marked with an asterisk need to be prepared as Ibis tables (with type of
     `ibis.expr.types.relations.Table`). Furthermore, using `col_summary_tbl()` with these types of
@@ -9171,9 +9309,9 @@ missing_vals_tbl(data: 'FrameT | Any') -> 'GT'
     Parameters
     ----------
     data
-        The table for which to display the missing values. This could be a DataFrame object or an
-        Ibis table object. Read the *Supported Input Table Types* section for details on the
-        supported table types.
+        The table for which to display the missing values. This could be a DataFrame object, an
+        Ibis table object, a CSV file path, a Parquet file path, or a database connection string.
+        Read the *Supported Input Table Types* section for details on the supported table types.
 
     Returns
     -------
@@ -9186,6 +9324,7 @@ missing_vals_tbl(data: 'FrameT | Any') -> 'GT'
 
     - Polars DataFrame (`"polars"`)
     - Pandas DataFrame (`"pandas"`)
+    - PySpark table (`"pyspark"`)
     - DuckDB table (`"duckdb"`)*
     - MySQL table (`"mysql"`)*
     - PostgreSQL table (`"postgresql"`)*
@@ -9193,9 +9332,12 @@ missing_vals_tbl(data: 'FrameT | Any') -> 'GT'
     - Microsoft SQL Server table (`"mssql"`)*
     - Snowflake table (`"snowflake"`)*
     - Databricks table (`"databricks"`)*
-    - PySpark table (`"pyspark"`)*
     - BigQuery table (`"bigquery"`)*
     - Parquet table (`"parquet"`)*
+    - CSV files (string path or `pathlib.Path` object with `.csv` extension)
+    - Parquet files (string path, `pathlib.Path` object, glob pattern, directory with `.parquet`
+    extension, or partitioned dataset)
+    - Database connection strings (URI format with optional table specification)
 
     The table types marked with an asterisk need to be prepared as Ibis tables (with type of
     `ibis.expr.types.relations.Table`). Furthermore, using `missing_vals_tbl()` with these types of
@@ -9270,8 +9412,9 @@ assistant(model: 'str', data: 'FrameT | Any | None' = None, tbl_name: 'str | Non
         `"ollama"`, and `"bedrock"`.
     data
         An optional data table to focus on during discussion with the PbA, which could be a
-        DataFrame object or an Ibis table object. Read the *Supported Input Table Types* section for
-        details on the supported table types.
+        DataFrame object, an Ibis table object, a CSV file path, a Parquet file path, or a database
+        connection string. Read the *Supported Input Table Types* section for details on the
+        supported table types.
     tbl_name : str, optional
         The name of the data table. This is optional and is only used to provide a more detailed
         prompt to the PbA.
@@ -9348,16 +9491,29 @@ assistant(model: 'str', data: 'FrameT | Any | None' = None, tbl_name: 'str | Non
 
     - Polars DataFrame (`"polars"`)
     - Pandas DataFrame (`"pandas"`)
+    - PySpark table (`"pyspark"`)
     - DuckDB table (`"duckdb"`)*
     - MySQL table (`"mysql"`)*
     - PostgreSQL table (`"postgresql"`)*
     - SQLite table (`"sqlite"`)*
+    - Microsoft SQL Server table (`"mssql"`)*
+    - Snowflake table (`"snowflake"`)*
+    - Databricks table (`"databricks"`)*
+    - BigQuery table (`"bigquery"`)*
     - Parquet table (`"parquet"`)*
+    - CSV files (string path or `pathlib.Path` object with `.csv` extension)
+    - Parquet files (string path, `pathlib.Path` object, glob pattern, directory with `.parquet`
+    extension, or partitioned dataset)
+    - Database connection strings (URI format with optional table specification)
 
     The table types marked with an asterisk need to be prepared as Ibis tables (with type of
-    `ibis.expr.types.relations.Table`). Furthermore, using `preview()` with these types of tables
+    `ibis.expr.types.relations.Table`). Furthermore, using `assistant()` with these types of tables
     requires the Ibis library (`v9.5.0` or above) to be installed. If the input table is a Polars or
     Pandas DataFrame, the availability of Ibis is not needed.
+
+    To use a CSV file, ensure that a string or `pathlib.Path` object with a `.csv` extension is
+    provided. The file will be automatically detected and loaded using the best available DataFrame
+    library. The loading preference is Polars first, then Pandas as a fallback.
     
 
 load_dataset(dataset: "Literal['small_table', 'game_revenue', 'nycflights', 'global_sales']" = 'small_table', tbl_type: "Literal['polars', 'pandas', 'duckdb']" = 'polars') -> 'FrameT | Any'
@@ -9553,6 +9709,372 @@ get_data_path(dataset: "Literal['small_table', 'game_revenue', 'nycflights', 'gl
     [`load_dataset()`](`pointblank.load_dataset`) for loading datasets directly as table objects.
     
 
+connect_to_table(connection_string: 'str') -> 'Any'
+
+    Connect to a database table using a connection string.
+
+    This utility function tests whether a connection string leads to a valid table and returns
+    the table object if successful. It provides helpful error messages when no table is specified
+    or when backend dependencies are missing.
+
+    Parameters
+    ----------
+    connection_string
+        A database connection string with a required table specification using the `::table_name`
+        suffix. Supported formats are outlined in the *Supported Connection String Formats* section.
+
+    Returns
+    -------
+    Any
+        An Ibis table object for the specified database table.
+
+    Supported Connection String Formats
+    -----------------------------------
+    The `connection_string` parameter must include a valid connection string with a table name
+    specified using the `::` syntax. Here are some examples on how to format connection strings
+    for various backends:
+
+    ```
+    DuckDB:     "duckdb:///path/to/database.ddb::table_name"
+    SQLite:     "sqlite:///path/to/database.db::table_name"
+    PostgreSQL: "postgresql://user:password@localhost:5432/database::table_name"
+    MySQL:      "mysql://user:password@localhost:3306/database::table_name"
+    BigQuery:   "bigquery://project/dataset::table_name"
+    Snowflake:  "snowflake://user:password@account/database/schema::table_name"
+    ```
+
+    If the connection string does not include a table name, the function will attempt to connect to
+    the database and list available tables, providing guidance on how to specify a table.
+
+    Examples
+    --------
+    Connect to a DuckDB table:
+
+    ```python
+    import pointblank as pb
+
+    # Get path to a DuckDB database file from package data
+    duckdb_path = pb.get_data_path("game_revenue", "duckdb")
+
+    # Connect to the `game_revenue` table in the DuckDB database
+    game_revenue = pb.connect_to_table(f"duckdb:///{duckdb_path}::game_revenue")
+
+    # Use with the `preview()` function
+    pb.preview(game_revenue)
+    ```
+
+    Here are some backend-specific connection examples:
+
+    ```python
+    # PostgreSQL
+    pg_table = pb.connect_to_table(
+        "postgresql://user:password@localhost:5432/warehouse::customer_data"
+    )
+
+    # SQLite
+    sqlite_table = pb.connect_to_table("sqlite:///local_data.db::products")
+
+    # BigQuery
+    bq_table = pb.connect_to_table("bigquery://my-project/analytics::daily_metrics")
+    ```
+
+    This function requires the Ibis library with appropriate backend drivers:
+
+    ```bash
+    # You can install a set of common backends:
+    pip install 'ibis-framework[duckdb,postgres,mysql,sqlite]'
+
+    # ...or specific backends as needed:
+    pip install 'ibis-framework[duckdb]'    # for DuckDB
+    pip install 'ibis-framework[postgres]'  # for PostgreSQL
+    ```
+    
+
+
+## The YAML family
+
+The *YAML* group contains functions that allow for the use of YAML to orchestrate
+validation workflows. The `yaml_interrogate()` function can be used to run a validation workflow from
+YAML strings or files. The `validate_yaml()` function checks if the YAML configuration
+passes its own validity checks.
+
+yaml_interrogate(yaml: 'Union[str, Path]') -> 'Validate'
+Execute a YAML-based validation workflow.
+
+    This is the main entry point for YAML-based validation workflows. It takes YAML configuration
+    (as a string or file path) and returns a validated `Validate` object with interrogation results.
+
+    The YAML configuration defines the data source, validation steps, and optional settings like
+    thresholds and labels. This function automatically loads the data, builds the validation plan,
+    executes all validation steps, and returns the interrogated results.
+
+    Parameters
+    ----------
+    yaml
+        YAML configuration as string or file path. Can be: (1) a YAML string containing the
+        validation configuration, or (2) a Path object or string path to a YAML file.
+
+    Returns
+    -------
+    Validate
+        An instance of the `Validate` class that has been configured based on the YAML input.
+        This object contains the results of the validation steps defined in the YAML configuration.
+        It includes metadata like table name, label, language, and thresholds if specified.
+
+    Raises
+    ------
+    YAMLValidationError
+        If the YAML is invalid, malformed, or execution fails. This includes syntax errors, missing
+        required fields, unknown validation methods, or data loading failures.
+
+    Examples
+    --------
+    For the examples here, we'll use YAML configurations to define validation workflows. Let's start
+    with a basic YAML workflow that validates the built-in `small_table` dataset.
+
+    ```python
+    import pointblank as pb
+
+    # Define a basic YAML validation workflow
+    yaml_config = '''
+    tbl: small_table
+    steps:
+    - rows_distinct
+    - col_exists:
+        columns: [date, a, b]
+    '''
+
+    # Execute the validation workflow
+    result = pb.yaml_interrogate(yaml_config)
+    result
+    ```
+
+    The validation table shows the results of our YAML-defined workflow. We can see that the
+    `rows_distinct()` validation failed (because there are duplicate rows in the table), while the
+    column existence checks passed.
+
+    Now let's create a more comprehensive validation workflow with thresholds and metadata:
+
+    ```python
+    # Advanced YAML configuration with thresholds and metadata
+    yaml_config = '''
+    tbl: small_table
+    tbl_name: small_table_demo
+    label: Comprehensive data validation
+    thresholds:
+      warning: 0.1
+      error: 0.25
+      critical: 0.35
+    steps:
+    - col_vals_gt:
+        columns: [d]
+        value: 100
+    - col_vals_regex:
+        columns: [b]
+        pattern: '[0-9]-[a-z]{3}-[0-9]{3}'
+    - col_vals_not_null:
+        columns: [date, a]
+    '''
+
+    # Execute the validation workflow
+    result = pb.yaml_interrogate(yaml_config)
+    print(f"Table name: {result.tbl_name}")
+    print(f"Label: {result.label}")
+    print(f"Total validation steps: {len(result.validation_info)}")
+    ```
+
+    The validation results now include our custom table name and label. The thresholds we defined
+    will determine when validation steps are marked as warnings, errors, or critical failures.
+
+    You can also load YAML configurations from files. Here's how you would work with a YAML file:
+
+    ```python
+    from pathlib import Path
+    import tempfile
+
+    # Create a temporary YAML file for demonstration
+    yaml_content = '''
+    tbl: small_table
+    tbl_name: File-based Validation
+    steps:
+    - col_vals_between:
+        columns: [c]
+        left: 1
+        right: 10
+    - col_vals_in_set:
+        columns: [f]
+        set: [low, mid, high]
+    '''
+
+    with tempfile.NamedTemporaryFile(mode='w', suffix='.yaml', delete=False) as f:
+        f.write(yaml_content)
+        yaml_file_path = Path(f.name)
+
+    # Load and execute validation from file
+    result = pb.yaml_interrogate(yaml_file_path)
+    result
+    ```
+
+    This approach is particularly useful for storing validation configurations as part of your data
+    pipeline or version control system, allowing you to maintain validation rules alongside your
+    code.
+    
+
+validate_yaml(yaml: 'Union[str, Path]') -> 'None'
+Validate YAML configuration against the expected structure.
+
+    This function validates that a YAML configuration conforms to the expected structure for
+    validation workflows. It checks for required fields, proper data types, and valid
+    validation method names. This is useful for validating configurations before execution or
+    for building configuration editors and validators.
+
+    The function performs comprehensive validation including:
+
+    - required fields ('tbl' and 'steps')
+    - proper data types for all fields
+    - valid threshold configurations
+    - known validation method names
+    - proper step configuration structure
+
+    Parameters
+    ----------
+    yaml
+        YAML configuration as string or file path. Can be: (1) a YAML string containing the
+        validation configuration, or (2) a Path object or string path to a YAML file.
+
+    Raises
+    ------
+    YAMLValidationError
+        If the YAML is invalid, malformed, or execution fails. This includes syntax errors,
+        missing required fields, unknown validation methods, or data loading failures.
+
+    Examples
+    --------
+    For the examples here, we'll demonstrate how to validate YAML configurations before using them
+    with validation workflows. This is particularly useful for building robust data validation
+    systems where you want to catch configuration errors early.
+
+    Let's start with validating a basic configuration:
+
+    ```python
+    import pointblank as pb
+
+    # Define a basic YAML validation configuration
+    yaml_config = '''
+    tbl: small_table
+    steps:
+    - rows_distinct
+    - col_exists:
+        columns: [a, b]
+    '''
+
+    # Validate the configuration: no exception means it's valid
+    pb.validate_yaml(yaml_config)
+    print("Basic YAML configuration is valid")
+    ```
+
+    The function completed without raising an exception, which means our configuration is valid and
+    follows the expected structure.
+
+    Now let's validate a more complex configuration with thresholds and metadata:
+
+    ```python
+    # Complex YAML configuration with all optional fields
+    yaml_config = '''
+    tbl: small_table
+    tbl_name: My Dataset
+    label: Quality check
+    lang: en
+    locale: en
+    thresholds:
+      warning: 0.1
+      error: 0.25
+      critical: 0.35
+    steps:
+    - rows_distinct
+    - col_vals_gt:
+        columns: [d]
+        value: 100
+    - col_vals_regex:
+        columns: [b]
+        pattern: '[0-9]-[a-z]{3}-[0-9]{3}'
+    '''
+
+    # Validate the configuration
+    pb.validate_yaml(yaml_config)
+    print("Complex YAML configuration is valid")
+
+    # Count the validation steps
+    import pointblank.yaml as pby
+    config = pby.load_yaml_config(yaml_config)
+    print(f"Configuration has {len(config['steps'])} validation steps")
+    ```
+
+    This configuration includes all the optional metadata fields and complex validation steps,
+    demonstrating that the validation handles the full range of supported options.
+
+    Let's see what happens when we try to validate an invalid configuration:
+
+    ```python
+    # Invalid YAML configuration: missing required 'tbl' field
+    invalid_yaml = '''
+    steps:
+    - rows_distinct
+    '''
+
+    try:
+        pb.validate_yaml(invalid_yaml)
+    except pb.yaml.YAMLValidationError as e:
+        print(f"Validation failed: {e}")
+    ```
+
+    The validation correctly identifies that our configuration is missing the required `'tbl'`
+    field.
+
+    Here's a practical example of using validation in a workflow builder:
+
+    ```python
+    def safe_yaml_interrogate(yaml_config):
+        """Safely execute a YAML configuration after validation."""
+        try:
+            # Validate the YAML configuration first
+            pb.validate_yaml(yaml_config)
+            print("✓ YAML configuration is valid")
+
+            # Then execute the workflow
+            result = pb.yaml_interrogate(yaml_config)
+            print(f"Validation completed with {len(result.validation_info)} steps")
+            return result
+
+        except pb.yaml.YAMLValidationError as e:
+            print(f"Configuration error: {e}")
+            return None
+
+    # Test with a valid YAML configuration
+    test_yaml = '''
+    tbl: small_table
+    steps:
+    - col_vals_between:
+        columns: [c]
+        left: 1
+        right: 10
+    '''
+
+    result = safe_yaml_interrogate(test_yaml)
+    ```
+
+    This pattern of validating before executing helps build more reliable data validation pipelines
+    by catching configuration errors early in the process.
+
+    Note that this function only validates the structure and does not check if the specified data
+    source ('tbl') exists or is accessible. Data source validation occurs during execution with
+    `yaml_interrogate()`.
+
+    See Also
+    --------
+    yaml_interrogate : execute YAML-based validation workflows
+    
+
 
 ## The Utility Functions family
 
@@ -9568,14 +10090,15 @@ get_column_count(data: 'FrameT | Any') -> 'int'
 
     The `get_column_count()` function returns the number of columns in a table. The function works
     with any table that is supported by the `pointblank` library, including Pandas, Polars, and Ibis
-    backend tables (e.g., DuckDB, MySQL, PostgreSQL, SQLite, Parquet, etc.).
+    backend tables (e.g., DuckDB, MySQL, PostgreSQL, SQLite, Parquet, etc.). It also supports
+    direct input of CSV files, Parquet files, and database connection strings.
 
     Parameters
     ----------
     data
-        The table for which to get the column count, which could be a DataFrame object or an Ibis
-        table object. Read the *Supported Input Table Types* section for details on the supported
-        table types.
+        The table for which to get the column count, which could be a DataFrame object, an Ibis
+        table object, a CSV file path, a Parquet file path, or a database connection string.
+        Read the *Supported Input Table Types* section for details on the supported table types.
 
     Returns
     -------
@@ -9588,6 +10111,7 @@ get_column_count(data: 'FrameT | Any') -> 'int'
 
     - Polars DataFrame (`"polars"`)
     - Pandas DataFrame (`"pandas"`)
+    - PySpark table (`"pyspark"`)
     - DuckDB table (`"duckdb"`)*
     - MySQL table (`"mysql"`)*
     - PostgreSQL table (`"postgresql"`)*
@@ -9595,14 +10119,40 @@ get_column_count(data: 'FrameT | Any') -> 'int'
     - Microsoft SQL Server table (`"mssql"`)*
     - Snowflake table (`"snowflake"`)*
     - Databricks table (`"databricks"`)*
-    - PySpark table (`"pyspark"`)*
     - BigQuery table (`"bigquery"`)*
     - Parquet table (`"parquet"`)*
+    - CSV files (string path or `pathlib.Path` object with `.csv` extension)
+    - Parquet files (string path, `pathlib.Path` object, glob pattern, directory with `.parquet`
+    extension, or partitioned dataset)
+    - Database connection strings (URI format with optional table specification)
 
     The table types marked with an asterisk need to be prepared as Ibis tables (with type of
     `ibis.expr.types.relations.Table`). Furthermore, using `get_column_count()` with these types of
     tables requires the Ibis library (`v9.5.0` or above) to be installed. If the input table is a
     Polars or Pandas DataFrame, the availability of Ibis is not needed.
+
+    To use a CSV file, ensure that a string or `pathlib.Path` object with a `.csv` extension is
+    provided. The file will be automatically detected and loaded using the best available DataFrame
+    library. The loading preference is Polars first, then Pandas as a fallback.
+
+    GitHub URLs pointing to CSV or Parquet files are automatically detected and converted to raw
+    content URLs for downloading. The URL format should be:
+    `https://github.com/user/repo/blob/branch/path/file.csv` or
+    `https://github.com/user/repo/blob/branch/path/file.parquet`
+
+    Connection strings follow database URL formats and must also specify a table using the
+    `::table_name` suffix. Examples include:
+
+    ```
+    "duckdb:///path/to/database.ddb::table_name"
+    "sqlite:///path/to/database.db::table_name"
+    "postgresql://user:password@localhost:5432/database::table_name"
+    "mysql://user:password@localhost:3306/database::table_name"
+    "bigquery://project/dataset::table_name"
+    "snowflake://user:password@account/database/schema::table_name"
+    ```
+
+    When using connection strings, the Ibis library with the appropriate backend driver is required.
 
     Examples
     --------
@@ -9620,6 +10170,31 @@ get_column_count(data: 'FrameT | Any') -> 'int'
     pb.get_column_count(small_table_duckdb)
     ```
 
+    #### Working with CSV Files
+
+    The `get_column_count()` function can directly accept CSV file paths:
+
+    #### Working with Parquet Files
+
+    The function supports various Parquet input formats:
+
+    You can also use glob patterns and directories:
+
+    ```python
+    # Multiple Parquet files with glob patterns
+    pb.get_column_count("data/sales_*.parquet")
+
+    # Directory containing Parquet files
+    pb.get_column_count("parquet_data/")
+
+    # Partitioned Parquet dataset
+    pb.get_column_count("sales_data/")  # Auto-discovers partition columns
+    ```
+
+    #### Working with Database Connection Strings
+
+    The function supports database connection strings for direct access to database tables:
+
     The function always returns the number of columns in the table as an integer value, which is
     `8` for the `small_table` dataset.
     
@@ -9630,14 +10205,15 @@ get_row_count(data: 'FrameT | Any') -> 'int'
 
     The `get_row_count()` function returns the number of rows in a table. The function works with
     any table that is supported by the `pointblank` library, including Pandas, Polars, and Ibis
-    backend tables (e.g., DuckDB, MySQL, PostgreSQL, SQLite, Parquet, etc.).
+    backend tables (e.g., DuckDB, MySQL, PostgreSQL, SQLite, Parquet, etc.). It also supports
+    direct input of CSV files, Parquet files, and database connection strings.
 
     Parameters
     ----------
     data
-        The table for which to get the row count, which could be a DataFrame object or an Ibis table
-        object. Read the *Supported Input Table Types* section for details on the supported table
-        types.
+        The table for which to get the row count, which could be a DataFrame object, an Ibis table
+        object, a CSV file path, a Parquet file path, or a database connection string.
+        Read the *Supported Input Table Types* section for details on the supported table types.
 
     Returns
     -------
@@ -9650,6 +10226,7 @@ get_row_count(data: 'FrameT | Any') -> 'int'
 
     - Polars DataFrame (`"polars"`)
     - Pandas DataFrame (`"pandas"`)
+    - PySpark table (`"pyspark"`)
     - DuckDB table (`"duckdb"`)*
     - MySQL table (`"mysql"`)*
     - PostgreSQL table (`"postgresql"`)*
@@ -9657,14 +10234,41 @@ get_row_count(data: 'FrameT | Any') -> 'int'
     - Microsoft SQL Server table (`"mssql"`)*
     - Snowflake table (`"snowflake"`)*
     - Databricks table (`"databricks"`)*
-    - PySpark table (`"pyspark"`)*
     - BigQuery table (`"bigquery"`)*
     - Parquet table (`"parquet"`)*
+    - CSV files (string path or `pathlib.Path` object with `.csv` extension)
+    - Parquet files (string path, `pathlib.Path` object, glob pattern, directory with `.parquet`
+    extension, or partitioned dataset)
+    - GitHub URLs (direct links to CSV or Parquet files on GitHub)
+    - Database connection strings (URI format with optional table specification)
 
     The table types marked with an asterisk need to be prepared as Ibis tables (with type of
     `ibis.expr.types.relations.Table`). Furthermore, using `get_row_count()` with these types of
     tables requires the Ibis library (`v9.5.0` or above) to be installed. If the input table is a
     Polars or Pandas DataFrame, the availability of Ibis is not needed.
+
+    To use a CSV file, ensure that a string or `pathlib.Path` object with a `.csv` extension is
+    provided. The file will be automatically detected and loaded using the best available DataFrame
+    library. The loading preference is Polars first, then Pandas as a fallback.
+
+    GitHub URLs pointing to CSV or Parquet files are automatically detected and converted to raw
+    content URLs for downloading. The URL format should be:
+    `https://github.com/user/repo/blob/branch/path/file.csv` or
+    `https://github.com/user/repo/blob/branch/path/file.parquet`
+
+    Connection strings follow database URL formats and must also specify a table using the
+    `::table_name` suffix. Examples include:
+
+    ```
+    "duckdb:///path/to/database.ddb::table_name"
+    "sqlite:///path/to/database.db::table_name"
+    "postgresql://user:password@localhost:5432/database::table_name"
+    "mysql://user:password@localhost:3306/database::table_name"
+    "bigquery://project/dataset::table_name"
+    "snowflake://user:password@account/database/schema::table_name"
+    ```
+
+    When using connection strings, the Ibis library with the appropriate backend driver is required.
 
     Examples
     --------
@@ -9681,6 +10285,31 @@ get_row_count(data: 'FrameT | Any') -> 'int'
 
     pb.get_row_count(game_revenue_duckdb)
     ```
+
+    #### Working with CSV Files
+
+    The `get_row_count()` function can directly accept CSV file paths:
+
+    #### Working with Parquet Files
+
+    The function supports various Parquet input formats:
+
+    You can also use glob patterns and directories:
+
+    ```python
+    # Multiple Parquet files with glob patterns
+    pb.get_row_count("data/sales_*.parquet")
+
+    # Directory containing Parquet files
+    pb.get_row_count("parquet_data/")
+
+    # Partitioned Parquet dataset
+    pb.get_row_count("sales_data/")  # Auto-discovers partition columns
+    ```
+
+    #### Working with Database Connection Strings
+
+    The function supports database connection strings for direct access to database tables:
 
     The function always returns the number of rows in the table as an integer value, which is `2000`
     for the `game_revenue` dataset.

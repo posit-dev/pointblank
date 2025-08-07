@@ -38,7 +38,7 @@ dependencies = [
     "commonmark>=0.9.1",
     "importlib-metadata",
     "great_tables>=0.17.0",
-    "narwhals>=1.45.0",
+    "narwhals>=2.0.1",
     "typing_extensions>=3.10.0.0",
     "requests>=2.31.0",
     "click>=8.0.0",
@@ -54,6 +54,7 @@ requires-python = ">=3.10"
 [project.optional-dependencies]
 pd = ["pandas>=2.2.3"]
 pl = ["polars>=1.24.0"]
+pyspark = ["pyspark==3.5.6"]
 generate = [
     "chatlas>=0.3.0",
     "anthropic[bedrock]>=0.45.2",
@@ -66,7 +67,6 @@ duckdb = ["ibis-framework[duckdb]>=9.5.0"]
 mysql = ["ibis-framework[mysql]>=9.5.0"]
 mssql = ["ibis-framework[mssql]>=9.5.0"]
 postgres = ["ibis-framework[postgres]>=9.5.0"]
-pyspark = ["ibis-framework[pyspark]>=9.5.0"]
 snowflake = ["ibis-framework[snowflake]>=9.5.0"]
 sqlite = ["ibis-framework[sqlite]>=9.5.0"]
 docs = [
@@ -76,6 +76,7 @@ docs = [
     "quartodoc>=0.8.1; python_version >= '3.9'",
     "pandas>=2.2.3",
     "polars>=1.17.1",
+    "pyspark==3.5.6",
 ]
 
 [dependency-groups]
@@ -93,6 +94,7 @@ dev = [
     "pre-commit==2.15.0",
     "pyarrow",
     "pyarrow-stubs>=19.4",
+    "pyspark==3.5.6",
     "pytest>=3",
     "pytest-cov",
     "pytest-randomly>=3.16.0",

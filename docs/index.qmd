@@ -120,6 +120,50 @@ validation.get_step_report(i=3).show("browser")  # Get failing records from step
 
 </div>
 
+## YAML Configuration
+
+For teams that need portable, version-controlled validation workflows, Pointblank supports YAML
+configuration files. This makes it easy to share validation logic across different environments and
+team members, ensuring everyone is on the same page.
+
+**validation.yaml**
+
+```yaml
+validate:
+  data: small_table
+  tbl_name: "small_table"
+  label: "Getting started validation"
+
+steps:
+  - col_vals_gt:
+      columns: "d"
+      value: 100
+  - col_vals_le:
+      columns: "c"
+      value: 5
+  - col_exists:
+      columns: ["date", "date_time"]
+```
+
+**Execute the YAML validation**
+
+```python
+import pointblank as pb
+
+# Run validation from YAML configuration
+validation = pb.yaml_interrogate("validation.yaml")
+
+# Get the results just like any other validation
+validation.get_tabular_report().show()
+```
+
+This approach is perfect for:
+
+- **CI/CD pipelines**: Store validation rules alongside your code
+- **Team collaboration**: Share validation logic in a readable format
+- **Environment consistency**: Use the same validation across dev, staging, and production
+- **Documentation**: YAML files serve as living documentation of your data quality requirements
+
 ## Command Line Interface
 
 Pointblank includes a powerful CLI utility called `pb` that lets you run data validation workflows
@@ -148,6 +192,12 @@ pb scan small_table
 **Run Essential Validations**
 
 ```bash
+# Run validation from YAML configuration file
+pb run validation.yaml
+
+# Run validation from Python file
+pb run validation.py
+
 # Check for duplicate rows
 pb validate small_table --check rows-distinct
 
@@ -161,8 +211,12 @@ pb validate small_table --check col-vals-gt --column a --value 5 --show-extract
 **Integrate with CI/CD**
 
 ```bash
-# Use exit codes for automation (0 = pass, 1 = fail)
+# Use exit codes for automation in one-liner validations (0 = pass, 1 = fail)
 pb validate small_table --check rows-distinct --exit-code
+
+# Run validation workflows with exit codes
+pb run validation.yaml --exit-code
+pb run validation.py --exit-code
 ```
 
 ## Join the Community

@@ -149,6 +149,48 @@ validation.get_step_report(i=3).show("browser")  # ステップ3の失敗レコ�
 
 <br>
 
+## YAML 設定
+
+ポータブルでバージョン管理された検証ワークフローが必要なチームのために、Pointblank は YAML 設定ファイルをサポートしています。これにより、異なる環境やチームメンバー間で検証ロジックを簡単に共有でき、全員が同じページにいることを確保できます。
+
+**validation.yaml**
+
+```yaml
+validate:
+  data: small_table
+  tbl_name: "small_table"
+  label: "スタートガイド検証"
+
+steps:
+  - col_vals_gt:
+      columns: "d"
+      value: 100
+  - col_vals_le:
+      columns: "c"
+      value: 5
+  - col_exists:
+      columns: ["date", "date_time"]
+```
+
+**YAML 検証の実行**
+
+```python
+import pointblank as pb
+
+# YAML設定から検証を実行
+validation = pb.yaml_interrogate("validation.yaml")
+
+# 他の検証と同様に結果を取得
+validation.get_tabular_report().show()
+```
+
+このアプローチは以下に最適です：
+
+- **CI/CD パイプライン**: コードと一緒に検証ルールを保存
+- **チーム協力**: 読みやすい形式で検証ロジックを共有
+- **環境一貫性**: 開発、ステージング、本番で同じ検証を使用
+- **ドキュメント**: YAML ファイルがデータ品質要件の生きたドキュメントとして機能
+
 ## コマンドラインインターフェース (CLI)
 
 Pointblank には、`pb` という強力な CLI ユーティリティが含まれており、コマンドラインから直接データ検証ワークフローを実行できます。CI/CD パイプライン、スケジュールされたデータ品質チェック、または迅速な検証タスクに最適です。
@@ -176,6 +218,12 @@ pb scan "duckdb:///data/sales.ddb::customers"
 **基本的な検証を実行**
 
 ```bash
+# YAML設定ファイルから検証を実行
+pb run validation.yaml
+
+# Pythonファイルから検証を実行
+pb run validation.py
+
 # 重複行をチェック
 pb validate small_table --check rows-distinct
 
@@ -192,8 +240,12 @@ pb validate small_table --check col-vals-gt --column a --value 5 --show-extract
 **CI/CD との統合**
 
 ```bash
-# 自動化のため終了コードを使用（0 = 成功、1 = 失敗）
+# 一行検証で自動化のため終了コードを使用（0 = 成功、1 = 失敗）
 pb validate small_table --check rows-distinct --exit-code
+
+# 終了コードで検証ワークフローを実行
+pb run validation.yaml --exit-code
+pb run validation.py --exit-code
 ```
 
 ## Pointblank を際立たせる特徴

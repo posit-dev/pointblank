@@ -118,7 +118,6 @@ IBIS_BACKENDS = [
     "mysql",
     "parquet",
     "postgres",
-    "pyspark",
     "snowflake",
     "sqlite",
 ]

@@ -22,6 +22,40 @@ import pandas as pd
 import polars as pl
 import ibis
 
+# PySpark import with environment setup for cross-platform compatibility
+try:
+    import os
+
+    # Set Java home for compatibility if not already set
+    if "JAVA_HOME" not in os.environ:
+        # Try common Java locations across platforms
+        java_paths = [
+            "/Library/Java/JavaVirtualMachines/temurin-11.jdk/Contents/Home",  # macOS
+            "/usr/lib/jvm/java-11-openjdk-amd64",  # Ubuntu/Debian
+            "/usr/lib/jvm/java-11-openjdk",  # CentOS/RHEL
+            "/usr/lib/jvm/default-java",  # Generic Ubuntu
+        ]
+
+        for java_path in java_paths:
+            if os.path.exists(java_path):
+                os.environ["JAVA_HOME"] = java_path
+                break
+
+    from pyspark.sql import SparkSession
+    from pyspark.sql.types import (
+        StructType,
+        StructField,
+        StringType,
+        IntegerType,
+        DoubleType,
+        DateType,
+    )
+    import pyspark.sql.functions as F
+
+    PYSPARK_AVAILABLE = True
+except ImportError:
+    PYSPARK_AVAILABLE = False
+
 
 import great_tables as GT
 import narwhals as nw
@@ -81,6 +115,34 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from typing import Any
 
+
+# PySpark helper functions
+def get_spark_session():
+    """Get or create a Spark session for testing."""
+    if not PYSPARK_AVAILABLE:
+        pytest.skip("PySpark not available")
+
+    # Allow skipping PySpark tests in CI if needed
+    if os.environ.get("SKIP_PYSPARK_TESTS", "").lower() in ("true", "1", "yes"):
+        pytest.skip("PySpark tests disabled via SKIP_PYSPARK_TESTS environment variable")
+
+    return (
+        SparkSession.builder.appName("PointblankTests")
+        .master("local[1]")  # Use single thread for CI stability
+        .config("spark.ui.enabled", "false")
+        .config("spark.sql.execution.arrow.pyspark.enabled", "false")
+        .config(
+            "spark.sql.adaptive.enabled", "false"
+        )  # Disable adaptive query execution for deterministic tests
+        .config("spark.sql.adaptive.coalescePartitions.enabled", "false")
+        .config("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
+        .config("spark.driver.memory", "1g")  # Limit memory usage for CI
+        .config("spark.driver.maxResultSize", "512m")
+        .config("spark.sql.shuffle.partitions", "2")  # Reduce partitions for small test data
+        .getOrCreate()
+    )
+
+
 TEST_DATA_DIR = Path("tests") / "tbl_files"
 
 TBL_LIST = [
@@ -91,6 +153,10 @@ TBL_LIST = [
     "tbl_sqlite",
 ]
 
+# Add PySpark to lists if available
+if PYSPARK_AVAILABLE:
+    TBL_LIST.append("tbl_pyspark")
+
 TBL_MISSING_LIST = [
     "tbl_missing_pd",
     "tbl_missing_pl",
@@ -98,6 +164,9 @@ TBL_MISSING_LIST = [
     "tbl_missing_duckdb",
     "tbl_missing_sqlite",
 ]
+
+if PYSPARK_AVAILABLE:
+    TBL_MISSING_LIST.append("tbl_missing_pyspark")
 
 TBL_DATES_TIMES_TEXT_LIST = [
     "tbl_dates_times_text_pd",
@@ -107,11 +176,17 @@ TBL_DATES_TIMES_TEXT_LIST = [
     "tbl_dates_times_text_sqlite",
 ]
 
+if PYSPARK_AVAILABLE:
+    TBL_DATES_TIMES_TEXT_LIST.append("tbl_dates_times_text_pyspark")
+
 TBL_TRUE_DATES_TIMES_LIST = [
     "tbl_true_dates_times_pd",
     "tbl_true_dates_times_pl",
     "tbl_true_dates_times_duckdb",
 ]
+
+if PYSPARK_AVAILABLE:
+    TBL_TRUE_DATES_TIMES_LIST.append("tbl_true_dates_times_pyspark")
 
 
 @pytest.fixture
@@ -330,6 +405,74 @@ def tbl_schema_tests():
     )
 
 
+# PySpark fixtures
+@pytest.fixture
+def tbl_pyspark():
+    """Basic PySpark DataFrame fixture matching tbl_pd structure."""
+    if not PYSPARK_AVAILABLE:
+        pytest.skip("PySpark not available")
+
+    spark = get_spark_session()
+    data = [(1, 4, 8), (2, 5, 8), (3, 6, 8), (4, 7, 8)]
+    columns = ["x", "y", "z"]
+    return spark.createDataFrame(data, columns)
+
+
+@pytest.fixture
+def tbl_missing_pyspark():
+    """PySpark DataFrame fixture with missing values matching tbl_missing_pd structure."""
+    if not PYSPARK_AVAILABLE:
+        pytest.skip("PySpark not available")
+
+    spark = get_spark_session()
+    data = [(1, 4, 8), (2, None, None), (None, 6, 8), (4, 7, 8)]
+    columns = ["x", "y", "z"]
+    return spark.createDataFrame(data, columns)
+
+
+@pytest.fixture
+def tbl_dates_times_text_pyspark():
+    """PySpark DataFrame fixture with dates, times, and text matching tbl_dates_times_text_pd structure."""
+    if not PYSPARK_AVAILABLE:
+        pytest.skip("PySpark not available")
+
+    spark = get_spark_session()
+    data = [
+        ("2021-01-01", "2021-01-01 00:00:00", None),
+        ("2021-02-01", None, "5-egh-163"),
+        (None, "2021-02-01 00:00:00", "8-kdg-938"),
+    ]
+    columns = ["date", "dttm", "text"]
+    return spark.createDataFrame(data, columns)
+
+
+@pytest.fixture
+def tbl_true_dates_times_pyspark():
+    """PySpark DataFrame fixture with proper datetime types matching tbl_true_dates_times_pd structure."""
+    if not PYSPARK_AVAILABLE:
+        pytest.skip("PySpark not available")
+
+    spark = get_spark_session()
+
+    # Create DataFrame with string dates/times first
+    data = [
+        ("2021-01-01", "2021-02-01", "2021-01-01 02:30:00", "2021-02-01 03:30:00"),
+        ("2021-02-01", "2021-03-01", "2021-02-01 02:30:00", "2021-03-01 03:30:00"),
+    ]
+    columns = ["date_1", "date_2", "dttm_1", "dttm_2"]
+    df = spark.createDataFrame(data, columns)
+
+    # Convert to proper date and datetime types
+    df = (
+        df.withColumn("date_1", F.to_date(F.col("date_1"), "yyyy-MM-dd"))
+        .withColumn("date_2", F.to_date(F.col("date_2"), "yyyy-MM-dd"))
+        .withColumn("dttm_1", F.to_timestamp(F.col("dttm_1"), "yyyy-MM-dd HH:mm:ss"))
+        .withColumn("dttm_2", F.to_timestamp(F.col("dttm_2"), "yyyy-MM-dd HH:mm:ss"))
+    )
+
+    return df
+
+
 def test_normalize_reporting_language():
     assert _normalize_reporting_language(lang=None) == "en"
     assert _normalize_reporting_language(lang="en") == "en"
@@ -475,7 +618,7 @@ def test_col_vals_all_passing(request, tbl_fixture):
 
     v = Validate(tbl).col_vals_gt(columns="x", value=0).interrogate()
 
-    if tbl_fixture not in ["tbl_parquet", "tbl_duckdb", "tbl_sqlite"]:
+    if tbl_fixture not in ["tbl_parquet", "tbl_duckdb", "tbl_sqlite", "tbl_pyspark"]:
         assert v.data.shape == (4, 3)
         assert str(v.data["x"].dtype).lower() == "int64"
         assert str(v.data["y"].dtype).lower() == "int64"
@@ -2294,6 +2437,52 @@ def test_validation_with_preprocessing_with_fn_pl(tbl_pl):
     assert v.n_passed()[2] == 4
 
 
+@pytest.mark.skipif(not PYSPARK_AVAILABLE, reason="PySpark not available")
+def test_validation_with_preprocessing_pyspark(tbl_pyspark):
+    import pyspark.sql.functions as F
+
+    v = (
+        Validate(tbl_pyspark)
+        .col_vals_eq(columns="z", value=8)
+        .col_vals_eq(columns="z", value=16, pre=lambda df: df.withColumn("z", F.col("z") * 2))
+        .interrogate()
+    )
+
+    assert v.n_passed()[1] == 4
+    assert v.n_passed()[2] == 4
+
+
+@pytest.mark.skipif(not PYSPARK_AVAILABLE, reason="PySpark not available")
+def test_validation_with_preprocessing_pyspark_use_nw(tbl_pyspark):
+    v = (
+        Validate(tbl_pyspark)
+        .col_vals_eq(columns="z", value=8)
+        .col_vals_eq(columns="z", value=16, pre=lambda dfn: dfn.with_columns(z=nw.col("z") * 2))
+        .interrogate()
+    )
+
+    assert v.n_passed()[1] == 4
+    assert v.n_passed()[2] == 4
+
+
+@pytest.mark.skipif(not PYSPARK_AVAILABLE, reason="PySpark not available")
+def test_validation_with_preprocessing_with_fn_pyspark(tbl_pyspark):
+    import pyspark.sql.functions as F
+
+    def multiply_z_by_two(df):
+        return df.withColumn("z", F.col("z") * 2)
+
+    v = (
+        Validate(tbl_pyspark)
+        .col_vals_eq(columns="z", value=8)
+        .col_vals_eq(columns="z", value=16, pre=multiply_z_by_two)
+        .interrogate()
+    )
+
+    assert v.n_passed()[1] == 4
+    assert v.n_passed()[2] == 4
+
+
 @pytest.mark.parametrize("tbl_fixture", TBL_MISSING_LIST)
 def test_col_vals_gt(request, tbl_fixture):
     pl.DataFrame({"x": [1, 2, None, 4], "y": [4, None, 6, 7], "z": [8, None, 8, 8]})
@@ -2677,6 +2866,246 @@ def test_col_vals_outside_with_datetime_bounds():
     assert validation.n_passed(i=1, scalar=True) == 2
 
 
+def test_validation_with_segments_and_pre_pandas():
+    import pandas as pd
+
+    tbl = pd.DataFrame(
+        {"category": ["A", "A", "B", "B"], "value": [10, 20, 30, 40], "multiplier": [2, 3, 4, 5]}
+    )
+
+    # Pre function that creates a new column
+    def add_computed_col(df):
+        return df.assign(computed=df["value"] * df["multiplier"])
+
+    validation = (
+        Validate(tbl)
+        .col_vals_gt(
+            columns="computed",
+            value=50,
+            pre=add_computed_col,
+            segments=[("category", "A"), ("category", "B")],
+        )
+        .interrogate()
+    )
+
+    # Should have run validation for both segments
+    assert len(validation.validation_info) == 2
+
+
+@pytest.mark.skipif(not PYSPARK_AVAILABLE, reason="PySpark not available")
+def test_validation_with_segments_and_pre_pyspark():
+    import pyspark.sql.functions as F
+
+    spark = get_spark_session()
+    tbl = spark.createDataFrame(
+        [("A", 10, 2), ("A", 20, 3), ("B", 30, 4), ("B", 40, 5)],
+        ["category", "value", "multiplier"],
+    )
+
+    # Pre function that creates a new column
+    def add_computed_col(df):
+        return df.withColumn("computed", F.col("value") * F.col("multiplier"))
+
+    validation = (
+        Validate(tbl)
+        .col_vals_gt(
+            columns="computed",
+            value=50,
+            pre=add_computed_col,
+            segments=[("category", "A"), ("category", "B")],
+        )
+        .interrogate()
+    )
+
+    # Should have run validation for both segments
+    assert len(validation.validation_info) == 2
+
+
+def test_validation_error_handling_in_pre_pandas():
+    import pandas as pd
+
+    tbl = pd.DataFrame({"values": [1, 2, 3]})
+
+    def failing_pre(df):
+        raise ValueError("Pre function failed")
+
+    validation = Validate(tbl).col_vals_gt(columns="values", value=0, pre=failing_pre).interrogate()
+
+    # Should handle the error gracefully
+    assert len(validation.validation_info) == 1
+    # The step should be marked as having an eval_error
+    assert validation.validation_info[0].eval_error is True
+
+
+@pytest.mark.skipif(not PYSPARK_AVAILABLE, reason="PySpark not available")
+def test_validation_error_handling_in_pre_pyspark():
+    spark = get_spark_session()
+    tbl = spark.createDataFrame([(1,), (2,), (3,)], ["values"])
+
+    def failing_pre(df):
+        raise ValueError("Pre function failed")
+
+    validation = Validate(tbl).col_vals_gt(columns="values", value=0, pre=failing_pre).interrogate()
+
+    # Should handle the error gracefully
+    assert len(validation.validation_info) == 1
+    # The step should be marked as having an eval_error
+    assert validation.validation_info[0].eval_error is True
+
+
+def test_conjointly_with_empty_expressions_pandas():
+    import pandas as pd
+
+    tbl = pd.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]})
+
+    # Test with minimal expressions
+    validation = Validate(tbl).conjointly(lambda df: df["a"] > 0).interrogate()
+
+    # Should pass as all values in 'a' are > 0
+    assert validation.all_passed()
+
+
+@pytest.mark.skipif(not PYSPARK_AVAILABLE, reason="PySpark not available")
+def test_conjointly_with_empty_expressions_pyspark():
+    spark = get_spark_session()
+    tbl = spark.createDataFrame([(1, 4), (2, 5), (3, 6)], ["a", "b"])
+
+    # Test with minimal expressions
+    validation = Validate(tbl).conjointly(lambda df: df["a"] > 0).interrogate()
+
+    # Should pass as all values in 'a' are > 0
+    assert validation.all_passed()
+
+
+def test_specially_with_complex_return_values_pandas():
+    import pandas as pd
+
+    tbl = pd.DataFrame({"values": [1, 2, 3, 4, 5]})
+
+    # Function returning list of mixed boolean/non-boolean (should fail)
+    def mixed_return():
+        return [True, False, "not_boolean"]
+
+    with pytest.raises(TypeError):
+        Validate(tbl).specially(expr=mixed_return).interrogate()
+
+    # Function returning single non-boolean (should fail)
+    def non_boolean_return():
+        return "not_boolean"
+
+    with pytest.raises(TypeError):
+        Validate(tbl).specially(expr=non_boolean_return).interrogate()
+
+
+@pytest.mark.skipif(not PYSPARK_AVAILABLE, reason="PySpark not available")
+def test_specially_with_complex_return_values_pyspark():
+    spark = get_spark_session()
+    tbl = spark.createDataFrame([(1,), (2,), (3,), (4,), (5,)], ["values"])
+
+    # Function returning list of mixed boolean/non-boolean (should fail)
+    def mixed_return():
+        return [True, False, "not_boolean"]
+
+    with pytest.raises(TypeError):
+        Validate(tbl).specially(expr=mixed_return).interrogate()
+
+    # Function returning single non-boolean (should fail)
+    def non_boolean_return():
+        return "not_boolean"
+
+    with pytest.raises(TypeError):
+        Validate(tbl).specially(expr=non_boolean_return).interrogate()
+
+
+def test_col_vals_between_with_column_references_pandas():
+    import pandas as pd
+
+    tbl = pd.DataFrame(
+        {"value": [5, 10, 15, 20], "lower": [1, 8, 12, 18], "upper": [10, 15, 20, 25]}
+    )
+
+    validation = (
+        Validate(tbl)
+        .col_vals_between(columns="value", left=col("lower"), right=col("upper"))
+        .interrogate()
+    )
+
+    # All values should be within their respective bounds
+    assert validation.all_passed()
+
+
+@pytest.mark.skipif(not PYSPARK_AVAILABLE, reason="PySpark not available")
+def test_col_vals_between_with_column_references_pyspark():
+    spark = get_spark_session()
+    tbl = spark.createDataFrame(
+        [(5, 1, 10), (10, 8, 15), (15, 12, 20), (20, 18, 25)], ["value", "lower", "upper"]
+    )
+
+    validation = (
+        Validate(tbl)
+        .col_vals_between(columns="value", left=col("lower"), right=col("upper"))
+        .interrogate()
+    )
+
+    # All values should be within their respective bounds
+    assert validation.all_passed()
+
+
+def test_col_vals_outside_with_datetime_bounds_pandas():
+    import pandas as pd
+
+    tbl = pd.DataFrame(
+        {
+            "timestamp": [
+                datetime.datetime(2023, 1, 1),
+                datetime.datetime(2023, 6, 1),
+                datetime.datetime(2023, 12, 1),
+            ]
+        }
+    )
+
+    # Values outside the middle of the year
+    validation = (
+        Validate(tbl)
+        .col_vals_outside(
+            columns="timestamp",
+            left=datetime.datetime(2023, 4, 1),
+            right=datetime.datetime(2023, 8, 1),
+        )
+        .interrogate()
+    )
+
+    # First and third values should be outside the range
+    assert validation.n_passed(i=1, scalar=True) == 2
+
+
+@pytest.mark.skipif(not PYSPARK_AVAILABLE, reason="PySpark not available")
+def test_col_vals_outside_with_datetime_bounds_pyspark():
+    spark = get_spark_session()
+    tbl = spark.createDataFrame(
+        [
+            (datetime.datetime(2023, 1, 1),),
+            (datetime.datetime(2023, 6, 1),),
+            (datetime.datetime(2023, 12, 1),),
+        ],
+        ["timestamp"],
+    )
+
+    # Values outside the middle of the year
+    validation = (
+        Validate(tbl)
+        .col_vals_outside(
+            columns="timestamp",
+            left=datetime.datetime(2023, 4, 1),
+            right=datetime.datetime(2023, 8, 1),
+        )
+        .interrogate()
+    )
+
+    # First and third values should be outside the range
+    assert validation.n_passed(i=1, scalar=True) == 2
+
+
 def test_validation_with_very_large_dataset():
     # Create a larger dataset to test performance
     n_rows = 10000
@@ -2724,8 +3153,93 @@ def test_validation_report_with_unicode_content():
     assert report is not None
 
 
+def test_validation_report_with_unicode_content_pandas():
+    import pandas as pd
+
+    tbl = pd.DataFrame(
+        {
+            "名前": ["太郎", "花子", "一郎"],  # Japanese names
+            "値": [1, 2, 3],  # Japanese for "value"
+            "émojis": ["😀", "😂", "🎉"],  # Emoji!
+        }
+    )
+
+    validation = (
+        Validate(tbl, tbl_name="ユニコードテーブル")  # Unicode table name
+        .col_exists(["名前", "値", "émojis"])
+        .col_vals_not_null(["名前"])
+        .interrogate()
+    )
+
+    # Should handle unicode content properly
+    assert validation.all_passed()
+
+    # Should be able to generate report with unicode content
+    report = validation.get_tabular_report()
+    assert report is not None
+
+
+@pytest.mark.skipif(not PYSPARK_AVAILABLE, reason="PySpark not available")
+def test_validation_report_with_unicode_content_pyspark():
+    spark = get_spark_session()
+    tbl = spark.createDataFrame(
+        [("太郎", 1, "😀"), ("花子", 2, "😂"), ("一郎", 3, "🎉")], ["名前", "値", "émojis"]
+    )
+
+    validation = (
+        Validate(tbl, tbl_name="ユニコードテーブル")  # Unicode table name
+        .col_exists(["名前", "値", "émojis"])
+        .col_vals_not_null(["名前"])
+        .interrogate()
+    )
+
+    # Should handle unicode content properly
+    assert validation.all_passed()
+
+    # Should be able to generate report with unicode content
+    report = validation.get_tabular_report()
+    assert report is not None
+
+
 def test_row_count_match_with_tolerance():
     tbl = pl.DataFrame({"col": range(100)})  # 100 rows
+
+    # Test exact match
+    validation_exact = Validate(tbl).row_count_match(count=100).interrogate()
+    assert validation_exact.all_passed()
+
+    # Test with tolerance
+    validation_tolerance = Validate(tbl).row_count_match(count=95, tol=5).interrogate()
+    assert validation_tolerance.all_passed()
+
+    # Test exceeding tolerance
+    validation_fail = Validate(tbl).row_count_match(count=80, tol=5).interrogate()
+    assert not validation_fail.all_passed()
+
+
+def test_row_count_match_with_tolerance_pandas():
+    import pandas as pd
+
+    tbl = pd.DataFrame({"col": range(100)})  # 100 rows
+
+    # Test exact match
+    validation_exact = Validate(tbl).row_count_match(count=100).interrogate()
+    assert validation_exact.all_passed()
+
+    # Test with tolerance
+    validation_tolerance = Validate(tbl).row_count_match(count=95, tol=5).interrogate()
+    assert validation_tolerance.all_passed()
+
+    # Test exceeding tolerance
+    validation_fail = Validate(tbl).row_count_match(count=80, tol=5).interrogate()
+    assert not validation_fail.all_passed()
+
+
+@pytest.mark.skipif(not PYSPARK_AVAILABLE, reason="PySpark not available")
+def test_row_count_match_with_tolerance_pyspark():
+    spark = get_spark_session()
+    # Create 100 rows
+    tbl = spark.range(100).toDF("col")
 
     # Test exact match
     validation_exact = Validate(tbl).row_count_match(count=100).interrogate()
@@ -2803,6 +3317,145 @@ def test_validation_with_all_validation_types():
     assert passed_count / total_count >= 0.9
 
 
+def test_validation_with_all_validation_types_pandas():
+    import pandas as pd
+
+    tbl = pd.DataFrame(
+        {
+            "id": [1, 2, 3, 4, 5],
+            "name": ["Alice", "Bob", "Charlie", "Diana", "Eve"],
+            "age": [25, 30, 35, 28, 32],
+            "email": [
+                "alice@test.com",
+                "bob@test.com",
+                "charlie@test.com",
+                "diana@test.com",
+                "eve@test.com",
+            ],
+            "score": [85.5, 92.0, 78.5, 88.0, 91.5],
+            "active": [True, True, False, True, True],
+            "category": ["A", "B", "A", "C", "B"],
+            "created_date": ["2023-01-01", "2023-01-02", "2023-01-03", "2023-01-04", "2023-01-05"],
+            "optional_field": [
+                None,
+                "value1",
+                None,
+                "value2",
+                None,
+            ],  # Column with nulls for testing
+        }
+    )
+
+    validation = (
+        Validate(tbl, label="Comprehensive validation test")
+        # Column value validations
+        .col_vals_gt(columns="age", value=18)
+        .col_vals_lt(columns="age", value=65)
+        .col_vals_between(columns="score", left=0, right=100)
+        .col_vals_in_set(columns="category", set=["A", "B", "C"])
+        .col_vals_not_in_set(columns="category", set=["D", "E"])
+        .col_vals_regex(columns="email", pattern=r"^[\w\.-]+@[\w\.-]+\.\w+$")
+        .col_vals_not_null(["id", "name", "email"])
+        .col_vals_null(columns="optional_field")  # Test null validation on column with actual nulls
+        # Column existence
+        .col_exists(["id", "name", "age", "email"])
+        # Row-level validations
+        .rows_distinct()
+        .rows_complete()
+        # Table-level validations
+        .row_count_match(count=5)
+        .col_count_match(count=9)  # Updated to match new column count
+        # Expression validation
+        .col_vals_expr(expr=tbl["age"] > 20)  # Use pandas-style expression
+        # Conjoint validation
+        .conjointly(lambda df: df["age"] > 20, lambda df: df["score"] > 50)
+        # Special validation
+        .specially(expr=lambda: [True, True])
+        .interrogate()
+    )
+
+    # Most validations should pass
+    passed_count = sum(1 for info in validation.validation_info if info.all_passed)
+    total_count = len(validation.validation_info)
+
+    # At least 90% should pass
+    assert passed_count / total_count >= 0.9
+
+
+@pytest.mark.skipif(not PYSPARK_AVAILABLE, reason="PySpark not available")
+def test_validation_with_all_validation_types_pyspark():
+    import pyspark.sql.functions as F
+    from pyspark.sql.types import (
+        StructType,
+        StructField,
+        IntegerType,
+        StringType,
+        DoubleType,
+        BooleanType,
+    )
+
+    spark = get_spark_session()
+
+    # Create the schema first
+    schema = StructType(
+        [
+            StructField("id", IntegerType(), True),
+            StructField("name", StringType(), True),
+            StructField("age", IntegerType(), True),
+            StructField("email", StringType(), True),
+            StructField("score", DoubleType(), True),
+            StructField("active", BooleanType(), True),
+            StructField("category", StringType(), True),
+            StructField("created_date", StringType(), True),
+            StructField("optional_field", StringType(), True),
+        ]
+    )
+
+    tbl = spark.createDataFrame(
+        [
+            (1, "Alice", 25, "alice@test.com", 85.5, True, "A", "2023-01-01", None),
+            (2, "Bob", 30, "bob@test.com", 92.0, True, "B", "2023-01-02", "value1"),
+            (3, "Charlie", 35, "charlie@test.com", 78.5, False, "A", "2023-01-03", None),
+            (4, "Diana", 28, "diana@test.com", 88.0, True, "C", "2023-01-04", "value2"),
+            (5, "Eve", 32, "eve@test.com", 91.5, True, "B", "2023-01-05", None),
+        ],
+        schema,
+    )
+
+    validation = (
+        Validate(tbl, label="Comprehensive validation test")
+        # Column value validations
+        .col_vals_gt(columns="age", value=18)
+        .col_vals_lt(columns="age", value=65)
+        .col_vals_between(columns="score", left=0, right=100)
+        .col_vals_in_set(columns="category", set=["A", "B", "C"])
+        .col_vals_not_in_set(columns="category", set=["D", "E"])
+        .col_vals_regex(columns="email", pattern=r"^[\w\.-]+@[\w\.-]+\.\w+$")
+        .col_vals_not_null(["id", "name", "email"])
+        .col_vals_null(columns="optional_field")  # Test null validation on column with actual nulls
+        # Column existence
+        .col_exists(["id", "name", "age", "email"])
+        # Row-level validations
+        .rows_distinct()
+        .rows_complete()
+        # Table-level validations
+        .row_count_match(count=5)
+        .col_count_match(count=9)  # Updated to match new column count
+        # Conjoint validation
+        .conjointly(lambda df: df["age"] > 20, lambda df: df["score"] > 50)
+        # Special validation
+        .specially(expr=lambda: [True, True])
+        .interrogate()
+    )
+
+    # Most validations should pass
+    passed_count = sum(1 for info in validation.validation_info if info.all_passed)
+    total_count = len(validation.validation_info)
+
+    # At least 90% should pass
+    assert passed_count / total_count >= 0.9
+
+
 def test_validation_info_string_representation():
     tbl = pl.DataFrame({"col": [1, 2, 3]})
 
@@ -2816,8 +3469,76 @@ def test_validation_info_string_representation():
     assert "col" in str_repr
 
 
+def test_validation_info_string_representation_pandas():
+    import pandas as pd
+
+    tbl = pd.DataFrame({"col": [1, 2, 3]})
+
+    validation = Validate(tbl).col_vals_gt(columns="col", value=0).interrogate()
+
+    val_info = validation.validation_info[0]
+
+    # Should have meaningful string representation
+    str_repr = str(val_info)
+    assert "col_vals_gt" in str_repr
+    assert "col" in str_repr
+
+
+@pytest.mark.skipif(not PYSPARK_AVAILABLE, reason="PySpark not available")
+def test_validation_info_string_representation_pyspark():
+    spark = get_spark_session()
+    tbl = spark.createDataFrame([(1,), (2,), (3,)], ["col"])
+
+    validation = Validate(tbl).col_vals_gt(columns="col", value=0).interrogate()
+
+    val_info = validation.validation_info[0]
+
+    # Should have meaningful string representation
+    str_repr = str(val_info)
+    assert "col_vals_gt" in str_repr
+    assert "col" in str_repr
+
+
 def test_validation_with_mixed_na_pass_values():
     tbl = pl.DataFrame({"col1": [1, 2, None, 4], "col2": [None, 2, 3, 4]})
+
+    validation = (
+        Validate(tbl)
+        .col_vals_gt(columns="col1", value=0, na_pass=True)  # Should pass NULL
+        .col_vals_gt(columns="col2", value=0, na_pass=False)  # Should fail NULL
+        .interrogate()
+    )
+
+    # First validation should pass all (including NULL)
+    assert validation.n_passed(i=1, scalar=True) == 4
+
+    # Second validation should fail the NULL value
+    assert validation.n_failed(i=2, scalar=True) == 1
+
+
+def test_validation_with_mixed_na_pass_values_pandas():
+    import pandas as pd
+
+    tbl = pd.DataFrame({"col1": [1, 2, None, 4], "col2": [None, 2, 3, 4]})
+
+    validation = (
+        Validate(tbl)
+        .col_vals_gt(columns="col1", value=0, na_pass=True)  # Should pass NULL
+        .col_vals_gt(columns="col2", value=0, na_pass=False)  # Should fail NULL
+        .interrogate()
+    )
+
+    # First validation should pass all (including NULL)
+    assert validation.n_passed(i=1, scalar=True) == 4
+
+    # Second validation should fail the NULL value
+    assert validation.n_failed(i=2, scalar=True) == 1
+
+
+@pytest.mark.skipif(not PYSPARK_AVAILABLE, reason="PySpark not available")
+def test_validation_with_mixed_na_pass_values_pyspark():
+    spark = get_spark_session()
+    tbl = spark.createDataFrame([(1, None), (2, 2), (None, 3), (4, 4)], ["col1", "col2"])
 
     validation = (
         Validate(tbl)
@@ -2996,6 +3717,100 @@ def test_date_time_validation_with_string_conversion():
             pl.col("date_str").str.to_date().alias("date_col"),
             pl.col("datetime_str").str.to_datetime().alias("datetime_col"),
         ]
+    )
+
+    # Test date comparisons with actual date columns
+    validation_date = (
+        Validate(tbl)
+        .col_vals_gt(columns="date_col", value=datetime.date(2023, 1, 1))
+        .col_vals_lt(columns="date_col", value=datetime.date(2024, 1, 1))
+        .interrogate()
+    )
+
+    # Should handle date comparisons
+    assert validation_date.n_passed(i=1, scalar=True) == 2  # Two dates after 2023-01-01
+    assert validation_date.n_passed(i=2, scalar=True) == 3  # All dates before 2024-01-01
+
+    # Test datetime comparisons with actual datetime columns
+    validation_datetime = (
+        Validate(tbl)
+        .col_vals_between(
+            columns="datetime_col",
+            left=datetime.datetime(2023, 1, 1, 0, 0, 0),
+            right=datetime.datetime(2023, 12, 31, 23, 59, 59),
+        )
+        .interrogate()
+    )
+
+    assert validation_datetime.all_passed()
+
+
+def test_date_time_validation_with_string_conversion_pandas():
+    import pandas as pd
+
+    tbl = pd.DataFrame(
+        {
+            "date_str": ["2023-01-01", "2023-06-15", "2023-12-31"],
+            "datetime_str": ["2023-01-01 10:30:00", "2023-06-15 14:45:30", "2023-12-31 23:59:59"],
+        }
+    )
+    # Convert string columns to datetime
+    tbl["date_col"] = pd.to_datetime(tbl["date_str"]).dt.date
+    tbl["datetime_col"] = pd.to_datetime(tbl["datetime_str"])
+
+    # Test date comparisons with actual date columns
+    validation_date = (
+        Validate(tbl)
+        .col_vals_gt(columns="date_col", value=datetime.date(2023, 1, 1))
+        .col_vals_lt(columns="date_col", value=datetime.date(2024, 1, 1))
+        .interrogate()
+    )
+
+    # Should handle date comparisons
+    assert validation_date.n_passed(i=1, scalar=True) == 2  # Two dates after 2023-01-01
+    assert validation_date.n_passed(i=2, scalar=True) == 3  # All dates before 2024-01-01
+
+    # Test datetime comparisons with actual datetime columns
+    validation_datetime = (
+        Validate(tbl)
+        .col_vals_between(
+            columns="datetime_col",
+            left=datetime.datetime(2023, 1, 1, 0, 0, 0),
+            right=datetime.datetime(2023, 12, 31, 23, 59, 59),
+        )
+        .interrogate()
+    )
+
+    assert validation_datetime.all_passed()
+
+
+@pytest.mark.skipif(not PYSPARK_AVAILABLE, reason="PySpark not available")
+def test_date_time_validation_with_string_conversion_pyspark():
+    from pyspark.sql import functions as F
+    from pyspark.sql.types import StructType, StructField, StringType
+
+    spark = get_spark_session()
+
+    # Create DataFrame with string date/datetime columns
+    schema = StructType(
+        [
+            StructField("date_str", StringType(), True),
+            StructField("datetime_str", StringType(), True),
+        ]
+    )
+
+    data = [
+        ("2023-01-01", "2023-01-01 10:30:00"),
+        ("2023-06-15", "2023-06-15 14:45:30"),
+        ("2023-12-31", "2023-12-31 23:59:59"),
+    ]
+
+    tbl = spark.createDataFrame(data, schema)
+
+    # Convert string columns to date/timestamp
+    tbl = tbl.withColumn("date_col", F.to_date(F.col("date_str"), "yyyy-MM-dd"))
+    tbl = tbl.withColumn(
+        "datetime_col", F.to_timestamp(F.col("datetime_str"), "yyyy-MM-dd HH:mm:ss")
     )
 
     # Test date comparisons with actual date columns
@@ -6815,7 +7630,11 @@ def test_interrogate_first_n(request, tbl_fixture):
 
         # Expect that the extracts table has 2 entries out of 3 failures
         assert validation.n_failed(i=1, scalar=True) == 3
-        assert len(nw.from_native(validation.get_data_extracts(i=1, frame=True)).rows()) == 2
+        extract_df = nw.from_native(validation.get_data_extracts(i=1, frame=True))
+        # For LazyFrames, need to collect first, then get length
+        if hasattr(extract_df, "collect"):
+            extract_df = extract_df.collect()
+        assert len(extract_df) == 2
         assert len(nw.from_native(validation.get_data_extracts(i=1, frame=True)).columns) == 4
 
 

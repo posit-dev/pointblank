@@ -138,10 +138,15 @@ def assistant(
 
     - Polars DataFrame (`"polars"`)
     - Pandas DataFrame (`"pandas"`)
+    - PySpark table (`"pyspark"`)
     - DuckDB table (`"duckdb"`)*
     - MySQL table (`"mysql"`)*
     - PostgreSQL table (`"postgresql"`)*
     - SQLite table (`"sqlite"`)*
+    - Microsoft SQL Server table (`"mssql"`)*
+    - Snowflake table (`"snowflake"`)*
+    - Databricks table (`"databricks"`)*
+    - BigQuery table (`"bigquery"`)*
     - Parquet table (`"parquet"`)*
     - CSV files (string path or `pathlib.Path` object with `.csv` extension)
     - Parquet files (string path, `pathlib.Path` object, glob pattern, directory with `.parquet`
@@ -152,6 +157,10 @@ def assistant(
     `ibis.expr.types.relations.Table`). Furthermore, using `assistant()` with these types of tables
     requires the Ibis library (`v9.5.0` or above) to be installed. If the input table is a Polars or
     Pandas DataFrame, the availability of Ibis is not needed.
+
+    To use a CSV file, ensure that a string or `pathlib.Path` object with a `.csv` extension is
+    provided. The file will be automatically detected and loaded using the best available DataFrame
+    library. The loading preference is Polars first, then Pandas as a fallback.
     """
 
     # Check that the chatlas package is installed

@@ -158,6 +158,48 @@ validation.get_step_report(i=3).show("browser")  # 获取步骤 3 的失败记�
 
 <br>
 
+## YAML 配置
+
+对于需要可移植、版本控制的验证工作流的团队，Pointblank 支持 YAML 配置文件。这使得在不同环境和团队成员之间轻松共享验证逻辑，确保每个人都在同一页面上。
+
+**validation.yaml**
+
+```yaml
+validate:
+  data: small_table
+  tbl_name: "small_table"
+  label: "入门验证"
+
+steps:
+  - col_vals_gt:
+      columns: "d"
+      value: 100
+  - col_vals_le:
+      columns: "c"
+      value: 5
+  - col_exists:
+      columns: ["date", "date_time"]
+```
+
+**执行 YAML 验证**
+
+```python
+import pointblank as pb
+
+# 从 YAML 配置运行验证
+validation = pb.yaml_interrogate("validation.yaml")
+
+# 获取结果，就像任何其他验证一样
+validation.get_tabular_report().show()
+```
+
+这种方法非常适合：
+
+- **CI/CD 管道**: 将验证规则与代码一起存储
+- **团队协作**: 以可读格式共享验证逻辑
+- **环境一致性**: 在开发、测试和生产环境中使用相同的验证
+- **文档**: YAML 文件作为数据质量要求的活文档
+
 ## 命令行界面 (CLI)
 
 Pointblank 包含一个强大的 CLI 工具称为 `pb`，让您可以直接从命令行运行数据验证工作流。非常适合 CI/CD 管道、定时数据质量检查或快速验证任务。
@@ -185,6 +227,12 @@ pb scan "duckdb:///data/sales.ddb::customers"
 **运行基本验证**
 
 ```bash
+# 从 YAML 配置文件运行验证
+pb run validation.yaml
+
+# 从 Python 文件运行验证
+pb run validation.py
+
 # 检查重复行
 pb validate small_table --check rows-distinct
 
@@ -201,8 +249,12 @@ pb validate small_table --check col-vals-gt --column a --value 5 --show-extract
 **与 CI/CD 集成**
 
 ```bash
-# 使用退出代码进行自动化（0 = 通过，1 = 失败）
+# 在单行验证中使用退出代码进行自动化（0 = 通过，1 = 失败）
 pb validate small_table --check rows-distinct --exit-code
+
+# 使用退出代码运行验证工作流
+pb run validation.yaml --exit-code
+pb run validation.py --exit-code
 ```
 
 ## Pointblank 的突出特点

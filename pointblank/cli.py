@@ -1360,10 +1360,10 @@ def preview(
     For tables with many columns, use these options to control which columns are displayed:
 
     \b
-    - --columns: Specify exact columns (e.g., --columns "name,age,email")
-    - --col-range: Select column range (e.g., --col-range "1:10", --col-range "5:", --col-range ":15")
-    - --col-first: Show first N columns (e.g., --col-first 5)
-    - --col-last: Show last N columns (e.g., --col-last 3)
+    - --columns: Specify exact columns (--columns "name,age,email")
+    - --col-range: Select column range (--col-range "1:10", --col-range "5:", --col-range ":15")
+    - --col-first: Show first N columns (--col-first 5)
+    - --col-last: Show last N columns (--col-last 3)
 
     Tables with >15 columns automatically show first 7 and last 7 columns with indicators.
     """
@@ -1920,31 +1920,43 @@ def validate(
 
     AVAILABLE CHECK_TYPES:
 
-    Use --list-checks to see all available validation methods with examples.
-
-    The default CHECK_TYPE is 'rows-distinct' which checks for duplicate rows.
+    Require no additional options:
 
     \b
     - rows-distinct: Check if all rows in the dataset are unique (no duplicates)
     - rows-complete: Check if all rows are complete (no missing values in any column)
-    - col-exists: Check if a specific column exists in the dataset (requires --column)
-    - col-vals-not-null: Check if all values in a column are not null/missing (requires --column)
-    - col-vals-gt: Check if all values in a column are greater than a comparison value (requires --column and --value)
-    - col-vals-ge: Check if all values in a column are greater than or equal to a comparison value (requires --column and --value)
-    - col-vals-lt: Check if all values in a column are less than a comparison value (requires --column and --value)
-    - col-vals-le: Check if all values in a column are less than or equal to a comparison value (requires --column and --value)
-    - col-vals-in-set: Check if all values in a column are in an allowed set (requires --column and --set)
+
+    Require --column:
+
+    \b
+    - col-exists: Check if a specific column exists in the dataset
+    - col-vals-not-null: Check if all values in a column are not null/missing
+
+    Require --column and --value:
+
+    \b
+    - col-vals-gt: Check if column values are greater than a fixed value
+    - col-vals-ge: Check if column values are greater than or equal to a fixed value
+    - col-vals-lt: Check if column values are less than a fixed value
+    - col-vals-le: Check if column values are less than or equal to a fixed value
+
+    Require --column and --set:
+
+    \b
+    - col-vals-in-set: Check if column values are in an allowed set
+
+    Use --list-checks to see all available validation methods with examples. The default CHECK_TYPE
+    is 'rows-distinct' which checks for duplicate rows.
 
     Examples:
 
     \b
-    pb validate data.csv                                             # Uses default validation (rows-distinct)
-    pb validate data.csv --list-checks                               # Show all available checks
+    pb validate data.csv                               # Uses default validation (rows-distinct)
+    pb validate data.csv --list-checks                 # Show all available checks
     pb validate data.csv --check rows-distinct
     pb validate data.csv --check rows-distinct --show-extract
     pb validate data.csv --check rows-distinct --write-extract failing_rows_folder
     pb validate data.csv --check rows-distinct --exit-code
-    pb validate data.csv --check rows-complete
     pb validate data.csv --check col-exists --column price
     pb validate data.csv --check col-vals-not-null --column email
     pb validate data.csv --check col-vals-gt --column score --value 50
@@ -1952,7 +1964,6 @@ def validate(
 
     Multiple validations in one command:
     pb validate data.csv --check rows-distinct --check rows-complete
-    pb validate data.csv --check col-vals-not-null --column email --check col-vals-gt --column age --value 18
     """
     try:
         import sys
@@ -4627,36 +4638,40 @@ def pl(
     pb pl "pl.read_csv('data.csv').select(['name', 'age'])"
     pb pl "pl.read_csv('data.csv').filter(pl.col('age') > 25)"
 
+    \b
     # Multi-line with editor (supports multiple statements)
     pb pl --edit
 
+    \b
     # Multi-statement code example in editor:
     # csv = pl.read_csv('data.csv')
     # result = csv.select(['name', 'age']).filter(pl.col('age') > 25)
 
+    \b
     # Multi-line with a specific editor
     pb pl --edit --editor nano
     pb pl --edit --editor code
     pb pl --edit --editor micro
 
+    \b
     # From file
     pb pl --file query.py
 
-    # Piping to other pb commands
-    pb pl "pl.read_csv('data.csv').filter(pl.col('age') > 25)" --pipe | pb validate --check rows-distinct
+    \b
+    Piping to other pb commands
+    pb pl "pl.read_csv('data.csv').head(20)" --pipe | pb validate --check rows-distinct
     pb pl --edit --pipe | pb preview --head 10
     pb pl --edit --pipe | pb scan --output-html report.html
     pb pl --edit --pipe | pb missing --output-html missing_report.html
 
-    Use --output-format to change how results are displayed:
-
     \b
+    Use --output-format to change how results are displayed:
     pb pl "pl.read_csv('data.csv')" --output-format scan
     pb pl "pl.read_csv('data.csv')" --output-format missing
     pb pl "pl.read_csv('data.csv')" --output-format info
 
-    Note: For multi-statement code, assign your final result to a variable like
-    'result', 'df', 'data', or ensure it's the last expression.
+    Note: For multi-statement code, assign your final result to a variable like 'result', 'df',
+    'data', or ensure it's the last expression.
     """
     try:
         # Check if Polars is available

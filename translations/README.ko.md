@@ -149,6 +149,48 @@ validation.get_step_report(i=3).show("browser")  # 단계 3의 실패 레코드 
 
 <br>
 
+## YAML 구성
+
+휴대 가능하고 버전 관리되는 검증 워크플로우가 필요한 팀을 위해 Pointblank은 YAML 구성 파일을 지원합니다. 이를 통해 다양한 환경과 팀원 간에 검증 로직을 쉽게 공유할 수 있어 모든 사람이 같은 페이지에 있을 수 있습니다.
+
+**validation.yaml**
+
+```yaml
+validate:
+  data: small_table
+  tbl_name: "small_table"
+  label: "시작하기 검증"
+
+steps:
+  - col_vals_gt:
+      columns: "d"
+      value: 100
+  - col_vals_le:
+      columns: "c"
+      value: 5
+  - col_exists:
+      columns: ["date", "date_time"]
+```
+
+**YAML 검증 실행**
+
+```python
+import pointblank as pb
+
+# YAML 구성에서 검증 실행
+validation = pb.yaml_interrogate("validation.yaml")
+
+# 다른 검증과 마찬가지로 결과 얻기
+validation.get_tabular_report().show()
+```
+
+이 접근 방식은 다음에 완벽합니다:
+
+- **CI/CD 파이프라인**: 코드와 함께 검증 규칙 저장
+- **팀 협업**: 읽기 쉬운 형식으로 검증 로직 공유
+- **환경 일관성**: 개발, 스테이징, 프로덕션에서 동일한 검증 사용
+- **문서화**: YAML 파일이 데이터 품질 요구사항의 살아있는 문서 역할
+
 ## 명령줄 인터페이스 (CLI)
 
 Pointblank은 `pb`라는 강력한 CLI 유틸리티를 포함하여 명령줄에서 직접 데이터 검증 워크플로우를 실행할 수 있습니다. CI/CD 파이프라인, 예약된 데이터 품질 검사 또는 빠른 검증 작업에 완벽합니다.
@@ -176,6 +218,12 @@ pb scan "duckdb:///data/sales.ddb::customers"
 **필수 검증 실행**
 
 ```bash
+# YAML 구성 파일에서 검증 실행
+pb run validation.yaml
+
+# Python 파일에서 검증 실행
+pb run validation.py
+
 # 중복 행 확인
 pb validate small_table --check rows-distinct
 
@@ -192,8 +240,12 @@ pb validate small_table --check col-vals-gt --column a --value 5 --show-extract
 **CI/CD와 통합**
 
 ```bash
-# 자동화를 위한 종료 코드 사용 (0 = 통과, 1 = 실패)
+# 한 줄 검증에서 자동화를 위한 종료 코드 사용 (0 = 통과, 1 = 실패)
 pb validate small_table --check rows-distinct --exit-code
+
+# 종료 코드로 검증 워크플로우 실행
+pb run validation.yaml --exit-code
+pb run validation.py --exit-code
 ```
 
 ## Pointblank을 차별화하는 기능

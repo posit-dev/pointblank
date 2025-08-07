@@ -149,6 +149,48 @@ validation.get_step_report(i=3).show("browser")  # Fehlgeschlagene Datensätze a
 
 <br>
 
+## YAML-Konfiguration
+
+Für Teams, die portable, versionskontrollierte Validierungs-Workflows benötigen, unterstützt Pointblank YAML-Konfigurationsdateien. Dies macht es einfach, Validierungslogik zwischen verschiedenen Umgebungen und Teammitgliedern zu teilen und sicherzustellen, dass alle auf derselben Seite stehen.
+
+**validation.yaml**
+
+```yaml
+validate:
+  data: small_table
+  tbl_name: "small_table"
+  label: "Einstiegs-Validierung"
+
+steps:
+  - col_vals_gt:
+      columns: "d"
+      value: 100
+  - col_vals_le:
+      columns: "c"
+      value: 5
+  - col_exists:
+      columns: ["date", "date_time"]
+```
+
+**YAML-Validierung ausführen**
+
+```python
+import pointblank as pb
+
+# Validierung aus YAML-Konfiguration ausführen
+validation = pb.yaml_interrogate("validation.yaml")
+
+# Ergebnisse wie bei jeder anderen Validierung erhalten
+validation.get_tabular_report().show()
+```
+
+Dieser Ansatz ist perfekt für:
+
+- **CI/CD-Pipelines**: Validierungsregeln zusammen mit Ihrem Code speichern
+- **Team-Zusammenarbeit**: Validierungslogik in lesbarem Format teilen
+- **Umgebungskonsistenz**: Dieselbe Validierung in Entwicklung, Staging und Produktion verwenden
+- **Dokumentation**: YAML-Dateien dienen als lebende Dokumentation Ihrer Datenqualitätsanforderungen
+
 ## Kommandozeilenschnittstelle (CLI)
 
 Pointblank enthält ein leistungsstarkes CLI-Dienstprogramm namens `pb`, mit dem Sie Datenvalidierungsworkflows direkt von der Kommandozeile aus ausführen können. Perfekt für CI/CD-Pipelines, geplante Datenqualitätsprüfungen oder schnelle Validierungsaufgaben.
@@ -176,6 +218,12 @@ pb scan "duckdb:///data/sales.ddb::customers"
 **Führen Sie grundlegende Validierungen durch**
 
 ```bash
+# Validierung aus YAML-Konfigurationsdatei ausführen
+pb run validation.yaml
+
+# Validierung aus Python-Datei ausführen
+pb run validation.py
+
 # Auf doppelte Zeilen prüfen
 pb validate small_table --check rows-distinct
 
@@ -192,8 +240,12 @@ pb validate small_table --check col-vals-gt --column a --value 5 --show-extract
 **Integration mit CI/CD**
 
 ```bash
-# Exit-Codes für Automatisierung verwenden (0 = Erfolg, 1 = Fehler)
+# Exit-Codes für Automatisierung in einzeiligen Validierungen verwenden (0 = Erfolg, 1 = Fehler)
 pb validate small_table --check rows-distinct --exit-code
+
+# Validierungs-Workflows mit Exit-Codes ausführen
+pb run validation.yaml --exit-code
+pb run validation.py --exit-code
 ```
 
 ## Funktionen, die Pointblank auszeichnen

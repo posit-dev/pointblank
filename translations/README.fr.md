@@ -149,6 +149,48 @@ validation.get_step_report(i=3).show("browser")  # Obtenir les enregistrements d
 
 <br>
 
+## Configuration YAML
+
+Pour les équipes qui ont besoin de flux de travail de validation portables et contrôlés par version, Pointblank prend en charge les fichiers de configuration YAML. Cela facilite le partage de la logique de validation entre différents environnements et membres d'équipe, en s'assurant que tout le monde soit sur la même page.
+
+**validation.yaml**
+
+```yaml
+validate:
+  data: small_table
+  tbl_name: "small_table"
+  label: "Validation de démarrage"
+
+steps:
+  - col_vals_gt:
+      columns: "d"
+      value: 100
+  - col_vals_le:
+      columns: "c"
+      value: 5
+  - col_exists:
+      columns: ["date", "date_time"]
+```
+
+**Exécuter la validation YAML**
+
+```python
+import pointblank as pb
+
+# Exécuter la validation depuis la configuration YAML
+validation = pb.yaml_interrogate("validation.yaml")
+
+# Obtenir les résultats comme n'importe quelle autre validation
+validation.get_tabular_report().show()
+```
+
+Cette approche est parfaite pour :
+
+- **Pipelines CI/CD** : Stockez les règles de validation avec votre code
+- **Collaboration d'équipe** : Partagez la logique de validation dans un format lisible
+- **Cohérence d'environnement** : Utilisez la même validation en développement, staging et production
+- **Documentation** : Les fichiers YAML servent de documentation vivante de vos exigences de qualité des données
+
 ## Interface en Ligne de Commande (CLI)
 
 Pointblank inclut un utilitaire CLI puissant appelé `pb` qui vous permet d'exécuter des workflows de validation de données directement depuis la ligne de commande. Parfait pour les pipelines CI/CD, les vérifications de qualité des données programmées, ou les tâches de validation rapides.
@@ -176,6 +218,12 @@ pb scan "duckdb:///data/sales.ddb::customers"
 **Exécutez des validations essentielles**
 
 ```bash
+# Exécuter la validation depuis un fichier de configuration YAML
+pb run validation.yaml
+
+# Exécuter la validation depuis un fichier Python
+pb run validation.py
+
 # Vérifiez les lignes dupliquées
 pb validate small_table --check rows-distinct
 
@@ -192,8 +240,12 @@ pb validate small_table --check col-vals-gt --column a --value 5 --show-extract
 **Intégrez avec CI/CD**
 
 ```bash
-# Utilisez les codes de sortie pour l'automatisation (0 = réussite, 1 = échec)
+# Utilisez les codes de sortie pour l'automatisation dans les validations en une ligne (0 = réussite, 1 = échec)
 pb validate small_table --check rows-distinct --exit-code
+
+# Exécuter les flux de travail de validation avec des codes de sortie
+pb run validation.yaml --exit-code
+pb run validation.py --exit-code
 ```
 
 ## Caractéristiques qui distinguent Pointblank

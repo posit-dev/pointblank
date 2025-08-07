@@ -97,6 +97,7 @@ website:
           contents:
             - user-guide/cli-data-inspection.qmd
             - user-guide/cli-data-validation.qmd
+            - user-guide/cli-reference.qmd
 
   page-footer:
     left: 'Proudly supported by <a href="https://www.posit.co/" class="no-icon"><img src="/assets/posit-logo-black.svg" alt="Posit" width="80" style="padding-left: 3px;vertical-align:text-top;"></a>'
@@ -179,6 +180,11 @@ quartodoc:
         - name: first_n
         - name: last_n
         - name: expr_col
+    - title: Segment Groups
+      desc: >
+        Combine multiple values into a single segment using `seg_*()` helper functions.
+      contents:
+        - name: seg_group
     - title: Interrogation and Reporting
       desc: >
         The validation plan is put into action when `interrogate()` is called. The workflow for

@@ -87,6 +87,7 @@ from pointblank._utils_check_args import (
 from pointblank._utils_html import _create_table_dims_html, _create_table_type_html
 from pointblank.column import Column, ColumnLiteral, ColumnSelector, ColumnSelectorNarwhals, col
 from pointblank.schema import Schema, _get_schema_validation_info
+from pointblank.segments import Segment
 from pointblank.thresholds import (
     Actions,
     FinalActions,
@@ -1194,6 +1195,7 @@ def preview(
 
     - Polars DataFrame (`"polars"`)
     - Pandas DataFrame (`"pandas"`)
+    - PySpark table (`"pyspark"`)
     - DuckDB table (`"duckdb"`)*
     - MySQL table (`"mysql"`)*
     - PostgreSQL table (`"postgresql"`)*
@@ -1201,7 +1203,6 @@ def preview(
     - Microsoft SQL Server table (`"mssql"`)*
     - Snowflake table (`"snowflake"`)*
     - Databricks table (`"databricks"`)*
-    - PySpark table (`"pyspark"`)*
     - BigQuery table (`"bigquery"`)*
     - Parquet table (`"parquet"`)*
     - CSV files (string path or `pathlib.Path` object with `.csv` extension)
@@ -1396,7 +1397,10 @@ def _generate_display_table(
     row_number_list: list[int] | None = None,
 ) -> GT:
     # Make a copy of the data to avoid modifying the original
-    data = copy.deepcopy(data)
+    # Note: PySpark DataFrames cannot be deep copied due to SparkContext serialization issues
+    tbl_type = _get_tbl_type(data=data)
+    if "pyspark" not in tbl_type:
+        data = copy.deepcopy(data)
 
     # Does the data table already have a leading row number column?
     if "_row_num_" in data.columns:
@@ -1422,22 +1426,31 @@ def _generate_display_table(
     # Determine if the table is a DataFrame or an Ibis table
     tbl_type = _get_tbl_type(data=data)
     ibis_tbl = "ibis.expr.types.relations.Table" in str(type(data))
-    pl_pb_tbl = "polars" in tbl_type or "pandas" in tbl_type
+    pl_pb_tbl = "polars" in tbl_type or "pandas" in tbl_type or "pyspark" in tbl_type
 
     # Select the DataFrame library to use for displaying the Ibis table
     df_lib_gt = _select_df_lib(preference="polars")
     df_lib_name_gt = df_lib_gt.__name__
 
-    # If the table is a DataFrame (Pandas or Polars), set `df_lib_name_gt` to the name of the
-    # library (e.g., "polars" or "pandas")
+    # If the table is a DataFrame (Pandas, Polars, or PySpark), set `df_lib_name_gt` to the name of the
+    # library (e.g., "polars", "pandas", or "pyspark")
     if pl_pb_tbl:
-        df_lib_name_gt = "polars" if "polars" in tbl_type else "pandas"
+        if "polars" in tbl_type:
+            df_lib_name_gt = "polars"
+        elif "pandas" in tbl_type:
+            df_lib_name_gt = "pandas"
+        elif "pyspark" in tbl_type:
+            df_lib_name_gt = "pyspark"
 
-        # Handle imports of Polars or Pandas here
+        # Handle imports of Polars, Pandas, or PySpark here
         if df_lib_name_gt == "polars":
             import polars as pl
-        else:
+        elif df_lib_name_gt == "pandas":
             import pandas as pd
+        elif df_lib_name_gt == "pyspark":
+            # Import pandas for conversion since Great Tables needs pandas DataFrame
+            import pandas as pd
+        # Note: PySpark import is handled as needed, typically already imported in user's environment
 
     # Get the initial column count for the table
     n_columns = len(data.columns)
@@ -1547,6 +1560,42 @@ def _generate_display_table(
                     range(n_rows - n_tail + 1, n_rows + 1)
                 )
 
+        if tbl_type == "pyspark":
+            n_rows = data.count()
+
+            # If n_head + n_tail is greater than the row count, display the entire table
+            if n_head + n_tail >= n_rows:
+                full_dataset = True
+                # Convert to pandas for Great Tables compatibility
+                data = data.toPandas()
+
+                row_number_list = range(1, n_rows + 1)
+            else:
+                # Get head and tail samples, then convert to pandas
+                head_data = data.limit(n_head).toPandas()
+
+                # PySpark tail() returns a list of Row objects, need to convert to DataFrame
+                tail_rows = data.tail(n_tail)
+                if tail_rows:
+                    # Convert list of Row objects back to DataFrame, then to pandas
+                    tail_df = data.sparkSession.createDataFrame(tail_rows, data.schema)
+                    tail_data = tail_df.toPandas()
+                else:
+                    # If no tail data, create empty DataFrame with same schema
+                    import pandas as pd
+
+                    tail_data = pd.DataFrame(columns=head_data.columns)
+
+                data = pd.concat([head_data, tail_data])
+
+                row_number_list = list(range(1, n_head + 1)) + list(
+                    range(n_rows - n_tail + 1, n_rows + 1)
+                )
+
+        # For PySpark, update schema after conversion to pandas
+        if tbl_type == "pyspark":
+            tbl_schema = Schema(tbl=data)
+
     # From the table schema, get a list of tuples containing column names and data types
     col_dtype_dict = tbl_schema.columns
 
@@ -1566,6 +1615,23 @@ def _generate_display_table(
     # This is used to highlight these values in the table
     if df_lib_name_gt == "polars":
         none_values = {k: data[k].is_null().to_list() for k in col_names}
+    elif df_lib_name_gt == "pyspark":
+        # For PySpark, check if data has been converted to pandas already
+        if hasattr(data, "isnull"):
+            # Data has been converted to pandas
+            none_values = {k: data[k].isnull() for k in col_names}
+        else:
+            # Data is still a PySpark DataFrame - use narwhals
+            import narwhals as nw
+
+            df_nw = nw.from_native(data)
+            none_values = {}
+            for col in col_names:
+                # Get null mask, collect to pandas, then convert to list
+                null_mask = (
+                    df_nw.select(nw.col(col).is_null()).collect().to_pandas().iloc[:, 0].tolist()
+                )
+                none_values[col] = null_mask
     else:
         none_values = {k: data[k].isnull() for k in col_names}
 
@@ -1579,7 +1645,13 @@ def _generate_display_table(
 
     for column in col_dtype_dict.keys():
         # Select a single column of values
-        data_col = data[[column]] if df_lib_name_gt == "pandas" else data.select([column])
+        if df_lib_name_gt == "pandas":
+            data_col = data[[column]]
+        elif df_lib_name_gt == "pyspark":
+            # PySpark data should have been converted to pandas by now
+            data_col = data[[column]]
+        else:
+            data_col = data.select([column])
 
         # Using Great Tables, render the columns and get the list of values as formatted strings
         built_gt = GT(data=data_col).fmt_markdown(columns=column)._build_data(context="html")
@@ -1656,6 +1728,10 @@ def _generate_display_table(
                 data = data.insert_column(0, row_number_series)
 
             if df_lib_name_gt == "pandas":
+                data.insert(0, "_row_num_", row_number_list)
+
+            if df_lib_name_gt == "pyspark":
+                # For PySpark converted to pandas, use pandas method
                 data.insert(0, "_row_num_", row_number_list)
 
         # Get the highest number in the `row_number_list` and calculate a width that will
@@ -1791,6 +1867,7 @@ def missing_vals_tbl(data: FrameT | Any) -> GT:
 
     - Polars DataFrame (`"polars"`)
     - Pandas DataFrame (`"pandas"`)
+    - PySpark table (`"pyspark"`)
     - DuckDB table (`"duckdb"`)*
     - MySQL table (`"mysql"`)*
     - PostgreSQL table (`"postgresql"`)*
@@ -1798,7 +1875,6 @@ def missing_vals_tbl(data: FrameT | Any) -> GT:
     - Microsoft SQL Server table (`"mssql"`)*
     - Snowflake table (`"snowflake"`)*
     - Databricks table (`"databricks"`)*
-    - PySpark table (`"pyspark"`)*
     - BigQuery table (`"bigquery"`)*
     - Parquet table (`"parquet"`)*
     - CSV files (string path or `pathlib.Path` object with `.csv` extension)
@@ -1851,7 +1927,10 @@ def missing_vals_tbl(data: FrameT | Any) -> GT:
     data = _process_data(data)
 
     # Make a copy of the data to avoid modifying the original
-    data = copy.deepcopy(data)
+    # Note: PySpark DataFrames cannot be deep copied due to SparkContext serialization issues
+    tbl_type = _get_tbl_type(data=data)
+    if "pyspark" not in tbl_type:
+        data = copy.deepcopy(data)
 
     # Get the number of rows in the table
     n_rows = get_row_count(data)
@@ -1868,22 +1947,28 @@ def missing_vals_tbl(data: FrameT | Any) -> GT:
     # Determine if the table is a DataFrame or an Ibis table
     tbl_type = _get_tbl_type(data=data)
     ibis_tbl = "ibis.expr.types.relations.Table" in str(type(data))
-    pl_pb_tbl = "polars" in tbl_type or "pandas" in tbl_type
+    pl_pb_tbl = "polars" in tbl_type or "pandas" in tbl_type or "pyspark" in tbl_type
 
     # Select the DataFrame library to use for displaying the Ibis table
     df_lib_gt = _select_df_lib(preference="polars")
     df_lib_name_gt = df_lib_gt.__name__
 
-    # If the table is a DataFrame (Pandas or Polars), set `df_lib_name_gt` to the name of the
-    # library (e.g., "polars" or "pandas")
+    # If the table is a DataFrame (Pandas, Polars, or PySpark), set `df_lib_name_gt` to the name of the
+    # library (e.g., "polars", "pandas", or "pyspark")
     if pl_pb_tbl:
-        df_lib_name_gt = "polars" if "polars" in tbl_type else "pandas"
+        if "polars" in tbl_type:
+            df_lib_name_gt = "polars"
+        elif "pandas" in tbl_type:
+            df_lib_name_gt = "pandas"
+        elif "pyspark" in tbl_type:
+            df_lib_name_gt = "pyspark"
 
-        # Handle imports of Polars or Pandas here
+        # Handle imports of Polars, Pandas, or PySpark here
         if df_lib_name_gt == "polars":
             import polars as pl
-        else:
+        elif df_lib_name_gt == "pandas":
             import pandas as pd
+        # Note: PySpark import is handled as needed, typically already imported in user's environment
 
     # From an Ibis table:
     # - get the row count
@@ -2046,6 +2131,77 @@ def missing_vals_tbl(data: FrameT | Any) -> GT:
 
             # Get a dictionary of counts of missing values in each column
             missing_val_counts = {col: data[col].isnull().sum() for col in data.columns}
+
+        if "pyspark" in tbl_type:
+            from pyspark.sql.functions import col as pyspark_col
+
+            # PySpark implementation for missing values calculation
+            missing_vals = {}
+            for col_name in data.columns:
+                col_missing_props = []
+
+                # Calculate missing value proportions for each sector
+                for i in range(len(cut_points)):
+                    start_row = cut_points[i - 1] if i > 0 else 0
+                    end_row = cut_points[i]
+                    sector_size = end_row - start_row
+
+                    if sector_size > 0:
+                        # Use row_number() to filter rows by range
+                        from pyspark.sql.functions import row_number
+                        from pyspark.sql.window import Window
+
+                        window = Window.orderBy(
+                            pyspark_col(data.columns[0])
+                        )  # Order by first column
+                        sector_data = data.withColumn("row_num", row_number().over(window)).filter(
+                            (pyspark_col("row_num") > start_row)
+                            & (pyspark_col("row_num") <= end_row)
+                        )
+
+                        # Count nulls in this sector
+                        null_count = sector_data.filter(pyspark_col(col_name).isNull()).count()
+                        missing_prop = (null_count / sector_size) * 100
+                        col_missing_props.append(missing_prop)
+                    else:
+                        col_missing_props.append(0)
+
+                # Handle the final sector (after last cut point)
+                if n_rows > cut_points[-1]:
+                    start_row = cut_points[-1]
+                    end_row = n_rows
+                    sector_size = end_row - start_row
+
+                    from pyspark.sql.functions import row_number
+                    from pyspark.sql.window import Window
+
+                    window = Window.orderBy(pyspark_col(data.columns[0]))
+                    sector_data = data.withColumn("row_num", row_number().over(window)).filter(
+                        pyspark_col("row_num") > start_row
+                    )
+
+                    null_count = sector_data.filter(pyspark_col(col_name).isNull()).count()
+                    missing_prop = (null_count / sector_size) * 100
+                    col_missing_props.append(missing_prop)
+                else:
+                    col_missing_props.append(0)
+
+                missing_vals[col_name] = col_missing_props
+
+            # Pivot the `missing_vals` dictionary to create a table with the missing value proportions
+            missing_vals = {
+                "columns": list(missing_vals.keys()),
+                **{
+                    str(i + 1): [missing_vals[col][i] for col in missing_vals.keys()]
+                    for i in range(len(cut_points) + 1)
+                },
+            }
+
+            # Get a dictionary of counts of missing values in each column
+            missing_val_counts = {}
+            for col_name in data.columns:
+                null_count = data.filter(pyspark_col(col_name).isNull()).count()
+                missing_val_counts[col_name] = null_count
 
     # From `missing_vals`, create the DataFrame with the missing value proportions
     if df_lib_name_gt == "polars":
@@ -2333,6 +2489,7 @@ def get_column_count(data: FrameT | Any) -> int:
 
     - Polars DataFrame (`"polars"`)
     - Pandas DataFrame (`"pandas"`)
+    - PySpark table (`"pyspark"`)
     - DuckDB table (`"duckdb"`)*
     - MySQL table (`"mysql"`)*
     - PostgreSQL table (`"postgresql"`)*
@@ -2340,7 +2497,6 @@ def get_column_count(data: FrameT | Any) -> int:
     - Microsoft SQL Server table (`"mssql"`)*
     - Snowflake table (`"snowflake"`)*
     - Databricks table (`"databricks"`)*
-    - PySpark table (`"pyspark"`)*
     - BigQuery table (`"bigquery"`)*
     - Parquet table (`"parquet"`)*
     - CSV files (string path or `pathlib.Path` object with `.csv` extension)
@@ -2467,6 +2623,9 @@ def get_column_count(data: FrameT | Any) -> int:
     elif "pandas" in str(type(data)):
         return data.shape[1]
 
+    elif "pyspark" in str(type(data)):
+        return len(data.columns)
+
     elif "narwhals" in str(type(data)):
         return len(data.columns)
 
@@ -2501,6 +2660,7 @@ def get_row_count(data: FrameT | Any) -> int:
 
     - Polars DataFrame (`"polars"`)
     - Pandas DataFrame (`"pandas"`)
+    - PySpark table (`"pyspark"`)
     - DuckDB table (`"duckdb"`)*
     - MySQL table (`"mysql"`)*
     - PostgreSQL table (`"postgresql"`)*
@@ -2508,7 +2668,6 @@ def get_row_count(data: FrameT | Any) -> int:
     - Microsoft SQL Server table (`"mssql"`)*
     - Snowflake table (`"snowflake"`)*
     - Databricks table (`"databricks"`)*
-    - PySpark table (`"pyspark"`)*
     - BigQuery table (`"bigquery"`)*
     - Parquet table (`"parquet"`)*
     - CSV files (string path or `pathlib.Path` object with `.csv` extension)
@@ -2645,6 +2804,9 @@ def get_row_count(data: FrameT | Any) -> int:
 
     elif "pandas" in str(type(data)):
         return data.shape[0]
+
+    elif "pyspark" in str(type(data)):
+        return data.count()
 
     elif "narwhals" in str(type(data)):
         return data.shape[0]
@@ -3098,6 +3260,7 @@ class Validate:
 
     - Polars DataFrame (`"polars"`)
     - Pandas DataFrame (`"pandas"`)
+    - PySpark table (`"pyspark"`)
     - DuckDB table (`"duckdb"`)*
     - MySQL table (`"mysql"`)*
     - PostgreSQL table (`"postgresql"`)*
@@ -3105,7 +3268,6 @@ class Validate:
     - Microsoft SQL Server table (`"mssql"`)*
     - Snowflake table (`"snowflake"`)*
     - Databricks table (`"databricks"`)*
-    - PySpark table (`"pyspark"`)*
     - BigQuery table (`"bigquery"`)*
     - Parquet table (`"parquet"`)*
     - CSV files (string path or `pathlib.Path` object with `.csv` extension)
@@ -9983,12 +10145,22 @@ class Validate:
                 and tbl_type not in IBIS_BACKENDS
             ):
                 # Add row numbers to the results table
-                validation_extract_nw = (
-                    nw.from_native(results_tbl)
-                    .with_row_index(name="_row_num_")
-                    .filter(nw.col("pb_is_good_") == False)  # noqa
-                    .drop("pb_is_good_")
-                )
+                validation_extract_nw = nw.from_native(results_tbl)
+
+                # Handle LazyFrame row indexing which requires order_by parameter
+                try:
+                    # Try without order_by first (for DataFrames)
+                    validation_extract_nw = validation_extract_nw.with_row_index(name="_row_num_")
+                except TypeError:
+                    # LazyFrames require order_by parameter - use first column for ordering
+                    first_col = validation_extract_nw.columns[0]
+                    validation_extract_nw = validation_extract_nw.with_row_index(
+                        name="_row_num_", order_by=first_col
+                    )
+
+                validation_extract_nw = validation_extract_nw.filter(~nw.col("pb_is_good_")).drop(
+                    "pb_is_good_"
+                )  # noqa
 
                 # Add 1 to the row numbers to make them 1-indexed
                 validation_extract_nw = validation_extract_nw.with_columns(nw.col("_row_num_") + 1)
@@ -9997,12 +10169,52 @@ class Validate:
                 if get_first_n is not None:
                     validation_extract_nw = validation_extract_nw.head(get_first_n)
                 elif sample_n is not None:
-                    validation_extract_nw = validation_extract_nw.sample(n=sample_n)
+                    # Narwhals LazyFrame doesn't have sample method, use head after shuffling
+                    try:
+                        validation_extract_nw = validation_extract_nw.sample(n=sample_n)
+                    except AttributeError:
+                        # For LazyFrames without sample method, collect first then sample
+                        validation_extract_native = validation_extract_nw.collect().to_native()
+                        if hasattr(validation_extract_native, "sample"):
+                            # PySpark DataFrame has sample method
+                            validation_extract_native = validation_extract_native.sample(
+                                fraction=min(1.0, sample_n / validation_extract_native.count())
+                            ).limit(sample_n)
+                            validation_extract_nw = nw.from_native(validation_extract_native)
+                        else:
+                            # Fallback: just take first n rows after collecting
+                            validation_extract_nw = validation_extract_nw.collect().head(sample_n)
                 elif sample_frac is not None:
-                    validation_extract_nw = validation_extract_nw.sample(fraction=sample_frac)
+                    try:
+                        validation_extract_nw = validation_extract_nw.sample(fraction=sample_frac)
+                    except AttributeError:
+                        # For LazyFrames without sample method, collect first then sample
+                        validation_extract_native = validation_extract_nw.collect().to_native()
+                        if hasattr(validation_extract_native, "sample"):
+                            # PySpark DataFrame has sample method
+                            validation_extract_native = validation_extract_native.sample(
+                                fraction=sample_frac
+                            )
+                            validation_extract_nw = nw.from_native(validation_extract_native)
+                        else:
+                            # Fallback: use fraction to calculate head size
+                            collected = validation_extract_nw.collect()
+                            sample_size = max(1, int(len(collected) * sample_frac))
+                            validation_extract_nw = collected.head(sample_size)
 
                 # Ensure a limit is set on the number of rows to extract
-                if len(validation_extract_nw) > extract_limit:
+                try:
+                    # For DataFrames, use len()
+                    extract_length = len(validation_extract_nw)
+                except TypeError:
+                    # For LazyFrames, collect to get length (or use a reasonable default)
+                    try:
+                        extract_length = len(validation_extract_nw.collect())
+                    except Exception:
+                        # If collection fails, apply limit anyway as a safety measure
+                        extract_length = extract_limit + 1  # Force limiting
+
+                if extract_length > extract_limit:
                     validation_extract_nw = validation_extract_nw.head(extract_limit)
 
                 # If a 'rows_distinct' validation step, then the extract should have the
@@ -10030,7 +10242,10 @@ class Validate:
                         .drop("group_min_row")
                     )
 
-                # Ensure that the extract is set to its native format
+                # Ensure that the extract is collected and set to its native format
+                # For LazyFrames (like PySpark), we need to collect before converting to native
+                if hasattr(validation_extract_nw, "collect"):
+                    validation_extract_nw = validation_extract_nw.collect()
                 validation.extract = nw.to_native(validation_extract_nw)
 
             # Get the end time for this step
@@ -11656,7 +11871,16 @@ class Validate:
         # TODO: add argument for user to specify the index column name
         index_name = "pb_index_"
 
-        data_nw = nw.from_native(self.data).with_row_index(name=index_name)
+        data_nw = nw.from_native(self.data)
+
+        # Handle LazyFrame row indexing which requires order_by parameter
+        try:
+            # Try without order_by first (for DataFrames)
+            data_nw = data_nw.with_row_index(name=index_name)
+        except TypeError:
+            # LazyFrames require order_by parameter - use first column for ordering
+            first_col = data_nw.columns[0]
+            data_nw = data_nw.with_row_index(name=index_name, order_by=first_col)
 
         # Get all validation step result tables and join together the `pb_is_good_` columns
         # ensuring that the columns are named uniquely (e.g., `pb_is_good_1`, `pb_is_good_2`, ...)
@@ -11665,7 +11889,13 @@ class Validate:
             results_tbl = nw.from_native(validation.tbl_checked)
 
             # Add row numbers to the results table
-            results_tbl = results_tbl.with_row_index(name=index_name)
+            try:
+                # Try without order_by first (for DataFrames)
+                results_tbl = results_tbl.with_row_index(name=index_name)
+            except TypeError:
+                # LazyFrames require order_by parameter - use first column for ordering
+                first_col = results_tbl.columns[0]
+                results_tbl = results_tbl.with_row_index(name=index_name, order_by=first_col)
 
             # Add numerical suffix to the `pb_is_good_` column to make it unique
             results_tbl = results_tbl.select([index_name, "pb_is_good_"]).rename(
@@ -12284,15 +12514,21 @@ class Validate:
             # Transform to Narwhals DataFrame
             extract_nw = nw.from_native(extract)
 
-            # Get the number of rows in the extract
-            n_rows = len(extract_nw)
+            # Get the number of rows in the extract (safe for LazyFrames)
+            try:
+                n_rows = len(extract_nw)
+            except TypeError:
+                # For LazyFrames, collect() first to get length
+                n_rows = len(extract_nw.collect()) if hasattr(extract_nw, "collect") else 0
 
             # If the number of rows is zero, then produce an em dash then go to the next iteration
             if n_rows == 0:
                 extract_upd.append("&mdash;")
                 continue
 
-            # Write the CSV text
+            # Write the CSV text (ensure LazyFrames are collected first)
+            if hasattr(extract_nw, "collect"):
+                extract_nw = extract_nw.collect()
             csv_text = extract_nw.write_csv()
 
             # Use Base64 encoding to encode the CSV text
@@ -13856,7 +14092,7 @@ def _prep_values_text(
     return values_str
 
 
-def _seg_expr_from_string(data_tbl: any, segments_expr: str) -> tuple[str, str]:
+def _seg_expr_from_string(data_tbl: any, segments_expr: str) -> list[tuple[str, str]]:
     """
     Obtain the segmentation categories from a table column.
 
@@ -13881,22 +14117,27 @@ def _seg_expr_from_string(data_tbl: any, segments_expr: str) -> tuple[str, str]:
     list[tuple[str, str]]
         A list of tuples representing pairings of a column name and a value in the column.
     """
+    import narwhals as nw
+
     # Determine if the table is a DataFrame or a DB table
     tbl_type = _get_tbl_type(data=data_tbl)
 
     # Obtain the segmentation categories from the table column given as `segments_expr`
-    if tbl_type == "polars":
-        seg_categories = data_tbl[segments_expr].unique().to_list()
-    elif tbl_type == "pandas":
-        seg_categories = data_tbl[segments_expr].unique().tolist()
+    if tbl_type in ["polars", "pandas", "pyspark"]:
+        # Use Narwhals for supported DataFrame types
+        data_nw = nw.from_native(data_tbl)
+        unique_vals = data_nw.select(nw.col(segments_expr)).unique()
+
+        # Convert to list of values
+        seg_categories = unique_vals[segments_expr].to_list()
     elif tbl_type in IBIS_BACKENDS:
         distinct_col_vals = data_tbl.select(segments_expr).distinct()
         seg_categories = distinct_col_vals[segments_expr].to_list()
     else:  # pragma: no cover
         raise ValueError(f"Unsupported table type: {tbl_type}")
 
-    # Ensure that the categories are sorted
-    seg_categories.sort()
+    # Ensure that the categories are sorted, and allow for None values
+    seg_categories.sort(key=lambda x: (x is None, x))
 
     # Place each category and each value in a list of tuples as: `(column, value)`
     seg_tuples = [(segments_expr, category) for category in seg_categories]
@@ -13904,7 +14145,7 @@ def _seg_expr_from_string(data_tbl: any, segments_expr: str) -> tuple[str, str]:
     return seg_tuples
 
 
-def _seg_expr_from_tuple(segments_expr: tuple) -> list[tuple[str, str]]:
+def _seg_expr_from_tuple(segments_expr: tuple) -> list[tuple[str, Any]]:
     """
     Normalize the segments expression to a list of tuples, given a single tuple.
 
@@ -13930,17 +14171,23 @@ def _seg_expr_from_tuple(segments_expr: tuple) -> list[tuple[str, str]]:
 
     Returns
     -------
-    list[tuple[str, str]]
+    list[tuple[str, Any]]
         A list of tuples representing pairings of a column name and a value in the column.
+        Values can be any type, including None.
     """
+    # Unpack the segments expression tuple for more convenient and explicit variable names
+    column, segment = segments_expr
+
     # Check if the first element is a string
-    if isinstance(segments_expr[0], str):
-        # If the second element is a list, create a list of tuples
-        if isinstance(segments_expr[1], list):
-            seg_tuples = [(segments_expr[0], value) for value in segments_expr[1]]
+    if isinstance(column, str):
+        if isinstance(segment, Segment):
+            seg_tuples = [(column, seg) for seg in segment.segments]
+        # If the second element is a collection, expand into a list of tuples
+        elif isinstance(segment, (list, set, tuple)):
+            seg_tuples = [(column, seg) for seg in segment]
         # If the second element is not a list, create a single tuple
         else:
-            seg_tuples = [(segments_expr[0], segments_expr[1])]
+            seg_tuples = [(column, segment)]
     # If the first element is not a string, raise an error
     else:  # pragma: no cover
         raise ValueError("The first element of the segments expression must be a string.")
@@ -13948,7 +14195,7 @@ def _seg_expr_from_tuple(segments_expr: tuple) -> list[tuple[str, str]]:
     return seg_tuples
 
 
-def _apply_segments(data_tbl: any, segments_expr: tuple[str, str]) -> any:
+def _apply_segments(data_tbl: any, segments_expr: tuple[str, Any]) -> any:
     """
     Apply the segments expression to the data table.
 
@@ -13971,15 +14218,24 @@ def _apply_segments(data_tbl: any, segments_expr: tuple[str, str]) -> any:
     # Get the table type
     tbl_type = _get_tbl_type(data=data_tbl)
 
-    if tbl_type in ["pandas", "polars"]:
-        # If the table is a Pandas or Polars DataFrame, transforming to a Narwhals table
+    # Unpack the segments expression tuple for more convenient and explicit variable names
+    column, segment = segments_expr
+
+    if tbl_type in ["pandas", "polars", "pyspark"]:
+        # If the table is a Pandas, Polars, or PySpark DataFrame, transforming to a Narwhals table
         # and perform the filtering operation
 
         # Transform to Narwhals table if a DataFrame
         data_tbl_nw = nw.from_native(data_tbl)
 
-        # Filter the data table based on the column name and value
-        data_tbl_nw = data_tbl_nw.filter(nw.col(segments_expr[0]) == segments_expr[1])
+        # Filter the data table based on the column name and segment
+        if segment is None:
+            data_tbl_nw = data_tbl_nw.filter(nw.col(column).is_null())
+        # Check if the segment is a segment group
+        elif isinstance(segment, list):
+            data_tbl_nw = data_tbl_nw.filter(nw.col(column).is_in(segment))
+        else:
+            data_tbl_nw = data_tbl_nw.filter(nw.col(column) == segment)
 
         # Transform back to the original table type
         data_tbl = data_tbl_nw.to_native()
@@ -13987,8 +14243,13 @@ def _apply_segments(data_tbl: any, segments_expr: tuple[str, str]) -> any:
     elif tbl_type in IBIS_BACKENDS:
         # If the table is an Ibis backend table, perform the filtering operation directly
 
-        # Filter the data table based on the column name and value
-        data_tbl = data_tbl[data_tbl[segments_expr[0]] == segments_expr[1]]
+        # Filter the data table based on the column name and segment
+        if segment is None:
+            data_tbl = data_tbl[data_tbl[column].isnull()]
+        elif isinstance(segment, list):
+            data_tbl = data_tbl[data_tbl[column].isin(segment)]
+        else:
+            data_tbl = data_tbl[data_tbl[column] == segment]
 
     return data_tbl
 

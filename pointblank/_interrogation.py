@@ -23,6 +23,74 @@ if TYPE_CHECKING:
     from pointblank._typing import AbsoluteTolBounds
 
 
+def _safe_modify_datetime_compare_val(data_frame: Any, column: str, compare_val: Any) -> Any:
+    """
+    Safely modify datetime comparison values for LazyFrame compatibility.
+
+    This function handles the case where we can't directly slice LazyFrames
+    to get column dtypes for datetime conversion.
+    """
+    try:
+        # First try to get column dtype from schema for LazyFrames
+        column_dtype = None
+
+        if hasattr(data_frame, "collect_schema"):
+            schema = data_frame.collect_schema()
+            column_dtype = schema.get(column)
+        elif hasattr(data_frame, "schema"):
+            schema = data_frame.schema
+            column_dtype = schema.get(column)
+
+        # If we got a dtype from schema, use it
+        if column_dtype is not None:
+            # Create a mock column object for _modify_datetime_compare_val
+            class MockColumn:
+                def __init__(self, dtype):
+                    self.dtype = dtype
+
+            mock_column = MockColumn(column_dtype)
+            return _modify_datetime_compare_val(tgt_column=mock_column, compare_val=compare_val)
+
+        # Fallback: try collecting a small sample if possible
+        try:
+            sample = data_frame.head(1).collect()
+            if hasattr(sample, "dtypes") and column in sample.columns:
+                # For pandas-like dtypes
+                column_dtype = sample.dtypes[column] if hasattr(sample, "dtypes") else None
+                if column_dtype:
+
+                    class MockColumn:
+                        def __init__(self, dtype):
+                            self.dtype = dtype
+
+                    mock_column = MockColumn(column_dtype)
+                    return _modify_datetime_compare_val(
+                        tgt_column=mock_column, compare_val=compare_val
+                    )
+        except Exception:
+            pass
+
+        # Final fallback: try direct access (for eager DataFrames)
+        try:
+            if hasattr(data_frame, "dtypes") and column in data_frame.columns:
+                column_dtype = data_frame.dtypes[column]
+
+                class MockColumn:
+                    def __init__(self, dtype):
+                        self.dtype = dtype
+
+                mock_column = MockColumn(column_dtype)
+                return _modify_datetime_compare_val(tgt_column=mock_column, compare_val=compare_val)
+        except Exception:
+            pass
+
+    except Exception:
+        pass
+
+    # If all else fails, return the original compare_val
+    return compare_val
+
+
 @dataclass
 class Interrogator:
     """
@@ -136,9 +204,7 @@ class Interrogator:
 
         compare_expr = _get_compare_expr_nw(compare=self.compare)
 
-        compare_expr = _modify_datetime_compare_val(
-            tgt_column=self.x[self.column], compare_val=compare_expr
-        )
+        compare_expr = _safe_modify_datetime_compare_val(self.x, self.column, compare_expr)
 
         return (
             self.x.with_columns(
@@ -211,9 +277,7 @@ class Interrogator:
 
         compare_expr = _get_compare_expr_nw(compare=self.compare)
 
-        compare_expr = _modify_datetime_compare_val(
-            tgt_column=self.x[self.column], compare_val=compare_expr
-        )
+        compare_expr = _safe_modify_datetime_compare_val(self.x, self.column, compare_expr)
 
         return (
             self.x.with_columns(
@@ -329,9 +393,7 @@ class Interrogator:
         else:
             compare_expr = _get_compare_expr_nw(compare=self.compare)
 
-            compare_expr = _modify_datetime_compare_val(
-                tgt_column=self.x[self.column], compare_val=compare_expr
-            )
+            compare_expr = _safe_modify_datetime_compare_val(self.x, self.column, compare_expr)
 
             tbl = self.x.with_columns(
                 pb_is_good_1=nw.col(self.column).is_null() & self.na_pass,
@@ -421,9 +483,7 @@ class Interrogator:
                 ).to_native()
 
             else:
-                compare_expr = _modify_datetime_compare_val(
-                    tgt_column=self.x[self.column], compare_val=self.compare
-                )
+                compare_expr = _safe_modify_datetime_compare_val(self.x, self.column, self.compare)
 
                 return self.x.with_columns(
                     pb_is_good_=nw.col(self.column) != nw.lit(compare_expr),
@@ -544,9 +604,7 @@ class Interrogator:
             if ref_col_has_null_vals:
                 # Create individual cases for Pandas and Polars
 
-                compare_expr = _modify_datetime_compare_val(
-                    tgt_column=self.x[self.column], compare_val=self.compare
-                )
+                compare_expr = _safe_modify_datetime_compare_val(self.x, self.column, self.compare)
 
                 if is_pandas_dataframe(self.x.to_native()):
                     tbl = self.x.with_columns(
@@ -583,6 +641,25 @@ class Interrogator:
                     tbl = tbl.drop("pb_is_good_1", "pb_is_good_2", "pb_is_good_3").to_native()
 
                     return tbl
+
+                else:
+                    # Generic case for other DataFrame types (PySpark, etc.)
+                    # Use similar logic to Polars but handle potential differences
+                    tbl = self.x.with_columns(
+                        pb_is_good_1=nw.col(self.column).is_null(),  # val is Null in Column
+                        pb_is_good_2=nw.lit(self.na_pass),  # Pass if any Null in val or compare
+                    )
+
+                    tbl = tbl.with_columns(pb_is_good_3=nw.col(self.column) != nw.lit(compare_expr))
+
+                    tbl = tbl.with_columns(
+                        pb_is_good_=(
+                            (nw.col("pb_is_good_1") & nw.col("pb_is_good_2"))
+                            | (nw.col("pb_is_good_3") & ~nw.col("pb_is_good_1"))
+                        )
+                    )
+
+                    return tbl.drop("pb_is_good_1", "pb_is_good_2", "pb_is_good_3").to_native()
 
     def ge(self) -> FrameT | Any:
         # Ibis backends ---------------------------------------------
@@ -629,9 +706,7 @@ class Interrogator:
 
         compare_expr = _get_compare_expr_nw(compare=self.compare)
 
-        compare_expr = _modify_datetime_compare_val(
-            tgt_column=self.x[self.column], compare_val=compare_expr
-        )
+        compare_expr = _safe_modify_datetime_compare_val(self.x, self.column, compare_expr)
 
         tbl = (
             self.x.with_columns(
@@ -702,9 +777,7 @@ class Interrogator:
 
         compare_expr = _get_compare_expr_nw(compare=self.compare)
 
-        compare_expr = _modify_datetime_compare_val(
-            tgt_column=self.x[self.column], compare_val=compare_expr
-        )
+        compare_expr = _safe_modify_datetime_compare_val(self.x, self.column, compare_expr)
 
         return (
             self.x.with_columns(
@@ -834,10 +907,8 @@ class Interrogator:
         low_val = _get_compare_expr_nw(compare=self.low)
         high_val = _get_compare_expr_nw(compare=self.high)
 
-        low_val = _modify_datetime_compare_val(tgt_column=self.x[self.column], compare_val=low_val)
-        high_val = _modify_datetime_compare_val(
-            tgt_column=self.x[self.column], compare_val=high_val
-        )
+        low_val = _safe_modify_datetime_compare_val(self.x, self.column, low_val)
+        high_val = _safe_modify_datetime_compare_val(self.x, self.column, high_val)
 
         tbl = self.x.with_columns(
             pb_is_good_1=nw.col(self.column).is_null(),  # val is Null in Column
@@ -1026,10 +1097,8 @@ class Interrogator:
         low_val = _get_compare_expr_nw(compare=self.low)
         high_val = _get_compare_expr_nw(compare=self.high)
 
-        low_val = _modify_datetime_compare_val(tgt_column=self.x[self.column], compare_val=low_val)
-        high_val = _modify_datetime_compare_val(
-            tgt_column=self.x[self.column], compare_val=high_val
-        )
+        low_val = _safe_modify_datetime_compare_val(self.x, self.column, low_val)
+        high_val = _safe_modify_datetime_compare_val(self.x, self.column, high_val)
 
         tbl = self.x.with_columns(
             pb_is_good_1=nw.col(self.column).is_null(),  # val is Null in Column
@@ -1209,14 +1278,15 @@ class Interrogator:
         else:
             columns_subset = self.columns_subset
 
-        # Create a subset of the table with only the columns of interest
-        subset_tbl = tbl.select(columns_subset)
+        # Create a count of duplicates using group_by approach like Ibis backend
+        # Group by the columns of interest and count occurrences
+        count_tbl = tbl.group_by(columns_subset).agg(nw.len().alias("pb_count_"))
 
-        # Check for duplicates in the subset table, creating a series of booleans
-        pb_is_good_series = subset_tbl.is_duplicated()
+        # Join back to original table to get count for each row
+        tbl = tbl.join(count_tbl, on=columns_subset, how="left")
 
-        # Add the series to the input table
-        tbl = tbl.with_columns(pb_is_good_=~pb_is_good_series)
+        # Passing rows will have the value `1` (no duplicates, so True), otherwise False applies
+        tbl = tbl.with_columns(pb_is_good_=nw.col("pb_count_") == 1).drop("pb_count_")
 
         return tbl.to_native()
 
@@ -2088,6 +2158,8 @@ class ConjointlyValidation:
             return self._get_pandas_results()
         elif "duckdb" in self.tbl_type or "ibis" in self.tbl_type:
             return self._get_ibis_results()
+        elif "pyspark" in self.tbl_type:
+            return self._get_pyspark_results()
         else:  # pragma: no cover
             raise NotImplementedError(f"Support for {self.tbl_type} is not yet implemented")
 
@@ -2247,6 +2319,53 @@ class ConjointlyValidation:
         results_tbl = self.data_tbl.mutate(pb_is_good_=ibis.literal(True))
         return results_tbl
 
+    def _get_pyspark_results(self):
+        """Process expressions for PySpark DataFrames."""
+        from pyspark.sql import functions as F
+
+        pyspark_columns = []
+
+        for expr_fn in self.expressions:
+            try:
+                # First try direct evaluation with PySpark DataFrame
+                expr_result = expr_fn(self.data_tbl)
+
+                # Check if it's a PySpark Column
+                if hasattr(expr_result, "_jc"):  # PySpark Column has _jc attribute
+                    pyspark_columns.append(expr_result)
+                else:
+                    raise TypeError(
+                        f"Expression returned {type(expr_result)}, expected PySpark Column"
+                    )
+
+            except Exception as e:
+                try:
+                    # Try as a ColumnExpression (for pb.expr_col style)
+                    col_expr = expr_fn(None)
+
+                    if hasattr(col_expr, "to_pyspark_expr"):
+                        # Convert to PySpark expression
+                        pyspark_expr = col_expr.to_pyspark_expr(self.data_tbl)
+                        pyspark_columns.append(pyspark_expr)
+                    else:
+                        raise TypeError(f"Cannot convert {type(col_expr)} to PySpark Column")
+                except Exception as nested_e:
+                    print(f"Error evaluating PySpark expression: {e} -> {nested_e}")
+
+        # Combine results with AND logic
+        if pyspark_columns:
+            final_result = pyspark_columns[0]
+            for col in pyspark_columns[1:]:
+                final_result = final_result & col
+
+            # Create results table with boolean column
+            results_tbl = self.data_tbl.withColumn("pb_is_good_", final_result)
+            return results_tbl
+
+        # Default case
+        results_tbl = self.data_tbl.withColumn("pb_is_good_", F.lit(True))
+        return results_tbl
+
 
 class SpeciallyValidation:
     def __init__(self, data_tbl, expression, threshold, tbl_type):
@@ -2359,12 +2478,21 @@ class NumberOfTestUnits:
     column: str
 
     def get_test_units(self, tbl_type: str) -> int:
-        if tbl_type == "pandas" or tbl_type == "polars":
+        if (
+            tbl_type == "pandas"
+            or tbl_type == "polars"
+            or tbl_type == "pyspark"
+            or tbl_type == "local"
+        ):
             # Convert the DataFrame to a format that narwhals can work with and:
             #  - check if the column exists
             dfn = _column_test_prep(
                 df=self.df, column=self.column, allowed_types=None, check_exists=False
             )
+
+            # Handle LazyFrames which don't have len()
+            if hasattr(dfn, "collect"):
+                dfn = dfn.collect()
 
             return len(dfn)
 
@@ -2383,7 +2511,22 @@ def _get_compare_expr_nw(compare: Any) -> Any:
 
 
 def _column_has_null_values(table: FrameT, column: str) -> bool:
-    null_count = (table.select(column).null_count())[column][0]
+    try:
+        # Try the standard null_count() method
+        null_count = (table.select(column).null_count())[column][0]
+    except AttributeError:
+        # For LazyFrames, collect first then get null count
+        try:
+            collected = table.select(column).collect()
+            null_count = (collected.null_count())[column][0]
+        except Exception:
+            # Fallback: check if any values are null
+            try:
+                result = table.select(nw.col(column).is_null().sum().alias("null_count")).collect()
+                null_count = result["null_count"][0]
+            except Exception:
+                # Last resort: return False (assume no nulls)
+                return False
 
     if null_count is None or null_count == 0:
         return False
@@ -2414,7 +2557,7 @@ def _check_nulls_across_columns_nw(table, columns_subset):
 
     # Build the expression by combining each column's `is_null()` with OR operations
     null_expr = functools.reduce(
-        lambda acc, col: acc | table[col].is_null() if acc is not None else table[col].is_null(),
+        lambda acc, col: acc | nw.col(col).is_null() if acc is not None else nw.col(col).is_null(),
         column_names,
         None,
     )

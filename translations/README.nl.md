@@ -149,6 +149,48 @@ validation.get_step_report(i=3).show("browser")  # Krijg falende records van sta
 
 <br>
 
+## YAML-configuratie
+
+Voor teams die draagbare, versiegecontroleerde validatieworkflows nodig hebben, ondersteunt Pointblank YAML-configuratiebestanden. Dit maakt het gemakkelijk om validatielogica te delen tussen verschillende omgevingen en teamleden, zodat iedereen op dezelfde lijn zit.
+
+**validation.yaml**
+
+```yaml
+validate:
+  data: small_table
+  tbl_name: "small_table"
+  label: "Aan de slag validatie"
+
+steps:
+  - col_vals_gt:
+      columns: "d"
+      value: 100
+  - col_vals_le:
+      columns: "c"
+      value: 5
+  - col_exists:
+      columns: ["date", "date_time"]
+```
+
+**Voer de YAML-validatie uit**
+
+```python
+import pointblank as pb
+
+# Voer validatie uit vanuit YAML-configuratie
+validation = pb.yaml_interrogate("validation.yaml")
+
+# Krijg de resultaten net zoals elke andere validatie
+validation.get_tabular_report().show()
+```
+
+Deze benadering is perfect voor:
+
+- **CI/CD-pipelines**: Bewaar validatieregels samen met je code
+- **Teamsamenwerking**: Deel validatielogica in een leesbaar formaat
+- **Omgevingsconsistentie**: Gebruik dezelfde validatie in ontwikkeling, staging en productie
+- **Documentatie**: YAML-bestanden dienen als levende documentatie van je datakwaliteitsvereisten
+
 ## Commandoregelinterface (CLI)
 
 Pointblank bevat een krachtig CLI-hulpprogramma genaamd `pb` waarmee je datavalidatieworkflows direct vanaf de commandoregel kunt uitvoeren. Perfect voor CI/CD-pipelines, geplande datakwaliteitscontroles of snelle validatietaken.
@@ -176,6 +218,12 @@ pb scan "duckdb:///data/sales.ddb::customers"
 **Voer essentiële validaties uit**
 
 ```bash
+# Voer validatie uit vanuit YAML-configuratiebestand
+pb run validation.yaml
+
+# Voer validatie uit vanuit Python-bestand
+pb run validation.py
+
 # Controleer op dubbele rijen
 pb validate small_table --check rows-distinct
 
@@ -192,8 +240,12 @@ pb validate small_table --check col-vals-gt --column a --value 5 --show-extract
 **Integreer met CI/CD**
 
 ```bash
-# Gebruik exit-codes voor automatisering (0 = slagen, 1 = falen)
+# Gebruik exit-codes voor automatisering in eenregelige validaties (0 = slagen, 1 = falen)
 pb validate small_table --check rows-distinct --exit-code
+
+# Voer validatieworkflows uit met exit-codes
+pb run validation.yaml --exit-code
+pb run validation.py --exit-code
 ```
 
 ## Kenmerken die Pointblank onderscheiden

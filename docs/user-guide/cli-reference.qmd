@@ -1,0 +1,453 @@
+---
+title: CLI Reference
+jupyter: python3
+toc-expand: 2
+---
+
+This page provides a complete reference for all Pointblank CLI commands. Each section shows the full help text as it appears in the terminal, giving you quick access to all available options and examples.
+
+For practical usage examples and workflows, see the [CLI Data Validation](cli-data-validation.qmd) and [CLI Data Inspection](cli-data-inspection.qmd) guides.
+
+## `pb` - Main Command
+
+The main entry point for all Pointblank CLI operations:
+
+> ```
+> Usage: pb [OPTIONS] COMMAND [ARGS]...
+>
+>   Pointblank CLI: Data validation and quality tools for data engineers.
+>
+>   Use this CLI to validate data quality, explore datasets, and generate
+>   comprehensive reports for CSV, Parquet, and database sources. Suitable for
+>   data pipelines, ETL validation, and exploratory data analysis from the
+>   command line.
+>
+>   Quick Examples:
+>
+>     pb preview data.csv              Preview your data
+>     pb scan data.csv                 Generate data profile
+>     pb validate data.csv             Run basic validation
+>
+>   Use pb COMMAND --help for detailed help on any command.
+>
+> Options:
+>   -v, --version  Show the version and exit.
+>   -h, --help     Show this message and exit.
+>
+> Commands:
+>   info           Display information about a data source.
+>   preview        Preview a data table showing head and tail rows.
+>   scan           Generate a data scan profile report.
+>   missing        Generate a missing values report for a data table.
+>   validate       Perform single or multiple data validations.
+>   run            Run a Pointblank validation script or YAML configuration.
+>   make-template  Create a validation script or YAML configuration template.
+>   pl             Execute Polars expressions and display results.
+>   datasets       List available built-in datasets.
+>   requirements   Check installed dependencies and their availability.
+> ```
+
+## `pb info` - Data Source Information
+
+Display basic information about a data source:
+
+> ```
+> Usage: pb info [OPTIONS] [DATA_SOURCE]
+>
+>   Display information about a data source.
+>
+>   Shows table type, dimensions, column names, and data types.
+>
+>   DATA_SOURCE can be:
+>
+>   - CSV file path (e.g., data.csv)
+>   - Parquet file path or pattern (e.g., data.parquet, data/*.parquet)
+>   - GitHub URL to CSV/Parquet (e.g., https://github.com/user/repo/blob/main/data.csv)
+>   - Database connection string (e.g., duckdb:///path/to/db.ddb::table_name)
+>   - Dataset name from pointblank (small_table, game_revenue, nycflights, global_sales)
+>
+> Options:
+>   --help  Show this message and exit.
+> ```
+
+## `pb preview` - Data Table Preview
+
+Preview data showing head and tail rows:
+
+> ```
+> Usage: pb preview [OPTIONS] [DATA_SOURCE]
+>
+>   Preview a data table showing head and tail rows.
+>
+>   DATA_SOURCE can be:
+>
+>   - CSV file path (e.g., data.csv)
+>   - Parquet file path or pattern (e.g., data.parquet, data/*.parquet)
+>   - GitHub URL to CSV/Parquet (e.g., https://github.com/user/repo/blob/main/data.csv)
+>   - Database connection string (e.g., duckdb:///path/to/db.ddb::table_name)
+>   - Dataset name from pointblank (small_table, game_revenue, nycflights, global_sales)
+>   - Piped data from pb pl command
+>
+>   COLUMN SELECTION OPTIONS:
+>
+>   For tables with many columns, use these options to control which columns are
+>   displayed:
+>
+>   - --columns: Specify exact columns (e.g., --columns "name,age,email")
+>   - --col-range: Select column range (e.g., --col-range "1:10", --col-range "5:", --col-range ":15")
+>   - --col-first: Show first N columns (e.g., --col-first 5)
+>   - --col-last: Show last N columns (e.g., --col-last 3)
+>
+>   Tables with >15 columns automatically show first 7 and last 7 columns with
+>   indicators.
+>
+> Options:
+>   --columns TEXT             Comma-separated list of columns to display
+>   --col-range TEXT           Column range like '1:10' or '5:' or ':15'
+>                              (1-based indexing)
+>   --col-first INTEGER        Show first N columns
+>   --col-last INTEGER         Show last N columns
+>   --head INTEGER             Number of rows from the top (default: 5)
+>   --tail INTEGER             Number of rows from the bottom (default: 5)
+>   --limit INTEGER            Maximum total rows to display (default: 50)
+>   --no-row-numbers           Hide row numbers
+>   --max-col-width INTEGER    Maximum column width in pixels (default: 250)
+>   --min-table-width INTEGER  Minimum table width in pixels (default: 500)
+>   --no-header                Hide table header
+>   --output-html PATH         Save HTML output to file
+>   --help                     Show this message and exit.
+> ```
+
+## `pb scan` - Data Profile Reports
+
+Generate comprehensive data profiles:
+
+> ```
+> Usage: pb scan [OPTIONS] [DATA_SOURCE]
+>
+>   Generate a data scan profile report.
+>
+>   Produces a comprehensive data profile including:
+>
+>   - Column types and distributions
+>   - Missing value patterns
+>   - Basic statistics
+>   - Data quality indicators
+>
+>   DATA_SOURCE can be:
+>
+>   - CSV file path (e.g., data.csv)
+>   - Parquet file path or pattern (e.g., data.parquet, data/*.parquet)
+>   - GitHub URL to CSV/Parquet (e.g., https://github.com/user/repo/blob/main/data.csv)
+>   - Database connection string (e.g., duckdb:///path/to/db.ddb::table_name)
+>   - Dataset name from pointblank (small_table, game_revenue, nycflights, global_sales)
+>   - Piped data from pb pl command
+>
+> Options:
+>   --output-html PATH  Save HTML scan report to file
+>   -c, --columns TEXT  Comma-separated list of columns to scan
+>   --help              Show this message and exit.
+> ```
+
+## `pb missing` - Missing Values Reports
+
+Generate reports focused on missing values:
+
+> ```
+> Usage: pb missing [OPTIONS] [DATA_SOURCE]
+>
+>   Generate a missing values report for a data table.
+>
+>   DATA_SOURCE can be:
+>
+>   - CSV file path (e.g., data.csv)
+>   - Parquet file path or pattern (e.g., data.parquet, data/*.parquet)
+>   - GitHub URL to CSV/Parquet (e.g., https://github.com/user/repo/blob/main/data.csv)
+>   - Database connection string (e.g., duckdb:///path/to/db.ddb::table_name)
+>   - Dataset name from pointblank (small_table, game_revenue, nycflights, global_sales)
+>   - Piped data from pb pl command
+>
+> Options:
+>   --output-html PATH  Save HTML output to file
+>   --help              Show this message and exit.
+> ```
+
+## `pb validate` - Quick Data Validations
+
+Perform single or multiple data validations:
+
+> ```
+> Usage: pb validate [OPTIONS] [DATA_SOURCE]
+>
+>   Perform single or multiple data validations.
+>
+>   Run one or more validation checks on your data in a single command. Use
+>   multiple --check options to perform multiple validations.
+>
+>   DATA_SOURCE can be:
+>
+>   - CSV file path (e.g., data.csv)
+>   - Parquet file path or pattern (e.g., data.parquet, data/*.parquet)
+>   - GitHub URL to CSV/Parquet (e.g., https://github.com/user/repo/blob/main/data.csv)
+>   - Database connection string (e.g., duckdb:///path/to/db.ddb::table_name)
+>   - Dataset name from pointblank (small_table, game_revenue, nycflights, global_sales)
+>
+>   AVAILABLE CHECK_TYPES:
+>
+>   Require no additional options:
+>
+>   - rows-distinct: Check if all rows in the dataset are unique (no duplicates)
+>   - rows-complete: Check if all rows are complete (no missing values in any column)
+>
+>   Require --column:
+>
+>   - col-exists: Check if a specific column exists in the dataset
+>   - col-vals-not-null: Check if all values in a column are not null/missing
+>
+>   Require --column and --value:
+>
+>   - col-vals-gt: Check if column values are greater than a fixed value
+>   - col-vals-ge: Check if column values are greater than or equal to a fixed value
+>   - col-vals-lt: Check if column values are less than a fixed value
+>   - col-vals-le: Check if column values are less than or equal to a fixed value
+>
+>   Require --column and --set:
+>
+>   - col-vals-in-set: Check if column values are in an allowed set
+>
+>   Use --list-checks to see all available validation methods with examples. The
+>   default CHECK_TYPE is 'rows-distinct' which checks for duplicate rows.
+>
+>   Examples:
+>
+>   pb validate data.csv                               # Uses default validation (rows-distinct)
+>   pb validate data.csv --list-checks                 # Show all available checks
+>   pb validate data.csv --check rows-distinct
+>   pb validate data.csv --check rows-distinct --show-extract
+>   pb validate data.csv --check rows-distinct --write-extract failing_rows_folder
+>   pb validate data.csv --check rows-distinct --exit-code
+>   pb validate data.csv --check col-exists --column price
+>   pb validate data.csv --check col-vals-not-null --column email
+>   pb validate data.csv --check col-vals-gt --column score --value 50
+>   pb validate data.csv --check col-vals-in-set --column status --set "active,inactive,pending"
+>
+>   Multiple validations in one command: pb validate data.csv --check rows-
+>   distinct --check rows-complete
+>
+> Options:
+>   --list-checks         List available validation checks and exit
+>   --check CHECK_TYPE    Type of validation check to perform. Can be used
+>                         multiple times for multiple checks.
+>   --column TEXT         Column name or integer position as #N (1-based index)
+>                         for validation.
+>   --set TEXT            Comma-separated allowed values for col-vals-in-set
+>                         checks.
+>   --value FLOAT         Numeric value for comparison checks.
+>   --show-extract        Show extract of failing rows if validation fails
+>   --write-extract TEXT  Save failing rows to folder. Provide base name for
+>                         folder.
+>   --limit INTEGER       Maximum number of failing rows to save to CSV
+>                         (default: 500)
+>   --exit-code           Exit with non-zero code if validation fails
+>   --help                Show this message and exit.
+> ```
+
+## `pb run` - Validation Scripts and YAML
+
+Run Python validation scripts or YAML configurations:
+
+> ```
+> Usage: pb run [OPTIONS] [VALIDATION_FILE]
+>
+>   Run a Pointblank validation script or YAML configuration.
+>
+>   VALIDATION_FILE can be: - A Python file (.py) that defines validation logic
+>   - A YAML configuration file (.yaml, .yml) that defines validation steps
+>
+>   Python scripts should load their own data and create validation objects.
+>   YAML configurations define data sources and validation steps declaratively.
+>
+>   If --data is provided, it will automatically replace the data source in your
+>   validation objects (Python scripts) or override the 'tbl' field (YAML
+>   configs).
+>
+>   To get started quickly, use 'pb make-template' to create templates.
+>
+>   DATA can be:
+>
+>   - CSV file path (e.g., data.csv)
+>   - Parquet file path or pattern (e.g., data.parquet, data/*.parquet)
+>   - GitHub URL to CSV/Parquet (e.g., https://github.com/user/repo/blob/main/data.csv)
+>   - Database connection string (e.g., duckdb:///path/to/db.ddb::table_name)
+>   - Dataset name from pointblank (small_table, game_revenue, nycflights, global_sales)
+>
+>   Examples:
+>
+>   pb make-template my_validation.py  # Create a Python template
+>   pb run validation_script.py
+>   pb run validation_config.yaml
+>   pb run validation_script.py --data data.csv
+>   pb run validation_config.yaml --data small_table --output-html report.html
+>   pb run validation_script.py --show-extract --fail-on error
+>   pb run validation_config.yaml --write-extract extracts_folder --fail-on critical
+>
+> Options:
+>   --data TEXT                     Data source to replace in validation objects
+>                                   (Python scripts and YAML configs)
+>   --output-html PATH              Save HTML validation report to file
+>   --output-json PATH              Save JSON validation summary to file
+>   --show-extract                  Show extract of failing rows if validation
+>                                   fails
+>   --write-extract TEXT            Save failing rows to folders (one CSV per
+>                                   step). Provide base name for folder.
+>   --limit INTEGER                 Maximum number of failing rows to save to
+>                                   CSV (default: 500)
+>   --fail-on [critical|error|warning|any]
+>                                   Exit with non-zero code when validation
+>                                   reaches this threshold level
+>   --help                          Show this message and exit.
+> ```
+
+## `pb make-template` - Template Generation
+
+Create validation script or YAML configuration templates:
+
+> ```
+> Usage: pb make-template [OPTIONS] [OUTPUT_FILE]
+>
+>   Create a validation script or YAML configuration template.
+>
+>   Creates a sample Python script or YAML configuration with examples showing
+>   how to use Pointblank for data validation. The template type is determined
+>   by the file extension: - .py files create Python script templates -
+>   .yaml/.yml files create YAML configuration templates
+>
+>   Edit the template to add your own data loading and validation rules, then
+>   run it with 'pb run'.
+>
+>   OUTPUT_FILE is the path where the template will be created.
+>
+>   Examples:
+>
+>   pb make-template my_validation.py        # Creates Python script template
+>   pb make-template my_validation.yaml      # Creates YAML config template
+>   pb make-template validation_template.yml # Creates YAML config template
+>
+> Options:
+>   --help  Show this message and exit.
+> ```
+
+## `pb pl` - Polars Expression Execution
+
+Execute Polars expressions and display results:
+
+> ```
+> Usage: pb pl [OPTIONS] [POLARS_EXPRESSION]
+>
+>   Execute Polars expressions and display results.
+>
+>   Execute Polars DataFrame operations from the command line and display the
+>   results using Pointblank's visualization tools.
+>
+>   POLARS_EXPRESSION should be a valid Polars expression that returns a
+>   DataFrame. The 'pl' module is automatically imported and available.
+>
+>   Examples:
+>
+>   # Direct expression
+>   pb pl "pl.read_csv('data.csv')"
+>   pb pl "pl.read_csv('data.csv').select(['name', 'age'])"
+>   pb pl "pl.read_csv('data.csv').filter(pl.col('age') > 25)"
+>
+>   # Multi-line with editor (supports multiple statements)
+>   pb pl --edit
+>
+>   # Multi-statement code example in editor:
+>   # csv = pl.read_csv('data.csv')
+>   # result = csv.select(['name', 'age']).filter(pl.col('age') > 25)
+>
+>   # Multi-line with a specific editor
+>   pb pl --edit --editor nano
+>   pb pl --edit --editor code
+>   pb pl --edit --editor micro
+>
+>   # From file
+>   pb pl --file query.py
+>
+>   Piping to other pb commands
+>   pb pl "pl.read_csv('data.csv').head(20)" --pipe | pb validate --check rows-distinct
+>   pb pl --edit --pipe | pb preview --head 10
+>   pb pl --edit --pipe | pb scan --output-html report.html
+>   pb pl --edit --pipe | pb missing --output-html missing_report.html
+>
+>   Use --output-format to change how results are displayed:
+>   pb pl "pl.read_csv('data.csv')" --output-format scan
+>   pb pl "pl.read_csv('data.csv')" --output-format missing
+>   pb pl "pl.read_csv('data.csv')" --output-format info
+>
+>   Note: For multi-statement code, assign your final result to a variable like
+>   'result', 'df', 'data', or ensure it's the last expression.
+>
+> Options:
+>   -e, --edit                      Open editor for multi-line input
+>   -f, --file PATH                 Read query from file
+>   --editor TEXT                   Editor to use for --edit mode (overrides
+>                                   $EDITOR and auto-detection)
+>   -o, --output-format [preview|scan|missing|info]
+>                                   Output format for the result
+>   --preview-head INTEGER          Number of head rows for preview
+>   --preview-tail INTEGER          Number of tail rows for preview
+>   --output-html PATH              Save HTML output to file
+>   --pipe                          Output data in a format suitable for piping
+>                                   to other pb commands
+>   --pipe-format [parquet|csv]     Format for piped output (default: parquet)
+>   --help                          Show this message and exit.
+> ```
+
+## `pb datasets` - Built-in Datasets
+
+List available built-in datasets:
+
+> ```
+> Usage: pb datasets [OPTIONS]
+>
+>   List available built-in datasets.
+>
+> Options:
+>   --help  Show this message and exit.
+> ```
+
+## `pb requirements` - Dependency Check
+
+Check installed dependencies and their availability:
+
+> ```
+> Usage: pb requirements [OPTIONS]
+>
+>   Check installed dependencies and their availability.
+>
+> Options:
+>   --help  Show this message and exit.
+> ```
+
+## Common Data Source Types
+
+All commands that accept a `DATA_SOURCE` parameter support these formats:
+
+- **CSV files**: `data.csv`, `path/to/data.csv`
+- **Parquet files**: `data.parquet`, `data/*.parquet` (patterns supported)
+- **GitHub URLs**: `https://github.com/user/repo/blob/main/data.csv`
+- **Database connections**: `duckdb:///path/to/db.ddb::table_name`
+- **Built-in datasets**: `small_table`, `game_revenue`, `nycflights`, `global_sales`
+- **Piped data**: Output from `pb pl` command (where supported)
+
+## Exit Codes and Automation
+
+Many commands support options useful for automation and CI/CD:
+
+- `--exit-code`: Exit with non-zero code on validation failure
+- `--fail-on [critical|error|warning|any]`: Control failure thresholds
+- `--output-html`, `--output-json`: Save reports for external consumption
+- `--write-extract`: Save failing rows for investigation
+
+These features make Pointblank CLI commands suitable for integration into data pipelines, quality gates, and automated workflows.
