@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.7.32">
+<meta name="generator" content="quarto-1.7.33">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -72,7 +72,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-ea385d0e468b0dd5ea5bf0780b1290d9.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="../site_libs/bootstrap/bootstrap-a6de9e393c7f0ebc3b9efe6368149acc.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
@@ -300,16 +300,22 @@ OPENAI_API_KEY="your_openai_api_key_here"</code></pre>
 <ul>
 <li>Polars DataFrame (<code>"polars"</code>)</li>
 <li>Pandas DataFrame (<code>"pandas"</code>)</li>
+<li>PySpark table (<code>"pyspark"</code>)</li>
 <li>DuckDB table (<code>"duckdb"</code>)*</li>
 <li>MySQL table (<code>"mysql"</code>)*</li>
 <li>PostgreSQL table (<code>"postgresql"</code>)*</li>
 <li>SQLite table (<code>"sqlite"</code>)*</li>
+<li>Microsoft SQL Server table (<code>"mssql"</code>)*</li>
+<li>Snowflake table (<code>"snowflake"</code>)*</li>
+<li>Databricks table (<code>"databricks"</code>)*</li>
+<li>BigQuery table (<code>"bigquery"</code>)*</li>
 <li>Parquet table (<code>"parquet"</code>)*</li>
 <li>CSV files (string path or <code>pathlib.Path</code> object with <code>.csv</code> extension)</li>
 <li>Parquet files (string path, <code>pathlib.Path</code> object, glob pattern, directory with <code>.parquet</code> extension, or partitioned dataset)</li>
 <li>Database connection strings (URI format with optional table specification)</li>
 </ul>
 <p>The table types marked with an asterisk need to be prepared as Ibis tables (with type of <code>ibis.expr.types.relations.Table</code>). Furthermore, using <a href="../reference/assistant.html#pointblank.assistant" title="0"><code>assistant()</code></a> with these types of tables requires the Ibis library (<code>v9.5.0</code> or above) to be installed. If the input table is a Polars or Pandas DataFrame, the availability of Ibis is not needed.</p>
+<p>To use a CSV file, ensure that a string or <code>pathlib.Path</code> object with a <code>.csv</code> extension is provided. The file will be automatically detected and loaded using the best available DataFrame library. The loading preference is Polars first, then Pandas as a fallback.</p>
 
 
 </section>

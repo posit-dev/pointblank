@@ -9,7 +9,7 @@
 <link>https://posit-dev.github.io/pointblank/blog/</link>
 <atom:link href="https://posit-dev.github.io/pointblank/blog/index.xml" rel="self" type="application/rss+xml"/>
 <description>Find out if your data is what you think it is</description>
-<generator>quarto-1.7.32</generator>
+<generator>quarto-1.7.33</generator>
 <lastBuildDate>Wed, 04 Jun 2025 00:00:00 GMT</lastBuildDate>
 <item>
   <title>Data Validation Libraries for Polars (2025 Edition)</title>
@@ -38,54 +38,54 @@ Note
 <section id="recommendations" class="level2">
 <h2 class="anchored" data-anchor-id="recommendations">Recommendations</h2>
 <p>Here are the unique strengths for each library:</p>
-<div id="0d358a1c" class="cell" data-execution_count="1">
+<div id="187f5bce" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display" data-execution_count="1">
-<div id="rrrdgvfvfv" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="jvzqxvqosq" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>
-#rrrdgvfvfv table {
+#jvzqxvqosq table {
           font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
           -webkit-font-smoothing: antialiased;
           -moz-osx-font-smoothing: grayscale;
         }
 
-#rrrdgvfvfv thead, tbody, tfoot, tr, td, th { border-style: none; }
+#jvzqxvqosq thead, tbody, tfoot, tr, td, th { border-style: none; }
  tr { background-color: transparent; }
-#rrrdgvfvfv p { margin: 0; padding: 0; }
- #rrrdgvfvfv .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 16px; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: auto; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
- #rrrdgvfvfv .gt_caption { padding-top: 4px; padding-bottom: 4px; }
- #rrrdgvfvfv .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 10px; padding-right: 10px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
- #rrrdgvfvfv .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 10px; padding-right: 10px; border-top-color: #FFFFFF; border-top-width: 0; }
- #rrrdgvfvfv .gt_heading { background-color: #FFFFFF; text-align: center; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
- #rrrdgvfvfv .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
- #rrrdgvfvfv .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
- #rrrdgvfvfv .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 10px; padding-right: 10px; overflow-x: hidden; }
- #rrrdgvfvfv .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
- #rrrdgvfvfv .gt_column_spanner_outer:first-child { padding-left: 0; }
- #rrrdgvfvfv .gt_column_spanner_outer:last-child { padding-right: 0; }
- #rrrdgvfvfv .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
- #rrrdgvfvfv .gt_spanner_row { border-bottom-style: hidden; }
- #rrrdgvfvfv .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 10px; padding-right: 10px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
- #rrrdgvfvfv .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
- #rrrdgvfvfv .gt_from_md> :first-child { margin-top: 0; }
- #rrrdgvfvfv .gt_from_md> :last-child { margin-bottom: 0; }
- #rrrdgvfvfv .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 10px; padding-right: 10px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
- #rrrdgvfvfv .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 10px; padding-right: 10px; }
- #rrrdgvfvfv .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 10px; padding-right: 10px; vertical-align: top; }
- #rrrdgvfvfv .gt_row_group_first td { border-top-width: 2px; }
- #rrrdgvfvfv .gt_row_group_first th { border-top-width: 2px; }
- #rrrdgvfvfv .gt_striped { background-color: rgba(128,128,128,0.05); }
- #rrrdgvfvfv .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
- #rrrdgvfvfv .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
- #rrrdgvfvfv .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 10px; padding-right: 10px; text-align: left; }
- #rrrdgvfvfv .gt_left { text-align: left; }
- #rrrdgvfvfv .gt_center { text-align: center; }
- #rrrdgvfvfv .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
- #rrrdgvfvfv .gt_font_normal { font-weight: normal; }
- #rrrdgvfvfv .gt_font_bold { font-weight: bold; }
- #rrrdgvfvfv .gt_font_italic { font-style: italic; }
- #rrrdgvfvfv .gt_super { font-size: 65%; }
- #rrrdgvfvfv .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
- #rrrdgvfvfv .gt_asterisk { font-size: 100%; vertical-align: 0; }
+#jvzqxvqosq p { margin: 0; padding: 0; }
+ #jvzqxvqosq .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 16px; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: auto; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
+ #jvzqxvqosq .gt_caption { padding-top: 4px; padding-bottom: 4px; }
+ #jvzqxvqosq .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 10px; padding-right: 10px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
+ #jvzqxvqosq .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 10px; padding-right: 10px; border-top-color: #FFFFFF; border-top-width: 0; }
+ #jvzqxvqosq .gt_heading { background-color: #FFFFFF; text-align: center; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #jvzqxvqosq .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #jvzqxvqosq .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #jvzqxvqosq .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 10px; padding-right: 10px; overflow-x: hidden; }
+ #jvzqxvqosq .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
+ #jvzqxvqosq .gt_column_spanner_outer:first-child { padding-left: 0; }
+ #jvzqxvqosq .gt_column_spanner_outer:last-child { padding-right: 0; }
+ #jvzqxvqosq .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
+ #jvzqxvqosq .gt_spanner_row { border-bottom-style: hidden; }
+ #jvzqxvqosq .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 10px; padding-right: 10px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
+ #jvzqxvqosq .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
+ #jvzqxvqosq .gt_from_md> :first-child { margin-top: 0; }
+ #jvzqxvqosq .gt_from_md> :last-child { margin-bottom: 0; }
+ #jvzqxvqosq .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 10px; padding-right: 10px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
+ #jvzqxvqosq .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 10px; padding-right: 10px; }
+ #jvzqxvqosq .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 10px; padding-right: 10px; vertical-align: top; }
+ #jvzqxvqosq .gt_row_group_first td { border-top-width: 2px; }
+ #jvzqxvqosq .gt_row_group_first th { border-top-width: 2px; }
+ #jvzqxvqosq .gt_striped { background-color: rgba(128,128,128,0.05); }
+ #jvzqxvqosq .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #jvzqxvqosq .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #jvzqxvqosq .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 10px; padding-right: 10px; text-align: left; }
+ #jvzqxvqosq .gt_left { text-align: left; }
+ #jvzqxvqosq .gt_center { text-align: center; }
+ #jvzqxvqosq .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
+ #jvzqxvqosq .gt_font_normal { font-weight: normal; }
+ #jvzqxvqosq .gt_font_bold { font-weight: bold; }
+ #jvzqxvqosq .gt_font_italic { font-style: italic; }
+ #jvzqxvqosq .gt_super { font-size: 65%; }
+ #jvzqxvqosq .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
+ #jvzqxvqosq .gt_asterisk { font-size: 100%; vertical-align: 0; }
  
 </style>
 <table class="gt_table" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
@@ -133,54 +133,54 @@ Note
 </div>
 </div>
 <p>Based on these strengths, here are my recommendations for which libraries to use according to use case:</p>
-<div id="f49ed052" class="cell" data-execution_count="2">
+<div id="1d1c3d5f" class="cell" data-execution_count="2">
 <div class="cell-output cell-output-display" data-execution_count="2">
-<div id="jwlatrmneo" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="qwepmtrizg" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>
-#jwlatrmneo table {
+#qwepmtrizg table {
           font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
           -webkit-font-smoothing: antialiased;
           -moz-osx-font-smoothing: grayscale;
         }
 
-#jwlatrmneo thead, tbody, tfoot, tr, td, th { border-style: none; }
+#qwepmtrizg thead, tbody, tfoot, tr, td, th { border-style: none; }
  tr { background-color: transparent; }
-#jwlatrmneo p { margin: 0; padding: 0; }
- #jwlatrmneo .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 16px; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: auto; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
- #jwlatrmneo .gt_caption { padding-top: 4px; padding-bottom: 4px; }
- #jwlatrmneo .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 10px; padding-right: 10px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
- #jwlatrmneo .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 10px; padding-right: 10px; border-top-color: #FFFFFF; border-top-width: 0; }
- #jwlatrmneo .gt_heading { background-color: #FFFFFF; text-align: center; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
- #jwlatrmneo .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
- #jwlatrmneo .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
- #jwlatrmneo .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 10px; padding-right: 10px; overflow-x: hidden; }
- #jwlatrmneo .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
- #jwlatrmneo .gt_column_spanner_outer:first-child { padding-left: 0; }
- #jwlatrmneo .gt_column_spanner_outer:last-child { padding-right: 0; }
- #jwlatrmneo .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
- #jwlatrmneo .gt_spanner_row { border-bottom-style: hidden; }
- #jwlatrmneo .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 10px; padding-right: 10px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
- #jwlatrmneo .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
- #jwlatrmneo .gt_from_md> :first-child { margin-top: 0; }
- #jwlatrmneo .gt_from_md> :last-child { margin-bottom: 0; }
- #jwlatrmneo .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 10px; padding-right: 10px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
- #jwlatrmneo .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 10px; padding-right: 10px; }
- #jwlatrmneo .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 10px; padding-right: 10px; vertical-align: top; }
- #jwlatrmneo .gt_row_group_first td { border-top-width: 2px; }
- #jwlatrmneo .gt_row_group_first th { border-top-width: 2px; }
- #jwlatrmneo .gt_striped { background-color: rgba(128,128,128,0.05); }
- #jwlatrmneo .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
- #jwlatrmneo .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
- #jwlatrmneo .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 10px; padding-right: 10px; text-align: left; }
- #jwlatrmneo .gt_left { text-align: left; }
- #jwlatrmneo .gt_center { text-align: center; }
- #jwlatrmneo .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
- #jwlatrmneo .gt_font_normal { font-weight: normal; }
- #jwlatrmneo .gt_font_bold { font-weight: bold; }
- #jwlatrmneo .gt_font_italic { font-style: italic; }
- #jwlatrmneo .gt_super { font-size: 65%; }
- #jwlatrmneo .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
- #jwlatrmneo .gt_asterisk { font-size: 100%; vertical-align: 0; }
+#qwepmtrizg p { margin: 0; padding: 0; }
+ #qwepmtrizg .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 16px; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: auto; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
+ #qwepmtrizg .gt_caption { padding-top: 4px; padding-bottom: 4px; }
+ #qwepmtrizg .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 10px; padding-right: 10px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
+ #qwepmtrizg .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 10px; padding-right: 10px; border-top-color: #FFFFFF; border-top-width: 0; }
+ #qwepmtrizg .gt_heading { background-color: #FFFFFF; text-align: center; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #qwepmtrizg .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #qwepmtrizg .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #qwepmtrizg .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 10px; padding-right: 10px; overflow-x: hidden; }
+ #qwepmtrizg .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
+ #qwepmtrizg .gt_column_spanner_outer:first-child { padding-left: 0; }
+ #qwepmtrizg .gt_column_spanner_outer:last-child { padding-right: 0; }
+ #qwepmtrizg .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
+ #qwepmtrizg .gt_spanner_row { border-bottom-style: hidden; }
+ #qwepmtrizg .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 10px; padding-right: 10px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
+ #qwepmtrizg .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
+ #qwepmtrizg .gt_from_md> :first-child { margin-top: 0; }
+ #qwepmtrizg .gt_from_md> :last-child { margin-bottom: 0; }
+ #qwepmtrizg .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 10px; padding-right: 10px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
+ #qwepmtrizg .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 10px; padding-right: 10px; }
+ #qwepmtrizg .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 10px; padding-right: 10px; vertical-align: top; }
+ #qwepmtrizg .gt_row_group_first td { border-top-width: 2px; }
+ #qwepmtrizg .gt_row_group_first th { border-top-width: 2px; }
+ #qwepmtrizg .gt_striped { background-color: rgba(128,128,128,0.05); }
+ #qwepmtrizg .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #qwepmtrizg .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #qwepmtrizg .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 10px; padding-right: 10px; text-align: left; }
+ #qwepmtrizg .gt_left { text-align: left; }
+ #qwepmtrizg .gt_center { text-align: center; }
+ #qwepmtrizg .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
+ #qwepmtrizg .gt_font_normal { font-weight: normal; }
+ #qwepmtrizg .gt_font_bold { font-weight: bold; }
+ #qwepmtrizg .gt_font_italic { font-style: italic; }
+ #qwepmtrizg .gt_super { font-size: 65%; }
+ #qwepmtrizg .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
+ #qwepmtrizg .gt_asterisk { font-size: 100%; vertical-align: 0; }
  
 </style>
 <table class="gt_table" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
@@ -231,7 +231,7 @@ Note
 <section id="setup" class="level2">
 <h2 class="anchored" data-anchor-id="setup">Setup</h2>
 <p>We are going to run through examples with <strong>Pandera</strong>, <strong>Patito</strong>, <strong>Pointblank</strong>, <strong>Validoopsie</strong>, and <strong>Dataframely</strong>, using this Polars DataFrame as our test case:</p>
-<div id="d71e0c49" class="cell" data-execution_count="3">
+<div id="40ee680a" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><span class="im" style="color: #00769E;
 background-color: null;
 font-style: inherit;">import</span> polars <span class="im" style="color: #00769E;
@@ -320,7 +320,7 @@ font-style: inherit;">95.2</span>]</span>
 <p>Pandera is a statistical data validation toolkit designed to provide a flexible and expressive API for performing data validation on dataframe-like objects. The library centers on schema-centric validation, where you define the expected structure and constraints of your data upfront. You can enable both runtime validation and static type checking integration. Pandera added Polars support in version <code>0.19.0</code> (early 2024).</p>
 <section id="example" class="level3">
 <h3 class="anchored" data-anchor-id="example">Example</h3>
-<div id="35436d4b" class="cell" data-execution_count="4">
+<div id="d95af2d7" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb2" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><span class="im" style="color: #00769E;
 background-color: null;
 font-style: inherit;">import</span> pandera.polars <span class="im" style="color: #00769E;
@@ -424,6 +424,14 @@ font-style: inherit;">"</span>)</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Validation failed: Column 'age' failed validator number 1: &lt;Check less_than_or_equal_to: less_than_or_equal_to(80)&gt; failure case examples: [{'age': 95}]</code></pre>
 </div>
+<div class="cell-output cell-output-stderr">
+<pre><code>/opt/hostedtoolcache/Python/3.11.13/x64/lib/python3.11/site-packages/pandera/api/polars/utils.py:35: PerformanceWarning: Determining the column names of a LazyFrame requires resolving its schema, which is a potentially expensive operation. Use `LazyFrame.collect_schema().names()` to get the column names without this warning.
+  return lf.columns
+/opt/hostedtoolcache/Python/3.11.13/x64/lib/python3.11/site-packages/pandera/api/polars/utils.py:28: PerformanceWarning: Resolving the schema of a LazyFrame is a potentially expensive operation. Use `LazyFrame.collect_schema()` to get the schema without this warning.
+  return [*lf.schema.values()]
+/opt/hostedtoolcache/Python/3.11.13/x64/lib/python3.11/site-packages/pandera/api/polars/utils.py:21: PerformanceWarning: Resolving the schema of a LazyFrame is a potentially expensive operation. Use `LazyFrame.collect_schema()` to get the schema without this warning.
+  return lf.schema</code></pre>
+</div>
 </div>
 <p>This example demonstrates Pandera’s declarative approach, where you define what your data should look like rather than writing imperative validation logic. The schema acts as both documentation and as a validation contract. Notice how multiple checks can be applied to a single column (here, the <code>age</code> column receives two checks), and the validation either succeeds completely or provides error information about what failed.</p>
 </section>
@@ -461,23 +469,23 @@ font-style: inherit;">"</span>)</span></code></pre></div>
 <p>Patito launched with Polars support from the beginning (in late 2022). Native Polars integration is touted as one of its core features, reflecting the growing adoption of Polars in the Python ecosystem.</p>
 <section id="example-1" class="level3">
 <h3 class="anchored" data-anchor-id="example-1">Example</h3>
-<div id="a412f15a" class="cell" data-execution_count="5">
-<div class="sourceCode cell-code" id="cb4" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><span class="im" style="color: #00769E;
+<div id="6988c071" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb5" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><span class="im" style="color: #00769E;
 background-color: null;
 font-style: inherit;">import</span> patito <span class="im" style="color: #00769E;
 background-color: null;
 font-style: inherit;">as</span> pt</span>
-<span id="cb4-2"><span class="im" style="color: #00769E;
+<span id="cb5-2"><span class="im" style="color: #00769E;
 background-color: null;
 font-style: inherit;">from</span> typing <span class="im" style="color: #00769E;
 background-color: null;
 font-style: inherit;">import</span> Annotated</span>
-<span id="cb4-3"></span>
-<span id="cb4-4"><span class="kw" style="color: #003B4F;
+<span id="cb5-3"></span>
+<span id="cb5-4"><span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">class</span> UserModel(pt.Model):</span>
-<span id="cb4-5">    user_id: <span class="bu" style="color: null;
+<span id="cb5-5">    user_id: <span class="bu" style="color: null;
 background-color: null;
 font-style: inherit;">int</span> <span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -486,7 +494,7 @@ background-color: null;
 font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">0</span>)</span>
-<span id="cb4-6">    age: Annotated[<span class="bu" style="color: null;
+<span id="cb5-6">    age: Annotated[<span class="bu" style="color: null;
 background-color: null;
 font-style: inherit;">int</span>, pt.Field(ge<span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -497,7 +505,7 @@ background-color: null;
 font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">80</span>)]</span>
-<span id="cb4-7">    email: <span class="bu" style="color: null;
+<span id="cb5-7">    email: <span class="bu" style="color: null;
 background-color: null;
 font-style: inherit;">str</span> <span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -528,7 +536,7 @@ background-color: null;
 font-style: inherit;">$</span><span class="vs" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"</span>)</span>
-<span id="cb4-8">    score: <span class="bu" style="color: null;
+<span id="cb5-8">    score: <span class="bu" style="color: null;
 background-color: null;
 font-style: inherit;">float</span> <span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -541,27 +549,27 @@ background-color: null;
 font-style: inherit;">=</span><span class="fl" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">100.0</span>)</span>
-<span id="cb4-9"></span>
-<span id="cb4-10"><span class="co" style="color: #5E5E5E;
+<span id="cb5-9"></span>
+<span id="cb5-10"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;"># Validate using the model</span></span>
-<span id="cb4-11"><span class="cf" style="color: #003B4F;
+<span id="cb5-11"><span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">try</span>:</span>
-<span id="cb4-12">    UserModel.validate(user_data)</span>
-<span id="cb4-13">    <span class="bu" style="color: null;
+<span id="cb5-12">    UserModel.validate(user_data)</span>
+<span id="cb5-13">    <span class="bu" style="color: null;
 background-color: null;
 font-style: inherit;">print</span>(<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"Validation successful!"</span>)</span>
-<span id="cb4-14"><span class="cf" style="color: #003B4F;
+<span id="cb5-14"><span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">except</span> pt.exceptions.DataFrameValidationError <span class="im" style="color: #00769E;
 background-color: null;
 font-style: inherit;">as</span> e:</span>
-<span id="cb4-15">    <span class="bu" style="color: null;
+<span id="cb5-15">    <span class="bu" style="color: null;
 background-color: null;
 font-style: inherit;">print</span>(<span class="ss" style="color: #20794D;
 background-color: null;
@@ -608,17 +616,17 @@ email
 <p>Pointblank launched with Polars support as a core feature from its initial Python release in late 2024, built on top of the Narwhals and Ibis compatibility layers to provide consistent DataFrame operations across multiple backends including Polars, Pandas, and database connections.</p>
 <section id="example-2" class="level3">
 <h3 class="anchored" data-anchor-id="example-2">Example</h3>
-<div id="cae144c1" class="cell" data-execution_count="6">
-<div class="sourceCode cell-code" id="cb6" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><span class="im" style="color: #00769E;
+<div id="583bb1ab" class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb7" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><span class="im" style="color: #00769E;
 background-color: null;
 font-style: inherit;">import</span> pointblank <span class="im" style="color: #00769E;
 background-color: null;
 font-style: inherit;">as</span> pb</span>
-<span id="cb6-2"></span>
-<span id="cb6-3">schema <span class="op" style="color: #5E5E5E;
+<span id="cb7-2"></span>
+<span id="cb7-3">schema <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> pb.Schema(</span>
-<span id="cb6-4">    columns<span class="op" style="color: #5E5E5E;
+<span id="cb7-4">    columns<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span>[(<span class="st" style="color: #20794D;
 background-color: null;
@@ -637,12 +645,12 @@ background-color: null;
 font-style: inherit;">"score"</span>, <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"Float64"</span>)]</span>
-<span id="cb6-5">)</span>
-<span id="cb6-6"></span>
-<span id="cb6-7">validation <span class="op" style="color: #5E5E5E;
+<span id="cb7-5">)</span>
+<span id="cb7-6"></span>
+<span id="cb7-7">validation <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> (</span>
-<span id="cb6-8">    pb.Validate(data<span class="op" style="color: #5E5E5E;
+<span id="cb7-8">    pb.Validate(data<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span>user_data, label<span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -661,7 +669,7 @@ background-color: null;
 font-style: inherit;">0.2</span>, <span class="fl" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">0.3</span>))</span>
-<span id="cb6-9">    .col_vals_gt(columns<span class="op" style="color: #5E5E5E;
+<span id="cb7-9">    .col_vals_gt(columns<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span><span class="st" style="color: #20794D;
 background-color: null;
@@ -670,7 +678,7 @@ background-color: null;
 font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">0</span>)</span>
-<span id="cb6-10">    .col_vals_between(columns<span class="op" style="color: #5E5E5E;
+<span id="cb7-10">    .col_vals_between(columns<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span><span class="st" style="color: #20794D;
 background-color: null;
@@ -683,7 +691,7 @@ background-color: null;
 font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">80</span>)</span>
-<span id="cb6-11">    .col_vals_regex(columns<span class="op" style="color: #5E5E5E;
+<span id="cb7-11">    .col_vals_regex(columns<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span><span class="st" style="color: #20794D;
 background-color: null;
@@ -714,7 +722,7 @@ background-color: null;
 font-style: inherit;">$</span><span class="vs" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"</span>)</span>
-<span id="cb6-12">    .col_vals_between(columns<span class="op" style="color: #5E5E5E;
+<span id="cb7-12">    .col_vals_between(columns<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span><span class="st" style="color: #20794D;
 background-color: null;
@@ -727,13 +735,13 @@ background-color: null;
 font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">100</span>)</span>
-<span id="cb6-13">    .col_schema_match(schema<span class="op" style="color: #5E5E5E;
+<span id="cb7-13">    .col_schema_match(schema<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span>schema)</span>
-<span id="cb6-14">    .interrogate()</span>
-<span id="cb6-15">)</span>
-<span id="cb6-16"></span>
-<span id="cb6-17">validation</span></code></pre></div>
+<span id="cb7-14">    .interrogate()</span>
+<span id="cb7-15">)</span>
+<span id="cb7-16"></span>
+<span id="cb7-17">validation</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="6">
 <div id="pb_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>
@@ -1046,7 +1054,7 @@ font-style: inherit;">=</span>schema)</span>
   <tfoot class="gt_sourcenotes">
   
   <tr>
-    <td class="gt_sourcenote" colspan="14" style="text-align: left;"><div style="margin-top: 5px; margin-bottom: 5px;"><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin-left: 10px; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2025-08-06 05:24:10 UTC</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">&lt; 1 s</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 1px 5px -1px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2025-08-06 05:24:10 UTC</span></div></td>
+    <td class="gt_sourcenote" colspan="14" style="text-align: left;"><div style="margin-top: 5px; margin-bottom: 5px;"><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin-left: 10px; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2025-08-07 05:34:04 UTC</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">&lt; 1 s</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 1px 5px -1px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2025-08-07 05:34:04 UTC</span></div></td>
   </tr>
 
 </tfoot>
@@ -1083,82 +1091,82 @@ font-style: inherit;">=</span>schema)</span>
 <p>What sets Validoopsie apart is its sophisticated approach to handling validation failures through <em>impact levels</em> and <em>threshold tolerances</em>. These features that give you fine-grained control over how your validation pipeline behaves when things go wrong.</p>
 <section id="example-3" class="level3">
 <h3 class="anchored" data-anchor-id="example-3">Example</h3>
-<div id="7e85a3ad" class="cell" data-execution_count="7">
-<div class="sourceCode cell-code" id="cb7" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><span class="im" style="color: #00769E;
+<div id="334942d9" class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb8" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><span class="im" style="color: #00769E;
 background-color: null;
 font-style: inherit;">from</span> validoopsie <span class="im" style="color: #00769E;
 background-color: null;
 font-style: inherit;">import</span> Validate</span>
-<span id="cb7-2"><span class="im" style="color: #00769E;
+<span id="cb8-2"><span class="im" style="color: #00769E;
 background-color: null;
 font-style: inherit;">from</span> narwhals.dtypes <span class="im" style="color: #00769E;
 background-color: null;
 font-style: inherit;">import</span> Int64, Float64, String</span>
-<span id="cb7-3"></span>
-<span id="cb7-4"><span class="co" style="color: #5E5E5E;
+<span id="cb8-3"></span>
+<span id="cb8-4"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;"># Composable validation checks with impact levels and thresholds</span></span>
-<span id="cb7-5">validation <span class="op" style="color: #5E5E5E;
+<span id="cb8-5">validation <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> (</span>
-<span id="cb7-6">    Validate(user_data)</span>
-<span id="cb7-7">    .ValuesValidation.ColumnValuesToBeBetween(</span>
-<span id="cb7-8">        column<span class="op" style="color: #5E5E5E;
+<span id="cb8-6">    Validate(user_data)</span>
+<span id="cb8-7">    .ValuesValidation.ColumnValuesToBeBetween(</span>
+<span id="cb8-8">        column<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span><span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"user_id"</span>,</span>
-<span id="cb7-9">        min_value<span class="op" style="color: #5E5E5E;
+<span id="cb8-9">        min_value<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">0</span>,</span>
-<span id="cb7-10">        impact<span class="op" style="color: #5E5E5E;
+<span id="cb8-10">        impact<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span><span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"high"</span>  <span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;"># Critical - will raise exception</span></span>
-<span id="cb7-11">    )</span>
-<span id="cb7-12">    .ValuesValidation.ColumnValuesToBeBetween(</span>
-<span id="cb7-13">        column<span class="op" style="color: #5E5E5E;
+<span id="cb8-11">    )</span>
+<span id="cb8-12">    .ValuesValidation.ColumnValuesToBeBetween(</span>
+<span id="cb8-13">        column<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span><span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"age"</span>,</span>
-<span id="cb7-14">        min_value<span class="op" style="color: #5E5E5E;
+<span id="cb8-14">        min_value<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">18</span>,</span>
-<span id="cb7-15">        max_value<span class="op" style="color: #5E5E5E;
+<span id="cb8-15">        max_value<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">80</span>,</span>
-<span id="cb7-16">        threshold<span class="op" style="color: #5E5E5E;
+<span id="cb8-16">        threshold<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span><span class="fl" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">0.1</span>,  <span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;"># Allow 10% failures</span></span>
-<span id="cb7-17">        impact<span class="op" style="color: #5E5E5E;
+<span id="cb8-17">        impact<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span><span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"medium"</span>  <span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;"># Important but not critical</span></span>
-<span id="cb7-18">    )</span>
-<span id="cb7-19">    .StringValidation.PatternMatch(</span>
-<span id="cb7-20">        column<span class="op" style="color: #5E5E5E;
+<span id="cb8-18">    )</span>
+<span id="cb8-19">    .StringValidation.PatternMatch(</span>
+<span id="cb8-20">        column<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span><span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"email"</span>,</span>
-<span id="cb7-21">        pattern<span class="op" style="color: #5E5E5E;
+<span id="cb8-21">        pattern<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span><span class="vs" style="color: #20794D;
 background-color: null;
@@ -1185,138 +1193,138 @@ background-color: null;
 font-style: inherit;">$</span><span class="vs" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"</span>,</span>
-<span id="cb7-22">        threshold<span class="op" style="color: #5E5E5E;
+<span id="cb8-22">        threshold<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span><span class="fl" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">0.05</span>,  <span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;"># Allow 5% malformed emails</span></span>
-<span id="cb7-23">        impact<span class="op" style="color: #5E5E5E;
+<span id="cb8-23">        impact<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span><span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"low"</span>  <span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;"># Record but don't interrupt</span></span>
-<span id="cb7-24">    )</span>
-<span id="cb7-25">    .ValuesValidation.ColumnValuesToBeBetween(</span>
-<span id="cb7-26">        column<span class="op" style="color: #5E5E5E;
+<span id="cb8-24">    )</span>
+<span id="cb8-25">    .ValuesValidation.ColumnValuesToBeBetween(</span>
+<span id="cb8-26">        column<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span><span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"score"</span>,</span>
-<span id="cb7-27">        min_value<span class="op" style="color: #5E5E5E;
+<span id="cb8-27">        min_value<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">0</span>,</span>
-<span id="cb7-28">        max_value<span class="op" style="color: #5E5E5E;
+<span id="cb8-28">        max_value<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">100</span>,</span>
-<span id="cb7-29">        impact<span class="op" style="color: #5E5E5E;
+<span id="cb8-29">        impact<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span><span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"medium"</span></span>
-<span id="cb7-30">    )</span>
-<span id="cb7-31">    .TypeValidation.TypeCheck(</span>
-<span id="cb7-32">        frame_schema_definition<span class="op" style="color: #5E5E5E;
+<span id="cb8-30">    )</span>
+<span id="cb8-31">    .TypeValidation.TypeCheck(</span>
+<span id="cb8-32">        frame_schema_definition<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span>{</span>
-<span id="cb7-33">            <span class="st" style="color: #20794D;
+<span id="cb8-33">            <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"user_id"</span>: Int64,</span>
-<span id="cb7-34">            <span class="st" style="color: #20794D;
+<span id="cb8-34">            <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"age"</span>: Int64,</span>
-<span id="cb7-35">            <span class="st" style="color: #20794D;
+<span id="cb8-35">            <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"email"</span>: String,</span>
-<span id="cb7-36">            <span class="st" style="color: #20794D;
+<span id="cb8-36">            <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"score"</span>: Float64</span>
-<span id="cb7-37">        },</span>
-<span id="cb7-38">        impact<span class="op" style="color: #5E5E5E;
+<span id="cb8-37">        },</span>
+<span id="cb8-38">        impact<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span><span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"high"</span>  <span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;"># Schema compliance is critical</span></span>
-<span id="cb7-39">    )</span>
-<span id="cb7-40">)</span>
-<span id="cb7-41"></span>
-<span id="cb7-42"><span class="co" style="color: #5E5E5E;
+<span id="cb8-39">    )</span>
+<span id="cb8-40">)</span>
+<span id="cb8-41"></span>
+<span id="cb8-42"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;"># Get validation results</span></span>
-<span id="cb7-43">validation.validate()</span>
-<span id="cb7-44"></span>
-<span id="cb7-45"><span class="co" style="color: #5E5E5E;
+<span id="cb8-43">validation.validate()</span>
+<span id="cb8-44"></span>
+<span id="cb8-45"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;"># Access detailed results for analysis</span></span>
-<span id="cb7-46"><span class="bu" style="color: null;
+<span id="cb8-46"><span class="bu" style="color: null;
 background-color: null;
 font-style: inherit;">print</span>(<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"Validation results:"</span>, validation.results)</span></code></pre></div>
 <div class="cell-output cell-output-stderr">
 <div class="ansi-escaped-output">
-<pre><span class="ansi-green-fg">2025-08-06 05:24:11.240</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">validoopsie.validate</span>:<span class="ansi-cyan-fg">validate</span>:<span class="ansi-cyan-fg">313</span> - <span class="ansi-bold">Passed validation: {'validation': 'ColumnValuesToBeBetween', 'impact': 'high', 'timestamp': '2025-08-06T05:24:11.228216+00:00', 'column': 'user_id', 'result': {'status': 'Success', 'threshold_pass': True, 'message': 'All items passed the validation.', 'frame_row_number': 5, 'threshold': 0.0}}</span>
+<pre><span class="ansi-green-fg">2025-08-07 05:34:04.698</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">validoopsie.validate</span>:<span class="ansi-cyan-fg">validate</span>:<span class="ansi-cyan-fg">313</span> - <span class="ansi-bold">Passed validation: {'validation': 'ColumnValuesToBeBetween', 'impact': 'high', 'timestamp': '2025-08-07T05:34:04.687028+00:00', 'column': 'user_id', 'result': {'status': 'Success', 'threshold_pass': True, 'message': 'All items passed the validation.', 'frame_row_number': 5, 'threshold': 0.0}}</span>
 
-<span class="ansi-green-fg">2025-08-06 05:24:11.240</span> | <span class="ansi-red-fg ansi-bold">ERROR   </span> | <span class="ansi-cyan-fg">validoopsie.validate</span>:<span class="ansi-cyan-fg">validate</span>:<span class="ansi-cyan-fg">305</span> - <span class="ansi-red-fg ansi-bold">Failed validation: ColumnValuesToBeBetween_age - The column 'age' has values that are not between 18 and 80.</span>
+<span class="ansi-green-fg">2025-08-07 05:34:04.699</span> | <span class="ansi-red-fg ansi-bold">ERROR   </span> | <span class="ansi-cyan-fg">validoopsie.validate</span>:<span class="ansi-cyan-fg">validate</span>:<span class="ansi-cyan-fg">305</span> - <span class="ansi-red-fg ansi-bold">Failed validation: ColumnValuesToBeBetween_age - The column 'age' has values that are not between 18 and 80.</span>
 
-<span class="ansi-green-fg">2025-08-06 05:24:11.241</span> | <span class="ansi-yellow-fg ansi-bold">WARNING </span> | <span class="ansi-cyan-fg">validoopsie.validate</span>:<span class="ansi-cyan-fg">validate</span>:<span class="ansi-cyan-fg">307</span> - <span class="ansi-yellow-fg ansi-bold">Failed validation: PatternMatch_email - The column 'email' has entries that do not match the pattern '^[^@]+@[^@]+\.[^@]+$'.</span>
+<span class="ansi-green-fg">2025-08-07 05:34:04.700</span> | <span class="ansi-yellow-fg ansi-bold">WARNING </span> | <span class="ansi-cyan-fg">validoopsie.validate</span>:<span class="ansi-cyan-fg">validate</span>:<span class="ansi-cyan-fg">307</span> - <span class="ansi-yellow-fg ansi-bold">Failed validation: PatternMatch_email - The column 'email' has entries that do not match the pattern '^[^@]+@[^@]+\.[^@]+$'.</span>
 
-<span class="ansi-green-fg">2025-08-06 05:24:11.241</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">validoopsie.validate</span>:<span class="ansi-cyan-fg">validate</span>:<span class="ansi-cyan-fg">313</span> - <span class="ansi-bold">Passed validation: {'validation': 'ColumnValuesToBeBetween', 'impact': 'medium', 'timestamp': '2025-08-06T05:24:11.232698+00:00', 'column': 'score', 'result': {'status': 'Success', 'threshold_pass': True, 'message': 'All items passed the validation.', 'frame_row_number': 5, 'threshold': 0.0}}</span>
+<span class="ansi-green-fg">2025-08-07 05:34:04.700</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">validoopsie.validate</span>:<span class="ansi-cyan-fg">validate</span>:<span class="ansi-cyan-fg">313</span> - <span class="ansi-bold">Passed validation: {'validation': 'ColumnValuesToBeBetween', 'impact': 'medium', 'timestamp': '2025-08-07T05:34:04.691656+00:00', 'column': 'score', 'result': {'status': 'Success', 'threshold_pass': True, 'message': 'All items passed the validation.', 'frame_row_number': 5, 'threshold': 0.0}}</span>
 
-<span class="ansi-green-fg">2025-08-06 05:24:11.242</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">validoopsie.validate</span>:<span class="ansi-cyan-fg">validate</span>:<span class="ansi-cyan-fg">313</span> - <span class="ansi-bold">Passed validation: {'validation': 'TypeCheck', 'impact': 'high', 'timestamp': '2025-08-06T05:24:11.233638+00:00', 'column': 'DataTypeColumnValidation', 'result': {'status': 'Success', 'threshold_pass': True, 'message': 'All items passed the validation.', 'frame_row_number': 4, 'threshold': 0.0}}</span>
+<span class="ansi-green-fg">2025-08-07 05:34:04.700</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">validoopsie.validate</span>:<span class="ansi-cyan-fg">validate</span>:<span class="ansi-cyan-fg">313</span> - <span class="ansi-bold">Passed validation: {'validation': 'TypeCheck', 'impact': 'high', 'timestamp': '2025-08-07T05:34:04.692642+00:00', 'column': 'DataTypeColumnValidation', 'result': {'status': 'Success', 'threshold_pass': True, 'message': 'All items passed the validation.', 'frame_row_number': 4, 'threshold': 0.0}}</span>
 </pre>
 </div>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Validation results: {'Summary': {'passed': False, 'validations': ['ColumnValuesToBeBetween_user_id', 'ColumnValuesToBeBetween_age', 'PatternMatch_email', 'ColumnValuesToBeBetween_score', 'TypeCheck_DataTypeColumnValidation'], 'failed_validation': ['ColumnValuesToBeBetween_age', 'PatternMatch_email']}, 'ColumnValuesToBeBetween_user_id': {'validation': 'ColumnValuesToBeBetween', 'impact': 'high', 'timestamp': '2025-08-06T05:24:11.228216+00:00', 'column': 'user_id', 'result': {'status': 'Success', 'threshold_pass': True, 'message': 'All items passed the validation.', 'frame_row_number': 5, 'threshold': 0.0}}, 'ColumnValuesToBeBetween_age': {'validation': 'ColumnValuesToBeBetween', 'impact': 'medium', 'timestamp': '2025-08-06T05:24:11.230192+00:00', 'column': 'age', 'result': {'status': 'Fail', 'threshold_pass': False, 'message': "The column 'age' has values that are not between 18 and 80.", 'failing_items': [95], 'failed_number': 1, 'frame_row_number': 5, 'threshold': 0.1, 'failed_percentage': 0.2}}, 'PatternMatch_email': {'validation': 'PatternMatch', 'impact': 'low', 'timestamp': '2025-08-06T05:24:11.231431+00:00', 'column': 'email', 'result': {'status': 'Fail', 'threshold_pass': False, 'message': "The column 'email' has entries that do not match the pattern '^[^@]+@[^@]+\\.[^@]+$'.", 'failing_items': ['invalid-email'], 'failed_number': 1, 'frame_row_number': 5, 'threshold': 0.05, 'failed_percentage': 0.2}}, 'ColumnValuesToBeBetween_score': {'validation': 'ColumnValuesToBeBetween', 'impact': 'medium', 'timestamp': '2025-08-06T05:24:11.232698+00:00', 'column': 'score', 'result': {'status': 'Success', 'threshold_pass': True, 'message': 'All items passed the validation.', 'frame_row_number': 5, 'threshold': 0.0}}, 'TypeCheck_DataTypeColumnValidation': {'validation': 'TypeCheck', 'impact': 'high', 'timestamp': '2025-08-06T05:24:11.233638+00:00', 'column': 'DataTypeColumnValidation', 'result': {'status': 'Success', 'threshold_pass': True, 'message': 'All items passed the validation.', 'frame_row_number': 4, 'threshold': 0.0}}}</code></pre>
+<pre><code>Validation results: {'Summary': {'passed': False, 'validations': ['ColumnValuesToBeBetween_user_id', 'ColumnValuesToBeBetween_age', 'PatternMatch_email', 'ColumnValuesToBeBetween_score', 'TypeCheck_DataTypeColumnValidation'], 'failed_validation': ['ColumnValuesToBeBetween_age', 'PatternMatch_email']}, 'ColumnValuesToBeBetween_user_id': {'validation': 'ColumnValuesToBeBetween', 'impact': 'high', 'timestamp': '2025-08-07T05:34:04.687028+00:00', 'column': 'user_id', 'result': {'status': 'Success', 'threshold_pass': True, 'message': 'All items passed the validation.', 'frame_row_number': 5, 'threshold': 0.0}}, 'ColumnValuesToBeBetween_age': {'validation': 'ColumnValuesToBeBetween', 'impact': 'medium', 'timestamp': '2025-08-07T05:34:04.689076+00:00', 'column': 'age', 'result': {'status': 'Fail', 'threshold_pass': False, 'message': "The column 'age' has values that are not between 18 and 80.", 'failing_items': [95], 'failed_number': 1, 'frame_row_number': 5, 'threshold': 0.1, 'failed_percentage': 0.2}}, 'PatternMatch_email': {'validation': 'PatternMatch', 'impact': 'low', 'timestamp': '2025-08-07T05:34:04.690339+00:00', 'column': 'email', 'result': {'status': 'Fail', 'threshold_pass': False, 'message': "The column 'email' has entries that do not match the pattern '^[^@]+@[^@]+\\.[^@]+$'.", 'failing_items': ['invalid-email'], 'failed_number': 1, 'frame_row_number': 5, 'threshold': 0.05, 'failed_percentage': 0.2}}, 'ColumnValuesToBeBetween_score': {'validation': 'ColumnValuesToBeBetween', 'impact': 'medium', 'timestamp': '2025-08-07T05:34:04.691656+00:00', 'column': 'score', 'result': {'status': 'Success', 'threshold_pass': True, 'message': 'All items passed the validation.', 'frame_row_number': 5, 'threshold': 0.0}}, 'TypeCheck_DataTypeColumnValidation': {'validation': 'TypeCheck', 'impact': 'high', 'timestamp': '2025-08-07T05:34:04.692642+00:00', 'column': 'DataTypeColumnValidation', 'result': {'status': 'Success', 'threshold_pass': True, 'message': 'All items passed the validation.', 'frame_row_number': 4, 'threshold': 0.0}}}</code></pre>
 </div>
 </div>
 <p>This example showcases Validoopsie’s key differentiators: modular validation categories (<code>ValuesValidation</code>, <code>StringValidation</code>, <code>TypeValidation</code>) combined with <em>impact levels</em> that control failure behavior and <em>thresholds</em> that allow controlled tolerance for data quality issues. Unlike other libraries that treat all validation failures equally, Validoopsie lets you specify which validations are critical (“high” impact raises exceptions) versus informational (“low” impact just logs results).</p>
 <p>Validoopsie’s most powerful feature is its three-tier <code>impact=</code> system combined with <code>threshold=</code> tolerance:</p>
-<div id="9286347a" class="cell" data-execution_count="8">
-<div class="sourceCode cell-code" id="cb9" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><span class="co" style="color: #5E5E5E;
+<div id="d4899e83" class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb10" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;"># Example showing sophisticated failure handling</span></span>
-<span id="cb9-2">validation <span class="op" style="color: #5E5E5E;
+<span id="cb10-2">validation <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> (</span>
-<span id="cb9-3">    Validate(user_data)</span>
-<span id="cb9-4">    <span class="co" style="color: #5E5E5E;
+<span id="cb10-3">    Validate(user_data)</span>
+<span id="cb10-4">    <span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;"># Critical validation - no tolerance</span></span>
-<span id="cb9-5">    .NullValidation.ColumnNotBeNull(</span>
-<span id="cb9-6">        column<span class="op" style="color: #5E5E5E;
+<span id="cb10-5">    .NullValidation.ColumnNotBeNull(</span>
+<span id="cb10-6">        column<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span><span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"user_id"</span>,</span>
-<span id="cb9-7">        impact<span class="op" style="color: #5E5E5E;
+<span id="cb10-7">        impact<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span><span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"high"</span>    <span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;"># Will raise an exception if any Null values found</span></span>
-<span id="cb9-8">    )</span>
-<span id="cb9-9">    <span class="co" style="color: #5E5E5E;
+<span id="cb10-8">    )</span>
+<span id="cb10-9">    <span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;"># Important validation with tolerance</span></span>
-<span id="cb9-10">    .StringValidation.PatternMatch(</span>
-<span id="cb9-11">        column<span class="op" style="color: #5E5E5E;
+<span id="cb10-10">    .StringValidation.PatternMatch(</span>
+<span id="cb10-11">        column<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span><span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"email"</span>,</span>
-<span id="cb9-12">        pattern<span class="op" style="color: #5E5E5E;
+<span id="cb10-12">        pattern<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span><span class="vs" style="color: #20794D;
 background-color: null;
@@ -1343,65 +1351,65 @@ background-color: null;
 font-style: inherit;">$</span><span class="vs" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"</span>,</span>
-<span id="cb9-13">        threshold<span class="op" style="color: #5E5E5E;
+<span id="cb10-13">        threshold<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span><span class="fl" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">0.15</span>,  <span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;"># Allow up to 15% malformed emails</span></span>
-<span id="cb9-14">        impact<span class="op" style="color: #5E5E5E;
+<span id="cb10-14">        impact<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span><span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"medium"</span>  <span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;"># Log failures but don't stop processing</span></span>
-<span id="cb9-15">    )</span>
-<span id="cb9-16">    <span class="co" style="color: #5E5E5E;
+<span id="cb10-15">    )</span>
+<span id="cb10-16">    <span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;"># Informational validation</span></span>
-<span id="cb9-17">    .ValuesValidation.ColumnValuesToBeBetween(</span>
-<span id="cb9-18">        column<span class="op" style="color: #5E5E5E;
+<span id="cb10-17">    .ValuesValidation.ColumnValuesToBeBetween(</span>
+<span id="cb10-18">        column<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span><span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"score"</span>,</span>
-<span id="cb9-19">        min_value<span class="op" style="color: #5E5E5E;
+<span id="cb10-19">        min_value<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">90</span>,</span>
-<span id="cb9-20">        max_value<span class="op" style="color: #5E5E5E;
+<span id="cb10-20">        max_value<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">100</span>,</span>
-<span id="cb9-21">        threshold<span class="op" style="color: #5E5E5E;
+<span id="cb10-21">        threshold<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span><span class="fl" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">0.8</span>,  <span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;"># Allow 80% to be outside "excellent" range</span></span>
-<span id="cb9-22">        impact<span class="op" style="color: #5E5E5E;
+<span id="cb10-22">        impact<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span><span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"low"</span>    <span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;"># Just track high performers</span></span>
-<span id="cb9-23">    )</span>
-<span id="cb9-24">)</span>
-<span id="cb9-25"></span>
-<span id="cb9-26">validation.validate()</span></code></pre></div>
+<span id="cb10-23">    )</span>
+<span id="cb10-24">)</span>
+<span id="cb10-25"></span>
+<span id="cb10-26">validation.validate()</span></code></pre></div>
 <div class="cell-output cell-output-stderr">
 <div class="ansi-escaped-output">
-<pre><span class="ansi-green-fg">2025-08-06 05:24:11.255</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">validoopsie.validate</span>:<span class="ansi-cyan-fg">validate</span>:<span class="ansi-cyan-fg">313</span> - <span class="ansi-bold">Passed validation: {'validation': 'ColumnNotBeNull', 'impact': 'high', 'timestamp': '2025-08-06T05:24:11.252039+00:00', 'column': 'user_id', 'result': {'status': 'Success', 'threshold_pass': True, 'message': 'All items passed the validation.', 'frame_row_number': 5, 'threshold': 0.0}}</span>
+<pre><span class="ansi-green-fg">2025-08-07 05:34:04.713</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">validoopsie.validate</span>:<span class="ansi-cyan-fg">validate</span>:<span class="ansi-cyan-fg">313</span> - <span class="ansi-bold">Passed validation: {'validation': 'ColumnNotBeNull', 'impact': 'high', 'timestamp': '2025-08-07T05:34:04.709928+00:00', 'column': 'user_id', 'result': {'status': 'Success', 'threshold_pass': True, 'message': 'All items passed the validation.', 'frame_row_number': 5, 'threshold': 0.0}}</span>
 
-<span class="ansi-green-fg">2025-08-06 05:24:11.256</span> | <span class="ansi-red-fg ansi-bold">ERROR   </span> | <span class="ansi-cyan-fg">validoopsie.validate</span>:<span class="ansi-cyan-fg">validate</span>:<span class="ansi-cyan-fg">305</span> - <span class="ansi-red-fg ansi-bold">Failed validation: PatternMatch_email - The column 'email' has entries that do not match the pattern '^[^@]+@[^@]+\.[^@]+$'.</span>
+<span class="ansi-green-fg">2025-08-07 05:34:04.714</span> | <span class="ansi-red-fg ansi-bold">ERROR   </span> | <span class="ansi-cyan-fg">validoopsie.validate</span>:<span class="ansi-cyan-fg">validate</span>:<span class="ansi-cyan-fg">305</span> - <span class="ansi-red-fg ansi-bold">Failed validation: PatternMatch_email - The column 'email' has entries that do not match the pattern '^[^@]+@[^@]+\.[^@]+$'.</span>
 
-<span class="ansi-green-fg">2025-08-06 05:24:11.256</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">validoopsie.validate</span>:<span class="ansi-cyan-fg">validate</span>:<span class="ansi-cyan-fg">313</span> - <span class="ansi-bold">Passed validation: {'validation': 'ColumnValuesToBeBetween', 'impact': 'low', 'timestamp': '2025-08-06T05:24:11.254515+00:00', 'column': 'score', 'result': {'status': 'Success', 'threshold_pass': True, 'message': "The column 'score' has values that are not between 90 and 100.", 'failing_items': [78.3, 85.5, 88.7], 'failed_number': 3, 'frame_row_number': 5, 'threshold': 0.8, 'failed_percentage': 0.6}}</span>
+<span class="ansi-green-fg">2025-08-07 05:34:04.714</span> | <span class="ansi-bold">INFO    </span> | <span class="ansi-cyan-fg">validoopsie.validate</span>:<span class="ansi-cyan-fg">validate</span>:<span class="ansi-cyan-fg">313</span> - <span class="ansi-bold">Passed validation: {'validation': 'ColumnValuesToBeBetween', 'impact': 'low', 'timestamp': '2025-08-07T05:34:04.712420+00:00', 'column': 'score', 'result': {'status': 'Success', 'threshold_pass': True, 'message': "The column 'score' has values that are not between 90 and 100.", 'failing_items': [78.3, 85.5, 88.7], 'failed_number': 3, 'frame_row_number': 5, 'threshold': 0.8, 'failed_percentage': 0.6}}</span>
 </pre>
 </div>
 </div>
@@ -1444,23 +1452,23 @@ font-style: inherit;"># Just track high performers</span></span>
 <p>Dataframely launched in early 2025 with native Polars support as a core feature, built specifically for the modern data ecosystem with first-class support for complex validation scenarios.</p>
 <section id="example-4" class="level3">
 <h3 class="anchored" data-anchor-id="example-4">Example</h3>
-<div id="72908077" class="cell" data-execution_count="9">
-<div class="sourceCode cell-code" id="cb10" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><span class="im" style="color: #00769E;
+<div id="2ec22c80" class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb11" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><span class="im" style="color: #00769E;
 background-color: null;
 font-style: inherit;">import</span> polars <span class="im" style="color: #00769E;
 background-color: null;
 font-style: inherit;">as</span> pl</span>
-<span id="cb10-2"><span class="im" style="color: #00769E;
+<span id="cb11-2"><span class="im" style="color: #00769E;
 background-color: null;
 font-style: inherit;">import</span> dataframely <span class="im" style="color: #00769E;
 background-color: null;
 font-style: inherit;">as</span> dy</span>
-<span id="cb10-3"></span>
-<span id="cb10-4"><span class="kw" style="color: #003B4F;
+<span id="cb11-3"></span>
+<span id="cb11-4"><span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">class</span> UserSchema(dy.Schema):</span>
-<span id="cb10-5">    user_id <span class="op" style="color: #5E5E5E;
+<span id="cb11-5">    user_id <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> dy.Int64(primary_key<span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -1477,14 +1485,14 @@ background-color: null;
 font-style: inherit;">=</span><span class="va" style="color: #111111;
 background-color: null;
 font-style: inherit;">False</span>)</span>
-<span id="cb10-6">    age <span class="op" style="color: #5E5E5E;
+<span id="cb11-6">    age <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> dy.Int64(nullable<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span><span class="va" style="color: #111111;
 background-color: null;
 font-style: inherit;">False</span>)</span>
-<span id="cb10-7">    email <span class="op" style="color: #5E5E5E;
+<span id="cb11-7">    email <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> dy.String(nullable<span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -1517,7 +1525,7 @@ background-color: null;
 font-style: inherit;">$</span><span class="vs" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"</span>)</span>
-<span id="cb10-8">    score <span class="op" style="color: #5E5E5E;
+<span id="cb11-8">    score <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> dy.Float64(nullable<span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -1536,20 +1544,20 @@ background-color: null;
 font-style: inherit;">=</span><span class="fl" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">100.0</span>)</span>
-<span id="cb10-9"></span>
-<span id="cb10-10">    <span class="co" style="color: #5E5E5E;
+<span id="cb11-9"></span>
+<span id="cb11-10">    <span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;"># Use @dy.rule() for age range validation</span></span>
-<span id="cb10-11">    <span class="at" style="color: #657422;
+<span id="cb11-11">    <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">@dy.rule</span>()</span>
-<span id="cb10-12">    <span class="kw" style="color: #003B4F;
+<span id="cb11-12">    <span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">def</span> age_in_range() <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">-&gt;</span> pl.Expr:</span>
-<span id="cb10-13">        <span class="cf" style="color: #003B4F;
+<span id="cb11-13">        <span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">return</span> pl.col(<span class="st" style="color: #20794D;
@@ -1563,30 +1571,30 @@ background-color: null;
 font-style: inherit;">=</span><span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"both"</span>)</span>
-<span id="cb10-14"></span>
-<span id="cb10-15"><span class="co" style="color: #5E5E5E;
+<span id="cb11-14"></span>
+<span id="cb11-15"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;"># Validate using the schema</span></span>
-<span id="cb10-16"><span class="cf" style="color: #003B4F;
+<span id="cb11-16"><span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">try</span>:</span>
-<span id="cb10-17">    validated_data <span class="op" style="color: #5E5E5E;
+<span id="cb11-17">    validated_data <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> UserSchema.validate(user_data, cast<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span><span class="va" style="color: #111111;
 background-color: null;
 font-style: inherit;">True</span>)</span>
-<span id="cb10-18">    <span class="bu" style="color: null;
+<span id="cb11-18">    <span class="bu" style="color: null;
 background-color: null;
 font-style: inherit;">print</span>(<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"Validation successful!"</span>)</span>
-<span id="cb10-19">    <span class="bu" style="color: null;
+<span id="cb11-19">    <span class="bu" style="color: null;
 background-color: null;
 font-style: inherit;">print</span>(validated_data)</span>
-<span id="cb10-20"><span class="cf" style="color: #003B4F;
+<span id="cb11-20"><span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">except</span> <span class="pp" style="color: #AD0000;
@@ -1594,7 +1602,7 @@ background-color: null;
 font-style: inherit;">Exception</span> <span class="im" style="color: #00769E;
 background-color: null;
 font-style: inherit;">as</span> e:</span>
-<span id="cb10-21">    <span class="bu" style="color: null;
+<span id="cb11-21">    <span class="bu" style="color: null;
 background-color: null;
 font-style: inherit;">print</span>(<span class="ss" style="color: #20794D;
 background-color: null;
@@ -1615,11 +1623,11 @@ font-style: inherit;">"</span>)</span></code></pre></div>
 <p>This example showcases Dataframely’s class-based schema approach with several notable features: primary key constraints, comprehensive type validation with bounds, regex pattern matching, and custom validation rules using the <code>@dy.rule()</code> decorator (used here for age range checking).</p>
 <p>The <code>cast=True</code> parameter automatically coerces column types to match the schema definitions. This is really useful when working with data from external sources where column types might not exactly match your schema expectations (e.g., integers loaded as strings from CSV files).</p>
 <p>Dataframely features soft validation and failure introspection. As one of Dataframely’s standout features, it brings a fairly sophisticated approach to validation failures. Rather than just raising exceptions, it provides detailed failure analysis:</p>
-<div id="87735ea6" class="cell" data-execution_count="10">
-<div class="sourceCode cell-code" id="cb12" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><span class="co" style="color: #5E5E5E;
+<div id="3196cbc3" class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb13" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;"># Soft validation: separate valid and invalid rows</span></span>
-<span id="cb12-2">good_data, failure_info <span class="op" style="color: #5E5E5E;
+<span id="cb13-2">good_data, failure_info <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> UserSchema.<span class="bu" style="color: null;
 background-color: null;
@@ -1628,32 +1636,32 @@ background-color: null;
 font-style: inherit;">=</span><span class="va" style="color: #111111;
 background-color: null;
 font-style: inherit;">True</span>)</span>
-<span id="cb12-3"></span>
-<span id="cb12-4"><span class="bu" style="color: null;
+<span id="cb13-3"></span>
+<span id="cb13-4"><span class="bu" style="color: null;
 background-color: null;
 font-style: inherit;">print</span>(<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"Valid rows:"</span>, <span class="bu" style="color: null;
 background-color: null;
 font-style: inherit;">len</span>(good_data))</span>
-<span id="cb12-5"><span class="bu" style="color: null;
+<span id="cb13-5"><span class="bu" style="color: null;
 background-color: null;
 font-style: inherit;">print</span>(<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"Failure counts:"</span>, failure_info.counts())</span>
-<span id="cb12-6"><span class="bu" style="color: null;
+<span id="cb13-6"><span class="bu" style="color: null;
 background-color: null;
 font-style: inherit;">print</span>(<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"Co-occurrence analysis:"</span>, failure_info.cooccurrence_counts())</span>
-<span id="cb12-7"></span>
-<span id="cb12-8"><span class="co" style="color: #5E5E5E;
+<span id="cb13-7"></span>
+<span id="cb13-8"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;"># Inspect the actual failed rows</span></span>
-<span id="cb12-9">failed_rows <span class="op" style="color: #5E5E5E;
+<span id="cb13-9">failed_rows <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> failure_info.invalid()</span>
-<span id="cb12-10"><span class="bu" style="color: null;
+<span id="cb13-10"><span class="bu" style="color: null;
 background-color: null;
 font-style: inherit;">print</span>(<span class="st" style="color: #20794D;
 background-color: null;
@@ -1661,7 +1669,7 @@ font-style: inherit;">"Failed data:"</span>, failed_rows)</span></code></pre></d
 <div class="cell-output cell-output-stdout">
 <pre><code>Valid rows: 3
 Failure counts: {'age_in_range': 1, 'email|regex': 1}
-Co-occurrence analysis: {frozenset({'email|regex'}): 1, frozenset({'age_in_range'}): 1}
+Co-occurrence analysis: {frozenset({'age_in_range'}): 1, frozenset({'email|regex'}): 1}
 Failed data: shape: (2, 4)
 ┌─────────┬─────┬───────────────────┬───────┐
 │ user_id ┆ age ┆ email             ┆ score │
@@ -1889,7 +1897,7 @@ Failed data: shape: (2, 4)
 <section id="getting-started-with-actions" class="level2">
 <h2 class="anchored" data-anchor-id="getting-started-with-actions">Getting Started with Actions</h2>
 <p>Actions are executed when validation steps fail to meet certain thresholds. Let’s start with a simple example:</p>
-<div id="34f443ee" class="cell" data-execution_count="2">
+<div id="e74f13ec" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><span class="im" style="color: #00769E;
 background-color: null;
 font-style: inherit;">import</span> pointblank <span class="im" style="color: #00769E;
@@ -2020,7 +2028,7 @@ font-style: inherit;">"⚠️ WARNING: Some values in column 'd' are below the m
     <td colspan="14" class="gt_heading gt_title gt_font_normal" style="color: #444444;font-size: 28px;text-align: left;font-weight: bold; text-align: left;">Pointblank Validation</td>
   </tr>
   <tr class="gt_heading">
-    <td colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style="text-align: left;"><div><span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2025-08-06|05:24:23</span><div style="padding-top: 10px; padding-bottom: 5px;"><span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 10px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 10px 2px 10px; font-size: 10px;">Polars</span></div></div></td>
+    <td colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style="text-align: left;"><div><span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2025-08-07|05:34:17</span><div style="padding-top: 10px; padding-bottom: 5px;"><span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 10px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 10px 2px 10px; font-size: 10px;">Polars</span></div></div></td>
   </tr>
 <tr class="gt_col_headings">
   <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-status_color"></th>
@@ -2118,7 +2126,7 @@ font-style: inherit;">"⚠️ WARNING: Some values in column 'd' are below the m
 <li><code>highest_only=</code>: only trigger the action for the highest threshold level reached (<code>True</code> by default)</li>
 </ul>
 <p>Let’s see how these work in practice:</p>
-<div id="c546544e" class="cell" data-execution_count="3">
+<div id="5f617ad0" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
@@ -2282,7 +2290,7 @@ font-style: inherit;">0.10</span></span>
     <td colspan="14" class="gt_heading gt_title gt_font_normal" style="color: #444444;font-size: 28px;text-align: left;font-weight: bold; text-align: left;">Pointblank Validation</td>
   </tr>
   <tr class="gt_heading">
-    <td colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style="text-align: left;"><div><span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2025-08-06|05:24:23</span><div style="padding-top: 10px; padding-bottom: 5px;"><span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 10px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 10px 2px 10px; font-size: 10px;">Polars</span><span><span style="background-color: #AAAAAA; color: white; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 5px; border: solid 1px #AAAAAA; font-weight: bold; padding: 2px 15px 2px 15px; font-size: smaller;">WARNING</span><span style="background-color: none; color: #333333; padding: 0.5em 0.5em; position: inherit; margin: 5px 0px 5px -4px; font-weight: bold; border: solid 1px #AAAAAA; padding: 2px 15px 2px 15px; font-size: smaller; margin-right: 5px;">0.05</span><span style="background-color: #EBBC14; color: white; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 1px; border: solid 1px #EBBC14; font-weight: bold; padding: 2px 15px 2px 15px; font-size: smaller;">ERROR</span><span style="background-color: none; color: #333333; padding: 0.5em 0.5em; position: inherit; margin: 5px 0px 5px -4px; font-weight: bold; border: solid 1px #EBBC14; padding: 2px 15px 2px 15px; font-size: smaller; margin-right: 5px;">0.1</span><span style="background-color: #FF3300; color: white; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 1px; border: solid 1px #FF3300; font-weight: bold; padding: 2px 15px 2px 15px; font-size: smaller;">CRITICAL</span><span style="background-color: none; color: #333333; padding: 0.5em 0.5em; position: inherit; margin: 5px 0px 5px -4px; font-weight: bold; border: solid 1px #FF3300; padding: 2px 15px 2px 15px; font-size: smaller;">0.15</span></span></div></div></td>
+    <td colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style="text-align: left;"><div><span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2025-08-07|05:34:17</span><div style="padding-top: 10px; padding-bottom: 5px;"><span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 10px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 10px 2px 10px; font-size: 10px;">Polars</span><span><span style="background-color: #AAAAAA; color: white; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 5px; border: solid 1px #AAAAAA; font-weight: bold; padding: 2px 15px 2px 15px; font-size: smaller;">WARNING</span><span style="background-color: none; color: #333333; padding: 0.5em 0.5em; position: inherit; margin: 5px 0px 5px -4px; font-weight: bold; border: solid 1px #AAAAAA; padding: 2px 15px 2px 15px; font-size: smaller; margin-right: 5px;">0.05</span><span style="background-color: #EBBC14; color: white; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 1px; border: solid 1px #EBBC14; font-weight: bold; padding: 2px 15px 2px 15px; font-size: smaller;">ERROR</span><span style="background-color: none; color: #333333; padding: 0.5em 0.5em; position: inherit; margin: 5px 0px 5px -4px; font-weight: bold; border: solid 1px #EBBC14; padding: 2px 15px 2px 15px; font-size: smaller; margin-right: 5px;">0.1</span><span style="background-color: #FF3300; color: white; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 1px; border: solid 1px #FF3300; font-weight: bold; padding: 2px 15px 2px 15px; font-size: smaller;">CRITICAL</span><span style="background-color: none; color: #333333; padding: 0.5em 0.5em; position: inherit; margin: 5px 0px 5px -4px; font-weight: bold; border: solid 1px #FF3300; padding: 2px 15px 2px 15px; font-size: smaller;">0.15</span></span></div></div></td>
   </tr>
 <tr class="gt_col_headings">
   <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-status_color"></th>
@@ -2411,7 +2419,7 @@ font-style: inherit;">0.10</span></span>
 <li><code>{time}</code>: when the action was executed</li>
 </ul>
 <p>You can also capitalize placeholders (like <code>{LEVEL}</code>) to get uppercase text.</p>
-<div id="6aedf482" class="cell" data-execution_count="4">
+<div id="95dbe82c" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb5" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1">action_template <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> <span class="st" style="color: #20794D;
@@ -2560,7 +2568,7 @@ font-style: inherit;">3000</span></span>
     <td colspan="14" class="gt_heading gt_title gt_font_normal" style="color: #444444;font-size: 28px;text-align: left;font-weight: bold; text-align: left;">Pointblank Validation</td>
   </tr>
   <tr class="gt_heading">
-    <td colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style="text-align: left;"><div><span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2025-08-06|05:24:23</span><div style="padding-top: 10px; padding-bottom: 5px;"><span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 10px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 10px 2px 10px; font-size: 10px;">Polars</span><span><span style="background-color: #AAAAAA; color: white; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 5px; border: solid 1px #AAAAAA; font-weight: bold; padding: 2px 15px 2px 15px; font-size: smaller;">WARNING</span><span style="background-color: none; color: #333333; padding: 0.5em 0.5em; position: inherit; margin: 5px 0px 5px -4px; font-weight: bold; border: solid 1px #AAAAAA; padding: 2px 15px 2px 15px; font-size: smaller; margin-right: 5px;">1</span><span style="background-color: #EBBC14; color: white; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 1px; border: solid 1px #EBBC14; font-weight: bold; padding: 2px 15px 2px 15px; font-size: smaller;">ERROR</span><span style="background-color: none; color: #333333; padding: 0.5em 0.5em; position: inherit; margin: 5px 0px 5px -4px; font-weight: bold; border: solid 1px #EBBC14; padding: 2px 15px 2px 15px; font-size: smaller; margin-right: 5px;">4</span><span style="background-color: #FF3300; color: white; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 1px; border: solid 1px #FF3300; font-weight: bold; padding: 2px 15px 2px 15px; font-size: smaller;">CRITICAL</span><span style="background-color: none; color: #333333; padding: 0.5em 0.5em; position: inherit; margin: 5px 0px 5px -4px; font-weight: bold; border: solid 1px #FF3300; padding: 2px 15px 2px 15px; font-size: smaller;">10</span></span></div></div></td>
+    <td colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style="text-align: left;"><div><span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2025-08-07|05:34:17</span><div style="padding-top: 10px; padding-bottom: 5px;"><span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 10px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 10px 2px 10px; font-size: 10px;">Polars</span><span><span style="background-color: #AAAAAA; color: white; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 5px; border: solid 1px #AAAAAA; font-weight: bold; padding: 2px 15px 2px 15px; font-size: smaller;">WARNING</span><span style="background-color: none; color: #333333; padding: 0.5em 0.5em; position: inherit; margin: 5px 0px 5px -4px; font-weight: bold; border: solid 1px #AAAAAA; padding: 2px 15px 2px 15px; font-size: smaller; margin-right: 5px;">1</span><span style="background-color: #EBBC14; color: white; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 1px; border: solid 1px #EBBC14; font-weight: bold; padding: 2px 15px 2px 15px; font-size: smaller;">ERROR</span><span style="background-color: none; color: #333333; padding: 0.5em 0.5em; position: inherit; margin: 5px 0px 5px -4px; font-weight: bold; border: solid 1px #EBBC14; padding: 2px 15px 2px 15px; font-size: smaller; margin-right: 5px;">4</span><span style="background-color: #FF3300; color: white; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 1px; border: solid 1px #FF3300; font-weight: bold; padding: 2px 15px 2px 15px; font-size: smaller;">CRITICAL</span><span style="background-color: none; color: #333333; padding: 0.5em 0.5em; position: inherit; margin: 5px 0px 5px -4px; font-weight: bold; border: solid 1px #FF3300; padding: 2px 15px 2px 15px; font-size: smaller;">10</span></span></div></div></td>
   </tr>
 <tr class="gt_col_headings">
   <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-status_color"></th>
@@ -2635,7 +2643,7 @@ font-style: inherit;">3000</span></span>
 <section id="accessing-metadata-in-custom-action-functions" class="level2">
 <h2 class="anchored" data-anchor-id="accessing-metadata-in-custom-action-functions">Accessing Metadata in Custom Action Functions</h2>
 <p>For more sophisticated actions, you often need access to details about the validation failure. The <a href="../../reference/get_action_metadata.html#pointblank.get_action_metadata" title="0"><code>get_action_metadata()</code></a> function provides this context when called inside an action function:</p>
-<div id="eafb4f3a" class="cell" data-execution_count="5">
+<div id="c900bbca" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb7" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
@@ -2778,7 +2786,7 @@ font-style: inherit;">5000</span></span>
     Column: d
     Validation type: col_vals_gt
     Severity: critical (level 50)
-    Time: 2025-08-06 05:24:23.794852+00:00
+    Time: 2025-08-07 05:34:17.560204+00:00
 
     Explanation: Exceedance of failed test units where values in `d` should have been &gt; `5000`.
     </code></pre>
@@ -2858,7 +2866,7 @@ font-style: inherit;">5000</span></span>
     <td colspan="14" class="gt_heading gt_title gt_font_normal" style="color: #444444;font-size: 28px;text-align: left;font-weight: bold; text-align: left;">Pointblank Validation</td>
   </tr>
   <tr class="gt_heading">
-    <td colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style="text-align: left;"><div><span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2025-08-06|05:24:23</span><div style="padding-top: 10px; padding-bottom: 5px;"><span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 10px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 10px 2px 10px; font-size: 10px;">Polars</span><span><span style="background-color: #AAAAAA; color: white; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 5px; border: solid 1px #AAAAAA; font-weight: bold; padding: 2px 15px 2px 15px; font-size: smaller;">WARNING</span><span style="background-color: none; color: #333333; padding: 0.5em 0.5em; position: inherit; margin: 5px 0px 5px -4px; font-weight: bold; border: solid 1px #AAAAAA; padding: 2px 15px 2px 15px; font-size: smaller; margin-right: 5px;">—</span><span style="background-color: #EBBC14; color: white; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 1px; border: solid 1px #EBBC14; font-weight: bold; padding: 2px 15px 2px 15px; font-size: smaller;">ERROR</span><span style="background-color: none; color: #333333; padding: 0.5em 0.5em; position: inherit; margin: 5px 0px 5px -4px; font-weight: bold; border: solid 1px #EBBC14; padding: 2px 15px 2px 15px; font-size: smaller; margin-right: 5px;">—</span><span style="background-color: #FF3300; color: white; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 1px; border: solid 1px #FF3300; font-weight: bold; padding: 2px 15px 2px 15px; font-size: smaller;">CRITICAL</span><span style="background-color: none; color: #333333; padding: 0.5em 0.5em; position: inherit; margin: 5px 0px 5px -4px; font-weight: bold; border: solid 1px #FF3300; padding: 2px 15px 2px 15px; font-size: smaller;">1</span></span></div></div></td>
+    <td colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style="text-align: left;"><div><span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2025-08-07|05:34:17</span><div style="padding-top: 10px; padding-bottom: 5px;"><span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 10px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 10px 2px 10px; font-size: 10px;">Polars</span><span><span style="background-color: #AAAAAA; color: white; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 5px; border: solid 1px #AAAAAA; font-weight: bold; padding: 2px 15px 2px 15px; font-size: smaller;">WARNING</span><span style="background-color: none; color: #333333; padding: 0.5em 0.5em; position: inherit; margin: 5px 0px 5px -4px; font-weight: bold; border: solid 1px #AAAAAA; padding: 2px 15px 2px 15px; font-size: smaller; margin-right: 5px;">—</span><span style="background-color: #EBBC14; color: white; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 1px; border: solid 1px #EBBC14; font-weight: bold; padding: 2px 15px 2px 15px; font-size: smaller;">ERROR</span><span style="background-color: none; color: #333333; padding: 0.5em 0.5em; position: inherit; margin: 5px 0px 5px -4px; font-weight: bold; border: solid 1px #EBBC14; padding: 2px 15px 2px 15px; font-size: smaller; margin-right: 5px;">—</span><span style="background-color: #FF3300; color: white; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 1px; border: solid 1px #FF3300; font-weight: bold; padding: 2px 15px 2px 15px; font-size: smaller;">CRITICAL</span><span style="background-color: none; color: #333333; padding: 0.5em 0.5em; position: inherit; margin: 5px 0px 5px -4px; font-weight: bold; border: solid 1px #FF3300; padding: 2px 15px 2px 15px; font-size: smaller;">1</span></span></div></div></td>
   </tr>
 <tr class="gt_col_headings">
   <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-status_color"></th>
@@ -2935,7 +2943,7 @@ font-style: inherit;">5000</span></span>
 <p>While regular <a href="https://posit-dev.github.io/pointblank/reference/Actions.html"><span><code>Actions</code></span></a> are great for responding to individual validation steps, sometimes you need to take action based on the overall validation results. This is where the new <a href="../../reference/FinalActions.html#pointblank.FinalActions" title="0"><code>FinalActions</code></a> feature from <code>v0.8.1</code> comes in.</p>
 <p>Unlike regular <a href="https://posit-dev.github.io/pointblank/reference/Actions.html"><span><code>Actions</code></span></a> that trigger during validation, <a href="https://posit-dev.github.io/pointblank/reference/FinalActions.html"><span><code>FinalActions</code></span></a> execute after all validation steps are complete. <a href="https://posit-dev.github.io/pointblank/reference/FinalActions.html"><span><code>FinalActions</code></span></a> accepts any number of actions (strings or callables) and executes them in sequence. Each argument can be a string message to display in the console, a callable function, or a list of strings/callables for multiple actions to execute in sequence.</p>
 <p>The real power of <a href="https://posit-dev.github.io/pointblank/reference/FinalActions.html"><span><code>FinalActions</code></span></a> comes from the ability to access comprehensive information about your validation results using <a href="https://posit-dev.github.io/pointblank/reference/get_validation_summary.html"><span><code>get_validation_summary()</code></span></a>. When called inside a function passed to <a href="https://posit-dev.github.io/pointblank/reference/FinalActions.html"><span><code>FinalActions</code></span></a>, this function provides a dictionary containing counts of passing/failing steps and test units, threshold levels exceeded, and much more:</p>
-<div id="518565e2" class="cell" data-execution_count="6">
+<div id="7a866ca2" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb9" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
@@ -3218,7 +3226,7 @@ Failing steps: 1
     <td colspan="14" class="gt_heading gt_title gt_font_normal" style="color: #444444;font-size: 28px;text-align: left;font-weight: bold; text-align: left;">Pointblank Validation</td>
   </tr>
   <tr class="gt_heading">
-    <td colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style="text-align: left;"><div><span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2025-08-06|05:24:23</span><div style="padding-top: 10px; padding-bottom: 5px;"><span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 15px 2px 15px; font-size: 10px;">Polars</span><span style="background-color: none; color: #222222; padding: 0.5em 0.5em; position: inherit; margin: 5px 10px 5px -4px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 15px 2px 15px; font-size: 10px;">small_table</span><span><span style="background-color: #AAAAAA; color: white; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 5px; border: solid 1px #AAAAAA; font-weight: bold; padding: 2px 15px 2px 15px; font-size: smaller;">WARNING</span><span style="background-color: none; color: #333333; padding: 0.5em 0.5em; position: inherit; margin: 5px 0px 5px -4px; font-weight: bold; border: solid 1px #AAAAAA; padding: 2px 15px 2px 15px; font-size: smaller; margin-right: 5px;">1</span><span style="background-color: #EBBC14; color: white; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 1px; border: solid 1px #EBBC14; font-weight: bold; padding: 2px 15px 2px 15px; font-size: smaller;">ERROR</span><span style="background-color: none; color: #333333; padding: 0.5em 0.5em; position: inherit; margin: 5px 0px 5px -4px; font-weight: bold; border: solid 1px #EBBC14; padding: 2px 15px 2px 15px; font-size: smaller; margin-right: 5px;">5</span><span style="background-color: #FF3300; color: white; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 1px; border: solid 1px #FF3300; font-weight: bold; padding: 2px 15px 2px 15px; font-size: smaller;">CRITICAL</span><span style="background-color: none; color: #333333; padding: 0.5em 0.5em; position: inherit; margin: 5px 0px 5px -4px; font-weight: bold; border: solid 1px #FF3300; padding: 2px 15px 2px 15px; font-size: smaller;">10</span></span></div></div></td>
+    <td colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style="text-align: left;"><div><span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2025-08-07|05:34:17</span><div style="padding-top: 10px; padding-bottom: 5px;"><span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 15px 2px 15px; font-size: 10px;">Polars</span><span style="background-color: none; color: #222222; padding: 0.5em 0.5em; position: inherit; margin: 5px 10px 5px -4px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 15px 2px 15px; font-size: 10px;">small_table</span><span><span style="background-color: #AAAAAA; color: white; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 5px; border: solid 1px #AAAAAA; font-weight: bold; padding: 2px 15px 2px 15px; font-size: smaller;">WARNING</span><span style="background-color: none; color: #333333; padding: 0.5em 0.5em; position: inherit; margin: 5px 0px 5px -4px; font-weight: bold; border: solid 1px #AAAAAA; padding: 2px 15px 2px 15px; font-size: smaller; margin-right: 5px;">1</span><span style="background-color: #EBBC14; color: white; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 1px; border: solid 1px #EBBC14; font-weight: bold; padding: 2px 15px 2px 15px; font-size: smaller;">ERROR</span><span style="background-color: none; color: #333333; padding: 0.5em 0.5em; position: inherit; margin: 5px 0px 5px -4px; font-weight: bold; border: solid 1px #EBBC14; padding: 2px 15px 2px 15px; font-size: smaller; margin-right: 5px;">5</span><span style="background-color: #FF3300; color: white; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 1px; border: solid 1px #FF3300; font-weight: bold; padding: 2px 15px 2px 15px; font-size: smaller;">CRITICAL</span><span style="background-color: none; color: #333333; padding: 0.5em 0.5em; position: inherit; margin: 5px 0px 5px -4px; font-weight: bold; border: solid 1px #FF3300; padding: 2px 15px 2px 15px; font-size: smaller;">10</span></span></div></div></td>
   </tr>
 <tr class="gt_col_headings">
   <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-status_color"></th>
@@ -3343,7 +3351,7 @@ Failing steps: 1
 <section id="combining-regular-and-final-actions" class="level2">
 <h2 class="anchored" data-anchor-id="combining-regular-and-final-actions">Combining Regular and Final Actions</h2>
 <p>You can use both <a href="https://posit-dev.github.io/pointblank/reference/Actions.html"><span><code>Actions</code></span></a> and <a href="https://posit-dev.github.io/pointblank/reference/FinalActions.html"><span><code>FinalActions</code></span></a> together for comprehensive control over your validation workflow:</p>
-<div id="1c5cb74a" class="cell" data-execution_count="7">
+<div id="8459c922" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb11" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
@@ -3644,7 +3652,7 @@ Validation complete with:
     <td colspan="14" class="gt_heading gt_title gt_font_normal" style="color: #444444;font-size: 28px;text-align: left;font-weight: bold; text-align: left;">Pointblank Validation</td>
   </tr>
   <tr class="gt_heading">
-    <td colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style="text-align: left;"><div><span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2025-08-06|05:24:24</span><div style="padding-top: 10px; padding-bottom: 5px;"><span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 10px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 10px 2px 10px; font-size: 10px;">Polars</span><span><span style="background-color: #AAAAAA; color: white; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 5px; border: solid 1px #AAAAAA; font-weight: bold; padding: 2px 15px 2px 15px; font-size: smaller;">WARNING</span><span style="background-color: none; color: #333333; padding: 0.5em 0.5em; position: inherit; margin: 5px 0px 5px -4px; font-weight: bold; border: solid 1px #AAAAAA; padding: 2px 15px 2px 15px; font-size: smaller; margin-right: 5px;">1</span><span style="background-color: #EBBC14; color: white; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 1px; border: solid 1px #EBBC14; font-weight: bold; padding: 2px 15px 2px 15px; font-size: smaller;">ERROR</span><span style="background-color: none; color: #333333; padding: 0.5em 0.5em; position: inherit; margin: 5px 0px 5px -4px; font-weight: bold; border: solid 1px #EBBC14; padding: 2px 15px 2px 15px; font-size: smaller; margin-right: 5px;">5</span><span style="background-color: #FF3300; color: white; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 1px; border: solid 1px #FF3300; font-weight: bold; padding: 2px 15px 2px 15px; font-size: smaller;">CRITICAL</span><span style="background-color: none; color: #333333; padding: 0.5em 0.5em; position: inherit; margin: 5px 0px 5px -4px; font-weight: bold; border: solid 1px #FF3300; padding: 2px 15px 2px 15px; font-size: smaller;">10</span></span></div></div></td>
+    <td colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style="text-align: left;"><div><span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2025-08-07|05:34:17</span><div style="padding-top: 10px; padding-bottom: 5px;"><span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 10px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 10px 2px 10px; font-size: 10px;">Polars</span><span><span style="background-color: #AAAAAA; color: white; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 5px; border: solid 1px #AAAAAA; font-weight: bold; padding: 2px 15px 2px 15px; font-size: smaller;">WARNING</span><span style="background-color: none; color: #333333; padding: 0.5em 0.5em; position: inherit; margin: 5px 0px 5px -4px; font-weight: bold; border: solid 1px #AAAAAA; padding: 2px 15px 2px 15px; font-size: smaller; margin-right: 5px;">1</span><span style="background-color: #EBBC14; color: white; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 1px; border: solid 1px #EBBC14; font-weight: bold; padding: 2px 15px 2px 15px; font-size: smaller;">ERROR</span><span style="background-color: none; color: #333333; padding: 0.5em 0.5em; position: inherit; margin: 5px 0px 5px -4px; font-weight: bold; border: solid 1px #EBBC14; padding: 2px 15px 2px 15px; font-size: smaller; margin-right: 5px;">5</span><span style="background-color: #FF3300; color: white; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 1px; border: solid 1px #FF3300; font-weight: bold; padding: 2px 15px 2px 15px; font-size: smaller;">CRITICAL</span><span style="background-color: none; color: #333333; padding: 0.5em 0.5em; position: inherit; margin: 5px 0px 5px -4px; font-weight: bold; border: solid 1px #FF3300; padding: 2px 15px 2px 15px; font-size: smaller;">10</span></span></div></div></td>
   </tr>
 <tr class="gt_col_headings">
   <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-status_color"></th>
@@ -3765,7 +3773,7 @@ Validation complete with:
 <li>send a Slack notification if critical failures occur</li>
 <li>generate a comprehensive report after validation completes</li>
 </ol>
-<div id="39a55631" class="cell" data-execution_count="8">
+<div id="0d6b9d43" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb13" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><span class="kw" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
@@ -4124,7 +4132,7 @@ Failing steps: 2 of 3
     <td colspan="14" class="gt_heading gt_title gt_font_normal" style="color: #444444;font-size: 28px;text-align: left;font-weight: bold; text-align: left;">Pointblank Validation</td>
   </tr>
   <tr class="gt_heading">
-    <td colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style="text-align: left;"><div><span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2025-08-06|05:24:24</span><div style="padding-top: 10px; padding-bottom: 5px;"><span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 15px 2px 15px; font-size: 10px;">Polars</span><span style="background-color: none; color: #222222; padding: 0.5em 0.5em; position: inherit; margin: 5px 10px 5px -4px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 15px 2px 15px; font-size: 10px;">game_revenue</span><span><span style="background-color: #AAAAAA; color: white; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 5px; border: solid 1px #AAAAAA; font-weight: bold; padding: 2px 15px 2px 15px; font-size: smaller;">WARNING</span><span style="background-color: none; color: #333333; padding: 0.5em 0.5em; position: inherit; margin: 5px 0px 5px -4px; font-weight: bold; border: solid 1px #AAAAAA; padding: 2px 15px 2px 15px; font-size: smaller; margin-right: 5px;">0.05</span><span style="background-color: #EBBC14; color: white; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 1px; border: solid 1px #EBBC14; font-weight: bold; padding: 2px 15px 2px 15px; font-size: smaller;">ERROR</span><span style="background-color: none; color: #333333; padding: 0.5em 0.5em; position: inherit; margin: 5px 0px 5px -4px; font-weight: bold; border: solid 1px #EBBC14; padding: 2px 15px 2px 15px; font-size: smaller; margin-right: 5px;">0.1</span><span style="background-color: #FF3300; color: white; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 1px; border: solid 1px #FF3300; font-weight: bold; padding: 2px 15px 2px 15px; font-size: smaller;">CRITICAL</span><span style="background-color: none; color: #333333; padding: 0.5em 0.5em; position: inherit; margin: 5px 0px 5px -4px; font-weight: bold; border: solid 1px #FF3300; padding: 2px 15px 2px 15px; font-size: smaller;">0.15</span></span></div></div></td>
+    <td colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style="text-align: left;"><div><span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2025-08-07|05:34:17</span><div style="padding-top: 10px; padding-bottom: 5px;"><span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 15px 2px 15px; font-size: 10px;">Polars</span><span style="background-color: none; color: #222222; padding: 0.5em 0.5em; position: inherit; margin: 5px 10px 5px -4px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 15px 2px 15px; font-size: 10px;">game_revenue</span><span><span style="background-color: #AAAAAA; color: white; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 5px; border: solid 1px #AAAAAA; font-weight: bold; padding: 2px 15px 2px 15px; font-size: smaller;">WARNING</span><span style="background-color: none; color: #333333; padding: 0.5em 0.5em; position: inherit; margin: 5px 0px 5px -4px; font-weight: bold; border: solid 1px #AAAAAA; padding: 2px 15px 2px 15px; font-size: smaller; margin-right: 5px;">0.05</span><span style="background-color: #EBBC14; color: white; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 1px; border: solid 1px #EBBC14; font-weight: bold; padding: 2px 15px 2px 15px; font-size: smaller;">ERROR</span><span style="background-color: none; color: #333333; padding: 0.5em 0.5em; position: inherit; margin: 5px 0px 5px -4px; font-weight: bold; border: solid 1px #EBBC14; padding: 2px 15px 2px 15px; font-size: smaller; margin-right: 5px;">0.1</span><span style="background-color: #FF3300; color: white; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 1px; border: solid 1px #FF3300; font-weight: bold; padding: 2px 15px 2px 15px; font-size: smaller;">CRITICAL</span><span style="background-color: none; color: #333333; padding: 0.5em 0.5em; position: inherit; margin: 5px 0px 5px -4px; font-weight: bold; border: solid 1px #FF3300; padding: 2px 15px 2px 15px; font-size: smaller;">0.15</span></span></div></div></td>
   </tr>
 <tr class="gt_col_headings">
   <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-status_color"></th>
@@ -4351,7 +4359,7 @@ Note
 <section id="the-data-validation-workflow" class="level2">
 <h2 class="anchored" data-anchor-id="the-data-validation-workflow">The Data Validation Workflow</h2>
 <p>Let’s get right to performing a basic check of a Polars DataFrame. We’ll make use of the included <code>small_table</code> dataset.</p>
-<div id="0d9c3054" class="cell" data-execution_count="1">
+<div id="93061dd0" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><span class="im" style="color: #00769E;
 background-color: null;
 font-style: inherit;">import</span> pointblank <span class="im" style="color: #00769E;
@@ -4724,7 +4732,7 @@ font-style: inherit;">"</span>)</span>
   <tfoot class="gt_sourcenotes">
   
   <tr>
-    <td class="gt_sourcenote" colspan="14" style="text-align: left;"><div style="margin-top: 5px; margin-bottom: 5px;"><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin-left: 10px; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2025-08-06 05:24:03 UTC</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">&lt; 1 s</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 1px 5px -1px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2025-08-06 05:24:03 UTC</span></div></td>
+    <td class="gt_sourcenote" colspan="14" style="text-align: left;"><div style="margin-top: 5px; margin-bottom: 5px;"><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin-left: 10px; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2025-08-07 05:33:55 UTC</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">&lt; 1 s</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 1px 5px -1px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2025-08-07 05:33:55 UTC</span></div></td>
   </tr>
 
 </tfoot>
@@ -4748,7 +4756,7 @@ font-style: inherit;">"</span>)</span>
 <p>All of those numbers under the <code>UNITS</code>, <code>PASS</code>, and <code>FAIL</code> columns have to do with test units, a measure of central importance in Pointblank. Each validation step will execute a type of validation test on the target table. For example, a <a href="https://posit-dev.github.io/pointblank/reference/Validate.col_vals_lt.html"><code>col_vals_lt()</code></a> validation step can test that each value in a column is less than a specified number. The key finding that’s reported as a result of this test is the number of test units that pass or fail. This little diagram explains what those numbers mean:</p>
 <p><img src="https://posit-dev.github.io/pointblank/blog/intro-pointblank/validation-test-units.png" class="img-fluid" data-text-align="center"></p>
 <p>Failing test units can be tied to threshold levels, which can provide a better indication of whether failures should raise some basic awareness or spur you into action. Here’s a validation workflow that sets three failure threshold levels that signal the severity of data quality problems:</p>
-<div id="7fe5b3ea" class="cell" data-execution_count="2">
+<div id="48fa5b6d" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><span class="im" style="color: #00769E;
 background-color: null;
 font-style: inherit;">import</span> pointblank <span class="im" style="color: #00769E;
@@ -5483,7 +5491,7 @@ font-style: inherit;"># STEP 10</span></span>
   <tfoot class="gt_sourcenotes">
   
   <tr>
-    <td class="gt_sourcenote" colspan="14" style="text-align: left;"><div style="margin-top: 5px; margin-bottom: 5px;"><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin-left: 10px; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2025-08-06 05:24:04 UTC</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">&lt; 1 s</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 1px 5px -1px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2025-08-06 05:24:04 UTC</span></div></td>
+    <td class="gt_sourcenote" colspan="14" style="text-align: left;"><div style="margin-top: 5px; margin-bottom: 5px;"><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin-left: 10px; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2025-08-07 05:33:55 UTC</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">&lt; 1 s</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 1px 5px -1px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2025-08-07 05:33:55 UTC</span></div></td>
   </tr>
 
 </tfoot>
@@ -5501,7 +5509,7 @@ font-style: inherit;"># STEP 10</span></span>
 <h2 class="anchored" data-anchor-id="reporting-for-individual-validation-steps">Reporting for Individual Validation Steps</h2>
 <p>The second validation step of the previous data validation showed 18 failing test units. That translates to 18 spots in a 2,000 row DataFrame where a data quality assertion failed. We often would like to know exactly what that failing data is; it’s usually the next step toward addressing data quality issues.</p>
 <p>Pointblank offers a method that gives you a tabular report on a specific step: <a href="https://posit-dev.github.io/pointblank/reference/Validate.get_step_report.html"><code>get_step_report()</code></a>. The previous tables you’ve seen (the validation report table) dealt with providing a summary of all validation steps. In contrast, a focused report on a single step can help to get to the heart of a data quality issue. Here’s how that looks for Step 2:</p>
-<div id="29fde3af" class="cell" data-execution_count="3">
+<div id="025ac945" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1">validation_2.get_step_report(i<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
@@ -5746,7 +5754,7 @@ font-style: inherit;">2</span>)</span></code></pre></div>
 </div>
 <p>This report provides the 18 rows where the failure occurred. If you scroll the table to the right you’ll see the column that underwent testing (<code>session_duration</code>) is highlighted in red. All of these values are <code>5.0</code> or less, which is in violation of the assertion (in the header) that <code>session_duration &gt; 5</code>.</p>
 <p>These types of bespoke reports are useful for finding a needle in a haystack. Another good use for a step report is when validating a table schema. Using the <a href="https://posit-dev.github.io/pointblank/reference/Validate.col_schema_match.html"><code>col_schema_match()</code></a> validation method with a table schema prepared with the <a href="https://posit-dev.github.io/pointblank/reference/Schema.html"><span><code>Schema</code></span></a> class allows us to verify our understanding of the table structure. Here is a validation that performs a schema validation with the <code>small_table</code> dataset prepared as a DuckDB table:</p>
-<div id="f8927d65" class="cell" data-execution_count="4">
+<div id="4bcc244d" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb5" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><span class="im" style="color: #00769E;
 background-color: null;
 font-style: inherit;">import</span> pointblank <span class="im" style="color: #00769E;
@@ -5984,7 +5992,7 @@ font-style: inherit;">=</span>schema)</span>
   <tfoot class="gt_sourcenotes">
   
   <tr>
-    <td class="gt_sourcenote" colspan="14" style="text-align: left;"><div style="margin-top: 5px; margin-bottom: 5px;"><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin-left: 10px; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2025-08-06 05:24:05 UTC</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">&lt; 1 s</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 1px 5px -1px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2025-08-06 05:24:05 UTC</span></div></td>
+    <td class="gt_sourcenote" colspan="14" style="text-align: left;"><div style="margin-top: 5px; margin-bottom: 5px;"><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin-left: 10px; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2025-08-07 05:33:56 UTC</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">&lt; 1 s</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 1px 5px -1px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2025-08-07 05:33:56 UTC</span></div></td>
   </tr>
 
 </tfoot>
@@ -5996,7 +6004,7 @@ font-style: inherit;">=</span>schema)</span>
 </div>
 </div>
 <p>This step fails, but the validation report table doesn’t tell us how (or where). Using <a href="https://posit-dev.github.io/pointblank/reference/Validate.get_step_report.html">`get_step_report()</a> will show us what the underlying issues are:</p>
-<div id="0d5daf64" class="cell" data-execution_count="5">
+<div id="72179b4f" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb6" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1">validation_3.get_step_report(i<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
