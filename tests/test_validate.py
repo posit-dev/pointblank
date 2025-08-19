@@ -42,12 +42,12 @@ try:
 
     from pyspark.sql import SparkSession
     from pyspark.sql.types import (
-        StructType,
-        StructField,
-        StringType,
-        IntegerType,
+        BooleanType,
         DoubleType,
-        DateType,
+        IntegerType,
+        StringType,
+        StructField,
+        StructType,
     )
     import pyspark.sql.functions as F
 
@@ -56,6 +56,7 @@ except ImportError:
     PYSPARK_AVAILABLE = False
 
 
+from great_tables import vals
 import great_tables as GT
 import narwhals as nw
 
@@ -64,6 +65,7 @@ from pointblank._constants import REPORTING_LANGUAGES
 from pointblank.validate import (
     Actions,
     FinalActions,
+    connect_to_table,
     get_action_metadata,
     get_column_count,
     get_data_path,
@@ -76,7 +78,11 @@ from pointblank.validate import (
     Validate,
     _create_table_time_html,
     _create_table_type_html,
+    _create_thresholds_html,
     _fmt_lg,
+    _format_single_float_with_gt,
+    _format_single_integer_with_gt,
+    _format_single_number_with_gt,
     _normalize_reporting_language,
     _prep_column_text,
     _process_action_str,
@@ -85,7 +91,6 @@ from pointblank.validate import (
     _process_csv_input,
     _process_data,
     _process_parquet_input,
-    connect_to_table,
     _process_title_text,
     _ValidationInfo,
     _is_string_date,
@@ -93,10 +98,10 @@ from pointblank.validate import (
     _convert_string_to_date,
     _convert_string_to_datetime,
     _string_date_dttm_conversion,
+    _transform_test_units,
 )
 from pointblank.thresholds import Thresholds
 from pointblank.schema import Schema, _get_schema_validation_info
-from pointblank._utils import _is_lib_present
 from pointblank.column import (
     col,
     starts_with,
@@ -2438,8 +2443,6 @@ def test_validation_with_preprocessing_with_fn_pl(tbl_pl):
 
 @pytest.mark.skipif(not PYSPARK_AVAILABLE, reason="PySpark not available")
 def test_validation_with_preprocessing_pyspark(tbl_pyspark):
-    import pyspark.sql.functions as F
-
     v = (
         Validate(tbl_pyspark)
         .col_vals_eq(columns="z", value=8)
@@ -2466,8 +2469,6 @@ def test_validation_with_preprocessing_pyspark_use_nw(tbl_pyspark):
 
 @pytest.mark.skipif(not PYSPARK_AVAILABLE, reason="PySpark not available")
 def test_validation_with_preprocessing_with_fn_pyspark(tbl_pyspark):
-    import pyspark.sql.functions as F
-
     def multiply_z_by_two(df):
         return df.withColumn("z", F.col("z") * 2)
 
@@ -2866,8 +2867,6 @@ def test_col_vals_outside_with_datetime_bounds():
 
 
 def test_validation_with_segments_and_pre_pandas():
-    import pandas as pd
-
     tbl = pd.DataFrame(
         {"category": ["A", "A", "B", "B"], "value": [10, 20, 30, 40], "multiplier": [2, 3, 4, 5]}
     )
@@ -2893,8 +2892,6 @@ def test_validation_with_segments_and_pre_pandas():
 
 @pytest.mark.skipif(not PYSPARK_AVAILABLE, reason="PySpark not available")
 def test_validation_with_segments_and_pre_pyspark():
-    import pyspark.sql.functions as F
-
     spark = get_spark_session()
     tbl = spark.createDataFrame(
         [("A", 10, 2), ("A", 20, 3), ("B", 30, 4), ("B", 40, 5)],
@@ -2921,8 +2918,6 @@ def test_validation_with_segments_and_pre_pyspark():
 
 
 def test_validation_error_handling_in_pre_pandas():
-    import pandas as pd
-
     tbl = pd.DataFrame({"values": [1, 2, 3]})
 
     def failing_pre(df):
@@ -2953,8 +2948,6 @@ def test_validation_error_handling_in_pre_pyspark():
 
 
 def test_conjointly_with_empty_expressions_pandas():
-    import pandas as pd
-
     tbl = pd.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]})
 
     # Test with minimal expressions
@@ -2977,8 +2970,6 @@ def test_conjointly_with_empty_expressions_pyspark():
 
 
 def test_specially_with_complex_return_values_pandas():
-    import pandas as pd
-
     tbl = pd.DataFrame({"values": [1, 2, 3, 4, 5]})
 
     # Function returning list of mixed boolean/non-boolean (should fail)
@@ -3017,8 +3008,6 @@ def test_specially_with_complex_return_values_pyspark():
 
 
 def test_col_vals_between_with_column_references_pandas():
-    import pandas as pd
-
     tbl = pd.DataFrame(
         {"value": [5, 10, 15, 20], "lower": [1, 8, 12, 18], "upper": [10, 15, 20, 25]}
     )
@@ -3051,8 +3040,6 @@ def test_col_vals_between_with_column_references_pyspark():
 
 
 def test_col_vals_outside_with_datetime_bounds_pandas():
-    import pandas as pd
-
     tbl = pd.DataFrame(
         {
             "timestamp": [
@@ -3153,8 +3140,6 @@ def test_validation_report_with_unicode_content():
 
 
 def test_validation_report_with_unicode_content_pandas():
-    import pandas as pd
-
     tbl = pd.DataFrame(
         {
             "名前": ["太郎", "花子", "一郎"],  # Japanese names
@@ -3217,8 +3202,6 @@ def test_row_count_match_with_tolerance():
 
 
 def test_row_count_match_with_tolerance_pandas():
-    import pandas as pd
-
     tbl = pd.DataFrame({"col": range(100)})  # 100 rows
 
     # Test exact match
@@ -3317,8 +3300,6 @@ def test_validation_with_all_validation_types():
 
 
 def test_validation_with_all_validation_types_pandas():
-    import pandas as pd
-
     tbl = pd.DataFrame(
         {
             "id": [1, 2, 3, 4, 5],
@@ -3383,16 +3364,6 @@ def test_validation_with_all_validation_types_pandas():
 
 @pytest.mark.skipif(not PYSPARK_AVAILABLE, reason="PySpark not available")
 def test_validation_with_all_validation_types_pyspark():
-    import pyspark.sql.functions as F
-    from pyspark.sql.types import (
-        StructType,
-        StructField,
-        IntegerType,
-        StringType,
-        DoubleType,
-        BooleanType,
-    )
-
     spark = get_spark_session()
 
     # Create the schema first
@@ -3469,8 +3440,6 @@ def test_validation_info_string_representation():
 
 
 def test_validation_info_string_representation_pandas():
-    import pandas as pd
-
     tbl = pd.DataFrame({"col": [1, 2, 3]})
 
     validation = Validate(tbl).col_vals_gt(columns="col", value=0).interrogate()
@@ -3516,8 +3485,6 @@ def test_validation_with_mixed_na_pass_values():
 
 
 def test_validation_with_mixed_na_pass_values_pandas():
-    import pandas as pd
-
     tbl = pd.DataFrame({"col1": [1, 2, None, 4], "col2": [None, 2, 3, 4]})
 
     validation = (
@@ -3745,8 +3712,6 @@ def test_date_time_validation_with_string_conversion():
 
 
 def test_date_time_validation_with_string_conversion_pandas():
-    import pandas as pd
-
     tbl = pd.DataFrame(
         {
             "date_str": ["2023-01-01", "2023-06-15", "2023-12-31"],
@@ -3785,9 +3750,6 @@ def test_date_time_validation_with_string_conversion_pandas():
 
 @pytest.mark.skipif(not PYSPARK_AVAILABLE, reason="PySpark not available")
 def test_date_time_validation_with_string_conversion_pyspark():
-    from pyspark.sql import functions as F
-    from pyspark.sql.types import StructType, StructField, StringType
-
     spark = get_spark_session()
 
     # Create DataFrame with string date/datetime columns
@@ -6739,8 +6701,6 @@ def test_date_validation_fixed_datetime(request, tbl_fixture, datetime_values):
 
 @pytest.mark.parametrize("tbl_fixture", TBL_TRUE_DATES_TIMES_LIST)
 def test_date_validation_fixed_date_ddtm_col(request, tbl_fixture):
-    import datetime
-
     tbl = request.getfixturevalue(tbl_fixture)
 
     date_left = datetime.date(2021, 1, 1)
@@ -6887,8 +6847,6 @@ def test_date_validation_fixed_date_ddtm_col(request, tbl_fixture):
 
 @pytest.mark.parametrize("tbl_fixture", TBL_TRUE_DATES_TIMES_LIST)
 def test_date_validation_fixed_datetime_date_col(request, tbl_fixture):
-    import datetime
-
     tbl = request.getfixturevalue(tbl_fixture)
 
     datetime_left = datetime.datetime(2021, 1, 1)
@@ -8587,8 +8545,6 @@ def test_process_brief():
 
 
 def test_process_action_str():
-    import datetime
-
     datetime_val = str(datetime.datetime(2025, 1, 1, 0, 0, 0, 0))
 
     partial_process_action_str = partial(
@@ -8922,8 +8878,6 @@ def test_fmt_lg(input_value, expected_output):
 
 
 def test_create_table_time_html():
-    import datetime
-
     datetime_0 = datetime.datetime(2021, 1, 1, 0, 0, 0, 0)
     datetime_1_min_later = datetime.datetime(2021, 1, 1, 0, 1, 0, 0)
 
@@ -9009,9 +8963,6 @@ def test_preview_fails_head_tail_exceed_limit():
 
 
 def test_gt_based_formatting_completely_avoids_vals_submodule():
-    from pointblank.validate import _format_single_number_with_gt
-    from unittest.mock import patch
-
     # Mock the vals.fmt_number to raise an error if called
     with patch(
         "pointblank.validate.vals.fmt_number", side_effect=ImportError("Pandas not available")
@@ -9023,8 +8974,6 @@ def test_gt_based_formatting_completely_avoids_vals_submodule():
 
 
 def test_polars_only_environment_simulation():
-    import polars as pl
-
     # Create a large dataset that will trigger number formatting
     large_data = pl.DataFrame(
         {
@@ -9048,8 +8997,6 @@ def test_polars_only_environment_simulation():
 
 
 def test_gt_based_threshold_formatting():
-    import polars as pl
-
     data = pl.DataFrame({"scores": [85, 92, 78, 88, 95, 82, 76, 90, 87, 93]})
 
     # Use large threshold values that will trigger formatting
@@ -9065,9 +9012,6 @@ def test_gt_based_threshold_formatting():
 
 
 def test_gt_formatting_preserves_accuracy():
-    from pointblank.validate import _format_single_number_with_gt
-    from great_tables import vals
-
     test_values = [1000, 12345, 999999, 1000000, 10000000]
 
     for value in test_values:
@@ -9084,8 +9028,6 @@ def test_gt_formatting_preserves_accuracy():
 
 
 def test_polars_df_lib_parameter_uses_gt_formatting():
-    import polars as pl
-
     # Create test data with large numbers
     data = pl.DataFrame({"large_numbers": [15000, 25000, 35000, 45000, 55000]})
 
@@ -9099,8 +9041,6 @@ def test_polars_df_lib_parameter_uses_gt_formatting():
 
 
 def test_comprehensive_polars_validation_scenario():
-    import polars as pl
-
     # Create realistic business data with large monetary values
     business_data = pl.DataFrame(
         {
@@ -9138,11 +9078,6 @@ def test_comprehensive_polars_validation_scenario():
 
 
 def test_polars_vs_pandas_formatting_consistency():
-    from pointblank.validate import _fmt_lg, _transform_test_units
-    import polars as pl
-    import pandas as pd
-
-    # Test data
     large_number = 15432
     test_units = [12000, 15000, 20000]
     active = [True, True, True]
@@ -9250,9 +9185,6 @@ def test_dataframe_library_selection_integration():
 
 
 def test_backward_compatibility_df_lib_none():
-    from pointblank.validate import _fmt_lg, _transform_test_units, _create_thresholds_html
-    from pointblank.thresholds import Thresholds
-
     # Test that functions work correctly when df_lib=None (backward compatibility)
     large_number = 15432
     result = _fmt_lg(large_number, locale="en", df_lib=None)
@@ -9272,13 +9204,6 @@ def test_backward_compatibility_df_lib_none():
 
 
 def test_helper_function_edge_cases():
-    from pointblank.validate import (
-        _format_single_number_with_gt,
-        _format_single_float_with_gt,
-    )
-    import polars as pl
-    import pandas as pd
-
     # Test with edge case values
     result1 = _format_single_number_with_gt(0, n_sigfig=3, df_lib=pl)
     assert result1 == "0"
@@ -9301,7 +9226,7 @@ def test_helper_function_edge_cases():
 
 
 def test_large_numbers_formatting_polars():
-    # Create a Polars DataFrame with large values that would trigger formatting
+    # Create a Polars DataFrame with large values that would trigger large-valueformatting
     large_data = pl.DataFrame(
         {
             "id": range(1, 15001),  # 15,000 rows to trigger large number formatting
@@ -9449,10 +9374,6 @@ def test_multiple_validation_steps_formatting_pandas():
 
 
 def test_fmt_lg_function_with_polars():
-    from pointblank.validate import _fmt_lg
-    import polars as pl
-
-    # Test with large numbers that would be formatted
     large_number = 15432
     result = _fmt_lg(large_number, locale="en", df_lib=pl)
 
@@ -9462,10 +9383,6 @@ def test_fmt_lg_function_with_polars():
 
 
 def test_fmt_lg_function_with_pandas():
-    from pointblank.validate import _fmt_lg
-    import pandas as pd
-
-    # Test with large numbers that would be formatted
     large_number = 15432
     result = _fmt_lg(large_number, locale="en", df_lib=pd)
 
@@ -9475,10 +9392,9 @@ def test_fmt_lg_function_with_pandas():
 
 
 def test_fmt_lg_function_backward_compatibility():
-    from pointblank.validate import _fmt_lg
+    large_number = 15432
 
     # Test without df_lib parameter (original behavior)
-    large_number = 15432
     result = _fmt_lg(large_number, locale="en", df_lib=None)
 
     # Should still work (fallback behavior)
@@ -9487,26 +9403,20 @@ def test_fmt_lg_function_backward_compatibility():
 
 
 def test_gt_based_formatting_helpers():
-    from pointblank.validate import (
-        _format_single_number_with_gt,
-        _format_single_float_with_gt,
-        _format_single_integer_with_gt,
-    )
-
     # Test single number formatting
     result = _format_single_number_with_gt(15432, n_sigfig=3, compact=True, locale="en")
     assert isinstance(result, str)
-    assert "15" in result  # Should contain the formatted number
+    assert "15" in result
 
     # Test single float formatting
     result = _format_single_float_with_gt(123.456, decimals=2, locale="en")
     assert isinstance(result, str)
-    assert "123" in result  # Should contain the formatted number
+    assert "123" in result
 
     # Test single integer formatting
     result = _format_single_integer_with_gt(12345, locale="en")
     assert isinstance(result, str)
-    assert "12" in result  # Should contain the formatted number
+    assert "12" in result
 
 
 def test_edge_case_small_numbers_polars():
@@ -9569,9 +9479,6 @@ def test_mixed_data_types_formatting():
 
 
 def test_pandas_only_users_scenario():
-    import pandas as pd
-    from pointblank.validate import _format_single_number_with_gt, _format_single_float_with_gt
-
     # Test GT-based helper functions work with Pandas
     result_num = _format_single_number_with_gt(15432, df_lib=pd)
     assert isinstance(result_num, str)
@@ -9601,9 +9508,6 @@ def test_pandas_only_users_scenario():
 
 
 def test_polars_only_users_scenario():
-    import polars as pl
-    from pointblank.validate import _format_single_number_with_gt, _format_single_float_with_gt
-
     # Test GT-based helper functions work with Polars
     result_num = _format_single_number_with_gt(15432, df_lib=pl)
     assert isinstance(result_num, str)
@@ -9633,13 +9537,9 @@ def test_polars_only_users_scenario():
 
 
 def test_both_libraries_users_scenario():
-    import polars as pl
-    import pandas as pd
-    from pointblank.validate import _format_single_number_with_gt
-
-    # Test that formatting is consistent between libraries
     test_value = 15432
 
+    # Test that formatting is consistent between libraries
     pl_result = _format_single_number_with_gt(test_value, df_lib=pl)
     pd_result = _format_single_number_with_gt(test_value, df_lib=pd)
 
@@ -9662,9 +9562,6 @@ def test_both_libraries_users_scenario():
 
 
 def test_dataframe_library_preference_in_gt_formatting():
-    import polars as pl
-    import pandas as pd
-
     # When both libraries are available, the specific df_lib parameter should be respected
     large_data = pl.DataFrame(
         {
@@ -9681,8 +9578,6 @@ def test_dataframe_library_preference_in_gt_formatting():
     assert isinstance(report, GT.GT)
 
     # Test that formatting functions can handle both library types
-    from pointblank.validate import _fmt_lg
-
     pl_formatted = _fmt_lg(15432, locale="en", df_lib=pl)
     pd_formatted = _fmt_lg(15432, locale="en", df_lib=pd)
 
@@ -9691,8 +9586,6 @@ def test_dataframe_library_preference_in_gt_formatting():
 
 
 def test_gt_helper_functions_default_behavior():
-    from pointblank.validate import _format_single_number_with_gt, _format_single_float_with_gt
-
     # When df_lib=None, should default to Polars (if available)
     result_num = _format_single_number_with_gt(15432, df_lib=None)
     assert isinstance(result_num, str)
@@ -10094,10 +9987,6 @@ def test_get_validation_summary_no_context():
 def test_connection_string_duckdb_in_memory():
     pytest.importorskip("ibis")
 
-    import ibis
-    import tempfile
-    import os
-
     # Create a temporary DuckDB database file instead of in-memory
     with tempfile.NamedTemporaryFile(suffix=".ddb", delete=False) as tmp_file:
         temp_db_path = tmp_file.name
@@ -10147,10 +10036,6 @@ def test_connection_string_duckdb_in_memory():
 
 def test_connection_string_sqlite_in_memory():
     pytest.importorskip("ibis")
-
-    import ibis
-    import tempfile
-    import os
 
     # Create a temporary SQLite database file instead of in-memory
     with tempfile.NamedTemporaryFile(suffix=".db", delete=False) as tmp_file:
@@ -10206,10 +10091,6 @@ def test_connection_string_no_table_specified_error():
     pytest.importorskip("ibis")
 
     # Create a temporary DuckDB database with test data
-    import ibis
-    import tempfile
-    import os
-
     with tempfile.NamedTemporaryFile(suffix=".ddb", delete=False) as tmp_file:
         temp_db_path = tmp_file.name
 
@@ -10253,8 +10134,6 @@ def test_connection_string_no_tables_in_database():
     pytest.importorskip("ibis")
 
     # Create an empty in-memory DuckDB database
-    import ibis
-
     conn = ibis.duckdb.connect()
 
     # Test: Connection string without table specification on empty database
@@ -10276,8 +10155,6 @@ def test_connection_string_invalid_table_name():
     pytest.importorskip("ibis")
 
     # Create an in-memory DuckDB database with test data
-    import ibis
-
     conn = ibis.duckdb.connect()
 
     # Create test table
@@ -10352,10 +10229,6 @@ def test_connection_string_not_a_connection_string():
 def test_connection_string_temporary_file_database():
     pytest.importorskip("ibis")
 
-    import ibis
-    import tempfile
-    import os
-
     # Create a temporary SQLite database file
     with tempfile.NamedTemporaryFile(suffix=".db", delete=False) as tmp_file:
         temp_db_path = tmp_file.name
@@ -10400,10 +10273,6 @@ def test_connection_string_temporary_file_database():
 
 def test_connection_string_integration_with_validation_methods():
     pytest.importorskip("ibis")
-
-    import ibis
-    import tempfile
-    import os
 
     # Create a temporary DuckDB database with comprehensive test data
     with tempfile.NamedTemporaryFile(suffix=".ddb", delete=False) as tmp_file:
@@ -10606,8 +10475,6 @@ def test_missing_vals_tbl_connection_string_input():
     assert result is not None
 
     # Test with SQLite connection string using absolute path
-    import os
-
     sqlite_path = os.path.abspath("tests/tbl_files/tbl_xyz.sqlite")
     sqlite_conn = f"sqlite:///{sqlite_path}::tbl_xyz"
     result2 = missing_vals_tbl(sqlite_conn)
@@ -10689,8 +10556,6 @@ def test_get_column_count_connection_string_input():
     assert result == 8
 
     # Test with SQLite connection string using absolute path
-    import os
-
     sqlite_path = os.path.abspath("tests/tbl_files/tbl_xyz.sqlite")
     sqlite_conn = f"sqlite:///{sqlite_path}::tbl_xyz"
     result2 = get_column_count(sqlite_conn)
@@ -10737,8 +10602,6 @@ def test_get_row_count_connection_string_input():
     assert result == 13
 
     # Test with SQLite connection string using absolute path
-    import os
-
     sqlite_path = os.path.abspath("tests/tbl_files/tbl_xyz.sqlite")
     sqlite_conn = f"sqlite:///{sqlite_path}::tbl_xyz"
     result2 = get_row_count(sqlite_conn)
@@ -14089,8 +13952,6 @@ def test_validate_parquet_pattern_not_found():
 
 
 def test_validate_parquet_directory_not_found():
-    import tempfile
-
     # Create a temporary empty directory for this test
     with tempfile.TemporaryDirectory() as temp_dir:
         empty_dir = Path(temp_dir) / "empty_subdir"
@@ -14163,8 +14024,6 @@ def test_validate_parquet_permanent_partitioned_sales():
 
 
 def test_pandas_only_environment_scenario():
-    from unittest.mock import patch
-
     # Mock polars as unavailable by making _is_lib_present return False for polars
     with patch("pointblank.validate._is_lib_present") as mock_is_lib:
 
@@ -14216,8 +14075,6 @@ def test_pandas_only_environment_scenario():
 
 
 def test_polars_only_environment_scenario():
-    from unittest.mock import patch
-
     # Mock pandas as unavailable by making `_is_lib_present()` return False for pandas
     with patch("pointblank.validate._is_lib_present") as mock_is_lib:
 
@@ -14269,8 +14126,6 @@ def test_polars_only_environment_scenario():
 
 
 def test_both_libraries_environment_scenario():
-    import pointblank as pb
-
     # Test data for both DataFrame types
     test_values = {
         "revenue": [10000, 25000, 30000, 45000, 60000, 75000, 90000],
@@ -14283,11 +14138,11 @@ def test_both_libraries_environment_scenario():
     pandas_data = pd.DataFrame(test_values)
 
     # Large threshold values that will trigger formatting
-    thresholds = pb.Thresholds(warning=8000, error=12000, critical=20000)
+    thresholds = Thresholds(warning=8000, error=12000, critical=20000)
 
     # Test with Polars DataFrame (should use Polars-based formatting)
     polars_validation = (
-        pb.Validate(data=polars_data, tbl_name="polars_mixed_env", thresholds=thresholds)
+        Validate(data=polars_data, tbl_name="polars_mixed_env", thresholds=thresholds)
         .col_vals_gt(columns="revenue", value=5000)
         .col_vals_between(columns="profit_margin", left=0.1, right=0.4)
         .col_vals_in_set(columns="region", set=["North", "South", "East", "West"])
@@ -14300,7 +14155,7 @@ def test_both_libraries_environment_scenario():
 
     # Test with Pandas DataFrame (should use Pandas-based formatting)
     pandas_validation = (
-        pb.Validate(data=pandas_data, tbl_name="pandas_mixed_env", thresholds=thresholds)
+        Validate(data=pandas_data, tbl_name="pandas_mixed_env", thresholds=thresholds)
         .col_vals_gt(columns="revenue", value=5000)
         .col_vals_between(columns="profit_margin", left=0.1, right=0.4)
         .col_vals_in_set(columns="region", set=["North", "South", "East", "West"])
@@ -14322,12 +14177,6 @@ def test_both_libraries_environment_scenario():
 
 
 def test_dataframe_library_formatting_consistency_across_scenarios():
-    from pointblank.validate import (
-        _format_single_number_with_gt,
-        _format_single_float_with_gt,
-        _format_single_integer_with_gt,
-    )
-
     # Test values that would commonly trigger formatting
     test_numbers = [1000, 12345, 999999, 1000000]
     test_floats = [1234.56, 99999.99, 0.000123]
@@ -14360,8 +14209,6 @@ def test_dataframe_library_formatting_consistency_across_scenarios():
 
 
 def test_scenario_integration_with_large_datasets():
-    import pointblank as pb
-
     # Create large dataset that will trigger number formatting in various functions
     large_size = 2000  # Reduced size for faster testing
 
@@ -14386,7 +14233,7 @@ def test_scenario_integration_with_large_datasets():
     )
 
     # High threshold values that will trigger threshold formatting
-    thresholds = pb.Thresholds(warning=1000, error=2500, critical=4000)
+    thresholds = Thresholds(warning=1000, error=2500, critical=4000)
 
     datasets = [
         ("Polars Large Dataset", polars_large_data),
@@ -14396,7 +14243,7 @@ def test_scenario_integration_with_large_datasets():
     for dataset_name, data in datasets:
         # Complex validation with multiple steps
         validation = (
-            pb.Validate(data=data, tbl_name=f"large_{dataset_name.lower()}", thresholds=thresholds)
+            Validate(data=data, tbl_name=f"large_{dataset_name.lower()}", thresholds=thresholds)
             .col_vals_gt(columns="amount", value=500)  # Large numbers formatting
             .col_vals_between(columns="processing_fee", left=0.0, right=200.0)  # Float formatting
             .col_vals_in_set(columns="customer_tier", set=["premium", "standard"])
@@ -14419,9 +14266,6 @@ def test_scenario_integration_with_large_datasets():
 
 
 def test_scenario_edge_cases_and_error_handling():
-    import pointblank as pb
-    from pointblank.validate import _format_single_number_with_gt
-
     # Test with some edge case values
     edge_cases = [
         0,  # Zero
@@ -14456,7 +14300,7 @@ def test_scenario_edge_cases_and_error_handling():
     empty_pandas = pd.DataFrame({"values": pd.Series([], dtype="int64")})
 
     for name, empty_data in [("Polars", empty_polars), ("Pandas", empty_pandas)]:
-        validation = pb.Validate(data=empty_data, tbl_name=f"empty_{name.lower()}")
+        validation = Validate(data=empty_data, tbl_name=f"empty_{name.lower()}")
         # Should be able to create validation object even with empty data
         assert validation is not None
 
@@ -14817,8 +14661,6 @@ def test_set_tbl_preserves_thresholds_and_actions():
 
 def test_set_tbl_with_string_and_path_inputs():
     """Test `set_tbl()` with CSV file paths and dataset names."""
-    import tempfile
-    import os
 
     # Create validation with built-in dataset
     dataset_validation = (
