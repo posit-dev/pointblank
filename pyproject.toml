@@ -131,3 +131,8 @@ ignore = [
 
 [tool.coverage.report]
 exclude_also = ["if TYPE_CHECKING:"]
+
+[tool.coverage.run]
+omit = [
+    "pointblank/_typing.py",
+]
