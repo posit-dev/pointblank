@@ -1388,6 +1388,17 @@ class RowsDistinct:
     def get_test_results(self):
         return self.test_unit_res
 
+    def test(self):
+        # Get the number of failing test units by counting instances of `False` in the `pb_is_good_`
+        # column and then determine if the test passes overall by comparing the number of failing
+        # test units to the threshold for failing test units
+
+        results_list = nw.from_native(self.test_unit_res)["pb_is_good_"].to_list()
+
+        return _threshold_check(
+            failing_test_units=results_list.count(False), threshold=self.threshold
+        )
+
 
 @dataclass
 class RowsComplete:
