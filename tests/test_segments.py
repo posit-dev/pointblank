@@ -4,18 +4,13 @@ import pytest
 from pointblank.validate import (
     Validate,
     load_dataset,
-    _seg_expr_from_string,
-    _seg_expr_from_tuple,
-    _apply_segments,
 )
 from pointblank.segments import (
     Segment,
     seg_group,
 )
 
-import pandas as pd
 import polars as pl
-import ibis
 
 
 def test_segment_class_fails_not_list():
@@ -26,6 +21,11 @@ def test_segment_class_fails_not_list():
 def test_segment_class_fails_not_nested_lists():
     with pytest.raises(TypeError, match="Sub-segments must be lists."):
         Segment([1, 2, 3])
+
+
+def test_segment_class_fails_mixed_types():
+    with pytest.raises(TypeError, match="All segment values must have the same type"):
+        Segment([[1, 2, 3], ["a", "b"]])
 
 
 def test_segment_class():
@@ -40,6 +40,11 @@ def test_seg_group():
     seg2 = seg_group([[1, 2, 3], [4, 5]])
     assert seg1 == Segment([[1, 2, 3]])
     assert seg2 == Segment([[1, 2, 3], [4, 5]])
+
+
+def test_seg_group_invalid_input():
+    with pytest.raises(ValueError, match="Must input a list of values for a segment"):
+        seg_group("not a list")
 
 
 # TODO: expand to all tbl_types
