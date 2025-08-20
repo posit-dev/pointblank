@@ -1,6 +1,12 @@
 import pytest
 from pointblank import yaml_interrogate, validate_yaml, yaml_to_python
-from pointblank.yaml import load_yaml_config, YAMLValidationError, YAMLValidator
+from pointblank.yaml import (
+    load_yaml_config,
+    YAMLValidationError,
+    YAMLValidator,
+    _process_python_expressions,
+    _safe_eval_python_code,
+)
 
 import polars as pl
 import pandas as pd
@@ -2970,3 +2976,171 @@ def test_yaml_interrogate_template_pattern():
 
     # Should have same number of validation steps
     assert len(q1_result.validation_info) == len(q2_result.validation_info)
+
+
+def test_safe_eval_python_code_simple_expression():
+    """Test evaluation of simple expressions."""
+
+    result = _safe_eval_python_code("2 + 3")
+    assert result == 5
+
+
+def test_safe_eval_python_code_syntax_error_with_statements():
+    """Test SyntaxError path with statements followed by expression."""
+
+    code = """
+x = 10
+y = 20
+x + y
+"""
+    result = _safe_eval_python_code(code)
+    assert result == 30
+
+
+def test_safe_eval_python_code_syntax_error_with_statements_no_final_expression():
+    """Test SyntaxError path with statements but no final expression."""
+
+    code = """
+x = 10
+y = 20
+"""
+    result = _safe_eval_python_code(code)
+    assert result is None
+
+
+def test_safe_eval_python_code_exception_handling():
+    """Test exception handling in `_safe_eval_python_code()`."""
+
+    # Use undefined variable to trigger runtime error
+    with pytest.raises(Exception):
+        _safe_eval_python_code("undefined_variable + 1")
+
+
+def test_safe_eval_python_code_import_error():
+    """Test that imports in eval code raise YAMLValidationError."""
+
+    with pytest.raises(YAMLValidationError, match="Potentially unsafe Python code"):
+        _safe_eval_python_code("import os")
+
+
+def test_safe_eval_python_code_function_call_allowed():
+    """Test that allowed function calls work (print is in the safe namespace)."""
+
+    # print is allowed in safe namespace, so this should work
+    result = _safe_eval_python_code("print('hello')")
+    assert result is None  # print returns None
+
+
+def test_safe_eval_python_code_attribute_access_error():
+    """Test that attribute access to undefined variables raises YAMLValidationError."""
+
+    with pytest.raises(YAMLValidationError, match="Error executing Python code"):
+        _safe_eval_python_code("os.path")
+
+
+def test_safe_eval_python_code_with_available_namespace():
+    """Test `_safe_eval_python_code()` with available namespace variables."""
+
+    # Test with basic arithmetic
+    result = _safe_eval_python_code("5 + 10")
+    assert result == 15
+
+    # Test with built-in functions
+    result = _safe_eval_python_code("len([1, 2, 3])")
+    assert result == 3
+
+    # Test with multiple operations
+    result = _safe_eval_python_code("max([1, 5, 3]) + min([4, 2, 6])")
+    assert result == 7
+
+
+def test_process_python_expressions_python_block():
+    """Test processing dictionary with `python:` block."""
+
+    data = {"python": "2 + 3"}
+    result = _process_python_expressions(data)
+
+    assert result == 5
+
+
+def test_process_python_expressions_nested_dict():
+    """Test processing nested dictionary structures."""
+
+    data = {
+        "level1": {"python": "10 * 2"},
+        "level2": {"normal": "text", "nested": {"python": "5 + 5"}},
+    }
+    result = _process_python_expressions(data)
+
+    expected = {"level1": 20, "level2": {"normal": "text", "nested": 10}}
+    assert result == expected
+
+
+def test_process_python_expressions_list():
+    """Test processing lists with Python expressions."""
+
+    data = [{"python": "1 + 1"}, "normal", {"python": "3 * 3"}]
+    result = _process_python_expressions(data)
+
+    assert result == [2, "normal", 9]
+
+
+def test_process_python_expressions_mixed_structure():
+    """Test processing mixed data structures."""
+
+    data = {
+        "list": [{"python": "2 + 2"}, "text"],
+        "dict": {"python": "7 - 2"},
+        "simple": "regular_string",
+    }
+    result = _process_python_expressions(data)
+
+    expected = {"list": [4, "text"], "dict": 5, "simple": "regular_string"}
+    assert result == expected
+
+
+def test_process_python_expressions_no_expressions():
+    """Test processing data with no Python expressions."""
+
+    data = {"key": "value", "list": [1, 2, 3]}
+    result = _process_python_expressions(data)
+
+    assert result == data
+
+
+def test_process_python_expressions_expression_error():
+    """Test handling of expression evaluation errors."""
+
+    data = {"python": "undefined_var + 1"}
+
+    with pytest.raises(YAMLValidationError, match="Error executing Python code"):
+        _process_python_expressions(data)
+
+
+def test_yaml_validator_column_parsing():
+    """Test the `_parse_column_spec()` method of YAMLValidator."""
+    validator = YAMLValidator()
+
+    # Test various YAML list formats
+    assert validator._parse_column_spec(["date", "date_time"]) == ["date", "date_time"]
+    assert validator._parse_column_spec(["a", "b", "c"]) == ["a", "b", "c"]
+    assert validator._parse_column_spec([]) == []
+
+    # Test string formats
+    assert validator._parse_column_spec("single_column") == ["single_column"]
+
+    # Test other types
+    assert validator._parse_column_spec(123) == ["123"]
+
+
+def test_yaml_validator_basic_methods():
+    """Test basic YAMLValidator methods."""
+    validator = YAMLValidator()
+
+    # Test that validator can be instantiated
+    assert validator is not None
+
+    # Test that the validation method map exists
+    assert hasattr(validator, "validation_method_map")
+    assert "rows_distinct" in validator.validation_method_map
+    assert "col_exists" in validator.validation_method_map
