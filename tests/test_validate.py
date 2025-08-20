@@ -90,6 +90,7 @@ from pointblank.validate import (
     _process_connection_string,
     _process_csv_input,
     _process_data,
+    _process_github_url,
     _process_parquet_input,
     _process_title_text,
     _ValidationInfo,
@@ -14737,3 +14738,91 @@ def test_set_tbl_interrogation_state_management():
     assert new_result.time_start is not None
     assert new_result.time_end is not None
     assert new_result.tbl_name == "New"
+
+
+def test_process_connection_string_not_string():
+    """Test that non-string input is returned as-is."""
+    data = {"not": "a string"}
+    result = _process_connection_string(data)
+    assert result == data
+
+
+@patch("pointblank.validate.connect_to_table")
+def test_process_connection_string_not_uri_format(mock_connect):
+    """Test string that doesn't look like a connection URI."""
+    # Mock connect_to_table to raise an exception (not a valid connection string)
+    mock_connect.side_effect = Exception("Not a connection string")
+
+    data = "just_a_regular_string"
+    result = _process_connection_string(data)
+
+    # Should return original data when connection fails
+    assert result == data
+
+
+@patch("pointblank.validate.connect_to_table")
+def test_process_connection_string_valid_uri(mock_connect):
+    """Test valid connection string processing."""
+    expected_result = Mock()
+    mock_connect.return_value = expected_result
+
+    data = "postgresql://user:pass@host:5432/db#table_name"
+    result = _process_connection_string(data)
+
+    assert result == expected_result
+    mock_connect.assert_called_once_with(data)
+
+
+def test_process_github_url_not_string():
+    """Test that non-string input is returned as-is."""
+
+    data = {"not": "a string"}
+    result = _process_github_url(data)
+    assert result == data
+
+
+def test_process_github_url_not_github_url():
+    """Test non-GitHub URL returns original data."""
+
+    data = "https://example.com/file.csv"
+    result = _process_github_url(data)
+    assert result == data
+
+
+def test_process_github_url_not_csv_or_parquet():
+    """Test GitHub URL without CSV/Parquet file returns original data."""
+
+    data = "https://github.com/user/repo/blob/main/README.md"
+    result = _process_github_url(data)
+    assert result == data
+
+
+def test_process_github_url_invalid_github_pattern():
+    """Test GitHub URL that doesn't match expected blob pattern."""
+
+    data = "https://github.com/user/file.csv"  # Missing repo/blob/branch structure
+    result = _process_github_url(data)
+    assert result == data
+
+
+def test_get_data_path_invalid_dataset():
+    """Test invalid dataset name raises ValueError."""
+    with pytest.raises(ValueError, match="The dataset name `invalid_dataset` is not valid"):
+        get_data_path(dataset="invalid_dataset")
+
+
+def test_get_data_path_invalid_file_type():
+    """Test invalid file type raises ValueError."""
+    with pytest.raises(ValueError, match="The file type `invalid_type` is not valid"):
+        get_data_path(dataset="small_table", file_type="invalid_type")
+
+
+def test_get_column_count_fallback_error():
+    """Test get_column_count error handling for unsupported types."""
+    # Use an object that will definitely not be supported
+    unsupported_object = object()
+
+    with pytest.raises(
+        ValueError, match="The input table type supplied in `data=` is not supported"
+    ):
+        get_column_count(unsupported_object)
