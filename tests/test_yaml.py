@@ -3841,3 +3841,46 @@ def test_yaml_to_python_step_actions_dict_with_complex_structure():
     assert 'warning="warning_func"' in result
     assert 'error="42"' in result
     assert 'critical="True"' in result
+
+
+def test_yaml_to_python_boolean_parameters():
+    """Test `yaml_to_python()` with boolean parameter values."""
+    yaml_content = """
+    tbl: small_table
+    steps:
+      - col_vals_gt:
+          columns: c
+          value: 5
+          na_pass: true
+          active: false
+          brief: true
+    """
+
+    python_code = yaml_to_python(yaml_content)
+
+    # Verify boolean values are correctly converted to Python format
+    assert "na_pass=True" in python_code
+    assert "active=False" in python_code
+    assert "brief=True" in python_code
+
+
+def test_yaml_to_python_non_dict_thresholds():
+    """Test `yaml_to_python()` with non-dict threshold values."""
+    yaml_content = """
+    tbl: small_table
+    steps:
+      - col_vals_gt:
+          columns: c
+          value: 5
+          thresholds: 0.1
+      - col_vals_lt:
+          columns: d
+          value: 1000
+          thresholds: true
+    """
+
+    python_code = yaml_to_python(yaml_content)
+
+    # Verify non-dict threshold values are handled correctly
+    assert "thresholds=0.1" in python_code
+    assert "thresholds=True" in python_code
