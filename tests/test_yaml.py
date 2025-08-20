@@ -1,5 +1,13 @@
 import pytest
-from pointblank import yaml_interrogate, validate_yaml, yaml_to_python
+
+from unittest.mock import patch
+
+import tempfile
+import os
+import io
+import contextlib
+
+from pointblank import load_dataset, yaml_interrogate, validate_yaml, yaml_to_python, Validate
 from pointblank.yaml import (
     load_yaml_config,
     YAMLValidationError,
@@ -320,9 +328,6 @@ def test_yaml_workflow_results_consistency():
     # YAML-based validation
     yaml_result = yaml_interrogate(yaml_content)
 
-    # Equivalent programmatic validation
-    from pointblank import Validate, load_dataset
-
     programmatic_result = Validate(load_dataset("small_table")).rows_distinct().interrogate()
 
     # Compare results (both should have same structure)
@@ -610,8 +615,6 @@ steps:
         validation_result = validator.execute_workflow(config)
         raise AssertionError("Security restrictions not working")
     except Exception as e:
-        from pointblank.yaml import YAMLValidationError
-
         if isinstance(e, YAMLValidationError) and ("not allowed" in str(e) or "unsafe" in str(e)):
             pass  # Expected - security restrictions work
         else:
@@ -1179,9 +1182,6 @@ steps:
 
 
 def test_yaml_actions_with_callables():
-    import io
-    import contextlib
-
     yaml_content = """
 tbl: small_table
 thresholds:
@@ -1217,9 +1217,6 @@ steps:
 
 
 def test_yaml_actions_comprehensive_demo():
-    import io
-    import contextlib
-
     yaml_content = """
 tbl: small_table
 label: Comprehensive Actions Demo
@@ -1278,9 +1275,6 @@ steps:
 
 
 def test_yaml_actions_output_verification():
-    import io
-    import contextlib
-
     # Test 1: String template actions
     yaml_content_templates = """
 tbl: small_table
@@ -1351,9 +1345,6 @@ steps:
 
 
 def test_yaml_actions_print_capture_demo():
-    import io
-    import contextlib
-
     yaml_content = """
 tbl: small_table
 thresholds:
@@ -2647,8 +2638,6 @@ def test_yaml_interrogate_set_tbl_error_cases():
 
 def test_yaml_interrogate_set_tbl_with_csv_and_datasets():
     """Test yaml_interrogate `set_tbl=` with CSV files and DataFrames."""
-    import tempfile
-    import os
 
     yaml_config = """
     tbl: small_table  # Will be overridden
@@ -3144,3 +3133,711 @@ def test_yaml_validator_basic_methods():
     assert hasattr(validator, "validation_method_map")
     assert "rows_distinct" in validator.validation_method_map
     assert "col_exists" in validator.validation_method_map
+
+
+def test_yaml_validator_load_config_invalid_source_type():
+    """Test YAMLValidator with invalid source type."""
+    validator = YAMLValidator()
+
+    # Test with unsupported type (list)
+    with pytest.raises(
+        YAMLValidationError, match="Invalid source type.*Only YAML strings and file paths supported"
+    ):
+        validator.load_config([1, 2, 3])
+
+
+def test_yaml_validator_load_config_not_dict():
+    """Test YAMLValidator with non-dict root level."""
+    validator = YAMLValidator()
+
+    # YAML that loads to a list instead of dict
+    yaml_content = "- item1\n- item2"
+
+    with pytest.raises(
+        YAMLValidationError, match="YAML must contain a dictionary at the root level"
+    ):
+        validator.load_config(yaml_content)
+
+
+def test_yaml_validator_validate_schema_invalid_threshold_key():
+    """Test schema validation with invalid threshold key."""
+    config = {
+        "tbl": "small_table",
+        "steps": [{"rows_distinct": {}}],
+        "thresholds": {
+            "invalid_key": 0.1  # This should trigger the error
+        },
+    }
+
+    validator = YAMLValidator()
+    with pytest.raises(
+        YAMLValidationError,
+        match="Invalid threshold key.*Must be 'warning', 'error', or 'critical'",
+    ):
+        validator._validate_schema(config)
+
+
+def test_yaml_validator_validate_schema_invalid_threshold_type():
+    """Test schema validation with invalid threshold value type."""
+    config = {
+        "tbl": "small_table",
+        "steps": [{"rows_distinct": {}}],
+        "thresholds": {
+            "warning": "not_a_number"  # Should be numeric
+        },
+    }
+
+    validator = YAMLValidator()
+    with pytest.raises(YAMLValidationError, match="Threshold 'warning' must be a number"):
+        validator._validate_schema(config)
+
+
+def test_yaml_validator_validate_schema_negative_threshold():
+    """Test schema validation with negative threshold."""
+    config = {
+        "tbl": "small_table",
+        "steps": [{"rows_distinct": {}}],
+        "thresholds": {
+            "warning": -0.1  # Should be non-negative
+        },
+    }
+
+    validator = YAMLValidator()
+    with pytest.raises(YAMLValidationError, match="Threshold 'warning' must be non-negative"):
+        validator._validate_schema(config)
+
+
+def test_yaml_validator_validate_schema_actions_not_dict():
+    """Test schema validation with actions not being a dict."""
+    config = {
+        "tbl": "small_table",
+        "steps": [{"rows_distinct": {}}],
+        "actions": "not_a_dict",  # Should be a dict
+    }
+
+    validator = YAMLValidator()
+    with pytest.raises(YAMLValidationError, match="'actions' must be a dictionary"):
+        validator._validate_schema(config)
+
+
+def test_yaml_validator_validate_schema_invalid_action_key():
+    """Test schema validation with invalid action key."""
+    config = {
+        "tbl": "small_table",
+        "steps": [{"rows_distinct": {}}],
+        "actions": {
+            "invalid_action": "some_value"  # Invalid action key
+        },
+    }
+
+    validator = YAMLValidator()
+    with pytest.raises(
+        YAMLValidationError,
+        match="Invalid action key.*Must be 'warning', 'error', 'critical', 'default', or 'highest_only'",
+    ):
+        validator._validate_schema(config)
+
+
+def test_yaml_validator_validate_schema_highest_only_not_bool():
+    """Test schema validation with highest_only not being boolean."""
+    config = {
+        "tbl": "small_table",
+        "steps": [{"rows_distinct": {}}],
+        "actions": {
+            "highest_only": "not_a_bool"  # Should be boolean
+        },
+    }
+
+    validator = YAMLValidator()
+    with pytest.raises(YAMLValidationError, match="Action 'highest_only' must be a boolean"):
+        validator._validate_schema(config)
+
+
+def test_yaml_validator_validate_schema_invalid_action_value_type():
+    """Test schema validation with invalid action value type."""
+    config = {
+        "tbl": "small_table",
+        "steps": [{"rows_distinct": {}}],
+        "actions": {
+            "warning": 123  # Should be string, dict, or list
+        },
+    }
+
+    validator = YAMLValidator()
+    with pytest.raises(
+        YAMLValidationError, match="Action 'warning' must be a string, dictionary.*or list"
+    ):
+        validator._validate_schema(config)
+
+
+def test_yaml_validator_load_data_source_process_python_expressions():
+    """Test `_load_data_source()` with python expressions processing."""
+    validator = YAMLValidator()
+
+    # Test with python expression that returns different object
+    tbl_spec = {"python": "{'data': 'test'}"}
+    result = validator._load_data_source(tbl_spec, "polars")
+    assert result == {"data": "test"}
+
+
+def test_yaml_validator_load_data_source_csv_file():
+    """Test `_load_data_source()` with CSV file."""
+    validator = YAMLValidator()
+
+    # Create a temporary CSV file
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".csv", delete=False) as f:
+        f.write("a,b,c\n1,2,3\n4,5,6\n")
+        temp_csv = f.name
+
+    try:
+        # Test loading CSV with polars
+        result = validator._load_data_source(temp_csv, "polars")
+        assert result is not None
+
+        # Test loading CSV with pandas
+        result = validator._load_data_source(temp_csv, "pandas")
+        assert result is not None
+    finally:
+        os.unlink(temp_csv)
+
+
+def test_yaml_validator_load_csv_file_not_found():
+    """Test `_load_csv_file()` with non-existent file."""
+    validator = YAMLValidator()
+
+    with pytest.raises(YAMLValidationError, match="CSV file not found"):
+        validator._load_csv_file("/nonexistent/file.csv", "polars")
+
+
+def test_yaml_validator_load_csv_file_polars_not_available():
+    """Test `_load_csv_file()` when Polars not available."""
+    validator = YAMLValidator()
+
+    # Create a temporary CSV file
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".csv", delete=False) as f:
+        f.write("a,b,c\n1,2,3\n")
+        temp_csv = f.name
+
+    try:
+        # Mock polars as not available
+        with patch("pointblank.yaml._is_lib_present", return_value=False):
+            with pytest.raises(YAMLValidationError, match="Polars library is not available"):
+                validator._load_csv_file(temp_csv, "polars")
+    finally:
+        os.unlink(temp_csv)
+
+
+def test_yaml_validator_load_csv_file_pandas_not_available():
+    """Test `_load_csv_file()` when Pandas not available."""
+    validator = YAMLValidator()
+
+    # Create a temporary CSV file
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".csv", delete=False) as f:
+        f.write("a,b,c\n1,2,3\n")
+        temp_csv = f.name
+
+    try:
+        # Mock pandas as not available
+        with patch("pointblank.yaml._is_lib_present", return_value=False):
+            with pytest.raises(YAMLValidationError, match="Pandas library is not available"):
+                validator._load_csv_file(temp_csv, "pandas")
+    finally:
+        os.unlink(temp_csv)
+
+
+def test_yaml_validator_load_csv_file_unsupported_library():
+    """Test `_load_csv_file()` with unsupported library."""
+    validator = YAMLValidator()
+
+    # Create a temporary CSV file
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".csv", delete=False) as f:
+        f.write("a,b,c\n1,2,3\n")
+        temp_csv = f.name
+
+    try:
+        with pytest.raises(
+            YAMLValidationError, match="Unsupported df_library.*Use 'polars', 'pandas', or 'duckdb'"
+        ):
+            validator._load_csv_file(temp_csv, "unsupported_lib")
+    finally:
+        os.unlink(temp_csv)
+
+
+def test_yaml_validator_load_csv_file_exception():
+    """Test `_load_csv_file()` with exception during loading."""
+    validator = YAMLValidator()
+
+    # Create a temporary invalid CSV file
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".csv", delete=False) as f:
+        f.write("invalid,csv,content\n")
+        temp_csv = f.name
+
+    try:
+        # Mock polars.read_csv to raise an exception
+        with patch("polars.read_csv", side_effect=Exception("Read error")):
+            with pytest.raises(YAMLValidationError, match="Failed to load CSV file.*with polars"):
+                validator._load_csv_file(temp_csv, "polars")
+    finally:
+        os.unlink(temp_csv)
+
+
+def test_yaml_validator_parse_schema_spec_columns_not_list():
+    """Test `_parse_schema_spec()` with columns not being a list."""
+    validator = YAMLValidator()
+
+    schema_spec = {
+        "columns": "not_a_list"  # Should be a list
+    }
+
+    with pytest.raises(YAMLValidationError, match="Schema 'columns' must be a list"):
+        validator._parse_schema_spec(schema_spec)
+
+
+def test_yaml_validator_parse_schema_spec_invalid_column_list_length():
+    """Test `_parse_schema_spec()` with invalid column spec list length."""
+    validator = YAMLValidator()
+
+    schema_spec = {
+        "columns": [
+            ["col1", "type1", "extra"]  # Too many elements
+        ]
+    }
+
+    with pytest.raises(YAMLValidationError, match="Column specification must have 1-2 elements"):
+        validator._parse_schema_spec(schema_spec)
+
+
+def test_yaml_validator_parse_schema_spec_invalid_column_type():
+    """Test `_parse_schema_spec()` with invalid column specification type."""
+    validator = YAMLValidator()
+
+    schema_spec = {
+        "columns": [
+            123  # Should be string or list
+        ]
+    }
+
+    with pytest.raises(YAMLValidationError, match="Invalid column specification type"):
+        validator._parse_schema_spec(schema_spec)
+
+
+def test_yaml_validator_parse_schema_spec_no_columns():
+    """Test `_parse_schema_spec()` without columns field."""
+    validator = YAMLValidator()
+
+    schema_spec = {}  # Missing columns field
+
+    with pytest.raises(
+        YAMLValidationError, match="Schema specification must contain 'columns' field"
+    ):
+        validator._parse_schema_spec(schema_spec)
+
+
+def test_yaml_validator_parse_schema_spec_not_dict():
+    """Test `_parse_schema_spec()` with non-dict schema."""
+    validator = YAMLValidator()
+
+    schema_spec = "not_a_dict"  # Should be a dict
+
+    with pytest.raises(YAMLValidationError, match="Schema specification must be a dictionary"):
+        validator._parse_schema_spec(schema_spec)
+
+
+def test_yaml_to_python_file_path_detection():
+    """Test `yaml_to_python()` with file path detection."""
+
+    # Create a temporary YAML file
+    yaml_content = """
+    tbl: small_table
+    steps:
+    - rows_distinct: {}
+    """
+
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".yaml", delete=False) as f:
+        f.write(yaml_content)
+        temp_yaml = f.name
+
+    try:
+        # Test with file path (short, no newlines)
+        result = yaml_to_python(temp_yaml)
+        assert "pb.Validate" in result
+        assert "rows_distinct" in result
+    finally:
+        os.unlink(temp_yaml)
+
+
+def test_yaml_to_python_content_analysis():
+    """Test `yaml_to_python()` with content analysis for Polars/Pandas."""
+    yaml_content = """
+    tbl:
+      python: "pl.DataFrame({'a': [1, 2, 3]})"
+    steps:
+    - col_vals_gt:
+        columns: a
+        value:
+          python: "pd.Series([0, 1, 2]).mean()"
+    """
+
+    result = yaml_to_python(yaml_content)
+    assert "import polars as pl" in result
+    assert "import pandas as pd" in result
+
+
+def test_yaml_to_python_file_loading_csv():
+    """Test `yaml_to_python()` with CSV file loading."""
+    yaml_content = """
+    tbl: test_data.csv
+    steps:
+    - rows_distinct: {}
+    """
+
+    result = yaml_to_python(yaml_content)
+    assert 'pb.load_dataset("test_data.csv"' in result
+
+
+def test_yaml_to_python_file_loading_parquet():
+    """Test `yaml_to_python()` with Parquet file loading."""
+    yaml_content = """
+    tbl: test_data.parquet
+    steps:
+    - rows_distinct: {}
+    """
+
+    result = yaml_to_python(yaml_content)
+    assert 'pb.load_dataset("test_data.parquet"' in result
+
+
+def test_yaml_to_python_with_lang():
+    """Test `yaml_to_python()` with language parameter."""
+    yaml_content = """
+    tbl: small_table
+    lang: fr
+    steps:
+    - rows_distinct: {}
+    """
+
+    result = yaml_to_python(yaml_content)
+    assert 'lang="fr"' in result
+
+
+def test_yaml_to_python_with_locale():
+    """Test `yaml_to_python()` with locale parameter."""
+    yaml_content = """
+    tbl: small_table
+    locale: fr_FR
+    steps:
+    - rows_distinct: {}
+    """
+
+    result = yaml_to_python(yaml_content)
+    assert 'locale="fr_FR"' in result
+
+
+def test_yaml_to_python_with_brief_bool():
+    """Test `yaml_to_python()` with brief as boolean."""
+    yaml_content = """
+    tbl: small_table
+    brief: true
+    steps:
+    - rows_distinct: {}
+    """
+
+    result = yaml_to_python(yaml_content)
+    assert "brief=True" in result
+
+
+def test_yaml_to_python_conjointly_expressions_list():
+    """Test `yaml_to_python()` with conjointly expressions list."""
+    yaml_content = """
+    tbl: small_table
+    steps:
+    - conjointly:
+        expressions:
+          - "lambda df: df['a'] > 0"
+          - "lambda df: df['b'] < 10"
+    """
+
+    result = yaml_to_python(yaml_content)
+    assert (
+        "conjointly(expressions=[\"lambda df: df['a'] > 0\", \"lambda df: df['b'] < 10\"])"
+        in result
+    )
+
+
+def test_yaml_to_python_specially_expr():
+    """Test `yaml_to_python()` with specially expr parameter."""
+    yaml_content = """
+    tbl: small_table
+    steps:
+    - specially:
+        expr: "lambda x: x > 0"
+    """
+
+    result = yaml_to_python(yaml_content)
+    assert "specially(expr=lambda x: x > 0)" in result
+
+
+def test_yaml_to_python_single_column():
+    """Test `yaml_to_python()` with single column."""
+    yaml_content = """
+    tbl: small_table
+    steps:
+    - col_exists:
+        columns: [single_col]
+    """
+
+    result = yaml_to_python(yaml_content)
+    assert 'col_exists(columns="single_col")' in result
+
+
+def test_yaml_to_python_brief_bool_in_step():
+    """Test `yaml_to_python()` with brief as boolean in step."""
+    yaml_content = """
+    tbl: small_table
+    steps:
+    - col_exists:
+        columns: a
+        brief: false
+    """
+
+    result = yaml_to_python(yaml_content)
+    assert "brief=False" in result
+
+
+def test_yaml_to_python_brief_string_in_step():
+    """Test `yaml_to_python()` with brief as string in step."""
+    yaml_content = """
+    tbl: small_table
+    steps:
+    - col_exists:
+        columns: a
+        brief: "Custom brief message"
+    """
+
+    result = yaml_to_python(yaml_content)
+    assert 'brief="Custom brief message"' in result
+
+
+def test_yaml_to_python_actions_object_warning():
+    """Test `yaml_to_python()` with Actions object warning."""
+
+    yaml_content = """
+    tbl: small_table
+    steps:
+    - col_exists:
+        columns: a
+        actions:
+          warning: "warn_func"
+          error: null
+          critical: null
+    """
+
+    result = yaml_to_python(yaml_content)
+    assert "Actions(" in result
+    assert "warning=" in result
+
+
+def test_yaml_to_python_actions_object_error():
+    """Test `yaml_to_python()` with Actions object error."""
+    yaml_content = """
+    tbl: small_table
+    steps:
+    - col_exists:
+        columns: a
+        actions:
+          error: "error_func"
+    """
+
+    result = yaml_to_python(yaml_content)
+    assert "Actions(" in result
+    assert "error=" in result
+
+
+def test_yaml_to_python_actions_object_critical_list():
+    """Test `yaml_to_python()` with Actions object critical as list."""
+    yaml_content = """
+    tbl: small_table
+    steps:
+    - col_exists:
+        columns: a
+        actions:
+          critical: ["critical_func"]
+    """
+
+    result = yaml_to_python(yaml_content)
+    assert "Actions(" in result
+    assert "critical=" in result
+
+
+def test_yaml_to_python_actions_dict_highest_only():
+    """Test `yaml_to_python()` with actions `highest_only:`."""
+    yaml_content = """
+    tbl: small_table
+    steps:
+    - col_exists:
+        columns: a
+        actions:
+          highest_only: false
+          warning: "warn_func"
+    """
+
+    result = yaml_to_python(yaml_content)
+    assert "highest_only=False" in result
+
+
+def test_yaml_to_python_thresholds_object():
+    """Test `yaml_to_python()` with Thresholds object."""
+    yaml_content = """
+    tbl: small_table
+    steps:
+    - col_exists:
+        columns: a
+        thresholds:
+          warning: 0.1
+          error: 0.2
+    """
+
+    result = yaml_to_python(yaml_content)
+    assert "Thresholds(" in result
+    assert "warning=0.1" in result
+    assert "error=0.2" in result
+
+
+def test_yaml_to_python_string_parameter():
+    """Test `yaml_to_python()` with string parameter."""
+    yaml_content = """
+    tbl: small_table
+    steps:
+    - col_vals_regex:
+        columns: a
+        pattern: "[0-9]+"
+    """
+
+    result = yaml_to_python(yaml_content)
+    assert 'pattern="[0-9]+"' in result
+
+
+def test_yaml_to_python_tuple_parameter():
+    """Test `yaml_to_python()` with tuple parameter."""
+    yaml_content = """
+    tbl: small_table
+    steps:
+    - col_vals_between:
+        columns: a
+        left: 0
+        right: 10
+        inclusive: [false, true]
+    """
+
+    result = yaml_to_python(yaml_content)
+    # This will be converted to a list format in the output
+    assert "inclusive=" in result
+
+
+def test_yaml_to_python_step_actions_dict_highest_only():
+    """Test `yaml_to_python()` with step-level actions dict `highest_only:`."""
+    yaml_content = """
+    tbl: small_table
+    steps:
+    - col_exists:
+        columns: a
+        actions:
+          highest_only: false
+          warning: "warn_action"
+    """
+
+    result = yaml_to_python(yaml_content)
+    assert "highest_only=False" in result
+    assert "pb.Actions(" in result
+
+
+def test_yaml_to_python_step_actions_dict_original_expression():
+    """Test `yaml_to_python()` with step-level actions dict using original expressions."""
+    yaml_content = """
+    tbl: small_table
+    steps:
+    - col_exists:
+        columns: a
+        actions:
+          warning:
+            python: "lambda x: print('Warning!')"
+    """
+
+    result = yaml_to_python(yaml_content)
+    assert "pb.Actions(" in result
+    assert "warning=" in result
+
+
+def test_yaml_to_python_step_actions_dict_string_values():
+    """Test `yaml_to_python()` with step-level actions dict with string values."""
+    yaml_content = """
+    tbl: small_table
+    steps:
+    - col_exists:
+        columns: a
+        actions:
+          warning: "warning_message"
+          error: "error_message"
+    """
+
+    result = yaml_to_python(yaml_content)
+    assert 'warning="warning_message"' in result
+    assert 'error="error_message"' in result
+    assert "pb.Actions(" in result
+
+
+def test_yaml_to_python_step_actions_dict_complex_values():
+    """Test `yaml_to_python()` with step-level actions dict with complex values."""
+    yaml_content = """
+    tbl: small_table
+    steps:
+    - col_exists:
+        columns: a
+        actions:
+          warning: 123
+          error: true
+    """
+
+    result = yaml_to_python(yaml_content)
+    assert 'warning="123"' in result  # Numbers get converted to strings in Actions
+    assert 'error="True"' in result  # Booleans get converted to strings in Actions
+    assert "pb.Actions(" in result
+
+
+def test_yaml_to_python_step_actions_non_dict():
+    """Test `yaml_to_python()` with step-level actions that are not dict."""
+    yaml_content = """
+    tbl: small_table
+    steps:
+    - col_exists:
+        columns: a
+        actions: "simple_action"
+    """
+
+    result = yaml_to_python(yaml_content)
+    assert "actions=simple_action" in result
+
+
+def test_yaml_to_python_step_actions_dict_with_complex_structure():
+    """Test `yaml_to_python()` with complex step-level actions dict structure."""
+    yaml_content = """
+    tbl: small_table
+    steps:
+    - col_vals_gt:
+        columns: [a]
+        value: 0
+        actions:
+          warning: "warning_func"
+          error: 42
+          critical: true
+          highest_only: false
+    """
+
+    result = yaml_to_python(yaml_content)
+
+    # Verify the step-level actions dictionary processing
+    assert "pb.Actions(" in result
+    assert "highest_only=False" in result
+    assert 'warning="warning_func"' in result
+    assert 'error="42"' in result
+    assert 'critical="True"' in result
