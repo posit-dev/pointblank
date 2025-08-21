@@ -13,10 +13,18 @@ test:
 test-update:
 	pytest --snapshot-update
 
-
+.PHONY: lint
 lint: ## Run ruff formatter and linter
 	@uv run ruff format
 	@uv run ruff check --fix
+
+.PHONY: install-pre-commit
+install-pre-commit: # Install pre-commit hooks
+	@uvx pre-commit install
+
+.PHONY: run-pre-commit
+run-pre-commit: # Run pre-commit hooks
+	@uvx pre-commit run --all-files
 
 check:
 	pyright --pythonversion 3.8 pointblank
