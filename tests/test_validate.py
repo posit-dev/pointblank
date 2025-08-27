@@ -8985,6 +8985,79 @@ def test_preview_no_fail_duckdb_table():
     preview(small_table, n_head=2, n_tail=2)
 
 
+@pytest.mark.skipif(not PYSPARK_AVAILABLE, reason="PySpark not available")
+def test_preview_no_fail_pyspark_table():
+    # Create a simple PySpark DataFrame to test the preview functionality
+    spark = get_spark_session()
+
+    # Create test data that covers the PySpark-specific code paths
+    test_data = [
+        (1, "apple", 2.5),
+        (2, "banana", 1.8),
+        (3, "cherry", 3.2),
+        (4, "date", 4.1),
+        (5, "elderberry", 2.9),
+        (6, "fig", 1.5),
+        (7, "grape", 3.8),
+        (8, "honeydew", 2.1),
+    ]
+
+    schema = ["id", "fruit", "price"]
+    spark_df = spark.createDataFrame(test_data, schema)
+
+    # Test various preview scenarios that trigger lines 1562-1589
+    # Basic preview - should use full dataset path
+    preview(spark_df)
+
+    # Head only - should use head sampling
+    preview(spark_df, n_head=2)
+
+    # Tail only - should use tail sampling
+    preview(spark_df, n_tail=2)
+
+    # Both head and tail - should combine head/tail sampling
+    preview(spark_df, n_head=2, n_tail=2)
+
+    # Test edge case: empty tail when dataset is smaller than requested
+    preview(spark_df, n_head=5, n_tail=10)  # More tail than available
+
+
+@pytest.mark.skipif(not PYSPARK_AVAILABLE, reason="PySpark not available")
+def test_preview_pyspark_edge_cases():
+    # Test specific edge cases in PySpark preview
+    spark = get_spark_session()
+
+    # Import required types for empty DataFrame
+    from pyspark.sql.types import StructType, StructField, IntegerType, StringType
+
+    # Test with empty DataFrame (need explicit schema definitions for PySpark though)
+    empty_schema = StructType(
+        [StructField("id", IntegerType(), True), StructField("name", StringType(), True)]
+    )
+    empty_df = spark.createDataFrame([], empty_schema)
+    preview(empty_df)  # Should handle empty DataFrame gracefully
+
+    # Test with single row DataFrame
+    single_row_data = [(1, "test")]
+    single_df = spark.createDataFrame(single_row_data, ["id", "name"])
+    preview(single_df, n_head=3, n_tail=3)  # Both exceed available rows
+
+    # Test case where tail might be empty
+    small_data = [(i, f"item_{i}") for i in range(1, 4)]  # Only 3 rows
+    small_df = spark.createDataFrame(small_data, ["id", "name"])
+    preview(small_df, n_head=2, n_tail=5)  # Tail exceeds available rows
+
+    # Test large dataset to ensure head/tail logic works correctly
+    large_data = [(i, f"item_{i}", i * 0.1) for i in range(1, 101)]  # 100 rows
+    large_schema = ["id", "name", "value"]
+    large_df = spark.createDataFrame(large_data, large_schema)
+
+    # Various combinations to test different code paths
+    preview(large_df, n_head=10, n_tail=0)  # Only head
+    preview(large_df, n_head=0, n_tail=10)  # Only tail
+    preview(large_df, n_head=5, n_tail=5)  # Balanced head/tail
+
+
 def test_preview_large_head_tail_pd_table():
     small_table = load_dataset(dataset="small_table", tbl_type="pandas")
     preview(small_table, n_head=10, n_tail=10)
