@@ -8260,7 +8260,7 @@ def test_load_dataset_invalid():
 
 
 def test_load_dataset_no_pandas():
-    # Mock the absence of the pandas library
+    # Mock the absence of the Pandas library
     with patch.dict(sys.modules, {"pandas": None}):
         # A ValueError is raised when `tbl_type="pandas"` and the `pandas` package is not installed
         with pytest.raises(ImportError):
@@ -8268,124 +8268,170 @@ def test_load_dataset_no_pandas():
 
 
 def test_load_dataset_no_polars():
-    # Mock the absence of the polars library
+    # Mock the absence of the Polars library
     with patch.dict(sys.modules, {"polars": None}):
         # A ValueError is raised when `tbl_type="pandas"` and the `pandas` package is not installed
         with pytest.raises(ImportError):
             load_dataset(tbl_type="polars")
 
 
-class TestGetDataPathSimple:
-    def test_get_data_path_csv_default(self):
-        path = get_data_path()  # Default: small_table, csv
+def test_get_data_path_csv_default():
+    path = get_data_path()  # Default: small_table, csv
+
+    assert isinstance(path, str)
+    assert path.endswith(".csv")
+    assert os.path.exists(path)
+    assert os.path.getsize(path) > 0
+
+
+def test_get_data_path_all_datasets_csv():
+    datasets = ["small_table", "game_revenue", "nycflights", "global_sales"]
+
+    for dataset in datasets:
+        path = get_data_path(dataset=dataset, file_type="csv")
 
         assert isinstance(path, str)
         assert path.endswith(".csv")
         assert os.path.exists(path)
         assert os.path.getsize(path) > 0
 
-    def test_get_data_path_all_datasets_csv(self):
-        datasets = ["small_table", "game_revenue", "nycflights", "global_sales"]
 
-        for dataset in datasets:
-            path = get_data_path(dataset=dataset, file_type="csv")
+def test_get_data_path_parquet():
+    path = get_data_path(dataset="small_table", file_type="parquet")
 
-            assert isinstance(path, str)
-            assert path.endswith(".csv")
-            assert os.path.exists(path)
-            assert os.path.getsize(path) > 0
+    assert isinstance(path, str)
+    assert path.endswith(".parquet")
+    assert os.path.exists(path)
+    assert os.path.getsize(path) > 0
 
-    def test_get_data_path_parquet(self):
+
+def test_get_data_path_duckdb():
+    path = get_data_path(dataset="small_table", file_type="duckdb")
+
+    assert isinstance(path, str)
+    assert path.endswith(".ddb")
+    assert os.path.exists(path)
+    assert os.path.getsize(path) > 0
+
+
+def test_get_data_path_invalid_dataset():
+    with pytest.raises(ValueError, match="dataset name .* is not valid"):
+        get_data_path(dataset="nonexistent_dataset")
+
+
+def test_get_data_path_invalid_file_type():
+    with pytest.raises(ValueError, match="file type .* is not valid"):
+        get_data_path(file_type="xlsx")
+
+
+def test_get_data_path_files_in_temp_dir():
+    path = get_data_path()
+    temp_dir = tempfile.gettempdir()
+
+    assert path.startswith(temp_dir)
+
+
+def test_get_data_path_multiple_calls_different_files():
+    path1 = get_data_path("small_table", "csv")
+    path2 = get_data_path("small_table", "csv")
+
+    # Should be different files (different temp file names)
+    assert path1 != path2
+
+    # But both should exist and be valid
+    assert os.path.exists(path1)
+    assert os.path.exists(path2)
+    assert os.path.getsize(path1) > 0
+    assert os.path.getsize(path2) > 0
+
+
+def test_get_data_path_works_with_validate():
+    csv_path = get_data_path("small_table", "csv")
+
+    # Should be able to create a Validate object with the path
+    validation = Validate(data=csv_path)
+
+    # Should have loaded the data successfully
+    assert validation.data is not None
+
+    # Should be able to add a simple validation
+    validation = validation.col_exists(columns="a").interrogate()
+
+    # Should pass (column 'a' exists in small_table)
+    assert validation.all_passed()
+
+
+@pytest.mark.parametrize("dataset", ["small_table", "game_revenue"])
+@pytest.mark.parametrize("file_type", ["csv", "parquet"])
+def test_get_data_path_data_loading_consistency(dataset, file_type):
+    # Get path and load via Validate
+    path = get_data_path(dataset=dataset, file_type=file_type)
+    validation = Validate(data=path)
+
+    # Compare with direct loading via load_dataset
+    if file_type == "csv":
+        reference_data = load_dataset(dataset=dataset, tbl_type="polars")
+    else:  # parquet
+        reference_data = load_dataset(dataset=dataset, tbl_type="polars")
+
+    # Both should have same number of columns
+    assert len(validation.data.columns) == len(reference_data.columns)
+
+    # Column names should match
+    assert validation.data.columns == reference_data.columns
+
+
+def test_get_data_path_example_usage_patterns():
+    # Example 1: Basic usage
+    csv_path = get_data_path("small_table", "csv")
+    validation = Validate(data=csv_path).col_exists(["a", "b", "c"]).interrogate()
+    assert validation.all_passed()
+
+    # Example 2: With different dataset
+    parquet_path = get_data_path("game_revenue", "parquet")
+    validation = Validate(data=parquet_path).col_exists(["player_id", "session_id"]).interrogate()
+    assert validation.all_passed()
+
+
+def test_get_data_path_parquet_pandas_only():
+    """Test get_data_path parquet creation when only pandas is available."""
+    with patch("pointblank.validate._is_lib_present") as mock_is_lib:
+
+        def side_effect(lib_name):
+            # Only pandas is available, polars is not
+            return lib_name == "pandas"
+
+        mock_is_lib.side_effect = side_effect
+
+        # This should trigger the pandas pathway
         path = get_data_path(dataset="small_table", file_type="parquet")
 
+        # Should return a valid parquet file path
         assert isinstance(path, str)
         assert path.endswith(".parquet")
         assert os.path.exists(path)
         assert os.path.getsize(path) > 0
 
-    def test_get_data_path_duckdb(self):
-        path = get_data_path(dataset="small_table", file_type="duckdb")
+        # Verify it can be loaded
+        import pandas as pd
 
-        assert isinstance(path, str)
-        assert path.endswith(".ddb")
-        assert os.path.exists(path)
-        assert os.path.getsize(path) > 0
-
-    def test_get_data_path_invalid_dataset(self):
-        with pytest.raises(ValueError, match="dataset name .* is not valid"):
-            get_data_path(dataset="nonexistent_dataset")
-
-    def test_get_data_path_invalid_file_type(self):
-        with pytest.raises(ValueError, match="file type .* is not valid"):
-            get_data_path(file_type="xlsx")
-
-    def test_get_data_path_files_in_temp_dir(self):
-        path = get_data_path()
-        temp_dir = tempfile.gettempdir()
-
-        assert path.startswith(temp_dir)
-
-    def test_get_data_path_multiple_calls_different_files(self):
-        path1 = get_data_path("small_table", "csv")
-        path2 = get_data_path("small_table", "csv")
-
-        # Should be different files (different temp file names)
-        assert path1 != path2
-
-        # But both should exist and be valid
-        assert os.path.exists(path1)
-        assert os.path.exists(path2)
-        assert os.path.getsize(path1) > 0
-        assert os.path.getsize(path2) > 0
-
-    def test_get_data_path_works_with_validate(self):
-        csv_path = get_data_path("small_table", "csv")
-
-        # Should be able to create a Validate object with the path
-        validation = Validate(data=csv_path)
-
-        # Should have loaded the data successfully
-        assert validation.data is not None
-
-        # Should be able to add a simple validation
-        validation = validation.col_exists(columns="a").interrogate()
-
-        # Should pass (column 'a' exists in small_table)
-        assert validation.all_passed()
+        df = pd.read_parquet(path)
+        assert len(df) > 0
+        assert len(df.columns) > 0
 
 
-class TestGetDataPathIntegration:
-    @pytest.mark.parametrize("dataset", ["small_table", "game_revenue"])
-    @pytest.mark.parametrize("file_type", ["csv", "parquet"])
-    def test_data_loading_consistency(self, dataset, file_type):
-        # Get path and load via Validate
-        path = get_data_path(dataset=dataset, file_type=file_type)
-        validation = Validate(data=path)
+def test_get_data_path_parquet_no_libraries():
+    """Test get_data_path parquet creation when neither polars nor pandas available."""
+    with patch("pointblank.validate._is_lib_present") as mock_is_lib:
+        # Neither polars nor pandas are available
+        mock_is_lib.return_value = False
 
-        # Compare with direct loading via load_dataset
-        if file_type == "csv":
-            reference_data = load_dataset(dataset=dataset, tbl_type="polars")
-        else:  # parquet
-            reference_data = load_dataset(dataset=dataset, tbl_type="polars")
-
-        # Both should have same number of columns
-        assert len(validation.data.columns) == len(reference_data.columns)
-
-        # Column names should match
-        assert validation.data.columns == reference_data.columns
-
-    def test_example_usage_patterns(self):
-        # Example 1: Basic usage
-        csv_path = get_data_path("small_table", "csv")
-        validation = Validate(data=csv_path).col_exists(["a", "b", "c"]).interrogate()
-        assert validation.all_passed()
-
-        # Example 2: With different dataset
-        parquet_path = get_data_path("game_revenue", "parquet")
-        validation = (
-            Validate(data=parquet_path).col_exists(["player_id", "session_id"]).interrogate()
-        )
-        assert validation.all_passed()
+        # This should trigger the ImportError
+        with pytest.raises(
+            ImportError,
+            match="Either Polars or Pandas is required to create temporary Parquet files",
+        ):
+            get_data_path(dataset="small_table", file_type="parquet")
 
 
 def test_is_string_date():
@@ -9622,7 +9668,7 @@ def test_csv_polars_fails_pandas_fallback():
 
             # Mock polars module to not be available
             with patch.dict("sys.modules", {"polars": None}):
-                # This should trigger lines 803-822 (pandas fallback)
+                # This should trigger the Pandas fallback
                 result = _process_csv_input(csv_path)
 
                 # Should succeed with pandas
@@ -9713,7 +9759,7 @@ def test_parquet_polars_fails_pandas_succeeds_single_file():
             with patch("polars.read_parquet") as mock_pl_read:
                 mock_pl_read.side_effect = Exception("Polars read failed")
 
-                # This should trigger pandas fallback (lines 935-964)
+                # This should trigger the Pandas fallback
                 result = _process_parquet_input(parquet_path)
 
                 assert result is not None
@@ -9771,7 +9817,7 @@ def test_parquet_pandas_only_available_single_file():
 
             mock_is_lib.side_effect = side_effect
 
-            # This should use pandas directly (lines in the elif branch)
+            # This should use Pandas directly
             result = _process_parquet_input(parquet_path)
 
             assert result is not None
@@ -14802,6 +14848,18 @@ def test_process_github_url_invalid_github_pattern():
 
     data = "https://github.com/user/file.csv"  # Missing repo/blob/branch structure
     result = _process_github_url(data)
+    assert result == data
+
+
+def test_process_github_url_urlparse_exception():
+    """Test that urlparse exceptions are handled gracefully."""
+
+    # This should cause urlparse to raise a ValueError due to invalid IPv6 URL
+    data = "http://[invalid-ipv6-url"
+    result = _process_github_url(data)
+
+    # Should return original data when urlparse fails
+    assert result == data
     assert result == data
 
 
