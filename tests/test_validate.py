@@ -14121,6 +14121,53 @@ def test_pandas_only_environment_scenario():
         assert "transaction_amounts" in report_html
 
 
+def test_validate_parquet_partitioned_pandas_only():
+    """Test partitioned parquet reading when Polars is unavailable and falls back to Pandas."""
+    # This tests the situation where Polars is not available and the code falls back to using
+    # Pandas for partitioned dataset reading
+
+    import tempfile
+    import os
+
+    # Create a temporary directory that looks like a partitioned dataset that Pandas can read
+    with tempfile.TemporaryDirectory() as temp_dir:
+        # Create some test data
+        import pandas as pd
+
+        df = pd.DataFrame(
+            {"a": [1, 2, 3, 4], "b": ["x", "y", "z", "w"], "partition_col": ["A", "A", "B", "B"]}
+        )
+
+        # Save as Parquet files in a way that Pandas can read as a "partitioned" dataset
+        # We'll save the whole thing as a single file that pandas can read from the directory
+        parquet_file_path = os.path.join(temp_dir, "data.parquet")
+        df.to_parquet(parquet_file_path)
+
+        with patch("pointblank.validate._is_lib_present") as mock_is_lib:
+
+            def side_effect(lib_name):
+                return lib_name == "pandas"  # Only Pandas is available, not Polars
+
+            mock_is_lib.side_effect = side_effect
+
+            # Mock Pandas to successfully read from the directory
+            with patch("pandas.read_parquet") as mock_pd_read:
+                mock_pd_read.return_value = df
+
+                # This should trigger the Pandas data-processing path
+                validator = Validate(data=temp_dir)
+
+                # Verify the Pandas `read_parquet()` was called
+                mock_pd_read.assert_called_once_with(temp_dir)
+
+                # Check that the data was read in correctly
+                assert validator.data.shape[0] == 4
+                assert validator.data.shape[1] == 3
+                assert "a" in validator.data.columns
+                assert "b" in validator.data.columns
+                assert "partition_col" in validator.data.columns
+
+
 def test_polars_only_environment_scenario():
     # Mock pandas as unavailable by making `_is_lib_present()` return False for pandas
     with patch("pointblank.validate._is_lib_present") as mock_is_lib:
