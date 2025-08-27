@@ -9029,6 +9029,25 @@ def test_preview_row_num_col_not_first():
     assert result is not None
 
 
+def test_preview_ibis_table_to_pandas():
+    """Test that an Ibis table is converted to Pandas (for preview) when Polars is unavailable."""
+    pytest.importorskip("ibis")
+
+    # Create a DuckDB/Ibis table
+    duckdb_table = load_dataset(dataset="small_table", tbl_type="duckdb")
+
+    # Mock `_select_df_lib()` to return a Pandas DF instead of a Polars DF
+    import pandas as pd
+
+    with patch("pointblank.validate._select_df_lib", return_value=pd):
+        # This should go down the path where `data = data_subset.to_pandas()`
+        # because `df_lib_name_gt` will be "pandas"
+        result = preview(duckdb_table, n_head=2, n_tail=2)
+
+        # Verify the preview works correctly
+        assert result is not None
+
+
 def test_gt_based_formatting_completely_avoids_vals_submodule():
     # Mock the vals.fmt_number to raise an error if called
     with patch(
