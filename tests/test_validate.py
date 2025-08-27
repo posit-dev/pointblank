@@ -10641,6 +10641,32 @@ def test_missing_vals_tbl_csv_input():
     assert result2 is not None
 
 
+@pytest.mark.skipif(not PYSPARK_AVAILABLE, reason="PySpark not available")
+def test_missing_vals_tbl_no_fail_pyspark_table():
+    # Test `missing_vals_tbl()` with PySpark DataFrames
+    spark = get_spark_session()
+
+    # Create test data with some missing values
+    test_data = [
+        (1, "apple", 2.5),
+        (2, None, 1.8),  # Missing value
+        (None, "cherry", 3.2),  # Missing value
+        (4, "date", None),  # Missing value
+        (5, "elderberry", 2.9),
+        (6, None, 1.5),  # Missing value
+        (7, "grape", None),  # Missing value
+    ]
+
+    schema = ["id", "fruit", "price"]
+    spark_df = spark.createDataFrame(test_data, schema)
+
+    # Test the `missing_vals_tbl()` function with PySpark DataFrame
+    result = missing_vals_tbl(spark_df)
+
+    # The result should be a GT object
+    assert hasattr(result, "_build_data"), "Result should be a GT object"
+
+
 def test_missing_vals_tbl_parquet_input():
     # Test with individual Parquet file
     parquet_path = "tests/tbl_files/tbl_xyz.parquet"
