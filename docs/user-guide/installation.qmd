@@ -32,6 +32,18 @@ uv pip install pointblank
 ```bash
 conda install -c conda-forge pointblank
 ```
+
+## pixi
+
+```bash
+# install cli tool globally
+pixi global install pointblank
+
+# add pointblank to project
+pixi create name-of-project
+cd name-of-project
+pixi add pointblank
+```
 :::
 
 ## DataFrame Libraries
