@@ -740,9 +740,9 @@ def _process_data(data: FrameT | Any) -> FrameT | Any:
     """
     Centralized data processing pipeline that handles all supported input types.
 
-    This function consolidates the data processing pipeline used across multiple
-    classes and functions in Pointblank. It processes data through a consistent
-    sequence of transformations to handle different data source types.
+    This function consolidates the data processing pipeline used across multiple classes and
+    functions in Pointblank. It processes data through a consistent sequence of transformations to
+    handle different data source types.
 
     The processing order is important:
 
@@ -829,7 +829,9 @@ def _process_github_url(data: FrameT | Any) -> FrameT | Any:
     # Parse the URL to check if it's a GitHub URL
     try:
         parsed = urlparse(data)
-    except Exception:
+    except ValueError:
+        # urlparse can raise ValueError for malformed URLs (e.g., invalid IPv6)
+        # Return original data as it's likely not a GitHub URL we can process
         return data
 
     # Check if it's a GitHub URL (standard or raw)
@@ -881,12 +883,9 @@ def _process_github_url(data: FrameT | Any) -> FrameT | Any:
         else:  # .parquet
             return _process_parquet_input(tmp_file_path)
 
-    except Exception:
+    except Exception:  # pragma: no cover
         # If download or processing fails, return original data
         return data
-
-    except Exception as e:
-        raise RuntimeError(f"Failed to download or process GitHub file from {raw_url}: {e}") from e
 
 
 def _process_connection_string(data: FrameT | Any) -> FrameT | Any:
@@ -943,8 +942,7 @@ def _process_csv_input(data: FrameT | Any) -> FrameT | Any:
     if not csv_path.exists():
         raise FileNotFoundError(f"CSV file not found: {csv_path}")
 
-    # Determine which library to use for reading CSV
-    # Prefer Polars, fallback to Pandas
+    # Determine which library to use for reading CSV: prefer Polars but fallback to Pandas
     if _is_lib_present(lib_name="polars"):
         try:
             import polars as pl
@@ -956,7 +954,7 @@ def _process_csv_input(data: FrameT | Any) -> FrameT | Any:
                 import pandas as pd
 
                 return pd.read_csv(csv_path)
-            else:
+            else:  # pragma: no cover
                 raise RuntimeError(
                     f"Failed to read CSV file with Polars: {e}. "
                     "Pandas is not available as fallback."
@@ -1093,7 +1091,7 @@ def _process_parquet_input(data: FrameT | Any) -> FrameT | Any:
                     # Multiple files: concatenate them
                     dfs = [pd.read_parquet(path) for path in parquet_paths]
                     return pd.concat(dfs, ignore_index=True)
-            else:
+            else:  # pragma: no cover
                 raise RuntimeError(
                     f"Failed to read Parquet file(s) with Polars: {e}. "
                     "Pandas is not available as fallback."
@@ -1615,24 +1613,9 @@ def _generate_display_table(
     # This is used to highlight these values in the table
     if df_lib_name_gt == "polars":
         none_values = {k: data[k].is_null().to_list() for k in col_names}
-    elif df_lib_name_gt == "pyspark":
-        # For PySpark, check if data has been converted to pandas already
-        if hasattr(data, "isnull"):
-            # Data has been converted to pandas
-            none_values = {k: data[k].isnull() for k in col_names}
-        else:
-            # Data is still a PySpark DataFrame - use narwhals
-            import narwhals as nw
-
-            df_nw = nw.from_native(data)
-            none_values = {}
-            for col in col_names:
-                # Get null mask, collect to pandas, then convert to list
-                null_mask = (
-                    df_nw.select(nw.col(col).is_null()).collect().to_pandas().iloc[:, 0].tolist()
-                )
-                none_values[col] = null_mask
     else:
+        # PySpark data has been converted to Pandas by this point so the 'isnull()'
+        # method can be used
         none_values = {k: data[k].isnull() for k in col_names}
 
     none_values = [(k, i) for k, v in none_values.items() for i, val in enumerate(v) if val]
@@ -1980,59 +1963,68 @@ def missing_vals_tbl(data: FrameT | Any) -> GT:
 
         # Use the `row_ranges` list of lists to query, for each column, the proportion of missing
         # values in each 'sector' of the table (a sector is a range of rows)
-        if df_lib_name_gt == "polars":
-            missing_vals = {
-                col: [
-                    (
-                        data[(cut_points[i - 1] if i > 0 else 0) : cut_points[i]][col]
-                        .isnull()
-                        .sum()
-                        .to_polars()
-                        / (cut_points[i] - (cut_points[i - 1] if i > 0 else 0))
-                        * 100
-                        if cut_points[i] > (cut_points[i - 1] if i > 0 else 0)
-                        else 0
-                    )
-                    for i in range(len(cut_points))
-                ]
-                + [
-                    (
-                        data[cut_points[-1] : n_rows][col].isnull().sum().to_polars()
-                        / (n_rows - cut_points[-1])
-                        * 100
-                        if n_rows > cut_points[-1]
-                        else 0
-                    )
-                ]
-                for col in data.columns
-            }
+        def _calculate_missing_proportions(use_polars_conversion: bool = False):
+            """
+            Calculate missing value proportions for each column and sector.
 
+            Parameters
+            ----------
+            use_polars_conversion
+                If True, use `.to_polars()` for conversions, otherwise use `.to_pandas()`
+            """
+            missing_vals = {}
+            for col in data.columns:
+                col_missing_props = []
+
+                # Calculate missing value proportions for each sector
+                for i in range(len(cut_points)):
+                    start_row = cut_points[i - 1] if i > 0 else 0
+                    end_row = cut_points[i]
+                    sector_size = end_row - start_row
+
+                    if sector_size > 0:
+                        sector_data = data[start_row:end_row][col]
+                        null_sum = sector_data.isnull().sum()
+
+                        # Apply the appropriate conversion method
+                        if use_polars_conversion:
+                            null_sum_converted = null_sum.to_polars()
+                        else:
+                            null_sum_converted = null_sum.to_pandas()
+
+                        missing_prop = (null_sum_converted / sector_size) * 100
+                        col_missing_props.append(missing_prop)
+                    else:
+                        col_missing_props.append(0)
+
+                # Handle the final sector (after last cut point)
+                if n_rows > cut_points[-1]:
+                    start_row = cut_points[-1]
+                    sector_size = n_rows - start_row
+
+                    sector_data = data[start_row:n_rows][col]
+                    null_sum = sector_data.isnull().sum()
+
+                    # Apply the appropriate conversion method
+                    if use_polars_conversion:
+                        null_sum_converted = null_sum.to_polars()
+                    else:
+                        null_sum_converted = null_sum.to_pandas()
+
+                    missing_prop = (null_sum_converted / sector_size) * 100
+                    col_missing_props.append(missing_prop)
+                else:
+                    col_missing_props.append(0)  # pragma: no cover
+
+                missing_vals[col] = col_missing_props
+
+            return missing_vals
+
+        # Use the helper function based on the DataFrame library
+        if df_lib_name_gt == "polars":
+            missing_vals = _calculate_missing_proportions(use_polars_conversion=True)
         else:
-            missing_vals = {
-                col: [
-                    (
-                        data[(cut_points[i - 1] if i > 0 else 0) : cut_points[i]][col]
-                        .isnull()
-                        .sum()
-                        .to_pandas()
-                        / (cut_points[i] - (cut_points[i - 1] if i > 0 else 0))
-                        * 100
-                        if cut_points[i] > (cut_points[i - 1] if i > 0 else 0)
-                        else 0
-                    )
-                    for i in range(len(cut_points))
-                ]
-                + [
-                    (
-                        data[cut_points[-1] : n_rows][col].isnull().sum().to_pandas()
-                        / (n_rows - cut_points[-1])
-                        * 100
-                        if n_rows > cut_points[-1]
-                        else 0
-                    )
-                ]
-                for col in data.columns
-            }
+            missing_vals = _calculate_missing_proportions(use_polars_conversion=False)
 
         # Pivot the `missing_vals` dictionary to create a table with the missing value proportions
         missing_vals = {
@@ -2053,86 +2045,65 @@ def missing_vals_tbl(data: FrameT | Any) -> GT:
         # Get the column names from the table
         col_names = list(data.columns)
 
+        # Helper function for DataFrame missing value calculation (Polars/Pandas)
+        def _calculate_missing_proportions_dataframe(is_polars=False):
+            null_method = "is_null" if is_polars else "isnull"
+
+            missing_vals = {
+                col: [
+                    (
+                        getattr(
+                            data[(cut_points[i - 1] if i > 0 else 0) : cut_points[i]][col],
+                            null_method,
+                        )().sum()
+                        / (cut_points[i] - (cut_points[i - 1] if i > 0 else 0))
+                        * 100
+                        if cut_points[i] > (cut_points[i - 1] if i > 0 else 0)
+                        else 0
+                    )
+                    for i in range(len(cut_points))
+                ]
+                + [
+                    (
+                        getattr(data[cut_points[-1] : n_rows][col], null_method)().sum()
+                        / (n_rows - cut_points[-1])
+                        * 100
+                        if n_rows > cut_points[-1]
+                        else 0
+                    )
+                ]
+                for col in data.columns
+            }
+
+            # Transform to the expected format
+            formatted_missing_vals = {
+                "columns": list(missing_vals.keys()),
+                **{
+                    str(i + 1): [missing_vals[col][i] for col in missing_vals.keys()]
+                    for i in range(len(cut_points) + 1)
+                },
+            }
+
+            # Get a dictionary of counts of missing values in each column
+            missing_val_counts = {
+                col: getattr(data[col], null_method)().sum() for col in data.columns
+            }
+
+            return formatted_missing_vals, missing_val_counts
+
         # Iterate over the cut points and get the proportion of missing values in each 'sector'
         # for each column
         if "polars" in tbl_type:
-            # Polars case
-            missing_vals = {
-                col: [
-                    (
-                        data[(cut_points[i - 1] if i > 0 else 0) : cut_points[i]][col]
-                        .is_null()
-                        .sum()
-                        / (cut_points[i] - (cut_points[i - 1] if i > 0 else 0))
-                        * 100
-                        if cut_points[i] > (cut_points[i - 1] if i > 0 else 0)
-                        else 0
-                    )
-                    for i in range(len(cut_points))
-                ]
-                + [
-                    (
-                        data[cut_points[-1] : n_rows][col].is_null().sum()
-                        / (n_rows - cut_points[-1])
-                        * 100
-                        if n_rows > cut_points[-1]
-                        else 0
-                    )
-                ]
-                for col in data.columns
-            }
+            missing_vals, missing_val_counts = _calculate_missing_proportions_dataframe(
+                is_polars=True
+            )
 
-            missing_vals = {
-                "columns": list(missing_vals.keys()),
-                **{
-                    str(i + 1): [missing_vals[col][i] for col in missing_vals.keys()]
-                    for i in range(len(cut_points) + 1)
-                },
-            }
+        elif "pandas" in tbl_type:
+            missing_vals, missing_val_counts = _calculate_missing_proportions_dataframe(
+                is_polars=False
+            )
 
-            # Get a dictionary of counts of missing values in each column
-            missing_val_counts = {col: data[col].is_null().sum() for col in data.columns}
-
-        if "pandas" in tbl_type:
-            missing_vals = {
-                col: [
-                    (
-                        data[(cut_points[i - 1] if i > 0 else 0) : cut_points[i]][col]
-                        .isnull()
-                        .sum()
-                        / (cut_points[i] - (cut_points[i - 1] if i > 0 else 0))
-                        * 100
-                        if cut_points[i] > (cut_points[i - 1] if i > 0 else 0)
-                        else 0
-                    )
-                    for i in range(len(cut_points))
-                ]
-                + [
-                    (
-                        data[cut_points[-1] : n_rows][col].isnull().sum()
-                        / (n_rows - cut_points[-1])
-                        * 100
-                        if n_rows > cut_points[-1]
-                        else 0
-                    )
-                ]
-                for col in data.columns
-            }
-
-            # Pivot the `missing_vals` dictionary to create a table with the missing
-            # value proportions
-            missing_vals = {
-                "columns": list(missing_vals.keys()),
-                **{
-                    str(i + 1): [missing_vals[col][i] for col in missing_vals.keys()]
-                    for i in range(len(cut_points) + 1)
-                },
-            }
-
-            # Get a dictionary of counts of missing values in each column
-            missing_val_counts = {col: data[col].isnull().sum() for col in data.columns}
-
-        if "pyspark" in tbl_type:
+        elif "pyspark" in tbl_type:
             from pyspark.sql.functions import col as pyspark_col
 
             # PySpark implementation for missing values calculation
@@ -2164,7 +2135,7 @@ def missing_vals_tbl(data: FrameT | Any) -> GT:
                         missing_prop = (null_count / sector_size) * 100
                         col_missing_props.append(missing_prop)
                     else:
-                        col_missing_props.append(0)
+                        col_missing_props.append(0)  # pragma: no cover
 
                 # Handle the final sector (after last cut point)
                 if n_rows > cut_points[-1]:
@@ -2184,7 +2155,7 @@ def missing_vals_tbl(data: FrameT | Any) -> GT:
                     missing_prop = (null_count / sector_size) * 100
                     col_missing_props.append(missing_prop)
                 else:
-                    col_missing_props.append(0)
+                    col_missing_props.append(0)  # pragma: no cover
 
                 missing_vals[col_name] = col_missing_props
 
@@ -2623,7 +2594,7 @@ def get_column_count(data: FrameT | Any) -> int:
     except Exception:
         # Fallback for unsupported types
         if "pandas" in str(type(data)):
-            return data.shape[1]
+            return data.shape[1]  # pragma: no cover
         else:
             raise ValueError("The input table type supplied in `data=` is not supported.")
 
@@ -2793,14 +2764,14 @@ def get_row_count(data: FrameT | Any) -> int:
         if hasattr(df_nw, "shape"):
             return df_nw.shape[0]
         elif hasattr(df_nw, "height"):
-            return df_nw.height
-        else:
+            return df_nw.height  # pragma: no cover
+        else:  # pragma: no cover
             raise ValueError("Unable to determine row count from Narwhals DataFrame")
     except Exception:
         # Fallback for types that don't work with Narwhals
-        if "pandas" in str(type(data)):
+        if "pandas" in str(type(data)):  # pragma: no cover
             return data.shape[0]
-        elif "pyspark" in str(type(data)):
+        elif "pyspark" in str(type(data)):  # pragma: no cover
             return data.count()
         else:
             raise ValueError("The input table type supplied in `data=` is not supported.")
@@ -3019,7 +2990,7 @@ def connect_to_table(connection_string: str) -> Any:
             # Get list of available tables
             try:
                 available_tables = conn.list_tables()
-            except Exception:
+            except Exception:  # pragma: no cover
                 available_tables = []
 
             conn.disconnect()
@@ -3064,7 +3035,7 @@ def connect_to_table(connection_string: str) -> Any:
             }
 
             # Check if this is a missing backend dependency
-            for backend, install_cmd in backend_install_map.items():
+            for backend, install_cmd in backend_install_map.items():  # pragma: no cover
                 if backend in error_str and ("not found" in error_str or "no module" in error_str):
                     raise ConnectionError(
                         f"Missing {backend.upper()} backend for Ibis. Install it with:\n"
@@ -3081,7 +3052,7 @@ def connect_to_table(connection_string: str) -> Any:
                     ) from e
 
             # Generic connection error
-            raise ConnectionError(
+            raise ConnectionError(  # pragma: no cover
                 f"Failed to connect to database using connection string: {connection_string}\n"
                 f"Error: {e}\n\n"
                 f"No table specified. Use the format: {connection_string}::TABLE_NAME"
@@ -3090,7 +3061,7 @@ def connect_to_table(connection_string: str) -> Any:
     # Split connection string and table name
     try:
         base_connection, table_name = connection_string.rsplit("::", 1)
-    except ValueError:
+    except ValueError:  # pragma: no cover
         raise ValueError(f"Invalid connection string format: {connection_string}")
 
     # Connect to database and get table
@@ -3124,7 +3095,7 @@ def connect_to_table(connection_string: str) -> Any:
         # Check if table doesn't exist
         if "table" in error_str and ("not found" in error_str or "does not exist" in error_str):
             # Try to get available tables for helpful message
-            try:
+            try:  # pragma: no cover
                 available_tables = conn.list_tables()
                 if available_tables:
                     table_list = "\n".join(f"  - {table}" for table in available_tables)

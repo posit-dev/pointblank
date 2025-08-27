@@ -1388,6 +1388,17 @@ class RowsDistinct:
     def get_test_results(self):
         return self.test_unit_res
 
+    def test(self):
+        # Get the number of failing test units by counting instances of `False` in the `pb_is_good_`
+        # column and then determine if the test passes overall by comparing the number of failing
+        # test units to the threshold for failing test units
+
+        results_list = nw.from_native(self.test_unit_res)["pb_is_good_"].to_list()
+
+        return _threshold_check(
+            failing_test_units=results_list.count(False), threshold=self.threshold
+        )
+
 
 @dataclass
 class RowsComplete:
@@ -2027,23 +2038,6 @@ def _column_has_null_values(table: FrameT, column: str) -> bool:
         return False
 
     return True
-
-
-def _check_nulls_across_columns_ibis(table, columns_subset):
-    # Get all column names from the table
-    column_names = columns_subset if columns_subset else table.columns
-
-    # Build the expression by combining each column's isnull() with OR operations
-    null_expr = functools.reduce(
-        lambda acc, col: acc | table[col].isnull() if acc is not None else table[col].isnull(),
-        column_names,
-        None,
-    )
-
-    # Add the expression as a new column to the table
-    result = table.mutate(_any_is_null_=null_expr)
-
-    return result
 
 
 def _check_nulls_across_columns_nw(table, columns_subset):

@@ -1510,26 +1510,6 @@ def yaml_to_python(yaml: Union[str, Path]) -> str:
                         action_params.append(f"highest_only={value.highest_only}")
                     actions_str = "pb.Actions(" + ", ".join(action_params) + ")"
                     param_parts.append(f"actions={actions_str}")
-                elif isinstance(value, dict):
-                    action_params = []
-                    step_action_base = f"steps[{step_index}].{list(step_config.keys())[0]}.actions"
-                    for action_key, action_value in value.items():
-                        if action_key == "highest_only":
-                            action_params.append(f"{action_key}={action_value}")
-                        else:
-                            # Check if we have an original expression for this action
-                            action_expr_path = f"{step_action_base}.{action_key}"
-                            if action_expr_path in step_expressions:
-                                action_params.append(
-                                    f"{action_key}={step_expressions[action_expr_path]}"
-                                )
-                            elif isinstance(action_value, str):
-                                action_params.append(f'{action_key}="{action_value}"')
-                            else:
-                                # For callables or complex expressions
-                                action_params.append(f"{action_key}={action_value}")
-                    actions_str = "pb.Actions(" + ", ".join(action_params) + ")"
-                    param_parts.append(f"actions={actions_str}")
                 else:
                     param_parts.append(f"actions={value}")
             elif key == "thresholds":
