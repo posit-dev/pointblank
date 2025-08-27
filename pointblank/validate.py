@@ -883,7 +883,7 @@ def _process_github_url(data: FrameT | Any) -> FrameT | Any:
         else:  # .parquet
             return _process_parquet_input(tmp_file_path)
 
-    except Exception:
+    except Exception:  # pragma: no cover
         # If download or processing fails, return original data
         return data
 
@@ -942,8 +942,7 @@ def _process_csv_input(data: FrameT | Any) -> FrameT | Any:
     if not csv_path.exists():
         raise FileNotFoundError(f"CSV file not found: {csv_path}")
 
-    # Determine which library to use for reading CSV
-    # Prefer Polars, fallback to Pandas
+    # Determine which library to use for reading CSV: prefer Polars but fallback to Pandas
     if _is_lib_present(lib_name="polars"):
         try:
             import polars as pl
@@ -955,7 +954,7 @@ def _process_csv_input(data: FrameT | Any) -> FrameT | Any:
                 import pandas as pd
 
                 return pd.read_csv(csv_path)
-            else:
+            else:  # pragma: no cover
                 raise RuntimeError(
                     f"Failed to read CSV file with Polars: {e}. "
                     "Pandas is not available as fallback."
