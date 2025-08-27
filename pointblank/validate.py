@@ -1091,7 +1091,7 @@ def _process_parquet_input(data: FrameT | Any) -> FrameT | Any:
                     # Multiple files: concatenate them
                     dfs = [pd.read_parquet(path) for path in parquet_paths]
                     return pd.concat(dfs, ignore_index=True)
-            else:
+            else:  # pragma: no cover
                 raise RuntimeError(
                     f"Failed to read Parquet file(s) with Polars: {e}. "
                     "Pandas is not available as fallback."
