@@ -740,9 +740,9 @@ def _process_data(data: FrameT | Any) -> FrameT | Any:
     """
     Centralized data processing pipeline that handles all supported input types.
 
-    This function consolidates the data processing pipeline used across multiple
-    classes and functions in Pointblank. It processes data through a consistent
-    sequence of transformations to handle different data source types.
+    This function consolidates the data processing pipeline used across multiple classes and
+    functions in Pointblank. It processes data through a consistent sequence of transformations to
+    handle different data source types.
 
     The processing order is important:
 
@@ -829,7 +829,9 @@ def _process_github_url(data: FrameT | Any) -> FrameT | Any:
     # Parse the URL to check if it's a GitHub URL
     try:
         parsed = urlparse(data)
-    except Exception:
+    except ValueError:
+        # urlparse can raise ValueError for malformed URLs (e.g., invalid IPv6)
+        # Return original data as it's likely not a GitHub URL we can process
         return data
 
     # Check if it's a GitHub URL (standard or raw)
@@ -884,9 +886,6 @@ def _process_github_url(data: FrameT | Any) -> FrameT | Any:
     except Exception:
         # If download or processing fails, return original data
         return data
-
-    except Exception as e:
-        raise RuntimeError(f"Failed to download or process GitHub file from {raw_url}: {e}") from e
 
 
 def _process_connection_string(data: FrameT | Any) -> FrameT | Any:
