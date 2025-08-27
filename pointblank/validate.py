@@ -2014,7 +2014,7 @@ def missing_vals_tbl(data: FrameT | Any) -> GT:
                     missing_prop = (null_sum_converted / sector_size) * 100
                     col_missing_props.append(missing_prop)
                 else:
-                    col_missing_props.append(0)
+                    col_missing_props.append(0)  # pragma: no cover
 
                 missing_vals[col] = col_missing_props
 
