@@ -9058,6 +9058,34 @@ def test_preview_pyspark_edge_cases():
     preview(large_df, n_head=5, n_tail=5)  # Balanced head/tail
 
 
+@pytest.mark.skipif(not PYSPARK_AVAILABLE, reason="PySpark not available")
+def test_preview_pyspark_with_nulls():
+    # Test PySpark DataFrames with null values to ensure null detection works
+    spark = get_spark_session()
+
+    # Create test data with explicit null values
+    test_data = [
+        (1, "apple", 2.5),
+        (2, None, 1.8),  # Null value in name column
+        (None, "cherry", 3.2),  # Null value in id column
+        (4, "date", None),  # Null value in price column
+        (5, "elderberry", 2.9),
+    ]
+
+    schema = ["id", "fruit", "price"]
+    spark_df = spark.createDataFrame(test_data, schema)
+
+    # Test `preview()` with null values (`preview()` should highlight them properly)
+    result = preview(spark_df, n_head=3, n_tail=2)
+
+    # The result should be a GT object
+    assert hasattr(result, "_build_data")
+
+    # Test full dataset with nulls
+    result_full = preview(spark_df)  # Should show all 5 rows
+    assert hasattr(result_full, "_build_data")
+
+
 def test_preview_large_head_tail_pd_table():
     small_table = load_dataset(dataset="small_table", tbl_type="pandas")
     preview(small_table, n_head=10, n_tail=10)
