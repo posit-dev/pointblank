@@ -134,6 +134,23 @@ conda install -c conda-forge pointblank-snowflake   # Snowflake
 # Example of installing multiple backends
 conda install -c conda-forge pointblank-duckdb pointblank-postgres pointblank-sqlite
 ```
+
+## pixi
+
+```bash
+pixi add pointblank-sqlite      # SQLite
+pixi add pointblank-duckdb      # DuckDB
+pixi add pointblank-postgres    # PostgreSQL
+pixi add pointblank-mysql       # MySQL
+pixi add pointblank-mssql       # Microsoft SQL Server
+pixi add pointblank-bigquery    # BigQuery
+pixi add pointblank-pyspark     # Apache Spark
+pixi add pointblank-databricks  # Databricks
+pixi add pointblank-snowflake   # Snowflake
+
+# Example of installing multiple backends
+pixi add pointblank-duckdb pointblank-postgres pointblank-sqlite
+```
 :::
 
 ::: {.callout-note}
