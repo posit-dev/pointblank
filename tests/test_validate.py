@@ -10781,6 +10781,16 @@ def test_get_column_count_parquet_glob_patterns():
     assert result > 0
 
 
+def test_get_column_count_parquet_list():
+    # Test with list of Parquet file paths with `get_column_count()`
+    parquet_files = [
+        "tests/tbl_files/parquet_data/data_a.parquet",
+        "tests/tbl_files/parquet_data/data_b.parquet",
+    ]
+    result = get_column_count(parquet_files)
+    assert result > 0  # Should return the column count from the combined Parquet files
+
+
 def test_get_row_count_csv_input():
     # Test with individual CSV file
     csv_path = "data_raw/small_table.csv"
@@ -10825,6 +10835,16 @@ def test_get_row_count_parquet_glob_patterns():
     parquet_glob = "tests/tbl_files/parquet_data/data_*.parquet"
     result = get_row_count(parquet_glob)
     assert result > 0
+
+
+def test_get_row_count_parquet_list():
+    # Test with list of Parquet file paths with `get_row_count()`
+    parquet_files = [
+        "tests/tbl_files/parquet_data/data_a.parquet",
+        "tests/tbl_files/parquet_data/data_b.parquet",
+    ]
+    result = get_row_count(parquet_files)
+    assert result > 0  # Should return the row count from the combined Parquet files
 
 
 @pytest.mark.parametrize("tbl_type", ["pandas", "polars"])
