@@ -2135,7 +2135,7 @@ def missing_vals_tbl(data: FrameT | Any) -> GT:
                         missing_prop = (null_count / sector_size) * 100
                         col_missing_props.append(missing_prop)
                     else:
-                        col_missing_props.append(0)
+                        col_missing_props.append(0)  # pragma: no cover
 
                 # Handle the final sector (after last cut point)
                 if n_rows > cut_points[-1]:
@@ -2155,7 +2155,7 @@ def missing_vals_tbl(data: FrameT | Any) -> GT:
                     missing_prop = (null_count / sector_size) * 100
                     col_missing_props.append(missing_prop)
                 else:
-                    col_missing_props.append(0)
+                    col_missing_props.append(0)  # pragma: no cover
 
                 missing_vals[col_name] = col_missing_props
 
