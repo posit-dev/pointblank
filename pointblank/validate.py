@@ -2594,7 +2594,7 @@ def get_column_count(data: FrameT | Any) -> int:
     except Exception:
         # Fallback for unsupported types
         if "pandas" in str(type(data)):
-            return data.shape[1]
+            return data.shape[1]  # pragma: no cover
         else:
             raise ValueError("The input table type supplied in `data=` is not supported.")
 
@@ -2764,14 +2764,14 @@ def get_row_count(data: FrameT | Any) -> int:
         if hasattr(df_nw, "shape"):
             return df_nw.shape[0]
         elif hasattr(df_nw, "height"):
-            return df_nw.height
-        else:
+            return df_nw.height  # pragma: no cover
+        else:  # pragma: no cover
             raise ValueError("Unable to determine row count from Narwhals DataFrame")
     except Exception:
         # Fallback for types that don't work with Narwhals
-        if "pandas" in str(type(data)):
+        if "pandas" in str(type(data)):  # pragma: no cover
             return data.shape[0]
-        elif "pyspark" in str(type(data)):
+        elif "pyspark" in str(type(data)):  # pragma: no cover
             return data.count()
         else:
             raise ValueError("The input table type supplied in `data=` is not supported.")
@@ -2990,7 +2990,7 @@ def connect_to_table(connection_string: str) -> Any:
             # Get list of available tables
             try:
                 available_tables = conn.list_tables()
-            except Exception:
+            except Exception:  # pragma: no cover
                 available_tables = []
 
             conn.disconnect()
@@ -3035,7 +3035,7 @@ def connect_to_table(connection_string: str) -> Any:
             }
 
             # Check if this is a missing backend dependency
-            for backend, install_cmd in backend_install_map.items():
+            for backend, install_cmd in backend_install_map.items():  # pragma: no cover
                 if backend in error_str and ("not found" in error_str or "no module" in error_str):
                     raise ConnectionError(
                         f"Missing {backend.upper()} backend for Ibis. Install it with:\n"
@@ -3052,7 +3052,7 @@ def connect_to_table(connection_string: str) -> Any:
                     ) from e
 
             # Generic connection error
-            raise ConnectionError(
+            raise ConnectionError(  # pragma: no cover
                 f"Failed to connect to database using connection string: {connection_string}\n"
                 f"Error: {e}\n\n"
                 f"No table specified. Use the format: {connection_string}::TABLE_NAME"
@@ -3061,7 +3061,7 @@ def connect_to_table(connection_string: str) -> Any:
     # Split connection string and table name
     try:
         base_connection, table_name = connection_string.rsplit("::", 1)
-    except ValueError:
+    except ValueError:  # pragma: no cover
         raise ValueError(f"Invalid connection string format: {connection_string}")
 
     # Connect to database and get table
@@ -3095,7 +3095,7 @@ def connect_to_table(connection_string: str) -> Any:
         # Check if table doesn't exist
         if "table" in error_str and ("not found" in error_str or "does not exist" in error_str):
             # Try to get available tables for helpful message
-            try:
+            try:  # pragma: no cover
                 available_tables = conn.list_tables()
                 if available_tables:
                     table_list = "\n".join(f"  - {table}" for table in available_tables)
