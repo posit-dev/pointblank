@@ -1963,59 +1963,68 @@ def missing_vals_tbl(data: FrameT | Any) -> GT:
 
         # Use the `row_ranges` list of lists to query, for each column, the proportion of missing
         # values in each 'sector' of the table (a sector is a range of rows)
-        if df_lib_name_gt == "polars":
-            missing_vals = {
-                col: [
-                    (
-                        data[(cut_points[i - 1] if i > 0 else 0) : cut_points[i]][col]
-                        .isnull()
-                        .sum()
-                        .to_polars()
-                        / (cut_points[i] - (cut_points[i - 1] if i > 0 else 0))
-                        * 100
-                        if cut_points[i] > (cut_points[i - 1] if i > 0 else 0)
-                        else 0
-                    )
-                    for i in range(len(cut_points))
-                ]
-                + [
-                    (
-                        data[cut_points[-1] : n_rows][col].isnull().sum().to_polars()
-                        / (n_rows - cut_points[-1])
-                        * 100
-                        if n_rows > cut_points[-1]
-                        else 0
-                    )
-                ]
-                for col in data.columns
-            }
+        def _calculate_missing_proportions(use_polars_conversion: bool = False):
+            """
+            Calculate missing value proportions for each column and sector.
 
+            Parameters
+            ----------
+            use_polars_conversion
+                If True, use `.to_polars()` for conversions, otherwise use `.to_pandas()`
+            """
+            missing_vals = {}
+            for col in data.columns:
+                col_missing_props = []
+
+                # Calculate missing value proportions for each sector
+                for i in range(len(cut_points)):
+                    start_row = cut_points[i - 1] if i > 0 else 0
+                    end_row = cut_points[i]
+                    sector_size = end_row - start_row
+
+                    if sector_size > 0:
+                        sector_data = data[start_row:end_row][col]
+                        null_sum = sector_data.isnull().sum()
+
+                        # Apply the appropriate conversion method
+                        if use_polars_conversion:
+                            null_sum_converted = null_sum.to_polars()
+                        else:
+                            null_sum_converted = null_sum.to_pandas()
+
+                        missing_prop = (null_sum_converted / sector_size) * 100
+                        col_missing_props.append(missing_prop)
+                    else:
+                        col_missing_props.append(0)
+
+                # Handle the final sector (after last cut point)
+                if n_rows > cut_points[-1]:
+                    start_row = cut_points[-1]
+                    sector_size = n_rows - start_row
+
+                    sector_data = data[start_row:n_rows][col]
+                    null_sum = sector_data.isnull().sum()
+
+                    # Apply the appropriate conversion method
+                    if use_polars_conversion:
+                        null_sum_converted = null_sum.to_polars()
+                    else:
+                        null_sum_converted = null_sum.to_pandas()
+
+                    missing_prop = (null_sum_converted / sector_size) * 100
+                    col_missing_props.append(missing_prop)
+                else:
+                    col_missing_props.append(0)
+
+                missing_vals[col] = col_missing_props
+
+            return missing_vals
+
+        # Use the helper function based on the DataFrame library
+        if df_lib_name_gt == "polars":
+            missing_vals = _calculate_missing_proportions(use_polars_conversion=True)
         else:
-            missing_vals = {
-                col: [
-                    (
-                        data[(cut_points[i - 1] if i > 0 else 0) : cut_points[i]][col]
-                        .isnull()
-                        .sum()
-                        .to_pandas()
-                        / (cut_points[i] - (cut_points[i - 1] if i > 0 else 0))
-                        * 100
-                        if cut_points[i] > (cut_points[i - 1] if i > 0 else 0)
-                        else 0
-                    )
-                    for i in range(len(cut_points))
-                ]
-                + [
-                    (
-                        data[cut_points[-1] : n_rows][col].isnull().sum().to_pandas()
-                        / (n_rows - cut_points[-1])
-                        * 100
-                        if n_rows > cut_points[-1]
-                        else 0
-                    )
-                ]
-                for col in data.columns
-            }
+            missing_vals = _calculate_missing_proportions(use_polars_conversion=False)
 
         # Pivot the `missing_vals` dictionary to create a table with the missing value proportions
         missing_vals = {
@@ -2036,86 +2045,65 @@ def missing_vals_tbl(data: FrameT | Any) -> GT:
         # Get the column names from the table
         col_names = list(data.columns)
 
+        # Helper function for DataFrame missing value calculation (Polars/Pandas)
+        def _calculate_missing_proportions_dataframe(is_polars=False):
+            null_method = "is_null" if is_polars else "isnull"
+
+            missing_vals = {
+                col: [
+                    (
+                        getattr(
+                            data[(cut_points[i - 1] if i > 0 else 0) : cut_points[i]][col],
+                            null_method,
+                        )().sum()
+                        / (cut_points[i] - (cut_points[i - 1] if i > 0 else 0))
+                        * 100
+                        if cut_points[i] > (cut_points[i - 1] if i > 0 else 0)
+                        else 0
+                    )
+                    for i in range(len(cut_points))
+                ]
+                + [
+                    (
+                        getattr(data[cut_points[-1] : n_rows][col], null_method)().sum()
+                        / (n_rows - cut_points[-1])
+                        * 100
+                        if n_rows > cut_points[-1]
+                        else 0
+                    )
+                ]
+                for col in data.columns
+            }
+
+            # Transform to the expected format
+            formatted_missing_vals = {
+                "columns": list(missing_vals.keys()),
+                **{
+                    str(i + 1): [missing_vals[col][i] for col in missing_vals.keys()]
+                    for i in range(len(cut_points) + 1)
+                },
+            }
+
+            # Get a dictionary of counts of missing values in each column
+            missing_val_counts = {
+                col: getattr(data[col], null_method)().sum() for col in data.columns
+            }
+
+            return formatted_missing_vals, missing_val_counts
+
         # Iterate over the cut points and get the proportion of missing values in each 'sector'
         # for each column
         if "polars" in tbl_type:
-            # Polars case
-            missing_vals = {
-                col: [
-                    (
-                        data[(cut_points[i - 1] if i > 0 else 0) : cut_points[i]][col]
-                        .is_null()
-                        .sum()
-                        / (cut_points[i] - (cut_points[i - 1] if i > 0 else 0))
-                        * 100
-                        if cut_points[i] > (cut_points[i - 1] if i > 0 else 0)
-                        else 0
-                    )
-                    for i in range(len(cut_points))
-                ]
-                + [
-                    (
-                        data[cut_points[-1] : n_rows][col].is_null().sum()
-                        / (n_rows - cut_points[-1])
-                        * 100
-                        if n_rows > cut_points[-1]
-                        else 0
-                    )
-                ]
-                for col in data.columns
-            }
+            missing_vals, missing_val_counts = _calculate_missing_proportions_dataframe(
+                is_polars=True
+            )
 
-            missing_vals = {
-                "columns": list(missing_vals.keys()),
-                **{
-                    str(i + 1): [missing_vals[col][i] for col in missing_vals.keys()]
-                    for i in range(len(cut_points) + 1)
-                },
-            }
+        elif "pandas" in tbl_type:
+            missing_vals, missing_val_counts = _calculate_missing_proportions_dataframe(
+                is_polars=False
+            )
 
-            # Get a dictionary of counts of missing values in each column
-            missing_val_counts = {col: data[col].is_null().sum() for col in data.columns}
-
-        if "pandas" in tbl_type:
-            missing_vals = {
-                col: [
-                    (
-                        data[(cut_points[i - 1] if i > 0 else 0) : cut_points[i]][col]
-                        .isnull()
-                        .sum()
-                        / (cut_points[i] - (cut_points[i - 1] if i > 0 else 0))
-                        * 100
-                        if cut_points[i] > (cut_points[i - 1] if i > 0 else 0)
-                        else 0
-                    )
-                    for i in range(len(cut_points))
-                ]
-                + [
-                    (
-                        data[cut_points[-1] : n_rows][col].isnull().sum()
-                        / (n_rows - cut_points[-1])
-                        * 100
-                        if n_rows > cut_points[-1]
-                        else 0
-                    )
-                ]
-                for col in data.columns
-            }
-
-            # Pivot the `missing_vals` dictionary to create a table with the missing
-            # value proportions
-            missing_vals = {
-                "columns": list(missing_vals.keys()),
-                **{
-                    str(i + 1): [missing_vals[col][i] for col in missing_vals.keys()]
-                    for i in range(len(cut_points) + 1)
-                },
-            }
-
-            # Get a dictionary of counts of missing values in each column
-            missing_val_counts = {col: data[col].isnull().sum() for col in data.columns}
-
-        if "pyspark" in tbl_type:
+        elif "pyspark" in tbl_type:
             from pyspark.sql.functions import col as pyspark_col
 
             # PySpark implementation for missing values calculation
