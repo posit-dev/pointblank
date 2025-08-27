@@ -10646,16 +10646,15 @@ def test_missing_vals_tbl_no_fail_pyspark_table():
     # Test `missing_vals_tbl()` with PySpark DataFrames
     spark = get_spark_session()
 
-    # Create test data with some missing values
-    test_data = [
-        (1, "apple", 2.5),
-        (2, None, 1.8),  # Missing value
-        (None, "cherry", 3.2),  # Missing value
-        (4, "date", None),  # Missing value
-        (5, "elderberry", 2.9),
-        (6, None, 1.5),  # Missing value
-        (7, "grape", None),  # Missing value
-    ]
+    # Create test data with enough rows to trigger sector processing (need at least 10 rows
+    # for `cut_points`); generate 100 rows to ensure we get meaningful sectors
+    test_data = []
+    for i in range(100):
+        # Add some missing values strategically
+        id_val = i if i % 7 != 0 else None  # Missing every 7th id
+        fruit_val = f"fruit_{i}" if i % 5 != 0 else None  # Missing every 5th fruit
+        price_val = float(i + 1) if i % 3 != 0 else None  # Missing every 3rd price
+        test_data.append((id_val, fruit_val, price_val))
 
     schema = ["id", "fruit", "price"]
     spark_df = spark.createDataFrame(test_data, schema)
