@@ -9009,6 +9009,26 @@ def test_preview_fails_head_tail_exceed_limit():
     preview(small_table, n_head=100, n_tail=100, limit=300)
 
 
+def test_preview_row_num_col_not_first():
+    """Test that '_row_num_' column exists but is not the first column."""
+    # Create a DataFrame with '_row_num_' column not in first position
+    data = pd.DataFrame(
+        {
+            "a": [1, 2, 3],
+            "_row_num_": [10, 20, 30],  # '_row_num_' exists but is not the first
+            "b": [4, 5, 6],
+        }
+    )
+
+    # This should lead to setting `has_leading_row_num_col = False`
+    # because '_row_num_' exists but `data.columns[0] != "_row_num_"`
+    # Use `show_row_numbers=False` to avoid conflict with existing '_row_num_' column
+    result = preview(data, n_head=2, n_tail=1, show_row_numbers=False)
+
+    # Verify the preview works correctly
+    assert result is not None
+
+
 def test_gt_based_formatting_completely_avoids_vals_submodule():
     # Mock the vals.fmt_number to raise an error if called
     with patch(
@@ -14017,6 +14037,17 @@ def test_validate_parquet_mixed_list():
 
     # Should return the original list unchanged
     assert validator.data == mixed_list
+
+
+def test_validate_parquet_list_file_not_found():
+    """Test for a `FileNotFoundError` when a Parquet file provided in a list doesn't exist."""
+    parquet_list = [
+        str(TEST_DATA_DIR / "taxi_part_01.parquet"),  # This file exists
+        str(TEST_DATA_DIR / "nonexistent.parquet"),  # This file doesn't exist
+    ]
+
+    with pytest.raises(FileNotFoundError, match="Parquet file not found"):
+        Validate(data=parquet_list)
 
 
 def test_validate_parquet_partitioned_small_table():
