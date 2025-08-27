@@ -1613,24 +1613,9 @@ def _generate_display_table(
     # This is used to highlight these values in the table
     if df_lib_name_gt == "polars":
         none_values = {k: data[k].is_null().to_list() for k in col_names}
-    elif df_lib_name_gt == "pyspark":
-        # For PySpark, check if data has been converted to pandas already
-        if hasattr(data, "isnull"):
-            # Data has been converted to pandas
-            none_values = {k: data[k].isnull() for k in col_names}
-        else:
-            # Data is still a PySpark DataFrame - use narwhals
-            import narwhals as nw
-
-            df_nw = nw.from_native(data)
-            none_values = {}
-            for col in col_names:
-                # Get null mask, collect to pandas, then convert to list
-                null_mask = (
-                    df_nw.select(nw.col(col).is_null()).collect().to_pandas().iloc[:, 0].tolist()
-                )
-                none_values[col] = null_mask
     else:
+        # PySpark data has been converted to Pandas by this point so the 'isnull()'
+        # method can be used
         none_values = {k: data[k].isnull() for k in col_names}
 
     none_values = [(k, i) for k, v in none_values.items() for i, val in enumerate(v) if val]
