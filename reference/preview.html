@@ -75,7 +75,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-ea385d0e468b0dd5ea5bf0780b1290d9.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-ac094b9e767832278df91157bc75fe51.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-957b4f91927897acbb869928b14d99d0.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -335,7 +335,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
         border-radius: 2px;
     ">
 <p>It’s easy to preview a table using the <a href="../reference/preview.html#pointblank.preview" title="0"><code>preview()</code></a> function. Here’s an example using the <code>small_table</code> dataset (itself loaded using the <a href="../reference/load_dataset.html#pointblank.load_dataset"><span><code>load_dataset()</code></span></a> function):</p>
-<div id="9e6609c6" class="cell" data-execution_count="1">
+<div id="2a9155a0" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>small_table_polars <span class="op">=</span> pb.load_dataset(<span class="st">"small_table"</span>)</span>
@@ -543,7 +543,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 </div>
 <p>This table is a Polars DataFrame, but the <a href="../reference/preview.html#pointblank.preview" title="0"><code>preview()</code></a> function works with any table supported by <code>pointblank</code>, including Pandas DataFrames and Ibis backend tables. Here’s an example using a DuckDB table handled by Ibis:</p>
-<div id="4471d47a" class="cell" data-execution_count="2">
+<div id="a4ea93f5" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>small_table_duckdb <span class="op">=</span> pb.load_dataset(<span class="st">"small_table"</span>, tbl_type<span class="op">=</span><span class="st">"duckdb"</span>)</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>pb.preview(small_table_duckdb)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -750,7 +750,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 <p>The blue dividing line marks the end of the first <code>n_head=</code> rows and the start of the last <code>n_tail=</code> rows.</p>
 <p>We can adjust the number of rows shown from the start and end of the table by setting the <code>n_head=</code> and <code>n_tail=</code> parameters. Let’s enlarge each of these to <code>10</code>:</p>
-<div id="63a4cb7b" class="cell" data-execution_count="3">
+<div id="a0fd08b1" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>pb.preview(small_table_polars, n_head<span class="op">=</span><span class="dv">10</span>, n_tail<span class="op">=</span><span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="3">
 <div id="pb_preview_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
@@ -988,7 +988,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 <p>In the above case, the entire dataset is shown since the sum of <code>n_head=</code> and <code>n_tail=</code> is greater than the number of rows in the table (which is 13).</p>
 <p>The <code>columns_subset=</code> parameter can be used to show only specific columns in the table. You can provide a list of column names to make the selection. Let’s try that with the <code>"game_revenue"</code> dataset as a Pandas DataFrame:</p>
-<div id="5ee46b7b" class="cell" data-execution_count="4">
+<div id="f8b43277" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>game_revenue_pandas <span class="op">=</span> pb.load_dataset(<span class="st">"game_revenue"</span>, tbl_type<span class="op">=</span><span class="st">"pandas"</span>)</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>pb.preview(game_revenue_pandas, columns_subset<span class="op">=</span>[<span class="st">"player_id"</span>, <span class="st">"item_name"</span>, <span class="st">"item_revenue"</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -1134,7 +1134,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 </div>
 <p>Alternatively, we can use column selector functions like <a href="../reference/starts_with.html#pointblank.starts_with"><span><code>starts_with()</code></span></a> and <a href="../reference/matches.html#pointblank.matches"><span><code>matches()</code></span></a>` to select columns based on text or patterns:</p>
-<div id="27226b74" class="cell" data-execution_count="5">
+<div id="2c45b80a" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>pb.preview(game_revenue_pandas, n_head<span class="op">=</span><span class="dv">2</span>, n_tail<span class="op">=</span><span class="dv">2</span>, columns_subset<span class="op">=</span>pb.starts_with(<span class="st">"session"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="5">
 <div id="pb_preview_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
@@ -1242,7 +1242,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 </div>
 <p>Multiple column selector functions can be combined within <a href="../reference/col.html#pointblank.col"><span><code>col()</code></span></a> using operators like <code>|</code> and <code>&amp;</code>:</p>
-<div id="0e478f61" class="cell" data-execution_count="6">
+<div id="c40531a4" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>pb.preview(</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  game_revenue_pandas,</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  n_head<span class="op">=</span><span class="dv">2</span>,</span>
@@ -1363,7 +1363,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="working-with-csv-files" class="level3">
 <h4 class="anchored" data-anchor-id="working-with-csv-files">Working with CSV Files</h4>
 <p>The <a href="../reference/preview.html#pointblank.preview" title="0"><code>preview()</code></a> function can directly accept CSV file paths, making it easy to preview data stored in CSV files without manual loading:</p>
-<div id="111cc680" class="cell" data-execution_count="7">
+<div id="987b1067" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get a path to a CSV file from the package data</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>csv_path <span class="op">=</span> pb.get_data_path(<span class="st">"global_sales"</span>, <span class="st">"csv"</span>)</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1714,7 +1714,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 </div>
 <p>You can also use a Path object to specify the CSV file:</p>
-<div id="f94864a5" class="cell" data-execution_count="8">
+<div id="73c7313a" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>csv_file <span class="op">=</span> Path(pb.get_data_path(<span class="st">"game_revenue"</span>, <span class="st">"csv"</span>))</span>
@@ -1905,7 +1905,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="working-with-parquet-files" class="level3">
 <h4 class="anchored" data-anchor-id="working-with-parquet-files">Working with Parquet Files</h4>
 <p>The <a href="../reference/preview.html#pointblank.preview" title="0"><code>preview()</code></a> function can directly accept Parquet files and datasets in various formats:</p>
-<div id="615b8b44" class="cell" data-execution_count="9">
+<div id="876b4c1b" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Single Parquet file from package data</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>parquet_path <span class="op">=</span> pb.get_data_path(<span class="st">"nycflights"</span>, <span class="st">"parquet"</span>)</span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2244,7 +2244,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="working-with-database-connection-strings" class="level3">
 <h4 class="anchored" data-anchor-id="working-with-database-connection-strings">Working with Database Connection Strings</h4>
 <p>The <a href="../reference/preview.html#pointblank.preview" title="0"><code>preview()</code></a> function supports database connection strings for direct preview of database tables. Connection strings must specify a table using the <code>::table_name</code> suffix:</p>
-<div id="32d8c6c5" class="cell" data-execution_count="10">
+<div id="2c0b4e2e" class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get path to a DuckDB database file from package data</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>duckdb_path <span class="op">=</span> pb.get_data_path(<span class="st">"game_revenue"</span>, <span class="st">"duckdb"</span>)</span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
