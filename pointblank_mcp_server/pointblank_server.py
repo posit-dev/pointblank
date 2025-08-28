@@ -38,6 +38,16 @@ except ImportError:
     pl = None
     HAS_POLARS = False
 
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    handlers=[logging.FileHandler("pointblank_mcp_server.log"), logging.StreamHandler()],
+)
+logger = logging.getLogger(__name__)
+logger.info(f"MCP Server starting at {datetime.now()}")
+logger.info(f"Available DataFrame backends: pandas={HAS_PANDAS}, polars={HAS_POLARS}")
+
 
 # Type alias for DataFrame: can be Pandas or Polars or other
 if HAS_PANDAS:
