@@ -16,7 +16,6 @@ from typing import (
 
 from fastmcp import Context, FastMCP
 from fastmcp.prompts.prompt import Message
-from pydantic import Field
 
 import pointblank as pb
 
@@ -184,20 +183,15 @@ class DataFrameInfo:
 )
 async def load_dataframe(
     ctx: Context,
-    input_path: Annotated[str, Field(description="Path to the input CSV, Excel or Parquet file.")],
+    input_path: Annotated[str, "Path to the input CSV, Excel or Parquet file."],
     df_id: Optional[
         Annotated[
-            str,
-            Field(
-                description="Optional ID for the DataFrame. If not provided, a new ID will be generated."
-            ),
+            str, "Optional ID for the DataFrame. If not provided, a new ID will be generated."
         ]
     ] = None,
     backend: Annotated[
         str,
-        Field(
-            description="DataFrame backend to use: 'auto', 'pandas', or 'polars'. Default is 'auto' (uses pandas if available, then polars)."
-        ),
+        "DataFrame backend to use: 'auto', 'pandas', or 'polars'. Default is 'auto' (uses pandas if available, then polars).",
     ] = "auto",
 ) -> DataFrameInfo:
     """
@@ -381,7 +375,7 @@ async def list_active_validators(ctx: Context) -> Dict[str, Any]:
 )
 async def delete_dataframe(
     ctx: Context,
-    df_id: Annotated[str, Field(description="ID of the DataFrame to delete.")],
+    df_id: Annotated[str, "ID of the DataFrame to delete."],
 ) -> Dict[str, str]:
     """
     Removes a DataFrame from the server context and frees up memory.
@@ -427,7 +421,7 @@ async def delete_dataframe(
 )
 async def delete_validator(
     ctx: Context,
-    validator_id: Annotated[str, Field(description="ID of the validator to delete.")],
+    validator_id: Annotated[str, "ID of the validator to delete."],
 ) -> Dict[str, str]:
     """
     Removes a validator from the server context.
@@ -457,12 +451,12 @@ async def delete_validator(
 )
 async def profile_dataframe(
     ctx: Context,
-    df_id: Annotated[str, Field(description="ID of the DataFrame to profile.")],
+    df_id: Annotated[str, "ID of the DataFrame to profile."],
     include_correlations: Annotated[
-        bool, Field(description="Whether to include correlation analysis for numeric columns.")
+        bool, "Whether to include correlation analysis for numeric columns."
     ] = True,
     sample_size: Annotated[
-        int, Field(description="Maximum number of rows to sample for profiling (0 = all rows).")
+        int, "Maximum number of rows to sample for profiling (0 = all rows)."
     ] = 10000,
 ) -> Dict[str, Any]:
     """
@@ -839,24 +833,18 @@ def _compute_correlations(df: Any) -> Dict[str, Any]:
 )
 async def apply_validation_template(
     ctx: Context,
-    validator_id: Annotated[str, Field(description="ID of the Validator to apply template to.")],
+    validator_id: Annotated[str, "ID of the Validator to apply template to."],
     template_name: Annotated[
         str,
-        Field(
-            description="Name of the validation template to apply. Available: 'basic_quality', 'financial_data', 'customer_data', 'sensor_data', 'survey_data'."
-        ),
+        "Name of the validation template to apply. Available: 'basic_quality', 'financial_data', 'customer_data', 'sensor_data', 'survey_data'.",
     ],
     column_mapping: Annotated[
         Dict[str, str],
-        Field(
-            description="Mapping of template column names to actual DataFrame column names. E.g., {'amount': 'price', 'id': 'customer_id'}."
-        ),
+        "Mapping of template column names to actual DataFrame column names. E.g., {'amount': 'price', 'id': 'customer_id'}.",
     ],
     thresholds: Annotated[
         Optional[Dict[str, float]],
-        Field(
-            description="Optional custom thresholds for validation steps. E.g., {'warning': 0.05, 'error': 0.1}."
-        ),
+        "Optional custom thresholds for validation steps. E.g., {'warning': 0.05, 'error': 0.1}.",
     ] = None,
 ) -> Dict[str, Any]:
     """
@@ -1269,31 +1257,23 @@ class ValidatorInfo:
 )
 def create_validator(
     ctx: Context,
-    df_id: Annotated[str, Field(description="ID of the DataFrame to validate.")],
+    df_id: Annotated[str, "ID of the DataFrame to validate."],
     validator_id: Annotated[
         Optional[str],
-        Field(
-            description="Optional ID for the Validator. If not provided, a new ID will be generated."
-        ),
+        "Optional ID for the Validator. If not provided, a new ID will be generated.",
     ] = None,
     table_name: Annotated[
         Optional[str],
-        Field(
-            description="Optional name for the table within Pointblank reports. If not provided, a default name will be used."
-        ),
+        "Optional name for the table within Pointblank reports. If not provided, a default name will be used.",
     ] = None,
     validator_label: Annotated[
         Optional[str],
-        Field(
-            description="Optional descriptive label for the Validator. If not provided, a default label will be used."
-        ),
+        "Optional descriptive label for the Validator. If not provided, a default label will be used.",
     ] = None,  # Corresponds to 'label' in pb.Validate
     thresholds_dict: Annotated[
         Optional[Dict[str, Union[int, float]]],
-        Field(
-            description="Optional thresholds for validation failures. Example: {'warning': 0.1, 'error': 5, 'critical': 0.10}. "
-            "If not provided, no thresholds will be set."
-        ),
+        "Optional thresholds for validation failures. Example: {'warning': 0.1, 'error': 5, 'critical': 0.10}. "
+        "If not provided, no thresholds will be set.",
     ] = None,  # Corresponds to 'thresholds' in pb.Validate, e.g. {"warning": 1, "error": 20, "critical": 0.10}
     actions_dict: Optional[Dict[str, Any]] = None,  # Simplified, for pb.Actions
     final_actions_dict: Optional[Dict[str, Any]] = None,  # Simplified, for pb.FinalActions
@@ -1399,18 +1379,14 @@ class ValidationStepInfo:
 )
 def add_validation_step(
     ctx: Context,
-    validator_id: Annotated[str, Field(description="ID of the Validator to add a step to.")],
+    validator_id: Annotated[str, "ID of the Validator to add a step to."],
     validation_type: Annotated[
         str,
-        Field(
-            description="Type of validation to perform. Supported types include: 'col_vals_lt', 'col_vals_gt', 'col_vals_between', 'col_exists', 'rows_distinct', etc."
-        ),
+        "Type of validation to perform. Supported types include: 'col_vals_lt', 'col_vals_gt', 'col_vals_between', 'col_exists', 'rows_distinct', etc.",
     ],
     params: Annotated[
         Dict[str, Any],
-        Field(
-            description="Parameters for the validation function. This should match the expected parameters for the Pointblank validation method."
-        ),
+        "Parameters for the validation function. This should match the expected parameters for the Pointblank validation method.",
     ],
     actions_config: Optional[Dict[str, Any]] = None,  # Placeholder for simplified action definition
 ) -> ValidationStepInfo:
@@ -1516,22 +1492,18 @@ class ValidationOutput:
 )
 async def get_validation_step_output(
     ctx: Context,
-    validator_id: Annotated[str, Field(description="ID of the Validator to retrieve output from.")],
+    validator_id: Annotated[str, "ID of the Validator to retrieve output from."],
     output_path: Annotated[
         str,
-        Field(description="Path to save the output file. Must end with .csv."),
+        "Path to save the output file. Must end with .csv.",
     ],
     sundered_type: Annotated[
         str,
-        Field(
-            description="Mode 2: Retrieve all 'pass' or 'fail' rows for the *entire* validation run. Only used if 'step_index' is not provided."
-        ),
+        "Mode 2: Retrieve all 'pass' or 'fail' rows for the *entire* validation run. Only used if 'step_index' is not provided.",
     ] = "fail",
     step_index: Annotated[
         Optional[int],
-        Field(
-            description="Mode 1: Retrieve data for a *specific* step by its index (starting from 0). If used, 'sundered_type' is ignored."
-        ),
+        "Mode 1: Retrieve data for a *specific* step by its index (starting from 0). If used, 'sundered_type' is ignored.",
     ] = None,
 ) -> ValidationOutput:
     """
@@ -1610,12 +1582,10 @@ async def get_validation_step_output(
 )
 async def interrogate_validator(
     ctx: Context,
-    validator_id: Annotated[str, Field(description="ID of the Validator to interrogate.")],
+    validator_id: Annotated[str, "ID of the Validator to interrogate."],
     report_file_path: Annotated[
         Optional[str],
-        Field(
-            description="Optional path to save the validation report. If provided, must end with .csv."
-        ),
+        "Optional path to save the validation report. If provided, must end with .csv.",
     ] = None,
 ) -> Dict[str, Any]:
     """
@@ -1684,11 +1654,10 @@ async def interrogate_validator(
     tags={"Data Management"},
 )
 def prompt_load_dataframe(
-    input_path: str = Field(description="Path to the input CSV, Excel or Parquet file."),
-    df_id: Optional[str] = Field(
-        default=None,
-        description="Optional ID for the DataFrame. If not provided, a new ID will be generated.",
-    ),
+    input_path: str = "Path to the input CSV, Excel or Parquet file.",
+    df_id: Optional[
+        str
+    ] = "Optional ID for the DataFrame. If not provided, a new ID will be generated.",
 ) -> tuple:
     return (
         Message(
@@ -1710,30 +1679,22 @@ def prompt_load_dataframe(
     tags={"Validation"},
 )
 def prompt_create_validator(
-    df_id: Annotated[str, Field(description="ID of the DataFrame to validate.")] = "df_default",
+    df_id: Annotated[str, "ID of the DataFrame to validate."] = "df_default",
     validator_id: Annotated[
         Optional[str],
-        Field(
-            description="Optional ID for the Validator. If not provided, a new ID will be generated."
-        ),
+        "Optional ID for the Validator. If not provided, a new ID will be generated.",
     ] = "validator_default",
     table_name: Annotated[
         Optional[str],
-        Field(
-            description="Optional name for the table within Pointblank reports. If not provided, a default name will be used."
-        ),
+        "Optional name for the table within Pointblank reports. If not provided, a default name will be used.",
     ] = "data_table",
     validator_label: Annotated[
         Optional[str],
-        Field(
-            description="Optional descriptive label for the Validator. If not provided, a default label will be used."
-        ),
+        "Optional descriptive label for the Validator. If not provided, a default label will be used.",
     ] = "Validator",
     thresholds_dict_example: Annotated[
         Optional[Dict[str, Union[int, float]]],
-        Field(
-            description="Example thresholds for validation failures. If not provided, a default example will be used."
-        ),
+        "Example thresholds for validation failures. If not provided, a default example will be used.",
     ] = None,
 ) -> tuple:
     """
@@ -1796,18 +1757,13 @@ def prompt_add_validation_step_example() -> tuple:
     tags={"Validation"},
 )
 def prompt_get_validation_step_output(
-    validator_id: Annotated[
-        str, Field(description="Example ID of the Validator.")
-    ] = "validator_123",
+    validator_id: Annotated[str, "Example ID of the Validator."] = "validator_123",
     step_index: Annotated[
         Optional[int],
-        Field(description="Example step index for the first mode of operation."),
+        "Example step index for the first mode of operation.",
     ] = 0,
     sundered_type: Annotated[
-        Optional[str],
-        Field(
-            description="Example sundered type ('pass' or 'fail') for the second mode of operation."
-        ),
+        Optional[str], "Example sundered type ('pass' or 'fail') for the second mode of operation."
     ] = "fail",
 ) -> tuple:
     """
@@ -1840,10 +1796,10 @@ def prompt_get_validation_step_output(
     tags={"Validation"},
 )
 def prompt_interrogate_validator(
-    validator_id: Annotated[str, Field(description="ID of the Validator to interrogate.")],
+    validator_id: Annotated[str, "ID of the Validator to interrogate."],
     report_file_path: Annotated[
         Optional[str],
-        Field(description="Optional path to save the validation report as a CSV file."),
+        "Optional path to save the validation report as a CSV file.",
     ] = "optional_report.csv",
 ) -> tuple:
     """
@@ -1871,11 +1827,11 @@ def prompt_interrogate_validator(
 @mcp.tool()
 def preview_table(
     ctx: Context,
-    dataframe_id: str = Field(..., description="ID of the loaded DataFrame to preview"),
-    n_head: int = Field(default=5, description="Number of rows to show from the top"),
-    n_tail: int = Field(default=5, description="Number of rows to show from the bottom"),
-    limit: int = Field(default=50, description="Total row limit"),
-    show_row_numbers: bool = Field(default=True, description="Whether to show row numbers"),
+    dataframe_id: str = "ID of the loaded DataFrame to preview",
+    n_head: int = "Number of rows to show from the top",
+    n_tail: int = "Number of rows to show from the bottom",
+    limit: int = "Total row limit",
+    show_row_numbers: bool = "Whether to show row numbers",
 ) -> str:
     """
     Display a preview of the DataFrame showing rows from top and bottom.
@@ -1909,7 +1865,7 @@ def preview_table(
 @mcp.tool()
 def missing_values_table(
     ctx: Context,
-    dataframe_id: str = Field(..., description="ID of the loaded DataFrame to analyze"),
+    dataframe_id: str = "ID of the loaded DataFrame to analyze",
 ) -> str:
     """
     Generate a table showing missing values analysis for the DataFrame.
@@ -1941,8 +1897,8 @@ def missing_values_table(
 @mcp.tool()
 def column_summary_table(
     ctx: Context,
-    dataframe_id: str = Field(..., description="ID of the loaded DataFrame to summarize"),
-    table_name: str = Field(default="", description="Optional name for the table"),
+    dataframe_id: str = "ID of the loaded DataFrame to summarize",
+    table_name: str = "Optional name for the table",
 ) -> str:
     """
     Generate a comprehensive column-level summary of the DataFrame.
@@ -1974,13 +1930,8 @@ def column_summary_table(
 @mcp.tool()
 def validation_assistant(
     ctx: Context,
-    dataframe_id: str = Field(
-        ..., description="ID of the loaded DataFrame to create validation plan for"
-    ),
-    validation_goal: str = Field(
-        default="general",
-        description="What type of validation: 'data_quality', 'completeness', 'consistency', 'accuracy', 'general'",
-    ),
+    dataframe_id: str = "ID of the loaded DataFrame to create validation plan for",
+    validation_goal: str = "What type of validation: ",
 ) -> str:
     """
     Interactive assistant to help create a validation plan for your data.
