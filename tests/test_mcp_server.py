@@ -7,8 +7,6 @@ import pytest
 from fastmcp import Client
 from pointblank_mcp_server.pointblank_server import mcp
 
-# --- Fixtures ---
-
 
 @pytest.fixture(scope="module")
 def mcp_server():
