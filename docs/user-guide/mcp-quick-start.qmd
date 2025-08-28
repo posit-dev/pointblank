@@ -1,16 +1,15 @@
-# 🚀 **Pointblank MCP Server: Quick Start Guide**
-
-## **Get Started in 5 Minutes**
-
-Transform your data validation workflow with conversational AI in VS Code or Positron IDE!
-
+---
+title: "MCP Quick Start"
+jupyter: python3
+toc-expand: 2
+html-table-processing: none
 ---
 
-## **⚡ Instant Setup**
+## Getting Started in 5 Minutes
 
-Three simple steps to start validating data through conversation. No complex configuration required!
+Transform your data validation workflow with conversational AI in VS Code or Positron IDE. Here are three simple steps to start validating data through conversation (and no complex configuration required).
 
-### **1. Install**
+### 1. Install
 
 ```bash
 pip install pointblank[mcp,pd,excel]
@@ -35,9 +34,9 @@ pip install pointblank[mcp,pd,pl]
 pip install pointblank[mcp,pd,pl,excel]
 ```
 
-### **2. Configure Your IDE**
+### 2. Configure Your IDE
 
-**For VS Code:**
+**For VS Code**:
 
 **Option 1: Workspace Configuration (Recommended for teams)**
 
@@ -62,29 +61,27 @@ pip install pointblank[mcp,pd,pl,excel]
 
 > ⚠️ **Security Note**: Only add MCP servers from trusted sources. VS Code will ask you to confirm trust when starting the server for the first time.
 
-**For Positron:**
+**For Positron**:
 
 1. Open Positron Settings
 2. Navigate to MCP Server configuration
 3. Add the configuration (format may vary)
 
-> **Note:** If you don't see MCP settings, you may need to install an MCP extension first. Search for "MCP" in the Extensions marketplace.
+> **Note**: If you don't see MCP settings, you may need to install an MCP extension first. Search for "MCP" in the Extensions marketplace.
 
-### **3. Start Chatting**
+### 3. Start Chatting
 
 ```
 "Load my sales data and check its quality"
 ```
 
-That's it! 🎉
+That's basically how you get started.
 
----
-
-## **💬 Essential Commands**
+## Essential Commands
 
 Master these four command patterns and you'll be able to handle most data validation scenarios. Think of these as your fundamental vocabulary for talking to Pointblank.
 
-### **Load Data**
+### Load Data
 
 ```
 "Load the file /path/to/data.csv"
@@ -92,7 +89,7 @@ Master these four command patterns and you'll be able to handle most data valida
 "Load the Excel file with sales metrics"
 ```
 
-### **Check Quality**
+### Check Quality
 
 ```
 "Analyze the data quality"
@@ -100,7 +97,7 @@ Master these four command patterns and you'll be able to handle most data valida
 "Check for missing values and duplicates"
 ```
 
-### **Create Validation**
+### Create Data Validations
 
 ```
 "Set up validation rules for this data"
@@ -108,7 +105,7 @@ Master these four command patterns and you'll be able to handle most data valida
 "Make sure amounts are positive"
 ```
 
-### **Run & Export**
+### Run and Export
 
 ```
 "Run the validation"
@@ -118,11 +115,12 @@ Master these four command patterns and you'll be able to handle most data valida
 
 ---
 
-## **🎯 Top 3 Use Cases**
+## Top Three Use Cases
 
 Once you have Pointblank set up, these scenarios show the most common and powerful ways to use natural language data validation. Each example demonstrates the conversational flow and immediate value you'll experience.
 
 ### **1. 📊 Quick Data Check**
+
 **When:** You get a new dataset
 ```
 👤 "I just got customer_data.csv. Is it clean?"
@@ -134,6 +132,7 @@ Once you have Pointblank set up, these scenarios show the most common and powerf
 ```
 
 ### **2. 🔄 Daily Validation**
+
 **When:** Regular data quality checks
 ```
 👤 "Run our standard sales validation"
@@ -144,6 +143,7 @@ Once you have Pointblank set up, these scenarios show the most common and powerf
 ```
 
 ### **3. 🚨 Issue Investigation**
+
 **When:** Something looks wrong
 ```
 👤 "Conversion rates jumped to 95%. That's impossible"
@@ -157,23 +157,23 @@ These examples show how natural conversation can quickly identify and resolve da
 
 ---
 
-## **🛠️ Common Validation Rules**
+## Common Validation Rules
 
 Understanding what validation rules to ask for will help you quickly build comprehensive data quality checks. These examples cover the most frequent validation scenarios across different industries and data types.
 
-### **Data Integrity**
+### Data Integrity
 
 - "Check for duplicate IDs"
 - "Ensure no missing required fields"
 - "Validate that dates are reasonable"
 
-### **Business Logic**
+### Business Logic
 
 - "Amounts must be positive"
 - "Email addresses must be valid format"
 - "Status must be active, inactive, or pending"
 
-### **Cross-Field Validation**
+### Cross-Field Validation
 
 - "End date must be after start date"
 - "Discount percentage between 0 and 100"
@@ -181,30 +181,28 @@ Understanding what validation rules to ask for will help you quickly build compr
 
 These rule patterns can be combined and customized for your specific data and business requirements. The natural language interface makes it easy to express complex validation logic without learning technical syntax.
 
----
-
-## **💡 Pro Tips**
+## Some Tips and Tricks
 
 These expert recommendations will help you get maximum value from your Pointblank MCP server and avoid common pitfalls. Following these practices ensures smooth, productive validation workflows.
 
-### **Talk Naturally**
+### Talk Naturally
 
 ✅ **Good:** "Check if customer emails look valid"
 ❌ **Avoid:** "Execute col_vals_regex on email column"
 
-### **Provide Context**
+### Provide Context
 
 ✅ **Good:** "This is for the board presentation"
 ❌ **Avoid:** Just asking for validation without explanation
 
-### **Build Incrementally**
+### Build Incrementally
 
 1. Start with data profiling
 2. Add basic validation rules
 3. Create templates for reuse
 4. Set up automated checks
 
-### **Save Templates**
+### Save Templates
 
 ```
 "Save these rules as 'customer_validation'"
@@ -214,9 +212,7 @@ These expert recommendations will help you get maximum value from your Pointblan
 
 These practices help you build sustainable data quality workflows that scale with your organization's needs while remaining accessible to team members with varying technical backgrounds.
 
----
-
-## **🔧 File Support**
+## File Support
 
 Pointblank works with all major data formats, making it easy to validate data regardless of how it's stored. This universal support means you can maintain consistent validation practices across your entire data ecosystem.
 
@@ -229,9 +225,7 @@ Pointblank works with all major data formats, making it easy to validate data re
 
 The consistent natural language interface works the same regardless of file format, so you can focus on validation logic rather than technical details.
 
----
-
-## **⚠️ Quick Troubleshooting**
+## Quick Troubleshooting
 
 When you encounter issues, these quick fixes resolve the most common problems. Don't worry; the natural language interface means you can always ask for help and explanations in plain English.
 
@@ -244,18 +238,8 @@ When you encounter issues, these quick fixes resolve the most common problems. D
 
 Remember, you can always ask the AI to explain what's happening or suggest solutions when you run into problems.
 
----
-
-## **🎉 You're Ready!**
+## Now You're Ready!
 
 You now have everything needed to start validating data through natural conversation. The beauty of Pointblank's MCP server is that it grows with your expertise: start simple and gradually build more sophisticated validation workflows as you become comfortable with the interface.
 
 Start with simple commands and build up to more complex validation workflows. The AI will guide you through the process and help you create robust data quality checks!
-
-### **Next Steps:**
-
-1. Try the [detailed User Guide](mcp-server-guide.qmd)
-2. Explore [Chat Scenarios](../VS_CODE_CHAT_SCENARIOS.md)
-3. Check out [Testing Examples](../MCP_TESTING_GUIDE.md)
-
-**Happy validating!** 🚀
