@@ -12,19 +12,43 @@ from typing import (
     Union,
 )
 
-import pandas as pd
 from fastmcp import Context, FastMCP
 from fastmcp.prompts.prompt import Message
 from pydantic import Field
 
 import pointblank as pb
 
+# Try to import pandas, but make it optional
+try:
+    import pandas as pd
+
+    HAS_PANDAS = True
+except ImportError:
+    pd = None
+    HAS_PANDAS = False
+
+# Try to import other DataFrame libraries
+try:
+    import polars as pl
+
+    HAS_POLARS = True
+except ImportError:
+    pl = None
+    HAS_POLARS = False
+
+
+# Type alias for DataFrame: can be Pandas or Polars or other
+if HAS_PANDAS:
+    DataFrameType = pd.DataFrame
+else:
+    DataFrameType = Any  # Fallback to Any if pandas not available
+
 
 # --- Lifespan Context: manage DataFrames and Validators ---
 @dataclass
 class AppContext:
     # Stores loaded DataFrames: {df_id: DataFrame}
-    loaded_dataframes: Dict[str, pd.DataFrame] = field(default_factory=dict)
+    loaded_dataframes: Dict[str, Any] = field(default_factory=dict)
     # Stores active Pointblank Validators: {validator_id: Validate}
     active_validators: Dict[str, pb.Validate] = field(default_factory=dict)
 
@@ -40,22 +64,87 @@ async def app_lifespan(server: FastMCP) -> AsyncIterator[AppContext]:
 mcp = FastMCP(
     "FlexiblePointblankMCP",
     lifespan=app_lifespan,
-    dependencies=["pandas", "pointblank", "openpyxl", "polars"],
+    dependencies=["pointblank", "openpyxl"],
 )
 
 
-def _load_dataframe_from_path(input_path: str) -> pd.DataFrame:
+def _get_available_backends():
+    """Get list of available DataFrame backends."""
+    backends = []
+    if HAS_PANDAS:
+        backends.append("pandas")
+    if HAS_POLARS:
+        backends.append("polars")
+    return backends
+
+
+def _save_dataframe_to_csv(df: Any, output_path: Path) -> None:
+    """Save DataFrame to CSV in a backend-agnostic way."""
+    if HAS_PANDAS and hasattr(df, "to_csv") and hasattr(df, "index"):
+        # Pandas DataFrame
+        df.to_csv(output_path, index=False)
+    elif HAS_POLARS and hasattr(df, "write_csv"):
+        # Polars DataFrame
+        df.write_csv(output_path)
+    else:
+        # Fallback: try to convert to pandas if available
+        if HAS_PANDAS:
+            if hasattr(df, "to_pandas"):
+                # Polars to pandas conversion
+                df.to_pandas().to_csv(output_path, index=False)
+            else:
+                # Try direct pandas constructor
+                pd.DataFrame(df).to_csv(output_path, index=False)
+        else:
+            raise TypeError(f"Unsupported DataFrame type '{type(df).__name__}' for CSV export.")
+
+
+def _load_dataframe_from_path(input_path: str, backend: str = "auto") -> Any:
+    """Load DataFrame from file using specified backend or auto-detect."""
     p_path = Path(input_path)
     if not p_path.exists():
         raise FileNotFoundError(f"Input file '{input_path}' not found.")
-    if p_path.suffix.lower() == ".csv":
-        return pd.read_csv(p_path)
-    elif p_path.suffix.lower() in [".xls", ".xlsx"]:
-        return pd.read_excel(p_path, engine="openpyxl")
-    elif p_path.suffix.lower() == ".parquet":
-        return pd.read_parquet(p_path)
+
+    # Auto-detect backend
+    if backend == "auto":
+        if HAS_PANDAS:
+            backend = "pandas"
+        elif HAS_POLARS:
+            backend = "polars"
+        else:
+            raise ImportError("No DataFrame library available. Install pandas or polars.")
+
+    # Load with specified backend
+    if backend == "pandas":
+        if not HAS_PANDAS:
+            raise ImportError("Pandas not available. Install with: pip install pandas")
+
+        if p_path.suffix.lower() == ".csv":
+            return pd.read_csv(p_path)
+        elif p_path.suffix.lower() in [".xls", ".xlsx"]:
+            return pd.read_excel(p_path, engine="openpyxl")
+        elif p_path.suffix.lower() == ".parquet":
+            return pd.read_parquet(p_path)
+    elif backend == "polars":
+        if not HAS_POLARS:
+            raise ImportError("Polars not available. Install with: pip install polars")
+
+        if p_path.suffix.lower() == ".csv":
+            return pl.read_csv(p_path)
+        elif p_path.suffix.lower() == ".parquet":
+            return pl.read_parquet(p_path)
+        elif p_path.suffix.lower() in [".xls", ".xlsx"]:
+            # Polars doesn't directly support Excel, fall back to pandas if available
+            if HAS_PANDAS:
+                return pd.read_excel(p_path, engine="openpyxl")
+            else:
+                raise ValueError(
+                    "Excel files require pandas. Install with: pip install pandas openpyxl"
+                )
     else:
-        raise ValueError(f"Unsupported file type: {p_path.suffix}. Please use CSV or Excel.")
+        raise ValueError(f"Unsupported backend: {backend}. Available: {_get_available_backends()}")
+
+    raise ValueError(f"Unsupported file type: {p_path.suffix}. Please use CSV, Excel, or Parquet.")
 
 
 @dataclass
@@ -81,15 +170,31 @@ async def load_dataframe(
             ),
         ]
     ] = None,
+    backend: Annotated[
+        str,
+        Field(
+            description="DataFrame backend to use: 'auto', 'pandas', or 'polars'. Default is 'auto' (uses pandas if available, then polars)."
+        ),
+    ] = "auto",
 ) -> DataFrameInfo:
     """
-    Loads a DataFrame from the specified CSV or Excel file into the server's context.
+    Loads a DataFrame from the specified CSV, Excel, or Parquet file into the server's context.
     Assigns a unique ID to the DataFrame for later reference.
     If df_id is not provided, a new one will be generated.
+    Supports multiple DataFrame backends (pandas, polars) for flexibility.
     Returns the DataFrame ID and basic information (shape, columns).
     """
     app_ctx: AppContext = ctx.request_context.lifespan_context
-    df = _load_dataframe_from_path(input_path)
+
+    # Check available backends
+    available_backends = _get_available_backends()
+    if not available_backends:
+        raise RuntimeError("No DataFrame library available. Install pandas or polars.")
+
+    # Inform user about available backends
+    await ctx.report_progress(10, 100, f"Available backends: {', '.join(available_backends)}")
+
+    df = _load_dataframe_from_path(input_path, backend)
 
     effective_df_id = df_id if df_id else f"df_{uuid.uuid4().hex[:8]}"
 
@@ -100,11 +205,57 @@ async def load_dataframe(
 
     app_ctx.loaded_dataframes[effective_df_id] = df
 
+    # Get DataFrame info in a backend-agnostic way
+    shape = df.shape
+    columns = list(df.columns)
+
+    await ctx.report_progress(
+        100, 100, f"DataFrame loaded with {backend} backend: {shape[0]} rows, {shape[1]} columns"
+    )
+
     return DataFrameInfo(
         df_id=effective_df_id,
-        shape=df.shape,
-        columns=list(df.columns),
+        shape=shape,
+        columns=columns,
     )
+
+
+@mcp.tool(
+    name="list_available_backends",
+    description="List available DataFrame backends (pandas, polars) installed in the environment.",
+    tags={"Data Management"},
+)
+async def list_available_backends(ctx: Context) -> Dict[str, Any]:
+    """
+    Returns information about available DataFrame backends and their capabilities.
+    """
+    backends = _get_available_backends()
+
+    backend_info = {}
+    for backend in backends:
+        if backend == "pandas":
+            backend_info["pandas"] = {
+                "available": True,
+                "supports": ["CSV", "Excel", "Parquet", "JSON"],
+                "excel_engine": "openpyxl" if HAS_PANDAS else None,
+            }
+        elif backend == "polars":
+            backend_info["polars"] = {
+                "available": True,
+                "supports": ["CSV", "Parquet"],
+                "notes": "Excel requires fallback to pandas",
+            }
+
+    if not backends:
+        backend_info["warning"] = "No DataFrame backends available. Install pandas or polars."
+
+    return {
+        "available_backends": backends,
+        "backend_details": backend_info,
+        "recommendation": "pandas"
+        if "pandas" in backends
+        else ("polars" if "polars" in backends else "install pandas or polars"),
+    }
 
 
 @dataclass
@@ -304,12 +455,12 @@ def add_validation_step(
         # Check existence of a column
         "col_exists": validator.col_exists,
         # Row validations
-        "rows_distinct": validator.rows_distinct,  # distinc rows in a table
-        "rows_complete": validator.rows_complete,  # Check for no NAs in specified columns
-        "row_count_match": validator.row_count_match,  # Check if number of rows in the table matches a fixed value
+        "rows_distinct": validator.rows_distinct,  # check distinct rows in a table
+        "rows_complete": validator.rows_complete,  # check for no nulls in rows across specified columns
+        "row_count_match": validator.row_count_match,  # check if number of rows in the table matches a fixed value
         # Other specialized validations
         "conjointly": validator.conjointly,  # For multiple column conditions
-        "col_schema_match": validator.col_schema_match,  # Do columns in the table (and their types) match a predefined schema? columns=[("a", "String"), ("b", "Int64"), ("c", "Float64")]
+        "col_schema_match": validator.col_schema_match,  # Do columns in the table (and their types) match a predefined schema?
     }
 
     if validation_type not in supported_validations:
@@ -437,13 +588,9 @@ async def get_validation_step_output(
                 output_file=None,
             )
 
-        if isinstance(data_extract_df, pd.DataFrame):
-            data_extract_df.to_csv(p_output_path, index=False)
-            message = f"Data extract saved to {p_output_path.resolve()}"
-        else:
-            raise TypeError(
-                f"Unsupported DataFrame type '{type(data_extract_df).__name__}' for CSV export."
-            )
+        # Save to CSV using backend-agnostic method
+        _save_dataframe_to_csv(data_extract_df, p_output_path)
+        message = f"Data extract saved to {p_output_path.resolve()}"
 
         await ctx.report_progress(100, 100, message)
 
@@ -503,8 +650,23 @@ async def interrogate_validator(
         p_report_file_path.parent.mkdir(parents=True, exist_ok=True)
         try:
             report_data = json.loads(json_report_str)
-            df_report = pd.DataFrame(report_data)
-            df_report.to_csv(p_report_file_path, index=False)
+            # Create DataFrame using available backend
+            if HAS_PANDAS:
+                df_report = pd.DataFrame(report_data)
+            else:
+                # If pandas not available, we need to handle this differently
+                # For now, save as JSON if no pandas
+                import json as json_module
+
+                with open(p_report_file_path.with_suffix(".json"), "w") as f:
+                    json_module.dump(report_data, f, indent=2)
+                file_saved_path = str(p_report_file_path.with_suffix(".json").resolve())
+                output_dict["json_report_saved_to"] = file_saved_path
+                await ctx.report_progress(100, 100, f"Report saved as JSON to {file_saved_path}")
+                return output_dict
+
+            # Save using backend-agnostic method
+            _save_dataframe_to_csv(df_report, p_report_file_path)
             file_saved_path = str(p_report_file_path.resolve())
             output_dict["csv_report_saved_to"] = file_saved_path
             await ctx.report_progress(100, 100, f"Report saved to {file_saved_path}")
