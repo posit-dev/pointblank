@@ -47,6 +47,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 logger.info(f"MCP Server starting at {datetime.now()}")
 logger.info(f"Available DataFrame backends: pandas={HAS_PANDAS}, polars={HAS_POLARS}")
+logger.info("Core Pointblank visualization features available")
 
 
 # Type alias for DataFrame: can be Pandas or Polars or other
