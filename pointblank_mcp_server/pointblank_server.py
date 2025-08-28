@@ -20,7 +20,7 @@ from pydantic import Field
 
 import pointblank as pb
 
-# Try to import pandas, but make it optional
+# Try to import Pandas, but make it optional
 try:
     import pandas as pd
 
