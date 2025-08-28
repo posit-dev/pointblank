@@ -280,6 +280,982 @@ async def list_available_backends(ctx: Context) -> Dict[str, Any]:
     }
 
 
+@mcp.tool(
+    name="list_loaded_dataframes",
+    description="List all DataFrames currently loaded in the server context.",
+    tags={"Data Management"},
+)
+async def list_loaded_dataframes(ctx: Context) -> Dict[str, Any]:
+    """
+    Returns information about all DataFrames currently loaded in the server.
+    """
+    app_ctx: AppContext = ctx.request_context.lifespan_context
+
+    dataframes_info = {}
+    for df_id, df in app_ctx.loaded_dataframes.items():
+        try:
+            shape = df.shape
+            columns = list(df.columns)
+            # Detect DataFrame type
+            df_type = "pandas" if hasattr(df, "to_csv") and hasattr(df, "index") else "polars"
+
+            dataframes_info[df_id] = {
+                "shape": shape,
+                "columns": columns,
+                "column_count": len(columns),
+                "row_count": shape[0],
+                "backend": df_type,
+                "memory_usage_mb": round(df.memory_usage(deep=True).sum() / 1024 / 1024, 2)
+                if df_type == "pandas"
+                else "N/A",
+            }
+        except Exception as e:
+            dataframes_info[df_id] = {
+                "error": f"Failed to get info: {str(e)}",
+                "backend": "unknown",
+            }
+
+    return {
+        "loaded_dataframes": dataframes_info,
+        "total_count": len(dataframes_info),
+        "memory_usage_summary": {
+            "total_mb": sum(
+                info.get("memory_usage_mb", 0)
+                for info in dataframes_info.values()
+                if isinstance(info.get("memory_usage_mb"), (int, float))
+            )
+        },
+    }
+
+
+@mcp.tool(
+    name="list_active_validators",
+    description="List all validators currently active in the server context.",
+    tags={"Validation"},
+)
+async def list_active_validators(ctx: Context) -> Dict[str, Any]:
+    """
+    Returns information about all active validators in the server.
+    """
+    app_ctx: AppContext = ctx.request_context.lifespan_context
+
+    validators_info = {}
+    for validator_id, validator in app_ctx.active_validators.items():
+        try:
+            # Get validator metadata
+            table_name = getattr(validator, "tbl_name", "Unknown")
+            label = getattr(validator, "label", "No label")
+
+            # Check if interrogated
+            is_interrogated = (
+                hasattr(validator, "time_processed") and validator.time_processed is not None
+            )
+
+            # Count validation steps (this is a rough estimate)
+            step_count = len(getattr(validator, "_validation_set", []))
+
+            validators_info[validator_id] = {
+                "table_name": table_name,
+                "label": label,
+                "is_interrogated": is_interrogated,
+                "validation_steps_count": step_count,
+                "last_processed": str(getattr(validator, "time_processed", "Never")),
+            }
+        except Exception as e:
+            validators_info[validator_id] = {"error": f"Failed to get info: {str(e)}"}
+
+    return {
+        "active_validators": validators_info,
+        "total_count": len(validators_info),
+        "interrogated_count": sum(
+            1 for info in validators_info.values() if info.get("is_interrogated", False)
+        ),
+    }
+
+
+@mcp.tool(
+    name="delete_dataframe",
+    description="Remove a DataFrame from the server context to free up memory.",
+    tags={"Data Management"},
+)
+async def delete_dataframe(
+    ctx: Context,
+    df_id: Annotated[str, Field(description="ID of the DataFrame to delete.")],
+) -> Dict[str, str]:
+    """
+    Removes a DataFrame from the server context and frees up memory.
+    Also removes any validators that were using this DataFrame.
+    """
+    app_ctx: AppContext = ctx.request_context.lifespan_context
+
+    if df_id not in app_ctx.loaded_dataframes:
+        raise ValueError(f"DataFrame ID '{df_id}' not found.")
+
+    # Remove the DataFrame
+    del app_ctx.loaded_dataframes[df_id]
+
+    # Find and remove validators that might be using this DataFrame
+    validators_to_remove = []
+    for validator_id, validator in app_ctx.active_validators.items():
+        # This is a heuristic - we can't easily determine which DataFrame a validator uses
+        # In a more sophisticated implementation, we'd track this relationship
+        try:
+            if hasattr(validator, "tbl_name") and df_id in validator.tbl_name:
+                validators_to_remove.append(validator_id)
+        except Exception:
+            pass
+
+    removed_validators = 0
+    for validator_id in validators_to_remove:
+        del app_ctx.active_validators[validator_id]
+        removed_validators += 1
+
+    message = f"DataFrame '{df_id}' deleted successfully."
+    if removed_validators > 0:
+        message += f" Also removed {removed_validators} associated validator(s)."
+
+    await ctx.report_progress(100, 100, message)
+
+    return {"status": "success", "message": message, "removed_validators": removed_validators}
+
+
+@mcp.tool(
+    name="delete_validator",
+    description="Remove a validator from the server context.",
+    tags={"Validation"},
+)
+async def delete_validator(
+    ctx: Context,
+    validator_id: Annotated[str, Field(description="ID of the validator to delete.")],
+) -> Dict[str, str]:
+    """
+    Removes a validator from the server context.
+    """
+    app_ctx: AppContext = ctx.request_context.lifespan_context
+
+    if validator_id not in app_ctx.active_validators:
+        raise ValueError(f"Validator ID '{validator_id}' not found.")
+
+    # Get validator info before deleting
+    validator = app_ctx.active_validators[validator_id]
+    table_name = getattr(validator, "tbl_name", "Unknown")
+
+    # Remove the validator
+    del app_ctx.active_validators[validator_id]
+
+    message = f"Validator '{validator_id}' (table: {table_name}) deleted successfully."
+    await ctx.report_progress(100, 100, message)
+
+    return {"status": "success", "message": message}
+
+
+@mcp.tool(
+    name="profile_dataframe",
+    description="Generate comprehensive data profiling insights for a loaded DataFrame.",
+    tags={"Data Analysis"},
+)
+async def profile_dataframe(
+    ctx: Context,
+    df_id: Annotated[str, Field(description="ID of the DataFrame to profile.")],
+    include_correlations: Annotated[
+        bool, Field(description="Whether to include correlation analysis for numeric columns.")
+    ] = True,
+    sample_size: Annotated[
+        int, Field(description="Maximum number of rows to sample for profiling (0 = all rows).")
+    ] = 10000,
+) -> Dict[str, Any]:
+    """
+    Generates comprehensive data profiling insights including:
+    - Column statistics, data types, missing values
+    - Data quality issues detection
+    - Suggested validation rules
+    - Correlation analysis (optional)
+    """
+    app_ctx: AppContext = ctx.request_context.lifespan_context
+
+    if df_id not in app_ctx.loaded_dataframes:
+        raise ValueError(f"DataFrame ID '{df_id}' not found.")
+
+    df = app_ctx.loaded_dataframes[df_id]
+
+    await ctx.report_progress(10, 100, "Starting data profiling...")
+
+    # Sample data if needed
+    if sample_size > 0 and df.shape[0] > sample_size:
+        if hasattr(df, "sample"):  # pandas
+            df_sample = df.sample(n=sample_size, random_state=42)
+        else:  # polars
+            df_sample = df.sample(n=sample_size, seed=42)
+        await ctx.report_progress(20, 100, f"Sampling {sample_size} rows for analysis...")
+    else:
+        df_sample = df
+
+    profile_results = {
+        "dataset_overview": {
+            "total_rows": df.shape[0],
+            "total_columns": df.shape[1],
+            "sampled_rows": df_sample.shape[0],
+            "backend": "pandas" if hasattr(df, "to_csv") and hasattr(df, "index") else "polars",
+        },
+        "column_profiles": {},
+        "data_quality_issues": [],
+        "suggested_validations": [],
+        "correlations": None,
+    }
+
+    await ctx.report_progress(30, 100, "Analyzing columns...")
+
+    # Analyze each column
+    for col in df.columns:
+        try:
+            col_profile = _profile_column(df_sample, col)
+            profile_results["column_profiles"][col] = col_profile
+
+            # Generate suggested validations based on column profile
+            suggestions = _generate_validation_suggestions(col, col_profile)
+            profile_results["suggested_validations"].extend(suggestions)
+
+        except Exception as e:
+            profile_results["column_profiles"][col] = {"error": str(e)}
+
+    await ctx.report_progress(70, 100, "Detecting data quality issues...")
+
+    # Detect data quality issues
+    profile_results["data_quality_issues"] = _detect_data_quality_issues(
+        df_sample, profile_results["column_profiles"]
+    )
+
+    # Correlation analysis for numeric columns
+    if include_correlations:
+        await ctx.report_progress(85, 100, "Computing correlations...")
+        try:
+            profile_results["correlations"] = _compute_correlations(df_sample)
+        except Exception as e:
+            profile_results["correlations"] = {"error": str(e)}
+
+    await ctx.report_progress(100, 100, "Data profiling complete!")
+
+    return profile_results
+
+
+def _profile_column(df: Any, column: str) -> Dict[str, Any]:
+    """Profile a single column and return statistics."""
+    try:
+        col_data = df[column]
+
+        # Basic info
+        profile = {
+            "dtype": str(col_data.dtype),
+            "non_null_count": int(col_data.count()) if hasattr(col_data, "count") else "N/A",
+            "null_count": int(col_data.isnull().sum()) if hasattr(col_data, "isnull") else "N/A",
+            "unique_count": int(col_data.nunique()) if hasattr(col_data, "nunique") else "N/A",
+        }
+
+        # Add null percentage
+        if isinstance(profile["null_count"], int) and len(col_data) > 0:
+            profile["null_percentage"] = round(profile["null_count"] / len(col_data) * 100, 2)
+
+        # Type-specific analysis
+        if hasattr(col_data, "dtype"):
+            if "int" in str(col_data.dtype) or "float" in str(col_data.dtype):
+                # Numeric column
+                profile.update(
+                    {
+                        "min": float(col_data.min()) if hasattr(col_data, "min") else None,
+                        "max": float(col_data.max()) if hasattr(col_data, "max") else None,
+                        "mean": float(col_data.mean()) if hasattr(col_data, "mean") else None,
+                        "std": float(col_data.std()) if hasattr(col_data, "std") else None,
+                        "quartiles": [
+                            float(col_data.quantile(0.25))
+                            if hasattr(col_data, "quantile")
+                            else None,
+                            float(col_data.quantile(0.5))
+                            if hasattr(col_data, "quantile")
+                            else None,
+                            float(col_data.quantile(0.75))
+                            if hasattr(col_data, "quantile")
+                            else None,
+                        ]
+                        if hasattr(col_data, "quantile")
+                        else None,
+                    }
+                )
+            elif "object" in str(col_data.dtype) or "string" in str(col_data.dtype):
+                # String column
+                if hasattr(col_data, "str"):
+                    try:
+                        profile.update(
+                            {
+                                "avg_length": float(col_data.str.len().mean())
+                                if hasattr(col_data.str, "len")
+                                else None,
+                                "min_length": int(col_data.str.len().min())
+                                if hasattr(col_data.str, "len")
+                                else None,
+                                "max_length": int(col_data.str.len().max())
+                                if hasattr(col_data.str, "len")
+                                else None,
+                            }
+                        )
+                    except Exception:
+                        pass
+
+                # Most common values
+                try:
+                    if hasattr(col_data, "value_counts"):
+                        top_values = col_data.value_counts().head(5)
+                        profile["top_values"] = (
+                            dict(top_values) if hasattr(top_values, "to_dict") else {}
+                        )
+                except Exception:
+                    pass
+
+        return profile
+    except Exception as e:
+        return {"error": str(e)}
+
+
+def _generate_validation_suggestions(column: str, profile: Dict[str, Any]) -> list:
+    """Generate suggested validation rules based on column profile."""
+    suggestions = []
+
+    try:
+        # Null checks
+        if profile.get("null_count", 0) == 0:
+            suggestions.append(
+                {
+                    "validation_type": "col_vals_not_null",
+                    "params": {"columns": column},
+                    "reason": "Column has no null values",
+                }
+            )
+        elif profile.get("null_percentage", 0) > 20:
+            suggestions.append(
+                {
+                    "validation_type": "col_vals_null",
+                    "params": {"columns": column},
+                    "reason": f"High null percentage ({profile.get('null_percentage', 0)}%)",
+                }
+            )
+
+        # Numeric validations
+        if profile.get("min") is not None and profile.get("max") is not None:
+            min_val = profile["min"]
+            max_val = profile["max"]
+
+            # Range validation
+            suggestions.append(
+                {
+                    "validation_type": "col_vals_between",
+                    "params": {"columns": column, "left": min_val, "right": max_val},
+                    "reason": f"Values range from {min_val} to {max_val}",
+                }
+            )
+
+            # Positive values check
+            if min_val >= 0:
+                suggestions.append(
+                    {
+                        "validation_type": "col_vals_gte",
+                        "params": {"columns": column, "value": 0},
+                        "reason": "All values are non-negative",
+                    }
+                )
+
+        # String validations
+        if "top_values" in profile and len(profile["top_values"]) <= 10:
+            # Limited set of values - suggest in_set validation
+            values_list = list(profile["top_values"].keys())
+            suggestions.append(
+                {
+                    "validation_type": "col_vals_in_set",
+                    "params": {"columns": column, "set_": values_list},
+                    "reason": f"Column has limited distinct values: {values_list[:3]}...",
+                }
+            )
+
+        # Length validations for strings
+        if profile.get("min_length") is not None and profile.get("max_length") is not None:
+            min_len = profile["min_length"]
+            max_len = profile["max_length"]
+            if min_len > 0:
+                suggestions.append(
+                    {
+                        "validation_type": "col_vals_expr",
+                        "params": {"columns": column, "expr": f"_.str.len() >= {min_len}"},
+                        "reason": f"Minimum string length is {min_len}",
+                    }
+                )
+
+    except Exception:
+        pass
+
+    return suggestions
+
+
+def _detect_data_quality_issues(df: Any, column_profiles: Dict[str, Any]) -> list:
+    """Detect potential data quality issues."""
+    issues = []
+
+    try:
+        total_rows = df.shape[0]
+
+        for col, profile in column_profiles.items():
+            if "error" in profile:
+                issues.append(
+                    {
+                        "column": col,
+                        "issue_type": "analysis_error",
+                        "severity": "warning",
+                        "description": f"Could not analyze column: {profile['error']}",
+                    }
+                )
+                continue
+
+            # High null percentage
+            null_pct = profile.get("null_percentage", 0)
+            if null_pct > 50:
+                issues.append(
+                    {
+                        "column": col,
+                        "issue_type": "high_null_rate",
+                        "severity": "critical",
+                        "description": f"Column has {null_pct}% null values",
+                    }
+                )
+            elif null_pct > 20:
+                issues.append(
+                    {
+                        "column": col,
+                        "issue_type": "moderate_null_rate",
+                        "severity": "warning",
+                        "description": f"Column has {null_pct}% null values",
+                    }
+                )
+
+            # Low cardinality (potential categorical)
+            unique_count = profile.get("unique_count")
+            if unique_count is not None and unique_count < 10 and total_rows > 100:
+                issues.append(
+                    {
+                        "column": col,
+                        "issue_type": "low_cardinality",
+                        "severity": "info",
+                        "description": f"Column has only {unique_count} unique values (potential categorical)",
+                    }
+                )
+
+            # High cardinality (potential identifier)
+            if unique_count is not None and unique_count > total_rows * 0.9:
+                issues.append(
+                    {
+                        "column": col,
+                        "issue_type": "high_cardinality",
+                        "severity": "info",
+                        "description": f"Column has {unique_count}/{total_rows} unique values (potential identifier)",
+                    }
+                )
+
+            # Constant column
+            if unique_count == 1:
+                issues.append(
+                    {
+                        "column": col,
+                        "issue_type": "constant_column",
+                        "severity": "warning",
+                        "description": "Column has only one unique value",
+                    }
+                )
+
+    except Exception as e:
+        issues.append(
+            {
+                "column": "general",
+                "issue_type": "analysis_error",
+                "severity": "error",
+                "description": f"Error during data quality analysis: {str(e)}",
+            }
+        )
+
+    return issues
+
+
+def _compute_correlations(df: Any) -> Dict[str, Any]:
+    """Compute correlation matrix for numeric columns."""
+    try:
+        # Get numeric columns
+        if hasattr(df, "select_dtypes"):  # pandas
+            numeric_df = df.select_dtypes(include=["number"])
+        else:  # polars - basic approach
+            numeric_cols = [
+                col
+                for col in df.columns
+                if "int" in str(df[col].dtype) or "float" in str(df[col].dtype)
+            ]
+            numeric_df = df.select(numeric_cols) if numeric_cols else None
+
+        if numeric_df is None or numeric_df.shape[1] < 2:
+            return {"message": "Not enough numeric columns for correlation analysis"}
+
+        # Compute correlation matrix
+        if hasattr(numeric_df, "corr"):  # pandas
+            corr_matrix = numeric_df.corr()
+
+            # Find strong correlations
+            strong_correlations = []
+            for i in range(len(corr_matrix.columns)):
+                for j in range(i + 1, len(corr_matrix.columns)):
+                    col1 = corr_matrix.columns[i]
+                    col2 = corr_matrix.columns[j]
+                    corr_value = corr_matrix.iloc[i, j]
+
+                    if abs(corr_value) > 0.7:  # Strong correlation threshold
+                        strong_correlations.append(
+                            {
+                                "column1": col1,
+                                "column2": col2,
+                                "correlation": round(float(corr_value), 3),
+                                "strength": "strong" if abs(corr_value) > 0.8 else "moderate",
+                            }
+                        )
+
+            return {
+                "correlation_matrix": corr_matrix.round(3).to_dict(),
+                "strong_correlations": strong_correlations,
+                "numeric_columns": list(numeric_df.columns),
+            }
+        else:
+            return {"message": "Correlation analysis not available for this DataFrame type"}
+
+    except Exception as e:
+        return {"error": str(e)}
+
+
+@mcp.tool(
+    name="apply_validation_template",
+    description="Apply a pre-built validation template to a validator for common data quality patterns.",
+    tags={"Validation"},
+)
+async def apply_validation_template(
+    ctx: Context,
+    validator_id: Annotated[str, Field(description="ID of the Validator to apply template to.")],
+    template_name: Annotated[
+        str,
+        Field(
+            description="Name of the validation template to apply. Available: 'basic_quality', 'financial_data', 'customer_data', 'sensor_data', 'survey_data'."
+        ),
+    ],
+    column_mapping: Annotated[
+        Dict[str, str],
+        Field(
+            description="Mapping of template column names to actual DataFrame column names. E.g., {'amount': 'price', 'id': 'customer_id'}."
+        ),
+    ],
+    thresholds: Annotated[
+        Optional[Dict[str, float]],
+        Field(
+            description="Optional custom thresholds for validation steps. E.g., {'warning': 0.05, 'error': 0.1}."
+        ),
+    ] = None,
+) -> Dict[str, Any]:
+    """
+    Applies a pre-built validation template with common data quality checks.
+    Templates include ready-made validation rules for typical data scenarios.
+    """
+    app_ctx: AppContext = ctx.request_context.lifespan_context
+
+    if validator_id not in app_ctx.active_validators:
+        raise ValueError(f"Validator ID '{validator_id}' not found.")
+
+    # Get validation template
+    template = _get_validation_template(template_name)
+    if not template:
+        available_templates = [
+            "basic_quality",
+            "financial_data",
+            "customer_data",
+            "sensor_data",
+            "survey_data",
+        ]
+        raise ValueError(f"Unknown template '{template_name}'. Available: {available_templates}")
+
+    validator = app_ctx.active_validators[validator_id]
+    applied_validations = []
+
+    await ctx.report_progress(10, 100, f"Applying {template_name} template...")
+
+    # Apply each validation in the template
+    for i, validation_rule in enumerate(template["validations"]):
+        try:
+            # Map template column names to actual column names
+            mapped_params = {}
+            for key, value in validation_rule["params"].items():
+                if key == "columns" and value in column_mapping:
+                    mapped_params[key] = column_mapping[value]
+                elif isinstance(value, str) and value in column_mapping:
+                    mapped_params[key] = column_mapping[value]
+                else:
+                    mapped_params[key] = value
+
+            # Add custom thresholds if provided
+            if thresholds:
+                mapped_params.update(thresholds)
+
+            # Get the validation method
+            validation_type = validation_rule["validation_type"]
+            supported_validations = _get_supported_validations(validator)
+
+            if validation_type in supported_validations:
+                validation_method = supported_validations[validation_type]
+                validation_method(**mapped_params)
+
+                applied_validations.append(
+                    {
+                        "validation_type": validation_type,
+                        "params": mapped_params,
+                        "description": validation_rule.get("description", ""),
+                    }
+                )
+
+                await ctx.report_progress(
+                    10 + (i + 1) * 80 // len(template["validations"]),
+                    100,
+                    f"Applied {validation_type}...",
+                )
+            else:
+                applied_validations.append(
+                    {
+                        "validation_type": validation_type,
+                        "params": mapped_params,
+                        "error": f"Unsupported validation type: {validation_type}",
+                    }
+                )
+
+        except Exception as e:
+            applied_validations.append(
+                {
+                    "validation_type": validation_rule["validation_type"],
+                    "params": validation_rule["params"],
+                    "error": str(e),
+                }
+            )
+
+    await ctx.report_progress(100, 100, f"Template {template_name} applied successfully!")
+
+    return {
+        "template_name": template_name,
+        "template_description": template["description"],
+        "applied_validations": applied_validations,
+        "total_validations": len(applied_validations),
+        "successful_validations": len([v for v in applied_validations if "error" not in v]),
+    }
+
+
+def _get_validation_template(template_name: str) -> Optional[Dict[str, Any]]:
+    """Get a predefined validation template."""
+    templates = {
+        "basic_quality": {
+            "description": "Basic data quality checks for any dataset",
+            "validations": [
+                {
+                    "validation_type": "col_exists",
+                    "params": {"columns": "id"},
+                    "description": "Check that ID column exists",
+                },
+                {
+                    "validation_type": "col_vals_not_null",
+                    "params": {"columns": "id"},
+                    "description": "ID column should not have null values",
+                },
+                {
+                    "validation_type": "rows_distinct",
+                    "params": {},
+                    "description": "Check for duplicate rows",
+                },
+            ],
+        },
+        "financial_data": {
+            "description": "Validation template for financial/transaction data",
+            "validations": [
+                {
+                    "validation_type": "col_vals_not_null",
+                    "params": {"columns": "amount"},
+                    "description": "Amount should not be null",
+                },
+                {
+                    "validation_type": "col_vals_gt",
+                    "params": {"columns": "amount", "value": 0},
+                    "description": "Amount should be positive",
+                },
+                {
+                    "validation_type": "col_vals_not_null",
+                    "params": {"columns": "date"},
+                    "description": "Transaction date should not be null",
+                },
+                {
+                    "validation_type": "col_vals_not_null",
+                    "params": {"columns": "account_id"},
+                    "description": "Account ID should not be null",
+                },
+            ],
+        },
+        "customer_data": {
+            "description": "Validation template for customer/user data",
+            "validations": [
+                {
+                    "validation_type": "col_vals_not_null",
+                    "params": {"columns": "customer_id"},
+                    "description": "Customer ID should not be null",
+                },
+                {
+                    "validation_type": "col_vals_regex",
+                    "params": {"columns": "email", "pattern": r"^[^@]+@[^@]+\.[^@]+$"},
+                    "description": "Email should be in valid format",
+                },
+                {
+                    "validation_type": "col_vals_between",
+                    "params": {"columns": "age", "left": 0, "right": 120},
+                    "description": "Age should be between 0 and 120",
+                },
+                {
+                    "validation_type": "col_vals_in_set",
+                    "params": {"columns": "status", "set_": ["active", "inactive", "pending"]},
+                    "description": "Status should be one of predefined values",
+                },
+            ],
+        },
+        "sensor_data": {
+            "description": "Validation template for IoT/sensor data",
+            "validations": [
+                {
+                    "validation_type": "col_vals_not_null",
+                    "params": {"columns": "timestamp"},
+                    "description": "Timestamp should not be null",
+                },
+                {
+                    "validation_type": "col_vals_not_null",
+                    "params": {"columns": "sensor_id"},
+                    "description": "Sensor ID should not be null",
+                },
+                {
+                    "validation_type": "col_vals_between",
+                    "params": {"columns": "temperature", "left": -50, "right": 100},
+                    "description": "Temperature should be in reasonable range",
+                },
+                {
+                    "validation_type": "col_vals_gte",
+                    "params": {"columns": "humidity", "value": 0},
+                    "description": "Humidity should be non-negative",
+                },
+                {
+                    "validation_type": "col_vals_lte",
+                    "params": {"columns": "humidity", "value": 100},
+                    "description": "Humidity should not exceed 100%",
+                },
+            ],
+        },
+        "survey_data": {
+            "description": "Validation template for survey/questionnaire data",
+            "validations": [
+                {
+                    "validation_type": "col_vals_not_null",
+                    "params": {"columns": "response_id"},
+                    "description": "Response ID should not be null",
+                },
+                {
+                    "validation_type": "col_vals_between",
+                    "params": {"columns": "satisfaction_score", "left": 1, "right": 10},
+                    "description": "Satisfaction score should be between 1 and 10",
+                },
+                {
+                    "validation_type": "col_vals_in_set",
+                    "params": {
+                        "columns": "completion_status",
+                        "set_": ["complete", "partial", "abandoned"],
+                    },
+                    "description": "Completion status should be one of predefined values",
+                },
+            ],
+        },
+    }
+
+    return templates.get(template_name)
+
+
+def _get_supported_validations(validator):
+    """Get the supported validation methods from a validator instance."""
+    return {
+        # Column value validations
+        "col_vals_lt": validator.col_vals_lt,
+        "col_vals_gt": validator.col_vals_gt,
+        "col_vals_lte": validator.col_vals_le,
+        "col_vals_gte": validator.col_vals_ge,
+        "col_vals_equal": validator.col_vals_eq,
+        "col_vals_not_equal": validator.col_vals_ne,
+        "col_vals_between": validator.col_vals_between,
+        "col_vals_not_between": validator.col_vals_outside,
+        "col_vals_in_set": validator.col_vals_in_set,
+        "col_vals_not_in_set": validator.col_vals_not_in_set,
+        "col_vals_null": validator.col_vals_null,
+        "col_vals_not_null": validator.col_vals_not_null,
+        "col_vals_regex": validator.col_vals_regex,
+        "col_vals_expr": validator.col_vals_expr,
+        "col_count_match": validator.col_count_match,
+        # Check existence of a column
+        "col_exists": validator.col_exists,
+        # Row validations
+        "rows_distinct": validator.rows_distinct,
+        "rows_complete": validator.rows_complete,
+        "row_count_match": validator.row_count_match,
+        # Other specialized validations
+        "conjointly": validator.conjointly,
+        "col_schema_match": validator.col_schema_match,
+    }
+
+
+@mcp.tool(
+    name="server_health_check",
+    description="Get comprehensive server health and status information.",
+    tags={"Server Management"},
+)
+async def server_health_check(ctx: Context) -> Dict[str, Any]:
+    """
+    Returns comprehensive server health information including:
+    - Resource usage and capacity
+    - Backend availability
+    - Active resources count
+    - System information
+    """
+    app_ctx: AppContext = ctx.request_context.lifespan_context
+
+    # Get current time
+    current_time = datetime.now().isoformat()
+
+    # Count resources
+    dataframes_count = len(app_ctx.loaded_dataframes)
+    validators_count = len(app_ctx.active_validators)
+
+    # Calculate memory usage
+    total_memory_mb = 0
+    dataframe_details = []
+
+    for df_id, df in app_ctx.loaded_dataframes.items():
+        try:
+            if hasattr(df, "memory_usage"):  # pandas
+                memory_mb = df.memory_usage(deep=True).sum() / 1024 / 1024
+                total_memory_mb += memory_mb
+                dataframe_details.append(
+                    {
+                        "df_id": df_id,
+                        "shape": df.shape,
+                        "memory_mb": round(memory_mb, 2),
+                        "backend": "pandas",
+                    }
+                )
+            else:  # polars or other
+                # Estimate memory for polars (rough approximation)
+                estimated_mb = (
+                    df.shape[0] * df.shape[1] * 8 / 1024 / 1024
+                )  # 8 bytes per value estimate
+                total_memory_mb += estimated_mb
+                dataframe_details.append(
+                    {
+                        "df_id": df_id,
+                        "shape": df.shape,
+                        "memory_mb": round(estimated_mb, 2),
+                        "backend": "polars/other",
+                    }
+                )
+        except Exception as e:
+            dataframe_details.append({"df_id": df_id, "error": str(e), "backend": "unknown"})
+
+    # Get system information
+    import platform
+    import sys
+
+    health_info = {
+        "timestamp": current_time,
+        "server_status": "healthy",
+        "system_info": {
+            "python_version": sys.version.split()[0],
+            "platform": platform.platform(),
+            "architecture": platform.architecture()[0],
+        },
+        "backend_status": {
+            "pandas_available": HAS_PANDAS,
+            "polars_available": HAS_POLARS,
+            "fastmcp_loaded": True,  # If we're running, FastMCP is loaded
+            "pointblank_loaded": True,  # If we're running, Pointblank is loaded
+        },
+        "resource_usage": {
+            "total_dataframes": dataframes_count,
+            "total_validators": validators_count,
+            "total_memory_mb": round(total_memory_mb, 2),
+            "dataframe_details": dataframe_details,
+        },
+        "capabilities": {
+            "supported_file_formats": ["CSV", "JSON", "JSONL", "Parquet"]
+            + (["Excel"] if HAS_PANDAS else []),
+            "validation_types_count": len(_get_supported_validations_list()),
+            "templates_available": [
+                "basic_quality",
+                "financial_data",
+                "customer_data",
+                "sensor_data",
+                "survey_data",
+            ],
+        },
+    }
+
+    # Add warnings if any
+    warnings = []
+    if not HAS_PANDAS and not HAS_POLARS:
+        warnings.append("No DataFrame backends available")
+        health_info["server_status"] = "degraded"
+
+    if total_memory_mb > 1000:  # > 1GB
+        warnings.append(f"High memory usage: {total_memory_mb:.1f}MB")
+
+    if dataframes_count > 50:
+        warnings.append(f"Many DataFrames loaded: {dataframes_count}")
+
+    if warnings:
+        health_info["warnings"] = warnings
+
+    logger.info(
+        f"Health check performed: {dataframes_count} DataFrames, {validators_count} validators, {total_memory_mb:.1f}MB memory"
+    )
+
+    return health_info
+
+
+def _get_supported_validations_list():
+    """Get list of supported validation types."""
+    return [
+        "col_vals_lt",
+        "col_vals_gt",
+        "col_vals_lte",
+        "col_vals_gte",
+        "col_vals_equal",
+        "col_vals_not_equal",
+        "col_vals_between",
+        "col_vals_not_between",
+        "col_vals_in_set",
+        "col_vals_not_in_set",
+        "col_vals_null",
+        "col_vals_not_null",
+        "col_vals_regex",
+        "col_vals_expr",
+        "col_count_match",
+        "col_exists",
+        "rows_distinct",
+        "rows_complete",
+        "row_count_match",
+        "conjointly",
+        "col_schema_match",
+    ]
+
+
 @dataclass
 class ValidatorInfo:
     validator_id: str
