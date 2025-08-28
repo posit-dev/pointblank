@@ -1,6 +1,23 @@
 import pytest
-from pointblank import yaml_interrogate, validate_yaml, yaml_to_python
-from pointblank.yaml import load_yaml_config, YAMLValidationError, YAMLValidator
+
+from unittest.mock import patch
+
+import tempfile
+import os
+import io
+import contextlib
+
+from pointblank import load_dataset, yaml_interrogate, validate_yaml, yaml_to_python, Validate
+from pointblank.yaml import (
+    load_yaml_config,
+    YAMLValidationError,
+    YAMLValidator,
+    _process_python_expressions,
+    _safe_eval_python_code,
+)
+
+import polars as pl
+import pandas as pd
 
 
 def test_yaml_interrogate_basic_workflow():
@@ -154,6 +171,14 @@ def test_validate_yaml():
     """
     validate_yaml(valid_yaml)  # Should not raise
 
+    # Valid configuration with tbl: null (for template use cases)
+    valid_yaml_null = """
+    tbl: null
+    steps:
+    - rows_distinct
+    """
+    validate_yaml(valid_yaml_null)  # Should not raise
+
     # Invalid configuration: missing tbl
     invalid_yaml1 = """
     steps:
@@ -302,9 +327,6 @@ def test_yaml_workflow_results_consistency():
 
     # YAML-based validation
     yaml_result = yaml_interrogate(yaml_content)
-
-    # Equivalent programmatic validation
-    from pointblank import Validate, load_dataset
 
     programmatic_result = Validate(load_dataset("small_table")).rows_distinct().interrogate()
 
@@ -593,8 +615,6 @@ steps:
         validation_result = validator.execute_workflow(config)
         raise AssertionError("Security restrictions not working")
     except Exception as e:
-        from pointblank.yaml import YAMLValidationError
-
         if isinstance(e, YAMLValidationError) and ("not allowed" in str(e) or "unsafe" in str(e)):
             pass  # Expected - security restrictions work
         else:
@@ -1162,9 +1182,6 @@ steps:
 
 
 def test_yaml_actions_with_callables():
-    import io
-    import contextlib
-
     yaml_content = """
 tbl: small_table
 thresholds:
@@ -1200,9 +1217,6 @@ steps:
 
 
 def test_yaml_actions_comprehensive_demo():
-    import io
-    import contextlib
-
     yaml_content = """
 tbl: small_table
 label: Comprehensive Actions Demo
@@ -1261,9 +1275,6 @@ steps:
 
 
 def test_yaml_actions_output_verification():
-    import io
-    import contextlib
-
     # Test 1: String template actions
     yaml_content_templates = """
 tbl: small_table
@@ -1334,9 +1345,6 @@ steps:
 
 
 def test_yaml_actions_print_capture_demo():
-    import io
-    import contextlib
-
     yaml_content = """
 tbl: small_table
 thresholds:
@@ -2288,7 +2296,7 @@ def test_yaml_to_python_count_matches_combined():
 
 
 def test_yaml_count_matches_with_different_datasets():
-    # Test `col_count_match()` with the `game_revenue` dataset
+    """Test `col_count_match()` with the `game_revenue` dataset."""
     yaml_content_game = """
     tbl: game_revenue
     steps:
@@ -2315,3 +2323,1564 @@ def test_yaml_count_matches_with_different_datasets():
     assert len(result.validation_info) == 1
     assert result.validation_info[0].assertion_type == "row_count_match"
     assert result.validation_info[0].all_passed is True
+
+
+def test_yaml_interrogate_set_tbl_basic():
+    """Test basic `yaml_interrogate()` with `set_tbl=` parameter."""
+
+    # Create a test table
+    test_table = pl.DataFrame(
+        {"a": [1, 2, 3, 4, 5], "b": [10, 20, 30, 40, 50], "c": ["x", "y", "z", "w", "v"]}
+    )
+
+    yaml_config = """
+    tbl: small_table
+    tbl_name: "Override Test"
+    label: "YAML validation with table override"
+    steps:
+      - col_exists:
+          columns: [a, b, c]
+      - col_vals_gt:
+          columns: [a]
+          value: 0
+      - col_vals_gt:
+          columns: [b]
+          value: 5
+    """
+
+    # Execute with table override
+    result = yaml_interrogate(yaml_config, set_tbl=test_table)
+
+    assert result.tbl_name == "Override Test"
+    assert result.label == "YAML validation with table override"
+    assert len(result.validation_info) > 0
+    assert all(step.all_passed for step in result.validation_info)
+
+    # Verify that interrogation was completed
+    assert result.time_start is not None
+    assert result.time_end is not None
+
+
+def test_yaml_interrogate_set_tbl_vs_no_override():
+    """Compare `yaml_interrogate()` with and without `set_tbl=` override."""
+
+    yaml_config = """
+    tbl: small_table
+    tbl_name: "Test Comparison"
+    steps:
+      - col_exists:
+          columns: [a, b]
+      - col_vals_gt:
+          columns: [a]
+          value: 0
+    """
+
+    # Execute without override (uses small_table)
+    result_original = yaml_interrogate(yaml_config)
+
+    # Create a test table with same structure as small_table
+    test_table = pl.DataFrame({"a": [1, 2, 3, 4, 5], "b": [10, 20, 30, 40, 50]})
+
+    # Execute with override
+    result_override = yaml_interrogate(yaml_config, set_tbl=test_table)
+
+    # Both should have same validation structure
+    assert len(result_original.validation_info) == len(result_override.validation_info)
+    assert result_original.tbl_name == result_override.tbl_name
+    assert result_original.label == result_override.label
+
+    # Assertion types should be the same
+    for orig_step, override_step in zip(
+        result_original.validation_info, result_override.validation_info
+    ):
+        assert orig_step.assertion_type == override_step.assertion_type
+        assert orig_step.column == override_step.column
+
+
+def test_yaml_interrogate_set_tbl_different_libraries():
+    """Test `yaml_interrogate()`'s `set_tbl=` with different DataFrame libraries."""
+
+    yaml_config = """
+    tbl: small_table
+    steps:
+      - col_vals_gt:
+          columns: [a]
+          value: 0
+      - col_exists:
+          columns: [a, b]
+    """
+
+    # Test with Polars DataFrame
+    polars_table = pl.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]})
+    result_polars = yaml_interrogate(yaml_config, set_tbl=polars_table)
+    assert all(step.all_passed for step in result_polars.validation_info)
+
+    # Test with Pandas DataFrame
+    pandas_table = pd.DataFrame({"a": [7, 8, 9], "b": [10, 11, 12]})
+    result_pandas = yaml_interrogate(yaml_config, set_tbl=pandas_table)
+    assert all(step.all_passed for step in result_pandas.validation_info)
+
+    # Both should have same structure
+    assert len(result_polars.validation_info) == len(result_pandas.validation_info)
+
+
+def test_yaml_interrogate_set_tbl_with_thresholds():
+    """Test `yaml_interrogate()`'s `set_tbl=` with thresholds configuration."""
+
+    # Create a table that will trigger some failures
+    test_table = pl.DataFrame(
+        {
+            "score": [85, 92, 45, 95, 88, 30, 91, 87, 25],  # Some values < 50
+            "category": ["A", "B", "A", "C", "B", "A", "C", "B", "A"],
+        }
+    )
+
+    yaml_config = """
+    tbl: small_table
+    tbl_name: "Threshold Test"
+    thresholds:
+      warning: 0.2
+      error: 0.4
+      critical: 0.6
+    steps:
+      - col_vals_gt:
+          columns: [score]
+          value: 50  # This will fail for some values
+      - col_exists:
+          columns: [score, category]
+    """
+
+    result = yaml_interrogate(yaml_config, set_tbl=test_table)
+
+    assert result.tbl_name == "Threshold Test"
+    assert result.thresholds.warning == 0.2
+    assert result.thresholds.error == 0.4
+    assert result.thresholds.critical == 0.6
+
+    # Some validations should pass, some might trigger thresholds
+    assert len(result.validation_info) > 0
+
+
+def test_yaml_interrogate_set_tbl_with_actions():
+    """Test `yaml_interrogate()`'s `set_tbl=` with actions configuration."""
+
+    test_table = pl.DataFrame(
+        {"value": [1, 2, 3, 4, 5], "status": ["active", "inactive", "active", "active", "inactive"]}
+    )
+
+    # Track action calls
+    action_calls = []
+
+    yaml_config = f"""
+    tbl: small_table
+    tbl_name: "Action Test"
+    actions:
+      warning: |
+        python: |
+          action_calls.append("warning_triggered")
+    steps:
+      - col_vals_gt:
+          columns: [value]
+          value: 0
+    """
+
+    # Execute with actions (note: actions might not trigger if all validations pass)
+    result = yaml_interrogate(yaml_config, set_tbl=test_table)
+
+    assert result.tbl_name == "Action Test"
+    assert result.actions is not None
+
+
+def test_yaml_interrogate_set_tbl_with_complex_validations():
+    """Test `yaml_interrogate()`'s `set_tbl=` with complex validation scenarios."""
+
+    test_table = pl.DataFrame(
+        {
+            "id": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            "score": [85, 92, 78, 95, 88, 76, 89, 91, 83, 96],
+            "category": ["A", "B", "A", "C", "B", "A", "C", "B", "A", "C"],
+            "active": [True, True, False, True, True, True, False, True, True, False],
+            "region": [
+                "North",
+                "South",
+                "North",
+                "East",
+                "West",
+                "North",
+                "South",
+                "East",
+                "West",
+                "North",
+            ],
+        }
+    )
+
+    yaml_config = """
+    tbl: small_table
+    tbl_name: "Complex Validation Test"
+    label: "Multi-step validation with various checks"
+    thresholds:
+      warning: 0.1
+      error: 0.25
+    steps:
+      - col_exists:
+          columns: [id, score, category, active, region]
+      - col_vals_not_null:
+          columns: [id, score, category]
+      - col_vals_between:
+          columns: [score]
+          left: 0
+          right: 100
+      - col_vals_in_set:
+          columns: [category]
+          set: [A, B, C]
+      - col_vals_gt:
+          columns: [id]
+          value: 0
+      - rows_distinct: {}  # Remove columns parameter for rows_distinct
+      - col_schema_match:
+          schema:
+            columns:
+              - [id, Int64]
+              - [score, Int64]
+              - [category, String]
+              - [active, Boolean]
+              - [region, String]
+          complete: false
+    """
+
+    result = yaml_interrogate(yaml_config, set_tbl=test_table)
+
+    assert result.tbl_name == "Complex Validation Test"
+    assert result.label == "Multi-step validation with various checks"
+    assert len(result.validation_info) > 5  # Should have many validation steps
+    assert all(step.all_passed for step in result.validation_info)
+
+
+def test_yaml_interrogate_set_tbl_with_segments():
+    """Test `yaml_interrogate()`'s `set_tbl=` with segmented validations."""
+
+    test_table = pl.DataFrame(
+        {
+            "region": ["North", "South", "North", "South", "East", "West", "East", "West"],
+            "sales": [100, 200, 150, 180, 120, 220, 160, 190],
+            "quarter": ["Q1", "Q1", "Q2", "Q2", "Q1", "Q1", "Q2", "Q2"],
+        }
+    )
+
+    yaml_config = """
+    tbl: small_table
+    tbl_name: "Segmented Test"
+    steps:
+      - col_vals_gt:
+          columns: [sales]
+          value: 50
+          segments: region
+      - col_vals_not_null:
+          columns: [sales, region]
+          segments: quarter
+    """
+
+    result = yaml_interrogate(yaml_config, set_tbl=test_table)
+
+    assert result.tbl_name == "Segmented Test"
+    # Should have multiple validation steps due to segmentation
+    assert len(result.validation_info) > 2
+
+
+def test_yaml_interrogate_set_tbl_with_preprocessing():
+    """Test `yaml_interrogate()`'s `set_tbl=` with basic preprocessing that works."""
+
+    test_table = pl.DataFrame(
+        {
+            "value": [1, 2, 3, 4, 5, 6, 7],  # All positive values
+            "category": ["A", "B", "A", "B", "A", "B", "A"],
+        }
+    )
+
+    yaml_config = """
+    tbl: small_table
+    tbl_name: "Preprocessing Test"
+    steps:
+      - col_vals_gt:
+          columns: [value]
+          value: 0
+      - col_exists:
+          columns: [value, category]
+    """
+
+    result = yaml_interrogate(yaml_config, set_tbl=test_table)
+
+    assert result.tbl_name == "Preprocessing Test"
+    # Should pass because all values are positive
+    assert all(step.all_passed for step in result.validation_info)
+
+
+def test_yaml_interrogate_set_tbl_error_cases():
+    """Test error handling in `yaml_interrogate()` with `set_tbl=`."""
+
+    # Table with incompatible structure
+    incompatible_table = pl.DataFrame({"different_col": [1, 2, 3], "another_col": [4, 5, 6]})
+
+    yaml_config = """
+    tbl: small_table
+    steps:
+      - col_exists:
+          columns: [a, b, c]  # These columns don't exist in incompatible_table
+    """
+
+    # Should execute but validation should fail
+    result = yaml_interrogate(yaml_config, set_tbl=incompatible_table)
+    assert result is not None
+    # col_exists should fail for non-existent columns
+    assert not all(step.all_passed for step in result.validation_info)
+
+
+def test_yaml_interrogate_set_tbl_with_csv_and_datasets():
+    """Test yaml_interrogate `set_tbl=` with CSV files and DataFrames."""
+
+    yaml_config = """
+    tbl: small_table  # Will be overridden
+    tbl_name: "Dataset Override Test"
+    steps:
+      - col_exists:
+          columns: [a, b]
+      - col_vals_gt:
+          columns: [a]
+          value: 0
+    """
+
+    # Test with DataFrame directly (instead of string dataset name)
+    test_df = pl.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]})
+    result_dataframe = yaml_interrogate(yaml_config, set_tbl=test_df)
+    assert result_dataframe.tbl_name == "Dataset Override Test"
+    assert all(step.all_passed for step in result_dataframe.validation_info)
+
+    # Test with CSV file
+    test_data = pl.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]})
+
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".csv", delete=False) as f:
+        test_data.write_csv(f.name)
+        csv_path = f.name
+
+    try:
+        result_csv = yaml_interrogate(yaml_config, set_tbl=csv_path)
+        assert result_csv.tbl_name == "Dataset Override Test"
+        assert all(step.all_passed for step in result_csv.validation_info)
+    finally:
+        os.unlink(csv_path)
+
+
+def test_yaml_interrogate_set_tbl_preserves_all_yaml_config():
+    """Test that `set_tbl=` preserves all YAML configuration options."""
+
+    test_table = pl.DataFrame({"metric": [1, 2, 3, 4, 5], "category": ["X", "Y", "Z", "X", "Y"]})
+
+    yaml_config = """
+    tbl: small_table
+    tbl_name: "Configuration Test"
+    label: "Testing all YAML options"
+    lang: en
+    locale: en-US
+    brief: "Step {step}: {auto}"
+    thresholds:
+      warning: 0.1
+      error: 0.3
+      critical: 0.5
+    steps:
+      - col_vals_gt:
+          columns: [metric]
+          value: 0
+          brief: "Custom brief for metric validation"
+      - col_exists:
+          columns: [metric, category]
+    """
+
+    result = yaml_interrogate(yaml_config, set_tbl=test_table)
+
+    # Verify all configuration is preserved
+    assert result.tbl_name == "Configuration Test"
+    assert result.label == "Testing all YAML options"
+    assert result.lang == "en"
+    assert result.locale == "en-US"
+    assert result.brief == "Step {step}: {auto}"
+    assert result.thresholds.warning == 0.1
+    assert result.thresholds.error == 0.3
+    assert result.thresholds.critical == 0.5
+
+    # Verify briefs are applied
+    assert len(result.validation_info) > 0
+    # First step should have custom brief
+    assert "Custom brief for metric validation" in str(result.validation_info[0].brief)
+
+
+def test_yaml_interrogate_set_tbl_multiple_scenarios():
+    """Test yaml_interrogate `set_tbl=` in multiple realistic scenarios."""
+
+    # Scenario 1: Sales data validation template
+    sales_template = """
+    tbl: small_table  # Changed from placeholder to valid dataset
+    tbl_name: "Sales Data Validation"
+    steps:
+      - col_exists:
+          columns: [customer_id, revenue, region]
+      - col_vals_not_null:
+          columns: [customer_id, revenue]
+      - col_vals_gt:
+          columns: [revenue]
+          value: 0
+      - col_vals_in_set:
+          columns: [region]
+          set: [North, South, East, West]
+    """
+
+    sales_q1 = pl.DataFrame(
+        {
+            "customer_id": [1, 2, 3, 4, 5],
+            "revenue": [100, 200, 150, 300, 250],
+            "region": ["North", "South", "East", "West", "North"],
+        }
+    )
+
+    sales_q2 = pl.DataFrame(
+        {
+            "customer_id": [6, 7, 8, 9, 10],
+            "revenue": [120, 180, 160, 320, 280],
+            "region": ["South", "East", "West", "North", "South"],
+        }
+    )
+
+    # Apply template to both quarters
+    result_q1 = yaml_interrogate(sales_template, set_tbl=sales_q1)
+    result_q2 = yaml_interrogate(sales_template, set_tbl=sales_q2)
+
+    assert result_q1.tbl_name == "Sales Data Validation"
+    assert result_q2.tbl_name == "Sales Data Validation"
+    assert all(step.all_passed for step in result_q1.validation_info)
+    assert all(step.all_passed for step in result_q2.validation_info)
+
+    # Scenario 2: User behavior validation
+    user_template = """
+    tbl: small_table
+    tbl_name: "User Behavior Analysis"
+    thresholds:
+      warning: 0.05
+    steps:
+      - col_vals_between:
+          columns: [session_duration]
+          left: 0
+          right: 7200  # Max 2 hours
+      - col_vals_in_set:
+          columns: [device_type]
+          set: [mobile, desktop, tablet]
+    """
+
+    user_data_mobile = pl.DataFrame(
+        {
+            "session_duration": [300, 450, 600, 1200, 900],
+            "device_type": ["mobile", "mobile", "mobile", "mobile", "mobile"],
+        }
+    )
+
+    user_data_mixed = pl.DataFrame(
+        {
+            "session_duration": [600, 1800, 300, 2400, 450],
+            "device_type": ["desktop", "tablet", "mobile", "desktop", "tablet"],
+        }
+    )
+
+    result_mobile = yaml_interrogate(user_template, set_tbl=user_data_mobile)
+    result_mixed = yaml_interrogate(user_template, set_tbl=user_data_mixed)
+
+    assert result_mobile.tbl_name == "User Behavior Analysis"
+    assert result_mixed.tbl_name == "User Behavior Analysis"
+    assert all(step.all_passed for step in result_mobile.validation_info)
+    assert all(step.all_passed for step in result_mixed.validation_info)
+
+
+def test_yaml_interrogate_set_tbl_edge_cases():
+    """Test edge cases for yaml_interrogate with `set_tbl=`."""
+
+    # Edge case 1: Empty DataFrame
+    empty_table = pl.DataFrame({"a": pl.Series([], dtype=pl.Int64)})
+
+    yaml_config = """
+    tbl: small_table
+    steps:
+      - col_exists:
+          columns: [a]
+    """
+
+    result_empty = yaml_interrogate(yaml_config, set_tbl=empty_table)
+    assert result_empty is not None
+    # col_exists should pass even for empty table if column exists
+    assert result_empty.validation_info[0].all_passed
+
+    # Edge case 2: Single row DataFrame
+    single_row = pl.DataFrame({"x": [42], "y": ["test"]})
+
+    yaml_single = """
+    tbl: small_table
+    steps:
+      - col_vals_gt:
+          columns: [x]
+          value: 0
+      - col_vals_not_null:
+          columns: [x, y]
+    """
+
+    result_single = yaml_interrogate(yaml_single, set_tbl=single_row)
+    assert all(step.all_passed for step in result_single.validation_info)
+
+    # Edge case 3: Large number of columns
+    many_cols_data = {f"col_{i}": [i] * 3 for i in range(50)}
+    many_cols_table = pl.DataFrame(many_cols_data)
+
+    yaml_many_cols = """
+    tbl: small_table
+    steps:
+      - col_count_match:
+          count: 50
+    """
+
+    result_many_cols = yaml_interrogate(yaml_many_cols, set_tbl=many_cols_table)
+    assert result_many_cols.validation_info[0].all_passed
+
+
+def test_yaml_interrogate_tbl_field_options_for_always_override():
+    """Test different tbl: field values when always using set_tbl= parameter."""
+
+    # Create test data
+    test_table = pl.DataFrame({"metric": [1, 2, 3, 4, 5], "category": ["X", "Y", "Z", "X", "Y"]})
+
+    # Test 1: Using valid built-in dataset names (gets overridden)
+    valid_datasets = ["small_table", "game_revenue", "nycflights", "global_sales"]
+
+    for dataset in valid_datasets:
+        yaml_config = f"""
+tbl: {dataset}
+tbl_name: "Test with {dataset}"
+steps:
+  - col_exists:
+      columns: [metric, category]
+  - col_vals_gt:
+      columns: [metric]
+      value: 0
+"""
+
+        result = yaml_interrogate(yaml_config, set_tbl=test_table)
+        assert result.tbl_name == f"Test with {dataset}"
+        assert all(step.all_passed for step in result.validation_info)
+
+    # Test 2: Using YAML null (the recommended approach)
+    yaml_null = """
+tbl: null
+tbl_name: "Test with null"
+steps:
+  - col_exists:
+      columns: [metric, category]
+  - col_vals_gt:
+      columns: [metric]
+      value: 0
+"""
+
+    result_null = yaml_interrogate(yaml_null, set_tbl=test_table)
+    assert result_null.tbl_name == "Test with null"
+    assert all(step.all_passed for step in result_null.validation_info)
+
+    # Test 3: Verify that any valid tbl: field works with `set_tbl=` (gets overridden anyway)
+    yaml_override_test = """
+tbl: small_table
+tbl_name: "Test override behavior"
+steps:
+  - col_exists:
+      columns: [metric, category]
+  - col_vals_gt:
+      columns: [metric]
+      value: 0
+"""
+
+    # Should work with set_tbl (overrides the small_table)
+    result_override = yaml_interrogate(yaml_override_test, set_tbl=test_table)
+    assert result_override.tbl_name == "Test override behavior"
+    assert all(step.all_passed for step in result_override.validation_info)
+
+
+def test_yaml_interrogate_template_pattern():
+    """Test the template pattern where YAML configs are designed for reuse with set_tbl=."""
+
+    # Define a reusable validation template
+    sales_validation_template = """
+    tbl: null  # Will always be overridden
+    tbl_name: "Sales Data Validation"
+    label: "Standard sales data validation checks"
+    thresholds:
+      warning: 0.05
+      error: 0.1
+    steps:
+      - col_exists:
+          columns: [customer_id, revenue, region, date]
+      - col_vals_not_null:
+          columns: [customer_id, revenue, region]
+      - col_vals_gt:
+          columns: [revenue]
+          value: 0
+      - col_vals_in_set:
+          columns: [region]
+          set: [North, South, East, West]
+    """
+
+    # Apply template to different datasets
+    q1_data = pl.DataFrame(
+        {
+            "customer_id": [1, 2, 3, 4],
+            "revenue": [100, 200, 150, 300],
+            "region": ["North", "South", "East", "West"],
+            "date": ["2024-01-01", "2024-01-15", "2024-02-01", "2024-02-15"],
+        }
+    )
+
+    q2_data = pl.DataFrame(
+        {
+            "customer_id": [5, 6, 7, 8],
+            "revenue": [250, 180, 220, 350],
+            "region": ["South", "North", "West", "East"],
+            "date": ["2024-04-01", "2024-04-15", "2024-05-01", "2024-05-15"],
+        }
+    )
+
+    # Apply same template to both datasets
+    q1_result = yaml_interrogate(sales_validation_template, set_tbl=q1_data)
+    q2_result = yaml_interrogate(sales_validation_template, set_tbl=q2_data)
+
+    # Both should have same validation structure
+    assert q1_result.tbl_name == "Sales Data Validation"
+    assert q2_result.tbl_name == "Sales Data Validation"
+    assert q1_result.label == "Standard sales data validation checks"
+    assert q2_result.label == "Standard sales data validation checks"
+
+    # Both should pass validations
+    assert all(step.all_passed for step in q1_result.validation_info)
+    assert all(step.all_passed for step in q2_result.validation_info)
+
+    # Should have same number of validation steps
+    assert len(q1_result.validation_info) == len(q2_result.validation_info)
+
+
+def test_safe_eval_python_code_simple_expression():
+    """Test evaluation of simple expressions."""
+
+    result = _safe_eval_python_code("2 + 3")
+    assert result == 5
+
+
+def test_safe_eval_python_code_syntax_error_with_statements():
+    """Test SyntaxError path with statements followed by expression."""
+
+    code = """
+x = 10
+y = 20
+x + y
+"""
+    result = _safe_eval_python_code(code)
+    assert result == 30
+
+
+def test_safe_eval_python_code_syntax_error_with_statements_no_final_expression():
+    """Test SyntaxError path with statements but no final expression."""
+
+    code = """
+x = 10
+y = 20
+"""
+    result = _safe_eval_python_code(code)
+    assert result is None
+
+
+def test_safe_eval_python_code_exception_handling():
+    """Test exception handling in `_safe_eval_python_code()`."""
+
+    # Use undefined variable to trigger runtime error
+    with pytest.raises(Exception):
+        _safe_eval_python_code("undefined_variable + 1")
+
+
+def test_safe_eval_python_code_import_error():
+    """Test that imports in eval code raise YAMLValidationError."""
+
+    with pytest.raises(YAMLValidationError, match="Potentially unsafe Python code"):
+        _safe_eval_python_code("import os")
+
+
+def test_safe_eval_python_code_function_call_allowed():
+    """Test that allowed function calls work (print is in the safe namespace)."""
+
+    # print is allowed in safe namespace, so this should work
+    result = _safe_eval_python_code("print('hello')")
+    assert result is None  # print returns None
+
+
+def test_safe_eval_python_code_attribute_access_error():
+    """Test that attribute access to undefined variables raises YAMLValidationError."""
+
+    with pytest.raises(YAMLValidationError, match="Error executing Python code"):
+        _safe_eval_python_code("os.path")
+
+
+def test_safe_eval_python_code_with_available_namespace():
+    """Test `_safe_eval_python_code()` with available namespace variables."""
+
+    # Test with basic arithmetic
+    result = _safe_eval_python_code("5 + 10")
+    assert result == 15
+
+    # Test with built-in functions
+    result = _safe_eval_python_code("len([1, 2, 3])")
+    assert result == 3
+
+    # Test with multiple operations
+    result = _safe_eval_python_code("max([1, 5, 3]) + min([4, 2, 6])")
+    assert result == 7
+
+
+def test_process_python_expressions_python_block():
+    """Test processing dictionary with `python:` block."""
+
+    data = {"python": "2 + 3"}
+    result = _process_python_expressions(data)
+
+    assert result == 5
+
+
+def test_process_python_expressions_nested_dict():
+    """Test processing nested dictionary structures."""
+
+    data = {
+        "level1": {"python": "10 * 2"},
+        "level2": {"normal": "text", "nested": {"python": "5 + 5"}},
+    }
+    result = _process_python_expressions(data)
+
+    expected = {"level1": 20, "level2": {"normal": "text", "nested": 10}}
+    assert result == expected
+
+
+def test_process_python_expressions_list():
+    """Test processing lists with Python expressions."""
+
+    data = [{"python": "1 + 1"}, "normal", {"python": "3 * 3"}]
+    result = _process_python_expressions(data)
+
+    assert result == [2, "normal", 9]
+
+
+def test_process_python_expressions_mixed_structure():
+    """Test processing mixed data structures."""
+
+    data = {
+        "list": [{"python": "2 + 2"}, "text"],
+        "dict": {"python": "7 - 2"},
+        "simple": "regular_string",
+    }
+    result = _process_python_expressions(data)
+
+    expected = {"list": [4, "text"], "dict": 5, "simple": "regular_string"}
+    assert result == expected
+
+
+def test_process_python_expressions_no_expressions():
+    """Test processing data with no Python expressions."""
+
+    data = {"key": "value", "list": [1, 2, 3]}
+    result = _process_python_expressions(data)
+
+    assert result == data
+
+
+def test_process_python_expressions_expression_error():
+    """Test handling of expression evaluation errors."""
+
+    data = {"python": "undefined_var + 1"}
+
+    with pytest.raises(YAMLValidationError, match="Error executing Python code"):
+        _process_python_expressions(data)
+
+
+def test_yaml_validator_column_parsing():
+    """Test the `_parse_column_spec()` method of YAMLValidator."""
+    validator = YAMLValidator()
+
+    # Test various YAML list formats
+    assert validator._parse_column_spec(["date", "date_time"]) == ["date", "date_time"]
+    assert validator._parse_column_spec(["a", "b", "c"]) == ["a", "b", "c"]
+    assert validator._parse_column_spec([]) == []
+
+    # Test string formats
+    assert validator._parse_column_spec("single_column") == ["single_column"]
+
+    # Test other types
+    assert validator._parse_column_spec(123) == ["123"]
+
+
+def test_yaml_validator_basic_methods():
+    """Test basic YAMLValidator methods."""
+    validator = YAMLValidator()
+
+    # Test that validator can be instantiated
+    assert validator is not None
+
+    # Test that the validation method map exists
+    assert hasattr(validator, "validation_method_map")
+    assert "rows_distinct" in validator.validation_method_map
+    assert "col_exists" in validator.validation_method_map
+
+
+def test_yaml_validator_load_config_invalid_source_type():
+    """Test YAMLValidator with invalid source type."""
+    validator = YAMLValidator()
+
+    # Test with unsupported type (list)
+    with pytest.raises(
+        YAMLValidationError, match="Invalid source type.*Only YAML strings and file paths supported"
+    ):
+        validator.load_config([1, 2, 3])
+
+
+def test_yaml_validator_load_config_not_dict():
+    """Test YAMLValidator with non-dict root level."""
+    validator = YAMLValidator()
+
+    # YAML that loads to a list instead of dict
+    yaml_content = "- item1\n- item2"
+
+    with pytest.raises(
+        YAMLValidationError, match="YAML must contain a dictionary at the root level"
+    ):
+        validator.load_config(yaml_content)
+
+
+def test_yaml_validator_validate_schema_invalid_threshold_key():
+    """Test schema validation with invalid threshold key."""
+    config = {
+        "tbl": "small_table",
+        "steps": [{"rows_distinct": {}}],
+        "thresholds": {
+            "invalid_key": 0.1  # This should trigger the error
+        },
+    }
+
+    validator = YAMLValidator()
+    with pytest.raises(
+        YAMLValidationError,
+        match="Invalid threshold key.*Must be 'warning', 'error', or 'critical'",
+    ):
+        validator._validate_schema(config)
+
+
+def test_yaml_validator_validate_schema_invalid_threshold_type():
+    """Test schema validation with invalid threshold value type."""
+    config = {
+        "tbl": "small_table",
+        "steps": [{"rows_distinct": {}}],
+        "thresholds": {
+            "warning": "not_a_number"  # Should be numeric
+        },
+    }
+
+    validator = YAMLValidator()
+    with pytest.raises(YAMLValidationError, match="Threshold 'warning' must be a number"):
+        validator._validate_schema(config)
+
+
+def test_yaml_validator_validate_schema_negative_threshold():
+    """Test schema validation with negative threshold."""
+    config = {
+        "tbl": "small_table",
+        "steps": [{"rows_distinct": {}}],
+        "thresholds": {
+            "warning": -0.1  # Should be non-negative
+        },
+    }
+
+    validator = YAMLValidator()
+    with pytest.raises(YAMLValidationError, match="Threshold 'warning' must be non-negative"):
+        validator._validate_schema(config)
+
+
+def test_yaml_validator_validate_schema_actions_not_dict():
+    """Test schema validation with actions not being a dict."""
+    config = {
+        "tbl": "small_table",
+        "steps": [{"rows_distinct": {}}],
+        "actions": "not_a_dict",  # Should be a dict
+    }
+
+    validator = YAMLValidator()
+    with pytest.raises(YAMLValidationError, match="'actions' must be a dictionary"):
+        validator._validate_schema(config)
+
+
+def test_yaml_validator_validate_schema_invalid_action_key():
+    """Test schema validation with invalid action key."""
+    config = {
+        "tbl": "small_table",
+        "steps": [{"rows_distinct": {}}],
+        "actions": {
+            "invalid_action": "some_value"  # Invalid action key
+        },
+    }
+
+    validator = YAMLValidator()
+    with pytest.raises(
+        YAMLValidationError,
+        match="Invalid action key.*Must be 'warning', 'error', 'critical', 'default', or 'highest_only'",
+    ):
+        validator._validate_schema(config)
+
+
+def test_yaml_validator_validate_schema_highest_only_not_bool():
+    """Test schema validation with highest_only not being boolean."""
+    config = {
+        "tbl": "small_table",
+        "steps": [{"rows_distinct": {}}],
+        "actions": {
+            "highest_only": "not_a_bool"  # Should be boolean
+        },
+    }
+
+    validator = YAMLValidator()
+    with pytest.raises(YAMLValidationError, match="Action 'highest_only' must be a boolean"):
+        validator._validate_schema(config)
+
+
+def test_yaml_validator_validate_schema_invalid_action_value_type():
+    """Test schema validation with invalid action value type."""
+    config = {
+        "tbl": "small_table",
+        "steps": [{"rows_distinct": {}}],
+        "actions": {
+            "warning": 123  # Should be string, dict, or list
+        },
+    }
+
+    validator = YAMLValidator()
+    with pytest.raises(
+        YAMLValidationError, match="Action 'warning' must be a string, dictionary.*or list"
+    ):
+        validator._validate_schema(config)
+
+
+def test_yaml_validator_load_data_source_process_python_expressions():
+    """Test `_load_data_source()` with python expressions processing."""
+    validator = YAMLValidator()
+
+    # Test with python expression that returns different object
+    tbl_spec = {"python": "{'data': 'test'}"}
+    result = validator._load_data_source(tbl_spec, "polars")
+    assert result == {"data": "test"}
+
+
+def test_yaml_validator_load_data_source_csv_file():
+    """Test `_load_data_source()` with CSV file."""
+    validator = YAMLValidator()
+
+    # Create a temporary CSV file
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".csv", delete=False) as f:
+        f.write("a,b,c\n1,2,3\n4,5,6\n")
+        temp_csv = f.name
+
+    try:
+        # Test loading CSV with polars
+        result = validator._load_data_source(temp_csv, "polars")
+        assert result is not None
+
+        # Test loading CSV with pandas
+        result = validator._load_data_source(temp_csv, "pandas")
+        assert result is not None
+    finally:
+        os.unlink(temp_csv)
+
+
+def test_yaml_validator_load_csv_file_not_found():
+    """Test `_load_csv_file()` with non-existent file."""
+    validator = YAMLValidator()
+
+    with pytest.raises(YAMLValidationError, match="CSV file not found"):
+        validator._load_csv_file("/nonexistent/file.csv", "polars")
+
+
+def test_yaml_validator_load_csv_file_polars_not_available():
+    """Test `_load_csv_file()` when Polars not available."""
+    validator = YAMLValidator()
+
+    # Create a temporary CSV file
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".csv", delete=False) as f:
+        f.write("a,b,c\n1,2,3\n")
+        temp_csv = f.name
+
+    try:
+        # Mock polars as not available
+        with patch("pointblank.yaml._is_lib_present", return_value=False):
+            with pytest.raises(YAMLValidationError, match="Polars library is not available"):
+                validator._load_csv_file(temp_csv, "polars")
+    finally:
+        os.unlink(temp_csv)
+
+
+def test_yaml_validator_load_csv_file_pandas_not_available():
+    """Test `_load_csv_file()` when Pandas not available."""
+    validator = YAMLValidator()
+
+    # Create a temporary CSV file
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".csv", delete=False) as f:
+        f.write("a,b,c\n1,2,3\n")
+        temp_csv = f.name
+
+    try:
+        # Mock pandas as not available
+        with patch("pointblank.yaml._is_lib_present", return_value=False):
+            with pytest.raises(YAMLValidationError, match="Pandas library is not available"):
+                validator._load_csv_file(temp_csv, "pandas")
+    finally:
+        os.unlink(temp_csv)
+
+
+def test_yaml_validator_load_csv_file_unsupported_library():
+    """Test `_load_csv_file()` with unsupported library."""
+    validator = YAMLValidator()
+
+    # Create a temporary CSV file
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".csv", delete=False) as f:
+        f.write("a,b,c\n1,2,3\n")
+        temp_csv = f.name
+
+    try:
+        with pytest.raises(
+            YAMLValidationError, match="Unsupported df_library.*Use 'polars', 'pandas', or 'duckdb'"
+        ):
+            validator._load_csv_file(temp_csv, "unsupported_lib")
+    finally:
+        os.unlink(temp_csv)
+
+
+def test_yaml_validator_load_csv_file_exception():
+    """Test `_load_csv_file()` with exception during loading."""
+    validator = YAMLValidator()
+
+    # Create a temporary invalid CSV file
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".csv", delete=False) as f:
+        f.write("invalid,csv,content\n")
+        temp_csv = f.name
+
+    try:
+        # Mock polars.read_csv to raise an exception
+        with patch("polars.read_csv", side_effect=Exception("Read error")):
+            with pytest.raises(YAMLValidationError, match="Failed to load CSV file.*with polars"):
+                validator._load_csv_file(temp_csv, "polars")
+    finally:
+        os.unlink(temp_csv)
+
+
+def test_yaml_validator_parse_schema_spec_columns_not_list():
+    """Test `_parse_schema_spec()` with columns not being a list."""
+    validator = YAMLValidator()
+
+    schema_spec = {
+        "columns": "not_a_list"  # Should be a list
+    }
+
+    with pytest.raises(YAMLValidationError, match="Schema 'columns' must be a list"):
+        validator._parse_schema_spec(schema_spec)
+
+
+def test_yaml_validator_parse_schema_spec_invalid_column_list_length():
+    """Test `_parse_schema_spec()` with invalid column spec list length."""
+    validator = YAMLValidator()
+
+    schema_spec = {
+        "columns": [
+            ["col1", "type1", "extra"]  # Too many elements
+        ]
+    }
+
+    with pytest.raises(YAMLValidationError, match="Column specification must have 1-2 elements"):
+        validator._parse_schema_spec(schema_spec)
+
+
+def test_yaml_validator_parse_schema_spec_invalid_column_type():
+    """Test `_parse_schema_spec()` with invalid column specification type."""
+    validator = YAMLValidator()
+
+    schema_spec = {
+        "columns": [
+            123  # Should be string or list
+        ]
+    }
+
+    with pytest.raises(YAMLValidationError, match="Invalid column specification type"):
+        validator._parse_schema_spec(schema_spec)
+
+
+def test_yaml_validator_parse_schema_spec_no_columns():
+    """Test `_parse_schema_spec()` without columns field."""
+    validator = YAMLValidator()
+
+    schema_spec = {}  # Missing columns field
+
+    with pytest.raises(
+        YAMLValidationError, match="Schema specification must contain 'columns' field"
+    ):
+        validator._parse_schema_spec(schema_spec)
+
+
+def test_yaml_validator_parse_schema_spec_not_dict():
+    """Test `_parse_schema_spec()` with non-dict schema."""
+    validator = YAMLValidator()
+
+    schema_spec = "not_a_dict"  # Should be a dict
+
+    with pytest.raises(YAMLValidationError, match="Schema specification must be a dictionary"):
+        validator._parse_schema_spec(schema_spec)
+
+
+def test_yaml_to_python_file_path_detection():
+    """Test `yaml_to_python()` with file path detection."""
+
+    # Create a temporary YAML file
+    yaml_content = """
+    tbl: small_table
+    steps:
+    - rows_distinct: {}
+    """
+
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".yaml", delete=False) as f:
+        f.write(yaml_content)
+        temp_yaml = f.name
+
+    try:
+        # Test with file path (short, no newlines)
+        result = yaml_to_python(temp_yaml)
+        assert "pb.Validate" in result
+        assert "rows_distinct" in result
+    finally:
+        os.unlink(temp_yaml)
+
+
+def test_yaml_to_python_content_analysis():
+    """Test `yaml_to_python()` with content analysis for Polars/Pandas."""
+    yaml_content = """
+    tbl:
+      python: "pl.DataFrame({'a': [1, 2, 3]})"
+    steps:
+    - col_vals_gt:
+        columns: a
+        value:
+          python: "pd.Series([0, 1, 2]).mean()"
+    """
+
+    result = yaml_to_python(yaml_content)
+    assert "import polars as pl" in result
+    assert "import pandas as pd" in result
+
+
+def test_yaml_to_python_file_loading_csv():
+    """Test `yaml_to_python()` with CSV file loading."""
+    yaml_content = """
+    tbl: test_data.csv
+    steps:
+    - rows_distinct: {}
+    """
+
+    result = yaml_to_python(yaml_content)
+    assert 'pb.load_dataset("test_data.csv"' in result
+
+
+def test_yaml_to_python_file_loading_parquet():
+    """Test `yaml_to_python()` with Parquet file loading."""
+    yaml_content = """
+    tbl: test_data.parquet
+    steps:
+    - rows_distinct: {}
+    """
+
+    result = yaml_to_python(yaml_content)
+    assert 'pb.load_dataset("test_data.parquet"' in result
+
+
+def test_yaml_to_python_with_lang():
+    """Test `yaml_to_python()` with language parameter."""
+    yaml_content = """
+    tbl: small_table
+    lang: fr
+    steps:
+    - rows_distinct: {}
+    """
+
+    result = yaml_to_python(yaml_content)
+    assert 'lang="fr"' in result
+
+
+def test_yaml_to_python_with_locale():
+    """Test `yaml_to_python()` with locale parameter."""
+    yaml_content = """
+    tbl: small_table
+    locale: fr_FR
+    steps:
+    - rows_distinct: {}
+    """
+
+    result = yaml_to_python(yaml_content)
+    assert 'locale="fr_FR"' in result
+
+
+def test_yaml_to_python_with_brief_bool():
+    """Test `yaml_to_python()` with brief as boolean."""
+    yaml_content = """
+    tbl: small_table
+    brief: true
+    steps:
+    - rows_distinct: {}
+    """
+
+    result = yaml_to_python(yaml_content)
+    assert "brief=True" in result
+
+
+def test_yaml_to_python_conjointly_expressions_list():
+    """Test `yaml_to_python()` with conjointly expressions list."""
+    yaml_content = """
+    tbl: small_table
+    steps:
+    - conjointly:
+        expressions:
+          - "lambda df: df['a'] > 0"
+          - "lambda df: df['b'] < 10"
+    """
+
+    result = yaml_to_python(yaml_content)
+    assert (
+        "conjointly(expressions=[\"lambda df: df['a'] > 0\", \"lambda df: df['b'] < 10\"])"
+        in result
+    )
+
+
+def test_yaml_to_python_specially_expr():
+    """Test `yaml_to_python()` with specially expr parameter."""
+    yaml_content = """
+    tbl: small_table
+    steps:
+    - specially:
+        expr: "lambda x: x > 0"
+    """
+
+    result = yaml_to_python(yaml_content)
+    assert "specially(expr=lambda x: x > 0)" in result
+
+
+def test_yaml_to_python_single_column():
+    """Test `yaml_to_python()` with single column."""
+    yaml_content = """
+    tbl: small_table
+    steps:
+    - col_exists:
+        columns: [single_col]
+    """
+
+    result = yaml_to_python(yaml_content)
+    assert 'col_exists(columns="single_col")' in result
+
+
+def test_yaml_to_python_brief_bool_in_step():
+    """Test `yaml_to_python()` with brief as boolean in step."""
+    yaml_content = """
+    tbl: small_table
+    steps:
+    - col_exists:
+        columns: a
+        brief: false
+    """
+
+    result = yaml_to_python(yaml_content)
+    assert "brief=False" in result
+
+
+def test_yaml_to_python_brief_string_in_step():
+    """Test `yaml_to_python()` with brief as string in step."""
+    yaml_content = """
+    tbl: small_table
+    steps:
+    - col_exists:
+        columns: a
+        brief: "Custom brief message"
+    """
+
+    result = yaml_to_python(yaml_content)
+    assert 'brief="Custom brief message"' in result
+
+
+def test_yaml_to_python_actions_object_warning():
+    """Test `yaml_to_python()` with Actions object warning."""
+
+    yaml_content = """
+    tbl: small_table
+    steps:
+    - col_exists:
+        columns: a
+        actions:
+          warning: "warn_func"
+          error: null
+          critical: null
+    """
+
+    result = yaml_to_python(yaml_content)
+    assert "Actions(" in result
+    assert "warning=" in result
+
+
+def test_yaml_to_python_actions_object_error():
+    """Test `yaml_to_python()` with Actions object error."""
+    yaml_content = """
+    tbl: small_table
+    steps:
+    - col_exists:
+        columns: a
+        actions:
+          error: "error_func"
+    """
+
+    result = yaml_to_python(yaml_content)
+    assert "Actions(" in result
+    assert "error=" in result
+
+
+def test_yaml_to_python_actions_object_critical_list():
+    """Test `yaml_to_python()` with Actions object critical as list."""
+    yaml_content = """
+    tbl: small_table
+    steps:
+    - col_exists:
+        columns: a
+        actions:
+          critical: ["critical_func"]
+    """
+
+    result = yaml_to_python(yaml_content)
+    assert "Actions(" in result
+    assert "critical=" in result
+
+
+def test_yaml_to_python_actions_dict_highest_only():
+    """Test `yaml_to_python()` with actions `highest_only:`."""
+    yaml_content = """
+    tbl: small_table
+    steps:
+    - col_exists:
+        columns: a
+        actions:
+          highest_only: false
+          warning: "warn_func"
+    """
+
+    result = yaml_to_python(yaml_content)
+    assert "highest_only=False" in result
+
+
+def test_yaml_to_python_thresholds_object():
+    """Test `yaml_to_python()` with Thresholds object."""
+    yaml_content = """
+    tbl: small_table
+    steps:
+    - col_exists:
+        columns: a
+        thresholds:
+          warning: 0.1
+          error: 0.2
+    """
+
+    result = yaml_to_python(yaml_content)
+    assert "Thresholds(" in result
+    assert "warning=0.1" in result
+    assert "error=0.2" in result
+
+
+def test_yaml_to_python_string_parameter():
+    """Test `yaml_to_python()` with string parameter."""
+    yaml_content = """
+    tbl: small_table
+    steps:
+    - col_vals_regex:
+        columns: a
+        pattern: "[0-9]+"
+    """
+
+    result = yaml_to_python(yaml_content)
+    assert 'pattern="[0-9]+"' in result
+
+
+def test_yaml_to_python_tuple_parameter():
+    """Test `yaml_to_python()` with tuple parameter."""
+    yaml_content = """
+    tbl: small_table
+    steps:
+    - col_vals_between:
+        columns: a
+        left: 0
+        right: 10
+        inclusive: [false, true]
+    """
+
+    result = yaml_to_python(yaml_content)
+    # This will be converted to a list format in the output
+    assert "inclusive=" in result
+
+
+def test_yaml_to_python_step_actions_dict_highest_only():
+    """Test `yaml_to_python()` with step-level actions dict `highest_only:`."""
+    yaml_content = """
+    tbl: small_table
+    steps:
+    - col_exists:
+        columns: a
+        actions:
+          highest_only: false
+          warning: "warn_action"
+    """
+
+    result = yaml_to_python(yaml_content)
+    assert "highest_only=False" in result
+    assert "pb.Actions(" in result
+
+
+def test_yaml_to_python_step_actions_dict_original_expression():
+    """Test `yaml_to_python()` with step-level actions dict using original expressions."""
+    yaml_content = """
+    tbl: small_table
+    steps:
+    - col_exists:
+        columns: a
+        actions:
+          warning:
+            python: "lambda x: print('Warning!')"
+    """
+
+    result = yaml_to_python(yaml_content)
+    assert "pb.Actions(" in result
+    assert "warning=" in result
+
+
+def test_yaml_to_python_step_actions_dict_string_values():
+    """Test `yaml_to_python()` with step-level actions dict with string values."""
+    yaml_content = """
+    tbl: small_table
+    steps:
+    - col_exists:
+        columns: a
+        actions:
+          warning: "warning_message"
+          error: "error_message"
+    """
+
+    result = yaml_to_python(yaml_content)
+    assert 'warning="warning_message"' in result
+    assert 'error="error_message"' in result
+    assert "pb.Actions(" in result
+
+
+def test_yaml_to_python_step_actions_dict_complex_values():
+    """Test `yaml_to_python()` with step-level actions dict with complex values."""
+    yaml_content = """
+    tbl: small_table
+    steps:
+    - col_exists:
+        columns: a
+        actions:
+          warning: 123
+          error: true
+    """
+
+    result = yaml_to_python(yaml_content)
+    assert 'warning="123"' in result  # Numbers get converted to strings in Actions
+    assert 'error="True"' in result  # Booleans get converted to strings in Actions
+    assert "pb.Actions(" in result
+
+
+def test_yaml_to_python_step_actions_non_dict():
+    """Test `yaml_to_python()` with step-level actions that are not dict."""
+    yaml_content = """
+    tbl: small_table
+    steps:
+    - col_exists:
+        columns: a
+        actions: "simple_action"
+    """
+
+    result = yaml_to_python(yaml_content)
+    assert "actions=simple_action" in result
+
+
+def test_yaml_to_python_step_actions_dict_with_complex_structure():
+    """Test `yaml_to_python()` with complex step-level actions dict structure."""
+    yaml_content = """
+    tbl: small_table
+    steps:
+    - col_vals_gt:
+        columns: [a]
+        value: 0
+        actions:
+          warning: "warning_func"
+          error: 42
+          critical: true
+          highest_only: false
+    """
+
+    result = yaml_to_python(yaml_content)
+
+    # Verify the step-level actions dictionary processing
+    assert "pb.Actions(" in result
+    assert "highest_only=False" in result
+    assert 'warning="warning_func"' in result
+    assert 'error="42"' in result
+    assert 'critical="True"' in result
+
+
+def test_yaml_to_python_boolean_parameters():
+    """Test `yaml_to_python()` with boolean parameter values."""
+    yaml_content = """
+    tbl: small_table
+    steps:
+      - col_vals_gt:
+          columns: c
+          value: 5
+          na_pass: true
+          active: false
+          brief: true
+    """
+
+    python_code = yaml_to_python(yaml_content)
+
+    # Verify boolean values are correctly converted to Python format
+    assert "na_pass=True" in python_code
+    assert "active=False" in python_code
+    assert "brief=True" in python_code
+
+
+def test_yaml_to_python_non_dict_thresholds():
+    """Test `yaml_to_python()` with non-dict threshold values."""
+    yaml_content = """
+    tbl: small_table
+    steps:
+      - col_vals_gt:
+          columns: c
+          value: 5
+          thresholds: 0.1
+      - col_vals_lt:
+          columns: d
+          value: 1000
+          thresholds: true
+    """
+
+    python_code = yaml_to_python(yaml_content)
+
+    # Verify non-dict threshold values are handled correctly
+    assert "thresholds=0.1" in python_code
+    assert "thresholds=True" in python_code

@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import Any, Union
 
 import yaml
+from narwhals.typing import FrameT
 
 from pointblank._utils import _is_lib_present
 from pointblank.thresholds import Actions
@@ -749,7 +750,7 @@ class YAMLValidator:
         return validation
 
 
-def yaml_interrogate(yaml: Union[str, Path]) -> Validate:
+def yaml_interrogate(yaml: Union[str, Path], set_tbl: Union[FrameT, Any, None] = None) -> Validate:
     """Execute a YAML-based validation workflow.
 
     This is the main entry point for YAML-based validation workflows. It takes YAML configuration
@@ -764,13 +765,20 @@ def yaml_interrogate(yaml: Union[str, Path]) -> Validate:
     yaml
         YAML configuration as string or file path. Can be: (1) a YAML string containing the
         validation configuration, or (2) a Path object or string path to a YAML file.
+    set_tbl
+        An optional table to override the table specified in the YAML configuration. This allows you
+        to apply a YAML-defined validation workflow to a different table than what's specified in
+        the configuration. If provided, this table will replace the table defined in the YAML's
+        `tbl` field before executing the validation workflow. This can be any supported table type
+        including DataFrame objects, Ibis table objects, CSV file paths, Parquet file paths, GitHub
+        URLs, or database connection strings.
 
     Returns
     -------
     Validate
-        An instance of the `Validate` class that has been configured based on the YAML input.
-        This object contains the results of the validation steps defined in the YAML configuration.
-        It includes metadata like table name, label, language, and thresholds if specified.
+        An instance of the `Validate` class that has been configured based on the YAML input. This
+        object contains the results of the validation steps defined in the YAML configuration. It
+        includes metadata like table name, label, language, and thresholds if specified.
 
     Raises
     ------
@@ -875,10 +883,59 @@ def yaml_interrogate(yaml: Union[str, Path]) -> Validate:
     This approach is particularly useful for storing validation configurations as part of your data
     pipeline or version control system, allowing you to maintain validation rules alongside your
     code.
+
+    ### Using `set_tbl=` to Override the Table
+
+    The `set_tbl=` parameter allows you to override the table specified in the YAML configuration.
+    This is useful when you have a template validation workflow but want to apply it to different
+    tables:
+
+    ```{python}
+    import polars as pl
+
+    # Create a test table with similar structure to small_table
+    test_table = pl.DataFrame({
+        "date": ["2023-01-01", "2023-01-02", "2023-01-03"],
+        "a": [1, 2, 3],
+        "b": ["1-abc-123", "2-def-456", "3-ghi-789"],
+        "d": [150, 200, 250]
+    })
+
+    # Use the same YAML config but apply it to our test table
+    yaml_config = '''
+    tbl: small_table  # This will be overridden
+    tbl_name: Test Table  # This name will be used
+    steps:
+    - col_exists:
+        columns: [date, a, b, d]
+    - col_vals_gt:
+        columns: [d]
+        value: 100
+    '''
+
+    # Execute with table override
+    result = pb.yaml_interrogate(yaml_config, set_tbl=test_table)
+    print(f"Validation applied to: {result.tbl_name}")
+    result
+    ```
+
+    This feature makes YAML configurations more reusable and flexible, allowing you to define
+    validation logic once and apply it to multiple similar tables.
     """
     validator = YAMLValidator()
     config = validator.load_config(yaml)
-    return validator.execute_workflow(config)
+
+    # If `set_tbl=` is provided, we need to build the validation workflow and then use `set_tbl()`
+    if set_tbl is not None:
+        # First build the validation object without interrogation
+        validation = validator.build_validation(config)
+        # Then replace the table using set_tbl method
+        validation = validation.set_tbl(tbl=set_tbl)
+        # Finally interrogate with the new table
+        return validation.interrogate()
+    else:
+        # Standard execution without table override (includes interrogation)
+        return validator.execute_workflow(config)
 
 
 def load_yaml_config(file_path: Union[str, Path]) -> dict:
@@ -1451,26 +1508,6 @@ def yaml_to_python(yaml: Union[str, Path]) -> str:
 
                     if hasattr(value, "highest_only") and value.highest_only is not True:
                         action_params.append(f"highest_only={value.highest_only}")
-                    actions_str = "pb.Actions(" + ", ".join(action_params) + ")"
-                    param_parts.append(f"actions={actions_str}")
-                elif isinstance(value, dict):
-                    action_params = []
-                    step_action_base = f"steps[{step_index}].{list(step_config.keys())[0]}.actions"
-                    for action_key, action_value in value.items():
-                        if action_key == "highest_only":
-                            action_params.append(f"{action_key}={action_value}")
-                        else:
-                            # Check if we have an original expression for this action
-                            action_expr_path = f"{step_action_base}.{action_key}"
-                            if action_expr_path in step_expressions:
-                                action_params.append(
-                                    f"{action_key}={step_expressions[action_expr_path]}"
-                                )
-                            elif isinstance(action_value, str):
-                                action_params.append(f'{action_key}="{action_value}"')
-                            else:
-                                # For callables or complex expressions
-                                action_params.append(f"{action_key}={action_value}")
                     actions_str = "pb.Actions(" + ", ".join(action_params) + ")"
                     param_parts.append(f"actions={actions_str}")
                 else:

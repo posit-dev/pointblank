@@ -167,6 +167,136 @@ tbl:
     )
 ```
 
+## Reusable Templates with `set_tbl=`
+
+One of the most powerful features of YAML validation workflows is the ability to create reusable
+templates that can be applied to different datasets. Using the `set_tbl=` parameter with
+`yaml_interrogate()`, you can define validation logic once and apply it to multiple data sources.
+
+### Creating Validation Templates
+
+When creating templates for use with `set_tbl=`, the `tbl` field is still required but its value
+will be overridden. The recommended approach is to use `tbl: null`:
+
+```yaml
+tbl: null
+tbl_name: "Sales Data Validation Template"
+label: "Standard validation checks for sales data"
+steps:
+  - col_exists:
+      columns: [customer_id, revenue, region, date]
+  - col_vals_not_null:
+      columns: [customer_id, revenue]
+  - col_vals_gt:
+      columns: [revenue]
+      value: 0
+  - col_vals_in_set:
+      columns: [region]
+      set: [North, South, East, West]
+```
+
+### Applying Templates to Multiple Datasets
+
+Here's a practical example showing how to apply the same validation template to multiple quarterly
+datasets, demonstrating the power of reusable YAML configurations:
+
+```{python}
+import pointblank as pb
+import polars as pl
+
+# Define the template once
+sales_template = """
+tbl: null  # Will be overridden
+tbl_name: "Sales Data Validation"
+label: "Standard sales validation checks"
+thresholds:
+  warning: 0.05
+  error: 0.1
+steps:
+  - col_exists:
+      columns: [customer_id, revenue, region]
+  - col_vals_not_null:
+      columns: [customer_id, revenue]
+  - col_vals_gt:
+      columns: [revenue]
+      value: 0
+  - col_vals_in_set:
+      columns: [region]
+      set: [North, South, East, West]
+"""
+
+# Create different datasets
+q1_data = pl.DataFrame({
+    "customer_id": [1, 2, 3, 4],
+    "revenue": [100, 200, 150, 300],
+    "region": ["North", "South", "East", "West"]
+})
+
+q2_data = pl.DataFrame({
+    "customer_id": [5, 6, 7, 8],
+    "revenue": [250, 180, 220, 350],
+    "region": ["South", "North", "West", "East"]
+})
+
+# Apply the same template to both datasets
+q1_result = pb.yaml_interrogate(sales_template, set_tbl=q1_data)
+q2_result = pb.yaml_interrogate(sales_template, set_tbl=q2_data)
+
+print(f"Q1 validation: {all(v.all_passed for v in q1_result.validation_info)}")
+print(f"Q2 validation: {all(v.all_passed for v in q2_result.validation_info)}")
+```
+
+### Template Best Practices
+
+1. **Use `tbl: null`**: this clearly indicates the template expects a data source to be provided
+2. **Include comprehensive metadata**: use `tbl_name`, `label`, and `brief` to make results
+self-documenting
+3. **Set appropriate thresholds**: define warning/error levels that make sense for your use case
+4. **Version control templates**: store templates in your repository alongside your data processing
+code
+5. **Test with sample data**: validate your templates work with representative datasets
+
+### Common Template Patterns
+
+For API response validation, you can ensure that responses have the expected structure and valid
+status codes:
+
+```yaml
+tbl: null
+tbl_name: "API Response Validation"
+brief: "Standard checks for API response data"
+steps:
+  - col_exists:
+      columns: [user_id, status, timestamp]
+  - col_vals_in_set:
+      columns: [status]
+      set: [success, error, pending]
+  - col_vals_not_null:
+      columns: [user_id, timestamp]
+```
+
+For file upload validation, you can check file sizes and formats to ensure they meet your
+requirements:
+
+```yaml
+tbl: null
+tbl_name: "File Upload Validation"
+steps:
+  - col_vals_gt:
+      columns: [file_size]
+      value: 0
+  - col_vals_lt:
+      columns: [file_size]
+      value: 10485760  # 10MB limit
+  - col_vals_in_set:
+      columns: [file_type]
+      set: [csv, json, xlsx, parquet]
+```
+
+This template approach is particularly valuable in data pipelines, ETL processes, and automated
+testing scenarios where you need to apply consistent validation logic across multiple similar
+datasets.
+
 ## Validation Steps
 
 YAML supports all of Pointblank's validation methods. Here are some common patterns:

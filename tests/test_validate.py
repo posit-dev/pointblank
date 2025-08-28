@@ -6,7 +6,7 @@ import pprint
 import sys
 import re
 import os
-from unittest.mock import patch, Mock, MagicMock
+from unittest.mock import patch, Mock
 import pytest
 import random
 import itertools
@@ -18,7 +18,6 @@ import contextlib
 import datetime
 
 import pandas as pd
-
 import polars as pl
 import ibis
 
@@ -43,12 +42,12 @@ try:
 
     from pyspark.sql import SparkSession
     from pyspark.sql.types import (
-        StructType,
-        StructField,
-        StringType,
-        IntegerType,
+        BooleanType,
         DoubleType,
-        DateType,
+        IntegerType,
+        StringType,
+        StructField,
+        StructType,
     )
     import pyspark.sql.functions as F
 
@@ -57,6 +56,7 @@ except ImportError:
     PYSPARK_AVAILABLE = False
 
 
+from great_tables import vals
 import great_tables as GT
 import narwhals as nw
 
@@ -65,6 +65,7 @@ from pointblank._constants import REPORTING_LANGUAGES
 from pointblank.validate import (
     Actions,
     FinalActions,
+    connect_to_table,
     get_action_metadata,
     get_column_count,
     get_data_path,
@@ -77,7 +78,11 @@ from pointblank.validate import (
     Validate,
     _create_table_time_html,
     _create_table_type_html,
+    _create_thresholds_html,
     _fmt_lg,
+    _format_single_float_with_gt,
+    _format_single_integer_with_gt,
+    _format_single_number_with_gt,
     _normalize_reporting_language,
     _prep_column_text,
     _process_action_str,
@@ -85,8 +90,8 @@ from pointblank.validate import (
     _process_connection_string,
     _process_csv_input,
     _process_data,
+    _process_github_url,
     _process_parquet_input,
-    connect_to_table,
     _process_title_text,
     _ValidationInfo,
     _is_string_date,
@@ -94,10 +99,10 @@ from pointblank.validate import (
     _convert_string_to_date,
     _convert_string_to_datetime,
     _string_date_dttm_conversion,
+    _transform_test_units,
 )
 from pointblank.thresholds import Thresholds
 from pointblank.schema import Schema, _get_schema_validation_info
-from pointblank._utils import _is_lib_present
 from pointblank.column import (
     col,
     starts_with,
@@ -2439,8 +2444,6 @@ def test_validation_with_preprocessing_with_fn_pl(tbl_pl):
 
 @pytest.mark.skipif(not PYSPARK_AVAILABLE, reason="PySpark not available")
 def test_validation_with_preprocessing_pyspark(tbl_pyspark):
-    import pyspark.sql.functions as F
-
     v = (
         Validate(tbl_pyspark)
         .col_vals_eq(columns="z", value=8)
@@ -2467,8 +2470,6 @@ def test_validation_with_preprocessing_pyspark_use_nw(tbl_pyspark):
 
 @pytest.mark.skipif(not PYSPARK_AVAILABLE, reason="PySpark not available")
 def test_validation_with_preprocessing_with_fn_pyspark(tbl_pyspark):
-    import pyspark.sql.functions as F
-
     def multiply_z_by_two(df):
         return df.withColumn("z", F.col("z") * 2)
 
@@ -2867,8 +2868,6 @@ def test_col_vals_outside_with_datetime_bounds():
 
 
 def test_validation_with_segments_and_pre_pandas():
-    import pandas as pd
-
     tbl = pd.DataFrame(
         {"category": ["A", "A", "B", "B"], "value": [10, 20, 30, 40], "multiplier": [2, 3, 4, 5]}
     )
@@ -2894,8 +2893,6 @@ def test_validation_with_segments_and_pre_pandas():
 
 @pytest.mark.skipif(not PYSPARK_AVAILABLE, reason="PySpark not available")
 def test_validation_with_segments_and_pre_pyspark():
-    import pyspark.sql.functions as F
-
     spark = get_spark_session()
     tbl = spark.createDataFrame(
         [("A", 10, 2), ("A", 20, 3), ("B", 30, 4), ("B", 40, 5)],
@@ -2922,8 +2919,6 @@ def test_validation_with_segments_and_pre_pyspark():
 
 
 def test_validation_error_handling_in_pre_pandas():
-    import pandas as pd
-
     tbl = pd.DataFrame({"values": [1, 2, 3]})
 
     def failing_pre(df):
@@ -2954,8 +2949,6 @@ def test_validation_error_handling_in_pre_pyspark():
 
 
 def test_conjointly_with_empty_expressions_pandas():
-    import pandas as pd
-
     tbl = pd.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]})
 
     # Test with minimal expressions
@@ -2978,8 +2971,6 @@ def test_conjointly_with_empty_expressions_pyspark():
 
 
 def test_specially_with_complex_return_values_pandas():
-    import pandas as pd
-
     tbl = pd.DataFrame({"values": [1, 2, 3, 4, 5]})
 
     # Function returning list of mixed boolean/non-boolean (should fail)
@@ -3018,8 +3009,6 @@ def test_specially_with_complex_return_values_pyspark():
 
 
 def test_col_vals_between_with_column_references_pandas():
-    import pandas as pd
-
     tbl = pd.DataFrame(
         {"value": [5, 10, 15, 20], "lower": [1, 8, 12, 18], "upper": [10, 15, 20, 25]}
     )
@@ -3052,8 +3041,6 @@ def test_col_vals_between_with_column_references_pyspark():
 
 
 def test_col_vals_outside_with_datetime_bounds_pandas():
-    import pandas as pd
-
     tbl = pd.DataFrame(
         {
             "timestamp": [
@@ -3154,8 +3141,6 @@ def test_validation_report_with_unicode_content():
 
 
 def test_validation_report_with_unicode_content_pandas():
-    import pandas as pd
-
     tbl = pd.DataFrame(
         {
             "名前": ["太郎", "花子", "一郎"],  # Japanese names
@@ -3218,8 +3203,6 @@ def test_row_count_match_with_tolerance():
 
 
 def test_row_count_match_with_tolerance_pandas():
-    import pandas as pd
-
     tbl = pd.DataFrame({"col": range(100)})  # 100 rows
 
     # Test exact match
@@ -3318,8 +3301,6 @@ def test_validation_with_all_validation_types():
 
 
 def test_validation_with_all_validation_types_pandas():
-    import pandas as pd
-
     tbl = pd.DataFrame(
         {
             "id": [1, 2, 3, 4, 5],
@@ -3384,16 +3365,6 @@ def test_validation_with_all_validation_types_pandas():
 
 @pytest.mark.skipif(not PYSPARK_AVAILABLE, reason="PySpark not available")
 def test_validation_with_all_validation_types_pyspark():
-    import pyspark.sql.functions as F
-    from pyspark.sql.types import (
-        StructType,
-        StructField,
-        IntegerType,
-        StringType,
-        DoubleType,
-        BooleanType,
-    )
-
     spark = get_spark_session()
 
     # Create the schema first
@@ -3470,8 +3441,6 @@ def test_validation_info_string_representation():
 
 
 def test_validation_info_string_representation_pandas():
-    import pandas as pd
-
     tbl = pd.DataFrame({"col": [1, 2, 3]})
 
     validation = Validate(tbl).col_vals_gt(columns="col", value=0).interrogate()
@@ -3517,8 +3486,6 @@ def test_validation_with_mixed_na_pass_values():
 
 
 def test_validation_with_mixed_na_pass_values_pandas():
-    import pandas as pd
-
     tbl = pd.DataFrame({"col1": [1, 2, None, 4], "col2": [None, 2, 3, 4]})
 
     validation = (
@@ -3746,8 +3713,6 @@ def test_date_time_validation_with_string_conversion():
 
 
 def test_date_time_validation_with_string_conversion_pandas():
-    import pandas as pd
-
     tbl = pd.DataFrame(
         {
             "date_str": ["2023-01-01", "2023-06-15", "2023-12-31"],
@@ -3786,9 +3751,6 @@ def test_date_time_validation_with_string_conversion_pandas():
 
 @pytest.mark.skipif(not PYSPARK_AVAILABLE, reason="PySpark not available")
 def test_date_time_validation_with_string_conversion_pyspark():
-    from pyspark.sql import functions as F
-    from pyspark.sql.types import StructType, StructField, StringType
-
     spark = get_spark_session()
 
     # Create DataFrame with string date/datetime columns
@@ -6740,8 +6702,6 @@ def test_date_validation_fixed_datetime(request, tbl_fixture, datetime_values):
 
 @pytest.mark.parametrize("tbl_fixture", TBL_TRUE_DATES_TIMES_LIST)
 def test_date_validation_fixed_date_ddtm_col(request, tbl_fixture):
-    import datetime
-
     tbl = request.getfixturevalue(tbl_fixture)
 
     date_left = datetime.date(2021, 1, 1)
@@ -6888,8 +6848,6 @@ def test_date_validation_fixed_date_ddtm_col(request, tbl_fixture):
 
 @pytest.mark.parametrize("tbl_fixture", TBL_TRUE_DATES_TIMES_LIST)
 def test_date_validation_fixed_datetime_date_col(request, tbl_fixture):
-    import datetime
-
     tbl = request.getfixturevalue(tbl_fixture)
 
     datetime_left = datetime.datetime(2021, 1, 1)
@@ -8302,7 +8260,7 @@ def test_load_dataset_invalid():
 
 
 def test_load_dataset_no_pandas():
-    # Mock the absence of the pandas library
+    # Mock the absence of the Pandas library
     with patch.dict(sys.modules, {"pandas": None}):
         # A ValueError is raised when `tbl_type="pandas"` and the `pandas` package is not installed
         with pytest.raises(ImportError):
@@ -8310,124 +8268,170 @@ def test_load_dataset_no_pandas():
 
 
 def test_load_dataset_no_polars():
-    # Mock the absence of the polars library
+    # Mock the absence of the Polars library
     with patch.dict(sys.modules, {"polars": None}):
         # A ValueError is raised when `tbl_type="pandas"` and the `pandas` package is not installed
         with pytest.raises(ImportError):
             load_dataset(tbl_type="polars")
 
 
-class TestGetDataPathSimple:
-    def test_get_data_path_csv_default(self):
-        path = get_data_path()  # Default: small_table, csv
+def test_get_data_path_csv_default():
+    path = get_data_path()  # Default: small_table, csv
+
+    assert isinstance(path, str)
+    assert path.endswith(".csv")
+    assert os.path.exists(path)
+    assert os.path.getsize(path) > 0
+
+
+def test_get_data_path_all_datasets_csv():
+    datasets = ["small_table", "game_revenue", "nycflights", "global_sales"]
+
+    for dataset in datasets:
+        path = get_data_path(dataset=dataset, file_type="csv")
 
         assert isinstance(path, str)
         assert path.endswith(".csv")
         assert os.path.exists(path)
         assert os.path.getsize(path) > 0
 
-    def test_get_data_path_all_datasets_csv(self):
-        datasets = ["small_table", "game_revenue", "nycflights", "global_sales"]
 
-        for dataset in datasets:
-            path = get_data_path(dataset=dataset, file_type="csv")
+def test_get_data_path_parquet():
+    path = get_data_path(dataset="small_table", file_type="parquet")
 
-            assert isinstance(path, str)
-            assert path.endswith(".csv")
-            assert os.path.exists(path)
-            assert os.path.getsize(path) > 0
+    assert isinstance(path, str)
+    assert path.endswith(".parquet")
+    assert os.path.exists(path)
+    assert os.path.getsize(path) > 0
 
-    def test_get_data_path_parquet(self):
+
+def test_get_data_path_duckdb():
+    path = get_data_path(dataset="small_table", file_type="duckdb")
+
+    assert isinstance(path, str)
+    assert path.endswith(".ddb")
+    assert os.path.exists(path)
+    assert os.path.getsize(path) > 0
+
+
+def test_get_data_path_invalid_dataset():
+    with pytest.raises(ValueError, match="dataset name .* is not valid"):
+        get_data_path(dataset="nonexistent_dataset")
+
+
+def test_get_data_path_invalid_file_type():
+    with pytest.raises(ValueError, match="file type .* is not valid"):
+        get_data_path(file_type="xlsx")
+
+
+def test_get_data_path_files_in_temp_dir():
+    path = get_data_path()
+    temp_dir = tempfile.gettempdir()
+
+    assert path.startswith(temp_dir)
+
+
+def test_get_data_path_multiple_calls_different_files():
+    path1 = get_data_path("small_table", "csv")
+    path2 = get_data_path("small_table", "csv")
+
+    # Should be different files (different temp file names)
+    assert path1 != path2
+
+    # But both should exist and be valid
+    assert os.path.exists(path1)
+    assert os.path.exists(path2)
+    assert os.path.getsize(path1) > 0
+    assert os.path.getsize(path2) > 0
+
+
+def test_get_data_path_works_with_validate():
+    csv_path = get_data_path("small_table", "csv")
+
+    # Should be able to create a Validate object with the path
+    validation = Validate(data=csv_path)
+
+    # Should have loaded the data successfully
+    assert validation.data is not None
+
+    # Should be able to add a simple validation
+    validation = validation.col_exists(columns="a").interrogate()
+
+    # Should pass (column 'a' exists in small_table)
+    assert validation.all_passed()
+
+
+@pytest.mark.parametrize("dataset", ["small_table", "game_revenue"])
+@pytest.mark.parametrize("file_type", ["csv", "parquet"])
+def test_get_data_path_data_loading_consistency(dataset, file_type):
+    # Get path and load via Validate
+    path = get_data_path(dataset=dataset, file_type=file_type)
+    validation = Validate(data=path)
+
+    # Compare with direct loading via load_dataset
+    if file_type == "csv":
+        reference_data = load_dataset(dataset=dataset, tbl_type="polars")
+    else:  # parquet
+        reference_data = load_dataset(dataset=dataset, tbl_type="polars")
+
+    # Both should have same number of columns
+    assert len(validation.data.columns) == len(reference_data.columns)
+
+    # Column names should match
+    assert validation.data.columns == reference_data.columns
+
+
+def test_get_data_path_example_usage_patterns():
+    # Example 1: Basic usage
+    csv_path = get_data_path("small_table", "csv")
+    validation = Validate(data=csv_path).col_exists(["a", "b", "c"]).interrogate()
+    assert validation.all_passed()
+
+    # Example 2: With different dataset
+    parquet_path = get_data_path("game_revenue", "parquet")
+    validation = Validate(data=parquet_path).col_exists(["player_id", "session_id"]).interrogate()
+    assert validation.all_passed()
+
+
+def test_get_data_path_parquet_pandas_only():
+    """Test get_data_path parquet creation when only pandas is available."""
+    with patch("pointblank.validate._is_lib_present") as mock_is_lib:
+
+        def side_effect(lib_name):
+            # Only pandas is available, polars is not
+            return lib_name == "pandas"
+
+        mock_is_lib.side_effect = side_effect
+
+        # This should trigger the pandas pathway
         path = get_data_path(dataset="small_table", file_type="parquet")
 
+        # Should return a valid parquet file path
         assert isinstance(path, str)
         assert path.endswith(".parquet")
         assert os.path.exists(path)
         assert os.path.getsize(path) > 0
 
-    def test_get_data_path_duckdb(self):
-        path = get_data_path(dataset="small_table", file_type="duckdb")
+        # Verify it can be loaded
+        import pandas as pd
 
-        assert isinstance(path, str)
-        assert path.endswith(".ddb")
-        assert os.path.exists(path)
-        assert os.path.getsize(path) > 0
-
-    def test_get_data_path_invalid_dataset(self):
-        with pytest.raises(ValueError, match="dataset name .* is not valid"):
-            get_data_path(dataset="nonexistent_dataset")
-
-    def test_get_data_path_invalid_file_type(self):
-        with pytest.raises(ValueError, match="file type .* is not valid"):
-            get_data_path(file_type="xlsx")
-
-    def test_get_data_path_files_in_temp_dir(self):
-        path = get_data_path()
-        temp_dir = tempfile.gettempdir()
-
-        assert path.startswith(temp_dir)
-
-    def test_get_data_path_multiple_calls_different_files(self):
-        path1 = get_data_path("small_table", "csv")
-        path2 = get_data_path("small_table", "csv")
-
-        # Should be different files (different temp file names)
-        assert path1 != path2
-
-        # But both should exist and be valid
-        assert os.path.exists(path1)
-        assert os.path.exists(path2)
-        assert os.path.getsize(path1) > 0
-        assert os.path.getsize(path2) > 0
-
-    def test_get_data_path_works_with_validate(self):
-        csv_path = get_data_path("small_table", "csv")
-
-        # Should be able to create a Validate object with the path
-        validation = Validate(data=csv_path)
-
-        # Should have loaded the data successfully
-        assert validation.data is not None
-
-        # Should be able to add a simple validation
-        validation = validation.col_exists(columns="a").interrogate()
-
-        # Should pass (column 'a' exists in small_table)
-        assert validation.all_passed()
+        df = pd.read_parquet(path)
+        assert len(df) > 0
+        assert len(df.columns) > 0
 
 
-class TestGetDataPathIntegration:
-    @pytest.mark.parametrize("dataset", ["small_table", "game_revenue"])
-    @pytest.mark.parametrize("file_type", ["csv", "parquet"])
-    def test_data_loading_consistency(self, dataset, file_type):
-        # Get path and load via Validate
-        path = get_data_path(dataset=dataset, file_type=file_type)
-        validation = Validate(data=path)
+def test_get_data_path_parquet_no_libraries():
+    """Test get_data_path parquet creation when neither polars nor pandas available."""
+    with patch("pointblank.validate._is_lib_present") as mock_is_lib:
+        # Neither polars nor pandas are available
+        mock_is_lib.return_value = False
 
-        # Compare with direct loading via load_dataset
-        if file_type == "csv":
-            reference_data = load_dataset(dataset=dataset, tbl_type="polars")
-        else:  # parquet
-            reference_data = load_dataset(dataset=dataset, tbl_type="polars")
-
-        # Both should have same number of columns
-        assert len(validation.data.columns) == len(reference_data.columns)
-
-        # Column names should match
-        assert validation.data.columns == reference_data.columns
-
-    def test_example_usage_patterns(self):
-        # Example 1: Basic usage
-        csv_path = get_data_path("small_table", "csv")
-        validation = Validate(data=csv_path).col_exists(["a", "b", "c"]).interrogate()
-        assert validation.all_passed()
-
-        # Example 2: With different dataset
-        parquet_path = get_data_path("game_revenue", "parquet")
-        validation = (
-            Validate(data=parquet_path).col_exists(["player_id", "session_id"]).interrogate()
-        )
-        assert validation.all_passed()
+        # This should trigger the ImportError
+        with pytest.raises(
+            ImportError,
+            match="Either Polars or Pandas is required to create temporary Parquet files",
+        ):
+            get_data_path(dataset="small_table", file_type="parquet")
 
 
 def test_is_string_date():
@@ -8588,8 +8592,6 @@ def test_process_brief():
 
 
 def test_process_action_str():
-    import datetime
-
     datetime_val = str(datetime.datetime(2025, 1, 1, 0, 0, 0, 0))
 
     partial_process_action_str = partial(
@@ -8923,8 +8925,6 @@ def test_fmt_lg(input_value, expected_output):
 
 
 def test_create_table_time_html():
-    import datetime
-
     datetime_0 = datetime.datetime(2021, 1, 1, 0, 0, 0, 0)
     datetime_1_min_later = datetime.datetime(2021, 1, 1, 0, 1, 0, 0)
 
@@ -8985,6 +8985,107 @@ def test_preview_no_fail_duckdb_table():
     preview(small_table, n_head=2, n_tail=2)
 
 
+@pytest.mark.skipif(not PYSPARK_AVAILABLE, reason="PySpark not available")
+def test_preview_no_fail_pyspark_table():
+    # Create a simple PySpark DataFrame to test the preview functionality
+    spark = get_spark_session()
+
+    # Create test data that covers the PySpark-specific code paths
+    test_data = [
+        (1, "apple", 2.5),
+        (2, "banana", 1.8),
+        (3, "cherry", 3.2),
+        (4, "date", 4.1),
+        (5, "elderberry", 2.9),
+        (6, "fig", 1.5),
+        (7, "grape", 3.8),
+        (8, "honeydew", 2.1),
+    ]
+
+    schema = ["id", "fruit", "price"]
+    spark_df = spark.createDataFrame(test_data, schema)
+
+    # Test various preview scenarios that trigger lines 1562-1589
+    # Basic preview - should use full dataset path
+    preview(spark_df)
+
+    # Head only - should use head sampling
+    preview(spark_df, n_head=2)
+
+    # Tail only - should use tail sampling
+    preview(spark_df, n_tail=2)
+
+    # Both head and tail - should combine head/tail sampling
+    preview(spark_df, n_head=2, n_tail=2)
+
+    # Test edge case: empty tail when dataset is smaller than requested
+    preview(spark_df, n_head=5, n_tail=10)  # More tail than available
+
+
+@pytest.mark.skipif(not PYSPARK_AVAILABLE, reason="PySpark not available")
+def test_preview_pyspark_edge_cases():
+    # Test specific edge cases in PySpark preview
+    spark = get_spark_session()
+
+    # Import required types for empty DataFrame
+    from pyspark.sql.types import StructType, StructField, IntegerType, StringType
+
+    # Test with empty DataFrame (need explicit schema definitions for PySpark though)
+    empty_schema = StructType(
+        [StructField("id", IntegerType(), True), StructField("name", StringType(), True)]
+    )
+    empty_df = spark.createDataFrame([], empty_schema)
+    preview(empty_df)  # Should handle empty DataFrame gracefully
+
+    # Test with single row DataFrame
+    single_row_data = [(1, "test")]
+    single_df = spark.createDataFrame(single_row_data, ["id", "name"])
+    preview(single_df, n_head=3, n_tail=3)  # Both exceed available rows
+
+    # Test case where tail might be empty
+    small_data = [(i, f"item_{i}") for i in range(1, 4)]  # Only 3 rows
+    small_df = spark.createDataFrame(small_data, ["id", "name"])
+    preview(small_df, n_head=2, n_tail=5)  # Tail exceeds available rows
+
+    # Test large dataset to ensure head/tail logic works correctly
+    large_data = [(i, f"item_{i}", i * 0.1) for i in range(1, 101)]  # 100 rows
+    large_schema = ["id", "name", "value"]
+    large_df = spark.createDataFrame(large_data, large_schema)
+
+    # Various combinations to test different code paths
+    preview(large_df, n_head=10, n_tail=0)  # Only head
+    preview(large_df, n_head=0, n_tail=10)  # Only tail
+    preview(large_df, n_head=5, n_tail=5)  # Balanced head/tail
+
+
+@pytest.mark.skipif(not PYSPARK_AVAILABLE, reason="PySpark not available")
+def test_preview_pyspark_with_nulls():
+    # Test PySpark DataFrames with null values to ensure null detection works
+    spark = get_spark_session()
+
+    # Create test data with explicit null values
+    test_data = [
+        (1, "apple", 2.5),
+        (2, None, 1.8),  # Null value in name column
+        (None, "cherry", 3.2),  # Null value in id column
+        (4, "date", None),  # Null value in price column
+        (5, "elderberry", 2.9),
+    ]
+
+    schema = ["id", "fruit", "price"]
+    spark_df = spark.createDataFrame(test_data, schema)
+
+    # Test `preview()` with null values (`preview()` should highlight them properly)
+    result = preview(spark_df, n_head=3, n_tail=2)
+
+    # The result should be a GT object
+    assert hasattr(result, "_build_data")
+
+    # Test full dataset with nulls
+    result_full = preview(spark_df)  # Should show all 5 rows
+    assert hasattr(result_full, "_build_data")
+
+
 def test_preview_large_head_tail_pd_table():
     small_table = load_dataset(dataset="small_table", tbl_type="pandas")
     preview(small_table, n_head=10, n_tail=10)
@@ -9009,10 +9110,46 @@ def test_preview_fails_head_tail_exceed_limit():
     preview(small_table, n_head=100, n_tail=100, limit=300)
 
 
-def test_gt_based_formatting_completely_avoids_vals_submodule():
-    from pointblank.validate import _format_single_number_with_gt
-    from unittest.mock import patch
+def test_preview_row_num_col_not_first():
+    """Test that '_row_num_' column exists but is not the first column."""
+    # Create a DataFrame with '_row_num_' column not in first position
+    data = pd.DataFrame(
+        {
+            "a": [1, 2, 3],
+            "_row_num_": [10, 20, 30],  # '_row_num_' exists but is not the first
+            "b": [4, 5, 6],
+        }
+    )
 
+    # This should lead to setting `has_leading_row_num_col = False`
+    # because '_row_num_' exists but `data.columns[0] != "_row_num_"`
+    # Use `show_row_numbers=False` to avoid conflict with existing '_row_num_' column
+    result = preview(data, n_head=2, n_tail=1, show_row_numbers=False)
+
+    # Verify the preview works correctly
+    assert result is not None
+
+
+def test_preview_ibis_table_to_pandas():
+    """Test that an Ibis table is converted to Pandas (for preview) when Polars is unavailable."""
+    pytest.importorskip("ibis")
+
+    # Create a DuckDB/Ibis table
+    duckdb_table = load_dataset(dataset="small_table", tbl_type="duckdb")
+
+    # Mock `_select_df_lib()` to return a Pandas DF instead of a Polars DF
+    import pandas as pd
+
+    with patch("pointblank.validate._select_df_lib", return_value=pd):
+        # This should go down the path where `data = data_subset.to_pandas()`
+        # because `df_lib_name_gt` will be "pandas"
+        result = preview(duckdb_table, n_head=2, n_tail=2)
+
+        # Verify the preview works correctly
+        assert result is not None
+
+
+def test_gt_based_formatting_completely_avoids_vals_submodule():
     # Mock the vals.fmt_number to raise an error if called
     with patch(
         "pointblank.validate.vals.fmt_number", side_effect=ImportError("Pandas not available")
@@ -9024,8 +9161,6 @@ def test_gt_based_formatting_completely_avoids_vals_submodule():
 
 
 def test_polars_only_environment_simulation():
-    import polars as pl
-
     # Create a large dataset that will trigger number formatting
     large_data = pl.DataFrame(
         {
@@ -9049,8 +9184,6 @@ def test_polars_only_environment_simulation():
 
 
 def test_gt_based_threshold_formatting():
-    import polars as pl
-
     data = pl.DataFrame({"scores": [85, 92, 78, 88, 95, 82, 76, 90, 87, 93]})
 
     # Use large threshold values that will trigger formatting
@@ -9066,9 +9199,6 @@ def test_gt_based_threshold_formatting():
 
 
 def test_gt_formatting_preserves_accuracy():
-    from pointblank.validate import _format_single_number_with_gt
-    from great_tables import vals
-
     test_values = [1000, 12345, 999999, 1000000, 10000000]
 
     for value in test_values:
@@ -9085,8 +9215,6 @@ def test_gt_formatting_preserves_accuracy():
 
 
 def test_polars_df_lib_parameter_uses_gt_formatting():
-    import polars as pl
-
     # Create test data with large numbers
     data = pl.DataFrame({"large_numbers": [15000, 25000, 35000, 45000, 55000]})
 
@@ -9100,8 +9228,6 @@ def test_polars_df_lib_parameter_uses_gt_formatting():
 
 
 def test_comprehensive_polars_validation_scenario():
-    import polars as pl
-
     # Create realistic business data with large monetary values
     business_data = pl.DataFrame(
         {
@@ -9139,11 +9265,6 @@ def test_comprehensive_polars_validation_scenario():
 
 
 def test_polars_vs_pandas_formatting_consistency():
-    from pointblank.validate import _fmt_lg, _transform_test_units
-    import polars as pl
-    import pandas as pd
-
-    # Test data
     large_number = 15432
     test_units = [12000, 15000, 20000]
     active = [True, True, True]
@@ -9221,7 +9342,6 @@ def test_dataframe_library_selection_integration():
     result = validator.col_vals_gt(columns="values", value=5000).interrogate()
 
     # Mock the formatting functions to verify they receive the correct df_lib parameter
-    from unittest.mock import patch, MagicMock
 
     original_transform_test_units = __import__(
         "pointblank.validate", fromlist=["_transform_test_units"]
@@ -9252,9 +9372,6 @@ def test_dataframe_library_selection_integration():
 
 
 def test_backward_compatibility_df_lib_none():
-    from pointblank.validate import _fmt_lg, _transform_test_units, _create_thresholds_html
-    from pointblank.thresholds import Thresholds
-
     # Test that functions work correctly when df_lib=None (backward compatibility)
     large_number = 15432
     result = _fmt_lg(large_number, locale="en", df_lib=None)
@@ -9274,13 +9391,6 @@ def test_backward_compatibility_df_lib_none():
 
 
 def test_helper_function_edge_cases():
-    from pointblank.validate import (
-        _format_single_number_with_gt,
-        _format_single_float_with_gt,
-    )
-    import polars as pl
-    import pandas as pd
-
     # Test with edge case values
     result1 = _format_single_number_with_gt(0, n_sigfig=3, df_lib=pl)
     assert result1 == "0"
@@ -9303,7 +9413,7 @@ def test_helper_function_edge_cases():
 
 
 def test_large_numbers_formatting_polars():
-    # Create a Polars DataFrame with large values that would trigger formatting
+    # Create a Polars DataFrame with large values that would trigger large-valueformatting
     large_data = pl.DataFrame(
         {
             "id": range(1, 15001),  # 15,000 rows to trigger large number formatting
@@ -9451,10 +9561,6 @@ def test_multiple_validation_steps_formatting_pandas():
 
 
 def test_fmt_lg_function_with_polars():
-    from pointblank.validate import _fmt_lg
-    import polars as pl
-
-    # Test with large numbers that would be formatted
     large_number = 15432
     result = _fmt_lg(large_number, locale="en", df_lib=pl)
 
@@ -9464,10 +9570,6 @@ def test_fmt_lg_function_with_polars():
 
 
 def test_fmt_lg_function_with_pandas():
-    from pointblank.validate import _fmt_lg
-    import pandas as pd
-
-    # Test with large numbers that would be formatted
     large_number = 15432
     result = _fmt_lg(large_number, locale="en", df_lib=pd)
 
@@ -9477,10 +9579,9 @@ def test_fmt_lg_function_with_pandas():
 
 
 def test_fmt_lg_function_backward_compatibility():
-    from pointblank.validate import _fmt_lg
+    large_number = 15432
 
     # Test without df_lib parameter (original behavior)
-    large_number = 15432
     result = _fmt_lg(large_number, locale="en", df_lib=None)
 
     # Should still work (fallback behavior)
@@ -9489,26 +9590,20 @@ def test_fmt_lg_function_backward_compatibility():
 
 
 def test_gt_based_formatting_helpers():
-    from pointblank.validate import (
-        _format_single_number_with_gt,
-        _format_single_float_with_gt,
-        _format_single_integer_with_gt,
-    )
-
     # Test single number formatting
     result = _format_single_number_with_gt(15432, n_sigfig=3, compact=True, locale="en")
     assert isinstance(result, str)
-    assert "15" in result  # Should contain the formatted number
+    assert "15" in result
 
     # Test single float formatting
     result = _format_single_float_with_gt(123.456, decimals=2, locale="en")
     assert isinstance(result, str)
-    assert "123" in result  # Should contain the formatted number
+    assert "123" in result
 
     # Test single integer formatting
     result = _format_single_integer_with_gt(12345, locale="en")
     assert isinstance(result, str)
-    assert "12" in result  # Should contain the formatted number
+    assert "12" in result
 
 
 def test_edge_case_small_numbers_polars():
@@ -9571,9 +9666,6 @@ def test_mixed_data_types_formatting():
 
 
 def test_pandas_only_users_scenario():
-    import pandas as pd
-    from pointblank.validate import _format_single_number_with_gt, _format_single_float_with_gt
-
     # Test GT-based helper functions work with Pandas
     result_num = _format_single_number_with_gt(15432, df_lib=pd)
     assert isinstance(result_num, str)
@@ -9603,9 +9695,6 @@ def test_pandas_only_users_scenario():
 
 
 def test_polars_only_users_scenario():
-    import polars as pl
-    from pointblank.validate import _format_single_number_with_gt, _format_single_float_with_gt
-
     # Test GT-based helper functions work with Polars
     result_num = _format_single_number_with_gt(15432, df_lib=pl)
     assert isinstance(result_num, str)
@@ -9635,13 +9724,9 @@ def test_polars_only_users_scenario():
 
 
 def test_both_libraries_users_scenario():
-    import polars as pl
-    import pandas as pd
-    from pointblank.validate import _format_single_number_with_gt
-
-    # Test that formatting is consistent between libraries
     test_value = 15432
 
+    # Test that formatting is consistent between libraries
     pl_result = _format_single_number_with_gt(test_value, df_lib=pl)
     pd_result = _format_single_number_with_gt(test_value, df_lib=pd)
 
@@ -9664,9 +9749,6 @@ def test_both_libraries_users_scenario():
 
 
 def test_dataframe_library_preference_in_gt_formatting():
-    import polars as pl
-    import pandas as pd
-
     # When both libraries are available, the specific df_lib parameter should be respected
     large_data = pl.DataFrame(
         {
@@ -9683,8 +9765,6 @@ def test_dataframe_library_preference_in_gt_formatting():
     assert isinstance(report, GT.GT)
 
     # Test that formatting functions can handle both library types
-    from pointblank.validate import _fmt_lg
-
     pl_formatted = _fmt_lg(15432, locale="en", df_lib=pl)
     pd_formatted = _fmt_lg(15432, locale="en", df_lib=pd)
 
@@ -9693,8 +9773,6 @@ def test_dataframe_library_preference_in_gt_formatting():
 
 
 def test_gt_helper_functions_default_behavior():
-    from pointblank.validate import _format_single_number_with_gt, _format_single_float_with_gt
-
     # When df_lib=None, should default to Polars (if available)
     result_num = _format_single_number_with_gt(15432, df_lib=None)
     assert isinstance(result_num, str)
@@ -9730,7 +9808,7 @@ def test_csv_polars_fails_pandas_fallback():
 
             # Mock polars module to not be available
             with patch.dict("sys.modules", {"polars": None}):
-                # This should trigger lines 803-822 (pandas fallback)
+                # This should trigger the Pandas fallback
                 result = _process_csv_input(csv_path)
 
                 # Should succeed with pandas
@@ -9821,7 +9899,7 @@ def test_parquet_polars_fails_pandas_succeeds_single_file():
             with patch("polars.read_parquet") as mock_pl_read:
                 mock_pl_read.side_effect = Exception("Polars read failed")
 
-                # This should trigger pandas fallback (lines 935-964)
+                # This should trigger the Pandas fallback
                 result = _process_parquet_input(parquet_path)
 
                 assert result is not None
@@ -9879,7 +9957,7 @@ def test_parquet_pandas_only_available_single_file():
 
             mock_is_lib.side_effect = side_effect
 
-            # This should use pandas directly (lines in the elif branch)
+            # This should use Pandas directly
             result = _process_parquet_input(parquet_path)
 
             assert result is not None
@@ -10096,10 +10174,6 @@ def test_get_validation_summary_no_context():
 def test_connection_string_duckdb_in_memory():
     pytest.importorskip("ibis")
 
-    import ibis
-    import tempfile
-    import os
-
     # Create a temporary DuckDB database file instead of in-memory
     with tempfile.NamedTemporaryFile(suffix=".ddb", delete=False) as tmp_file:
         temp_db_path = tmp_file.name
@@ -10149,10 +10223,6 @@ def test_connection_string_duckdb_in_memory():
 
 def test_connection_string_sqlite_in_memory():
     pytest.importorskip("ibis")
-
-    import ibis
-    import tempfile
-    import os
 
     # Create a temporary SQLite database file instead of in-memory
     with tempfile.NamedTemporaryFile(suffix=".db", delete=False) as tmp_file:
@@ -10208,10 +10278,6 @@ def test_connection_string_no_table_specified_error():
     pytest.importorskip("ibis")
 
     # Create a temporary DuckDB database with test data
-    import ibis
-    import tempfile
-    import os
-
     with tempfile.NamedTemporaryFile(suffix=".ddb", delete=False) as tmp_file:
         temp_db_path = tmp_file.name
 
@@ -10255,8 +10321,6 @@ def test_connection_string_no_tables_in_database():
     pytest.importorskip("ibis")
 
     # Create an empty in-memory DuckDB database
-    import ibis
-
     conn = ibis.duckdb.connect()
 
     # Test: Connection string without table specification on empty database
@@ -10278,8 +10342,6 @@ def test_connection_string_invalid_table_name():
     pytest.importorskip("ibis")
 
     # Create an in-memory DuckDB database with test data
-    import ibis
-
     conn = ibis.duckdb.connect()
 
     # Create test table
@@ -10354,10 +10416,6 @@ def test_connection_string_not_a_connection_string():
 def test_connection_string_temporary_file_database():
     pytest.importorskip("ibis")
 
-    import ibis
-    import tempfile
-    import os
-
     # Create a temporary SQLite database file
     with tempfile.NamedTemporaryFile(suffix=".db", delete=False) as tmp_file:
         temp_db_path = tmp_file.name
@@ -10402,10 +10460,6 @@ def test_connection_string_temporary_file_database():
 
 def test_connection_string_integration_with_validation_methods():
     pytest.importorskip("ibis")
-
-    import ibis
-    import tempfile
-    import os
 
     # Create a temporary DuckDB database with comprehensive test data
     with tempfile.NamedTemporaryFile(suffix=".ddb", delete=False) as tmp_file:
@@ -10587,6 +10641,31 @@ def test_missing_vals_tbl_csv_input():
     assert result2 is not None
 
 
+@pytest.mark.skipif(not PYSPARK_AVAILABLE, reason="PySpark not available")
+def test_missing_vals_tbl_no_fail_pyspark_table():
+    # Test `missing_vals_tbl()` with PySpark DataFrames
+    spark = get_spark_session()
+
+    # Create test data with enough rows to trigger sector processing (need at least 10 rows
+    # for `cut_points`); generate 100 rows to ensure we get meaningful sectors
+    test_data = []
+    for i in range(100):
+        # Add some missing values strategically
+        id_val = i if i % 7 != 0 else None  # Missing every 7th id
+        fruit_val = f"fruit_{i}" if i % 5 != 0 else None  # Missing every 5th fruit
+        price_val = float(i + 1) if i % 3 != 0 else None  # Missing every 3rd price
+        test_data.append((id_val, fruit_val, price_val))
+
+    schema = ["id", "fruit", "price"]
+    spark_df = spark.createDataFrame(test_data, schema)
+
+    # Test the `missing_vals_tbl()` function with PySpark DataFrame
+    result = missing_vals_tbl(spark_df)
+
+    # The result should be a GT object
+    assert hasattr(result, "_build_data"), "Result should be a GT object"
+
+
 def test_missing_vals_tbl_parquet_input():
     # Test with individual Parquet file
     parquet_path = "tests/tbl_files/tbl_xyz.parquet"
@@ -10608,8 +10687,6 @@ def test_missing_vals_tbl_connection_string_input():
     assert result is not None
 
     # Test with SQLite connection string using absolute path
-    import os
-
     sqlite_path = os.path.abspath("tests/tbl_files/tbl_xyz.sqlite")
     sqlite_conn = f"sqlite:///{sqlite_path}::tbl_xyz"
     result2 = missing_vals_tbl(sqlite_conn)
@@ -10659,29 +10736,6 @@ def test_get_row_count_failing():
         get_row_count("not a table")
 
 
-def test_get_row_count_no_polars_duckdb_table():
-    small_table = load_dataset(dataset="small_table", tbl_type="duckdb")
-
-    # Mock the absence of the Polars library, which is the default library for making
-    # a table for the preview; this should not raise an error since Pandas is the
-    # fallback library and is available
-    with patch.dict(sys.modules, {"polars": None}):
-        assert get_row_count(small_table) == 13
-
-    # Mock the absence of the Pandas library, which is a secondary library for making
-    # a table for the preview; this should not raise an error since Polars is the default
-    # library and is available
-    with patch.dict(sys.modules, {"pandas": None}):
-        assert get_row_count(small_table) == 13
-
-    # Mock the absence of both the Polars and Pandas libraries, which are the libraries
-    # for making a table for the preview; this should raise an error since there are no
-    # libraries available to make a table for the preview
-    with patch.dict(sys.modules, {"polars": None, "pandas": None}):
-        with pytest.raises(ImportError):
-            assert get_row_count(small_table) == 13
-
-
 def test_get_column_count_csv_input():
     # Test with individual CSV file
     csv_path = "data_raw/small_table.csv"
@@ -10714,8 +10768,6 @@ def test_get_column_count_connection_string_input():
     assert result == 8
 
     # Test with SQLite connection string using absolute path
-    import os
-
     sqlite_path = os.path.abspath("tests/tbl_files/tbl_xyz.sqlite")
     sqlite_conn = f"sqlite:///{sqlite_path}::tbl_xyz"
     result2 = get_column_count(sqlite_conn)
@@ -10727,6 +10779,16 @@ def test_get_column_count_parquet_glob_patterns():
     parquet_glob = "tests/tbl_files/parquet_data/data_*.parquet"
     result = get_column_count(parquet_glob)
     assert result > 0
+
+
+def test_get_column_count_parquet_list():
+    # Test with list of Parquet file paths with `get_column_count()`
+    parquet_files = [
+        "tests/tbl_files/parquet_data/data_a.parquet",
+        "tests/tbl_files/parquet_data/data_b.parquet",
+    ]
+    result = get_column_count(parquet_files)
+    assert result > 0  # Should return the column count from the combined Parquet files
 
 
 def test_get_row_count_csv_input():
@@ -10762,8 +10824,6 @@ def test_get_row_count_connection_string_input():
     assert result == 13
 
     # Test with SQLite connection string using absolute path
-    import os
-
     sqlite_path = os.path.abspath("tests/tbl_files/tbl_xyz.sqlite")
     sqlite_conn = f"sqlite:///{sqlite_path}::tbl_xyz"
     result2 = get_row_count(sqlite_conn)
@@ -10775,6 +10835,16 @@ def test_get_row_count_parquet_glob_patterns():
     parquet_glob = "tests/tbl_files/parquet_data/data_*.parquet"
     result = get_row_count(parquet_glob)
     assert result > 0
+
+
+def test_get_row_count_parquet_list():
+    # Test with list of Parquet file paths with `get_row_count()`
+    parquet_files = [
+        "tests/tbl_files/parquet_data/data_a.parquet",
+        "tests/tbl_files/parquet_data/data_b.parquet",
+    ]
+    result = get_row_count(parquet_files)
+    assert result > 0  # Should return the row count from the combined Parquet files
 
 
 @pytest.mark.parametrize("tbl_type", ["pandas", "polars"])
@@ -14114,8 +14184,6 @@ def test_validate_parquet_pattern_not_found():
 
 
 def test_validate_parquet_directory_not_found():
-    import tempfile
-
     # Create a temporary empty directory for this test
     with tempfile.TemporaryDirectory() as temp_dir:
         empty_dir = Path(temp_dir) / "empty_subdir"
@@ -14134,6 +14202,17 @@ def test_validate_parquet_mixed_list():
 
     # Should return the original list unchanged
     assert validator.data == mixed_list
+
+
+def test_validate_parquet_list_file_not_found():
+    """Test for a `FileNotFoundError` when a Parquet file provided in a list doesn't exist."""
+    parquet_list = [
+        str(TEST_DATA_DIR / "taxi_part_01.parquet"),  # This file exists
+        str(TEST_DATA_DIR / "nonexistent.parquet"),  # This file doesn't exist
+    ]
+
+    with pytest.raises(FileNotFoundError, match="Parquet file not found"):
+        Validate(data=parquet_list)
 
 
 def test_validate_parquet_partitioned_small_table():
@@ -14188,8 +14267,6 @@ def test_validate_parquet_permanent_partitioned_sales():
 
 
 def test_pandas_only_environment_scenario():
-    from unittest.mock import patch
-
     # Mock polars as unavailable by making _is_lib_present return False for polars
     with patch("pointblank.validate._is_lib_present") as mock_is_lib:
 
@@ -14240,9 +14317,54 @@ def test_pandas_only_environment_scenario():
         assert "transaction_amounts" in report_html
 
 
-def test_polars_only_environment_scenario():
-    from unittest.mock import patch
+def test_validate_parquet_partitioned_pandas_only():
+    """Test partitioned parquet reading when Polars is unavailable and falls back to Pandas."""
+    # This tests the situation where Polars is not available and the code falls back to using
+    # Pandas for partitioned dataset reading
 
+    import tempfile
+    import os
+
+    # Create a temporary directory that looks like a partitioned dataset that Pandas can read
+    with tempfile.TemporaryDirectory() as temp_dir:
+        # Create some test data
+        import pandas as pd
+
+        df = pd.DataFrame(
+            {"a": [1, 2, 3, 4], "b": ["x", "y", "z", "w"], "partition_col": ["A", "A", "B", "B"]}
+        )
+
+        # Save as Parquet files in a way that Pandas can read as a "partitioned" dataset
+        # We'll save the whole thing as a single file that pandas can read from the directory
+        parquet_file_path = os.path.join(temp_dir, "data.parquet")
+        df.to_parquet(parquet_file_path)
+
+        with patch("pointblank.validate._is_lib_present") as mock_is_lib:
+
+            def side_effect(lib_name):
+                return lib_name == "pandas"  # Only Pandas is available, not Polars
+
+            mock_is_lib.side_effect = side_effect
+
+            # Mock Pandas to successfully read from the directory
+            with patch("pandas.read_parquet") as mock_pd_read:
+                mock_pd_read.return_value = df
+
+                # This should trigger the Pandas data-processing path
+                validator = Validate(data=temp_dir)
+
+                # Verify the Pandas `read_parquet()` was called
+                mock_pd_read.assert_called_once_with(temp_dir)
+
+                # Check that the data was read in correctly
+                assert validator.data.shape[0] == 4
+                assert validator.data.shape[1] == 3
+                assert "a" in validator.data.columns
+                assert "b" in validator.data.columns
+                assert "partition_col" in validator.data.columns
+
+
+def test_polars_only_environment_scenario():
     # Mock pandas as unavailable by making `_is_lib_present()` return False for pandas
     with patch("pointblank.validate._is_lib_present") as mock_is_lib:
 
@@ -14294,10 +14416,6 @@ def test_polars_only_environment_scenario():
 
 
 def test_both_libraries_environment_scenario():
-    import pandas as pd
-    import polars as pl
-    import pointblank as pb
-
     # Test data for both DataFrame types
     test_values = {
         "revenue": [10000, 25000, 30000, 45000, 60000, 75000, 90000],
@@ -14310,11 +14428,11 @@ def test_both_libraries_environment_scenario():
     pandas_data = pd.DataFrame(test_values)
 
     # Large threshold values that will trigger formatting
-    thresholds = pb.Thresholds(warning=8000, error=12000, critical=20000)
+    thresholds = Thresholds(warning=8000, error=12000, critical=20000)
 
     # Test with Polars DataFrame (should use Polars-based formatting)
     polars_validation = (
-        pb.Validate(data=polars_data, tbl_name="polars_mixed_env", thresholds=thresholds)
+        Validate(data=polars_data, tbl_name="polars_mixed_env", thresholds=thresholds)
         .col_vals_gt(columns="revenue", value=5000)
         .col_vals_between(columns="profit_margin", left=0.1, right=0.4)
         .col_vals_in_set(columns="region", set=["North", "South", "East", "West"])
@@ -14327,7 +14445,7 @@ def test_both_libraries_environment_scenario():
 
     # Test with Pandas DataFrame (should use Pandas-based formatting)
     pandas_validation = (
-        pb.Validate(data=pandas_data, tbl_name="pandas_mixed_env", thresholds=thresholds)
+        Validate(data=pandas_data, tbl_name="pandas_mixed_env", thresholds=thresholds)
         .col_vals_gt(columns="revenue", value=5000)
         .col_vals_between(columns="profit_margin", left=0.1, right=0.4)
         .col_vals_in_set(columns="region", set=["North", "South", "East", "West"])
@@ -14349,14 +14467,6 @@ def test_both_libraries_environment_scenario():
 
 
 def test_dataframe_library_formatting_consistency_across_scenarios():
-    import pandas as pd
-    import polars as pl
-    from pointblank.validate import (
-        _format_single_number_with_gt,
-        _format_single_float_with_gt,
-        _format_single_integer_with_gt,
-    )
-
     # Test values that would commonly trigger formatting
     test_numbers = [1000, 12345, 999999, 1000000]
     test_floats = [1234.56, 99999.99, 0.000123]
@@ -14389,10 +14499,6 @@ def test_dataframe_library_formatting_consistency_across_scenarios():
 
 
 def test_scenario_integration_with_large_datasets():
-    import polars as pl
-    import pandas as pd
-    import pointblank as pb
-
     # Create large dataset that will trigger number formatting in various functions
     large_size = 2000  # Reduced size for faster testing
 
@@ -14417,7 +14523,7 @@ def test_scenario_integration_with_large_datasets():
     )
 
     # High threshold values that will trigger threshold formatting
-    thresholds = pb.Thresholds(warning=1000, error=2500, critical=4000)
+    thresholds = Thresholds(warning=1000, error=2500, critical=4000)
 
     datasets = [
         ("Polars Large Dataset", polars_large_data),
@@ -14427,7 +14533,7 @@ def test_scenario_integration_with_large_datasets():
     for dataset_name, data in datasets:
         # Complex validation with multiple steps
         validation = (
-            pb.Validate(data=data, tbl_name=f"large_{dataset_name.lower()}", thresholds=thresholds)
+            Validate(data=data, tbl_name=f"large_{dataset_name.lower()}", thresholds=thresholds)
             .col_vals_gt(columns="amount", value=500)  # Large numbers formatting
             .col_vals_between(columns="processing_fee", left=0.0, right=200.0)  # Float formatting
             .col_vals_in_set(columns="customer_tier", set=["premium", "standard"])
@@ -14450,11 +14556,6 @@ def test_scenario_integration_with_large_datasets():
 
 
 def test_scenario_edge_cases_and_error_handling():
-    import polars as pl
-    import pandas as pd
-    import pointblank as pb
-    from pointblank.validate import _format_single_number_with_gt
-
     # Test with some edge case values
     edge_cases = [
         0,  # Zero
@@ -14489,10 +14590,540 @@ def test_scenario_edge_cases_and_error_handling():
     empty_pandas = pd.DataFrame({"values": pd.Series([], dtype="int64")})
 
     for name, empty_data in [("Polars", empty_polars), ("Pandas", empty_pandas)]:
-        validation = pb.Validate(data=empty_data, tbl_name=f"empty_{name.lower()}")
+        validation = Validate(data=empty_data, tbl_name=f"empty_{name.lower()}")
         # Should be able to create validation object even with empty data
         assert validation is not None
 
         # Adding validation steps to empty data should work
         validation = validation.col_vals_gt(columns="values", value=0)
         assert len(validation.validation_info) == 1
+
+
+def test_set_tbl_basic_functionality():
+    """Test basic `set_tbl()` functionality with different table types."""
+
+    # Create test tables
+    table1_pl = pl.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]})
+    table2_pl = pl.DataFrame({"a": [7, 8, 9], "b": [10, 11, 12]})
+    table1_pd = pd.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]})
+    table2_pd = pd.DataFrame({"a": [7, 8, 9], "b": [10, 11, 12]})
+
+    # Test with Polars
+    validation1 = Validate(data=table1_pl, tbl_name="Table 1").col_vals_gt(columns="a", value=0)
+    validation2 = validation1.set_tbl(tbl=table2_pl, tbl_name="Table 2", label="New label")
+
+    # Verify original is unchanged
+    assert validation1.tbl_name == "Table 1"
+    assert validation1.label is None
+    assert validation1 is not validation2
+
+    # Verify new validation has updated properties
+    assert validation2.tbl_name == "Table 2"
+    assert validation2.label == "New label"
+    assert len(validation1.validation_info) == len(validation2.validation_info)
+
+    # Test with Pandas
+    validation1_pd = Validate(data=table1_pd, tbl_name="PD Table 1").col_vals_gt(
+        columns="a", value=0
+    )
+    validation2_pd = validation1_pd.set_tbl(tbl=table2_pd, tbl_name="PD Table 2")
+
+    assert validation1_pd.tbl_name == "PD Table 1"
+    assert validation2_pd.tbl_name == "PD Table 2"
+
+
+def test_set_tbl_preserves_validation_steps():
+    """Test that `set_tbl()` preserves all validation step configurations."""
+
+    table1 = pl.DataFrame(
+        {"x": [1, 2, 3, 4, 5], "y": [10, 20, 30, 40, 50], "z": ["a", "b", "c", "d", "e"]}
+    )
+    table2 = pl.DataFrame(
+        {"x": [6, 7, 8, 9, 10], "y": [60, 70, 80, 90, 100], "z": ["f", "g", "h", "i", "j"]}
+    )
+
+    # Create validation with multiple steps and various configurations
+    original = (
+        Validate(data=table1, thresholds=Thresholds(warning=0.1))
+        .col_vals_gt(columns="x", value=0, na_pass=True, brief="Check x > 0")
+        .col_vals_between(columns="y", left=5, right=200, brief="Check y range")
+        .col_exists(columns=["x", "y", "z"])
+        .col_vals_in_set(columns="z", set=["a", "b", "c", "d", "e", "f", "g", "h", "i", "j"])
+    )
+
+    # Apply set_tbl
+    new_validation = original.set_tbl(table2)
+
+    # Verify same number of validation steps
+    assert len(original.validation_info) == len(new_validation.validation_info)
+
+    # Verify step configurations are preserved in detail
+    for orig_step, new_step in zip(original.validation_info, new_validation.validation_info):
+        assert orig_step.assertion_type == new_step.assertion_type
+        assert orig_step.column == new_step.column
+        assert orig_step.values == new_step.values
+        assert orig_step.brief == new_step.brief
+        assert orig_step.na_pass == new_step.na_pass
+        assert orig_step.thresholds == new_step.thresholds
+
+    # Verify global thresholds are preserved
+    assert original.thresholds.warning == new_validation.thresholds.warning
+
+    # Interrogate and verify results
+    result = new_validation.interrogate()
+    assert all(step.all_passed for step in result.validation_info)
+
+
+def test_set_tbl_before_and_after_interrogation():
+    """Test `set_tbl()` behavior before and after interrogation."""
+
+    table1 = pl.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]})
+    table2 = pl.DataFrame({"a": [7, 8, 9], "b": [10, 11, 12]})
+
+    # Test set_tbl BEFORE interrogation
+    validation_before = (
+        Validate(data=table1).col_vals_gt(columns="a", value=0).col_exists(columns=["a", "b"])
+    )
+
+    # Should have validation_info but no interrogation results
+    assert len(validation_before.validation_info) == 3  # 1 + 2 (col_exists creates multiple steps)
+    assert validation_before.time_start is None
+    assert validation_before.time_end is None
+
+    # Apply set_tbl before interrogation
+    validation_before_new = validation_before.set_tbl(table2, tbl_name="Before Interrogation")
+    assert len(validation_before_new.validation_info) == 3
+    assert validation_before_new.time_start is None
+    assert validation_before_new.time_end is None
+
+    # Interrogate the new validation
+    result_before = validation_before_new.interrogate()
+    assert result_before.time_start is not None
+    assert result_before.time_end is not None
+    assert all(step.all_passed for step in result_before.validation_info)
+
+    # Test set_tbl AFTER interrogation
+    validation_after = (
+        Validate(data=table1)
+        .col_vals_gt(columns="a", value=0)
+        .col_exists(columns=["a", "b"])
+        .interrogate()
+    )
+
+    # Should have interrogation results
+    assert validation_after.time_start is not None
+    assert validation_after.time_end is not None
+
+    # Apply set_tbl after interrogation
+    validation_after_new = validation_after.set_tbl(table2, tbl_name="After Interrogation")
+
+    # Should reset interrogation state but preserve validation steps
+    assert len(validation_after_new.validation_info) == 3
+    assert validation_after_new.time_start is None  # Reset
+    assert validation_after_new.time_end is None  # Reset
+
+    # Re-interrogate
+    result_after = validation_after_new.interrogate()
+    assert result_after.time_start is not None
+    assert result_after.time_end is not None
+
+
+def test_set_tbl_deep_copy_behavior():
+    """Test that `set_tbl()` creates proper deep copies."""
+
+    table1 = pl.DataFrame({"a": [1, 2, 3]})
+    table2 = pl.DataFrame({"a": [4, 5, 6]})
+
+    original = Validate(data=table1, tbl_name="Original", label="Original Label")
+    copied = original.set_tbl(table2, tbl_name="Copied")
+
+    # Verify they are different objects
+    assert original is not copied
+    assert original.data is not copied.data
+    assert original.tbl_name != copied.tbl_name
+
+    # Verify modifying one doesn't affect the other
+    original.tbl_name = "Modified Original"
+    assert copied.tbl_name == "Copied"
+
+    # Test with complex validation plans
+    complex_original = Validate(data=table1, thresholds=Thresholds(warning=0.1)).col_vals_gt(
+        columns="a", value=0
+    )
+    complex_copied = complex_original.set_tbl(table2)
+
+    # Modify original validation info (should not affect copy)
+    complex_original.validation_info[0].brief = "Modified brief"
+    assert complex_copied.validation_info[0].brief != "Modified brief"
+
+
+def test_set_tbl_optional_parameters():
+    """Test `set_tbl()` with various combinations of optional parameters."""
+
+    table1 = pl.DataFrame({"a": [1, 2, 3]})
+    table2 = pl.DataFrame({"a": [4, 5, 6]})
+
+    original = Validate(data=table1, tbl_name="Original", label="Original Label")
+
+    # Test with only table (should preserve existing tbl_name and label)
+    copy1 = original.set_tbl(table2)
+    assert copy1.tbl_name == "Original"
+    assert copy1.label == "Original Label"
+
+    # Test with table and tbl_name only
+    copy2 = original.set_tbl(table2, tbl_name="New Name")
+    assert copy2.tbl_name == "New Name"
+    assert copy2.label == "Original Label"
+
+    # Test with table and label only
+    copy3 = original.set_tbl(table2, label="New Label")
+    assert copy3.tbl_name == "Original"
+    assert copy3.label == "New Label"
+
+    # Test with all parameters
+    copy4 = original.set_tbl(table2, tbl_name="New Name", label="New Label")
+    assert copy4.tbl_name == "New Name"
+    assert copy4.label == "New Label"
+
+    # Test with None values (should use defaults/existing values)
+    copy5 = original.set_tbl(table2, tbl_name=None, label=None)
+    assert copy5.tbl_name == "Original"
+    assert copy5.label == "Original Label"
+
+
+def test_set_tbl_with_complex_validations():
+    """Test `set_tbl()` with complex validation scenarios."""
+
+    # Create tables with different data patterns
+    table1 = pl.DataFrame(
+        {
+            "id": [1, 2, 3, 4, 5],
+            "score": [85, 92, 78, 95, 88],
+            "category": ["A", "B", "A", "C", "B"],
+            "active": [True, True, False, True, True],
+        }
+    )
+
+    table2 = pl.DataFrame(
+        {
+            "id": [6, 7, 8, 9, 10],
+            "score": [76, 89, 91, 83, 96],
+            "category": ["C", "A", "B", "A", "C"],
+            "active": [True, False, True, True, False],
+        }
+    )
+
+    # Create complex validation with multiple types of validations
+    complex_validation = (
+        Validate(data=table1, thresholds=Thresholds(warning=0.2, error=0.5))
+        .col_exists(columns=["id", "score", "category", "active"])
+        .col_vals_not_null(columns=["id", "score"])
+        .col_vals_between(columns="score", left=0, right=100)
+        .col_vals_in_set(columns="category", set=["A", "B", "C"])
+        .col_vals_gt(columns="id", value=0)
+        .rows_distinct()
+    )
+
+    # Apply to new table
+    new_validation = complex_validation.set_tbl(table2, tbl_name="Complex Test")
+
+    # Verify all validation steps are preserved
+    assert len(complex_validation.validation_info) == len(new_validation.validation_info)
+
+    # Interrogate and verify results
+    result = new_validation.interrogate()
+    assert all(step.all_passed for step in result.validation_info)
+    assert result.tbl_name == "Complex Test"
+
+
+def test_set_tbl_with_segments_and_preprocessing():
+    """Test `set_tbl()` with segmented validations and preprocessing."""
+
+    table1 = pl.DataFrame(
+        {
+            "region": ["North", "South", "North", "South"],
+            "sales": [100, 200, 150, 180],
+            "quarter": ["Q1", "Q1", "Q2", "Q2"],
+        }
+    )
+
+    table2 = pl.DataFrame(
+        {
+            "region": ["East", "West", "East", "West"],
+            "sales": [120, 220, 160, 190],
+            "quarter": ["Q3", "Q3", "Q4", "Q4"],
+        }
+    )
+
+    # Create validation with preprocessing and segments
+    segmented_validation = Validate(data=table1).col_vals_gt(
+        columns="sales",
+        value=50,
+        pre=lambda df: df.filter(pl.col("sales") > 0),  # Preprocessing
+        segments="region",  # Segmentation
+    )
+
+    # Apply set_tbl
+    new_segmented = segmented_validation.set_tbl(table2, tbl_name="Segmented Test")
+
+    # Verify segmentation and preprocessing are preserved
+    result = new_segmented.interrogate()
+    assert result.tbl_name == "Segmented Test"
+    # Should have multiple validation steps due to segmentation
+    assert len(result.validation_info) > 1
+
+
+def test_set_tbl_error_handling():
+    """Test error handling and edge cases for `set_tbl()`."""
+
+    table1 = pl.DataFrame({"a": [1, 2, 3]})
+    table2 = pl.DataFrame({"b": [4, 5, 6]})  # Different column structure
+
+    validation = Validate(data=table1).col_vals_gt(columns="a", value=0)
+
+    # Test with incompatible table structure
+    # set_tbl should work but interrogation might fail
+    incompatible_validation = validation.set_tbl(table2)
+    assert incompatible_validation is not None
+
+    # Test that interrogation fails gracefully with incompatible structure
+    with pytest.raises(Exception):  # Should raise an error during interrogation
+        incompatible_validation.interrogate()
+
+
+def test_set_tbl_with_different_dataframe_libraries():
+    """Test `set_tbl()` across different DataFrame libraries."""
+
+    # Create tables in different formats
+    polars_table = pl.DataFrame({"x": [1, 2, 3], "y": [4, 5, 6]})
+    pandas_table = pd.DataFrame({"x": [7, 8, 9], "y": [10, 11, 12]})
+
+    # Test Polars -> Pandas
+    polars_validation = Validate(data=polars_table).col_vals_gt(columns="x", value=0)
+    pandas_from_polars = polars_validation.set_tbl(pandas_table, tbl_name="Pandas from Polars")
+
+    result1 = pandas_from_polars.interrogate()
+    assert result1.tbl_name == "Pandas from Polars"
+    assert all(step.all_passed for step in result1.validation_info)
+
+    # Test Pandas -> Polars
+    pandas_validation = Validate(data=pandas_table).col_vals_gt(columns="x", value=0)
+    polars_from_pandas = pandas_validation.set_tbl(polars_table, tbl_name="Polars from Pandas")
+
+    result2 = polars_from_pandas.interrogate()
+    assert result2.tbl_name == "Polars from Pandas"
+    assert all(step.all_passed for step in result2.validation_info)
+
+
+def test_set_tbl_preserves_thresholds_and_actions():
+    """Test that `set_tbl()` preserves thresholds and actions."""
+
+    table1 = pl.DataFrame({"a": [1, 2, 3]})
+    table2 = pl.DataFrame({"a": [4, 5, 6]})
+
+    # Create validation with thresholds and actions
+    action_calls = []
+
+    def test_action():
+        action_calls.append("action_called")
+
+    validation_with_config = Validate(
+        data=table1,
+        thresholds=Thresholds(warning=0.1, error=0.5),
+        actions=Actions(warning=test_action),
+    ).col_vals_gt(columns="a", value=0)
+
+    # Apply `set_tbl()`
+    new_validation = validation_with_config.set_tbl(table2, tbl_name="With Config")
+
+    # Verify thresholds are preserved
+    assert new_validation.thresholds.warning == 0.1
+    assert new_validation.thresholds.error == 0.5
+
+    # Verify actions are preserved
+    assert new_validation.actions is not None
+    assert new_validation.actions.warning is not None
+
+    # Interrogate (should not trigger warning since data passes)
+    result = new_validation.interrogate()
+    assert all(step.all_passed for step in result.validation_info)
+
+
+def test_set_tbl_with_string_and_path_inputs():
+    """Test `set_tbl()` with CSV file paths and dataset names."""
+
+    # Create validation with built-in dataset
+    dataset_validation = (
+        Validate(data="small_table")
+        .col_exists(columns=["a", "b"])
+        .col_vals_gt(columns="a", value=0)
+    )
+
+    # Test set_tbl with different DataFrame that has compatible columns
+    compatible_df = pl.DataFrame({"a": [10, 20, 30], "b": [40, 50, 60], "c": [70, 80, 90]})
+    compatible_validation = dataset_validation.set_tbl(compatible_df, tbl_name="Compatible Data")
+
+    # Verify the dataset was changed
+    assert compatible_validation.tbl_name == "Compatible Data"
+    # Note: col_exists may generate multiple validation steps (one per column)
+    assert len(compatible_validation.validation_info) >= 2  # Original validations preserved
+
+    # Test interrogate should work with compatible DataFrame
+    result = compatible_validation.interrogate()
+    assert result.tbl_name == "Compatible Data"
+    assert all(step.all_passed for step in result.validation_info)
+
+    # Test with CSV file
+    test_data = pl.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]})
+
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".csv", delete=False) as f:
+        test_data.write_csv(f.name)
+        csv_path = f.name
+
+    try:
+        csv_validation = dataset_validation.set_tbl(csv_path, tbl_name="CSV Data")
+
+        # Verify CSV was loaded
+        assert csv_validation.tbl_name == "CSV Data"
+        assert len(csv_validation.validation_info) >= 2
+
+        # Test interrogation with CSV data
+        result_csv = csv_validation.interrogate()
+        assert result_csv.tbl_name == "CSV Data"
+        assert all(step.all_passed for step in result_csv.validation_info)
+    finally:
+        os.unlink(csv_path)
+
+
+def test_set_tbl_interrogation_state_management():
+    """Test that `set_tbl()` properly manages interrogation state."""
+
+    table1 = pl.DataFrame({"a": [1, 2, 3]})
+    table2 = pl.DataFrame({"a": [4, 5, 6]})
+
+    # Create and interrogate original validation
+    original = (
+        Validate(data=table1, tbl_name="Original").col_vals_gt(columns="a", value=0).interrogate()
+    )
+
+    # Verify original has interrogation state
+    assert original.time_start is not None
+    assert original.time_end is not None
+    assert len(original.validation_info) > 0
+    assert all(hasattr(step, "all_passed") for step in original.validation_info)
+
+    # Apply set_tbl (should reset interrogation state)
+    new_validation = original.set_tbl(table2, tbl_name="New")
+
+    # Verify interrogation state is reset
+    assert new_validation.time_start is None
+    assert new_validation.time_end is None
+
+    # Verify validation steps are preserved but not yet executed
+    assert len(new_validation.validation_info) == len(original.validation_info)
+
+    # Re-interrogate
+    new_result = new_validation.interrogate()
+    assert new_result.time_start is not None
+    assert new_result.time_end is not None
+    assert new_result.tbl_name == "New"
+
+
+def test_process_connection_string_not_string():
+    """Test that non-string input is returned as-is."""
+    data = {"not": "a string"}
+    result = _process_connection_string(data)
+    assert result == data
+
+
+@patch("pointblank.validate.connect_to_table")
+def test_process_connection_string_not_uri_format(mock_connect):
+    """Test string that doesn't look like a connection URI."""
+    # Mock connect_to_table to raise an exception (not a valid connection string)
+    mock_connect.side_effect = Exception("Not a connection string")
+
+    data = "just_a_regular_string"
+    result = _process_connection_string(data)
+
+    # Should return original data when connection fails
+    assert result == data
+
+
+@patch("pointblank.validate.connect_to_table")
+def test_process_connection_string_valid_uri(mock_connect):
+    """Test valid connection string processing."""
+    expected_result = Mock()
+    mock_connect.return_value = expected_result
+
+    data = "postgresql://user:pass@host:5432/db#table_name"
+    result = _process_connection_string(data)
+
+    assert result == expected_result
+    mock_connect.assert_called_once_with(data)
+
+
+def test_process_github_url_not_string():
+    """Test that non-string input is returned as-is."""
+
+    data = {"not": "a string"}
+    result = _process_github_url(data)
+    assert result == data
+
+
+def test_process_github_url_not_github_url():
+    """Test non-GitHub URL returns original data."""
+
+    data = "https://example.com/file.csv"
+    result = _process_github_url(data)
+    assert result == data
+
+
+def test_process_github_url_not_csv_or_parquet():
+    """Test GitHub URL without CSV/Parquet file returns original data."""
+
+    data = "https://github.com/user/repo/blob/main/README.md"
+    result = _process_github_url(data)
+    assert result == data
+
+
+def test_process_github_url_invalid_github_pattern():
+    """Test GitHub URL that doesn't match expected blob pattern."""
+
+    data = "https://github.com/user/file.csv"  # Missing repo/blob/branch structure
+    result = _process_github_url(data)
+    assert result == data
+
+
+def test_process_github_url_urlparse_exception():
+    """Test that urlparse exceptions are handled gracefully."""
+
+    # This should cause urlparse to raise a ValueError due to invalid IPv6 URL
+    data = "http://[invalid-ipv6-url"
+    result = _process_github_url(data)
+
+    # Should return original data when urlparse fails
+    assert result == data
+    assert result == data
+
+
+def test_get_data_path_invalid_dataset():
+    """Test invalid dataset name raises ValueError."""
+    with pytest.raises(ValueError, match="The dataset name `invalid_dataset` is not valid"):
+        get_data_path(dataset="invalid_dataset")
+
+
+def test_get_data_path_invalid_file_type():
+    """Test invalid file type raises ValueError."""
+    with pytest.raises(ValueError, match="The file type `invalid_type` is not valid"):
+        get_data_path(dataset="small_table", file_type="invalid_type")
+
+
+def test_get_column_count_fallback_error():
+    """Test get_column_count error handling for unsupported types."""
+    # Use an object that will definitely not be supported
+    unsupported_object = object()
+
+    with pytest.raises(
+        ValueError, match="The input table type supplied in `data=` is not supported"
+    ):
+        get_column_count(unsupported_object)

@@ -10,7 +10,7 @@ from great_tables import GT
 from great_tables.gt import _get_column_of_values
 from narwhals.typing import FrameT
 
-from pointblank._constants import ASSERTION_TYPE_METHOD_MAP, GENERAL_COLUMN_TYPES
+from pointblank._constants import ASSERTION_TYPE_METHOD_MAP, GENERAL_COLUMN_TYPES, IBIS_BACKENDS
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
@@ -108,6 +108,41 @@ def _get_tbl_type(data: FrameT | Any) -> str:
         return backend
 
     return "unknown"  # pragma: no cover
+
+
+def _process_ibis_through_narwhals(data: FrameT | Any, tbl_type: str) -> tuple[FrameT | Any, str]:
+    """
+    Process Ibis tables through Narwhals to unify the processing pathway.
+
+    This function takes an Ibis table and wraps it with Narwhals, allowing
+    all downstream processing to use the unified Narwhals API instead of
+    Ibis-specific code paths.
+
+    Parameters
+    ----------
+    data : FrameT | Any
+        The data table, potentially an Ibis table
+    tbl_type : str
+        The detected table type
+
+    Returns
+    -------
+    tuple[FrameT | Any, str]
+        A tuple of (processed_data, updated_tbl_type) where:
+        - processed_data is the Narwhals-wrapped table if it was Ibis, otherwise original data
+        - updated_tbl_type is "narwhals" if it was Ibis, otherwise original tbl_type
+    """
+    # Check if this is an Ibis table type
+    if tbl_type in IBIS_BACKENDS:
+        try:
+            # Wrap with Narwhals
+            narwhals_wrapped = nw.from_native(data)
+            return narwhals_wrapped, "narwhals"
+        except Exception:
+            # If Narwhals can't handle it, fall back to original approach
+            return data, tbl_type
+
+    return data, tbl_type
 
 
 def _is_narwhals_table(data: any) -> bool:

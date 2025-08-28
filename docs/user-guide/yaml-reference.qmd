@@ -56,6 +56,40 @@ tbl:
     pl.scan_csv("data.csv").filter(pl.col("date") >= "2024-01-01")
 ```
 
+#### Using Templates with `set_tbl=`
+
+For reusable validation templates that will always use a custom data source via the `set_tbl=`
+parameter in `yaml_interrogate()`, the `tbl` field is still required but its value doesn't matter
+since it will be overridden. Recommended approaches:
+
+```yaml
+# Option 1: Use a valid dataset name (gets overridden anyway)
+tbl: small_table  # Will be ignored when `set_tbl=` is used
+
+# Option 2: Use YAML null (clearest semantic intent)
+tbl: null  # Indicates table will be provided via `set_tbl=`
+```
+
+When using `yaml_interrogate()` with `set_tbl=`, the validation template becomes fully reusable:
+
+```python
+# Define reusable template
+template = """
+tbl: null  # Will be overridden
+tbl_name: "Sales Validation"
+steps:
+  - col_exists:
+      columns: [customer_id, revenue, region]
+  - col_vals_gt:
+      columns: [revenue]
+      value: 0
+"""
+
+# Apply to different datasets
+q1_result = pb.yaml_interrogate(template, set_tbl=q1_data)
+q2_result = pb.yaml_interrogate(template, set_tbl=q2_data)
+```
+
 ### DataFrame Library (`df_library`)
 
 The `df_library` key controls which DataFrame library is used to load data sources. This parameter
@@ -117,7 +151,7 @@ thresholds:
   critical: 0.15   # 15% failure rate triggers critical
 ```
 
-- values: numbers between 0 and 1 (percentages) or integers (row counts)
+- values: numbers between `0` and `1` (percentages) or integers (row counts)
 - levels: `warning`, `error`, `critical`
 
 ### Global Actions
@@ -477,6 +511,7 @@ For Pandas DataFrames (when using `df_library: pandas`):
 ```yaml
 - specially:
     expr: "lambda df: df.assign(is_valid=df['a'] + df['d'] > 0)"
+```
 
 ## Column Selection Patterns
 

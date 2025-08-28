@@ -15,7 +15,7 @@ from pointblank._utils import (
     _convert_to_narwhals,
     _get_tbl_type,
 )
-from pointblank.column import Column, ColumnLiteral
+from pointblank.column import Column
 from pointblank.schema import Schema
 from pointblank.thresholds import _threshold_check
 
@@ -157,50 +157,21 @@ class Interrogator:
     na_pass: bool = False
     tbl_type: str = "local"
 
+    def __post_init__(self):
+        """
+        Post-initialization to process Ibis tables through Narwhals.
+
+        This converts Ibis tables to Narwhals-wrapped tables to unify
+        the processing pathway and reduce code branching.
+        """
+        # Import the processing function
+        from pointblank._utils import _process_ibis_through_narwhals
+
+        # Process Ibis tables through Narwhals
+        self.x, self.tbl_type = _process_ibis_through_narwhals(self.x, self.tbl_type)
+
     def gt(self) -> FrameT | Any:
-        # Ibis backends ---------------------------------------------
-
-        if self.tbl_type in IBIS_BACKENDS:
-            import ibis
-
-            if isinstance(self.compare, ColumnLiteral):
-                #
-                # Ibis column-to-column comparison
-                #
-
-                tbl = self.x.mutate(
-                    pb_is_good_1=(self.x[self.column].isnull() | self.x[self.compare.name].isnull())
-                    & ibis.literal(self.na_pass),
-                    pb_is_good_2=self.x[self.column] > self.x[self.compare.name],
-                )
-
-                tbl = tbl.mutate(
-                    pb_is_good_2=ibis.ifelse(tbl.pb_is_good_2.notnull(), tbl.pb_is_good_2, False)
-                )
-
-                return tbl.mutate(pb_is_good_=tbl.pb_is_good_1 | tbl.pb_is_good_2).drop(
-                    "pb_is_good_1", "pb_is_good_2"
-                )
-
-            else:
-                #
-                # Ibis column-to-literal comparison
-                #
-
-                tbl = self.x.mutate(
-                    pb_is_good_1=self.x[self.column].isnull() & ibis.literal(self.na_pass),
-                    pb_is_good_2=self.x[self.column] > ibis.literal(self.compare),
-                )
-
-                tbl = tbl.mutate(
-                    pb_is_good_2=ibis.ifelse(tbl.pb_is_good_2.notnull(), tbl.pb_is_good_2, False)
-                )
-
-                return tbl.mutate(pb_is_good_=tbl.pb_is_good_1 | tbl.pb_is_good_2).drop(
-                    "pb_is_good_1", "pb_is_good_2"
-                )
-
-        # Local backends (Narwhals) ---------------------------------
+        # All backends now use Narwhals (including former Ibis tables) ---------
 
         compare_expr = _get_compare_expr_nw(compare=self.compare)
 
@@ -231,49 +202,7 @@ class Interrogator:
         )
 
     def lt(self) -> FrameT | Any:
-        # Ibis backends ---------------------------------------------
-
-        if self.tbl_type in IBIS_BACKENDS:
-            import ibis
-
-            if isinstance(self.compare, Column):
-                #
-                # Ibis column-to-column comparison
-                #
-
-                tbl = self.x.mutate(
-                    pb_is_good_1=(self.x[self.column].isnull() | self.x[self.compare.name].isnull())
-                    & ibis.literal(self.na_pass),
-                    pb_is_good_2=self.x[self.column] < self.x[self.compare.name],
-                )
-
-                tbl = tbl.mutate(
-                    pb_is_good_2=ibis.ifelse(tbl.pb_is_good_2.notnull(), tbl.pb_is_good_2, False)
-                )
-
-                return tbl.mutate(pb_is_good_=tbl.pb_is_good_1 | tbl.pb_is_good_2).drop(
-                    "pb_is_good_1", "pb_is_good_2"
-                )
-
-            else:
-                #
-                # Ibis column-to-literal comparison
-                #
-
-                tbl = self.x.mutate(
-                    pb_is_good_1=self.x[self.column].isnull() & ibis.literal(self.na_pass),
-                    pb_is_good_2=self.x[self.column] < ibis.literal(self.compare),
-                )
-
-                tbl = tbl.mutate(
-                    pb_is_good_2=ibis.ifelse(tbl.pb_is_good_2.notnull(), tbl.pb_is_good_2, False)
-                )
-
-                return tbl.mutate(pb_is_good_=tbl.pb_is_good_1 | tbl.pb_is_good_2).drop(
-                    "pb_is_good_1", "pb_is_good_2"
-                )
-
-        # Local backends (Narwhals) ---------------------------------
+        # All backends now use Narwhals (including former Ibis tables) ---------
 
         compare_expr = _get_compare_expr_nw(compare=self.compare)
 
@@ -304,49 +233,7 @@ class Interrogator:
         )
 
     def eq(self) -> FrameT | Any:
-        # Ibis backends ---------------------------------------------
-
-        if self.tbl_type in IBIS_BACKENDS:
-            import ibis
-
-            if isinstance(self.compare, Column):
-                #
-                # Ibis column-to-column comparison
-                #
-
-                tbl = self.x.mutate(
-                    pb_is_good_1=(self.x[self.column].isnull() | self.x[self.compare.name].isnull())
-                    & ibis.literal(self.na_pass),
-                    pb_is_good_2=self.x[self.column] == self.x[self.compare.name],
-                )
-
-                tbl = tbl.mutate(
-                    pb_is_good_2=ibis.ifelse(tbl.pb_is_good_2.notnull(), tbl.pb_is_good_2, False)
-                )
-
-                return tbl.mutate(pb_is_good_=tbl.pb_is_good_1 | tbl.pb_is_good_2).drop(
-                    "pb_is_good_1", "pb_is_good_2"
-                )
-
-            else:
-                #
-                # Ibis column-to-literal comparison
-                #
-
-                tbl = self.x.mutate(
-                    pb_is_good_1=self.x[self.column].isnull() & ibis.literal(self.na_pass),
-                    pb_is_good_2=self.x[self.column] == ibis.literal(self.compare),
-                )
-
-                tbl = tbl.mutate(
-                    pb_is_good_2=ibis.ifelse(tbl.pb_is_good_2.notnull(), tbl.pb_is_good_2, False)
-                )
-
-                return tbl.mutate(pb_is_good_=tbl.pb_is_good_1 | tbl.pb_is_good_2).drop(
-                    "pb_is_good_1", "pb_is_good_2"
-                )
-
-        # Local backends (Narwhals) ---------------------------------
+        # All backends now use Narwhals (including former Ibis tables) ---------
 
         if isinstance(self.compare, Column):
             compare_expr = _get_compare_expr_nw(compare=self.compare)
@@ -421,47 +308,7 @@ class Interrogator:
             return tbl.drop("pb_is_good_1", "pb_is_good_2", "pb_is_good_3").to_native()
 
     def ne(self) -> FrameT | Any:
-        # Ibis backends ---------------------------------------------
-
-        if self.tbl_type in IBIS_BACKENDS:
-            import ibis
-
-            if isinstance(self.compare, Column):
-                #
-                # Ibis column-to-column comparison
-                #
-
-                tbl = self.x.mutate(
-                    pb_is_good_1=(self.x[self.column].isnull() | self.x[self.compare.name].isnull())
-                    & ibis.literal(self.na_pass),
-                    pb_is_good_2=self.x[self.column] != self.x[self.compare.name],
-                )
-
-                tbl = tbl.mutate(
-                    pb_is_good_2=ibis.ifelse(tbl.pb_is_good_2.notnull(), tbl.pb_is_good_2, False)
-                )
-
-                return tbl.mutate(pb_is_good_=tbl.pb_is_good_1 | tbl.pb_is_good_2).drop(
-                    "pb_is_good_1", "pb_is_good_2"
-                )
-
-            #
-            # Ibis column-to-literal comparison
-            #
-            tbl = self.x.mutate(
-                pb_is_good_1=self.x[self.column].isnull() & ibis.literal(self.na_pass),
-                pb_is_good_2=ibis.ifelse(
-                    self.x[self.column].notnull(),
-                    self.x[self.column] != ibis.literal(self.compare),
-                    ibis.literal(False),
-                ),
-            )
-
-            return tbl.mutate(pb_is_good_=tbl.pb_is_good_1 | tbl.pb_is_good_2).drop(
-                "pb_is_good_1", "pb_is_good_2"
-            )
-
-        # Local backends (Narwhals) ---------------------------------
+        # All backends now use Narwhals (including former Ibis tables) ---------
 
         # Determine if the reference and comparison columns have any null values
         ref_col_has_null_vals = _column_has_null_values(table=self.x, column=self.column)
@@ -529,6 +376,12 @@ class Interrogator:
                         tbl = tbl.with_columns(
                             pb_is_good_2=(nw.col("pb_is_good_1") | nw.col("pb_is_good_2"))
                         )
+                else:
+                    # General case (non-Polars): handle na_pass=True properly
+                    if self.na_pass:
+                        tbl = tbl.with_columns(
+                            pb_is_good_2=(nw.col("pb_is_good_1") | nw.col("pb_is_good_2"))
+                        )
 
                 return (
                     tbl.with_columns(pb_is_good_=nw.col("pb_is_good_2"))
@@ -556,6 +409,12 @@ class Interrogator:
                     )
 
                 if is_polars_dataframe(self.x.to_native()):
+                    if self.na_pass:
+                        tbl = tbl.with_columns(
+                            pb_is_good_1=(nw.col("pb_is_good_1") | nw.col("pb_is_good_2"))
+                        )
+                else:
+                    # General case (non-Polars): handle na_pass=True properly
                     if self.na_pass:
                         tbl = tbl.with_columns(
                             pb_is_good_1=(nw.col("pb_is_good_1") | nw.col("pb_is_good_2"))
@@ -590,6 +449,16 @@ class Interrogator:
                                 nw.when(nw.col("pb_is_good_1") | nw.col("pb_is_good_2"))
                                 .then(True)
                                 .otherwise(False)
+                            )
+                        )
+                else:
+                    # General case (non-Polars): handle na_pass=True properly
+                    if self.na_pass:
+                        tbl = tbl.with_columns(
+                            pb_is_good_3=(
+                                nw.when(nw.col("pb_is_good_1") | nw.col("pb_is_good_2"))
+                                .then(True)
+                                .otherwise(nw.col("pb_is_good_3"))
                             )
                         )
 
@@ -662,47 +531,7 @@ class Interrogator:
                     return tbl.drop("pb_is_good_1", "pb_is_good_2", "pb_is_good_3").to_native()
 
     def ge(self) -> FrameT | Any:
-        # Ibis backends ---------------------------------------------
-
-        if self.tbl_type in IBIS_BACKENDS:
-            import ibis
-
-            if isinstance(self.compare, Column):
-                #
-                # Ibis column-to-column comparison
-                #
-
-                tbl = self.x.mutate(
-                    pb_is_good_1=(self.x[self.column].isnull() | self.x[self.compare.name].isnull())
-                    & ibis.literal(self.na_pass),
-                    pb_is_good_2=self.x[self.column] >= self.x[self.compare.name],
-                )
-
-                tbl = tbl.mutate(
-                    pb_is_good_2=ibis.ifelse(tbl.pb_is_good_2.notnull(), tbl.pb_is_good_2, False)
-                )
-
-                return tbl.mutate(pb_is_good_=tbl.pb_is_good_1 | tbl.pb_is_good_2).drop(
-                    "pb_is_good_1", "pb_is_good_2"
-                )
-
-            #
-            # Ibis column-to-literal comparison
-            #
-            tbl = self.x.mutate(
-                pb_is_good_1=self.x[self.column].isnull() & ibis.literal(self.na_pass),
-                pb_is_good_2=self.x[self.column] >= ibis.literal(self.compare),
-            )
-
-            tbl = tbl.mutate(
-                pb_is_good_2=ibis.ifelse(tbl.pb_is_good_2.notnull(), tbl.pb_is_good_2, False)
-            )
-
-            return tbl.mutate(pb_is_good_=tbl.pb_is_good_1 | tbl.pb_is_good_2).drop(
-                "pb_is_good_1", "pb_is_good_2"
-            )
-
-        # Local backends (Narwhals) ---------------------------------
+        # All backends now use Narwhals (including former Ibis tables) ---------
 
         compare_expr = _get_compare_expr_nw(compare=self.compare)
 
@@ -733,47 +562,7 @@ class Interrogator:
         return tbl.drop("pb_is_good_1", "pb_is_good_2", "pb_is_good_3").to_native()
 
     def le(self) -> FrameT | Any:
-        # Ibis backends ---------------------------------------------
-
-        if self.tbl_type in IBIS_BACKENDS:
-            import ibis
-
-            if isinstance(self.compare, Column):
-                #
-                # Ibis column-to-column comparison
-                #
-
-                tbl = self.x.mutate(
-                    pb_is_good_1=(self.x[self.column].isnull() | self.x[self.compare.name].isnull())
-                    & ibis.literal(self.na_pass),
-                    pb_is_good_2=self.x[self.column] <= self.x[self.compare.name],
-                )
-
-                tbl = tbl.mutate(
-                    pb_is_good_2=ibis.ifelse(tbl.pb_is_good_2.notnull(), tbl.pb_is_good_2, False)
-                )
-
-                return tbl.mutate(pb_is_good_=tbl.pb_is_good_1 | tbl.pb_is_good_2).drop(
-                    "pb_is_good_1", "pb_is_good_2"
-                )
-
-            #
-            # Ibis column-to-literal comparison
-            #
-            tbl = self.x.mutate(
-                pb_is_good_1=self.x[self.column].isnull() & ibis.literal(self.na_pass),
-                pb_is_good_2=self.x[self.column] <= ibis.literal(self.compare),
-            )
-
-            tbl = tbl.mutate(
-                pb_is_good_2=ibis.ifelse(tbl.pb_is_good_2.notnull(), tbl.pb_is_good_2, False)
-            )
-
-            return tbl.mutate(pb_is_good_=tbl.pb_is_good_1 | tbl.pb_is_good_2).drop(
-                "pb_is_good_1", "pb_is_good_2"
-            )
-
-        # Local backends (Narwhals) ---------------------------------
+        # All backends now use Narwhals (including former Ibis tables) ---------
 
         compare_expr = _get_compare_expr_nw(compare=self.compare)
 
@@ -804,105 +593,7 @@ class Interrogator:
         )
 
     def between(self) -> FrameT | Any:
-        # Ibis backends ---------------------------------------------
-
-        if self.tbl_type in IBIS_BACKENDS:
-            import ibis
-
-            if isinstance(self.low, Column) or isinstance(self.high, Column):
-                #
-                # Ibis column-to-column/column or column-to-column/literal comparison
-                #
-
-                if isinstance(self.low, Column):
-                    low_val = self.x[self.low.name]
-                else:
-                    low_val = ibis.literal(self.low)
-
-                if isinstance(self.high, Column):
-                    high_val = self.x[self.high.name]
-                else:
-                    high_val = ibis.literal(self.high)
-
-                if isinstance(self.low, Column) and isinstance(self.high, Column):
-                    tbl = self.x.mutate(
-                        pb_is_good_1=(
-                            self.x[self.column].isnull()
-                            | self.x[self.low.name].isnull()
-                            | self.x[self.high.name].isnull()
-                        )
-                        & ibis.literal(self.na_pass)
-                    )
-                elif isinstance(self.low, Column):
-                    tbl = self.x.mutate(
-                        pb_is_good_1=(self.x[self.column].isnull() | self.x[self.low.name].isnull())
-                        & ibis.literal(self.na_pass)
-                    )
-                elif isinstance(self.high, Column):
-                    tbl = self.x.mutate(
-                        pb_is_good_1=(
-                            self.x[self.column].isnull() | self.x[self.high.name].isnull()
-                        )
-                        & ibis.literal(self.na_pass)
-                    )
-
-                if self.inclusive[0]:
-                    tbl = tbl.mutate(pb_is_good_2=tbl[self.column] >= low_val)
-                else:
-                    tbl = tbl.mutate(pb_is_good_2=tbl[self.column] > low_val)
-
-                tbl = tbl.mutate(
-                    pb_is_good_2=ibis.ifelse(tbl.pb_is_good_2.notnull(), tbl.pb_is_good_2, False)
-                )
-
-                if self.inclusive[1]:
-                    tbl = tbl.mutate(pb_is_good_3=tbl[self.column] <= high_val)
-                else:
-                    tbl = tbl.mutate(pb_is_good_3=tbl[self.column] < high_val)
-
-                tbl = tbl.mutate(
-                    pb_is_good_3=ibis.ifelse(tbl.pb_is_good_3.notnull(), tbl.pb_is_good_3, False)
-                )
-
-                return tbl.mutate(
-                    pb_is_good_=tbl.pb_is_good_1 | (tbl.pb_is_good_2 & tbl.pb_is_good_3)
-                ).drop("pb_is_good_1", "pb_is_good_2", "pb_is_good_3")
-
-            else:
-                #
-                # Ibis column-to-literal/literal comparison
-                #
-
-                low_val = ibis.literal(self.low)
-                high_val = ibis.literal(self.high)
-
-                tbl = self.x.mutate(
-                    pb_is_good_1=self.x[self.column].isnull() & ibis.literal(self.na_pass)
-                )
-
-                if self.inclusive[0]:
-                    tbl = tbl.mutate(pb_is_good_2=tbl[self.column] >= low_val)
-                else:
-                    tbl = tbl.mutate(pb_is_good_2=tbl[self.column] > low_val)
-
-                tbl = tbl.mutate(
-                    pb_is_good_2=ibis.ifelse(tbl.pb_is_good_2.notnull(), tbl.pb_is_good_2, False)
-                )
-
-                if self.inclusive[1]:
-                    tbl = tbl.mutate(pb_is_good_3=tbl[self.column] <= high_val)
-                else:
-                    tbl = tbl.mutate(pb_is_good_3=tbl[self.column] < high_val)
-
-                tbl = tbl.mutate(
-                    pb_is_good_3=ibis.ifelse(tbl.pb_is_good_3.notnull(), tbl.pb_is_good_3, False)
-                )
-
-                return tbl.mutate(
-                    pb_is_good_=tbl.pb_is_good_1 | (tbl.pb_is_good_2 & tbl.pb_is_good_3)
-                ).drop("pb_is_good_1", "pb_is_good_2", "pb_is_good_3")
-
-        # Local backends (Narwhals) ---------------------------------
+        # All backends now use Narwhals (including former Ibis tables) ---------
 
         low_val = _get_compare_expr_nw(compare=self.low)
         high_val = _get_compare_expr_nw(compare=self.high)
@@ -971,128 +662,10 @@ class Interrogator:
         return tbl
 
     def outside(self) -> FrameT | Any:
-        # Ibis backends ---------------------------------------------
+        # All backends now use Narwhals (including former Ibis tables) ---------
 
-        if self.tbl_type in IBIS_BACKENDS:
-            import ibis
-
-            if isinstance(self.low, Column) or isinstance(self.high, Column):
-                #
-                # Ibis column-to-column/column or column-to-column/literal comparison
-                #
-
-                if isinstance(self.low, Column):
-                    low_val = self.x[self.low.name]
-                else:
-                    low_val = ibis.literal(self.low)
-
-                if isinstance(self.high, Column):
-                    high_val = self.x[self.high.name]
-                else:
-                    high_val = ibis.literal(self.high)
-
-                if isinstance(self.low, Column) and isinstance(self.high, Column):
-                    tbl = self.x.mutate(
-                        pb_is_good_1=(
-                            self.x[self.column].isnull()
-                            | self.x[self.low.name].isnull()
-                            | self.x[self.high.name].isnull()
-                        )
-                        & ibis.literal(self.na_pass)
-                    )
-
-                elif isinstance(self.low, Column):
-                    tbl = self.x.mutate(
-                        pb_is_good_1=(self.x[self.column].isnull() | self.x[self.low.name].isnull())
-                        & ibis.literal(self.na_pass)
-                    )
-                elif isinstance(self.high, Column):
-                    tbl = self.x.mutate(
-                        pb_is_good_1=(
-                            self.x[self.column].isnull() | self.x[self.high.name].isnull()
-                        )
-                        & ibis.literal(self.na_pass)
-                    )
-
-                if self.inclusive[0]:
-                    tbl = tbl.mutate(pb_is_good_2=tbl[self.column] < low_val)
-                else:
-                    tbl = tbl.mutate(pb_is_good_2=tbl[self.column] <= low_val)
-
-                if self.inclusive[1]:
-                    tbl = tbl.mutate(pb_is_good_3=tbl[self.column] > high_val)
-                else:
-                    tbl = tbl.mutate(pb_is_good_3=tbl[self.column] >= high_val)
-
-                tbl = tbl.mutate(
-                    pb_is_good_2=ibis.ifelse(
-                        tbl.pb_is_good_3.isnull(),
-                        False,
-                        tbl.pb_is_good_2,
-                    )
-                )
-
-                tbl = tbl.mutate(
-                    pb_is_good_3=ibis.ifelse(
-                        tbl.pb_is_good_2.isnull(),
-                        False,
-                        tbl.pb_is_good_3,
-                    )
-                )
-
-                tbl = tbl.mutate(
-                    pb_is_good_2=ibis.ifelse(
-                        tbl.pb_is_good_2.isnull(),
-                        False,
-                        tbl.pb_is_good_2,
-                    )
-                )
-
-                tbl = tbl.mutate(
-                    pb_is_good_3=ibis.ifelse(
-                        tbl.pb_is_good_3.isnull(),
-                        False,
-                        tbl.pb_is_good_3,
-                    )
-                )
-
-                return tbl.mutate(
-                    pb_is_good_=tbl.pb_is_good_1 | (tbl.pb_is_good_2 | tbl.pb_is_good_3)
-                ).drop("pb_is_good_1", "pb_is_good_2", "pb_is_good_3")
-
-            #
-            # Ibis column-to-literal/literal comparison
-            #
-            low_val = ibis.literal(self.low)
-            high_val = ibis.literal(self.high)
-
-            tbl = self.x.mutate(
-                pb_is_good_1=self.x[self.column].isnull() & ibis.literal(self.na_pass)
-            )
-
-            if self.inclusive[0]:
-                tbl = tbl.mutate(pb_is_good_2=tbl[self.column] < low_val)
-            else:
-                tbl = tbl.mutate(pb_is_good_2=tbl[self.column] <= low_val)
-
-            tbl = tbl.mutate(
-                pb_is_good_2=ibis.ifelse(tbl.pb_is_good_2.notnull(), tbl.pb_is_good_2, False)
-            )
-
-            if self.inclusive[1]:
-                tbl = tbl.mutate(pb_is_good_3=tbl[self.column] > high_val)
-            else:
-                tbl = tbl.mutate(pb_is_good_3=tbl[self.column] >= high_val)
-
-            tbl = tbl.mutate(
-                pb_is_good_3=ibis.ifelse(tbl.pb_is_good_3.notnull(), tbl.pb_is_good_3, False)
-            )
-
-            return tbl.mutate(
-                pb_is_good_=tbl.pb_is_good_1 | tbl.pb_is_good_2 | tbl.pb_is_good_3
-            ).drop("pb_is_good_1", "pb_is_good_2", "pb_is_good_3")
-
-        # Local backends (Narwhals) ---------------------------------
+        low_val = _get_compare_expr_nw(compare=self.low)
+        high_val = _get_compare_expr_nw(compare=self.high)
 
         low_val = _get_compare_expr_nw(compare=self.low)
         high_val = _get_compare_expr_nw(compare=self.high)
@@ -1157,17 +730,10 @@ class Interrogator:
         return tbl
 
     def isin(self) -> FrameT | Any:
-        # Ibis backends ---------------------------------------------
+        # All backends now use Narwhals (including former Ibis tables) ---------
 
         can_be_null: bool = None in self.set
 
-        if self.tbl_type in IBIS_BACKENDS:
-            base_expr = self.x[self.column].isin(self.set)
-            if can_be_null:
-                base_expr = base_expr | self.x[self.column].isnull()
-            return self.x.mutate(pb_is_good_=base_expr)
-
-        # Local backends (Narwhals) ---------------------------------
         base_expr: nw.Expr = nw.col(self.column).is_in(self.set)
         if can_be_null:
             base_expr = base_expr | nw.col(self.column).is_null()
@@ -1175,12 +741,7 @@ class Interrogator:
         return self.x.with_columns(pb_is_good_=base_expr).to_native()
 
     def notin(self) -> FrameT | Any:
-        # Ibis backends ---------------------------------------------
-
-        if self.tbl_type in IBIS_BACKENDS:
-            return self.x.mutate(pb_is_good_=self.x[self.column].notin(self.set))
-
-        # Local backends (Narwhals) ---------------------------------
+        # All backends now use Narwhals (including former Ibis tables) ---------
 
         return (
             self.x.with_columns(
@@ -1191,21 +752,7 @@ class Interrogator:
         )
 
     def regex(self) -> FrameT | Any:
-        # Ibis backends ---------------------------------------------
-
-        if self.tbl_type in IBIS_BACKENDS:
-            import ibis
-
-            tbl = self.x.mutate(
-                pb_is_good_1=self.x[self.column].isnull() & ibis.literal(self.na_pass),
-                pb_is_good_2=self.x[self.column].re_search(self.pattern),
-            )
-
-            return tbl.mutate(pb_is_good_=tbl.pb_is_good_1 | tbl.pb_is_good_2).drop(
-                "pb_is_good_1", "pb_is_good_2"
-            )
-
-        # Local backends (Narwhals) ---------------------------------
+        # All backends now use Narwhals (including former Ibis tables) ---------
 
         return (
             self.x.with_columns(
@@ -1220,55 +767,21 @@ class Interrogator:
         )
 
     def null(self) -> FrameT | Any:
-        # Ibis backends ---------------------------------------------
-
-        if self.tbl_type in IBIS_BACKENDS:
-            return self.x.mutate(
-                pb_is_good_=self.x[self.column].isnull(),
-            )
-
-        # Local backends (Narwhals) ---------------------------------
+        # All backends now use Narwhals (including former Ibis tables) ---------
 
         return self.x.with_columns(
             pb_is_good_=nw.col(self.column).is_null(),
         ).to_native()
 
     def not_null(self) -> FrameT | Any:
-        # Ibis backends ---------------------------------------------
-
-        if self.tbl_type in IBIS_BACKENDS:
-            return self.x.mutate(
-                pb_is_good_=~self.x[self.column].isnull(),
-            )
-
-        # Local backends (Narwhals) ---------------------------------
+        # All backends now use Narwhals (including former Ibis tables) ---------
 
         return self.x.with_columns(
             pb_is_good_=~nw.col(self.column).is_null(),
         ).to_native()
 
     def rows_distinct(self) -> FrameT | Any:
-        # Ibis backends ---------------------------------------------
-
-        if self.tbl_type in IBIS_BACKENDS:
-            import ibis
-
-            tbl = self.x
-
-            # Get the column subset to use for the test
-            if self.columns_subset is None:
-                columns_subset = tbl.columns
-            else:
-                columns_subset = self.columns_subset
-
-            # Create a subset of the table with only the columns of interest and count the
-            # number of times each unique row (or portion thereof) appears
-            tbl = tbl.group_by(columns_subset).mutate(pb_count_=ibis._.count())
-
-            # Passing rows will have the value `1` (no duplicates, so True), otherwise False applies
-            return tbl.mutate(pb_is_good_=tbl["pb_count_"] == 1).drop("pb_count_")
-
-        # Local backends (Narwhals) ---------------------------------
+        # All backends now use Narwhals (including former Ibis tables) ---------
 
         tbl = self.x
 
@@ -1291,20 +804,7 @@ class Interrogator:
         return tbl.to_native()
 
     def rows_complete(self) -> FrameT | Any:
-        # Ibis backends ---------------------------------------------
-
-        if self.tbl_type in IBIS_BACKENDS:
-            tbl = self.x
-
-            # Determine the number of null values in each row (column subsets are handled in
-            # the `_check_nulls_across_columns_ibis()` function)
-            tbl = _check_nulls_across_columns_ibis(table=tbl, columns_subset=self.columns_subset)
-
-            # Failing rows will have the value `True` in the generated column, so we need to negate
-            # the result to get the passing rows
-            return tbl.mutate(pb_is_good_=~tbl["_any_is_null_"]).drop("_any_is_null_")
-
-        # Local backends (Narwhals) ---------------------------------
+        # All backends now use Narwhals (including former Ibis tables) ---------
 
         tbl = self.x
 
@@ -1369,10 +869,8 @@ class ColValsCompareOne:
             tbl = _column_test_prep(
                 df=self.data_tbl, column=self.column, allowed_types=self.allowed_types
             )
-
-        # TODO: For Ibis backends, check if the column exists and if the column type is compatible;
-        #       for now, just pass the table as is
-        if self.tbl_type in IBIS_BACKENDS:
+        else:
+            # For remote backends (Ibis), pass the table as is since Interrogator now handles Ibis through Narwhals
             tbl = self.data_tbl
 
         # Collect results for the test units; the results are a list of booleans where
@@ -1527,7 +1025,8 @@ class ColValsCompareTwo:
 
         # TODO: For Ibis backends, check if the column exists and if the column type is compatible;
         #       for now, just pass the table as is
-        if self.tbl_type in IBIS_BACKENDS:
+        else:
+            # For remote backends (Ibis), pass the table as is since Interrogator now handles Ibis through Narwhals
             tbl = self.data_tbl
 
         # Collect results for the test units; the results are a list of booleans where
@@ -1620,10 +1119,8 @@ class ColValsCompareSet:
             tbl = _column_test_prep(
                 df=self.data_tbl, column=self.column, allowed_types=self.allowed_types
             )
-
-        # TODO: For Ibis backends, check if the column exists and if the column type is compatible;
-        #       for now, just pass the table as is
-        if self.tbl_type in IBIS_BACKENDS:
+        else:
+            # For remote backends (Ibis), pass the table as is since Interrogator now handles Ibis through Narwhals
             tbl = self.data_tbl
 
         # Collect results for the test units; the results are a list of booleans where
@@ -1697,10 +1194,8 @@ class ColValsRegex:
             tbl = _column_test_prep(
                 df=self.data_tbl, column=self.column, allowed_types=self.allowed_types
             )
-
-        # TODO: For Ibis backends, check if the column exists and if the column type is compatible;
-        #       for now, just pass the table as is
-        if self.tbl_type in IBIS_BACKENDS:
+        else:
+            # For remote backends (Ibis), pass the table as is since Interrogator now handles Ibis through Narwhals
             tbl = self.data_tbl
 
         # Collect results for the test units; the results are a list of booleans where
@@ -1828,11 +1323,9 @@ class ColExistsHasType:
             #  - check if the `column=` exists
             #  - check if the `column=` type is compatible with the test
             tbl = _convert_to_narwhals(df=self.data_tbl)
-
-        # TODO: For Ibis backends, check if the column exists and if the column type is compatible;
-        #       for now, just pass the table as is
-        if self.tbl_type in IBIS_BACKENDS:
-            tbl = self.data_tbl
+        else:
+            # For remote backends (Ibis), pass the table as is since Narwhals can handle it
+            tbl = _convert_to_narwhals(df=self.data_tbl)
 
         if self.assertion_method == "exists":
             res = int(self.column in tbl.columns)
@@ -1880,7 +1373,8 @@ class RowsDistinct:
 
         # TODO: For Ibis backends, check if the column exists and if the column type is compatible;
         #       for now, just pass the table as is
-        if self.tbl_type in IBIS_BACKENDS:
+        else:
+            # For remote backends (Ibis), pass the table as is since Interrogator now handles Ibis through Narwhals
             tbl = self.data_tbl
 
         # Collect results for the test units; the results are a list of booleans where
@@ -1893,6 +1387,17 @@ class RowsDistinct:
 
     def get_test_results(self):
         return self.test_unit_res
+
+    def test(self):
+        # Get the number of failing test units by counting instances of `False` in the `pb_is_good_`
+        # column and then determine if the test passes overall by comparing the number of failing
+        # test units to the threshold for failing test units
+
+        results_list = nw.from_native(self.test_unit_res)["pb_is_good_"].to_list()
+
+        return _threshold_check(
+            failing_test_units=results_list.count(False), threshold=self.threshold
+        )
 
 
 @dataclass
@@ -1932,7 +1437,8 @@ class RowsComplete:
 
         # TODO: For Ibis backends, check if the column exists and if the column type is compatible;
         #       for now, just pass the table as is
-        if self.tbl_type in IBIS_BACKENDS:
+        else:
+            # For remote backends (Ibis), pass the table as is since Interrogator now handles Ibis through Narwhals
             tbl = self.data_tbl
 
         # Collect results for the test units; the results are a list of booleans where
@@ -2532,23 +2038,6 @@ def _column_has_null_values(table: FrameT, column: str) -> bool:
         return False
 
     return True
-
-
-def _check_nulls_across_columns_ibis(table, columns_subset):
-    # Get all column names from the table
-    column_names = columns_subset if columns_subset else table.columns
-
-    # Build the expression by combining each column's isnull() with OR operations
-    null_expr = functools.reduce(
-        lambda acc, col: acc | table[col].isnull() if acc is not None else table[col].isnull(),
-        column_names,
-        None,
-    )
-
-    # Add the expression as a new column to the table
-    result = table.mutate(_any_is_null_=null_expr)
-
-    return result
 
 
 def _check_nulls_across_columns_nw(table, columns_subset):
