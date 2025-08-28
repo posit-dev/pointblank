@@ -164,7 +164,9 @@ def _load_dataframe_from_path(input_path: str, backend: str = "auto") -> Any:
     else:
         raise ValueError(f"Unsupported backend: {backend}. Available: {_get_available_backends()}")
 
-    raise ValueError(f"Unsupported file type: {p_path.suffix}. Please use CSV, Excel, or Parquet.")
+    raise ValueError(
+        f"Unsupported file type: {p_path.suffix}. Please use CSV, Excel, Parquet, JSON, or JSONL."
+    )
 
 
 @dataclass
