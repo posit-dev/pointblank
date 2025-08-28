@@ -398,7 +398,7 @@ async def delete_dataframe(
     # Find and remove validators that might be using this DataFrame
     validators_to_remove = []
     for validator_id, validator in app_ctx.active_validators.items():
-        # This is a heuristic - we can't easily determine which DataFrame a validator uses
+        # This is a heuristic as we can't easily determine which DataFrame a validator uses
         # In a more sophisticated implementation, we'd track this relationship
         try:
             if hasattr(validator, "tbl_name") and df_id in validator.tbl_name:
@@ -467,10 +467,10 @@ async def profile_dataframe(
 ) -> Dict[str, Any]:
     """
     Generates comprehensive data profiling insights including:
-    - Column statistics, data types, missing values
-    - Data quality issues detection
-    - Suggested validation rules
-    - Correlation analysis (optional)
+    - column statistics, data types, missing values
+    - data quality issues detection
+    - suggested validation rules
+    - correlation analysis (optional)
     """
     app_ctx: AppContext = ctx.request_context.lifespan_context
 
@@ -665,7 +665,7 @@ def _generate_validation_suggestions(column: str, profile: Dict[str, Any]) -> li
 
         # String validations
         if "top_values" in profile and len(profile["top_values"]) <= 10:
-            # Limited set of values - suggest in_set validation
+            # With a limited set of values suggest `in_set` validation
             values_list = list(profile["top_values"].keys())
             suggestions.append(
                 {
@@ -785,9 +785,9 @@ def _compute_correlations(df: Any) -> Dict[str, Any]:
     """Compute correlation matrix for numeric columns."""
     try:
         # Get numeric columns
-        if hasattr(df, "select_dtypes"):  # pandas
+        if hasattr(df, "select_dtypes"):  # Pandas
             numeric_df = df.select_dtypes(include=["number"])
-        else:  # polars - basic approach
+        else:  # Polars: basic approach
             numeric_cols = [
                 col
                 for col in df.columns
@@ -799,7 +799,7 @@ def _compute_correlations(df: Any) -> Dict[str, Any]:
             return {"message": "Not enough numeric columns for correlation analysis"}
 
         # Compute correlation matrix
-        if hasattr(numeric_df, "corr"):  # pandas
+        if hasattr(numeric_df, "corr"):  # Pandas
             corr_matrix = numeric_df.corr()
 
             # Find strong correlations
@@ -1122,10 +1122,10 @@ def _get_supported_validations(validator):
 async def server_health_check(ctx: Context) -> Dict[str, Any]:
     """
     Returns comprehensive server health information including:
-    - Resource usage and capacity
-    - Backend availability
-    - Active resources count
-    - System information
+    - resource usage and capacity
+    - backend availability
+    - active resources count
+    - system information
     """
     app_ctx: AppContext = ctx.request_context.lifespan_context
 
