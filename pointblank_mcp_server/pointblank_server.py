@@ -1865,5 +1865,262 @@ def prompt_interrogate_validator(
     )
 
 
+# --- Core Pointblank Table Functions ---
+
+
+@mcp.tool()
+def preview_table(
+    ctx: Context,
+    dataframe_id: str = Field(..., description="ID of the loaded DataFrame to preview"),
+    n_head: int = Field(default=5, description="Number of rows to show from the top"),
+    n_tail: int = Field(default=5, description="Number of rows to show from the bottom"),
+    limit: int = Field(default=50, description="Total row limit"),
+    show_row_numbers: bool = Field(default=True, description="Whether to show row numbers"),
+) -> str:
+    """
+    Display a preview of the DataFrame showing rows from top and bottom.
+
+    Uses Pointblank's built-in preview() function to generate a nicely formatted
+    table view with column types and a sample of the data.
+    """
+    try:
+        # Get the DataFrame
+        data = ctx.loaded_dataframes.get(dataframe_id)
+        if data is None:
+            return f"❌ Error: DataFrame '{dataframe_id}' not found. Load a DataFrame first."
+
+        # Use Pointblank's preview function
+        import pointblank as pb
+
+        gt_table = pb.preview(
+            data, n_head=n_head, n_tail=n_tail, limit=limit, show_row_numbers=show_row_numbers
+        )
+
+        # Convert to HTML string for display
+        html_output = gt_table.as_raw_html()
+
+        return f"✅ Table preview generated successfully!\n\nHTML preview available (showing {n_head} head + {n_tail} tail rows)\n\nUse save_html() method to save to file if needed."
+
+    except Exception as e:
+        logger.error(f"Error creating table preview: {e}")
+        return f"❌ Error creating preview: {str(e)}"
+
+
+@mcp.tool()
+def missing_values_table(
+    ctx: Context,
+    dataframe_id: str = Field(..., description="ID of the loaded DataFrame to analyze"),
+) -> str:
+    """
+    Generate a table showing missing values analysis for the DataFrame.
+
+    Uses Pointblank's built-in missing_vals_tbl() function to show
+    missing value patterns and statistics.
+    """
+    try:
+        # Get the DataFrame
+        data = ctx.loaded_dataframes.get(dataframe_id)
+        if data is None:
+            return f"❌ Error: DataFrame '{dataframe_id}' not found. Load a DataFrame first."
+
+        # Use Pointblank's missing_vals_tbl function
+        import pointblank as pb
+
+        gt_table = pb.missing_vals_tbl(data)
+
+        # Convert to HTML string for display
+        html_output = gt_table.as_raw_html()
+
+        return "✅ Missing values analysis generated successfully!\n\nThe analysis shows patterns and statistics of missing values across all columns.\n\nUse save_html() method to save to file if needed."
+
+    except Exception as e:
+        logger.error(f"Error creating missing values table: {e}")
+        return f"❌ Error creating missing values analysis: {str(e)}"
+
+
+@mcp.tool()
+def column_summary_table(
+    ctx: Context,
+    dataframe_id: str = Field(..., description="ID of the loaded DataFrame to summarize"),
+    table_name: str = Field(default="", description="Optional name for the table"),
+) -> str:
+    """
+    Generate a comprehensive column-level summary of the DataFrame.
+
+    Uses Pointblank's built-in col_summary_tbl() function to provide detailed
+    statistics including data types, missing values, and descriptive statistics.
+    """
+    try:
+        # Get the DataFrame
+        data = ctx.loaded_dataframes.get(dataframe_id)
+        if data is None:
+            return f"❌ Error: DataFrame '{dataframe_id}' not found. Load a DataFrame first."
+
+        # Use Pointblank's col_summary_tbl function
+        import pointblank as pb
+
+        gt_table = pb.col_summary_tbl(data, tbl_name=table_name if table_name else dataframe_id)
+
+        # Convert to HTML string for display
+        html_output = gt_table.as_raw_html()
+
+        return "✅ Column summary table generated successfully!\n\nThe summary includes:\n- Column names and types\n- Missing value statistics\n- Descriptive statistics for numeric columns\n- Unique value counts\n\nUse save_html() method to save to file if needed."
+
+    except Exception as e:
+        logger.error(f"Error creating column summary table: {e}")
+        return f"❌ Error creating column summary: {str(e)}"
+
+
+@mcp.tool()
+def validation_assistant(
+    ctx: Context,
+    dataframe_id: str = Field(
+        ..., description="ID of the loaded DataFrame to create validation plan for"
+    ),
+    validation_goal: str = Field(
+        default="general",
+        description="What type of validation: 'data_quality', 'completeness', 'consistency', 'accuracy', 'general'",
+    ),
+) -> str:
+    """
+    Interactive assistant to help create a validation plan for your data.
+
+    This tool walks you through creating appropriate validation rules based on
+    your data characteristics and validation goals.
+    """
+    try:
+        # Get the DataFrame
+        data = ctx.loaded_dataframes.get(dataframe_id)
+        if data is None:
+            return f"❌ Error: DataFrame '{dataframe_id}' not found. Load a DataFrame first."
+
+        # Analyze the DataFrame structure
+
+        # Get basic info about the data
+        if hasattr(data, "shape"):
+            rows, cols = data.shape
+        elif hasattr(data, "count"):
+            rows = data.count().collect()[0, 0] if hasattr(data.count(), "collect") else len(data)
+            cols = len(data.columns)
+        else:
+            rows, cols = "unknown", len(data.columns) if hasattr(data, "columns") else "unknown"
+
+        # Get column information
+        column_info = []
+        for col in data.columns:
+            if hasattr(data, "dtypes"):
+                if hasattr(data.dtypes, "items"):  # pandas
+                    dtype = str(data.dtypes[col])
+                else:  # polars
+                    dtype = str(data.dtypes[data.columns.index(col)])
+            else:
+                dtype = "unknown"
+            column_info.append(f"  - {col}: {dtype}")
+
+        # Generate validation suggestions based on goal
+        suggestions = []
+
+        if validation_goal in ["general", "data_quality"]:
+            suggestions.extend(
+                [
+                    "# Basic Data Quality Checks",
+                    "validator = pb.Validate(data)",
+                    f".col_exists(columns={data.columns})  # Ensure all expected columns exist",
+                ]
+            )
+
+            # Add type-specific suggestions
+            for col in data.columns:
+                if any(keyword in col.lower() for keyword in ["id", "key"]):
+                    suggestions.append(
+                        f".col_vals_not_null(columns='{col}')  # ID columns should not be null"
+                    )
+                    suggestions.append(
+                        f".col_vals_unique(columns='{col}')  # ID columns should be unique"
+                    )
+                elif any(keyword in col.lower() for keyword in ["email", "mail"]):
+                    suggestions.append(
+                        f".col_vals_regex(columns='{col}', regex=r'[^@]+@[^@]+\\.[^@]+')  # Email format"
+                    )
+                elif any(keyword in col.lower() for keyword in ["phone", "tel"]):
+                    suggestions.append(
+                        f".col_vals_regex(columns='{col}', regex=r'\\+?[\\d\\s\\-\\(\\)]+')  # Phone format"
+                    )
+                elif any(keyword in col.lower() for keyword in ["date", "time"]):
+                    suggestions.append(
+                        f".col_vals_not_null(columns='{col}')  # Date columns should not be null"
+                    )
+
+        if validation_goal in ["general", "completeness"]:
+            suggestions.extend(
+                [
+                    "# Completeness Checks",
+                    ".col_vals_not_null(columns=['critical_column1', 'critical_column2'])  # Critical fields must be complete",
+                    ".row_count_match(count=expected_count)  # Verify expected number of records",
+                ]
+            )
+
+        if validation_goal in ["general", "consistency"]:
+            suggestions.extend(
+                [
+                    "# Consistency Checks",
+                    ".col_vals_in_set(columns='status', set=['active', 'inactive', 'pending'])  # Valid status values",
+                    ".col_vals_between(columns='age', left=0, right=120)  # Reasonable age range",
+                ]
+            )
+
+        if validation_goal in ["general", "accuracy"]:
+            suggestions.extend(
+                [
+                    "# Accuracy Checks",
+                    ".col_vals_gt(columns='price', value=0)  # Prices should be positive",
+                    ".col_vals_le(columns='discount_pct', value=100)  # Discounts <= 100%",
+                ]
+            )
+
+        # Add interrogation
+        suggestions.append(".interrogate()  # Execute all validation steps")
+
+        suggestion_text = "\n".join(suggestions)
+
+        response = f"""
+🔍 **Validation Assistant for DataFrame '{dataframe_id}'**
+
+📊 **Data Overview:**
+- Rows: {rows}
+- Columns: {cols}
+- Column Details:
+{chr(10).join(column_info)}
+
+🎯 **Validation Goal:** {validation_goal}
+
+📋 **Suggested Validation Plan:**
+
+```python
+{suggestion_text}
+```
+
+💡 **Next Steps:**
+1. Review the suggested validation rules above
+2. Customize the rules based on your specific business requirements
+3. Use the `create_validator` tool to implement these checks
+4. Run `interrogate_validator` to execute the validation
+
+❓ **Need More Help?**
+- Use `validation_goal='data_quality'` for basic data quality checks
+- Use `validation_goal='completeness'` for missing data validation
+- Use `validation_goal='consistency'` for value range/format validation
+- Use `validation_goal='accuracy'` for business rule validation
+
+Would you like me to create a validator with these suggestions? Use the `create_validator` tool with the above validation steps!
+"""
+
+        return response
+
+    except Exception as e:
+        logger.error(f"Error in validation assistant: {e}")
+        return f"❌ Error in validation assistant: {str(e)}"
+
+
 if __name__ == "__main__":
     mcp.run(transport="stdio")
