@@ -62,6 +62,7 @@ mcp = [
     "fastmcp>=2.10.5",
     "pytest-asyncio>=1.0.0",
 ]
+
 excel = ["openpyxl>=3.0.0"]
 bigquery = ["ibis-framework[bigquery]>=9.5.0"]
 databricks = ["ibis-framework[databricks]>=9.5.0"]
