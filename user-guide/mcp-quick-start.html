@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Data Validation – Pointblank</title>
+<title>MCP Quick Start – Pointblank</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -65,8 +65,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../user-guide/cli-reference.html" rel="next">
-<link href="../user-guide/cli-data-inspection.html" rel="prev">
+<link href="../user-guide/cli-reference.html" rel="prev">
 <link href="../assets/fav-logo.png" rel="icon" type="image/png">
 <script src="../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
@@ -177,7 +176,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
         <a class="flex-grow-1 no-decor" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
-          <h1 class="quarto-secondary-nav-title">Data Validation</h1>
+          <h1 class="quarto-secondary-nav-title">MCP Quick Start</h1>
         </a>     
     </div>
   </nav>
@@ -403,7 +402,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../user-guide/cli-data-validation.html" class="sidebar-item-text sidebar-link active">
+  <a href="../user-guide/cli-data-validation.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Data Validation</span></a>
   </div>
 </li>
@@ -426,7 +425,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
       <ul id="quarto-sidebar-section-8" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../user-guide/mcp-quick-start.html" class="sidebar-item-text sidebar-link">
+  <a href="../user-guide/mcp-quick-start.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">MCP Quick Start</span></a>
   </div>
 </li>
@@ -442,20 +441,41 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#pb-validate-quick-one-line-data-checks" id="toc-pb-validate-quick-one-line-data-checks" class="nav-link active" data-scroll-target="#pb-validate-quick-one-line-data-checks"><code>pb validate</code>: Quick, One-Line Data Checks</a>
+  <li><a href="#getting-started-in-5-minutes" id="toc-getting-started-in-5-minutes" class="nav-link active" data-scroll-target="#getting-started-in-5-minutes">Getting Started in 5 Minutes</a>
   <ul class="collapse">
-  <li><a href="#checking-for-duplicate-and-complete-rows" id="toc-checking-for-duplicate-and-complete-rows" class="nav-link" data-scroll-target="#checking-for-duplicate-and-complete-rows">Checking for Duplicate and Complete Rows</a></li>
-  <li><a href="#checking-for-nulls-and-value-ranges" id="toc-checking-for-nulls-and-value-ranges" class="nav-link" data-scroll-target="#checking-for-nulls-and-value-ranges">Checking for Nulls and Value Ranges</a></li>
-  <li><a href="#multiple-checks-in-one-command" id="toc-multiple-checks-in-one-command" class="nav-link" data-scroll-target="#multiple-checks-in-one-command">Multiple Checks in One Command</a></li>
-  <li><a href="#seeing-and-saving-failing-rows" id="toc-seeing-and-saving-failing-rows" class="nav-link" data-scroll-target="#seeing-and-saving-failing-rows">Seeing and Saving Failing Rows</a></li>
-  <li><a href="#advanced-options-and-cicd-integration" id="toc-advanced-options-and-cicd-integration" class="nav-link" data-scroll-target="#advanced-options-and-cicd-integration">Advanced Options and CI/CD Integration</a></li>
+  <li><a href="#install" id="toc-install" class="nav-link" data-scroll-target="#install">1. Install</a></li>
+  <li><a href="#configure-your-ide" id="toc-configure-your-ide" class="nav-link" data-scroll-target="#configure-your-ide">2. Configure Your IDE</a></li>
+  <li><a href="#start-chatting" id="toc-start-chatting" class="nav-link" data-scroll-target="#start-chatting">3. Start Chatting</a></li>
   </ul></li>
-  <li><a href="#pb-run-custom-validation-workflows-with-python" id="toc-pb-run-custom-validation-workflows-with-python" class="nav-link" data-scroll-target="#pb-run-custom-validation-workflows-with-python"><code>pb run</code>: Custom Validation Workflows with Python</a>
+  <li><a href="#essential-commands" id="toc-essential-commands" class="nav-link" data-scroll-target="#essential-commands">Essential Commands</a>
   <ul class="collapse">
-  <li><a href="#output-options" id="toc-output-options" class="nav-link" data-scroll-target="#output-options">Output Options</a></li>
-  <li><a href="#controlling-failure-behavior" id="toc-controlling-failure-behavior" class="nav-link" data-scroll-target="#controlling-failure-behavior">Controlling Failure Behavior</a></li>
+  <li><a href="#load-data" id="toc-load-data" class="nav-link" data-scroll-target="#load-data">Load Data</a></li>
+  <li><a href="#check-quality" id="toc-check-quality" class="nav-link" data-scroll-target="#check-quality">Check Quality</a></li>
+  <li><a href="#create-data-validations" id="toc-create-data-validations" class="nav-link" data-scroll-target="#create-data-validations">Create Data Validations</a></li>
+  <li><a href="#run-and-export" id="toc-run-and-export" class="nav-link" data-scroll-target="#run-and-export">Run and Export</a></li>
   </ul></li>
-  <li><a href="#wrapping-up" id="toc-wrapping-up" class="nav-link" data-scroll-target="#wrapping-up">Wrapping Up</a></li>
+  <li><a href="#top-three-use-cases" id="toc-top-three-use-cases" class="nav-link" data-scroll-target="#top-three-use-cases">Top Three Use Cases</a>
+  <ul class="collapse">
+  <li><a href="#quick-data-check" id="toc-quick-data-check" class="nav-link" data-scroll-target="#quick-data-check">1. 📊 Quick Data Check</a></li>
+  <li><a href="#daily-validation" id="toc-daily-validation" class="nav-link" data-scroll-target="#daily-validation">2. 🔄 Daily Validation</a></li>
+  <li><a href="#issue-investigation" id="toc-issue-investigation" class="nav-link" data-scroll-target="#issue-investigation">3. 🚨 Issue Investigation</a></li>
+  </ul></li>
+  <li><a href="#common-validation-rules" id="toc-common-validation-rules" class="nav-link" data-scroll-target="#common-validation-rules">Common Validation Rules</a>
+  <ul class="collapse">
+  <li><a href="#data-integrity" id="toc-data-integrity" class="nav-link" data-scroll-target="#data-integrity">Data Integrity</a></li>
+  <li><a href="#business-logic" id="toc-business-logic" class="nav-link" data-scroll-target="#business-logic">Business Logic</a></li>
+  <li><a href="#cross-field-validation" id="toc-cross-field-validation" class="nav-link" data-scroll-target="#cross-field-validation">Cross-Field Validation</a></li>
+  </ul></li>
+  <li><a href="#some-tips-and-tricks" id="toc-some-tips-and-tricks" class="nav-link" data-scroll-target="#some-tips-and-tricks">Some Tips and Tricks</a>
+  <ul class="collapse">
+  <li><a href="#talk-naturally" id="toc-talk-naturally" class="nav-link" data-scroll-target="#talk-naturally">Talk Naturally</a></li>
+  <li><a href="#provide-context" id="toc-provide-context" class="nav-link" data-scroll-target="#provide-context">Provide Context</a></li>
+  <li><a href="#build-incrementally" id="toc-build-incrementally" class="nav-link" data-scroll-target="#build-incrementally">Build Incrementally</a></li>
+  <li><a href="#save-templates" id="toc-save-templates" class="nav-link" data-scroll-target="#save-templates">Save Templates</a></li>
+  </ul></li>
+  <li><a href="#file-support" id="toc-file-support" class="nav-link" data-scroll-target="#file-support">File Support</a></li>
+  <li><a href="#quick-troubleshooting" id="toc-quick-troubleshooting" class="nav-link" data-scroll-target="#quick-troubleshooting">Quick Troubleshooting</a></li>
+  <li><a href="#now-youre-ready" id="toc-now-youre-ready" class="nav-link" data-scroll-target="#now-youre-ready">Now You’re Ready!</a></li>
   </ul>
 </nav>
     </div>
@@ -464,7 +484,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title d-none d-lg-block">Data Validation</h1>
+<h1 class="title d-none d-lg-block">MCP Quick Start</h1>
 </div>
 
 
@@ -481,136 +501,260 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </header>
 
 
-<p>Validating data directly in the terminal with the Pointblank CLI offers a fast, scriptable, and repeatable way to check your data. This approach is especially useful for quick checks, CI/CD pipelines, and automation workflows, where you want immediate feedback and clear pass/fail results.</p>
-<p>The CLI commands are designed for efficiency: you can run validations with a single line, integrate them easily into shell scripts or data pipelines, and benefit from clear, color-coded output that’s easy to interpret at a glance.</p>
-<p>The <code>pb validate</code> command lets you perform common validation checks directly on your data source with a simple command-line interface. This works well both for quick, one-off checks and for use in automated pipelines.</p>
-<p>For more complex validation logic, the <code>pb run</code> command serves as a runner for validation scripts written with the Pointblank Python API, allowing you to execute custom validation workflows from the command line.</p>
-<section id="pb-validate-quick-one-line-data-checks" class="level2">
-<h2 class="anchored" data-anchor-id="pb-validate-quick-one-line-data-checks"><code>pb validate</code>: Quick, One-Line Data Checks</h2>
-<p>The <code>pb validate</code> command is your go-to for running common validation checks directly on your data source. It’s perfect for quick, one-off checks or for use in automated pipelines. You specify exactly which check you want to run using the <code>--check</code> option, making your intent clear and your validation explicit.</p>
-<p>Here’s how you construct a validation command:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate worldcities.csv <span class="at">--check</span> <span class="op">&lt;</span>check-name<span class="op">&gt;</span> [other options]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>You always provide the data source first, then specify one or more checks with <code>--check</code>. Each check can have its own options, such as <code>--column</code> or <code>--value</code>, depending on what you want to validate.</p>
-<section id="checking-for-duplicate-and-complete-rows" class="level3">
-<h3 class="anchored" data-anchor-id="checking-for-duplicate-and-complete-rows">Checking for Duplicate and Complete Rows</h3>
-<p>To check for duplicate rows, use the <code>rows-distinct</code> check:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate worldcities.csv <span class="at">--check</span> rows-distinct</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p><img src="../assets/pb-validate-rows-distinct-worldcities-csv.png" class="img-fluid" style="width:100.0%"></p>
-<p>The output shows you whether your data contains any duplicate rows, how many rows were checked, and if any duplicates were found. The color-coding of the results helps you quickly interpret the results, using green for pass and red for fail. Here, no duplicate rows were detected out of the 41K rows checked.</p>
-<p>To check that every row is complete (i.e., no missing values in any column), use the <code>rows-complete</code> check:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate worldcities.csv <span class="at">--check</span> rows-complete</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p><img src="../assets/pb-validate-rows-complete-worldcities-csv.png" class="img-fluid" style="width:100.0%"></p>
-<p>With this check we see that the <code>worldcities.csv</code> dataset has 739 rows containing at least one Null/missing value. And with any dataset, it’s easy to quickly spot if there are any rows with missing data using this command.</p>
-</section>
-<section id="checking-for-nulls-and-value-ranges" class="level3">
-<h3 class="anchored" data-anchor-id="checking-for-nulls-and-value-ranges">Checking for Nulls and Value Ranges</h3>
-<p>You can easily check for missing values in a column, or ensure that values fall within a certain range. Here’s how to check that all values in the <code>population</code> column are not null:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate worldcities.csv <span class="at">--check</span> col-vals-not-null <span class="at">--column</span> city_name</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p><img src="../assets/pb-validate-worldcities-not-null-city_name.png" class="img-fluid" style="width:100.0%"></p>
-<p>Perhaps surprisingly, we find that one row has a missing city name.</p>
-<p>Let’s now check whether all values in the <code>population</code> column are greater than zero:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate worldcities.csv <span class="at">--check</span> col-vals-gt <span class="at">--column</span> population <span class="at">--value</span> 0</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p><img src="../assets/pb-validate-worldcities-gt-0-population.png" class="img-fluid" style="width:100.0%"></p>
-<p>With that we find that there are 741 rows where the <code>population</code> value is not greater than 0 (note that this check also fails when cells are null or missing).</p>
-</section>
-<section id="multiple-checks-in-one-command" class="level3">
-<h3 class="anchored" data-anchor-id="multiple-checks-in-one-command">Multiple Checks in One Command</h3>
-<p>You can chain several checks together in a single command. This is handy for comprehensive data quality checks:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate worldcities.csv <span class="at">--check</span> rows-distinct <span class="at">--check</span> col-vals-not-null <span class="at">--column</span> city_name <span class="at">--check</span> col-vals-gt <span class="at">--column</span> population <span class="at">--value</span> 0</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p><img src="../assets/pb-validate-multi-check.png" class="img-fluid" style="width:100.0%"></p>
-<p>Each check is shown one after the other in the terminal output, so you can review the result of each validation step individually as the command proceeds.</p>
-</section>
-<section id="seeing-and-saving-failing-rows" class="level3">
-<h3 class="anchored" data-anchor-id="seeing-and-saving-failing-rows">Seeing and Saving Failing Rows</h3>
-<p>If a check fails, you might want to see which rows caused the failure. Use the <code>--show-extract</code> option to display failing rows right in the terminal:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate worldcities.csv <span class="at">--check</span> rows-complete <span class="at">--show-extract</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p><img src="../assets/pb-validate-show-extract.png" class="img-fluid" style="width:100.0%"></p>
-<p>Or, save the failing rows to a CSV file for further investigation:</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate worldcities.csv <span class="at">--check</span> rows-complete <span class="at">--show-extract</span> <span class="at">--write-extract</span> incomplete_failing_rows</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p><img src="../assets/pb-validate-write-extract.png" class="img-fluid" style="width:100.0%"></p>
-<p>Note here in the output the additional lines stating that failing rows were saved to a folder (<code>incomplete_failing_rows</code>) and, within that folder the <code>step_01_rows_complete.csv</code> file was written. Using a folder for extracts is necessary in practice since there may be multiple validations defined in a <code>pb validate</code> command.</p>
-</section>
-<section id="advanced-options-and-cicd-integration" class="level3">
-<h3 class="anchored" data-anchor-id="advanced-options-and-cicd-integration">Advanced Options and CI/CD Integration</h3>
+<section id="getting-started-in-5-minutes" class="level2">
+<h2 class="anchored" data-anchor-id="getting-started-in-5-minutes">Getting Started in 5 Minutes</h2>
+<p>Transform your data validation workflow with conversational AI in VS Code or Positron IDE. Here are three simple steps to start validating data through conversation (and no complex configuration required).</p>
+<section id="install" class="level3">
+<h3 class="anchored" data-anchor-id="install">1. Install</h3>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install pointblank<span class="pp">[</span><span class="ss">mcp,pd,excel</span><span class="pp">]</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>What this installs:</strong></p>
 <ul>
-<li>use <code>--exit-code</code> to make the command exit with a non-zero code if any check fails; useful for CI/CD pipelines</li>
-<li>use <code>--limit</code> to control how many failing rows are shown or saved</li>
-<li>use <code>--list-checks</code> to see all available validation checks and their options</li>
+<li><code>mcp</code> - Model Context Protocol server dependencies</li>
+<li><code>pd</code> - pandas backend for data processing</li>
+<li><code>excel</code> - Excel file support (<code>openpyxl</code>)</li>
 </ul>
-<div class="sourceCode" id="cb9"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate worldcities.csv <span class="at">--check</span> col-vals-not-null <span class="at">--column</span> city_name <span class="at">--exit-code</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p><img src="../assets/pb-validate-exit-code.png" class="img-fluid" style="width:100.0%"></p>
+<p><strong>Alternative installs based on your needs:</strong></p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Minimal MCP server only</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install pointblank<span class="pp">[</span><span class="ss">mcp</span><span class="pp">]</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Add Polars for faster data processing</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install pointblank<span class="pp">[</span><span class="ss">mcp,pd,pl</span><span class="pp">]</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Full installation with all backends</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install pointblank<span class="pp">[</span><span class="ss">mcp,pd,pl,excel</span><span class="pp">]</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="configure-your-ide" class="level3">
+<h3 class="anchored" data-anchor-id="configure-your-ide">2. Configure Your IDE</h3>
+<p><strong>For VS Code</strong>:</p>
+<p><strong>Option 1: Workspace Configuration (Recommended for teams)</strong></p>
+<ol type="1">
+<li>Create a <code>.vscode/mcp.json</code> file in your project folder</li>
+<li>Add this configuration:</li>
+</ol>
+<div class="sourceCode" id="cb3"><pre class="sourceCode json code-with-copy"><code class="sourceCode json"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"servers"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"pointblank"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>      <span class="dt">"command"</span><span class="fu">:</span> <span class="st">"python"</span><span class="fu">,</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>      <span class="dt">"args"</span><span class="fu">:</span> <span class="ot">[</span><span class="st">"-m"</span><span class="ot">,</span> <span class="st">"pointblank_mcp_server.pointblank_server"</span><span class="ot">]</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">}</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">}</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Option 2: User Configuration (Personal use)</strong></p>
+<ol type="1">
+<li>Run command: <code>MCP: Open User Configuration</code> (Cmd/Ctrl + Shift + P)</li>
+<li>Add the same JSON configuration above</li>
+</ol>
+<blockquote class="blockquote">
+<p>⚠️ <strong>Security Note</strong>: Only add MCP servers from trusted sources. VS Code will ask you to confirm trust when starting the server for the first time.</p>
+</blockquote>
+<p><strong>For Positron</strong>:</p>
+<ol type="1">
+<li>Open Positron Settings</li>
+<li>Navigate to MCP Server configuration</li>
+<li>Add the configuration (format may vary)</li>
+</ol>
+<blockquote class="blockquote">
+<p><strong>Note</strong>: If you don’t see MCP settings, you may need to install an MCP extension first. Search for “MCP” in the Extensions marketplace.</p>
+</blockquote>
+</section>
+<section id="start-chatting" class="level3">
+<h3 class="anchored" data-anchor-id="start-chatting">3. Start Chatting</h3>
+<pre><code>"Load my sales data and check its quality"</code></pre>
+<p>That’s basically how you get started.</p>
 </section>
 </section>
-<section id="pb-run-custom-validation-workflows-with-python" class="level2">
-<h2 class="anchored" data-anchor-id="pb-run-custom-validation-workflows-with-python"><code>pb run</code>: Custom Validation Workflows with Python</h2>
-<p>For more complex validation logic, use the <code>pb run</code> command. This lets you execute a Python script containing Pointblank validation steps, combining the flexibility of the Python API with the convenience of the CLI.</p>
-<p>You can always scaffold a template script using the <code>pb make-template</code> command:</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> make-template my_validation.py</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p><img src="../assets/pb-make-template.png" class="img-fluid" style="width:100.0%"></p>
-<p>But for our example, we’ll elect to make our own <code>worldcities_validation.py</code> file from scratch. It will:</p>
+<section id="essential-commands" class="level2">
+<h2 class="anchored" data-anchor-id="essential-commands">Essential Commands</h2>
+<p>Master these four command patterns and you’ll be able to handle most data validation scenarios. Think of these as your fundamental vocabulary for talking to Pointblank.</p>
+<section id="load-data" class="level3">
+<h3 class="anchored" data-anchor-id="load-data">Load Data</h3>
+<pre><code>"Load the file /path/to/data.csv"
+"Open my customer data from Downloads"
+"Load the Excel file with sales metrics"</code></pre>
+</section>
+<section id="check-quality" class="level3">
+<h3 class="anchored" data-anchor-id="check-quality">Check Quality</h3>
+<pre><code>"Analyze the data quality"
+"What issues should I worry about?"
+"Check for missing values and duplicates"</code></pre>
+</section>
+<section id="create-data-validations" class="level3">
+<h3 class="anchored" data-anchor-id="create-data-validations">Create Data Validations</h3>
+<pre><code>"Set up validation rules for this data"
+"Check that all emails are valid"
+"Make sure amounts are positive"</code></pre>
+</section>
+<section id="run-and-export" class="level3">
+<h3 class="anchored" data-anchor-id="run-and-export">Run and Export</h3>
+<pre><code>"Run the validation"
+"Show me what failed"
+"Export problem rows to CSV"</code></pre>
+<hr>
+</section>
+</section>
+<section id="top-three-use-cases" class="level2">
+<h2 class="anchored" data-anchor-id="top-three-use-cases">Top Three Use Cases</h2>
+<p>Once you have Pointblank set up, these scenarios show the most common and powerful ways to use natural language data validation. Each example demonstrates the conversational flow and immediate value you’ll experience.</p>
+<section id="quick-data-check" class="level3">
+<h3 class="anchored" data-anchor-id="quick-data-check">1. 📊 Quick Data Check</h3>
+<p><strong>When</strong>: You get a new dataset</p>
+<pre><code>👤 "I just got customer_data.csv. Is it clean?"
+🤖 "Loading... Found 15K customers. Issues:
+    - ✅ No duplicate IDs
+    - ⚠️ 2% missing phones
+    - ❌ 234 invalid emails
+    Want me to fix the emails?"</code></pre>
+</section>
+<section id="daily-validation" class="level3">
+<h3 class="anchored" data-anchor-id="daily-validation">2. 🔄 Daily Validation</h3>
+<p><strong>When</strong>: Regular data quality checks</p>
+<pre><code>👤 "Run our standard sales validation"
+🤖 "Running daily_sales template...
+    ✅ All checks passed!
+    3,247 transactions validated
+    Ready for dashboard update"</code></pre>
+</section>
+<section id="issue-investigation" class="level3">
+<h3 class="anchored" data-anchor-id="issue-investigation">3. 🚨 Issue Investigation</h3>
+<p><strong>When</strong>: Something looks wrong</p>
+<pre><code>👤 "Conversion rates jumped to 95%. That's impossible"
+🤖 "Found the problem! Test data contamination:
+    - 1,247 test emails with 100% conversion
+    - Real rate is 4.2% (normal)
+    Should I clean the data?"</code></pre>
+<p>These examples show how natural conversation can quickly identify and resolve data quality issues that might take hours to diagnose manually.</p>
+</section>
+</section>
+<section id="common-validation-rules" class="level2">
+<h2 class="anchored" data-anchor-id="common-validation-rules">Common Validation Rules</h2>
+<p>Understanding what validation rules to ask for will help you quickly build comprehensive data quality checks. These examples cover the most frequent validation scenarios across different industries and data types.</p>
+<section id="data-integrity" class="level3">
+<h3 class="anchored" data-anchor-id="data-integrity">Data Integrity</h3>
 <ul>
-<li>use the <code>worldcities.csv</code> file</li>
-<li>apply two thresholds (one for ‘warning’, another for ‘error’)</li>
-<li>have six validation steps</li>
+<li>“Check for duplicate IDs”</li>
+<li>“Ensure no missing required fields”</li>
+<li>“Validate that dates are reasonable”</li>
 </ul>
-<p>Here’s what it looks like:</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    pb.Validate(</span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>        data<span class="op">=</span><span class="st">"worldcities.csv"</span>,</span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>        thresholds<span class="op">=</span>pb.Thresholds(</span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>            warning<span class="op">=</span><span class="dv">1</span>,  <span class="co"># 1 failure</span></span>
-<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>            error<span class="op">=</span><span class="fl">0.05</span>,  <span class="co"># 5% of rows failing</span></span>
-<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>        ),</span>
-<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>    .col_schema_match(</span>
-<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>        schema<span class="op">=</span>pb.Schema(</span>
-<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>            columns<span class="op">=</span>[</span>
-<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>                (<span class="st">"city_name"</span>, <span class="st">"object"</span>),</span>
-<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>                (<span class="st">"latitude"</span>, <span class="st">"float64"</span>),</span>
-<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>                (<span class="st">"longitude"</span>, <span class="st">"float64"</span>),</span>
-<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>                (<span class="st">"country"</span>, <span class="st">"object"</span>),</span>
-<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>                (<span class="st">"population"</span>, <span class="st">"float64"</span>),</span>
-<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>            ]</span>
-<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>        ),</span>
-<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a>    .col_vals_not_null(columns<span class="op">=</span><span class="st">"city_name"</span>)</span>
-<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a>    .col_vals_not_null(columns<span class="op">=</span><span class="st">"population"</span>)</span>
-<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a>    .col_vals_gt(columns<span class="op">=</span><span class="st">"population"</span>, value<span class="op">=</span><span class="dv">0</span>, na_pass<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a>    .col_vals_between(columns<span class="op">=</span><span class="st">"latitude"</span>, left<span class="op">=-</span><span class="dv">90</span>, right<span class="op">=</span><span class="dv">90</span>)</span>
-<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a>    .col_vals_between(columns<span class="op">=</span><span class="st">"longitude"</span>, left<span class="op">=-</span><span class="dv">180</span>, right<span class="op">=</span><span class="dv">180</span>)</span>
-<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
-<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Now, we’ll run the .py script from the terminal:</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> run worldcities_validation.py</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p><img src="../assets/pb-run-worldcities_validation.png" class="img-fluid" style="width:100.0%"></p>
-<p>You’ll see a summary table that lists all of the steps and their results and you can include as many steps and as much logic as you need.</p>
-<section id="output-options" class="level3">
-<h3 class="anchored" data-anchor-id="output-options">Output Options</h3>
-<p>You could save the validation report as HTML or JSON (or both) for the purposes of sharing or for automation:</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> run worldcities_validation.py <span class="at">--output-html</span> report.html <span class="at">--output-json</span> report.json</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p><img src="../assets/pb-run-worldcities_validation-output.png" class="img-fluid" style="width:100.0%"></p>
-<p>There are also the options to produce extracts (subset of failing rows) with <code>--show-extract</code> or <code>--write-extract</code> (just like with <code>pb validate</code>). Let’s do both in the following example:</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> run worldcities_validation.py <span class="at">--show-extract</span> <span class="at">--write-extract</span> worldcities_failures</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p><img src="../assets/pb-run-worldcities_validation-extracts.png" class="img-fluid" style="width:100.0%"></p>
-<p>This shows a preview of each extract for those validation steps where extracts were produced (steps 2, 3, and 4). Individual CSV files with extracted rows for those steps were written to the <code>worldcities_failures</code> directory.</p>
 </section>
-<section id="controlling-failure-behavior" class="level3">
-<h3 class="anchored" data-anchor-id="controlling-failure-behavior">Controlling Failure Behavior</h3>
-<p>It’s possible to use the <code>--fail-on</code> option to control when the command should exit with an error, based on the severity of validation failures. This is especially useful for automated workflows and CI/CD pipelines.</p>
-<p>Let’s try that with our <code>worldcities_validation.py</code> validation, which we’ve seen exeeds the ‘warning’ in steps 2, 3, and 4:</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> run worldcities_validation.py <span class="at">--fail-on</span> warning</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p><img src="../assets/pb-run-worldcities_validation-fail-on-warning.png" class="img-fluid" style="width:100.0%"></p>
-<p>Notice the final line states <code>Exiting with error due to warning, error, or critical validation failures</code>. Because we applied <code>--fail-on warning</code>, any presence of `warning’ (or higher levels such as ‘error’ or ‘critical’) will yield a non-zero exit code that should stop a pipeline process. We can prove this by running the following lines in the terminal</p>
-<div class="sourceCode" id="cb16"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> run worldcities_validation.py <span class="at">--fail-on</span> warning <span class="op">&gt;</span> /dev/null <span class="dv">2</span><span class="op">&gt;&amp;</span><span class="dv">1</span></span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="va">$?</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>which returns <code>1</code>.</p>
+<section id="business-logic" class="level3">
+<h3 class="anchored" data-anchor-id="business-logic">Business Logic</h3>
+<ul>
+<li>“Amounts must be positive”</li>
+<li>“Email addresses must be valid format”</li>
+<li>“Status must be active, inactive, or pending”</li>
+</ul>
+</section>
+<section id="cross-field-validation" class="level3">
+<h3 class="anchored" data-anchor-id="cross-field-validation">Cross-Field Validation</h3>
+<ul>
+<li>“End date must be after start date”</li>
+<li>“Discount percentage between 0 and 100”</li>
+<li>“Age must match birth date”</li>
+</ul>
+<p>These rule patterns can be combined and customized for your specific data and business requirements. The natural language interface makes it easy to express complex validation logic without learning technical syntax.</p>
 </section>
 </section>
-<section id="wrapping-up" class="level2">
-<h2 class="anchored" data-anchor-id="wrapping-up">Wrapping Up</h2>
-<p>Pointblank’s CLI gives you powerful tools for validating your data, whether you need a quick check or a custom workflow. Use <code>pb validate</code> for fast, one-liner checks and <code>pb run</code> for more advanced, scriptable validation logic. With clear output and flexible options, you can catch data issues early and keep your workflows running smoothly.</p>
+<section id="some-tips-and-tricks" class="level2">
+<h2 class="anchored" data-anchor-id="some-tips-and-tricks">Some Tips and Tricks</h2>
+<p>These recommendations will help you get more value from your Pointblank MCP server and avoid some common pitfalls.</p>
+<section id="talk-naturally" class="level3">
+<h3 class="anchored" data-anchor-id="talk-naturally">Talk Naturally</h3>
+<p>✅ <strong>Good:</strong> “Check if customer emails look valid”</p>
+<p>❌ <strong>Avoid:</strong> “Execute col_vals_regex on email column”</p>
+</section>
+<section id="provide-context" class="level3">
+<h3 class="anchored" data-anchor-id="provide-context">Provide Context</h3>
+<p>✅ <strong>Good:</strong> “This is for the board presentation”</p>
+<p>❌ <strong>Avoid:</strong> Just asking for validation without explanation</p>
+</section>
+<section id="build-incrementally" class="level3">
+<h3 class="anchored" data-anchor-id="build-incrementally">Build Incrementally</h3>
+<ol type="1">
+<li>Start with data profiling</li>
+<li>Add basic validation rules</li>
+<li>Create templates for reuse</li>
+<li>Set up automated checks</li>
+</ol>
+</section>
+<section id="save-templates" class="level3">
+<h3 class="anchored" data-anchor-id="save-templates">Save Templates</h3>
+<pre><code>"Save these rules as 'customer_validation'"
+"Apply the financial_data template"
+"Use our standard survey validation"</code></pre>
+<p>These practices help you build data quality workflows that scale with your needs while remaining accessible to those with varying technical backgrounds.</p>
+</section>
+</section>
+<section id="file-support" class="level2">
+<h2 class="anchored" data-anchor-id="file-support">File Support</h2>
+<p>Pointblank works with many major data file formats, making it easy to validate data regardless of how it’s stored. This support means you can maintain consistent validation practices across your entire data ecosystem.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Extensions</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>CSV</strong></td>
+<td><code>.csv</code></td>
+<td><code>sales_data.csv</code></td>
+</tr>
+<tr class="even">
+<td><strong>Excel</strong></td>
+<td><code>.xlsx</code>, <code>.xls</code></td>
+<td><code>monthly_report.xlsx</code></td>
+</tr>
+<tr class="odd">
+<td><strong>Parquet</strong></td>
+<td><code>.parquet</code></td>
+<td><code>big_data.parquet</code></td>
+</tr>
+<tr class="even">
+<td><strong>JSON</strong></td>
+<td><code>.json</code>, <code>.jsonl</code></td>
+<td><code>api_response.json</code></td>
+</tr>
+</tbody>
+</table>
+<p>The consistent natural language interface works the same regardless of file format, so you can focus on validation logic rather than technical details.</p>
+</section>
+<section id="quick-troubleshooting" class="level2">
+<h2 class="anchored" data-anchor-id="quick-troubleshooting">Quick Troubleshooting</h2>
+<p>When you encounter issues, these quick fixes resolve the most common problems. Furthermore, the natural language interface means you can always ask for help and explanations.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Problem</th>
+<th>Quick Fix</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>“File not found”</td>
+<td>Use full file path: <code>/Users/name/data.csv</code></td>
+</tr>
+<tr class="even">
+<td>Validation too slow</td>
+<td>“Use a sample for testing”</td>
+</tr>
+<tr class="odd">
+<td>Don’t understand error</td>
+<td>“Explain why validation failed”</td>
+</tr>
+<tr class="even">
+<td>Need help</td>
+<td>“Show me examples of data quality checks”</td>
+</tr>
+</tbody>
+</table>
+<p>Remember, you can always ask the AI to explain what’s happening or suggest solutions when you run into problems.</p>
+</section>
+<section id="now-youre-ready" class="level2">
+<h2 class="anchored" data-anchor-id="now-youre-ready">Now You’re Ready!</h2>
+<p>You now have everything needed to start validating data through conversation. The beauty of Pointblank’s MCP server is that it grows with your expertise: start simple and gradually build more sophisticated validation workflows as you become comfortable with the interface.</p>
+<p>Start with simple commands and build up to more complex validation workflows. The AI will guide you through the process and help you create robust data quality checks!</p>
 
 
 </section>
@@ -1017,14 +1161,11 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
   </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../user-guide/cli-data-inspection.html" class="pagination-link" aria-label="Data Inspection">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Data Inspection</span>
+      <a href="../user-guide/cli-reference.html" class="pagination-link" aria-label="CLI Reference">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">CLI Reference</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../user-guide/cli-reference.html" class="pagination-link" aria-label="CLI Reference">
-        <span class="nav-page-text">CLI Reference</span> <i class="bi bi-arrow-right-short"></i>
-      </a>
   </div>
 </nav>
 </div> <!-- /content -->
