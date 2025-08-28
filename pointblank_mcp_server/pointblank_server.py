@@ -137,6 +137,10 @@ def _load_dataframe_from_path(input_path: str, backend: str = "auto") -> Any:
             return pd.read_excel(p_path, engine="openpyxl")
         elif p_path.suffix.lower() == ".parquet":
             return pd.read_parquet(p_path)
+        elif p_path.suffix.lower() == ".json":
+            return pd.read_json(p_path)
+        elif p_path.suffix.lower() == ".jsonl":
+            return pd.read_json(p_path, lines=True)
     elif backend == "polars":
         if not HAS_POLARS:
             raise ImportError("Polars not available. Install with: pip install polars")
@@ -145,6 +149,10 @@ def _load_dataframe_from_path(input_path: str, backend: str = "auto") -> Any:
             return pl.read_csv(p_path)
         elif p_path.suffix.lower() == ".parquet":
             return pl.read_parquet(p_path)
+        elif p_path.suffix.lower() == ".json":
+            return pl.read_json(p_path)
+        elif p_path.suffix.lower() == ".jsonl":
+            return pl.read_ndjson(p_path)
         elif p_path.suffix.lower() in [".xls", ".xlsx"]:
             # Polars doesn't directly support Excel, fall back to pandas if available
             if HAS_PANDAS:
