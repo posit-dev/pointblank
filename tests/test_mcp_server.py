@@ -5,7 +5,7 @@ import pytest
 
 # Import the fastmcp Client and your mcp application instance
 from fastmcp import Client
-from mcp_folder.pointblank_server import mcp
+from pointblank_mcp_server.pointblank_server import mcp
 
 # --- Fixtures ---
 
