@@ -12,26 +12,7 @@ Transform your data validation workflow with conversational AI in VS Code or Pos
 ### 1. Install
 
 ```bash
-pip install pointblank[mcp,pd,excel]
-```
-
-**What this installs:**
-
-- `mcp` - Model Context Protocol server dependencies
-- `pd` - pandas backend for data processing
-- `excel` - Excel file support (`openpyxl`)
-
-**Alternative installs based on your needs:**
-
-```bash
-# Minimal MCP server only
 pip install pointblank[mcp]
-
-# Add Polars for faster data processing
-pip install pointblank[mcp,pd,pl]
-
-# Full installation with all backends
-pip install pointblank[mcp,pd,pl,excel]
 ```
 
 ### 2. Configure Your IDE
@@ -79,38 +60,57 @@ That's basically how you get started.
 
 ## Essential Commands
 
-Master these four command patterns and you'll be able to handle most data validation scenarios. Think of these as your fundamental vocabulary for talking to Pointblank.
+Master these five command patterns and you'll be able to handle most data validation scenarios. Think of these as your fundamental vocabulary for talking to Pointblank.
 
 ### Load Data
 
 ```
 "Load the file /path/to/data.csv"
-"Open my customer data from Downloads"
-"Load the Excel file with sales metrics"
+"Load my Netflix dataset from Downloads"
+"Load the CSV file with sales metrics"
+"Load customer_data.csv as my main dataset"
 ```
+
+### Explore Data
+
+```
+"Analyze the data for netflix_data"
+"Show me a preview of the loaded data"
+"Create a column summary table"
+"Generate a missing values analysis"
+```
+
+**What you'll get**: Comprehensive data profiling with statistics including missing values, data types, distributions, and summary statistics for each column. The preview and summary tables are automatically generated as beautiful HTML files that open in your browser. This gives you a complete picture of your dataset's structure and characteristics before you define quality rules.
 
 ### Check Quality
 
 ```
-"Analyze the data quality"
-"What issues should I worry about?"
-"Check for missing values and duplicates"
+"Create a validator for netflix_data"
+"Add validation that ratings are between 0 and 10"
+"Check that all release years are reasonable"
+"Apply the basic_quality template"
 ```
+
+**What you'll get**: Actual data quality validation that checks your data against business rules and domain knowledge. This tells you if your data meets your specific quality requirements and identifies rows that fail validation criteria.
 
 ### Create Data Validations
 
 ```
-"Set up validation rules for this data"
-"Check that all emails are valid"
-"Make sure amounts are positive"
+"Add validation that show_id values are unique"
+"Check that cast field is not empty for movies"
+"Ensure vote_count is greater than 0"
+"Validate that country field follows ISO format"
 ```
+
+**What you'll get**: Individual validation rules added to your validator. Each rule tests a specific business requirement and can be customized with thresholds and actions.
 
 ### Run and Export
 
 ```
-"Run the validation"
-"Show me what failed"
-"Export problem rows to CSV"
+"Run the validation and show results"
+"Export validation failures to CSV"
+"Get failed rows for step 2"
+"Save the validation report"
 ```
 
 ---
@@ -124,12 +124,13 @@ Once you have Pointblank set up, these scenarios show the most common and powerf
 **When**: You get a new dataset
 
 ```
-👤 "I just got customer_data.csv. Is it clean?"
-🤖 "Loading... Found 15K customers. Issues:
-    - ✅ No duplicate IDs
-    - ⚠️ 2% missing phones
-    - ❌ 234 invalid emails
-    Want me to fix the emails?"
+👤 "I just got netflix_data.csv. Is it clean?"
+🤖 "Loading dataset... Found 16,000 movies/shows with 18 columns.
+    Quality analysis complete:
+    - ✅ No duplicate show IDs
+    - ⚠️ 466 missing countries (2.9%)
+    - ⚠️ 132 missing directors (0.8%)
+    Opening data preview in your browser..."
 ```
 
 ### 2. 🔄 Daily Validation
@@ -137,11 +138,12 @@ Once you have Pointblank set up, these scenarios show the most common and powerf
 **When**: Regular data quality checks
 
 ```
-👤 "Run our standard sales validation"
-🤖 "Running daily_sales template...
-    ✅ All checks passed!
-    3,247 transactions validated
-    Ready for dashboard update"
+👤 "Apply the basic_quality template to my data"
+🤖 "Creating validator with basic quality checks...
+    ✅ Data types validated
+    ✅ Missing value thresholds checked
+    ✅ Duplicate detection passed
+    Validation complete! All checks passed."
 ```
 
 ### 3. 🚨 Issue Investigation
@@ -149,36 +151,72 @@ Once you have Pointblank set up, these scenarios show the most common and powerf
 **When**: Something looks wrong
 
 ```
-👤 "Conversion rates jumped to 95%. That's impossible"
-🤖 "Found the problem! Test data contamination:
-    - 1,247 test emails with 100% conversion
-    - Real rate is 4.2% (normal)
-    Should I clean the data?"
+👤 "Show me movies with ratings above 9.5"
+🤖 "Creating validator for high ratings...
+    Found 47 entries with ratings > 9.5
+    Exporting suspicious rows to CSV
+    Most are documentaries - could be valid!"
 ```
 
 These examples show how natural conversation can quickly identify and resolve data quality issues that might take hours to diagnose manually.
 
+## Core Capabilities
+
+Pointblank's MCP server provides powerful tools for comprehensive data validation with beautiful, interactive HTML reports:
+
+### Data Exploration
+
+- **Interactive HTML previews** with automatic browser opening showing head/tail rows
+- **Column summary tables** with detailed statistics and color-coded data types
+- **Missing values analysis** with visual patterns and percentages
+- **Data quality analysis** with comprehensive profiling insights
+
+### Validation Workflows
+
+- **Validator creation** with flexible thresholds and configuration
+- **Many validation types** for comprehensive data quality checking
+- **Step-by-step validation** building with natural language commands
+- **Template-based validation** for common data quality patterns
+
+### HTML Reports & Analysis
+
+- **Interactive validation reports** automatically opened in your browser
+- **Timestamped HTML files** for easy sharing and documentation
+- **Python code generation** for reproducible validation scripts
+
+All interactions use natural language, making advanced data validation accessible to users at any technical level while producing publication-ready HTML reports.
+
 ## Common Validation Rules
 
-Understanding what validation rules to ask for will help you quickly build comprehensive data quality checks. These examples cover the most frequent validation scenarios across different industries and data types.
+Understanding what validation rules to ask for will help you quickly build comprehensive data quality checks. These examples cover the most frequent validation scenarios using Pointblank's built-in validation functions.
 
 ### Data Integrity
 
-- "Check for duplicate IDs"
-- "Ensure no missing required fields"
-- "Validate that dates are reasonable"
+- "Check for duplicate show IDs"
+- "Ensure no missing required fields like title"
+- "Validate that release years are between 1900 and 2025"
 
 ### Business Logic
 
-- "Amounts must be positive"
-- "Email addresses must be valid format"
-- "Status must be active, inactive, or pending"
+- "Ratings must be between 0 and 10"
+- "Budget must be positive numbers"
+- "Duration should be greater than 0"
 
 ### Cross-Field Validation
 
-- "End date must be after start date"
-- "Discount percentage between 0 and 100"
-- "Age must match birth date"
+- "Release year should match date_added year"
+- "Vote count should correlate with popularity"
+- "Movies should have directors specified"
+
+### Available Templates
+
+Pointblank includes pre-built validation templates:
+
+- `basic_quality` - Essential data quality checks
+- `financial_data` - Money and numeric validations
+- `customer_data` - Personal information validations
+- `sensor_data` - Time series and measurement checks
+- `survey_data` - Response and rating validations
 
 These rule patterns can be combined and customized for your specific data and business requirements. The natural language interface makes it easy to express complex validation logic without learning technical syntax.
 
@@ -213,20 +251,39 @@ These recommendations will help you get more value from your Pointblank MCP serv
 "Use our standard survey validation"
 ```
 
+### Interactive Visual Tables
+
+Pointblank automatically generates beautiful, interactive HTML tables for data exploration:
+
+```
+"Show me a preview of the data"
+"Generate a column summary table"
+"Create a missing values analysis"
+```
+
+These commands create professional HTML tables with:
+
+- **Color-coded data types** (numeric in purple, text in yellow)
+- **Gradient styling** tailored to each table type
+- **Automatic browser opening** for immediate viewing
+- **Timestamped files** for easy reference and sharing
+
+The tables open automatically in your default browser, making it easy to share data insights with colleagues or include in presentations.
+
 These practices help you build data quality workflows that scale with your needs while remaining accessible to those with varying technical backgrounds.
 
 ## File Support
 
 Pointblank works with many major data file formats, making it easy to validate data regardless of how it's stored. This support means you can maintain consistent validation practices across your entire data ecosystem.
 
-| Type | Extensions | Example |
-|------|------------|---------|
-| **CSV** | `.csv` | `sales_data.csv` |
-| **Excel** | `.xlsx`, `.xls` | `monthly_report.xlsx` |
-| **Parquet** | `.parquet` | `big_data.parquet` |
-| **JSON** | `.json`, `.jsonl` | `api_response.json` |
+| Type | Extensions | Example | Backend Support |
+|------|------------|---------|-----------------|
+| **CSV** | `.csv` | `sales_data.csv` | pandas, polars |
+| **Parquet** | `.parquet` | `big_data.parquet` | pandas, polars |
+| **JSON** | `.json` | `api_response.json` | pandas, polars |
+| **JSON Lines** | `.jsonl` | `streaming_data.jsonl` | pandas, polars |
 
-The consistent natural language interface works the same regardless of file format, so you can focus on validation logic rather than technical details.
+The consistent natural language interface works the same regardless of file format, so you can focus on validation logic rather than technical details. Polars provides faster processing for large datasets, while Pandas offers broader format support.
 
 ## Quick Troubleshooting
 
@@ -234,10 +291,14 @@ When you encounter issues, these quick fixes resolve the most common problems. F
 
 | Problem | Quick Fix |
 |---------|-----------|
-| "File not found" | Use full file path: `/Users/name/data.csv` |
-| Validation too slow | "Use a sample for testing" |
-| Don't understand error | "Explain why validation failed" |
-| Need help | "Show me examples of data quality checks" |
+| "File not found" | Use absolute path: `/Users/name/Downloads/data.csv` |
+| "DataFrame not found" | Check loaded datasets with "List my loaded dataframes" |
+| "Validator not found" | Use "List active validators" to see available validators |
+| "Validation too slow" | Try "Use pandas backend" or sample your data first |
+| "HTML tables won't open" | Check your default browser settings |
+| "Need validation ideas" | Ask "Show me validation templates" or "Suggest validations for my data" |
+
+**Browser Issues**: The HTML tables automatically open in your default browser. If they don't appear, check that your browser isn't blocking pop-ups and that you have a default browser set in your system preferences.
 
 Remember, you can always ask the AI to explain what's happening or suggest solutions when you run into problems.
 
