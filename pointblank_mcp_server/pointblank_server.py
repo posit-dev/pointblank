@@ -1905,11 +1905,11 @@ def prompt_interrogate_validator(
 @mcp.tool()
 def preview_table(
     ctx: Context,
-    dataframe_id: str = "ID of the loaded DataFrame to preview",
-    n_head: int = "Number of rows to show from the top",
-    n_tail: int = "Number of rows to show from the bottom",
-    limit: int = "Total row limit",
-    show_row_numbers: bool = "Whether to show row numbers",
+    dataframe_id: str,
+    n_head: int = 5,
+    n_tail: int = 5,
+    limit: int = 1000,
+    show_row_numbers: bool = True,
 ) -> str:
     """
     Display a preview of the DataFrame showing rows from top and bottom.
@@ -1919,9 +1919,12 @@ def preview_table(
     """
     try:
         # Get the DataFrame
-        data = ctx.loaded_dataframes.get(dataframe_id)
-        if data is None:
+        app_ctx: AppContext = ctx.request_context.lifespan_context
+
+        if dataframe_id not in app_ctx.loaded_dataframes:
             return f"❌ Error: DataFrame '{dataframe_id}' not found. Load a DataFrame first."
+
+        data = app_ctx.loaded_dataframes[dataframe_id]
 
         # Use Pointblank's preview function
         import pointblank as pb
@@ -1943,7 +1946,7 @@ def preview_table(
 @mcp.tool()
 def missing_values_table(
     ctx: Context,
-    dataframe_id: str = "ID of the loaded DataFrame to analyze",
+    dataframe_id: str,
 ) -> str:
     """
     Generate a table showing missing values analysis for the DataFrame.
@@ -1953,9 +1956,12 @@ def missing_values_table(
     """
     try:
         # Get the DataFrame
-        data = ctx.loaded_dataframes.get(dataframe_id)
-        if data is None:
+        app_ctx: AppContext = ctx.request_context.lifespan_context
+
+        if dataframe_id not in app_ctx.loaded_dataframes:
             return f"❌ Error: DataFrame '{dataframe_id}' not found. Load a DataFrame first."
+
+        data = app_ctx.loaded_dataframes[dataframe_id]
 
         # Use Pointblank's missing_vals_tbl function
         import pointblank as pb
@@ -1975,8 +1981,8 @@ def missing_values_table(
 @mcp.tool()
 def column_summary_table(
     ctx: Context,
-    dataframe_id: str = "ID of the loaded DataFrame to summarize",
-    table_name: str = "Optional name for the table",
+    dataframe_id: str,
+    table_name: str = None,
 ) -> str:
     """
     Generate a comprehensive column-level summary of the DataFrame.
@@ -1986,9 +1992,12 @@ def column_summary_table(
     """
     try:
         # Get the DataFrame
-        data = ctx.loaded_dataframes.get(dataframe_id)
-        if data is None:
+        app_ctx: AppContext = ctx.request_context.lifespan_context
+
+        if dataframe_id not in app_ctx.loaded_dataframes:
             return f"❌ Error: DataFrame '{dataframe_id}' not found. Load a DataFrame first."
+
+        data = app_ctx.loaded_dataframes[dataframe_id]
 
         # Use Pointblank's col_summary_tbl function
         import pointblank as pb
@@ -2008,8 +2017,8 @@ def column_summary_table(
 @mcp.tool()
 def validation_assistant(
     ctx: Context,
-    dataframe_id: str = "ID of the loaded DataFrame to create validation plan for",
-    validation_goal: str = "What type of validation: ",
+    dataframe_id: str,
+    validation_goal: str = "general data quality",
 ) -> str:
     """
     Interactive assistant to help create a validation plan for your data.
@@ -2019,9 +2028,12 @@ def validation_assistant(
     """
     try:
         # Get the DataFrame
-        data = ctx.loaded_dataframes.get(dataframe_id)
-        if data is None:
+        app_ctx: AppContext = ctx.request_context.lifespan_context
+
+        if dataframe_id not in app_ctx.loaded_dataframes:
             return f"❌ Error: DataFrame '{dataframe_id}' not found. Load a DataFrame first."
+
+        data = app_ctx.loaded_dataframes[dataframe_id]
 
         # Analyze the DataFrame structure
 
