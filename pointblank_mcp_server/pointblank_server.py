@@ -1903,7 +1903,7 @@ def prompt_interrogate_validator(
 
 
 @mcp.tool()
-def preview_table(
+async def preview_table(
     ctx: Context,
     dataframe_id: str,
     n_head: int = 5,
@@ -1936,7 +1936,55 @@ def preview_table(
         # Convert to HTML string for display
         html_output = gt_table.as_raw_html()
 
-        return f"✅ Table preview generated successfully!\n\nHTML preview available (showing {n_head} head + {n_tail} tail rows)\n\nUse save_html() method to save to file if needed."
+        # Save HTML to file for viewing
+
+        # Create a complete HTML document with nice styling
+        full_html = f"""
+<!DOCTYPE html>
+<html>
+<head>
+    <title>DataFrame Preview: {dataframe_id}</title>
+    <meta charset="utf-8">
+    <style>
+        body {{
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 20px;
+            background-color: #f8f9fa;
+        }}
+        .table-container {{
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow-x: auto;
+        }}
+    </style>
+</head>
+<body>
+    <div class="table-container">
+        {html_output}
+    </div>
+</body>
+</html>
+"""
+
+        # Save HTML to file for viewing
+        try:
+            # Save to a user-friendly location
+            html_filename = (
+                f"pointblank_preview_{dataframe_id}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.html"
+            )
+            html_path = Path.cwd() / html_filename
+
+            with open(html_path, "w", encoding="utf-8") as f:
+                f.write(full_html)
+
+            browser_msg = f"HTML preview saved to: {html_path}\n\n📖 To view the table, you can:\n1. Open the file in your browser\n2. Use: open_simple_browser with url: file://{html_path}"
+
+        except Exception as e:
+            browser_msg = f"Error saving HTML file: {str(e)}"
+
+        return f"✅ Table preview generated successfully!\n\n{browser_msg}\n\nShowing {n_head} head + {n_tail} tail rows from {data.shape[0]:,} total rows with {data.shape[1]} columns."
 
     except Exception as e:
         logger.error(f"Error creating table preview: {e}")
@@ -1944,7 +1992,7 @@ def preview_table(
 
 
 @mcp.tool()
-def missing_values_table(
+async def missing_values_table(
     ctx: Context,
     dataframe_id: str,
 ) -> str:
@@ -1971,7 +2019,53 @@ def missing_values_table(
         # Convert to HTML string for display
         html_output = gt_table.as_raw_html()
 
-        return "✅ Missing values analysis generated successfully!\n\nThe analysis shows patterns and statistics of missing values across all columns.\n\nUse save_html() method to save to file if needed."
+        # Save HTML to file for viewing
+
+        # Create a complete HTML document with nice styling
+        full_html = f"""
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Missing Values Analysis: {dataframe_id}</title>
+    <meta charset="utf-8">
+    <style>
+        body {{
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 20px;
+            background-color: #f8f9fa;
+        }}
+        .table-container {{
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow-x: auto;
+        }}
+    </style>
+</head>
+<body>
+    <div class="table-container">
+        {html_output}
+    </div>
+</body>
+</html>
+"""
+
+        # Save HTML to file for viewing
+        try:
+            # Save to a user-friendly location
+            html_filename = f"pointblank_missing_values_{dataframe_id}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.html"
+            html_path = Path.cwd() / html_filename
+
+            with open(html_path, "w", encoding="utf-8") as f:
+                f.write(full_html)
+
+            browser_msg = f"HTML analysis saved to: {html_path}\n\n📖 To view the analysis, you can:\n1. Open the file in your browser\n2. Use: open_simple_browser with url: file://{html_path}"
+
+        except Exception as e:
+            browser_msg = f"Error saving HTML file: {str(e)}"
+
+        return f"✅ Missing values analysis generated successfully!\n\n{browser_msg}\n\nDataset: {data.shape[0]:,} rows × {data.shape[1]} columns"
 
     except Exception as e:
         logger.error(f"Error creating missing values table: {e}")
@@ -1979,7 +2073,7 @@ def missing_values_table(
 
 
 @mcp.tool()
-def column_summary_table(
+async def column_summary_table(
     ctx: Context,
     dataframe_id: str,
     table_name: str = None,
@@ -2007,7 +2101,53 @@ def column_summary_table(
         # Convert to HTML string for display
         html_output = gt_table.as_raw_html()
 
-        return "✅ Column summary table generated successfully!\n\nThe summary includes:\n- Column names and types\n- Missing value statistics\n- Descriptive statistics for numeric columns\n- Unique value counts\n\nUse save_html() method to save to file if needed."
+        # Save HTML to file for viewing
+
+        # Create a complete HTML document with nice styling
+        full_html = f"""
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Column Summary: {dataframe_id}</title>
+    <meta charset="utf-8">
+    <style>
+        body {{
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 20px;
+            background-color: #f8f9fa;
+        }}
+        .table-container {{
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow-x: auto;
+        }}
+    </style>
+</head>
+<body>
+    <div class="table-container">
+        {html_output}
+    </div>
+</body>
+</html>
+"""
+
+        # Save HTML to file for viewing
+        try:
+            # Save to a user-friendly location
+            html_filename = f"pointblank_column_summary_{dataframe_id}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.html"
+            html_path = Path.cwd() / html_filename
+
+            with open(html_path, "w", encoding="utf-8") as f:
+                f.write(full_html)
+
+            browser_msg = f"HTML summary saved to: {html_path}\n\n📖 To view the summary, you can:\n1. Open the file in your browser\n2. Use: open_simple_browser with url: file://{html_path}"
+
+        except Exception as e:
+            browser_msg = f"Error saving HTML file: {str(e)}"
+
+        return f"✅ Column summary table generated successfully!\n\n{browser_msg}\n\nDataset: {data.shape[0]:,} rows × {data.shape[1]} columns"
 
     except Exception as e:
         logger.error(f"Error creating column summary table: {e}")
