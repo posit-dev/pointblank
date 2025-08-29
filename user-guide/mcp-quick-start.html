@@ -450,6 +450,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
   <li><a href="#essential-commands" id="toc-essential-commands" class="nav-link" data-scroll-target="#essential-commands">Essential Commands</a>
   <ul class="collapse">
   <li><a href="#load-data" id="toc-load-data" class="nav-link" data-scroll-target="#load-data">Load Data</a></li>
+  <li><a href="#explore-data" id="toc-explore-data" class="nav-link" data-scroll-target="#explore-data">Explore Data</a></li>
   <li><a href="#check-quality" id="toc-check-quality" class="nav-link" data-scroll-target="#check-quality">Check Quality</a></li>
   <li><a href="#create-data-validations" id="toc-create-data-validations" class="nav-link" data-scroll-target="#create-data-validations">Create Data Validations</a></li>
   <li><a href="#run-and-export" id="toc-run-and-export" class="nav-link" data-scroll-target="#run-and-export">Run and Export</a></li>
@@ -460,11 +461,18 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
   <li><a href="#daily-validation" id="toc-daily-validation" class="nav-link" data-scroll-target="#daily-validation">2. 🔄 Daily Validation</a></li>
   <li><a href="#issue-investigation" id="toc-issue-investigation" class="nav-link" data-scroll-target="#issue-investigation">3. 🚨 Issue Investigation</a></li>
   </ul></li>
+  <li><a href="#core-capabilities" id="toc-core-capabilities" class="nav-link" data-scroll-target="#core-capabilities">Core Capabilities</a>
+  <ul class="collapse">
+  <li><a href="#data-exploration" id="toc-data-exploration" class="nav-link" data-scroll-target="#data-exploration">Data Exploration</a></li>
+  <li><a href="#validation-workflows" id="toc-validation-workflows" class="nav-link" data-scroll-target="#validation-workflows">Validation Workflows</a></li>
+  <li><a href="#html-reports-analysis" id="toc-html-reports-analysis" class="nav-link" data-scroll-target="#html-reports-analysis">HTML Reports &amp; Analysis</a></li>
+  </ul></li>
   <li><a href="#common-validation-rules" id="toc-common-validation-rules" class="nav-link" data-scroll-target="#common-validation-rules">Common Validation Rules</a>
   <ul class="collapse">
   <li><a href="#data-integrity" id="toc-data-integrity" class="nav-link" data-scroll-target="#data-integrity">Data Integrity</a></li>
   <li><a href="#business-logic" id="toc-business-logic" class="nav-link" data-scroll-target="#business-logic">Business Logic</a></li>
   <li><a href="#cross-field-validation" id="toc-cross-field-validation" class="nav-link" data-scroll-target="#cross-field-validation">Cross-Field Validation</a></li>
+  <li><a href="#available-templates" id="toc-available-templates" class="nav-link" data-scroll-target="#available-templates">Available Templates</a></li>
   </ul></li>
   <li><a href="#some-tips-and-tricks" id="toc-some-tips-and-tricks" class="nav-link" data-scroll-target="#some-tips-and-tricks">Some Tips and Tricks</a>
   <ul class="collapse">
@@ -472,6 +480,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
   <li><a href="#provide-context" id="toc-provide-context" class="nav-link" data-scroll-target="#provide-context">Provide Context</a></li>
   <li><a href="#build-incrementally" id="toc-build-incrementally" class="nav-link" data-scroll-target="#build-incrementally">Build Incrementally</a></li>
   <li><a href="#save-templates" id="toc-save-templates" class="nav-link" data-scroll-target="#save-templates">Save Templates</a></li>
+  <li><a href="#interactive-visual-tables" id="toc-interactive-visual-tables" class="nav-link" data-scroll-target="#interactive-visual-tables">Interactive Visual Tables</a></li>
   </ul></li>
   <li><a href="#file-support" id="toc-file-support" class="nav-link" data-scroll-target="#file-support">File Support</a></li>
   <li><a href="#quick-troubleshooting" id="toc-quick-troubleshooting" class="nav-link" data-scroll-target="#quick-troubleshooting">Quick Troubleshooting</a></li>
@@ -506,22 +515,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <p>Transform your data validation workflow with conversational AI in VS Code or Positron IDE. Here are three simple steps to start validating data through conversation (and no complex configuration required).</p>
 <section id="install" class="level3">
 <h3 class="anchored" data-anchor-id="install">1. Install</h3>
-<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install pointblank<span class="pp">[</span><span class="ss">mcp,pd,excel</span><span class="pp">]</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p><strong>What this installs:</strong></p>
-<ul>
-<li><code>mcp</code> - Model Context Protocol server dependencies</li>
-<li><code>pd</code> - pandas backend for data processing</li>
-<li><code>excel</code> - Excel file support (<code>openpyxl</code>)</li>
-</ul>
-<p><strong>Alternative installs based on your needs:</strong></p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Minimal MCP server only</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install pointblank<span class="pp">[</span><span class="ss">mcp</span><span class="pp">]</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Add Polars for faster data processing</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install pointblank<span class="pp">[</span><span class="ss">mcp,pd,pl</span><span class="pp">]</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Full installation with all backends</span></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install pointblank<span class="pp">[</span><span class="ss">mcp,pd,pl,excel</span><span class="pp">]</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install pointblank<span class="pp">[</span><span class="ss">mcp</span><span class="pp">]</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section id="configure-your-ide" class="level3">
 <h3 class="anchored" data-anchor-id="configure-your-ide">2. Configure Your IDE</h3>
@@ -531,14 +525,14 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <li>Create a <code>.vscode/mcp.json</code> file in your project folder</li>
 <li>Add this configuration:</li>
 </ol>
-<div class="sourceCode" id="cb3"><pre class="sourceCode json code-with-copy"><code class="sourceCode json"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"servers"</span><span class="fu">:</span> <span class="fu">{</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"pointblank"</span><span class="fu">:</span> <span class="fu">{</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>      <span class="dt">"command"</span><span class="fu">:</span> <span class="st">"python"</span><span class="fu">,</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>      <span class="dt">"args"</span><span class="fu">:</span> <span class="ot">[</span><span class="st">"-m"</span><span class="ot">,</span> <span class="st">"pointblank_mcp_server.pointblank_server"</span><span class="ot">]</span></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">}</span></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">}</span></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode json code-with-copy"><code class="sourceCode json"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"servers"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"pointblank"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>      <span class="dt">"command"</span><span class="fu">:</span> <span class="st">"python"</span><span class="fu">,</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>      <span class="dt">"args"</span><span class="fu">:</span> <span class="ot">[</span><span class="st">"-m"</span><span class="ot">,</span> <span class="st">"pointblank_mcp_server.pointblank_server"</span><span class="ot">]</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">}</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">}</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p><strong>Option 2: User Configuration (Personal use)</strong></p>
 <ol type="1">
 <li>Run command: <code>MCP: Open User Configuration</code> (Cmd/Ctrl + Shift + P)</li>
@@ -565,30 +559,44 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </section>
 <section id="essential-commands" class="level2">
 <h2 class="anchored" data-anchor-id="essential-commands">Essential Commands</h2>
-<p>Master these four command patterns and you’ll be able to handle most data validation scenarios. Think of these as your fundamental vocabulary for talking to Pointblank.</p>
+<p>Master these five command patterns and you’ll be able to handle most data validation scenarios. Think of these as your fundamental vocabulary for talking to Pointblank.</p>
 <section id="load-data" class="level3">
 <h3 class="anchored" data-anchor-id="load-data">Load Data</h3>
 <pre><code>"Load the file /path/to/data.csv"
-"Open my customer data from Downloads"
-"Load the Excel file with sales metrics"</code></pre>
+"Load my Netflix dataset from Downloads"
+"Load the CSV file with sales metrics"
+"Load customer_data.csv as my main dataset"</code></pre>
+</section>
+<section id="explore-data" class="level3">
+<h3 class="anchored" data-anchor-id="explore-data">Explore Data</h3>
+<pre><code>"Analyze the data for netflix_data"
+"Show me a preview of the loaded data"
+"Create a column summary table"
+"Generate a missing values analysis"</code></pre>
+<p><strong>What you’ll get</strong>: Comprehensive data profiling with statistics including missing values, data types, distributions, and summary statistics for each column. The preview and summary tables are automatically generated as beautiful HTML files that open in your browser. This gives you a complete picture of your dataset’s structure and characteristics before you define quality rules.</p>
 </section>
 <section id="check-quality" class="level3">
 <h3 class="anchored" data-anchor-id="check-quality">Check Quality</h3>
-<pre><code>"Analyze the data quality"
-"What issues should I worry about?"
-"Check for missing values and duplicates"</code></pre>
+<pre><code>"Create a validator for netflix_data"
+"Add validation that ratings are between 0 and 10"
+"Check that all release years are reasonable"
+"Apply the basic_quality template"</code></pre>
+<p><strong>What you’ll get</strong>: Actual data quality validation that checks your data against business rules and domain knowledge. This tells you if your data meets your specific quality requirements and identifies rows that fail validation criteria.</p>
 </section>
 <section id="create-data-validations" class="level3">
 <h3 class="anchored" data-anchor-id="create-data-validations">Create Data Validations</h3>
-<pre><code>"Set up validation rules for this data"
-"Check that all emails are valid"
-"Make sure amounts are positive"</code></pre>
+<pre><code>"Add validation that show_id values are unique"
+"Check that cast field is not empty for movies"
+"Ensure vote_count is greater than 0"
+"Validate that country field follows ISO format"</code></pre>
+<p><strong>What you’ll get</strong>: Individual validation rules added to your validator. Each rule tests a specific business requirement and can be customized with thresholds and actions.</p>
 </section>
 <section id="run-and-export" class="level3">
 <h3 class="anchored" data-anchor-id="run-and-export">Run and Export</h3>
-<pre><code>"Run the validation"
-"Show me what failed"
-"Export problem rows to CSV"</code></pre>
+<pre><code>"Run the validation and show results"
+"Export validation failures to CSV"
+"Get failed rows for step 2"
+"Save the validation report"</code></pre>
 <hr>
 </section>
 </section>
@@ -598,58 +606,102 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="quick-data-check" class="level3">
 <h3 class="anchored" data-anchor-id="quick-data-check">1. 📊 Quick Data Check</h3>
 <p><strong>When</strong>: You get a new dataset</p>
-<pre><code>👤 "I just got customer_data.csv. Is it clean?"
-🤖 "Loading... Found 15K customers. Issues:
-    - ✅ No duplicate IDs
-    - ⚠️ 2% missing phones
-    - ❌ 234 invalid emails
-    Want me to fix the emails?"</code></pre>
+<pre><code>👤 "I just got netflix_data.csv. Is it clean?"
+🤖 "Loading dataset... Found 16,000 movies/shows with 18 columns.
+    Quality analysis complete:
+    - ✅ No duplicate show IDs
+    - ⚠️ 466 missing countries (2.9%)
+    - ⚠️ 132 missing directors (0.8%)
+    Opening data preview in your browser..."</code></pre>
 </section>
 <section id="daily-validation" class="level3">
 <h3 class="anchored" data-anchor-id="daily-validation">2. 🔄 Daily Validation</h3>
 <p><strong>When</strong>: Regular data quality checks</p>
-<pre><code>👤 "Run our standard sales validation"
-🤖 "Running daily_sales template...
-    ✅ All checks passed!
-    3,247 transactions validated
-    Ready for dashboard update"</code></pre>
+<pre><code>👤 "Apply the basic_quality template to my data"
+🤖 "Creating validator with basic quality checks...
+    ✅ Data types validated
+    ✅ Missing value thresholds checked
+    ✅ Duplicate detection passed
+    Validation complete! All checks passed."</code></pre>
 </section>
 <section id="issue-investigation" class="level3">
 <h3 class="anchored" data-anchor-id="issue-investigation">3. 🚨 Issue Investigation</h3>
 <p><strong>When</strong>: Something looks wrong</p>
-<pre><code>👤 "Conversion rates jumped to 95%. That's impossible"
-🤖 "Found the problem! Test data contamination:
-    - 1,247 test emails with 100% conversion
-    - Real rate is 4.2% (normal)
-    Should I clean the data?"</code></pre>
+<pre><code>👤 "Show me movies with ratings above 9.5"
+🤖 "Creating validator for high ratings...
+    Found 47 entries with ratings &gt; 9.5
+    Exporting suspicious rows to CSV
+    Most are documentaries - could be valid!"</code></pre>
 <p>These examples show how natural conversation can quickly identify and resolve data quality issues that might take hours to diagnose manually.</p>
+</section>
+</section>
+<section id="core-capabilities" class="level2">
+<h2 class="anchored" data-anchor-id="core-capabilities">Core Capabilities</h2>
+<p>Pointblank’s MCP server provides powerful tools for comprehensive data validation with beautiful, interactive HTML reports:</p>
+<section id="data-exploration" class="level3">
+<h3 class="anchored" data-anchor-id="data-exploration">Data Exploration</h3>
+<ul>
+<li><strong>Interactive HTML previews</strong> with automatic browser opening showing head/tail rows</li>
+<li><strong>Column summary tables</strong> with detailed statistics and color-coded data types</li>
+<li><strong>Missing values analysis</strong> with visual patterns and percentages</li>
+<li><strong>Data quality analysis</strong> with comprehensive profiling insights</li>
+</ul>
+</section>
+<section id="validation-workflows" class="level3">
+<h3 class="anchored" data-anchor-id="validation-workflows">Validation Workflows</h3>
+<ul>
+<li><strong>Validator creation</strong> with flexible thresholds and configuration</li>
+<li><strong>Many validation types</strong> for comprehensive data quality checking</li>
+<li><strong>Step-by-step validation</strong> building with natural language commands</li>
+<li><strong>Template-based validation</strong> for common data quality patterns</li>
+</ul>
+</section>
+<section id="html-reports-analysis" class="level3">
+<h3 class="anchored" data-anchor-id="html-reports-analysis">HTML Reports &amp; Analysis</h3>
+<ul>
+<li><strong>Interactive validation reports</strong> automatically opened in your browser</li>
+<li><strong>Timestamped HTML files</strong> for easy sharing and documentation</li>
+<li><strong>Python code generation</strong> for reproducible validation scripts</li>
+</ul>
+<p>All interactions use natural language, making advanced data validation accessible to users at any technical level while producing publication-ready HTML reports.</p>
 </section>
 </section>
 <section id="common-validation-rules" class="level2">
 <h2 class="anchored" data-anchor-id="common-validation-rules">Common Validation Rules</h2>
-<p>Understanding what validation rules to ask for will help you quickly build comprehensive data quality checks. These examples cover the most frequent validation scenarios across different industries and data types.</p>
+<p>Understanding what validation rules to ask for will help you quickly build comprehensive data quality checks. These examples cover the most frequent validation scenarios using Pointblank’s built-in validation functions.</p>
 <section id="data-integrity" class="level3">
 <h3 class="anchored" data-anchor-id="data-integrity">Data Integrity</h3>
 <ul>
-<li>“Check for duplicate IDs”</li>
-<li>“Ensure no missing required fields”</li>
-<li>“Validate that dates are reasonable”</li>
+<li>“Check for duplicate show IDs”</li>
+<li>“Ensure no missing required fields like title”</li>
+<li>“Validate that release years are between 1900 and 2025”</li>
 </ul>
 </section>
 <section id="business-logic" class="level3">
 <h3 class="anchored" data-anchor-id="business-logic">Business Logic</h3>
 <ul>
-<li>“Amounts must be positive”</li>
-<li>“Email addresses must be valid format”</li>
-<li>“Status must be active, inactive, or pending”</li>
+<li>“Ratings must be between 0 and 10”</li>
+<li>“Budget must be positive numbers”</li>
+<li>“Duration should be greater than 0”</li>
 </ul>
 </section>
 <section id="cross-field-validation" class="level3">
 <h3 class="anchored" data-anchor-id="cross-field-validation">Cross-Field Validation</h3>
 <ul>
-<li>“End date must be after start date”</li>
-<li>“Discount percentage between 0 and 100”</li>
-<li>“Age must match birth date”</li>
+<li>“Release year should match date_added year”</li>
+<li>“Vote count should correlate with popularity”</li>
+<li>“Movies should have directors specified”</li>
+</ul>
+</section>
+<section id="available-templates" class="level3">
+<h3 class="anchored" data-anchor-id="available-templates">Available Templates</h3>
+<p>Pointblank includes pre-built validation templates:</p>
+<ul>
+<li><code>basic_quality</code> - Essential data quality checks</li>
+<li><code>financial_data</code> - Money and numeric validations</li>
+<li><code>customer_data</code> - Personal information validations</li>
+<li><code>sensor_data</code> - Time series and measurement checks</li>
+<li><code>survey_data</code> - Response and rating validations</li>
 </ul>
 <p>These rule patterns can be combined and customized for your specific data and business requirements. The natural language interface makes it easy to express complex validation logic without learning technical syntax.</p>
 </section>
@@ -681,6 +733,21 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <pre><code>"Save these rules as 'customer_validation'"
 "Apply the financial_data template"
 "Use our standard survey validation"</code></pre>
+</section>
+<section id="interactive-visual-tables" class="level3">
+<h3 class="anchored" data-anchor-id="interactive-visual-tables">Interactive Visual Tables</h3>
+<p>Pointblank automatically generates beautiful, interactive HTML tables for data exploration:</p>
+<pre><code>"Show me a preview of the data"
+"Generate a column summary table"
+"Create a missing values analysis"</code></pre>
+<p>These commands create professional HTML tables with:</p>
+<ul>
+<li><strong>Color-coded data types</strong> (numeric in purple, text in yellow)</li>
+<li><strong>Gradient styling</strong> tailored to each table type</li>
+<li><strong>Automatic browser opening</strong> for immediate viewing</li>
+<li><strong>Timestamped files</strong> for easy reference and sharing</li>
+</ul>
+<p>The tables open automatically in your default browser, making it easy to share data insights with colleagues or include in presentations.</p>
 <p>These practices help you build data quality workflows that scale with your needs while remaining accessible to those with varying technical backgrounds.</p>
 </section>
 </section>
@@ -693,6 +760,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <th>Type</th>
 <th>Extensions</th>
 <th>Example</th>
+<th>Backend Support</th>
 </tr>
 </thead>
 <tbody>
@@ -700,30 +768,38 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <td><strong>CSV</strong></td>
 <td><code>.csv</code></td>
 <td><code>sales_data.csv</code></td>
+<td>pandas, polars</td>
 </tr>
 <tr class="even">
-<td><strong>Excel</strong></td>
-<td><code>.xlsx</code>, <code>.xls</code></td>
-<td><code>monthly_report.xlsx</code></td>
-</tr>
-<tr class="odd">
 <td><strong>Parquet</strong></td>
 <td><code>.parquet</code></td>
 <td><code>big_data.parquet</code></td>
+<td>pandas, polars</td>
+</tr>
+<tr class="odd">
+<td><strong>JSON</strong></td>
+<td><code>.json</code></td>
+<td><code>api_response.json</code></td>
+<td>pandas, polars</td>
 </tr>
 <tr class="even">
-<td><strong>JSON</strong></td>
-<td><code>.json</code>, <code>.jsonl</code></td>
-<td><code>api_response.json</code></td>
+<td><strong>JSON Lines</strong></td>
+<td><code>.jsonl</code></td>
+<td><code>streaming_data.jsonl</code></td>
+<td>pandas, polars</td>
 </tr>
 </tbody>
 </table>
-<p>The consistent natural language interface works the same regardless of file format, so you can focus on validation logic rather than technical details.</p>
+<p>The consistent natural language interface works the same regardless of file format, so you can focus on validation logic rather than technical details. Polars provides faster processing for large datasets, while Pandas offers broader format support.</p>
 </section>
 <section id="quick-troubleshooting" class="level2">
 <h2 class="anchored" data-anchor-id="quick-troubleshooting">Quick Troubleshooting</h2>
 <p>When you encounter issues, these quick fixes resolve the most common problems. Furthermore, the natural language interface means you can always ask for help and explanations.</p>
 <table class="caption-top table">
+<colgroup>
+<col style="width: 45%">
+<col style="width: 55%">
+</colgroup>
 <thead>
 <tr class="header">
 <th>Problem</th>
@@ -733,22 +809,31 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <tbody>
 <tr class="odd">
 <td>“File not found”</td>
-<td>Use full file path: <code>/Users/name/data.csv</code></td>
+<td>Use absolute path: <code>/Users/name/Downloads/data.csv</code></td>
 </tr>
 <tr class="even">
-<td>Validation too slow</td>
-<td>“Use a sample for testing”</td>
+<td>“DataFrame not found”</td>
+<td>Check loaded datasets with “List my loaded dataframes”</td>
 </tr>
 <tr class="odd">
-<td>Don’t understand error</td>
-<td>“Explain why validation failed”</td>
+<td>“Validator not found”</td>
+<td>Use “List active validators” to see available validators</td>
 </tr>
 <tr class="even">
-<td>Need help</td>
-<td>“Show me examples of data quality checks”</td>
+<td>“Validation too slow”</td>
+<td>Try “Use pandas backend” or sample your data first</td>
+</tr>
+<tr class="odd">
+<td>“HTML tables won’t open”</td>
+<td>Check your default browser settings</td>
+</tr>
+<tr class="even">
+<td>“Need validation ideas”</td>
+<td>Ask “Show me validation templates” or “Suggest validations for my data”</td>
 </tr>
 </tbody>
 </table>
+<p><strong>Browser Issues</strong>: The HTML tables automatically open in your default browser. If they don’t appear, check that your browser isn’t blocking pop-ups and that you have a default browser set in your system preferences.</p>
 <p>Remember, you can always ask the AI to explain what’s happening or suggest solutions when you run into problems.</p>
 </section>
 <section id="now-youre-ready" class="level2">

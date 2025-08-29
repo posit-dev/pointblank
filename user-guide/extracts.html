@@ -541,7 +541,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="csv-data-from-validation-reports" class="level3">
 <h3 class="anchored" data-anchor-id="csv-data-from-validation-reports">CSV Data from Validation Reports</h3>
 <p>Data extracts are embedded within validation report tables. Let’s look at an example, using the <code>small_table</code> dataset, where data extracts are collected in a single validation step due to failing test units:</p>
-<div id="84b4eba3" class="cell" data-execution_count="2">
+<div id="bee3864d" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
@@ -701,7 +701,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="get_data_extracts" class="level3">
 <h3 class="anchored" data-anchor-id="get_data_extracts"><code>get_data_extracts()</code></h3>
 <p>For programmatic access to data extracts, Pointblank provides the <a href="../reference/Validate.get_data_extracts.html#pointblank.Validate.get_data_extracts" title="0"><code>get_data_extracts()</code></a> method. This allows you to work with extract data directly in your Python workflow:</p>
-<div id="5eab26d4" class="cell" data-execution_count="3">
+<div id="ee11231e" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get data extracts from step 1</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>extract_1 <span class="op">=</span> validation.get_data_extracts(i<span class="op">=</span><span class="dv">1</span>, frame<span class="op">=</span><span class="va">True</span>)</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -729,7 +729,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="step-reports" class="level3">
 <h3 class="anchored" data-anchor-id="step-reports">Step Reports</h3>
 <p>Step reports provide another way to access and visualize failing data. When you generate a step report for a validation step that has failing rows, those failing rows are displayed directly in the report:</p>
-<div id="faf592af" class="cell" data-execution_count="4">
+<div id="2c27b00e" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get a step report for the first validation step</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>step_report <span class="op">=</span> validation.get_step_report(i<span class="op">=</span><span class="dv">1</span>)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -876,7 +876,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <li>include additional metadata about the validation step and failure statistics</li>
 </ol>
 <p>For steps with many failures, you can customize how many rows to display:</p>
-<div id="a65a3397" class="cell" data-execution_count="5">
+<div id="8db2f114" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Limit to just 2 rows of failing data</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>limited_report <span class="op">=</span> validation.get_step_report(i<span class="op">=</span><span class="dv">1</span>, limit<span class="op">=</span><span class="dv">2</span>)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1000,7 +1000,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="viewing-data-extracts-with-preview" class="level2">
 <h2 class="anchored" data-anchor-id="viewing-data-extracts-with-preview">Viewing Data Extracts with <code class="qd-no-link">preview()</code></h2>
 <p>To get a consistent HTML representation of any data extract (regardless of the table type), we can use the <a href="../reference/preview.html#pointblank.preview" title="0"><code>preview()</code></a> function:</p>
-<div id="43a2f7dc" class="cell" data-execution_count="6">
+<div id="6517e96e" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>pb.preview(data<span class="op">=</span>extract_1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="6">
 <div id="pb_preview_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
@@ -1143,7 +1143,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="working-with-multiple-validation-steps" class="level2">
 <h2 class="anchored" data-anchor-id="working-with-multiple-validation-steps">Working with Multiple Validation Steps</h2>
 <p>When validating data with multiple steps, you can extract failing rows from any step or combine extracts from multiple steps:</p>
-<div id="756c590d" class="cell" data-execution_count="7">
+<div id="16c41f95" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a validation with multiple steps</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>multi_validation <span class="op">=</span> (</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>pb.load_dataset(dataset<span class="op">=</span><span class="st">"small_table"</span>, tbl_type<span class="op">=</span><span class="st">"polars"</span>))</span>
@@ -1381,7 +1381,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="extracting-data-from-a-specific-step" class="level3">
 <h3 class="anchored" data-anchor-id="extracting-data-from-a-specific-step">Extracting Data from a Specific Step</h3>
 <p>You can access extracts from any specific validation step:</p>
-<div id="03edb977" class="cell" data-execution_count="8">
+<div id="8f534fb5" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get extracts from step 2 (`d &lt; 3000` validation)</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>less_than_failures <span class="op">=</span> multi_validation.get_data_extracts(i<span class="op">=</span><span class="dv">2</span>, frame<span class="op">=</span><span class="va">True</span>)</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1399,7 +1399,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 <p>Using <code>frame=True</code> means that returned value will be a DataFrame (not a dictionary that contains a single DataFrame).</p>
 <p>If a step has no failing rows, an empty DataFrame will be returned:</p>
-<div id="4190f484" class="cell" data-execution_count="9">
+<div id="2a03b927" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get extracts from step 3 (regex check)</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>regex_failures <span class="op">=</span> multi_validation.get_data_extracts(i<span class="op">=</span><span class="dv">3</span>, frame<span class="op">=</span><span class="va">True</span>)</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1419,7 +1419,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="getting-all-extracts-at-once" class="level3">
 <h3 class="anchored" data-anchor-id="getting-all-extracts-at-once">Getting All Extracts at Once</h3>
 <p>To retrieve extracts from all steps with failures in one command:</p>
-<div id="0f76209c" class="cell" data-execution_count="10">
+<div id="79e8b668" class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get all extracts ()</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>all_extracts <span class="op">=</span> multi_validation.get_data_extracts()</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1434,7 +1434,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="getting-specific-extracts" class="level3">
 <h3 class="anchored" data-anchor-id="getting-specific-extracts">Getting Specific Extracts</h3>
 <p>You can also retrieve data extracts from several specified steps as a dictionary:</p>
-<div id="8c0f716c" class="cell" data-execution_count="11">
+<div id="d9edf42b" class="cell" data-execution_count="11">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get extracts from steps 1 and 2 as a dictionary</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>extract_dict <span class="op">=</span> multi_validation.get_data_extracts(i<span class="op">=</span>[<span class="dv">1</span>, <span class="dv">2</span>])</span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1459,7 +1459,7 @@ Step 2: 4 failing rows</code></pre>
 <section id="finding-patterns-across-validation-steps" class="level3">
 <h3 class="anchored" data-anchor-id="finding-patterns-across-validation-steps">Finding Patterns Across Validation Steps</h3>
 <p>You can analyze patterns across different validation steps by combining extracts:</p>
-<div id="e2895baa" class="cell" data-execution_count="12">
+<div id="17f3285e" class="cell" data-execution_count="12">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get a consolidated view of all rows that failed any validation</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>all_failure_rows <span class="op">=</span> <span class="bu">set</span>()</span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> step, extract <span class="kw">in</span> all_extracts.items():</span>
@@ -1477,7 +1477,7 @@ Row numbers with failures: [1, 2, 4, 6, 9, 10, 12, 13]</code></pre>
 <section id="identifying-rows-with-multiple-failures" class="level3">
 <h3 class="anchored" data-anchor-id="identifying-rows-with-multiple-failures">Identifying Rows with Multiple Failures</h3>
 <p>You might want to find rows that failed multiple validation checks, as these often represent more serious data quality issues:</p>
-<div id="f8a6035b" class="cell" data-execution_count="13">
+<div id="2781fb45" class="cell" data-execution_count="13">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get row numbers from each extract</span></span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>step1_rows <span class="op">=</span> <span class="bu">set</span>(multi_validation.get_data_extracts(i<span class="op">=</span><span class="dv">1</span>, frame<span class="op">=</span><span class="va">True</span>)[<span class="st">"_row_num_"</span>])</span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>step2_rows <span class="op">=</span> <span class="bu">set</span>(multi_validation.get_data_extracts(i<span class="op">=</span><span class="dv">2</span>, frame<span class="op">=</span><span class="va">True</span>)[<span class="st">"_row_num_"</span>])</span>
@@ -1493,7 +1493,7 @@ Row numbers with failures: [1, 2, 4, 6, 9, 10, 12, 13]</code></pre>
 <section id="statistical-analysis-of-failing-values" class="level3">
 <h3 class="anchored" data-anchor-id="statistical-analysis-of-failing-values">Statistical Analysis of Failing Values</h3>
 <p>Once you have data extracts, you can perform statistical analysis to identify patterns in the failing data:</p>
-<div id="5e946981" class="cell" data-execution_count="14">
+<div id="11cd3f90" class="cell" data-execution_count="14">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get extracts from step 2</span></span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>d_value_failures <span class="op">=</span> multi_validation.get_data_extracts(i<span class="op">=</span><span class="dv">2</span>, frame<span class="op">=</span><span class="va">True</span>)</span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1513,61 +1513,61 @@ Mean failing value: 5151.6775</code></pre>
 <section id="detailed-analysis-with-col_summary_tbl" class="level3">
 <h3 class="anchored" data-anchor-id="detailed-analysis-with-col_summary_tbl">Detailed Analysis with <code class="qd-no-link">col_summary_tbl()</code></h3>
 <p>For a more comprehensive view of the statistical properties of your extract data, you can use the <a href="../reference/col_summary_tbl.html#pointblank.col_summary_tbl" title="0"><code>col_summary_tbl()</code></a> function:</p>
-<div id="cfce51fe" class="cell" data-execution_count="15">
+<div id="1f073466" class="cell" data-execution_count="15">
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get extracts from step 2</span></span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>d_value_failures <span class="op">=</span> multi_validation.get_data_extracts(i<span class="op">=</span><span class="dv">2</span>, frame<span class="op">=</span><span class="va">True</span>)</span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate a comprehensive statistical summary of the failing data</span></span>
 <span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>pb.col_summary_tbl(d_value_failures)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="15">
-<div id="eprhrdlrkh" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="vvmolefysm" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans&display=swap');
-#eprhrdlrkh table {
+#vvmolefysm table {
           font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
           -webkit-font-smoothing: antialiased;
           -moz-osx-font-smoothing: grayscale;
         }
 
-#eprhrdlrkh thead, tbody, tfoot, tr, td, th { border-style: none; }
+#vvmolefysm thead, tbody, tfoot, tr, td, th { border-style: none; }
  tr { background-color: transparent; }
-#eprhrdlrkh p { margin: 0; padding: 0; }
- #eprhrdlrkh .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 16px; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: auto; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
- #eprhrdlrkh .gt_caption { padding-top: 4px; padding-bottom: 4px; }
- #eprhrdlrkh .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
- #eprhrdlrkh .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
- #eprhrdlrkh .gt_heading { background-color: #FFFFFF; text-align: left; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
- #eprhrdlrkh .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
- #eprhrdlrkh .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
- #eprhrdlrkh .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
- #eprhrdlrkh .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
- #eprhrdlrkh .gt_column_spanner_outer:first-child { padding-left: 0; }
- #eprhrdlrkh .gt_column_spanner_outer:last-child { padding-right: 0; }
- #eprhrdlrkh .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
- #eprhrdlrkh .gt_spanner_row { border-bottom-style: hidden; }
- #eprhrdlrkh .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
- #eprhrdlrkh .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
- #eprhrdlrkh .gt_from_md> :first-child { margin-top: 0; }
- #eprhrdlrkh .gt_from_md> :last-child { margin-bottom: 0; }
- #eprhrdlrkh .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
- #eprhrdlrkh .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
- #eprhrdlrkh .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
- #eprhrdlrkh .gt_row_group_first td { border-top-width: 2px; }
- #eprhrdlrkh .gt_row_group_first th { border-top-width: 2px; }
- #eprhrdlrkh .gt_striped { background-color: rgba(128,128,128,0.05); }
- #eprhrdlrkh .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
- #eprhrdlrkh .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
- #eprhrdlrkh .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
- #eprhrdlrkh .gt_left { text-align: left; }
- #eprhrdlrkh .gt_center { text-align: center; }
- #eprhrdlrkh .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
- #eprhrdlrkh .gt_font_normal { font-weight: normal; }
- #eprhrdlrkh .gt_font_bold { font-weight: bold; }
- #eprhrdlrkh .gt_font_italic { font-style: italic; }
- #eprhrdlrkh .gt_super { font-size: 65%; }
- #eprhrdlrkh .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
- #eprhrdlrkh .gt_asterisk { font-size: 100%; vertical-align: 0; }
+#vvmolefysm p { margin: 0; padding: 0; }
+ #vvmolefysm .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 16px; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: auto; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
+ #vvmolefysm .gt_caption { padding-top: 4px; padding-bottom: 4px; }
+ #vvmolefysm .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
+ #vvmolefysm .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
+ #vvmolefysm .gt_heading { background-color: #FFFFFF; text-align: left; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #vvmolefysm .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #vvmolefysm .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #vvmolefysm .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
+ #vvmolefysm .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
+ #vvmolefysm .gt_column_spanner_outer:first-child { padding-left: 0; }
+ #vvmolefysm .gt_column_spanner_outer:last-child { padding-right: 0; }
+ #vvmolefysm .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
+ #vvmolefysm .gt_spanner_row { border-bottom-style: hidden; }
+ #vvmolefysm .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
+ #vvmolefysm .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
+ #vvmolefysm .gt_from_md> :first-child { margin-top: 0; }
+ #vvmolefysm .gt_from_md> :last-child { margin-bottom: 0; }
+ #vvmolefysm .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
+ #vvmolefysm .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
+ #vvmolefysm .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
+ #vvmolefysm .gt_row_group_first td { border-top-width: 2px; }
+ #vvmolefysm .gt_row_group_first th { border-top-width: 2px; }
+ #vvmolefysm .gt_striped { background-color: rgba(128,128,128,0.05); }
+ #vvmolefysm .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #vvmolefysm .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #vvmolefysm .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #vvmolefysm .gt_left { text-align: left; }
+ #vvmolefysm .gt_center { text-align: center; }
+ #vvmolefysm .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
+ #vvmolefysm .gt_font_normal { font-weight: normal; }
+ #vvmolefysm .gt_font_bold { font-weight: bold; }
+ #vvmolefysm .gt_font_italic { font-style: italic; }
+ #vvmolefysm .gt_super { font-size: 65%; }
+ #vvmolefysm .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
+ #vvmolefysm .gt_asterisk { font-size: 100%; vertical-align: 0; }
  
 </style>
 <table style="table-layout: fixed;; width: 0px" class="gt_table" data-quarto-disable-processing="true" data-quarto-bootstrap="false">
@@ -1891,7 +1891,7 @@ Mean failing value: 5151.6775</code></pre>
 <li><strong>Pattern Recognition</strong>: identifying systemic issues by analyzing groups of failing records</li>
 </ol>
 <p>Here’s an example of using extracts to create a corrective action plan:</p>
-<div id="92c722c3" class="cell" data-execution_count="16">
+<div id="b6829cac" class="cell" data-execution_count="16">
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a new sample of an extract DF</span></span>
