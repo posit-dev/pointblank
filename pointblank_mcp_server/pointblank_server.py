@@ -171,6 +171,135 @@ def _load_dataframe_from_path(input_path: str, backend: str = "auto") -> Any:
     )
 
 
+def _generate_python_code_for_validator(
+    validator: pb.Validate, validator_id: str, df_path: Optional[str] = None
+) -> str:
+    """
+    Generate Python code equivalent for reproducing the validation using fluent interface.
+    """
+    # Start building the Python code
+    code_lines = [
+        "# Generated Python code for Pointblank validation",
+        "import pointblank as pb",
+        "",
+        "# Load your data",
+    ]
+
+    if df_path:
+        code_lines.extend(
+            [
+                f"# Original file: {df_path}",
+                f"df = pb.load_dataset('{df_path}')  # Adjust path as needed",
+            ]
+        )
+    else:
+        code_lines.extend(
+            [
+                "# Replace 'your_data.csv' with your actual data file",
+                "df = pb.load_dataset('your_data.csv')",
+            ]
+        )
+
+    # Get validation steps from the validator's method chain
+    validation_methods = []
+
+    try:
+        # Access the validator's validation steps
+        # Reconstruct based on the report data
+        json_report = validator.get_json_report()
+        validation_data = json.loads(json_report)
+
+        for step in validation_data:
+            assertion_type = step.get("assertion_type", "")
+            column = step.get("column", "")
+            values = step.get("values", None)
+            inclusive = step.get("inclusive", None)
+
+            if assertion_type == "rows_distinct":
+                validation_methods.append("    .rows_distinct()")
+
+            elif assertion_type == "col_vals_not_null":
+                if column:
+                    validation_methods.append(f"    .col_vals_not_null(columns='{column}')")
+
+            elif assertion_type == "col_vals_between":
+                if column and values and len(values) >= 2:
+                    left, right = values[0], values[1]
+                    validation_methods.append(
+                        f"    .col_vals_between(columns='{column}', left={left}, right={right})"
+                    )
+
+            elif assertion_type == "col_vals_ge":
+                if column and values is not None:
+                    validation_methods.append(
+                        f"    .col_vals_ge(columns='{column}', value={values})"
+                    )
+
+            elif assertion_type == "col_vals_gt":
+                if column and values is not None:
+                    validation_methods.append(
+                        f"    .col_vals_gt(columns='{column}', value={values})"
+                    )
+
+            elif assertion_type == "col_vals_le":
+                if column and values is not None:
+                    validation_methods.append(
+                        f"    .col_vals_le(columns='{column}', value={values})"
+                    )
+
+            elif assertion_type == "col_vals_lt":
+                if column and values is not None:
+                    validation_methods.append(
+                        f"    .col_vals_lt(columns='{column}', value={values})"
+                    )
+
+            elif assertion_type == "col_vals_in_set":
+                if column and values:
+                    set_values = repr(values) if isinstance(values, list) else f"[{repr(values)}]"
+                    validation_methods.append(
+                        f"    .col_vals_in_set(columns='{column}', set={set_values})"
+                    )
+
+            elif assertion_type == "col_vals_regex":
+                if column and values:
+                    pattern = values if isinstance(values, str) else str(values)
+                    validation_methods.append(
+                        f"    .col_vals_regex(columns='{column}', pattern=r'{pattern}')"
+                    )
+
+            elif assertion_type == "col_exists":
+                if column:
+                    if isinstance(column, list):
+                        cols = repr(column)
+                    else:
+                        cols = f"'{column}'"
+                    validation_methods.append(f"    .col_exists(columns={cols})")
+
+    except Exception as e:
+        validation_methods.append(f"    # Error reconstructing validation steps: {e}")
+        validation_methods.append("    # Please manually add your validation steps")
+
+    # Build the fluent interface chain
+    code_lines.extend(
+        [
+            "",
+            "# Create validator, add validation steps, and interrogate",
+            "validator = (",
+            "    pb.Validate(df)",
+        ]
+    )
+
+    # Add all validation methods
+    code_lines.extend(validation_methods)
+
+    # Close the chain with interrogate
+    code_lines.extend(
+        ["    .interrogate()", ")", "", "# View HTML report", "validator.get_tabular_report()"]
+    )
+
+    return "\n".join(code_lines)
+
+
 def _generate_validation_report_html(validator: pb.Validate, validator_id: str) -> str:
     """
     Generate an HTML report table for validation results and save to file.
@@ -1703,21 +1832,17 @@ async def get_validation_step_output(
 
 @mcp.tool(
     name="interrogate_validator",
-    description="Run validations and return a JSON summary. Optionally save the report to a CSV file.",
+    description="Run validations and return a JSON summary with Python code equivalent.",
     tags={"Validation"},
 )
 async def interrogate_validator(
     ctx: Context,
     validator_id: Annotated[str, "ID of the Validator to interrogate."],
-    report_file_path: Annotated[
-        Optional[str],
-        "Optional path to save the validation report. If provided, must end with .csv.",
-    ] = None,
 ) -> Dict[str, Any]:
     """
     Runs validations and returns a JSON summary.
-    Optionally saves the report to 'report_file_path' as a CSV file.
     Also generates an HTML report table that opens in browser.
+    Provides Python code equivalent for reproducing the validation.
     """
     app_ctx: AppContext = ctx.request_context.lifespan_context
 
@@ -1740,48 +1865,32 @@ async def interrogate_validator(
         except Exception as html_error:
             logger.warning(f"Could not generate HTML report: {html_error}")
 
+        # Generate Python code equivalent
+        try:
+            python_code = _generate_python_code_for_validator(validator, validator_id)
+            await ctx.report_progress(75, 100, "Generated Python code equivalent for validation")
+        except Exception as code_error:
+            logger.warning(f"Could not generate Python code: {code_error}")
+            python_code = "# Error generating Python code equivalent"
+
     except Exception as e:
         raise RuntimeError(f"Error during validator interrogation: {e}")
 
     report_data = json.loads(json_report_str)
-    output_dict = {"validation_summary": report_data}
 
-    if report_file_path:
-        p_report_file_path = Path(report_file_path)
+    # Enhanced output with Python code
+    output_dict = {
+        "validation_summary": report_data,
+        "python_code": python_code,
+        "html_report_path": html_report_path if "html_report_path" in locals() else None,
+        "instructions": {
+            "html_report": "Interactive validation report opened in your browser",
+            "python_code": "Use the provided Python code to reproduce this validation in your own scripts",
+            "customization": "Modify the Python code to adjust validation rules, thresholds, or add new checks",
+        },
+    }
 
-        if not report_file_path.lower().endswith(".csv"):
-            err_msg = "Unsupported report file extension. Use .csv."
-            print(err_msg)
-            output_dict["report_save_error"] = err_msg
-            return output_dict
-
-        p_report_file_path.parent.mkdir(parents=True, exist_ok=True)
-        try:
-            # Create DataFrame using available backend
-            if HAS_PANDAS:
-                df_report = pd.DataFrame(report_data)
-            else:
-                # If pandas not available, we need to handle this differently
-                # For now, save as JSON if no pandas
-                import json as json_module
-
-                with open(p_report_file_path.with_suffix(".json"), "w") as f:
-                    json_module.dump(report_data, f, indent=2)
-                file_saved_path = str(p_report_file_path.with_suffix(".json").resolve())
-                output_dict["json_report_saved_to"] = file_saved_path
-                await ctx.report_progress(100, 100, f"Report saved as JSON to {file_saved_path}")
-                return output_dict
-
-            # Save using backend-agnostic method
-            _save_dataframe_to_csv(df_report, p_report_file_path)
-            file_saved_path = str(p_report_file_path.resolve())
-            output_dict["csv_report_saved_to"] = file_saved_path
-            await ctx.report_progress(100, 100, f"Report saved to {file_saved_path}")
-
-        except Exception as e:
-            error_msg = f"Failed to save report to {report_file_path}: {e}"
-            print(error_msg)
-            output_dict["report_save_error"] = error_msg
+    await ctx.report_progress(100, 100, "Validation complete! Check browser for detailed report.")
 
     return output_dict
 
@@ -1930,30 +2039,27 @@ def prompt_get_validation_step_output(
 
 @mcp.prompt(
     name="prompt_interrogate_validator",
-    description="Prompt to run validations and optionally save the report.",
+    description="Prompt to run validations and generate reports with Python code.",
     tags={"Validation"},
 )
 def prompt_interrogate_validator(
     validator_id: Annotated[str, "ID of the Validator to interrogate."],
-    report_file_path: Annotated[
-        Optional[str],
-        "Optional path to save the validation report as a CSV file.",
-    ] = "optional_report.csv",
 ) -> tuple:
     """
-    Prompt guiding the LLM to run validations and optionally save the report as a CSV file.
+    Prompt guiding the LLM to run validations and generate HTML reports with Python code equivalent.
     """
     return (
         Message(
-            "After all desired validation steps have been added to a validator, I can run the interrogation process. This will execute all checks.",
+            "After all desired validation steps have been added to a validator, I can run the interrogation process. This will execute all checks and generate comprehensive reports.",
             role="assistant",
         ),
         Message(
             f"Please call `interrogate_validator` with the `validator_id` (e.g., '{validator_id}').\n"
-            f"The main result will be a JSON object summarizing all validation steps.\n"
-            f"Optionally, you can specify `report_file_path` to save the report to a CSV file. "
-            f"For example, to save as a CSV file: `report_file_path='{report_file_path}'`\n"
-            f"If `report_file_path` is not provided, the report will not be saved to a file.",
+            f"This will:\n"
+            f"• Execute all validation checks and return a JSON summary\n"
+            f"• Generate an interactive HTML report that opens in your browser\n"
+            f"• Provide Python code equivalent for reproducing the validation\n"
+            f"• Give you the flexibility to customize and extend the validation in your own scripts",
             role="user",
         ),
     )
