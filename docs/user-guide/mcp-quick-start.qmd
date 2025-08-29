@@ -162,36 +162,29 @@ These examples show how natural conversation can quickly identify and resolve da
 
 ## Core Capabilities
 
-Pointblank's MCP server provides 19 powerful tools for comprehensive data validation:
-
-### Data Management
-
-- **Load DataFrames** from CSV, Parquet, JSON, JSONL files
-- **Multiple backends** (pandas, polars) for optimal performance
-- **Memory management** with DataFrame deletion capabilities
+Pointblank's MCP server provides powerful tools for comprehensive data validation with beautiful, interactive HTML reports:
 
 ### Data Exploration
 
-- **Interactive HTML tables** with automatic browser opening
-- **Data quality analysis** with comprehensive statistics
-- **Column summaries** and missing value reports
-- **Data previews** showing head and tail rows
+- **Interactive HTML previews** with automatic browser opening showing head/tail rows
+- **Column summary tables** with detailed statistics and color-coded data types
+- **Missing values analysis** with visual patterns and percentages
+- **Data quality analysis** with comprehensive profiling insights
 
 ### Validation Workflows
 
-- **Validator creation** with flexible configuration
-- **21+ validation types** for comprehensive checking
-- **Pre-built templates** for common validation patterns
-- **Step-by-step validation** with detailed reporting
+- **Validator creation** with flexible thresholds and configuration
+- **Many validation types** for comprehensive data quality checking
+- **Step-by-step validation** building with natural language commands
+- **Template-based validation** for common data quality patterns
 
-### Results & Export
+### HTML Reports & Analysis
 
-- **Validation reports** in JSON and CSV formats
-- **Failed data export** for investigation and cleanup
-- **Validation step outputs** for detailed analysis
-- **Server health monitoring** and diagnostics
+- **Interactive validation reports** automatically opened in your browser
+- **Timestamped HTML files** for easy sharing and documentation
+- **Python code generation** for reproducible validation scripts
 
-All interactions use natural language, making advanced data validation accessible to users at any technical level.
+All interactions use natural language, making advanced data validation accessible to users at any technical level while producing publication-ready HTML reports.
 
 ## Common Validation Rules
 
