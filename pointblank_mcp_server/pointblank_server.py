@@ -1,5 +1,6 @@
 import json
 import logging
+import math
 import uuid
 from contextlib import asynccontextmanager
 from dataclasses import dataclass, field
@@ -232,7 +233,7 @@ async def load_dataframe(
 
     return DataFrameInfo(
         df_id=effective_df_id,
-        shape=shape,
+        shape=(int(shape[0]), int(shape[1])),  # Convert to Python ints
         columns=columns,
     )
 
@@ -295,12 +296,12 @@ async def list_loaded_dataframes(ctx: Context) -> Dict[str, Any]:
             df_type = "pandas" if hasattr(df, "to_csv") and hasattr(df, "index") else "polars"
 
             dataframes_info[df_id] = {
-                "shape": shape,
+                "shape": [int(shape[0]), int(shape[1])],  # Convert to Python ints
                 "columns": columns,
                 "column_count": len(columns),
-                "row_count": shape[0],
+                "row_count": int(shape[0]),  # Convert to Python int
                 "backend": df_type,
-                "memory_usage_mb": round(df.memory_usage(deep=True).sum() / 1024 / 1024, 2)
+                "memory_usage_mb": round(float(df.memory_usage(deep=True).sum()) / 1024 / 1024, 2)
                 if df_type == "pandas"
                 else "N/A",
             }
@@ -310,7 +311,7 @@ async def list_loaded_dataframes(ctx: Context) -> Dict[str, Any]:
                 "backend": "unknown",
             }
 
-    return {
+    result = {
         "loaded_dataframes": dataframes_info,
         "total_count": len(dataframes_info),
         "memory_usage_summary": {
@@ -321,6 +322,55 @@ async def list_loaded_dataframes(ctx: Context) -> Dict[str, Any]:
             )
         },
     }
+
+    # Clean the result to ensure all numpy types are converted
+    return clean_for_json_serialization(result)
+
+
+@mcp.tool(
+    name="analyze_data_quality",
+    description="Analyze data quality using Pointblank's DataScan class.",
+    tags={"Data Analysis"},
+)
+async def analyze_data_quality(
+    ctx: Context,
+    df_id: Annotated[str, "ID of the DataFrame to analyze."],
+) -> Dict[str, Any]:
+    """
+    Analyze data quality using Pointblank's built-in DataScan functionality.
+    """
+    app_ctx: AppContext = ctx.request_context.lifespan_context
+
+    if df_id not in app_ctx.loaded_dataframes:
+        raise ValueError(f"DataFrame ID '{df_id}' not found.")
+
+    df = app_ctx.loaded_dataframes[df_id]
+
+    await ctx.report_progress(20, 100, "Starting data quality analysis...")
+
+    try:
+        # Use Pointblank's DataScan class for profiling
+        scanner = pb.DataScan(data=df)
+
+        await ctx.report_progress(60, 100, "Running DataScan analysis...")
+
+        # Get the JSON representation which properly handles numpy types
+        profile_json = scanner.to_json()
+
+        await ctx.report_progress(80, 100, "Processing results...")
+
+        # Parse it back to a dictionary and clean any problematic values
+        profile_results = json.loads(profile_json)
+        cleaned_results = clean_for_json_serialization(profile_results)
+
+        await ctx.report_progress(100, 100, "Data quality analysis complete!")
+
+        return {"status": "success", "df_id": df_id, "analysis": cleaned_results}
+
+    except Exception as e:
+        error_msg = f"Error during data quality analysis: {str(e)}"
+        await ctx.report_progress(100, 100, error_msg)
+        raise ValueError(error_msg)
 
 
 @mcp.tool(
@@ -444,8 +494,56 @@ async def delete_validator(
     return {"status": "success", "message": message}
 
 
+def clean_for_json_serialization(obj: Any) -> Any:
+    """
+    Recursively clean an object to ensure it can be JSON serialized by converting
+    problematic values like NaN and infinity.
+    """
+    if isinstance(obj, float):
+        if math.isnan(obj):
+            return None
+        elif math.isinf(obj):
+            return str(obj)  # "inf" or "-inf"
+        else:
+            return obj
+    elif isinstance(obj, dict):
+        return {key: clean_for_json_serialization(value) for key, value in obj.items()}
+    elif isinstance(obj, (list, tuple)):
+        return [clean_for_json_serialization(item) for item in obj]
+    else:
+        return obj
+
+
 @mcp.tool(
-    name="profile_dataframe",
+    name="test_simple_dataframe_access",
+    description="Simple test to check if DataFrame access causes serialization issues.",
+    tags={"Debug"},
+)
+async def test_simple_dataframe_access(
+    ctx: Context,
+    df_id: Annotated[str, "ID of the DataFrame to test."],
+) -> Dict[str, Any]:
+    """
+    Simple test function to check DataFrame access.
+    """
+    app_ctx: AppContext = ctx.request_context.lifespan_context
+
+    if df_id not in app_ctx.loaded_dataframes:
+        raise ValueError(f"DataFrame ID '{df_id}' not found.")
+
+    df = app_ctx.loaded_dataframes[df_id]
+
+    # Return minimal info without accessing df.shape or any other potentially problematic attributes
+    return {
+        "status": "success",
+        "df_id": df_id,
+        "columns": list(df.columns),
+        "column_count": len(df.columns),
+    }
+
+
+@mcp.tool(
+    name="profile_dataframe_original",
     description="Generate comprehensive data profiling insights for a loaded DataFrame.",
     tags={"Data Analysis"},
 )
@@ -460,11 +558,7 @@ async def profile_dataframe(
     ] = 10000,
 ) -> Dict[str, Any]:
     """
-    Generates comprehensive data profiling insights including:
-    - column statistics, data types, missing values
-    - data quality issues detection
-    - suggested validation rules
-    - correlation analysis (optional)
+    Generates comprehensive data profiling insights using Pointblank's DataScan class.
     """
     app_ctx: AppContext = ctx.request_context.lifespan_context
 
@@ -485,52 +579,29 @@ async def profile_dataframe(
     else:
         df_sample = df
 
-    profile_results = {
-        "dataset_overview": {
-            "total_rows": df.shape[0],
-            "total_columns": df.shape[1],
-            "sampled_rows": df_sample.shape[0],
-            "backend": "pandas" if hasattr(df, "to_csv") and hasattr(df, "index") else "polars",
-        },
-        "column_profiles": {},
-        "data_quality_issues": [],
-        "suggested_validations": [],
-        "correlations": None,
-    }
+    await ctx.report_progress(50, 100, "Running Pointblank DataScan...")
 
-    await ctx.report_progress(30, 100, "Analyzing columns...")
+    try:
+        # Use Pointblank's DataScan class for profiling
+        scanner = pb.DataScan(data=df_sample)
 
-    # Analyze each column
-    for col in df.columns:
-        try:
-            col_profile = _profile_column(df_sample, col)
-            profile_results["column_profiles"][col] = col_profile
+        await ctx.report_progress(80, 100, "Converting to JSON...")
 
-            # Generate suggested validations based on column profile
-            suggestions = _generate_validation_suggestions(col, col_profile)
-            profile_results["suggested_validations"].extend(suggestions)
+        # Get the JSON representation which properly handles numpy types
+        profile_json = scanner.to_json()
 
-        except Exception as e:
-            profile_results["column_profiles"][col] = {"error": str(e)}
+        # Parse it back to a dictionary and clean any problematic values
+        profile_results = json.loads(profile_json)
+        cleaned_results = clean_for_json_serialization(profile_results)
 
-    await ctx.report_progress(70, 100, "Detecting data quality issues...")
+        await ctx.report_progress(100, 100, "Data profiling complete!")
 
-    # Detect data quality issues
-    profile_results["data_quality_issues"] = _detect_data_quality_issues(
-        df_sample, profile_results["column_profiles"]
-    )
+        return cleaned_results
 
-    # Correlation analysis for numeric columns
-    if include_correlations:
-        await ctx.report_progress(85, 100, "Computing correlations...")
-        try:
-            profile_results["correlations"] = _compute_correlations(df_sample)
-        except Exception as e:
-            profile_results["correlations"] = {"error": str(e)}
-
-    await ctx.report_progress(100, 100, "Data profiling complete!")
-
-    return profile_results
+    except Exception as e:
+        error_msg = f"Error during data profiling: {str(e)}"
+        await ctx.report_progress(100, 100, error_msg)
+        raise ValueError(error_msg)
 
 
 def _profile_column(df: Any, column: str) -> Dict[str, Any]:
@@ -599,9 +670,10 @@ def _profile_column(df: Any, column: str) -> Dict[str, Any]:
                 try:
                     if hasattr(col_data, "value_counts"):
                         top_values = col_data.value_counts().head(5)
-                        profile["top_values"] = (
-                            dict(top_values) if hasattr(top_values, "to_dict") else {}
-                        )
+                        if hasattr(top_values, "to_dict"):
+                            profile["top_values"] = top_values.to_dict()
+                        else:
+                            profile["top_values"] = dict(top_values)
                 except Exception:
                     pass
 
@@ -651,7 +723,7 @@ def _generate_validation_suggestions(column: str, profile: Dict[str, Any]) -> li
             if min_val >= 0:
                 suggestions.append(
                     {
-                        "validation_type": "col_vals_gte",
+                        "validation_type": "col_vals_ge",
                         "params": {"columns": column, "value": 0},
                         "reason": "All values are non-negative",
                     }
@@ -1032,12 +1104,12 @@ def _get_validation_template(template_name: str) -> Optional[Dict[str, Any]]:
                     "description": "Temperature should be in reasonable range",
                 },
                 {
-                    "validation_type": "col_vals_gte",
+                    "validation_type": "col_vals_ge",
                     "params": {"columns": "humidity", "value": 0},
                     "description": "Humidity should be non-negative",
                 },
                 {
-                    "validation_type": "col_vals_lte",
+                    "validation_type": "col_vals_le",
                     "params": {"columns": "humidity", "value": 100},
                     "description": "Humidity should not exceed 100%",
                 },
@@ -1077,12 +1149,12 @@ def _get_supported_validations(validator):
         # Column value validations
         "col_vals_lt": validator.col_vals_lt,
         "col_vals_gt": validator.col_vals_gt,
-        "col_vals_lte": validator.col_vals_le,
-        "col_vals_gte": validator.col_vals_ge,
-        "col_vals_equal": validator.col_vals_eq,
-        "col_vals_not_equal": validator.col_vals_ne,
+        "col_vals_le": validator.col_vals_le,
+        "col_vals_ge": validator.col_vals_ge,
+        "col_vals_eq": validator.col_vals_eq,
+        "col_vals_ne": validator.col_vals_ne,
         "col_vals_between": validator.col_vals_between,
-        "col_vals_not_between": validator.col_vals_outside,
+        "col_vals_outside": validator.col_vals_outside,
         "col_vals_in_set": validator.col_vals_in_set,
         "col_vals_not_in_set": validator.col_vals_not_in_set,
         "col_vals_null": validator.col_vals_null,
@@ -1136,7 +1208,7 @@ async def server_health_check(ctx: Context) -> Dict[str, Any]:
                 dataframe_details.append(
                     {
                         "df_id": df_id,
-                        "shape": df.shape,
+                        "shape": [int(df.shape[0]), int(df.shape[1])],  # Convert to Python ints
                         "memory_mb": round(memory_mb, 2),
                         "backend": "pandas",
                     }
@@ -1150,7 +1222,7 @@ async def server_health_check(ctx: Context) -> Dict[str, Any]:
                 dataframe_details.append(
                     {
                         "df_id": df_id,
-                        "shape": df.shape,
+                        "shape": [int(df.shape[0]), int(df.shape[1])],  # Convert to Python ints
                         "memory_mb": round(estimated_mb, 2),
                         "backend": "polars/other",
                     }
@@ -1223,12 +1295,12 @@ def _get_supported_validations_list():
     return [
         "col_vals_lt",
         "col_vals_gt",
-        "col_vals_lte",
-        "col_vals_gte",
-        "col_vals_equal",
-        "col_vals_not_equal",
+        "col_vals_le",
+        "col_vals_ge",
+        "col_vals_eq",
+        "col_vals_ne",
         "col_vals_between",
-        "col_vals_not_between",
+        "col_vals_outside",
         "col_vals_in_set",
         "col_vals_not_in_set",
         "col_vals_null",
@@ -1414,12 +1486,12 @@ def add_validation_step(
         # Column value validations
         "col_vals_lt": validator.col_vals_lt,  # less than a value
         "col_vals_gt": validator.col_vals_gt,  # greater than a value
-        "col_vals_lte": validator.col_vals_le,  # less or equal
-        "col_vals_gte": validator.col_vals_ge,  # greater or equal
-        "col_vals_equal": validator.col_vals_eq,  # equal to a value
-        "col_vals_not_equal": validator.col_vals_ne,  # not equal to a value
+        "col_vals_le": validator.col_vals_le,  # less or equal
+        "col_vals_ge": validator.col_vals_ge,  # greater or equal
+        "col_vals_eq": validator.col_vals_eq,  # equal to a value
+        "col_vals_ne": validator.col_vals_ne,  # not equal to a value
         "col_vals_between": validator.col_vals_between,  # data lies between two values left=val, right=val
-        "col_vals_not_between": validator.col_vals_outside,  # data is outside two values
+        "col_vals_outside": validator.col_vals_outside,  # data is outside two values
         "col_vals_in_set": validator.col_vals_in_set,  # values in a set e.g. [1,2,3]
         "col_vals_not_in_set": validator.col_vals_not_in_set,  # values not in a set
         "col_vals_null": validator.col_vals_null,  # null values
@@ -1450,6 +1522,12 @@ def add_validation_step(
     # This is a placeholder for how one might construct it.
     # A more robust solution would deserialize a dict into pb.Actions object.
     current_params = {**params}
+
+    # Handle parameter name mapping for reserved keywords
+    # Pointblank uses 'set' but we use 'set_' in JSON to avoid Python reserved keyword issues
+    if "set_" in current_params:
+        current_params["set"] = current_params.pop("set_")
+
     if actions_config:
         # Example: actions_config = {"warn": 0.1} might translate to
         # actions = pb.Actions(warn_fraction=0.1)
