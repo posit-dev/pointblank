@@ -12,26 +12,7 @@ Transform your data validation workflow with conversational AI in VS Code or Pos
 ### 1. Install
 
 ```bash
-pip install pointblank[mcp,pd,excel]
-```
-
-**What this installs:**
-
-- `mcp` - Model Context Protocol server dependencies
-- `pd` - pandas backend for data processing
-- `excel` - Excel file support (`openpyxl`)
-
-**Alternative installs based on your needs:**
-
-```bash
-# Minimal MCP server only
 pip install pointblank[mcp]
-
-# Add Polars for faster data processing
-pip install pointblank[mcp,pd,pl]
-
-# Full installation with all backends
-pip install pointblank[mcp,pd,pl,excel]
 ```
 
 ### 2. Configure Your IDE
@@ -86,7 +67,7 @@ Master these five command patterns and you'll be able to handle most data valida
 ```
 "Load the file /path/to/data.csv"
 "Load my Netflix dataset from Downloads"
-"Load the Excel file with sales metrics"
+"Load the CSV file with sales metrics"
 "Load customer_data.csv as my main dataset"
 ```
 
@@ -184,23 +165,27 @@ These examples show how natural conversation can quickly identify and resolve da
 Pointblank's MCP server provides 19 powerful tools for comprehensive data validation:
 
 ### Data Management
-- **Load DataFrames** from CSV, Excel, Parquet, JSON, JSONL files
+
+- **Load DataFrames** from CSV, Parquet, JSON, JSONL files
 - **Multiple backends** (pandas, polars) for optimal performance
 - **Memory management** with DataFrame deletion capabilities
 
 ### Data Exploration
+
 - **Interactive HTML tables** with automatic browser opening
 - **Data quality analysis** with comprehensive statistics
 - **Column summaries** and missing value reports
 - **Data previews** showing head and tail rows
 
 ### Validation Workflows
+
 - **Validator creation** with flexible configuration
 - **21+ validation types** for comprehensive checking
 - **Pre-built templates** for common validation patterns
 - **Step-by-step validation** with detailed reporting
 
 ### Results & Export
+
 - **Validation reports** in JSON and CSV formats
 - **Failed data export** for investigation and cleanup
 - **Validation step outputs** for detailed analysis
@@ -233,6 +218,7 @@ Understanding what validation rules to ask for will help you quickly build compr
 ### Available Templates
 
 Pointblank includes pre-built validation templates:
+
 - `basic_quality` - Essential data quality checks
 - `financial_data` - Money and numeric validations
 - `customer_data` - Personal information validations
@@ -283,6 +269,7 @@ Pointblank automatically generates beautiful, interactive HTML tables for data e
 ```
 
 These commands create professional HTML tables with:
+
 - **Color-coded data types** (numeric in purple, text in yellow)
 - **Gradient styling** tailored to each table type
 - **Automatic browser opening** for immediate viewing
@@ -299,12 +286,11 @@ Pointblank works with many major data file formats, making it easy to validate d
 | Type | Extensions | Example | Backend Support |
 |------|------------|---------|-----------------|
 | **CSV** | `.csv` | `sales_data.csv` | pandas, polars |
-| **Excel** | `.xlsx`, `.xls` | `monthly_report.xlsx` | pandas (openpyxl) |
 | **Parquet** | `.parquet` | `big_data.parquet` | pandas, polars |
 | **JSON** | `.json` | `api_response.json` | pandas, polars |
 | **JSON Lines** | `.jsonl` | `streaming_data.jsonl` | pandas, polars |
 
-The consistent natural language interface works the same regardless of file format, so you can focus on validation logic rather than technical details. Polars provides faster processing for large datasets, while pandas offers broader format support including Excel files.
+The consistent natural language interface works the same regardless of file format, so you can focus on validation logic rather than technical details. Polars provides faster processing for large datasets, while Pandas offers broader format support.
 
 ## Quick Troubleshooting
 
