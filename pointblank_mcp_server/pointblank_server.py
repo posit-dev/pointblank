@@ -2,6 +2,7 @@ import json
 import logging
 import math
 import uuid
+import webbrowser
 from contextlib import asynccontextmanager
 from dataclasses import dataclass, field
 from datetime import datetime
@@ -1979,7 +1980,12 @@ async def preview_table(
             with open(html_path, "w", encoding="utf-8") as f:
                 f.write(full_html)
 
-            browser_msg = f"HTML preview saved to: {html_path}\n\n📖 To view the table, you can:\n1. Open the file in your browser\n2. Use: open_simple_browser with url: file://{html_path}"
+            # Open in default browser
+            try:
+                webbrowser.open(f"file://{html_path}")
+                browser_msg = f"HTML preview saved and opened in default browser!\n\nFile location: {html_path}"
+            except Exception as browser_error:
+                browser_msg = f"HTML preview saved to: {html_path}\n\n📖 Could not open browser automatically: {str(browser_error)}\nPlease open the file manually in your browser."
 
         except Exception as e:
             browser_msg = f"Error saving HTML file: {str(e)}"
@@ -2060,7 +2066,12 @@ async def missing_values_table(
             with open(html_path, "w", encoding="utf-8") as f:
                 f.write(full_html)
 
-            browser_msg = f"HTML analysis saved to: {html_path}\n\n📖 To view the analysis, you can:\n1. Open the file in your browser\n2. Use: open_simple_browser with url: file://{html_path}"
+            # Open in default browser
+            try:
+                webbrowser.open(f"file://{html_path}")
+                browser_msg = f"HTML missing values analysis saved and opened in default browser!\n\nFile location: {html_path}"
+            except Exception as browser_error:
+                browser_msg = f"HTML analysis saved to: {html_path}\n\n📖 Could not open browser automatically: {str(browser_error)}\nPlease open the file manually in your browser."
 
         except Exception as e:
             browser_msg = f"Error saving HTML file: {str(e)}"
@@ -2142,7 +2153,12 @@ async def column_summary_table(
             with open(html_path, "w", encoding="utf-8") as f:
                 f.write(full_html)
 
-            browser_msg = f"HTML summary saved to: {html_path}\n\n📖 To view the summary, you can:\n1. Open the file in your browser\n2. Use: open_simple_browser with url: file://{html_path}"
+            # Open in default browser
+            try:
+                webbrowser.open(f"file://{html_path}")
+                browser_msg = f"HTML column summary saved and opened in default browser!\n\nFile location: {html_path}"
+            except Exception as browser_error:
+                browser_msg = f"HTML summary saved to: {html_path}\n\n📖 Could not open browser automatically: {str(browser_error)}\nPlease open the file manually in your browser."
 
         except Exception as e:
             browser_msg = f"Error saving HTML file: {str(e)}"
