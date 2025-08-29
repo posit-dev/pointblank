@@ -1,6 +1,8 @@
 import json
 import logging
 import math
+import os
+import sys
 import uuid
 import webbrowser
 from contextlib import asynccontextmanager
@@ -20,6 +22,13 @@ from fastmcp import Context, FastMCP
 from fastmcp.prompts.prompt import Message
 
 import pointblank as pb
+
+# Detect if we're running in a test environment
+TESTING_MODE = (
+    "pytest" in sys.modules
+    or os.environ.get("PYTEST_CURRENT_TEST") is not None
+    or os.environ.get("POINTBLANK_TESTING") == "true"
+)
 
 # Try to import Pandas, but make it optional
 try:
@@ -111,6 +120,14 @@ def _save_dataframe_to_csv(df: Any, output_path: Path) -> None:
                 pd.DataFrame(df).to_csv(output_path, index=False)
         else:
             raise TypeError(f"Unsupported DataFrame type '{type(df).__name__}' for CSV export.")
+
+
+def _open_browser_conditionally(url: str) -> None:
+    """Open browser only if not in testing mode."""
+    if not TESTING_MODE:
+        webbrowser.open(url)
+    else:
+        logger.debug(f"Browser opening suppressed in testing mode for: {url}")
 
 
 def _load_dataframe_from_path(input_path: str, backend: str = "auto") -> Any:
@@ -307,6 +324,16 @@ def _generate_validation_report_html(validator: pb.Validate, validator_id: str) 
     Returns the file path.
     """
     try:
+        # Generate timestamped filename
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        filename = f"pointblank_validation_report_{validator_id}_{timestamp}.html"
+        file_path = Path.cwd() / filename
+
+        # Skip file generation during testing
+        if TESTING_MODE:
+            logger.debug(f"Skipping HTML file generation during testing: {filename}")
+            return str(file_path.resolve())  # Return path but don't create file
+
         # Get the validation report as a GT table
         gt_report = validator.get_tabular_report()
 
@@ -328,11 +355,6 @@ def _generate_validation_report_html(validator: pb.Validate, validator_id: str) 
         # Ensure proper UTF-8 content
         if isinstance(html_content, bytes):
             html_content = html_content.decode("utf-8", errors="replace")
-
-        # Generate timestamped filename
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        filename = f"pointblank_validation_report_{validator_id}_{timestamp}.html"
-        file_path = Path.cwd() / filename
 
         # Save HTML file with explicit UTF-8 encoding
         with open(file_path, "w", encoding="utf-8", newline="") as f:
@@ -1858,7 +1880,7 @@ async def interrogate_validator(
         # Generate HTML report table and open in browser
         try:
             html_report_path = _generate_validation_report_html(validator, validator_id)
-            webbrowser.open(f"file://{html_report_path}")
+            _open_browser_conditionally(f"file://{html_report_path}")
             await ctx.report_progress(
                 50, 100, f"Validation report opened in browser: {html_report_path}"
             )
@@ -2142,15 +2164,19 @@ async def preview_table(
             )
             html_path = Path.cwd() / html_filename
 
-            with open(html_path, "w", encoding="utf-8") as f:
-                f.write(full_html)
+            # Skip file generation during testing
+            if TESTING_MODE:
+                browser_msg = f"HTML preview generated (file creation skipped during testing)\n\nFile location: {html_path}"
+            else:
+                with open(html_path, "w", encoding="utf-8") as f:
+                    f.write(full_html)
 
-            # Open in default browser
-            try:
-                webbrowser.open(f"file://{html_path}")
-                browser_msg = f"HTML preview saved and opened in default browser!\n\nFile location: {html_path}"
-            except Exception as browser_error:
-                browser_msg = f"HTML preview saved to: {html_path}\n\n📖 Could not open browser automatically: {str(browser_error)}\nPlease open the file manually in your browser."
+                # Open in default browser
+                try:
+                    _open_browser_conditionally(f"file://{html_path}")
+                    browser_msg = f"HTML preview saved and opened in default browser!\n\nFile location: {html_path}"
+                except Exception as browser_error:
+                    browser_msg = f"HTML preview saved to: {html_path}\n\n📖 Could not open browser automatically: {str(browser_error)}\nPlease open the file manually in your browser."
 
         except Exception as e:
             browser_msg = f"Error saving HTML file: {str(e)}"
@@ -2228,15 +2254,19 @@ async def missing_values_table(
             html_filename = f"pointblank_missing_values_{dataframe_id}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.html"
             html_path = Path.cwd() / html_filename
 
-            with open(html_path, "w", encoding="utf-8") as f:
-                f.write(full_html)
+            # Skip file generation during testing
+            if TESTING_MODE:
+                browser_msg = f"HTML missing values analysis generated (file creation skipped during testing)\n\nFile location: {html_path}"
+            else:
+                with open(html_path, "w", encoding="utf-8") as f:
+                    f.write(full_html)
 
-            # Open in default browser
-            try:
-                webbrowser.open(f"file://{html_path}")
-                browser_msg = f"HTML missing values analysis saved and opened in default browser!\n\nFile location: {html_path}"
-            except Exception as browser_error:
-                browser_msg = f"HTML analysis saved to: {html_path}\n\n📖 Could not open browser automatically: {str(browser_error)}\nPlease open the file manually in your browser."
+                # Open in default browser
+                try:
+                    _open_browser_conditionally(f"file://{html_path}")
+                    browser_msg = f"HTML missing values analysis saved and opened in default browser!\n\nFile location: {html_path}"
+                except Exception as browser_error:
+                    browser_msg = f"HTML analysis saved to: {html_path}\n\n📖 Could not open browser automatically: {str(browser_error)}\nPlease open the file manually in your browser."
 
         except Exception as e:
             browser_msg = f"Error saving HTML file: {str(e)}"
@@ -2315,15 +2345,19 @@ async def column_summary_table(
             html_filename = f"pointblank_column_summary_{dataframe_id}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.html"
             html_path = Path.cwd() / html_filename
 
-            with open(html_path, "w", encoding="utf-8") as f:
-                f.write(full_html)
+            # Skip file generation during testing
+            if TESTING_MODE:
+                browser_msg = f"HTML column summary generated (file creation skipped during testing)\n\nFile location: {html_path}"
+            else:
+                with open(html_path, "w", encoding="utf-8") as f:
+                    f.write(full_html)
 
-            # Open in default browser
-            try:
-                webbrowser.open(f"file://{html_path}")
-                browser_msg = f"HTML column summary saved and opened in default browser!\n\nFile location: {html_path}"
-            except Exception as browser_error:
-                browser_msg = f"HTML summary saved to: {html_path}\n\n📖 Could not open browser automatically: {str(browser_error)}\nPlease open the file manually in your browser."
+                # Open in default browser
+                try:
+                    _open_browser_conditionally(f"file://{html_path}")
+                    browser_msg = f"HTML column summary saved and opened in default browser!\n\nFile location: {html_path}"
+                except Exception as browser_error:
+                    browser_msg = f"HTML summary saved to: {html_path}\n\n📖 Could not open browser automatically: {str(browser_error)}\nPlease open the file manually in your browser."
 
         except Exception as e:
             browser_msg = f"Error saving HTML file: {str(e)}"
