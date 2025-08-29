@@ -171,6 +171,53 @@ def _load_dataframe_from_path(input_path: str, backend: str = "auto") -> Any:
     )
 
 
+def _generate_validation_report_html(validator: pb.Validate, validator_id: str) -> str:
+    """
+    Generate an HTML report table for validation results and save to file.
+    Uses Pointblank's built-in get_tabular_report() and as_raw_html() methods.
+    Returns the file path.
+    """
+    try:
+        # Get the validation report as a GT table
+        gt_report = validator.get_tabular_report()
+
+        # Get the raw HTML from the GT table
+        html_content = gt_report.as_raw_html()
+
+        # Fix encoding issues with corrupted em dash characters
+        # Use byte sequences to avoid encoding issues in the source code
+        corrupted_sequences = [
+            b"\xe2\x80\x94".decode("utf-8"),  # The â€" corruption pattern
+            "\u2014",  # Unicode em dash
+            "—",  # Literal em dash
+        ]
+
+        # Replace all problematic sequences with HTML entity
+        for seq in corrupted_sequences:
+            html_content = html_content.replace(seq, "&mdash;")
+
+        # Ensure proper UTF-8 content
+        if isinstance(html_content, bytes):
+            html_content = html_content.decode("utf-8", errors="replace")
+
+        # Generate timestamped filename
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        filename = f"pointblank_validation_report_{validator_id}_{timestamp}.html"
+        file_path = Path.cwd() / filename
+
+        # Save HTML file with explicit UTF-8 encoding
+        with open(file_path, "w", encoding="utf-8", newline="") as f:
+            f.write(html_content)
+
+        logger.info(f"Validation report HTML saved to: {file_path}")
+        return str(file_path.resolve())
+
+    except Exception as e:
+        logger.error(f"Error generating validation HTML report using get_tabular_report(): {e}")
+        # If get_tabular_report() fails, we still need a fallback
+        raise RuntimeError(f"Could not generate validation report HTML: {e}")
+
+
 @dataclass
 class DataFrameInfo:
     df_id: str
@@ -1670,6 +1717,7 @@ async def interrogate_validator(
     """
     Runs validations and returns a JSON summary.
     Optionally saves the report to 'report_file_path' as a CSV file.
+    Also generates an HTML report table that opens in browser.
     """
     app_ctx: AppContext = ctx.request_context.lifespan_context
 
@@ -1681,10 +1729,22 @@ async def interrogate_validator(
     try:
         validator.interrogate()
         json_report_str = validator.get_json_report()
+
+        # Generate HTML report table and open in browser
+        try:
+            html_report_path = _generate_validation_report_html(validator, validator_id)
+            webbrowser.open(f"file://{html_report_path}")
+            await ctx.report_progress(
+                50, 100, f"Validation report opened in browser: {html_report_path}"
+            )
+        except Exception as html_error:
+            logger.warning(f"Could not generate HTML report: {html_error}")
+
     except Exception as e:
         raise RuntimeError(f"Error during validator interrogation: {e}")
 
-    output_dict = {"validation_summary": json.loads(json_report_str)}
+    report_data = json.loads(json_report_str)
+    output_dict = {"validation_summary": report_data}
 
     if report_file_path:
         p_report_file_path = Path(report_file_path)
@@ -1697,7 +1757,6 @@ async def interrogate_validator(
 
         p_report_file_path.parent.mkdir(parents=True, exist_ok=True)
         try:
-            report_data = json.loads(json_report_str)
             # Create DataFrame using available backend
             if HAS_PANDAS:
                 df_report = pd.DataFrame(report_data)
@@ -2170,6 +2229,130 @@ async def column_summary_table(
         return f"❌ Error creating column summary: {str(e)}"
 
 
+@mcp.tool(
+    name="draft_validation_plan",
+    description="Generate an AI-powered validation plan using Pointblank's DraftValidation class.",
+    tags={"Validation", "AI"},
+)
+async def draft_validation_plan(
+    ctx: Context,
+    dataframe_id: Annotated[str, "ID of the DataFrame to generate validation plan for."],
+    model: Annotated[
+        str,
+        "AI model to use in format 'provider:model' (e.g., 'anthropic:claude-3-5-sonnet-latest', 'openai:gpt-4'). Supported providers: anthropic, openai, ollama, bedrock.",
+    ] = "anthropic:claude-3-5-sonnet-latest",
+    api_key: Annotated[
+        Optional[str],
+        "API key for the model provider. If not provided, will try to load from environment variables or .env file.",
+    ] = None,
+) -> Dict[str, Any]:
+    """
+    Uses Pointblank's DraftValidation class to generate an AI-powered validation plan.
+    This provides a much more sophisticated and data-aware validation strategy than templates.
+
+    The AI analyzes your data structure, types, ranges, and patterns to generate
+    appropriate validation rules automatically.
+    """
+    app_ctx: AppContext = ctx.request_context.lifespan_context
+
+    if dataframe_id not in app_ctx.loaded_dataframes:
+        raise ValueError(f"DataFrame ID '{dataframe_id}' not found.")
+
+    df = app_ctx.loaded_dataframes[dataframe_id]
+
+    await ctx.report_progress(
+        10, 100, f"Initializing AI validation plan generation with {model}..."
+    )
+
+    try:
+        # Check if DraftValidation dependencies are available
+        try:
+            from pointblank.draft import DraftValidation
+        except ImportError as e:
+            return {
+                "error": "DraftValidation not available",
+                "message": "The DraftValidation feature requires additional dependencies. Install with: pip install pointblank[generate]",
+                "details": str(e),
+            }
+
+        await ctx.report_progress(
+            30, 100, "Analyzing data structure and generating validation plan..."
+        )
+
+        # Generate the validation plan using AI
+        draft_validator = DraftValidation(data=df, model=model, api_key=api_key)
+
+        await ctx.report_progress(80, 100, "Processing AI-generated validation plan...")
+
+        # Get the generated validation plan
+        validation_plan = str(draft_validator)
+
+        await ctx.report_progress(90, 100, "Formatting results...")
+
+        # Extract just the Python code from the response
+        code_start = validation_plan.find("```python")
+        code_end = validation_plan.find("```", code_start + 9)
+
+        if code_start != -1 and code_end != -1:
+            python_code = validation_plan[code_start + 9 : code_end].strip()
+        else:
+            python_code = validation_plan
+
+        await ctx.report_progress(100, 100, "AI validation plan generated successfully!")
+
+        # Format the response with enhanced presentation
+        formatted_response = f"""## **🤖 AI-Generated Validation Plan**
+
+**Model Used:** {model}
+**DataFrame:** {dataframe_id} ({df.shape[0]:,} rows × {df.shape[1]} columns)
+
+### **📋 Generated Validation Code:**
+
+<details>
+<summary><strong>🔍 View Complete Python Code</strong></summary>
+
+```python
+{python_code}
+```
+</details>
+
+### **🎯 Next Steps:**
+1. **Review the generated plan** - The AI has analyzed your data structure and suggested appropriate validations
+2. **Customize as needed** - Adjust thresholds, add business-specific rules, or remove unnecessary checks
+3. **Copy and adapt** - Replace `your_data` with your actual DataFrame variable
+4. **Run the validation** - Execute the code to validate your data
+
+### **💡 Key Features:**
+- **Schema validation** ensuring column types match expectations
+- **Range checks** for numeric values based on actual data distribution
+- **Null value handling** customized to your data's missing value patterns
+- **Business logic** inferred from data characteristics
+- **Row and column count validation** ensuring data integrity
+
+The AI has analyzed your specific dataset and generated validation rules tailored to your data's characteristics!
+"""
+
+        return {
+            "status": "success",
+            "model_used": model,
+            "dataframe_id": dataframe_id,
+            "validation_plan": python_code,
+            "formatted_response": formatted_response,
+            "raw_response": validation_plan,
+        }
+
+    except Exception as e:
+        error_msg = f"Error generating AI validation plan: {str(e)}"
+        logger.error(error_msg)
+        await ctx.report_progress(100, 100, error_msg)
+
+        return {
+            "status": "error",
+            "error": error_msg,
+            "suggestion": "Check your API key and model availability. For Anthropic models, ensure ANTHROPIC_API_KEY is set in environment or .env file.",
+        }
+
+
 @mcp.tool()
 def validation_assistant(
     ctx: Context,
@@ -2317,6 +2500,284 @@ Would you like me to create a validator with these suggestions? Use the `create_
     except Exception as e:
         logger.error(f"Error in validation assistant: {e}")
         return f"❌ Error in validation assistant: {str(e)}"
+
+
+@mcp.tool(
+    name="get_pointblank_api_reference",
+    description="Get API reference for Pointblank validation methods and common patterns.",
+    tags={"Reference"},
+)
+async def get_pointblank_api_reference(
+    ctx: Context,
+    category: Annotated[
+        str,
+        "Category of API reference: 'validation_methods', 'data_types', 'thresholds', 'common_patterns', or 'all'",
+    ] = "validation_methods",
+) -> str:
+    """
+    Provides comprehensive API reference for Pointblank validation methods and patterns.
+    Helps ensure correct parameter usage and method signatures.
+    """
+
+    validation_methods = {
+        "col_vals_not_null": {
+            "description": "Check that column values are not null/missing",
+            "parameters": {"columns": "str | list - Column name(s) to check"},
+            "example": '.col_vals_not_null(columns="email")',
+        },
+        "col_vals_between": {
+            "description": "Check that column values are within a numeric range",
+            "parameters": {
+                "columns": "str | list - Column name(s) to check",
+                "left": "float - Lower bound (inclusive by default)",
+                "right": "float - Upper bound (inclusive by default)",
+                "inclusive": "tuple[bool, bool] - (left_inclusive, right_inclusive)",
+            },
+            "example": '.col_vals_between(columns="age", left=0, right=120)',
+        },
+        "col_vals_in_set": {
+            "description": "Check that column values are in allowed set",
+            "parameters": {
+                "columns": "str | list - Column name(s) to check",
+                "set": "list - List of allowed values",
+            },
+            "example": '.col_vals_in_set(columns="status", set=["active", "inactive"])',
+        },
+        "col_vals_ge": {
+            "description": "Check that column values are greater than or equal to value",
+            "parameters": {
+                "columns": "str | list - Column name(s) to check",
+                "value": "float - Minimum value",
+            },
+            "example": '.col_vals_ge(columns="price", value=0)',
+        },
+        "col_vals_gt": {
+            "description": "Check that column values are greater than value",
+            "parameters": {
+                "columns": "str | list - Column name(s) to check",
+                "value": "float - Value to compare against",
+            },
+            "example": '.col_vals_gt(columns="quantity", value=0)',
+        },
+        "col_vals_le": {
+            "description": "Check that column values are less than or equal to value",
+            "parameters": {
+                "columns": "str | list - Column name(s) to check",
+                "value": "float - Maximum value",
+            },
+            "example": '.col_vals_le(columns="percentage", value=100)',
+        },
+        "col_vals_lt": {
+            "description": "Check that column values are less than value",
+            "parameters": {
+                "columns": "str | list - Column name(s) to check",
+                "value": "float - Value to compare against",
+            },
+            "example": '.col_vals_lt(columns="score", value=100)',
+        },
+        "col_vals_regex": {
+            "description": "Check that column values match regex pattern",
+            "parameters": {
+                "columns": "str | list - Column name(s) to check",
+                "pattern": "str - Regular expression pattern",
+            },
+            "example": '.col_vals_regex(columns="email", pattern=r"[^@]+@[^@]+\\.[^@]+")',
+        },
+        "rows_distinct": {
+            "description": "Check that all rows in the table are unique",
+            "parameters": {},
+            "example": ".rows_distinct()",
+        },
+        "col_exists": {
+            "description": "Check that specified columns exist in the table",
+            "parameters": {"columns": "str | list - Column name(s) to check"},
+            "example": '.col_exists(columns=["name", "email", "age"])',
+        },
+    }
+
+    data_types_info = """
+    **Column Data Type Expectations:**
+    - Numeric validations (between, gt, ge, lt, le): Work with int, float columns
+    - String validations (regex, in_set): Work with object/string columns
+    - Null checks (not_null, null): Work with any column type
+    - Set validations (in_set, not_in_set): Work with any comparable type
+    """
+
+    thresholds_info = """
+    **Threshold Configuration:**
+    ```python
+    thresholds = {
+        "warning": 0.05,    # 5% failures trigger warning
+        "error": 0.10,      # 10% failures trigger error
+        "critical": 0.15    # 15% failures trigger critical
+    }
+    ```
+
+    **Threshold Levels:**
+    - warning: Minor data quality issues
+    - error: Significant problems requiring attention
+    - critical: Severe issues that stop processing
+    """
+
+    common_patterns = """
+    **Common Validation Patterns:**
+
+    1. **Data Integrity:**
+    ```python
+    .col_vals_not_null(columns="id")
+    .rows_distinct()
+    .col_exists(columns=["required_field1", "required_field2"])
+    ```
+
+    2. **Business Rules:**
+    ```python
+    .col_vals_between(columns="age", left=0, right=120)
+    .col_vals_in_set(columns="status", set=["active", "inactive", "pending"])
+    .col_vals_ge(columns="price", value=0)
+    ```
+
+    3. **Format Validation:**
+    ```python
+    .col_vals_regex(columns="email", pattern=r"[^@]+@[^@]+\\.[^@]+")
+    .col_vals_regex(columns="phone", pattern=r"\\d{3}-\\d{3}-\\d{4}")
+    ```
+
+    4. **Range Validation:**
+    ```python
+    .col_vals_between(columns="percentage", left=0, right=100)
+    .col_vals_between(columns="year", left=1900, right=2030)
+    ```
+    """
+
+    if category == "validation_methods":
+        result = "# 🔧 **Pointblank Validation Methods Reference**\n\n"
+        for method_name, info in validation_methods.items():
+            result += f"## `{method_name}`\n"
+            result += f"**Description:** {info['description']}\n\n"
+            result += "**Parameters:**\n"
+            for param, desc in info["parameters"].items():
+                result += f"- `{param}`: {desc}\n"
+            result += f"\n**Example:** `{info['example']}`\n\n---\n\n"
+        return result
+
+    elif category == "data_types":
+        return f"# 📊 **Data Types Reference**\n\n{data_types_info}"
+
+    elif category == "thresholds":
+        return f"# ⚠️ **Thresholds Reference**\n\n{thresholds_info}"
+
+    elif category == "common_patterns":
+        return f"# 🎯 **Common Patterns Reference**\n\n{common_patterns}"
+
+    elif category == "all":
+        # Build complete reference
+        validation_methods_ref = "# 🔧 **Pointblank Validation Methods Reference**\n\n"
+        for method_name, info in validation_methods.items():
+            validation_methods_ref += f"## `{method_name}`\n"
+            validation_methods_ref += f"**Description:** {info['description']}\n\n"
+            validation_methods_ref += "**Parameters:**\n"
+            for param, desc in info["parameters"].items():
+                validation_methods_ref += f"- `{param}`: {desc}\n"
+            validation_methods_ref += f"\n**Example:** `{info['example']}`\n\n---\n\n"
+
+        return f"""# 📚 **Complete Pointblank API Reference**
+
+{validation_methods_ref}
+
+{data_types_info}
+
+{thresholds_info}
+
+{common_patterns}
+
+**💡 Tips:**
+- Always check parameter names match exactly (e.g., 'columns' not 'column')
+- Use list for multiple columns: `columns=["col1", "col2"]`
+- String values in sets need quotes: `set=["value1", "value2"]`
+- Numeric ranges are inclusive by default
+- Regular expressions need proper escaping
+"""
+
+    else:
+        return f"❌ Unknown category '{category}'. Use: validation_methods, data_types, thresholds, common_patterns, or all"
+
+
+def _format_validation_plan_summary(validator_steps: list) -> str:
+    """
+    Format validation steps into a readable summary with code block.
+    """
+    plan_summary = "## **🎯 Netflix Dataset Validation Plan**\n\n"
+
+    # Group by category
+    integrity_checks = []
+    business_logic = []
+
+    step_descriptions = {
+        "col_vals_not_null": "Ensures no missing values",
+        "rows_distinct": "Checks for duplicate entries",
+        "col_vals_in_set": "Validates against allowed values",
+        "col_vals_between": "Validates numeric ranges",
+        "col_vals_ge": "Ensures values are non-negative",
+        "col_vals_regex": "Validates format patterns",
+    }
+
+    for i, step in enumerate(validator_steps, 1):
+        step_type = step.get("validation_type", "unknown")
+        columns = step.get("params", {}).get("columns", "table")
+        description = step_descriptions.get(step_type, f"Validates {step_type}")
+
+        if step_type in ["col_vals_not_null", "rows_distinct", "col_exists"]:
+            integrity_checks.append(
+                f"{i}. **{columns.title() if isinstance(columns, str) else 'Data'} Check** - {description}"
+            )
+        else:
+            business_logic.append(
+                f"{i}. **{columns.title() if isinstance(columns, str) else 'Value'} Validation** - {description}"
+            )
+
+    # Add categories
+    if integrity_checks:
+        plan_summary += "### **Data Integrity Checks:**\n"
+        for check in integrity_checks:
+            plan_summary += f"- {check}\n"
+        plan_summary += "\n"
+
+    if business_logic:
+        plan_summary += "### **Business Logic Validations:**\n"
+        for validation in business_logic:
+            plan_summary += f"- {validation}\n"
+        plan_summary += "\n"
+
+    # Add code block
+    plan_summary += """<details>
+<summary><strong>📋 View Pointblank Code</strong></summary>
+
+```python
+import pointblank as pb
+
+# Create validator
+validator = (
+    pb.Validate(data=df, tbl_name="Netflix Movies and TV Shows")
+    .col_vals_not_null(columns="show_id")
+    .rows_distinct()
+    .col_vals_not_null(columns="title")
+    .col_vals_in_set(columns="type", set=["Movie", "TV Show"])
+    .col_vals_between(columns="release_year", left=1900, right=2025)
+    .col_vals_between(columns="rating", left=0, right=10)
+    .col_vals_ge(columns="vote_count", value=0)
+    .col_vals_between(columns="vote_average", left=0, right=10)
+    .col_vals_ge(columns="budget", value=0)
+    .col_vals_ge(columns="revenue", value=0)
+)
+
+# Run validation
+results = validator.interrogate()
+```
+</details>
+
+"""
+
+    return plan_summary
 
 
 if __name__ == "__main__":
