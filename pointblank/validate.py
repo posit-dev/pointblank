@@ -1584,13 +1584,22 @@ def _generate_display_table(
 
                     tail_data = pd.DataFrame(columns=head_data.columns)
 
-                data = pd.concat([head_data, tail_data])
+                # Suppress the FutureWarning about DataFrame concatenation with empty entries
+                import warnings
+
+                with warnings.catch_warnings():
+                    warnings.filterwarnings(
+                        "ignore",
+                        category=FutureWarning,
+                        message="The behavior of DataFrame concatenation with empty or all-NA entries is deprecated",
+                    )
+                    data = pd.concat([head_data, tail_data])
 
                 row_number_list = list(range(1, n_head + 1)) + list(
                     range(n_rows - n_tail + 1, n_rows + 1)
                 )
 
-        # For PySpark, update schema after conversion to pandas
+        # For PySpark, update schema after conversion to Pandas
         if tbl_type == "pyspark":
             tbl_schema = Schema(tbl=data)
 
@@ -14432,12 +14441,13 @@ def _apply_segments(data_tbl: any, segments_expr: tuple[str, Any]) -> any:
         # If the table is an Ibis backend table, perform the filtering operation directly
 
         # Filter the data table based on the column name and segment
+        # Use the new Ibis API methods to avoid deprecation warnings
         if segment is None:
-            data_tbl = data_tbl[data_tbl[column].isnull()]
+            data_tbl = data_tbl.filter(data_tbl[column].isnull())
         elif isinstance(segment, list):
-            data_tbl = data_tbl[data_tbl[column].isin(segment)]
+            data_tbl = data_tbl.filter(data_tbl[column].isin(segment))
         else:
-            data_tbl = data_tbl[data_tbl[column] == segment]
+            data_tbl = data_tbl.filter(data_tbl[column] == segment)
 
     return data_tbl
 
