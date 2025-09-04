@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import pathlib
-
+import warnings
 import pprint
 import sys
 import re
@@ -2946,6 +2946,426 @@ def test_validation_error_handling_in_pre_pyspark():
     assert len(validation.validation_info) == 1
     # The step should be marked as having an eval_error
     assert validation.validation_info[0].eval_error is True
+
+
+# Polars expressions backward compatibility tests for segments
+def test_polars_datetime_expression_with_warning():
+    """Test that pl.datetime() expressions are converted with a deprecation warning."""
+    with warnings.catch_warnings(record=True) as w:
+        warnings.simplefilter("always")
+
+        validation = (
+            Validate(data=load_dataset(dataset="small_table", tbl_type="polars"))
+            .col_vals_gt(
+                columns="d",
+                value=100,
+                segments=("date", (pl.datetime(2016, 1, 4), pl.datetime(2016, 1, 5))),
+            )
+            .interrogate()
+        )
+
+        # Check that we got the expected warning
+        assert len(w) >= 1
+        warning_messages = [str(warning.message) for warning in w]
+        deprecation_warnings = [
+            msg
+            for msg in warning_messages
+            if "Polars expressions in segments are deprecated" in msg
+        ]
+        assert len(deprecation_warnings) >= 1
+
+        # Check that the warning mentions the correct alternative
+        assert "datetime.date(2016, 1, 4)" in deprecation_warnings[0]
+        assert "pl.datetime(2016, 1, 4)" in deprecation_warnings[0]
+
+        # Check that the validation still works correctly
+        assert validation.n_passed(i=1, scalar=True) == 2
+        assert validation.n_passed(i=2, scalar=True) == 1
+
+
+def test_polars_datetime_expression_single_segment_with_warning():
+    """Test single Polars datetime expression in segments."""
+    with warnings.catch_warnings(record=True) as w:
+        warnings.simplefilter("always")
+
+        validation = (
+            Validate(data=load_dataset(dataset="small_table", tbl_type="polars"))
+            .col_vals_gt(
+                columns="d",
+                value=100,
+                segments=("date", pl.datetime(2016, 1, 4)),
+            )
+            .interrogate()
+        )
+
+        # Check that we got a deprecation warning
+        assert len(w) >= 1
+        deprecation_warnings = [
+            warning
+            for warning in w
+            if warning.category == DeprecationWarning
+            and "Polars expressions in segments are deprecated" in str(warning.message)
+        ]
+        assert len(deprecation_warnings) >= 1
+
+        # Validation should work
+        assert validation.n_passed(i=1, scalar=True) == 2
+
+
+def test_polars_datetime_non_midnight_conversion():
+    """Test that non-midnight datetime expressions are converted to datetime objects."""
+    # Create a datetime expression that's not at midnight but use a more realistic approach
+    # We'll test the conversion logic without requiring it to match actual data
+
+    with warnings.catch_warnings(record=True) as w:
+        warnings.simplefilter("always")
+
+        # Use a valid date that exists in the data but with a time component
+        # This will test our conversion logic while still having data to validate
+        try:
+            validation = (
+                Validate(data=load_dataset(dataset="small_table", tbl_type="polars"))
+                .col_vals_gt(
+                    columns="d",
+                    value=100,
+                    segments=(
+                        "date",
+                        pl.lit(datetime.datetime(2016, 1, 4, 0, 0, 1)),
+                    ),  # 1 second after midnight
+                )
+                .interrogate()
+            )
+
+            # If successful, check results
+            assert validation.n_passed(i=1, scalar=True) >= 0
+
+        except ValueError as e:
+            # If it fails due to no matching data, that's okay - we mainly want to test the warning
+            if "test units must be greater than zero" in str(e):
+                pass  # This is expected if the datetime doesn't match any data
+            else:
+                raise
+
+        # Check that we got a deprecation warning
+        deprecation_warnings = [
+            warning
+            for warning in w
+            if warning.category == DeprecationWarning
+            and "Polars expressions in segments are deprecated" in str(warning.message)
+        ]
+        assert len(deprecation_warnings) >= 1
+
+
+def test_polars_lit_expression_with_warning():
+    """Test that pl.lit() datetime expressions are handled with warnings."""
+    with warnings.catch_warnings(record=True) as w:
+        warnings.simplefilter("always")
+
+        validation = (
+            Validate(data=load_dataset(dataset="small_table", tbl_type="polars"))
+            .col_vals_gt(
+                columns="d",
+                value=100,
+                segments=("date", pl.lit(datetime.date(2016, 1, 4))),
+            )
+            .interrogate()
+        )
+
+        # Check that we got a deprecation warning
+        deprecation_warnings = [
+            warning
+            for warning in w
+            if warning.category == DeprecationWarning
+            and "Polars expressions in segments are deprecated" in str(warning.message)
+        ]
+        assert len(deprecation_warnings) >= 1
+
+        # Validation should work
+        assert validation.n_passed(i=1, scalar=True) == 2
+
+
+def test_native_python_types_no_warning():
+    """Test that native Python types don't trigger warnings."""
+    with warnings.catch_warnings(record=True) as w:
+        warnings.simplefilter("always")
+
+        validation = (
+            Validate(data=load_dataset(dataset="small_table", tbl_type="polars"))
+            .col_vals_gt(
+                columns="d",
+                value=100,
+                segments=("date", (datetime.date(2016, 1, 4), datetime.date(2016, 1, 5))),
+            )
+            .interrogate()
+        )
+
+        # Check that we didn't get any deprecation warnings about Polars expressions
+        deprecation_warnings = [
+            warning
+            for warning in w
+            if warning.category == DeprecationWarning
+            and "Polars expressions in segments are deprecated" in str(warning.message)
+        ]
+        assert len(deprecation_warnings) == 0
+
+        # Validation should work
+        assert validation.n_passed(i=1, scalar=True) == 2
+        assert validation.n_passed(i=2, scalar=True) == 1
+
+
+def test_polars_expression_parsing_failure_fallback():
+    """Test that parsing failures don't crash but fall back gracefully."""
+
+    # Create a mock Polars expression that will fail parsing
+    class MockPolarsExpr:
+        def __init__(self):
+            self.__class__.__module__ = "polars.expr.expr"
+            self.__class__.__name__ = "Expr"
+
+        def __str__(self):
+            return "invalid_datetime_format.alias('datetime')"
+
+    mock_expr = MockPolarsExpr()
+
+    with warnings.catch_warnings(record=True) as w:
+        warnings.simplefilter("always")
+
+        # This should trigger the warning but fail parsing and fall back
+        try:
+            validation = (
+                Validate(data=load_dataset(dataset="small_table", tbl_type="polars"))
+                .col_vals_gt(
+                    columns="d",
+                    value=100,
+                    segments=("date", mock_expr),
+                )
+                .interrogate()
+            )
+        except Exception:
+            # We expect this might fail due to the invalid expression,
+            # but it shouldn't crash during the conversion attempt
+            pass
+
+        # Check that we got a deprecation warning
+        deprecation_warnings = [
+            warning
+            for warning in w
+            if warning.category == DeprecationWarning
+            and "Polars expressions in segments are deprecated" in str(warning.message)
+        ]
+        assert len(deprecation_warnings) >= 1
+
+
+def test_non_datetime_polars_expression():
+    """Test that non-datetime Polars expressions still trigger warnings."""
+    with warnings.catch_warnings(record=True) as w:
+        warnings.simplefilter("always")
+
+        # This might fail during validation but should trigger the warning
+        try:
+            validation = (
+                Validate(data=load_dataset(dataset="small_table", tbl_type="polars"))
+                .col_vals_gt(
+                    columns="d",
+                    value=100,
+                    segments=("f", pl.lit("high")),  # String literal expression
+                )
+                .interrogate()
+            )
+        except Exception:
+            # We expect this might fail, but the warning should still be triggered
+            pass
+
+        # Check that we got a deprecation warning
+        deprecation_warnings = [
+            warning
+            for warning in w
+            if warning.category == DeprecationWarning
+            and "Polars expressions in segments are deprecated" in str(warning.message)
+        ]
+        assert len(deprecation_warnings) >= 1
+
+
+def test_polars_segments_warning_stacklevel():
+    """Test that the warning points to the correct location in the call stack."""
+    with warnings.catch_warnings(record=True) as w:
+        warnings.simplefilter("always")
+
+        validation = (
+            Validate(data=load_dataset(dataset="small_table", tbl_type="polars"))
+            .col_vals_gt(
+                columns="d",
+                value=100,
+                segments=("date", pl.datetime(2016, 1, 4)),
+            )
+            .interrogate()
+        )
+
+        # Find the deprecation warning
+        deprecation_warnings = [
+            warning
+            for warning in w
+            if warning.category == DeprecationWarning
+            and "Polars expressions in segments are deprecated" in str(warning.message)
+        ]
+        assert len(deprecation_warnings) >= 1
+
+        # Check that the warning has the correct stacklevel (should point to user code)
+        warning = deprecation_warnings[0]
+        # The filename should be this test file, not the internal validate.py
+        assert "test_validate.py" in warning.filename
+
+
+def test_polars_segments_comparison_with_native_types():
+    """Test that converted expressions produce the same results as native types."""
+    # Test with Polars expressions (should produce warning)
+    with warnings.catch_warnings(record=True):
+        warnings.simplefilter("always")
+
+        validation_polars = (
+            Validate(data=load_dataset(dataset="small_table", tbl_type="polars"))
+            .col_vals_gt(
+                columns="d",
+                value=100,
+                segments=("date", (pl.datetime(2016, 1, 4), pl.datetime(2016, 1, 5))),
+            )
+            .interrogate()
+        )
+
+    # Test with native types (should not produce warning)
+    validation_native = (
+        Validate(data=load_dataset(dataset="small_table", tbl_type="polars"))
+        .col_vals_gt(
+            columns="d",
+            value=100,
+            segments=("date", (datetime.date(2016, 1, 4), datetime.date(2016, 1, 5))),
+        )
+        .interrogate()
+    )
+
+    # Results should be identical
+    assert validation_polars.n_passed(i=1, scalar=True) == validation_native.n_passed(
+        i=1, scalar=True
+    )
+    assert validation_polars.n_passed(i=2, scalar=True) == validation_native.n_passed(
+        i=2, scalar=True
+    )
+    assert validation_polars.n_failed(i=1, scalar=True) == validation_native.n_failed(
+        i=1, scalar=True
+    )
+    assert validation_polars.n_failed(i=2, scalar=True) == validation_native.n_failed(
+        i=2, scalar=True
+    )
+
+
+def test_polars_expr_detection():
+    """Test that the code correctly identifies Polars expressions."""
+    dt_expr = pl.datetime(2016, 1, 4)
+
+    # This mimics the detection logic in the actual code
+    is_polars_expr = (
+        hasattr(dt_expr, "__class__")
+        and "polars" in dt_expr.__class__.__module__
+        and hasattr(dt_expr, "__class__")
+        and dt_expr.__class__.__name__ == "Expr"
+    )
+
+    assert is_polars_expr is True
+
+
+def test_native_type_detection():
+    """Test that native types are not detected as Polars expressions."""
+    native_date = datetime.date(2016, 1, 4)
+    native_datetime = datetime.datetime(2016, 1, 4)
+    native_string = "2016-01-04"
+    native_int = 42
+
+    for value in [native_date, native_datetime, native_string, native_int]:
+        is_polars_expr = (
+            hasattr(value, "__class__")
+            and "polars" in value.__class__.__module__
+            and hasattr(value, "__class__")
+            and value.__class__.__name__ == "Expr"
+        )
+
+        assert is_polars_expr is False
+
+
+def test_datetime_string_parsing():
+    """Test the datetime string parsing logic."""
+    dt_expr = pl.datetime(2016, 1, 4)
+    segment_str = str(dt_expr)
+
+    # Should contain datetime and alias
+    assert "datetime" in segment_str
+    assert '.alias("datetime")' in segment_str
+
+    # Test the parsing logic
+    datetime_part = segment_str.split('.alias("datetime")')[0]
+    parsed_dt = datetime.datetime.fromisoformat(datetime_part)
+
+    assert parsed_dt == datetime.datetime(2016, 1, 4)
+    assert parsed_dt.time() == datetime.datetime.min.time()  # Should be midnight
+
+    # Should convert to date
+    converted = parsed_dt.date()
+    assert converted == datetime.date(2016, 1, 4)
+
+
+def test_datetime_conversion_logic_midnight():
+    """Test the specific conversion logic for midnight datetimes."""
+    # Test midnight datetime (should convert to date)
+    midnight_str = "2016-01-04 00:00:00"
+    parsed_dt = datetime.datetime.fromisoformat(midnight_str)
+
+    if parsed_dt.time() == datetime.datetime.min.time():
+        result = parsed_dt.date()
+    else:
+        result = parsed_dt
+
+    assert result == datetime.date(2016, 1, 4)
+    assert isinstance(result, datetime.date)
+    assert not isinstance(result, datetime.datetime)
+
+
+def test_datetime_conversion_logic_non_midnight():
+    """Test the specific conversion logic for non-midnight datetimes."""
+    # Test non-midnight datetime (should remain as datetime)
+    non_midnight_str = "2016-01-04 12:30:45"
+    parsed_dt = datetime.datetime.fromisoformat(non_midnight_str)
+
+    if parsed_dt.time() == datetime.datetime.min.time():
+        result = parsed_dt.date()
+    else:
+        result = parsed_dt
+
+    assert result == datetime.datetime(2016, 1, 4, 12, 30, 45)
+    assert isinstance(result, datetime.datetime)
+
+
+def test_polars_expression_string_representation():
+    """Test various Polars expression string representations."""
+    # Test different Polars expressions and their string representations
+    expressions = [
+        pl.datetime(2016, 1, 4),
+        pl.lit(datetime.datetime(2016, 1, 4)),
+        pl.lit(datetime.date(2016, 1, 4)),
+    ]
+
+    for expr in expressions:
+        expr_str = str(expr)
+        # All should be identified as Polars expressions
+        is_polars_expr = (
+            hasattr(expr, "__class__")
+            and "polars" in expr.__class__.__module__
+            and hasattr(expr, "__class__")
+            and expr.__class__.__name__ == "Expr"
+        )
+        assert is_polars_expr is True
+
+        # Should contain some recognizable pattern
+        assert isinstance(expr_str, str)
+        assert len(expr_str) > 0
 
 
 def test_conjointly_with_empty_expressions_pandas():

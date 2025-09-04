@@ -44,12 +44,13 @@ dependencies = [
     "click>=8.0.0",
     "rich>=13.0.0",
     "pyyaml>=6.0.0",
+    "polars>=1.33.0",
 ]
 requires-python = ">=3.10"
 
 [project.optional-dependencies]
 pd = ["pandas>=2.2.3"]
-pl = ["polars>=1.24.0"]
+pl = ["polars>=1.33.0"]
 pyspark = ["pyspark==3.5.6"]
 generate = [
     "chatlas>=0.3.0",

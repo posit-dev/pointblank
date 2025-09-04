@@ -14319,17 +14319,58 @@ def _apply_segments(data_tbl: any, segments_expr: tuple[str, Any]) -> any:
     column, segment = segments_expr
 
     if tbl_type in ["pandas", "polars", "pyspark"]:
-        # If the table is a Pandas, Polars, or PySpark DataFrame, transforming to a Narwhals table
+        # If the table is a Pandas, Polars, or PySpark DataFrame, transform to a Narwhals table
         # and perform the filtering operation
 
         # Transform to Narwhals table if a DataFrame
         data_tbl_nw = nw.from_native(data_tbl)
 
+        # Handle Polars expressions by attempting to extract literal values
+        # This is a compatibility measure for cases where `pl.datetime()`, `pl.lit()`, etc.,
+        # are accidentally used instead of native Python types
+        if (
+            hasattr(segment, "__class__")
+            and "polars" in segment.__class__.__module__
+            and hasattr(segment, "__class__")
+            and segment.__class__.__name__ == "Expr"
+        ):
+            # This is a Polars expression so we should warn about this and suggest native types
+            import warnings
+
+            warnings.warn(
+                "Polars expressions in segments are deprecated. Please use native Python types instead. "
+                "For example, use datetime.date(2016, 1, 4) instead of pl.datetime(2016, 1, 4).",
+                DeprecationWarning,
+                stacklevel=3,
+            )
+            # For now, try to handle datetime expressions by converting to string representations;
+            # this is not ideal but provides some backward compatibility
+            segment_str = str(segment)
+            if "datetime" in segment_str and '.alias("datetime")' in segment_str:
+                # Extract the datetime part from expressions
+                # like '2016-01-04 00:00:00.alias("datetime")'
+                from datetime import datetime
+
+                try:
+                    datetime_part = segment_str.split('.alias("datetime")')[0]
+
+                    # Try to parse as datetime and convert to date if it's midnight
+                    parsed_dt = datetime.fromisoformat(datetime_part)
+
+                    if parsed_dt.time() == datetime.min.time():
+                        segment = parsed_dt.date()
+                    else:
+                        segment = parsed_dt
+
+                except (ValueError, AttributeError):
+                    # If parsing fails, leave segment as is and let it fail naturally
+                    pass
+
         # Filter the data table based on the column name and segment
         if segment is None:
             data_tbl_nw = data_tbl_nw.filter(nw.col(column).is_null())
-        # Check if the segment is a segment group
         elif isinstance(segment, list):
+            # Check if the segment is a segment group
             data_tbl_nw = data_tbl_nw.filter(nw.col(column).is_in(segment))
         else:
             data_tbl_nw = data_tbl_nw.filter(nw.col(column) == segment)
