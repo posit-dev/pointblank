@@ -91,6 +91,76 @@ def _safe_modify_datetime_compare_val(data_frame: Any, column: str, compare_val:
     return compare_val
 
 
+def _safe_is_nan_or_null_expr(data_frame: Any, column_expr: Any, column_name: str = None) -> Any:
+    """
+    Create an expression that safely checks for both Null and NaN values.
+
+    This function handles the case where `is_nan()` is not supported for certain data types (like
+    strings) or backends (like `SQLite` via Ibis) by checking the backend type and column type
+    first.
+
+    Parameters
+    ----------
+    data_frame
+        The data frame to get schema information from.
+    column_expr
+        The narwhals column expression to check.
+    column_name
+        The name of the column.
+
+    Returns
+    -------
+    Any
+        A narwhals expression that returns `True` for Null or NaN values.
+    """
+    # Always check for null values
+    null_check = column_expr.is_null()
+
+    # For Ibis backends, many don't support `is_nan()` so we stick to Null checks only;
+    # use `narwhals.get_native_namespace()` for reliable backend detection
+    try:
+        native_namespace = nw.get_native_namespace(data_frame)
+
+        # If it's an Ibis backend, only check for null values
+        # The namespace is the actual module, so we check its name
+        if hasattr(native_namespace, "__name__") and "ibis" in native_namespace.__name__:
+            return null_check
+    except Exception:
+        pass
+
+    # For non-Ibis backends, try to use `is_nan()` if the column type supports it
+    try:
+        if hasattr(data_frame, "collect_schema"):
+            schema = data_frame.collect_schema()
+        elif hasattr(data_frame, "schema"):
+            schema = data_frame.schema
+        else:
+            schema = None
+
+        if schema and column_name:
+            column_dtype = schema.get(column_name)
+            if column_dtype:
+                dtype_str = str(column_dtype).lower()
+
+                # Check if it's a numeric type that supports NaN
+                is_numeric = any(
+                    num_type in dtype_str for num_type in ["float", "double", "f32", "f64"]
+                )
+
+                if is_numeric:
+                    try:
+                        # For numeric types, try to check both Null and NaN
+                        return null_check | column_expr.is_nan()
+                    except Exception:
+                        # If `is_nan()` fails for any reason, fall back to Null only
+                        pass
+    except Exception:
+        pass
+
+    # Fallback: just check Null values
+    return null_check
+
+
 @dataclass
 class Interrogator:
     """
@@ -179,13 +249,16 @@ class Interrogator:
 
         return (
             self.x.with_columns(
-                pb_is_good_1=nw.col(self.column).is_null() & self.na_pass,
+                pb_is_good_1=_safe_is_nan_or_null_expr(self.x, nw.col(self.column), self.column)
+                & self.na_pass,
                 pb_is_good_2=(
-                    nw.col(self.compare.name).is_null() & self.na_pass
+                    _safe_is_nan_or_null_expr(self.x, nw.col(self.compare.name), self.compare.name)
+                    & self.na_pass
                     if isinstance(self.compare, Column)
                     else nw.lit(False)
                 ),
-                pb_is_good_3=nw.col(self.column) > compare_expr,
+                pb_is_good_3=(nw.col(self.column) > compare_expr)
+                & ~_safe_is_nan_or_null_expr(self.x, nw.col(self.column), self.column),
             )
             .with_columns(
                 pb_is_good_3=(
@@ -210,13 +283,16 @@ class Interrogator:
 
         return (
             self.x.with_columns(
-                pb_is_good_1=nw.col(self.column).is_null() & self.na_pass,
+                pb_is_good_1=_safe_is_nan_or_null_expr(self.x, nw.col(self.column), self.column)
+                & self.na_pass,
                 pb_is_good_2=(
-                    nw.col(self.compare.name).is_null() & self.na_pass
+                    _safe_is_nan_or_null_expr(self.x, nw.col(self.compare.name), self.compare.name)
+                    & self.na_pass
                     if isinstance(self.compare, Column)
                     else nw.lit(False)
                 ),
-                pb_is_good_3=nw.col(self.column) < compare_expr,
+                pb_is_good_3=(nw.col(self.column) < compare_expr)
+                & ~_safe_is_nan_or_null_expr(self.x, nw.col(self.column), self.column),
             )
             .with_columns(
                 pb_is_good_3=(
@@ -539,13 +615,16 @@ class Interrogator:
 
         tbl = (
             self.x.with_columns(
-                pb_is_good_1=nw.col(self.column).is_null() & self.na_pass,
+                pb_is_good_1=_safe_is_nan_or_null_expr(self.x, nw.col(self.column), self.column)
+                & self.na_pass,
                 pb_is_good_2=(
-                    nw.col(self.compare.name).is_null() & self.na_pass
+                    _safe_is_nan_or_null_expr(self.x, nw.col(self.compare.name), self.compare.name)
+                    & self.na_pass
                     if isinstance(self.compare, Column)
                     else nw.lit(False)
                 ),
-                pb_is_good_3=nw.col(self.column) >= compare_expr,
+                pb_is_good_3=(nw.col(self.column) >= compare_expr)
+                & ~_safe_is_nan_or_null_expr(self.x, nw.col(self.column), self.column),
             )
             .with_columns(
                 pb_is_good_3=(
@@ -570,13 +649,16 @@ class Interrogator:
 
         return (
             self.x.with_columns(
-                pb_is_good_1=nw.col(self.column).is_null() & self.na_pass,
+                pb_is_good_1=_safe_is_nan_or_null_expr(self.x, nw.col(self.column), self.column)
+                & self.na_pass,
                 pb_is_good_2=(
-                    nw.col(self.compare.name).is_null() & self.na_pass
+                    _safe_is_nan_or_null_expr(self.x, nw.col(self.compare.name), self.compare.name)
+                    & self.na_pass
                     if isinstance(self.compare, Column)
                     else nw.lit(False)
                 ),
-                pb_is_good_3=nw.col(self.column) <= compare_expr,
+                pb_is_good_3=(nw.col(self.column) <= compare_expr)
+                & ~_safe_is_nan_or_null_expr(self.x, nw.col(self.column), self.column),
             )
             .with_columns(
                 pb_is_good_3=(
