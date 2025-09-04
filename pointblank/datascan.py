@@ -162,14 +162,15 @@ class DataScan:
         self.profile: _DataProfile = self._generate_profile_df()
 
     def _generate_profile_df(self) -> _DataProfile:
-        columns: list[str] = self.nw_data.columns
+        # Get schema and extract all column names from it
+        schema: Mapping[str, Any] = self.nw_data.collect_schema()
+        columns: list[str] = list(schema.keys())
 
         profile = _DataProfile(
             table_name=self.tbl_name,
             columns=columns,
             implementation=self.nw_data.implementation,
         )
-        schema: Mapping[str, Any] = self.nw_data.schema
         for column in columns:
             col_data: DataFrame = self.nw_data.select(column)
 
