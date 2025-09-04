@@ -3941,6 +3941,206 @@ def test_validation_with_mixed_na_pass_values_pyspark():
     assert validation.n_failed(i=2, scalar=True) == 1
 
 
+def test_nan_none_null_handling_comprehensive_polars():
+    """Test comprehensive NaN/None/Null handling across all comparison methods with Polars."""
+
+    # Test data with different types of missing values
+    df = pl.DataFrame(
+        {
+            "float_col": [1.0, 2.0, float("nan"), None, 5.0],  # NaN and None
+            "int_col": [1, 2, None, 4, 5],  # None only (int can't have NaN)
+            "str_col": ["a", "b", None, "d", "e"],  # None only (str can't have NaN)
+        }
+    )
+
+    # Test `col_vals_gt()` with `na_pass=False`, both NaN and None should fail
+    validation_gt_false = (
+        Validate(df).col_vals_gt(columns="float_col", value=0, na_pass=False).interrogate()
+    )
+    # Should have 3 passes (1.0, 2.0, 5.0) and 2 fails (NaN, None)
+    assert validation_gt_false.n_passed(i=1, scalar=True) == 3
+    assert validation_gt_false.n_failed(i=1, scalar=True) == 2
+
+    # Test `col_vals_gt()` with `na_pass=True`, NaN and None should pass
+    validation_gt_true = (
+        Validate(df).col_vals_gt(columns="float_col", value=0, na_pass=True).interrogate()
+    )
+    # Should have 5 passes (all values pass)
+    assert validation_gt_true.n_passed(i=1, scalar=True) == 5
+    assert validation_gt_true.n_failed(i=1, scalar=True) == 0
+
+    # Test `col_vals_ge()` with `na_pass=False`
+    validation_ge_false = (
+        Validate(df).col_vals_ge(columns="float_col", value=1, na_pass=False).interrogate()
+    )
+    assert validation_ge_false.n_passed(i=1, scalar=True) == 3  # 1.0, 2.0, 5.0
+    assert validation_ge_false.n_failed(i=1, scalar=True) == 2  # NaN, None
+
+    # Test `col_vals_lt()` with `na_pass=False`
+    validation_lt_false = (
+        Validate(df).col_vals_lt(columns="float_col", value=10, na_pass=False).interrogate()
+    )
+    assert validation_lt_false.n_passed(i=1, scalar=True) == 3  # 1.0, 2.0, 5.0
+    assert validation_lt_false.n_failed(i=1, scalar=True) == 2  # NaN, None
+
+    # Test `col_vals_le()` with `na_pass=False`
+    validation_le_false = (
+        Validate(df).col_vals_le(columns="float_col", value=5, na_pass=False).interrogate()
+    )
+    assert validation_le_false.n_passed(i=1, scalar=True) == 3  # 1.0, 2.0, 5.0
+    assert validation_le_false.n_failed(i=1, scalar=True) == 2  # NaN, None
+
+    # Test integer column with None (no NaN possible)
+    validation_int_false = (
+        Validate(df).col_vals_gt(columns="int_col", value=0, na_pass=False).interrogate()
+    )
+    assert validation_int_false.n_passed(i=1, scalar=True) == 4  # 1, 2, 4, 5
+    assert validation_int_false.n_failed(i=1, scalar=True) == 1  # None
+
+
+def test_nan_none_null_handling_comprehensive_pandas():
+    """Test comprehensive NaN/None/Null handling across all comparison methods with Pandas."""
+
+    # Test data with different types of missing values
+    df = pd.DataFrame(
+        {
+            "float_col": [
+                1.0,
+                2.0,
+                float("nan"),
+                None,
+                5.0,
+            ],  # NaN and None (both become NaN in Pandas)
+            "int_col": [1, 2, None, 4, 5],  # None becomes NaN in Pandas
+            "str_col": ["a", "b", None, "d", "e"],  # None stays None in Pandas
+        }
+    )
+
+    # Test `col_vals_gt()` with `na_pass=False`, both NaN values should fail
+    validation_gt_false = (
+        Validate(df).col_vals_gt(columns="float_col", value=0, na_pass=False).interrogate()
+    )
+
+    # Should have 3 passes (1.0, 2.0, 5.0) and 2 fails (two NaN values from `float("nan")` and None)
+    assert validation_gt_false.n_passed(i=1, scalar=True) == 3
+    assert validation_gt_false.n_failed(i=1, scalar=True) == 2
+
+    # Test `col_vals_gt()` with `na_pass=True`, NaN values should pass
+    validation_gt_true = (
+        Validate(df).col_vals_gt(columns="float_col", value=0, na_pass=True).interrogate()
+    )
+    assert validation_gt_true.n_passed(i=1, scalar=True) == 5
+    assert validation_gt_true.n_failed(i=1, scalar=True) == 0
+
+    # Test all comparison methods with na_pass=False
+    for method_name, method_args in [
+        ("col_vals_ge", {"value": 1}),
+        ("col_vals_lt", {"value": 10}),
+        ("col_vals_le", {"value": 5}),
+    ]:
+        validation = getattr(Validate(df), method_name)(
+            columns="float_col", na_pass=False, **method_args
+        ).interrogate()
+        assert validation.n_passed(i=1, scalar=True) == 3  # 1.0, 2.0, 5.0
+        assert validation.n_failed(i=1, scalar=True) == 2  # NaN values
+
+
+def test_nan_none_null_handling_ibis_sqlite():
+    """Test NaN/None/Null handling with Ibis SQLite backend."""
+    import tempfile
+    import os
+
+    with tempfile.NamedTemporaryFile(suffix=".db", delete=False) as tmp_file:
+        temp_db_path = tmp_file.name
+
+    try:
+        # Create SQLite database with test data
+        conn = ibis.sqlite.connect(temp_db_path)
+
+        test_data = pl.DataFrame(
+            {
+                "float_col": [
+                    1.0,
+                    2.0,
+                    None,
+                    4.0,
+                    5.0,
+                ],  # Use None instead of NaN for SQLite compatibility
+                "int_col": [1, 2, None, 4, 5],
+            }
+        )
+
+        ibis_table = ibis.memtable(test_data.to_pandas())
+        conn.create_table("test_data", ibis_table, overwrite=True)
+        conn.disconnect()
+
+        # Test using connection string (this triggers our backend detection logic)
+        table_ref = f"sqlite:///{temp_db_path}::test_data"
+
+        # Test `col_vals_gt()` with `na_pass=False`: NULL should fail
+        validation_false = (
+            Validate(table_ref)
+            .col_vals_gt(columns="float_col", value=0, na_pass=False)
+            .interrogate()
+        )
+        assert validation_false.n_passed(i=1, scalar=True) == 4  # 1.0, 2.0, 4.0, 5.0
+        assert validation_false.n_failed(i=1, scalar=True) == 1  # NULL
+
+        # Test that all comparison methods work with this Ibis backend
+        for method_name, method_args in [
+            ("col_vals_ge", {"value": 1}),
+            ("col_vals_lt", {"value": 10}),
+            ("col_vals_le", {"value": 5}),
+        ]:
+            validation = getattr(Validate(table_ref), method_name)(
+                columns="float_col", na_pass=False, **method_args
+            ).interrogate()
+
+            # Should not raise "IsNan operation not defined" error
+            assert validation.n_passed(i=1, scalar=True) == 4
+            assert validation.n_failed(i=1, scalar=True) == 1
+
+    finally:
+        if os.path.exists(temp_db_path):
+            os.unlink(temp_db_path)
+
+
+def test_edge_case_nan_vs_none_distinction():
+    """Test edge cases around NaN vs None distinction."""
+
+    # Test specifically the use of `float("nan")` with `na_pass=False`
+    df = pl.DataFrame(
+        {
+            "values": [1.0, 2.0, float("nan"), 4.0, 5.0]  # Explicit float("nan")
+        }
+    )
+
+    # This was the original failing case, NaN should fail with `na_pass=False`
+    validation = Validate(df).col_vals_ge(columns="values", value=0, na_pass=False).interrogate()
+    assert validation.n_passed(i=1, scalar=True) == 4  # 1.0, 2.0, 4.0, 5.0
+    assert validation.n_failed(i=1, scalar=True) == 1  # float("nan")
+
+    # Also test `col_vals_le()` (the method that was working in the original issue)
+    validation_le = (
+        Validate(df).col_vals_le(columns="values", value=10, na_pass=False).interrogate()
+    )
+    assert validation_le.n_passed(i=1, scalar=True) == 4  # 1.0, 2.0, 4.0, 5.0
+    assert validation_le.n_failed(i=1, scalar=True) == 1  # float("nan")
+
+    # Test mixed None and NaN values in column
+    df_mixed = pl.DataFrame(
+        {
+            "values": [1.0, None, float("nan"), 4.0]  # Both None and NaN
+        }
+    )
+
+    validation_mixed = (
+        Validate(df_mixed).col_vals_gt(columns="values", value=0, na_pass=False).interrogate()
+    )
+    assert validation_mixed.n_passed(i=1, scalar=True) == 2  # 1.0, 4.0
+    assert validation_mixed.n_failed(i=1, scalar=True) == 2  # None, float("nan")
+
+
 @pytest.mark.parametrize("tbl_fixture", TBL_LIST)
 def test_col_vals_in_set_comprehensive(request, tbl_fixture):
     tbl = request.getfixturevalue(tbl_fixture)
