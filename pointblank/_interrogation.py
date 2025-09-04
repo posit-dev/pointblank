@@ -91,6 +91,76 @@ def _safe_modify_datetime_compare_val(data_frame: Any, column: str, compare_val:
     return compare_val
 
 
+def _safe_is_nan_or_null_expr(data_frame: Any, column_expr: Any, column_name: str = None) -> Any:
+    """
+    Create an expression that safely checks for both Null and NaN values.
+
+    This function handles the case where `is_nan()` is not supported for certain data types (like
+    strings) or backends (like `SQLite` via Ibis) by checking the backend type and column type
+    first.
+
+    Parameters
+    ----------
+    data_frame
+        The data frame to get schema information from.
+    column_expr
+        The narwhals column expression to check.
+    column_name
+        The name of the column.
+
+    Returns
+    -------
+    Any
+        A narwhals expression that returns `True` for Null or NaN values.
+    """
+    # Always check for null values
+    null_check = column_expr.is_null()
+
+    # For Ibis backends, many don't support `is_nan()` so we stick to Null checks only;
+    # use `narwhals.get_native_namespace()` for reliable backend detection
+    try:
+        native_namespace = nw.get_native_namespace(data_frame)
+
+        # If it's an Ibis backend, only check for null values
+        # The namespace is the actual module, so we check its name
+        if hasattr(native_namespace, "__name__") and "ibis" in native_namespace.__name__:
+            return null_check
+    except Exception:
+        pass
+
+    # For non-Ibis backends, try to use `is_nan()` if the column type supports it
+    try:
+        if hasattr(data_frame, "collect_schema"):
+            schema = data_frame.collect_schema()
+        elif hasattr(data_frame, "schema"):
+            schema = data_frame.schema
+        else:
+            schema = None
+
+        if schema and column_name:
+            column_dtype = schema.get(column_name)
+            if column_dtype:
+                dtype_str = str(column_dtype).lower()
+
+                # Check if it's a numeric type that supports NaN
+                is_numeric = any(
+                    num_type in dtype_str for num_type in ["float", "double", "f32", "f64"]
+                )
+
+                if is_numeric:
+                    try:
+                        # For numeric types, try to check both Null and NaN
+                        return null_check | column_expr.is_nan()
+                    except Exception:
+                        # If `is_nan()` fails for any reason, fall back to Null only
+                        pass
+    except Exception:
+        pass
+
+    # Fallback: just check Null values
+    return null_check
+
+
 @dataclass
 class Interrogator:
     """
@@ -170,22 +240,50 @@ class Interrogator:
         # Process Ibis tables through Narwhals
         self.x, self.tbl_type = _process_ibis_through_narwhals(self.x, self.tbl_type)
 
-    def gt(self) -> FrameT | Any:
-        # All backends now use Narwhals (including former Ibis tables) ---------
+    def _comparison_base(self, operator: str) -> FrameT | Any:
+        """
+        Unified base method for comparison operations (gt, ge, lt, le).
 
+        Parameters
+        ----------
+        operator
+            The comparison operator: 'gt', 'ge', 'lt', or 'le'.
+
+        Returns
+        -------
+        FrameT | Any
+            The result table with `pb_is_good_` column indicating the passing test units.
+        """
         compare_expr = _get_compare_expr_nw(compare=self.compare)
-
         compare_expr = _safe_modify_datetime_compare_val(self.x, self.column, compare_expr)
+
+        # Create the comparison expression based on the operator
+        column_expr = nw.col(self.column)
+        if operator == "gt":
+            comparison = column_expr > compare_expr
+        elif operator == "ge":
+            comparison = column_expr >= compare_expr
+        elif operator == "lt":
+            comparison = column_expr < compare_expr
+        elif operator == "le":
+            comparison = column_expr <= compare_expr
+        else:
+            raise ValueError(  # pragma: no cover
+                f"Invalid operator: {operator}. Must be one of: 'gt', 'ge', 'lt', 'le'"
+            )
 
         return (
             self.x.with_columns(
-                pb_is_good_1=nw.col(self.column).is_null() & self.na_pass,
+                pb_is_good_1=_safe_is_nan_or_null_expr(self.x, nw.col(self.column), self.column)
+                & self.na_pass,
                 pb_is_good_2=(
-                    nw.col(self.compare.name).is_null() & self.na_pass
+                    _safe_is_nan_or_null_expr(self.x, nw.col(self.compare.name), self.compare.name)
+                    & self.na_pass
                     if isinstance(self.compare, Column)
                     else nw.lit(False)
                 ),
-                pb_is_good_3=nw.col(self.column) > compare_expr,
+                pb_is_good_3=comparison
+                & ~_safe_is_nan_or_null_expr(self.x, nw.col(self.column), self.column),
             )
             .with_columns(
                 pb_is_good_3=(
@@ -200,41 +298,20 @@ class Interrogator:
             .drop("pb_is_good_1", "pb_is_good_2", "pb_is_good_3")
             .to_native()
         )
+
+    def gt(self) -> FrameT | Any:
+        return self._comparison_base("gt")
 
     def lt(self) -> FrameT | Any:
-        # All backends now use Narwhals (including former Ibis tables) ---------
+        return self._comparison_base("lt")
 
-        compare_expr = _get_compare_expr_nw(compare=self.compare)
+    def ge(self) -> FrameT | Any:
+        return self._comparison_base("ge")
 
-        compare_expr = _safe_modify_datetime_compare_val(self.x, self.column, compare_expr)
-
-        return (
-            self.x.with_columns(
-                pb_is_good_1=nw.col(self.column).is_null() & self.na_pass,
-                pb_is_good_2=(
-                    nw.col(self.compare.name).is_null() & self.na_pass
-                    if isinstance(self.compare, Column)
-                    else nw.lit(False)
-                ),
-                pb_is_good_3=nw.col(self.column) < compare_expr,
-            )
-            .with_columns(
-                pb_is_good_3=(
-                    nw.when(nw.col("pb_is_good_3").is_null())
-                    .then(nw.lit(False))
-                    .otherwise(nw.col("pb_is_good_3"))
-                )
-            )
-            .with_columns(
-                pb_is_good_=nw.col("pb_is_good_1") | nw.col("pb_is_good_2") | nw.col("pb_is_good_3")
-            )
-            .drop("pb_is_good_1", "pb_is_good_2", "pb_is_good_3")
-            .to_native()
-        )
+    def le(self) -> FrameT | Any:
+        return self._comparison_base("le")
 
     def eq(self) -> FrameT | Any:
-        # All backends now use Narwhals (including former Ibis tables) ---------
-
         if isinstance(self.compare, Column):
             compare_expr = _get_compare_expr_nw(compare=self.compare)
 
@@ -308,8 +385,6 @@ class Interrogator:
             return tbl.drop("pb_is_good_1", "pb_is_good_2", "pb_is_good_3").to_native()
 
     def ne(self) -> FrameT | Any:
-        # All backends now use Narwhals (including former Ibis tables) ---------
-
         # Determine if the reference and comparison columns have any null values
         ref_col_has_null_vals = _column_has_null_values(table=self.x, column=self.column)
 
@@ -530,71 +605,7 @@ class Interrogator:
 
                     return tbl.drop("pb_is_good_1", "pb_is_good_2", "pb_is_good_3").to_native()
 
-    def ge(self) -> FrameT | Any:
-        # All backends now use Narwhals (including former Ibis tables) ---------
-
-        compare_expr = _get_compare_expr_nw(compare=self.compare)
-
-        compare_expr = _safe_modify_datetime_compare_val(self.x, self.column, compare_expr)
-
-        tbl = (
-            self.x.with_columns(
-                pb_is_good_1=nw.col(self.column).is_null() & self.na_pass,
-                pb_is_good_2=(
-                    nw.col(self.compare.name).is_null() & self.na_pass
-                    if isinstance(self.compare, Column)
-                    else nw.lit(False)
-                ),
-                pb_is_good_3=nw.col(self.column) >= compare_expr,
-            )
-            .with_columns(
-                pb_is_good_3=(
-                    nw.when(nw.col("pb_is_good_3").is_null())
-                    .then(nw.lit(False))
-                    .otherwise(nw.col("pb_is_good_3"))
-                )
-            )
-            .with_columns(
-                pb_is_good_=nw.col("pb_is_good_1") | nw.col("pb_is_good_2") | nw.col("pb_is_good_3")
-            )
-        )
-
-        return tbl.drop("pb_is_good_1", "pb_is_good_2", "pb_is_good_3").to_native()
-
-    def le(self) -> FrameT | Any:
-        # All backends now use Narwhals (including former Ibis tables) ---------
-
-        compare_expr = _get_compare_expr_nw(compare=self.compare)
-
-        compare_expr = _safe_modify_datetime_compare_val(self.x, self.column, compare_expr)
-
-        return (
-            self.x.with_columns(
-                pb_is_good_1=nw.col(self.column).is_null() & self.na_pass,
-                pb_is_good_2=(
-                    nw.col(self.compare.name).is_null() & self.na_pass
-                    if isinstance(self.compare, Column)
-                    else nw.lit(False)
-                ),
-                pb_is_good_3=nw.col(self.column) <= compare_expr,
-            )
-            .with_columns(
-                pb_is_good_3=(
-                    nw.when(nw.col("pb_is_good_3").is_null())
-                    .then(nw.lit(False))
-                    .otherwise(nw.col("pb_is_good_3"))
-                )
-            )
-            .with_columns(
-                pb_is_good_=nw.col("pb_is_good_1") | nw.col("pb_is_good_2") | nw.col("pb_is_good_3")
-            )
-            .drop("pb_is_good_1", "pb_is_good_2", "pb_is_good_3")
-            .to_native()
-        )
-
     def between(self) -> FrameT | Any:
-        # All backends now use Narwhals (including former Ibis tables) ---------
-
         low_val = _get_compare_expr_nw(compare=self.low)
         high_val = _get_compare_expr_nw(compare=self.high)
 
@@ -662,8 +673,6 @@ class Interrogator:
         return tbl
 
     def outside(self) -> FrameT | Any:
-        # All backends now use Narwhals (including former Ibis tables) ---------
-
         low_val = _get_compare_expr_nw(compare=self.low)
         high_val = _get_compare_expr_nw(compare=self.high)
 
@@ -730,8 +739,6 @@ class Interrogator:
         return tbl
 
     def isin(self) -> FrameT | Any:
-        # All backends now use Narwhals (including former Ibis tables) ---------
-
         can_be_null: bool = None in self.set
 
         base_expr: nw.Expr = nw.col(self.column).is_in(self.set)
@@ -741,8 +748,6 @@ class Interrogator:
         return self.x.with_columns(pb_is_good_=base_expr).to_native()
 
     def notin(self) -> FrameT | Any:
-        # All backends now use Narwhals (including former Ibis tables) ---------
-
         return (
             self.x.with_columns(
                 pb_is_good_=nw.col(self.column).is_in(self.set),
@@ -752,8 +757,6 @@ class Interrogator:
         )
 
     def regex(self) -> FrameT | Any:
-        # All backends now use Narwhals (including former Ibis tables) ---------
-
         return (
             self.x.with_columns(
                 pb_is_good_1=nw.col(self.column).is_null() & self.na_pass,
@@ -767,22 +770,16 @@ class Interrogator:
         )
 
     def null(self) -> FrameT | Any:
-        # All backends now use Narwhals (including former Ibis tables) ---------
-
         return self.x.with_columns(
             pb_is_good_=nw.col(self.column).is_null(),
         ).to_native()
 
     def not_null(self) -> FrameT | Any:
-        # All backends now use Narwhals (including former Ibis tables) ---------
-
         return self.x.with_columns(
             pb_is_good_=~nw.col(self.column).is_null(),
         ).to_native()
 
     def rows_distinct(self) -> FrameT | Any:
-        # All backends now use Narwhals (including former Ibis tables) ---------
-
         tbl = self.x
 
         # Get the column subset to use for the test
@@ -804,8 +801,6 @@ class Interrogator:
         return tbl.to_native()
 
     def rows_complete(self) -> FrameT | Any:
-        # All backends now use Narwhals (including former Ibis tables) ---------
-
         tbl = self.x
 
         # Determine the number of null values in each row (column subsets are handled in
