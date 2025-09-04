@@ -14331,11 +14331,11 @@ def _apply_segments(data_tbl: any, segments_expr: tuple[str, Any]) -> any:
         if (
             hasattr(segment, "__class__")
             and "polars" in segment.__class__.__module__
-            and hasattr(segment, "__class__")
             and segment.__class__.__name__ == "Expr"
         ):
             # This is a Polars expression so we should warn about this and suggest native types
             import warnings
+            from datetime import date, datetime
 
             warnings.warn(
                 "Polars expressions in segments are deprecated. Please use native Python types instead. "
@@ -14343,28 +14343,78 @@ def _apply_segments(data_tbl: any, segments_expr: tuple[str, Any]) -> any:
                 DeprecationWarning,
                 stacklevel=3,
             )
-            # For now, try to handle datetime expressions by converting to string representations;
-            # this is not ideal but provides some backward compatibility
-            segment_str = str(segment)
-            if "datetime" in segment_str and '.alias("datetime")' in segment_str:
-                # Extract the datetime part from expressions
-                # like '2016-01-04 00:00:00.alias("datetime")'
-                from datetime import datetime
 
+            # Try to extract the literal value from various Polars expression patterns
+            segment_str = str(segment)
+            parsed_value = None
+
+            # Handle different Polars expression string formats
+            # Format 1: Direct date strings like "2016-01-04"
+            if len(segment_str) == 10 and segment_str.count("-") == 2:
+                try:
+                    parsed_value = date.fromisoformat(segment_str)
+                except ValueError:
+                    pass
+
+            # Format 2: Datetime strings with UTC timezone like
+            # "2016-01-04 00:00:01 UTC.strict_cast(...)"
+            elif " UTC" in segment_str:
+                try:
+                    # Extract just the datetime part before "UTC"
+                    datetime_part = segment_str.split(" UTC")[0]
+                    if len(datetime_part) >= 10:
+                        parsed_dt = datetime.fromisoformat(datetime_part)
+                        # Convert midnight datetimes to dates for consistency
+                        if parsed_dt.time() == datetime.min.time():
+                            parsed_value = parsed_dt.date()
+                        else:
+                            parsed_value = parsed_dt
+                except (ValueError, IndexError):
+                    pass
+
+            # Format 3: Bracketed expressions like ['2016-01-04']
+            elif segment_str.startswith("[") and segment_str.endswith("]"):
+                try:
+                    content = segment_str[2:-2]  # Remove [' and ']
+
+                    # Try parsing as date first
+                    if len(content) == 10 and content.count("-") == 2:
+                        try:
+                            parsed_value = date.fromisoformat(content)
+                        except ValueError:
+                            pass
+
+                    # Try parsing as datetime
+                    if parsed_value is None:
+                        try:
+                            parsed_dt = datetime.fromisoformat(content.replace(" UTC", ""))
+                            if parsed_dt.time() == datetime.min.time():
+                                parsed_value = parsed_dt.date()
+                            else:
+                                parsed_value = parsed_dt
+                        except ValueError:
+                            pass
+
+                except (ValueError, IndexError):
+                    pass
+
+            # Handle `pl.datetime()` expressions with .alias("datetime")
+            elif "datetime" in segment_str and '.alias("datetime")' in segment_str:
                 try:
                     datetime_part = segment_str.split('.alias("datetime")')[0]
-
-                    # Try to parse as datetime and convert to date if it's midnight
                     parsed_dt = datetime.fromisoformat(datetime_part)
 
                     if parsed_dt.time() == datetime.min.time():
-                        segment = parsed_dt.date()
+                        parsed_value = parsed_dt.date()
                     else:
-                        segment = parsed_dt
+                        parsed_value = parsed_dt
 
                 except (ValueError, AttributeError):
-                    # If parsing fails, leave segment as is and let it fail naturally
                     pass
+
+            # If we successfully parsed a value, use it; otherwise leave segment as is
+            if parsed_value is not None:
+                segment = parsed_value
 
         # Filter the data table based on the column name and segment
         if segment is None:
