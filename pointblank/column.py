@@ -215,8 +215,12 @@ class ColumnSelectorNarwhals(Column):
         # Convert the native table to a Narwhals DataFrame
         dfn = nw.from_native(table)
         # Use the selector to select columns and return their names
-        columns = dfn.select(self.exprs.exprs).columns
-        return columns
+        selected_df = dfn.select(self.exprs.exprs)
+        # Use `collect_schema()` for LazyFrame to avoid performance warnings
+        if hasattr(selected_df, "collect_schema"):
+            return list(selected_df.collect_schema().keys())
+        else:
+            return list(selected_df.columns)
 
 
 def col(

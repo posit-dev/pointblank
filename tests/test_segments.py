@@ -135,12 +135,14 @@ def test_segments_with_multiple_criteria_2(tbl_type):
 # TODO: use a dataframe agnostic way to handle datetime segments
 @pytest.mark.parametrize("tbl_type", ["polars"])
 def test_segments_with_dates(tbl_type):
+    from datetime import date
+
     validation = (
         Validate(data=load_dataset(dataset="small_table", tbl_type=tbl_type))
         .col_vals_gt(
             columns="d",
             value=100,
-            segments=("date", (pl.datetime(2016, 1, 4), pl.datetime(2016, 1, 5))),
+            segments=("date", (date(2016, 1, 4), date(2016, 1, 5))),
         )
         .interrogate()
     )

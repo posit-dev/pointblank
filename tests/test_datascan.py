@@ -160,7 +160,7 @@ def test_deterministic_calculations(case: _Case) -> None:
         "check_row_order": False,
         "check_column_order": False,
         "check_exact": False,
-        "atol": 0.01,
+        "abs_tol": 0.01,
     }
 
     pt.assert_frame_equal(case.should_be, output, check_dtypes=False, **check_settings)

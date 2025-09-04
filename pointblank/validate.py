@@ -1584,13 +1584,22 @@ def _generate_display_table(
 
                     tail_data = pd.DataFrame(columns=head_data.columns)
 
-                data = pd.concat([head_data, tail_data])
+                # Suppress the FutureWarning about DataFrame concatenation with empty entries
+                import warnings
+
+                with warnings.catch_warnings():
+                    warnings.filterwarnings(
+                        "ignore",
+                        category=FutureWarning,
+                        message="The behavior of DataFrame concatenation with empty or all-NA entries is deprecated",
+                    )
+                    data = pd.concat([head_data, tail_data])
 
                 row_number_list = list(range(1, n_head + 1)) + list(
                     range(n_rows - n_tail + 1, n_rows + 1)
                 )
 
-        # For PySpark, update schema after conversion to pandas
+        # For PySpark, update schema after conversion to Pandas
         if tbl_type == "pyspark":
             tbl_schema = Schema(tbl=data)
 
@@ -2398,10 +2407,31 @@ def _get_row_ranges(cut_points: list[int], n_rows: int) -> list[list[int]]:
     return [lhs_values, rhs_values]
 
 
+def _get_column_names_safe(data: Any) -> list[str]:
+    """
+    Safely get column names from a DataFrame, optimized for LazyFrames.
+    This function avoids the Narwhals PerformanceWarning for LazyFrames.
+    """
+    try:
+        import narwhals as nw
+
+        df_nw = nw.from_native(data)
+        # Use `collect_schema()` for LazyFrames to avoid performance warnings
+        if hasattr(df_nw, "collect_schema"):
+            return list(df_nw.collect_schema().keys())
+        else:
+            return list(df_nw.columns)
+    except Exception:
+        # Fallback to direct column access
+        return list(data.columns)
+
+
 def _get_column_names(data: FrameT | Any, ibis_tbl: bool, df_lib_name_gt: str) -> list[str]:
     if ibis_tbl:
         return data.columns if df_lib_name_gt == "polars" else list(data.columns)
-    return list(data.columns)
+
+    # Use the optimized helper function
+    return _get_column_names_safe(data)
 
 
 def _validate_columns_subset(
@@ -2590,7 +2620,11 @@ def get_column_count(data: FrameT | Any) -> int:
         import narwhals as nw
 
         df_nw = nw.from_native(data)
-        return len(df_nw.columns)
+        # Use `collect_schema()` for LazyFrames to avoid performance warnings
+        if hasattr(df_nw, "collect_schema"):
+            return len(df_nw.collect_schema())
+        else:
+            return len(df_nw.columns)
     except Exception:
         # Fallback for unsupported types
         if "pandas" in str(type(data)):
@@ -14319,17 +14353,108 @@ def _apply_segments(data_tbl: any, segments_expr: tuple[str, Any]) -> any:
     column, segment = segments_expr
 
     if tbl_type in ["pandas", "polars", "pyspark"]:
-        # If the table is a Pandas, Polars, or PySpark DataFrame, transforming to a Narwhals table
+        # If the table is a Pandas, Polars, or PySpark DataFrame, transform to a Narwhals table
         # and perform the filtering operation
 
         # Transform to Narwhals table if a DataFrame
         data_tbl_nw = nw.from_native(data_tbl)
 
+        # Handle Polars expressions by attempting to extract literal values
+        # This is a compatibility measure for cases where `pl.datetime()`, `pl.lit()`, etc.,
+        # are accidentally used instead of native Python types
+        if (
+            hasattr(segment, "__class__")
+            and "polars" in segment.__class__.__module__
+            and segment.__class__.__name__ == "Expr"
+        ):
+            # This is a Polars expression so we should warn about this and suggest native types
+            import warnings
+            from datetime import date, datetime
+
+            warnings.warn(
+                "Polars expressions in segments are deprecated. Please use native Python types instead. "
+                "For example, use datetime.date(2016, 1, 4) instead of pl.datetime(2016, 1, 4).",
+                DeprecationWarning,
+                stacklevel=3,
+            )
+
+            # Try to extract the literal value from various Polars expression patterns
+            segment_str = str(segment)
+            parsed_value = None
+
+            # Handle different Polars expression string formats
+            # Format 1: Direct date strings like "2016-01-04"
+            if len(segment_str) == 10 and segment_str.count("-") == 2:
+                try:
+                    parsed_value = date.fromisoformat(segment_str)
+                except ValueError:
+                    pass
+
+            # Format 2: Datetime strings with UTC timezone like
+            # "2016-01-04 00:00:01 UTC.strict_cast(...)"
+            elif " UTC" in segment_str:
+                try:
+                    # Extract just the datetime part before "UTC"
+                    datetime_part = segment_str.split(" UTC")[0]
+                    if len(datetime_part) >= 10:
+                        parsed_dt = datetime.fromisoformat(datetime_part)
+                        # Convert midnight datetimes to dates for consistency
+                        if parsed_dt.time() == datetime.min.time():
+                            parsed_value = parsed_dt.date()
+                        else:
+                            parsed_value = parsed_dt
+                except (ValueError, IndexError):
+                    pass
+
+            # Format 3: Bracketed expressions like ['2016-01-04']
+            elif segment_str.startswith("[") and segment_str.endswith("]"):
+                try:
+                    content = segment_str[2:-2]  # Remove [' and ']
+
+                    # Try parsing as date first
+                    if len(content) == 10 and content.count("-") == 2:
+                        try:
+                            parsed_value = date.fromisoformat(content)
+                        except ValueError:
+                            pass
+
+                    # Try parsing as datetime
+                    if parsed_value is None:
+                        try:
+                            parsed_dt = datetime.fromisoformat(content.replace(" UTC", ""))
+                            if parsed_dt.time() == datetime.min.time():
+                                parsed_value = parsed_dt.date()
+                            else:
+                                parsed_value = parsed_dt
+                        except ValueError:
+                            pass
+
+                except (ValueError, IndexError):
+                    pass
+
+            # Handle `pl.datetime()` expressions with .alias("datetime")
+            elif "datetime" in segment_str and '.alias("datetime")' in segment_str:
+                try:
+                    datetime_part = segment_str.split('.alias("datetime")')[0]
+                    parsed_dt = datetime.fromisoformat(datetime_part)
+
+                    if parsed_dt.time() == datetime.min.time():
+                        parsed_value = parsed_dt.date()
+                    else:
+                        parsed_value = parsed_dt
+
+                except (ValueError, AttributeError):
+                    pass
+
+            # If we successfully parsed a value, use it; otherwise leave segment as is
+            if parsed_value is not None:
+                segment = parsed_value
+
         # Filter the data table based on the column name and segment
         if segment is None:
             data_tbl_nw = data_tbl_nw.filter(nw.col(column).is_null())
-        # Check if the segment is a segment group
         elif isinstance(segment, list):
+            # Check if the segment is a segment group
             data_tbl_nw = data_tbl_nw.filter(nw.col(column).is_in(segment))
         else:
             data_tbl_nw = data_tbl_nw.filter(nw.col(column) == segment)
@@ -14341,12 +14466,13 @@ def _apply_segments(data_tbl: any, segments_expr: tuple[str, Any]) -> any:
         # If the table is an Ibis backend table, perform the filtering operation directly
 
         # Filter the data table based on the column name and segment
+        # Use the new Ibis API methods to avoid deprecation warnings
         if segment is None:
-            data_tbl = data_tbl[data_tbl[column].isnull()]
+            data_tbl = data_tbl.filter(data_tbl[column].isnull())
         elif isinstance(segment, list):
-            data_tbl = data_tbl[data_tbl[column].isin(segment)]
+            data_tbl = data_tbl.filter(data_tbl[column].isin(segment))
         else:
-            data_tbl = data_tbl[data_tbl[column] == segment]
+            data_tbl = data_tbl.filter(data_tbl[column] == segment)
 
     return data_tbl
 

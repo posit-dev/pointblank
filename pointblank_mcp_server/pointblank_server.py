@@ -84,11 +84,59 @@ async def app_lifespan(server: FastMCP) -> AsyncIterator[AppContext]:
     context.active_validators.clear()
 
 
-mcp = FastMCP(
-    "FlexiblePointblankMCP",
-    lifespan=app_lifespan,
-    dependencies=["pointblank", "openpyxl"],
-)
+# Create FastMCP instance with version-aware dependency handling
+def _create_fastmcp_instance():
+    """Create FastMCP instance with backwards compatibility for dependencies parameter."""
+    try:
+        # Try to get FastMCP version to determine if the `dependencies=` parameter is available
+        import fastmcp
+
+        version_str = getattr(fastmcp, "__version__", "0.0.0")
+
+        # Parse version and assume format like "2.11.4"
+        version_parts = version_str.split(".")
+        if len(version_parts) >= 3:
+            major, minor, patch = (
+                int(version_parts[0]),
+                int(version_parts[1]),
+                int(version_parts[2]),
+            )
+
+            # For versions >=2.11.4, the `dependencies=` parameter is deprecated
+            if (
+                (major > 2)
+                or (major == 2 and minor > 11)
+                or (major == 2 and minor == 11 and patch >= 4)
+            ):
+                return FastMCP(
+                    "PointblankMCP",
+                    lifespan=app_lifespan,
+                )
+
+        # For older versions, use the `dependencies=` parameter
+        return FastMCP(
+            "PointblankMCP",
+            lifespan=app_lifespan,
+            dependencies=["pointblank", "openpyxl"],
+        )
+
+    except Exception:
+        # Fallback: try without dependencies first (newer approach)
+        # If that fails, try with dependencies (older approach)
+        try:
+            return FastMCP(
+                "PointblankMCP",
+                lifespan=app_lifespan,
+            )
+        except Exception:
+            return FastMCP(
+                "PointblankMCP",
+                lifespan=app_lifespan,
+                dependencies=["pointblank", "openpyxl"],
+            )
+
+
+mcp = _create_fastmcp_instance()
 
 
 def _get_available_backends():
