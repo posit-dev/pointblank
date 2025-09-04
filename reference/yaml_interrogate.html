@@ -273,7 +273,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
         border-radius: 2px;
     ">
 <p>For the examples here, we’ll use YAML configurations to define validation workflows. Let’s start with a basic YAML workflow that validates the built-in <code>small_table</code> dataset.</p>
-<div id="6a68df5f" class="cell" data-execution_count="2">
+<div id="e6ddc676" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Define a basic YAML validation workflow</span></span>
@@ -559,7 +559,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 <p>The validation table shows the results of our YAML-defined workflow. We can see that the <code>rows_distinct()</code> validation failed (because there are duplicate rows in the table), while the column existence checks passed.</p>
 <p>Now let’s create a more comprehensive validation workflow with thresholds and metadata:</p>
-<div id="57ee4e23" class="cell" data-execution_count="3">
+<div id="2ccb7249" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Advanced YAML configuration with thresholds and metadata</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>yaml_config <span class="op">=</span> <span class="st">'''</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="st">tbl: small_table</span></span>
@@ -593,7 +593,7 @@ Total validation steps: 4</code></pre>
 </div>
 <p>The validation results now include our custom table name and label. The thresholds we defined will determine when validation steps are marked as warnings, errors, or critical failures.</p>
 <p>You can also load YAML configurations from files. Here’s how you would work with a YAML file:</p>
-<div id="dc376ad8" class="cell" data-execution_count="4">
+<div id="c54c32e3" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tempfile</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -802,7 +802,7 @@ Total validation steps: 4</code></pre>
 <section id="using-set_tbl-to-override-the-table" class="level3">
 <h4 class="anchored" data-anchor-id="using-set_tbl-to-override-the-table">Using <code>set_tbl=</code> to Override the Table</h4>
 <p>The <code>set_tbl=</code> parameter allows you to override the table specified in the YAML configuration. This is useful when you have a template validation workflow but want to apply it to different tables:</p>
-<div id="63c8a2c8" class="cell" data-execution_count="5">
+<div id="decd9d9c" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a test table with similar structure to small_table</span></span>
