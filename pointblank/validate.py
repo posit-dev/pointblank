@@ -2407,10 +2407,31 @@ def _get_row_ranges(cut_points: list[int], n_rows: int) -> list[list[int]]:
     return [lhs_values, rhs_values]
 
 
+def _get_column_names_safe(data: Any) -> list[str]:
+    """
+    Safely get column names from a DataFrame, optimized for LazyFrames.
+    This function avoids the Narwhals PerformanceWarning for LazyFrames.
+    """
+    try:
+        import narwhals as nw
+
+        df_nw = nw.from_native(data)
+        # Use `collect_schema()` for LazyFrames to avoid performance warnings
+        if hasattr(df_nw, "collect_schema"):
+            return list(df_nw.collect_schema().keys())
+        else:
+            return list(df_nw.columns)
+    except Exception:
+        # Fallback to direct column access
+        return list(data.columns)
+
+
 def _get_column_names(data: FrameT | Any, ibis_tbl: bool, df_lib_name_gt: str) -> list[str]:
     if ibis_tbl:
         return data.columns if df_lib_name_gt == "polars" else list(data.columns)
-    return list(data.columns)
+
+    # Use the optimized helper function
+    return _get_column_names_safe(data)
 
 
 def _validate_columns_subset(
@@ -2599,7 +2620,11 @@ def get_column_count(data: FrameT | Any) -> int:
         import narwhals as nw
 
         df_nw = nw.from_native(data)
-        return len(df_nw.columns)
+        # Use `collect_schema()` for LazyFrames to avoid performance warnings
+        if hasattr(df_nw, "collect_schema"):
+            return len(df_nw.collect_schema())
+        else:
+            return len(df_nw.columns)
     except Exception:
         # Fallback for unsupported types
         if "pandas" in str(type(data)):
