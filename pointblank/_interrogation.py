@@ -312,8 +312,6 @@ class Interrogator:
         return self._comparison_base("le")
 
     def eq(self) -> FrameT | Any:
-        # All backends now use Narwhals (including former Ibis tables) ---------
-
         if isinstance(self.compare, Column):
             compare_expr = _get_compare_expr_nw(compare=self.compare)
 
@@ -387,8 +385,6 @@ class Interrogator:
             return tbl.drop("pb_is_good_1", "pb_is_good_2", "pb_is_good_3").to_native()
 
     def ne(self) -> FrameT | Any:
-        # All backends now use Narwhals (including former Ibis tables) ---------
-
         # Determine if the reference and comparison columns have any null values
         ref_col_has_null_vals = _column_has_null_values(table=self.x, column=self.column)
 
@@ -610,8 +606,6 @@ class Interrogator:
                     return tbl.drop("pb_is_good_1", "pb_is_good_2", "pb_is_good_3").to_native()
 
     def between(self) -> FrameT | Any:
-        # All backends now use Narwhals (including former Ibis tables) ---------
-
         low_val = _get_compare_expr_nw(compare=self.low)
         high_val = _get_compare_expr_nw(compare=self.high)
 
@@ -679,8 +673,6 @@ class Interrogator:
         return tbl
 
     def outside(self) -> FrameT | Any:
-        # All backends now use Narwhals (including former Ibis tables) ---------
-
         low_val = _get_compare_expr_nw(compare=self.low)
         high_val = _get_compare_expr_nw(compare=self.high)
 
@@ -747,8 +739,6 @@ class Interrogator:
         return tbl
 
     def isin(self) -> FrameT | Any:
-        # All backends now use Narwhals (including former Ibis tables) ---------
-
         can_be_null: bool = None in self.set
 
         base_expr: nw.Expr = nw.col(self.column).is_in(self.set)
@@ -758,8 +748,6 @@ class Interrogator:
         return self.x.with_columns(pb_is_good_=base_expr).to_native()
 
     def notin(self) -> FrameT | Any:
-        # All backends now use Narwhals (including former Ibis tables) ---------
-
         return (
             self.x.with_columns(
                 pb_is_good_=nw.col(self.column).is_in(self.set),
@@ -769,8 +757,6 @@ class Interrogator:
         )
 
     def regex(self) -> FrameT | Any:
-        # All backends now use Narwhals (including former Ibis tables) ---------
-
         return (
             self.x.with_columns(
                 pb_is_good_1=nw.col(self.column).is_null() & self.na_pass,
@@ -784,22 +770,16 @@ class Interrogator:
         )
 
     def null(self) -> FrameT | Any:
-        # All backends now use Narwhals (including former Ibis tables) ---------
-
         return self.x.with_columns(
             pb_is_good_=nw.col(self.column).is_null(),
         ).to_native()
 
     def not_null(self) -> FrameT | Any:
-        # All backends now use Narwhals (including former Ibis tables) ---------
-
         return self.x.with_columns(
             pb_is_good_=~nw.col(self.column).is_null(),
         ).to_native()
 
     def rows_distinct(self) -> FrameT | Any:
-        # All backends now use Narwhals (including former Ibis tables) ---------
-
         tbl = self.x
 
         # Get the column subset to use for the test
@@ -821,8 +801,6 @@ class Interrogator:
         return tbl.to_native()
 
     def rows_complete(self) -> FrameT | Any:
-        # All backends now use Narwhals (including former Ibis tables) ---------
-
         tbl = self.x
 
         # Determine the number of null values in each row (column subsets are handled in
