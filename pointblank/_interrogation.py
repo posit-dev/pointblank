@@ -240,12 +240,37 @@ class Interrogator:
         # Process Ibis tables through Narwhals
         self.x, self.tbl_type = _process_ibis_through_narwhals(self.x, self.tbl_type)
 
-    def gt(self) -> FrameT | Any:
-        # All backends now use Narwhals (including former Ibis tables) ---------
+    def _comparison_base(self, operator: str) -> FrameT | Any:
+        """
+        Unified base method for comparison operations (gt, ge, lt, le).
 
+        Parameters
+        ----------
+        operator
+            The comparison operator: 'gt', 'ge', 'lt', or 'le'.
+
+        Returns
+        -------
+        FrameT | Any
+            The result table with `pb_is_good_` column indicating the passing test units.
+        """
         compare_expr = _get_compare_expr_nw(compare=self.compare)
-
         compare_expr = _safe_modify_datetime_compare_val(self.x, self.column, compare_expr)
+
+        # Create the comparison expression based on the operator
+        column_expr = nw.col(self.column)
+        if operator == "gt":
+            comparison = column_expr > compare_expr
+        elif operator == "ge":
+            comparison = column_expr >= compare_expr
+        elif operator == "lt":
+            comparison = column_expr < compare_expr
+        elif operator == "le":
+            comparison = column_expr <= compare_expr
+        else:
+            raise ValueError(  # pragma: no cover
+                f"Invalid operator: {operator}. Must be one of: 'gt', 'ge', 'lt', 'le'"
+            )
 
         return (
             self.x.with_columns(
@@ -257,7 +282,7 @@ class Interrogator:
                     if isinstance(self.compare, Column)
                     else nw.lit(False)
                 ),
-                pb_is_good_3=(nw.col(self.column) > compare_expr)
+                pb_is_good_3=comparison
                 & ~_safe_is_nan_or_null_expr(self.x, nw.col(self.column), self.column),
             )
             .with_columns(
@@ -273,40 +298,18 @@ class Interrogator:
             .drop("pb_is_good_1", "pb_is_good_2", "pb_is_good_3")
             .to_native()
         )
+
+    def gt(self) -> FrameT | Any:
+        return self._comparison_base("gt")
 
     def lt(self) -> FrameT | Any:
-        # All backends now use Narwhals (including former Ibis tables) ---------
+        return self._comparison_base("lt")
 
-        compare_expr = _get_compare_expr_nw(compare=self.compare)
+    def ge(self) -> FrameT | Any:
+        return self._comparison_base("ge")
 
-        compare_expr = _safe_modify_datetime_compare_val(self.x, self.column, compare_expr)
-
-        return (
-            self.x.with_columns(
-                pb_is_good_1=_safe_is_nan_or_null_expr(self.x, nw.col(self.column), self.column)
-                & self.na_pass,
-                pb_is_good_2=(
-                    _safe_is_nan_or_null_expr(self.x, nw.col(self.compare.name), self.compare.name)
-                    & self.na_pass
-                    if isinstance(self.compare, Column)
-                    else nw.lit(False)
-                ),
-                pb_is_good_3=(nw.col(self.column) < compare_expr)
-                & ~_safe_is_nan_or_null_expr(self.x, nw.col(self.column), self.column),
-            )
-            .with_columns(
-                pb_is_good_3=(
-                    nw.when(nw.col("pb_is_good_3").is_null())
-                    .then(nw.lit(False))
-                    .otherwise(nw.col("pb_is_good_3"))
-                )
-            )
-            .with_columns(
-                pb_is_good_=nw.col("pb_is_good_1") | nw.col("pb_is_good_2") | nw.col("pb_is_good_3")
-            )
-            .drop("pb_is_good_1", "pb_is_good_2", "pb_is_good_3")
-            .to_native()
-        )
+    def le(self) -> FrameT | Any:
+        return self._comparison_base("le")
 
     def eq(self) -> FrameT | Any:
         # All backends now use Narwhals (including former Ibis tables) ---------
@@ -605,74 +608,6 @@ class Interrogator:
                     )
 
                     return tbl.drop("pb_is_good_1", "pb_is_good_2", "pb_is_good_3").to_native()
-
-    def ge(self) -> FrameT | Any:
-        # All backends now use Narwhals (including former Ibis tables) ---------
-
-        compare_expr = _get_compare_expr_nw(compare=self.compare)
-
-        compare_expr = _safe_modify_datetime_compare_val(self.x, self.column, compare_expr)
-
-        tbl = (
-            self.x.with_columns(
-                pb_is_good_1=_safe_is_nan_or_null_expr(self.x, nw.col(self.column), self.column)
-                & self.na_pass,
-                pb_is_good_2=(
-                    _safe_is_nan_or_null_expr(self.x, nw.col(self.compare.name), self.compare.name)
-                    & self.na_pass
-                    if isinstance(self.compare, Column)
-                    else nw.lit(False)
-                ),
-                pb_is_good_3=(nw.col(self.column) >= compare_expr)
-                & ~_safe_is_nan_or_null_expr(self.x, nw.col(self.column), self.column),
-            )
-            .with_columns(
-                pb_is_good_3=(
-                    nw.when(nw.col("pb_is_good_3").is_null())
-                    .then(nw.lit(False))
-                    .otherwise(nw.col("pb_is_good_3"))
-                )
-            )
-            .with_columns(
-                pb_is_good_=nw.col("pb_is_good_1") | nw.col("pb_is_good_2") | nw.col("pb_is_good_3")
-            )
-        )
-
-        return tbl.drop("pb_is_good_1", "pb_is_good_2", "pb_is_good_3").to_native()
-
-    def le(self) -> FrameT | Any:
-        # All backends now use Narwhals (including former Ibis tables) ---------
-
-        compare_expr = _get_compare_expr_nw(compare=self.compare)
-
-        compare_expr = _safe_modify_datetime_compare_val(self.x, self.column, compare_expr)
-
-        return (
-            self.x.with_columns(
-                pb_is_good_1=_safe_is_nan_or_null_expr(self.x, nw.col(self.column), self.column)
-                & self.na_pass,
-                pb_is_good_2=(
-                    _safe_is_nan_or_null_expr(self.x, nw.col(self.compare.name), self.compare.name)
-                    & self.na_pass
-                    if isinstance(self.compare, Column)
-                    else nw.lit(False)
-                ),
-                pb_is_good_3=(nw.col(self.column) <= compare_expr)
-                & ~_safe_is_nan_or_null_expr(self.x, nw.col(self.column), self.column),
-            )
-            .with_columns(
-                pb_is_good_3=(
-                    nw.when(nw.col("pb_is_good_3").is_null())
-                    .then(nw.lit(False))
-                    .otherwise(nw.col("pb_is_good_3"))
-                )
-            )
-            .with_columns(
-                pb_is_good_=nw.col("pb_is_good_1") | nw.col("pb_is_good_2") | nw.col("pb_is_good_3")
-            )
-            .drop("pb_is_good_1", "pb_is_good_2", "pb_is_good_3")
-            .to_native()
-        )
 
     def between(self) -> FrameT | Any:
         # All backends now use Narwhals (including former Ibis tables) ---------
