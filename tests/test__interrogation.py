@@ -5,7 +5,7 @@ from unittest.mock import Mock, patch
 
 from pointblank._interrogation import (
     ColValsExpr,
-    ColExistsHasType,
+    col_exists,
     RowsDistinct,
     _safe_modify_datetime_compare_val,
     _modify_datetime_compare_val,
@@ -52,24 +52,22 @@ COLUMN_LIST_DISTINCT = ["col_1", "col_2", "col_3", "pb_is_good_"]
 
 
 @pytest.mark.parametrize(
-    "tbl_fixture, assertion_method",
+    "tbl_fixture",
     [
-        ("tbl_pd", "exists"),
-        ("tbl_pl", "exists"),
+        "tbl_pd",
+        "tbl_pl",
     ],
 )
-def test_column_exists_has_type(request, tbl_fixture, assertion_method):
+def test_col_exists(request, tbl_fixture):
     tbl = request.getfixturevalue(tbl_fixture)
 
-    col_exists_has_type = ColExistsHasType(
+    result = col_exists(
         data_tbl=tbl,
         column="x",
-        threshold=1,
-        assertion_method=assertion_method,
     )
 
-    assert isinstance(col_exists_has_type.test_unit_res, int)
-    assert col_exists_has_type.test_unit_res == 1
+    assert isinstance(result, bool)
+    assert result == True
 
 
 @pytest.mark.parametrize("tbl_fixture", ["tbl_pd_distinct", "tbl_pl_distinct"])

@@ -48,7 +48,7 @@ from pointblank._interrogation import (
     NumberOfTestUnits,
     SpeciallyValidation,
     col_count_match,
-    col_exists_has_type,
+    col_exists,
     col_schema_match,
     col_vals_expr,
     conjointly_validation,
@@ -10031,12 +10031,9 @@ class Validate:
 
                     # COL_EXISTS validation
                     elif assertion_type == "col_exists":
-                        result_bool = col_exists_has_type(
+                        result_bool = col_exists(
                             data_tbl=data_tbl_step,
                             column=column,
-                            threshold=threshold,
-                            assertion_method="exists",
-                            tbl_type=tbl_type,
                         )
 
                         validation.all_passed = result_bool

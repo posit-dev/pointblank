@@ -219,54 +219,7 @@ class ColValsExpr:
         return self.test_unit_res
 
 
-@dataclass
-class ColExistsHasType:
-    """
-    Check if a column exists in a DataFrame or has a certain data type.
 
-    Parameters
-    ----------
-    data_tbl
-        A data table.
-    column
-        The column to check.
-    threshold
-        The maximum number of failing test units to allow.
-    assertion_method
-        The type of assertion ('exists' for column existence).
-    tbl_type
-        The type of table to use for the assertion.
-
-    Returns
-    -------
-    bool
-        `True` when test units pass below the threshold level for failing test units, `False`
-        otherwise.
-    """
-
-    data_tbl: FrameT
-    column: str
-    threshold: int
-    assertion_method: str
-    tbl_type: str = "local"
-
-    def __post_init__(self):
-        if self.tbl_type == "local":
-            # Convert the DataFrame to a format that narwhals can work with, and:
-            #  - check if the `column=` exists
-            #  - check if the `column=` type is compatible with the test
-            tbl = _convert_to_narwhals(df=self.data_tbl)
-        else:
-            # For remote backends (Ibis), pass the table as is since Narwhals can handle it
-            tbl = _convert_to_narwhals(df=self.data_tbl)
-
-        if self.assertion_method == "exists":
-            res = int(self.column in tbl.columns)
-
-        self.test_unit_res = res
-
-    def get_test_results(self):
-        return self.test_unit_res
 
 
 @dataclass
@@ -878,24 +831,24 @@ def rows_complete(
     )
 
 
-def col_exists_has_type(
-    data_tbl: FrameT, column: str, threshold: int, assertion_method: str, tbl_type: str = "local"
-) -> bool:
+def col_exists(data_tbl: FrameT, column: str) -> bool:
     """
-    Check if a column exists in a DataFrame or has a certain data type.
+    Check if a column exists in a DataFrame.
 
-    This function replaces the ColExistsHasType dataclass for direct usage.
+    Parameters
+    ----------
+    data_tbl
+        A data table.
+    column
+        The column to check.
+
+    Returns
+    -------
+    bool
+        `True` if the column exists, `False` otherwise.
     """
-    if tbl_type == "local":
-        tbl_nw = _convert_to_narwhals(df=data_tbl)
-        if assertion_method == "exists":
-            return column in tbl_nw.columns
-    else:
-        # For remote backends (Ibis), check column existence through narwhals
-        tbl_nw = nw.from_native(data_tbl)
-        if assertion_method == "exists":
-            return column in tbl_nw.columns
-    return True
+    tbl = _convert_to_narwhals(df=data_tbl)
+    return column in tbl.columns
 
 
 def col_schema_match(
