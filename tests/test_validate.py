@@ -4693,6 +4693,29 @@ def test_col_vals_expr_step_report():
     assert result_pd is not None
 
 
+def test_col_vals_expr_display_text_formatting():
+    """Test that `col_vals_expr()` step reports don't show 'IN COLUMN None' text."""
+
+    # Create test data where expression will fail for some rows
+    df = pl.DataFrame(
+        {
+            "a": [1, 2, 3, 4, 5, 6],
+            "b": [2, 3, 4, 5, 6, 7],
+        }
+    )
+
+    # Test failing case, which should not show "IN COLUMN None"
+    validator_fail = Validate(df).col_vals_expr(pl.col("a") > pl.col("b")).interrogate()
+    report_html_fail = validator_fail.get_step_report(i=1).as_raw_html()
+
+    # Main assertions: no column references for expression validations
+    assert "IN COLUMN None" not in report_html_fail
+    assert "IN COLUMN" not in report_html_fail
+
+    # Verify it has the basic failure structure
+    assert "TEST UNIT FAILURES" in report_html_fail
+
+
 @pytest.mark.parametrize("tbl_fixture", TBL_LIST)
 def test_rows_distinct(request, tbl_fixture):
     tbl = request.getfixturevalue(tbl_fixture)

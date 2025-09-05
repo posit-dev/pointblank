@@ -15386,10 +15386,14 @@ def _step_report_row_based(
         title = STEP_REPORT_TEXT["report_for_step_i"][lang].format(i=i) + " " + CHECK_MARK_SPAN
         assertion_header_text = STEP_REPORT_TEXT["assertion_header_text"][lang]
 
-        success_stmt = STEP_REPORT_TEXT["success_statement"][lang].format(
-            n=n,
-            column_position=column_position,
-        )
+        # Use success_statement_no_column for col_vals_expr since it doesn't target a specific column
+        if assertion_type == "col_vals_expr":
+            success_stmt = STEP_REPORT_TEXT["success_statement_no_column"][lang].format(n=n)
+        else:
+            success_stmt = STEP_REPORT_TEXT["success_statement"][lang].format(
+                n=n,
+                column_position=column_position,
+            )
         preview_stmt = STEP_REPORT_TEXT["preview_statement"][lang]
 
         details = (
@@ -15469,10 +15473,16 @@ def _step_report_row_based(
         assertion_header_text = STEP_REPORT_TEXT["assertion_header_text"][lang]
         failure_rate_metrics = f"<strong>{n_failed}</strong> / <strong>{n}</strong>"
 
-        failure_rate_stmt = STEP_REPORT_TEXT["failure_rate_summary"][lang].format(
-            failure_rate=failure_rate_metrics,
-            column_position=column_position,
-        )
+        # Use failure_rate_summary_no_column for col_vals_expr since it doesn't target a specific column
+        if assertion_type == "col_vals_expr":
+            failure_rate_stmt = STEP_REPORT_TEXT["failure_rate_summary_no_column"][lang].format(
+                failure_rate=failure_rate_metrics
+            )
+        else:
+            failure_rate_stmt = STEP_REPORT_TEXT["failure_rate_summary"][lang].format(
+                failure_rate=failure_rate_metrics,
+                column_position=column_position,
+            )
 
         if limit < extract_length:
             extract_length_resolved = limit
