@@ -219,9 +219,6 @@ class ColValsExpr:
         return self.test_unit_res
 
 
-
-
-
 @dataclass
 class RowsDistinct:
     """
