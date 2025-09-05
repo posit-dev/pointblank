@@ -1732,33 +1732,48 @@ class ConjointlyValidation:
         """Process expressions for Polars DataFrames."""
         import polars as pl
 
-        polars_expressions = []
+        polars_results = []  # Changed from polars_expressions to polars_results
 
         for expr_fn in self.expressions:
             try:
-                # First try direct evaluation with native Polars expressions
+                # First try direct evaluation with native expressions
                 expr_result = expr_fn(self.data_tbl)
                 if isinstance(expr_result, pl.Expr):
-                    polars_expressions.append(expr_result)
+                    # This is a Polars expression, we'll evaluate it later
+                    polars_results.append(("expr", expr_result))
+                elif isinstance(expr_result, pl.Series):
+                    # This is a boolean Series from lambda function
+                    polars_results.append(("series", expr_result))
                 else:
-                    raise TypeError("Not a valid Polars expression")
+                    raise TypeError("Not a valid Polars expression or series")
             except Exception as e:
                 try:
                     # Try to get a ColumnExpression
                     col_expr = expr_fn(None)
                     if hasattr(col_expr, "to_polars_expr"):
                         polars_expr = col_expr.to_polars_expr()
-                        polars_expressions.append(polars_expr)
+                        polars_results.append(("expr", polars_expr))
                     else:  # pragma: no cover
                         raise TypeError(f"Cannot convert {type(col_expr)} to Polars expression")
                 except Exception as e:  # pragma: no cover
                     print(f"Error evaluating expression: {e}")
 
         # Combine results with AND logic
-        if polars_expressions:
-            final_result = polars_expressions[0]
-            for expr in polars_expressions[1:]:
-                final_result = final_result & expr
+        if polars_results:
+            # Convert everything to Series for consistent handling
+            series_results = []
+            for result_type, result_value in polars_results:
+                if result_type == "series":
+                    series_results.append(result_value)
+                elif result_type == "expr":
+                    # Evaluate the expression on the DataFrame to get a Series
+                    evaluated_series = self.data_tbl.select(result_value).to_series()
+                    series_results.append(evaluated_series)
+
+            # Combine all boolean Series with AND logic
+            final_result = series_results[0]
+            for series in series_results[1:]:
+                final_result = final_result & series
 
             # Create results table with boolean column
             results_tbl = self.data_tbl.with_columns(pb_is_good_=final_result)
@@ -2158,3 +2173,190 @@ def _modify_datetime_compare_val(tgt_column: any, compare_val: any) -> any:
         return compare_val
 
     return compare_expr
+
+
+# ============================================================================
+# New simplified functions to replace dataclass wrappers
+# ============================================================================
+
+
+def col_vals_expr(data_tbl: FrameT, expr, threshold: int, tbl_type: str = "local"):
+    """
+    Check if values in a column evaluate to True for a given predicate expression.
+
+    This function replaces the ColValsExpr dataclass for direct usage.
+    """
+    if tbl_type == "local":
+        # Check the type of expression provided
+        if "narwhals" in str(type(expr)) and "expr" in str(type(expr)):
+            expression_type = "narwhals"
+        elif "polars" in str(type(expr)) and "expr" in str(type(expr)):
+            expression_type = "polars"
+        else:
+            expression_type = "pandas"
+
+        # Determine whether this is a Pandas or Polars table
+        tbl_type_detected = _get_tbl_type(data=data_tbl)
+        df_lib_name = "polars" if "polars" in tbl_type_detected else "pandas"
+
+        if expression_type == "narwhals":
+            tbl_nw = _convert_to_narwhals(df=data_tbl)
+            tbl_nw = tbl_nw.with_columns(pb_is_good_=expr)
+            return tbl_nw.to_native()
+
+        if df_lib_name == "polars" and expression_type == "polars":
+            return data_tbl.with_columns(pb_is_good_=expr)
+
+        if df_lib_name == "pandas" and expression_type == "pandas":
+            return data_tbl.assign(pb_is_good_=expr)
+
+    # For remote backends, return original table (placeholder)
+    return data_tbl
+
+
+def rows_distinct(
+    data_tbl: FrameT, columns_subset: list[str] | None, threshold: int, tbl_type: str = "local"
+):
+    """
+    Check if rows in a DataFrame are distinct.
+
+    This function replaces the RowsDistinct dataclass for direct usage.
+    """
+    if tbl_type == "local":
+        # Convert the DataFrame to a format that narwhals can work with, and:
+        #  - check if the `column=` exists
+        #  - check if the `column=` type is compatible with the test
+        tbl = _column_subset_test_prep(df=data_tbl, columns_subset=columns_subset)
+    else:
+        # For remote backends (Ibis), pass the table as is since Interrogator now handles Ibis through Narwhals
+        tbl = data_tbl
+
+    # Collect results for the test units; the results are a list of booleans where
+    # `True` indicates a passing test unit
+    return Interrogator(
+        x=tbl,
+        columns_subset=columns_subset,
+        tbl_type=tbl_type,
+    ).rows_distinct()
+
+
+def rows_complete(
+    data_tbl: FrameT, columns_subset: list[str] | None, threshold: int, tbl_type: str = "local"
+):
+    """
+    Check if rows in a DataFrame are complete (no null values).
+
+    This function replaces the RowsComplete dataclass for direct usage.
+    """
+    if tbl_type == "local":
+        tbl = _column_subset_test_prep(df=data_tbl, columns_subset=columns_subset)
+    else:
+        tbl = data_tbl
+
+    return Interrogator(
+        x=tbl,
+        columns_subset=columns_subset,
+        tbl_type=tbl_type,
+    ).rows_complete()
+
+
+def col_exists_has_type(
+    data_tbl: FrameT, column: str, threshold: int, assertion_method: str, tbl_type: str = "local"
+) -> bool:
+    """
+    Check if a column exists in a DataFrame or has a certain data type.
+
+    This function replaces the ColExistsHasType dataclass for direct usage.
+    """
+    if tbl_type == "local":
+        tbl_nw = _convert_to_narwhals(df=data_tbl)
+        if assertion_method == "exists":
+            return column in tbl_nw.columns
+    else:
+        # For remote backends (Ibis), check column existence through narwhals
+        tbl_nw = nw.from_native(data_tbl)
+        if assertion_method == "exists":
+            return column in tbl_nw.columns
+    return True
+
+
+def col_schema_match(
+    data_tbl: FrameT,
+    schema,
+    complete: bool,
+    in_order: bool,
+    case_sensitive_colnames: bool,
+    case_sensitive_dtypes: bool,
+    full_match_dtypes: bool,
+    threshold: int,
+) -> bool:
+    """
+    Check if DataFrame schema matches expected schema.
+
+    This function replaces the ColSchemaMatch dataclass for direct usage.
+    """
+    from pointblank.schema import _check_schema_match
+
+    return _check_schema_match(
+        data_tbl=data_tbl,
+        schema=schema,
+        complete=complete,
+        in_order=in_order,
+        case_sensitive_colnames=case_sensitive_colnames,
+        case_sensitive_dtypes=case_sensitive_dtypes,
+        full_match_dtypes=full_match_dtypes,
+    )
+
+
+def row_count_match(
+    data_tbl: FrameT, count, inverse: bool, threshold: int, abs_tol_bounds, tbl_type: str = "local"
+) -> bool:
+    """
+    Check if DataFrame row count matches expected count.
+
+    This function replaces the RowCountMatch dataclass for direct usage.
+    """
+    from pointblank.validate import get_row_count
+
+    row_count: int = get_row_count(data=data_tbl)
+    lower_abs_limit, upper_abs_limit = abs_tol_bounds
+    min_val: int = count - lower_abs_limit
+    max_val: int = count + upper_abs_limit
+
+    if inverse:
+        return not (row_count >= min_val and row_count <= max_val)
+    else:
+        return row_count >= min_val and row_count <= max_val
+
+
+def col_count_match(
+    data_tbl: FrameT, count, inverse: bool, threshold: int, tbl_type: str = "local"
+) -> bool:
+    """
+    Check if DataFrame column count matches expected count.
+
+    This function replaces the ColCountMatch dataclass for direct usage.
+    """
+    from pointblank.validate import get_column_count
+
+    if not inverse:
+        return get_column_count(data=data_tbl) == count
+    else:
+        return get_column_count(data=data_tbl) != count
+
+
+def conjointly_validation(data_tbl: FrameT, expressions, threshold: int, tbl_type: str = "local"):
+    """
+    Perform conjoint validation using multiple expressions.
+
+    This function replaces the ConjointlyValidation dataclass for direct usage.
+    """
+    # Create a ConjointlyValidation instance and get the results
+    conjointly_instance = ConjointlyValidation(
+        data_tbl=data_tbl,
+        expressions=expressions,
+        threshold=threshold,
+        tbl_type=tbl_type,
+    )
+
+    return conjointly_instance.get_test_results()

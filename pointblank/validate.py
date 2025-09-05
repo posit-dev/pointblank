@@ -31,7 +31,6 @@ from pointblank._constants import (
     CROSS_MARK_SPAN,
     IBIS_BACKENDS,
     LOG_LEVELS_MAP,
-    METHOD_CATEGORY_MAP,
     REPORTING_LANGUAGES,
     ROW_BASED_VALIDATION_TYPES,
     RTL_LANGUAGES,
@@ -46,17 +45,17 @@ from pointblank._constants_translations import (
     VALIDATION_REPORT_TEXT,
 )
 from pointblank._interrogation import (
-    ColCountMatch,
-    ColExistsHasType,
-    ColSchemaMatch,
-    ColValsExpr,
-    ConjointlyValidation,
     Interrogator,
     NumberOfTestUnits,
-    RowCountMatch,
-    RowsComplete,
-    RowsDistinct,
     SpeciallyValidation,
+    col_count_match,
+    col_exists_has_type,
+    col_schema_match,
+    col_vals_expr,
+    conjointly_validation,
+    row_count_match,
+    rows_complete,
+    rows_distinct,
 )
 from pointblank._typing import SegmentSpec
 from pointblank._utils import (
@@ -9772,8 +9771,8 @@ class Validate:
             threshold = validation.thresholds
             segment = validation.segments
 
+            # Get compatible data types for this assertion type
             assertion_method = ASSERTION_TYPE_METHOD_MAP[assertion_type]
-            assertion_category = METHOD_CATEGORY_MAP[assertion_method]
             compatible_dtypes = COMPATIBLE_DTYPES.get(assertion_method, [])
 
             # Process the `brief` text for the validation step by including template variables to
@@ -9905,9 +9904,19 @@ class Validate:
             # ------------------------------------------------
 
             # Apply error handling only to data quality validations, not programming error validations
-            if assertion_category != "SPECIALLY":
+            if assertion_type != "specially":
                 try:
-                    if assertion_category == "COMPARE_ONE":
+                    # COMPARE_ONE validations: gt, lt, eq, ne, ge, le, null, not_null
+                    if assertion_type in [
+                        "col_vals_gt",
+                        "col_vals_lt",
+                        "col_vals_eq",
+                        "col_vals_ne",
+                        "col_vals_ge",
+                        "col_vals_le",
+                        "col_vals_null",
+                        "col_vals_not_null",
+                    ]:
                         # Process table for column validation (Narwhals handles all backends)
                         tbl = _column_test_prep(
                             df=data_tbl_step, column=column, allowed_types=compatible_dtypes
@@ -9944,7 +9953,8 @@ class Validate:
                                 f"Expected one of: gt, lt, eq, ne, ge, le, null, not_null"
                             )
 
-                    if assertion_category == "COMPARE_TWO":
+                    # COMPARE_TWO validations: between, outside
+                    elif assertion_type in ["col_vals_between", "col_vals_outside"]:
                         # Process table for column validation (Narwhals handles all backends)
                         tbl = _column_test_prep(
                             df=data_tbl_step, column=column, allowed_types=compatible_dtypes
@@ -9971,7 +9981,8 @@ class Validate:
                                 f"Expected one of: between, outside"
                             )
 
-                    if assertion_category == "COMPARE_SET":
+                    # COMPARE_SET validations: in_set, not_in_set
+                    elif assertion_type in ["col_vals_in_set", "col_vals_not_in_set"]:
                         # Process table for column validation (Narwhals handles all backends)
                         tbl = _column_test_prep(
                             df=data_tbl_step, column=column, allowed_types=compatible_dtypes
@@ -9992,7 +10003,8 @@ class Validate:
                         else:
                             results_tbl = interrogator.notin()
 
-                    if assertion_category == "COMPARE_REGEX":
+                    # COMPARE_REGEX validation: regex
+                    elif assertion_type == "col_vals_regex":
                         # Process table for column validation (Narwhals handles all backends)
                         tbl = _column_test_prep(
                             df=data_tbl_step, column=column, allowed_types=compatible_dtypes
@@ -10009,48 +10021,53 @@ class Validate:
 
                         results_tbl = interrogator.regex()
 
-                    if assertion_category == "COMPARE_EXPR":
-                        results_tbl = ColValsExpr(
+                    # COMPARE_EXPR validation: expr
+                    elif assertion_type == "col_vals_expr":
+                        results_tbl = col_vals_expr(
                             data_tbl=data_tbl_step,
                             expr=value,
                             threshold=threshold,
                             tbl_type=tbl_type,
-                        ).get_test_results()
+                        )
 
-                    if assertion_category == "ROWS_DISTINCT":
-                        results_tbl = RowsDistinct(
+                    # ROWS_DISTINCT validation
+                    elif assertion_type == "rows_distinct":
+                        results_tbl = rows_distinct(
                             data_tbl=data_tbl_step,
                             columns_subset=column,
                             threshold=threshold,
                             tbl_type=tbl_type,
-                        ).get_test_results()
+                        )
 
-                    if assertion_category == "ROWS_COMPLETE":
-                        results_tbl = RowsComplete(
+                    # ROWS_COMPLETE validation
+                    elif assertion_type == "rows_complete":
+                        results_tbl = rows_complete(
                             data_tbl=data_tbl_step,
                             columns_subset=column,
                             threshold=threshold,
                             tbl_type=tbl_type,
-                        ).get_test_results()
+                        )
 
-                    if assertion_category == "COL_EXISTS_HAS_TYPE":
-                        result_bool = ColExistsHasType(
+                    # COL_EXISTS validation
+                    elif assertion_type == "col_exists":
+                        result_bool = col_exists_has_type(
                             data_tbl=data_tbl_step,
                             column=column,
                             threshold=threshold,
                             assertion_method="exists",
                             tbl_type=tbl_type,
-                        ).get_test_results()
+                        )
 
                         validation.all_passed = result_bool
                         validation.n = 1
-                        validation.n_passed = result_bool
-                        validation.n_failed = 1 - result_bool
+                        validation.n_passed = int(result_bool)
+                        validation.n_failed = 1 - int(result_bool)
 
                         results_tbl = None
 
-                    if assertion_category == "COL_SCHEMA_MATCH":
-                        result_bool = ColSchemaMatch(
+                    # COL_SCHEMA_MATCH validation
+                    elif assertion_type == "col_schema_match":
+                        result_bool = col_schema_match(
                             data_tbl=data_tbl_step,
                             schema=value["schema"],
                             complete=value["complete"],
@@ -10059,7 +10076,7 @@ class Validate:
                             case_sensitive_dtypes=value["case_sensitive_dtypes"],
                             full_match_dtypes=value["full_match_dtypes"],
                             threshold=threshold,
-                        ).get_test_results()
+                        )
 
                         schema_validation_info = _get_schema_validation_info(
                             data_tbl=data_tbl,
@@ -10082,15 +10099,16 @@ class Validate:
 
                         results_tbl = None
 
-                    if assertion_category == "ROW_COUNT_MATCH":
-                        result_bool = RowCountMatch(
+                    # ROW_COUNT_MATCH validation
+                    elif assertion_type == "row_count_match":
+                        result_bool = row_count_match(
                             data_tbl=data_tbl_step,
                             count=value["count"],
                             inverse=value["inverse"],
                             threshold=threshold,
                             abs_tol_bounds=value["abs_tol_bounds"],
                             tbl_type=tbl_type,
-                        ).get_test_results()
+                        )
 
                         validation.all_passed = result_bool
                         validation.n = 1
@@ -10099,14 +10117,15 @@ class Validate:
 
                         results_tbl = None
 
-                    if assertion_category == "COL_COUNT_MATCH":
-                        result_bool = ColCountMatch(
+                    # COL_COUNT_MATCH validation
+                    elif assertion_type == "col_count_match":
+                        result_bool = col_count_match(
                             data_tbl=data_tbl_step,
                             count=value["count"],
                             inverse=value["inverse"],
                             threshold=threshold,
                             tbl_type=tbl_type,
-                        ).get_test_results()
+                        )
 
                         validation.all_passed = result_bool
                         validation.n = 1
@@ -10115,13 +10134,17 @@ class Validate:
 
                         results_tbl = None
 
-                    if assertion_category == "CONJOINTLY":
-                        results_tbl = ConjointlyValidation(
+                    # CONJOINTLY validation
+                    elif assertion_type == "conjointly":
+                        results_tbl = conjointly_validation(
                             data_tbl=data_tbl_step,
                             expressions=value["expressions"],
                             threshold=threshold,
                             tbl_type=tbl_type,
-                        ).get_test_results()
+                        )
+
+                    else:
+                        raise ValueError(f"Unknown assertion type: {assertion_type}")
 
                 except Exception as e:
                     # Only catch specific data quality comparison errors, not programming errors
@@ -10149,8 +10172,8 @@ class Validate:
                         raise
 
             else:
-                # For "SPECIALLY" validations, let programming errors propagate as exceptions
-                if assertion_category == "SPECIALLY":
+                # For "specially" validations, let programming errors propagate as exceptions
+                if assertion_type == "specially":
                     results_tbl_list = SpeciallyValidation(
                         data_tbl=data_tbl_step,
                         expression=value,
