@@ -4,8 +4,6 @@ import polars as pl
 from unittest.mock import Mock, patch
 
 from pointblank._interrogation import (
-    col_exists,
-    rows_distinct,
     _safe_modify_datetime_compare_val,
     _modify_datetime_compare_val,
     _column_has_null_values,
@@ -48,46 +46,6 @@ def tbl_pl_distinct():
 COLUMN_LIST = ["x", "y", "z", "pb_is_good_"]
 
 COLUMN_LIST_DISTINCT = ["col_1", "col_2", "col_3", "pb_is_good_"]
-
-
-@pytest.mark.parametrize(
-    "tbl_fixture",
-    [
-        "tbl_pd",
-        "tbl_pl",
-    ],
-)
-def test_col_exists(request, tbl_fixture):
-    tbl = request.getfixturevalue(tbl_fixture)
-
-    result = col_exists(
-        data_tbl=tbl,
-        column="x",
-    )
-
-    assert isinstance(result, bool)
-    assert result == True
-
-
-@pytest.mark.parametrize("tbl_fixture", ["tbl_pd_distinct", "tbl_pl_distinct"])
-def test_rows_distinct(request, tbl_fixture):
-    tbl = request.getfixturevalue(tbl_fixture)
-
-    result = rows_distinct(
-        data_tbl=tbl,
-        columns_subset=["col_1", "col_2", "col_3"],
-        threshold=1,
-    )
-
-    assert isinstance(
-        result,
-        pd.DataFrame if tbl_fixture == "tbl_pd_distinct" else pl.DataFrame,
-    )
-
-    if tbl_fixture == "tbl_pd_distinct":
-        assert result.columns.tolist() == COLUMN_LIST_DISTINCT
-    else:
-        assert result.columns == COLUMN_LIST_DISTINCT
 
 
 def test_safe_modify_datetime_with_collect_schema():

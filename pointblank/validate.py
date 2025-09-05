@@ -65,9 +65,9 @@ from pointblank._interrogation import (
     interrogate_null,
     interrogate_outside,
     interrogate_regex,
+    interrogate_rows_distinct,
     row_count_match,
     rows_complete,
-    rows_distinct,
 )
 from pointblank._typing import SegmentSpec
 from pointblank._utils import (
@@ -9936,21 +9936,33 @@ class Validate:
 
                         # Call the appropriate top-level function
                         if assertion_method == "gt":
-                            results_tbl = interrogate_gt(tbl, column, value, na_pass, tbl_type)
+                            results_tbl = interrogate_gt(
+                                tbl=tbl, column=column, compare=value, na_pass=na_pass
+                            )
                         elif assertion_method == "lt":
-                            results_tbl = interrogate_lt(tbl, column, value, na_pass, tbl_type)
+                            results_tbl = interrogate_lt(
+                                tbl=tbl, column=column, compare=value, na_pass=na_pass
+                            )
                         elif assertion_method == "eq":
-                            results_tbl = interrogate_eq(tbl, column, value, na_pass, tbl_type)
+                            results_tbl = interrogate_eq(
+                                tbl=tbl, column=column, compare=value, na_pass=na_pass
+                            )
                         elif assertion_method == "ne":
-                            results_tbl = interrogate_ne(tbl, column, value, na_pass, tbl_type)
+                            results_tbl = interrogate_ne(
+                                tbl=tbl, column=column, compare=value, na_pass=na_pass
+                            )
                         elif assertion_method == "ge":
-                            results_tbl = interrogate_ge(tbl, column, value, na_pass, tbl_type)
+                            results_tbl = interrogate_ge(
+                                tbl=tbl, column=column, compare=value, na_pass=na_pass
+                            )
                         elif assertion_method == "le":
-                            results_tbl = interrogate_le(tbl, column, value, na_pass, tbl_type)
+                            results_tbl = interrogate_le(
+                                tbl=tbl, column=column, compare=value, na_pass=na_pass
+                            )
                         elif assertion_method == "null":
-                            results_tbl = interrogate_null(tbl, column, tbl_type)
+                            results_tbl = interrogate_null(tbl=tbl, column=column)
                         elif assertion_method == "not_null":
-                            results_tbl = interrogate_not_null(tbl, column, tbl_type)
+                            results_tbl = interrogate_not_null(tbl=tbl, column=column)
                         else:
                             raise ValueError(
                                 f"Invalid assertion method: {assertion_method}. "
@@ -9967,11 +9979,11 @@ class Validate:
                         # Call the appropriate top-level function
                         if assertion_method == "between":
                             results_tbl = interrogate_between(
-                                tbl, column, value[0], value[1], inclusive, na_pass, tbl_type
+                                tbl, column, value[0], value[1], inclusive, na_pass
                             )
                         elif assertion_method == "outside":
                             results_tbl = interrogate_outside(
-                                tbl, column, value[0], value[1], inclusive, na_pass, tbl_type
+                                tbl, column, value[0], value[1], inclusive, na_pass
                             )
                         else:
                             raise ValueError(
@@ -9988,9 +10000,9 @@ class Validate:
 
                         # Call the appropriate top-level function
                         if assertion_method == "in_set":
-                            results_tbl = interrogate_isin(tbl, column, value, tbl_type)
+                            results_tbl = interrogate_isin(tbl, column, value)
                         else:
-                            results_tbl = interrogate_notin(tbl, column, value, tbl_type)
+                            results_tbl = interrogate_notin(tbl, column, value)
 
                     # COMPARE_REGEX validation: regex
                     elif assertion_type == "col_vals_regex":
@@ -10000,34 +10012,23 @@ class Validate:
                         )
 
                         # Call the regex function
-                        results_tbl = interrogate_regex(tbl, column, value, na_pass, tbl_type)
+                        results_tbl = interrogate_regex(tbl, column, value, na_pass)
 
                     # COMPARE_EXPR validation: expr
                     elif assertion_type == "col_vals_expr":
                         results_tbl = col_vals_expr(
-                            data_tbl=data_tbl_step,
-                            expr=value,
-                            threshold=threshold,
-                            tbl_type=tbl_type,
+                            data_tbl=data_tbl_step, expr=value, tbl_type=tbl_type
                         )
 
                     # ROWS_DISTINCT validation
                     elif assertion_type == "rows_distinct":
-                        results_tbl = rows_distinct(
-                            data_tbl=data_tbl_step,
-                            columns_subset=column,
-                            threshold=threshold,
-                            tbl_type=tbl_type,
+                        results_tbl = interrogate_rows_distinct(
+                            data_tbl=data_tbl_step, columns_subset=column
                         )
 
                     # ROWS_COMPLETE validation
                     elif assertion_type == "rows_complete":
-                        results_tbl = rows_complete(
-                            data_tbl=data_tbl_step,
-                            columns_subset=column,
-                            threshold=threshold,
-                            tbl_type=tbl_type,
-                        )
+                        results_tbl = rows_complete(data_tbl=data_tbl_step, columns_subset=column)
 
                     # COL_EXISTS validation
                     elif assertion_type == "col_exists":
@@ -10083,9 +10084,7 @@ class Validate:
                             data_tbl=data_tbl_step,
                             count=value["count"],
                             inverse=value["inverse"],
-                            threshold=threshold,
                             abs_tol_bounds=value["abs_tol_bounds"],
-                            tbl_type=tbl_type,
                         )
 
                         validation.all_passed = result_bool
@@ -10098,11 +10097,7 @@ class Validate:
                     # COL_COUNT_MATCH validation
                     elif assertion_type == "col_count_match":
                         result_bool = col_count_match(
-                            data_tbl=data_tbl_step,
-                            count=value["count"],
-                            inverse=value["inverse"],
-                            threshold=threshold,
-                            tbl_type=tbl_type,
+                            data_tbl=data_tbl_step, count=value["count"], inverse=value["inverse"]
                         )
 
                         validation.all_passed = result_bool
