@@ -47,32 +47,6 @@ ASSERTION_TYPE_METHOD_MAP = {
     "specially": "specially",
 }
 
-METHOD_CATEGORY_MAP = {
-    "gt": "COMPARE_ONE",
-    "lt": "COMPARE_ONE",
-    "eq": "COMPARE_ONE",
-    "ne": "COMPARE_ONE",
-    "ge": "COMPARE_ONE",
-    "le": "COMPARE_ONE",
-    "not": "COMPARE_ONE",
-    "null": "COMPARE_ONE",
-    "not_null": "COMPARE_ONE",
-    "between": "COMPARE_TWO",
-    "outside": "COMPARE_TWO",
-    "in_set": "COMPARE_SET",
-    "not_in_set": "COMPARE_SET",
-    "regex": "COMPARE_REGEX",
-    "col_exists": "COL_EXISTS_HAS_TYPE",
-    "expr": "COMPARE_EXPR",
-    "rows_distinct": "ROWS_DISTINCT",
-    "rows_complete": "ROWS_COMPLETE",
-    "col_schema_match": "COL_SCHEMA_MATCH",
-    "row_count_match": "ROW_COUNT_MATCH",
-    "col_count_match": "COL_COUNT_MATCH",
-    "conjointly": "CONJOINTLY",
-    "specially": "SPECIALLY",
-}
-
 COMPARISON_OPERATORS = {
     "col_vals_gt": ">",
     "col_vals_ge": ">=",
