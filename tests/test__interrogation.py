@@ -5,7 +5,7 @@ from unittest.mock import Mock, patch
 
 from pointblank._interrogation import (
     col_exists,
-    RowsDistinct,
+    rows_distinct,
     _safe_modify_datetime_compare_val,
     _modify_datetime_compare_val,
     _column_has_null_values,
@@ -73,23 +73,21 @@ def test_col_exists(request, tbl_fixture):
 def test_rows_distinct(request, tbl_fixture):
     tbl = request.getfixturevalue(tbl_fixture)
 
-    rows_distinct = RowsDistinct(
+    result = rows_distinct(
         data_tbl=tbl,
         columns_subset=["col_1", "col_2", "col_3"],
         threshold=1,
     )
 
     assert isinstance(
-        rows_distinct.test_unit_res,
+        result,
         pd.DataFrame if tbl_fixture == "tbl_pd_distinct" else pl.DataFrame,
     )
 
     if tbl_fixture == "tbl_pd_distinct":
-        assert rows_distinct.test_unit_res.columns.tolist() == COLUMN_LIST_DISTINCT
-        assert rows_distinct.get_test_results().columns.tolist() == COLUMN_LIST_DISTINCT
+        assert result.columns.tolist() == COLUMN_LIST_DISTINCT
     else:
-        assert rows_distinct.test_unit_res.columns == COLUMN_LIST_DISTINCT
-        assert rows_distinct.get_test_results().columns == COLUMN_LIST_DISTINCT
+        assert result.columns == COLUMN_LIST_DISTINCT
 
 
 def test_safe_modify_datetime_with_collect_schema():

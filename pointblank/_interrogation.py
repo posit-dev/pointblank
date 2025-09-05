@@ -156,58 +156,6 @@ def _safe_is_nan_or_null_expr(data_frame: Any, column_expr: Any, column_name: st
     return null_check
 
 
-@dataclass
-class RowsDistinct:
-    """
-    Check if rows in a DataFrame are distinct.
-
-    Parameters
-    ----------
-    data_tbl
-        A data table.
-    columns_subset
-        A list of columns to check for distinctness.
-    threshold
-        The maximum number of failing test units to allow.
-    tbl_type
-        The type of table to use for the assertion.
-
-    Returns
-    -------
-    bool
-        `True` when test units pass below the threshold level for failing test units, `False`
-        otherwise.
-    """
-
-    data_tbl: FrameT
-    columns_subset: list[str] | None
-    threshold: int
-    tbl_type: str = "local"
-
-    def __post_init__(self):
-        if self.tbl_type == "local":
-            # Convert the DataFrame to a format that narwhals can work with, and:
-            #  - check if the `column=` exists
-            #  - check if the `column=` type is compatible with the test
-            tbl = _column_subset_test_prep(df=self.data_tbl, columns_subset=self.columns_subset)
-
-        # TODO: For Ibis backends, check if the column exists and if the column type is compatible;
-        #       for now, just pass the table as is
-        else:
-            # For remote backends (Ibis), pass the table as is since Interrogator now handles Ibis through Narwhals
-            tbl = self.data_tbl
-
-        # Collect results for the test units; the results are a list of booleans where
-        # `True` indicates a passing test unit
-        self.test_unit_res = interrogate_rows_distinct(
-            tbl=tbl,
-            columns_subset=self.columns_subset,
-        )
-
-    def get_test_results(self):
-        return self.test_unit_res
-
-
 class ConjointlyValidation:
     def __init__(self, data_tbl, expressions, threshold, tbl_type):
         self.data_tbl = data_tbl
@@ -718,7 +666,21 @@ def rows_distinct(
     """
     Check if rows in a DataFrame are distinct.
 
-    This function replaces the RowsDistinct dataclass for direct usage.
+    Parameters
+    ----------
+    data_tbl
+        A data table.
+    columns_subset
+        A list of columns to check for distinctness.
+    threshold
+        The maximum number of failing test units to allow.
+    tbl_type
+        The type of table to use for the assertion.
+
+    Returns
+    -------
+    FrameT
+        A DataFrame with a `pb_is_good_` column indicating which rows pass the test.
     """
     if tbl_type == "local":
         # Convert the DataFrame to a format that narwhals can work with, and:
@@ -788,8 +750,6 @@ def col_schema_match(
 ) -> bool:
     """
     Check if DataFrame schema matches expected schema.
-
-    This function replaces the ColSchemaMatch dataclass for direct usage.
     """
     from pointblank.schema import _check_schema_match
 
@@ -809,8 +769,6 @@ def row_count_match(
 ) -> bool:
     """
     Check if DataFrame row count matches expected count.
-
-    This function replaces the RowCountMatch dataclass for direct usage.
     """
     from pointblank.validate import get_row_count
 
@@ -830,8 +788,6 @@ def col_count_match(
 ) -> bool:
     """
     Check if DataFrame column count matches expected count.
-
-    This function replaces the ColCountMatch dataclass for direct usage.
     """
     from pointblank.validate import get_column_count
 
@@ -844,8 +800,6 @@ def col_count_match(
 def conjointly_validation(data_tbl: FrameT, expressions, threshold: int, tbl_type: str = "local"):
     """
     Perform conjoint validation using multiple expressions.
-
-    This function replaces the ConjointlyValidation dataclass for direct usage.
     """
     # Create a ConjointlyValidation instance and get the results
     conjointly_instance = ConjointlyValidation(
@@ -1650,7 +1604,7 @@ def interrogate_between(
     na_pass: bool,
     tbl_type: str = "local",
 ) -> FrameT:
-    """Between interrogation as a top-level function."""
+    """Between interrogation function."""
     import narwhals as nw
 
     from pointblank.column import Column
@@ -1728,7 +1682,7 @@ def interrogate_outside(
     na_pass: bool,
     tbl_type: str = "local",
 ) -> FrameT:
-    """Outside range interrogation as a top-level function."""
+    """Outside range interrogation function."""
     import narwhals as nw
 
     from pointblank.column import Column
@@ -1796,7 +1750,7 @@ def interrogate_outside(
 
 
 def interrogate_isin(tbl: FrameT, column: str, set_values: any, tbl_type: str = "local") -> FrameT:
-    """In set interrogation as a top-level function."""
+    """In set interrogation."""
     import narwhals as nw
 
     nw_tbl = nw.from_native(tbl)
@@ -1811,7 +1765,7 @@ def interrogate_isin(tbl: FrameT, column: str, set_values: any, tbl_type: str = 
 
 
 def interrogate_notin(tbl: FrameT, column: str, set_values: any, tbl_type: str = "local") -> FrameT:
-    """Not in set interrogation as a top-level function."""
+    """Not in set interrogation."""
     import narwhals as nw
 
     nw_tbl = nw.from_native(tbl)
@@ -1824,7 +1778,7 @@ def interrogate_notin(tbl: FrameT, column: str, set_values: any, tbl_type: str =
 def interrogate_regex(
     tbl: FrameT, column: str, pattern: str, na_pass: bool, tbl_type: str = "local"
 ) -> FrameT:
-    """Regex interrogation as a top-level function."""
+    """Regex interrogation."""
     import narwhals as nw
 
     nw_tbl = nw.from_native(tbl)
@@ -1841,7 +1795,7 @@ def interrogate_regex(
 
 
 def interrogate_null(tbl: FrameT, column: str, tbl_type: str = "local") -> FrameT:
-    """Null interrogation as a top-level function."""
+    """Null interrogation."""
     import narwhals as nw
 
     nw_tbl = nw.from_native(tbl)
@@ -1850,7 +1804,7 @@ def interrogate_null(tbl: FrameT, column: str, tbl_type: str = "local") -> Frame
 
 
 def interrogate_not_null(tbl: FrameT, column: str, tbl_type: str = "local") -> FrameT:
-    """Not null interrogation as a top-level function."""
+    """Not null interrogation."""
     import narwhals as nw
 
     nw_tbl = nw.from_native(tbl)
@@ -1936,7 +1890,7 @@ def _interrogate_comparison_base(
 
 
 def interrogate_rows_distinct(tbl: FrameT, columns_subset: list[str] | None) -> FrameT:
-    """Rows distinct interrogation as a top-level function."""
+    """Rows distinct interrogation."""
     nw_tbl = nw.from_native(tbl)
 
     # Get the column subset to use for the test
@@ -1957,7 +1911,7 @@ def interrogate_rows_distinct(tbl: FrameT, columns_subset: list[str] | None) -> 
 
 
 def interrogate_rows_complete(tbl: FrameT, columns_subset: list[str] | None) -> FrameT:
-    """Rows complete interrogation as a top-level function."""
+    """Rows complete interrogation."""
     nw_tbl = nw.from_native(tbl)
 
     # Determine the number of null values in each row (column subsets are handled in
