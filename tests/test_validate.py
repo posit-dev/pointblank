@@ -4669,6 +4669,30 @@ def test_col_vals_expr_pandas_tbl():
     )
 
 
+def test_col_vals_expr_step_report():
+    """Test that `get_step_report()` works for `col_vals_expr()` validations."""
+
+    # Polars test
+    df_pl = pl.DataFrame({"a": ["foo"], "b": ["bar"]})
+    validation_pl = Validate(data=df_pl).col_vals_expr(pl.col("a") == pl.col("b")).interrogate()
+
+    # This should not throw an exception (the original issue)
+    result_pl = validation_pl.get_step_report(1)
+    assert result_pl is not None
+
+    # Check that the expression is shown in the report
+    html_pl = result_pl.as_raw_html()
+    assert "The following column expression holds:" in html_pl
+
+    # Pandas test
+    df_pd = pd.DataFrame({"a": ["foo"], "b": ["bar"]})
+    validation_pd = Validate(data=df_pd).col_vals_expr(lambda df: df["a"] == df["b"]).interrogate()
+
+    # This should not throw an exception
+    result_pd = validation_pd.get_step_report(1)
+    assert result_pd is not None
+
+
 @pytest.mark.parametrize("tbl_fixture", TBL_LIST)
 def test_rows_distinct(request, tbl_fixture):
     tbl = request.getfixturevalue(tbl_fixture)
