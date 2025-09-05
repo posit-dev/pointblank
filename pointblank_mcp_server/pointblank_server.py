@@ -2708,29 +2708,6 @@ async def get_pointblank_api_reference(
     """
 
     validation_methods = {
-        "col_vals_not_null": {
-            "description": "Check that column values are not null/missing",
-            "parameters": {"columns": "str | list - Column name(s) to check"},
-            "example": '.col_vals_not_null(columns="email")',
-        },
-        "col_vals_between": {
-            "description": "Check that column values are within a numeric range",
-            "parameters": {
-                "columns": "str | list - Column name(s) to check",
-                "left": "float - Lower bound (inclusive by default)",
-                "right": "float - Upper bound (inclusive by default)",
-                "inclusive": "tuple[bool, bool] - (left_inclusive, right_inclusive)",
-            },
-            "example": '.col_vals_between(columns="age", left=0, right=120)',
-        },
-        "col_vals_in_set": {
-            "description": "Check that column values are in allowed set",
-            "parameters": {
-                "columns": "str | list - Column name(s) to check",
-                "set": "list - List of allowed values",
-            },
-            "example": '.col_vals_in_set(columns="status", set=["active", "inactive"])',
-        },
         "col_vals_ge": {
             "description": "Check that column values are greater than or equal to value",
             "parameters": {
@@ -2763,6 +2740,42 @@ async def get_pointblank_api_reference(
             },
             "example": '.col_vals_lt(columns="score", value=100)',
         },
+        "col_vals_null": {
+            "description": "Check that column values are null/missing",
+            "parameters": {"columns": "str | list - Column name(s) to check"},
+            "example": '.col_vals_null(columns="empty")',
+        },
+        "col_vals_not_null": {
+            "description": "Check that column values are not null/missing",
+            "parameters": {"columns": "str | list - Column name(s) to check"},
+            "example": '.col_vals_not_null(columns="email")',
+        },
+        "col_vals_between": {
+            "description": "Check that column values are within a numeric range",
+            "parameters": {
+                "columns": "str | list - Column name(s) to check",
+                "left": "float - Lower bound (inclusive by default)",
+                "right": "float - Upper bound (inclusive by default)",
+                "inclusive": "tuple[bool, bool] - (left_inclusive, right_inclusive)",
+            },
+            "example": '.col_vals_between(columns="age", left=0, right=120)',
+        },
+        "col_vals_in_set": {
+            "description": "Check that column values are in allowed set",
+            "parameters": {
+                "columns": "str | list - Column name(s) to check",
+                "set": "list - List of allowed values",
+            },
+            "example": '.col_vals_in_set(columns="status", set=["active", "inactive"])',
+        },
+        "col_vals_outside": {
+            "description": "Check that column values are outside of a specified set",
+            "parameters": {
+                "columns": "str | list - Column name(s) to check",
+                "set": "list - List of allowed values",
+            },
+            "example": '.col_vals_outside(columns="status", set=["active", "inactive"])',
+        },
         "col_vals_regex": {
             "description": "Check that column values match regex pattern",
             "parameters": {
@@ -2771,15 +2784,24 @@ async def get_pointblank_api_reference(
             },
             "example": '.col_vals_regex(columns="email", pattern=r"[^@]+@[^@]+\\.[^@]+")',
         },
-        "rows_distinct": {
-            "description": "Check that all rows in the table are unique",
-            "parameters": {},
-            "example": ".rows_distinct()",
-        },
         "col_exists": {
             "description": "Check that specified columns exist in the table",
             "parameters": {"columns": "str | list - Column name(s) to check"},
             "example": '.col_exists(columns=["name", "email", "age"])',
+        },
+        "rows_distinct": {
+            "description": "Check that all rows in the table are unique",
+            "parameters": {
+                "columns_subset": "str | list - Column name(s) for constraining uniqueness"
+            },
+            "example": ".rows_distinct()",
+        },
+        "rows_complete": {
+            "description": "Check that all rows in the table are complete (no missing values)",
+            "parameters": {
+                "columns_subset": "str | list - Column name(s) for constraining completeness"
+            },
+            "example": ".rows_complete()",
         },
     }
 
