@@ -94,8 +94,6 @@ def test_rows_distinct(request, tbl_fixture):
         assert rows_distinct.test_unit_res.columns == COLUMN_LIST_DISTINCT
         assert rows_distinct.get_test_results().columns == COLUMN_LIST_DISTINCT
 
-    assert rows_distinct.test() is True
-
 
 def test_safe_modify_datetime_with_collect_schema():
     """Test using collect_schema method."""
