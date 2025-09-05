@@ -49,12 +49,9 @@ from pointblank._interrogation import (
     ColCountMatch,
     ColExistsHasType,
     ColSchemaMatch,
-    ColValsCompareOne,
-    ColValsCompareSet,
-    ColValsCompareTwo,
     ColValsExpr,
-    ColValsRegex,
     ConjointlyValidation,
+    Interrogator,
     NumberOfTestUnits,
     RowCountMatch,
     RowsComplete,
@@ -65,6 +62,7 @@ from pointblank._typing import SegmentSpec
 from pointblank._utils import (
     _check_any_df_lib,
     _check_invalid_fields,
+    _column_test_prep,
     _count_null_values_in_column,
     _count_true_values_in_column,
     _derive_bounds,
@@ -9910,54 +9908,122 @@ class Validate:
             if assertion_category != "SPECIALLY":
                 try:
                     if assertion_category == "COMPARE_ONE":
-                        results_tbl = ColValsCompareOne(
-                            data_tbl=data_tbl_step,
+                        # Process table for column validation
+                        if tbl_type == "local":
+                            tbl = _column_test_prep(
+                                df=data_tbl_step, column=column, allowed_types=compatible_dtypes
+                            )
+                        else:
+                            # For remote backends (Ibis), pass the table as is since Interrogator handles Ibis through Narwhals
+                            tbl = data_tbl_step
+
+                        # Create Interrogator and call the appropriate method
+                        interrogator = Interrogator(
+                            x=tbl,
                             column=column,
-                            value=value,
+                            compare=value,
                             na_pass=na_pass,
-                            threshold=threshold,
-                            assertion_method=assertion_method,
-                            allowed_types=compatible_dtypes,
                             tbl_type=tbl_type,
-                        ).get_test_results()
+                        )
+
+                        if assertion_method == "gt":
+                            results_tbl = interrogator.gt()
+                        elif assertion_method == "lt":
+                            results_tbl = interrogator.lt()
+                        elif assertion_method == "eq":
+                            results_tbl = interrogator.eq()
+                        elif assertion_method == "ne":
+                            results_tbl = interrogator.ne()
+                        elif assertion_method == "ge":
+                            results_tbl = interrogator.ge()
+                        elif assertion_method == "le":
+                            results_tbl = interrogator.le()
+                        elif assertion_method == "null":
+                            results_tbl = interrogator.null()
+                        elif assertion_method == "not_null":
+                            results_tbl = interrogator.not_null()
+                        else:
+                            raise ValueError(
+                                f"Invalid assertion method: {assertion_method}. "
+                                f"Expected one of: gt, lt, eq, ne, ge, le, null, not_null"
+                            )
 
                     if assertion_category == "COMPARE_TWO":
-                        results_tbl = ColValsCompareTwo(
-                            data_tbl=data_tbl_step,
+                        # Process table for column validation
+                        if tbl_type == "local":
+                            tbl = _column_test_prep(
+                                df=data_tbl_step, column=column, allowed_types=compatible_dtypes
+                            )
+                        else:
+                            # For remote backends (Ibis), pass the table as is since Interrogator handles Ibis through Narwhals
+                            tbl = data_tbl_step
+
+                        # Create Interrogator and call the appropriate method
+                        interrogator = Interrogator(
+                            x=tbl,
                             column=column,
-                            value1=value[0],
-                            value2=value[1],
+                            low=value[0],
+                            high=value[1],
                             inclusive=inclusive,
                             na_pass=na_pass,
-                            threshold=threshold,
-                            assertion_method=assertion_method,
-                            allowed_types=compatible_dtypes,
                             tbl_type=tbl_type,
-                        ).get_test_results()
+                        )
+
+                        if assertion_method == "between":
+                            results_tbl = interrogator.between()
+                        elif assertion_method == "outside":
+                            results_tbl = interrogator.outside()
+                        else:
+                            raise ValueError(
+                                f"Invalid assertion method: {assertion_method}. "
+                                f"Expected one of: between, outside"
+                            )
 
                     if assertion_category == "COMPARE_SET":
+                        # Process table for column validation
+                        if tbl_type == "local":
+                            tbl = _column_test_prep(
+                                df=data_tbl_step, column=column, allowed_types=compatible_dtypes
+                            )
+                        else:
+                            # For remote backends (Ibis), pass the table as is since Interrogator handles Ibis through Narwhals
+                            tbl = data_tbl_step
+
                         inside = True if assertion_method == "in_set" else False
 
-                        results_tbl = ColValsCompareSet(
-                            data_tbl=data_tbl_step,
+                        # Create Interrogator and call the appropriate method
+                        interrogator = Interrogator(
+                            x=tbl,
                             column=column,
-                            values=value,
-                            threshold=threshold,
-                            inside=inside,
-                            allowed_types=compatible_dtypes,
+                            set=value,
                             tbl_type=tbl_type,
-                        ).get_test_results()
+                        )
+
+                        if inside:
+                            results_tbl = interrogator.isin()
+                        else:
+                            results_tbl = interrogator.notin()
 
                     if assertion_category == "COMPARE_REGEX":
-                        results_tbl = ColValsRegex(
-                            data_tbl=data_tbl_step,
+                        # Process table for column validation
+                        if tbl_type == "local":
+                            tbl = _column_test_prep(
+                                df=data_tbl_step, column=column, allowed_types=compatible_dtypes
+                            )
+                        else:
+                            # For remote backends (Ibis), pass the table as is since Interrogator handles Ibis through Narwhals
+                            tbl = data_tbl_step
+
+                        # Create Interrogator and call the regex method
+                        interrogator = Interrogator(
+                            x=tbl,
                             column=column,
                             pattern=value,
                             na_pass=na_pass,
-                            threshold=threshold,
-                            allowed_types=compatible_dtypes,
                             tbl_type=tbl_type,
-                        ).get_test_results()
+                        )
+
+                        results_tbl = interrogator.regex()
 
                     if assertion_category == "COMPARE_EXPR":
                         results_tbl = ColValsExpr(
