@@ -785,9 +785,6 @@ def interrogate_le(tbl: FrameT, column: str, compare: any, na_pass: bool) -> Fra
 
 def interrogate_eq(tbl: FrameT, column: str, compare: any, na_pass: bool) -> FrameT:
     """Equal interrogation."""
-    import narwhals as nw
-
-    from pointblank.column import Column
 
     nw_tbl = nw.from_native(tbl)
 
@@ -977,10 +974,7 @@ def interrogate_eq(tbl: FrameT, column: str, compare: any, na_pass: bool) -> Fra
 
 
 def interrogate_ne(tbl: FrameT, column: str, compare: any, na_pass: bool) -> FrameT:
-    """Not equal interrogation as a top-level function."""
-    import narwhals as nw
-
-    from pointblank.column import Column
+    """Not equal interrogation."""
 
     nw_tbl = nw.from_native(tbl)
 
@@ -1538,9 +1532,6 @@ def interrogate_between(
     tbl: FrameT, column: str, low: any, high: any, inclusive: tuple, na_pass: bool
 ) -> FrameT:
     """Between interrogation."""
-    import narwhals as nw
-
-    from pointblank.column import Column
 
     low_val = _get_compare_expr_nw(compare=low)
     high_val = _get_compare_expr_nw(compare=high)
@@ -1610,9 +1601,6 @@ def interrogate_outside(
     tbl: FrameT, column: str, low: any, high: any, inclusive: tuple, na_pass: bool
 ) -> FrameT:
     """Outside range interrogation."""
-    import narwhals as nw
-
-    from pointblank.column import Column
 
     low_val = _get_compare_expr_nw(compare=low)
     high_val = _get_compare_expr_nw(compare=high)
@@ -1678,7 +1666,6 @@ def interrogate_outside(
 
 def interrogate_isin(tbl: FrameT, column: str, set_values: any) -> FrameT:
     """In set interrogation."""
-    import narwhals as nw
 
     nw_tbl = nw.from_native(tbl)
 
@@ -1693,7 +1680,6 @@ def interrogate_isin(tbl: FrameT, column: str, set_values: any) -> FrameT:
 
 def interrogate_notin(tbl: FrameT, column: str, set_values: any) -> FrameT:
     """Not in set interrogation."""
-    import narwhals as nw
 
     nw_tbl = nw.from_native(tbl)
     result_tbl = nw_tbl.with_columns(
@@ -1704,7 +1690,6 @@ def interrogate_notin(tbl: FrameT, column: str, set_values: any) -> FrameT:
 
 def interrogate_regex(tbl: FrameT, column: str, pattern: str, na_pass: bool) -> FrameT:
     """Regex interrogation."""
-    import narwhals as nw
 
     nw_tbl = nw.from_native(tbl)
     result_tbl = nw_tbl.with_columns(
@@ -1721,7 +1706,6 @@ def interrogate_regex(tbl: FrameT, column: str, pattern: str, na_pass: bool) -> 
 
 def interrogate_null(tbl: FrameT, column: str) -> FrameT:
     """Null interrogation."""
-    import narwhals as nw
 
     nw_tbl = nw.from_native(tbl)
     result_tbl = nw_tbl.with_columns(pb_is_good_=nw.col(column).is_null())
@@ -1730,7 +1714,6 @@ def interrogate_null(tbl: FrameT, column: str) -> FrameT:
 
 def interrogate_not_null(tbl: FrameT, column: str) -> FrameT:
     """Not null interrogation."""
-    import narwhals as nw
 
     nw_tbl = nw.from_native(tbl)
     result_tbl = nw_tbl.with_columns(pb_is_good_=~nw.col(column).is_null())
@@ -1761,9 +1744,6 @@ def _interrogate_comparison_base(
     FrameT
         The result table with `pb_is_good_` column indicating the passing test units.
     """
-    import narwhals as nw
-
-    from pointblank.column import Column
 
     compare_expr = _get_compare_expr_nw(compare=compare)
 

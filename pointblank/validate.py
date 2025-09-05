@@ -9918,7 +9918,7 @@ class Validate:
             # Apply error handling only to data quality validations, not programming error validations
             if assertion_type != "specially":
                 try:
-                    # COMPARE_ONE validations: gt, lt, eq, ne, ge, le, null, not_null
+                    # validations requiring `_column_test_prep()`
                     if assertion_type in [
                         "col_vals_gt",
                         "col_vals_lt",
@@ -9928,13 +9928,17 @@ class Validate:
                         "col_vals_le",
                         "col_vals_null",
                         "col_vals_not_null",
+                        "col_vals_between",
+                        "col_vals_outside",
+                        "col_vals_in_set",
+                        "col_vals_not_in_set",
+                        "col_vals_regex",
                     ]:
-                        # Process table for column validation (Narwhals handles all backends)
+                        # Process table for column validation
                         tbl = _column_test_prep(
                             df=data_tbl_step, column=column, allowed_types=compatible_dtypes
                         )
 
-                        # Call the appropriate top-level function
                         if assertion_method == "gt":
                             results_tbl = interrogate_gt(
                                 tbl=tbl, column=column, compare=value, na_pass=na_pass
@@ -9963,74 +9967,53 @@ class Validate:
                             results_tbl = interrogate_null(tbl=tbl, column=column)
                         elif assertion_method == "not_null":
                             results_tbl = interrogate_not_null(tbl=tbl, column=column)
-                        else:
-                            raise ValueError(
-                                f"Invalid assertion method: {assertion_method}. "
-                                f"Expected one of: gt, lt, eq, ne, ge, le, null, not_null"
-                            )
 
-                    # COMPARE_TWO validations: between, outside
-                    elif assertion_type in ["col_vals_between", "col_vals_outside"]:
-                        # Process table for column validation (Narwhals handles all backends)
-                        tbl = _column_test_prep(
-                            df=data_tbl_step, column=column, allowed_types=compatible_dtypes
-                        )
-
-                        # Call the appropriate top-level function
-                        if assertion_method == "between":
+                        elif assertion_type == "col_vals_between":
                             results_tbl = interrogate_between(
-                                tbl, column, value[0], value[1], inclusive, na_pass
+                                tbl=tbl,
+                                column=column,
+                                low=value[0],
+                                high=value[1],
+                                inclusive=inclusive,
+                                na_pass=na_pass,
                             )
-                        elif assertion_method == "outside":
+
+                        elif assertion_type == "col_vals_outside":
                             results_tbl = interrogate_outside(
-                                tbl, column, value[0], value[1], inclusive, na_pass
+                                tbl=tbl,
+                                column=column,
+                                low=value[0],
+                                high=value[1],
+                                inclusive=inclusive,
+                                na_pass=na_pass,
                             )
-                        else:
-                            raise ValueError(
-                                f"Invalid assertion method: {assertion_method}. "
-                                f"Expected one of: between, outside"
+
+                        elif assertion_type == "col_vals_in_set":
+                            results_tbl = interrogate_isin(tbl=tbl, column=column, set_values=value)
+
+                        elif assertion_type == "col_vals_not_in_set":
+                            results_tbl = interrogate_notin(
+                                tbl=tbl, column=column, set_values=value
                             )
 
-                    # COMPARE_SET validations: in_set, not_in_set
-                    elif assertion_type in ["col_vals_in_set", "col_vals_not_in_set"]:
-                        # Process table for column validation (Narwhals handles all backends)
-                        tbl = _column_test_prep(
-                            df=data_tbl_step, column=column, allowed_types=compatible_dtypes
-                        )
+                        elif assertion_type == "col_vals_regex":
+                            results_tbl = interrogate_regex(
+                                tbl=tbl, column=column, pattern=value, na_pass=na_pass
+                            )
 
-                        # Call the appropriate top-level function
-                        if assertion_method == "in_set":
-                            results_tbl = interrogate_isin(tbl, column, value)
-                        else:
-                            results_tbl = interrogate_notin(tbl, column, value)
-
-                    # COMPARE_REGEX validation: regex
-                    elif assertion_type == "col_vals_regex":
-                        # Process table for column validation (Narwhals handles all backends)
-                        tbl = _column_test_prep(
-                            df=data_tbl_step, column=column, allowed_types=compatible_dtypes
-                        )
-
-                        # Call the regex function
-                        results_tbl = interrogate_regex(tbl, column, value, na_pass)
-
-                    # COMPARE_EXPR validation: expr
                     elif assertion_type == "col_vals_expr":
                         results_tbl = col_vals_expr(
                             data_tbl=data_tbl_step, expr=value, tbl_type=tbl_type
                         )
 
-                    # ROWS_DISTINCT validation
                     elif assertion_type == "rows_distinct":
                         results_tbl = interrogate_rows_distinct(
                             data_tbl=data_tbl_step, columns_subset=column
                         )
 
-                    # ROWS_COMPLETE validation
                     elif assertion_type == "rows_complete":
                         results_tbl = rows_complete(data_tbl=data_tbl_step, columns_subset=column)
 
-                    # COL_EXISTS validation
                     elif assertion_type == "col_exists":
                         result_bool = col_exists(
                             data_tbl=data_tbl_step,
@@ -10044,7 +10027,6 @@ class Validate:
 
                         results_tbl = None
 
-                    # COL_SCHEMA_MATCH validation
                     elif assertion_type == "col_schema_match":
                         result_bool = col_schema_match(
                             data_tbl=data_tbl_step,
@@ -10078,7 +10060,6 @@ class Validate:
 
                         results_tbl = None
 
-                    # ROW_COUNT_MATCH validation
                     elif assertion_type == "row_count_match":
                         result_bool = row_count_match(
                             data_tbl=data_tbl_step,
@@ -10094,7 +10075,6 @@ class Validate:
 
                         results_tbl = None
 
-                    # COL_COUNT_MATCH validation
                     elif assertion_type == "col_count_match":
                         result_bool = col_count_match(
                             data_tbl=data_tbl_step, count=value["count"], inverse=value["inverse"]
@@ -10107,7 +10087,6 @@ class Validate:
 
                         results_tbl = None
 
-                    # CONJOINTLY validation
                     elif assertion_type == "conjointly":
                         results_tbl = conjointly_validation(
                             data_tbl=data_tbl_step,
