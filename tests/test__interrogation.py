@@ -4,7 +4,6 @@ import polars as pl
 from unittest.mock import Mock, patch
 
 from pointblank._interrogation import (
-    ColValsExpr,
     col_exists,
     RowsDistinct,
     _safe_modify_datetime_compare_val,

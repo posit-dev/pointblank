@@ -157,69 +157,6 @@ def _safe_is_nan_or_null_expr(data_frame: Any, column_expr: Any, column_name: st
 
 
 @dataclass
-class ColValsExpr:
-    """
-    Check if values in a column evaluate to True for a given predicate expression.
-
-    Parameters
-    ----------
-    data_tbl
-        A data table.
-    expr
-        The expression to check against.
-    threshold
-        The maximum number of failing test units to allow.
-    tbl_type
-        The type of table to use for the assertion.
-
-    Returns
-    -------
-    bool
-        `True` when test units pass below the threshold level for failing test units, `False`
-        otherwise.
-    """
-
-    data_tbl: FrameT
-    expr: str
-    threshold: int
-    tbl_type: str = "local"
-
-    def __post_init__(self):
-        if self.tbl_type == "local":
-            # Check the type of expression provided
-            if "narwhals" in str(type(self.expr)) and "expr" in str(type(self.expr)):
-                expression_type = "narwhals"
-            elif "polars" in str(type(self.expr)) and "expr" in str(type(self.expr)):
-                expression_type = "polars"
-            else:
-                expression_type = "pandas"
-
-            # Determine whether this is a Pandas or Polars table
-            tbl_type = _get_tbl_type(data=self.data_tbl)
-
-            df_lib_name = "polars" if "polars" in tbl_type else "pandas"
-
-            if expression_type == "narwhals":
-                tbl_nw = _convert_to_narwhals(df=self.data_tbl)
-                tbl_nw = tbl_nw.with_columns(pb_is_good_=self.expr)
-                tbl = tbl_nw.to_native()
-                self.test_unit_res = tbl
-
-                return self
-
-            if df_lib_name == "polars" and expression_type == "polars":
-                self.test_unit_res = self.data_tbl.with_columns(pb_is_good_=self.expr)
-
-            if df_lib_name == "pandas" and expression_type == "pandas":
-                self.test_unit_res = self.data_tbl.assign(pb_is_good_=self.expr)
-
-            return self
-
-    def get_test_results(self):
-        return self.test_unit_res
-
-
-@dataclass
 class RowsDistinct:
     """
     Check if rows in a DataFrame are distinct.
@@ -745,17 +682,8 @@ def _modify_datetime_compare_val(tgt_column: any, compare_val: any) -> any:
     return compare_expr
 
 
-# ============================================================================
-# New simplified functions to replace dataclass wrappers
-# ============================================================================
-
-
 def col_vals_expr(data_tbl: FrameT, expr, threshold: int, tbl_type: str = "local"):
-    """
-    Check if values in a column evaluate to True for a given predicate expression.
-
-    This function replaces the ColValsExpr dataclass for direct usage.
-    """
+    """Check if values in a column evaluate to True for a given predicate expression."""
     if tbl_type == "local":
         # Check the type of expression provided
         if "narwhals" in str(type(expr)) and "expr" in str(type(expr)):
