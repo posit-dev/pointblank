@@ -2547,6 +2547,73 @@ def test_col_vals_ne(request, tbl_fixture):
 
 
 @pytest.mark.parametrize("tbl_fixture", TBL_MISSING_LIST)
+def test_col_vals_eq_string(request, tbl_fixture):
+    """Test `col_vals_eq()` with string values (numeric columns cast to string)."""
+    import narwhals as nw
+
+    tbl = request.getfixturevalue(tbl_fixture)
+
+    # Convert numeric column to string for string comparison testing
+    tbl_nw = nw.from_native(tbl)
+    tbl_str = tbl_nw.with_columns(z_str=nw.col("z").cast(nw.String))
+    tbl_with_str = nw.to_native(tbl_str)
+
+    # Test string equality: `z` column has values [8, None, 8, 8], so `8` should match 3 rows
+    validation_1 = Validate(tbl_with_str).col_vals_eq(columns="z_str", value="8").interrogate()
+
+    # Check that validation runs successfully
+    assert validation_1.validation_info[0].active is True
+    assert validation_1.validation_info[0].eval_error is None
+    assert validation_1.n_passed(i=1, scalar=True) == 3  # Three "8"s match
+    assert validation_1.n_failed(i=1, scalar=True) == 1  # One non-matching value
+
+    # Test string equality with `na_pass=True`: behavior may vary by backend
+    validation_2 = (
+        Validate(tbl_with_str).col_vals_eq(columns="z_str", value="8", na_pass=True).interrogate()
+    )
+
+    # Check that validation runs successfully
+    assert validation_2.validation_info[0].active is True
+    assert validation_2.validation_info[0].eval_error is None
+    # Note: na_pass behavior may differ between backends for string casting
+    assert validation_2.n_passed(i=1, scalar=True) >= 3  # At least the three `8`s should pass
+
+
+@pytest.mark.parametrize("tbl_fixture", TBL_MISSING_LIST)
+def test_col_vals_ne_string(request, tbl_fixture):
+    """Test `col_vals_ne()` with string values (numeric columns cast to string)."""
+    import narwhals as nw
+
+    tbl = request.getfixturevalue(tbl_fixture)
+
+    # Convert numeric column to string for string comparison testing
+    tbl_nw = nw.from_native(tbl)
+    tbl_str = tbl_nw.with_columns(z_str=nw.col("z").cast(nw.String))
+    tbl_with_str = nw.to_native(tbl_str)
+
+    # Test string inequality: `z` column has values [8, None, 8, 8], so `9` != should
+    # match all non-Null rows
+    validation_1 = Validate(tbl_with_str).col_vals_ne(columns="z_str", value="9").interrogate()
+
+    # Check that validation runs successfully
+    assert validation_1.validation_info[0].active is True
+    assert validation_1.validation_info[0].eval_error is None
+    assert validation_1.n_passed(i=1, scalar=True) >= 3  # At least the three `8`s are != `9`
+    assert validation_1.n_failed(i=1, scalar=True) <= 1  # At most one failing value
+
+    # Test string inequality with na_pass=True
+    validation_2 = (
+        Validate(tbl_with_str).col_vals_ne(columns="z_str", value="9", na_pass=True).interrogate()
+    )
+
+    # Check that validation runs successfully
+    assert validation_2.validation_info[0].active is True
+    assert validation_2.validation_info[0].eval_error is None
+    assert validation_2.n_passed(i=1, scalar=True) >= 3  # At least the three `8`s should pass
+    assert validation_2.n_failed(i=1, scalar=True) <= 1  # At most one failure
+
+
+@pytest.mark.parametrize("tbl_fixture", TBL_MISSING_LIST)
 def test_col_vals_ge(request, tbl_fixture):
     tbl = request.getfixturevalue(tbl_fixture)
 
@@ -2558,7 +2625,6 @@ def test_col_vals_ge(request, tbl_fixture):
     validation_2 = Validate(tbl).col_vals_ge(columns="x", value=1, na_pass=True).interrogate()
 
     assert validation_2.n_passed(i=1, scalar=True) == 4
-    # assert validation_2.n_failed(i=1, scalar=True) == 0
 
 
 @pytest.mark.parametrize("tbl_fixture", TBL_MISSING_LIST)

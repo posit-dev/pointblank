@@ -4736,7 +4736,8 @@ class Validate:
         _check_boolean_input(param=active, param_name="active")
 
         # If value is a string-based date or datetime, convert it to the appropriate type
-        value = _string_date_dttm_conversion(value=value)
+        # Allow regular strings to pass through for string comparisons
+        value = _conditional_string_date_dttm_conversion(value=value, allow_regular_strings=True)
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
@@ -5024,7 +5025,8 @@ class Validate:
         _check_boolean_input(param=active, param_name="active")
 
         # If value is a string-based date or datetime, convert it to the appropriate type
-        value = _string_date_dttm_conversion(value=value)
+        # Allow regular strings to pass through for string comparisons
+        value = _conditional_string_date_dttm_conversion(value=value, allow_regular_strings=True)
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
@@ -9904,197 +9906,227 @@ class Validate:
             # Validation stage
             # ------------------------------------------------
 
-            if assertion_category == "COMPARE_ONE":
-                results_tbl = ColValsCompareOne(
-                    data_tbl=data_tbl_step,
-                    column=column,
-                    value=value,
-                    na_pass=na_pass,
-                    threshold=threshold,
-                    assertion_method=assertion_method,
-                    allowed_types=compatible_dtypes,
-                    tbl_type=tbl_type,
-                ).get_test_results()
+            # Apply error handling only to data quality validations, not programming error validations
+            if assertion_category != "SPECIALLY":
+                try:
+                    if assertion_category == "COMPARE_ONE":
+                        results_tbl = ColValsCompareOne(
+                            data_tbl=data_tbl_step,
+                            column=column,
+                            value=value,
+                            na_pass=na_pass,
+                            threshold=threshold,
+                            assertion_method=assertion_method,
+                            allowed_types=compatible_dtypes,
+                            tbl_type=tbl_type,
+                        ).get_test_results()
 
-            if assertion_category == "COMPARE_TWO":
-                results_tbl = ColValsCompareTwo(
-                    data_tbl=data_tbl_step,
-                    column=column,
-                    value1=value[0],
-                    value2=value[1],
-                    inclusive=inclusive,
-                    na_pass=na_pass,
-                    threshold=threshold,
-                    assertion_method=assertion_method,
-                    allowed_types=compatible_dtypes,
-                    tbl_type=tbl_type,
-                ).get_test_results()
+                    if assertion_category == "COMPARE_TWO":
+                        results_tbl = ColValsCompareTwo(
+                            data_tbl=data_tbl_step,
+                            column=column,
+                            value1=value[0],
+                            value2=value[1],
+                            inclusive=inclusive,
+                            na_pass=na_pass,
+                            threshold=threshold,
+                            assertion_method=assertion_method,
+                            allowed_types=compatible_dtypes,
+                            tbl_type=tbl_type,
+                        ).get_test_results()
 
-            if assertion_category == "COMPARE_SET":
-                inside = True if assertion_method == "in_set" else False
+                    if assertion_category == "COMPARE_SET":
+                        inside = True if assertion_method == "in_set" else False
 
-                results_tbl = ColValsCompareSet(
-                    data_tbl=data_tbl_step,
-                    column=column,
-                    values=value,
-                    threshold=threshold,
-                    inside=inside,
-                    allowed_types=compatible_dtypes,
-                    tbl_type=tbl_type,
-                ).get_test_results()
+                        results_tbl = ColValsCompareSet(
+                            data_tbl=data_tbl_step,
+                            column=column,
+                            values=value,
+                            threshold=threshold,
+                            inside=inside,
+                            allowed_types=compatible_dtypes,
+                            tbl_type=tbl_type,
+                        ).get_test_results()
 
-            if assertion_category == "COMPARE_REGEX":
-                results_tbl = ColValsRegex(
-                    data_tbl=data_tbl_step,
-                    column=column,
-                    pattern=value,
-                    na_pass=na_pass,
-                    threshold=threshold,
-                    allowed_types=compatible_dtypes,
-                    tbl_type=tbl_type,
-                ).get_test_results()
+                    if assertion_category == "COMPARE_REGEX":
+                        results_tbl = ColValsRegex(
+                            data_tbl=data_tbl_step,
+                            column=column,
+                            pattern=value,
+                            na_pass=na_pass,
+                            threshold=threshold,
+                            allowed_types=compatible_dtypes,
+                            tbl_type=tbl_type,
+                        ).get_test_results()
 
-            if assertion_category == "COMPARE_EXPR":
-                results_tbl = ColValsExpr(
-                    data_tbl=data_tbl_step,
-                    expr=value,
-                    threshold=threshold,
-                    tbl_type=tbl_type,
-                ).get_test_results()
+                    if assertion_category == "COMPARE_EXPR":
+                        results_tbl = ColValsExpr(
+                            data_tbl=data_tbl_step,
+                            expr=value,
+                            threshold=threshold,
+                            tbl_type=tbl_type,
+                        ).get_test_results()
 
-            if assertion_category == "ROWS_DISTINCT":
-                results_tbl = RowsDistinct(
-                    data_tbl=data_tbl_step,
-                    columns_subset=column,
-                    threshold=threshold,
-                    tbl_type=tbl_type,
-                ).get_test_results()
+                    if assertion_category == "ROWS_DISTINCT":
+                        results_tbl = RowsDistinct(
+                            data_tbl=data_tbl_step,
+                            columns_subset=column,
+                            threshold=threshold,
+                            tbl_type=tbl_type,
+                        ).get_test_results()
 
-            if assertion_category == "ROWS_COMPLETE":
-                results_tbl = RowsComplete(
-                    data_tbl=data_tbl_step,
-                    columns_subset=column,
-                    threshold=threshold,
-                    tbl_type=tbl_type,
-                ).get_test_results()
+                    if assertion_category == "ROWS_COMPLETE":
+                        results_tbl = RowsComplete(
+                            data_tbl=data_tbl_step,
+                            columns_subset=column,
+                            threshold=threshold,
+                            tbl_type=tbl_type,
+                        ).get_test_results()
 
-            if assertion_category == "COL_EXISTS_HAS_TYPE":
-                result_bool = ColExistsHasType(
-                    data_tbl=data_tbl_step,
-                    column=column,
-                    threshold=threshold,
-                    assertion_method="exists",
-                    tbl_type=tbl_type,
-                ).get_test_results()
+                    if assertion_category == "COL_EXISTS_HAS_TYPE":
+                        result_bool = ColExistsHasType(
+                            data_tbl=data_tbl_step,
+                            column=column,
+                            threshold=threshold,
+                            assertion_method="exists",
+                            tbl_type=tbl_type,
+                        ).get_test_results()
 
-                validation.all_passed = result_bool
-                validation.n = 1
-                validation.n_passed = result_bool
-                validation.n_failed = 1 - result_bool
+                        validation.all_passed = result_bool
+                        validation.n = 1
+                        validation.n_passed = result_bool
+                        validation.n_failed = 1 - result_bool
 
-                results_tbl = None
+                        results_tbl = None
 
-            if assertion_category == "COL_SCHEMA_MATCH":
-                result_bool = ColSchemaMatch(
-                    data_tbl=data_tbl_step,
-                    schema=value["schema"],
-                    complete=value["complete"],
-                    in_order=value["in_order"],
-                    case_sensitive_colnames=value["case_sensitive_colnames"],
-                    case_sensitive_dtypes=value["case_sensitive_dtypes"],
-                    full_match_dtypes=value["full_match_dtypes"],
-                    threshold=threshold,
-                ).get_test_results()
+                    if assertion_category == "COL_SCHEMA_MATCH":
+                        result_bool = ColSchemaMatch(
+                            data_tbl=data_tbl_step,
+                            schema=value["schema"],
+                            complete=value["complete"],
+                            in_order=value["in_order"],
+                            case_sensitive_colnames=value["case_sensitive_colnames"],
+                            case_sensitive_dtypes=value["case_sensitive_dtypes"],
+                            full_match_dtypes=value["full_match_dtypes"],
+                            threshold=threshold,
+                        ).get_test_results()
 
-                schema_validation_info = _get_schema_validation_info(
-                    data_tbl=data_tbl,
-                    schema=value["schema"],
-                    passed=result_bool,
-                    complete=value["complete"],
-                    in_order=value["in_order"],
-                    case_sensitive_colnames=value["case_sensitive_colnames"],
-                    case_sensitive_dtypes=value["case_sensitive_dtypes"],
-                    full_match_dtypes=value["full_match_dtypes"],
-                )
+                        schema_validation_info = _get_schema_validation_info(
+                            data_tbl=data_tbl,
+                            schema=value["schema"],
+                            passed=result_bool,
+                            complete=value["complete"],
+                            in_order=value["in_order"],
+                            case_sensitive_colnames=value["case_sensitive_colnames"],
+                            case_sensitive_dtypes=value["case_sensitive_dtypes"],
+                            full_match_dtypes=value["full_match_dtypes"],
+                        )
 
-                # Add the schema validation info to the validation object
-                validation.val_info = schema_validation_info
+                        # Add the schema validation info to the validation object
+                        validation.val_info = schema_validation_info
 
-                validation.all_passed = result_bool
-                validation.n = 1
-                validation.n_passed = int(result_bool)
-                validation.n_failed = 1 - result_bool
+                        validation.all_passed = result_bool
+                        validation.n = 1
+                        validation.n_passed = int(result_bool)
+                        validation.n_failed = 1 - result_bool
 
-                results_tbl = None
+                        results_tbl = None
 
-            if assertion_category == "ROW_COUNT_MATCH":
-                result_bool = RowCountMatch(
-                    data_tbl=data_tbl_step,
-                    count=value["count"],
-                    inverse=value["inverse"],
-                    threshold=threshold,
-                    abs_tol_bounds=value["abs_tol_bounds"],
-                    tbl_type=tbl_type,
-                ).get_test_results()
+                    if assertion_category == "ROW_COUNT_MATCH":
+                        result_bool = RowCountMatch(
+                            data_tbl=data_tbl_step,
+                            count=value["count"],
+                            inverse=value["inverse"],
+                            threshold=threshold,
+                            abs_tol_bounds=value["abs_tol_bounds"],
+                            tbl_type=tbl_type,
+                        ).get_test_results()
 
-                validation.all_passed = result_bool
-                validation.n = 1
-                validation.n_passed = int(result_bool)
-                validation.n_failed = 1 - result_bool
+                        validation.all_passed = result_bool
+                        validation.n = 1
+                        validation.n_passed = int(result_bool)
+                        validation.n_failed = 1 - result_bool
 
-                results_tbl = None
+                        results_tbl = None
 
-            if assertion_category == "COL_COUNT_MATCH":
-                result_bool = ColCountMatch(
-                    data_tbl=data_tbl_step,
-                    count=value["count"],
-                    inverse=value["inverse"],
-                    threshold=threshold,
-                    tbl_type=tbl_type,
-                ).get_test_results()
+                    if assertion_category == "COL_COUNT_MATCH":
+                        result_bool = ColCountMatch(
+                            data_tbl=data_tbl_step,
+                            count=value["count"],
+                            inverse=value["inverse"],
+                            threshold=threshold,
+                            tbl_type=tbl_type,
+                        ).get_test_results()
 
-                validation.all_passed = result_bool
-                validation.n = 1
-                validation.n_passed = int(result_bool)
-                validation.n_failed = 1 - result_bool
+                        validation.all_passed = result_bool
+                        validation.n = 1
+                        validation.n_passed = int(result_bool)
+                        validation.n_failed = 1 - result_bool
 
-                results_tbl = None
+                        results_tbl = None
 
-            if assertion_category == "CONJOINTLY":
-                results_tbl = ConjointlyValidation(
-                    data_tbl=data_tbl_step,
-                    expressions=value["expressions"],
-                    threshold=threshold,
-                    tbl_type=tbl_type,
-                ).get_test_results()
+                    if assertion_category == "CONJOINTLY":
+                        results_tbl = ConjointlyValidation(
+                            data_tbl=data_tbl_step,
+                            expressions=value["expressions"],
+                            threshold=threshold,
+                            tbl_type=tbl_type,
+                        ).get_test_results()
 
-            if assertion_category == "SPECIALLY":
-                results_tbl_list = SpeciallyValidation(
-                    data_tbl=data_tbl_step,
-                    expression=value,
-                    threshold=threshold,
-                    tbl_type=tbl_type,
-                ).get_test_results()
+                except Exception as e:
+                    # Only catch specific data quality comparison errors, not programming errors
+                    error_msg = str(e).lower()
+                    is_comparison_error = (
+                        "boolean value of na is ambiguous" in error_msg
+                        or "cannot compare" in error_msg
+                        or (
+                            "type" in error_msg
+                            and ("mismatch" in error_msg or "incompatible" in error_msg)
+                        )
+                        or ("dtype" in error_msg and "compare" in error_msg)
+                    )
 
-                #
-                # The result from this could either be a table in the conventional form, or,
-                # a list of boolean values; handle both cases
-                #
+                    if is_comparison_error:
+                        # If data quality comparison fails, mark the validation as having an eval_error
+                        validation.eval_error = True
+                        end_time = datetime.datetime.now(datetime.timezone.utc)
+                        validation.proc_duration_s = (end_time - start_time).total_seconds()
+                        validation.time_processed = end_time.isoformat(timespec="milliseconds")
+                        validation.active = False
+                        continue
+                    else:
+                        # For other errors (like missing columns), let them propagate
+                        raise
 
-                if isinstance(results_tbl_list, list):
-                    # If the result is a list of boolean values, then we need to convert it to a
-                    # set the validation results from the list
-                    validation.all_passed = all(results_tbl_list)
-                    validation.n = len(results_tbl_list)
-                    validation.n_passed = results_tbl_list.count(True)
-                    validation.n_failed = results_tbl_list.count(False)
+            else:
+                # For "SPECIALLY" validations, let programming errors propagate as exceptions
+                if assertion_category == "SPECIALLY":
+                    results_tbl_list = SpeciallyValidation(
+                        data_tbl=data_tbl_step,
+                        expression=value,
+                        threshold=threshold,
+                        tbl_type=tbl_type,
+                    ).get_test_results()
 
-                    results_tbl = None
+                    #
+                    # The result from this could either be a table in the conventional form, or,
+                    # a list of boolean values; handle both cases
+                    #
 
-                else:
-                    # If the result is not a list, then we assume it's a table in the conventional
-                    # form (where the column is `pb_is_good_` exists, with boolean values
-                    results_tbl = results_tbl_list
+                    if isinstance(results_tbl_list, list):
+                        # If the result is a list of boolean values, then we need to convert it to a
+                        # set the validation results from the list
+                        validation.all_passed = all(results_tbl_list)
+                        validation.n = len(results_tbl_list)
+                        validation.n_passed = results_tbl_list.count(True)
+                        validation.n_failed = results_tbl_list.count(False)
+
+                        results_tbl = None
+
+                    else:
+                        # If the result is not a list, then we assume it's a table in the conventional
+                        # form (where the column is `pb_is_good_` exists, with boolean values
+                        results_tbl = results_tbl_list
 
             # If the results table is not `None`, then we assume there is a table with a column
             # called `pb_is_good_` that contains boolean values; we can then use this table to
@@ -13700,6 +13732,48 @@ def _string_date_dttm_conversion(value: any) -> any:
             raise ValueError(
                 "If `value=` is provided as a string it must be a date or datetime string."
             )
+
+    return value
+
+
+def _conditional_string_date_dttm_conversion(
+    value: any, allow_regular_strings: bool = False
+) -> any:
+    """
+    Conditionally convert a string to a date or datetime object if it is in the correct format. If
+    `allow_regular_strings=` is `True`, regular strings are allowed to pass through unchanged. If
+    the value is not a string, it is returned as is.
+
+    Parameters
+    ----------
+    value
+        The value to convert. It can be a string, date, or datetime object.
+    allow_regular_strings
+        If `True`, regular strings (non-date/datetime) are allowed to pass through unchanged. If
+        `False`, behaves like `_string_date_dttm_conversion()` and raises `ValueError` for regular
+        strings.
+
+    Returns
+    -------
+    any
+        The converted date or datetime object, or the original value.
+
+    Raises
+    ------
+    ValueError
+        If allow_regular_strings is False and the string cannot be converted to a date or datetime.
+    """
+
+    if isinstance(value, str):
+        if _is_string_date(value):
+            value = _convert_string_to_date(value)
+        elif _is_string_datetime(value):
+            value = _convert_string_to_datetime(value)
+        elif not allow_regular_strings:
+            raise ValueError(
+                "If `value=` is provided as a string it must be a date or datetime string."
+            )
+        # If allow_regular_strings is True, regular strings pass through unchanged
 
     return value
 

@@ -329,20 +329,106 @@ class Interrogator:
             )
 
             if is_pandas_dataframe(tbl.to_native()):
-                tbl = tbl.with_columns(
-                    pb_is_good_4=nw.col(self.column) - compare_expr,
-                )
+                # For Pandas, handle potential NA comparison issues
+                try:
+                    tbl = tbl.with_columns(
+                        pb_is_good_4=nw.col(self.column) == compare_expr,
+                    )
+                except (TypeError, ValueError) as e:
+                    # Handle Pandas NA comparison issues
+                    if "boolean value of NA is ambiguous" in str(e):
+                        # Work around Pandas NA comparison issue by using Null checks first
+                        tbl = tbl.with_columns(
+                            pb_is_good_4_tmp=(
+                                # Both Null: True (they're equal)
+                                (
+                                    nw.col(self.column).is_null()
+                                    & nw.col(self.compare.name).is_null()
+                                )
+                                |
+                                # Both not Null and values are equal: use string conversion
+                                # as a fallback
+                                (
+                                    (
+                                        ~nw.col(self.column).is_null()
+                                        & ~nw.col(self.compare.name).is_null()
+                                    )
+                                    & (
+                                        nw.col(self.column).cast(nw.String)
+                                        == nw.col(self.compare.name).cast(nw.String)
+                                    )
+                                )
+                            )
+                        )
+                        tbl = tbl.rename({"pb_is_good_4_tmp": "pb_is_good_4"})
+                    elif "cannot compare" in str(e).lower():
+                        # Handle genuine type incompatibility
+                        native_df = tbl.to_native()
+                        col_dtype = str(native_df[self.column].dtype)
+                        compare_dtype = str(native_df[self.compare.name].dtype)
+
+                        raise TypeError(
+                            f"Cannot compare columns '{self.column}' (dtype: {col_dtype}) and "
+                            f"'{self.compare.name}' (dtype: {compare_dtype}). "
+                            f"Column types are incompatible for equality comparison. "
+                            f"Ensure both columns have compatible data types (both numeric, "
+                            f"both string, or both datetime) before comparing."
+                        ) from e
+                    else:
+                        raise  # Re-raise unexpected errors
 
                 tbl = tbl.with_columns(
                     pb_is_good_=nw.col("pb_is_good_1")
                     | nw.col("pb_is_good_2")
-                    | (nw.col("pb_is_good_4") == 0 & ~nw.col("pb_is_good_3").is_null())
+                    | (nw.col("pb_is_good_4") & ~nw.col("pb_is_good_1") & ~nw.col("pb_is_good_2"))
                 )
 
             else:
-                tbl = tbl.with_columns(
-                    pb_is_good_4=nw.col(self.column) == compare_expr,
-                )
+                # For non-Pandas backends (Polars, Ibis, etc.), handle type incompatibility
+                try:
+                    tbl = tbl.with_columns(
+                        pb_is_good_4=nw.col(self.column) == compare_expr,
+                    )
+                except (TypeError, ValueError, Exception) as e:
+                    # Handle type compatibility issues for all backends
+                    error_msg = str(e).lower()
+                    if (
+                        "cannot compare" in error_msg
+                        or "type" in error_msg
+                        and ("mismatch" in error_msg or "incompatible" in error_msg)
+                        or "dtype" in error_msg
+                        or "conversion" in error_msg
+                        and "failed" in error_msg
+                    ):
+                        # Get column types for a descriptive error message
+                        try:
+                            native_df = tbl.to_native()
+                            if hasattr(native_df, "dtypes"):
+                                col_dtype = str(native_df.dtypes.get(self.column, "unknown"))
+                                compare_dtype = str(
+                                    native_df.dtypes.get(self.compare.name, "unknown")
+                                )
+                            elif hasattr(native_df, "schema"):
+                                col_dtype = str(native_df.schema.get(self.column, "unknown"))
+                                compare_dtype = str(
+                                    native_df.schema.get(self.compare.name, "unknown")
+                                )
+                            else:
+                                col_dtype = "unknown"
+                                compare_dtype = "unknown"
+                        except Exception:
+                            col_dtype = "unknown"
+                            compare_dtype = "unknown"
+
+                        raise TypeError(
+                            f"Cannot compare columns '{self.column}' (dtype: {col_dtype}) and "
+                            f"'{self.compare.name}' (dtype: {compare_dtype}). "
+                            f"Column types are incompatible for equality comparison. "
+                            f"Ensure both columns have compatible data types (both numeric, "
+                            f"both string, or both datetime) before comparing."
+                        ) from e
+                    else:
+                        raise  # Re-raise unexpected errors
 
                 tbl = tbl.with_columns(
                     pb_is_good_=nw.col("pb_is_good_1")
@@ -368,7 +454,44 @@ class Interrogator:
                 ),
             )
 
-            tbl = tbl.with_columns(pb_is_good_3=nw.col(self.column) == compare_expr)
+            # Handle type incompatibility for literal value comparisons
+            try:
+                tbl = tbl.with_columns(pb_is_good_3=nw.col(self.column) == compare_expr)
+            except (TypeError, ValueError, Exception) as e:
+                # Handle type compatibility issues for column vs literal comparisons
+                error_msg = str(e).lower()
+                if (
+                    "cannot compare" in error_msg
+                    or "type" in error_msg
+                    and ("mismatch" in error_msg or "incompatible" in error_msg)
+                    or "dtype" in error_msg
+                    or "conversion" in error_msg
+                    and "failed" in error_msg
+                ):
+                    # Get column type for a descriptive error message
+                    try:
+                        native_df = tbl.to_native()
+                        if hasattr(native_df, "dtypes"):
+                            col_dtype = str(native_df.dtypes.get(self.column, "unknown"))
+                        elif hasattr(native_df, "schema"):
+                            col_dtype = str(native_df.schema.get(self.column, "unknown"))
+                        else:
+                            col_dtype = "unknown"
+                    except Exception:
+                        col_dtype = "unknown"
+
+                    compare_type = type(self.compare).__name__
+                    compare_value = str(self.compare)
+
+                    raise TypeError(
+                        f"Cannot compare column '{self.column}' (dtype: {col_dtype}) with "
+                        f"literal value '{compare_value}' (type: {compare_type}). "
+                        f"Column type and literal value type are incompatible for equality comparison. "
+                        f"Ensure the column data type is compatible with the comparison value "
+                        f"(e.g., numeric column with numeric value, string column with string value)."
+                    ) from e
+                else:
+                    raise  # Re-raise unexpected errors
 
             tbl = tbl.with_columns(
                 pb_is_good_3=(
@@ -400,37 +523,179 @@ class Interrogator:
             if isinstance(self.compare, Column):
                 compare_expr = _get_compare_expr_nw(compare=self.compare)
 
-                return self.x.with_columns(
-                    pb_is_good_=nw.col(self.column) != compare_expr,
-                ).to_native()
+                # Handle type incompatibility for column comparisons
+                try:
+                    return self.x.with_columns(
+                        pb_is_good_=nw.col(self.column) != compare_expr,
+                    ).to_native()
+                except (TypeError, ValueError, Exception) as e:
+                    # Handle type compatibility issues for column vs column comparisons
+                    error_msg = str(e).lower()
+                    if (
+                        "cannot compare" in error_msg
+                        or "type" in error_msg
+                        and ("mismatch" in error_msg or "incompatible" in error_msg)
+                        or "dtype" in error_msg
+                        or "conversion" in error_msg
+                        and "failed" in error_msg
+                        or "boolean value of na is ambiguous" in error_msg
+                    ):
+                        # Get column types for a descriptive error message
+                        try:
+                            native_df = self.x.to_native()
+                            if hasattr(native_df, "dtypes"):
+                                col_dtype = str(native_df.dtypes.get(self.column, "unknown"))
+                                compare_dtype = str(
+                                    native_df.dtypes.get(self.compare.name, "unknown")
+                                )
+                            elif hasattr(native_df, "schema"):
+                                col_dtype = str(native_df.schema.get(self.column, "unknown"))
+                                compare_dtype = str(
+                                    native_df.schema.get(self.compare.name, "unknown")
+                                )
+                            else:
+                                col_dtype = "unknown"
+                                compare_dtype = "unknown"
+                        except Exception:
+                            col_dtype = "unknown"
+                            compare_dtype = "unknown"
+
+                        raise TypeError(
+                            f"Cannot compare columns '{self.column}' (dtype: {col_dtype}) and "
+                            f"'{self.compare.name}' (dtype: {compare_dtype}). "
+                            f"Column types are incompatible for inequality comparison. "
+                            f"Ensure both columns have compatible data types (both numeric, "
+                            f"both string, or both datetime) before comparing."
+                        ) from e
+                    else:
+                        raise  # Re-raise unexpected errors
 
             else:
                 compare_expr = _safe_modify_datetime_compare_val(self.x, self.column, self.compare)
 
-                return self.x.with_columns(
-                    pb_is_good_=nw.col(self.column) != nw.lit(compare_expr),
-                ).to_native()
+                # Handle type incompatibility for literal comparisons
+                try:
+                    return self.x.with_columns(
+                        pb_is_good_=nw.col(self.column) != nw.lit(compare_expr),
+                    ).to_native()
+                except (TypeError, ValueError, Exception) as e:
+                    # Handle type compatibility issues for column vs literal comparisons
+                    error_msg = str(e).lower()
+                    if (
+                        "cannot compare" in error_msg
+                        or "type" in error_msg
+                        and ("mismatch" in error_msg or "incompatible" in error_msg)
+                        or "dtype" in error_msg
+                        or "conversion" in error_msg
+                        and "failed" in error_msg
+                    ):
+                        # Get column type for a descriptive error message
+                        try:
+                            native_df = self.x.to_native()
+                            if hasattr(native_df, "dtypes"):
+                                col_dtype = str(native_df.dtypes.get(self.column, "unknown"))
+                            elif hasattr(native_df, "schema"):
+                                col_dtype = str(native_df.schema.get(self.column, "unknown"))
+                            else:
+                                col_dtype = "unknown"
+                        except Exception:
+                            col_dtype = "unknown"
 
-        # If either column has null values, we need to handle the comparison
-        # much more carefully since we can't inadverdently compare null values
-        # to non-null values
+                        compare_type = type(self.compare).__name__
+                        compare_value = str(self.compare)
+
+                        raise TypeError(
+                            f"Cannot compare column '{self.column}' (dtype: {col_dtype}) with "
+                            f"literal value '{compare_value}' (type: {compare_type}). "
+                            f"Column type and literal value type are incompatible for inequality comparison. "
+                            f"Ensure the column data type is compatible with the comparison value "
+                            f"(e.g., numeric column with numeric value, string column with string value)."
+                        ) from e
+                    else:
+                        raise  # Re-raise unexpected errors
+
+        # If either column has Null values, we need to handle the comparison
+        # much more carefully since we can't inadverdently compare Null values
+        # to non-Null values
 
         if isinstance(self.compare, Column):
             compare_expr = _get_compare_expr_nw(compare=self.compare)
 
-            # CASE 1: the reference column has null values but the comparison column does not
+            # CASE 1: the reference column has Null values but the comparison column does not
             if ref_col_has_null_vals and not cmp_col_has_null_vals:
                 if is_pandas_dataframe(self.x.to_native()):
-                    tbl = self.x.with_columns(
-                        pb_is_good_1=nw.col(self.column).is_null(),
-                        pb_is_good_2=nw.lit(self.column) != nw.col(self.compare.name),
-                    )
+                    try:
+                        tbl = self.x.with_columns(
+                            pb_is_good_1=nw.col(self.column).is_null(),
+                            pb_is_good_2=nw.col(self.column) != nw.col(self.compare.name),
+                        )
+                    except (TypeError, ValueError) as e:
+                        # Handle Pandas type compatibility issues
+                        if (
+                            "boolean value of NA is ambiguous" in str(e)
+                            or "cannot compare" in str(e).lower()
+                        ):
+                            # Get column types for a descriptive error message
+                            native_df = self.x.to_native()
+                            col_dtype = str(native_df[self.column].dtype)
+                            compare_dtype = str(native_df[self.compare.name].dtype)
+
+                            raise TypeError(
+                                f"Cannot compare columns '{self.column}' (dtype: {col_dtype}) and "
+                                f"'{self.compare.name}' (dtype: {compare_dtype}). "
+                                f"Column types are incompatible for inequality comparison. "
+                                f"Ensure both columns have compatible data types (both numeric, "
+                                f"both string, or both datetime) before comparing."
+                            ) from e
+                        else:
+                            raise  # Re-raise unexpected errors
 
                 else:
-                    tbl = self.x.with_columns(
-                        pb_is_good_1=nw.col(self.column).is_null(),
-                        pb_is_good_2=nw.col(self.column) != nw.col(self.compare.name),
-                    )
+                    try:
+                        tbl = self.x.with_columns(
+                            pb_is_good_1=nw.col(self.column).is_null(),
+                            pb_is_good_2=nw.col(self.column) != nw.col(self.compare.name),
+                        )
+                    except (TypeError, ValueError, Exception) as e:
+                        # Handle type compatibility issues for non-Pandas backends
+                        error_msg = str(e).lower()
+                        if (
+                            "cannot compare" in error_msg
+                            or "type" in error_msg
+                            and ("mismatch" in error_msg or "incompatible" in error_msg)
+                            or "dtype" in error_msg
+                            or "conversion" in error_msg
+                            and "failed" in error_msg
+                        ):
+                            # Get column types for a descriptive error message
+                            try:
+                                native_df = self.x.to_native()
+                                if hasattr(native_df, "dtypes"):
+                                    col_dtype = str(native_df.dtypes.get(self.column, "unknown"))
+                                    compare_dtype = str(
+                                        native_df.dtypes.get(self.compare.name, "unknown")
+                                    )
+                                elif hasattr(native_df, "schema"):
+                                    col_dtype = str(native_df.schema.get(self.column, "unknown"))
+                                    compare_dtype = str(
+                                        native_df.schema.get(self.compare.name, "unknown")
+                                    )
+                                else:
+                                    col_dtype = "unknown"
+                                    compare_dtype = "unknown"
+                            except Exception:
+                                col_dtype = "unknown"
+                                compare_dtype = "unknown"
+
+                            raise TypeError(
+                                f"Cannot compare columns '{self.column}' (dtype: {col_dtype}) and "
+                                f"'{self.compare.name}' (dtype: {compare_dtype}). "
+                                f"Column types are incompatible for inequality comparison. "
+                                f"Ensure both columns have compatible data types (both numeric, "
+                                f"both string, or both datetime) before comparing."
+                            ) from e
+                        else:
+                            raise  # Re-raise unexpected errors
 
                 if not self.na_pass:
                     tbl = tbl.with_columns(
@@ -438,8 +703,8 @@ class Interrogator:
                     )
 
                 if is_polars_dataframe(self.x.to_native()):
-                    # There may be Null values in the pb_is_good_2 column, change those to
-                    # True if na_pass is True, False otherwise
+                    # There may be Null values in the `pb_is_good_2` column, change those to
+                    # True if `na_pass=` is True, False otherwise
 
                     tbl = tbl.with_columns(
                         pb_is_good_2=nw.when(nw.col("pb_is_good_2").is_null())
@@ -464,19 +729,81 @@ class Interrogator:
                     .to_native()
                 )
 
-            # CASE 2: the comparison column has null values but the reference column does not
+            # CASE 2: the comparison column has Null values but the reference column does not
             elif not ref_col_has_null_vals and cmp_col_has_null_vals:
                 if is_pandas_dataframe(self.x.to_native()):
-                    tbl = self.x.with_columns(
-                        pb_is_good_1=nw.col(self.column) != nw.lit(self.compare.name),
-                        pb_is_good_2=nw.col(self.compare.name).is_null(),
-                    )
+                    try:
+                        tbl = self.x.with_columns(
+                            pb_is_good_1=nw.col(self.column) != nw.lit(self.compare.name),
+                            pb_is_good_2=nw.col(self.compare.name).is_null(),
+                        )
+                    except (TypeError, ValueError) as e:
+                        # Handle Pandas type compatibility issues
+                        if (
+                            "boolean value of NA is ambiguous" in str(e)
+                            or "cannot compare" in str(e).lower()
+                        ):
+                            # Get column types for a descriptive error message
+                            native_df = self.x.to_native()
+                            col_dtype = str(native_df[self.column].dtype)
+                            compare_dtype = str(native_df[self.compare.name].dtype)
+
+                            raise TypeError(
+                                f"Cannot compare columns '{self.column}' (dtype: {col_dtype}) and "
+                                f"'{self.compare.name}' (dtype: {compare_dtype}). "
+                                f"Column types are incompatible for inequality comparison. "
+                                f"Ensure both columns have compatible data types (both numeric, "
+                                f"both string, or both datetime) before comparing."
+                            ) from e
+                        else:
+                            raise  # Re-raise unexpected errors
 
                 else:
-                    tbl = self.x.with_columns(
-                        pb_is_good_1=nw.col(self.column) != nw.col(self.compare.name),
-                        pb_is_good_2=nw.col(self.compare.name).is_null(),
-                    )
+                    try:
+                        tbl = self.x.with_columns(
+                            pb_is_good_1=nw.col(self.column) != nw.col(self.compare.name),
+                            pb_is_good_2=nw.col(self.compare.name).is_null(),
+                        )
+                    except (TypeError, ValueError, Exception) as e:
+                        # Handle type compatibility issues for non-Pandas backends
+                        error_msg = str(e).lower()
+                        if (
+                            "cannot compare" in error_msg
+                            or "type" in error_msg
+                            and ("mismatch" in error_msg or "incompatible" in error_msg)
+                            or "dtype" in error_msg
+                            or "conversion" in error_msg
+                            and "failed" in error_msg
+                        ):
+                            # Get column types for a descriptive error message
+                            try:
+                                native_df = self.x.to_native()
+                                if hasattr(native_df, "dtypes"):
+                                    col_dtype = str(native_df.dtypes.get(self.column, "unknown"))
+                                    compare_dtype = str(
+                                        native_df.dtypes.get(self.compare.name, "unknown")
+                                    )
+                                elif hasattr(native_df, "schema"):
+                                    col_dtype = str(native_df.schema.get(self.column, "unknown"))
+                                    compare_dtype = str(
+                                        native_df.schema.get(self.compare.name, "unknown")
+                                    )
+                                else:
+                                    col_dtype = "unknown"
+                                    compare_dtype = "unknown"
+                            except Exception:
+                                col_dtype = "unknown"
+                                compare_dtype = "unknown"
+
+                            raise TypeError(
+                                f"Cannot compare columns '{self.column}' (dtype: {col_dtype}) and "
+                                f"'{self.compare.name}' (dtype: {compare_dtype}). "
+                                f"Column types are incompatible for inequality comparison. "
+                                f"Ensure both columns have compatible data types (both numeric, "
+                                f"both string, or both datetime) before comparing."
+                            ) from e
+                        else:
+                            raise  # Re-raise unexpected errors
 
                 if not self.na_pass:
                     tbl = tbl.with_columns(
@@ -489,7 +816,7 @@ class Interrogator:
                             pb_is_good_1=(nw.col("pb_is_good_1") | nw.col("pb_is_good_2"))
                         )
                 else:
-                    # General case (non-Polars): handle na_pass=True properly
+                    # General case (non-Polars): handle `na_pass=True` properly
                     if self.na_pass:
                         tbl = tbl.with_columns(
                             pb_is_good_1=(nw.col("pb_is_good_1") | nw.col("pb_is_good_2"))
@@ -501,14 +828,56 @@ class Interrogator:
                     .to_native()
                 )
 
-            # CASE 3: both columns have null values and there may potentially be cases where
-            # there could even be null/null comparisons
+            # CASE 3: both columns have Null values and there may potentially be cases where
+            # there could even be Null/Null comparisons
             elif ref_col_has_null_vals and cmp_col_has_null_vals:
-                tbl = self.x.with_columns(
-                    pb_is_good_1=nw.col(self.column).is_null(),
-                    pb_is_good_2=nw.col(self.compare.name).is_null(),
-                    pb_is_good_3=nw.col(self.column) != nw.col(self.compare.name),
-                )
+                try:
+                    tbl = self.x.with_columns(
+                        pb_is_good_1=nw.col(self.column).is_null(),
+                        pb_is_good_2=nw.col(self.compare.name).is_null(),
+                        pb_is_good_3=nw.col(self.column) != nw.col(self.compare.name),
+                    )
+                except (TypeError, ValueError, Exception) as e:
+                    # Handle type compatibility issues for column vs column comparisons
+                    error_msg = str(e).lower()
+                    if (
+                        "cannot compare" in error_msg
+                        or "type" in error_msg
+                        and ("mismatch" in error_msg or "incompatible" in error_msg)
+                        or "dtype" in error_msg
+                        or "conversion" in error_msg
+                        and "failed" in error_msg
+                        or "boolean value of na is ambiguous" in error_msg
+                    ):
+                        # Get column types for a descriptive error message
+                        try:
+                            native_df = self.x.to_native()
+                            if hasattr(native_df, "dtypes"):
+                                col_dtype = str(native_df.dtypes.get(self.column, "unknown"))
+                                compare_dtype = str(
+                                    native_df.dtypes.get(self.compare.name, "unknown")
+                                )
+                            elif hasattr(native_df, "schema"):
+                                col_dtype = str(native_df.schema.get(self.column, "unknown"))
+                                compare_dtype = str(
+                                    native_df.schema.get(self.compare.name, "unknown")
+                                )
+                            else:
+                                col_dtype = "unknown"
+                                compare_dtype = "unknown"
+                        except Exception:
+                            col_dtype = "unknown"
+                            compare_dtype = "unknown"
+
+                        raise TypeError(
+                            f"Cannot compare columns '{self.column}' (dtype: {col_dtype}) and "
+                            f"'{self.compare.name}' (dtype: {compare_dtype}). "
+                            f"Column types are incompatible for inequality comparison. "
+                            f"Ensure both columns have compatible data types (both numeric, "
+                            f"both string, or both datetime) before comparing."
+                        ) from e
+                    else:
+                        raise  # Re-raise unexpected errors
 
                 if not self.na_pass:
                     tbl = tbl.with_columns(
@@ -547,14 +916,35 @@ class Interrogator:
             # Case where the reference column contains null values
             if ref_col_has_null_vals:
                 # Create individual cases for Pandas and Polars
-
                 compare_expr = _safe_modify_datetime_compare_val(self.x, self.column, self.compare)
 
                 if is_pandas_dataframe(self.x.to_native()):
-                    tbl = self.x.with_columns(
-                        pb_is_good_1=nw.col(self.column).is_null(),
-                        pb_is_good_2=nw.lit(self.column) != nw.lit(compare_expr),
-                    )
+                    try:
+                        tbl = self.x.with_columns(
+                            pb_is_good_1=nw.col(self.column).is_null(),
+                            pb_is_good_2=nw.col(self.column) != nw.lit(compare_expr),
+                        )
+                    except (TypeError, ValueError) as e:
+                        # Handle Pandas type compatibility issues for literal comparisons
+                        if (
+                            "boolean value of NA is ambiguous" in str(e)
+                            or "cannot compare" in str(e).lower()
+                        ):
+                            # Get column type for a descriptive error message
+                            native_df = self.x.to_native()
+                            col_dtype = str(native_df[self.column].dtype)
+                            compare_type = type(self.compare).__name__
+                            compare_value = str(self.compare)
+
+                            raise TypeError(
+                                f"Cannot compare column '{self.column}' (dtype: {col_dtype}) with "
+                                f"literal value '{compare_value}' (type: {compare_type}). "
+                                f"Column type and literal value type are incompatible for inequality comparison. "
+                                f"Ensure the column data type is compatible with the comparison value "
+                                f"(e.g., numeric column with numeric value, string column with string value)."
+                            ) from e
+                        else:
+                            raise  # Re-raise unexpected errors
 
                     if not self.na_pass:
                         tbl = tbl.with_columns(
@@ -573,7 +963,45 @@ class Interrogator:
                         pb_is_good_2=nw.lit(self.na_pass),  # Pass if any Null in val or compare
                     )
 
-                    tbl = tbl.with_columns(pb_is_good_3=nw.col(self.column) != nw.lit(compare_expr))
+                    try:
+                        tbl = tbl.with_columns(
+                            pb_is_good_3=nw.col(self.column) != nw.lit(compare_expr)
+                        )
+                    except (TypeError, ValueError, Exception) as e:
+                        # Handle type compatibility issues for literal comparisons
+                        error_msg = str(e).lower()
+                        if (
+                            "cannot compare" in error_msg
+                            or "type" in error_msg
+                            and ("mismatch" in error_msg or "incompatible" in error_msg)
+                            or "dtype" in error_msg
+                            or "conversion" in error_msg
+                            and "failed" in error_msg
+                        ):
+                            # Get column type for a descriptive error message
+                            try:
+                                native_df = self.x.to_native()
+                                if hasattr(native_df, "dtypes"):
+                                    col_dtype = str(native_df.dtypes.get(self.column, "unknown"))
+                                elif hasattr(native_df, "schema"):
+                                    col_dtype = str(native_df.schema.get(self.column, "unknown"))
+                                else:
+                                    col_dtype = "unknown"
+                            except Exception:
+                                col_dtype = "unknown"
+
+                            compare_type = type(self.compare).__name__
+                            compare_value = str(self.compare)
+
+                            raise TypeError(
+                                f"Cannot compare column '{self.column}' (dtype: {col_dtype}) with "
+                                f"literal value '{compare_value}' (type: {compare_type}). "
+                                f"Column type and literal value type are incompatible for inequality comparison. "
+                                f"Ensure the column data type is compatible with the comparison value "
+                                f"(e.g., numeric column with numeric value, string column with string value)."
+                            ) from e
+                        else:
+                            raise  # Re-raise unexpected errors
 
                     tbl = tbl.with_columns(
                         pb_is_good_=(
@@ -594,7 +1022,45 @@ class Interrogator:
                         pb_is_good_2=nw.lit(self.na_pass),  # Pass if any Null in val or compare
                     )
 
-                    tbl = tbl.with_columns(pb_is_good_3=nw.col(self.column) != nw.lit(compare_expr))
+                    try:
+                        tbl = tbl.with_columns(
+                            pb_is_good_3=nw.col(self.column) != nw.lit(compare_expr)
+                        )
+                    except (TypeError, ValueError, Exception) as e:
+                        # Handle type compatibility issues for literal comparisons
+                        error_msg = str(e).lower()
+                        if (
+                            "cannot compare" in error_msg
+                            or "type" in error_msg
+                            and ("mismatch" in error_msg or "incompatible" in error_msg)
+                            or "dtype" in error_msg
+                            or "conversion" in error_msg
+                            and "failed" in error_msg
+                        ):
+                            # Get column type for a descriptive error message
+                            try:
+                                native_df = self.x.to_native()
+                                if hasattr(native_df, "dtypes"):
+                                    col_dtype = str(native_df.dtypes.get(self.column, "unknown"))
+                                elif hasattr(native_df, "schema"):
+                                    col_dtype = str(native_df.schema.get(self.column, "unknown"))
+                                else:
+                                    col_dtype = "unknown"
+                            except Exception:
+                                col_dtype = "unknown"
+
+                            compare_type = type(self.compare).__name__
+                            compare_value = str(self.compare)
+
+                            raise TypeError(
+                                f"Cannot compare column '{self.column}' (dtype: {col_dtype}) with "
+                                f"literal value '{compare_value}' (type: {compare_type}). "
+                                f"Column type and literal value type are incompatible for inequality comparison. "
+                                f"Ensure the column data type is compatible with the comparison value "
+                                f"(e.g., numeric column with numeric value, string column with string value)."
+                            ) from e
+                        else:
+                            raise  # Re-raise unexpected errors
 
                     tbl = tbl.with_columns(
                         pb_is_good_=(

@@ -9,8 +9,8 @@ GENERAL_COLUMN_TYPES = [
 COMPATIBLE_DTYPES = {
     "gt": ["numeric", "datetime"],
     "lt": ["numeric", "datetime"],
-    "eq": ["numeric", "datetime"],
-    "ne": ["numeric", "datetime"],
+    "eq": ["numeric", "datetime", "str"],
+    "ne": ["numeric", "datetime", "str"],
     "ge": ["numeric", "datetime"],
     "le": ["numeric", "datetime"],
     "between": ["numeric", "datetime"],
