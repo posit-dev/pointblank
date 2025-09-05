@@ -9908,14 +9908,10 @@ class Validate:
             if assertion_category != "SPECIALLY":
                 try:
                     if assertion_category == "COMPARE_ONE":
-                        # Process table for column validation
-                        if tbl_type == "local":
-                            tbl = _column_test_prep(
-                                df=data_tbl_step, column=column, allowed_types=compatible_dtypes
-                            )
-                        else:
-                            # For remote backends (Ibis), pass the table as is since Interrogator handles Ibis through Narwhals
-                            tbl = data_tbl_step
+                        # Process table for column validation (Narwhals handles all backends)
+                        tbl = _column_test_prep(
+                            df=data_tbl_step, column=column, allowed_types=compatible_dtypes
+                        )
 
                         # Create Interrogator and call the appropriate method
                         interrogator = Interrogator(
@@ -9949,14 +9945,10 @@ class Validate:
                             )
 
                     if assertion_category == "COMPARE_TWO":
-                        # Process table for column validation
-                        if tbl_type == "local":
-                            tbl = _column_test_prep(
-                                df=data_tbl_step, column=column, allowed_types=compatible_dtypes
-                            )
-                        else:
-                            # For remote backends (Ibis), pass the table as is since Interrogator handles Ibis through Narwhals
-                            tbl = data_tbl_step
+                        # Process table for column validation (Narwhals handles all backends)
+                        tbl = _column_test_prep(
+                            df=data_tbl_step, column=column, allowed_types=compatible_dtypes
+                        )
 
                         # Create Interrogator and call the appropriate method
                         interrogator = Interrogator(
@@ -9980,14 +9972,10 @@ class Validate:
                             )
 
                     if assertion_category == "COMPARE_SET":
-                        # Process table for column validation
-                        if tbl_type == "local":
-                            tbl = _column_test_prep(
-                                df=data_tbl_step, column=column, allowed_types=compatible_dtypes
-                            )
-                        else:
-                            # For remote backends (Ibis), pass the table as is since Interrogator handles Ibis through Narwhals
-                            tbl = data_tbl_step
+                        # Process table for column validation (Narwhals handles all backends)
+                        tbl = _column_test_prep(
+                            df=data_tbl_step, column=column, allowed_types=compatible_dtypes
+                        )
 
                         inside = True if assertion_method == "in_set" else False
 
@@ -10005,14 +9993,10 @@ class Validate:
                             results_tbl = interrogator.notin()
 
                     if assertion_category == "COMPARE_REGEX":
-                        # Process table for column validation
-                        if tbl_type == "local":
-                            tbl = _column_test_prep(
-                                df=data_tbl_step, column=column, allowed_types=compatible_dtypes
-                            )
-                        else:
-                            # For remote backends (Ibis), pass the table as is since Interrogator handles Ibis through Narwhals
-                            tbl = data_tbl_step
+                        # Process table for column validation (Narwhals handles all backends)
+                        tbl = _column_test_prep(
+                            df=data_tbl_step, column=column, allowed_types=compatible_dtypes
+                        )
 
                         # Create Interrogator and call the regex method
                         interrogator = Interrogator(
