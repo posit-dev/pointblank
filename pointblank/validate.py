@@ -45,7 +45,6 @@ from pointblank._constants_translations import (
     VALIDATION_REPORT_TEXT,
 )
 from pointblank._interrogation import (
-    Interrogator,
     NumberOfTestUnits,
     SpeciallyValidation,
     col_count_match,
@@ -53,6 +52,19 @@ from pointblank._interrogation import (
     col_schema_match,
     col_vals_expr,
     conjointly_validation,
+    interrogate_between,
+    interrogate_eq,
+    interrogate_ge,
+    interrogate_gt,
+    interrogate_isin,
+    interrogate_le,
+    interrogate_lt,
+    interrogate_ne,
+    interrogate_not_null,
+    interrogate_notin,
+    interrogate_null,
+    interrogate_outside,
+    interrogate_regex,
     row_count_match,
     rows_complete,
     rows_distinct,
@@ -9922,31 +9934,23 @@ class Validate:
                             df=data_tbl_step, column=column, allowed_types=compatible_dtypes
                         )
 
-                        # Create Interrogator and call the appropriate method
-                        interrogator = Interrogator(
-                            x=tbl,
-                            column=column,
-                            compare=value,
-                            na_pass=na_pass,
-                            tbl_type=tbl_type,
-                        )
-
+                        # Call the appropriate top-level function
                         if assertion_method == "gt":
-                            results_tbl = interrogator.gt()
+                            results_tbl = interrogate_gt(tbl, column, value, na_pass, tbl_type)
                         elif assertion_method == "lt":
-                            results_tbl = interrogator.lt()
+                            results_tbl = interrogate_lt(tbl, column, value, na_pass, tbl_type)
                         elif assertion_method == "eq":
-                            results_tbl = interrogator.eq()
+                            results_tbl = interrogate_eq(tbl, column, value, na_pass, tbl_type)
                         elif assertion_method == "ne":
-                            results_tbl = interrogator.ne()
+                            results_tbl = interrogate_ne(tbl, column, value, na_pass, tbl_type)
                         elif assertion_method == "ge":
-                            results_tbl = interrogator.ge()
+                            results_tbl = interrogate_ge(tbl, column, value, na_pass, tbl_type)
                         elif assertion_method == "le":
-                            results_tbl = interrogator.le()
+                            results_tbl = interrogate_le(tbl, column, value, na_pass, tbl_type)
                         elif assertion_method == "null":
-                            results_tbl = interrogator.null()
+                            results_tbl = interrogate_null(tbl, column, tbl_type)
                         elif assertion_method == "not_null":
-                            results_tbl = interrogator.not_null()
+                            results_tbl = interrogate_not_null(tbl, column, tbl_type)
                         else:
                             raise ValueError(
                                 f"Invalid assertion method: {assertion_method}. "
@@ -9960,21 +9964,15 @@ class Validate:
                             df=data_tbl_step, column=column, allowed_types=compatible_dtypes
                         )
 
-                        # Create Interrogator and call the appropriate method
-                        interrogator = Interrogator(
-                            x=tbl,
-                            column=column,
-                            low=value[0],
-                            high=value[1],
-                            inclusive=inclusive,
-                            na_pass=na_pass,
-                            tbl_type=tbl_type,
-                        )
-
+                        # Call the appropriate top-level function
                         if assertion_method == "between":
-                            results_tbl = interrogator.between()
+                            results_tbl = interrogate_between(
+                                tbl, column, value[0], value[1], inclusive, na_pass, tbl_type
+                            )
                         elif assertion_method == "outside":
-                            results_tbl = interrogator.outside()
+                            results_tbl = interrogate_outside(
+                                tbl, column, value[0], value[1], inclusive, na_pass, tbl_type
+                            )
                         else:
                             raise ValueError(
                                 f"Invalid assertion method: {assertion_method}. "
@@ -9988,20 +9986,11 @@ class Validate:
                             df=data_tbl_step, column=column, allowed_types=compatible_dtypes
                         )
 
-                        inside = True if assertion_method == "in_set" else False
-
-                        # Create Interrogator and call the appropriate method
-                        interrogator = Interrogator(
-                            x=tbl,
-                            column=column,
-                            set=value,
-                            tbl_type=tbl_type,
-                        )
-
-                        if inside:
-                            results_tbl = interrogator.isin()
+                        # Call the appropriate top-level function
+                        if assertion_method == "in_set":
+                            results_tbl = interrogate_isin(tbl, column, value, tbl_type)
                         else:
-                            results_tbl = interrogator.notin()
+                            results_tbl = interrogate_notin(tbl, column, value, tbl_type)
 
                     # COMPARE_REGEX validation: regex
                     elif assertion_type == "col_vals_regex":
@@ -10010,16 +9999,8 @@ class Validate:
                             df=data_tbl_step, column=column, allowed_types=compatible_dtypes
                         )
 
-                        # Create Interrogator and call the regex method
-                        interrogator = Interrogator(
-                            x=tbl,
-                            column=column,
-                            pattern=value,
-                            na_pass=na_pass,
-                            tbl_type=tbl_type,
-                        )
-
-                        results_tbl = interrogator.regex()
+                        # Call the regex function
+                        results_tbl = interrogate_regex(tbl, column, value, na_pass, tbl_type)
 
                     # COMPARE_EXPR validation: expr
                     elif assertion_type == "col_vals_expr":
