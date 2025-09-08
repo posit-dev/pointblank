@@ -279,7 +279,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
         border-radius: 2px;
     ">
 <p>Below are some examples of how to use the <code>assert_below_threshold()</code> method. First, we’ll create a simple Polars DataFrame with two columns (<code>a</code> and <code>b</code>).</p>
-<div id="f2d33319" class="cell" data-execution_count="2">
+<div id="e66a20ff" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>tbl <span class="op">=</span> pl.DataFrame({</span>
@@ -288,7 +288,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Then a validation plan will be created with thresholds (<code>warning=0.1</code>, <code>error=0.2</code>, <code>critical=0.3</code>). After interrogating, we display the validation report table:</p>
-<div id="a98f7046" class="cell" data-execution_count="3">
+<div id="f01aa799" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
@@ -480,7 +480,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 </div>
 <p>Using <code>assert_below_threshold(level="warning")</code> will raise an <code>AssertionError</code> if any step exceeds the ‘warning’ threshold:</p>
-<div id="4f8e918e" class="cell" data-execution_count="4">
+<div id="c44f7464" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="cf">try</span>:</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    validation.assert_below_threshold(level<span class="op">=</span><span class="st">"warning"</span>)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="cf">except</span> <span class="pp">AssertionError</span> <span class="im">as</span> e:</span>
@@ -492,12 +492,12 @@ Step 2: Expect that values in `b` should be &lt; `10`.</code></pre>
 </div>
 </div>
 <p>Check a specific step against the ‘critical’ threshold using the <code>i=</code> parameter:</p>
-<div id="5b153c78" class="cell" data-execution_count="5">
+<div id="52be83a5" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>validation.assert_below_threshold(level<span class="op">=</span><span class="st">"critical"</span>, i<span class="op">=</span><span class="dv">1</span>)  <span class="co"># Won't raise an error</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>As the first step is below the ‘critical’ threshold (it exceeds the ‘warning’ and ‘error’ thresholds), no error is raised and nothing is printed.</p>
 <p>We can also provide a custom error message with the <code>message=</code> parameter. Let’s try that here:</p>
-<div id="8e3e9d4c" class="cell" data-execution_count="6">
+<div id="2bf41591" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="cf">try</span>:</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    validation.assert_below_threshold(</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>        level<span class="op">=</span><span class="st">"error"</span>,</span>
