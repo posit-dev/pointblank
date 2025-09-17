@@ -13851,12 +13851,33 @@ def _process_brief(
 
     if segment is not None:
         # The segment is always a tuple of the form ("{column}", "{value}")
+        # Handle both regular lists and Segment objects (from seg_group())
 
-        segment_fmt = f"{segment[0]} / {segment[1]}"
+        segment_column = segment[0]
+        segment_value = segment[1]
+
+        # If segment_value is a Segment object (from seg_group()), format it appropriately
+        if isinstance(segment_value, Segment):
+            # For Segment objects, format the segments as a readable string
+            segments = segment_value.segments
+            if len(segments) == 1:
+                # Single segment: join the values with commas
+                segment_value_str = ", ".join(str(v) for v in segments[0])
+            else:
+                # Multiple segments: join each segment with commas, separate segments with " | "
+                segment_value_str = " | ".join([", ".join(str(v) for v in seg) for seg in segments])
+        else:
+            # For regular lists or other types, convert to string
+            if isinstance(segment_value, list):
+                segment_value_str = ", ".join(str(v) for v in segment_value)
+            else:
+                segment_value_str = str(segment_value)
+
+        segment_fmt = f"{segment_column} / {segment_value_str}"
 
         brief = brief.replace("{segment}", segment_fmt)
-        brief = brief.replace("{segment_column}", segment[0])
-        brief = brief.replace("{segment_value}", segment[1])
+        brief = brief.replace("{segment_column}", segment_column)
+        brief = brief.replace("{segment_value}", segment_value_str)
 
     return brief
 
