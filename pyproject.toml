@@ -86,7 +86,7 @@ docs = [
 [dependency-groups]
 dev = [
     "chatlas>=0.6.1",
-    "duckdb>=1.1.3",
+    "duckdb>=1.2.0,<1.3.3",  # Pin to stable versions avoiding 1.4.0+ RecordBatchReader issues
     "griffe==0.38.1",
     "hypothesis>=6.129.2",
     "ibis-framework[duckdb,mysql,postgres,sqlite]>=9.5.0",
