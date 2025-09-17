@@ -1,7 +1,8 @@
 from __future__ import annotations
 
+from importlib import import_module
 from pathlib import Path
-from typing import Any, Union
+from typing import Any, Iterable, Mapping, Optional, Union
 
 import yaml
 from narwhals.typing import FrameT
@@ -17,7 +18,9 @@ class YAMLValidationError(Exception):
     pass
 
 
-def _safe_eval_python_code(code: str) -> Any:
+def _safe_eval_python_code(
+    code: str, namespaces: Optional[Union[Iterable[str], Mapping[str, str]]] = None
+) -> Any:
     """Safely evaluate Python code with restricted namespace.
 
     This function provides a controlled environment for executing Python code embedded in YAML
@@ -88,6 +91,17 @@ def _safe_eval_python_code(code: str) -> Any:
 
         safe_namespace["pd"] = pd
 
+    if namespaces:
+        for alias, module_name in (
+            namespaces.items() if isinstance(namespaces, dict) else ((m, m) for m in namespaces)
+        ):
+            try:
+                safe_namespace[alias] = import_module(module_name)
+            except ImportError as e:
+                raise ImportError(
+                    f"Could not import requested namespace '{module_name}': {e}"
+                ) from e
+
     # Check for dangerous patterns
     dangerous_patterns = [
         r"import\s+os",
@@ -142,7 +156,9 @@ def _safe_eval_python_code(code: str) -> Any:
         raise YAMLValidationError(f"Error executing Python code '{code}': {e}")
 
 
-def _process_python_expressions(value: Any) -> Any:
+def _process_python_expressions(
+    value: Any, namespaces: Optional[Union[Iterable[str], Mapping[str, str]]] = None
+) -> Any:
     """Process Python code snippets embedded in YAML values.
 
     This function supports the python: block syntax for embedding Python code:
@@ -152,7 +168,7 @@ def _process_python_expressions(value: Any) -> Any:
       pl.scan_csv("data.csv").head(10)
 
     Note: col_vals_expr() also supports a shortcut syntax where the expr parameter
-    can be written directly without the python: wrapper:
+    can be written directly without the python: wrapper: +
 
     col_vals_expr:
       expr: |
@@ -180,14 +196,14 @@ def _process_python_expressions(value: Any) -> Any:
         # Handle python: block syntax
         if "python" in value and len(value) == 1:
             code = value["python"]
-            return _safe_eval_python_code(code)
+            return _safe_eval_python_code(code, namespaces=namespaces)
 
         # Recursively process dictionary values
-        return {k: _process_python_expressions(v) for k, v in value.items()}
+        return {k: _process_python_expressions(v, namespaces=namespaces) for k, v in value.items()}
 
     elif isinstance(value, list):
         # Recursively process list items
-        return [_process_python_expressions(item) for item in value]
+        return [_process_python_expressions(item, namespaces=namespaces) for item in value]
 
     else:
         # Return primitive types unchanged
@@ -658,7 +674,9 @@ class YAMLValidator:
 
         return self.validation_method_map[method_name], parameters
 
-    def build_validation(self, config: dict) -> Validate:
+    def build_validation(
+        self, config: dict, namespaces: Optional[Union[Iterable[str], Mapping[str, str]]] = None
+    ) -> Validate:
         """Convert YAML config to Validate object.
 
         Parameters
@@ -693,7 +711,9 @@ class YAMLValidator:
         # Set actions if provided
         if "actions" in config:
             # Process actions: handle `python:` block syntax for callables
-            processed_actions = _process_python_expressions(config["actions"])
+            processed_actions = _process_python_expressions(
+                config["actions"], namespaces=namespaces
+            )
             # Convert to Actions object
             validate_kwargs["actions"] = Actions(**processed_actions)
 
@@ -728,7 +748,9 @@ class YAMLValidator:
 
         return validation
 
-    def execute_workflow(self, config: dict) -> Validate:
+    def execute_workflow(
+        self, config: dict, namespaces: Optional[Union[Iterable[str], Mapping[str, str]]] = None
+    ) -> Validate:
         """Execute a complete YAML validation workflow.
 
         Parameters
@@ -742,7 +764,7 @@ class YAMLValidator:
             Interrogated Validate object with results.
         """
         # Build the validation plan
-        validation = self.build_validation(config)
+        validation = self.build_validation(config, namespaces=namespaces)
 
         # Execute interrogation to get results
         validation = validation.interrogate()
@@ -750,7 +772,11 @@ class YAMLValidator:
         return validation
 
 
-def yaml_interrogate(yaml: Union[str, Path], set_tbl: Union[FrameT, Any, None] = None) -> Validate:
+def yaml_interrogate(
+    yaml: Union[str, Path],
+    set_tbl: Union[FrameT, Any, None] = None,
+    namespaces: Optional[Union[Iterable[str], Mapping[str, str]]] = None,
+) -> Validate:
     """Execute a YAML-based validation workflow.
 
     This is the main entry point for YAML-based validation workflows. It takes YAML configuration
@@ -928,14 +954,14 @@ def yaml_interrogate(yaml: Union[str, Path], set_tbl: Union[FrameT, Any, None] =
     # If `set_tbl=` is provided, we need to build the validation workflow and then use `set_tbl()`
     if set_tbl is not None:
         # First build the validation object without interrogation
-        validation = validator.build_validation(config)
+        validation = validator.build_validation(config, namespaces=namespaces)
         # Then replace the table using set_tbl method
         validation = validation.set_tbl(tbl=set_tbl)
         # Finally interrogate with the new table
         return validation.interrogate()
     else:
         # Standard execution without table override (includes interrogation)
-        return validator.execute_workflow(config)
+        return validator.execute_workflow(config, namespaces=namespaces)
 
 
 def load_yaml_config(file_path: Union[str, Path]) -> dict:
