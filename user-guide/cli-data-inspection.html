@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.7.34">
+<meta name="generator" content="quarto-1.8.24">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -70,14 +70,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../assets/fav-logo.png" rel="icon" type="image/png">
 <script src="../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-c8ad9e5dbd60b7b70b38521ab19b7da4.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dc55a5b9e770e841cd82e46aadbfb9b0.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-ac094b9e767832278df91157bc75fe51.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-6db88e7b476494ae1895bca8c73958c5.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -127,6 +128,8 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
+    <a href="../index.html" class="navbar-brand navbar-brand-logo">
+    </a>
     <a class="navbar-brand" href="../index.html">
     <span class="navbar-title">Pointblank</span>
     </a>
@@ -186,6 +189,10 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
   <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+      <a href="../index.html" class="sidebar-logo-link">
+      </a>
+      </div>
     <div class="sidebar-menu-container"> 
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item sidebar-item-section">
@@ -476,44 +483,44 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="pb-info-inspecting-the-data-structure" class="level2">
 <h2 class="anchored" data-anchor-id="pb-info-inspecting-the-data-structure"><code>pb info</code>: Inspecting the Data Structure</h2>
 <p>Use <code>pb info</code> to display basic information about your data source. Here’s how this works with a local CSV file:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> info worldcities.csv</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> info worldcities.csv</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><img src="../assets/pb-info-worldcities-csv.png" class="img-fluid" style="width:100.0%"></p>
 <p>This command shows the (1) table type (e.g., <code>pandas</code>, <code>polars</code>, etc.), (2) the number of rows and columns, and (3) the data source path or identifier.</p>
 <p>That example used a local CSV file. The same file is also present in Pointblank’s GitHub repository (in the <code>data-raw</code> directory) and the CLI is able to load the data from there as well:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> info https://github.com/posit-dev/pointblank/blob/main/data_raw/worldcities.csv</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> info https://github.com/posit-dev/pointblank/blob/main/data_raw/worldcities.csv</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><img src="../assets/pb-info-worldcities-github-csv.png" class="img-fluid" style="width:100.0%"></p>
 <p>The <code>pb info</code> command is useful before running validations to confirm your data source’s dimensions, and, whether it can even be loaded.</p>
 <div class="callout-info">
 <p>You can inspect a wide variety of data sources using the CLI! Here are some examples with <code>pb info</code>:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> info small_table         <span class="co"># built in dataset</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> info small_table         <span class="co"># built in dataset</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> info worldcities.csv     <span class="co"># single CSV file</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> info meteo.parquet       <span class="co"># single Parquet file</span></span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> info <span class="st">"*.parquet"</span>         <span class="co"># several Parquet files</span></span>
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> info <span class="st">"data/*.parquet"</span>    <span class="co"># partitioned Parquet files</span></span>
 <span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> info <span class="st">"duckdb:///warehouse/analytics.ddb::customer_metrics"</span> <span class="co"># DB table via connection string</span></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> info https://github.com/posit-dev/pointblank/blob/main/data_raw/global_sales.csv <span class="co"># GitHub URL</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> info https://github.com/posit-dev/pointblank/blob/main/data_raw/global_sales.csv <span class="co"># GitHub URL</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>And these input schemes work with all other commands that accept a <code>DATA_SOURCE</code>.</p>
 </div>
 </section>
 <section id="pb-preview-previewing-data" class="level2">
 <h2 class="anchored" data-anchor-id="pb-preview-previewing-data"><code>pb preview</code>: Previewing Data</h2>
 <p>Use <code>pb preview</code> to view the first and last rows of your data. Let’s try it out with the <code>worldcities.csv</code> file:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> preview worldcities.csv</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> preview worldcities.csv</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><img src="../assets/pb-preview-worldcities-csv.png" class="img-fluid" style="width:100.0%"></p>
 <p>As can be seen, <code>pb preview</code> gives you a preview of the dataset as a table in the console. The dataset has 41K rows but we’re electing to show only five rows from the head and from the tail.</p>
 <p>Let’s go over some features of the table preview. First off, the table header provides information on the data source and the DataFrame library that handled the reading of the CSV. Below the column names are simplified representations of the data types (e.g., <code>&lt;obj&gt;</code> for <code>object</code>, <code>&lt;f64&gt;</code> for <code>Float64</code>). We provide row numbers (in gray) in the table stub to indicate which of the rows are from the head or the tail (and a divider helps to distinguish these row groups). If you’d prefer to eliminate the row numbers, use the <code>--no-row-numbers</code> option:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> preview worldcities.csv <span class="at">--no-row-numbers</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> preview worldcities.csv <span class="at">--no-row-numbers</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><img src="../assets/pb-preview-worldcities-csv-no-row-numbers.png" class="img-fluid" style="width:100.0%"></p>
 <p>While <code>pb preview</code> purposefully displays only a few rows, the number of columns shown can be more than you might need. Furthermore, if a table has <em>a lot</em> of columns, you’ll only see some of the first and some of the last columns. This is where column selection becomes useful and there are a few methods available for subsetting the preview table’s columns. A good one (provided you know the column names) is to use the <code>--columns</code> option along with a comma-delimted set of column names. Let’s look at a preview of the included <code>game_revenue</code> dataset before subsetting the columns:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> preview game_revenue</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> preview game_revenue</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><img src="../assets/pb-preview-game_revenue-all-columns.png" class="img-fluid" style="width:100.0%"></p>
 <p>That’s 11 columns in total and while the all columns <em>are</em> shown (i.e., none in the middle are truncated from view), we start to see some necessary instances of abbreviating via <code>…</code> within the column names and in the displayed values.</p>
 <p>Let’s now use the <code>--columns</code> with a set of column names:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> preview game_revenue <span class="at">-columns</span> <span class="st">"player_id, item_type, item_name, start_day"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> preview game_revenue <span class="at">-columns</span> <span class="st">"player_id, item_type, item_name, start_day"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><img src="../assets/pb-preview-game_revenue-column-names.png" class="img-fluid" style="width:100.0%"></p>
 <p>With that, the few columns that are displayed no longer have to abbreviate their data values. This is an important consideration since a selective display of column becomes more necessary if column content is large or if the width of the terminal (in terms of characters) cannot be increased.</p>
 <p>You may want to view ranges of columns by their indices. This is convenient when you want to get a closer look at a few side-by-side columns and you don’t want to bother with getting the set of column names exactly right (i.e., for quick inspection). For this, we need to use the <code>--col-range</code> option with the desired left/right column bounds separated by a colon:</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> preview game_revenue —-col-range <span class="st">"3:6"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> preview game_revenue —-col-range <span class="st">"3:6"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><img src="../assets/pb-preview-game_revenue-column-range.png" class="img-fluid" style="width:100.0%"></p>
 <p>In the case that you want to save a table preview as an HTML table in a standalone file, you can add in the <code>--output-html</code> option (just add a path/filename with an .html extension).</p>
 <p>And there are many more options that allow for quick iteration while previewing a table. Use <code>pb preview --help</code> to get a helpful listing.</p>
@@ -528,7 +535,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <li>summary statistics (mean, standard deviation, min, max, quartiles, and the interquartile range)</li>
 </ul>
 <p>Let’s use this on the <code>worldcities.csv</code> dataset:</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> scan worldcities.csv</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> scan worldcities.csv</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><img src="../assets/pb-scan-worldcities-csv.png" class="img-fluid" style="width:100.0%"></p>
 <p>Each row in the summary table represents a column in the input dataset. Just as in <code>pb preview</code> we get simplified dtypes (in the <code>Type</code> column). The <code>NA</code> and <code>UQ</code> indicate how many missing and unique values are in the column. The remaining columns are statistical measures and there’s an important thing to note here: the values provided for any string-based columns (here, <code>city_name</code> and <code>country</code>) are derived from string lengths.</p>
 <p>When using <code>pb scan</code>, it’s helpful to know that large numbers in the summary table are automatically abbreviated for readability, so you’ll see values like <code>39.8k</code> or <code>38.0M</code> instead of long numbers that would require many more characters. For the best experience, try to use a terminal window that’s at least 150 characters wide. This will help ensure that all column values are fully visible and not adversely abbreviated by the underlying table mechanism.</p>
@@ -543,7 +550,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="pb-missing-reporting-on-missing-values" class="level2">
 <h2 class="anchored" data-anchor-id="pb-missing-reporting-on-missing-values"><code>pb missing</code>: Reporting on Missing Values</h2>
 <p>Use <code>pb missing</code> to generate a missing values report, visualizing missingness across columns and 10 <em>row sectors</em>. Here’s an example using <code>worldcities.csv</code>:</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> missing worldcities.csv</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> missing worldcities.csv</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><img src="../assets/pb-missing-worldcities-csv.png" class="img-fluid" style="width:100.0%"></p>
 <p>This report is arranged similarly to that of <code>pb scan</code>, where each column in the input table gets a row in this report table. Each of the 10 row sectors represents 1/10 of the rows in the dataset, where sector <code>1</code> encompasses the head of the table, and <code>10</code> the tail.</p>
 <p>More often than not, we expect few missing values so a filled green circle signifies that the collection of rows in a sector (for a column) has no missing values. We don’t see any red circles in the <code>worldcities.csv</code>-based example but, if we did, that would mean that sectors for a given column are entirely filled with missing values.</p>
@@ -618,13 +625,14 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
       e.clearSelection();
     }
     const getTextToCopy = function(trigger) {
-        const codeEl = trigger.previousElementSibling.cloneNode(true);
-        for (const childEl of codeEl.children) {
-          if (isCodeAnnotation(childEl)) {
-            childEl.remove();
-          }
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
         }
-        return codeEl.innerText;
+      }
+      return codeEl.innerText;
     }
     const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
       text: getTextToCopy

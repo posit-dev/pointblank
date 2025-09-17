@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.7.34">
+<meta name="generator" content="quarto-1.8.24">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -70,14 +70,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../assets/fav-logo.png" rel="icon" type="image/png">
 <script src="../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-c8ad9e5dbd60b7b70b38521ab19b7da4.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dc55a5b9e770e841cd82e46aadbfb9b0.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-ac094b9e767832278df91157bc75fe51.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-6db88e7b476494ae1895bca8c73958c5.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -127,6 +128,8 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
+    <a href="../index.html" class="navbar-brand navbar-brand-logo">
+    </a>
     <a class="navbar-brand" href="../index.html">
     <span class="navbar-title">Pointblank</span>
     </a>
@@ -186,6 +189,10 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
   <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+      <a href="../index.html" class="sidebar-logo-link">
+      </a>
+      </div>
     <div class="sidebar-menu-container"> 
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item sidebar-item-section">
@@ -489,44 +496,44 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <h2 class="anchored" data-anchor-id="pb-validate-quick-one-line-data-checks"><code>pb validate</code>: Quick, One-Line Data Checks</h2>
 <p>The <code>pb validate</code> command is your go-to for running common validation checks directly on your data source. It’s perfect for quick, one-off checks or for use in automated pipelines. You specify exactly which check you want to run using the <code>--check</code> option, making your intent clear and your validation explicit.</p>
 <p>Here’s how you construct a validation command:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate worldcities.csv <span class="at">--check</span> <span class="op">&lt;</span>check-name<span class="op">&gt;</span> [other options]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate worldcities.csv <span class="at">--check</span> <span class="op">&lt;</span>check-name<span class="op">&gt;</span> [other options]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>You always provide the data source first, then specify one or more checks with <code>--check</code>. Each check can have its own options, such as <code>--column</code> or <code>--value</code>, depending on what you want to validate.</p>
 <section id="checking-for-duplicate-and-complete-rows" class="level3">
 <h3 class="anchored" data-anchor-id="checking-for-duplicate-and-complete-rows">Checking for Duplicate and Complete Rows</h3>
 <p>To check for duplicate rows, use the <code>rows-distinct</code> check:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate worldcities.csv <span class="at">--check</span> rows-distinct</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate worldcities.csv <span class="at">--check</span> rows-distinct</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><img src="../assets/pb-validate-rows-distinct-worldcities-csv.png" class="img-fluid" style="width:100.0%"></p>
 <p>The output shows you whether your data contains any duplicate rows, how many rows were checked, and if any duplicates were found. The color-coding of the results helps you quickly interpret the results, using green for pass and red for fail. Here, no duplicate rows were detected out of the 41K rows checked.</p>
 <p>To check that every row is complete (i.e., no missing values in any column), use the <code>rows-complete</code> check:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate worldcities.csv <span class="at">--check</span> rows-complete</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate worldcities.csv <span class="at">--check</span> rows-complete</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><img src="../assets/pb-validate-rows-complete-worldcities-csv.png" class="img-fluid" style="width:100.0%"></p>
 <p>With this check we see that the <code>worldcities.csv</code> dataset has 739 rows containing at least one Null/missing value. And with any dataset, it’s easy to quickly spot if there are any rows with missing data using this command.</p>
 </section>
 <section id="checking-for-nulls-and-value-ranges" class="level3">
 <h3 class="anchored" data-anchor-id="checking-for-nulls-and-value-ranges">Checking for Nulls and Value Ranges</h3>
 <p>You can easily check for missing values in a column, or ensure that values fall within a certain range. Here’s how to check that all values in the <code>population</code> column are not null:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate worldcities.csv <span class="at">--check</span> col-vals-not-null <span class="at">--column</span> city_name</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate worldcities.csv <span class="at">--check</span> col-vals-not-null <span class="at">--column</span> city_name</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><img src="../assets/pb-validate-worldcities-not-null-city_name.png" class="img-fluid" style="width:100.0%"></p>
 <p>Perhaps surprisingly, we find that one row has a missing city name.</p>
 <p>Let’s now check whether all values in the <code>population</code> column are greater than zero:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate worldcities.csv <span class="at">--check</span> col-vals-gt <span class="at">--column</span> population <span class="at">--value</span> 0</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate worldcities.csv <span class="at">--check</span> col-vals-gt <span class="at">--column</span> population <span class="at">--value</span> 0</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><img src="../assets/pb-validate-worldcities-gt-0-population.png" class="img-fluid" style="width:100.0%"></p>
 <p>With that we find that there are 741 rows where the <code>population</code> value is not greater than 0 (note that this check also fails when cells are null or missing).</p>
 </section>
 <section id="multiple-checks-in-one-command" class="level3">
 <h3 class="anchored" data-anchor-id="multiple-checks-in-one-command">Multiple Checks in One Command</h3>
 <p>You can chain several checks together in a single command. This is handy for comprehensive data quality checks:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate worldcities.csv <span class="at">--check</span> rows-distinct <span class="at">--check</span> col-vals-not-null <span class="at">--column</span> city_name <span class="at">--check</span> col-vals-gt <span class="at">--column</span> population <span class="at">--value</span> 0</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate worldcities.csv <span class="at">--check</span> rows-distinct <span class="at">--check</span> col-vals-not-null <span class="at">--column</span> city_name <span class="at">--check</span> col-vals-gt <span class="at">--column</span> population <span class="at">--value</span> 0</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><img src="../assets/pb-validate-multi-check.png" class="img-fluid" style="width:100.0%"></p>
 <p>Each check is shown one after the other in the terminal output, so you can review the result of each validation step individually as the command proceeds.</p>
 </section>
 <section id="seeing-and-saving-failing-rows" class="level3">
 <h3 class="anchored" data-anchor-id="seeing-and-saving-failing-rows">Seeing and Saving Failing Rows</h3>
 <p>If a check fails, you might want to see which rows caused the failure. Use the <code>--show-extract</code> option to display failing rows right in the terminal:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate worldcities.csv <span class="at">--check</span> rows-complete <span class="at">--show-extract</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate worldcities.csv <span class="at">--check</span> rows-complete <span class="at">--show-extract</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><img src="../assets/pb-validate-show-extract.png" class="img-fluid" style="width:100.0%"></p>
 <p>Or, save the failing rows to a CSV file for further investigation:</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate worldcities.csv <span class="at">--check</span> rows-complete <span class="at">--show-extract</span> <span class="at">--write-extract</span> incomplete_failing_rows</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate worldcities.csv <span class="at">--check</span> rows-complete <span class="at">--show-extract</span> <span class="at">--write-extract</span> incomplete_failing_rows</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><img src="../assets/pb-validate-write-extract.png" class="img-fluid" style="width:100.0%"></p>
 <p>Note here in the output the additional lines stating that failing rows were saved to a folder (<code>incomplete_failing_rows</code>) and, within that folder the <code>step_01_rows_complete.csv</code> file was written. Using a folder for extracts is necessary in practice since there may be multiple validations defined in a <code>pb validate</code> command.</p>
 </section>
@@ -537,7 +544,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <li>use <code>--limit</code> to control how many failing rows are shown or saved</li>
 <li>use <code>--list-checks</code> to see all available validation checks and their options</li>
 </ul>
-<div class="sourceCode" id="cb9"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate worldcities.csv <span class="at">--check</span> col-vals-not-null <span class="at">--column</span> city_name <span class="at">--exit-code</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> validate worldcities.csv <span class="at">--check</span> col-vals-not-null <span class="at">--column</span> city_name <span class="at">--exit-code</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><img src="../assets/pb-validate-exit-code.png" class="img-fluid" style="width:100.0%"></p>
 </section>
 </section>
@@ -545,7 +552,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <h2 class="anchored" data-anchor-id="pb-run-custom-validation-workflows-with-python"><code>pb run</code>: Custom Validation Workflows with Python</h2>
 <p>For more complex validation logic, use the <code>pb run</code> command. This lets you execute a Python script containing Pointblank validation steps, combining the flexibility of the Python API with the convenience of the CLI.</p>
 <p>You can always scaffold a template script using the <code>pb make-template</code> command:</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> make-template my_validation.py</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> make-template my_validation.py</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><img src="../assets/pb-make-template.png" class="img-fluid" style="width:100.0%"></p>
 <p>But for our example, we’ll elect to make our own <code>worldcities_validation.py</code> file from scratch. It will:</p>
 <ul>
@@ -554,7 +561,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <li>have six validation steps</li>
 </ul>
 <p>Here’s what it looks like:</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    pb.Validate(</span>
@@ -581,18 +588,18 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a>    .col_vals_between(columns<span class="op">=</span><span class="st">"latitude"</span>, left<span class="op">=-</span><span class="dv">90</span>, right<span class="op">=</span><span class="dv">90</span>)</span>
 <span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a>    .col_vals_between(columns<span class="op">=</span><span class="st">"longitude"</span>, left<span class="op">=-</span><span class="dv">180</span>, right<span class="op">=</span><span class="dv">180</span>)</span>
 <span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
-<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Now, we’ll run the .py script from the terminal:</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> run worldcities_validation.py</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> run worldcities_validation.py</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><img src="../assets/pb-run-worldcities_validation.png" class="img-fluid" style="width:100.0%"></p>
 <p>You’ll see a summary table that lists all of the steps and their results and you can include as many steps and as much logic as you need.</p>
 <section id="output-options" class="level3">
 <h3 class="anchored" data-anchor-id="output-options">Output Options</h3>
 <p>You could save the validation report as HTML or JSON (or both) for the purposes of sharing or for automation:</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> run worldcities_validation.py <span class="at">--output-html</span> report.html <span class="at">--output-json</span> report.json</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> run worldcities_validation.py <span class="at">--output-html</span> report.html <span class="at">--output-json</span> report.json</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><img src="../assets/pb-run-worldcities_validation-output.png" class="img-fluid" style="width:100.0%"></p>
 <p>There are also the options to produce extracts (subset of failing rows) with <code>--show-extract</code> or <code>--write-extract</code> (just like with <code>pb validate</code>). Let’s do both in the following example:</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> run worldcities_validation.py <span class="at">--show-extract</span> <span class="at">--write-extract</span> worldcities_failures</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> run worldcities_validation.py <span class="at">--show-extract</span> <span class="at">--write-extract</span> worldcities_failures</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><img src="../assets/pb-run-worldcities_validation-extracts.png" class="img-fluid" style="width:100.0%"></p>
 <p>This shows a preview of each extract for those validation steps where extracts were produced (steps 2, 3, and 4). Individual CSV files with extracted rows for those steps were written to the <code>worldcities_failures</code> directory.</p>
 </section>
@@ -600,11 +607,11 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <h3 class="anchored" data-anchor-id="controlling-failure-behavior">Controlling Failure Behavior</h3>
 <p>It’s possible to use the <code>--fail-on</code> option to control when the command should exit with an error, based on the severity of validation failures. This is especially useful for automated workflows and CI/CD pipelines.</p>
 <p>Let’s try that with our <code>worldcities_validation.py</code> validation, which we’ve seen exeeds the ‘warning’ in steps 2, 3, and 4:</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> run worldcities_validation.py <span class="at">--fail-on</span> warning</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb15"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> run worldcities_validation.py <span class="at">--fail-on</span> warning</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><img src="../assets/pb-run-worldcities_validation-fail-on-warning.png" class="img-fluid" style="width:100.0%"></p>
 <p>Notice the final line states <code>Exiting with error due to warning, error, or critical validation failures</code>. Because we applied <code>--fail-on warning</code>, any presence of `warning’ (or higher levels such as ‘error’ or ‘critical’) will yield a non-zero exit code that should stop a pipeline process. We can prove this by running the following lines in the terminal</p>
-<div class="sourceCode" id="cb16"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> run worldcities_validation.py <span class="at">--fail-on</span> warning <span class="op">&gt;</span> /dev/null <span class="dv">2</span><span class="op">&gt;&amp;</span><span class="dv">1</span></span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="va">$?</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb16"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pb</span> run worldcities_validation.py <span class="at">--fail-on</span> warning <span class="op">&gt;</span> /dev/null <span class="dv">2</span><span class="op">&gt;&amp;</span><span class="dv">1</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="va">$?</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>which returns <code>1</code>.</p>
 </section>
 </section>
@@ -667,13 +674,14 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
       e.clearSelection();
     }
     const getTextToCopy = function(trigger) {
-        const codeEl = trigger.previousElementSibling.cloneNode(true);
-        for (const childEl of codeEl.children) {
-          if (isCodeAnnotation(childEl)) {
-            childEl.remove();
-          }
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
         }
-        return codeEl.innerText;
+      }
+      return codeEl.innerText;
     }
     const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
       text: getTextToCopy

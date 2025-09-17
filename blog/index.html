@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.7.34">
+<meta name="generator" content="quarto-1.8.24">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -35,14 +35,15 @@ ul.task-list li input[type="checkbox"] {
 <script src="../site_libs/quarto-listing/quarto-listing.js"></script>
 <script src="../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-c8ad9e5dbd60b7b70b38521ab19b7da4.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dc55a5b9e770e841cd82e46aadbfb9b0.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-ac094b9e767832278df91157bc75fe51.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-6db88e7b476494ae1895bca8c73958c5.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -123,7 +124,7 @@ const typesetMath = (el) => {
     var macros = [];
     for (var i = 0; i < mathElements.length; i++) {
       var texText = mathElements[i].firstChild;
-      if (mathElements[i].tagName == "SPAN") {
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
         window.katex.render(texText.data, mathElements[i], {
           displayMode: mathElements[i].classList.contains('display'),
           throwOnError: false,
@@ -150,6 +151,8 @@ window.Quarto = {
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
+    <a href="../index.html" class="navbar-brand navbar-brand-logo">
+    </a>
     <a class="navbar-brand" href="../index.html">
     <span class="navbar-title">Pointblank</span>
     </a>
@@ -259,7 +262,7 @@ window.Quarto = {
 </thead>
 <tbody class="list">
 
-<tr data-index="0" data-listing-date-sort="1748995200000" data-listing-file-modified-sort="1757347788870" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="24" data-listing-word-count-sort="4702" data-listing-title-sort="Data Validation Libraries for Polars (2025 Edition)" data-listing-filename-sort="index.qmd">
+<tr data-index="0" data-listing-date-sort="1748995200000" data-listing-file-modified-sort="1758135591509" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="24" data-listing-word-count-sort="4702" data-listing-title-sort="Data Validation Libraries for Polars (2025 Edition)" data-listing-filename-sort="index.qmd">
 <td>
 <span class="listing-date">Jun 4, 2025</span>
 </td>
@@ -272,7 +275,7 @@ window.Quarto = {
 
 </tr>
 
-<tr data-index="1" data-listing-date-sort="1748908800000" data-listing-file-modified-sort="1757347788861" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="2" data-listing-word-count-sort="251" data-listing-title-sort="C'mon C'mon: Let's Do a Pointblank Workshop!" data-listing-filename-sort="index.qmd">
+<tr data-index="1" data-listing-date-sort="1748908800000" data-listing-file-modified-sort="1758135591500" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="2" data-listing-word-count-sort="251" data-listing-title-sort="C'mon C'mon: Let's Do a Pointblank Workshop!" data-listing-filename-sort="index.qmd">
 <td>
 <span class="listing-date">Jun 3, 2025</span>
 </td>
@@ -285,7 +288,7 @@ window.Quarto = {
 
 </tr>
 
-<tr data-index="2" data-listing-date-sort="1747699200000" data-listing-file-modified-sort="1757347788865" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="5" data-listing-word-count-sort="814" data-listing-title-sort="Overhauling Pointblank's User Guide" data-listing-filename-sort="index.qmd">
+<tr data-index="2" data-listing-date-sort="1747699200000" data-listing-file-modified-sort="1758135591504" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="5" data-listing-word-count-sort="814" data-listing-title-sort="Overhauling Pointblank's User Guide" data-listing-filename-sort="index.qmd">
 <td>
 <span class="listing-date">May 20, 2025</span>
 </td>
@@ -298,7 +301,7 @@ window.Quarto = {
 
 </tr>
 
-<tr data-index="3" data-listing-date-sort="1746144000000" data-listing-file-modified-sort="1757347788857" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="12" data-listing-word-count-sort="2204" data-listing-title-sort="Level Up Your Data Validation with `Actions` and `FinalActions`" data-listing-filename-sort="index.qmd">
+<tr data-index="3" data-listing-date-sort="1746144000000" data-listing-file-modified-sort="1758135591496" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="12" data-listing-word-count-sort="2204" data-listing-title-sort="Level Up Your Data Validation with `Actions` and `FinalActions`" data-listing-filename-sort="index.qmd">
 <td>
 <span class="listing-date">May 2, 2025</span>
 </td>
@@ -311,7 +314,7 @@ window.Quarto = {
 
 </tr>
 
-<tr data-index="4" data-listing-date-sort="1743724800000" data-listing-file-modified-sort="1757347788857" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="11" data-listing-word-count-sort="2026" data-listing-title-sort="Introducing Pointblank" data-listing-filename-sort="index.qmd">
+<tr data-index="4" data-listing-date-sort="1743724800000" data-listing-file-modified-sort="1758135591496" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="11" data-listing-word-count-sort="2026" data-listing-title-sort="Introducing Pointblank" data-listing-filename-sort="index.qmd">
 <td>
 <span class="listing-date">Apr 4, 2025</span>
 </td>
@@ -379,13 +382,14 @@ window.Quarto = {
       e.clearSelection();
     }
     const getTextToCopy = function(trigger) {
-        const codeEl = trigger.previousElementSibling.cloneNode(true);
-        for (const childEl of codeEl.children) {
-          if (isCodeAnnotation(childEl)) {
-            childEl.remove();
-          }
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
         }
-        return codeEl.innerText;
+      }
+      return codeEl.innerText;
     }
     const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
       text: getTextToCopy
