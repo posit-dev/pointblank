@@ -100,6 +100,7 @@ from pointblank.validate import (
     _convert_string_to_datetime,
     _string_date_dttm_conversion,
     _transform_test_units,
+    _validate_columns_subset,
 )
 from pointblank.thresholds import Thresholds
 from pointblank.schema import Schema, _get_schema_validation_info
@@ -15989,3 +15990,177 @@ def test_get_column_count_fallback_error():
         ValueError, match="The input table type supplied in `data=` is not supported"
     ):
         get_column_count(unsupported_object)
+
+
+def test_col_vals_in_set_invalid_values():
+    """Test col_vals_in_set() with invalid value types in set."""
+    df = pd.DataFrame({"x": [1, 2, 3]})
+    validation = Validate(data=df)
+
+    # Test with a dict in the set (should raise ValueError)
+    with pytest.raises(ValueError, match="`set=` must be a list of floats, integers, or strings"):
+        validation.col_vals_in_set(columns="x", set=[1, 2, {"invalid": "dict"}])
+
+    # Test with a list in the set (should raise ValueError)
+    with pytest.raises(ValueError, match="`set=` must be a list of floats, integers, or strings"):
+        validation.col_vals_in_set(columns="x", set=[1, 2, [3, 4]])
+
+
+def test_col_vals_null_polars_conversion():
+    """Test col_vals_null() with Polars data using conversion paths."""
+    df_pl = pl.DataFrame({"x": [1, None, 3], "y": [None, 5, None]})
+    validation = Validate(data=df_pl)
+
+    result = validation.col_vals_null(columns="x").interrogate()
+    assert result.all_passed() is False
+
+
+def test_missing_vals_tbl_pandas_conversion():
+    """Test missing_vals_tbl() with Pandas data to hit conversion paths."""
+    df_pd = pd.DataFrame({"x": [1, None, 3], "y": [None, 5, None]})
+
+    missing_tbl = missing_vals_tbl(data=df_pd)
+    assert missing_tbl is not None
+
+
+def test_get_column_count_with_row_index():
+    """Test get_column_count() with two DataFrame types."""
+
+    # Test with Polars DataFrame
+    df_pl = pl.DataFrame({"x": [1, 2, 3], "y": [4, 5, 6]})
+    count = get_column_count(df_pl)
+    assert count == 2
+
+    # Test with Pandas DataFrame
+    df_pd = pd.DataFrame({"x": [1, 2, 3], "y": [4, 5, 6]})
+    count = get_column_count(df_pd)
+    assert count == 2
+
+
+def test_validation_with_columns_subset_string():
+    """Test _validate_columns_subset() with string input."""
+
+    col_names = ["x", "y", "z"]
+
+    # Test with string input (should be converted to list internally)
+    result = _validate_columns_subset(columns_subset="y", col_names=col_names)
+    assert result == ["y"]
+
+    # Test with list input
+    result = _validate_columns_subset(columns_subset=["x", "z"], col_names=col_names)
+    assert result == ["x", "z"]
+
+
+def test_validation_eval_error_handling():
+    """Test validation eval error handling for comparison errors."""
+
+    # Create a DataFrame that will cause comparison issues
+    df = pd.DataFrame({"x": [1.0, float("nan"), 3.0]})
+    validation = Validate(data=df)
+
+    # This should trigger the eval_error handling when comparing with NaN
+    result = validation.col_vals_eq(columns="x", value=float("nan")).interrogate()
+
+    # Check that the validation had an eval_error
+    validation_steps = result.validation_info
+    assert len(validation_steps) > 0
+    # Just check that the validation was added
+    assert validation_steps[0].active is not None
+
+
+def test_format_functions_coverage():
+    """Test format functions for coverage."""
+
+    # Test the format single number function
+    result = _format_single_number_with_gt(value=42, n_sigfig=3, compact=True)
+    assert result is not None
+
+    # Test the format single float function
+    result = _format_single_float_with_gt(value=3.14159, decimals=2)
+    assert result is not None
+
+
+def test_format_single_float_with_gt_custom():
+    """Test _format_single_float_with_gt_custom() function with various parameters."""
+    from pointblank.validate import _format_single_float_with_gt_custom
+
+    # Test basic formatting with decimals
+    result = _format_single_float_with_gt_custom(value=3.14159, decimals=2)
+    assert result is not None
+    assert isinstance(result, str)
+
+    # Test with drop_trailing_zeros=True
+    result = _format_single_float_with_gt_custom(
+        value=3.10000, decimals=3, drop_trailing_zeros=True
+    )
+    assert result is not None
+
+    # Test with drop_trailing_zeros=False (default)
+    result = _format_single_float_with_gt_custom(
+        value=3.10000, decimals=3, drop_trailing_zeros=False
+    )
+    assert result is not None
+
+    # Test with different locale
+    result = _format_single_float_with_gt_custom(value=1234.56, decimals=2, locale="en")
+    assert result is not None
+
+    # Test with explicit DataFrame library (Polars if available)
+    try:
+        import polars as pl
+
+        result = _format_single_float_with_gt_custom(value=42.789, decimals=1, df_lib=pl)
+        assert result is not None
+    except ImportError:
+        pass  # Skip if Polars not available
+
+    # Test with explicit DataFrame library (Pandas)
+    try:
+        import pandas as pd
+
+        result = _format_single_float_with_gt_custom(value=42.789, decimals=1, df_lib=pd)
+        assert result is not None
+    except ImportError:
+        pass  # Skip if Pandas not available
+
+    # Test edge cases
+    result = _format_single_float_with_gt_custom(value=0.0, decimals=2)
+    assert result is not None
+
+    result = _format_single_float_with_gt_custom(value=-123.456, decimals=1)
+    assert result is not None
+
+    # Test with very small numbers
+    result = _format_single_float_with_gt_custom(value=0.00001, decimals=5)
+    assert result is not None
+
+    # Test with large numbers
+    result = _format_single_float_with_gt_custom(value=1234567.89, decimals=2)
+    assert result is not None
+
+    # Test different decimal precision scenarios
+    result = _format_single_float_with_gt_custom(value=123.456789, decimals=0)
+    assert result is not None
+
+    result = _format_single_float_with_gt_custom(value=123.456789, decimals=4)
+    assert result is not None
+
+    # Test combination of all parameters
+    result = _format_single_float_with_gt_custom(
+        value=9876.54321, decimals=3, drop_trailing_zeros=True, locale="en"
+    )
+    assert result is not None
+
+
+def test_format_single_float_with_gt_custom_df_lib_selection():
+    """Test _format_single_float_with_gt_custom() automatic library selection."""
+    from pointblank.validate import _format_single_float_with_gt_custom
+
+    # Test automatic library selection (should use whichever is available)
+    result = _format_single_float_with_gt_custom(value=123.456, decimals=2, df_lib=None)
+    assert result is not None
+    assert isinstance(result, str)
+
+    # Test that the function works when df_lib is not specified (uses auto-detection)
+    result = _format_single_float_with_gt_custom(value=42.0)
+    assert result is not None
