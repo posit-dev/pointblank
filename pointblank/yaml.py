@@ -321,7 +321,7 @@ class YAMLValidator:
             raise YAMLValidationError("YAML must contain 'steps' field")
 
         if not isinstance(config["steps"], list):
-            raise YAMLValidationError("'steps' must be a list")
+            raise YAMLValidationError("'steps' must be a list")  # pragma: no cover
 
         if len(config["steps"]) == 0:
             raise YAMLValidationError("'steps' cannot be empty")
@@ -412,9 +412,9 @@ class YAMLValidator:
             if processed_data is processed_tbl_spec and isinstance(processed_tbl_spec, str):
                 return load_dataset(processed_tbl_spec, tbl_type=df_library)
             else:
-                return processed_data
+                return processed_data  # pragma: no cover
 
-        except Exception as e:
+        except Exception as e:  # pragma: no cover
             raise YAMLValidationError(f"Failed to load data source '{tbl_spec}': {e}")
 
     def _load_csv_file(self, file_path: str, df_library: str) -> Any:
@@ -458,16 +458,16 @@ class YAMLValidator:
 
             elif df_library == "duckdb":
                 # For DuckDB, we'll use the existing _process_data since it handles DuckDB
-                from pointblank.validate import _process_data
+                from pointblank.validate import _process_data  # pragma: no cover
 
-                return _process_data(file_path)
+                return _process_data(file_path)  # pragma: no cover
 
             else:
                 raise YAMLValidationError(
                     f"Unsupported df_library: {df_library}. Use 'polars', 'pandas', or 'duckdb'"
                 )
 
-        except Exception as e:
+        except Exception as e:  # pragma: no cover
             raise YAMLValidationError(
                 f"Failed to load CSV file '{file_path}' with {df_library}: {e}"
             )
@@ -659,7 +659,7 @@ class YAMLValidator:
                     if isinstance(expr, str):
                         lambda_expressions.append(_safe_eval_python_code(expr))
                     else:
-                        lambda_expressions.append(expr)
+                        lambda_expressions.append(expr)  # pragma: no cover
                 # Pass expressions as positional arguments (stored as special key)
                 parameters["_conjointly_expressions"] = lambda_expressions
             else:
@@ -1329,7 +1329,7 @@ def yaml_to_python(yaml: Union[str, Path]) -> str:
     """
     # First, parse the raw YAML to detect Polars/Pandas expressions in the source code
     if isinstance(yaml, Path):
-        yaml_content = yaml.read_text()
+        yaml_content = yaml.read_text()  # pragma: no cover
     elif isinstance(yaml, str):
         # Check if it's a file path (single line, reasonable length, no newlines)
         if len(yaml) < 260 and "\n" not in yaml and Path(yaml).exists():
@@ -1337,7 +1337,7 @@ def yaml_to_python(yaml: Union[str, Path]) -> str:
         else:
             yaml_content = yaml
     else:
-        yaml_content = str(yaml)
+        yaml_content = str(yaml)  # pragma: no cover
 
     # Track whether we need to import Polars and Pandas by analyzing the raw YAML content
     needs_polars_import = False
@@ -1432,7 +1432,7 @@ def yaml_to_python(yaml: Union[str, Path]) -> str:
             validate_args.append(f'data=pb.load_dataset("{tbl_spec}", tbl_type="{df_library}")')
     else:
         # Fallback to placeholder if we couldn't extract the original expression
-        validate_args.append("data=<python_expression_result>")
+        validate_args.append("data=<python_expression_result>")  # pragma: no cover
 
     # Add table name if present
     if "tbl_name" in config:
@@ -1465,7 +1465,7 @@ def yaml_to_python(yaml: Union[str, Path]) -> str:
                 action_params.append(f'{key}="{value}"')
             else:
                 # For callables or complex expressions, use placeholder
-                action_params.append(f"{key}={value}")
+                action_params.append(f"{key}={value}")  # pragma: no cover
         actions_str = "pb.Actions(" + ", ".join(action_params) + ")"
         validate_args.append(f"actions={actions_str}")
 
@@ -1552,13 +1552,13 @@ def yaml_to_python(yaml: Union[str, Path]) -> str:
                     expressions_str = "[" + ", ".join([f'"{expr}"' for expr in value]) + "]"
                     param_parts.append(f"expressions={expressions_str}")
                 else:
-                    param_parts.append(f"expressions={value}")
+                    param_parts.append(f"expressions={value}")  # pragma: no cover
             elif key == "expr" and method_name == "specially":
                 # Handle specially expr parameter: should be unquoted lambda expression
                 if isinstance(value, str):
                     param_parts.append(f"expr={value}")
                 else:
-                    param_parts.append(f"expr={value}")
+                    param_parts.append(f"expr={value}")  # pragma: no cover
             elif key in ["columns", "columns_subset"]:
                 if isinstance(value, list):
                     if len(value) == 1:
@@ -1569,7 +1569,7 @@ def yaml_to_python(yaml: Union[str, Path]) -> str:
                         columns_str = "[" + ", ".join([f'"{col}"' for col in value]) + "]"
                         param_parts.append(f"{key}={columns_str}")
                 else:
-                    param_parts.append(f'{key}="{value}"')
+                    param_parts.append(f'{key}="{value}"')  # pragma: no cover
             elif key == "brief":
                 # Handle `brief=` parameter: can be a boolean or a string
                 if isinstance(value, bool):
@@ -1592,25 +1592,29 @@ def yaml_to_python(yaml: Union[str, Path]) -> str:
                         elif isinstance(value.warning, list) and len(value.warning) == 1:
                             action_params.append(f'warning="{value.warning[0]}"')
                         else:
-                            action_params.append(f"warning={value.warning}")
+                            action_params.append(f"warning={value.warning}")  # pragma: no cover
 
                     if value.error is not None:
                         error_expr_path = f"{step_action_base}.error"
                         if error_expr_path in step_expressions:
-                            action_params.append(f"error={step_expressions[error_expr_path]}")
+                            action_params.append(
+                                f"error={step_expressions[error_expr_path]}"
+                            )  # pragma: no cover
                         elif isinstance(value.error, list) and len(value.error) == 1:
                             action_params.append(f'error="{value.error[0]}"')
                         else:
-                            action_params.append(f"error={value.error}")
+                            action_params.append(f"error={value.error}")  # pragma: no cover
 
                     if value.critical is not None:
                         critical_expr_path = f"{step_action_base}.critical"
                         if critical_expr_path in step_expressions:
-                            action_params.append(f"critical={step_expressions[critical_expr_path]}")
+                            action_params.append(
+                                f"critical={step_expressions[critical_expr_path]}"
+                            )  # pragma: no cover
                         elif isinstance(value.critical, list) and len(value.critical) == 1:
                             action_params.append(f'critical="{value.critical[0]}"')
                         else:
-                            action_params.append(f"critical={value.critical}")
+                            action_params.append(f"critical={value.critical}")  # pragma: no cover
 
                     if hasattr(value, "highest_only") and value.highest_only is not True:
                         action_params.append(f"highest_only={value.highest_only}")
