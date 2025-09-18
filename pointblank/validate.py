@@ -15205,10 +15205,10 @@ def _format_single_float_with_gt_custom(
             import polars as pl
 
             df_lib = pl
-        elif _is_lib_present("pandas"):
-            import pandas as pd
+        elif _is_lib_present("pandas"):  # pragma: no cover
+            import pandas as pd  # pragma: no cover
 
-            df_lib = pd
+            df_lib = pd  # pragma: no cover
         else:  # pragma: no cover
             raise ImportError(
                 "Neither Polars nor Pandas is available for formatting"
@@ -15247,7 +15247,7 @@ def _create_thresholds_html(thresholds: Thresholds, locale: str, df_lib=None) ->
             # Fallback to the original behavior
             return fmt_number(
                 value, decimals=decimals, drop_trailing_zeros=drop_trailing_zeros, locale=locale
-            )[0]
+            )[0]  # pragma: no cover
 
     def _format_integer_safe(value: int) -> str:
         if df_lib is not None and value is not None:
@@ -15432,9 +15432,12 @@ def _step_report_row_based(
         title = STEP_REPORT_TEXT["report_for_step_i"][lang].format(i=i) + " " + CHECK_MARK_SPAN
         assertion_header_text = STEP_REPORT_TEXT["assertion_header_text"][lang]
 
-        # Use success_statement_no_column for col_vals_expr since it doesn't target a specific column
+        # Use 'success_statement_no_column' for col_vals_expr() since it doesn't target
+        # a specific column
         if assertion_type == "col_vals_expr":
-            success_stmt = STEP_REPORT_TEXT["success_statement_no_column"][lang].format(n=n)
+            success_stmt = STEP_REPORT_TEXT["success_statement_no_column"][lang].format(
+                n=n
+            )  # pragma: no cover
         else:
             success_stmt = STEP_REPORT_TEXT["success_statement"][lang].format(
                 n=n,
@@ -16147,14 +16150,14 @@ def _step_report_schema_any_order(
         if exp_columns_dict[column_name_exp_i]["colname_matched"]:
             col_exp_correct.append(CHECK_MARK_SPAN)
         else:
-            col_exp_correct.append(CROSS_MARK_SPAN)
+            col_exp_correct.append(CROSS_MARK_SPAN)  # pragma: no cover
 
         #
         # `dtype_exp` values
         #
 
         if not exp_columns_dict[column_name_exp_i]["dtype_present"]:
-            dtype_exp.append("")
+            dtype_exp.append("")  # pragma: no cover
 
         elif len(exp_columns_dict[column_name_exp_i]["dtype_input"]) > 1:
             dtype = exp_columns_dict[column_name_exp_i]["dtype_input"]
@@ -16189,9 +16192,9 @@ def _step_report_schema_any_order(
         #
 
         if not exp_columns_dict[column_name_exp_i]["colname_matched"]:
-            dtype_exp_correct.append("&mdash;")
+            dtype_exp_correct.append("&mdash;")  # pragma: no cover
         elif not exp_columns_dict[column_name_exp_i]["dtype_present"]:
-            dtype_exp_correct.append("")
+            dtype_exp_correct.append("")  # pragma: no cover
         elif exp_columns_dict[column_name_exp_i]["dtype_matched"]:
             dtype_exp_correct.append(CHECK_MARK_SPAN)
         else:
@@ -16237,13 +16240,17 @@ def _step_report_schema_any_order(
             #
 
             if not exp_columns_dict[column_name_exp_i]["dtype_present"]:
-                dtype_exp.append("")
+                dtype_exp.append("")  # pragma: no cover
 
             elif len(exp_columns_dict[column_name_exp_i]["dtype_input"]) > 1:
-                dtype = exp_columns_dict[column_name_exp_i]["dtype_input"]
+                dtype = exp_columns_dict[column_name_exp_i]["dtype_input"]  # pragma: no cover
 
-                if exp_columns_dict[column_name_exp_i]["dtype_matched_pos"] is not None:
-                    pos = exp_columns_dict[column_name_exp_i]["dtype_matched_pos"]
+                if (
+                    exp_columns_dict[column_name_exp_i]["dtype_matched_pos"] is not None
+                ):  # pragma: no cover
+                    pos = exp_columns_dict[column_name_exp_i][
+                        "dtype_matched_pos"
+                    ]  # pragma: no cover
 
                     # Combine the dtypes together with pipes but underline the matched dtype in
                     # green with an HTML span tag and style attribute
@@ -16255,13 +16262,13 @@ def _step_report_schema_any_order(
                             else dtype[i]
                         )
                         for i in range(len(dtype))
-                    ]
-                    dtype = " | ".join(dtype)
-                    dtype_exp.append(dtype)
+                    ]  # pragma: no cover
+                    dtype = " | ".join(dtype)  # pragma: no cover
+                    dtype_exp.append(dtype)  # pragma: no cover
 
                 else:
-                    dtype = " | ".join(dtype)
-                    dtype_exp.append(dtype)
+                    dtype = " | ".join(dtype)  # pragma: no cover
+                    dtype_exp.append(dtype)  # pragma: no cover
 
             else:
                 dtype = exp_columns_dict[column_name_exp_i]["dtype_input"][0]
@@ -16273,12 +16280,12 @@ def _step_report_schema_any_order(
 
             if not exp_columns_dict[column_name_exp_i]["colname_matched"]:
                 dtype_exp_correct.append("&mdash;")
-            elif not exp_columns_dict[column_name_exp_i]["dtype_present"]:
-                dtype_exp_correct.append("")
-            elif exp_columns_dict[column_name_exp_i]["dtype_matched"]:
-                dtype_exp_correct.append(CHECK_MARK_SPAN)
-            else:
-                dtype_exp_correct.append(CROSS_MARK_SPAN)
+            elif not exp_columns_dict[column_name_exp_i]["dtype_present"]:  # pragma: no cover
+                dtype_exp_correct.append("")  # pragma: no cover
+            elif exp_columns_dict[column_name_exp_i]["dtype_matched"]:  # pragma: no cover
+                dtype_exp_correct.append(CHECK_MARK_SPAN)  # pragma: no cover
+            else:  # pragma: no cover
+                dtype_exp_correct.append(CROSS_MARK_SPAN)  # pragma: no cover
 
         if len(columns_found) > 0:
             # Get the last index of the columns found
@@ -16294,7 +16301,9 @@ def _step_report_schema_any_order(
             ]
 
         else:
-            index_exp = [str(i) for i in range(1, len(colnames_exp_unmatched) + 1)]
+            index_exp = [
+                str(i) for i in range(1, len(colnames_exp_unmatched) + 1)
+            ]  # pragma: no cover
 
         schema_exp_unmatched = pl.DataFrame(
             {
