@@ -840,6 +840,8 @@ def yaml_interrogate(
     **Option 1: Inline expressions (no namespaces needed)**
 
     ```{python}
+    import pointblank as pb
+
     # Simple inline custom action
     yaml_config = '''
     tbl: small_table
