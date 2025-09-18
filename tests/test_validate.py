@@ -103,6 +103,7 @@ from pointblank.validate import (
 )
 from pointblank.thresholds import Thresholds
 from pointblank.schema import Schema, _get_schema_validation_info
+from pointblank.segments import seg_group, Segment
 from pointblank.column import (
     col,
     starts_with,
@@ -9322,6 +9323,134 @@ def test_process_brief():
         )
         == "Segment: column and seg1/seg2"
     )
+
+    # Test seg_group() with a single segment
+    assert (
+        _process_brief(
+            brief="Seg group: {segment_value}",
+            step=1,
+            col=None,
+            values=None,
+            thresholds=None,
+            segment=("column", seg_group(["low", "high"])),
+        )
+        == "Seg group: low, high"
+    )
+
+    # Test seg_group() with multiple segments
+    assert (
+        _process_brief(
+            brief="Multiple segments: {segment_value}",
+            step=1,
+            col=None,
+            values=None,
+            thresholds=None,
+            segment=("column", seg_group([["low", "mid"], ["high"]])),
+        )
+        == "Multiple segments: low, mid | high"
+    )
+
+    # Test seg_group() with a full segment template
+    assert (
+        _process_brief(
+            brief="Full segment: {segment}",
+            step=1,
+            col=None,
+            values=None,
+            thresholds=None,
+            segment=("region", seg_group(["north", "south"])),
+        )
+        == "Full segment: region / north, south"
+    )
+
+    # Test seg_group() with segment_column template
+    assert (
+        _process_brief(
+            brief="Column: {segment_column}, Values: {segment_value}",
+            step=1,
+            col=None,
+            values=None,
+            thresholds=None,
+            segment=("category", seg_group([["A", "B"], ["C", "D"]])),
+        )
+        == "Column: category, Values: A, B | C, D"
+    )
+
+
+def test_seg_group_with_auto_brief():
+    """Test that seg_group() works correctly with brief='{auto}'."""
+
+    # Load test data
+    data = load_dataset("small_table", tbl_type="polars")
+
+    # Test seg_group with {auto} brief; should not raise a TypeError
+    # Use col_vals_gt() with a low threshold to ensure the validation passes
+    validation = (
+        Validate(data=data)
+        .col_vals_gt(
+            "d",
+            100,  # Use a low threshold that all values will pass
+            segments=("f", seg_group(["low", "high"])),
+            brief="{auto}",
+        )
+        .interrogate()
+    )
+
+    # Validation should complete successfully without TypeError
+    assert validation is not None
+    assert len(validation.validation_info) == 1
+    assert validation.validation_info[0].eval_error is None  # No processing errors
+
+    # Test with multiple segment groups and {auto} brief
+    validation_multi = (
+        Validate(data=data)
+        .col_vals_not_null(
+            "a",  # Column 'a' has no nulls, so this will pass
+            segments=("f", seg_group([["low"], ["high"]])),
+            brief="{auto}",
+        )
+        .interrogate()
+    )
+
+    # Should have two validation steps (one for each segment group)
+    assert validation_multi is not None
+    assert len(validation_multi.validation_info) == 2
+    assert all(step.eval_error is None for step in validation_multi.validation_info)
+
+    # Test comparison: regular segments vs seg_group() with {auto} brief
+    validation_regular = (
+        Validate(data=data)
+        .col_vals_not_null(
+            "b",  # Column 'b' has no nulls
+            segments=("f", ["low", "high"]),
+            brief="{auto}",
+        )
+        .interrogate()
+    )
+
+    validation_seggroup = (
+        Validate(data=data)
+        .col_vals_not_null("b", segments=("f", seg_group(["low", "high"])), brief="{auto}")
+        .interrogate()
+    )
+
+    # Both should work without errors
+    assert validation_regular is not None
+    assert validation_seggroup is not None
+    assert all(step.eval_error is None for step in validation_regular.validation_info)
+    assert all(step.eval_error is None for step in validation_seggroup.validation_info)
+
+    # Regular segments create individual steps, seg_group creates one grouped step
+    assert len(validation_regular.validation_info) == 2  # Two separate steps
+    assert len(validation_seggroup.validation_info) == 1  # One grouped step
+
+    # Verify that the auto-generated brief was processed correctly for seg_group
+    brief_text = validation_seggroup.validation_info[0].autobrief
+    assert brief_text is not None
+    assert "b" in brief_text  # Should contain column name
+    assert (
+        "not be null" in brief_text.lower() or "not null" in brief_text.lower()
+    )  # Should describe the validation
 
 
 def test_process_action_str():
