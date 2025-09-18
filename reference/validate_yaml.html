@@ -265,7 +265,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     ">
 <p>For the examples here, we’ll demonstrate how to validate YAML configurations before using them with validation workflows. This is particularly useful for building robust data validation systems where you want to catch configuration errors early.</p>
 <p>Let’s start with validating a basic configuration:</p>
-<div id="00169e53" class="cell" data-execution_count="2">
+<div id="3fe7b0b6" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Define a basic YAML validation configuration</span></span>
@@ -286,7 +286,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 <p>The function completed without raising an exception, which means our configuration is valid and follows the expected structure.</p>
 <p>Now let’s validate a more complex configuration with thresholds and metadata:</p>
-<div id="49f8e8e4" class="cell" data-execution_count="3">
+<div id="6fca7f18" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Complex YAML configuration with all optional fields</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>yaml_config <span class="op">=</span> <span class="st">'''</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="st">tbl: small_table</span></span>
@@ -323,7 +323,7 @@ Configuration has 3 validation steps</code></pre>
 </div>
 <p>This configuration includes all the optional metadata fields and complex validation steps, demonstrating that the validation handles the full range of supported options.</p>
 <p>Let’s see what happens when we try to validate an invalid configuration:</p>
-<div id="65611f0b" class="cell" data-execution_count="4">
+<div id="1f4cd084" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Invalid YAML configuration: missing required 'tbl' field</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>invalid_yaml <span class="op">=</span> <span class="st">'''</span></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="st">steps:</span></span>
@@ -340,7 +340,7 @@ Configuration has 3 validation steps</code></pre>
 </div>
 <p>The validation correctly identifies that our configuration is missing the required <code>'tbl'</code> field.</p>
 <p>Here’s a practical example of using validation in a workflow builder:</p>
-<div id="bebcdde7" class="cell" data-execution_count="5">
+<div id="d91ecea8" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> safe_yaml_interrogate(yaml_config):</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Safely execute a YAML configuration after validation."""</span></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">try</span>:</span>
