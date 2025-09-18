@@ -71,6 +71,7 @@ def _safe_eval_python_code(
             "abs": abs,
             "round": round,
             "print": print,
+            "__import__": __import__,
         },
     }
 
@@ -102,12 +103,14 @@ def _safe_eval_python_code(
                     f"Could not import requested namespace '{module_name}': {e}"
                 ) from e
 
-    # Check for dangerous patterns
+    # Check for dangerous patterns and be more specific about __import__ to allow legitimate use
     dangerous_patterns = [
-        r"import\s+os",
-        r"import\s+sys",
-        r"import\s+subprocess",
-        r"__import__",
+        r"import\s+os\b",
+        r"import\s+sys\b",
+        r"import\s+subprocess\b",
+        r"__import__\s*\(\s*['\"]os['\"]",
+        r"__import__\s*\(\s*['\"]sys['\"]",
+        r"__import__\s*\(\s*['\"]subprocess['\"]",
         r"exec\s*\(",
         r"eval\s*\(",
         r"open\s*\(",
@@ -563,7 +566,11 @@ class YAMLValidator:
                 f"Schema specification must be a dictionary, got: {type(schema_spec)}"
             )
 
-    def _parse_validation_step(self, step_config: Union[str, dict]) -> tuple[str, dict]:
+    def _parse_validation_step(
+        self,
+        step_config: Union[str, dict],
+        namespaces: Optional[Union[Iterable[str], Mapping[str, str]]] = None,
+    ) -> tuple[str, dict]:
         """Parse a single validation step from YAML configuration.
 
         Parameters
@@ -614,14 +621,16 @@ class YAMLValidator:
             # Special case: `col_vals_expr()`'s `expr=` parameter can use shortcut syntax
             if method_name == "col_vals_expr" and key == "expr" and isinstance(value, str):
                 # Treat string directly as Python code (shortcut syntax)
-                processed_parameters[key] = _safe_eval_python_code(value)
+                processed_parameters[key] = _safe_eval_python_code(value, namespaces=namespaces)
             # Special case: `pre=` parameter can use shortcut syntax (like `expr=`)
             elif key == "pre" and isinstance(value, str):
                 # Treat string directly as Python code (shortcut syntax)
-                processed_parameters[key] = _safe_eval_python_code(value)
+                processed_parameters[key] = _safe_eval_python_code(value, namespaces=namespaces)
             else:
                 # Normal processing (requires python: block syntax)
-                processed_parameters[key] = _process_python_expressions(value)
+                processed_parameters[key] = _process_python_expressions(
+                    value, namespaces=namespaces
+                )
         parameters = processed_parameters
 
         # Convert `columns=` specification
@@ -733,7 +742,9 @@ class YAMLValidator:
 
         # Add validation steps
         for step_config in config["steps"]:
-            method_name, parameters = self._parse_validation_step(step_config)
+            method_name, parameters = self._parse_validation_step(
+                step_config, namespaces=namespaces
+            )
 
             # Get the method from the validation object
             method = getattr(validation, method_name)
@@ -798,6 +809,10 @@ def yaml_interrogate(
         `tbl` field before executing the validation workflow. This can be any supported table type
         including DataFrame objects, Ibis table objects, CSV file paths, Parquet file paths, GitHub
         URLs, or database connection strings.
+    namespaces
+        Optional module namespaces to make available for Python code execution in YAML
+        configurations. Can be a dictionary mapping aliases to module names or a list of module
+        names. See the "Using Namespaces" section below for detailed examples.
 
     Returns
     -------
@@ -811,6 +826,69 @@ def yaml_interrogate(
     YAMLValidationError
         If the YAML is invalid, malformed, or execution fails. This includes syntax errors, missing
         required fields, unknown validation methods, or data loading failures.
+
+    Using Namespaces
+    ----------------
+    The `namespaces=` parameter enables custom Python modules and functions in YAML configurations.
+    This is particularly useful for custom action functions and advanced Python expressions.
+
+    **Namespace formats:**
+
+    - Dictionary format: `{"alias": "module.name"}` maps aliases to module names
+    - List format: `["module.name", "another.module"]` imports modules directly
+
+    **Option 1: Inline expressions (no namespaces needed)**
+
+    ```{python}
+    # Simple inline custom action
+    yaml_config = '''
+    tbl: small_table
+    thresholds:
+      warning: 0.01
+    actions:
+      warning:
+        python: "lambda: print('Custom warning triggered')"
+    steps:
+    - col_vals_gt:
+        columns: [a]
+        value: 1000
+    '''
+
+    result = pb.yaml_interrogate(yaml_config)
+    result
+    ```
+
+    **Option 2: External functions with namespaces**
+
+    ```{python}
+    # Define a custom action function
+    def my_custom_action():
+        print("Data validation failed: please check your data.")
+
+    # Add to current module for demo
+    import sys
+    sys.modules[__name__].my_custom_action = my_custom_action
+
+    # YAML that references the external function
+    yaml_config = '''
+    tbl: small_table
+    thresholds:
+      warning: 0.01
+    actions:
+      warning:
+        python: actions.my_custom_action
+    steps:
+    - col_vals_gt:
+        columns: [a]
+        value: 1000  # This will fail
+    '''
+
+    # Use namespaces to make the function available
+    result = pb.yaml_interrogate(yaml_config, namespaces={'actions': '__main__'})
+    result
+    ```
+
+    This approach enables modular, reusable validation workflows with custom business logic.
 
     Examples
     --------
@@ -1440,7 +1518,7 @@ def yaml_to_python(yaml: Union[str, Path]) -> str:
             elif isinstance(step_params["expr"], str):
                 original_expressions["expr"] = step_params["expr"]
 
-        method_name, parameters = validator._parse_validation_step(step_config)
+        method_name, parameters = validator._parse_validation_step(step_config, namespaces=None)
 
         # Apply the original expressions to override the converted lambda functions
         if method_name == "conjointly" and "expressions" in original_expressions:

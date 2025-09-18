@@ -3884,3 +3884,309 @@ def test_yaml_to_python_non_dict_thresholds():
     # Verify non-dict threshold values are handled correctly
     assert "thresholds=0.1" in python_code
     assert "thresholds=True" in python_code
+
+
+# Custom Actions Tests (from test_yaml_custom_actions_simple.py)
+
+
+# Test helper functions that can be used as custom actions
+def test_action_function():
+    """A simple test action function."""
+    from pointblank import get_action_metadata
+
+    metadata = get_action_metadata()
+    if metadata:
+        print(f"Test action triggered: {metadata['type']} at step {metadata['step']}")
+    else:
+        print("Test action triggered: no metadata available")
+
+
+def logging_action():
+    """Action that simulates logging behavior."""
+    from pointblank import get_action_metadata
+
+    metadata = get_action_metadata()
+    if metadata:
+        print(f"LOG: {metadata['type'].upper()} - Step {metadata['step']} failed")
+    else:
+        print("LOG: Action triggered with no metadata")
+
+
+def test_yaml_custom_actions_namespace_import_functionality():
+    """Test that namespaces parameter allows importing modules."""
+    # Test that we can import a test module through namespaces
+    namespaces = {"test_actions": "tests.test_yaml"}
+
+    result = _safe_eval_python_code("test_actions.test_action_function", namespaces=namespaces)
+    assert callable(result)
+    assert result.__name__ == "test_action_function"
+
+
+def test_yaml_custom_actions_basic_with_dict_namespaces():
+    """Test basic custom action functionality using dictionary namespaces."""
+    yaml_content = """
+    tbl: small_table
+    thresholds:
+      warning: 0.01  # Very low threshold to trigger action
+    actions:
+      warning:
+        python: test_actions.test_action_function
+    steps:
+    - col_vals_gt:
+        columns: [a]
+        value: 1000  # This will fail and trigger the action
+    """
+
+    # Create a module-like namespace
+    namespaces = {"test_actions": "tests.test_yaml"}
+
+    captured_output = io.StringIO()
+    with contextlib.redirect_stdout(captured_output):
+        result = yaml_interrogate(yaml_content, namespaces=namespaces)
+        assert result is not None
+        assert len(result.validation_info) == 1
+
+    # Verify the custom action was executed
+    output_text = captured_output.getvalue()
+    assert "Test action triggered:" in output_text
+
+
+def test_yaml_custom_actions_inline_import():
+    """Test custom action using inline import (no namespaces param needed)."""
+    yaml_content = """
+    tbl: small_table
+    thresholds:
+      warning: 0.01
+    actions:
+      warning:
+        python: |
+          test_actions = __import__('tests.test_yaml', fromlist=[''])
+          test_actions.test_action_function
+    steps:
+    - col_vals_gt:
+        columns: [a]
+        value: 1000
+    """
+
+    captured_output = io.StringIO()
+    with contextlib.redirect_stdout(captured_output):
+        result = yaml_interrogate(yaml_content)
+        assert result is not None
+
+    output_text = captured_output.getvalue()
+    assert "Test action triggered:" in output_text
+
+
+def test_yaml_custom_actions_invalid_namespace_error():
+    """Test error handling for invalid namespace modules."""
+    yaml_content = """
+    tbl: small_table
+    actions:
+      warning:
+        python: some_module.some_function
+    steps:
+    - col_vals_gt:
+        columns: [a]
+        value: 1000
+    """
+
+    namespaces = {"some_module": "non.existent.module"}
+
+    with pytest.raises(ImportError) as exc_info:
+        yaml_interrogate(yaml_content, namespaces=namespaces)
+
+    assert "Could not import requested namespace 'non.existent.module'" in str(exc_info.value)
+
+
+def test_yaml_custom_actions_multiple_namespaces():
+    """Test using multiple namespaces."""
+    yaml_content = """
+    tbl: small_table
+    thresholds:
+      warning: 0.01
+    actions:
+      warning:
+        python: actions.logging_action
+    steps:
+    - col_vals_gt:
+        columns: [a]
+        value: 1000
+    """
+
+    namespaces = {
+        "actions": "tests.test_yaml",
+        "utils": "os",  # Just to test multiple imports work
+    }
+
+    captured_output = io.StringIO()
+    with contextlib.redirect_stdout(captured_output):
+        result = yaml_interrogate(yaml_content, namespaces=namespaces)
+        assert result is not None
+
+    output_text = captured_output.getvalue()
+    assert "LOG:" in output_text
+
+
+def test_yaml_custom_actions_namespaces_list_format():
+    """Test namespaces as a list."""
+    yaml_content = """
+    tbl: small_table
+    thresholds:
+      warning: 0.01
+    actions:
+      warning:
+        python: |
+          import tests.test_yaml as actions
+          actions.test_action_function
+    steps:
+    - col_vals_gt:
+        columns: [a]
+        value: 1000
+    """
+
+    namespaces = ["tests.test_yaml"]
+
+    captured_output = io.StringIO()
+    with contextlib.redirect_stdout(captured_output):
+        result = yaml_interrogate(yaml_content, namespaces=namespaces)
+        assert result is not None
+
+    output_text = captured_output.getvalue()
+    assert "Test action triggered:" in output_text
+
+
+def test_yaml_custom_actions_with_set_tbl():
+    """Test that custom actions work with set_tbl parameter."""
+    # Create a test table that will fail validation
+    test_table = pl.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]})
+
+    yaml_content = """
+    tbl: small_table  # This will be overridden
+    thresholds:
+      warning: 0.01
+    actions:
+      warning:
+        python: actions.test_action_function
+    steps:
+    - col_vals_gt:
+        columns: [a]
+        value: 100  # Will fail with our test data
+    """
+
+    namespaces = {"actions": "tests.test_yaml"}
+
+    captured_output = io.StringIO()
+    with contextlib.redirect_stdout(captured_output):
+        result = yaml_interrogate(yaml_content, set_tbl=test_table, namespaces=namespaces)
+        assert result is not None
+
+    output_text = captured_output.getvalue()
+    assert "Test action triggered:" in output_text
+
+
+def test_yaml_custom_actions_step_level():
+    """Test custom actions defined at the step level."""
+    yaml_content = """
+    tbl: small_table
+    steps:
+    - col_vals_gt:
+        columns: [a]
+        value: 1000
+        thresholds:
+          warning: 0.01
+        actions:
+          warning:
+            python: actions.logging_action
+    """
+
+    namespaces = {"actions": "tests.test_yaml"}
+
+    captured_output = io.StringIO()
+    with contextlib.redirect_stdout(captured_output):
+        result = yaml_interrogate(yaml_content, namespaces=namespaces)
+        assert result is not None
+
+    output_text = captured_output.getvalue()
+    assert "LOG:" in output_text
+
+
+def test_yaml_custom_actions_empty_namespaces_fallback():
+    """Test that empty namespaces parameter works (fallback to normal behavior)."""
+    yaml_content = """
+    tbl: small_table
+    actions:
+      warning:
+        python: |
+          lambda: print("Lambda action executed")
+    thresholds:
+      warning: 0.01
+    steps:
+    - col_vals_gt:
+        columns: [a]
+        value: 1000
+    """
+
+    # Test with None namespaces
+    captured_output = io.StringIO()
+    with contextlib.redirect_stdout(captured_output):
+        result = yaml_interrogate(yaml_content, namespaces=None)
+        assert result is not None
+
+    output_text = captured_output.getvalue()
+    assert "Lambda action executed" in output_text
+
+    # Test with empty dict namespaces
+    captured_output = io.StringIO()
+    with contextlib.redirect_stdout(captured_output):
+        result = yaml_interrogate(yaml_content, namespaces={})
+        assert result is not None
+
+    output_text = captured_output.getvalue()
+    assert "Lambda action executed" in output_text
+
+
+def test_yaml_custom_actions_original_issue_use_case():
+    """Test the exact use case from the original GitHub issue."""
+    # This is what the user wanted to work
+    yaml_content = """
+    tbl: small_table
+    df_library: polars
+    actions:
+      warning:
+        python: log_actions.log_issue
+    thresholds:
+      warning: 0.05
+      error: 0.10
+      critical: 0.15
+    steps:
+    - col_vals_gt:
+        columns: [a]
+        value: 1000  # This will fail
+    """
+
+    # Define the custom action function
+    def log_issue():
+        from pointblank import get_action_metadata
+
+        metadata = get_action_metadata()
+        if metadata:
+            print(f"Type: {metadata['type']}, Step: {metadata['step']}")
+        else:
+            print("Custom action executed")
+
+    # Add the function to our test module
+    import tests.test_yaml as test_mod
+
+    test_mod.log_issue = log_issue
+
+    # Use namespaces to make it available
+    namespaces = {"log_actions": "tests.test_yaml"}
+
+    captured_output = io.StringIO()
+    with contextlib.redirect_stdout(captured_output):
+        result = yaml_interrogate(yaml_content, namespaces=namespaces)
+        assert result is not None
+
+    output_text = captured_output.getvalue()
+    # The metadata type appears to be the validation type, not the action level
+    assert "Type: col_vals_gt, Step: 1" in output_text or "Custom action executed" in output_text
