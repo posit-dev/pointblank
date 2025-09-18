@@ -1,7 +1,8 @@
 from __future__ import annotations
 
+from importlib import import_module
 from pathlib import Path
-from typing import Any, Union
+from typing import Any, Iterable, Mapping, Optional, Union
 
 import yaml
 from narwhals.typing import FrameT
@@ -17,7 +18,9 @@ class YAMLValidationError(Exception):
     pass
 
 
-def _safe_eval_python_code(code: str) -> Any:
+def _safe_eval_python_code(
+    code: str, namespaces: Optional[Union[Iterable[str], Mapping[str, str]]] = None
+) -> Any:
     """Safely evaluate Python code with restricted namespace.
 
     This function provides a controlled environment for executing Python code embedded in YAML
@@ -68,6 +71,7 @@ def _safe_eval_python_code(code: str) -> Any:
             "abs": abs,
             "round": round,
             "print": print,
+            "__import__": __import__,
         },
     }
 
@@ -88,12 +92,25 @@ def _safe_eval_python_code(code: str) -> Any:
 
         safe_namespace["pd"] = pd
 
-    # Check for dangerous patterns
+    if namespaces:
+        for alias, module_name in (
+            namespaces.items() if isinstance(namespaces, dict) else ((m, m) for m in namespaces)
+        ):
+            try:
+                safe_namespace[alias] = import_module(module_name)
+            except ImportError as e:
+                raise ImportError(
+                    f"Could not import requested namespace '{module_name}': {e}"
+                ) from e
+
+    # Check for dangerous patterns and be more specific about __import__ to allow legitimate use
     dangerous_patterns = [
-        r"import\s+os",
-        r"import\s+sys",
-        r"import\s+subprocess",
-        r"__import__",
+        r"import\s+os\b",
+        r"import\s+sys\b",
+        r"import\s+subprocess\b",
+        r"__import__\s*\(\s*['\"]os['\"]",
+        r"__import__\s*\(\s*['\"]sys['\"]",
+        r"__import__\s*\(\s*['\"]subprocess['\"]",
         r"exec\s*\(",
         r"eval\s*\(",
         r"open\s*\(",
@@ -142,7 +159,9 @@ def _safe_eval_python_code(code: str) -> Any:
         raise YAMLValidationError(f"Error executing Python code '{code}': {e}")
 
 
-def _process_python_expressions(value: Any) -> Any:
+def _process_python_expressions(
+    value: Any, namespaces: Optional[Union[Iterable[str], Mapping[str, str]]] = None
+) -> Any:
     """Process Python code snippets embedded in YAML values.
 
     This function supports the python: block syntax for embedding Python code:
@@ -152,7 +171,7 @@ def _process_python_expressions(value: Any) -> Any:
       pl.scan_csv("data.csv").head(10)
 
     Note: col_vals_expr() also supports a shortcut syntax where the expr parameter
-    can be written directly without the python: wrapper:
+    can be written directly without the python: wrapper: +
 
     col_vals_expr:
       expr: |
@@ -180,14 +199,14 @@ def _process_python_expressions(value: Any) -> Any:
         # Handle python: block syntax
         if "python" in value and len(value) == 1:
             code = value["python"]
-            return _safe_eval_python_code(code)
+            return _safe_eval_python_code(code, namespaces=namespaces)
 
         # Recursively process dictionary values
-        return {k: _process_python_expressions(v) for k, v in value.items()}
+        return {k: _process_python_expressions(v, namespaces=namespaces) for k, v in value.items()}
 
     elif isinstance(value, list):
         # Recursively process list items
-        return [_process_python_expressions(item) for item in value]
+        return [_process_python_expressions(item, namespaces=namespaces) for item in value]
 
     else:
         # Return primitive types unchanged
@@ -547,7 +566,11 @@ class YAMLValidator:
                 f"Schema specification must be a dictionary, got: {type(schema_spec)}"
             )
 
-    def _parse_validation_step(self, step_config: Union[str, dict]) -> tuple[str, dict]:
+    def _parse_validation_step(
+        self,
+        step_config: Union[str, dict],
+        namespaces: Optional[Union[Iterable[str], Mapping[str, str]]] = None,
+    ) -> tuple[str, dict]:
         """Parse a single validation step from YAML configuration.
 
         Parameters
@@ -598,14 +621,16 @@ class YAMLValidator:
             # Special case: `col_vals_expr()`'s `expr=` parameter can use shortcut syntax
             if method_name == "col_vals_expr" and key == "expr" and isinstance(value, str):
                 # Treat string directly as Python code (shortcut syntax)
-                processed_parameters[key] = _safe_eval_python_code(value)
+                processed_parameters[key] = _safe_eval_python_code(value, namespaces=namespaces)
             # Special case: `pre=` parameter can use shortcut syntax (like `expr=`)
             elif key == "pre" and isinstance(value, str):
                 # Treat string directly as Python code (shortcut syntax)
-                processed_parameters[key] = _safe_eval_python_code(value)
+                processed_parameters[key] = _safe_eval_python_code(value, namespaces=namespaces)
             else:
                 # Normal processing (requires python: block syntax)
-                processed_parameters[key] = _process_python_expressions(value)
+                processed_parameters[key] = _process_python_expressions(
+                    value, namespaces=namespaces
+                )
         parameters = processed_parameters
 
         # Convert `columns=` specification
@@ -658,7 +683,9 @@ class YAMLValidator:
 
         return self.validation_method_map[method_name], parameters
 
-    def build_validation(self, config: dict) -> Validate:
+    def build_validation(
+        self, config: dict, namespaces: Optional[Union[Iterable[str], Mapping[str, str]]] = None
+    ) -> Validate:
         """Convert YAML config to Validate object.
 
         Parameters
@@ -693,7 +720,9 @@ class YAMLValidator:
         # Set actions if provided
         if "actions" in config:
             # Process actions: handle `python:` block syntax for callables
-            processed_actions = _process_python_expressions(config["actions"])
+            processed_actions = _process_python_expressions(
+                config["actions"], namespaces=namespaces
+            )
             # Convert to Actions object
             validate_kwargs["actions"] = Actions(**processed_actions)
 
@@ -713,7 +742,9 @@ class YAMLValidator:
 
         # Add validation steps
         for step_config in config["steps"]:
-            method_name, parameters = self._parse_validation_step(step_config)
+            method_name, parameters = self._parse_validation_step(
+                step_config, namespaces=namespaces
+            )
 
             # Get the method from the validation object
             method = getattr(validation, method_name)
@@ -728,7 +759,9 @@ class YAMLValidator:
 
         return validation
 
-    def execute_workflow(self, config: dict) -> Validate:
+    def execute_workflow(
+        self, config: dict, namespaces: Optional[Union[Iterable[str], Mapping[str, str]]] = None
+    ) -> Validate:
         """Execute a complete YAML validation workflow.
 
         Parameters
@@ -742,7 +775,7 @@ class YAMLValidator:
             Interrogated Validate object with results.
         """
         # Build the validation plan
-        validation = self.build_validation(config)
+        validation = self.build_validation(config, namespaces=namespaces)
 
         # Execute interrogation to get results
         validation = validation.interrogate()
@@ -750,7 +783,11 @@ class YAMLValidator:
         return validation
 
 
-def yaml_interrogate(yaml: Union[str, Path], set_tbl: Union[FrameT, Any, None] = None) -> Validate:
+def yaml_interrogate(
+    yaml: Union[str, Path],
+    set_tbl: Union[FrameT, Any, None] = None,
+    namespaces: Optional[Union[Iterable[str], Mapping[str, str]]] = None,
+) -> Validate:
     """Execute a YAML-based validation workflow.
 
     This is the main entry point for YAML-based validation workflows. It takes YAML configuration
@@ -772,6 +809,10 @@ def yaml_interrogate(yaml: Union[str, Path], set_tbl: Union[FrameT, Any, None] =
         `tbl` field before executing the validation workflow. This can be any supported table type
         including DataFrame objects, Ibis table objects, CSV file paths, Parquet file paths, GitHub
         URLs, or database connection strings.
+    namespaces
+        Optional module namespaces to make available for Python code execution in YAML
+        configurations. Can be a dictionary mapping aliases to module names or a list of module
+        names. See the "Using Namespaces" section below for detailed examples.
 
     Returns
     -------
@@ -785,6 +826,71 @@ def yaml_interrogate(yaml: Union[str, Path], set_tbl: Union[FrameT, Any, None] =
     YAMLValidationError
         If the YAML is invalid, malformed, or execution fails. This includes syntax errors, missing
         required fields, unknown validation methods, or data loading failures.
+
+    Using Namespaces
+    ----------------
+    The `namespaces=` parameter enables custom Python modules and functions in YAML configurations.
+    This is particularly useful for custom action functions and advanced Python expressions.
+
+    **Namespace formats:**
+
+    - Dictionary format: `{"alias": "module.name"}` maps aliases to module names
+    - List format: `["module.name", "another.module"]` imports modules directly
+
+    **Option 1: Inline expressions (no namespaces needed)**
+
+    ```{python}
+    import pointblank as pb
+
+    # Simple inline custom action
+    yaml_config = '''
+    tbl: small_table
+    thresholds:
+      warning: 0.01
+    actions:
+      warning:
+        python: "lambda: print('Custom warning triggered')"
+    steps:
+    - col_vals_gt:
+        columns: [a]
+        value: 1000
+    '''
+
+    result = pb.yaml_interrogate(yaml_config)
+    result
+    ```
+
+    **Option 2: External functions with namespaces**
+
+    ```{python}
+    # Define a custom action function
+    def my_custom_action():
+        print("Data validation failed: please check your data.")
+
+    # Add to current module for demo
+    import sys
+    sys.modules[__name__].my_custom_action = my_custom_action
+
+    # YAML that references the external function
+    yaml_config = '''
+    tbl: small_table
+    thresholds:
+      warning: 0.01
+    actions:
+      warning:
+        python: actions.my_custom_action
+    steps:
+    - col_vals_gt:
+        columns: [a]
+        value: 1000  # This will fail
+    '''
+
+    # Use namespaces to make the function available
+    result = pb.yaml_interrogate(yaml_config, namespaces={'actions': '__main__'})
+    result
+    ```
+
+    This approach enables modular, reusable validation workflows with custom business logic.
 
     Examples
     --------
@@ -928,14 +1034,14 @@ def yaml_interrogate(yaml: Union[str, Path], set_tbl: Union[FrameT, Any, None] =
     # If `set_tbl=` is provided, we need to build the validation workflow and then use `set_tbl()`
     if set_tbl is not None:
         # First build the validation object without interrogation
-        validation = validator.build_validation(config)
+        validation = validator.build_validation(config, namespaces=namespaces)
         # Then replace the table using set_tbl method
         validation = validation.set_tbl(tbl=set_tbl)
         # Finally interrogate with the new table
         return validation.interrogate()
     else:
         # Standard execution without table override (includes interrogation)
-        return validator.execute_workflow(config)
+        return validator.execute_workflow(config, namespaces=namespaces)
 
 
 def load_yaml_config(file_path: Union[str, Path]) -> dict:
@@ -1414,7 +1520,7 @@ def yaml_to_python(yaml: Union[str, Path]) -> str:
             elif isinstance(step_params["expr"], str):
                 original_expressions["expr"] = step_params["expr"]
 
-        method_name, parameters = validator._parse_validation_step(step_config)
+        method_name, parameters = validator._parse_validation_step(step_config, namespaces=None)
 
         # Apply the original expressions to override the converted lambda functions
         if method_name == "conjointly" and "expressions" in original_expressions:
