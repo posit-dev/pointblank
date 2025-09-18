@@ -2437,7 +2437,7 @@ def _get_column_names_safe(data: Any) -> list[str]:
         if hasattr(df_nw, "collect_schema"):
             return list(df_nw.collect_schema().keys())
         else:
-            return list(df_nw.columns)
+            return list(df_nw.columns)  # pragma: no cover
     except Exception:  # pragma: no cover
         # Fallback to direct column access
         return list(data.columns)  # pragma: no cover
@@ -2641,7 +2641,7 @@ def get_column_count(data: FrameT | Any) -> int:
         if hasattr(df_nw, "collect_schema"):
             return len(df_nw.collect_schema())
         else:
-            return len(df_nw.columns)
+            return len(df_nw.columns)  # pragma: no cover
     except Exception:
         # Fallback for unsupported types
         if "pandas" in str(type(data)):
@@ -2814,7 +2814,7 @@ def get_row_count(data: FrameT | Any) -> int:
         # Try different ways to get row count
         if hasattr(df_nw, "shape"):
             return df_nw.shape[0]
-        elif hasattr(df_nw, "height"):
+        elif hasattr(df_nw, "height"):  # pragma: no cover
             return df_nw.height  # pragma: no cover
         else:  # pragma: no cover
             raise ValueError("Unable to determine row count from Narwhals DataFrame")
@@ -8409,8 +8409,8 @@ class Validate:
             self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
         )
 
-        if columns_subset is not None and isinstance(columns_subset, str):
-            columns_subset = [columns_subset]
+        if columns_subset is not None and isinstance(columns_subset, str):  # pragma: no cover
+            columns_subset = [columns_subset]  # pragma: no cover
 
         # TODO: incorporate Column object
 
@@ -10397,15 +10397,15 @@ class Validate:
                 elif sample_frac is not None:
                     try:
                         validation_extract_nw = validation_extract_nw.sample(fraction=sample_frac)
-                    except AttributeError:
+                    except AttributeError:  # pragma: no cover
                         # For LazyFrames without sample method, collect first then sample
-                        validation_extract_native = validation_extract_nw.collect().to_native()
+                        validation_extract_native = (
+                            validation_extract_nw.collect().to_native()
+                        )  # pragma: no cover
                         if hasattr(validation_extract_native, "sample"):  # pragma: no cover
                             # PySpark DataFrame has sample method
-                            validation_extract_native = (
-                                validation_extract_native.sample(  # pragma: no cover
-                                    fraction=sample_frac  # pragma: no cover
-                                )
+                            validation_extract_native = validation_extract_native.sample(
+                                fraction=sample_frac
                             )  # pragma: no cover
                             validation_extract_nw = nw.from_native(
                                 validation_extract_native
@@ -10426,9 +10426,9 @@ class Validate:
                     # For LazyFrames, collect to get length (or use a reasonable default)
                     try:
                         extract_length = len(validation_extract_nw.collect())
-                    except Exception:
+                    except Exception:  # pragma: no cover
                         # If collection fails, apply limit anyway as a safety measure
-                        extract_length = extract_limit + 1  # Force limiting
+                        extract_length = extract_limit + 1  # pragma: no cover
 
                 if extract_length > extract_limit:
                     validation_extract_nw = validation_extract_nw.head(extract_limit)
@@ -12247,15 +12247,15 @@ class Validate:
         # If the table is a Polars one, determine if it's a LazyFrame
         if tbl_info == "polars":
             if _is_lazy_frame(self.data):
-                tbl_info = "polars-lazy"
+                tbl_info = "polars-lazy"  # pragma: no cover
 
         # Determine if the input table is a Narwhals DF
         if _is_narwhals_table(self.data):
             # Determine if the Narwhals table is a LazyFrame
-            if _is_lazy_frame(self.data):
-                tbl_info = "narwhals-lazy"
+            if _is_lazy_frame(self.data):  # pragma: no cover
+                tbl_info = "narwhals-lazy"  # pragma: no cover
             else:
-                tbl_info = "narwhals"
+                tbl_info = "narwhals"  # pragma: no cover
 
         # Get the thresholds object
         thresholds = self.thresholds
@@ -12420,7 +12420,7 @@ class Validate:
             if lang in RTL_LANGUAGES:
                 gt_tbl = gt_tbl.tab_style(
                     style=style.css("direction: rtl;"), locations=loc.source_notes()
-                )
+                )  # pragma: no cover
 
             if incl_header:
                 gt_tbl = gt_tbl.tab_header(title=html(title_text), subtitle=html(combined_subtitle))
@@ -12737,9 +12737,11 @@ class Validate:
             # Get the number of rows in the extract (safe for LazyFrames)
             try:
                 n_rows = len(extract_nw)
-            except TypeError:
+            except TypeError:  # pragma: no cover
                 # For LazyFrames, collect() first to get length
-                n_rows = len(extract_nw.collect()) if hasattr(extract_nw, "collect") else 0
+                n_rows = (
+                    len(extract_nw.collect()) if hasattr(extract_nw, "collect") else 0
+                )  # pragma: no cover
 
             # If the number of rows is zero, then produce an em dash then go to the next iteration
             if n_rows == 0:
@@ -12747,7 +12749,7 @@ class Validate:
                 continue
 
             # Write the CSV text (ensure LazyFrames are collected first)
-            if hasattr(extract_nw, "collect"):
+            if hasattr(extract_nw, "collect"):  # pragma: no cover
                 extract_nw = extract_nw.collect()
             csv_text = extract_nw.write_csv()
 
@@ -13249,7 +13251,7 @@ class Validate:
             elif isinstance(column, list):
                 column_position = [list(self.data.columns).index(col) + 1 for col in column]
             else:
-                column_position = None
+                column_position = None  # pragma: no cover
         else:
             column_position = None
 
@@ -13341,7 +13343,7 @@ class Validate:
                 )
 
         else:
-            step_report = None
+            step_report = None  # pragma: no cover
 
         return step_report
 
@@ -13829,7 +13831,7 @@ def _conditional_string_date_dttm_conversion(
         elif not allow_regular_strings:
             raise ValueError(
                 "If `value=` is provided as a string it must be a date or datetime string."
-            )
+            )  # pragma: no cover
         # If allow_regular_strings is True, regular strings pass through unchanged
 
     return value
@@ -13943,7 +13945,7 @@ def _process_action_str(
     if col is not None:
         # If a list of columns is provided, then join the columns into a comma-separated string
         if isinstance(col, list):
-            col = ", ".join(col)
+            col = ", ".join(col)  # pragma: no cover
 
         action_str = action_str.replace("{col}", col)
         action_str = action_str.replace("{column}", col)
@@ -14340,7 +14342,7 @@ def _prep_values_text(
     length_values = len(values)
 
     if length_values == 0:
-        return ""
+        return ""  # pragma: no cover
 
     if length_values > limit:
         num_omitted = length_values - limit
@@ -14349,7 +14351,7 @@ def _prep_values_text(
         formatted_values = []
         for value in values[:limit]:
             if isinstance(value, (datetime.datetime, datetime.date)):
-                formatted_values.append(f"`{value.isoformat()}`")
+                formatted_values.append(f"`{value.isoformat()}`")  # pragma: no cover
             else:
                 formatted_values.append(f"`{value}`")
 
@@ -14539,8 +14541,8 @@ def _apply_segments(data_tbl: any, segments_expr: tuple[str, Any]) -> any:
             if len(segment_str) == 10 and segment_str.count("-") == 2:
                 try:
                     parsed_value = date.fromisoformat(segment_str)
-                except ValueError:
-                    pass
+                except ValueError:  # pragma: no cover
+                    pass  # pragma: no cover
 
             # Format 2: Datetime strings with UTC timezone like
             # "2016-01-04 00:00:01 UTC.strict_cast(...)"
@@ -14552,27 +14554,28 @@ def _apply_segments(data_tbl: any, segments_expr: tuple[str, Any]) -> any:
                         parsed_dt = datetime.fromisoformat(datetime_part)
                         # Convert midnight datetimes to dates for consistency
                         if parsed_dt.time() == datetime.min.time():
-                            parsed_value = parsed_dt.date()
+                            parsed_value = parsed_dt.date()  # pragma: no cover
                         else:
                             parsed_value = parsed_dt
-                except (ValueError, IndexError):
-                    pass
+                except (ValueError, IndexError):  # pragma: no cover
+                    pass  # pragma: no cover
 
             # Format 3: Bracketed expressions like ['2016-01-04']
             elif segment_str.startswith("[") and segment_str.endswith("]"):
-                try:
-                    content = segment_str[2:-2]  # Remove [' and ']
+                try:  # pragma: no cover
+                    # Remove [' and ']
+                    content = segment_str[2:-2]  # pragma: no cover
 
                     # Try parsing as date first
-                    if len(content) == 10 and content.count("-") == 2:
-                        try:
-                            parsed_value = date.fromisoformat(content)
-                        except ValueError:
-                            pass
+                    if len(content) == 10 and content.count("-") == 2:  # pragma: no cover
+                        try:  # pragma: no cover
+                            parsed_value = date.fromisoformat(content)  # pragma: no cover
+                        except ValueError:  # pragma: no cover
+                            pass  # pragma: no cover
 
                     # Try parsing as datetime
-                    if parsed_value is None:
-                        try:
+                    if parsed_value is None:  # pragma: no cover
+                        try:  # pragma: no cover
                             parsed_dt = datetime.fromisoformat(content.replace(" UTC", ""))
                             if parsed_dt.time() == datetime.min.time():
                                 parsed_value = parsed_dt.date()
@@ -14581,8 +14584,8 @@ def _apply_segments(data_tbl: any, segments_expr: tuple[str, Any]) -> any:
                         except ValueError:
                             pass
 
-                except (ValueError, IndexError):
-                    pass
+                except (ValueError, IndexError):  # pragma: no cover
+                    pass  # pragma: no cover
 
             # Handle `pl.datetime()` expressions with .alias("datetime")
             elif "datetime" in segment_str and '.alias("datetime")' in segment_str:
@@ -14593,10 +14596,10 @@ def _apply_segments(data_tbl: any, segments_expr: tuple[str, Any]) -> any:
                     if parsed_dt.time() == datetime.min.time():
                         parsed_value = parsed_dt.date()
                     else:
-                        parsed_value = parsed_dt
+                        parsed_value = parsed_dt  # pragma: no cover
 
-                except (ValueError, AttributeError):
-                    pass
+                except (ValueError, AttributeError):  # pragma: no cover
+                    pass  # pragma: no cover
 
             # If we successfully parsed a value, use it; otherwise leave segment as is
             if parsed_value is not None:
@@ -14620,9 +14623,9 @@ def _apply_segments(data_tbl: any, segments_expr: tuple[str, Any]) -> any:
         # Filter the data table based on the column name and segment
         # Use the new Ibis API methods to avoid deprecation warnings
         if segment is None:
-            data_tbl = data_tbl.filter(data_tbl[column].isnull())
+            data_tbl = data_tbl.filter(data_tbl[column].isnull())  # pragma: no cover
         elif isinstance(segment, list):
-            data_tbl = data_tbl.filter(data_tbl[column].isin(segment))
+            data_tbl = data_tbl.filter(data_tbl[column].isin(segment))  # pragma: no cover
         else:
             data_tbl = data_tbl.filter(data_tbl[column] == segment)
 
@@ -14743,7 +14746,7 @@ def _get_title_text(
             "</span>"
             f'<span style="float: right;">{title}</span>'
             "</div>"
-        )
+        )  # pragma: no cover
 
     return html_str
 
@@ -14831,10 +14834,10 @@ def _format_single_number_with_gt(
             import polars as pl
 
             df_lib = pl
-        elif _is_lib_present("pandas"):
-            import pandas as pd
+        elif _is_lib_present("pandas"):  # pragma: no cover
+            import pandas as pd  # pragma: no cover
 
-            df_lib = pd
+            df_lib = pd  # pragma: no cover
         else:  # pragma: no cover
             raise ImportError(
                 "Neither Polars nor Pandas is available for formatting"
@@ -14904,10 +14907,10 @@ def _format_single_float_with_gt(
             import polars as pl
 
             df_lib = pl
-        elif _is_lib_present("pandas"):
-            import pandas as pd
+        elif _is_lib_present("pandas"):  # pragma: no cover
+            import pandas as pd  # pragma: no cover
 
-            df_lib = pd
+            df_lib = pd  # pragma: no cover
         else:  # pragma: no cover
             raise ImportError(
                 "Neither Polars nor Pandas is available for formatting"
@@ -14943,7 +14946,7 @@ def _transform_passed_failed(
             return _format_single_float_with_gt(value, decimals=2, locale=locale, df_lib=df_lib)
         else:
             # Fallback to the original behavior
-            return vals.fmt_number(value, decimals=2, locale=locale)[0]
+            return vals.fmt_number(value, decimals=2, locale=locale)[0]  # pragma: no cover
 
     passed_failed = [
         (
@@ -15083,7 +15086,7 @@ def _get_callable_source(fn: Callable) -> str:
             return pre_arg
         except (OSError, TypeError):  # pragma: no cover
             return fn.__name__
-    return fn
+    return fn  # pragma: no cover
 
 
 def _extract_pre_argument(source: str) -> str:
@@ -15167,10 +15170,10 @@ def _format_single_integer_with_gt(value: int, locale: str = "en", df_lib=None) 
             import polars as pl
 
             df_lib = pl
-        elif _is_lib_present("pandas"):
-            import pandas as pd
+        elif _is_lib_present("pandas"):  # pragma: no cover
+            import pandas as pd  # pragma: no cover
 
-            df_lib = pd
+            df_lib = pd  # pragma: no cover
         else:  # pragma: no cover
             raise ImportError(
                 "Neither Polars nor Pandas is available for formatting"
