@@ -4190,3 +4190,255 @@ def test_yaml_custom_actions_original_issue_use_case():
     output_text = captured_output.getvalue()
     # The metadata type appears to be the validation type, not the action level
     assert "Type: col_vals_gt, Step: 1" in output_text or "Custom action executed" in output_text
+
+
+def test_yaml_validator_invalid_threshold_keys():
+    """Test error handling for invalid threshold keys"""
+
+    validator = YAMLValidator()
+    config = {
+        "tbl": "small_table",
+        "thresholds": {
+            "invalid_key": 0.1  # Invalid threshold key
+        },
+        "steps": [{"rows_distinct": None}],
+    }
+
+    with pytest.raises(YAMLValidationError, match="Invalid threshold key: invalid_key"):
+        validator._validate_schema(config)
+
+
+def test_yaml_validator_non_dict_thresholds():
+    """Test error handling for non-dict thresholds"""
+
+    validator = YAMLValidator()
+    config = {
+        "tbl": "small_table",
+        "thresholds": ["not", "a", "dict"],  # Should be dict
+        "steps": [{"rows_distinct": None}],
+    }
+
+    with pytest.raises(YAMLValidationError, match="'thresholds' must be a dictionary"):
+        validator._validate_schema(config)
+
+
+def test_yaml_validator_unsupported_df_library():
+    """Test error handling for unsupported `df_library=`"""
+    import tempfile
+    import os
+
+    validator = YAMLValidator()
+
+    # Create a temporary CSV file
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".csv", delete=False) as f:
+        f.write("a,b,c\n1,2,3\n")
+        temp_file = f.name
+
+    try:
+        with pytest.raises(YAMLValidationError, match="Unsupported df_library: unsupported"):
+            validator._load_csv_file(temp_file, "unsupported")
+    finally:
+        os.unlink(temp_file)
+
+
+def test_yaml_validator_invalid_step_configuration_type():
+    """Test error handling for invalid step configuration"""
+    from pointblank.yaml import YAMLValidator, YAMLValidationError
+
+    validator = YAMLValidator()
+
+    # Test with invalid step configuration type (not dict or string)
+    with pytest.raises(YAMLValidationError, match="Invalid step configuration type"):
+        validator._parse_validation_step(123)  # Integer instead of dict/string
+
+
+def test_yaml_validator_unknown_validation_method():
+    """Test error handling for unknown validation method"""
+    from pointblank.yaml import YAMLValidator, YAMLValidationError
+
+    validator = YAMLValidator()
+
+    # Test with unknown validation method
+    with pytest.raises(YAMLValidationError, match="Unknown validation method 'nonexistent_method'"):
+        validator._parse_validation_step({"nonexistent_method": {"value": 1}})
+
+
+def test_yaml_validator_conjointly_non_list_expressions():
+    """Test error handling for conjointly with non-list expressions"""
+
+    validator = YAMLValidator()
+
+    # Test with conjointly method having non-list expressions
+    with pytest.raises(YAMLValidationError, match="conjointly 'expressions' must be a list"):
+        validator._parse_validation_step({"conjointly": {"expressions": "not_a_list"}})
+
+
+def test_yaml_to_python_file_path_check():
+    """Test `yaml_to_python()` with file path detection"""
+    import tempfile
+    import os
+
+    # Create a temporary YAML file
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".yaml", delete=False) as f:
+        f.write("""
+tbl: small_table
+steps:
+- col_vals_gt:
+    columns: [a]
+    value: 0
+""")
+        temp_file = f.name
+
+    try:
+        # Test with file path (should read from file)
+        result = yaml_to_python(temp_file)
+        assert "pb.load_dataset" in result
+        assert "col_vals_gt" in result
+    finally:
+        os.unlink(temp_file)
+
+
+def test_yaml_to_python_dataset_loading():
+    """Test `yaml_to_python()` with dataset loading"""
+    yaml_content = """
+tbl: small_table
+steps:
+- col_vals_gt:
+    columns: [a]
+    value: 0
+"""
+
+    result = yaml_to_python(yaml_content)
+    # Should contain dataset loading code
+    assert 'pb.load_dataset("small_table", tbl_type="polars")' in result
+
+
+def test_yaml_to_python_with_actions_simple():
+    """Test `yaml_to_python()` with actions having simple values"""
+    yaml_content = """
+tbl: small_table
+actions:
+  warning: "warn_func"
+steps:
+- col_vals_gt:
+    columns: [a]
+    value: 0
+"""
+
+    result = yaml_to_python(yaml_content)
+    # Should handle action values
+    assert "actions=" in result
+    assert "warning=" in result
+
+
+def test_yaml_to_python_conjointly_simple():
+    """Test `yaml_to_python()` with conjointly basic structure"""
+    yaml_content = """
+tbl: small_table
+steps:
+- conjointly:
+    expressions: ["lambda x: True", "lambda x: True"]
+"""
+
+    result = yaml_to_python(yaml_content)
+    # Should format conjointly expressions properly
+    assert "conjointly" in result
+    assert "expressions=" in result
+
+
+def test_yaml_to_python_specially_expr():
+    """Test `yaml_to_python()` with specially expr parameter"""
+    yaml_content = """
+tbl: small_table
+steps:
+- specially:
+    expr: "lambda x: len(x) > 0"
+"""
+
+    result = yaml_to_python(yaml_content)
+    # Should handle specially expr parameter
+    assert "specially" in result
+    assert "expr=" in result
+
+
+def test_yaml_to_python_brief_boolean():
+    """Test `yaml_to_python()` with boolean brief parameter"""
+    yaml_content = """
+tbl: small_table
+steps:
+- rows_distinct:
+    brief: true
+"""
+
+    result = yaml_to_python(yaml_content)
+    # Should format boolean brief parameter
+    assert "brief=True" in result
+
+
+def test_yaml_to_python_actions_with_warning_list():
+    """Test `yaml_to_python()` with actions having warning as list"""
+    yaml_content = """
+tbl: small_table
+steps:
+- col_vals_gt:
+    columns: [a]
+    value: 0
+    actions:
+      warning: ["warn_func"]
+"""
+
+    result = yaml_to_python(yaml_content)
+    # Should handle warning as list
+    assert "warning=" in result
+
+
+def test_yaml_to_python_actions_with_error_list():
+    """Test `yaml_to_python()` with actions having error as list"""
+    yaml_content = """
+tbl: small_table
+steps:
+- col_vals_gt:
+    columns: [a]
+    value: 0
+    actions:
+      error: ["error_func"]
+"""
+
+    result = yaml_to_python(yaml_content)
+    # Should handle error as list
+    assert "error=" in result
+
+
+def test_yaml_to_python_actions_with_critical_list():
+    """Test `yaml_to_python()` with actions having critical as list"""
+    yaml_content = """
+tbl: small_table
+steps:
+- col_vals_gt:
+    columns: [a]
+    value: 0
+    actions:
+      critical: ["critical_func"]
+"""
+
+    result = yaml_to_python(yaml_content)
+    # Should handle critical as list
+    assert "critical=" in result
+
+
+def test_yaml_to_python_actions_with_highest_only_false():
+    """Test `yaml_to_python()` with actions having `highest_only=False`"""
+    yaml_content = """
+tbl: small_table
+steps:
+- col_vals_gt:
+    columns: [a]
+    value: 0
+    actions:
+      warning: warn_func
+      highest_only: false
+"""
+
+    result = yaml_to_python(yaml_content)
+    # Should handle highest_only=False
+    assert "highest_only=False" in result
