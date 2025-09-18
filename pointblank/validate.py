@@ -14821,24 +14821,6 @@ def _transform_eval(
     return symbol_list
 
 
-def _format_numbers_with_gt(
-    values: list[int], n_sigfig: int = 3, compact: bool = True, locale: str = "en"
-) -> list[str]:
-    """Format numbers using Great Tables GT object to avoid pandas dependency."""
-    import polars as pl
-
-    # Create a single-column DataFrame with all values
-    df = pl.DataFrame({"values": values})
-
-    # Create GT object and format the column
-    gt_obj = GT(df).fmt_number(columns="values", n_sigfig=n_sigfig, compact=compact, locale=locale)
-
-    # Extract the formatted values using _get_column_of_values
-    formatted_values = _get_column_of_values(gt_obj, column_name="values", context="html")
-
-    return formatted_values
-
-
 def _format_single_number_with_gt(
     value: int, n_sigfig: int = 3, compact: bool = True, locale: str = "en", df_lib=None
 ) -> str:
