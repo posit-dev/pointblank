@@ -16078,3 +16078,89 @@ def test_format_functions_coverage():
     # Test the format single float function
     result = _format_single_float_with_gt(value=3.14159, decimals=2)
     assert result is not None
+
+
+def test_format_single_float_with_gt_custom():
+    """Test _format_single_float_with_gt_custom() function with various parameters."""
+    from pointblank.validate import _format_single_float_with_gt_custom
+
+    # Test basic formatting with decimals
+    result = _format_single_float_with_gt_custom(value=3.14159, decimals=2)
+    assert result is not None
+    assert isinstance(result, str)
+
+    # Test with drop_trailing_zeros=True
+    result = _format_single_float_with_gt_custom(
+        value=3.10000, decimals=3, drop_trailing_zeros=True
+    )
+    assert result is not None
+
+    # Test with drop_trailing_zeros=False (default)
+    result = _format_single_float_with_gt_custom(
+        value=3.10000, decimals=3, drop_trailing_zeros=False
+    )
+    assert result is not None
+
+    # Test with different locale
+    result = _format_single_float_with_gt_custom(value=1234.56, decimals=2, locale="en")
+    assert result is not None
+
+    # Test with explicit DataFrame library (Polars if available)
+    try:
+        import polars as pl
+
+        result = _format_single_float_with_gt_custom(value=42.789, decimals=1, df_lib=pl)
+        assert result is not None
+    except ImportError:
+        pass  # Skip if Polars not available
+
+    # Test with explicit DataFrame library (Pandas)
+    try:
+        import pandas as pd
+
+        result = _format_single_float_with_gt_custom(value=42.789, decimals=1, df_lib=pd)
+        assert result is not None
+    except ImportError:
+        pass  # Skip if Pandas not available
+
+    # Test edge cases
+    result = _format_single_float_with_gt_custom(value=0.0, decimals=2)
+    assert result is not None
+
+    result = _format_single_float_with_gt_custom(value=-123.456, decimals=1)
+    assert result is not None
+
+    # Test with very small numbers
+    result = _format_single_float_with_gt_custom(value=0.00001, decimals=5)
+    assert result is not None
+
+    # Test with large numbers
+    result = _format_single_float_with_gt_custom(value=1234567.89, decimals=2)
+    assert result is not None
+
+    # Test different decimal precision scenarios
+    result = _format_single_float_with_gt_custom(value=123.456789, decimals=0)
+    assert result is not None
+
+    result = _format_single_float_with_gt_custom(value=123.456789, decimals=4)
+    assert result is not None
+
+    # Test combination of all parameters
+    result = _format_single_float_with_gt_custom(
+        value=9876.54321, decimals=3, drop_trailing_zeros=True, locale="en"
+    )
+    assert result is not None
+
+
+def test_format_single_float_with_gt_custom_df_lib_selection():
+    """Test _format_single_float_with_gt_custom() automatic library selection."""
+    from pointblank.validate import _format_single_float_with_gt_custom
+
+    # Test automatic library selection (should use whichever is available)
+    result = _format_single_float_with_gt_custom(value=123.456, decimals=2, df_lib=None)
+    assert result is not None
+    assert isinstance(result, str)
+
+    # Test that the function works when df_lib is not specified (uses auto-detection)
+    result = _format_single_float_with_gt_custom(value=42.0)
+    assert result is not None
