@@ -2119,6 +2119,88 @@ def test_validation_actions_get_action_metadata(tbl_type, capsys):
     assert "Step: 20, Type: row_count_match, Column: None" in captured.out
 
 
+def test_col_vals_regex_expectation_and_failure_text():
+    """Test that col_vals_regex generates correct expectation and failure text for both normal and inverse patterns."""
+
+    # Create simple test data that will create predictable scenarios
+    # Use pandas for simplicity since it's the most straightforward
+    import pandas as pd
+
+    test_data = pd.DataFrame(
+        {
+            "letters": ["abc", "def", "ghi"],  # Only contains letters
+            "numbers": ["123", "456", "789"],  # Only contains numbers
+            "mixed": ["abc123", "def456", "ghi789"],  # Contains both
+        }
+    )
+
+    # Test 1: Normal regex expectation text (should pass)
+    validation_normal_pass = (
+        Validate(data=test_data)
+        .col_vals_regex(columns="letters", pattern=r"^[a-z]+$", inverse=False)
+        .interrogate()
+    )
+
+    # Check expectation text (autobrief) for normal regex
+    step_info = validation_normal_pass.validation_info[0]
+    assert (
+        step_info.autobrief
+        == "Expect that values in `letters` should match the regular expression: ^[a-z]+$."
+    )
+    assert step_info.failure_text is None  # Should be None when validation passes
+
+    # Test 2: Inverse regex expectation text (should pass)
+    validation_inverse_pass = (
+        Validate(data=test_data)
+        .col_vals_regex(columns="letters", pattern=r"^[0-9]+$", inverse=True)
+        .interrogate()
+    )
+
+    # Check expectation text (autobrief) for inverse regex
+    step_info = validation_inverse_pass.validation_info[0]
+    assert (
+        step_info.autobrief
+        == "Expect that values in `letters` should not match the regular expression: ^[0-9]+$."
+    )
+    assert step_info.failure_text is None  # Should be None when validation passes
+
+    # Test 3: Normal regex failure text (should fail and generate failure text)
+    validation_normal_fail = (
+        Validate(data=test_data)
+        .col_vals_regex(columns="letters", pattern=r"^[0-9]+$", inverse=False, thresholds=0.1)
+        .interrogate()
+    )
+
+    # Check failure text for normal regex
+    step_info = validation_normal_fail.validation_info[0]
+    assert (
+        step_info.autobrief
+        == "Expect that values in `letters` should match the regular expression: ^[0-9]+$."
+    )
+    assert (
+        step_info.failure_text
+        == "Exceedance of failed test units where values in `letters` should have matched the regular expression: ^[0-9]+$."
+    )
+
+    # Test 4: Inverse regex failure text (should fail and generate failure text)
+    validation_inverse_fail = (
+        Validate(data=test_data)
+        .col_vals_regex(columns="numbers", pattern=r"^[0-9]+$", inverse=True, thresholds=0.1)
+        .interrogate()
+    )
+
+    # Check failure text for inverse regex
+    step_info = validation_inverse_fail.validation_info[0]
+    assert (
+        step_info.autobrief
+        == "Expect that values in `numbers` should not match the regular expression: ^[0-9]+$."
+    )
+    assert (
+        step_info.failure_text
+        == "Exceedance of failed test units where values in `numbers` should not have matched the regular expression: ^[0-9]+$."
+    )
+
+
 @pytest.mark.parametrize("tbl_type", ["pandas", "polars", "duckdb"])
 def test_validation_with_final_actions_callable(tbl_type, capsys):
     def final_info():
@@ -4633,6 +4715,59 @@ def test_col_vals_regex(request, tbl_fixture):
     assert (
         Validate(tbl)
         .col_vals_regex(columns="text", pattern=r"^[0-9]-[a-z]{3}-[0-9]{3}$", na_pass=True)
+        .interrogate()
+        .n_passed(i=1, scalar=True)
+        == 3
+    )
+
+
+@pytest.mark.parametrize("tbl_fixture", TBL_DATES_TIMES_TEXT_LIST)
+def test_col_vals_regex_inverse(request, tbl_fixture):
+    tbl = request.getfixturevalue(tbl_fixture)
+
+    # Test inverse=False (default behavior, should match existing tests)
+    assert (
+        Validate(tbl)
+        .col_vals_regex(columns="text", pattern=r"[0-9]-[a-z]{3}-[0-9]{3}", inverse=False)
+        .interrogate()
+        .n_passed(i=1, scalar=True)
+        == 2
+    )
+
+    # Test inverse=True (should fail where pattern matches)
+    # Data: [None, "5-egh-163", "8-kdg-938"] (pattern= matches the 2 strings)
+    # Inverse=True means we want values that DON'T match the pattern
+    # Only None doesn't match the pattern, so with inverse=True, None passes
+    # The 2 strings that match the pattern now fail with inverse=True
+    # So 1 value passes (None)
+    assert (
+        Validate(tbl)
+        .col_vals_regex(columns="text", pattern=r"[0-9]-[a-z]{3}-[0-9]{3}", inverse=True)
+        .interrogate()
+        .n_passed(i=1, scalar=True)
+        == 1
+    )
+
+    # Test inverse=True with na_pass=True
+    # None doesn't match pattern AND na_pass=True, so None passes
+    # The 2 strings match the pattern, so with inverse=True they fail
+    # Result: 1 pass (None)
+    assert (
+        Validate(tbl)
+        .col_vals_regex(
+            columns="text", pattern=r"[0-9]-[a-z]{3}-[0-9]{3}", inverse=True, na_pass=True
+        )
+        .interrogate()
+        .n_passed(i=1, scalar=True)
+        == 1
+    )
+
+    # Test inverse=True with a pattern that doesn't match anything
+    # If pattern doesn't match any values, then inverse=True should pass all non-null values
+    # With na_pass=True, should pass all 3 values
+    assert (
+        Validate(tbl)
+        .col_vals_regex(columns="text", pattern=r"xyz", inverse=True, na_pass=True)
         .interrogate()
         .n_passed(i=1, scalar=True)
         == 3
@@ -7900,7 +8035,7 @@ def test_validation_with_selector_helper_functions(request, tbl_fixture):
         4e7,
         ["apple", "banana"],
         (10, 15),
-        "a",
+        {"pattern": "a", "inverse": False},
     ]
 
     # Check that all validation steps are active
