@@ -1688,14 +1688,29 @@ def interrogate_notin(tbl: FrameT, column: str, set_values: any) -> FrameT:
     return result_tbl.to_native()
 
 
-def interrogate_regex(tbl: FrameT, column: str, pattern: str, na_pass: bool) -> FrameT:
+def interrogate_regex(tbl: FrameT, column: str, values: dict | str, na_pass: bool) -> FrameT:
     """Regex interrogation."""
+
+    # Handle both old and new formats for backward compatibility
+    if isinstance(values, str):
+        pattern = values
+        inverse = False
+    else:
+        pattern = values["pattern"]
+        inverse = values["inverse"]
 
     nw_tbl = nw.from_native(tbl)
     result_tbl = nw_tbl.with_columns(
         pb_is_good_1=nw.col(column).is_null() & na_pass,
         pb_is_good_2=nw.col(column).str.contains(pattern, literal=False).fill_null(False),
     )
+
+    # Apply inverse logic if needed
+    if inverse:
+        # Use explicit boolean logic instead of bitwise NOT for pandas compatibility
+        result_tbl = result_tbl.with_columns(
+            pb_is_good_2=nw.when(nw.col("pb_is_good_2")).then(False).otherwise(True)
+        )
 
     result_tbl = result_tbl.with_columns(
         pb_is_good_=nw.col("pb_is_good_1") | nw.col("pb_is_good_2")

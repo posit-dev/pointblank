@@ -7445,6 +7445,7 @@ class Validate:
         columns: str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals,
         pattern: str,
         na_pass: bool = False,
+        inverse: bool = False,
         pre: Callable | None = None,
         segments: SegmentSpec | None = None,
         thresholds: int | float | bool | tuple | dict | Thresholds = None,
@@ -7472,6 +7473,9 @@ class Validate:
         na_pass
             Should any encountered None, NA, or Null values be considered as passing test units? By
             default, this is `False`. Set to `True` to pass test units with missing values.
+        inverse
+            Should the validation step be inverted? If `True`, then the expectation is that column
+            values should *not* match the specified `pattern=` regex.
         pre
             An optional preprocessing function or lambda to apply to the data table during
             interrogation. This function should take a table as input and return a modified table.
@@ -7658,6 +7662,7 @@ class Validate:
         # _check_segments(segments=segments)
         _check_thresholds(thresholds=thresholds)
         _check_boolean_input(param=na_pass, param_name="na_pass")
+        _check_boolean_input(param=inverse, param_name="inverse")
         _check_boolean_input(param=active, param_name="active")
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
@@ -7677,12 +7682,15 @@ class Validate:
         # Determine brief to use (global or local) and transform any shorthands of `brief=`
         brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
 
+        # Package up the `pattern=` and boolean params into a dictionary for later interrogation
+        values = {"pattern": pattern, "inverse": inverse}
+
         # Iterate over the columns and create a validation step for each
         for column in columns:
             val_info = _ValidationInfo(
                 assertion_type=assertion_type,
                 column=column,
-                values=pattern,
+                values=values,
                 na_pass=na_pass,
                 pre=pre,
                 segments=segments,
@@ -10146,7 +10154,7 @@ class Validate:
 
                         elif assertion_type == "col_vals_regex":
                             results_tbl = interrogate_regex(
-                                tbl=tbl, column=column, pattern=value, na_pass=na_pass
+                                tbl=tbl, column=column, values=value, na_pass=na_pass
                             )
 
                     elif assertion_type == "col_vals_expr":
@@ -12709,6 +12717,14 @@ class Validate:
             elif assertion_type[i] in ["specially"]:
                 values_upd.append("EXPR")
 
+            elif assertion_type[i] in ["col_vals_regex"]:
+                # Handle both old string format and new dictionary format
+                if isinstance(value, dict):
+                    pattern = value["pattern"]
+                else:
+                    pattern = value
+                values_upd.append(str(pattern))
+
             # If the assertion type is not recognized, add the value as a string
             else:
                 values_upd.append(str(value))
@@ -14358,15 +14374,30 @@ def _create_text_null(
 
 
 def _create_text_regex(
-    lang: str, column: str | None, pattern: str, for_failure: bool = False
+    lang: str, column: str | None, pattern: str | dict, for_failure: bool = False
 ) -> str:
     type_ = _expect_failure_type(for_failure=for_failure)
 
     column_text = _prep_column_text(column=column)
 
-    return EXPECT_FAIL_TEXT[f"regex_{type_}_text"][lang].format(
+    # Handle case where pattern is a dictionary containing `pattern` and `inverse`
+    if isinstance(pattern, dict):
+        pattern_str = pattern["pattern"]
+        inverse = pattern.get("inverse", False)
+    else:
+        # For backward compatibility, assume it's just the pattern string
+        pattern_str = pattern
+        inverse = False
+
+    # Use inverse-specific translations if inverse=True
+    if inverse:
+        text_key = f"regex_inverse_{type_}_text"
+    else:
+        text_key = f"regex_{type_}_text"
+
+    return EXPECT_FAIL_TEXT[text_key][lang].format(
         column_text=column_text,
-        values_text=pattern,
+        values_text=pattern_str,
     )
 
 
