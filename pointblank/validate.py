@@ -10,6 +10,7 @@ import re
 import tempfile
 import threading
 from dataclasses import dataclass
+from enum import Enum
 from importlib.metadata import version
 from typing import TYPE_CHECKING, Any, Callable, Literal
 from zipfile import ZipFile
@@ -2648,6 +2649,48 @@ def get_column_count(data: FrameT | Any) -> int:
             return data.shape[1]  # pragma: no cover
         else:
             raise ValueError("The input table type supplied in `data=` is not supported.")
+
+
+def _extract_enum_values(set_values: Any) -> list[Any]:
+    """
+    Extract values from Enum classes or collections containing Enum instances.
+
+    This helper function handles:
+    1. Enum classes: extracts all enum values
+    2. Collections containing Enum instances: extracts their values
+    3. Regular collections: returns as-is
+
+    Parameters
+    ----------
+    set_values
+        The input collection that may contain Enum class or Enum instances.
+
+    Returns
+    -------
+    list[Any]
+        A list of extracted values
+    """
+    from collections.abc import Collection
+
+    # Check if set_values is an Enum class (not an instance)
+    if inspect.isclass(set_values) and issubclass(set_values, Enum):
+        # Extract all values from the Enum class
+        return [enum_member.value for enum_member in set_values]
+
+    # Check if set_values is a collection
+    if isinstance(set_values, Collection) and not isinstance(set_values, (str, bytes)):
+        extracted_values = []
+        for item in set_values:
+            if isinstance(item, Enum):
+                # If item is an Enum instance, extract its value
+                extracted_values.append(item.value)
+            else:
+                # If item is not an Enum instance, keep as-is
+                extracted_values.append(item)
+        return extracted_values
+
+    # If set_values is neither an Enum class nor a collection, return as list
+    return [set_values]
 
 
 def get_row_count(data: FrameT | Any) -> int:
@@ -6332,7 +6375,10 @@ class Validate:
             multiple columns are supplied or resolved, there will be a separate validation step
             generated for each column.
         set
-            A list of values to compare against.
+            A collection of values to compare against. Can be a list of values, a Python Enum
+            class, or a collection containing Enum instances. When an Enum class is provided,
+            all enum values will be used. When a collection contains Enum instances, their
+            values will be extracted automatically.
         pre
             An optional preprocessing function or lambda to apply to the data table during
             interrogation. This function should take a table as input and return a modified table.
@@ -6509,11 +6555,65 @@ class Validate:
 
         The validation table reports two failing test units. The specific failing cases are for the
         column `b` values of `8` and `1`, which are not in the set of `[2, 3, 4, 5, 6]`.
+
+        **Using Python Enums**
+
+        The `col_vals_in_set()` method also supports Python Enum classes and instances, which can
+        make validations more readable and maintainable:
+
+        ```{python}
+        from enum import Enum
+
+        class Color(Enum):
+            RED = "red"
+            GREEN = "green"
+            BLUE = "blue"
+
+        # Create a table with color data
+        tbl_colors = pl.DataFrame({
+            "product": ["shirt", "pants", "hat", "shoes"],
+            "color": ["red", "blue", "green", "yellow"]
+        })
+
+        # Validate using an Enum class (all enum values are allowed)
+        validation = (
+            pb.Validate(data=tbl_colors)
+            .col_vals_in_set(columns="color", set=Color)
+            .interrogate()
+        )
+
+        validation
+        ```
+
+        This validation will fail for the `"yellow"` value since it's not in the `Color` enum.
+
+        You can also use specific Enum instances or mix them with regular values:
+
+        ```{python}
+        # Validate using specific Enum instances
+        validation = (
+            pb.Validate(data=tbl_colors)
+            .col_vals_in_set(columns="color", set=[Color.RED, Color.BLUE])
+            .interrogate()
+        )
+
+        # Mix Enum instances with regular values
+        validation = (
+            pb.Validate(data=tbl_colors)
+            .col_vals_in_set(columns="color", set=[Color.RED, Color.BLUE, "yellow"])
+            .interrogate()
+        )
+
+        validation
+        ```
         """
 
         assertion_type = _get_fn_name()
 
         _check_column(column=columns)
+
+        # Extract values from Enum classes or Enum instances if present
+        set = _extract_enum_values(set)
 
         for val in set:
             if val is None:
@@ -6565,7 +6665,7 @@ class Validate:
     def col_vals_not_in_set(
         self,
         columns: str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals,
-        set: list[float | int],
+        set: Collection[Any],
         pre: Callable | None = None,
         segments: SegmentSpec | None = None,
         thresholds: int | float | bool | tuple | dict | Thresholds = None,
@@ -6589,7 +6689,10 @@ class Validate:
             multiple columns are supplied or resolved, there will be a separate validation step
             generated for each column.
         set
-            A list of values to compare against.
+            A collection of values to compare against. Can be a list of values, a Python Enum
+            class, or a collection containing Enum instances. When an Enum class is provided,
+            all enum values will be used. When a collection contains Enum instances, their
+            values will be extracted automatically.
         pre
             An optional preprocessing function or lambda to apply to the data table during
             interrogation. This function should take a table as input and return a modified table.
@@ -6767,11 +6870,45 @@ class Validate:
 
         The validation table reports two failing test units. The specific failing cases are for the
         column `b` values of `2` and `6`, both of which are in the set of `[2, 3, 4, 5, 6]`.
+
+        **Using Python Enums**
+
+        Like `col_vals_in_set()`, this method also supports Python Enum classes and instances:
+
+        ```{python}
+        from enum import Enum
+
+        class InvalidStatus(Enum):
+            DELETED = "deleted"
+            ARCHIVED = "archived"
+
+        # Create a table with status data
+        status_table = pl.DataFrame({
+            "product": ["widget", "gadget", "tool", "device"],
+            "status": ["active", "pending", "deleted", "active"]
+        })
+
+        # Validate that no values are in the invalid status set
+        validation = (
+            pb.Validate(data=status_table)
+            .col_vals_not_in_set(columns="status", set=InvalidStatus)
+            .interrogate()
+        )
+
+        validation
+        ```
+
+        This validation fails for the `"deleted"` value since it matches one of the invalid statuses
+        in the `InvalidStatus` enum.
         """
 
         assertion_type = _get_fn_name()
 
         _check_column(column=columns)
+
+        # Extract values from Enum classes or Enum instances if present
+        set = _extract_enum_values(set)
+
         _check_set_types(set=set)
         _check_pre(pre=pre)
         # TODO: add check for segments

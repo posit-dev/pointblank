@@ -16,6 +16,16 @@ from pathlib import Path
 from functools import partial
 import contextlib
 import datetime
+from enum import Enum, IntEnum
+
+# StrEnum was introduced in Python 3.11, so we use regular Enum for compatibility
+try:
+    from enum import StrEnum
+except ImportError:
+    # For Python < 3.11, create a StrEnum-like class
+    class StrEnum(str, Enum):
+        pass
+
 
 import pandas as pd
 import polars as pl
@@ -16164,3 +16174,263 @@ def test_format_single_float_with_gt_custom_df_lib_selection():
     # Test that the function works when df_lib is not specified (uses auto-detection)
     result = _format_single_float_with_gt_custom(value=42.0)
     assert result is not None
+
+
+#
+# Define test Enums
+#
+
+
+class Color(Enum):
+    RED = "red"
+    GREEN = "green"
+    BLUE = "blue"
+
+
+class Priority(IntEnum):
+    LOW = 1
+    MEDIUM = 2
+    HIGH = 3
+
+
+class Status(StrEnum):
+    ACTIVE = "active"
+    INACTIVE = "inactive"
+    PENDING = "pending"
+
+
+class MixedEnum(Enum):
+    STRING_VAL = "string_value"
+    INT_VAL = 42
+    FLOAT_VAL = 3.14
+
+
+# Test fixtures for enum tests
+@pytest.fixture
+def sample_data_polars():
+    """Create sample Polars DataFrame for testing."""
+    return pl.DataFrame(
+        {
+            "colors": ["red", "green", "blue", "red", "yellow"],
+            "priorities": [1, 2, 3, 1, 4],
+            "statuses": ["active", "inactive", "pending", "active", "deleted"],
+        }
+    )
+
+
+@pytest.fixture
+def sample_data_pandas():
+    """Create sample Pandas DataFrame for testing."""
+    return pd.DataFrame(
+        {
+            "colors": ["red", "green", "blue", "red", "yellow"],
+            "priorities": [1, 2, 3, 1, 4],
+            "statuses": ["active", "inactive", "pending", "active", "deleted"],
+        }
+    )
+
+
+def test_col_vals_in_set_with_enum_class_polars(sample_data_polars):
+    """Test col_vals_in_set() with Enum class using Polars."""
+    validation = (
+        Validate(sample_data_polars).col_vals_in_set(columns="colors", set=Color).interrogate()
+    )
+
+    # Should have 1 failure (yellow is not in Color enum)
+    assert validation.n_passed()[1] == 4
+    assert validation.n_failed()[1] == 1
+    assert not validation.all_passed()
+
+
+def test_col_vals_in_set_with_enum_class_pandas(sample_data_pandas):
+    """Test col_vals_in_set() with Enum class using Pandas."""
+    validation = (
+        Validate(sample_data_pandas).col_vals_in_set(columns="colors", set=Color).interrogate()
+    )
+
+    # Should have 1 failure (yellow is not in Color enum)
+    assert validation.n_passed()[1] == 4
+    assert validation.n_failed()[1] == 1
+    assert not validation.all_passed()
+
+
+def test_col_vals_in_set_with_int_enum(sample_data_polars):
+    """Test col_vals_in_set() with IntEnum."""
+    validation = (
+        Validate(sample_data_polars)
+        .col_vals_in_set(columns="priorities", set=Priority)
+        .interrogate()
+    )
+
+    # Should have 1 failure (4 is not in Priority enum)
+    assert validation.n_passed()[1] == 4
+    assert validation.n_failed()[1] == 1
+    assert not validation.all_passed()
+
+
+def test_col_vals_in_set_with_str_enum(sample_data_polars):
+    """Test col_vals_in_set() with StrEnum."""
+    validation = (
+        Validate(sample_data_polars).col_vals_in_set(columns="statuses", set=Status).interrogate()
+    )
+
+    # Should have 1 failure (deleted is not in Status enum)
+    assert validation.n_passed()[1] == 4
+    assert validation.n_failed()[1] == 1
+    assert not validation.all_passed()
+
+
+def test_col_vals_in_set_with_enum_instances_list(sample_data_polars):
+    """Test col_vals_in_set() with a list of Enum instances."""
+    validation = (
+        Validate(sample_data_polars)
+        .col_vals_in_set(columns="colors", set=[Color.RED, Color.GREEN])
+        .interrogate()
+    )
+
+    # Should have 2 failures: blue and yellow are not red or green
+    # red appears twice (passes), green appears once (passes)
+    assert validation.n_passed()[1] == 3
+    assert validation.n_failed()[1] == 2
+    assert not validation.all_passed()
+
+
+def test_col_vals_in_set_with_mixed_enum_and_values(sample_data_polars):
+    """Test col_vals_in_set() with mixed Enum instances and regular values."""
+    validation = (
+        Validate(sample_data_polars)
+        .col_vals_in_set(columns="colors", set=[Color.RED, Color.GREEN, "yellow"])
+        .interrogate()
+    )
+
+    # Should have 1 failure (blue is not in the set)
+    assert validation.n_passed()[1] == 4
+    assert validation.n_failed()[1] == 1
+    assert not validation.all_passed()
+
+
+def test_col_vals_not_in_set_with_enum_class(sample_data_polars):
+    """Test col_vals_not_in_set() with Enum class."""
+    validation = (
+        Validate(sample_data_polars).col_vals_not_in_set(columns="colors", set=Color).interrogate()
+    )
+
+    # Should have 4 failures (red appears twice, green once, blue once; all in Color enum)
+    assert validation.n_passed()[1] == 1  # Only yellow passes (not in Color enum)
+    assert validation.n_failed()[1] == 4
+    assert not validation.all_passed()
+
+
+def test_col_vals_not_in_set_with_enum_instances_list(sample_data_polars):
+    """Test col_vals_not_in_set() with a list of Enum instances."""
+    validation = (
+        Validate(sample_data_polars)
+        .col_vals_not_in_set(columns="colors", set=[Color.RED, Color.GREEN])
+        .interrogate()
+    )
+
+    # Should have 3 failures (red appears twice, green appears once; all in the prohibited set)
+    assert validation.n_passed()[1] == 2  # blue and yellow pass (not red or green)
+    assert validation.n_failed()[1] == 3
+    assert not validation.all_passed()
+
+
+def test_col_vals_in_set_all_pass_with_enum():
+    """Test col_vals_in_set() where all values pass with Enum."""
+    # Create data where all colors are in the enum
+    data = pl.DataFrame({"colors": ["red", "green", "blue", "red", "green"]})
+
+    validation = Validate(data).col_vals_in_set(columns="colors", set=Color).interrogate()
+
+    # Should have no failures
+    assert validation.n_passed()[1] == 5
+    assert validation.n_failed()[1] == 0
+    assert validation.all_passed()
+
+
+def test_col_vals_not_in_set_all_pass_with_enum():
+    """Test col_vals_not_in_set() where all values pass with Enum."""
+    # Create data where no colors are in the enum
+    data = pl.DataFrame({"colors": ["yellow", "orange", "purple", "pink", "cyan"]})
+
+    validation = Validate(data).col_vals_not_in_set(columns="colors", set=Color).interrogate()
+
+    # Should have no failures
+    assert validation.n_passed()[1] == 5
+    assert validation.n_failed()[1] == 0
+    assert validation.all_passed()
+
+
+def test_enum_extraction_helper_function():
+    """Test the _extract_enum_values() helper function directly."""
+    from pointblank.validate import _extract_enum_values
+
+    # Test with Enum class
+    values = _extract_enum_values(Color)
+    assert set(values) == {"red", "green", "blue"}
+
+    # Test with list of Enum instances
+    values = _extract_enum_values([Color.RED, Color.GREEN])
+    assert values == ["red", "green"]
+
+    # Test with mixed list
+    values = _extract_enum_values([Color.RED, "yellow", Color.GREEN])
+    assert values == ["red", "yellow", "green"]
+
+    # Test with regular list
+    values = _extract_enum_values(["red", "yellow", "green"])
+    assert values == ["red", "yellow", "green"]
+
+    # Test with single value
+    values = _extract_enum_values("red")
+    assert values == ["red"]
+
+    # Test with list containing instances from different Enum classes
+    values = _extract_enum_values([Color.RED, Priority.LOW, Status.ACTIVE])
+    assert values == ["red", 1, "active"]
+
+
+def test_col_vals_in_set_with_mixed_enum_classes():
+    """Test col_vals_in_set with a mix of different Enum class instances."""
+    # Create data that has all string values for Polars compatibility
+    data = pl.DataFrame({"mixed_values": ["red", "active", "green", "pending", "blue", "inactive"]})
+
+    # Test with instances from different Enum classes
+    # This tests whether our _extract_enum_values can handle different Enum types
+    validation = (
+        Validate(data)
+        .col_vals_in_set(
+            columns="mixed_values", set=[Color.RED, Color.GREEN, Status.ACTIVE, Status.PENDING]
+        )
+        .interrogate()
+    )
+
+    # Should have 4 passes: "red", "green", "active", "pending" are in the set
+    # Should have 2 failures: "blue", "inactive" are not in the set
+    assert validation.n_passed()[1] == 4
+    assert validation.n_failed()[1] == 2
+    assert not validation.all_passed()
+
+
+def test_col_vals_not_in_set_with_mixed_enum_classes():
+    """Test col_vals_not_in_set with a mix of different Enum class instances."""
+    # Create data that has all string values for Polars compatibility
+    data = pl.DataFrame(
+        {"mixed_values": ["red", "active", "yellow", "deleted", "orange", "archived"]}
+    )
+
+    # Test with instances from different Enum classes
+    # This tests whether our _extract_enum_values can handle different Enum types
+    validation = (
+        Validate(data)
+        .col_vals_not_in_set(
+            columns="mixed_values", set=[Color.RED, Color.GREEN, Status.ACTIVE, Status.PENDING]
+        )
+        .interrogate()
+    )
+
+    # Should have 4 passes: "yellow", "deleted", "orange", "archived" are NOT in the prohibited set
+    # Should have 2 failures: "red", "active" ARE in the prohibited set
+    assert validation.n_passed()[1] == 4
+    assert validation.n_failed()[1] == 2
+    assert not validation.all_passed()
