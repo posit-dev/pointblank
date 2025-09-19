@@ -75,6 +75,7 @@ from pointblank._utils import (
     _check_any_df_lib,
     _check_invalid_fields,
     _column_test_prep,
+    _copy_dataframe,
     _count_null_values_in_column,
     _count_true_values_in_column,
     _derive_bounds,
@@ -9986,8 +9987,9 @@ class Validate:
                 validation.active = False
                 continue
 
-            # Make a copy of the table for this step
-            data_tbl_step = data_tbl
+            # Make a deep copy of the table for this step to ensure proper isolation
+            # This prevents modifications from one validation step affecting others
+            data_tbl_step = _copy_dataframe(data_tbl)
 
             # ------------------------------------------------
             # Preprocessing stage
