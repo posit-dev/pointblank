@@ -240,6 +240,46 @@ def _select_df_lib(preference: str = "polars") -> Any:
     return pl if pl is not None else pd
 
 
+def _copy_dataframe(df):
+    """
+    Create a copy of a DataFrame, handling different DataFrame types.
+
+    This function attempts to create a proper copy of the DataFrame using
+    the most appropriate method for each DataFrame type.
+    """
+    # Try standard copy methods first
+    if hasattr(df, "copy") and callable(getattr(df, "copy")):
+        try:
+            return df.copy()
+        except Exception:
+            pass
+
+    if hasattr(df, "clone") and callable(getattr(df, "clone")):
+        try:
+            return df.clone()
+        except Exception:
+            pass
+
+    # Try the select('*') approach for DataFrames that support it
+    # This works well for PySpark and other SQL-like DataFrames
+    if hasattr(df, "select") and callable(getattr(df, "select")):
+        try:
+            return df.select("*")
+        except Exception:
+            pass
+
+    # For DataFrames that can't be copied, return original
+    # This provides some protection while avoiding crashes
+    try:
+        import copy
+
+        return copy.deepcopy(df)
+    except Exception:
+        # If all else fails, return the original DataFrame
+        # This is better than crashing the validation
+        return df
+
+
 def _convert_to_narwhals(df: FrameT) -> nw.DataFrame:
     # Convert the DataFrame to a format that narwhals can work with
     return nw.from_native(df)

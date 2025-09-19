@@ -16569,3 +16569,578 @@ def test_col_vals_not_in_set_with_mixed_enum_classes():
     assert validation.n_passed()[1] == 4
     assert validation.n_failed()[1] == 2
     assert not validation.all_passed()
+
+
+@pytest.mark.parametrize("tbl_fixture", ["tbl_pd", "tbl_pl"])
+def test_pre_parameter_isolation_with_proper_closures(request, tbl_fixture):
+    """Test that the `pre` parameter in multiple validation steps uses proper closures to avoid
+    shared state issues.
+    """
+    tbl = request.getfixturevalue(tbl_fixture)
+
+    # Create proper closure functions that capture values, not references
+    # Using narwhals syntax that works across DataFrame types
+    def create_filter_func(threshold):
+        def filter_func(df):
+            dfn = nw.from_native(df)
+            filtered = dfn.filter(nw.col("x") > threshold)
+            return nw.to_native(filtered)
+
+        return filter_func
+
+    # First validation: filter for x > 1 (should keep 3 rows: x=2,3,4)
+    pre_func_1 = create_filter_func(1)
+
+    # Second validation: filter for x > 2 (should keep 2 rows: x=3,4)
+    pre_func_2 = create_filter_func(2)
+
+    validation = (
+        Validate(tbl)
+        .col_vals_not_null(columns="y", pre=pre_func_1)
+        .col_vals_not_null(columns="z", pre=pre_func_2)
+        .interrogate()
+    )
+
+    # Check that each step processed the correct number of rows
+    n_values = [vi.n for vi in validation.validation_info]
+
+    # First step should filter to 3 rows (x > 1: keeps x=2,3,4)
+    # Second step should filter to 2 rows (x > 2: keeps x=3,4)
+    assert n_values[0] == 3
+    assert n_values[1] == 2
+
+
+@pytest.mark.parametrize("tbl_fixture", ["tbl_pd", "tbl_pl"])
+def test_pre_parameter_closure(request, tbl_fixture):
+    """Test that documents the closure issue that users might encounter."""
+    tbl = request.getfixturevalue(tbl_fixture)
+
+    # Use simple numeric thresholds that work with test fixture data
+    thresholds = [1, 2]  # Different thresholds that should give different results
+
+    # This creates the problematic closure issue
+    val = Validate(tbl)
+    for threshold in thresholds:
+        # BAD: Lambda captures 'threshold' by reference, not by value
+        def bad_pre_func(df):
+            dfn = nw.from_native(df)
+            filtered = dfn.filter(nw.col("x") > threshold)
+            return nw.to_native(filtered)
+
+        val = val.col_vals_not_null(columns="y", pre=bad_pre_func)
+
+    val = val.interrogate()
+    n_values = [vi.n for vi in val.validation_info]
+
+    # Due to closure issue, both steps will use the last threshold value (2)
+    # Both should show 2 rows (x > 2: keeps x=3,4)
+    assert n_values[0] == 2
+    assert n_values[1] == 2
+
+
+@pytest.mark.parametrize("tbl_fixture", ["tbl_pd", "tbl_pl"])
+def test_dataframe_isolation_between_steps(request, tbl_fixture):
+    """
+    Test that the library provides proper DataFrame isolation between validation steps.
+
+    This ensures that preprocessing in one step doesn't affect other steps,
+    even if there are mutable operations or shared references.
+    """
+    tbl = request.getfixturevalue(tbl_fixture)
+
+    # Keep a reference to the original for comparison
+    if hasattr(tbl, "clone"):
+        original_tbl = tbl.clone()
+    elif hasattr(tbl, "copy"):
+        original_tbl = tbl.copy()
+    else:
+        original_tbl = tbl  # For immutable types
+
+    # Create pre functions that filter differently using narwhals
+    def pre_filter_high_x(df):
+        dfn = nw.from_native(df)
+        filtered = dfn.filter(nw.col("x") >= 3)  # Keep x=3,4 (2 rows)
+        return nw.to_native(filtered)
+
+    def pre_filter_one_row(df):
+        dfn = nw.from_native(df)
+        filtered = dfn.filter(nw.col("x") == 1)  # Keep only x=1 (1 row)
+        return nw.to_native(filtered)
+
+    validation = (
+        Validate(tbl)
+        .col_vals_not_null(columns="y", pre=pre_filter_high_x)
+        .col_vals_not_null(columns="z", pre=pre_filter_one_row)
+        .interrogate()
+    )
+
+    # Verify that original table wasn't modified
+    assert tbl.shape == original_tbl.shape
+
+    # Verify that each step used its own filtered copy using n (number of test units)
+    n_values = [vi.n for vi in validation.validation_info]
+
+    # The steps should have different numbers of rows due to different filters
+    assert n_values[0] != n_values[1]
+
+    # First filter (x >= 3) should keep 2 rows, second filter (x == 1) should keep 1 row
+    assert n_values[0] == 2
+    assert n_values[1] == 1
+
+
+@pytest.mark.parametrize("tbl_fixture", ["tbl_pd", "tbl_pl"])
+def test_pre_parameter_with_multiple_steps_proper_isolation(request, tbl_fixture):
+    """Test multiple validation steps with different pre functions to ensure proper isolation."""
+    tbl = request.getfixturevalue(tbl_fixture)
+
+    # Define different pre functions with clear isolation using narwhals
+    def pre_x_eq_1(df):
+        """Keep rows where x == 1"""
+        dfn = nw.from_native(df)
+        filtered = dfn.filter(nw.col("x") == 1)
+        return nw.to_native(filtered)
+
+    def pre_x_eq_2(df):
+        """Keep rows where x == 2"""
+        dfn = nw.from_native(df)
+        filtered = dfn.filter(nw.col("x") == 2)
+        return nw.to_native(filtered)
+
+    def pre_x_ge_3(df):
+        """Keep rows where x >= 3"""
+        dfn = nw.from_native(df)
+        filtered = dfn.filter(nw.col("x") >= 3)
+        return nw.to_native(filtered)
+
+    validation = (
+        Validate(tbl)
+        .col_vals_not_null(columns="y", pre=pre_x_eq_1)  # Should check 1 row (x=1)
+        .col_vals_not_null(columns="y", pre=pre_x_eq_2)  # Should check 1 row (x=2)
+        .col_vals_not_null(columns="y", pre=pre_x_ge_3)  # Should check 2 rows (x=3,4)
+        .interrogate()
+    )
+
+    n_values = [vi.n for vi in validation.validation_info]
+
+    # All three steps should have different numbers of rows
+    assert len(set(n_values)) == 2
+
+    # Verify the steps processed data correctly
+    assert all(n > 0 for n in n_values)
+    assert all(n <= tbl.shape[0] for n in n_values)
+
+    # Specific expected counts: 1, 1, 2
+    assert n_values[0] == 1
+    assert n_values[1] == 1
+    assert n_values[2] == 2
+
+
+@pytest.mark.parametrize("tbl_fixture", ["tbl_pd", "tbl_pl"])
+def test_pre_parameter_native_lambda_isolation(request, tbl_fixture):
+    """Test pre parameter isolation using native lambdas specific to each DataFrame type."""
+    tbl = request.getfixturevalue(tbl_fixture)
+
+    # Use native lambdas for each DataFrame type
+    if hasattr(tbl, "query"):  # Pandas
+        pre_filter_x_gt_2 = lambda df: df.query("x > 2")
+        pre_filter_x_le_2 = lambda df: df.query("x <= 2")
+    else:  # Polars
+        pre_filter_x_gt_2 = lambda df: df.filter(pl.col("x") > 2)
+        pre_filter_x_le_2 = lambda df: df.filter(pl.col("x") <= 2)
+
+    validation = (
+        Validate(tbl)
+        .col_vals_not_null(columns="y", pre=pre_filter_x_gt_2)  # Should check 2 rows (x=3,4)
+        .col_vals_not_null(columns="z", pre=pre_filter_x_le_2)  # Should check 2 rows (x=1,2)
+        .interrogate()
+    )
+
+    n_values = [vi.n for vi in validation.validation_info]
+
+    # Both filters should process 2 rows each
+    assert n_values[0] == 2
+    assert n_values[1] == 2
+    assert all(vi.all_passed for vi in validation.validation_info)
+
+
+@pytest.mark.parametrize("tbl_fixture", ["tbl_pd", "tbl_pl"])
+def test_pre_parameter_function_isolation(request, tbl_fixture):
+    """Test pre parameter isolation using regular functions instead of lambdas."""
+    tbl = request.getfixturevalue(tbl_fixture)
+
+    def filter_high_values(df):
+        """Function to filter high x values (>= 3)."""
+        if hasattr(df, "query"):  # Pandas
+            return df.query("x >= 3")
+        else:  # Polars
+            return df.filter(pl.col("x") >= 3)
+
+    def filter_low_values(df):
+        """Function to filter low x values (< 3)."""
+        if hasattr(df, "query"):  # Pandas
+            return df.query("x < 3")
+        else:  # Polars
+            return df.filter(pl.col("x") < 3)
+
+    def filter_single_value(df):
+        """Function to filter single x value (== 1)."""
+        if hasattr(df, "query"):  # Pandas
+            return df.query("x == 1")
+        else:  # Polars
+            return df.filter(pl.col("x") == 1)
+
+    validation = (
+        Validate(tbl)
+        .col_vals_not_null(columns="y", pre=filter_high_values)  # Should check 2 rows
+        .col_vals_not_null(columns="z", pre=filter_low_values)  # Should check 2 rows
+        .col_vals_not_null(columns="y", pre=filter_single_value)  # Should check 1 row
+        .interrogate()
+    )
+
+    n_values = [vi.n for vi in validation.validation_info]
+
+    # Verify each function processed the expected number of rows
+    assert n_values[0] == 2
+    assert n_values[1] == 2
+    assert n_values[2] == 1
+    assert all(vi.all_passed for vi in validation.validation_info)
+
+
+@pytest.mark.parametrize("tbl_fixture", ["tbl_pd", "tbl_pl"])
+def test_pre_parameter_mixed_functions_and_lambdas(request, tbl_fixture):
+    """Test pre parameter isolation mixing functions and lambdas in the same validation."""
+    tbl = request.getfixturevalue(tbl_fixture)
+
+    def named_filter_func(df):
+        """Named function to filter x > 1."""
+        if hasattr(df, "query"):  # Pandas
+            return df.query("x > 1")
+        else:  # Polars
+            return df.filter(pl.col("x") > 1)
+
+    # Mix named functions and lambdas
+    if hasattr(tbl, "query"):  # Pandas
+        lambda_filter = lambda df: df.query("x < 4")
+    else:  # Polars
+        lambda_filter = lambda df: df.filter(pl.col("x") < 4)
+
+    validation = (
+        Validate(tbl)
+        .col_vals_not_null(columns="y", pre=named_filter_func)  # Function: x > 1 (3 rows)
+        .col_vals_not_null(columns="z", pre=lambda_filter)  # Lambda: x < 4 (3 rows)
+        .col_vals_not_null(
+            columns="y", pre=lambda df: df.head(2) if hasattr(df, "head") else df[:2]
+        )  # Lambda: first 2 rows
+        .interrogate()
+    )
+
+    n_values = [vi.n for vi in validation.validation_info]
+
+    # Verify mixed approach works correctly
+    assert n_values[0] == 3
+    assert n_values[1] == 3
+    assert n_values[2] == 2
+    assert all(vi.all_passed for vi in validation.validation_info)
+
+
+def test_pre_parameter_closure_variable_capture_functions():
+    """Test that functions properly capture variables (not affected by closure issues)."""
+
+    tbl = pd.DataFrame({"x": [1, 2, 3, 4], "y": [4, 5, 6, 7], "z": [8, 8, 8, 8]})
+
+    # Create functions that capture different threshold values
+    def create_filter_function(threshold):
+        def filter_func(df):
+            return df.query(f"x > {threshold}")
+
+        return filter_func
+
+    # Create different filter functions with different captured values
+    filter_gt_1 = create_filter_function(1)  # Should keep 3 rows (x=2,3,4)
+    filter_gt_2 = create_filter_function(2)  # Should keep 2 rows (x=3,4)
+    filter_gt_3 = create_filter_function(3)  # Should keep 1 row (x=4)
+
+    validation = (
+        Validate(tbl)
+        .col_vals_not_null(columns="y", pre=filter_gt_1)  # 3 rows
+        .col_vals_not_null(columns="z", pre=filter_gt_2)  # 2 rows
+        .col_vals_not_null(columns="y", pre=filter_gt_3)  # 1 row
+        .interrogate()
+    )
+
+    n_values = [vi.n for vi in validation.validation_info]
+
+    # Functions should properly capture their respective threshold values
+    assert n_values[0] == 3
+    assert n_values[1] == 2
+    assert n_values[2] == 1
+    assert all(vi.all_passed for vi in validation.validation_info)
+
+
+def test_pre_parameter_complex_native_operations():
+    """Test pre parameter isolation with complex native DataFrame operations."""
+
+    # Test with Pandas
+    df_pd = pd.DataFrame(
+        {
+            "x": [1, 2, 3, 4, 5, 6],
+            "y": [10, 20, 30, 40, 50, 60],
+            "z": ["a", "b", "c", "d", "e", "f"],
+            "group": ["A", "A", "B", "B", "C", "C"],
+        }
+    )
+
+    def pandas_complex_filter_1(df):
+        """Complex Pandas operations: filter and aggregate."""
+        return df[df.groupby("group")["y"].transform("mean") > 25]
+
+    def pandas_complex_filter_2(df):
+        """Complex Pandas operations: sort and slice."""
+        return df.sort_values("y", ascending=False).head(3)
+
+    validation_pd = (
+        Validate(df_pd)
+        .col_vals_not_null(columns="z", pre=pandas_complex_filter_1)  # Should filter by group mean
+        .col_vals_not_null(columns="x", pre=pandas_complex_filter_2)  # Should take top 3 by y
+        .interrogate()
+    )
+
+    n_values_pd = [vi.n for vi in validation_pd.validation_info]
+    assert all(n > 0 for n in n_values_pd)
+    assert all(vi.all_passed for vi in validation_pd.validation_info)
+
+    # Test with Polars
+    df_pl = pl.DataFrame(
+        {
+            "x": [1, 2, 3, 4, 5, 6],
+            "y": [10, 20, 30, 40, 50, 60],
+            "z": ["a", "b", "c", "d", "e", "f"],
+            "group": ["A", "A", "B", "B", "C", "C"],
+        }
+    )
+
+    def polars_complex_filter_1(df):
+        """Complex Polars operations: window function."""
+        return df.with_columns(pl.col("y").mean().over("group").alias("group_mean")).filter(
+            pl.col("group_mean") > 25
+        )
+
+    def polars_complex_filter_2(df):
+        """Complex Polars operations: sort and slice."""
+        return df.sort("y", descending=True).head(3)
+
+    validation_pl = (
+        Validate(df_pl)
+        .col_vals_not_null(columns="z", pre=polars_complex_filter_1)  # Should filter by group mean
+        .col_vals_not_null(columns="x", pre=polars_complex_filter_2)  # Should take top 3 by y
+        .interrogate()
+    )
+
+    n_values_pl = [vi.n for vi in validation_pl.validation_info]
+    assert all(n > 0 for n in n_values_pl)
+    assert all(vi.all_passed for vi in validation_pl.validation_info)
+
+
+@pytest.mark.parametrize("tbl_fixture", ["tbl_pd", "tbl_pl"])
+def test_validation_steps_without_pre_are_unaffected(request, tbl_fixture):
+    """Test that validation steps without a `pre=` parameter are completely unaffected."""
+    tbl = request.getfixturevalue(tbl_fixture)
+
+    # Keep reference to original table for comparison
+    if hasattr(tbl, "clone"):
+        original_tbl = tbl.clone()
+    elif hasattr(tbl, "copy"):
+        original_tbl = tbl.copy()
+    else:
+        original_tbl = tbl
+
+    # Define a pre function that filters data for the middle step only
+    if hasattr(tbl, "query"):  # Pandas
+        pre_filter = lambda df: df.query("x > 2")  # Should keep 2 rows (x=3,4)
+    else:  # Polars
+        pre_filter = lambda df: df.filter(pl.col("x") > 2)  # Should keep 2 rows (x=3,4)
+
+    # Create validation where ONLY the middle step uses pre= while others should be unaffected
+    validation = (
+        Validate(tbl)
+        .col_vals_not_null(columns="x")  # No pre= means we should use full table (4 rows)
+        .col_vals_gt(
+            columns="y", value=3, pre=pre_filter
+        )  # with pre= we should use filtered table (2 rows)
+        .col_vals_in_set(columns="z", set=[8])  # No pre= means we should use full table (4 rows)
+        .interrogate()
+    )
+
+    # Verify that steps w/o pre= processed the FULL table, step WITH pre= processed filtered data
+    n_values = [vi.n for vi in validation.validation_info]
+    original_row_count = tbl.shape[0]  # Should be 4 rows
+
+    # Step 1: No pre= and should process full table
+    assert n_values[0] == original_row_count
+
+    # Step 2: With pre= and should process filtered table
+    assert n_values[1] == 2
+
+    # Step 3: No pre= and should process full table
+    assert n_values[2] == original_row_count
+
+    # Verify original table was not modified
+    assert tbl.shape == original_tbl.shape
+
+    # All validations should pass (since our test data is designed to pass)
+    assert all(vi.all_passed for vi in validation.validation_info)
+
+
+@pytest.mark.parametrize("tbl_fixture", ["tbl_pd", "tbl_pl"])
+def test_mixed_pre_and_no_pre_isolation(request, tbl_fixture):
+    """Test mixing validation steps with and without pre= parameters."""
+    tbl = request.getfixturevalue(tbl_fixture)
+
+    # Define a pre function that filters data
+    if hasattr(tbl, "query"):  # Pandas
+        pre_filter = lambda df: df.query("x > 2")  # Should keep 2 rows (x=3,4)
+    else:  # Polars
+        import polars as pl
+
+        pre_filter = lambda df: df.filter(pl.col("x") > 2)  # Should keep 2 rows (x=3,4)
+
+    validation = (
+        Validate(tbl)
+        .col_vals_not_null(columns="y", pre=pre_filter)  # WITH pre= should process 2 rows
+        .col_vals_not_null(columns="z")  # NO pre= should process 4 rows
+        .col_vals_gt(columns="x", value=0, pre=pre_filter)  # WITH pre= should process 2 rows
+        .col_vals_gt(columns="y", value=3)  # NO pre= should process 4 rows
+        .col_vals_in_set(columns="z", set=[8])  # NO pre= should process 4 rows
+        .interrogate()
+    )
+
+    n_values = [vi.n for vi in validation.validation_info]
+
+    # Verify the pattern: pre= steps get filtered data, no-pre= steps get full data
+    expected_pattern = [2, 4, 2, 4, 4]  # pre=, none, pre=, none, none
+
+    for i, (actual, expected) in enumerate(zip(n_values, expected_pattern)):
+        step_type = "WITH pre=" if expected == 2 else "NO pre="
+        assert actual == expected, (
+            f"Step {i + 1} ({step_type}) should process {expected} rows, got {actual}"
+        )
+
+    # All validations should pass
+    assert all(vi.all_passed for vi in validation.validation_info)
+
+
+def test_performance_impact_of_dataframe_copying():
+    """
+    Test that DataFrame copying doesn't significantly impact performance for steps without
+    pre= parameters (which shouldn't need copying).
+    """
+    import time
+
+    # Create a larger DataFrame to make timing differences more apparent
+    large_df = pd.DataFrame(
+        {
+            "x": list(range(1000)) * 4,  # 4000 rows
+            "y": list(range(1000, 2000)) * 4,
+            "z": ["test"] * 4000,
+        }
+    )
+
+    # Time validation WITHOUT pre= parameters
+    start_time = time.time()
+    validation_no_pre = (
+        Validate(large_df)
+        .col_vals_not_null(columns="x")  # No copying needed
+        .col_vals_gt(columns="y", value=0)  # No copying needed
+        .col_vals_not_null(columns="z")  # No copying needed
+        .interrogate()
+    )
+    no_pre_time = time.time() - start_time
+
+    # Time validation WITH pre= parameters
+    start_time = time.time()
+    validation_with_pre = (
+        Validate(large_df)
+        .col_vals_not_null(columns="x", pre=lambda df: df.head(100))  # Copying needed
+        .col_vals_gt(columns="y", value=0, pre=lambda df: df.head(100))  # Copying needed
+        .col_vals_not_null(columns="z", pre=lambda df: df.head(100))  # Copying needed
+        .interrogate()
+    )
+    with_pre_time = time.time() - start_time
+
+    # Verify both work correctly
+    assert all(vi.all_passed for vi in validation_no_pre.validation_info)
+    assert all(vi.all_passed for vi in validation_with_pre.validation_info)
+
+    # Steps without pre= should process full data
+    no_pre_n_values = [vi.n for vi in validation_no_pre.validation_info]
+    assert all(n == 4000 for n in no_pre_n_values)
+
+    # Steps with pre= should process filtered data
+    with_pre_n_values = [vi.n for vi in validation_with_pre.validation_info]
+    assert all(n == 100 for n in with_pre_n_values)
+
+    # Both should complete in reasonable time (less than 10 seconds for this test)
+    assert no_pre_time < 10.0
+    assert with_pre_time < 10.0
+
+
+@pytest.mark.parametrize("tbl_fixture", ["tbl_pd", "tbl_pl"])
+def test_original_table_never_modified_without_pre(request, tbl_fixture):
+    """
+    Test that the original table is NEVER modified by validation steps,
+    especially for steps without pre= parameters.
+    """
+    tbl = request.getfixturevalue(tbl_fixture)
+
+    # Create a deep copy to compare against later
+    if hasattr(tbl, "clone"):
+        original_copy = tbl.clone()
+    elif hasattr(tbl, "copy"):
+        original_copy = tbl.copy()
+    else:
+        original_copy = tbl
+
+    # Store original values to verify they don't change
+    if hasattr(tbl, "to_numpy"):  # Pandas
+        original_x_values = tbl["x"].to_numpy().copy()
+        original_y_values = tbl["y"].to_numpy().copy()
+        original_z_values = tbl["z"].to_numpy().copy()
+    else:  # Polars
+        original_x_values = tbl["x"].to_numpy()
+        original_y_values = tbl["y"].to_numpy()
+        original_z_values = tbl["z"].to_numpy()
+
+    # Run validation with NO pre= parameters
+    validation = (
+        Validate(tbl)
+        .col_vals_not_null(columns="x")
+        .col_vals_not_null(columns="y")
+        .col_vals_not_null(columns="z")
+        .interrogate()
+    )
+
+    # Verify original table is identical to before validation
+    assert tbl.shape == original_copy.shape
+
+    # Verify individual values haven't changed
+    if hasattr(tbl, "to_numpy"):  # Pandas
+        current_x_values = tbl["x"].to_numpy()
+        current_y_values = tbl["y"].to_numpy()
+        current_z_values = tbl["z"].to_numpy()
+    else:  # Polars
+        current_x_values = tbl["x"].to_numpy()
+        current_y_values = tbl["y"].to_numpy()
+        current_z_values = tbl["z"].to_numpy()
+
+    # Compare values without numpy dependency
+    assert (original_x_values == current_x_values).all()
+    assert (original_y_values == current_y_values).all()
+    assert (original_z_values == current_z_values).all()
+
+    # Verify validation worked correctly
+    assert all(vi.all_passed for vi in validation.validation_info)
+
+    # Verify all steps processed the full table
+    n_values = [vi.n for vi in validation.validation_info]
+    expected_rows = tbl.shape[0]
+    assert all(n == expected_rows for n in n_values)
