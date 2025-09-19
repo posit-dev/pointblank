@@ -16,7 +16,16 @@ from pathlib import Path
 from functools import partial
 import contextlib
 import datetime
-from enum import Enum, IntEnum, StrEnum
+from enum import Enum, IntEnum
+
+# StrEnum was introduced in Python 3.11, so we use regular Enum for compatibility
+try:
+    from enum import StrEnum
+except ImportError:
+    # For Python < 3.11, create a StrEnum-like class
+    class StrEnum(str, Enum):
+        pass
+
 
 import pandas as pd
 import polars as pl
