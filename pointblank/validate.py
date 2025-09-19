@@ -6375,10 +6375,10 @@ class Validate:
             multiple columns are supplied or resolved, there will be a separate validation step
             generated for each column.
         set
-            A collection of values to compare against. Can be a list of values, a Python Enum
-            class, or a collection containing Enum instances. When an Enum class is provided,
-            all enum values will be used. When a collection contains Enum instances, their
-            values will be extracted automatically.
+            A collection of values to compare against. Can be a list of values, a Python Enum class,
+            or a collection containing Enum instances. When an Enum class is provided, all enum
+            values will be used. When a collection contains Enum instances, their values will be
+            extracted automatically.
         pre
             An optional preprocessing function or lambda to apply to the data table during
             interrogation. This function should take a table as input and return a modified table.
@@ -6606,6 +6606,9 @@ class Validate:
 
         validation
         ```
+
+        In this case, the `"green"` value will cause a failing test unit since it's not part of the
+        specified set.
         """
 
         assertion_type = _get_fn_name()
@@ -6689,10 +6692,10 @@ class Validate:
             multiple columns are supplied or resolved, there will be a separate validation step
             generated for each column.
         set
-            A collection of values to compare against. Can be a list of values, a Python Enum
-            class, or a collection containing Enum instances. When an Enum class is provided,
-            all enum values will be used. When a collection contains Enum instances, their
-            values will be extracted automatically.
+            A collection of values to compare against. Can be a list of values, a Python Enum class,
+            or a collection containing Enum instances. When an Enum class is provided, all enum
+            values will be used. When a collection contains Enum instances, their values will be
+            extracted automatically.
         pre
             An optional preprocessing function or lambda to apply to the data table during
             interrogation. This function should take a table as input and return a modified table.
@@ -6898,8 +6901,8 @@ class Validate:
         validation
         ```
 
-        This validation fails for the `"deleted"` value since it matches one of the invalid statuses
-        in the `InvalidStatus` enum.
+        This `"deleted"` value in the `status` column will fail since it matches one of the invalid
+        statuses in the `InvalidStatus` enum.
         """
 
         assertion_type = _get_fn_name()
