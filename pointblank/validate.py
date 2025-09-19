@@ -6882,6 +6882,12 @@ class Validate:
             DELETED = "deleted"
             ARCHIVED = "archived"
 
+        # Create a table with status data
+        status_table = pl.DataFrame({
+            "product": ["widget", "gadget", "tool", "device"],
+            "status": ["active", "pending", "deleted", "active"]
+        })
+
         # Validate that no values are in the invalid status set
         validation = (
             pb.Validate(data=status_table)
@@ -6891,6 +6897,9 @@ class Validate:
 
         validation
         ```
+
+        This validation fails for the `"deleted"` value since it matches one of the invalid statuses
+        in the `InvalidStatus` enum.
         """
 
         assertion_type = _get_fn_name()
