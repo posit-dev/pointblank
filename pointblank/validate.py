@@ -12718,11 +12718,8 @@ class Validate:
                 values_upd.append("EXPR")
 
             elif assertion_type[i] in ["col_vals_regex"]:
-                # Handle both old string format and new dictionary format
-                if isinstance(value, dict):
-                    pattern = value["pattern"]
-                else:
-                    pattern = value
+                pattern = value["pattern"]
+
                 values_upd.append(str(pattern))
 
             # If the assertion type is not recognized, add the value as a string
@@ -15550,7 +15547,8 @@ def _step_report_row_based(
         elements = ", ".join(values)
         text = f"{column} &NotElement; {{{elements}}}"
     elif assertion_type == "col_vals_regex":
-        text = STEP_REPORT_TEXT["column_matches_regex"][lang].format(column=column, values=values)
+        pattern = values["pattern"]
+        text = STEP_REPORT_TEXT["column_matches_regex"][lang].format(column=column, values=pattern)
     elif assertion_type == "col_vals_null":
         text = STEP_REPORT_TEXT["column_is_null"][lang].format(column=column)
     elif assertion_type == "col_vals_not_null":
