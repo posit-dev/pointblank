@@ -289,7 +289,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
         border-radius: 2px;
     ">
 <p>Getting the number of rows in a table is easily done by using the <a href="../reference/get_row_count.html#pointblank.get_row_count" title="0"><code>get_row_count()</code></a> function. Here’s an example using the <code>game_revenue</code> dataset (itself loaded using the <a href="../reference/load_dataset.html#pointblank.load_dataset"><span><code>load_dataset()</code></span></a> function):</p>
-<div id="1c7fec94" class="cell" data-execution_count="1">
+<div id="31384db5" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>game_revenue_polars <span class="op">=</span> pb.load_dataset(<span class="st">"game_revenue"</span>)</span>
@@ -300,7 +300,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 </div>
 <p>This table is a Polars DataFrame, but the <a href="../reference/get_row_count.html#pointblank.get_row_count" title="0"><code>get_row_count()</code></a> function works with any table supported by <code>pointblank</code>, including Pandas DataFrames and Ibis backend tables. Here’s an example using a DuckDB table handled by Ibis:</p>
-<div id="5d68f1d0" class="cell" data-execution_count="2">
+<div id="9edd797d" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>game_revenue_duckdb <span class="op">=</span> pb.load_dataset(<span class="st">"game_revenue"</span>, tbl_type<span class="op">=</span><span class="st">"duckdb"</span>)</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>pb.get_row_count(game_revenue_duckdb)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -311,7 +311,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="working-with-csv-files" class="level4">
 <h4 class="anchored" data-anchor-id="working-with-csv-files">Working with CSV Files</h4>
 <p>The <a href="../reference/get_row_count.html#pointblank.get_row_count" title="0"><code>get_row_count()</code></a> function can directly accept CSV file paths:</p>
-<div id="a9b23c71" class="cell" data-execution_count="3">
+<div id="16d97267" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get a path to a CSV file from the package data</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>csv_path <span class="op">=</span> pb.get_data_path(<span class="st">"global_sales"</span>, <span class="st">"csv"</span>)</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -324,7 +324,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="working-with-parquet-files" class="level4">
 <h4 class="anchored" data-anchor-id="working-with-parquet-files">Working with Parquet Files</h4>
 <p>The function supports various Parquet input formats:</p>
-<div id="dcfbe0d2" class="cell" data-execution_count="4">
+<div id="560d982f" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Single Parquet file from package data</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>parquet_path <span class="op">=</span> pb.get_data_path(<span class="st">"nycflights"</span>, <span class="st">"parquet"</span>)</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -346,7 +346,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="working-with-database-connection-strings" class="level4">
 <h4 class="anchored" data-anchor-id="working-with-database-connection-strings">Working with Database Connection Strings</h4>
 <p>The function supports database connection strings for direct access to database tables:</p>
-<div id="264d5ad4" class="cell" data-execution_count="5">
+<div id="0459265e" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get path to a DuckDB database file from package data</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>duckdb_path <span class="op">=</span> pb.get_data_path(<span class="st">"game_revenue"</span>, <span class="st">"duckdb"</span>)</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
