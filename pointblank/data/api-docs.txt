@@ -3186,7 +3186,10 @@ col_vals_in_set(self, columns: 'str | list[str] | Column | ColumnSelector | Colu
             multiple columns are supplied or resolved, there will be a separate validation step
             generated for each column.
         set
-            A list of values to compare against.
+            A collection of values to compare against. Can be a list of values, a Python Enum class,
+            or a collection containing Enum instances. When an Enum class is provided, all enum
+            values will be used. When a collection contains Enum instances, their values will be
+            extracted automatically.
         pre
             An optional preprocessing function or lambda to apply to the data table during
             interrogation. This function should take a table as input and return a modified table.
@@ -3357,9 +3360,63 @@ col_vals_in_set(self, columns: 'str | list[str] | Column | ColumnSelector | Colu
 
         The validation table reports two failing test units. The specific failing cases are for the
         column `b` values of `8` and `1`, which are not in the set of `[2, 3, 4, 5, 6]`.
+
+        **Using Python Enums**
+
+        The `col_vals_in_set()` method also supports Python Enum classes and instances, which can
+        make validations more readable and maintainable:
+
+        ```python
+        from enum import Enum
+
+        class Color(Enum):
+            RED = "red"
+            GREEN = "green"
+            BLUE = "blue"
+
+        # Create a table with color data
+        tbl_colors = pl.DataFrame({
+            "product": ["shirt", "pants", "hat", "shoes"],
+            "color": ["red", "blue", "green", "yellow"]
+        })
+
+        # Validate using an Enum class (all enum values are allowed)
+        validation = (
+            pb.Validate(data=tbl_colors)
+            .col_vals_in_set(columns="color", set=Color)
+            .interrogate()
+        )
+
+        validation
+        ```
+
+        This validation will fail for the `"yellow"` value since it's not in the `Color` enum.
+
+        You can also use specific Enum instances or mix them with regular values:
+
+        ```python
+        # Validate using specific Enum instances
+        validation = (
+            pb.Validate(data=tbl_colors)
+            .col_vals_in_set(columns="color", set=[Color.RED, Color.BLUE])
+            .interrogate()
+        )
+
+        # Mix Enum instances with regular values
+        validation = (
+            pb.Validate(data=tbl_colors)
+            .col_vals_in_set(columns="color", set=[Color.RED, Color.BLUE, "yellow"])
+            .interrogate()
+        )
+
+        validation
+        ```
+
+        In this case, the `"green"` value will cause a failing test unit since it's not part of the
+        specified set.
         
 
-col_vals_not_in_set(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', set: 'list[float | int]', pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
+col_vals_not_in_set(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', set: 'Collection[Any]', pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
 
         Validate whether column values are not in a set of values.
 
@@ -3376,7 +3433,10 @@ col_vals_not_in_set(self, columns: 'str | list[str] | Column | ColumnSelector | 
             multiple columns are supplied or resolved, there will be a separate validation step
             generated for each column.
         set
-            A list of values to compare against.
+            A collection of values to compare against. Can be a list of values, a Python Enum class,
+            or a collection containing Enum instances. When an Enum class is provided, all enum
+            values will be used. When a collection contains Enum instances, their values will be
+            extracted automatically.
         pre
             An optional preprocessing function or lambda to apply to the data table during
             interrogation. This function should take a table as input and return a modified table.
@@ -3548,6 +3608,36 @@ col_vals_not_in_set(self, columns: 'str | list[str] | Column | ColumnSelector | 
 
         The validation table reports two failing test units. The specific failing cases are for the
         column `b` values of `2` and `6`, both of which are in the set of `[2, 3, 4, 5, 6]`.
+
+        **Using Python Enums**
+
+        Like `col_vals_in_set()`, this method also supports Python Enum classes and instances:
+
+        ```python
+        from enum import Enum
+
+        class InvalidStatus(Enum):
+            DELETED = "deleted"
+            ARCHIVED = "archived"
+
+        # Create a table with status data
+        status_table = pl.DataFrame({
+            "product": ["widget", "gadget", "tool", "device"],
+            "status": ["active", "pending", "deleted", "active"]
+        })
+
+        # Validate that no values are in the invalid status set
+        validation = (
+            pb.Validate(data=status_table)
+            .col_vals_not_in_set(columns="status", set=InvalidStatus)
+            .interrogate()
+        )
+
+        validation
+        ```
+
+        This `"deleted"` value in the `status` column will fail since it matches one of the invalid
+        statuses in the `InvalidStatus` enum.
         
 
 col_vals_null(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
@@ -3922,7 +4012,7 @@ col_vals_not_null(self, columns: 'str | list[str] | Column | ColumnSelector | Co
         two Null values in column `b`.
         
 
-col_vals_regex(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', pattern: 'str', na_pass: 'bool' = False, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
+col_vals_regex(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', pattern: 'str', na_pass: 'bool' = False, inverse: 'bool' = False, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
 
         Validate whether column values match a regular expression pattern.
 
@@ -3943,6 +4033,9 @@ col_vals_regex(self, columns: 'str | list[str] | Column | ColumnSelector | Colum
         na_pass
             Should any encountered None, NA, or Null values be considered as passing test units? By
             default, this is `False`. Set to `True` to pass test units with missing values.
+        inverse
+            Should the validation step be inverted? If `True`, then the expectation is that column
+            values should *not* match the specified `pattern=` regex.
         pre
             An optional preprocessing function or lambda to apply to the data table during
             interrogation. This function should take a table as input and return a modified table.
@@ -9798,7 +9891,7 @@ validation workflows. The `yaml_interrogate()` function can be used to run a val
 YAML strings or files. The `validate_yaml()` function checks if the YAML configuration
 passes its own validity checks.
 
-yaml_interrogate(yaml: 'Union[str, Path]', set_tbl: 'Union[FrameT, Any, None]' = None) -> 'Validate'
+yaml_interrogate(yaml: 'Union[str, Path]', set_tbl: 'Union[FrameT, Any, None]' = None, namespaces: 'Optional[Union[Iterable[str], Mapping[str, str]]]' = None) -> 'Validate'
 Execute a YAML-based validation workflow.
 
     This is the main entry point for YAML-based validation workflows. It takes YAML configuration
@@ -9820,6 +9913,10 @@ Execute a YAML-based validation workflow.
         `tbl` field before executing the validation workflow. This can be any supported table type
         including DataFrame objects, Ibis table objects, CSV file paths, Parquet file paths, GitHub
         URLs, or database connection strings.
+    namespaces
+        Optional module namespaces to make available for Python code execution in YAML
+        configurations. Can be a dictionary mapping aliases to module names or a list of module
+        names. See the "Using Namespaces" section below for detailed examples.
 
     Returns
     -------
@@ -9833,6 +9930,71 @@ Execute a YAML-based validation workflow.
     YAMLValidationError
         If the YAML is invalid, malformed, or execution fails. This includes syntax errors, missing
         required fields, unknown validation methods, or data loading failures.
+
+    Using Namespaces
+    ----------------
+    The `namespaces=` parameter enables custom Python modules and functions in YAML configurations.
+    This is particularly useful for custom action functions and advanced Python expressions.
+
+    **Namespace formats:**
+
+    - Dictionary format: `{"alias": "module.name"}` maps aliases to module names
+    - List format: `["module.name", "another.module"]` imports modules directly
+
+    **Option 1: Inline expressions (no namespaces needed)**
+
+    ```python
+    import pointblank as pb
+
+    # Simple inline custom action
+    yaml_config = '''
+    tbl: small_table
+    thresholds:
+      warning: 0.01
+    actions:
+      warning:
+        python: "lambda: print('Custom warning triggered')"
+    steps:
+    - col_vals_gt:
+        columns: [a]
+        value: 1000
+    '''
+
+    result = pb.yaml_interrogate(yaml_config)
+    result
+    ```
+
+    **Option 2: External functions with namespaces**
+
+    ```python
+    # Define a custom action function
+    def my_custom_action():
+        print("Data validation failed: please check your data.")
+
+    # Add to current module for demo
+    import sys
+    sys.modules[__name__].my_custom_action = my_custom_action
+
+    # YAML that references the external function
+    yaml_config = '''
+    tbl: small_table
+    thresholds:
+      warning: 0.01
+    actions:
+      warning:
+        python: actions.my_custom_action
+    steps:
+    - col_vals_gt:
+        columns: [a]
+        value: 1000  # This will fail
+    '''
+
+    # Use namespaces to make the function available
+    result = pb.yaml_interrogate(yaml_config, namespaces={'actions': '__main__'})
+    result
+    ```
+
+    This approach enables modular, reusable validation workflows with custom business logic.
 
     Examples
     --------
