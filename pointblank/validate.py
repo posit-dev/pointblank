@@ -3445,7 +3445,7 @@ class Validate:
         summary = pb.get_validation_summary()
         if summary["status"] == "CRITICAL":
             send_alert_email(
-                subject=f"CRITICAL validation failures in {summary['table_name']}",
+                subject=f"CRITICAL validation failures in {summary['tbl_name']}",
                 body=f"{summary['critical_steps']} steps failed with critical severity."
             )
 
