@@ -266,7 +266,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> send_alert():</span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    summary <span class="op">=</span> pb.get_validation_summary()</span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> summary[<span class="st">"highest_severity"</span>] <span class="op">==</span> <span class="st">"critical"</span>:</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"ALERT: Critical validation failures found in </span><span class="sc">{</span>summary[<span class="st">'table_name'</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"ALERT: Critical validation failures found in </span><span class="sc">{</span>summary[<span class="st">'tbl_name'</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
 <span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    pb.Validate(</span>
