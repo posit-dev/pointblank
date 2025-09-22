@@ -239,7 +239,7 @@ Validate(data: 'FrameT | Any', tbl_name: 'str | None' = None, label: 'str | None
         summary = pb.get_validation_summary()
         if summary["status"] == "CRITICAL":
             send_alert_email(
-                subject=f"CRITICAL validation failures in {summary['table_name']}",
+                subject=f"CRITICAL validation failures in {summary['tbl_name']}",
                 body=f"{summary['critical_steps']} steps failed with critical severity."
             )
 
@@ -858,7 +858,7 @@ FinalActions(*args)
     def send_alert():
         summary = pb.get_validation_summary()
         if summary["highest_severity"] == "critical":
-            print(f"ALERT: Critical validation failures found in {summary['table_name']}")
+            print(f"ALERT: Critical validation failures found in {summary['tbl_name']}")
 
     validation = (
         pb.Validate(
