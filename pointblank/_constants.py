@@ -40,6 +40,7 @@ ASSERTION_TYPE_METHOD_MAP = {
     "col_exists": "col_exists",
     "rows_distinct": "rows_distinct",
     "rows_complete": "rows_complete",
+    "rows_ai": "rows_ai",
     "col_schema_match": "col_schema_match",
     "row_count_match": "row_count_match",
     "col_count_match": "col_count_match",
@@ -81,6 +82,7 @@ ROW_BASED_VALIDATION_TYPES = [
     "col_vals_not_null",
     "col_vals_expr",
     "conjointly",
+    "rows_ai",
 ]
 
 IBIS_BACKENDS = [
@@ -368,6 +370,51 @@ SVG_ICONS_FOR_ASSERTION_TYPES = {
             <g id="complete_me" transform="translate(12.500000, 9.500000)" fill="#000000">
                 <path d="M8,0 L8,10 L16,10 L16,18 L26,18 L26,10 L34,10 L34,0 L8,0 Z M10,2 L16,2 L16,8 L10,8 L10,2 Z M18,2 L24,2 L24,8 L18,8 L18,2 Z M26,2 L32,2 L32,8 L26,8 L26,2 Z M18,10 L24,10 L24,16 L18,16 L18,10 Z M0,21 L0,47 L42,47 L42,21 L32,21 L32,29 L24,29 L24,37 L18,37 L18,29 L10,29 L10,21 L0,21 Z M2,23 L8,23 L8,29 L2,29 L2,23 Z M34,23 L40,23 L40,29 L34,29 L34,23 Z M2,31 L8,31 L8,37 L2,37 L2,31 Z M10,31 L16,31 L16,37 L10,37 L10,31 Z M26,31 L32,31 L32,37 L26,37 L26,31 Z M34,31 L40,31 L40,37 L34,37 L34,31 Z M2,39 L8,39 L8,45 L2,45 L2,39 Z M10,39 L16,39 L16,45 L10,45 L10,39 Z M18,39 L24,39 L24,45 L18,45 L18,39 Z M26,39 L32,39 L32,45 L26,45 L26,39 Z M34,39 L40,39 L40,45 L34,45 L34,39 Z" id="Shape" fill-rule="nonzero"></path>
                 <path d="M22.4566476,18.35817 C22.9253976,18.29567 23.3746166,18.569108 23.5308666,19.01442 C23.6910226,19.459733 23.5152416,19.955826 23.1128976,20.20192 L23.1128976,20.20192 L20.2066476,22.38942 L25.7989286,22.3893123 L25.7989286,24.3893123 L20.2066476,24.38942 L23.1128976,26.57692 C23.5621166,26.912858 23.6519606,27.549576 23.3160226,27.998795 C22.9800856,28.448014 22.3433666,28.537858 21.8941476,28.20192 L21.8941476,28.20192 L16.6128976,24.20192 C16.3511786,24.01442 16.1949286,23.709733 16.1949286,23.38942 C16.1949286,23.069108 16.3511786,22.76442 16.6128976,22.57692 L16.6128976,22.57692 L21.8941476,18.57692 C22.0230536,18.479264 22.1714916,18.416764 22.3316476,18.38942 C22.3707106,18.377701 22.4136786,18.365983 22.4566476,18.35817 Z" id="arrow_right" transform="translate(20.997393, 23.377149) rotate(-90.000000) translate(-20.997393, -23.377149) "></path>
+            </g>
+        </g>
+    </g>
+</svg>""",
+    "rows_ai": """<?xml version="1.0" encoding="UTF-8"?>
+<svg width="67px" height="67px" viewBox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>rows_ai</title>
+    <defs>
+        <radialGradient id="EyeCore" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" style="stop-color:#ff0000;stop-opacity:1" />
+            <stop offset="70%" style="stop-color:#cc0000;stop-opacity:1" />
+            <stop offset="100%" style="stop-color:#990000;stop-opacity:1" />
+        </radialGradient>
+        <radialGradient id="EyeOuter" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" style="stop-color:#ff3333;stop-opacity:0.8" />
+            <stop offset="50%" style="stop-color:#ff0000;stop-opacity:0.9" />
+            <stop offset="100%" style="stop-color:#660000;stop-opacity:1" />
+        </radialGradient>
+        <filter id="redGlow" color-interpolation-filters="sRGB">
+            <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+            <feMerge>
+                <feMergeNode in="coloredBlur"/>
+                <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+        </filter>
+    </defs>
+    <g id="All-Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="rows_ai" transform="translate(0.000000, 0.965517)">
+            <path d="M56.712234,1 C59.1975153,1 61.4475153,2.00735931 63.076195,3.63603897 C64.7048747,5.26471863 65.712234,7.51471863 65.712234,10 L65.712234,10 L65.712234,65 L10.712234,65 C8.22695259,65 5.97695259,63.9926407 4.34827294,62.363961 C2.71959328,60.7352814 1.71223397,58.4852814 1.71223397,56 L1.71223397,56 L1.71223397,10 C1.71223397,7.51471863 2.71959328,5.26471863 4.34827294,3.63603897 C5.97695259,2.00735931 8.22695259,1 10.712234,1 L10.712234,1 Z" id="rectangle" stroke="#333333" stroke-width="1" fill="#000000"></path>
+            <g id="eye" transform="translate(33.5, 33.5)">
+                <circle cx="0" cy="0" r="18" fill="#ff0000" opacity="0.3" filter="url(#redGlow)"/>
+                <circle cx="0" cy="0" r="15" fill="url(#EyeOuter)" stroke="#ff0000" stroke-width="1"/>
+                <circle cx="0" cy="0" r="12" fill="none" stroke="#ff6666" stroke-width="1.2" opacity="0.8"/>
+                <circle cx="0" cy="0" r="9" fill="url(#EyeCore)"/>
+                <circle cx="0" cy="0" r="6" fill="none" stroke="#ffcccc" stroke-width="0.8" opacity="0.6"/>
+                <circle cx="0" cy="0" r="3" fill="#000000" stroke="#ff0000" stroke-width="0.5"/>
+                <circle cx="0" cy="0" r="1" fill="#ff0000"/>
+                <rect x="-1" y="-8" width="2" height="6" fill="#ffffff" opacity="0.7" rx="1"/>
+                <rect x="-6" y="-2" width="4" height="1" fill="#ffffff" opacity="0.5" rx="0.5"/>
+            </g>
+            <g id="corner_brackets" stroke="#333333" stroke-width="1" fill="none" opacity="0.6">
+                <path d="M8,12 L8,8 L12,8"/>
+                <path d="M55,8 L59,8 L59,12"/>
+                <path d="M59,54 L59,58 L55,58"/>
+                <path d="M12,58 L8,58 L8,54"/>
             </g>
         </g>
     </g>
