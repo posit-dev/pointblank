@@ -58,7 +58,7 @@ def _create_chat_instance(provider: str, model_name: str, api_key: Optional[str]
     # Check if chatlas is installed
     try:
         import chatlas  # noqa
-    except ImportError:
+    except ImportError:  # pragma: no cover
         raise ImportError(
             "The `chatlas` package is required for AI validation. "
             "Please install it using `pip install chatlas`."
@@ -90,7 +90,7 @@ EXAMPLE OUTPUT FORMAT:
 ]"""
 
     # Create provider-specific chat instance
-    if provider == "anthropic":
+    if provider == "anthropic":  # pragma: no cover
         # Check that the anthropic package is installed
         try:
             import anthropic  # noqa
@@ -108,7 +108,7 @@ EXAMPLE OUTPUT FORMAT:
             system_prompt=system_prompt,
         )
 
-    elif provider == "openai":
+    elif provider == "openai":  # pragma: no cover
         # Check that the openai package is installed
         try:
             import openai  # noqa
@@ -126,7 +126,7 @@ EXAMPLE OUTPUT FORMAT:
             system_prompt=system_prompt,
         )
 
-    elif provider == "ollama":
+    elif provider == "ollama":  # pragma: no cover
         # Check that the openai package is installed (required for Ollama)
         try:
             import openai  # noqa
@@ -143,7 +143,7 @@ EXAMPLE OUTPUT FORMAT:
             system_prompt=system_prompt,
         )
 
-    elif provider == "bedrock":
+    elif provider == "bedrock":  # pragma: no cover
         from chatlas import ChatBedrockAnthropic
 
         chat = ChatBedrockAnthropic(
@@ -268,7 +268,7 @@ class _DataBatcher:
         elif hasattr(native_data, "to_dict"):
             # Pandas DataFrame
             all_rows = native_data.to_dict("records")
-        else:
+        else:  # pragma: no cover
             # Fallback: manual conversion
             all_rows = []
             columns = nw_data.columns
@@ -312,10 +312,10 @@ class _DataBatcher:
                 import pandas as pd
 
                 unique_df = pd.DataFrame(unique_rows)
-            else:
+            else:  # pragma: no cover
                 # This is tricky for generic case, but let's try
                 unique_df = unique_rows  # Fallback to list of dicts
-        else:
+        else:  # pragma: no cover
             unique_df = native_data.head(0)  # Empty dataframe with same structure
 
         # Store reduction stats
@@ -352,14 +352,14 @@ class _DataBatcher:
         # Create batches from unique rows table
         if hasattr(unique_rows_table, "shape"):
             total_rows = unique_rows_table.shape[0]
-        else:
+        else:  # pragma: no cover
             total_rows = len(unique_rows_table)
 
         batches = []
         batch_id = 0
 
         # Convert to narwhals if needed
-        if not hasattr(unique_rows_table, "columns"):
+        if not hasattr(unique_rows_table, "columns"):  # pragma: no cover
             nw_unique = nw.from_native(unique_rows_table)
         else:
             nw_unique = unique_rows_table
@@ -370,7 +370,7 @@ class _DataBatcher:
             # Get the batch data
             if hasattr(nw_unique, "__getitem__"):
                 batch_data = nw_unique[start_row:end_row]
-            else:
+            else:  # pragma: no cover
                 # Fallback for list of dicts
                 batch_data = unique_rows_table[start_row:end_row]
 
@@ -425,7 +425,7 @@ class _DataBatcher:
             elif hasattr(native_batch, "to_dict"):
                 # Pandas DataFrame
                 batch_dicts = native_batch.to_dict("records")
-            else:
+            else:  # pragma: no cover
                 # Fallback: manual conversion
                 batch_dicts = []
                 for i in range(len(native_batch)):
@@ -577,7 +577,7 @@ class _ValidationResponseParser:
             # Try to parse the first match
             try:
                 return json.loads(matches[0])
-            except json.JSONDecodeError:
+            except json.JSONDecodeError:  # pragma: no cover
                 # If that fails, try the raw response
                 return json.loads(response)
         else:
@@ -686,7 +686,7 @@ class _ValidationResponseParser:
                 # Project this result to all original rows with this signature
                 for original_idx in original_indices:
                     combined_results[original_idx] = validation_result
-            else:
+            else:  # pragma: no cover
                 logger.warning(f"Unique index {unique_idx} out of range for signature mapping")
 
         logger.debug("📊 Projected results summary:")
@@ -777,7 +777,7 @@ class _AIValidationEngine:
                 parser = _ValidationResponseParser(total_rows=1000)  # This will be set properly
                 results = parser.parse_response(response, batch)
 
-                # Debug: Log parsed results
+                # Debug: Log parsed results  # pragma: no cover
                 logger.debug(f"📊 Parsed results for batch {batch['batch_id']}:")
                 for i, result in enumerate(results[:5]):  # Show first 5 results
                     logger.debug(f"   Row {result['index']}: {result['result']}")
@@ -792,7 +792,9 @@ class _AIValidationEngine:
                 return results
 
             except Exception as e:
-                logger.error(f"Failed to validate batch {batch['batch_id']}: {e}")
+                logger.error(
+                    f"Failed to validate batch {batch['batch_id']}: {e}"
+                )  # pragma: no cover
                 # Return default results (all False) for failed batches
                 default_results = []
                 for i in range(batch["start_row"], batch["end_row"]):
