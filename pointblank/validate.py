@@ -8582,7 +8582,7 @@ class Validate:
 
         return self
 
-    def rows_ai(
+    def prompt(
         self,
         prompt: str,
         model: str,
@@ -8599,20 +8599,20 @@ class Validate:
         """
         Validate rows using AI/LLM-powered analysis.
 
-        The `rows_ai()` validation method uses Large Language Models (LLMs) to validate rows of data
+        The `prompt()` validation method uses Large Language Models (LLMs) to validate rows of data
         based on natural language criteria. Similar to other Pointblank validation methods, this
         generates binary test results (pass/fail) that integrate seamlessly with the standard
         reporting framework.
 
-        Like `col_vals_*()` methods, `rows_ai()` evaluates data against specific criteria, but
+        Like `col_vals_*()` methods, `prompt()` evaluates data against specific criteria, but
         instead of using programmatic rules, it uses natural language prompts interpreted by an LLM.
         Like `rows_distinct()` and `rows_complete()`, it operates at the row level and allows you to
         specify a subset of columns for evaluation using `columns_subset=`.
 
-        The system automatically constructs a comprehensive prompt that combines your validation
-        criteria from `prompt=` with the necessary technical context, data formatting instructions,
-        and response structure requirements, so you only need to focus on describing your validation
-        logic in plain language.
+        The system automatically combines your validation criteria from the `prompt=` parameter with
+        the necessary technical context, data formatting instructions, and response structure
+        requirements. This is all so you only need to focus on describing your validation logic in
+        plain language.
 
         Each row becomes a test unit that either passes or fails the validation criteria, producing
         the familiar True/False results that appear in Pointblank validation reports. This method
@@ -8856,7 +8856,7 @@ class Validate:
         # Validate using AI
         validation = (
             pb.Validate(data=tbl)
-            .rows_ai(
+            .prompt(
                 prompt="Each row should have a valid email address and a non-empty name",
                 columns_subset=["email", "name"],  # Only check these columns
                 model="openai:gpt-4o-mini",
@@ -8873,7 +8873,7 @@ class Validate:
         # More complex validation with thresholds
         validation = (
             pb.Validate(data=customer_data)
-            .rows_ai(
+            .prompt(
                 prompt="Do all the phone numbers include an area code?",
                 columns_subset="phone_number",  # Only check the `phone_number` column
                 model="openai:gpt-4o",
@@ -10543,10 +10543,10 @@ class Validate:
                     elif assertion_type == "rows_complete":
                         results_tbl = rows_complete(data_tbl=data_tbl_step, columns_subset=column)
 
-                    elif assertion_type == "rows_ai":
-                        from pointblank._interrogation import interrogate_rows_ai
+                    elif assertion_type == "prompt":
+                        from pointblank._interrogation import interrogate_prompt
 
-                        results_tbl = interrogate_rows_ai(
+                        results_tbl = interrogate_prompt(
                             tbl=data_tbl_step, columns_subset=column, ai_config=value
                         )
 
@@ -13012,7 +13012,7 @@ class Validate:
                 "col_vals_expr",
             ]:
                 columns_upd.append("&mdash;")
-            elif assertion_type[i] in ["rows_distinct", "rows_complete", "rows_ai"]:
+            elif assertion_type[i] in ["rows_distinct", "rows_complete", "prompt"]:
                 if not column:
                     # If there is no column subset, then all columns are used
                     columns_upd.append("ALL COLUMNS")
@@ -13102,7 +13102,7 @@ class Validate:
 
                 values_upd.append(str(pattern))
 
-            elif assertion_type[i] in ["rows_ai"]:
+            elif assertion_type[i] in ["prompt"]:
                 # For AI validation, show only the prompt, not the full config
                 if isinstance(value, dict) and "prompt" in value:
                     values_upd.append(value["prompt"])
@@ -14650,8 +14650,8 @@ def _create_autobrief_or_failure_text(
     if assertion_type == "specially":
         return _create_text_specially(lang=lang, for_failure=for_failure)
 
-    if assertion_type == "rows_ai":
-        return _create_text_rows_ai(
+    if assertion_type == "prompt":
+        return _create_text_prompt(
             lang=lang,
             prompt=values["prompt"]
             if isinstance(values, dict) and "prompt" in values
@@ -14878,8 +14878,8 @@ def _create_text_specially(lang: str, for_failure: bool = False) -> str:
     return EXPECT_FAIL_TEXT[f"specially_{type_}_text"][lang]
 
 
-def _create_text_rows_ai(lang: str, prompt: str, for_failure: bool = False) -> str:
-    """Create text for rows_ai validation - just return the prompt."""
+def _create_text_prompt(lang: str, prompt: str, for_failure: bool = False) -> str:
+    """Create text for prompt validation - just return the prompt."""
     return prompt
 
 
