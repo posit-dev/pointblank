@@ -165,6 +165,7 @@ quartodoc:
         - name: Validate.col_count_match
         - name: Validate.conjointly
         - name: Validate.specially
+        - name: Validate.prompt
     - title: Column Selection
       desc: >
         A flexible way to select columns for validation is to use the `col()` function along with

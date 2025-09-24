@@ -333,7 +333,7 @@ class ConjointlyValidation:
                     ibis_expr = col_expr.to_ibis_expr(self.data_tbl)
                     ibis_expressions.append(ibis_expr)
             except Exception:  # pragma: no cover
-                # Silent failure - we already tried both strategies
+                # Silent failure where we already tried both strategies
                 pass
 
         # Combine expressions
@@ -435,7 +435,7 @@ class SpeciallyValidation:
             data_tbl = self.data_tbl
             result = expression(data_tbl)
         else:
-            # More than one parameter - this doesn't match either allowed signature
+            # More than one parameter: this doesn't match either allowed signature
             raise ValueError(
                 f"The function provided to 'specially()' should have either no parameters or a "
                 f"single 'data' parameter, but it has {len(params)} parameters: {params}"
@@ -1862,3 +1862,172 @@ def interrogate_rows_complete(tbl: FrameT, columns_subset: list[str] | None) -> 
     result_tbl = result_tbl.drop("_any_is_null_")
 
     return result_tbl.to_native()
+
+
+def interrogate_prompt(tbl: FrameT, columns_subset: list[str] | None, ai_config: dict) -> FrameT:
+    """AI-powered interrogation of rows."""
+    import logging
+
+    logger = logging.getLogger(__name__)
+
+    try:
+        # Import AI validation modules
+        from pointblank._utils_ai import (
+            _AIValidationEngine,
+            _BatchConfig,
+            _DataBatcher,
+            _LLMConfig,
+            _PromptBuilder,
+            _ValidationResponseParser,
+        )
+
+        # Extract AI configuration
+        prompt = ai_config["prompt"]
+        llm_provider = ai_config["llm_provider"]
+        llm_model = ai_config["llm_model"]
+        batch_size = ai_config.get("batch_size", 1000)
+        max_concurrent = ai_config.get("max_concurrent", 3)
+
+        # Set up LLM configuration (api_key will be loaded from environment)
+        llm_config = _LLMConfig(
+            provider=llm_provider,
+            model=llm_model,
+            api_key=None,  # Will be loaded from environment variables
+        )
+
+        # Set up batch configuration
+        batch_config = _BatchConfig(size=batch_size, max_concurrent=max_concurrent)
+
+        # Create optimized data batcher
+        batcher = _DataBatcher(data=tbl, columns=columns_subset, config=batch_config)
+
+        # Create batches with signature mapping for optimization
+        batches, signature_mapping = batcher.create_batches()
+        logger.info(f"Created {len(batches)} batches for AI validation")
+
+        # Log optimization stats
+        if hasattr(batcher, "get_reduction_stats"):
+            stats = batcher.get_reduction_stats()
+            if stats.get("reduction_percentage", 0) > 0:
+                logger.info(
+                    f"Optimization: {stats['original_rows']} → {stats['unique_rows']} rows ({stats['reduction_percentage']:.1f}% reduction)"
+                )
+
+        # Create prompt builder
+        prompt_builder = _PromptBuilder(prompt)
+
+        # Create AI validation engine
+        engine = _AIValidationEngine(llm_config)
+
+        # Run AI validation synchronously (chatlas is synchronous)
+        batch_results = engine.validate_batches(
+            batches=batches, prompt_builder=prompt_builder, max_concurrent=max_concurrent
+        )
+
+        # Parse and combine results with signature mapping optimization
+        parser = _ValidationResponseParser(total_rows=len(tbl))
+        combined_results = parser.combine_batch_results(batch_results, signature_mapping)
+
+        # Debug: Log table info and combined results
+        logger.debug("🏁 Final result conversion:")
+        logger.debug(f"   - Table length: {len(tbl)}")
+        logger.debug(
+            f"   - Combined results keys: {sorted(combined_results.keys()) if combined_results else 'None'}"
+        )
+
+        # Convert results to narwhals format
+        nw_tbl = nw.from_native(tbl)
+
+        # Create a boolean column for validation results
+        validation_results = []
+        for i in range(len(tbl)):
+            # Default to False if row wasn't processed
+            result = combined_results.get(i, False)
+            validation_results.append(result)
+
+            # Debug: Log first few conversions
+            if i < 5 or len(tbl) - i <= 2:
+                logger.debug(f"   Row {i}: {result} (from combined_results.get({i}, False))")
+
+        logger.debug(f"   - Final validation_results length: {len(validation_results)}")
+        logger.debug(f"   - Final passed count: {sum(validation_results)}")
+        logger.debug(
+            f"   - Final failed count: {len(validation_results) - sum(validation_results)}"
+        )
+
+        # Add the pb_is_good_ column by creating a proper boolean Series
+        # First convert to native to work with the underlying data frame
+        native_tbl = nw_tbl.to_native()
+
+        # Create the result table with the boolean column
+        if hasattr(native_tbl, "with_columns"):  # Polars
+            import polars as pl
+
+            result_tbl = native_tbl.with_columns(pb_is_good_=pl.Series(validation_results))
+
+        elif hasattr(native_tbl, "assign"):  # Pandas
+            import pandas as pd
+
+            result_tbl = native_tbl.assign(pb_is_good_=pd.Series(validation_results, dtype=bool))
+
+        else:
+            # Generic fallback
+            result_tbl = native_tbl.copy() if hasattr(native_tbl, "copy") else native_tbl
+            result_tbl["pb_is_good_"] = validation_results
+
+        logger.info(
+            f"AI validation completed. {sum(validation_results)} rows passed out of {len(validation_results)}"
+        )
+
+        return result_tbl
+
+    except ImportError as e:
+        logger.error(f"Missing dependencies for AI validation: {e}")
+        logger.error("Install required packages: pip install openai anthropic aiohttp")
+
+        # Return all False results as fallback
+        nw_tbl = nw.from_native(tbl)
+        native_tbl = nw_tbl.to_native()
+        validation_results = [False] * len(tbl)
+
+        if hasattr(native_tbl, "with_columns"):  # Polars
+            import polars as pl
+
+            result_tbl = native_tbl.with_columns(pb_is_good_=pl.Series(validation_results))
+
+        elif hasattr(native_tbl, "assign"):  # Pandas
+            import pandas as pd
+
+            result_tbl = native_tbl.assign(pb_is_good_=pd.Series(validation_results, dtype=bool))
+
+        else:
+            # Fallback
+            result_tbl = native_tbl.copy() if hasattr(native_tbl, "copy") else native_tbl
+            result_tbl["pb_is_good_"] = validation_results
+
+        return result_tbl
+
+    except Exception as e:
+        logger.error(f"AI validation failed: {e}")
+
+        # Return all False results as fallback
+        nw_tbl = nw.from_native(tbl)
+        native_tbl = nw_tbl.to_native()
+        validation_results = [False] * len(tbl)
+
+        if hasattr(native_tbl, "with_columns"):  # Polars
+            import polars as pl
+
+            result_tbl = native_tbl.with_columns(pb_is_good_=pl.Series(validation_results))
+
+        elif hasattr(native_tbl, "assign"):  # Pandas
+            import pandas as pd
+
+            result_tbl = native_tbl.assign(pb_is_good_=pd.Series(validation_results, dtype=bool))
+
+        else:
+            # Fallback
+            result_tbl = native_tbl.copy() if hasattr(native_tbl, "copy") else native_tbl
+            result_tbl["pb_is_good_"] = validation_results
+
+        return result_tbl

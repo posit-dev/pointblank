@@ -1558,6 +1558,7 @@ def _get_supported_validations_list():
         "col_exists",
         "rows_distinct",
         "rows_complete",
+        "prompt",
         "row_count_match",
         "conjointly",
         "col_schema_match",
@@ -1751,6 +1752,7 @@ def add_validation_step(
         # Row validations
         "rows_distinct": validator.rows_distinct,  # check distinct rows in a table
         "rows_complete": validator.rows_complete,  # check for no nulls in rows across specified columns
+        "prompt": validator.prompt,  # AI-powered validation of rows using LLMs
         "row_count_match": validator.row_count_match,  # check if number of rows in the table matches a fixed value
         # Other specialized validations
         "conjointly": validator.conjointly,  # For multiple column conditions
