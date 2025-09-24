@@ -40,7 +40,7 @@ ASSERTION_TYPE_METHOD_MAP = {
     "col_exists": "col_exists",
     "rows_distinct": "rows_distinct",
     "rows_complete": "rows_complete",
-    "rows_ai": "rows_ai",
+    "prompt": "prompt",
     "col_schema_match": "col_schema_match",
     "row_count_match": "row_count_match",
     "col_count_match": "col_count_match",
@@ -82,7 +82,7 @@ ROW_BASED_VALIDATION_TYPES = [
     "col_vals_not_null",
     "col_vals_expr",
     "conjointly",
-    "rows_ai",
+    "prompt",
 ]
 
 IBIS_BACKENDS = [
@@ -374,9 +374,9 @@ SVG_ICONS_FOR_ASSERTION_TYPES = {
         </g>
     </g>
 </svg>""",
-    "rows_ai": """<?xml version="1.0" encoding="UTF-8"?>
+    "prompt": """<?xml version="1.0" encoding="UTF-8"?>
 <svg width="67px" height="67px" viewBox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <title>rows_ai</title>
+    <title>prompt</title>
     <defs>
         <radialGradient id="EyeCore" cx="50%" cy="50%" r="50%">
             <stop offset="0%" style="stop-color:#ff0000;stop-opacity:1" />
@@ -397,7 +397,7 @@ SVG_ICONS_FOR_ASSERTION_TYPES = {
         </filter>
     </defs>
     <g id="All-Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="rows_ai" transform="translate(0.000000, 0.965517)">
+        <g id="prompt" transform="translate(0.000000, 0.965517)">
             <path d="M56.712234,1 C59.1975153,1 61.4475153,2.00735931 63.076195,3.63603897 C64.7048747,5.26471863 65.712234,7.51471863 65.712234,10 L65.712234,10 L65.712234,65 L10.712234,65 C8.22695259,65 5.97695259,63.9926407 4.34827294,62.363961 C2.71959328,60.7352814 1.71223397,58.4852814 1.71223397,56 L1.71223397,56 L1.71223397,10 C1.71223397,7.51471863 2.71959328,5.26471863 4.34827294,3.63603897 C5.97695259,2.00735931 8.22695259,1 10.712234,1 L10.712234,1 Z" id="rectangle" stroke="#333333" stroke-width="1" fill="#000000"></path>
             <g id="eye" transform="translate(33.5, 33.5)">
                 <circle cx="0" cy="0" r="18" fill="#ff0000" opacity="0.3" filter="url(#redGlow)"/>
