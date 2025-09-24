@@ -8839,8 +8839,16 @@ class Validate:
         import pointblank as pb
         pb.config(report_incl_header=False, report_incl_footer=False, preview_incl_header=False)
         ```
+        The following examples demonstrate how to use AI validation for different types of data
+        quality checks. These examples show both basic usage and more advanced configurations with
+        custom thresholds and actions.
 
-        Basic AI validation example:
+        **Basic AI validation example:**
+
+        This first example shows a simple validation scenario where we want to check that customer
+        records have both valid email addresses and non-empty names. Notice how we use
+        `columns_subset=` to focus only on the relevant columns, which improves both performance
+        and cost-effectiveness.
 
         ```python
         import pointblank as pb
@@ -8867,10 +8875,29 @@ class Validate:
         validation
         ```
 
-        Advanced example with custom thresholds:
+        In this example, the AI will identify that the second row fails validation because it has
+        an invalid email format (`"invalid-email"`) and the third row also fails because it has an
+        empty name field. The validation results will show 2 out of 3 rows failing the criteria.
+
+        **Advanced example with custom thresholds:**
+
+        This more sophisticated example demonstrates how to use AI validation with custom thresholds
+        and actions. Here we're validating phone number formats to ensure they include area codes,
+        which is a common data quality requirement for customer contact information.
 
         ```python
-        # More complex validation with thresholds
+        customer_data = pl.DataFrame({
+            "customer_id": [1, 2, 3, 4, 5],
+            "name": ["John Doe", "Jane Smith", "Bob Johnson", "Alice Brown", "Charlie Davis"],
+            "phone_number": [
+                "(555) 123-4567",  # Valid with area code
+                "555-987-6543",    # Valid with area code
+                "123-4567",        # Missing area code
+                "(800) 555-1234",  # Valid with area code
+                "987-6543"         # Missing area code
+            ]
+        })
+
         validation = (
             pb.Validate(data=customer_data)
             .prompt(
@@ -8880,11 +8907,16 @@ class Validate:
                 batch_size=500,
                 max_concurrent=5,
                 thresholds=pb.Thresholds(warning=0.1, error=0.2, critical=0.3),
-                actions=pb.Actions(error="Too many phone numbers missing area codes!")
+                actions=pb.Actions(error="Too many phone numbers missing area codes.")
             )
             .interrogate()
         )
         ```
+
+        This validation will identify that 2 out of 5 phone numbers (40%) are missing area codes,
+        which exceeds all threshold levels. The validation will trigger the specified error action
+        since the failure rate (40%) is above the error threshold (20%). The AI can recognize
+        various phone number formats and determine whether they include area codes.
         """
 
         assertion_type = _get_fn_name()
