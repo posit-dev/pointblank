@@ -1864,7 +1864,7 @@ def interrogate_rows_complete(tbl: FrameT, columns_subset: list[str] | None) -> 
     return result_tbl.to_native()
 
 
-def interrogate_rows_ai(tbl: FrameT, columns_subset: list[str] | None, ai_config: dict) -> FrameT:
+def interrogate_prompt(tbl: FrameT, columns_subset: list[str] | None, ai_config: dict) -> FrameT:
     """AI-powered interrogation of rows."""
     import logging
 
