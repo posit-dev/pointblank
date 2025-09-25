@@ -239,10 +239,12 @@ quartodoc:
         The *YAML* group contains functions that allow for the use of YAML to orchestrate validation
         workflows. The `yaml_interrogate()` function can be used to run a validation workflow from
         YAML strings or files. The `validate_yaml()` function checks if the YAML configuration
-        passes its own validity checks.
+        passes its own validity checks. The `yaml_to_python()` function converts YAML configuration
+        to equivalent Python code.
       contents:
         - name: yaml_interrogate
         - name: validate_yaml
+        - name: yaml_to_python
     - title: Utility Functions
       desc: >
         The *Utility Functions* group contains functions that are useful accessing metadata about
