@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>datascan – Pointblank</title>
+<title>yaml_to_python – Pointblank</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -182,136 +182,170 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     <h3 id="toc-title">On this page</h3>
    
   <ul>
-  <li><a href="#pointblank.DataScan" id="toc-pointblank.DataScan" class="nav-link active" data-scroll-target="#pointblank.DataScan">DataScan</a>
-  <ul class="collapse">
-  <li><a href="#parameters" id="toc-parameters" class="nav-link" data-scroll-target="#parameters">Parameters</a></li>
-  <li><a href="#measures-of-missingness-and-distinctness" id="toc-measures-of-missingness-and-distinctness" class="nav-link" data-scroll-target="#measures-of-missingness-and-distinctness">Measures of Missingness and Distinctness</a></li>
-  <li><a href="#counts-and-fractions-of-negative-zero-and-positive-values" id="toc-counts-and-fractions-of-negative-zero-and-positive-values" class="nav-link" data-scroll-target="#counts-and-fractions-of-negative-zero-and-positive-values">Counts and Fractions of Negative, Zero, and Positive Values</a></li>
-  <li><a href="#statistics-for-numerical-and-string-columns" id="toc-statistics-for-numerical-and-string-columns" class="nav-link" data-scroll-target="#statistics-for-numerical-and-string-columns">Statistics for Numerical and String Columns</a></li>
-  <li><a href="#statistics-for-date-and-datetime-columns" id="toc-statistics-for-date-and-datetime-columns" class="nav-link" data-scroll-target="#statistics-for-date-and-datetime-columns">Statistics for Date and Datetime Columns</a></li>
+  <li><a href="#parameters" id="toc-parameters" class="nav-link active" data-scroll-target="#parameters">Parameters</a></li>
   <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
-  </ul></li>
+  <li><a href="#raises" id="toc-raises" class="nav-link" data-scroll-target="#raises">Raises</a></li>
+  <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
   </ul>
 </nav>
     </div>
 <!-- main -->
-<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"></header>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title" style="font-family: SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace; font-size: 1.25rem;">yaml_to_python()<span style="font-size: 0.75rem; border-style: solid; border-width: 1px; border-color: darkorange; background-color: #FFF1E0; margin-left: 12px; vertical-align: 3.5px;"><code style="background-color: transparent; color: darkorange;">function</code></span></h1>
+</div>
 
 
 
+<div class="quarto-title-meta">
 
-<section id="pointblank.DataScan" class="level1">
-<h1 style="font-family: SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace; font-size: 1.25rem;">DataScan</h1>
+    
+  
+    
+  </div>
+  
 
-<p style="font-size: 1rem; font-style: italic; margin-top: -10px; line-height: 1;">Get a summary of a dataset.</p>
+
+</header>
+
+<p style="font-size: 1rem; font-style: italic; margin-top: -10px; line-height: 1;">Convert YAML validation configuration to equivalent Python code.</p>
+
+
 
 <p style="font-size: 12px; color: rgb(170, 170, 170); margin-bottom: -14px;">USAGE</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>DataScan(data, tbl_name<span class="op">=</span><span class="va">None</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>The <a href="../reference/DataScan.html#pointblank.DataScan" title="0"><code>DataScan</code></a> class provides a way to get a summary of a dataset. The summary includes the following information:</p>
-<ul>
-<li>the name of the table (if provided)</li>
-<li>the type of the table (e.g., <code>"polars"</code>, <code>"pandas"</code>, etc.)</li>
-<li>the number of rows and columns in the table</li>
-<li>column-level information, including:
-<ul>
-<li>the column name</li>
-<li>the column type</li>
-<li>measures of missingness and distinctness</li>
-<li>measures of negative, zero, and positive values (for numerical columns)</li>
-<li>a sample of the data (the first 5 values)</li>
-<li>statistics (if the column contains numbers, strings, or datetimes)</li>
-</ul></li>
-</ul>
-<p>To obtain a dictionary representation of the summary, you can use the <code>to_dict()</code> method. To get a JSON representation of the summary, you can use the <code>to_json()</code> method. To save the JSON text to a file, the <code>save_to_json()</code> method could be used.</p>
-<div class="callout callout-style-default callout-warning callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Warning
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>The <a href="../reference/DataScan.html#pointblank.DataScan" title="0"><code>DataScan()</code></a> class is still experimental. Please report any issues you encounter in the <a href="https://github.com/posit-dev/pointblank/issues">Pointblank issue tracker</a>.</p>
-</div>
-</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>yaml_to_python(yaml)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>This function takes a YAML validation configuration and generates the equivalent Python code that would produce the same validation workflow. This is useful for documentation, code generation, or learning how to translate YAML workflows into programmatic workflows.</p>
+<p>The generated Python code includes all necessary imports, data loading, validation steps, and interrogation execution, formatted as executable Python code.</p>
 <section id="parameters" class="level2 doc-section doc-section-parameters">
 <h3 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters">Parameters</h3>
 <dl style="border-style: solid; border-width: 2px; border-color: #00AC1480; padding: 1rem; padding-bottom: 0.25rem;">
-<dt><code><span class="parameter-name"><strong>data</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><code>IntoFrameT</code></span></code></dt>
+<dt><code><span class="parameter-name"><strong>yaml</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><code>Union</code>[<code>str</code>, <code>Path</code>]</span></code></dt>
 <dd>
-<p>The data to scan and summarize. This could be a DataFrame object, an Ibis table object, a CSV file path, a Parquet file path, a GitHub URL pointing to a CSV or Parquet file, or a database connection string.</p>
-</dd>
-<dt><code><span class="parameter-name"><strong>tbl_name</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><code>str</code> | None</span> <span class="parameter-default-sep">=</span> <span class="parameter-default">None</span></code></dt>
-<dd>
-<p>Optionally, the name of the table could be provided as <code>tbl_name</code>.</p>
+<p>YAML configuration as string or file path. Can be: (1) a YAML string containing the validation configuration, or (2) a Path object or string path to a YAML file.</p>
 </dd>
 </dl>
-</section>
-<section id="measures-of-missingness-and-distinctness" class="level2 doc-section doc-section-measures-of-missingness-and-distinctness">
-<h3 class="doc-section doc-section-measures-of-missingness-and-distinctness anchored" data-anchor-id="measures-of-missingness-and-distinctness">Measures of Missingness and Distinctness</h3>
-<p>For each column, the following measures are provided:</p>
-<ul>
-<li><code>n_missing_values</code>: the number of missing values in the column</li>
-<li><code>f_missing_values</code>: the fraction of missing values in the column</li>
-<li><code>n_unique_values</code>: the number of unique values in the column</li>
-<li><code>f_unique_values</code>: the fraction of unique values in the column</li>
-</ul>
-<p>The fractions are calculated as the ratio of the measure to the total number of rows in the dataset.</p>
-</section>
-<section id="counts-and-fractions-of-negative-zero-and-positive-values" class="level2 doc-section doc-section-counts-and-fractions-of-negative-zero-and-positive-values">
-<h3 class="doc-section doc-section-counts-and-fractions-of-negative-zero-and-positive-values anchored" data-anchor-id="counts-and-fractions-of-negative-zero-and-positive-values">Counts and Fractions of Negative, Zero, and Positive Values</h3>
-<p>For numerical columns, the following measures are provided:</p>
-<ul>
-<li><code>n_negative_values</code>: the number of negative values in the column</li>
-<li><code>f_negative_values</code>: the fraction of negative values in the column</li>
-<li><code>n_zero_values</code>: the number of zero values in the column</li>
-<li><code>f_zero_values</code>: the fraction of zero values in the column</li>
-<li><code>n_positive_values</code>: the number of positive values in the column</li>
-<li><code>f_positive_values</code>: the fraction of positive values in the column</li>
-</ul>
-<p>The fractions are calculated as the ratio of the measure to the total number of rows in the dataset.</p>
-</section>
-<section id="statistics-for-numerical-and-string-columns" class="level2 doc-section doc-section-statistics-for-numerical-and-string-columns">
-<h3 class="doc-section doc-section-statistics-for-numerical-and-string-columns anchored" data-anchor-id="statistics-for-numerical-and-string-columns">Statistics for Numerical and String Columns</h3>
-<p>For numerical and string columns, several statistical measures are provided. Please note that for string columms, the statistics are based on the lengths of the strings in the column.</p>
-<p>The following descriptive statistics are provided:</p>
-<ul>
-<li><code>mean</code>: the mean of the column</li>
-<li><code>std_dev</code>: the standard deviation of the column</li>
-</ul>
-<p>Additionally, the following quantiles are provided:</p>
-<ul>
-<li><code>min</code>: the minimum value in the column</li>
-<li><code>p05</code>: the 5th percentile of the column</li>
-<li><code>q_1</code>: the first quartile of the column</li>
-<li><code>med</code>: the median of the column</li>
-<li><code>q_3</code>: the third quartile of the column</li>
-<li><code>p95</code>: the 95th percentile of the column</li>
-<li><code>max</code>: the maximum value in the column</li>
-<li><code>iqr</code>: the interquartile range of the column</li>
-</ul>
-</section>
-<section id="statistics-for-date-and-datetime-columns" class="level2 doc-section doc-section-statistics-for-date-and-datetime-columns">
-<h3 class="doc-section doc-section-statistics-for-date-and-datetime-columns anchored" data-anchor-id="statistics-for-date-and-datetime-columns">Statistics for Date and Datetime Columns</h3>
-<p>For date/datetime columns, the following statistics are provided:</p>
-<ul>
-<li><code>min</code>: the minimum date/datetime in the column</li>
-<li><code>max</code>: the maximum date/datetime in the column</li>
-</ul>
 </section>
 <section id="returns" class="level2 doc-section doc-section-returns">
 <h3 class="doc-section doc-section-returns anchored" data-anchor-id="returns">Returns</h3>
 <dl style="border-style: solid; border-width: 2px; border-color: #0059AC80; padding: 1rem; padding-bottom: 0.25rem;">
-<dt><code><span class="parameter-name"></span> <span class="parameter-annotation-sep" style="margin-left: -8px;"></span> <span class="parameter-annotation"><a href="../reference/DataScan.html#pointblank.DataScan">DataScan</a></span></code></dt>
+<dt><code><span class="parameter-name"></span> <span class="parameter-annotation-sep" style="margin-left: -8px;"></span> <span class="parameter-annotation"><code>str</code></span></code></dt>
 <dd>
-<p>A DataScan object.</p>
+<p>A formatted Python code string enclosed in markdown code blocks that replicates the YAML workflow. The code includes import statements, data loading, validation method calls, and interrogation execution.</p>
 </dd>
 </dl>
-
-
 </section>
+<section id="raises" class="level2 doc-section doc-section-raises">
+<h3 class="doc-section doc-section-raises anchored" data-anchor-id="raises">Raises</h3>
+<dl>
+<dt><code><span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><code>YAMLValidationError</code></span></code></dt>
+<dd>
+<p>If the YAML is invalid, malformed, or contains unknown validation methods.</p>
+</dd>
+</dl>
+</section>
+<section id="examples" class="level2 doc-section doc-section-examples">
+<h3 class="doc-section doc-section-examples anchored" data-anchor-id="examples"><span style="
+        background: linear-gradient(-45deg, #D63031, #00B894, #0984E3, #6C5CE7, #FDCB6E, #A29BFE, #E84393, #2D3436);
+        background-size: 400% 400%;
+        animation: examplesGradient 8s ease-in-out infinite;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-weight: bold;
+        font-size: 1.2em;
+    ">Examples</span></h3>
+    <hr style="
+        background: linear-gradient(-45deg, #D63031, #00B894, #0984E3, #6C5CE7, #FDCB6E, #A29BFE, #E84393, #2D3436);
+        background-size: 400% 400%;
+        animation: examplesGradient 16s ease-in-out infinite;
+        height: 3px;
+        border: none;
+        margin: 10px 0;
+        border-radius: 2px;
+    ">
+<p>Convert a basic YAML configuration to Python code:</p>
+<div id="df773bba" class="cell" data-execution_count="2">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Define a YAML validation workflow</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>yaml_config <span class="op">=</span> <span class="st">'''</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="st">tbl: small_table</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="st">tbl_name: Data Quality Check</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="st">steps:</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="st">- col_vals_not_null:</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="st">    columns: [a, b]</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="st">- col_vals_gt:</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="st">    columns: [c]</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="st">    value: 0</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="st">'''</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate equivalent Python code</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>python_code <span class="op">=</span> pb.yaml_to_python(yaml_config)</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(python_code)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>```python
+import pointblank as pb
+
+(
+    pb.Validate(
+        data=pb.load_dataset("small_table", tbl_type="polars"),
+        tbl_name="Data Quality Check",
+    )
+    .col_vals_not_null(columns=["a", "b"])
+    .col_vals_gt(columns="c", value=0)
+    .interrogate()
+)
+```</code></pre>
+</div>
+</div>
+<p>The generated Python code shows exactly how to replicate the YAML workflow programmatically. This is particularly useful when transitioning from YAML-based workflows to code-based workflows, or when generating documentation that shows both YAML and Python approaches.</p>
+<p>For more complex workflows with thresholds and metadata:</p>
+<div id="763ff168" class="cell" data-execution_count="3">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Advanced YAML configuration</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>yaml_config <span class="op">=</span> <span class="st">'''</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="st">tbl: small_table</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="st">tbl_name: Advanced Validation</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="st">label: Production data check</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="st">thresholds:</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="st">  warning: 0.1</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="st">  error: 0.2</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="st">steps:</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="st">- col_vals_between:</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="st">    columns: [c]</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="st">    left: 1</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="st">    right: 10</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="st">- col_vals_regex:</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="st">    columns: [b]</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a><span class="st">    pattern: '[0-9]-[a-z]</span><span class="sc">{3}</span><span class="st">-[0-9]</span><span class="sc">{3}</span><span class="st">'</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a><span class="st">'''</span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate the equivalent Python code</span></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>python_code <span class="op">=</span> pb.yaml_to_python(yaml_config)</span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(python_code)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>```python
+import pointblank as pb
+
+(
+    pb.Validate(
+        data=pb.load_dataset("small_table", tbl_type="polars"),
+        tbl_name="Advanced Validation",
+        label="Production data check",
+        thresholds=pb.Thresholds(warning=0.1, error=0.2),
+    )
+    .col_vals_between(columns="c", left=1, right=10)
+    .col_vals_regex(columns="b", pattern="[0-9]-[a-z]{3}-[0-9]{3}")
+    .interrogate()
+)
+```</code></pre>
+</div>
+</div>
+<p>The generated code includes all configuration parameters, thresholds, and maintains the exact same validation logic as the original YAML workflow.</p>
+<p>This function is also useful for educational purposes, helping users understand how YAML configurations map to the underlying Python API calls.</p>
+
+
 </section>
 
 </main>
