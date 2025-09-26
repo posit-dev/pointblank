@@ -153,8 +153,11 @@ For far more specialized validations, modify the table with the `pre=` argument 
 [Verifying Row and Column Counts](./check-row-column-counts/index.qmd)<br>
 Check the dimensions of the table with the `*_count_match()` validation methods.
 
-[Validating Datetime Values and Data Freshness](./check-for-freshness/index.qmd)<br>
-Use date-based validations to ensure your data is current and within expected time ranges.
+[Validating Data Freshness](./check-for-freshness/index.qmd)<br>
+Use date-based validations to ensure your data is current and recent.
+
+[Date and Datetime Validations](./datetime-validations/index.qmd)<br>
+Comprehensive examples of date, datetime, and timezone-aware datetime comparisons.
 
 [Custom Validation with `specially()`](./custom-validation-specially/index.qmd)<br>
 Create bespoke validations using `specially()` to implement domain-specific business rules.
