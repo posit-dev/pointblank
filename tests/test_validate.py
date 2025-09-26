@@ -29,6 +29,7 @@ except ImportError:
 
 import pandas as pd
 import polars as pl
+import pytz
 import ibis
 
 # PySpark import with environment setup for cross-platform compatibility
@@ -1522,37 +1523,37 @@ def test_validation_autobriefs(request, tbl_fixture):
     # `col_vals_gt()`
     assert v.validation_info[0].autobrief == "Expect that values in `x` should be > `0`."
 
-    # `col_vals_gt()` - column literal
+    # `col_vals_gt()`: column literal
     assert v.validation_info[1].autobrief == "Expect that values in `x` should be > `y`."
 
     # `col_vals_lt()`
     assert v.validation_info[2].autobrief == "Expect that values in `x` should be < `2`."
 
-    # `col_vals_lt()` - column literal
+    # `col_vals_lt()`: column literal
     assert v.validation_info[3].autobrief == "Expect that values in `x` should be < `y`."
 
     # `col_vals_eq()`
     assert v.validation_info[4].autobrief == "Expect that values in `z` should be == `4`."
 
-    # `col_vals_eq()` - column literal
+    # `col_vals_eq()`: column literal
     assert v.validation_info[5].autobrief == "Expect that values in `z` should be == `y`."
 
     # `col_vals_ne()`
     assert v.validation_info[6].autobrief == "Expect that values in `z` should be != `6`."
 
-    # `col_vals_ne()` - column literal
+    # `col_vals_ne()`: column literal
     assert v.validation_info[7].autobrief == "Expect that values in `z` should be != `y`."
 
     # `col_vals_ge()`
     assert v.validation_info[8].autobrief == "Expect that values in `z` should be >= `8`."
 
-    # `col_vals_ge()` - column literal
+    # `col_vals_ge()`: column literal
     assert v.validation_info[9].autobrief == "Expect that values in `z` should be >= `y`."
 
     # `col_vals_le()`
     assert v.validation_info[10].autobrief == "Expect that values in `z` should be <= `10`."
 
-    # `col_vals_le()` - column literal
+    # `col_vals_le()`: column literal
     assert v.validation_info[11].autobrief == "Expect that values in `z` should be <= `y`."
 
     # `col_vals_between()`
@@ -1561,19 +1562,19 @@ def test_validation_autobriefs(request, tbl_fixture):
         == "Expect that values in `x` should be between `0` and `5`."
     )
 
-    # `col_vals_between()` - left column literal
+    # `col_vals_between()`: left column literal
     assert (
         v.validation_info[13].autobrief
         == "Expect that values in `x` should be between `y` and `5`."
     )
 
-    # `col_vals_between()` - right column literal
+    # `col_vals_between()`: right column literal
     assert (
         v.validation_info[14].autobrief
         == "Expect that values in `x` should be between `0` and `z`."
     )
 
-    # `col_vals_between()` - left and right column literal
+    # `col_vals_between()`: left and right column literal
     assert (
         v.validation_info[15].autobrief
         == "Expect that values in `x` should be between `y` and `z`."
@@ -1585,67 +1586,67 @@ def test_validation_autobriefs(request, tbl_fixture):
         == "Expect that values in `x` should not be between `-5` and `0`."
     )
 
-    # `col_vals_outside()` - left column literal
+    # `col_vals_outside()`: left column literal
     assert (
         v.validation_info[17].autobrief
         == "Expect that values in `x` should not be between `y` and `0`."
     )
 
-    # `col_vals_outside()` - right column literal
+    # `col_vals_outside()`: right column literal
     assert (
         v.validation_info[18].autobrief
         == "Expect that values in `x` should not be between `-5` and `z`."
     )
 
-    # `col_vals_outside()` - left and right column literal
+    # `col_vals_outside()`: left and right column literal
     assert (
         v.validation_info[19].autobrief
         == "Expect that values in `x` should not be between `y` and `z`."
     )
 
-    # `col_vals_in_set()` - 2 elements
+    # `col_vals_in_set()`: 2 elements
     assert (
         v.validation_info[20].autobrief
         == "Expect that values in `x` should be in the set of `1`, `2`."
     )
 
-    # `col_vals_in_set()` - 3 elements
+    # `col_vals_in_set()`: 3 elements
     assert (
         v.validation_info[21].autobrief
         == "Expect that values in `x` should be in the set of `1`, `2`, `3`."
     )
 
-    # `col_vals_in_set()` - 4 elements
+    # `col_vals_in_set()`: 4 elements
     assert (
         v.validation_info[22].autobrief
         == "Expect that values in `x` should be in the set of `1`, `2`, `3`, and 1 more."
     )
 
-    # `col_vals_in_set()` - 5 elements
+    # `col_vals_in_set()`: 5 elements
     assert (
         v.validation_info[23].autobrief
         == "Expect that values in `x` should be in the set of `1`, `2`, `3`, and 2 more."
     )
 
-    # `col_vals_not_in_set()` - 2 elements
+    # `col_vals_not_in_set()`: 2 elements
     assert (
         v.validation_info[24].autobrief
         == "Expect that values in `x` should not be in the set of `1`, `2`."
     )
 
-    # `col_vals_not_in_set()` - 3 elements
+    # `col_vals_not_in_set()`: 3 elements
     assert (
         v.validation_info[25].autobrief
         == "Expect that values in `x` should not be in the set of `1`, `2`, `3`."
     )
 
-    # `col_vals_not_in_set()` - 4 elements
+    # `col_vals_not_in_set()`: 4 elements
     assert (
         v.validation_info[26].autobrief
         == "Expect that values in `x` should not be in the set of `1`, `2`, `3`, and 1 more."
     )
 
-    # `col_vals_not_in_set()` - 5 elements
+    # `col_vals_not_in_set()`: 5 elements
     assert (
         v.validation_info[27].autobrief
         == "Expect that values in `x` should not be in the set of `1`, `2`, `3`, and 2 more."
@@ -1663,13 +1664,13 @@ def test_validation_autobriefs(request, tbl_fixture):
     # `rows_distinct()`
     assert v.validation_info[31].autobrief == "Expect entirely distinct rows across all columns."
 
-    # `rows_distinct()` - subset of columns
+    # `rows_distinct()`: subset of columns
     assert v.validation_info[32].autobrief == "Expect entirely distinct rows across `x`, `y`."
 
     # `rows_complete()`
     assert v.validation_info[33].autobrief == "Expect entirely complete rows across all columns."
 
-    # `rows_complete()` - subset of columns
+    # `rows_complete()`: subset of columns
     assert v.validation_info[34].autobrief == "Expect entirely complete rows across `x`, `y`."
 
     # `col_schema_match()`
@@ -3200,7 +3201,7 @@ def test_polars_datetime_non_midnight_conversion():
             assert validation.n_passed(i=1, scalar=True) >= 0
 
         except ValueError as e:
-            # If it fails due to no matching data, that's okay - we mainly want to test the warning
+            # If it fails due to no matching data, that's okay: we mainly want to test the warning
             if "test units must be greater than zero" in str(e):
                 pass  # This is expected if the datetime doesn't match any data
             else:
@@ -4444,7 +4445,7 @@ def test_schema_validation_completeness():
     # Schema with subset of columns
     schema = Schema(columns=[("a", "Int64"), ("b", "String")])
 
-    # Complete match required (should fail - missing column c in schema)
+    # Complete match required (should fail: missing column c in schema)
     validation_complete = Validate(tbl).col_schema_match(schema=schema, complete=True).interrogate()
     assert not validation_complete.all_passed()
 
@@ -5297,7 +5298,7 @@ def test_col_schema_match():
         == 0
     )
 
-    # Schema expressed in a different order (yet complete) - wrong column name
+    # Schema expressed in a different order (yet complete): wrong column name
     schema = Schema(columns=[("b", "Int64"), ("c", "Float64"), ("wrong", "String")])
     assert (
         Validate(data=tbl).col_schema_match(schema=schema).interrogate().n_passed(i=1, scalar=True)
@@ -5353,7 +5354,7 @@ def test_col_schema_match():
         == 1
     )
 
-    # Schema has duplicate column/dtype - wrong column name
+    # Schema has duplicate column/dtype: wrong column name
     schema = Schema(
         columns=[("a", "String"), ("a", "String"), ("wrong", "Int64"), ("c", "Float64")]
     )
@@ -5411,7 +5412,7 @@ def test_col_schema_match():
         == 1
     )
 
-    # Supplied schema is a subset of the actual schema (in the correct order) - wrong column name
+    # Supplied schema is a subset of the actual schema (in the correct order): wrong column name
     schema = Schema(columns=[("wrong", "Int64"), ("c", "Float64")])
     assert (
         Validate(data=tbl).col_schema_match(schema=schema).interrogate().n_passed(i=1, scalar=True)
@@ -5467,7 +5468,7 @@ def test_col_schema_match():
         == 1
     )
 
-    # Supplied schema is a subset of the actual schema but in a different order - wrong column name
+    # Supplied schema is a subset of the actual schema but in a different order: wrong column name
     schema = Schema(columns=[("wrong", "Float64"), ("b", "Int64")])
     assert (
         Validate(data=tbl).col_schema_match(schema=schema).interrogate().n_passed(i=1, scalar=True)
@@ -6193,7 +6194,7 @@ def test_col_schema_match_list_of_dtypes():
         == 0
     )
 
-    # Schema expressed in a different order (yet complete) - wrong column name
+    # Schema expressed in a different order (yet complete): wrong column name
     schema = Schema(
         columns=[("b", ["int", "Int64"]), ("c", ["float", "Float64"]), ("wrong", ["String", "str"])]
     )
@@ -6258,7 +6259,7 @@ def test_col_schema_match_list_of_dtypes():
         == 1
     )
 
-    # Schema has duplicate column/dtype - wrong dtypes in one case
+    # Schema has duplicate column/dtype: wrong dtypes in one case
     schema = Schema(
         columns=[
             ("a", ["String", "str"]),
@@ -6293,7 +6294,7 @@ def test_col_schema_match_list_of_dtypes():
         == 1
     )
 
-    # Schema has duplicate column/dtype - wrong dtypes in both cases
+    # Schema has duplicate column/dtype: wrong dtypes in both cases
     schema = Schema(
         columns=[
             ("a", ["wrong", "Wrong"]),
@@ -6328,7 +6329,7 @@ def test_col_schema_match_list_of_dtypes():
         == 0
     )
 
-    # Schema has duplicate column/dtype - wrong column name
+    # Schema has duplicate column/dtype: wrong column name
     schema = Schema(
         columns=[
             ("a", ["String", "str"]),
@@ -6391,7 +6392,7 @@ def test_col_schema_match_list_of_dtypes():
         == 1
     )
 
-    # Supplied schema is a subset of the actual schema (in the correct order) - wrong column name
+    # Supplied schema is a subset of the actual schema (in the correct order): wrong column name
     schema = Schema(columns=[("wrong", ["Int64", "int"]), ("c", ["Float64", "float"])])
     assert (
         Validate(data=tbl).col_schema_match(schema=schema).interrogate().n_passed(i=1, scalar=True)
@@ -6447,7 +6448,7 @@ def test_col_schema_match_list_of_dtypes():
         == 1
     )
 
-    # Supplied schema is a subset of the actual schema but in a different order - wrong column name
+    # Supplied schema is a subset of the actual schema but in a different order: wrong column name
     schema = Schema(columns=[("wrong", ["float", "Float64"]), ("b", ["Int64", "int"])])
     assert (
         Validate(data=tbl).col_schema_match(schema=schema).interrogate().n_passed(i=1, scalar=True)
@@ -6864,7 +6865,7 @@ def test_col_schema_match_columns_only():
         == 0
     )
 
-    # Schema columns expressed in a different order (yet complete) - wrong column name
+    # Schema columns expressed in a different order (yet complete): wrong column name
     schema = Schema(columns=["b", "c", "wrong"])
     assert (
         Validate(data=tbl).col_schema_match(schema=schema).interrogate().n_passed(i=1, scalar=True)
@@ -6976,7 +6977,7 @@ def test_col_schema_match_columns_only():
         == 1
     )
 
-    # Supplied columns are a subset of the actual column (in correct order) - has wrong column name
+    # Supplied columns are a subset of the actual column (in correct order): has wrong column name
     schema = Schema(columns=["wrong", "c"])
     assert (
         Validate(data=tbl).col_schema_match(schema=schema).interrogate().n_passed(i=1, scalar=True)
@@ -7032,7 +7033,7 @@ def test_col_schema_match_columns_only():
         == 1
     )
 
-    # Supplied columns are a subset of actual columns but in a different order - wrong column name
+    # Supplied columns are a subset of actual columns but in a different order: wrong column name
     schema = Schema(columns=["wrong", "b"])
     assert (
         Validate(data=tbl).col_schema_match(schema=schema).interrogate().n_passed(i=1, scalar=True)
@@ -10014,16 +10015,16 @@ def test_preview_no_fail_pyspark_table():
     spark_df = spark.createDataFrame(test_data, schema)
 
     # Test various preview scenarios that trigger lines 1562-1589
-    # Basic preview - should use full dataset path
+    # Basic preview: should use full dataset path
     preview(spark_df)
 
-    # Head only - should use head sampling
+    # Head only: should use head sampling
     preview(spark_df, n_head=2)
 
-    # Tail only - should use tail sampling
+    # Tail only: should use tail sampling
     preview(spark_df, n_tail=2)
 
-    # Both head and tail - should combine head/tail sampling
+    # Both head and tail should combine head/tail sampling
     preview(spark_df, n_head=2, n_tail=2)
 
     # Test edge case: empty tail when dataset is smaller than requested
@@ -10177,11 +10178,11 @@ def test_polars_only_environment_simulation():
         }
     )
 
-    # Test validation with large numbers - this uses our GT-based formatting
+    # Test validation with large numbers; this uses our GT-based formatting
     validator = Validate(data=large_data, tbl_name="polars_large_test")
     result = validator.col_vals_gt(columns="amount", value=0).interrogate()
 
-    # Generate tabular report - should work without any pandas dependency
+    # Generate tabular report that should work without any Pandas dependency
     report = result.get_tabular_report()
     assert report is not None
     assert isinstance(report, GT.GT)
@@ -10433,7 +10434,7 @@ def test_large_numbers_formatting_polars():
     validator = Validate(data=large_data, tbl_name="large_polars_data")
     result = validator.col_vals_gt(columns="value", value=0).interrogate()
 
-    # Generate tabular report - this should not fail with Pandas dependency error
+    # Generate tabular report that should not fail with Pandas dependency error
     try:
         report = result.get_tabular_report()
         assert report is not None
@@ -10458,7 +10459,7 @@ def test_large_numbers_formatting_pandas():
     validator = Validate(data=large_data, tbl_name="large_pandas_data")
     result = validator.col_vals_gt(columns="value", value=0).interrogate()
 
-    # Generate tabular report - should work as before
+    # Generate tabular report that should work as before
     report = result.get_tabular_report()
     assert report is not None
     assert isinstance(report, GT.GT)  # Should be a Great Tables object
@@ -11107,11 +11108,11 @@ def test_connect_to_table_invalid_connection_string_format():
 
         mock_ibis = Mock()
         with patch.dict("sys.modules", {"ibis": mock_ibis}):
-            # This should work - rsplit("::", 1) handles multiple :: correctly
+            # This should work: rsplit("::", 1) as it should handle multiple :: correctly
             # So let's test a truly invalid format
             try:
                 connect_to_table("invalid_format_no_double_colon")
-                # If no error is raised, that's fine - it means the function is robust
+                # If no error is raised, that's fine; it means the function is robust
             except Exception:
                 # Any exception is acceptable here as this is an edge case
                 pass
@@ -14904,17 +14905,17 @@ def test_above_threshold_multiple_steps():
         .interrogate()
     )
 
-    # Check steps 1 and 2 - only step 2 exceeds warning/error but not critical
+    # Check steps 1 and 2: only step 2 exceeds warning/error but not critical
     assert validation.above_threshold(level="warning", i=[1, 2]) is True
     assert validation.above_threshold(level="error", i=[1, 2]) is True
     assert validation.above_threshold(level="critical", i=[1, 2]) is False
 
-    # Check steps 1 and 3 - step 3 exceeds all thresholds
+    # Check steps 1 and 3: step 3 exceeds all thresholds
     assert validation.above_threshold(level="warning", i=[1, 3]) is True
     assert validation.above_threshold(level="error", i=[1, 3]) is True
     assert validation.above_threshold(level="critical", i=[1, 3]) is True
 
-    # Check all steps - should have exceedances at all levels
+    # Check all steps: should have exceedances at all levels
     assert validation.above_threshold(level="warning") is True
     assert validation.above_threshold(level="error") is True
     assert validation.above_threshold(level="critical") is True
@@ -14929,7 +14930,7 @@ def test_above_threshold_invalid_level():
     with pytest.raises(ValueError, match="Invalid threshold level"):
         validation.above_threshold(level="invalid_level")
 
-    # Also test with capitalized input - should be normalized
+    # Also test with capitalized input, which should be normalized
     assert validation.above_threshold(level="WARNING") is False
 
 
@@ -15314,7 +15315,7 @@ def test_pandas_only_environment_scenario():
             .interrogate()
         )
 
-        # Generate tabular report - should use Pandas-based GT formatting
+        # Generate tabular report that should use Pandas-based GT formatting
         report = validation.get_tabular_report()
         assert report is not None
         assert hasattr(report, "_body")
@@ -15412,7 +15413,7 @@ def test_polars_only_environment_scenario():
             .interrogate()
         )
 
-        # Generate tabular report - should use Polars-based GT formatting
+        # Generate tabular report that should use Polars-based GT formatting
         report = validation.get_tabular_report()
         assert report is not None
         assert hasattr(report, "_body")
@@ -15549,7 +15550,7 @@ def test_scenario_integration_with_large_datasets():
             .interrogate()
         )
 
-        # Generate report - should handle large numbers correctly
+        # Generate report that should handle large numbers correctly
         report = validation.get_tabular_report()
         assert report is not None
         assert hasattr(report, "_body")
@@ -17144,3 +17145,331 @@ def test_original_table_never_modified_without_pre(request, tbl_fixture):
     n_values = [vi.n for vi in validation.validation_info]
     expected_rows = tbl.shape[0]
     assert all(n == expected_rows for n in n_values)
+
+
+@pytest.fixture
+def timezone_datetime_polars():
+    """Polars DataFrame with timezone-aware datetime values."""
+    return pl.DataFrame(
+        {
+            "date_time": [
+                datetime.datetime(2020, 1, 1, tzinfo=pytz.timezone("America/Vancouver")),
+                datetime.datetime(2020, 1, 2, tzinfo=pytz.timezone("America/Vancouver")),
+                datetime.datetime(2020, 1, 3, tzinfo=pytz.timezone("America/Vancouver")),
+                datetime.datetime(2020, 1, 4, tzinfo=pytz.timezone("America/Vancouver")),
+            ]
+        }
+    )
+
+
+@pytest.fixture
+def timezone_datetime_pandas():
+    """Pandas DataFrame with timezone-aware datetime values."""
+    return pd.DataFrame(
+        {
+            "date_time": [
+                datetime.datetime(2020, 1, 1, tzinfo=pytz.timezone("America/Vancouver")),
+                datetime.datetime(2020, 1, 2, tzinfo=pytz.timezone("America/Vancouver")),
+                datetime.datetime(2020, 1, 3, tzinfo=pytz.timezone("America/Vancouver")),
+                datetime.datetime(2020, 1, 4, tzinfo=pytz.timezone("America/Vancouver")),
+            ]
+        }
+    )
+
+
+def test_col_vals_ge_timezone_datetime_polars(timezone_datetime_polars):
+    """Test col_vals_ge() with timezone-aware datetime values in Polars."""
+    df = timezone_datetime_polars
+
+    # Test that col_vals_ge() works with timezone-aware datetime comparison
+    validation = (
+        Validate(data=df)
+        .col_vals_ge(
+            columns="date_time",
+            value=datetime.datetime(2020, 1, 1, tzinfo=pytz.timezone("America/Vancouver")),
+        )
+        .interrogate()
+    )
+
+    # All values should pass (all are >= 2020-01-01)
+    assert validation.all_passed()
+    assert validation.n_passed(i=1, scalar=True) == 4
+    assert validation.n_failed(i=1, scalar=True) == 0
+
+
+def test_col_vals_le_timezone_datetime_polars(timezone_datetime_polars):
+    """Test col_vals_le() with timezone-aware datetime values in Polars."""
+    df = timezone_datetime_polars
+
+    # Test that col_vals_le() works with timezone-aware datetime comparison
+    validation = (
+        Validate(data=df)
+        .col_vals_le(
+            columns="date_time",
+            value=datetime.datetime(
+                2020, 1, 5, tzinfo=pytz.timezone("America/Vancouver")
+            ),  # Use Jan 5 to be safe
+        )
+        .interrogate()
+    )
+
+    # All values should pass (all are <= 2020-01-05)
+    assert validation.all_passed()
+    assert validation.n_passed(i=1, scalar=True) == 4
+    assert validation.n_failed(i=1, scalar=True) == 0
+
+
+def test_col_vals_between_timezone_datetime_polars(timezone_datetime_polars):
+    """Test col_vals_between() with timezone-aware datetime values in Polars."""
+    df = timezone_datetime_polars
+
+    # Test that col_vals_between() works with timezone-aware datetime comparison
+    # Use a range that definitely includes some but not all values
+    validation = (
+        Validate(data=df)
+        .col_vals_between(
+            columns="date_time",
+            left=datetime.datetime(
+                2019, 12, 31, tzinfo=pytz.timezone("America/Vancouver")
+            ),  # Way before
+            right=datetime.datetime(
+                2020, 1, 3, 1, 0, tzinfo=pytz.timezone("America/Vancouver")
+            ),  # Jan 3 1AM (after the 00:12 time)
+        )
+        .interrogate()
+    )
+
+    # Test that it doesn't fail completely; as long as some pass and some fail, the basic
+    # functionality works
+    #
+    # The exact count may vary due to timezone display vs. internal representation differences
+    assert not validation.all_passed()  # Not all should pass
+    assert validation.n_passed(i=1, scalar=True) > 0  # Some should pass
+    assert validation.n_failed(i=1, scalar=True) > 0  # Some should fail
+
+
+def test_col_schema_match_timezone_datetime_polars(timezone_datetime_polars):
+    """Test col_schema_match with timezone-aware datetime schema in Polars."""
+    df = timezone_datetime_polars
+
+    # Test that col_schema_match() works with a timezone-aware datetime schema
+    validation = (
+        Validate(data=df)
+        .col_schema_match(
+            Schema(
+                columns=[
+                    (
+                        "date_time",
+                        "Datetime(time_unit='us', time_zone='America/Vancouver')",
+                    ),
+                ]
+            )
+        )
+        .interrogate()
+    )
+
+    # Schema should match exactly
+    assert validation.all_passed()
+    assert validation.n_passed(i=1, scalar=True) == 1
+
+
+def test_col_vals_ge_timezone_datetime_pandas(timezone_datetime_pandas):
+    """Test col_vals_ge() with timezone-aware datetime values in Pandas."""
+    df = timezone_datetime_pandas
+
+    # Test that col_vals_ge() works with timezone-aware datetime comparison
+    validation = (
+        Validate(data=df)
+        .col_vals_ge(
+            columns="date_time",
+            value=datetime.datetime(2020, 1, 1, tzinfo=pytz.timezone("America/Vancouver")),
+        )
+        .interrogate()
+    )
+
+    # All values should pass (all are >= 2020-01-01)
+    assert validation.all_passed()
+    assert validation.n_passed(i=1, scalar=True) == 4
+    assert validation.n_failed(i=1, scalar=True) == 0
+
+
+def test_col_vals_le_timezone_datetime_pandas(timezone_datetime_pandas):
+    """Test col_vals_le() with timezone-aware datetime values in Pandas."""
+    df = timezone_datetime_pandas
+
+    # Test that col_vals_le() works with timezone-aware datetime comparison
+    validation = (
+        Validate(data=df)
+        .col_vals_le(
+            columns="date_time",
+            value=datetime.datetime(
+                2020, 1, 5, tzinfo=pytz.timezone("America/Vancouver")
+            ),  # Use Jan 5 to be safe
+        )
+        .interrogate()
+    )
+
+    # All values should pass (all are <= 2020-01-05)
+    assert validation.all_passed()
+    assert validation.n_passed(i=1, scalar=True) == 4
+    assert validation.n_failed(i=1, scalar=True) == 0
+
+
+def test_timezone_datetime_same_timezone_polars():
+    """Test timezone datetime comparisons with same timezone in Polars."""
+    # Create DataFrame with same timezone datetimes but different times
+    df = pl.DataFrame(
+        {
+            "date_time": [
+                datetime.datetime(
+                    2020, 1, 1, 8, 0, tzinfo=pytz.timezone("America/Vancouver")
+                ),  # Early morning
+                datetime.datetime(
+                    2020, 1, 1, 12, 0, tzinfo=pytz.timezone("America/Vancouver")
+                ),  # Noon
+                datetime.datetime(
+                    2020, 1, 1, 18, 0, tzinfo=pytz.timezone("America/Vancouver")
+                ),  # Evening
+            ]
+        }
+    )
+
+    # Test comparison with a time in the middle
+    validation = (
+        Validate(data=df)
+        .col_vals_ge(
+            columns="date_time",
+            value=datetime.datetime(2020, 1, 1, 10, 0, tzinfo=pytz.timezone("America/Vancouver")),
+        )
+        .interrogate()
+    )
+
+    # Last 2 values should pass (noon and evening are >= 10 AM)
+    # First value (8 AM) should fail
+    assert not validation.all_passed()
+    assert validation.n_passed(i=1, scalar=True) == 2
+    assert validation.n_failed(i=1, scalar=True) == 1
+
+
+@pytest.mark.skipif(not PYSPARK_AVAILABLE, reason="PySpark not available")
+@pytest.mark.xfail(
+    reason="PySpark timezone datetime comparisons may not work correctly with narwhals"
+)
+def test_col_vals_ge_timezone_datetime_pyspark():
+    """Test col_vals_ge() with timezone-aware datetime values in PySpark."""
+    # Create PySpark DataFrame with timezone-aware datetime
+    spark = SparkSession.builder.appName("test").getOrCreate()
+
+    # Create data with timezone-aware datetime
+    data = [
+        (datetime.datetime(2020, 1, 1, tzinfo=pytz.timezone("America/Vancouver")),),
+        (datetime.datetime(2020, 1, 2, tzinfo=pytz.timezone("America/Vancouver")),),
+        (datetime.datetime(2020, 1, 3, tzinfo=pytz.timezone("America/Vancouver")),),
+        (datetime.datetime(2020, 1, 4, tzinfo=pytz.timezone("America/Vancouver")),),
+    ]
+
+    schema = StructType(
+        [
+            StructField(
+                "date_time", StringType(), True
+            )  # PySpark may need special handling for timezone-aware datetimes
+        ]
+    )
+
+    df = spark.createDataFrame(data, schema=schema)
+
+    # Test that col_vals_ge() works with timezone-aware datetime comparison
+    validation = (
+        Validate(data=df)
+        .col_vals_ge(
+            columns="date_time",
+            value=datetime.datetime(2020, 1, 1, tzinfo=pytz.timezone("America/Vancouver")),
+        )
+        .interrogate()
+    )
+
+    # All values should pass (all are >= 2020-01-01)
+    assert validation.all_passed()
+    assert validation.n_passed(i=1, scalar=True) == 4
+    assert validation.n_failed(i=1, scalar=True) == 0
+
+
+@pytest.mark.xfail(reason="DuckDB timezone datetime comparisons may not work correctly yet")
+def test_col_vals_ge_timezone_datetime_duckdb():
+    """Test col_vals_ge() with timezone-aware datetime values in DuckDB."""
+    try:
+        import duckdb
+    except ImportError:
+        pytest.skip("duckdb not available")
+
+    # Create DuckDB connection and table with timezone-aware datetime
+    conn = duckdb.connect()
+
+    try:
+        # Create table with timezone-aware datetime data
+        # (DuckDB uses TIMESTAMPTZ for timezone-aware timestamps)
+        conn.execute("""
+            CREATE TABLE test_tz_datetime AS
+            SELECT TIMESTAMP '2020-01-01 00:00:00-08:00' AS date_time
+            UNION ALL
+            SELECT TIMESTAMP '2020-01-02 00:00:00-08:00' AS date_time
+            UNION ALL
+            SELECT TIMESTAMP '2020-01-03 00:00:00-08:00' AS date_time
+            UNION ALL
+            SELECT TIMESTAMP '2020-01-04 00:00:00-08:00' AS date_time
+        """)
+
+        # Get the table as an Ibis table
+        tbl = conn.table("test_tz_datetime")
+
+        # Test that col_vals_ge() works with timezone-aware datetime comparison
+        validation = (
+            Validate(data=tbl)
+            .col_vals_ge(
+                columns="date_time",
+                value=datetime.datetime(2020, 1, 1, tzinfo=pytz.timezone("America/Vancouver")),
+            )
+            .interrogate()
+        )
+
+        # All values should pass (all are >= 2020-01-01)
+        assert validation.all_passed()
+        assert validation.n_passed(i=1, scalar=True) == 4
+        assert validation.n_failed(i=1, scalar=True) == 0
+
+    finally:
+        conn.close()
+
+
+@pytest.mark.xfail(reason="Mixed timezone comparisons may not work correctly yet")
+def test_timezone_datetime_mixed_timezones_polars():
+    """Test timezone datetime comparisons with mixed timezones in Polars."""
+    # Create DataFrame with mixed timezone datetimes
+    df = pl.DataFrame(
+        {
+            "date_time": [
+                datetime.datetime(
+                    2020, 1, 1, 12, 0, tzinfo=pytz.timezone("America/Vancouver")
+                ),  # PST
+                datetime.datetime(
+                    2020, 1, 1, 15, 0, tzinfo=pytz.timezone("America/New_York")
+                ),  # EST
+                datetime.datetime(2020, 1, 1, 20, 0, tzinfo=pytz.timezone("UTC")),  # UTC
+            ]
+        }
+    )
+
+    # Test comparison with UTC datetime (this may fail due to mixed timezone handling)
+    validation = (
+        Validate(data=df)
+        .col_vals_ge(
+            columns="date_time",
+            value=datetime.datetime(2020, 1, 1, 19, 0, tzinfo=pytz.timezone("UTC")),
+        )
+        .interrogate()
+    )
+
+    # If this works, all values should pass as they're all >= 19:00 UTC
+    assert validation.all_passed()
+    assert validation.n_passed(i=1, scalar=True) == 3
+    assert validation.n_failed(i=1, scalar=True) == 0
