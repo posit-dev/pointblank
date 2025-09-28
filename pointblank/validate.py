@@ -11,6 +11,7 @@ import tempfile
 import threading
 from dataclasses import dataclass
 from enum import Enum
+from functools import partial
 from importlib.metadata import version
 from typing import TYPE_CHECKING, Any, Callable, Literal
 from zipfile import ZipFile
@@ -53,6 +54,7 @@ from pointblank._interrogation import (
     col_exists,
     col_schema_match,
     col_vals_expr,
+    col_vals_pct_null,
     conjointly_validation,
     interrogate_between,
     interrogate_eq,
@@ -3962,6 +3964,55 @@ class Validate:
 
     def _repr_html_(self) -> str:
         return self.get_tabular_report()._repr_html_()  # pragma: no cover
+
+    def col_vals_pct_null(
+        self,
+        columns: str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals,
+        p: float,
+        tol: Tolerance = 0,
+        thresholds: int | float | None | bool | tuple | dict | Thresholds = None,
+        brief: str | bool | None = None,
+    ) -> Validate:
+        """Assert the number of values in a column are null.
+
+        Args:
+            columns (str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals): _description_
+            p (float): Percentage that should be null.
+            tol (Tolerance, optional): Tolerance allowed against the total dataset.
+        """
+        # If `columns` is a ColumnSelector or Narwhals selector, call `col()` on it to later
+        # resolve the columns
+        if isinstance(columns, (ColumnSelector, nw.selectors.Selector)):
+            columns = col(columns)
+
+        # If `columns` is Column value or a string, place it in a list for iteration
+        if isinstance(columns, (Column, str)):
+            columns = [columns]
+
+        # Determine brief to use (global or local) and transform any shorthands of `brief=`
+        brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
+
+        bound_finder: Callable[[int], AbsoluteBounds] = partial(_derive_bounds, tol=tol)
+
+        thresholds = (
+            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+        )
+
+        # Iterate over the columns and create a validation step for each
+        for column in columns:
+            val_info = _ValidationInfo(
+                # TODO: should type hint these as required args i think
+                assertion_type="col_vals_pct_null",
+                column=column,
+                values={"p": p, "bound_finder": bound_finder},
+                brief=brief,
+                active=True,
+                thresholds=thresholds,
+            )
+
+            self._add_validation(validation_info=val_info)
+
+        return self
 
     def col_vals_gt(
         self,
@@ -10335,7 +10386,7 @@ class Validate:
 
             start_time = datetime.datetime.now(datetime.timezone.utc)
 
-            assertion_type = validation.assertion_type
+            assertion_type: str = validation.assertion_type
             column = validation.column
             value = validation.values
             inclusive = validation.inclusive
@@ -10652,6 +10703,20 @@ class Validate:
                         validation.n = 1
                         validation.n_passed = int(result_bool)
                         validation.n_failed = 1 - result_bool
+
+                        results_tbl = None
+
+                    elif assertion_type == "col_vals_pct_null":
+                        results_bool: bool = col_vals_pct_null(
+                            data_tbl=data_tbl_step,
+                            column=column,
+                            p=value["p"],
+                            bound_finder=value["bound_finder"],
+                        )
+                        validation.all_passed = results_bool
+                        validation.n = 1
+                        validation.n_passed = int(results_bool)
+                        validation.n_failed = 1 - int(results_bool)
 
                         results_tbl = None
 

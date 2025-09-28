@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import functools
+from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Any
 
@@ -9,6 +10,7 @@ from narwhals.dependencies import is_pandas_dataframe, is_polars_dataframe
 from narwhals.typing import FrameT
 
 from pointblank._constants import IBIS_BACKENDS
+from pointblank._typing import AbsoluteBounds
 from pointblank._utils import (
     _column_test_prep,
     _convert_to_narwhals,
@@ -734,6 +736,32 @@ def row_count_match(data_tbl: FrameT, count, inverse: bool, abs_tol_bounds) -> b
         return not (row_count >= min_val and row_count <= max_val)
     else:
         return row_count >= min_val and row_count <= max_val
+
+
+def col_vals_pct_null(
+    data_tbl: FrameT, column: str, p: float, bound_finder: Callable[[int], AbsoluteBounds]
+) -> bool:
+    """Check if the pct of null vales are within p given the absolute bounds.
+
+    Args:
+        data_tbl (FrameT): Data
+        column (str): Column in the data.
+        p (float): Percentage of null values out of the total allowed.
+        bound_finder (Callable[[int], AbsoluteBounds]): Function that takes a target number of
+            null values and returns the absolute bounds.
+
+    Returns:
+        bool: _description_
+    """
+    # TODO: Shouldn't be passing the whole dataframe for things like this.
+    # Extract the absolute target to use with the absolute bounds.
+    total_rows: int = data_tbl[column].len()
+    abs_target: float = round(total_rows * p)
+    lower_bound, upper_bound = bound_finder(abs_target)
+
+    n_null: int = nw.from_native(data_tbl).select(nw.col(column).is_null().sum()).item()
+
+    return n_null >= (abs_target - lower_bound) and n_null <= (abs_target + upper_bound)
 
 
 def col_count_match(data_tbl: FrameT, count, inverse: bool) -> bool:
