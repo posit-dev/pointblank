@@ -1,42 +1,61 @@
 ---
-pagetitle: "Examples: Validating Datetime Values and Data Freshness"
+pagetitle: "Examples: Validating Data Freshness"
 notebook-links: false
 page-navigation: false
 toc: false
 html-table-processing: none
 ---
 
-### Validating Datetime Values and Data Freshness
+### Validating Data Freshness
 
-Use date/datetime-based validations to ensure your data is current and within expected time ranges.
+Use date/datetime-based validations to ensure your data is current and recent. This is critical for applications that depend on timely data updates.
 
 ```{python}
 #| echo: false
 
 import pointblank as pb
 import polars as pl
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 
-# Supposing it is 2023-12-31, there should be data available in the last 3 days
-cutoff_date = date(2023, 12, 31) - timedelta(days=3)
+# Create sample data with mixed freshness levels
+freshness_data = pl.DataFrame({
+    "data_timestamp": [
+        datetime(2023, 12, 28, 10, 30),  # 3 days ago from Dec 31
+        datetime(2023, 12, 29, 14, 15),  # 2 days ago
+        datetime(2023, 12, 30, 9, 45),   # 1 day ago
+        datetime(2023, 12, 31, 16, 20),  # Today
+    ],
+    "sensor_id": ["TEMP_01", "TEMP_02", "TEMP_01", "TEMP_03"],
+    "reading": [22.5, 21.8, 23.1, 22.9],
+    "quality_score": [0.95, 0.88, 0.92, 0.97]
+})
+
+# Assuming today is 2023-12-31, check for data freshness
+current_date = date(2023, 12, 31)
+freshness_cutoff = current_date - timedelta(days=2)  # Data should be within 2 days
 
 validation = (
-    pb.Validate(
-        data=pb.load_dataset(dataset="global_sales", tbl_type="polars")
+    pb.Validate(freshness_data)
+    .specially(
+        expr=lambda df: df.filter(
+            pl.col("data_timestamp").dt.date() >= freshness_cutoff
+        ).height > 0,
+        brief=f"Recent data available (within 2 days of {current_date})"
+    )
+    .col_vals_ge(
+        columns="data_timestamp",
+        value=current_date - timedelta(days=7),  # Within last week
+        brief="All data points are from the last week"
     )
     .specially(
-        expr=lambda df: df.filter(pl.col("timestamp") >= cutoff_date).height > 0,
-        brief="Recent data availability check: there is data in the last 3 days."
-    )
-    .col_vals_between(
-        columns="timestamp",
-        left="2021-01-01",
-        right="2023-12-31",
-        brief="Date range validation."
+        expr=lambda df: (
+            df.select(pl.col("data_timestamp").max()).item().date() >= current_date
+        ),
+        brief="Most recent data is from today"
     )
     .col_vals_not_null(
-        columns="timestamp",
-        brief="No missing timestamps."
+        columns="data_timestamp",
+        brief="No missing timestamps"
     )
     .interrogate()
 )
@@ -47,28 +66,47 @@ validation
 ```python
 import pointblank as pb
 import polars as pl
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 
-# Supposing it is 2023-12-31, there should be data available in the last 3 days
-cutoff_date = date(2023, 12, 31) - timedelta(days=3)
+# Create sample data with mixed freshness levels
+freshness_data = pl.DataFrame({
+    "data_timestamp": [
+        datetime(2023, 12, 28, 10, 30),  # 3 days ago from Dec 31
+        datetime(2023, 12, 29, 14, 15),  # 2 days ago
+        datetime(2023, 12, 30, 9, 45),   # 1 day ago
+        datetime(2023, 12, 31, 16, 20),  # Today
+    ],
+    "sensor_id": ["TEMP_01", "TEMP_02", "TEMP_01", "TEMP_03"],
+    "reading": [22.5, 21.8, 23.1, 22.9],
+    "quality_score": [0.95, 0.88, 0.92, 0.97]
+})
+
+# Assuming today is 2023-12-31, check for data freshness
+current_date = date(2023, 12, 31)
+freshness_cutoff = current_date - timedelta(days=2)  # Data should be within 2 days
 
 validation = (
-    pb.Validate(
-        data=pb.load_dataset(dataset="global_sales", tbl_type="polars")
+    pb.Validate(freshness_data)
+    .specially(
+        expr=lambda df: df.filter(
+            pl.col("data_timestamp").dt.date() >= freshness_cutoff
+        ).height > 0,
+        brief=f"Recent data available (within 2 days of {current_date})"
+    )
+    .col_vals_ge(
+        columns="data_timestamp",
+        value=current_date - timedelta(days=7),  # Within last week
+        brief="All data points are from the last week"
     )
     .specially(
-        expr=lambda df: df.filter(pl.col("timestamp") >= cutoff_date).height > 0,
-        brief="Recent data availability check: there is data in the last 3 days."
-    )
-    .col_vals_between(
-        columns="timestamp",
-        left="2021-01-01",
-        right="2023-12-31",
-        brief="Date range validation."
+        expr=lambda df: (
+            df.select(pl.col("data_timestamp").max()).item().date() >= current_date
+        ),
+        brief="Most recent data is from today"
     )
     .col_vals_not_null(
-        columns="timestamp",
-        brief="No missing timestamps."
+        columns="data_timestamp",
+        brief="No missing timestamps"
     )
     .interrogate()
 )
@@ -81,7 +119,7 @@ validation
 
 ```{python}
 # | echo: false
-pb.preview(pb.load_dataset(dataset="global_sales", tbl_type="polars"))
+pb.preview(freshness_data)
 ```
 
 </details>
