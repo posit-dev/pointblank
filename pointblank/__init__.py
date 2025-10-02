@@ -39,6 +39,8 @@ from pointblank.validate import (
     load_dataset,
     missing_vals_tbl,
     preview,
+    read_file,
+    write_file,
 )
 from pointblank.yaml import (
     validate_yaml,
@@ -66,6 +68,8 @@ __all__ = [
     "first_n",
     "last_n",
     "load_dataset",
+    "write_file",
+    "read_file",
     "get_data_path",
     "config",
     "connect_to_table",
