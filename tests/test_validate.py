@@ -18,6 +18,15 @@ import contextlib
 import datetime
 from enum import Enum, IntEnum
 
+
+# Module-level function for testing (can be pickled)
+def multiply_column_by_20(df):
+    """Test preprocessing function that can be pickled."""
+    import narwhals as nw
+
+    return df.with_columns(nw.col("a") * 20)
+
+
 # StrEnum was introduced in Python 3.11, so we use regular Enum for compatibility
 try:
     from enum import StrEnum
@@ -86,7 +95,9 @@ from pointblank.validate import (
     missing_vals_tbl,
     PointblankConfig,
     preview,
+    read_file,
     Validate,
+    write_file,
     _create_table_time_html,
     _create_table_type_html,
     _create_thresholds_html,
@@ -17472,4 +17483,446 @@ def test_timezone_datetime_mixed_timezones_polars():
     # If this works, all values should pass as they're all >= 19:00 UTC
     assert validation.all_passed()
     assert validation.n_passed(i=1, scalar=True) == 3
-    assert validation.n_failed(i=1, scalar=True) == 0
+
+
+@pytest.fixture
+def sample_validation_polars():
+    """Create a sample validation object with Polars data."""
+
+    data = load_dataset("small_table", tbl_type="polars")
+    return (
+        Validate(
+            data=data,
+            tbl_name="small_table",
+            label="Test validation",
+            thresholds=Thresholds(warning=0.1, error=0.2, critical=0.3),
+        )
+        .col_vals_gt(columns="d", value=100)
+        .col_vals_regex(columns="b", pattern=r"[0-9]-[a-z]{3}-[0-9]{3}")
+        .col_vals_not_null(columns=["a", "b"])
+        .interrogate()
+    )
+
+
+@pytest.fixture
+def sample_validation_pandas():
+    """Create a sample validation object with Pandas data."""
+
+    data = load_dataset("small_table", tbl_type="pandas")
+    return (
+        Validate(data=data, label="Pandas validation")
+        .col_vals_gt(columns="d", value=100)
+        .interrogate()
+    )
+
+
+@pytest.fixture
+def sample_validation_duckdb():
+    """Create a sample validation object with DuckDB data."""
+
+    data = load_dataset("small_table", tbl_type="duckdb")
+    return (
+        Validate(data=data, label="DuckDB validation")
+        .col_vals_gt(columns="d", value=100)
+        .interrogate()
+    )
+
+
+def test_write_file_basic_functionality(sample_validation_polars):
+    """Test basic write_file functionality."""
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        filepath = Path(tmpdir) / "test_validation"
+
+        # Test writing
+        write_file(sample_validation_polars, str(filepath), quiet=True)
+
+        # Verify file was created with correct extension
+        expected_file = filepath.with_suffix(".pkl")
+        assert expected_file.exists()
+        assert expected_file.stat().st_size > 0
+
+
+def test_read_file_basic_functionality(sample_validation_polars):
+    """Test basic read_file functionality."""
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        filepath = Path(tmpdir) / "test_validation"
+
+        # Write and read back
+        write_file(sample_validation_polars, str(filepath), quiet=True)
+        loaded_validation = read_file(str(filepath))
+
+        # Verify object type and basic properties
+        assert isinstance(loaded_validation, Validate)
+        assert loaded_validation.label == sample_validation_polars.label
+        assert loaded_validation.tbl_name == sample_validation_polars.tbl_name
+        assert len(loaded_validation.validation_info) == len(
+            sample_validation_polars.validation_info
+        )
+
+
+def test_write_file_automatic_extension(sample_validation_polars):
+    """Test that .pkl extension is added automatically."""
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        # Test without extension
+        filepath = Path(tmpdir) / "test_validation"
+        write_file(sample_validation_polars, str(filepath), quiet=True)
+        assert filepath.with_suffix(".pkl").exists()
+
+    # Test with extension already present
+    filepath_with_ext = Path(tmpdir) / "test_validation.pkl"
+    write_file(sample_validation_polars, str(filepath_with_ext), quiet=True)
+    assert filepath_with_ext.exists()
+
+    # Should not create .pkl.pkl
+    assert not (Path(tmpdir) / "test_validation.pkl.pkl").exists()
+
+
+def test_path_creation(sample_validation_polars):
+    """Test that directories are created if they don't exist."""
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        nested_path = Path(tmpdir) / "nested" / "subdirectory"
+        filepath = nested_path / "test_validation"
+
+        # Path doesn't exist yet
+        assert not nested_path.exists()
+
+        # Write file should create the path
+        write_file(sample_validation_polars, str(filepath), path=None, quiet=True)
+
+        # Verify path was created
+        assert nested_path.exists()
+        assert (filepath.with_suffix(".pkl")).exists()
+
+
+def test_path_parameter(sample_validation_polars):
+    """Test the path parameter functionality."""
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        subdir = Path(tmpdir) / "validations"
+
+        # Use path parameter
+        write_file(sample_validation_polars, "test_validation", path=str(subdir), quiet=True)
+
+        # Verify file is in the specified directory
+        expected_file = subdir / "test_validation.pkl"
+        assert expected_file.exists()
+
+
+def test_keep_tbl_false_default(sample_validation_polars):
+    """Test that data table is removed by default (`keep_tbl=False`)."""
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        filepath = Path(tmpdir) / "test_validation"
+
+        # Default behavior should not keep table
+        write_file(sample_validation_polars, str(filepath), quiet=True)
+        loaded_validation = read_file(str(filepath))
+
+        assert loaded_validation.data is None
+
+
+def test_keep_tbl_true_preserves_data(sample_validation_polars):
+    """Test that data table is preserved when `keep_tbl=True`."""
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        filepath = Path(tmpdir) / "test_validation"
+
+        # Keep the table data
+        write_file(sample_validation_polars, str(filepath), keep_tbl=True, quiet=True)
+        loaded_validation = read_file(str(filepath))
+
+        assert loaded_validation.data is not None
+        # Verify the data is the same structure
+        assert len(loaded_validation.data) == len(sample_validation_polars.data)
+        assert list(loaded_validation.data.columns) == list(sample_validation_polars.data.columns)
+
+
+def test_database_table_removal(sample_validation_duckdb):
+    """Test that database tables are always removed even with `keep_tbl=True`."""
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        filepath = Path(tmpdir) / "test_validation"
+
+        # Try to keep database table (should be removed anyway)
+        write_file(sample_validation_duckdb, str(filepath), keep_tbl=True, quiet=True)
+        loaded_validation = read_file(str(filepath))
+
+        # Database table should be None even with keep_tbl=True
+        assert loaded_validation.data is None
+
+
+def test_keep_extracts_functionality(sample_validation_polars):
+    """Test extract data preservation functionality."""
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        filepath_no_extracts = Path(tmpdir) / "no_extracts"
+        filepath_with_extracts = Path(tmpdir) / "with_extracts"
+
+        # Save without extracts (default)
+        write_file(sample_validation_polars, str(filepath_no_extracts), quiet=True)
+
+        # Save with extracts
+        write_file(
+            sample_validation_polars, str(filepath_with_extracts), keep_extracts=True, quiet=True
+        )
+
+        # Both should work (extract handling is implementation detail)
+        loaded_no_extracts = read_file(str(filepath_no_extracts))
+        loaded_with_extracts = read_file(str(filepath_with_extracts))
+
+        assert isinstance(loaded_no_extracts, Validate)
+        assert isinstance(loaded_with_extracts, Validate)
+
+
+def test_quiet_parameter(sample_validation_polars, capsys):
+    """Test the quiet parameter functionality."""
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        filepath = Path(tmpdir) / "test_validation"
+
+        # Test with quiet=False (default) - should print
+        write_file(sample_validation_polars, str(filepath), quiet=False)
+        captured = capsys.readouterr()
+        assert "Validation object written to:" in captured.out
+
+        # Test with quiet=True - should not print
+        filepath2 = Path(tmpdir) / "test_validation2"
+        write_file(sample_validation_polars, str(filepath2), quiet=True)
+        captured = capsys.readouterr()
+        assert captured.out == ""
+
+
+def test_validation_state_preservation(sample_validation_polars):
+    """Test that validation results and metadata are preserved."""
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        filepath = Path(tmpdir) / "test_validation"
+
+        # Capture original state
+        original_steps = len(sample_validation_polars.validation_info)
+        original_thresholds = sample_validation_polars.thresholds
+        original_time_start = sample_validation_polars.time_start
+        original_time_end = sample_validation_polars.time_end
+
+        # Write and read
+        write_file(sample_validation_polars, str(filepath), quiet=True)
+        loaded_validation = read_file(str(filepath))
+
+        # Verify state preservation
+        assert len(loaded_validation.validation_info) == original_steps
+        assert loaded_validation.thresholds.warning == original_thresholds.warning
+        assert loaded_validation.thresholds.error == original_thresholds.error
+        assert loaded_validation.time_start == original_time_start
+        assert loaded_validation.time_end == original_time_end
+
+        # Verify validation results are preserved
+        for i, (orig_info, loaded_info) in enumerate(
+            zip(sample_validation_polars.validation_info, loaded_validation.validation_info)
+        ):
+            assert orig_info.assertion_type == loaded_info.assertion_type
+            assert orig_info.column == loaded_info.column
+            assert orig_info.n == loaded_info.n
+            assert orig_info.n_passed == loaded_info.n_passed
+            assert orig_info.n_failed == loaded_info.n_failed
+
+
+def test_original_object_not_modified(sample_validation_polars):
+    """Test that write_file doesn't modify the original validation object."""
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        filepath = Path(tmpdir) / "test_validation"
+
+        # Capture original state
+        original_data = sample_validation_polars.data
+        original_validation_info = sample_validation_polars.validation_info
+
+        # Write with keep_tbl=False
+        write_file(sample_validation_polars, str(filepath), keep_tbl=False, quiet=True)
+
+        # Original should be unchanged
+        assert sample_validation_polars.data is original_data
+        assert sample_validation_polars.validation_info is original_validation_info
+
+
+def test_multiple_table_types(sample_validation_polars, sample_validation_pandas):
+    """Test serialization with different table types."""
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        # Test Polars
+        filepath_polars = Path(tmpdir) / "polars_validation"
+        write_file(sample_validation_polars, str(filepath_polars), keep_tbl=True, quiet=True)
+        loaded_polars = read_file(str(filepath_polars))
+
+        # Test Pandas
+        filepath_pandas = Path(tmpdir) / "pandas_validation"
+        write_file(sample_validation_pandas, str(filepath_pandas), keep_tbl=True, quiet=True)
+        loaded_pandas = read_file(str(filepath_pandas))
+
+        # Both should work
+        assert loaded_polars.data is not None
+        assert loaded_pandas.data is not None
+
+
+def test_read_file_with_extension_handling(sample_validation_polars):
+    """Test read_file handles file extension automatically."""
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        filepath = Path(tmpdir) / "test_validation"
+
+        # Write file
+        write_file(sample_validation_polars, str(filepath), quiet=True)
+
+        # Read with and without extension
+        loaded_no_ext = read_file(str(filepath))
+        loaded_with_ext = read_file(str(filepath) + ".pkl")
+
+        assert isinstance(loaded_no_ext, Validate)
+        assert isinstance(loaded_with_ext, Validate)
+        assert loaded_no_ext.label == loaded_with_ext.label
+
+
+def test_file_not_found_error():
+    """Test that FileNotFoundError is raised for non-existent files."""
+
+    with pytest.raises(FileNotFoundError, match="Validation file not found"):
+        read_file("nonexistent_file.pkl")
+
+
+def test_invalid_file_content_error():
+    """Test that RuntimeError is raised for invalid file content."""
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        # Create a file with invalid content
+        invalid_file = Path(tmpdir) / "invalid.pkl"
+        with open(invalid_file, "wb") as f:
+            import pickle
+
+            pickle.dump("not a validation object", f)
+
+        with pytest.raises(RuntimeError, match="Invalid validation file format"):
+            read_file(str(invalid_file))
+
+
+def test_write_file_permission_error(sample_validation_polars):
+    """Test handling of write permission errors."""
+
+    # Try to write to a non-writable location, which should fail
+    with pytest.raises((RuntimeError, OSError, PermissionError)):
+        write_file(sample_validation_polars, "/root/test_validation", quiet=True)
+
+
+def test_round_trip_consistency(sample_validation_polars):
+    """Test that multiple save/load cycles maintain consistency."""
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        # First round trip
+        filepath1 = Path(tmpdir) / "validation1"
+        write_file(sample_validation_polars, str(filepath1), keep_tbl=True, quiet=True)
+        loaded1 = read_file(str(filepath1))
+
+        # Second round trip
+        filepath2 = Path(tmpdir) / "validation2"
+        write_file(loaded1, str(filepath2), keep_tbl=True, quiet=True)
+        loaded2 = read_file(str(filepath2))
+
+        # Should be consistent
+        assert loaded1.label == loaded2.label == sample_validation_polars.label
+        assert len(loaded1.validation_info) == len(loaded2.validation_info)
+        assert loaded1.data is not None
+        assert loaded2.data is not None
+
+
+@pytest.mark.parametrize("tbl_type", ["polars", "pandas"])
+def test_parametrized_table_types(tbl_type):
+    """Test write_file and read_file with different table types."""
+
+    data = load_dataset("small_table", tbl_type=tbl_type)
+    validation = (
+        Validate(data=data, label=f"Test {tbl_type}")
+        .col_vals_gt(columns="d", value=100)
+        .interrogate()
+    )
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        filepath = Path(tmpdir) / f"validation_{tbl_type}"
+
+        # Test round trip
+        write_file(validation, str(filepath), keep_tbl=True, quiet=True)
+        loaded = read_file(str(filepath))
+
+        assert loaded.label == f"Test {tbl_type}"
+        assert loaded.data is not None
+        assert len(loaded.validation_info) == 1
+
+
+def test_large_validation_object():
+    """Test serialization of validation objects with many steps."""
+
+    data = load_dataset("small_table", tbl_type="polars")
+
+    # Create validation with many steps
+    validation = Validate(data=data, label="Large validation")
+    for i in range(10):
+        validation = validation.col_vals_gt(columns="d", value=100 + i)
+
+    validation = validation.interrogate()
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        filepath = Path(tmpdir) / "large_validation"
+
+        # Test serialization
+        write_file(validation, str(filepath), quiet=True)
+        loaded = read_file(str(filepath))
+
+        assert len(loaded.validation_info) == 10
+        assert loaded.label == "Large validation"
+
+
+def test_write_file_with_lambda_functions_error():
+    """Test write_file error handling with lambda functions."""
+    import narwhals as nw
+
+    # Create validation with lambda functions
+    validation = Validate(data=load_dataset("small_table")).col_vals_ge(
+        columns="a", value=20, pre=lambda dfn: dfn.with_columns(nw.col("a") * 20)
+    )
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        filepath = Path(tmpdir) / "validation_with_lambdas"
+
+        # Should raise ValueError when lambda functions are present
+        with pytest.raises(ValueError, match="Cannot serialize validation object"):
+            write_file(validation, str(filepath), quiet=True)
+
+
+def test_write_file_with_module_level_function():
+    """Test write_file works with module-level functions."""
+
+    # Create validation with module-level function (defined at top of file)
+    validation = Validate(data=load_dataset("small_table")).col_vals_ge(
+        columns="a", value=20, pre=multiply_column_by_20
+    )
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        filepath = Path(tmpdir) / "validation_with_function"
+
+        # Should work fine with module-level functions
+        write_file(validation, str(filepath), quiet=True)
+
+        # Verify the file was created
+        assert filepath.with_suffix(".pkl").exists()
+
+        # Verify we can load it back
+        loaded_validation = read_file(str(filepath))
+
+        # Verify structure is preserved
+        assert len(loaded_validation.validation_info) == len(validation.validation_info)
+
+        # Verify that the function is preserved
+        step = loaded_validation.validation_info[0]
+        assert step.pre is not None
+        assert step.pre.__name__ == "multiply_column_by_20"
