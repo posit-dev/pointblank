@@ -17976,6 +17976,93 @@ def test_col_selector_write_read_file(column_selector_test_data):
         assert reinterrogated.n_passed(scalar=True) == validation.n_passed(scalar=True)
 
 
+def test_col_selector_in_value_parameter_write_read_file(column_selector_test_data):
+    """Test col() selector used in value= parameter with write_file/read_file."""
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        filepath = Path(tmpdir) / "col_value_selector_validation"
+
+        # Create validation using col() in value parameter to compare columns
+        validation = (
+            Validate(data=column_selector_test_data, label="col() in value parameter test")
+            # Test that paid_2022 is greater than paid_2021
+            .col_vals_gt(columns=col("paid_2022"), value=col("paid_2021"))
+            # Test that revenue_total is greater than cost_base
+            .col_vals_gt(columns=col("revenue_total"), value=col("cost_base"))
+            # Test that final_score is greater than temp_value
+            .col_vals_gt(columns=col("final_score"), value=col("temp_value"))
+            .interrogate()
+        )
+
+        # Write and read back
+        write_file(validation, str(filepath), keep_tbl=True, quiet=True)
+        loaded_validation = read_file(str(filepath))
+
+        # Verify column selectors are preserved in both columns and values
+        assert len(loaded_validation.validation_info) == 3
+
+        # Check column names
+        assert loaded_validation.validation_info[0].column == "paid_2022"
+        assert loaded_validation.validation_info[1].column == "revenue_total"
+        assert loaded_validation.validation_info[2].column == "final_score"
+
+        # Check that value references are preserved (these should be column references)
+        assert loaded_validation.validation_info[0].values == col("paid_2021")
+        assert loaded_validation.validation_info[1].values == col("cost_base")
+        assert loaded_validation.validation_info[2].values == col("temp_value")
+
+        assert loaded_validation.label == "col() in value parameter test"
+
+        # Verify re-interrogation works
+        reinterrogated = loaded_validation.interrogate()
+        assert reinterrogated.n_passed(scalar=True) == validation.n_passed(scalar=True)
+
+
+def test_multiple_col_selectors_in_value_parameter_write_read_file(column_selector_test_data):
+    """Test multiple column selectors used in value= parameter with write_file/read_file."""
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        filepath = Path(tmpdir) / "multiple_col_value_validation"
+
+        # Create validation using column selectors in both columns and values
+        validation = (
+            Validate(data=column_selector_test_data, label="multiple col() selectors test")
+            # Compare columns selected by starts_with against columns selected by contains
+            .col_vals_gt(columns=starts_with("paid"), value=col("temp_value"))
+            # Compare specific columns
+            .col_vals_lt(columns=col("cost_base"), value=col("revenue_total"))
+            .interrogate()
+        )
+
+        # Write and read back
+        write_file(validation, str(filepath), keep_tbl=True, quiet=True)
+        loaded_validation = read_file(str(filepath))
+
+        # Verify column selectors are preserved
+        # First validation: starts_with("paid") -> paid_2021, paid_2022 (2 steps)
+        # Second validation: col("cost_base") -> cost_base (1 step)
+        assert len(loaded_validation.validation_info) == 3  # 2 + 1
+
+        # Get all column names and values from validation steps
+        columns = [step.column for step in loaded_validation.validation_info]
+        values = [step.values for step in loaded_validation.validation_info]
+
+        # First two steps should be for paid columns, both compared against temp_value
+        assert set(columns[:2]) == {"paid_2021", "paid_2022"}
+        assert values[0] == col("temp_value")
+        assert values[1] == col("temp_value")
+
+        # Third step should be cost_base compared against revenue_total
+        assert columns[2] == "cost_base"
+        assert values[2] == col("revenue_total")
+
+        assert loaded_validation.label == "multiple col() selectors test"
+
+        # Verify re-interrogation works
+        reinterrogated = loaded_validation.interrogate()
+        assert reinterrogated.n_passed(scalar=True) == validation.n_passed(scalar=True)
+
+
 def test_starts_with_selector_write_read_file(column_selector_test_data):
     """Test starts_with() selector with write_file/read_file."""
 
