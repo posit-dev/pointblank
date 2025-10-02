@@ -17,6 +17,18 @@ import pointblank as pb
 import polars as pl
 import narwhals as nw
 
+# Define preprocessing functions
+def get_median_a(df):
+    """Use a Polars expression to aggregate column `a`."""
+    return df.select(pl.median("a"))
+
+def add_b_length_column(df):
+    """Use Narwhals to add a string length column `b_len`."""
+    return (
+        nw.from_native(df)
+        .with_columns(b_len=nw.col("b").str.len_chars())
+    )
+
 validation = (
     pb.Validate(
         data=pb.load_dataset(dataset="small_table", tbl_type="polars")
@@ -24,14 +36,12 @@ validation = (
     .col_vals_between(
         columns="a",
         left=3, right=6,
-        pre=lambda df: df.select(pl.median("a"))    # Use a Polars expression to aggregate
+        pre=get_median_a
     )
     .col_vals_eq(
         columns="b_len",
         value=9,
-        pre=lambda dfn: dfn.with_columns(           # Use a Narwhals expression, identified
-            b_len=nw.col("b").str.len_chars()       # by the 'dfn' here
-        )
+        pre=add_b_length_column
     )
     .interrogate()
 )
@@ -44,6 +54,18 @@ import pointblank as pb
 import polars as pl
 import narwhals as nw
 
+# Define preprocessing functions
+def get_median_a(df):
+    """Use a Polars expression to aggregate column `a`."""
+    return df.select(pl.median("a"))
+
+def add_b_length_column(df):
+    """Use Narwhals to add a string length column `b_len`."""
+    return (
+        nw.from_native(df)
+        .with_columns(b_len=nw.col("b").str.len_chars())
+    )
+
 validation = (
     pb.Validate(
         data=pb.load_dataset(dataset="small_table", tbl_type="polars")
@@ -51,14 +73,12 @@ validation = (
     .col_vals_between(
         columns="a",
         left=3, right=6,
-        pre=lambda df: df.select(pl.median("a"))    # Use a Polars expression to aggregate
+        pre=get_median_a
     )
     .col_vals_eq(
         columns="b_len",
         value=9,
-        pre=lambda dfn: dfn.with_columns(           # Use a Narwhals expression, identified
-            b_len=nw.col("b").str.len_chars()       # by the 'dfn' here
-        )
+        pre=add_b_length_column
     )
     .interrogate()
 )

@@ -54,11 +54,15 @@ less than 10 characters. We can't directly use the `~~Validate.col_vals_lt()` va
 that column because it is meant to be used with a column of numeric values. Let's just give that
 method what it needs and create a column with string lengths!
 
-The target table is a Polars DataFrame so we'll provide a lambda function that uses the Polars API
-to add in that numeric column:
+The target table is a Polars DataFrame so we'll provide a function that uses the Polars API to add
+in that numeric column:
 
 ```{python}
 import polars as pl
+
+# Define a preprocessing function that gets string lengths from column `b`
+def add_string_length_column(df):
+    return df.with_columns(string_lengths=pl.col("b").str.len_chars())
 
 (
     pb.Validate(
@@ -74,8 +78,8 @@ import polars as pl
         # The string length value to be less than ---
         value=10,
 
-        # Polars code that modifies the table ---
-        pre=lambda df: df.with_columns(string_lengths=pl.col("b").str.len_chars())
+        # The preprocessing function that modifies the table ---
+        pre=add_string_length_column
     )
     .interrogate()
 )
@@ -194,6 +198,10 @@ the median of column `c` is greater than the median in column `a`.
 ```{python}
 import narwhals as nw
 
+# Define preprocessing function using Narwhals for cross-backend compatibility
+def get_median_columns_c_and_a(df):
+    return nw.from_native(df).select(nw.median("c"), nw.median("a"))
+
 (
     pb.Validate(
         data=pb.load_dataset(dataset="small_table", tbl_type="pandas"),
@@ -205,7 +213,7 @@ import narwhals as nw
         value=pb.col("a"),
 
         # Using Narwhals to modify the table; generates table with columns `c` and `a` ---
-        pre=lambda df: nw.from_native(df).select(nw.median("c"), nw.median("a"))
+        pre=get_median_columns_c_and_a
     )
     .interrogate()
 )
@@ -249,9 +257,13 @@ data_transformed = data_original.group_by("f").len(name="n")
 data_transformed
 ```
 
-Then, we'll plug in the `data_transformed` DataFrame with a lambda expression in `pre=`:
+Then, we'll plug in the `data_transformed` DataFrame with a preprocessing function:
 
 ```{python}
+# Define preprocessing function to use the transformed data
+def use_transformed_data(df):
+    return data_transformed
+
 (
     pb.Validate(
         data=data_original,
@@ -261,7 +273,7 @@ Then, we'll plug in the `data_transformed` DataFrame with a lambda expression in
     .col_vals_ge(
         columns="n",
         value=3,
-        pre=lambda x: data_transformed
+        pre=use_transformed_data
     )
     .interrogate()
 )
