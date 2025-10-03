@@ -4233,6 +4233,11 @@ class Validate:
     - Japanese (`"ja"`)
     - Korean (`"ko"`)
     - Vietnamese (`"vi"`)
+    - Indonesian (`"id"`)
+    - Ukrainian (`"uk"`)
+    - Hebrew (`"he"`)
+    - Thai (`"th"`)
+    - Persian (`"fa"`)
 
     Automatically generated briefs (produced by using `brief=True` or `brief="...{auto}..."`) will
     be written in the selected language. The language setting will also used when generating the
