@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.8.24">
+<meta name="generator" content="quarto-1.8.25">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -73,7 +73,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dc55a5b9e770e841cd82e46aadbfb9b0.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="../site_libs/bootstrap/bootstrap-421a81a0b92e1ede7072f5beb12c1611.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
@@ -396,8 +396,8 @@ OPENAI_API_KEY="your_openai_api_key_here"</code></pre>
 <p>The row signature memoization optimization can reduce processing time significantly when data has repetitive patterns. For datasets where every row is unique, expect longer processing times similar to validating each row individually.</p>
 <p><strong>Strategies to Reduce Processing Time</strong>:</p>
 <ul>
-<li>test on data slices: use something like <code>pre=lambda df: df.head(1000)</code> to validate on smaller samples</li>
-<li>filter relevant data: use <code>pre=</code> with filter expressions like <code>pre=lambda df: df.filter(df["status"] == "active")</code> to focus on a specific subset</li>
+<li>test on data slices: define a sampling function like <code>def sample_1000(df): return df.head(1000)</code> and use <code>pre=sample_1000</code> to validate on smaller samples</li>
+<li>filter relevant data: define filter functions like <code>def active_only(df): return df.filter(df["status"] == "active")</code> and use <code>pre=active_only</code> to focus on a specific subset</li>
 <li>optimize column selection: use <code>columns_subset=</code> to include only the columns necessary for validation</li>
 <li>start with smaller batches: begin with <code>batch_size=100</code> for testing, then increase gradually</li>
 <li>reduce concurrency: lower <code>max_concurrent=1</code> if hitting rate limits</li>

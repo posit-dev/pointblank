@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>index – Pointblank</title>
+<title>read_file – Pointblank</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -20,6 +20,41 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -31,8 +66,6 @@ ul.task-list li input[type="checkbox"] {
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
 <link href="../assets/fav-logo.png" rel="icon" type="image/png">
-<script src="../site_libs/quarto-listing/list.min.js"></script>
-<script src="../site_libs/quarto-listing/quarto-listing.js"></script>
 <script src="../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
@@ -71,35 +104,6 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
-<script>
-
-  window.document.addEventListener("DOMContentLoaded", function (_event) {
-    const listingTargetEl = window.document.querySelector('#listing-listing .list');
-    if (!listingTargetEl) {
-      // No listing discovered, do not attach.
-      return; 
-    }
-
-    const options = {
-      valueNames: ['listing-date','listing-title','listing-author',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-title-sort'] }],
-      
-      searchColumns: ["listing-date","listing-title","listing-author"],
-    };
-
-    window['quarto-listings'] = window['quarto-listings'] || {};
-    window['quarto-listings']['listing-listing'] = new List('listing-listing', options);
-
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  });
-
-  window.addEventListener('hashchange',() => {
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  })
-  </script>
 <script async="" src="https://www.googletagmanager.com/gtag/js?id=G-XSFKYZM9GW"></script>
 
 <script type="text/javascript">
@@ -110,39 +114,10 @@ gtag('js', new Date());
 gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </script>
 
-  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
-
-<script type="text/javascript">
-const typesetMath = (el) => {
-  if (window.MathJax) {
-    // MathJax Typeset
-    window.MathJax.typeset([el]);
-  } else if (window.katex) {
-    // KaTeX Render
-    var mathElements = el.getElementsByClassName("math");
-    var macros = [];
-    for (var i = 0; i < mathElements.length; i++) {
-      var texText = mathElements[i].firstChild;
-      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
-        window.katex.render(texText.data, mathElements[i], {
-          displayMode: mathElements[i].classList.contains('display'),
-          throwOnError: false,
-          macros: macros,
-          fleqn: false
-        });
-      }
-    }
-  }
-}
-window.Quarto = {
-  typesetMath
-};
-</script>
 
 <link rel="stylesheet" href="../styles.css">
 <link rel="stylesheet" href="reference/_styles-quartodoc.css">
-<link rel="alternate" type="application/rss+xml" title="Pointblank" href="index.xml" data-external="1"></head>
+</head>
 
 <body class="nav-fixed quarto-light">
 
@@ -176,7 +151,7 @@ window.Quarto = {
 <span class="menu-text">API Reference</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link active" href="../blog/index.html" aria-current="page"> 
+    <a class="nav-link" href="../blog/index.html"> 
 <span class="menu-text">Pointblog</span></a>
   </li>  
 </ul>
@@ -202,8 +177,20 @@ window.Quarto = {
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
-        
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h3 id="toc-title">On this page</h3>
+   
+  <ul>
+  <li><a href="#pointblank.read_file" id="toc-pointblank.read_file" class="nav-link active" data-scroll-target="#pointblank.read_file">read_file</a>
+  <ul class="collapse">
+  <li><a href="#parameters" id="toc-parameters" class="nav-link" data-scroll-target="#parameters">Parameters</a></li>
+  <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
+  <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
+  <li><a href="#see-also" id="toc-see-also" class="nav-link" data-scroll-target="#see-also">See Also</a></li>
+  </ul></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"></header>
@@ -211,126 +198,95 @@ window.Quarto = {
 
 
 
-<p><img src="./pointblank_blog_logo.png" class="img-fluid"></p>
+<section id="pointblank.read_file" class="level1">
+<h1 style="font-family: SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace; font-size: 1.25rem;">read_file</h1>
 
+<p style="font-size: 1rem; font-style: italic; margin-top: -10px; line-height: 1;">Read a Validate object from disk that was previously saved with <a href="../reference/write_file.html#pointblank.write_file" title="0"><code>write_file()</code></a>.</p>
 
-
-
-<div class="quarto-listing quarto-listing-container-table" id="listing-listing">
-<div class="listing-actions-group">
-   <div class="input-group input-group-sm quarto-listing-sort">
-    <span class="input-group-text"><i class="bi bi-sort-down"></i></span>
-    <select id="listing-listing-sort" class="form-select" aria-label="Order By" onchange="window['quarto-listings']['listing-listing'].sort(this.options[this.selectedIndex].value, { order: this.options[this.selectedIndex].getAttribute('data-direction')})">
-      <option value="" disabled="" selected="" hidden="">Order By</option>
-      <option value="index" data-direction="asc">Default</option>
-      <option value="listing-date-sort" data-direction="asc">
-        Date - Oldest
-      </option>
-      <option value="listing-date-sort" data-direction="desc">
-        Date - Newest
-      </option>
-      <option value="listing-title-sort" data-direction="asc">
-        Title
-      </option>
-      <option value="listing-author" data-direction="asc">
-        Author
-      </option>
-    </select>
-  </div>
-    <div class="input-group input-group-sm quarto-listing-filter">
-      <span class="input-group-text"><i class="bi bi-search"></i></span>
-      <input type="text" class="search form-control" placeholder="Filter">
-    </div>
+<p style="font-size: 12px; color: rgb(170, 170, 170); margin-bottom: -14px;">USAGE</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>read_file(filepath)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>This function loads a validation object that was previously serialized to disk using the <a href="../reference/write_file.html#pointblank.write_file" title="0"><code>write_file()</code></a> function. The validation object will be restored with all its validation results, metadata, and optionally the source data (if it was saved with <code>keep_tbl=True</code>).</p>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
 </div>
-<table class="quarto-listing-table table">
-<thead>
-<tr>
+<div class="callout-title-container flex-fill">
+Warning
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The <a href="../reference/read_file.html#pointblank.read_file" title="0"><code>read_file()</code></a> function is currently experimental. Please report any issues you encounter in the <a href="https://github.com/posit-dev/pointblank/issues">Pointblank issue tracker</a>.</p>
+</div>
+</div>
+<section id="parameters" class="level2 doc-section doc-section-parameters">
+<h3 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters">Parameters</h3>
+<dl style="border-style: solid; border-width: 2px; border-color: #00AC1480; padding: 1rem; padding-bottom: 0.25rem;">
+<dt><code><span class="parameter-name"><strong>filepath</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><code>str</code> | <code>Path</code></span></code></dt>
+<dd>
+<p>The path to the saved validation file. Can be a string or Path object.</p>
+</dd>
+</dl>
+</section>
+<section id="returns" class="level2 doc-section doc-section-returns">
+<h3 class="doc-section doc-section-returns anchored" data-anchor-id="returns">Returns</h3>
+<dl style="border-style: solid; border-width: 2px; border-color: #0059AC80; padding: 1rem; padding-bottom: 0.25rem;">
+<dt><code><span class="parameter-name"></span> <span class="parameter-annotation-sep" style="margin-left: -8px;"></span> <span class="parameter-annotation"><a href="../reference/Validate.html#pointblank.Validate">Validate</a></span></code></dt>
+<dd>
+<p>The restored validation object with all its original state, validation results, and metadata.</p>
+</dd>
+</dl>
+</section>
+<section id="examples" class="level2 doc-section doc-section-examples">
+<h3 class="doc-section doc-section-examples anchored" data-anchor-id="examples"><span style="
+        background: linear-gradient(-45deg, #D63031, #00B894, #0984E3, #6C5CE7, #FDCB6E, #A29BFE, #E84393, #2D3436);
+        background-size: 400% 400%;
+        animation: examplesGradient 8s ease-in-out infinite;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-weight: bold;
+        font-size: 1.2em;
+    ">Examples</span></h3>
+    <hr style="
+        background: linear-gradient(-45deg, #D63031, #00B894, #0984E3, #6C5CE7, #FDCB6E, #A29BFE, #E84393, #2D3436);
+        background-size: 400% 400%;
+        animation: examplesGradient 16s ease-in-out infinite;
+        height: 3px;
+        border: none;
+        margin: 10px 0;
+        border-radius: 2px;
+    ">
+<p>Load a validation object that was previously saved:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Load a validation object from disk</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> pb.read_file(<span class="st">"my_validation.pkl"</span>)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co"># View the validation results</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>validation</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>You can also load using just the filename (without extension):</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># This will automatically look for "my_validation.pkl"</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> pb.read_file(<span class="st">"my_validation"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The loaded validation object retains all its functionality:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get validation summary</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>summary <span class="op">=</span> validation.get_json_report()</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Get sundered data (if original table was saved)</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> validation.data <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>:</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    failing_rows <span class="op">=</span> validation.get_sundered_data(<span class="bu">type</span><span class="op">=</span><span class="st">"fail"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="see-also" class="level2 doc-section doc-section-see-also">
+<h3 class="doc-section doc-section-see-also anchored" data-anchor-id="see-also">See Also</h3>
+<p>Use the <code>write_file()</code> method to save a validation object to disk for later retrieval with this function.</p>
 
-<th>
-<a class="sort" data-sort="listing-date-sort" onclick="if (this.classList.contains('sort-asc')) { this.classList.add('sort-desc'); this.classList.remove('sort-asc') } else { this.classList.add('sort-asc'); this.classList.remove('sort-desc')} return false;">Date</a>
-</th>
 
-<th>
-<a class="sort" data-sort="listing-title-sort" onclick="if (this.classList.contains('sort-asc')) { this.classList.add('sort-desc'); this.classList.remove('sort-asc') } else { this.classList.add('sort-asc'); this.classList.remove('sort-desc')} return false;">Title</a>
-</th>
+</section>
+</section>
 
-<th>
-<a class="sort" data-sort="listing-author" onclick="if (this.classList.contains('sort-asc')) { this.classList.add('sort-desc'); this.classList.remove('sort-asc') } else { this.classList.add('sort-asc'); this.classList.remove('sort-desc')} return false;">Author</a>
-</th>
-
-</tr>
-</thead>
-<tbody class="list">
-
-<tr data-index="0" data-listing-date-sort="1748995200000" data-listing-file-modified-sort="1759509311734" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="24" data-listing-word-count-sort="4702" data-listing-title-sort="Data Validation Libraries for Polars (2025 Edition)" data-listing-filename-sort="index.qmd">
-<td>
-<span class="listing-date">Jun 4, 2025</span>
-</td>
-<td>
-<a href="../blog/validation-libs-2025/index.html" class="title listing-title">Data Validation Libraries for Polars (2025 Edition)</a>
-</td>
-<td>
-<span class="listing-author">Rich Iannone</span>
-</td>
-
-</tr>
-
-<tr data-index="1" data-listing-date-sort="1748908800000" data-listing-file-modified-sort="1759509311726" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="2" data-listing-word-count-sort="251" data-listing-title-sort="C'mon C'mon: Let's Do a Pointblank Workshop!" data-listing-filename-sort="index.qmd">
-<td>
-<span class="listing-date">Jun 3, 2025</span>
-</td>
-<td>
-<a href="../blog/lets-workshop-together/index.html" class="title listing-title">C’mon C’mon: Let’s Do a Pointblank Workshop!</a>
-</td>
-<td>
-<span class="listing-author">Rich Iannone</span>
-</td>
-
-</tr>
-
-<tr data-index="2" data-listing-date-sort="1747699200000" data-listing-file-modified-sort="1759509311729" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="5" data-listing-word-count-sort="814" data-listing-title-sort="Overhauling Pointblank's User Guide" data-listing-filename-sort="index.qmd">
-<td>
-<span class="listing-date">May 20, 2025</span>
-</td>
-<td>
-<a href="../blog/overhauled-user-guide/index.html" class="title listing-title">Overhauling Pointblank’s User Guide</a>
-</td>
-<td>
-<span class="listing-author">Rich Iannone and Michael Chow</span>
-</td>
-
-</tr>
-
-<tr data-index="3" data-listing-date-sort="1746144000000" data-listing-file-modified-sort="1759509311721" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="12" data-listing-word-count-sort="2204" data-listing-title-sort="Level Up Your Data Validation with `Actions` and `FinalActions`" data-listing-filename-sort="index.qmd">
-<td>
-<span class="listing-date">May 2, 2025</span>
-</td>
-<td>
-<a href="../blog/all-about-actions/index.html" class="title listing-title">Level Up Your Data Validation with </a><a href="../reference/Actions.html#pointblank.Actions" title="0"><code>Actions</code></a> and <a href="../reference/FinalActions.html#pointblank.FinalActions" title="0"><code>FinalActions</code></a>
-</td>
-<td>
-<span class="listing-author">Rich Iannone</span>
-</td>
-
-</tr>
-
-<tr data-index="4" data-listing-date-sort="1743724800000" data-listing-file-modified-sort="1759509311722" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="11" data-listing-word-count-sort="2026" data-listing-title-sort="Introducing Pointblank" data-listing-filename-sort="index.qmd">
-<td>
-<span class="listing-date">Apr 4, 2025</span>
-</td>
-<td>
-<a href="../blog/intro-pointblank/index.html" class="title listing-title">Introducing Pointblank</a>
-</td>
-<td>
-<span class="listing-author">Rich Iannone</span>
-</td>
-
-</tr>
-
-</tbody>
-</table>
-<div class="listing-no-matching d-none">No matching items</div>
-</div></main> <!-- /main -->
+</main>
+<hr style="padding: 0; margin: 0;">
+<div style="text-align: center; padding: 0; margin-top: -60px; color: #B3B3B3;">⦾</div> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
     const icon = "";
