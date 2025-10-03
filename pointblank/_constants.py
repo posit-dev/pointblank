@@ -176,10 +176,17 @@ REPORTING_LANGUAGES = [
     "ar",
     "hi",
     "el",
+    "id",
+    "uk",
+    "he",
+    "th",
+    "fa",
 ]
 
 RTL_LANGUAGES = [
     "ar",
+    "he",
+    "fa",
 ]
 
 SEVERITY_LEVEL_COLORS = {
