@@ -6,6 +6,9 @@ project:
 
 format:
   html:
+    include-in-header:
+      - text: |
+          <script src="https://cdn.jsdelivr.net/gh/posit-dev/supported-by-posit/js/badge.min.js"></script>
     theme: flatly
     css:
       - styles.css
