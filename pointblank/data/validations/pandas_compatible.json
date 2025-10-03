@@ -1,0 +1,28 @@
+[
+    {
+        "i": 1,
+        "i_o": 1,
+        "assertion_type": "col_vals_gt",
+        "column": "a_plus_b",
+        "values": 10,
+        "inclusive": null,
+        "na_pass": false,
+        "pre": "def pandas_compatible_transform(df):\n    \"\"\"Transform that works with pandas DataFrames.\"\"\"\n    if hasattr(df, \"assign\"):  # pandas\n        return df.assign(a_plus_b=df[\"a\"] + df.get(\"b\", 0))\n    else:  # polars or other\n        return df.with_columns((pl.col(\"a\") + pl.col(\"b\")).alias(\"a_plus_b\"))",
+        "segments": null,
+        "thresholds": "Thresholds(warning=None, error=None, critical=None)",
+        "label": null,
+        "brief": null,
+        "active": true,
+        "all_passed": true,
+        "n": 10,
+        "n_passed": 10,
+        "n_failed": 0,
+        "f_passed": 1.0,
+        "f_failed": 0.0,
+        "warning": null,
+        "error": null,
+        "critical": null,
+        "time_processed": "2025-10-02T04:16:44.717+00:00",
+        "proc_duration_s": 0.001428
+    }
+]

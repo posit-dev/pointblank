@@ -6,12 +6,14 @@ import copy
 import datetime
 import inspect
 import json
+import pickle
 import re
 import tempfile
 import threading
 from dataclasses import dataclass
 from enum import Enum
 from importlib.metadata import version
+from pathlib import Path
 from typing import TYPE_CHECKING, Any, Callable, Literal
 from zipfile import ZipFile
 
@@ -116,6 +118,8 @@ if TYPE_CHECKING:
 __all__ = [
     "Validate",
     "load_dataset",
+    "read_file",
+    "write_file",
     "config",
     "connect_to_table",
     "preview",
@@ -580,6 +584,741 @@ def load_dataset(
             dataset = ibis.connect(f"duckdb://{data_path}").table(dataset)
 
     return dataset
+
+
+def read_file(filepath: str | Path) -> Validate:
+    """
+    Read a Validate object from disk that was previously saved with `write_file()`.
+
+    This function loads a validation object that was previously serialized to disk using the
+    `write_file()` function. The validation object will be restored with all its validation results,
+    metadata, and optionally the source data (if it was saved with `keep_tbl=True`).
+
+    :::{.callout-warning}
+    The `read_file()` function is currently experimental. Please report any issues you encounter in
+    the [Pointblank issue tracker](https://github.com/posit-dev/pointblank/issues).
+    :::
+
+    Parameters
+    ----------
+    filepath
+        The path to the saved validation file. Can be a string or Path object.
+
+    Returns
+    -------
+    Validate
+        The restored validation object with all its original state, validation results, and
+        metadata.
+
+    Examples
+    --------
+    Load a validation object that was previously saved:
+
+    ```python
+    import pointblank as pb
+
+    # Load a validation object from disk
+    validation = pb.read_file("my_validation.pkl")
+
+    # View the validation results
+    validation
+    ```
+
+    You can also load using just the filename (without extension):
+
+    ```python
+    # This will automatically look for "my_validation.pkl"
+    validation = pb.read_file("my_validation")
+    ```
+
+    The loaded validation object retains all its functionality:
+
+    ```python
+    # Get validation summary
+    summary = validation.get_json_report()
+
+    # Get sundered data (if original table was saved)
+    if validation.data is not None:
+        failing_rows = validation.get_sundered_data(type="fail")
+    ```
+
+    See Also
+    --------
+    Use the [`write_file()`](`pointblank.Validate.write_file`) method to save a validation object
+    to disk for later retrieval with this function.
+    """
+    # Handle file path and extension
+    file_path = Path(filepath)
+    if not file_path.suffix:
+        file_path = file_path.with_suffix(".pkl")
+
+    # Check if file exists
+    if not file_path.exists():
+        raise FileNotFoundError(f"Validation file not found: {file_path}")
+
+    # Load and deserialize the validation object
+    try:
+        with open(file_path, "rb") as f:
+            loaded_data = pickle.load(f)
+
+        # Expect validation package format with function sources
+        if not isinstance(loaded_data, dict) or "validation" not in loaded_data:
+            raise RuntimeError(f"Invalid validation file format: {file_path}")
+
+        validation = loaded_data["validation"]
+        function_sources = loaded_data["function_sources"]
+
+        # Restore functions from source code
+        if function_sources:
+            restored_functions = {}
+            for func_name, source_code in function_sources.items():
+                try:
+                    # Create a namespace with common imports that functions might need
+                    execution_namespace = {}
+
+                    # Add common imports to the execution namespace
+                    try:
+                        import polars as pl
+
+                        execution_namespace["pl"] = pl
+                    except ImportError:
+                        pass
+
+                    try:
+                        import pandas as pd
+
+                        execution_namespace["pd"] = pd
+                    except ImportError:
+                        pass
+
+                    try:
+                        import narwhals as nw
+
+                        execution_namespace["nw"] = nw
+                    except ImportError:
+                        pass
+
+                    # Execute the function source code with the enhanced namespace
+                    exec(source_code, execution_namespace, execution_namespace)
+
+                    # The function should now be in the execution namespace
+                    if func_name in execution_namespace:
+                        restored_functions[func_name] = execution_namespace[func_name]
+                    else:  # pragma: no cover
+                        print(
+                            f"Warning: Function '{func_name}' not found after executing source code"
+                        )
+
+                except Exception as e:  # pragma: no cover
+                    print(f"Warning: Could not restore function '{func_name}': {e}")
+
+            # Restore functions to validation steps
+            for validation_info in validation.validation_info:
+                if (
+                    hasattr(validation_info, "_pb_function_name")
+                    and validation_info._pb_function_name in restored_functions
+                ):
+                    func_name = validation_info._pb_function_name
+                    validation_info.pre = restored_functions[func_name]
+                    # Clean up the temporary attribute
+                    delattr(validation_info, "_pb_function_name")
+
+        # Verify that we loaded a Validate object
+        if not isinstance(validation, Validate):  # pragma: no cover
+            raise RuntimeError(f"File does not contain a valid Validate object: {file_path}")
+
+        return validation
+
+    except Exception as e:
+        raise RuntimeError(f"Failed to read validation object from {file_path}: {e}")
+
+
+def _check_for_unpicklable_objects(validation: Validate) -> tuple[dict[str, str], list[int]]:
+    """
+    Check for functions and capture source code for preservation across sessions.
+
+    This function examines all preprocessing functions and attempts to capture their source code for
+    later restoration. Lambda functions are rejected. Functions that might be picklable in the
+    current session but fail across sessions (e.g., interactively defined functions) have their
+    source preserved.
+
+    Returns
+    -------
+    tuple[dict[str, str], list[int]]
+        A tuple containing:
+        - A dictionary mapping function names to their source code
+        - A list of step indices that have unpicklable lambda functions (which should cause errors)
+    """
+    import inspect
+    import pickle
+
+    unpicklable_lambda_steps = []
+    function_sources = {}
+
+    for i, validation_info in enumerate(validation.validation_info):
+        if hasattr(validation_info, "pre") and validation_info.pre is not None:
+            func = validation_info.pre
+            func_name = getattr(func, "__name__", "<unknown>")
+
+            # Always reject lambda functions
+            if func_name == "<lambda>":
+                unpicklable_lambda_steps.append((i, validation_info))
+                continue
+
+            # For all non-lambda functions, try to capture source code
+            # This helps with functions that might be picklable now but fail across sessions
+            source_code = None
+
+            try:
+                # Try to get the source code
+                source_code = inspect.getsource(func)
+
+                # Test if the function can be pickled and loaded in a clean environment
+                # by checking if it's defined in a "real" module vs interactively
+                func_module = getattr(func, "__module__", None)
+
+                if func_module == "__main__" or not func_module:
+                    # Functions defined in __main__ or without a module are risky
+                    # These might pickle now but fail when loaded elsewhere
+                    function_sources[func_name] = source_code
+                    validation_info._pb_function_name = func_name
+
+            except (OSError, TypeError):
+                # If we can't get source, check if it's at least picklable
+                try:
+                    pickle.dumps(func, protocol=pickle.HIGHEST_PROTOCOL)
+                    # It's picklable but no source: this might cause issues across sessions
+                    print(  # pragma: no cover
+                        f"Warning: Function '{func_name}' is picklable but source code could not be captured. "
+                        f"It may not be available when loading in a different session."
+                    )
+                except (pickle.PicklingError, AttributeError, TypeError):
+                    # Not picklable and no source: treat as problematic
+                    print(  # pragma: no cover
+                        f"Warning: Function '{func_name}' is not picklable and source could not be captured. "
+                        f"It will not be available after saving/loading."
+                    )
+                    unpicklable_lambda_steps.append((i, validation_info))
+
+    # Only raise error for lambda functions now
+    if unpicklable_lambda_steps:
+        step_descriptions = []
+        for i, step in unpicklable_lambda_steps:
+            desc = f"Step {i + 1}"
+            if hasattr(step, "assertion_type"):
+                desc += f" ({step.assertion_type})"
+            if hasattr(step, "column") and step.column:
+                desc += f" on column '{step.column}'"
+            step_descriptions.append(desc)
+
+        raise ValueError(
+            f"Cannot serialize validation object: found {len(unpicklable_lambda_steps)} validation step(s) "
+            f"with unpicklable preprocessing functions (likely lambda functions defined in interactive "
+            f"environments):\n\n"
+            + "\n".join(f"  - {desc}" for desc in step_descriptions)
+            + "\n\nTo resolve this, define your preprocessing functions at the module level:\n\n"
+            "  # Instead of:\n"
+            "  .col_vals_gt(columns='a', value=10, pre=lambda df: df.with_columns(...))\n\n"
+            "  # Use:\n"
+            "  def preprocess_data(df):\n"
+            "      return df.with_columns(...)\n\n"
+            "  .col_vals_gt(columns='a', value=10, pre=preprocess_data)\n\n"
+            "Module-level functions can be pickled and will preserve the complete validation logic."
+        )
+
+    return function_sources, []
+
+
+def _provide_serialization_guidance(validation: Validate) -> None:
+    """
+    Provide helpful guidance to users about creating serializable validations.
+
+    This function analyzes the validation object and provides tailored advice
+    about preprocessing functions, best practices, and potential issues.
+    """
+    import pickle
+
+    # Find all preprocessing functions in the validation
+    preprocessing_functions = []
+    for i, validation_info in enumerate(validation.validation_info):
+        if hasattr(validation_info, "pre") and validation_info.pre is not None:
+            preprocessing_functions.append((i, validation_info))
+
+    if not preprocessing_functions:
+        # No preprocessing functions - validation should serialize cleanly
+        print("  Serialization Analysis:")
+        print("   ✓ No preprocessing functions detected")  # pragma: no cover
+        print(
+            "   ✓ This validation should serialize and load reliably across sessions"
+        )  # pragma: no cover
+        return  # pragma: no cover
+
+    print("  Serialization Analysis:")
+    print(
+        f"   Found {len(preprocessing_functions)} validation step(s) with preprocessing functions"
+    )
+
+    # Analyze each function
+    functions_analysis = {
+        "module_functions": [],
+        "interactive_functions": [],
+        "lambda_functions": [],
+        "unpicklable_functions": [],
+    }
+
+    for i, validation_info in preprocessing_functions:
+        func = validation_info.pre
+        func_name = getattr(func, "__name__", "<unknown>")
+        func_module = getattr(func, "__module__", "<unknown>")
+
+        # Categorize the function
+        if func_name == "<lambda>":
+            functions_analysis["lambda_functions"].append((i, func_name, func_module))
+        else:
+            # Test if it can be pickled
+            try:
+                pickle.dumps(func, protocol=pickle.HIGHEST_PROTOCOL)
+                can_pickle = True
+            except (pickle.PicklingError, AttributeError, TypeError):
+                can_pickle = False
+                functions_analysis["unpicklable_functions"].append((i, func_name, func_module))
+                continue
+
+            # Check if it's likely to work across sessions
+            if func_module == "__main__" or not func_module or func_module == "<unknown>":
+                # Function defined interactively - risky for cross-session use
+                functions_analysis["interactive_functions"].append((i, func_name, func_module))
+            else:
+                # Function from a proper module - should work reliably
+                functions_analysis["module_functions"].append((i, func_name, func_module))
+
+    # Provide specific guidance based on analysis
+    if functions_analysis["module_functions"]:  # pragma: no cover
+        print("   ✓ Module-level functions detected:")
+        for i, func_name, func_module in functions_analysis["module_functions"]:
+            print(f"     • Step {i + 1}: {func_name} (from {func_module})")
+        print("     These should work reliably across sessions")
+
+    if functions_analysis["interactive_functions"]:  # pragma: no cover
+        print("      Interactive functions detected:")
+        for i, func_name, func_module in functions_analysis["interactive_functions"]:
+            print(f"     • Step {i + 1}: {func_name} (defined in {func_module})")
+        print("     These may not load properly in different sessions")
+        print()
+        print("     Recommendation: Move these functions to a separate .py module:")
+        print("      1. Create a file like 'preprocessing_functions.py'")
+        print("      2. Define your functions there with proper imports")
+        print("      3. Import them: from preprocessing_functions import your_function")
+        print("      4. This ensures reliable serialization across sessions")
+
+    if functions_analysis["lambda_functions"]:  # pragma: no cover
+        print("     Lambda functions detected:")
+        for i, func_name, func_module in functions_analysis["lambda_functions"]:
+            print(f"     • Step {i + 1}: {func_name}")
+        print("     Lambda functions cannot be serialized!")
+        print()
+        print("     Required fix: Replace lambda functions with named functions:")
+        print("      # Instead of: pre=lambda df: df.with_columns(...)")
+        print("      # Use: ")
+        print("      def my_preprocessing_function(df):")
+        print("          return df.with_columns(...)")
+        print("      # Then: pre=my_preprocessing_function")
+
+    if functions_analysis["unpicklable_functions"]:  # pragma: no cover
+        print("     Unpicklable functions detected:")
+        for i, func_name, func_module in functions_analysis["unpicklable_functions"]:
+            print(f"     • Step {i + 1}: {func_name} (from {func_module})")
+        print("     These functions cannot be serialized")
+
+    # Provide overall assessment
+    total_problematic = (
+        len(functions_analysis["interactive_functions"])
+        + len(functions_analysis["lambda_functions"])
+        + len(functions_analysis["unpicklable_functions"])
+    )
+
+    if total_problematic == 0:  # pragma: no cover
+        print("     All preprocessing functions should serialize reliably!")
+    else:  # pragma: no cover
+        print(
+            f"      {total_problematic} function(s) may cause issues when loading in different sessions"
+        )
+        print()
+        print("     Best Practice Guide:")
+        print("      • Define all preprocessing functions in separate .py modules")
+        print("      • Import functions before creating and loading validations")
+        print("      • Avoid lambda functions and interactive definitions")
+        print("      • Test your validation by loading it in a fresh Python session")
+
+        # Offer to create a template
+        print()
+        print("     Example module structure:")
+        print("      # preprocessing_functions.py")
+        print("      import polars as pl  # or pandas, numpy, etc.")
+        print("      ")
+        print("      def multiply_by_factor(df, factor=10):")
+        print("          return df.with_columns(pl.col('value') * factor)")
+        print("      ")
+        print("      # your_main_script.py")
+        print("      import pointblank as pb")
+        print("      from preprocessing_functions import multiply_by_factor")
+        print("      ")
+        print(
+            "      validation = pb.Validate(data).col_vals_gt('value', 100, pre=multiply_by_factor)"
+        )
+
+
+def write_file(
+    validation: Validate,
+    filename: str,
+    path: str | None = None,
+    keep_tbl: bool = False,
+    keep_extracts: bool = False,
+    quiet: bool = False,
+) -> None:
+    """
+    Write a Validate object to disk as a serialized file.
+
+    Writing a validation object to disk with `write_file()` can be useful for keeping data
+    validation results close at hand for later retrieval (with `read_file()`). By default, any data
+    table that the validation object holds will be removed before writing to disk (not applicable if
+    no data table is present). This behavior can be changed by setting `keep_tbl=True`, but this
+    only works when the table is not of a database type (e.g., DuckDB, PostgreSQL, etc.), as
+    database connections cannot be serialized.
+
+    Extract data from failing validation steps can also be preserved by setting
+    `keep_extracts=True`, which is useful for later analysis of data quality issues.
+
+    The serialized file uses Python's pickle format for storage of the validation object state,
+    including all validation results, metadata, and optionally the source data.
+
+    **Important note.** If your validation uses custom preprocessing functions (via the `pre=`
+    parameter), these functions must be defined at the module level (not interactively or as lambda
+    functions) to ensure they can be properly restored when loading the validation in a different
+    Python session. Read the *Creating Serializable Validations* section below for more information.
+
+    :::{.callout-warning}
+    The `write_file()` function is currently experimental. Please report any issues you encounter in
+    the [Pointblank issue tracker](https://github.com/posit-dev/pointblank/issues).
+    :::
+
+    Parameters
+    ----------
+    validation
+        The `Validate` object to write to disk.
+    filename
+        The filename to create on disk for the validation object. Should not include the file
+        extension as `.pkl` will be added automatically.
+    path
+        An optional directory path where the file should be saved. If not provided, the file will be
+        saved in the current working directory. The directory will be created if it doesn't exist.
+    keep_tbl
+        An option to keep the data table that is associated with the validation object. The default
+        is `False` where the data table is removed before writing to disk. For database tables
+        (e.g., Ibis tables with database backends), the table is always removed even if
+        `keep_tbl=True`, as database connections cannot be serialized.
+    keep_extracts
+        An option to keep any collected extract data for failing rows from validation steps. By
+        default, this is `False` (i.e., extract data is removed to save space).
+    quiet
+        Should the function not inform when the file is written? By default, this is `False`, so a
+        message will be printed when the file is successfully written.
+
+    Returns
+    -------
+    None
+        This function doesn't return anything but saves the validation object to disk.
+
+    Creating Serializable Validations
+    ---------------------------------
+    To ensure your validations work reliably across different Python sessions, the recommended
+    approach is to use module-Level functions. So, create a separate Python file for your
+    preprocessing functions:
+
+    ```python
+    # preprocessing_functions.py
+    import polars as pl
+
+    def multiply_by_100(df):
+        return df.with_columns(pl.col("value") * 100)
+
+    def add_computed_column(df):
+        return df.with_columns(computed=pl.col("value") * 2 + 10)
+    ```
+
+    Then import and use them in your validation:
+
+    ```python
+    # your_main_script.py
+    import pointblank as pb
+    from preprocessing_functions import multiply_by_100, add_computed_column
+
+    validation = (
+        pb.Validate(data=my_data)
+        .col_vals_gt(columns="value", value=500, pre=multiply_by_100)
+        .col_vals_between(columns="computed", left=50, right=1000, pre=add_computed_column)
+        .interrogate()
+    )
+
+    # Save validation and it will work reliably across sessions
+    pb.write_file(validation, "my_validation", keep_tbl=True)
+    ```
+
+    ### Problematic Patterns to Avoid
+
+    Don't use lambda functions as they will cause immediate errors.
+
+    ```python
+    validation = pb.Validate(data).col_vals_gt(
+        columns="value", value=100,
+        pre=lambda df: df.with_columns(pl.col("value") * 2)
+    )
+    ```
+
+    Don't use interactive function definitions (as they may fail when loading).
+
+    ```python
+    def my_function(df):  # Defined in notebook/REPL
+        return df.with_columns(pl.col("value") * 2)
+
+    validation = pb.Validate(data).col_vals_gt(
+        columns="value", value=100, pre=my_function
+    )
+    ```
+
+    ### Automatic Analysis and Guidance
+
+    When you call `write_file()`, it automatically analyzes your validation and provides:
+
+    - confirmation when all functions will work reliably
+    - warnings for functions that may cause cross-session issues
+    - clear errors for unsupported patterns (lambda functions)
+    - specific recommendations and code examples
+    - loading instructions tailored to your validation
+
+    ### Loading Your Validation
+
+    To load a saved validation in a new Python session:
+
+    ```python
+    # In a new Python session
+    import pointblank as pb
+
+    # Import the same preprocessing functions used when creating the validation
+    from preprocessing_functions import multiply_by_100, add_computed_column
+
+    # Upon loading the validation, functions will be automatically restored
+    validation = pb.read_file("my_validation.pkl")
+    ```
+
+    ** Testing Your Validation:**
+
+    To verify your validation works across sessions:
+
+    1. save your validation in one Python session
+    2. start a fresh Python session (restart kernel/interpreter)
+    3. import required preprocessing functions
+    4. load the validation using `read_file()`
+    5. test that preprocessing functions work as expected
+
+    ### Performance and Storage
+
+    - use `keep_tbl=False` (default) to reduce file size when you don't need the original data
+    - use `keep_extracts=False` (default) to save space by excluding extract data
+    - set `quiet=True` to suppress guidance messages in automated scripts
+    - files are saved using pickle's highest protocol for optimal performance
+
+    Examples
+    --------
+    Let's create a simple validation and save it to disk:
+
+    ```{python}
+    import pointblank as pb
+
+    # Create a validation
+    validation = (
+        pb.Validate(data=pb.load_dataset("small_table"), label="My validation")
+        .col_vals_gt(columns="d", value=100)
+        .col_vals_regex(columns="b", pattern=r"[0-9]-[a-z]{3}-[0-9]{3}")
+        .interrogate()
+    )
+
+    # Save to disk (without the original table data)
+    pb.write_file(validation, "my_validation")
+    ```
+
+    To keep the original table data for later analysis:
+
+    ```{python}
+    # Save with the original table data included
+    pb.write_file(validation, "my_validation_with_data", keep_tbl=True)
+    ```
+
+    You can also specify a custom directory and keep extract data:
+
+    ```python
+    pb.write_file(
+        validation,
+        filename="detailed_validation",
+        path="/path/to/validations",
+        keep_tbl=True,
+        keep_extracts=True
+    )
+    ```
+
+    ### Working with Preprocessing Functions
+
+    For validations that use preprocessing functions to be portable across sessions, define your
+    functions in a separate `.py` file:
+
+    ```python
+    # In `preprocessing_functions.py`
+
+    import polars as pl
+
+    def multiply_by_100(df):
+        return df.with_columns(pl.col("value") * 100)
+
+    def add_computed_column(df):
+        return df.with_columns(computed=pl.col("value") * 2 + 10)
+    ```
+
+    Then import and use them in your validation:
+
+    ```python
+    # In your main script
+
+    import pointblank as pb
+    from preprocessing_functions import multiply_by_100, add_computed_column
+
+    validation = (
+        pb.Validate(data=my_data)
+        .col_vals_gt(columns="value", value=500, pre=multiply_by_100)
+        .col_vals_between(columns="computed", left=50, right=1000, pre=add_computed_column)
+        .interrogate()
+    )
+
+    # This validation can now be saved and loaded reliably
+    pb.write_file(validation, "my_validation", keep_tbl=True)
+    ```
+
+    When you load this validation in a new session, simply import the preprocessing functions
+    again and they will be automatically restored.
+
+    See Also
+    --------
+    Use the [`read_file()`](`pointblank.read_file`) function to load a validation object that was
+    previously saved with `write_file()`.
+    """
+    # Construct the full file path
+    if not filename.endswith(".pkl"):
+        filename = f"{filename}.pkl"
+
+    if path is not None:
+        file_path = Path(path) / filename
+    else:
+        file_path = Path(filename)
+
+    # Create directory if it doesn't exist
+    file_path.parent.mkdir(parents=True, exist_ok=True)
+
+    # Create a copy of the validation object to avoid modifying the original
+    validation_copy = copy.deepcopy(validation)
+
+    # Handle data table preservation
+    if not keep_tbl:
+        validation_copy.data = None
+    else:
+        # Check if the data is a database table that cannot be serialized
+        if validation_copy.data is not None:
+            tbl_type = _get_tbl_type(validation_copy.data)
+
+            # Database tables cannot be serialized, so remove them regardless of keep_tbl
+            if tbl_type in [
+                "duckdb",
+                "mysql",
+                "postgresql",
+                "sqlite",
+                "mssql",
+                "snowflake",
+                "databricks",
+                "bigquery",
+            ]:
+                validation_copy.data = None
+                if not quiet:  # pragma: no cover
+                    print(
+                        f"Note: Database table removed from saved validation "
+                        f"(table type: {tbl_type})"
+                    )
+
+    # Handle extract data preservation
+    if not keep_extracts:
+        # Remove extract data from validation_info to save space
+        for validation_info in validation_copy.validation_info:
+            if hasattr(validation_info, "extract"):
+                validation_info.extract = None
+
+    # Provide user guidance about serialization if not quiet
+    if not quiet:
+        _provide_serialization_guidance(validation_copy)
+
+    # Check for unpicklable objects and capture function sources
+    function_sources, lambda_steps = _check_for_unpicklable_objects(validation_copy)
+
+    # Create a validation package that includes both the object and function sources
+    validation_package = {"validation": validation_copy, "function_sources": function_sources}
+
+    # Serialize to disk using pickle
+    try:
+        with open(file_path, "wb") as f:
+            pickle.dump(validation_package, f, protocol=pickle.HIGHEST_PROTOCOL)
+
+        if not quiet:  # pragma: no cover
+            print(f"✅ Validation object written to: {file_path}")
+
+            if function_sources:  # pragma: no cover
+                print(
+                    f"   🔧 Enhanced preservation: Captured source code for {len(function_sources)} function(s)"
+                )
+                for func_name in function_sources.keys():
+                    print(f"      • {func_name}")
+                print("   📥 These functions will be automatically restored when loading")
+
+            # Provide loading instructions
+            preprocessing_funcs = [
+                info
+                for info in validation_copy.validation_info
+                if hasattr(info, "pre") and info.pre is not None
+            ]
+            if preprocessing_funcs:
+                print()
+                print("   💡 To load this validation in a new session:")
+                print("      import pointblank as pb")
+                if any(
+                    hasattr(info.pre, "__module__")
+                    and info.pre.__module__ not in ["__main__", None]
+                    for info in preprocessing_funcs
+                    if hasattr(info, "pre") and info.pre
+                ):
+                    print("      # Import any preprocessing functions from their modules")
+                    modules_mentioned = set()
+                    for info in preprocessing_funcs:
+                        if (
+                            hasattr(info, "pre")
+                            and hasattr(info.pre, "__module__")
+                            and info.pre.__module__ not in ["__main__", None]
+                        ):
+                            if info.pre.__module__ not in modules_mentioned:
+                                print(
+                                    f"      from {info.pre.__module__} import {info.pre.__name__}"
+                                )
+                                modules_mentioned.add(info.pre.__module__)
+                print(f"      validation = pb.read_file('{file_path.name}')")
+            else:
+                print("   📖 To load: validation = pb.read_file('{}')".format(file_path.name))
+
+    except Exception as e:
+        raise RuntimeError(f"Failed to write validation object to {file_path}: {e}")
 
 
 def get_data_path(
@@ -8819,10 +9558,10 @@ class Validate:
 
         **Strategies to Reduce Processing Time**:
 
-        - test on data slices: use something like `pre=lambda df: df.head(1000)` to validate on
-        smaller samples
-        - filter relevant data: use `pre=` with filter expressions like
-        `pre=lambda df: df.filter(df["status"] == "active")` to focus on a specific subset
+        - test on data slices: define a sampling function like `def sample_1000(df): return df.head(1000)`
+        and use `pre=sample_1000` to validate on smaller samples
+        - filter relevant data: define filter functions like `def active_only(df): return df.filter(df["status"] == "active")`
+        and use `pre=active_only` to focus on a specific subset
         - optimize column selection: use `columns_subset=` to include only the columns necessary
         for validation
         - start with smaller batches: begin with `batch_size=100` for testing, then increase
@@ -9757,13 +10496,17 @@ class Validate:
         We can also use preprocessing to filter the data before applying the conjoint validation:
 
         ```{python}
+        # Define preprocessing function for serialization compatibility
+        def filter_by_c_gt_5(df):
+            return df.filter(pl.col("c") > 5)
+
         validation = (
             pb.Validate(data=tbl)
             .conjointly(
                 lambda df: pl.col("a") > 2,
                 lambda df: pl.col("b") < 7,
                 lambda df: pl.col("a") + pl.col("b") < pl.col("c"),
-                pre=lambda df: df.filter(pl.col("c") > 5)
+                pre=filter_by_c_gt_5
             )
             .interrogate()
         )
@@ -10914,7 +11657,7 @@ class Validate:
                     # Try without order_by first (for DataFrames)
                     validation_extract_nw = validation_extract_nw.with_row_index(name="_row_num_")
                 except TypeError:
-                    # LazyFrames require order_by parameter - use first column for ordering
+                    # LazyFrames require order_by parameter: use first column for ordering
                     first_col = validation_extract_nw.columns[0]
                     validation_extract_nw = validation_extract_nw.with_row_index(
                         name="_row_num_", order_by=first_col
@@ -11513,11 +12256,15 @@ class Validate:
             }
         )
 
+        # Define a preprocessing function
+        def filter_by_a_gt_1(df):
+            return df.filter(pl.col("a") > 1)
+
         validation = (
             pb.Validate(data=tbl)
             .col_vals_gt(columns="a", value=0)
             .col_exists(columns="b")
-            .col_vals_lt(columns="b", value=9, pre=lambda df: df.filter(pl.col("a") > 1))
+            .col_vals_lt(columns="b", value=9, pre=filter_by_a_gt_1)
             .interrogate()
         )
         ```
@@ -12654,7 +13401,7 @@ class Validate:
             # Try without order_by first (for DataFrames)
             data_nw = data_nw.with_row_index(name=index_name)
         except TypeError:  # pragma: no cover
-            # LazyFrames require order_by parameter - use first column for ordering
+            # LazyFrames require order_by parameter: use first column for ordering
             first_col = data_nw.columns[0]  # pragma: no cover
             data_nw = data_nw.with_row_index(
                 name=index_name, order_by=first_col
@@ -12671,7 +13418,7 @@ class Validate:
                 # Try without order_by first (for DataFrames)
                 results_tbl = results_tbl.with_row_index(name=index_name)
             except TypeError:  # pragma: no cover
-                # LazyFrames require order_by parameter - use first column for ordering
+                # LazyFrames require order_by parameter: use first column for ordering
                 first_col = results_tbl.columns[0]  # pragma: no cover
                 results_tbl = results_tbl.with_row_index(
                     name=index_name, order_by=first_col
@@ -14911,7 +15658,7 @@ def _create_text_specially(lang: str, for_failure: bool = False) -> str:
 
 
 def _create_text_prompt(lang: str, prompt: str, for_failure: bool = False) -> str:
-    """Create text for prompt validation - just return the prompt."""
+    """Create text for prompt validation: just return the prompt."""
     return prompt
 
 

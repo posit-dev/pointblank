@@ -18,6 +18,15 @@ import contextlib
 import datetime
 from enum import Enum, IntEnum
 
+
+# Module-level function for testing (can be pickled)
+def multiply_column_by_20(df):
+    """Test preprocessing function that can be pickled."""
+    import narwhals as nw
+
+    return df.with_columns(nw.col("a") * 20)
+
+
 # StrEnum was introduced in Python 3.11, so we use regular Enum for compatibility
 try:
     from enum import StrEnum
@@ -86,7 +95,9 @@ from pointblank.validate import (
     missing_vals_tbl,
     PointblankConfig,
     preview,
+    read_file,
     Validate,
+    write_file,
     _create_table_time_html,
     _create_table_type_html,
     _create_thresholds_html,
@@ -17472,4 +17483,905 @@ def test_timezone_datetime_mixed_timezones_polars():
     # If this works, all values should pass as they're all >= 19:00 UTC
     assert validation.all_passed()
     assert validation.n_passed(i=1, scalar=True) == 3
-    assert validation.n_failed(i=1, scalar=True) == 0
+
+
+@pytest.fixture
+def sample_validation_polars():
+    """Create a sample validation object with Polars data."""
+
+    data = load_dataset("small_table", tbl_type="polars")
+    return (
+        Validate(
+            data=data,
+            tbl_name="small_table",
+            label="Test validation",
+            thresholds=Thresholds(warning=0.1, error=0.2, critical=0.3),
+        )
+        .col_vals_gt(columns="d", value=100)
+        .col_vals_regex(columns="b", pattern=r"[0-9]-[a-z]{3}-[0-9]{3}")
+        .col_vals_not_null(columns=["a", "b"])
+        .interrogate()
+    )
+
+
+@pytest.fixture
+def sample_validation_pandas():
+    """Create a sample validation object with Pandas data."""
+
+    data = load_dataset("small_table", tbl_type="pandas")
+    return (
+        Validate(data=data, label="Pandas validation")
+        .col_vals_gt(columns="d", value=100)
+        .interrogate()
+    )
+
+
+@pytest.fixture
+def sample_validation_duckdb():
+    """Create a sample validation object with DuckDB data."""
+
+    data = load_dataset("small_table", tbl_type="duckdb")
+    return (
+        Validate(data=data, label="DuckDB validation")
+        .col_vals_gt(columns="d", value=100)
+        .interrogate()
+    )
+
+
+def test_write_file_basic_functionality(sample_validation_polars):
+    """Test basic write_file functionality."""
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        filepath = Path(tmpdir) / "test_validation"
+
+        # Test writing
+        write_file(sample_validation_polars, str(filepath), quiet=True)
+
+        # Verify file was created with correct extension
+        expected_file = filepath.with_suffix(".pkl")
+        assert expected_file.exists()
+        assert expected_file.stat().st_size > 0
+
+
+def test_read_file_basic_functionality(sample_validation_polars):
+    """Test basic read_file functionality."""
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        filepath = Path(tmpdir) / "test_validation"
+
+        # Write and read back
+        write_file(sample_validation_polars, str(filepath), quiet=True)
+        loaded_validation = read_file(str(filepath))
+
+        # Verify object type and basic properties
+        assert isinstance(loaded_validation, Validate)
+        assert loaded_validation.label == sample_validation_polars.label
+        assert loaded_validation.tbl_name == sample_validation_polars.tbl_name
+        assert len(loaded_validation.validation_info) == len(
+            sample_validation_polars.validation_info
+        )
+
+
+def test_write_file_automatic_extension(sample_validation_polars):
+    """Test that .pkl extension is added automatically."""
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        # Test without extension
+        filepath = Path(tmpdir) / "test_validation"
+        write_file(sample_validation_polars, str(filepath), quiet=True)
+        assert filepath.with_suffix(".pkl").exists()
+
+    # Test with extension already present
+    filepath_with_ext = Path(tmpdir) / "test_validation.pkl"
+    write_file(sample_validation_polars, str(filepath_with_ext), quiet=True)
+    assert filepath_with_ext.exists()
+
+    # Should not create .pkl.pkl
+    assert not (Path(tmpdir) / "test_validation.pkl.pkl").exists()
+
+
+def test_path_creation(sample_validation_polars):
+    """Test that directories are created if they don't exist."""
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        nested_path = Path(tmpdir) / "nested" / "subdirectory"
+        filepath = nested_path / "test_validation"
+
+        # Path doesn't exist yet
+        assert not nested_path.exists()
+
+        # Write file should create the path
+        write_file(sample_validation_polars, str(filepath), path=None, quiet=True)
+
+        # Verify path was created
+        assert nested_path.exists()
+        assert (filepath.with_suffix(".pkl")).exists()
+
+
+def test_path_parameter(sample_validation_polars):
+    """Test the path parameter functionality."""
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        subdir = Path(tmpdir) / "validations"
+
+        # Use path parameter
+        write_file(sample_validation_polars, "test_validation", path=str(subdir), quiet=True)
+
+        # Verify file is in the specified directory
+        expected_file = subdir / "test_validation.pkl"
+        assert expected_file.exists()
+
+
+def test_keep_tbl_false_default(sample_validation_polars):
+    """Test that data table is removed by default (`keep_tbl=False`)."""
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        filepath = Path(tmpdir) / "test_validation"
+
+        # Default behavior should not keep table
+        write_file(sample_validation_polars, str(filepath), quiet=True)
+        loaded_validation = read_file(str(filepath))
+
+        assert loaded_validation.data is None
+
+
+def test_keep_tbl_true_preserves_data(sample_validation_polars):
+    """Test that data table is preserved when `keep_tbl=True`."""
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        filepath = Path(tmpdir) / "test_validation"
+
+        # Keep the table data
+        write_file(sample_validation_polars, str(filepath), keep_tbl=True, quiet=True)
+        loaded_validation = read_file(str(filepath))
+
+        assert loaded_validation.data is not None
+        # Verify the data is the same structure
+        assert len(loaded_validation.data) == len(sample_validation_polars.data)
+        assert list(loaded_validation.data.columns) == list(sample_validation_polars.data.columns)
+
+
+def test_database_table_removal(sample_validation_duckdb):
+    """Test that database tables are always removed even with `keep_tbl=True`."""
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        filepath = Path(tmpdir) / "test_validation"
+
+        # Try to keep database table (should be removed anyway)
+        write_file(sample_validation_duckdb, str(filepath), keep_tbl=True, quiet=True)
+        loaded_validation = read_file(str(filepath))
+
+        # Database table should be None even with keep_tbl=True
+        assert loaded_validation.data is None
+
+
+def test_keep_extracts_functionality(sample_validation_polars):
+    """Test extract data preservation functionality."""
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        filepath_no_extracts = Path(tmpdir) / "no_extracts"
+        filepath_with_extracts = Path(tmpdir) / "with_extracts"
+
+        # Save without extracts (default)
+        write_file(sample_validation_polars, str(filepath_no_extracts), quiet=True)
+
+        # Save with extracts
+        write_file(
+            sample_validation_polars, str(filepath_with_extracts), keep_extracts=True, quiet=True
+        )
+
+        # Both should work (extract handling is implementation detail)
+        loaded_no_extracts = read_file(str(filepath_no_extracts))
+        loaded_with_extracts = read_file(str(filepath_with_extracts))
+
+        assert isinstance(loaded_no_extracts, Validate)
+        assert isinstance(loaded_with_extracts, Validate)
+
+
+def test_quiet_parameter(sample_validation_polars, capsys):
+    """Test the quiet parameter functionality."""
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        filepath = Path(tmpdir) / "test_validation"
+
+        # Test with quiet=False (default) - should print
+        write_file(sample_validation_polars, str(filepath), quiet=False)
+        captured = capsys.readouterr()
+        assert "Validation object written to:" in captured.out
+
+        # Test with quiet=True - should not print
+        filepath2 = Path(tmpdir) / "test_validation2"
+        write_file(sample_validation_polars, str(filepath2), quiet=True)
+        captured = capsys.readouterr()
+        assert captured.out == ""
+
+
+def test_validation_state_preservation(sample_validation_polars):
+    """Test that validation results and metadata are preserved."""
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        filepath = Path(tmpdir) / "test_validation"
+
+        # Capture original state
+        original_steps = len(sample_validation_polars.validation_info)
+        original_thresholds = sample_validation_polars.thresholds
+        original_time_start = sample_validation_polars.time_start
+        original_time_end = sample_validation_polars.time_end
+
+        # Write and read
+        write_file(sample_validation_polars, str(filepath), quiet=True)
+        loaded_validation = read_file(str(filepath))
+
+        # Verify state preservation
+        assert len(loaded_validation.validation_info) == original_steps
+        assert loaded_validation.thresholds.warning == original_thresholds.warning
+        assert loaded_validation.thresholds.error == original_thresholds.error
+        assert loaded_validation.time_start == original_time_start
+        assert loaded_validation.time_end == original_time_end
+
+        # Verify validation results are preserved
+        for i, (orig_info, loaded_info) in enumerate(
+            zip(sample_validation_polars.validation_info, loaded_validation.validation_info)
+        ):
+            assert orig_info.assertion_type == loaded_info.assertion_type
+            assert orig_info.column == loaded_info.column
+            assert orig_info.n == loaded_info.n
+            assert orig_info.n_passed == loaded_info.n_passed
+            assert orig_info.n_failed == loaded_info.n_failed
+
+
+def test_original_object_not_modified(sample_validation_polars):
+    """Test that write_file doesn't modify the original validation object."""
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        filepath = Path(tmpdir) / "test_validation"
+
+        # Capture original state
+        original_data = sample_validation_polars.data
+        original_validation_info = sample_validation_polars.validation_info
+
+        # Write with keep_tbl=False
+        write_file(sample_validation_polars, str(filepath), keep_tbl=False, quiet=True)
+
+        # Original should be unchanged
+        assert sample_validation_polars.data is original_data
+        assert sample_validation_polars.validation_info is original_validation_info
+
+
+def test_multiple_table_types(sample_validation_polars, sample_validation_pandas):
+    """Test serialization with different table types."""
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        # Test Polars
+        filepath_polars = Path(tmpdir) / "polars_validation"
+        write_file(sample_validation_polars, str(filepath_polars), keep_tbl=True, quiet=True)
+        loaded_polars = read_file(str(filepath_polars))
+
+        # Test Pandas
+        filepath_pandas = Path(tmpdir) / "pandas_validation"
+        write_file(sample_validation_pandas, str(filepath_pandas), keep_tbl=True, quiet=True)
+        loaded_pandas = read_file(str(filepath_pandas))
+
+        # Both should work
+        assert loaded_polars.data is not None
+        assert loaded_pandas.data is not None
+
+
+def test_read_file_with_extension_handling(sample_validation_polars):
+    """Test read_file handles file extension automatically."""
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        filepath = Path(tmpdir) / "test_validation"
+
+        # Write file
+        write_file(sample_validation_polars, str(filepath), quiet=True)
+
+        # Read with and without extension
+        loaded_no_ext = read_file(str(filepath))
+        loaded_with_ext = read_file(str(filepath) + ".pkl")
+
+        assert isinstance(loaded_no_ext, Validate)
+        assert isinstance(loaded_with_ext, Validate)
+        assert loaded_no_ext.label == loaded_with_ext.label
+
+
+def test_file_not_found_error():
+    """Test that FileNotFoundError is raised for non-existent files."""
+
+    with pytest.raises(FileNotFoundError, match="Validation file not found"):
+        read_file("nonexistent_file.pkl")
+
+
+def test_invalid_file_content_error():
+    """Test that RuntimeError is raised for invalid file content."""
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        # Create a file with invalid content
+        invalid_file = Path(tmpdir) / "invalid.pkl"
+        with open(invalid_file, "wb") as f:
+            import pickle
+
+            pickle.dump("not a validation object", f)
+
+        with pytest.raises(RuntimeError, match="Invalid validation file format"):
+            read_file(str(invalid_file))
+
+
+def test_write_file_permission_error(sample_validation_polars):
+    """Test handling of write permission errors."""
+
+    # Try to write to a non-writable location, which should fail
+    with pytest.raises((RuntimeError, OSError, PermissionError)):
+        write_file(sample_validation_polars, "/root/test_validation", quiet=True)
+
+
+def test_round_trip_consistency(sample_validation_polars):
+    """Test that multiple save/load cycles maintain consistency."""
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        # First round trip
+        filepath1 = Path(tmpdir) / "validation1"
+        write_file(sample_validation_polars, str(filepath1), keep_tbl=True, quiet=True)
+        loaded1 = read_file(str(filepath1))
+
+        # Second round trip
+        filepath2 = Path(tmpdir) / "validation2"
+        write_file(loaded1, str(filepath2), keep_tbl=True, quiet=True)
+        loaded2 = read_file(str(filepath2))
+
+        # Should be consistent
+        assert loaded1.label == loaded2.label == sample_validation_polars.label
+        assert len(loaded1.validation_info) == len(loaded2.validation_info)
+        assert loaded1.data is not None
+        assert loaded2.data is not None
+
+
+@pytest.mark.parametrize("tbl_type", ["polars", "pandas"])
+def test_parametrized_table_types(tbl_type):
+    """Test write_file and read_file with different table types."""
+
+    data = load_dataset("small_table", tbl_type=tbl_type)
+    validation = (
+        Validate(data=data, label=f"Test {tbl_type}")
+        .col_vals_gt(columns="d", value=100)
+        .interrogate()
+    )
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        filepath = Path(tmpdir) / f"validation_{tbl_type}"
+
+        # Test round trip
+        write_file(validation, str(filepath), keep_tbl=True, quiet=True)
+        loaded = read_file(str(filepath))
+
+        assert loaded.label == f"Test {tbl_type}"
+        assert loaded.data is not None
+        assert len(loaded.validation_info) == 1
+
+
+def test_large_validation_object():
+    """Test serialization of validation objects with many steps."""
+
+    data = load_dataset("small_table", tbl_type="polars")
+
+    # Create validation with many steps
+    validation = Validate(data=data, label="Large validation")
+    for i in range(10):
+        validation = validation.col_vals_gt(columns="d", value=100 + i)
+
+    validation = validation.interrogate()
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        filepath = Path(tmpdir) / "large_validation"
+
+        # Test serialization
+        write_file(validation, str(filepath), quiet=True)
+        loaded = read_file(str(filepath))
+
+        assert len(loaded.validation_info) == 10
+        assert loaded.label == "Large validation"
+
+
+def test_write_file_with_lambda_functions_error():
+    """Test write_file error handling with lambda functions."""
+    import narwhals as nw
+
+    # Create validation with lambda functions
+    validation = Validate(data=load_dataset("small_table")).col_vals_ge(
+        columns="a", value=20, pre=lambda dfn: dfn.with_columns(nw.col("a") * 20)
+    )
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        filepath = Path(tmpdir) / "validation_with_lambdas"
+
+        # Should raise ValueError when lambda functions are present
+        with pytest.raises(ValueError, match="Cannot serialize validation object"):
+            write_file(validation, str(filepath), quiet=True)
+
+
+def test_write_file_with_module_level_function():
+    """Test write_file works with module-level functions."""
+
+    # Create validation with module-level function (defined at top of file)
+    validation = Validate(data=load_dataset("small_table")).col_vals_ge(
+        columns="a", value=20, pre=multiply_column_by_20
+    )
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        filepath = Path(tmpdir) / "validation_with_function"
+
+        # Should work fine with module-level functions
+        write_file(validation, str(filepath), quiet=True)
+
+        # Verify the file was created
+        assert filepath.with_suffix(".pkl").exists()
+
+        # Verify we can load it back
+        loaded_validation = read_file(str(filepath))
+
+        # Verify structure is preserved
+        assert len(loaded_validation.validation_info) == len(validation.validation_info)
+
+        # Verify that the function is preserved
+        step = loaded_validation.validation_info[0]
+        assert step.pre is not None
+        assert step.pre.__name__ == "multiply_column_by_20"
+
+
+@pytest.fixture
+def column_selector_test_data():
+    """Create test data with diverse column names for column selector testing."""
+    return pl.DataFrame(
+        {
+            "paid_2021": [16.32, 16.25, 15.75],
+            "paid_2022": [18.62, 16.95, 18.25],
+            "revenue_total": [120.50, 105.75, 98.25],
+            "cost_base": [80.20, 70.50, 65.15],
+            "cost_extra": [10.15, 8.75, 7.50],
+            "person_id": ["A123", "B456", "C789"],
+            "location_code": ["NYC", "LAX", "CHI"],
+            "temp_value": [22.5, 25.1, 19.8],
+            "final_score": [85.5, 92.3, 78.1],
+            "data_quality": ["good", "excellent", "fair"],
+        }
+    )
+
+
+def test_col_selector_write_read_file(column_selector_test_data):
+    """Test basic col() selector with write_file/read_file."""
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        filepath = Path(tmpdir) / "col_selector_validation"
+
+        # Create validation with col() selector
+        validation = (
+            Validate(data=column_selector_test_data, label="col() selector test")
+            .col_vals_gt(columns=col("paid_2021"), value=10)
+            .col_vals_lt(columns=col("final_score"), value=100)
+            .interrogate()
+        )
+
+        # Write and read back
+        write_file(validation, str(filepath), keep_tbl=True, quiet=True)
+        loaded_validation = read_file(str(filepath))
+
+        # Verify column selectors are preserved
+        assert len(loaded_validation.validation_info) == 2
+        assert loaded_validation.validation_info[0].column == "paid_2021"
+        assert loaded_validation.validation_info[1].column == "final_score"
+        assert loaded_validation.label == "col() selector test"
+
+        # Verify re-interrogation works
+        reinterrogated = loaded_validation.interrogate()
+        assert reinterrogated.n_passed(scalar=True) == validation.n_passed(scalar=True)
+
+
+def test_col_selector_in_value_parameter_write_read_file(column_selector_test_data):
+    """Test col() selector used in value= parameter with write_file/read_file."""
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        filepath = Path(tmpdir) / "col_value_selector_validation"
+
+        # Create validation using col() in value parameter to compare columns
+        validation = (
+            Validate(data=column_selector_test_data, label="col() in value parameter test")
+            # Test that paid_2022 is greater than paid_2021
+            .col_vals_gt(columns=col("paid_2022"), value=col("paid_2021"))
+            # Test that revenue_total is greater than cost_base
+            .col_vals_gt(columns=col("revenue_total"), value=col("cost_base"))
+            # Test that final_score is greater than temp_value
+            .col_vals_gt(columns=col("final_score"), value=col("temp_value"))
+            .interrogate()
+        )
+
+        # Write and read back
+        write_file(validation, str(filepath), keep_tbl=True, quiet=True)
+        loaded_validation = read_file(str(filepath))
+
+        # Verify column selectors are preserved in both columns and values
+        assert len(loaded_validation.validation_info) == 3
+
+        # Check column names
+        assert loaded_validation.validation_info[0].column == "paid_2022"
+        assert loaded_validation.validation_info[1].column == "revenue_total"
+        assert loaded_validation.validation_info[2].column == "final_score"
+
+        # Check that value references are preserved (these should be column references)
+        assert loaded_validation.validation_info[0].values == col("paid_2021")
+        assert loaded_validation.validation_info[1].values == col("cost_base")
+        assert loaded_validation.validation_info[2].values == col("temp_value")
+
+        assert loaded_validation.label == "col() in value parameter test"
+
+        # Verify re-interrogation works
+        reinterrogated = loaded_validation.interrogate()
+        assert reinterrogated.n_passed(scalar=True) == validation.n_passed(scalar=True)
+
+
+def test_multiple_col_selectors_in_value_parameter_write_read_file(column_selector_test_data):
+    """Test multiple column selectors used in value= parameter with write_file/read_file."""
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        filepath = Path(tmpdir) / "multiple_col_value_validation"
+
+        # Create validation using column selectors in both columns and values
+        validation = (
+            Validate(data=column_selector_test_data, label="multiple col() selectors test")
+            # Compare columns selected by starts_with against columns selected by contains
+            .col_vals_gt(columns=starts_with("paid"), value=col("temp_value"))
+            # Compare specific columns
+            .col_vals_lt(columns=col("cost_base"), value=col("revenue_total"))
+            .interrogate()
+        )
+
+        # Write and read back
+        write_file(validation, str(filepath), keep_tbl=True, quiet=True)
+        loaded_validation = read_file(str(filepath))
+
+        # Verify column selectors are preserved
+        # First validation: starts_with("paid") -> paid_2021, paid_2022 (2 steps)
+        # Second validation: col("cost_base") -> cost_base (1 step)
+        assert len(loaded_validation.validation_info) == 3  # 2 + 1
+
+        # Get all column names and values from validation steps
+        columns = [step.column for step in loaded_validation.validation_info]
+        values = [step.values for step in loaded_validation.validation_info]
+
+        # First two steps should be for paid columns, both compared against temp_value
+        assert set(columns[:2]) == {"paid_2021", "paid_2022"}
+        assert values[0] == col("temp_value")
+        assert values[1] == col("temp_value")
+
+        # Third step should be cost_base compared against revenue_total
+        assert columns[2] == "cost_base"
+        assert values[2] == col("revenue_total")
+
+        assert loaded_validation.label == "multiple col() selectors test"
+
+        # Verify re-interrogation works
+        reinterrogated = loaded_validation.interrogate()
+        assert reinterrogated.n_passed(scalar=True) == validation.n_passed(scalar=True)
+
+
+def test_starts_with_selector_write_read_file(column_selector_test_data):
+    """Test starts_with() selector with write_file/read_file."""
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        filepath = Path(tmpdir) / "starts_with_validation"
+
+        # Create validation with starts_with() selector
+        validation = (
+            Validate(data=column_selector_test_data, label="starts_with() selector test")
+            .col_vals_gt(columns=starts_with("paid"), value=10)
+            .col_vals_gt(columns=starts_with("cost"), value=5)
+            .interrogate()
+        )
+
+        # Write and read back
+        write_file(validation, str(filepath), keep_tbl=True, quiet=True)
+        loaded_validation = read_file(str(filepath))
+
+        # Verify column selectors are expanded correctly (each column becomes separate step)
+        assert len(loaded_validation.validation_info) == 4  # 2 paid + 2 cost columns
+
+        # Get all column names from validation steps
+        columns = [step.column for step in loaded_validation.validation_info]
+
+        # First two steps should be for paid columns
+        assert set(columns[:2]) == {"paid_2021", "paid_2022"}
+
+        # Next two steps should be for cost columns
+        assert set(columns[2:]) == {"cost_base", "cost_extra"}
+
+        # Verify re-interrogation works
+        reinterrogated = loaded_validation.interrogate()
+        assert reinterrogated.n_passed(scalar=True) == validation.n_passed(scalar=True)
+
+
+def test_ends_with_selector_write_read_file(column_selector_test_data):
+    """Test ends_with() selector with write_file/read_file."""
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        filepath = Path(tmpdir) / "ends_with_validation"
+
+        # Create validation with ends_with() selector
+        validation = (
+            Validate(data=column_selector_test_data, label="ends_with() selector test")
+            .col_vals_regex(columns=ends_with("_id"), pattern=r"^[A-C]\d{3}$")
+            .col_vals_regex(columns=ends_with("_code"), pattern=r"^[A-Z]{3}$")
+            .interrogate()
+        )
+
+        # Write and read back
+        write_file(validation, str(filepath), keep_tbl=True, quiet=True)
+        loaded_validation = read_file(str(filepath))
+
+        # Verify column selectors are preserved and expanded correctly
+        assert len(loaded_validation.validation_info) == 2
+        assert loaded_validation.validation_info[0].column == "person_id"
+        assert loaded_validation.validation_info[1].column == "location_code"
+
+        # Verify re-interrogation works
+        reinterrogated = loaded_validation.interrogate()
+        assert reinterrogated.n_passed(scalar=True) == validation.n_passed(scalar=True)
+
+
+def test_contains_selector_write_read_file(column_selector_test_data):
+    """Test contains() selector with write_file/read_file."""
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        filepath = Path(tmpdir) / "contains_validation"
+
+        # Create validation with contains() selector
+        validation = (
+            Validate(data=column_selector_test_data, label="contains() selector test")
+            .col_vals_gt(columns=contains("cost"), value=5)
+            .col_vals_in_set(
+                columns=col("person_id"), set=["A123", "B456", "C789"]
+            )  # Use specific string column
+            .interrogate()
+        )
+
+        # Write and read back
+        write_file(validation, str(filepath), keep_tbl=True, quiet=True)
+        loaded_validation = read_file(str(filepath))
+
+        # Verify column selectors are expanded correctly
+        # First validation: contains("cost") -> cost_base, cost_extra (2 steps)
+        # Second validation: col("person_id") -> person_id (1 step)
+        assert len(loaded_validation.validation_info) == 3  # 2 + 1 columns
+
+        # Get all column names from validation steps
+        columns = [step.column for step in loaded_validation.validation_info]
+
+        # First two steps should be for cost columns
+        assert set(columns[:2]) == {"cost_base", "cost_extra"}
+
+        # Last step should be for person_id
+        assert columns[2] == "person_id"
+
+        # Verify re-interrogation works
+        reinterrogated = loaded_validation.interrogate()
+        assert reinterrogated.n_passed(scalar=True) == validation.n_passed(scalar=True)
+
+
+def test_matches_selector_write_read_file(column_selector_test_data):
+    """Test matches() regex selector with write_file/read_file."""
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        filepath = Path(tmpdir) / "matches_validation"
+
+        # Create validation with matches() selector
+        validation = (
+            Validate(data=column_selector_test_data, label="matches() selector test")
+            .col_vals_gt(columns=matches(r"^paid_\d{4}$"), value=10)  # paid_2021, paid_2022
+            .col_vals_regex(columns=matches(r".*_code$"), pattern=r"^[A-Z]{3}$")  # location_code
+            .interrogate()
+        )
+
+        # Write and read back
+        write_file(validation, str(filepath), keep_tbl=True, quiet=True)
+        loaded_validation = read_file(str(filepath))
+
+        # Verify column selectors are expanded correctly
+        # First validation: matches(r"^paid_\d{4}$") -> paid_2021, paid_2022 (2 steps)
+        # Second validation: matches(r".*_code$") -> location_code (1 step)
+        assert len(loaded_validation.validation_info) == 3  # 2 + 1 columns
+
+        # Get all column names from validation steps
+        columns = [step.column for step in loaded_validation.validation_info]
+
+        # First two steps should be for paid columns
+        assert set(columns[:2]) == {"paid_2021", "paid_2022"}
+
+        # Last step should be for location_code
+        assert columns[2] == "location_code"
+
+        # Verify re-interrogation works
+        reinterrogated = loaded_validation.interrogate()
+        assert reinterrogated.n_passed(scalar=True) == validation.n_passed(scalar=True)
+
+
+def test_everything_selector_write_read_file(column_selector_test_data):
+    """Test everything() selector with write_file/read_file."""
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        filepath = Path(tmpdir) / "everything_validation"
+
+        # Create validation with everything() selector (using a suitable validation)
+        validation = (
+            Validate(data=column_selector_test_data, label="everything() selector test")
+            .col_exists(columns=everything())
+            .interrogate()
+        )
+
+        # Write and read back
+        write_file(validation, str(filepath), keep_tbl=True, quiet=True)
+        loaded_validation = read_file(str(filepath))
+
+        # Verify column selector expands to all columns (each becomes separate step)
+        expected_columns = list(column_selector_test_data.columns)
+        assert len(loaded_validation.validation_info) == len(expected_columns)
+
+        # Get all column names from validation steps
+        columns = [step.column for step in loaded_validation.validation_info]
+        assert set(columns) == set(expected_columns)
+
+        # Verify re-interrogation works
+        reinterrogated = loaded_validation.interrogate()
+        assert reinterrogated.n_passed(scalar=True) == validation.n_passed(scalar=True)
+
+
+def test_first_n_selector_write_read_file(column_selector_test_data):
+    """Test first_n() selector with write_file/read_file."""
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        filepath = Path(tmpdir) / "first_n_validation"
+
+        # Create validation with first_n() selector
+        validation = (
+            Validate(data=column_selector_test_data, label="first_n() selector test")
+            .col_vals_gt(
+                columns=first_n(3), value=10
+            )  # First 3 columns: paid_2021, paid_2022, revenue_total
+            .col_exists(columns=first_n(2))  # First 2 columns: paid_2021, paid_2022
+            .interrogate()
+        )
+
+        # Write and read back
+        write_file(validation, str(filepath), keep_tbl=True, quiet=True)
+        loaded_validation = read_file(str(filepath))
+
+        # Verify column selectors are expanded correctly
+        # First validation: first_n(3) -> 3 steps
+        # Second validation: first_n(2) -> 2 steps
+        assert len(loaded_validation.validation_info) == 5  # 3 + 2 columns
+
+        # Get all column names from validation steps
+        columns = [step.column for step in loaded_validation.validation_info]
+
+        expected_first_3 = list(column_selector_test_data.columns[:3])
+        expected_first_2 = list(column_selector_test_data.columns[:2])
+
+        # First 3 steps should be for first_n(3)
+        assert set(columns[:3]) == set(expected_first_3)
+
+        # Last 2 steps should be for first_n(2)
+        assert set(columns[3:]) == set(expected_first_2)
+
+        # Verify re-interrogation works
+        reinterrogated = loaded_validation.interrogate()
+        assert reinterrogated.n_passed(scalar=True) == validation.n_passed(scalar=True)
+
+
+def test_last_n_selector_write_read_file(column_selector_test_data):
+    """Test last_n() selector with write_file/read_file."""
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        filepath = Path(tmpdir) / "last_n_validation"
+
+        # Create validation with last_n() selector
+        validation = (
+            Validate(data=column_selector_test_data, label="last_n() selector test")
+            .col_exists(columns=last_n(3))  # Last 3 columns
+            .col_vals_not_null(columns=last_n(2))  # Last 2 columns
+            .interrogate()
+        )
+
+        # Write and read back
+        write_file(validation, str(filepath), keep_tbl=True, quiet=True)
+        loaded_validation = read_file(str(filepath))
+
+        # Verify column selectors are expanded correctly
+        # First validation: last_n(3) -> 3 steps
+        # Second validation: last_n(2) -> 2 steps
+        assert len(loaded_validation.validation_info) == 5  # 3 + 2 columns
+
+        # Get all column names from validation steps
+        columns = [step.column for step in loaded_validation.validation_info]
+
+        expected_last_3 = list(column_selector_test_data.columns[-3:])
+        expected_last_2 = list(column_selector_test_data.columns[-2:])
+
+        # First 3 steps should be for last_n(3)
+        assert set(columns[:3]) == set(expected_last_3)
+
+        # Last 2 steps should be for last_n(2)
+        assert set(columns[3:]) == set(expected_last_2)
+
+        # Verify re-interrogation works
+        reinterrogated = loaded_validation.interrogate()
+        assert reinterrogated.n_passed(scalar=True) == validation.n_passed(scalar=True)
+
+
+def test_selector_union_operator_write_read_file(column_selector_test_data):
+    """Test union operator (|) for column selectors with write_file/read_file."""
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        filepath = Path(tmpdir) / "union_selector_validation"
+
+        # Create validation with union of selectors
+        validation = (
+            Validate(data=column_selector_test_data, label="union selector test")
+            # Union: starts_with("cost") OR starts_with("person") = cost_base, cost_extra, person_id
+            .col_exists(columns=starts_with("cost") | starts_with("person"))
+            .interrogate()
+        )
+
+        # Write and read back
+        write_file(validation, str(filepath), keep_tbl=True, quiet=True)
+        loaded_validation = read_file(str(filepath))
+
+        # Verify column selectors are expanded correctly
+        # Get all column names from validation steps
+        columns = [step.column for step in loaded_validation.validation_info]
+
+        # Should have steps for: cost_base, cost_extra, person_id
+        expected_cols = {"cost_base", "cost_extra", "person_id"}
+        assert set(columns) == expected_cols
+
+        # Verify re-interrogation works
+        reinterrogated = loaded_validation.interrogate()
+        assert reinterrogated.n_passed(scalar=True) == validation.n_passed(scalar=True)
+
+
+def test_column_selector_with_different_table_types():
+    """Test column selectors work with different table types after serialization."""
+
+    # Test with Polars
+    polars_data = pl.DataFrame(
+        {"start_value": [1, 2, 3], "end_value": [4, 5, 6], "middle_col": [7, 8, 9]}
+    )
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        filepath_polars = Path(tmpdir) / "polars_selector_validation"
+
+        validation_polars = (
+            Validate(data=polars_data, label="Polars column selector test")
+            .col_vals_gt(columns=starts_with("start"), value=0)
+            .col_vals_lt(columns=ends_with("_value"), value=10)
+            .interrogate()
+        )
+
+        # Write and read back
+        write_file(validation_polars, str(filepath_polars), keep_tbl=True, quiet=True)
+        loaded_polars = read_file(str(filepath_polars))
+
+        # Verify selectors work correctly
+        # First validation: starts_with("start") -> start_value (1 step)
+        # Second validation: ends_with("_value") -> start_value, end_value (2 steps)
+        assert len(loaded_polars.validation_info) == 3  # 1 + 2 columns
+
+        columns = [step.column for step in loaded_polars.validation_info]
+
+        # First step should be start_value
+        assert columns[0] == "start_value"
+
+        # Remaining steps should be for columns ending with "_value"
+        assert set(columns[1:]) == {"start_value", "end_value"}
+
+        # Verify re-interrogation works
+        reinterrogated_polars = loaded_polars.interrogate()
+        assert reinterrogated_polars.n_passed(scalar=True) == validation_polars.n_passed(
+            scalar=True
+        )
