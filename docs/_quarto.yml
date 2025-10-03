@@ -257,6 +257,8 @@ quartodoc:
         - name: get_row_count
         - name: get_action_metadata
         - name: get_validation_summary
+        - name: write_file
+        - name: read_file
         - name: config
     - title: Prebuilt Actions
       desc: >
