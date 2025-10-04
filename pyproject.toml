@@ -149,4 +149,5 @@ exclude_also = ["if TYPE_CHECKING:"]
 [tool.coverage.run]
 omit = [
     "pointblank/_typing.py",
+    "pointblank/data/validations/preprocessing_functions.py",
 ]
