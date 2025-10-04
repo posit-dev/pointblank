@@ -36,13 +36,61 @@ _Data validation made beautiful and powerful_
    <a href="translations/README.ar.md">العربية</a>
 </div>
 
-## What is Pointblank?
+**Data validation shouldn't be a chore: it should be collaborative.**
 
-Pointblank is a powerful, yet elegant data validation framework for Python that transforms how you ensure data quality. With its intuitive, chainable API, you can quickly validate your data against comprehensive quality checks and visualize results through stunning, interactive reports that make data issues immediately actionable.
+Pointblank takes a different approach to data quality. It doesn't have to be a tedious technical task. Rather, it can become a process focused on clear communication between team members. While other validation libraries focus solely on catching errors, Pointblank excels at both **finding issues and sharing insights**. Our beautiful, customizable reports turn validation results into conversations with stakeholders, making data quality issues immediately understandable and actionable for everyone on your team.
 
-Whether you're a data scientist, data engineer, or analyst, Pointblank helps you catch data quality issues before they impact your analyses or downstream systems.
+**Get started in minutes, not hours.** Pointblank's AI-powered [`DraftValidation`](https://posit-dev.github.io/pointblank/user-guide/draft-validation.html) feature analyzes your data and suggests intelligent validation rules automatically. No more staring at empty validation scripts wondering where to begin. Let Pointblank kickstart your data quality journey so you can focus on what matters most.
 
-## Getting Started in 30 Seconds
+Whether you're a data scientist who needs to quickly communicate data quality findings, a data engineer building robust pipelines, or an analyst presenting data quality results to business stakeholders, Pointblank helps you turn data quality from an afterthought into a competitive advantage.
+
+## Getting Started with AI-Powered Validation Drafting
+
+```python
+import pointblank as pb
+
+# Load your data
+data = pb.load_dataset("game_revenue")
+
+# Use DraftValidation to generate a validation plan
+pb.DraftValidation(data=data, model="anthropic:claude-sonnet-4-5")
+```
+
+**Output:** A complete validation plan with intelligent suggestions based on your data:
+
+```python
+import pointblank as pb
+
+# The validation plan
+validation = (
+    pb.Validate(
+        data=data,
+        label="Draft Validation",
+        thresholds=pb.Thresholds(warning=0.10, error=0.25, critical=0.35)
+    )
+    .col_vals_in_set(columns="item_type", set=["iap", "ad"])
+    .col_vals_gt(columns="item_revenue", value=0)
+    .col_vals_between(columns="session_duration", left=3.2, right=41.0)
+    .col_count_match(count=11)
+    .row_count_match(count=2000)
+    .rows_distinct()
+    .interrogate()
+)
+
+validation
+```
+
+<div align="center">
+<img src="https://posit-dev.github.io/pointblank/assets/pointblank-draft-validation-report.png" width="800px">
+</div>
+
+<br>
+
+Copy, paste, and customize the generated validation plan for your needs.
+
+## Chainable Validation API
+
+If you prefer to write validation rules manually or need more control over the validation logic, Pointblank's chainable API makes it simple and readable:
 
 ```python
 import pointblank as pb
@@ -76,7 +124,9 @@ validation
 - **Threshold-based alerts**: Set 'warning', 'error', and 'critical' thresholds with custom actions
 - **Practical outputs**: Use validation results to filter tables, extract problematic data, or trigger downstream processes
 
-## Real-World Example
+## Production-Ready Validation Pipeline
+
+Here's how Pointblank handles complex, real-world scenarios with advanced features like threshold management, automated alerts, and comprehensive business rule validation:
 
 ```python
 import pointblank as pb
@@ -184,7 +234,7 @@ validation = pb.yaml_interrogate("validation.yaml")
 validation.get_tabular_report().show()
 ```
 
-This approach is perfect for:
+This approach is suitable for:
 
 - **CI/CD pipelines**: Store validation rules alongside your code
 - **Team collaboration**: Share validation logic in a readable format
