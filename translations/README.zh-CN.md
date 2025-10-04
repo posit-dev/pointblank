@@ -49,13 +49,61 @@ pb validate small_table --check col-vals-gt --column a --value 5 --show-extract
    <a href="README.ar.md">العربية</a>
 </div>
 
-## Pointblank 是什么？
+Pointblank 采用了不同的数据质量方法。它不必是一项繁琐的技术任务。相反，它可以成为一个专注于团队成员之间清晰沟通的过程。虽然其他验证库只专注于捕获错误，但 Pointblank 在**发现问题和分享见解**方面都表现出色。我们美观、可定制的报告将验证结果转化为与利益相关者的对话，使数据质量问题对您的整个团队来说立即可理解和可操作。
 
-Pointblank 是一个强大而优雅的 Python 数据验证框架，它改变了您确保数据质量的方式。通过其直观、可链接的 API，您可以快速验证您的数据是否符合全面的质量检查标准，并通过精美、交互式的报告可视化结果，使数据问题能够立即采取行动。
+**几分钟内开始，而不是几小时。** Pointblank 的 AI 驱动的 [`DraftValidation`](https://posit-dev.github.io/pointblank/user-guide/draft-validation.html) 功能分析您的数据并自动建议智能验证规则。因此无需盯着空白的验证脚本想知道从哪里开始。Pointblank 可以启动您的数据质量之旅，让您专注于最重要的事情。
 
-无论您是数据科学家、数据工程师还是分析师，Pointblank 都可以帮助您在数据质量问题影响您的分析或下游系统之前捕获它们。
+无论您是需要快速传达数据质量发现的数据科学家、构建稳健管道的数据工程师，还是向业务利益相关者展示数据质量结果的分析师，Pointblank 都能帮助您将数据质量从事后想法转变为竞争优势。
 
-## 30 秒内快速入门
+## AI 驱动的验证起草入门
+
+`DraftValidation` 类使用 LLM 来分析您的数据并生成具有智能建议的完整验证计划。这可以帮助您快速开始数据验证或启动新项目。
+
+```python
+import pointblank as pb
+
+# 加载您的数据
+data = pb.load_dataset("game_revenue")              # 示例数据集
+
+# 使用 DraftValidation 生成验证计划
+pb.DraftValidation(data=data, model="anthropic:claude-sonnet-4-5")
+```
+
+输出是基于您的数据的具有智能建议的完整验证计划：
+
+```python
+import pointblank as pb
+
+# 验证计划
+validation = (
+    pb.Validate(
+        data=data,
+        label="Draft Validation",
+        thresholds=pb.Thresholds(warning=0.10, error=0.25, critical=0.35)
+    )
+    .col_vals_in_set(columns="item_type", set=["iap", "ad"])
+    .col_vals_gt(columns="item_revenue", value=0)
+    .col_vals_between(columns="session_duration", left=3.2, right=41.0)
+    .col_count_match(count=11)
+    .row_count_match(count=2000)
+    .rows_distinct()
+    .interrogate()
+)
+
+validation
+```
+
+<div align="center">
+<img src="https://posit-dev.github.io/pointblank/assets/pointblank-draft-validation-report.png" width="800px">
+</div>
+
+<br>
+
+根据您的需要复制、粘贴和自定义生成的验证计划。
+
+## 可链接的验证 API
+
+Pointblank 的可链接 API 使验证变得简单易读。相同的模式始终适用：(1) 从 `Validate` 开始，(2) 添加验证步骤，(3) 以 `interrogate()` 结束。
 
 ```python
 import pointblank as pb
@@ -73,11 +121,19 @@ validation.get_tabular_report().show()
 
 # 在 notebook 中只需使用：
 validation
-````
+```
 
 <div align="center">
 <img src="https://posit-dev.github.io/pointblank/assets/pointblank-tabular-report.png" width="800px">
 </div>
+
+<br>
+
+一旦您拥有已询问的 `validation` 对象，您就可以利用各种方法来提取见解，例如：
+
+- 获取单个步骤的详细报告以查看出了什么问题
+- 根据验证结果过滤表格
+- 提取有问题的数据进行调试
 
 <br>
 
@@ -351,3 +407,4 @@ Pointblank 基于 MIT 许可证授权。
 ## 🏛️ 治理
 
 该项目主要由 [Rich Iannone](https://bsky.app/profile/richmeister.bsky.social) 维护。其他作者偶尔也会协助完成这些任务。
+````

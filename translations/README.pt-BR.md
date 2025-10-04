@@ -35,13 +35,61 @@ _Validação de dados bonita e poderosa_
    <a href="README.ar.md">العربية</a>
 </div>
 
-## O que é o Pointblank?
+O Pointblank adota uma abordagem diferente para a qualidade dos dados. Não precisa ser uma tarefa técnica tediosa. Em vez disso, pode se tornar um processo focado na comunicação clara entre os membros da equipe. Enquanto outras bibliotecas de validação se concentram apenas na detecção de erros, o Pointblank se destaca tanto em **encontrar problemas quanto em compartilhar insights**. Nossos belos relatórios personalizáveis transformam resultados de validação em conversas com stakeholders, tornando os problemas de qualidade dos dados imediatamente compreensíveis e acionáveis para toda sua equipe.
 
-O Pointblank é um framework de validação de dados poderoso e elegante para Python que transforma a maneira como você garante a qualidade dos dados. Com sua API intuitiva e encadeável, você pode validar rapidamente seus dados contra verificações de qualidade abrangentes e visualizar os resultados através de relatórios interativos impressionantes que tornam os problemas de dados imediatamente acionáveis.
+**Comece em minutos, não em horas.** O recurso [`DraftValidation`](https://posit-dev.github.io/pointblank/user-guide/draft-validation.html) alimentado por IA do Pointblank analisa seus dados e sugere regras de validação inteligentes automaticamente. Assim, não há necessidade de ficar olhando para um script de validação vazio se perguntando por onde começar. O Pointblank pode impulsionar sua jornada de qualidade de dados para que você possa focar no que mais importa.
 
-Seja você um cientista de dados, engenheiro de dados ou analista, o Pointblank ajuda a detectar problemas de qualidade antes que eles afetem suas análises ou sistemas subsequentes.
+Seja você um cientista de dados que precisa comunicar rapidamente descobertas de qualidade de dados, um engenheiro de dados construindo pipelines robustos, ou um analista apresentando resultados de qualidade de dados para stakeholders do negócio, o Pointblank ajuda você a transformar a qualidade dos dados de uma reflextão tardia em uma vantagem competitiva.
 
-## Começando em 30 Segundos
+## Começando com Validação Alimentada por IA
+
+A classe `DraftValidation` usa LLMs para analisar seus dados e gerar um plano de validação completo com sugestões inteligentes. Isso ajuda você a começar rapidamente com a validação de dados ou iniciar um novo projeto.
+
+```python
+import pointblank as pb
+
+# Carregue seus dados
+data = pb.load_dataset("game_revenue")              # Um conjunto de dados de exemplo
+
+# Use DraftValidation para gerar um plano de validação
+pb.DraftValidation(data=data, model="anthropic:claude-sonnet-4-5")
+```
+
+A saída é um plano de validação completo com sugestões inteligentes baseadas em seus dados:
+
+```python
+import pointblank as pb
+
+# O plano de validação
+validation = (
+    pb.Validate(
+        data=data,
+        label="Draft Validation",
+        thresholds=pb.Thresholds(warning=0.10, error=0.25, critical=0.35)
+    )
+    .col_vals_in_set(columns="item_type", set=["iap", "ad"])
+    .col_vals_gt(columns="item_revenue", value=0)
+    .col_vals_between(columns="session_duration", left=3.2, right=41.0)
+    .col_count_match(count=11)
+    .row_count_match(count=2000)
+    .rows_distinct()
+    .interrogate()
+)
+
+validation
+```
+
+<div align="center">
+<img src="https://posit-dev.github.io/pointblank/assets/pointblank-draft-validation-report.png" width="800px">
+</div>
+
+<br>
+
+Copie, cole e personalize o plano de validação gerado conforme suas necessidades.
+
+## API de Validação Encadeável
+
+A API encadeável do Pointblank torna a validação simples e legível. O mesmo padrão sempre se aplica: (1) comece com `Validate`, (2) adicione etapas de validação, e (3) termine com `interrogate()`.
 
 ```python
 import pointblank as pb
@@ -66,6 +114,12 @@ validation
 </div>
 
 <br>
+
+Uma vez que você tenha um objeto `validation` interrogado, você pode aproveitar uma variedade de métodos para extrair insights como:
+
+- obter relatórios detalhados para etapas individuais para ver o que deu errado
+- filtrar tabelas baseadas em resultados de validação
+- extrair dados problemáticos para depuração
 
 ## Por que escolher o Pointblank?
 

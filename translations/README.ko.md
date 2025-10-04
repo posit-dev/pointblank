@@ -35,13 +35,61 @@ _아름답고 강력한 데이터 검증_
    <a href="README.ar.md">العربية</a>
 </div>
 
-## Pointblank이란?
+Pointblank은 데이터 품질에 대해 다른 접근 방식을 취합니다. 지루한 기술적 작업일 필요가 없습닄. 오히려 팀 구성원 간의 명확한 커뮤니케이션에 초점을 맞춘 프로세스가 될 수 있습니다. 다른 검증 라이브러리가 오류 감지에만 집중하는 반면, Pointblank은 **문제 발견과 인사이트 공유** 모두에서 뛰어납니다. 아름답고 커스터마이지 가능한 보고서는 검증 결과를 이해관계자와의 대화로 바꿔주어, 데이터 품질 문제를 전체 팀에게 즉시 이해하기 쉭고 실행 가능하게 만듭니다.
 
-Pointblank은 데이터 품질을 보장하는 방식을 변화시키는 강력하면서도 우아한 Python용 데이터 검증 프레임워크입니다. 직관적이고 연쇄 가능한 API를 통해 포괄적인 품질 검사에 데이터를 빠르게 검증하고, 데이터 문제를 즉시 조치할 수 있게 만드는 멋진 대화형 보고서를 통해 결과를 시각화할 수 있습니다.
+**몇 시간이 아닌 몇 분 내에 시작하세요.** Pointblank의 AI 기반 [`DraftValidation`](https://posit-dev.github.io/pointblank/user-guide/draft-validation.html) 기능이 데이터를 분석하고 지능적인 검증 규칙을 자동으로 제안합니다. 빈 검증 스크립트를 센쓀센쓀 보며 어디서부터 시작할지 고민할 필요가 없습니다. Pointblank이 데이터 품질 여정을 킥시트하여 가장 중요한 일에 집중할 수 있도록 도와줍니다.
 
-당신이 데이터 과학자, 데이터 엔지니어, 또는 분석가인지에 관계없이 Pointblank은 데이터 품질 문제가 분석이나 다운스트림 시스템에 영향을 미치기 전에 발견하는 데 도움을 줍니다.
+데이터 품질 발견 사항을 빠르게 전달해야 하는 데이터 과학자, 견고한 파이프라인을 구축하는 데이터 엔지니어, 비즈니스 이해관계자에게 데이터 품질 결과를 발표하는 애널리스트 누구나 Pointblank을 통해 데이터 품질을 단순한 사후 고려 사항에서 경쟁 우위로 바꿀 수 있습니다.
 
-## 30초 시작하기
+## AI 기반 검증 초안 작성 시작하기
+
+`DraftValidation` 클래스는 LLM을 사용하여 데이터를 분석하고 지능적인 제안이 포함된 완전한 검증 계획을 생성합니다. 이를 통해 데이터 검증을 빠르게 시작하거나 새 프로젝트를 시작할 수 있습니다.
+
+```python
+import pointblank as pb
+
+# 데이터 로드
+data = pb.load_dataset("game_revenue")              # 예제 데이터셋
+
+# DraftValidation을 사용하여 검증 계획 생성
+pb.DraftValidation(data=data, model="anthropic:claude-sonnet-4-5")
+```
+
+결과는 데이터에 기반한 지능적 제안이 포함된 완전한 검증 계획입니다:
+
+```python
+import pointblank as pb
+
+# 검증 계획
+validation = (
+    pb.Validate(
+        data=data,
+        label="Draft Validation",
+        thresholds=pb.Thresholds(warning=0.10, error=0.25, critical=0.35)
+    )
+    .col_vals_in_set(columns="item_type", set=["iap", "ad"])
+    .col_vals_gt(columns="item_revenue", value=0)
+    .col_vals_between(columns="session_duration", left=3.2, right=41.0)
+    .col_count_match(count=11)
+    .row_count_match(count=2000)
+    .rows_distinct()
+    .interrogate()
+)
+
+validation
+```
+
+<div align="center">
+<img src="https://posit-dev.github.io/pointblank/assets/pointblank-draft-validation-report.png" width="800px">
+</div>
+
+<br>
+
+필요에 따라 생성된 검증 계획을 복사, 붙여넣기 및 커스터마이지하세요.
+
+## 체이닝 가능한 검증 API
+
+Pointblank의 체이닝 가능한 API는 검증을 간단하고 읽기 쉬답게 만듭니다. 동일한 패턴이 항상 적용됩니다: (1) `Validate`로 시작, (2) 검증 단계 추가, (3) `interrogate()`로 마무리.
 
 ```python
 import pointblank as pb
@@ -66,6 +114,12 @@ validation
 </div>
 
 <br>
+
+질의된 `validation` 객체가 있으면 다음과 같은 다양한 메서드를 활용하여 인사이트를 추출할 수 있습니다:
+
+- 개별 단계에 대한 상세 보고서를 얻어 무엇이 잘못되었는지 확인
+- 검증 결과에 기반하여 테이블 필터링
+- 디버깅을 위해 문제가 있는 데이터 추출
 
 ## Pointblank을 선택해야 하는 이유?
 

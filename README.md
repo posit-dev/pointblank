@@ -38,19 +38,21 @@ _Data validation made beautiful and powerful_
 
 <br>
 
-Pointblank takes a different approach to data quality. It doesn't have to be a tedious technical task. Rather, it can become a process focused on clear communication between team members. While other validation libraries focus solely on catching errors, Pointblank excels at both **finding issues and sharing insights**. Our beautiful, customizable reports turn validation results into conversations with stakeholders, making data quality issues immediately understandable and actionable for everyone on your team.
+Pointblank takes a different approach to data quality. It doesn't have to be a tedious technical task. Rather, it can become a process focused on clear communication between team members. While other validation libraries focus solely on catching errors, Pointblank is great at both **finding issues and sharing insights**. Our beautiful, customizable reports turn validation results into conversations with stakeholders, making data quality issues immediately understandable and actionable for everyone on your team.
 
-**Get started in minutes, not hours.** Pointblank's AI-powered [`DraftValidation`](https://posit-dev.github.io/pointblank/user-guide/draft-validation.html) feature analyzes your data and suggests intelligent validation rules automatically. No more staring at empty validation scripts wondering where to begin. Let Pointblank kickstart your data quality journey so you can focus on what matters most.
+**Get started in minutes, not hours.** Pointblank's AI-powered [`DraftValidation`](https://posit-dev.github.io/pointblank/user-guide/draft-validation.html) feature analyzes your data and suggests intelligent validation rules automatically. So there's no need to stare at an empty validation script wondering where to begin. Pointblank can kickstart your data quality journey so you can focus on what matters most.
 
-Whether you're a data scientist who needs to quickly communicate data quality findings, a data engineer building robust pipelines, or an analyst presenting data quality results to business stakeholders, Pointblank helps you turn data quality from an afterthought into a competitive advantage.
+Whether you're a data scientist who needs to quickly communicate data quality findings, a data engineer building robust pipelines, or an analyst presenting data quality results to business stakeholders, Pointblank helps you to turn data quality from an afterthought into a competitive advantage.
 
 ## Getting Started with AI-Powered Validation Drafting
+
+The `DraftValidation` class uses LLMs to analyze your data and generate a complete validation plan with intelligent suggestions. This helps you quickly get started with data validation or jumpstart a new project.
 
 ```python
 import pointblank as pb
 
 # Load your data
-data = pb.load_dataset("game_revenue")
+data = pb.load_dataset("game_revenue")              # A sample dataset
 
 # Use DraftValidation to generate a validation plan
 pb.DraftValidation(data=data, model="anthropic:claude-sonnet-4-5")
@@ -90,7 +92,7 @@ Copy, paste, and customize the generated validation plan for your needs.
 
 ## Chainable Validation API
 
-If you prefer to write validation rules manually or need more control over the validation logic, Pointblank's chainable API makes it simple and readable:
+Pointblank's chainable API makes validation simple and readable. The same pattern always applies: (1) start with `Validate`, (2) add validation steps, and (3) finish with `interrogate()`.
 
 ```python
 import pointblank as pb
@@ -115,6 +117,12 @@ validation
 </div>
 
 <br>
+
+Once you have an interrogated `validation` object, you can leverage a variety of methods to extract insights like:
+
+- getting detailed reports for single steps to see what went wrong
+- filtering tables based on validation results
+- extracting problematic data for debugging
 
 ## Why Choose Pointblank?
 
