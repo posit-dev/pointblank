@@ -2142,3 +2142,26 @@ def test_rich_print_scan_table_no_statistical_columns():
             source_type="Minimal test",
             table_type="simple",
         )
+
+
+def test_get_column_dtypes_polars_missing_column_fallback():
+    """Test _get_column_dtypes() for Polars case where column not in raw_dtypes."""
+    from pointblank.cli import _get_column_dtypes
+
+    # Create mock that simulates Polars DataFrame with missing column in dtypes
+    mock_df = Mock()
+    mock_df.dtypes = Mock()
+
+    # Mock to_dict method that returns incomplete dtype mapping
+    def mock_to_dict():
+        return {"col1": "Int64"}  # Missing col2
+
+    mock_df.dtypes.to_dict = mock_to_dict
+
+    # Call with columns that include one not in raw_dtypes
+    result = _get_column_dtypes(mock_df, ["col1", "col2", "col3"])
+
+    # col1 should have the actual dtype, col2 and col3 should be "?"
+    assert "col1" in result
+    assert result["col2"] == "?"
+    assert result["col3"] == "?"
