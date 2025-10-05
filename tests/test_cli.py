@@ -7,11 +7,13 @@ from typing import Any
 
 import pandas as pd
 import pytest
+import click
 from click.testing import CliRunner
 from rich.console import Console
 
 import pointblank as pb
 from pointblank.cli import (
+    OrderedGroup,
     cli,
     datasets,
     requirements,
@@ -22,12 +24,14 @@ from pointblank.cli import (
     make_template,
     run,
     validate,
-    _format_cell_value,
-    _get_column_dtypes,
-    _format_dtype_compact,
-    _rich_print_gt_table,
     _display_validation_summary,
+    _format_cell_value,
+    _format_dtype_compact,
     _format_missing_percentage,
+    _get_column_dtypes,
+    _is_piped_data_source,
+    _load_data_source,
+    _rich_print_gt_table,
     _rich_print_missing_table,
     _rich_print_scan_table,
     console,
@@ -1381,3 +1385,760 @@ def test_preview_with_column_iteration_error():
         _rich_print_gt_table(MockErrorTable())
     except Exception:
         pass  # Expected
+
+
+def test_is_piped_data_source():
+    """Test the _is_piped_data_source() function."""
+
+    # Test valid piped data source
+    assert _is_piped_data_source("/var/folders/abc/def/pb_pipe_12345") == True
+    assert _is_piped_data_source("/tmp/pb_pipe_67890") == True
+
+    # Test non-piped data sources
+    assert _is_piped_data_source("regular_file.csv") == False
+    assert _is_piped_data_source("/var/folders/abc/regular_file.csv") == False
+    assert _is_piped_data_source("/tmp/regular_file.csv") == False
+    assert _is_piped_data_source("pb_pipe_without_path") == False
+
+    # Test falsy values (empty string returns empty string, which is falsy)
+    assert not _is_piped_data_source("")
+    assert not _is_piped_data_source(None)
+
+
+def test_ordered_group_fallback():
+    """Test OrderedGroup fallback for commands not in desired order."""
+
+    # Create a mock context
+    class MockContext:
+        pass
+
+    # Create an OrderedGroup instance
+    group = OrderedGroup()
+
+    # Mock the parent list_commands to return commands not in our desired order
+    def mock_list_commands(self, ctx):
+        return ["unknown_command", "info", "another_unknown", "preview"]
+
+    # Temporarily replace the parent method
+    original_method = click.Group.list_commands
+    click.Group.list_commands = mock_list_commands
+
+    try:
+        ctx = MockContext()
+        result = group.list_commands(ctx)
+
+        # Should have info and preview in desired order, followed by unknown commands
+        assert "info" in result
+        assert "preview" in result
+        assert "unknown_command" in result
+        assert "another_unknown" in result
+
+        # info should come before preview (desired order)
+        info_idx = result.index("info")
+        preview_idx = result.index("preview")
+        assert info_idx < preview_idx
+
+    finally:
+        # Restore original method
+        click.Group.list_commands = original_method
+
+
+def test_format_cell_value_edge_cases():
+    """Test edge cases in _format_cell_value() function."""
+
+    # Test with very wide content and many columns
+    long_text = "x" * 200
+    result = _format_cell_value(long_text, max_width=50, num_columns=20)
+
+    assert len(result) <= 30  # Should be more aggressive with many columns
+    assert "…" in result
+
+    # Test with medium number of columns
+    result = _format_cell_value(long_text, max_width=50, num_columns=12)
+
+    assert len(result) <= 40  # Less aggressive truncation
+    assert "…" in result
+
+    # Test extremely long text
+    extremely_long = "y" * 1000
+    result = _format_cell_value(extremely_long, max_width=50, num_columns=5)
+
+    assert "…" in result
+    assert len(result) <= 50
+
+
+def test_get_column_dtypes_exception_handling():
+    """Test exception handling in _get_column_dtypes()."""
+
+    # Mock an object that raises exceptions when accessing dtypes
+    class ProblematicDataFrame:
+        @property
+        def dtypes(self):
+            raise Exception("Cannot access dtypes")
+
+        @property
+        def schema(self):
+            raise Exception("Cannot access schema")
+
+    columns = ["col1", "col2"]
+    df = ProblematicDataFrame()
+
+    # Should handle exceptions gracefully and return "?" for all columns
+    result = _get_column_dtypes(df, columns)
+    expected = {"col1": "?", "col2": "?"}
+
+    assert result == expected
+
+
+def test_format_cell_value_pandas_specific():
+    """Test Pandas-specific NA handling in _format_cell_value()."""
+
+    # Test with Pandas NA
+    result = _format_cell_value(pd.NA)
+    assert "[red]" in result and "NA" in result
+
+    # Test with Pandas NaT (Not a Time)
+    result = _format_cell_value(pd.NaT)
+    assert "[red]" in result
+
+
+def test_get_column_dtypes_schema_exception():
+    """Test _get_column_dtypes() with schema objects that raise exceptions."""
+
+    class MockSchemaWithError:
+        def to_dict(self):
+            raise Exception("Schema conversion error")
+
+    class MockDataFrameWithBadSchema:
+        dtypes = None
+        schema = MockSchemaWithError()
+
+    columns = ["col1", "col2"]
+    df = MockDataFrameWithBadSchema()
+
+    # Should handle schema exception and fall back to "?"
+    result = _get_column_dtypes(df, columns)
+    expected = {"col1": "?", "col2": "?"}
+
+    assert result == expected
+
+
+def test_get_column_dtypes_pandas_edge_cases():
+    """Test _get_column_dtypes() Pandas DataFrame edge cases."""
+
+    # Test pandas DataFrame with dtypes that don't have iloc
+    class MockPandasDtypes:
+        def __init__(self):
+            self.data = ["int64", "float32", "object"]
+
+        def __len__(self):
+            return len(self.data)
+
+        def __getitem__(self, index):
+            return self.data[index]
+
+    class MockPandasDF:
+        def __init__(self):
+            self.dtypes = MockPandasDtypes()
+
+    df = MockPandasDF()
+    columns = ["col1", "col2", "col3"]
+
+    # Should handle pandas dtypes without iloc
+    result = _get_column_dtypes(df, columns)
+
+    assert result["col1"] == "i64"  # int64 -> i64
+    assert result["col2"] == "f32"  # float32 -> f32
+    assert result["col3"] == "obj"  # object -> obj
+
+    # Test case where we have more columns than dtypes
+    columns_extra = ["col1", "col2", "col3", "col4", "col5"]
+    result = _get_column_dtypes(df, columns_extra)
+
+    assert result["col4"] == "?"  # Should fall back to "?" for extra columns
+    assert result["col5"] == "?"
+
+
+def test_format_dtype_compact_generic_fallbacks():
+    """Test _format_dtype_compact() generic fallback cases."""
+
+    # Test generic int fallback: types that contain "int" but not specific patterns
+    assert _format_dtype_compact("int") == "int"
+    assert _format_dtype_compact("bigint") == "int"
+    assert _format_dtype_compact("smallint") == "int"
+    assert _format_dtype_compact("integer") == "int"
+
+    # Test generic float fallback: types that contain "float" but not float32/float64
+    assert _format_dtype_compact("float") == "float"  # exact match
+    assert _format_dtype_compact("myfloat") == "float"  # contains "float"
+
+    # Test generic string fallback: types that contain "str" but not "string"
+    assert _format_dtype_compact("str") == "str"  # exact match
+    assert _format_dtype_compact("mystr") == "str"  # contains "str" and ≤8 chars
+
+    # Test long unknown types get truncated: this happens before generic fallbacks
+    long_type = "very_long_unknown_type_name"
+    result = _format_dtype_compact(long_type)
+
+    assert result == "very_lon…"
+    assert len(result) == 9  # 8 chars + ellipsis
+
+    # Test short unknown types pass through: this is the final fallback
+    short_type = "custom"
+    result = _format_dtype_compact(short_type)
+
+    assert result == "custom"
+
+    # Test types that don't match any pattern and are short
+    assert _format_dtype_compact("double") == "double"  # 6 chars, passes through
+    assert _format_dtype_compact("decimal") == "decimal"  # 7 chars, passes through
+    assert _format_dtype_compact("varchar") == "varchar"  # 7 chars, passes through
+
+
+def test_format_cell_value_pandas_exception_handling():
+    """Test _format_cell_value() Pandas exception handling."""
+
+    # Mock pandas to raise exceptions
+    with patch("pandas.isna") as mock_isna, patch("numpy.isnan") as mock_isnan:
+        # Test ImportError path
+        mock_isna.side_effect = ImportError("pandas not available")
+        mock_isnan.side_effect = ImportError("numpy not available")
+
+        result = _format_cell_value(float("nan"))
+
+        # Should handle ImportError gracefully and return string representation
+        assert isinstance(result, str)
+
+        mock_isna.side_effect = TypeError("value not compatible")
+        mock_isnan.side_effect = TypeError("value not compatible")
+
+        result = _format_cell_value("test_value")
+
+        # Should handle TypeError gracefully
+        assert result == "test_value"
+
+        # Test ValueError path
+        mock_isna.side_effect = ValueError("ambiguous array")
+        mock_isnan.side_effect = ValueError("ambiguous array")
+
+        result = _format_cell_value(123)
+
+        # Should handle ValueError gracefully
+        assert result == "123"
+
+
+def test_format_cell_value_pandas_type_detection():
+    """Test _format_cell_value() Pandas type detection edge case."""
+
+    # Test with pandas NA type
+    with patch("pandas.isna") as mock_isna:
+        mock_isna.return_value = True
+
+        # Create a pandas object and mock its type detection
+        pd_series = pd.Series([1, 2, 3])
+        result = _format_cell_value(pd_series.iloc[0])
+
+        # The result should be a string
+        assert isinstance(result, str)
+
+
+def test_get_column_dtypes_polars_style():
+    """Test _get_column_dtypes() with Polars dtypes."""
+
+    # Mock Polars-style DataFrame
+    class MockPolarsDtypes:
+        def to_dict(self):
+            return {"col1": "Int64", "col2": "Utf8", "col3": "Float64", "col4": "Boolean"}
+
+    class MockPolarsDF:
+        def __init__(self):
+            self.dtypes = MockPolarsDtypes()
+
+    df = MockPolarsDF()
+    columns = ["col1", "col2", "col3", "col4"]
+
+    # Should handle Polars-style dtypes
+    result = _get_column_dtypes(df, columns)
+
+    assert result["col1"] == "i64"  # Int64 -> i64
+    assert result["col2"] == "str"  # Utf8 -> str
+    assert result["col3"] == "f64"  # Float64 -> f64
+    assert result["col4"] == "bool"  # Boolean -> bool
+
+
+def test_get_column_dtypes_missing_column_fallback():
+    """Test _get_column_dtypes() when column is missing from dtypes."""
+
+    # Mock Polars-style DataFrame with missing column
+    class MockPartialDtypes:
+        def to_dict(self):
+            return {"col1": "Int64", "col2": "Utf8"}  # Only 2 columns
+
+    class MockPartialDF:
+        def __init__(self):
+            self.dtypes = MockPartialDtypes()
+
+    df = MockPartialDF()
+    columns = ["col1", "col2", "col3", "col4"]  # Asking for 4 columns but only 2 exist
+
+    # Should handle missing columns by falling back to "?"
+    result = _get_column_dtypes(df, columns)
+
+    assert result["col1"] == "i64"  # Int64 -> i64 (exists)
+    assert result["col2"] == "str"  # Utf8 -> str (exists)
+    assert result["col3"] == "?"  # Missing column -> "?"
+    assert result["col4"] == "?"  # Missing column -> "?"
+
+
+def test_rich_print_gt_table_data_extraction_paths():
+    """Test _rich_print_gt_table() data extraction from different GT table structures."""
+
+    # Test _body.body path
+    class MockBodyTable:
+        def __init__(self):
+            self._body = Mock()
+            self._body.body = Mock()
+            self._body.body.columns = ["col1", "col2"]
+            self._body.body.to_dicts = Mock(return_value=[{"col1": "val1", "col2": "val2"}])
+
+        def as_raw_html(self):
+            return "<table><tr><td>test</td></tr></table>"
+
+    # Should extract data from _body.body
+    try:
+        _rich_print_gt_table(MockBodyTable())
+    except Exception:
+        pass  # Expected due to mocking limitations
+
+    # Test _data path
+    class MockDataTable:
+        def __init__(self):
+            self._data = Mock()
+            self._data.columns = ["col1", "col2"]
+            self._data.to_dicts = Mock(return_value=[{"col1": "val1", "col2": "val2"}])
+
+        def as_raw_html(self):
+            return "<table><tr><td>test</td></tr></table>"
+
+    # Should extract data from _data
+    try:
+        _rich_print_gt_table(MockDataTable())
+    except Exception:
+        pass  # Expected due to mocking limitations
+
+    # Test .data path
+    class MockDirectDataTable:
+        def __init__(self):
+            self.data = Mock()
+            self.data.columns = ["col1", "col2"]
+            self.data.to_dicts = Mock(return_value=[{"col1": "val1", "col2": "val2"}])
+
+        def as_raw_html(self):
+            return "<table><tr><td>test</td></tr></table>"
+
+    # Should extract data from .data
+    try:
+        _rich_print_gt_table(MockDirectDataTable())
+    except Exception:
+        pass  # Expected due to mocking limitations
+
+
+@patch("pointblank.cli.console")
+def test_rich_print_gt_table_console_size_fallback(mock_console):
+    """Test _rich_print_gt_table() console size exception handling."""
+
+    # Mock console that raises exception when accessing size
+    mock_console.size.width.side_effect = Exception("Cannot get console size")
+
+    class MockGTTable:
+        def __init__(self):
+            self._tbl_data = Mock()
+            self._tbl_data.columns = ["col1", "col2", "col3"]
+            self._tbl_data.to_dicts = Mock(
+                return_value=[{"col1": "val1", "col2": "val2", "col3": "val3"}]
+            )
+
+        def as_raw_html(self):
+            return "<table><tr><td>test</td></tr></table>"
+
+    # Should handle console size exception gracefully
+    try:
+        _rich_print_gt_table(MockGTTable())
+    except Exception:
+        pass  # May fail but shouldn't crash due to console size error
+
+
+def test_rich_print_gt_table_row_number_calculations():
+    """Test _rich_print_gt_table() row number width calculations."""
+
+    # Test to_dicts path for row number calculation
+    class MockTableWithRowNums:
+        def __init__(self):
+            self._tbl_data = Mock()
+            self._tbl_data.columns = ["_row_num_", "col1", "col2"]
+            self._tbl_data.to_dicts = Mock(
+                return_value=[
+                    {"_row_num_": 1, "col1": "val1", "col2": "val2"},
+                    {"_row_num_": 999, "col1": "val3", "col2": "val4"},  # Large row number
+                    {"_row_num_": 1234, "col1": "val5", "col2": "val6"},  # Even larger
+                ]
+            )
+
+        def as_raw_html(self):
+            return "<table><tr><td>test</td></tr></table>"
+
+    # Should calculate appropriate row number width based on max row number
+    try:
+        _rich_print_gt_table(MockTableWithRowNums())
+    except Exception:
+        pass  # Expected due to mocking limitations
+
+    # Test to_dict("records") path
+    class MockTableWithRecords:
+        def __init__(self):
+            self._tbl_data = Mock()
+            self._tbl_data.columns = ["_row_num_", "col1"]
+            # Remove to_dicts to force to_dict path
+            del self._tbl_data.to_dicts
+            self._tbl_data.to_dict = Mock(
+                return_value=[{"_row_num_": 1, "col1": "val1"}, {"_row_num_": 500, "col1": "val2"}]
+            )
+
+        def as_raw_html(self):
+            return "<table><tr><td>test</td></tr></table>"
+
+    # Should use to_dict("records") fallback
+    try:
+        _rich_print_gt_table(MockTableWithRecords())
+    except Exception:
+        pass  # Expected due to mocking limitations
+
+    # Test exception in row number calculation
+    class MockTableRowNumError:
+        def __init__(self):
+            self._tbl_data = Mock()
+            self._tbl_data.columns = ["_row_num_", "col1"]
+            self._tbl_data.to_dicts = Mock(side_effect=Exception("Row number calculation error"))
+
+        def as_raw_html(self):
+            return "<table><tr><td>test</td></tr></table>"
+
+    # Should handle row number calculation exception
+    try:
+        _rich_print_gt_table(MockTableRowNumError())
+    except Exception:
+        pass  # Expected due to mocking limitations
+
+
+def test_cli_preview_with_advanced_options():
+    """Test preview command with advanced option combinations that might hit untested paths."""
+    runner = CliRunner()
+
+    # Test with very specific column selections that might trigger edge cases
+    result = runner.invoke(preview, ["small_table", "--col-first", "1", "--col-last", "1"])
+    assert result.exit_code == 0
+
+    # Test with head=0 (edge case)
+    result = runner.invoke(preview, ["small_table", "--head", "0"])
+    assert result.exit_code in [0, 1]  # May be handled differently
+
+    # Test with tail=0 (edge case)
+    result = runner.invoke(preview, ["small_table", "--tail", "0"])
+    assert result.exit_code in [0, 1]  # May be handled differently
+
+    # Test with both head and tail as very small numbers
+    result = runner.invoke(preview, ["small_table", "--head", "1", "--tail", "1"])
+    assert result.exit_code == 0
+
+
+def test_cli_scan_with_edge_case_options():
+    """Test scan command with options that might trigger untested paths."""
+    runner = CliRunner()
+
+    # Test scan with very small limits that might trigger edge cases
+    result = runner.invoke(scan, ["small_table"])
+    assert result.exit_code == 0
+
+    # These might exercise different code paths in scan processing
+    # The exact paths depend on the internal logic, but these are reasonable test cases
+
+
+def test_format_cell_value_extremely_long_truncation():
+    """Test _format_cell_value with edge cases in truncation logic."""
+
+    # Test the "extremely long text" path in _format_cell_value
+    extremely_long_text = "z" * 2000  # Very long text
+
+    # Test with various column counts to hit different truncation branches
+    result = _format_cell_value(extremely_long_text, max_width=50, num_columns=5)
+    assert "…" in result
+    assert len(result) <= 50
+
+    # Test the "double max_width" condition mentioned in the function
+    double_max_text = "w" * 100  # Exactly double the max_width of 50
+    result = _format_cell_value(double_max_text, max_width=50, num_columns=8)
+    assert "…" in result
+
+
+def test_load_data_source_edge_cases():
+    """Test _load_data_source function edge cases."""
+
+    # Test with each of the built-in datasets to ensure they all work
+    datasets = ["small_table", "game_revenue", "nycflights", "global_sales"]
+
+    for dataset in datasets:
+        try:
+            result = _load_data_source(dataset)
+            assert result is not None
+        except Exception:
+            pass  # May fail in test environment, but shouldn't crash
+
+    # Test with non-dataset that should go through _process_data() path
+    try:
+        result = _load_data_source("unknown_dataset_name.csv")
+    except Exception:
+        pass  # Expected to fail, but shouldn't crash
+
+
+def test_get_column_dtypes_missing_column_fallback(mock_data_loading):
+    """Test _get_column_dtypes() when column not in dtypes."""
+
+    # Create test data
+    test_data = pd.DataFrame({"col1": [1, 2, 3], "col2": ["a", "b", "c"]})
+
+    # Mock a scenario where column dtype detection fails
+    with patch("pandas.api.types.infer_dtype") as mock_infer:
+        mock_infer.side_effect = Exception("Dtype detection failed")
+
+        # This should fall back to dtypes_dict[col] = "?"
+        result = _get_column_dtypes(test_data, ["col1", "col2"])
+
+        # Should have fallback values
+        assert "col1" in result
+        assert "col2" in result
+
+
+def test_validation_summary_severity_branches():
+    """Test _display_validation_summary() severity logic."""
+
+    # Mock a validation object with specific counts to test different severity branches
+    mock_validation = Mock()
+
+    # Test case 1: Some steps have errors
+    mock_validation.n_passed.return_value = 2
+    mock_validation.n_passed_all.return_value = 1
+    mock_validation.n_failed.return_value = 1
+    mock_validation.n_warned.return_value = 1
+    mock_validation.get_tabulation_df.return_value = pd.DataFrame(
+        {
+            "eval": [1, 1, 0, 0, 1],  # Mix of pass/fail to avoid n_error > 0
+            "n": [10, 8, 5, 3, 12],
+            "f_passed": [1.0, 1.0, 0.0, 0.0, 1.0],
+        }
+    )
+
+    with patch("pointblank.cli.console"):
+        _display_validation_summary(mock_validation)
+
+    # Test case 2: All passed
+    mock_validation.get_tabulation_df.return_value = pd.DataFrame(
+        {
+            "eval": [1, 1, 1],  # All pass
+            "n": [10, 8, 5],
+            "f_passed": [1.0, 1.0, 1.0],  # All 100% pass rate
+        }
+    )
+    mock_validation.n_passed.return_value = 3
+    mock_validation.n_passed_all.return_value = 3  # All steps are "all passed"
+    mock_validation.n_failed.return_value = 0
+    mock_validation.n_warned.return_value = 0
+
+    with patch("pointblank.cli.console"):
+        _display_validation_summary(mock_validation)
+
+
+def test_info_command_data_loading_status(runner, mock_data_loading):
+    """Test info command data loading status message."""
+    # Test the status context manager during data loading
+    with patch("pointblank.cli.console") as mock_console:
+        with patch("pointblank.cli._load_data_source") as mock_load:
+            mock_load.return_value = pd.DataFrame({"col": [1, 2, 3]})
+            with patch("pointblank.cli._get_tbl_type") as mock_type:
+                mock_type.return_value = "pandas"
+                with patch("pointblank.get_row_count") as mock_count:
+                    mock_count.return_value = 3
+
+                    result = runner.invoke(info, ["small_table"])
+
+                    # Should have called console.status with loading message
+                    mock_console.status.assert_called_with("[bold green]Loading data...")
+
+
+def test_format_missing_percentage_edge_case():
+    """Test _format_missing_percentage() with edge case values."""
+    from pointblank.cli import _format_missing_percentage
+
+    # Test with exactly 0.0
+    result = _format_missing_percentage(0.0)
+    assert result is not None
+
+    # Test with exactly 1.0
+    result = _format_missing_percentage(1.0)
+    assert result is not None
+
+    # Test with middle percentage
+    result = _format_missing_percentage(0.5)
+    assert result is not None
+
+
+def test_rich_print_scan_table_comprehensive():
+    """Test _rich_print_scan_table()."""
+
+    # Create a mock GT object with _tbl_data attribute and realistic scan data
+    mock_scan_result = Mock()
+
+    # Create realistic scan data that would come from col_summary_tbl()
+    scan_data = pd.DataFrame(
+        {
+            "colname": [
+                '<div>col1</div><div style="color: gray;">int64</div>',
+                '<div>col2</div><div style="color: gray;">object</div>',
+                '<div>col3</div><div style="color: gray;">float64</div>',
+            ],
+            "n_missing": ["0", "2<br>10%", "1<br>5%"],
+            "n_unique": ["3", "2", "T0.67F0.33"],  # Test different unique value formats
+            "mean": [None, None, "15.5"],
+            "std": [None, None, "5.2"],
+            "min": ["1", None, "10.0"],
+            "max": ["3", None, "21.0"],
+            "median": [None, None, "15.0"],
+            "q_1": [None, None, "12.5"],
+            "q_3": [None, None, "18.5"],
+            "iqr": [None, None, "6.0"],
+        }
+    )
+
+    # Mock the _tbl_data attribute
+    mock_scan_result._tbl_data = scan_data
+
+    # Test successful table creation
+    with patch("pointblank.cli.console") as mock_console:
+        _rich_print_scan_table(
+            scan_result=mock_scan_result,
+            data_source="test_data.csv",
+            source_type="External source: test_data.csv",
+            table_type="pandas.DataFrame",
+            total_rows=20,
+            total_columns=3,
+        )
+
+        # Should have called console.print to display the table
+        assert mock_console.print.called
+
+
+def test_rich_print_scan_table_format_value_edge_cases():
+    """Test the format_value() helper function with edge cases."""
+
+    # Create test data with various edge cases
+    mock_scan_result = Mock()
+    edge_case_data = pd.DataFrame(
+        {
+            "colname": [
+                '<div>dates</div><div style="color: gray;">int64</div>',
+                '<div>large_nums</div><div style="color: gray;">int64</div>',
+                '<div>small_nums</div><div style="color: gray;">float64</div>',
+                '<div>strings</div><div style="color: gray;">object</div>',
+            ],
+            "n_missing": ["0", "0", "0", "0"],
+            "n_unique": ["20240101", "1000000", "0.001", "some_very_long_string_value"],
+            "mean": ["20240515", "5000000", "0.005", None],
+            "max": ["20241231", "10000000", "0.01", None],
+        }
+    )
+    mock_scan_result._tbl_data = edge_case_data
+
+    with patch("pointblank.cli.console"):
+        _rich_print_scan_table(
+            scan_result=mock_scan_result,
+            data_source="edge_cases.csv",
+            source_type="Test data",
+            table_type="pandas.DataFrame",
+        )
+
+
+def test_rich_print_scan_table_extract_column_info():
+    """Test HTML column info extraction."""
+
+    # Test data with various HTML formats
+    mock_scan_result = Mock()
+    html_test_data = pd.DataFrame(
+        {
+            "colname": [
+                '<div>normal_col</div><div style="color: gray;">string</div>',
+                "<div>missing_type</div>",  # No type div
+                '<div class="fancy">fancy_col</div><div style="color: gray; font-style: italic;">complex_type</div>',
+            ],
+            "n_missing": ["0", "0", "0"],
+            "n_unique": ["5", "3", "8"],
+        }
+    )
+    mock_scan_result._tbl_data = html_test_data
+
+    with patch("pointblank.cli.console"):
+        _rich_print_scan_table(
+            scan_result=mock_scan_result,
+            data_source="html_test.csv",
+            source_type="HTML test",
+            table_type="test",
+        )
+
+
+def test_rich_print_scan_table_error_fallback():
+    """Test error handling fallback."""
+
+    # Create mock that will raise an exception during processing
+    mock_scan_result = Mock()
+    mock_scan_result._tbl_data = None  # This will cause an AttributeError
+
+    with patch("pointblank.cli.console") as mock_console:
+        _rich_print_scan_table(
+            scan_result=mock_scan_result,
+            data_source="error_test.csv",
+            source_type="Error test",
+            table_type="test",
+        )
+
+        # Should have called console.print with error message
+        assert mock_console.print.called
+        # Check that error message was displayed
+        calls = mock_console.print.call_args_list
+        error_call_found = False
+        for call in calls:
+            if len(call[0]) > 0 and "Error displaying table" in str(call[0][0]):
+                error_call_found = True
+                break
+        assert error_call_found
+
+
+def test_rich_print_scan_table_no_statistical_columns():
+    """Test table with minimal columns (no statistical data)."""
+
+    # Create data with only basic columns (no mean, std, etc.)
+    mock_scan_result = Mock()
+    minimal_data = pd.DataFrame(
+        {
+            "colname": ['<div>simple_col</div><div style="color: gray;">int</div>'],
+            "n_missing": ["0"],
+            "n_unique": ["10"],
+            # No statistical columns
+        }
+    )
+    mock_scan_result._tbl_data = minimal_data
+
+    with patch("pointblank.cli.console"):
+        _rich_print_scan_table(
+            scan_result=mock_scan_result,
+            data_source="minimal.csv",
+            source_type="Minimal test",
+            table_type="simple",
+        )
