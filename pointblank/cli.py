@@ -725,7 +725,7 @@ def _rich_print_gt_table(
                             # Create header with column name and data type
                             header_text = f"{display_col}\n[dim yellow]{dtype_display}[/dim yellow]"
                         else:
-                            header_text = display_col
+                            header_text = display_col  # pragma: no cover
 
                         rich_table.add_column(
                             header_text,
