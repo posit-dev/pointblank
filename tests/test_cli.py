@@ -2288,6 +2288,183 @@ def test_show_concise_help_pl():
         assert pl_content_found
 
 
+@patch("pointblank.cli.console")
+def test_rich_print_gt_table_is_complete_preview(mock_console):
+    """Test _rich_print_gt_table() with is_complete=True preview info."""
+    mock_gt_table = Mock()
+    mock_gt_table.as_raw_html.return_value = "<table><tr><td>test</td></tr></table>"
+
+    # Mock _tbl_data for rich table creation
+    mock_df = Mock()
+    mock_df.columns = ["col1", "col2"]
+    mock_df.to_dicts.return_value = [{"col1": "val1", "col2": "val2"}]
+    mock_gt_table._tbl_data = mock_df
+
+    # Preview info with is_complete=True
+    preview_info = {
+        "is_complete": True,
+        "total_rows": 1,  # Match the actual number of rows in mock data
+        "head_rows": 0,
+        "tail_rows": 0,
+    }
+
+    _rich_print_gt_table(mock_gt_table, preview_info=preview_info)
+
+    # Should call console.print with "Showing all X rows" message
+    calls = mock_console.print.call_args_list
+    found_complete_message = any(
+        len(call[0]) > 0 and "Showing all 1 rows" in str(call[0][0]) for call in calls
+    )
+    assert found_complete_message
+
+
+@patch("pointblank.cli.console")
+def test_rich_print_gt_table_fallback_preview(mock_console):
+    """Test _rich_print_gt_table() fallback case with preview_info but no head/tail rows."""
+    mock_gt_table = Mock()
+    mock_gt_table.as_raw_html.return_value = "<table><tr><td>test</td></tr></table>"
+
+    # Mock _tbl_data for rich table creation
+    mock_df = Mock()
+    mock_df.columns = ["col1", "col2"]
+    mock_df.to_dicts.return_value = [{"col1": "val1", "col2": "val2"}]
+    mock_gt_table._tbl_data = mock_df
+
+    # Preview info with no head/tail rows and is_complete=False should trigger fallback
+    preview_info = {
+        "is_complete": False,
+        "total_rows": 1000,  # This becomes total_dataset_rows in the logic
+        "head_rows": 0,
+        "tail_rows": 0,
+    }
+
+    _rich_print_gt_table(mock_gt_table, preview_info=preview_info)
+
+    # Should call console.print with fallback message
+    # total_rows (actual table) = 1, total_dataset_rows = 1000
+    calls = mock_console.print.call_args_list
+    found_fallback_message = any(
+        len(call[0]) > 0 and "Showing 1 rows from 1,000 total rows" in str(call[0][0])
+        for call in calls
+    )
+    assert found_fallback_message
+
+
+@patch("pointblank.cli.console")
+def test_rich_print_gt_table_max_rows_exceeded(mock_console):
+    """Test _rich_print_gt_table() when total_rows > max_rows without preview_info."""
+    mock_gt_table = Mock()
+    mock_gt_table.as_raw_html.return_value = "<table><tr><td>test</td></tr></table>"
+
+    # Mock _tbl_data for rich table creation with many rows
+    mock_df = Mock()
+    mock_df.columns = ["col1", "col2"]
+    # Create 100 rows of mock data to exceed max_rows limit (50)
+    mock_rows = [{"col1": f"val1_{i}", "col2": f"val2_{i}"} for i in range(100)]
+    mock_df.to_dicts.return_value = mock_rows
+    mock_gt_table._tbl_data = mock_df
+
+    # No preview_info provided, should use original fallback logic
+    _rich_print_gt_table(mock_gt_table, preview_info=None)
+
+    # Should call console.print with max_rows exceeded message
+    calls = mock_console.print.call_args_list
+    found_max_rows_message = any(
+        len(call[0]) > 0
+        and "Showing first 50 of 100 rows. Use --output-html to see all data" in str(call[0][0])
+        for call in calls
+    )
+    assert found_max_rows_message
+
+
+@patch("pointblank.cli.console")
+def test_display_validation_summary_error_severity(mock_console):
+    """Test _display_validation_summary() with error severity."""
+    mock_validation = Mock()
+
+    # Create mock validation_info with steps that have error=True
+    mock_step1 = Mock()
+    mock_step1.warning = False
+    mock_step1.error = False
+    mock_step1.critical = False
+    mock_step1.all_passed = True
+
+    mock_step2 = Mock()
+    mock_step2.warning = False
+    mock_step2.error = True  # This step has error=True
+    mock_step2.critical = False
+    mock_step2.all_passed = False
+
+    mock_validation.validation_info = [mock_step1, mock_step2]
+
+    # Mock other validation object methods used by function
+    mock_validation.get_tabulation_df.return_value = pd.DataFrame(
+        {
+            "eval": [1, 0],  # One pass, one fail
+            "n": [10, 5],
+            "f_passed": [1.0, 0.0],
+            "f_failed": [0.0, 1.0],
+            "W": [False, False],
+            "S": [False, True],
+            "N": [False, False],
+        }
+    )
+
+    _display_validation_summary(mock_validation)
+
+    # Should call console.print and set highest_severity="error" with severity_color="yellow"
+    assert mock_console.print.called
+
+    # Check that error-related styling was used
+    calls = mock_console.print.call_args_list
+    found_error_styling = any("yellow" in str(call) for call in calls)
+    assert found_error_styling
+
+
+@patch("pointblank.cli.console")
+def test_display_validation_summary_warning_severity(mock_console):
+    """Test _display_validation_summary() with warning severity."""
+    mock_validation = Mock()
+
+    # Create mock validation_info with steps that have warning=True
+    mock_step1 = Mock()
+    mock_step1.warning = False
+    mock_step1.error = False
+    mock_step1.critical = False
+    mock_step1.all_passed = True
+
+    mock_step2 = Mock()
+    mock_step2.warning = True  # This step has warning=True
+    mock_step2.error = False
+    mock_step2.critical = False
+    mock_step2.all_passed = False
+
+    mock_validation.validation_info = [mock_step1, mock_step2]
+
+    # Mock other validation object methods used by function
+    mock_validation.get_tabulation_df.return_value = pd.DataFrame(
+        {
+            "eval": [1, 1],  # Both pass evaluation but one has warning
+            "n": [10, 5],
+            "f_passed": [1.0, 0.8],  # Second has 80% pass rate (warning level)
+            "f_failed": [0.0, 0.2],
+            "W": [False, True],  # Second has W=True (warning condition)
+            "S": [False, False],
+            "N": [False, False],
+        }
+    )
+
+    _display_validation_summary(mock_validation)
+
+    # Should call console.print and set highest_severity="warning" with severity_color="bright_black"
+    assert mock_console.print.called
+
+    # Check that warning-related styling was used
+    calls = mock_console.print.call_args_list
+    found_warning_styling = any("bright_black" in str(call) for call in calls)
+    assert found_warning_styling
+
+
 def test_show_concise_help_with_context():
     """Test _show_concise_help() exit behavior when context is provided."""
     mock_ctx = Mock()
