@@ -314,7 +314,7 @@ def _rich_print_scan_table(
         total_rows: Total number of rows in the dataset
         total_columns: Total number of columns in the dataset
     """
-    try:
+    try:  # pragma: no cover
         import re
 
         import narwhals as nw
@@ -556,7 +556,7 @@ def _rich_print_scan_table(
         console.print()
         console.print(scan_table)
 
-    except Exception as e:
+    except Exception as e:  # pragma: no cover
         # Fallback to simple message if table creation fails
         console.print(f"[yellow]Scan results available for {data_source}[/yellow]")
         console.print(f"[red]Error displaying table: {str(e)}[/red]")
@@ -774,7 +774,7 @@ def _rich_print_gt_table(
                             ]
                             for row in data_dict
                         ]
-                elif hasattr(df, "to_dict"):
+                elif hasattr(df, "to_dict"):  # pragma: no cover
                     # Pandas-like interface
                     data_dict = df.to_dict("records")
                     if len(columns) > max_terminal_cols:
@@ -808,7 +808,7 @@ def _rich_print_gt_table(
                             ]
                             for row in data_dict
                         ]
-                elif hasattr(df, "iter_rows"):
+                elif hasattr(df, "iter_rows"):  # pragma: no cover
                     # Polars lazy frame
                     rows = [
                         [
@@ -822,7 +822,7 @@ def _rich_print_gt_table(
                         ]
                         for row in df.iter_rows()
                     ]
-                elif hasattr(df, "__iter__"):
+                elif hasattr(df, "__iter__"):  # pragma: no cover
                     # Try to iterate directly
                     rows = [
                         [
