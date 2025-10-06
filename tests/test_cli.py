@@ -2466,6 +2466,69 @@ def test_display_validation_summary_warning_severity(mock_console):
     assert found_warning_styling
 
 
+@patch("pointblank.cli.console")
+def test_display_validation_summary_passed_severity(mock_console):
+    """Test _display_validation_summary() with passed severity."""
+    mock_validation = Mock()
+
+    # Create mock validation_info with steps that:
+    # - Have no warning/error/critical threshold exceedances (all False)
+    # - Some steps don't have 100% pass rate (all_passed=False for some)
+    mock_step1 = Mock()
+    mock_step1.warning = False
+    mock_step1.error = False
+    mock_step1.critical = False
+    mock_step1.all_passed = True  # This step has 100% pass rate
+    mock_step1.i = 1
+    mock_step1.assertion_type = "col_vals_not_null"
+    mock_step1.column = "name"
+    mock_step1.n = 1000
+    mock_step1.n_passed = 1000
+    mock_step1.values = None
+
+    mock_step2 = Mock()
+    mock_step2.warning = False
+    mock_step2.error = False
+    mock_step2.critical = False
+    mock_step2.all_passed = False  # This step has some failing units but no threshold exceedance
+    mock_step2.i = 2
+    mock_step2.assertion_type = "col_vals_gt"
+    mock_step2.column = "age"
+    mock_step2.n = 1000
+    mock_step2.n_passed = 950  # 95% pass rate - no threshold exceeded but not 100%
+    mock_step2.values = 0
+
+    # Mock thresholds for the steps
+    mock_threshold = Mock()
+    mock_threshold.warning = None
+    mock_threshold.error = None
+    mock_threshold.critical = None
+    mock_step1.thresholds = mock_threshold
+    mock_step2.thresholds = mock_threshold
+
+    # Mock extract
+    mock_step1.extract = None
+    mock_step2.extract = None
+
+    mock_validation.validation_info = [mock_step1, mock_step2]
+
+    _display_validation_summary(mock_validation)
+
+    # Should call console.print and set highest_severity="passed" with severity_color="green"
+    assert mock_console.print.called
+
+    # Check that the passed severity styling was used (green color for "passed")
+    calls = mock_console.print.call_args_list
+    summary_calls = [call for call in calls if "passed" in str(call)]
+
+    assert len(summary_calls) > 0
+
+    # Verify green styling is used for passed severity
+    found_green_styling = any("[green]passed[/green]" in str(call) for call in calls)
+
+    assert found_green_styling
+
+
 def test_show_concise_help_with_context():
     """Test _show_concise_help() exit behavior when context is provided."""
     mock_ctx = Mock()
