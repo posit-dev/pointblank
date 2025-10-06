@@ -29,6 +29,7 @@ from pointblank.cli import (
     _format_dtype_compact,
     _format_missing_percentage,
     _get_column_dtypes,
+    _handle_pl_missing,
     _is_piped_data_source,
     _load_data_source,
     _rich_print_gt_table,
@@ -2484,3 +2485,144 @@ def test_show_concise_help_without_context():
 
             # Should call sys.exit(1)
             mock_exit.assert_called_once_with(1)
+
+
+@patch("pointblank.cli._rich_print_missing_table")
+@patch("pointblank.missing_vals_tbl")
+def test_handle_pl_missing_console_output(mock_missing_vals_tbl, mock_rich_print):
+    """Test _handle_pl_missing() with console output (no HTML file)."""
+
+    # Create mock result data and missing values table
+    mock_result = Mock()
+    mock_missing_table = Mock()
+    mock_missing_table.as_raw_html.return_value = "<html><body>Missing report</body></html>"
+    mock_missing_vals_tbl.return_value = mock_missing_table
+
+    # Test console output path (output_html=None)
+    _handle_pl_missing(mock_result, "pl.read_csv('test.csv')", None)
+
+    # Should call pb.missing_vals_tbl with the result data
+    mock_missing_vals_tbl.assert_called_once_with(data=mock_result)
+
+    # Should call _rich_print_missing_table with missing_table and result
+    mock_rich_print.assert_called_once_with(mock_missing_table, mock_result)
+
+
+@patch("pointblank.cli.console")
+@patch("pathlib.Path.write_text")
+@patch("pointblank.missing_vals_tbl")
+def test_handle_pl_missing_html_output(mock_missing_vals_tbl, mock_write_text, mock_console):
+    """Test _handle_pl_missing() with HTML output."""
+
+    # Create mock result data and missing values table
+    mock_result = Mock()
+    mock_missing_table = Mock()
+    mock_html_content = "<html><body>Missing values report</body></html>"
+    mock_missing_table.as_raw_html.return_value = mock_html_content
+    mock_missing_vals_tbl.return_value = mock_missing_table
+
+    output_file = "/tmp/test_missing_report.html"
+
+    # Test HTML output path
+    _handle_pl_missing(mock_result, "pl.read_csv('test.csv')", output_file)
+
+    # Should call pb.missing_vals_tbl with the result data
+    mock_missing_vals_tbl.assert_called_once_with(data=mock_result)
+
+    # Should call as_raw_html to get HTML content
+    mock_missing_table.as_raw_html.assert_called_once()
+
+    # Should write HTML content to file
+    mock_write_text.assert_called_once_with(mock_html_content, encoding="utf-8")
+
+    # Should print success message
+    mock_console.print.assert_called_once_with(
+        f"[green]✓[/green] Missing values report saved to: {output_file}"
+    )
+
+
+@patch("pointblank.cli.console")
+@patch("pointblank.missing_vals_tbl")
+@patch("sys.exit")
+def test_handle_pl_missing_exception_handling(mock_exit, mock_missing_vals_tbl, mock_console):
+    """Test _handle_pl_missing() exception handling."""
+
+    # Create mock result data
+    mock_result = Mock()
+
+    # Make pb.missing_vals_tbl raise an exception to trigger error handling
+    test_error = Exception("Test missing values table creation error")
+    mock_missing_vals_tbl.side_effect = test_error
+
+    # Test exception handling path
+    _handle_pl_missing(mock_result, "pl.read_csv('test.csv')", None)
+
+    # Should call pb.missing_vals_tbl and get exception
+    mock_missing_vals_tbl.assert_called_once_with(data=mock_result)
+
+    # Should print error message
+    mock_console.print.assert_called_once_with(
+        "[red]Error creating missing values report:[/red] Test missing values table creation error"
+    )
+
+    # Should call sys.exit(1)
+    mock_exit.assert_called_once_with(1)
+
+
+@patch("pointblank.cli.console")
+@patch("pathlib.Path.write_text")
+@patch("pointblank.missing_vals_tbl")
+@patch("sys.exit")
+def test_handle_pl_missing_html_write_exception(
+    mock_exit, mock_missing_vals_tbl, mock_write_text, mock_console
+):
+    """Test _handle_pl_missing() when HTML file writing fails."""
+
+    # Create mock result data and missing values table
+    mock_result = Mock()
+    mock_missing_table = Mock()
+    mock_missing_table.as_raw_html.return_value = "<html><body>Missing report</body></html>"
+    mock_missing_vals_tbl.return_value = mock_missing_table
+
+    # Make Path.write_text raise an exception to trigger error handling during HTML writing
+    test_error = Exception("Permission denied writing HTML file")
+    mock_write_text.side_effect = test_error
+
+    output_file = "/tmp/test_missing_report.html"
+
+    # Test HTML writing exception path
+    _handle_pl_missing(mock_result, "pl.read_csv('test.csv')", output_file)
+
+    # Should call pb.missing_vals_tbl
+    mock_missing_vals_tbl.assert_called_once_with(data=mock_result)
+
+    # Should attempt to write HTML content
+    mock_write_text.assert_called_once()
+
+    # Should print error message
+    mock_console.print.assert_called_once_with(
+        "[red]Error creating missing values report:[/red] Permission denied writing HTML file"
+    )
+
+    # Should call sys.exit(1)
+    mock_exit.assert_called_once_with(1)
+
+
+@patch("pointblank.cli._rich_print_missing_table")
+@patch("pointblank.missing_vals_tbl")
+def test_handle_pl_missing_rich_print_call(mock_missing_vals_tbl, mock_rich_print):
+    """Test that _handle_pl_missing() calls _rich_print_missing_table() for console output."""
+
+    # Create mock result data and missing values table
+    mock_result = Mock()
+    mock_missing_table = Mock()
+    mock_missing_vals_tbl.return_value = mock_missing_table
+
+    # Test console output path to verify _rich_print_missing_table call
+    _handle_pl_missing(mock_result, "pl.read_csv('test.csv')", None)
+
+    # Should call pb.missing_vals_tbl with the result data
+    mock_missing_vals_tbl.assert_called_once_with(data=mock_result)
+
+    # Should call _rich_print_missing_table with missing_table and result
+    mock_rich_print.assert_called_once_with(mock_missing_table, mock_result)
