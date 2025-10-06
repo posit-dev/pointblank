@@ -34,6 +34,7 @@ from pointblank.cli import (
     _rich_print_gt_table,
     _rich_print_missing_table,
     _rich_print_scan_table,
+    _show_concise_help,
     console,
 )
 from pointblank._utils import _get_tbl_type, _is_lib_present
@@ -2165,3 +2166,144 @@ def test_get_column_dtypes_polars_missing_column_fallback():
     assert "col1" in result
     assert result["col2"] == "?"
     assert result["col3"] == "?"
+
+
+def test_show_concise_help_info():
+    """Test _show_concise_help() for 'info' command."""
+    with patch("pointblank.cli.console") as mock_console:
+        with patch("sys.exit"):
+            _show_concise_help("info", None)
+
+        # Should have called console.print multiple times
+        assert mock_console.print.called
+
+        # Check that info-specific content was printed
+        calls = [str(call) for call in mock_console.print.call_args_list]
+        info_content_found = any("pb info" in call for call in calls)
+        assert info_content_found
+
+
+def test_show_concise_help_preview():
+    """Test _show_concise_help() for 'preview' command."""
+    with patch("pointblank.cli.console") as mock_console:
+        with patch("sys.exit"):
+            _show_concise_help("preview", None)
+
+        # Should have called console.print multiple times
+        assert mock_console.print.called
+
+        # Check that preview-specific content was printed
+        calls = [str(call) for call in mock_console.print.call_args_list]
+        preview_content_found = any("pb preview" in call for call in calls)
+        assert preview_content_found
+
+
+def test_show_concise_help_scan():
+    """Test _show_concise_help() for 'scan' command."""
+    with patch("pointblank.cli.console") as mock_console:
+        with patch("sys.exit"):
+            _show_concise_help("scan", None)
+
+        # Should have called console.print multiple times
+        assert mock_console.print.called
+
+        # Check that scan-specific content was printed
+        calls = [str(call) for call in mock_console.print.call_args_list]
+        scan_content_found = any("pb scan" in call for call in calls)
+        assert scan_content_found
+
+
+def test_show_concise_help_missing():
+    """Test _show_concise_help() for 'missing' command."""
+    with patch("pointblank.cli.console") as mock_console:
+        with patch("sys.exit"):
+            _show_concise_help("missing", None)
+
+        # Should have called console.print multiple times
+        assert mock_console.print.called
+
+        # Check that missing-specific content was printed
+        calls = [str(call) for call in mock_console.print.call_args_list]
+        missing_content_found = any("pb missing" in call for call in calls)
+        assert missing_content_found
+
+
+def test_show_concise_help_validate():
+    """Test _show_concise_help() for 'validate' command."""
+    with patch("pointblank.cli.console") as mock_console:
+        with patch("sys.exit"):
+            _show_concise_help("validate", None)
+
+        # Should have called console.print multiple times
+        assert mock_console.print.called
+
+        # Check that validate-specific content was printed
+        calls = [str(call) for call in mock_console.print.call_args_list]
+        validate_content_found = any("pb validate" in call for call in calls)
+        assert validate_content_found
+
+
+def test_show_concise_help_run():
+    """Test _show_concise_help() for 'run' command."""
+    with patch("pointblank.cli.console") as mock_console:
+        with patch("sys.exit"):
+            _show_concise_help("run", None)
+
+        # Should have called console.print multiple times
+        assert mock_console.print.called
+
+        # Check that run-specific content was printed
+        calls = [str(call) for call in mock_console.print.call_args_list]
+        run_content_found = any("pb run" in call for call in calls)
+        assert run_content_found
+
+
+def test_show_concise_help_make_template():
+    """Test _show_concise_help() for 'make-template' command."""
+    with patch("pointblank.cli.console") as mock_console:
+        with patch("sys.exit"):
+            _show_concise_help("make-template", None)
+
+        # Should have called console.print multiple times
+        assert mock_console.print.called
+
+        # Check that make-template-specific content was printed
+        calls = [str(call) for call in mock_console.print.call_args_list]
+        template_content_found = any("pb make-template" in call for call in calls)
+        assert template_content_found
+
+
+def test_show_concise_help_pl():
+    """Test _show_concise_help() for 'pl' command."""
+    with patch("pointblank.cli.console") as mock_console:
+        with patch("sys.exit"):
+            _show_concise_help("pl", None)
+
+        # Should have called console.print multiple times
+        assert mock_console.print.called
+
+        # Check that pl-specific content was printed
+        calls = [str(call) for call in mock_console.print.call_args_list]
+        pl_content_found = any("pb pl" in call for call in calls)
+        assert pl_content_found
+
+
+def test_show_concise_help_with_context():
+    """Test _show_concise_help() exit behavior when context is provided."""
+    mock_ctx = Mock()
+
+    with patch("pointblank.cli.console"):
+        _show_concise_help("info", mock_ctx)
+
+    # Should call ctx.exit(1)
+    mock_ctx.exit.assert_called_once_with(1)
+
+
+def test_show_concise_help_without_context():
+    """Test _show_concise_help() exit behavior when no context provided."""
+    with patch("pointblank.cli.console"):
+        with patch("sys.exit") as mock_exit:
+            _show_concise_help("info", None)
+
+            # Should call sys.exit(1)
+            mock_exit.assert_called_once_with(1)
