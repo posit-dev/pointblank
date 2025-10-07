@@ -295,6 +295,46 @@ def _format_dtype_compact(dtype_str: str) -> str:
         return dtype_str
 
 
+def _format_units(n: int) -> str:
+    """Format large numbers with K, M, B abbreviations for values above 10,000."""
+    if n is None:
+        return "—"
+    if n >= 1000000000:  # Billions
+        return f"{n / 1000000000:.1f}B"
+    elif n >= 1000000:  # Millions
+        return f"{n / 1000000:.1f}M"
+    elif n >= 10000:  # Use K for 10,000 and above
+        return f"{n / 1000:.0f}K"
+    else:
+        return str(n)
+
+
+def _format_pass_fail(passed: int, total: int) -> str:
+    """Format pass/fail counts with abbreviated numbers and fractions."""
+    if passed is None or total is None or total == 0:
+        return "—/—"
+
+    # Calculate fraction
+    fraction = passed / total
+
+    # Format fraction with special handling for very small and very large values
+    if fraction == 0.0:
+        fraction_str = "0.00"
+    elif fraction == 1.0:
+        fraction_str = "1.00"
+    elif fraction < 0.005:  # Less than 0.005 rounds to 0.00
+        fraction_str = "<0.01"
+    elif fraction > 0.995:  # Greater than 0.995 rounds to 1.00
+        fraction_str = ">0.99"
+    else:
+        fraction_str = f"{fraction:.2f}"
+
+    # Format absolute number with abbreviations
+    absolute_str = _format_units(passed)
+
+    return f"{absolute_str}/{fraction_str}"
+
+
 def _rich_print_scan_table(
     scan_result: Any,
     data_source: str,
@@ -1031,51 +1071,13 @@ def _display_validation_summary(validation: Any) -> None:
                 steps_table.add_column("C", style="red")
                 steps_table.add_column("Ext", style="blue", justify="center")
 
-                def format_units(n: int) -> str:
-                    """Format large numbers with K, M, B abbreviations for values above 10,000."""
-                    if n is None:
-                        return "—"
-                    if n >= 1000000000:  # Billions
-                        return f"{n / 1000000000:.1f}B"
-                    elif n >= 1000000:  # Millions
-                        return f"{n / 1000000:.1f}M"
-                    elif n >= 10000:  # Use K for 10,000 and above
-                        return f"{n / 1000:.0f}K"
-                    else:
-                        return str(n)
-
-                def format_pass_fail(passed: int, total: int) -> str:
-                    """Format pass/fail counts with abbreviated numbers and fractions."""
-                    if passed is None or total is None or total == 0:
-                        return "—/—"
-
-                    # Calculate fraction
-                    fraction = passed / total
-
-                    # Format fraction with special handling for very small and very large values
-                    if fraction == 0.0:
-                        fraction_str = "0.00"
-                    elif fraction == 1.0:
-                        fraction_str = "1.00"
-                    elif fraction < 0.005:  # Less than 0.005 rounds to 0.00
-                        fraction_str = "<0.01"
-                    elif fraction > 0.995:  # Greater than 0.995 rounds to 1.00
-                        fraction_str = ">0.99"
-                    else:
-                        fraction_str = f"{fraction:.2f}"
-
-                    # Format absolute number with abbreviations
-                    absolute_str = format_units(passed)
-
-                    return f"{absolute_str}/{fraction_str}"
-
                 for step in info:
                     # Extract values information for the Values column
                     values_str = "—"  # Default to em dash if no values
 
                     # Handle different validation types
                     if step.assertion_type == "col_schema_match":
-                        values_str = "—"  # Schema is too complex to display inline
+                        values_str = "—"  # pragma: no cover
                     elif step.assertion_type == "col_vals_between":
                         # For between validations, try to get left and right bounds
                         if (
@@ -1178,9 +1180,9 @@ def _display_validation_summary(validation: Any) -> None:
                         step.assertion_type,
                         str(step.column) if step.column else "—",
                         values_str,
-                        format_units(step.n),
-                        format_pass_fail(step.n_passed, step.n),
-                        format_pass_fail(step.n - step.n_passed, step.n),
+                        _format_units(step.n),
+                        _format_pass_fail(step.n_passed, step.n),
+                        _format_pass_fail(step.n - step.n_passed, step.n),
                         w_status,
                         e_status,
                         c_status,
