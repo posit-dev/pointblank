@@ -28,6 +28,8 @@ from pointblank.cli import (
     _format_cell_value,
     _format_dtype_compact,
     _format_missing_percentage,
+    _format_pass_fail,
+    _format_units,
     _get_column_dtypes,
     _handle_pl_missing,
     _is_piped_data_source,
@@ -1866,9 +1868,9 @@ def test_cli_scan_with_edge_case_options():
 
 
 def test_format_cell_value_extremely_long_truncation():
-    """Test _format_cell_value with edge cases in truncation logic."""
+    """Test _format_cell_value() with edge cases in truncation logic."""
 
-    # Test the "extremely long text" path in _format_cell_value
+    # Test the "extremely long text" path in _format_cell_value()
     extremely_long_text = "z" * 2000  # Very long text
 
     # Test with various column counts to hit different truncation branches
@@ -1882,8 +1884,140 @@ def test_format_cell_value_extremely_long_truncation():
     assert "…" in result
 
 
+def test_format_units_basic_numbers():
+    """Test _format_units() with basic number formatting."""
+
+    # Test None
+    assert _format_units(None) == "—"
+
+    # Test small numbers (no formatting)
+    assert _format_units(0) == "0"
+    assert _format_units(1) == "1"
+    assert _format_units(999) == "999"
+    assert _format_units(9999) == "9999"
+
+    # Test thousands (K formatting starts at 10,000)
+    assert _format_units(10000) == "10K"
+    assert _format_units(15000) == "15K"
+    assert _format_units(99999) == "100K"
+    assert _format_units(150000) == "150K"
+    assert _format_units(999999) == "1000K"
+
+    # Test millions
+    assert _format_units(1000000) == "1.0M"
+    assert _format_units(1500000) == "1.5M"
+    assert _format_units(15000000) == "15.0M"
+    assert _format_units(999999999) == "1000.0M"
+
+    # Test billions
+    assert _format_units(1000000000) == "1.0B"
+    assert _format_units(1500000000) == "1.5B"
+    assert _format_units(15000000000) == "15.0B"
+
+
+def test_format_units_edge_cases():
+    """Test _format_units() with edge cases."""
+    # Test exact boundaries
+    assert _format_units(9999) == "9999"  # Just under K threshold
+    assert _format_units(10000) == "10K"  # Exactly K threshold
+    assert _format_units(999999) == "1000K"  # Just under M threshold
+    assert _format_units(1000000) == "1.0M"  # Exactly M threshold
+    assert _format_units(999999999) == "1000.0M"  # Just under B threshold
+    assert _format_units(1000000000) == "1.0B"  # Exactly B threshold
+
+    # Test decimal precision
+    assert _format_units(1234567) == "1.2M"  # Rounds down
+    assert _format_units(1567890) == "1.6M"  # Rounds up
+    assert _format_units(10550000000) == "10.6B"  # Rounds up
+
+
+def test_format_pass_fail_basic():
+    """Test _format_pass_fail() with basic pass/fail scenarios."""
+
+    # Test None values
+    assert _format_pass_fail(None, 100) == "—/—"
+    assert _format_pass_fail(50, None) == "—/—"
+    assert _format_pass_fail(None, None) == "—/—"
+
+    # Test zero total
+    assert _format_pass_fail(0, 0) == "—/—"
+    assert _format_pass_fail(5, 0) == "—/—"
+
+    # Test perfect scores (fraction = 1.0)
+    assert _format_pass_fail(100, 100) == "100/1.00"
+    assert _format_pass_fail(50, 50) == "50/1.00"
+    assert _format_pass_fail(1, 1) == "1/1.00"
+
+    # Test zero scores (fraction = 0.0)
+    assert _format_pass_fail(0, 100) == "0/0.00"
+    assert _format_pass_fail(0, 50) == "0/0.00"
+
+    # Test regular fractions
+    assert _format_pass_fail(50, 100) == "50/0.50"  # Exactly 50%
+    assert _format_pass_fail(25, 100) == "25/0.25"  # Exactly 25%
+    assert _format_pass_fail(75, 100) == "75/0.75"  # Exactly 75%
+
+
+def test_format_pass_fail_special_thresholds():
+    """Test _format_pass_fail() with special threshold handling."""
+
+    # Test very small fractions (< 0.005)
+    assert _format_pass_fail(1, 1000) == "1/<0.01"  # 0.001 -> <0.01
+    assert _format_pass_fail(2, 1000) == "2/<0.01"  # 0.002 -> <0.01
+    assert _format_pass_fail(4, 1000) == "4/<0.01"  # 0.004 -> <0.01
+
+    # Test just at boundary (>= 0.005)
+    assert _format_pass_fail(5, 1000) == "5/0.01"  # 0.005 -> 0.01
+    assert _format_pass_fail(6, 1000) == "6/0.01"  # 0.006 -> 0.01
+
+    # Test very high fractions (> 0.995)
+    assert _format_pass_fail(996, 1000) == "996/>0.99"  # 0.996 -> >0.99
+    assert _format_pass_fail(999, 1000) == "999/>0.99"  # 0.999 -> >0.99
+
+    # Test at 0.995 boundary (0.995 rounds to 0.99, not 1.00)
+    assert _format_pass_fail(995, 1000) == "995/0.99"  # 0.995 -> 0.99
+    assert _format_pass_fail(994, 1000) == "994/0.99"  # 0.994 -> 0.99
+
+
+def test_format_pass_fail_with_large_numbers():
+    """Test _format_pass_fail() with large numbers (uses _format_units)."""
+
+    # Test thousands
+    assert _format_pass_fail(15000, 20000) == "15K/0.75"
+    assert _format_pass_fail(50000, 100000) == "50K/0.50"
+
+    # Test millions
+    assert _format_pass_fail(1500000, 2000000) == "1.5M/0.75"
+    assert _format_pass_fail(750000, 1000000) == "750K/0.75"
+
+    # Test billions
+    assert _format_pass_fail(1500000000, 2000000000) == "1.5B/0.75"
+
+    # Test mixed large numbers with special thresholds
+    assert _format_pass_fail(15000, 20000000) == "15K/<0.01"  # Very small fraction
+    assert (
+        _format_pass_fail(19950000, 20000000) == "19.9M/>0.99"
+    )  # Very high fraction (19.95M rounds to 19.9M)
+
+
+def test_format_pass_fail_precision():
+    """Test _format_pass_fail() decimal precision handling."""
+
+    # Test various decimal precisions
+    assert _format_pass_fail(33, 100) == "33/0.33"  # 0.33
+    assert _format_pass_fail(67, 100) == "67/0.67"  # 0.67
+    assert _format_pass_fail(123, 1000) == "123/0.12"  # 0.123 -> 0.12
+    assert _format_pass_fail(567, 1000) == "567/0.57"  # 0.567 -> 0.57
+    assert _format_pass_fail(789, 1000) == "789/0.79"  # 0.789 -> 0.79
+
+    # Test rounding behavior
+    assert _format_pass_fail(333, 1000) == "333/0.33"  # 0.333 -> 0.33 (rounds down)
+    assert _format_pass_fail(336, 1000) == "336/0.34"  # 0.336 -> 0.34 (rounds up)
+    assert _format_pass_fail(666, 1000) == "666/0.67"  # 0.666 -> 0.67 (rounds up)
+
+
 def test_load_data_source_edge_cases():
-    """Test _load_data_source function edge cases."""
+    """Test _load_data_source() function edge cases."""
 
     # Test with each of the built-in datasets to ensure they all work
     datasets = ["small_table", "game_revenue", "nycflights", "global_sales"]
@@ -2689,3 +2823,53 @@ def test_handle_pl_missing_rich_print_call(mock_missing_vals_tbl, mock_rich_prin
 
     # Should call _rich_print_missing_table with missing_table and result
     mock_rich_print.assert_called_once_with(mock_missing_table, mock_result)
+
+
+def test_info_command_no_data_source(runner):
+    """Test info command when no data source is provided (should show help)."""
+    result = runner.invoke(info, [])
+
+    # Should exit with code 1 after showing help (expected behavior)
+    assert result.exit_code == 1
+    # Should contain help content
+    assert "pb info" in result.output
+
+
+def test_preview_command_no_data_source_no_pipe(runner):
+    """Test preview command when no data source is provided and not piped."""
+    result = runner.invoke(preview, [])
+
+    # Should exit with code 1
+    assert result.exit_code == 1
+    # Should contain either help content or pipe error (both are valid error paths)
+    assert ("pb preview" in result.output) or ("No data provided via pipe" in result.output)
+
+
+def test_scan_command_no_data_source_no_pipe(runner):
+    """Test scan command when no data source is provided and not piped."""
+    result = runner.invoke(scan, [])
+
+    # Should exit with code 1
+    assert result.exit_code == 1
+    # Should contain either help content or pipe error (both are valid error paths)
+    assert ("pb scan" in result.output) or ("No data provided via pipe" in result.output)
+
+
+def test_missing_command_no_data_source_no_pipe(runner):
+    """Test missing command when no data source is provided and not piped."""
+    result = runner.invoke(missing, [])
+
+    # Should exit with code 1
+    assert result.exit_code == 1
+    # Should contain either help content or pipe error (both are valid error paths)
+    assert ("pb missing" in result.output) or ("No data provided via pipe" in result.output)
+
+
+def test_validate_command_no_data_source_no_pipe(runner):
+    """Test validate command when no data source is provided and not piped."""
+    result = runner.invoke(validate, [])
+
+    # Should exit with code 1
+    assert result.exit_code == 1
+    # Should contain either help content or pipe error (both are valid error paths)
+    assert ("pb validate" in result.output) or ("No data provided via pipe" in result.output)
