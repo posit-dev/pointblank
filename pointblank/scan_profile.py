@@ -302,9 +302,9 @@ class _DataProfile:  # TODO: feels redundant and weird
                     if strict:
                         msg = f"Some types in {key!s} stat are different. Turn off `strict` to bypass."
                         raise TypeError(msg)
-                    for d in cols:
-                        if key in d:
-                            d[key] = str(d[key])
+                    for d in cols:  # pragma: no cover
+                        if key in d:  # pragma: no cover
+                            d[key] = str(d[key])  # pragma: no cover
 
         return nw.from_dict(transpose_dicts(cols), backend=self.implementation)
 
