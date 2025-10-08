@@ -2970,6 +2970,125 @@ def test_validation_error_handling_in_pre():
     assert validation.validation_info[0].eval_error is True
 
 
+def test_validation_pre_zero_rows():
+    """Test that validation handles zero-row tables from preconditions gracefully."""
+    tbl = pl.DataFrame({"a": [1, 2, 3, 4, 5]})
+
+    def keep_big_values(df):
+        return df.filter(pl.col("a") > 10)
+
+    validation = (
+        Validate(tbl).col_vals_lt(columns="a", value=100, pre=keep_big_values).interrogate()
+    )
+
+    # Should handle zero-row table gracefully
+    assert len(validation.validation_info) == 1
+
+    # The step should be marked as having an eval_error
+    assert validation.validation_info[0].eval_error is True
+
+    # The step should be marked as inactive
+    assert validation.validation_info[0].active is False
+
+    # The validation should have processed timing information
+    assert validation.validation_info[0].proc_duration_s is not None
+    assert validation.validation_info[0].time_processed is not None
+
+
+def test_validation_pre_zero_rows_with_multiple_steps():
+    """Test that zero-row precondition doesn't affect subsequent validation steps."""
+    tbl = pl.DataFrame({"a": [1, 2, 3, 4, 5], "b": [10, 20, 30, 40, 50]})
+
+    def keep_big_values(df):
+        return df.filter(pl.col("a") > 10)
+
+    validation = (
+        Validate(tbl)
+        .col_vals_lt(columns="a", value=100, pre=keep_big_values)
+        .col_vals_gt(columns="b", value=0)  # This should still run
+        .interrogate()
+    )
+
+    # Should have two validation steps
+    assert len(validation.validation_info) == 2
+
+    # First step should have eval_error due to zero rows
+    assert validation.validation_info[0].eval_error is True
+    assert validation.validation_info[0].active is False
+
+    # Second step should run successfully
+    assert validation.validation_info[1].eval_error is None
+    assert validation.validation_info[1].active is True
+    assert validation.validation_info[1].all_passed is True
+
+
+def test_validation_segments_zero_rows():
+    """Test that validation handles zero-row tables from segmentation gracefully."""
+
+    tbl = pl.DataFrame({"a": [1, 2, 3, 4, 5], "category": ["A", "A", "B", "B", "B"]})
+
+    # Segment by a category that doesn't exist
+    validation = (
+        Validate(tbl).col_vals_lt(columns="a", value=100, segments=("category", "C")).interrogate()
+    )
+
+    # Should handle zero-row segment gracefully
+    assert len(validation.validation_info) == 1
+
+    # The step should be marked as having an eval_error
+    assert validation.validation_info[0].eval_error is True
+
+    # The step should be marked as inactive
+    assert validation.validation_info[0].active is False
+
+
+def test_validation_table_level_assertions_zero_rows():
+    """Test that table-level assertions work correctly with zero-row preconditions.
+
+    Table-level assertions (col_schema_match(), row_count_match(), col_count_match(), etc.) should
+    still execute even when preprocessing results in zero rows, since they operate on the table
+    structure rather than row content. This is different from row-based validations which should
+    error when there are no rows to validate.
+    """
+
+    tbl = pl.DataFrame({"a": [1, 2, 3, 4, 5], "b": [10, 20, 30, 40, 50]})
+
+    def filter_to_zero_rows(df):
+        return df.filter(pl.col("a") > 100)
+
+    # Test col_schema_match: should work on zero-row table
+    schema = Schema(columns=[("a", "Int64"), ("b", "Int64")])
+    validation = (
+        Validate(tbl).col_schema_match(schema=schema, pre=filter_to_zero_rows).interrogate()
+    )
+    assert validation.validation_info[0].eval_error is None
+    assert validation.validation_info[0].active is True
+    assert validation.validation_info[0].all_passed is True
+    assert validation.validation_info[0].n == 1
+
+    # Test row_count_match: should work on zero-row table
+    # When we expect 0 rows, it should pass
+    validation = Validate(tbl).row_count_match(count=0, pre=filter_to_zero_rows).interrogate()
+    assert validation.validation_info[0].eval_error is None
+    assert validation.validation_info[0].active is True
+    assert validation.validation_info[0].all_passed is True
+    assert validation.validation_info[0].n == 1
+
+    # Test row_count_match with non-zero count: should fail but not error
+    validation = Validate(tbl).row_count_match(count=5, pre=filter_to_zero_rows).interrogate()
+    assert validation.validation_info[0].eval_error is None
+    assert validation.validation_info[0].active is True
+    assert validation.validation_info[0].all_passed is False
+    assert validation.validation_info[0].n == 1
+
+    # Test col_count_match: should work on zero-row table
+    validation = Validate(tbl).col_count_match(count=2, pre=filter_to_zero_rows).interrogate()
+    assert validation.validation_info[0].eval_error is None
+    assert validation.validation_info[0].active is True
+    assert validation.validation_info[0].all_passed is True
+    assert validation.validation_info[0].n == 1
+
+
 def test_conjointly_with_empty_expressions():
     tbl = pl.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]})
 
@@ -3194,29 +3313,27 @@ def test_polars_datetime_non_midnight_conversion():
 
         # Use a valid date that exists in the data but with a time component
         # This will test our conversion logic while still having data to validate
-        try:
-            validation = (
-                Validate(data=load_dataset(dataset="small_table", tbl_type="polars"))
-                .col_vals_gt(
-                    columns="d",
-                    value=100,
-                    segments=(
-                        "date",
-                        pl.lit(datetime.datetime(2016, 1, 4, 0, 0, 1)),
-                    ),  # 1 second after midnight
-                )
-                .interrogate()
+        validation = (
+            Validate(data=load_dataset(dataset="small_table", tbl_type="polars"))
+            .col_vals_gt(
+                columns="d",
+                value=100,
+                segments=(
+                    "date",
+                    pl.lit(datetime.datetime(2016, 1, 4, 0, 0, 1)),
+                ),  # 1 second after midnight
             )
+            .interrogate()
+        )
 
-            # If successful, check results
+        # If successful, check results (if it has data)
+        # Otherwise, it should have an eval_error if no rows match the segment
+        if validation.validation_info[0].eval_error:
+            # This is expected if the datetime doesn't match any data (zero rows)
+            assert validation.validation_info[0].active is False
+        else:
+            # If it has data, check that n_passed is valid
             assert validation.n_passed(i=1, scalar=True) >= 0
-
-        except ValueError as e:
-            # If it fails due to no matching data, that's okay: we mainly want to test the warning
-            if "test units must be greater than zero" in str(e):
-                pass  # This is expected if the datetime doesn't match any data
-            else:
-                raise
 
         # Check that we got a deprecation warning
         deprecation_warnings = [
