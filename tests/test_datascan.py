@@ -17,6 +17,10 @@ from pointblank.datascan import DataScan, col_summary_tbl
 from pointblank.validate import get_data_path, _process_github_url
 from pointblank._datascan_utils import _compact_0_1_fmt, _compact_decimal_fmt, _compact_integer_fmt
 from pointblank.scan_profile_stats import StatGroup, COLUMN_ORDER_REGISTRY
+from pointblank.scan_profile import _TypeMap, _DataProfile
+
+from pointblank._constants import SVG_ICONS_FOR_DATA_TYPES
+from enum import Enum
 
 if TYPE_CHECKING:
     import pyarrow as pa
@@ -548,3 +552,40 @@ def test_datascan_save_to_json(tmp_path):
         content = json.load(f)
         # The saved content should be a JSON string (due to json.dump with a string)
         assert isinstance(content, str)
+
+
+def test_typemap_fetch_icon_with_unknown_type():
+    """Test the KeyError exception handler in _TypeMap.fetch_icon()."""
+
+    # Create a mock type that's not in the icon_map
+    class UnknownType(Enum):
+        UNKNOWN = ("unknown_type",)
+
+    # This should trigger the KeyError and return the "object" icon
+    result = _TypeMap.fetch_icon(UnknownType.UNKNOWN)
+    assert result == SVG_ICONS_FOR_DATA_TYPES["object"]
+
+
+def test_dataprofile_as_dataframe_with_mixed_column_types():
+    """Test as_dataframe works correctly with different column types."""
+    # Create a DataFrame with different column types
+    df_pl = pl.DataFrame(
+        {
+            "numeric_col": [1, 2, 3],
+            "string_col": ["a", "b", "c"],
+            "bool_col": [True, False, True],
+        }
+    )
+
+    scanner = DataScan(data=df_pl)
+
+    # Call as_dataframe() with strict=False (the default)
+    result = scanner.profile.as_dataframe(strict=False)
+
+    # Should succeed without raising TypeError
+    assert result is not None
+    assert len(result) > 0
+
+    # Verify we can also call with strict=True
+    result_strict = scanner.profile.as_dataframe(strict=True)
+    assert result_strict is not None
