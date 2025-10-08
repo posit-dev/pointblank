@@ -430,7 +430,3 @@ def test_schema_input_errors(request, tbl_fixture):
 
     with pytest.raises(ValueError):
         Schema(columns=(1, "int"))
-
-
-if __name__ == "__main__":
-    pytest.main([__file__])
