@@ -162,8 +162,3 @@ def test_multiple_preprocessing_steps():
     # Each should be callable
     for func in preprocessing_functions:
         assert callable(func)
-
-
-if __name__ == "__main__":
-    # Run the tests if executed directly
-    pytest.main([__file__, "-v"])
