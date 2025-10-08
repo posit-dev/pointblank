@@ -308,61 +308,61 @@ Warning
         border-radius: 2px;
     ">
 <p>It’s easy to get a column-level summary of a table using the <a href="../reference/col_summary_tbl.html#pointblank.col_summary_tbl" title="0"><code>col_summary_tbl()</code></a> function. Here’s an example using the <code>small_table</code> dataset (itself loaded using the <a href="../reference/load_dataset.html#pointblank.load_dataset"><span><code>load_dataset()</code></span></a> function):</p>
-<div id="d1d8c256" class="cell" data-execution_count="1">
+<div id="27ef2b59" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>small_table <span class="op">=</span> pb.load_dataset(dataset<span class="op">=</span><span class="st">"small_table"</span>, tbl_type<span class="op">=</span><span class="st">"polars"</span>)</span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>pb.col_summary_tbl(data<span class="op">=</span>small_table)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
-<div id="yfsmvntuca" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="dhtgfhupxa" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans&display=swap');
-#yfsmvntuca table {
+#dhtgfhupxa table {
           font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
           -webkit-font-smoothing: antialiased;
           -moz-osx-font-smoothing: grayscale;
         }
 
-#yfsmvntuca thead, tbody, tfoot, tr, td, th { border-style: none; }
+#dhtgfhupxa thead, tbody, tfoot, tr, td, th { border-style: none; }
  tr { background-color: transparent; }
-#yfsmvntuca p { margin: 0; padding: 0; }
- #yfsmvntuca .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 16px; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: auto; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
- #yfsmvntuca .gt_caption { padding-top: 4px; padding-bottom: 4px; }
- #yfsmvntuca .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
- #yfsmvntuca .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
- #yfsmvntuca .gt_heading { background-color: #FFFFFF; text-align: left; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
- #yfsmvntuca .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
- #yfsmvntuca .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
- #yfsmvntuca .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
- #yfsmvntuca .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
- #yfsmvntuca .gt_column_spanner_outer:first-child { padding-left: 0; }
- #yfsmvntuca .gt_column_spanner_outer:last-child { padding-right: 0; }
- #yfsmvntuca .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
- #yfsmvntuca .gt_spanner_row { border-bottom-style: hidden; }
- #yfsmvntuca .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
- #yfsmvntuca .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
- #yfsmvntuca .gt_from_md> :first-child { margin-top: 0; }
- #yfsmvntuca .gt_from_md> :last-child { margin-bottom: 0; }
- #yfsmvntuca .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
- #yfsmvntuca .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
- #yfsmvntuca .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
- #yfsmvntuca .gt_row_group_first td { border-top-width: 2px; }
- #yfsmvntuca .gt_row_group_first th { border-top-width: 2px; }
- #yfsmvntuca .gt_striped { background-color: rgba(128,128,128,0.05); }
- #yfsmvntuca .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
- #yfsmvntuca .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
- #yfsmvntuca .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
- #yfsmvntuca .gt_left { text-align: left; }
- #yfsmvntuca .gt_center { text-align: center; }
- #yfsmvntuca .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
- #yfsmvntuca .gt_font_normal { font-weight: normal; }
- #yfsmvntuca .gt_font_bold { font-weight: bold; }
- #yfsmvntuca .gt_font_italic { font-style: italic; }
- #yfsmvntuca .gt_super { font-size: 65%; }
- #yfsmvntuca .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
- #yfsmvntuca .gt_asterisk { font-size: 100%; vertical-align: 0; }
+#dhtgfhupxa p { margin: 0; padding: 0; }
+ #dhtgfhupxa .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 16px; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: auto; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
+ #dhtgfhupxa .gt_caption { padding-top: 4px; padding-bottom: 4px; }
+ #dhtgfhupxa .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
+ #dhtgfhupxa .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
+ #dhtgfhupxa .gt_heading { background-color: #FFFFFF; text-align: left; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #dhtgfhupxa .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #dhtgfhupxa .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #dhtgfhupxa .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
+ #dhtgfhupxa .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
+ #dhtgfhupxa .gt_column_spanner_outer:first-child { padding-left: 0; }
+ #dhtgfhupxa .gt_column_spanner_outer:last-child { padding-right: 0; }
+ #dhtgfhupxa .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
+ #dhtgfhupxa .gt_spanner_row { border-bottom-style: hidden; }
+ #dhtgfhupxa .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
+ #dhtgfhupxa .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
+ #dhtgfhupxa .gt_from_md> :first-child { margin-top: 0; }
+ #dhtgfhupxa .gt_from_md> :last-child { margin-bottom: 0; }
+ #dhtgfhupxa .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
+ #dhtgfhupxa .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
+ #dhtgfhupxa .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
+ #dhtgfhupxa .gt_row_group_first td { border-top-width: 2px; }
+ #dhtgfhupxa .gt_row_group_first th { border-top-width: 2px; }
+ #dhtgfhupxa .gt_striped { color: #333333; background-color: #F4F4F4; }
+ #dhtgfhupxa .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #dhtgfhupxa .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #dhtgfhupxa .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #dhtgfhupxa .gt_left { text-align: left; }
+ #dhtgfhupxa .gt_center { text-align: center; }
+ #dhtgfhupxa .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
+ #dhtgfhupxa .gt_font_normal { font-weight: normal; }
+ #dhtgfhupxa .gt_font_bold { font-weight: bold; }
+ #dhtgfhupxa .gt_font_italic { font-style: italic; }
+ #dhtgfhupxa .gt_super { font-size: 65%; }
+ #dhtgfhupxa .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
+ #dhtgfhupxa .gt_asterisk { font-size: 100%; vertical-align: 0; }
  
 </style>
 <table style="table-layout: fixed;; width: 0px" class="gt_table" data-quarto-disable-processing="true" data-quarto-bootstrap="false">
@@ -634,63 +634,63 @@ Warning
 </div>
 </div>
 <p>This table used above was a Polars DataFrame, but the <a href="../reference/col_summary_tbl.html#pointblank.col_summary_tbl" title="0"><code>col_summary_tbl()</code></a> function works with any table supported by <code>pointblank</code>, including Pandas DataFrames and Ibis backend tables. Here’s an example using a DuckDB table handled by Ibis:</p>
-<div id="35e2eb70" class="cell" data-execution_count="2">
+<div id="56587eba" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>nycflights <span class="op">=</span> pb.load_dataset(dataset<span class="op">=</span><span class="st">"nycflights"</span>, tbl_type<span class="op">=</span><span class="st">"duckdb"</span>)</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>pb.col_summary_tbl(data<span class="op">=</span>nycflights, tbl_name<span class="op">=</span><span class="st">"nycflights"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>/opt/hostedtoolcache/Python/3.11.13/x64/lib/python3.11/site-packages/great_tables/_tbl_data.py:817: UserWarning: PyArrow Table support is currently experimental.
+<pre><code>/opt/hostedtoolcache/Python/3.11.13/x64/lib/python3.11/site-packages/great_tables/_tbl_data.py:822: UserWarning: PyArrow Table support is currently experimental.
   warnings.warn("PyArrow Table support is currently experimental.")</code></pre>
 </div>
 <div class="cell-output cell-output-display" data-execution_count="2">
-<div id="xnanfptorw" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="qoqfylzgpc" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans&display=swap');
-#xnanfptorw table {
+#qoqfylzgpc table {
           font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
           -webkit-font-smoothing: antialiased;
           -moz-osx-font-smoothing: grayscale;
         }
 
-#xnanfptorw thead, tbody, tfoot, tr, td, th { border-style: none; }
+#qoqfylzgpc thead, tbody, tfoot, tr, td, th { border-style: none; }
  tr { background-color: transparent; }
-#xnanfptorw p { margin: 0; padding: 0; }
- #xnanfptorw .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 16px; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: auto; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
- #xnanfptorw .gt_caption { padding-top: 4px; padding-bottom: 4px; }
- #xnanfptorw .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
- #xnanfptorw .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
- #xnanfptorw .gt_heading { background-color: #FFFFFF; text-align: left; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
- #xnanfptorw .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
- #xnanfptorw .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
- #xnanfptorw .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
- #xnanfptorw .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
- #xnanfptorw .gt_column_spanner_outer:first-child { padding-left: 0; }
- #xnanfptorw .gt_column_spanner_outer:last-child { padding-right: 0; }
- #xnanfptorw .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
- #xnanfptorw .gt_spanner_row { border-bottom-style: hidden; }
- #xnanfptorw .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
- #xnanfptorw .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
- #xnanfptorw .gt_from_md> :first-child { margin-top: 0; }
- #xnanfptorw .gt_from_md> :last-child { margin-bottom: 0; }
- #xnanfptorw .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
- #xnanfptorw .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
- #xnanfptorw .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
- #xnanfptorw .gt_row_group_first td { border-top-width: 2px; }
- #xnanfptorw .gt_row_group_first th { border-top-width: 2px; }
- #xnanfptorw .gt_striped { background-color: rgba(128,128,128,0.05); }
- #xnanfptorw .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
- #xnanfptorw .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
- #xnanfptorw .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
- #xnanfptorw .gt_left { text-align: left; }
- #xnanfptorw .gt_center { text-align: center; }
- #xnanfptorw .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
- #xnanfptorw .gt_font_normal { font-weight: normal; }
- #xnanfptorw .gt_font_bold { font-weight: bold; }
- #xnanfptorw .gt_font_italic { font-style: italic; }
- #xnanfptorw .gt_super { font-size: 65%; }
- #xnanfptorw .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
- #xnanfptorw .gt_asterisk { font-size: 100%; vertical-align: 0; }
+#qoqfylzgpc p { margin: 0; padding: 0; }
+ #qoqfylzgpc .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 16px; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: auto; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
+ #qoqfylzgpc .gt_caption { padding-top: 4px; padding-bottom: 4px; }
+ #qoqfylzgpc .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
+ #qoqfylzgpc .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
+ #qoqfylzgpc .gt_heading { background-color: #FFFFFF; text-align: left; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #qoqfylzgpc .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #qoqfylzgpc .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #qoqfylzgpc .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
+ #qoqfylzgpc .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
+ #qoqfylzgpc .gt_column_spanner_outer:first-child { padding-left: 0; }
+ #qoqfylzgpc .gt_column_spanner_outer:last-child { padding-right: 0; }
+ #qoqfylzgpc .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
+ #qoqfylzgpc .gt_spanner_row { border-bottom-style: hidden; }
+ #qoqfylzgpc .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
+ #qoqfylzgpc .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
+ #qoqfylzgpc .gt_from_md> :first-child { margin-top: 0; }
+ #qoqfylzgpc .gt_from_md> :last-child { margin-bottom: 0; }
+ #qoqfylzgpc .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
+ #qoqfylzgpc .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
+ #qoqfylzgpc .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
+ #qoqfylzgpc .gt_row_group_first td { border-top-width: 2px; }
+ #qoqfylzgpc .gt_row_group_first th { border-top-width: 2px; }
+ #qoqfylzgpc .gt_striped { color: #333333; background-color: #F4F4F4; }
+ #qoqfylzgpc .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #qoqfylzgpc .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #qoqfylzgpc .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #qoqfylzgpc .gt_left { text-align: left; }
+ #qoqfylzgpc .gt_center { text-align: center; }
+ #qoqfylzgpc .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
+ #qoqfylzgpc .gt_font_normal { font-weight: normal; }
+ #qoqfylzgpc .gt_font_bold { font-weight: bold; }
+ #qoqfylzgpc .gt_font_italic { font-style: italic; }
+ #qoqfylzgpc .gt_super { font-size: 65%; }
+ #qoqfylzgpc .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
+ #qoqfylzgpc .gt_asterisk { font-size: 100%; vertical-align: 0; }
  
 </style>
 <table style="table-layout: fixed;; width: 0px" class="gt_table" data-quarto-disable-processing="true" data-quarto-bootstrap="false">
@@ -735,7 +735,7 @@ Warning
 </thead>
 <tbody class="gt_table_body">
   <tr>
-    <td class="gt_row gt_left"><svg width="24px" viewbox="0 0 180 181" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF; display: block; vertical-align: middle; margin: auto; padding-top: 0.5px;">
+    <td style="font-family: IBM Plex Mono;" class="gt_row gt_left"><svg width="24px" viewbox="0 0 180 181" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF; display: block; vertical-align: middle; margin: auto; padding-top: 0.5px;">
     <title>numeric</title>
     <g id="icon" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="numeric" transform="translate(4.000000, 4.339342)">
@@ -746,22 +746,22 @@ Warning
         </g>
     </g>
 </svg></td>
-    <td style="border-right: 1px solid #D3D3D3; font-size: 12px;" class="gt_row gt_left"><div style="font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">year</div><div style="font-size: 11px; color: gray;">Int64</div></td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">0<br>0</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">1<br>&lt;.01</td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">2,013</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">0</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">2,013</td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">2,013</td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">2,013</td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">2,013</td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">2,013</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">2,013</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">2,013</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">0</td>
+    <td style="font-family: IBM Plex Mono; border-right: 1px solid #D3D3D3; font-size: 12px;" class="gt_row gt_left"><div style="font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">year</div><div style="font-size: 11px; color: gray;">Int64</div></td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">0<br>0</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">1<br>&lt;.01</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">2,013</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">0</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">2,013</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">2,013</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">2,013</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">2,013</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">2,013</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">2,013</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">2,013</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">0</td>
   </tr>
   <tr>
-    <td class="gt_row gt_left"><svg width="24px" viewbox="0 0 180 181" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF; display: block; vertical-align: middle; margin: auto; padding-top: 0.5px;">
+    <td style="font-family: IBM Plex Mono;" class="gt_row gt_left"><svg width="24px" viewbox="0 0 180 181" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF; display: block; vertical-align: middle; margin: auto; padding-top: 0.5px;">
     <title>numeric</title>
     <g id="icon" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="numeric" transform="translate(4.000000, 4.339342)">
@@ -772,22 +772,22 @@ Warning
         </g>
     </g>
 </svg></td>
-    <td style="border-right: 1px solid #D3D3D3; font-size: 12px;" class="gt_row gt_left"><div style="font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">month</div><div style="font-size: 11px; color: gray;">Int64</div></td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">0<br>0</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">12<br>&lt;.01</td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">6.55</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">3.41</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">1</td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">1</td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">4</td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">6.77</td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">10</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">12</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">12</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">6</td>
+    <td style="font-family: IBM Plex Mono; border-right: 1px solid #D3D3D3; font-size: 12px;" class="gt_row gt_left"><div style="font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">month</div><div style="font-size: 11px; color: gray;">Int64</div></td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">0<br>0</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">12<br>&lt;.01</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">6.55</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">3.41</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">1</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">1</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">4</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">6.77</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">10</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">12</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">12</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">6</td>
   </tr>
   <tr>
-    <td class="gt_row gt_left"><svg width="24px" viewbox="0 0 180 181" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF; display: block; vertical-align: middle; margin: auto; padding-top: 0.5px;">
+    <td style="font-family: IBM Plex Mono;" class="gt_row gt_left"><svg width="24px" viewbox="0 0 180 181" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF; display: block; vertical-align: middle; margin: auto; padding-top: 0.5px;">
     <title>numeric</title>
     <g id="icon" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="numeric" transform="translate(4.000000, 4.339342)">
@@ -798,22 +798,22 @@ Warning
         </g>
     </g>
 </svg></td>
-    <td style="border-right: 1px solid #D3D3D3; font-size: 12px;" class="gt_row gt_left"><div style="font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">day</div><div style="font-size: 11px; color: gray;">Int64</div></td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">0<br>0</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">31<br>&lt;.01</td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">15.71</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">8.77</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">1</td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">1</td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">8</td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">15.64</td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">23</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">29</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">31</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">15</td>
+    <td style="font-family: IBM Plex Mono; border-right: 1px solid #D3D3D3; font-size: 12px;" class="gt_row gt_left"><div style="font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">day</div><div style="font-size: 11px; color: gray;">Int64</div></td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">0<br>0</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">31<br>&lt;.01</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">15.71</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">8.77</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">1</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">1</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">8</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">15.64</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">23</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">29</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">31</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">15</td>
   </tr>
   <tr>
-    <td class="gt_row gt_left"><svg width="24px" viewbox="0 0 180 181" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF; display: block; vertical-align: middle; margin: auto; padding-top: 0.5px;">
+    <td style="font-family: IBM Plex Mono;" class="gt_row gt_left"><svg width="24px" viewbox="0 0 180 181" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF; display: block; vertical-align: middle; margin: auto; padding-top: 0.5px;">
     <title>numeric</title>
     <g id="icon" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="numeric" transform="translate(4.000000, 4.339342)">
@@ -824,22 +824,22 @@ Warning
         </g>
     </g>
 </svg></td>
-    <td style="border-right: 1px solid #D3D3D3; font-size: 12px;" class="gt_row gt_left"><div style="font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">dep_time</div><div style="font-size: 11px; color: gray;">Int64</div></td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">8255<br>0.02</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">1319<br>&lt;.01</td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">1,349.11</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">488.28</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">1</td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">514</td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">907</td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">1,381.15</td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">1,744</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">2,112</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">2,400</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">837</td>
+    <td style="font-family: IBM Plex Mono; border-right: 1px solid #D3D3D3; font-size: 12px;" class="gt_row gt_left"><div style="font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">dep_time</div><div style="font-size: 11px; color: gray;">Int64</div></td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">8255<br>0.02</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">1319<br>&lt;.01</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">1,349.11</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">488.28</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">1</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">514</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">907</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">1,381.15</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">1,744</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">2,112</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">2,400</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">837</td>
   </tr>
   <tr>
-    <td class="gt_row gt_left"><svg width="24px" viewbox="0 0 180 181" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF; display: block; vertical-align: middle; margin: auto; padding-top: 0.5px;">
+    <td style="font-family: IBM Plex Mono;" class="gt_row gt_left"><svg width="24px" viewbox="0 0 180 181" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF; display: block; vertical-align: middle; margin: auto; padding-top: 0.5px;">
     <title>numeric</title>
     <g id="icon" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="numeric" transform="translate(4.000000, 4.339342)">
@@ -850,22 +850,22 @@ Warning
         </g>
     </g>
 </svg></td>
-    <td style="border-right: 1px solid #D3D3D3; font-size: 12px;" class="gt_row gt_left"><div style="font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">sched_dep_time</div><div style="font-size: 11px; color: gray;">Int64</div></td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">0<br>0</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">1021<br>&lt;.01</td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">1,344.25</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">467.34</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">106</td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">545</td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">906</td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">1,377.13</td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">1,729</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">2,050</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">2,359</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">823</td>
+    <td style="font-family: IBM Plex Mono; border-right: 1px solid #D3D3D3; font-size: 12px;" class="gt_row gt_left"><div style="font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">sched_dep_time</div><div style="font-size: 11px; color: gray;">Int64</div></td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">0<br>0</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">1021<br>&lt;.01</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">1,344.25</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">467.34</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">106</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">545</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">906</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">1,377.13</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">1,729</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">2,050</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">2,359</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">823</td>
   </tr>
   <tr>
-    <td class="gt_row gt_left"><svg width="24px" viewbox="0 0 180 181" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF; display: block; vertical-align: middle; margin: auto; padding-top: 0.5px;">
+    <td style="font-family: IBM Plex Mono;" class="gt_row gt_left"><svg width="24px" viewbox="0 0 180 181" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF; display: block; vertical-align: middle; margin: auto; padding-top: 0.5px;">
     <title>numeric</title>
     <g id="icon" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="numeric" transform="translate(4.000000, 4.339342)">
@@ -876,22 +876,22 @@ Warning
         </g>
     </g>
 </svg></td>
-    <td style="border-right: 1px solid #D3D3D3; font-size: 12px;" class="gt_row gt_left"><div style="font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">dep_delay</div><div style="font-size: 11px; color: gray;">Int64</div></td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">8255<br>0.02</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">528<br>&lt;.01</td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">12.64</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">40.21</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">−43</td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">−13</td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">−5</td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">−1.58</td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">11</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">88</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">1,301</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">16</td>
+    <td style="font-family: IBM Plex Mono; border-right: 1px solid #D3D3D3; font-size: 12px;" class="gt_row gt_left"><div style="font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">dep_delay</div><div style="font-size: 11px; color: gray;">Int64</div></td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">8255<br>0.02</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">528<br>&lt;.01</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">12.64</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">40.21</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">−43</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">−13</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">−5</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">−1.58</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">11</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">88</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">1,301</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">16</td>
   </tr>
   <tr>
-    <td class="gt_row gt_left"><svg width="24px" viewbox="0 0 180 181" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF; display: block; vertical-align: middle; margin: auto; padding-top: 0.5px;">
+    <td style="font-family: IBM Plex Mono;" class="gt_row gt_left"><svg width="24px" viewbox="0 0 180 181" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF; display: block; vertical-align: middle; margin: auto; padding-top: 0.5px;">
     <title>numeric</title>
     <g id="icon" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="numeric" transform="translate(4.000000, 4.339342)">
@@ -902,22 +902,22 @@ Warning
         </g>
     </g>
 </svg></td>
-    <td style="border-right: 1px solid #D3D3D3; font-size: 12px;" class="gt_row gt_left"><div style="font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">arr_time</div><div style="font-size: 11px; color: gray;">Int64</div></td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">8713<br>0.03</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">1412<br>&lt;.01</td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">1,502.05</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">533.26</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">1</td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">10</td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">1,104</td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">1,539.25</td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">1,940</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">2,248</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">2,400</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">836</td>
+    <td style="font-family: IBM Plex Mono; border-right: 1px solid #D3D3D3; font-size: 12px;" class="gt_row gt_left"><div style="font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">arr_time</div><div style="font-size: 11px; color: gray;">Int64</div></td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">8713<br>0.03</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">1412<br>&lt;.01</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">1,502.05</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">533.26</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">1</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">10</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">1,104</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">1,539.25</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">1,940</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">2,248</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">2,400</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">836</td>
   </tr>
   <tr>
-    <td class="gt_row gt_left"><svg width="24px" viewbox="0 0 180 181" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF; display: block; vertical-align: middle; margin: auto; padding-top: 0.5px;">
+    <td style="font-family: IBM Plex Mono;" class="gt_row gt_left"><svg width="24px" viewbox="0 0 180 181" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF; display: block; vertical-align: middle; margin: auto; padding-top: 0.5px;">
     <title>numeric</title>
     <g id="icon" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="numeric" transform="translate(4.000000, 4.339342)">
@@ -928,22 +928,22 @@ Warning
         </g>
     </g>
 </svg></td>
-    <td style="border-right: 1px solid #D3D3D3; font-size: 12px;" class="gt_row gt_left"><div style="font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">sched_arr_time</div><div style="font-size: 11px; color: gray;">Int64</div></td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">0<br>0</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">1163<br>&lt;.01</td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">1,536.38</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">497.46</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">1</td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">15</td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">1,124</td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">1,575.93</td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">1,945</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">2,246</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">2,359</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">821</td>
+    <td style="font-family: IBM Plex Mono; border-right: 1px solid #D3D3D3; font-size: 12px;" class="gt_row gt_left"><div style="font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">sched_arr_time</div><div style="font-size: 11px; color: gray;">Int64</div></td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">0<br>0</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">1163<br>&lt;.01</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">1,536.38</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">497.46</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">1</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">15</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">1,124</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">1,575.93</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">1,945</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">2,246</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">2,359</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">821</td>
   </tr>
   <tr>
-    <td class="gt_row gt_left"><svg width="24px" viewbox="0 0 180 181" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF; display: block; vertical-align: middle; margin: auto; padding-top: 0.5px;">
+    <td style="font-family: IBM Plex Mono;" class="gt_row gt_left"><svg width="24px" viewbox="0 0 180 181" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF; display: block; vertical-align: middle; margin: auto; padding-top: 0.5px;">
     <title>numeric</title>
     <g id="icon" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="numeric" transform="translate(4.000000, 4.339342)">
@@ -954,22 +954,22 @@ Warning
         </g>
     </g>
 </svg></td>
-    <td style="border-right: 1px solid #D3D3D3; font-size: 12px;" class="gt_row gt_left"><div style="font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">arr_delay</div><div style="font-size: 11px; color: gray;">Int64</div></td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">9430<br>0.03</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">578<br>&lt;.01</td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">6.9</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">44.63</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">−86</td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">−48</td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">−17</td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">−4.92</td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">14</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">91</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">1,272</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">31</td>
+    <td style="font-family: IBM Plex Mono; border-right: 1px solid #D3D3D3; font-size: 12px;" class="gt_row gt_left"><div style="font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">arr_delay</div><div style="font-size: 11px; color: gray;">Int64</div></td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">9430<br>0.03</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">578<br>&lt;.01</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">6.9</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">44.63</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">−86</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">−48</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">−17</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">−4.92</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">14</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">91</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">1,272</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">31</td>
   </tr>
   <tr>
-    <td class="gt_row gt_left"><svg width="24px" viewbox="0 0 180 181" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF; display: block; vertical-align: middle; margin: auto; padding-top: 0.5px;">
+    <td style="font-family: IBM Plex Mono;" class="gt_row gt_left"><svg width="24px" viewbox="0 0 180 181" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF; display: block; vertical-align: middle; margin: auto; padding-top: 0.5px;">
     <title>string</title>
     <g id="icon" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="string" transform="translate(4.000000, 4.500000)">
@@ -980,22 +980,22 @@ Warning
         </g>
     </g>
 </svg></td>
-    <td style="border-right: 1px solid #D3D3D3; font-size: 12px;" class="gt_row gt_left"><div style="font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">carrier</div><div style="font-size: 11px; color: gray;">String</div></td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">0<br>0</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">16<br>&lt;.01</td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">2</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">0</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">2</td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">2</td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">2</td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">2</td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">2</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">2</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">2</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">0</td>
+    <td style="font-family: IBM Plex Mono; border-right: 1px solid #D3D3D3; font-size: 12px;" class="gt_row gt_left"><div style="font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">carrier</div><div style="font-size: 11px; color: gray;">String</div></td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">0<br>0</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">16<br>&lt;.01</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">2</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">0</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">2</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">2</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">2</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">2</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">2</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">2</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">2</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">0</td>
   </tr>
   <tr>
-    <td class="gt_row gt_left"><svg width="24px" viewbox="0 0 180 181" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF; display: block; vertical-align: middle; margin: auto; padding-top: 0.5px;">
+    <td style="font-family: IBM Plex Mono;" class="gt_row gt_left"><svg width="24px" viewbox="0 0 180 181" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF; display: block; vertical-align: middle; margin: auto; padding-top: 0.5px;">
     <title>numeric</title>
     <g id="icon" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="numeric" transform="translate(4.000000, 4.339342)">
@@ -1006,22 +1006,22 @@ Warning
         </g>
     </g>
 </svg></td>
-    <td style="border-right: 1px solid #D3D3D3; font-size: 12px;" class="gt_row gt_left"><div style="font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">flight</div><div style="font-size: 11px; color: gray;">Int64</div></td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">0<br>0</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">3844<br>0.01</td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">1,971.92</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">1,632.47</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">1</td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">4</td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">553</td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">1,499.04</td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">3,465</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">4,695</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">8,500</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">2,912</td>
+    <td style="font-family: IBM Plex Mono; border-right: 1px solid #D3D3D3; font-size: 12px;" class="gt_row gt_left"><div style="font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">flight</div><div style="font-size: 11px; color: gray;">Int64</div></td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">0<br>0</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">3844<br>0.01</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">1,971.92</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">1,632.47</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">1</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">4</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">553</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">1,499.04</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">3,465</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">4,695</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">8,500</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">2,912</td>
   </tr>
   <tr>
-    <td class="gt_row gt_left"><svg width="24px" viewbox="0 0 180 181" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF; display: block; vertical-align: middle; margin: auto; padding-top: 0.5px;">
+    <td style="font-family: IBM Plex Mono;" class="gt_row gt_left"><svg width="24px" viewbox="0 0 180 181" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF; display: block; vertical-align: middle; margin: auto; padding-top: 0.5px;">
     <title>string</title>
     <g id="icon" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="string" transform="translate(4.000000, 4.500000)">
@@ -1032,22 +1032,22 @@ Warning
         </g>
     </g>
 </svg></td>
-    <td style="border-right: 1px solid #D3D3D3; font-size: 12px;" class="gt_row gt_left"><div style="font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">tailnum</div><div style="font-size: 11px; color: gray;">String</div></td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">2512<br>&lt;.01</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">4044<br>0.01</td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">6</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">0.07</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">5</td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">6</td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">6</td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">6</td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">6</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">6</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">6</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">0</td>
+    <td style="font-family: IBM Plex Mono; border-right: 1px solid #D3D3D3; font-size: 12px;" class="gt_row gt_left"><div style="font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">tailnum</div><div style="font-size: 11px; color: gray;">String</div></td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">2512<br>&lt;.01</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">4044<br>0.01</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">6</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">0.07</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">5</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">6</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">6</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">6</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">6</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">6</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">6</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">0</td>
   </tr>
   <tr>
-    <td class="gt_row gt_left"><svg width="24px" viewbox="0 0 180 181" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF; display: block; vertical-align: middle; margin: auto; padding-top: 0.5px;">
+    <td style="font-family: IBM Plex Mono;" class="gt_row gt_left"><svg width="24px" viewbox="0 0 180 181" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF; display: block; vertical-align: middle; margin: auto; padding-top: 0.5px;">
     <title>string</title>
     <g id="icon" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="string" transform="translate(4.000000, 4.500000)">
@@ -1058,22 +1058,22 @@ Warning
         </g>
     </g>
 </svg></td>
-    <td style="border-right: 1px solid #D3D3D3; font-size: 12px;" class="gt_row gt_left"><div style="font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">origin</div><div style="font-size: 11px; color: gray;">String</div></td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">0<br>0</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">3<br>&lt;.01</td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">3</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">0</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">3</td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">3</td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">3</td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">3</td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">3</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">3</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">3</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">0</td>
+    <td style="font-family: IBM Plex Mono; border-right: 1px solid #D3D3D3; font-size: 12px;" class="gt_row gt_left"><div style="font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">origin</div><div style="font-size: 11px; color: gray;">String</div></td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">0<br>0</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">3<br>&lt;.01</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">3</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">0</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">3</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">3</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">3</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">3</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">3</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">3</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">3</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">0</td>
   </tr>
   <tr>
-    <td class="gt_row gt_left"><svg width="24px" viewbox="0 0 180 181" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF; display: block; vertical-align: middle; margin: auto; padding-top: 0.5px;">
+    <td style="font-family: IBM Plex Mono;" class="gt_row gt_left"><svg width="24px" viewbox="0 0 180 181" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF; display: block; vertical-align: middle; margin: auto; padding-top: 0.5px;">
     <title>string</title>
     <g id="icon" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="string" transform="translate(4.000000, 4.500000)">
@@ -1084,22 +1084,22 @@ Warning
         </g>
     </g>
 </svg></td>
-    <td style="border-right: 1px solid #D3D3D3; font-size: 12px;" class="gt_row gt_left"><div style="font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">dest</div><div style="font-size: 11px; color: gray;">String</div></td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">0<br>0</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">105<br>&lt;.01</td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">3</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">0</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">3</td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">3</td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">3</td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">3</td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">3</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">3</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">3</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">0</td>
+    <td style="font-family: IBM Plex Mono; border-right: 1px solid #D3D3D3; font-size: 12px;" class="gt_row gt_left"><div style="font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">dest</div><div style="font-size: 11px; color: gray;">String</div></td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">0<br>0</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">105<br>&lt;.01</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">3</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">0</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">3</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">3</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">3</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">3</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">3</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">3</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">3</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">0</td>
   </tr>
   <tr>
-    <td class="gt_row gt_left"><svg width="24px" viewbox="0 0 180 181" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF; display: block; vertical-align: middle; margin: auto; padding-top: 0.5px;">
+    <td style="font-family: IBM Plex Mono;" class="gt_row gt_left"><svg width="24px" viewbox="0 0 180 181" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF; display: block; vertical-align: middle; margin: auto; padding-top: 0.5px;">
     <title>numeric</title>
     <g id="icon" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="numeric" transform="translate(4.000000, 4.339342)">
@@ -1110,22 +1110,22 @@ Warning
         </g>
     </g>
 </svg></td>
-    <td style="border-right: 1px solid #D3D3D3; font-size: 12px;" class="gt_row gt_left"><div style="font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">air_time</div><div style="font-size: 11px; color: gray;">Int64</div></td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">9430<br>0.03</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">510<br>&lt;.01</td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">150.69</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">93.69</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">20</td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">31</td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">82</td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">129.35</td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">192</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">339</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">695</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">110</td>
+    <td style="font-family: IBM Plex Mono; border-right: 1px solid #D3D3D3; font-size: 12px;" class="gt_row gt_left"><div style="font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">air_time</div><div style="font-size: 11px; color: gray;">Int64</div></td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">9430<br>0.03</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">510<br>&lt;.01</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">150.69</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">93.69</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">20</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">31</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">82</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">129.35</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">192</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">339</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">695</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">110</td>
   </tr>
   <tr>
-    <td class="gt_row gt_left"><svg width="24px" viewbox="0 0 180 181" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF; display: block; vertical-align: middle; margin: auto; padding-top: 0.5px;">
+    <td style="font-family: IBM Plex Mono;" class="gt_row gt_left"><svg width="24px" viewbox="0 0 180 181" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF; display: block; vertical-align: middle; margin: auto; padding-top: 0.5px;">
     <title>numeric</title>
     <g id="icon" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="numeric" transform="translate(4.000000, 4.339342)">
@@ -1136,22 +1136,22 @@ Warning
         </g>
     </g>
 </svg></td>
-    <td style="border-right: 1px solid #D3D3D3; font-size: 12px;" class="gt_row gt_left"><div style="font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">distance</div><div style="font-size: 11px; color: gray;">Int64</div></td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">0<br>0</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">214<br>&lt;.01</td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">1,039.91</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">733.23</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">17</td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">116</td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">502</td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">861.05</td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">1,389</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">2,475</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">4,983</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">887</td>
+    <td style="font-family: IBM Plex Mono; border-right: 1px solid #D3D3D3; font-size: 12px;" class="gt_row gt_left"><div style="font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">distance</div><div style="font-size: 11px; color: gray;">Int64</div></td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">0<br>0</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">214<br>&lt;.01</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">1,039.91</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">733.23</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">17</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">116</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">502</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">861.05</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">1,389</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">2,475</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">4,983</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">887</td>
   </tr>
   <tr>
-    <td class="gt_row gt_left"><svg width="24px" viewbox="0 0 180 181" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF; display: block; vertical-align: middle; margin: auto; padding-top: 0.5px;">
+    <td style="font-family: IBM Plex Mono;" class="gt_row gt_left"><svg width="24px" viewbox="0 0 180 181" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF; display: block; vertical-align: middle; margin: auto; padding-top: 0.5px;">
     <title>numeric</title>
     <g id="icon" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="numeric" transform="translate(4.000000, 4.339342)">
@@ -1162,22 +1162,22 @@ Warning
         </g>
     </g>
 </svg></td>
-    <td style="border-right: 1px solid #D3D3D3; font-size: 12px;" class="gt_row gt_left"><div style="font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">hour</div><div style="font-size: 11px; color: gray;">Int64</div></td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">0<br>0</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">20<br>&lt;.01</td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">13.18</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">4.66</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">1</td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">5</td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">9</td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">13.4</td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">17</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">20</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">23</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">8</td>
+    <td style="font-family: IBM Plex Mono; border-right: 1px solid #D3D3D3; font-size: 12px;" class="gt_row gt_left"><div style="font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">hour</div><div style="font-size: 11px; color: gray;">Int64</div></td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">0<br>0</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">20<br>&lt;.01</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">13.18</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">4.66</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">1</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">5</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">9</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">13.4</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">17</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">20</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">23</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">8</td>
   </tr>
   <tr>
-    <td class="gt_row gt_left"><svg width="24px" viewbox="0 0 180 181" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF; display: block; vertical-align: middle; margin: auto; padding-top: 0.5px;">
+    <td style="font-family: IBM Plex Mono;" class="gt_row gt_left"><svg width="24px" viewbox="0 0 180 181" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF; display: block; vertical-align: middle; margin: auto; padding-top: 0.5px;">
     <title>numeric</title>
     <g id="icon" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="numeric" transform="translate(4.000000, 4.339342)">
@@ -1188,19 +1188,19 @@ Warning
         </g>
     </g>
 </svg></td>
-    <td style="border-right: 1px solid #D3D3D3; font-size: 12px;" class="gt_row gt_left"><div style="font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">minute</div><div style="font-size: 11px; color: gray;">Int64</div></td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">0<br>0</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">60<br>&lt;.01</td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">26.23</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">19.3</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">0</td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">0</td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">8</td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">28.3</td>
-    <td style="text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">44</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">58</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">59</td>
-    <td style="text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">36</td>
+    <td style="font-family: IBM Plex Mono; border-right: 1px solid #D3D3D3; font-size: 12px;" class="gt_row gt_left"><div style="font-size: 13px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">minute</div><div style="font-size: 11px; color: gray;">Int64</div></td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">0<br>0</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">60<br>&lt;.01</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">26.23</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">19.3</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">0</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">0</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">8</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">28.3</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">44</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">58</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">59</td>
+    <td style="font-family: IBM Plex Mono; text-align: right; border-right: 1px solid #D3D3D3; border-left: 1px dashed #E5E5E5; font-size: 10px;" class="gt_row gt_center">36</td>
   </tr>
 </tbody>
   <tfoot class="gt_sourcenotes">

@@ -343,7 +343,7 @@ segments=["region", "date"]</code></pre>
         border-radius: 2px;
     ">
 <p>For the examples here, we’ll use a simple Polars DataFrame with two string columns (<code>a</code> and <code>b</code>). The table is shown below:</p>
-<div id="83904850" class="cell" data-execution_count="2">
+<div id="7103dccf" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -391,7 +391,7 @@ segments=["region", "date"]</code></pre>
  #pb_preview_tbl .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
  #pb_preview_tbl .gt_row_group_first td { border-top-width: 2px; }
  #pb_preview_tbl .gt_row_group_first th { border-top-width: 2px; }
- #pb_preview_tbl .gt_striped { background-color: rgba(128,128,128,0.05); }
+ #pb_preview_tbl .gt_striped { color: #333333; background-color: #F4F4F4; }
  #pb_preview_tbl .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
  #pb_preview_tbl .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
  #pb_preview_tbl .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
@@ -452,7 +452,7 @@ segments=["region", "date"]</code></pre>
 </div>
 </div>
 <p>Let’s validate that all of the values in column <code>a</code> match a particular regex pattern. We’ll determine if this validation had any failing test units (there are four test units, one for each row).</p>
-<div id="8853cd6a" class="cell" data-execution_count="3">
+<div id="a637e3ec" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_regex(columns<span class="op">=</span><span class="st">"a"</span>, pattern<span class="op">=</span><span class="vs">r"r</span><span class="pp">[a-z]</span><span class="vs">-</span><span class="pp">[0-9]</span><span class="op">{4}</span><span class="vs">"</span>)</span>
@@ -496,7 +496,7 @@ segments=["region", "date"]</code></pre>
  #pb_tbl .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
  #pb_tbl .gt_row_group_first td { border-top-width: 2px; }
  #pb_tbl .gt_row_group_first th { border-top-width: 2px; }
- #pb_tbl .gt_striped { background-color: rgba(128,128,128,0.05); }
+ #pb_tbl .gt_striped { color: #333333; background-color: #F4F4F4; }
  #pb_tbl .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
  #pb_tbl .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
  #pb_tbl .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
@@ -604,7 +604,7 @@ segments=["region", "date"]</code></pre>
 </div>
 <p>Printing the <code>validation</code> object shows the validation table in an HTML viewing environment. The validation table shows the single entry that corresponds to the validation step created by using <code>col_vals_regex()</code>. All test units passed, and there are no failing test units.</p>
 <p>Now, let’s use the same regex for a validation on column <code>b</code>.</p>
-<div id="921e6628" class="cell" data-execution_count="4">
+<div id="af614c07" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_regex(columns<span class="op">=</span><span class="st">"b"</span>, pattern<span class="op">=</span><span class="vs">r"r</span><span class="pp">[a-z]</span><span class="vs">-</span><span class="pp">[0-9]</span><span class="op">{4}</span><span class="vs">"</span>)</span>
@@ -648,7 +648,7 @@ segments=["region", "date"]</code></pre>
  #pb_tbl .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
  #pb_tbl .gt_row_group_first td { border-top-width: 2px; }
  #pb_tbl .gt_row_group_first th { border-top-width: 2px; }
- #pb_tbl .gt_striped { background-color: rgba(128,128,128,0.05); }
+ #pb_tbl .gt_striped { color: #333333; background-color: #F4F4F4; }
  #pb_tbl .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
  #pb_tbl .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
  #pb_tbl .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }

@@ -302,7 +302,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
         border-radius: 2px;
     ">
 <p>Suppose we have a table with columns <code>paid_2021</code>, <code>paid_2022</code>, <code>paid_2023</code>, <code>paid_2024</code>, and <code>name</code> and we’d like to validate that the values in the first four columns are greater than <code>10</code>. We can use the <a href="../reference/first_n.html#pointblank.first_n" title="0"><code>first_n()</code></a> column selector function to specify that the first four columns in the table are the columns to validate.</p>
-<div id="0768c77a" class="cell" data-execution_count="2">
+<div id="96720f23" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -359,7 +359,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
  #pb_tbl .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
  #pb_tbl .gt_row_group_first td { border-top-width: 2px; }
  #pb_tbl .gt_row_group_first th { border-top-width: 2px; }
- #pb_tbl .gt_striped { background-color: rgba(128,128,128,0.05); }
+ #pb_tbl .gt_striped { color: #333333; background-color: #F4F4F4; }
  #pb_tbl .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
  #pb_tbl .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
  #pb_tbl .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
@@ -587,7 +587,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 <p>From the results of the validation table we get four validation steps. The values in all those columns were all greater than <code>10</code>.</p>
 <p>We can also use the <a href="../reference/first_n.html#pointblank.first_n" title="0"><code>first_n()</code></a> function in combination with other column selectors (within <a href="../reference/col.html#pointblank.col"><span><code>col()</code></span></a>) to create more complex column selection criteria (i.e., to select columns that satisfy multiple conditions). For example, to select the first four columns but also omit those columns that end with <code>"2023"</code>, we can use the <code>-</code> operator to combine column selectors.</p>
-<div id="3aab8900" class="cell" data-execution_count="3">
+<div id="7f63dcb0" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>tbl <span class="op">=</span> pl.DataFrame(</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    {</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"paid_2021"</span>: [<span class="fl">17.94</span>, <span class="fl">16.55</span>, <span class="fl">17.85</span>],</span>
@@ -641,7 +641,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
  #pb_tbl .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
  #pb_tbl .gt_row_group_first td { border-top-width: 2px; }
  #pb_tbl .gt_row_group_first th { border-top-width: 2px; }
- #pb_tbl .gt_striped { background-color: rgba(128,128,128,0.05); }
+ #pb_tbl .gt_striped { color: #333333; background-color: #F4F4F4; }
  #pb_tbl .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
  #pb_tbl .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
  #pb_tbl .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
