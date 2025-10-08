@@ -11220,6 +11220,26 @@ class Validate:
                 tbl_type=tbl_type
             )
 
+            # Check if preprocessing or segmentation resulted in zero rows
+            # Only apply this check to row-based validations, not table-level validations
+            # (table-level validations like row_count_match(), col_count_match(), etc.,
+            # operate on the table as a whole, so zero rows is a valid input)
+            table_level_assertions = [
+                "col_exists",
+                "col_schema_match",
+                "row_count_match",
+                "col_count_match",
+            ]
+
+            if validation.n == 0 and assertion_type not in table_level_assertions:
+                # Mark the validation as having an eval_error
+                validation.eval_error = True
+                end_time = datetime.datetime.now(datetime.timezone.utc)
+                validation.proc_duration_s = (end_time - start_time).total_seconds()
+                validation.time_processed = end_time.isoformat(timespec="milliseconds")
+                validation.active = False
+                continue
+
             # ------------------------------------------------
             # Validation stage
             # ------------------------------------------------
