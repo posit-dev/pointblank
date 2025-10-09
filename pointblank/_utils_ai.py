@@ -791,15 +791,15 @@ class _AIValidationEngine:
                 logger.info(f"Successfully validated batch {batch['batch_id']}")
                 return results
 
-            except Exception as e:
+            except Exception as e:  # pragma: no cover
                 logger.error(
                     f"Failed to validate batch {batch['batch_id']}: {e}"
                 )  # pragma: no cover
                 # Return default results (all False) for failed batches
-                default_results = []
-                for i in range(batch["start_row"], batch["end_row"]):
-                    default_results.append({"index": i, "result": False})
-                return default_results
+                default_results = []  # pragma: no cover
+                for i in range(batch["start_row"], batch["end_row"]):  # pragma: no cover
+                    default_results.append({"index": i, "result": False})  # pragma: no cover
+                return default_results  # pragma: no cover
 
         # Execute all batch validations sequentially (chatlas is synchronous)
         final_results = []
