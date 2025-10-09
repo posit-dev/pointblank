@@ -845,12 +845,13 @@ def _provide_serialization_guidance(validation: Validate) -> None:
 
     # Find all preprocessing functions in the validation
     preprocessing_functions = []
+
     for i, validation_info in enumerate(validation.validation_info):
         if hasattr(validation_info, "pre") and validation_info.pre is not None:
             preprocessing_functions.append((i, validation_info))
 
     if not preprocessing_functions:  # pragma: no cover
-        # No preprocessing functions - validation should serialize cleanly
+        # No preprocessing functions: validation should serialize cleanly
         print("  Serialization Analysis:")  # pragma: no cover
         print("   ✓ No preprocessing functions detected")  # pragma: no cover
         print(
