@@ -479,7 +479,7 @@ def test_schema_from_polars_lazy_frame():
 
 
 def test_check_schema_match_basic():
-    """Test the _check_schema_match function with basic validation."""
+    """Test the _check_schema_match() function with basic validation."""
     # Create a simple DataFrame
     tbl = pd.DataFrame({"x": [1, 2, 3], "y": [4, 5, 6]})
 
@@ -502,7 +502,7 @@ def test_check_schema_match_basic():
 
 
 def test_check_schema_match_complete_option():
-    """Test the _check_schema_match function with complete parameter."""
+    """Test the _check_schema_match() function with complete= parameter."""
     tbl = pd.DataFrame({"x": [1, 2, 3], "y": [4, 5, 6], "z": [7, 8, 9]})
 
     # Partial schema (only 2 of 3 columns)
@@ -526,7 +526,7 @@ def test_check_schema_match_complete_option():
 
 
 def test_check_schema_match_in_order_option():
-    """Test the _check_schema_match function with in_order parameter."""
+    """Test the _check_schema_match() function with in_order= parameter."""
     tbl = pd.DataFrame({"x": [1, 2, 3], "y": [4, 5, 6]})
 
     # Schema with columns in different order
