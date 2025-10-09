@@ -1,47 +1,54 @@
-import pytest
-import pandas as pd
-import polars as pl
-
+import os
 import sys
+import tempfile
 from unittest.mock import patch
 
 import narwhals as nw
+import pandas as pd
+import polars as pl
+import pytest
 
 from pointblank._utils import (
-    _convert_to_narwhals,
+    _check_any_df_lib,
     _check_column_exists,
     _check_column_type,
     _check_invalid_fields,
-    _column_test_prep,
     _column_subset_test_prep,
-    _count_true_values_in_column,
+    _column_test_prep,
+    _convert_to_narwhals,
+    _copy_dataframe,
     _count_null_values_in_column,
-    _derive_single_bound,
+    _count_true_values_in_column,
     _derive_bounds,
+    _derive_single_bound,
     _format_to_float_value,
     _format_to_integer_value,
-    _get_assertion_from_fname,
-    _get_column_dtype,
     _get_api_and_examples_text,
     _get_api_text,
+    _get_assertion_from_fname,
+    _get_column_dtype,
     _get_examples_text,
     _get_fn_name,
     _get_tbl_type,
+    _is_date_or_datetime_dtype,
+    _is_duration_dtype,
     _is_lazy_frame,
     _is_lib_present,
     _is_narwhals_table,
     _is_numeric_dtype,
-    _is_date_or_datetime_dtype,
-    _is_duration_dtype,
     _is_value_a_df,
-    _check_any_df_lib,
     _pivot_to_dict,
     _process_ibis_through_narwhals,
     _select_df_lib,
     transpose_dicts,
 )
-
 from pointblank.validate import load_dataset
+
+# Import ibis conditionally for tests that need it
+try:
+    import ibis
+except ImportError:
+    ibis = None
 
 
 @pytest.fixture
@@ -726,13 +733,14 @@ def test_process_ibis_through_narwhals():
 
 
 def test_get_tbl_type_additional():
-    # Test with invalid data that raises TypeError
+    """Test invalid input detection in _get_tbl_type()."""
     with pytest.raises(TypeError):
         _get_tbl_type("invalid_data")
 
 
 def test_get_tbl_type_pyspark():
-    # Test pyspark detection by mocking narwhals
+    """Test detection of PySpark DataFrames."""
+
     class MockPySparkNamespace:
         def __str__(self):
             return "pyspark.sql.module"
@@ -751,9 +759,123 @@ def test_get_tbl_type_pyspark():
 
 
 def test_get_column_dtype_raw_parameter():
+    """Test the `raw=` parameter of _get_column_dtype()."""
+
     tbl = pd.DataFrame({"int_col": [1, 2, 3]})
     dfn = _convert_to_narwhals(tbl)
 
-    # Test raw=True - this should return the raw dtype from the schema
+    # Test raw=True as this should return the raw dtype from the schema
     raw_dtype = _get_column_dtype(dfn=dfn, column="int_col", raw=True)
+
     assert raw_dtype is not None  # Just check that it returns something
+
+
+def test_get_tbl_type_ibis_memtable():
+    """Test detection of Ibis memtable tables."""
+
+    # Create an actual Ibis memtable
+    df_pd = pd.DataFrame({"x": [1, 2, 3], "y": [4, 5, 6]})
+    ibis_table = ibis.memtable(df_pd)
+
+    # Test that it's detected as a memtable
+    result = _get_tbl_type(ibis_table)
+    assert result == "memtable"
+
+
+def test_get_tbl_type_ibis_parquet():
+    """Test detection of Ibis parquet tables."""
+
+    # Create a temporary parquet file
+    df_pd = pd.DataFrame({"x": [1, 2, 3], "y": [4, 5, 6]})
+
+    with tempfile.NamedTemporaryFile(suffix=".parquet", delete=False) as tmp:
+        tmp_path = tmp.name
+        df_pd.to_parquet(tmp_path)
+
+    try:
+        # Read it with ibis
+        conn = ibis.duckdb.connect()
+        ibis_table = conn.read_parquet(tmp_path)
+
+        # Test that it's detected as parquet
+        result = _get_tbl_type(ibis_table)
+        assert result == "parquet"
+    finally:
+        # Clean up
+        if os.path.exists(tmp_path):
+            os.unlink(tmp_path)
+
+
+def test_get_tbl_type_ibis_duckdb():
+    """Test detection of plain DuckDB Ibis tables."""
+
+    # Create a DuckDB table that's not a memtable or Parquet
+    conn = ibis.duckdb.connect()
+
+    # Create a table directly in DuckDB
+    ibis_table = conn.create_table(
+        "test_table", pd.DataFrame({"x": [1, 2, 3], "y": [4, 5, 6]}), overwrite=True
+    )
+
+    # Test that it's detected as duckdb
+    result = _get_tbl_type(ibis_table)
+
+    assert result == "duckdb"
+
+
+def test_copy_dataframe_exception_handling():
+    """Test _copy_dataframe() with DataFrames that don't support standard copy methods."""
+
+    # Test with a normal DataFrame (should use .copy())
+    df_pd = pd.DataFrame({"x": [1, 2, 3]})
+    copied = _copy_dataframe(df_pd)
+
+    assert copied is not df_pd  # Should be a different object
+    assert copied.equals(df_pd)  # But with same values
+
+    # Test with a Polars DataFrame (should use .clone())
+    df_pl = pl.DataFrame({"x": [1, 2, 3]})
+    copied_pl = _copy_dataframe(df_pl)
+
+    assert copied_pl is not df_pl
+    assert copied_pl.equals(df_pl)
+
+    # Test with a mock object that has copy() but it raises an exception
+    class MockDFWithBrokenCopy:
+        def copy(self):
+            raise RuntimeError("Copy failed!")
+
+        def clone(self):
+            raise RuntimeError("Clone failed!")
+
+        def select(self, col):
+            raise RuntimeError("Select failed!")
+
+    mock_df = MockDFWithBrokenCopy()
+
+    # Should fall back to deepcopy or return original
+    result = _copy_dataframe(mock_df)
+
+    # Since deepcopy might work or fail, we just verify no exception is raised
+    assert result is not None
+
+    # Test with an object that can't be deepcopied either
+    class UncopyableObject:
+        def copy(self):
+            raise RuntimeError("Copy failed!")
+
+        def clone(self):
+            raise RuntimeError("Clone failed!")
+
+        def select(self, col):
+            raise RuntimeError("Select failed!")
+
+        def __deepcopy__(self, memo):
+            raise RuntimeError("Deepcopy failed!")
+
+    uncopyable = UncopyableObject()
+
+    # Should return the original object without raising an exception
+    result = _copy_dataframe(uncopyable)
+
+    assert result is uncopyable  # Should return the original

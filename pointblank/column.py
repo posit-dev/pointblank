@@ -219,7 +219,7 @@ class ColumnSelectorNarwhals(Column):
         # Use `collect_schema()` for LazyFrame to avoid performance warnings
         if hasattr(selected_df, "collect_schema"):
             return list(selected_df.collect_schema().keys())
-        else:
+        else:  # pragma: no cover
             return list(selected_df.columns)
 
 

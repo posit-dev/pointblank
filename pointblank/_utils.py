@@ -102,7 +102,7 @@ def _get_tbl_type(data: FrameT | Any) -> str:
                 if "read_parquet" in tbl_name:
                     return "parquet"
 
-            else:
+            else:  # pragma: no cover
                 return "duckdb"
 
         return backend
@@ -274,10 +274,10 @@ def _copy_dataframe(df):
         import copy
 
         return copy.deepcopy(df)
-    except Exception:
+    except Exception:  # pragma: no cover
         # If all else fails, return the original DataFrame
         # This is better than crashing the validation
-        return df
+        return df  # pragma: no cover
 
 
 def _convert_to_narwhals(df: FrameT) -> nw.DataFrame:

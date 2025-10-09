@@ -25,7 +25,3 @@ def test_no_pandas_interr() -> None:
     validate = pb.Validate(data=df).col_exists(columns=["date", "number"])
 
     validate.interrogate().get_tabular_report()
-
-
-if __name__ == "__main__":
-    pytest.main([__file__, "-v", "-s"])

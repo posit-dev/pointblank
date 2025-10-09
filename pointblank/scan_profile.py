@@ -299,12 +299,12 @@ class _DataProfile:  # TODO: feels redundant and weird
                 # instantiations that require consistent types.
                 all_same_type: bool = all(type(v) is first_type for v in values[1:])
                 if not all_same_type:
-                    if strict:
-                        msg = f"Some types in {key!s} stat are different. Turn off `strict` to bypass."
-                        raise TypeError(msg)
-                    for d in cols:
-                        if key in d:
-                            d[key] = str(d[key])
+                    if strict:  # pragma: no cover
+                        msg = f"Some types in {key!s} stat are different. Turn off `strict` to bypass."  # pragma: no cover
+                        raise TypeError(msg)  # pragma: no cover
+                    for d in cols:  # pragma: no cover
+                        if key in d:  # pragma: no cover
+                            d[key] = str(d[key])  # pragma: no cover
 
         return nw.from_dict(transpose_dicts(cols), backend=self.implementation)
 

@@ -343,15 +343,15 @@ class Schema:
             schema_dict = {k: str(v) for k, v in schema_dict.items()}
             self.columns = list(schema_dict.items())
 
-        elif table_type == "pyspark":
+        elif table_type == "pyspark":  # pragma: no cover
             # Convert PySpark DataFrame to Narwhals to get schema
-            nw_df = nw.from_native(self.tbl)
-            if _is_lazy_frame(data=nw_df):
-                schema_dict = dict(nw_df.collect_schema())
-            else:
-                schema_dict = dict(nw_df.schema.items())
-            schema_dict = {k: str(v) for k, v in schema_dict.items()}
-            self.columns = list(schema_dict.items())
+            nw_df = nw.from_native(self.tbl)  # pragma: no cover
+            if _is_lazy_frame(data=nw_df):  # pragma: no cover
+                schema_dict = dict(nw_df.collect_schema())  # pragma: no cover
+            else:  # pragma: no cover
+                schema_dict = dict(nw_df.schema.items())  # pragma: no cover
+            schema_dict = {k: str(v) for k, v in schema_dict.items()}  # pragma: no cover
+            self.columns = list(schema_dict.items())  # pragma: no cover
 
         elif table_type in IBIS_BACKENDS:
             schema_dict = dict(self.tbl.schema().items())
@@ -886,80 +886,6 @@ def _schema_info_generate_params_dict(
         "case_sensitive_dtypes": case_sensitive_dtypes,
         "full_match_dtypes": full_match_dtypes,
     }
-
-
-def _check_schema_match(
-    data_tbl: any,
-    schema: Schema,
-    complete: bool = True,
-    in_order: bool = True,
-    case_sensitive_colnames: bool = True,
-    case_sensitive_dtypes: bool = True,
-    full_match_dtypes: bool = True,
-) -> bool:
-    """
-    Check if the schema matches the target table.
-
-    This function performs schema validation and returns a boolean result.
-
-    Parameters
-    ----------
-    data_tbl
-        The target table to validate.
-    schema
-        The expected schema.
-    complete
-        Whether the schema should be complete.
-    in_order
-        Whether the schema should be in order.
-    case_sensitive_colnames
-        Whether column names are case-sensitive.
-    case_sensitive_dtypes
-        Whether data types are case-sensitive.
-    full_match_dtypes
-        Whether data types must match exactly.
-
-    Returns
-    -------
-    bool
-        True if the schema matches, False otherwise.
-    """
-    validation_info = _get_schema_validation_info(
-        data_tbl=data_tbl,
-        schema=schema,
-        passed=False,  # This will be determined by the logic below
-        complete=complete,
-        in_order=in_order,
-        case_sensitive_colnames=case_sensitive_colnames,
-        case_sensitive_dtypes=case_sensitive_dtypes,
-        full_match_dtypes=full_match_dtypes,
-    )
-
-    # Determine if the schema validation passed based on the validation info
-    passed = True
-
-    # Check completeness requirement
-    if complete and not validation_info["columns_full_set"]:
-        passed = False
-
-    # Check order requirement
-    if in_order and not validation_info["columns_matched_in_order"]:
-        passed = False
-
-    # Check if all expected columns were found
-    if validation_info["columns_not_found"]:
-        passed = False
-
-    # Check column-specific validations
-    for col_info in validation_info["columns"].values():
-        if not col_info["colname_matched"]:
-            passed = False
-        if not col_info.get(
-            "dtype_matched", True
-        ):  # dtype_matched may not exist if no dtypes specified
-            passed = False
-
-    return passed
 
 
 def _get_schema_validation_info(

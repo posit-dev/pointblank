@@ -625,6 +625,61 @@ def test_validate_batches(mock_create_chat, llm_config, mock_chat_response):
     assert mock_chat.chat.call_count == 2
 
 
+@patch("pointblank._utils_ai._create_chat_instance")
+def test_validate_batches_with_many_results(mock_create_chat, llm_config):
+    """Test validating a batch with more than 5 results to trigger debug logging."""
+
+    # Create a mock response with 7 results (more than 5)
+    mock_chat_response = """[
+        {"index": 0, "result": true},
+        {"index": 1, "result": false},
+        {"index": 2, "result": true},
+        {"index": 3, "result": true},
+        {"index": 4, "result": false},
+        {"index": 5, "result": true},
+        {"index": 6, "result": false}
+    ]"""
+
+    mock_chat = Mock()
+    mock_chat.chat.return_value = mock_chat_response
+    mock_create_chat.return_value = mock_chat
+
+    engine = _AIValidationEngine(llm_config)
+
+    # Create a batch with 7 rows
+    batches = [
+        {
+            "batch_id": 0,
+            "start_row": 0,
+            "end_row": 7,
+            "data": {
+                "columns": ["name"],
+                "rows": [
+                    {"name": "Alice"},
+                    {"name": "Bob"},
+                    {"name": "Charlie"},
+                    {"name": "David"},
+                    {"name": "Eve"},
+                    {"name": "Frank"},
+                    {"name": "Grace"},
+                ],
+            },
+        }
+    ]
+
+    prompt_builder = _PromptBuilder("Check names")
+
+    results = engine.validate_batches(batches, prompt_builder)
+
+    assert len(results) == 1  # One batch
+    assert len(results[0]) == 7  # Batch has 7 results
+
+    # Verify the results
+    assert results[0][0]["result"] is True
+    assert results[0][1]["result"] is False
+    assert results[0][6]["result"] is False
+
+
 # ============================================================================
 # Integration Tests
 # ============================================================================

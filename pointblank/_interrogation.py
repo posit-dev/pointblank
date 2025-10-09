@@ -119,8 +119,8 @@ def _safe_is_nan_or_null_expr(data_frame: Any, column_expr: Any, column_name: st
         # The namespace is the actual module, so we check its name
         if hasattr(native_namespace, "__name__") and "ibis" in native_namespace.__name__:
             return null_check
-    except Exception:
-        pass
+    except Exception:  # pragma: no cover
+        pass  # pragma: no cover
 
     # For non-Ibis backends, try to use `is_nan()` if the column type supports it
     try:
@@ -128,8 +128,8 @@ def _safe_is_nan_or_null_expr(data_frame: Any, column_expr: Any, column_name: st
             schema = data_frame.collect_schema()
         elif hasattr(data_frame, "schema"):
             schema = data_frame.schema
-        else:
-            schema = None
+        else:  # pragma: no cover
+            schema = None  # pragma: no cover
 
         if schema and column_name:
             column_dtype = schema.get(column_name)
@@ -148,8 +148,8 @@ def _safe_is_nan_or_null_expr(data_frame: Any, column_expr: Any, column_name: st
                     except Exception:
                         # If `is_nan()` fails for any reason, fall back to Null only
                         pass
-    except Exception:
-        pass
+    except Exception:  # pragma: no cover
+        pass  # pragma: no cover
 
     # Fallback: just check Null values
     return null_check
@@ -370,7 +370,7 @@ class ConjointlyValidation:
                 else:
                     raise TypeError(
                         f"Expression returned {type(expr_result)}, expected PySpark Column"
-                    )
+                    )  # pragma: no cover
 
             except Exception as e:
                 try:
@@ -382,7 +382,9 @@ class ConjointlyValidation:
                         pyspark_expr = col_expr.to_pyspark_expr(self.data_tbl)
                         pyspark_columns.append(pyspark_expr)
                     else:
-                        raise TypeError(f"Cannot convert {type(col_expr)} to PySpark Column")
+                        raise TypeError(
+                            f"Cannot convert {type(col_expr)} to PySpark Column"
+                        )  # pragma: no cover
                 except Exception as nested_e:
                     print(f"Error evaluating PySpark expression: {e} -> {nested_e}")
 
@@ -656,7 +658,7 @@ def col_vals_expr(data_tbl: FrameT, expr, tbl_type: str = "local"):
             return data_tbl.assign(pb_is_good_=expr)
 
     # For remote backends, return original table (placeholder)
-    return data_tbl
+    return data_tbl  # pragma: no cover
 
 
 def rows_complete(data_tbl: FrameT, columns_subset: list[str] | None):

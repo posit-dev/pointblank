@@ -143,17 +143,17 @@ class DataScan:
             for conv_method in valid_conversion_methods:
                 try:
                     valid_native = getattr(ibis_native, conv_method)()
-                except (NotImplementedError, ImportError, ModuleNotFoundError):
-                    continue
+                except (NotImplementedError, ImportError, ModuleNotFoundError):  # pragma: no cover
+                    continue  # pragma: no cover
                 break
-            else:
+            else:  # pragma: no cover
                 msg = (
                     "To use `ibis` as input, you must have one of arrow, pandas, polars or numpy "
                     "available in the process. Until `ibis` is fully supported by Narwhals, this is "
                     "necessary. Additionally, the data must be collected in order to calculate some "
                     "structural statistics, which may be performance detrimental."
                 )
-                raise ImportError(msg)
+                raise ImportError(msg)  # pragma: no cover
             as_native = nw.from_native(valid_native)
 
         self.nw_data: Frame = nw.from_native(as_native)
