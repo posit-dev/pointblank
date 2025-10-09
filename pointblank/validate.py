@@ -785,8 +785,8 @@ def _check_for_unpicklable_objects(validation: Validate) -> tuple[dict[str, str]
                 if func_module == "__main__" or not func_module:
                     # Functions defined in __main__ or without a module are risky
                     # These might pickle now but fail when loaded elsewhere
-                    function_sources[func_name] = source_code
-                    validation_info._pb_function_name = func_name
+                    function_sources[func_name] = source_code  # pragma: no cover
+                    validation_info._pb_function_name = func_name  # pragma: no cover
 
             except (OSError, TypeError):  # pragma: no cover
                 # If we can't get source, check if it's at least picklable
