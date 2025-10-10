@@ -4384,128 +4384,6 @@ col_vals_expr(self, expr: 'any', pre: 'Callable | None' = None, segments: 'Segme
         by using `col_vals_expr()`. All test units passed, with no failing test units.
         
 
-col_exists(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', thresholds: 'int | float | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
-
-        Validate whether one or more columns exist in the table.
-
-        The `col_exists()` method checks whether one or more columns exist in the target table. The
-        only requirement is specification of the column names. Each validation step or expectation
-        will operate over a single test unit, which is whether the column exists or not.
-
-        Parameters
-        ----------
-        columns
-            A single column or a list of columns to validate. Can also use
-            [`col()`](`pointblank.col`) with column selectors to specify one or more columns. If
-            multiple columns are supplied or resolved, there will be a separate validation step
-            generated for each column.
-        thresholds
-            Set threshold failure levels for reporting and reacting to exceedences of the levels.
-            The thresholds are set at the step level and will override any global thresholds set in
-            `Validate(thresholds=...)`. The default is `None`, which means that no thresholds will
-            be set locally and global thresholds (if any) will take effect. Look at the *Thresholds*
-            section for information on how to set threshold levels.
-        actions
-            Optional actions to take when the validation step(s) meets or exceeds any set threshold
-            levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
-            define the actions.
-        brief
-            An optional brief description of the validation step that will be displayed in the
-            reporting table. You can use the templating elements like `"{step}"` to insert
-            the step number, or `"{auto}"` to include an automatically generated brief. If `True`
-            the entire brief will be automatically generated. If `None` (the default) then there
-            won't be a brief.
-        active
-            A boolean value indicating whether the validation step should be active. Using `False`
-            will make the validation step inactive (still reporting its presence and keeping indexes
-            for the steps unchanged).
-
-        Returns
-        -------
-        Validate
-            The `Validate` object with the added validation step.
-
-        Thresholds
-        ----------
-        The `thresholds=` parameter is used to set the failure-condition levels for the validation
-        step. If they are set here at the step level, these thresholds will override any thresholds
-        set at the global level in `Validate(thresholds=...)`.
-
-        There are three threshold levels: 'warning', 'error', and 'critical'. The threshold values
-        can either be set as a proportion failing of all test units (a value between `0` to `1`),
-        or, the absolute number of failing test units (as integer that's `1` or greater).
-
-        Thresholds can be defined using one of these input schemes:
-
-        1. use the [`Thresholds`](`pointblank.Thresholds`) class (the most direct way to create
-        thresholds)
-        2. provide a tuple of 1-3 values, where position `0` is the 'warning' level, position `1` is
-        the 'error' level, and position `2` is the 'critical' level
-        3. create a dictionary of 1-3 value entries; the valid keys: are 'warning', 'error', and
-        'critical'
-        4. a single integer/float value denoting absolute number or fraction of failing test units
-        for the 'warning' level only
-
-        If the number of failing test units exceeds set thresholds, the validation step will be
-        marked as 'warning', 'error', or 'critical'. All of the threshold levels don't need to be
-        set, you're free to set any combination of them.
-
-        Aside from reporting failure conditions, thresholds can be used to determine the actions to
-        take for each level of failure (using the `actions=` parameter).
-
-        Examples
-        --------
-        For the examples here, we'll use a simple Polars DataFrame with a string columns (`a`) and a
-        numeric column (`b`). The table is shown below:
-
-        ```python
-        import pointblank as pb
-        import polars as pl
-
-        tbl = pl.DataFrame(
-            {
-                "a": ["apple", "banana", "cherry", "date"],
-                "b": [1, 6, 3, 5],
-            }
-        )
-
-        pb.preview(tbl)
-        ```
-
-        Let's validate that the columns `a` and `b` actually exist in the table. We'll determine if
-        this validation had any failing test units (each validation will have a single test unit).
-
-        ```python
-        validation = (
-            pb.Validate(data=tbl)
-            .col_exists(columns=["a", "b"])
-            .interrogate()
-        )
-
-        validation
-        ```
-
-        Printing the `validation` object shows the validation table in an HTML viewing environment.
-        The validation table shows two entries (one check per column) generated by the
-        `col_exists()` validation step. Both steps passed since both columns provided in `columns=`
-        are present in the table.
-
-        Now, let's check for the existence of a different set of columns.
-
-        ```python
-        validation = (
-            pb.Validate(data=tbl)
-            .col_exists(columns=["b", "c"])
-            .interrogate()
-        )
-
-        validation
-        ```
-
-        The validation table reports one passing validation step (the check for column `b`) and one
-        failing validation step (the check for column `c`, which doesn't exist).
-        
-
 rows_distinct(self, columns_subset: 'str | list[str] | None' = None, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
 
         Validate whether rows in the table are distinct.
@@ -4884,6 +4762,128 @@ rows_complete(self, columns_subset: 'str | list[str] | None' = None, pre: 'Calla
         The validation table reports a single failing test units. The last row contains missing
         values in both the `col_2` and `col_3` columns.
         others.
+        
+
+col_exists(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', thresholds: 'int | float | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
+
+        Validate whether one or more columns exist in the table.
+
+        The `col_exists()` method checks whether one or more columns exist in the target table. The
+        only requirement is specification of the column names. Each validation step or expectation
+        will operate over a single test unit, which is whether the column exists or not.
+
+        Parameters
+        ----------
+        columns
+            A single column or a list of columns to validate. Can also use
+            [`col()`](`pointblank.col`) with column selectors to specify one or more columns. If
+            multiple columns are supplied or resolved, there will be a separate validation step
+            generated for each column.
+        thresholds
+            Set threshold failure levels for reporting and reacting to exceedences of the levels.
+            The thresholds are set at the step level and will override any global thresholds set in
+            `Validate(thresholds=...)`. The default is `None`, which means that no thresholds will
+            be set locally and global thresholds (if any) will take effect. Look at the *Thresholds*
+            section for information on how to set threshold levels.
+        actions
+            Optional actions to take when the validation step(s) meets or exceeds any set threshold
+            levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
+            define the actions.
+        brief
+            An optional brief description of the validation step that will be displayed in the
+            reporting table. You can use the templating elements like `"{step}"` to insert
+            the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+            the entire brief will be automatically generated. If `None` (the default) then there
+            won't be a brief.
+        active
+            A boolean value indicating whether the validation step should be active. Using `False`
+            will make the validation step inactive (still reporting its presence and keeping indexes
+            for the steps unchanged).
+
+        Returns
+        -------
+        Validate
+            The `Validate` object with the added validation step.
+
+        Thresholds
+        ----------
+        The `thresholds=` parameter is used to set the failure-condition levels for the validation
+        step. If they are set here at the step level, these thresholds will override any thresholds
+        set at the global level in `Validate(thresholds=...)`.
+
+        There are three threshold levels: 'warning', 'error', and 'critical'. The threshold values
+        can either be set as a proportion failing of all test units (a value between `0` to `1`),
+        or, the absolute number of failing test units (as integer that's `1` or greater).
+
+        Thresholds can be defined using one of these input schemes:
+
+        1. use the [`Thresholds`](`pointblank.Thresholds`) class (the most direct way to create
+        thresholds)
+        2. provide a tuple of 1-3 values, where position `0` is the 'warning' level, position `1` is
+        the 'error' level, and position `2` is the 'critical' level
+        3. create a dictionary of 1-3 value entries; the valid keys: are 'warning', 'error', and
+        'critical'
+        4. a single integer/float value denoting absolute number or fraction of failing test units
+        for the 'warning' level only
+
+        If the number of failing test units exceeds set thresholds, the validation step will be
+        marked as 'warning', 'error', or 'critical'. All of the threshold levels don't need to be
+        set, you're free to set any combination of them.
+
+        Aside from reporting failure conditions, thresholds can be used to determine the actions to
+        take for each level of failure (using the `actions=` parameter).
+
+        Examples
+        --------
+        For the examples here, we'll use a simple Polars DataFrame with a string columns (`a`) and a
+        numeric column (`b`). The table is shown below:
+
+        ```python
+        import pointblank as pb
+        import polars as pl
+
+        tbl = pl.DataFrame(
+            {
+                "a": ["apple", "banana", "cherry", "date"],
+                "b": [1, 6, 3, 5],
+            }
+        )
+
+        pb.preview(tbl)
+        ```
+
+        Let's validate that the columns `a` and `b` actually exist in the table. We'll determine if
+        this validation had any failing test units (each validation will have a single test unit).
+
+        ```python
+        validation = (
+            pb.Validate(data=tbl)
+            .col_exists(columns=["a", "b"])
+            .interrogate()
+        )
+
+        validation
+        ```
+
+        Printing the `validation` object shows the validation table in an HTML viewing environment.
+        The validation table shows two entries (one check per column) generated by the
+        `col_exists()` validation step. Both steps passed since both columns provided in `columns=`
+        are present in the table.
+
+        Now, let's check for the existence of a different set of columns.
+
+        ```python
+        validation = (
+            pb.Validate(data=tbl)
+            .col_exists(columns=["b", "c"])
+            .interrogate()
+        )
+
+        validation
+        ```
+
+        The validation table reports one passing validation step (the check for column `b`) and one
+        failing validation step (the check for column `c`, which doesn't exist).
         
 
 col_schema_match(self, schema: 'Schema', complete: 'bool' = True, in_order: 'bool' = True, case_sensitive_colnames: 'bool' = True, case_sensitive_dtypes: 'bool' = True, full_match_dtypes: 'bool' = True, pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
@@ -5812,6 +5812,317 @@ specially(self, expr: 'Callable', pre: 'Callable | None' = None, thresholds: 'in
 
         By combining these patterns, you can create sophisticated validation workflows that address
         virtually any data quality requirement in your organization.
+        
+
+prompt(self, prompt: 'str', model: 'str', columns_subset: 'str | list[str] | None' = None, batch_size: 'int' = 1000, max_concurrent: 'int' = 3, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
+
+        Validate rows using AI/LLM-powered analysis.
+
+        The `prompt()` validation method uses Large Language Models (LLMs) to validate rows of data
+        based on natural language criteria. Similar to other Pointblank validation methods, this
+        generates binary test results (pass/fail) that integrate seamlessly with the standard
+        reporting framework.
+
+        Like `col_vals_*()` methods, `prompt()` evaluates data against specific criteria, but
+        instead of using programmatic rules, it uses natural language prompts interpreted by an LLM.
+        Like `rows_distinct()` and `rows_complete()`, it operates at the row level and allows you to
+        specify a subset of columns for evaluation using `columns_subset=`.
+
+        The system automatically combines your validation criteria from the `prompt=` parameter with
+        the necessary technical context, data formatting instructions, and response structure
+        requirements. This is all so you only need to focus on describing your validation logic in
+        plain language.
+
+        Each row becomes a test unit that either passes or fails the validation criteria, producing
+        the familiar True/False results that appear in Pointblank validation reports. This method
+        is particularly useful for complex validation rules that are difficult to express with
+        traditional validation methods, such as semantic checks, context-dependent validation, or
+        subjective quality assessments.
+
+        Parameters
+        ----------
+        prompt
+            A natural language description of the validation criteria. This prompt should clearly
+            describe what constitutes valid vs invalid rows. Some examples:
+            `"Each row should contain a valid email address and a realistic person name"`,
+            `"Values should indicate positive sentiment"`,
+            `"The description should mention a country name"`.
+        columns_subset
+            A single column or list of columns to include in the validation. If `None`, all columns
+            will be included. Specifying fewer columns can improve performance and reduce API costs
+            so try to include only the columns necessary for the validation.
+        model
+            The model to be used. This should be in the form of `provider:model` (e.g.,
+            `"anthropic:claude-3-5-sonnet-latest"`). Supported providers are `"anthropic"`,
+            `"openai"`, `"ollama"`, and `"bedrock"`. The model name should be the specific model to
+            be used from the provider. Model names are subject to change so consult the provider's
+            documentation for the most up-to-date model names.
+        batch_size
+            Number of rows to process in each batch. Larger batches are more efficient but may hit
+            API limits. Default is `1000`.
+        max_concurrent
+            Maximum number of concurrent API requests. Higher values speed up processing but may
+            hit rate limits. Default is `3`.
+        pre
+            An optional preprocessing function or lambda to apply to the data table during
+            interrogation. This function should take a table as input and return a modified table.
+        segments
+            An optional directive on segmentation, which serves to split a validation step into
+            multiple (one step per segment). Can be a single column name, a tuple that specifies a
+            column name and its corresponding values to segment on, or a combination of both
+            (provided as a list).
+        thresholds
+            Set threshold failure levels for reporting and reacting to exceedences of the levels.
+            The thresholds are set at the step level and will override any global thresholds set in
+            `Validate(thresholds=...)`. The default is `None`, which means that no thresholds will
+            be set locally and global thresholds (if any) will take effect.
+        actions
+            Optional actions to take when the validation step meets or exceeds any set threshold
+            levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
+            define the actions.
+        brief
+            An optional brief description of the validation step that will be displayed in the
+            reporting table. You can use the templating elements like `"{step}"` to insert
+            the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+            the entire brief will be automatically generated. If `None` (the default) then there
+            won't be a brief.
+        active
+            A boolean value indicating whether the validation step should be active. Using `False`
+            will make the validation step inactive (still reporting its presence and keeping indexes
+            for the steps unchanged).
+
+        Returns
+        -------
+        Validate
+            The `Validate` object with the added validation step.
+
+        Constructing the `model` Argument
+        ---------------------------------
+        The `model=` argument should be constructed using the provider and model name separated by a
+        colon (`provider:model`). The provider text can any of:
+
+        - `"anthropic"` (Anthropic)
+        - `"openai"` (OpenAI)
+        - `"ollama"` (Ollama)
+        - `"bedrock"` (Amazon Bedrock)
+
+        The model name should be the specific model to be used from the provider. Model names are
+        subject to change so consult the provider's documentation for the most up-to-date model
+        names.
+
+        Notes on Authentication
+        -----------------------
+        API keys are automatically loaded from environment variables or `.env` files and are **not**
+        stored in the validation object for security reasons. You should consider using a secure
+        method for handling API keys.
+
+        One way to do this is to load the API key from an environment variable and retrieve it using
+        the `os` module (specifically the `os.getenv()` function). Places to store the API key might
+        include `.bashrc`, `.bash_profile`, `.zshrc`, or `.zsh_profile`.
+
+        Another solution is to store one or more model provider API keys in an `.env` file (in the
+        root of your project). If the API keys have correct names (e.g., `ANTHROPIC_API_KEY` or
+        `OPENAI_API_KEY`) then the AI validation will automatically load the API key from the `.env`
+        file. An `.env` file might look like this:
+
+        ```plaintext
+        ANTHROPIC_API_KEY="your_anthropic_api_key_here"
+        OPENAI_API_KEY="your_openai_api_key_here"
+        ```
+
+        There's no need to have the `python-dotenv` package installed when using `.env` files in
+        this way.
+
+        **Provider-specific setup**:
+
+        - **OpenAI**: set `OPENAI_API_KEY` environment variable or create `.env` file
+        - **Anthropic**: set `ANTHROPIC_API_KEY` environment variable or create `.env` file
+        - **Ollama**: no API key required, just ensure Ollama is running locally
+        - **Bedrock**: configure AWS credentials through standard AWS methods
+
+        AI Validation Process
+        ---------------------
+        The AI validation process works as follows:
+
+        1. data batching: the data is split into batches of the specified size
+        2. row deduplication: duplicate rows (based on selected columns) are identified and only
+        unique combinations are sent to the LLM for analysis
+        3. json conversion: each batch of unique rows is converted to JSON format for the LLM
+        4. prompt construction: the user prompt is embedded in a structured system prompt
+        5. llm processing: each batch is sent to the LLM for analysis
+        6. response parsing: LLM responses are parsed to extract validation results
+        7. result projection: results are mapped back to all original rows using row signatures
+        8. result aggregation: results from all batches are combined
+
+        **Performance Optimization**: the process uses row signature memoization to avoid redundant
+        LLM calls. When multiple rows have identical values in the selected columns, only one
+        representative row is validated, and the result is applied to all matching rows. This can
+        dramatically reduce API costs and processing time for datasets with repetitive patterns.
+
+        The LLM receives data in this JSON format:
+
+        ```json
+        {
+          "columns": ["col1", "col2", "col3"],
+          "rows": [
+            {"col1": "value1", "col2": "value2", "col3": "value3", "_pb_row_index": 0},
+            {"col1": "value4", "col2": "value5", "col3": "value6", "_pb_row_index": 1}
+          ]
+        }
+        ```
+
+        The LLM returns validation results in this format:
+        ```json
+        [
+          {"index": 0, "result": true},
+          {"index": 1, "result": false}
+        ]
+        ```
+
+        Prompt Design Tips
+        ------------------
+        For best results, design prompts that are:
+
+        - boolean-oriented: frame validation criteria to elicit clear valid/invalid responses
+        - specific: clearly define what makes a row valid/invalid
+        - unambiguous: avoid subjective language that could be interpreted differently
+        - context-aware: include relevant business rules or domain knowledge
+        - example-driven: consider providing examples in the prompt when helpful
+
+        **Critical**: Prompts must be designed so the LLM can determine whether each row passes or
+        fails the validation criteria. The system expects binary validation responses, so avoid
+        open-ended questions or prompts that might generate explanatory text instead of clear
+        pass/fail judgments.
+
+        Good prompt examples:
+
+        - "Each row should contain a valid email address in the 'email' column and a non-empty name
+        in the 'name' column"
+        - "The 'sentiment' column should contain positive sentiment words (happy, good, excellent,
+        etc.)"
+        - "Product descriptions should mention at least one technical specification"
+
+        Poor prompt examples (avoid these):
+
+        - "What do you think about this data?" (too open-ended)
+        - "Describe the quality of each row" (asks for description, not validation)
+        - "How would you improve this data?" (asks for suggestions, not pass/fail)
+
+        Performance Considerations
+        --------------------------
+        AI validation is significantly slower than traditional validation methods due to API calls
+        to LLM providers. However, performance varies dramatically based on data characteristics:
+
+        **High Memoization Scenarios** (seconds to minutes):
+
+        - data with many duplicate rows in the selected columns
+        - low cardinality data (repeated patterns)
+        - small number of unique row combinations
+
+        **Low Memoization Scenarios** (minutes to hours):
+
+        - high cardinality data with mostly unique rows
+        - large datasets with few repeated patterns
+        - all or most rows requiring individual LLM evaluation
+
+        The row signature memoization optimization can reduce processing time significantly when
+        data has repetitive patterns. For datasets where every row is unique, expect longer
+        processing times similar to validating each row individually.
+
+        **Strategies to Reduce Processing Time**:
+
+        - test on data slices: define a sampling function like `def sample_1000(df): return df.head(1000)`
+        and use `pre=sample_1000` to validate on smaller samples
+        - filter relevant data: define filter functions like `def active_only(df): return df.filter(df["status"] == "active")`
+        and use `pre=active_only` to focus on a specific subset
+        - optimize column selection: use `columns_subset=` to include only the columns necessary
+        for validation
+        - start with smaller batches: begin with `batch_size=100` for testing, then increase
+        gradually
+        - reduce concurrency: lower `max_concurrent=1` if hitting rate limits
+        - use faster/cheaper models: consider using smaller or more efficient models for initial
+        testing before switching to more capable models
+
+        Examples
+        --------
+        The following examples demonstrate how to use AI validation for different types of data
+        quality checks. These examples show both basic usage and more advanced configurations with
+        custom thresholds and actions.
+
+        **Basic AI validation example:**
+
+        This first example shows a simple validation scenario where we want to check that customer
+        records have both valid email addresses and non-empty names. Notice how we use
+        `columns_subset=` to focus only on the relevant columns, which improves both performance
+        and cost-effectiveness.
+
+        ```python
+        import pointblank as pb
+        import polars as pl
+
+        # Sample data with email and name columns
+        tbl = pl.DataFrame({
+            "email": ["john@example.com", "invalid-email", "jane@test.org"],
+            "name": ["John Doe", "", "Jane Smith"],
+            "age": [25, 30, 35]
+        })
+
+        # Validate using AI
+        validation = (
+            pb.Validate(data=tbl)
+            .prompt(
+                prompt="Each row should have a valid email address and a non-empty name",
+                columns_subset=["email", "name"],  # Only check these columns
+                model="openai:gpt-4o-mini",
+            )
+            .interrogate()
+        )
+
+        validation
+        ```
+
+        In this example, the AI will identify that the second row fails validation because it has
+        an invalid email format (`"invalid-email"`) and the third row also fails because it has an
+        empty name field. The validation results will show 2 out of 3 rows failing the criteria.
+
+        **Advanced example with custom thresholds:**
+
+        This more sophisticated example demonstrates how to use AI validation with custom thresholds
+        and actions. Here we're validating phone number formats to ensure they include area codes,
+        which is a common data quality requirement for customer contact information.
+
+        ```python
+        customer_data = pl.DataFrame({
+            "customer_id": [1, 2, 3, 4, 5],
+            "name": ["John Doe", "Jane Smith", "Bob Johnson", "Alice Brown", "Charlie Davis"],
+            "phone_number": [
+                "(555) 123-4567",  # Valid with area code
+                "555-987-6543",    # Valid with area code
+                "123-4567",        # Missing area code
+                "(800) 555-1234",  # Valid with area code
+                "987-6543"         # Missing area code
+            ]
+        })
+
+        validation = (
+            pb.Validate(data=customer_data)
+            .prompt(
+                prompt="Do all the phone numbers include an area code?",
+                columns_subset="phone_number",  # Only check the `phone_number` column
+                model="openai:gpt-4o",
+                batch_size=500,
+                max_concurrent=5,
+                thresholds=pb.Thresholds(warning=0.1, error=0.2, critical=0.3),
+                actions=pb.Actions(error="Too many phone numbers missing area codes.")
+            )
+            .interrogate()
+        )
+        ```
+
+        This validation will identify that 2 out of 5 phone numbers (40%) are missing area codes,
+        which exceeds all threshold levels. The validation will trigger the specified error action
+        since the failure rate (40%) is above the error threshold (20%). The AI can recognize
+        various phone number formats and determine whether they include area codes.
         
 
 
@@ -7418,6 +7729,108 @@ interrogate(self, collect_extracts: 'bool' = True, collect_tbl_checked: 'bool' =
         into the [`preview()`](`pointblank.preview`) function for a better display). There are
         actually 18 rows that failed but we limited the collection of extracts with
         `get_first_n=10`.
+        
+
+set_tbl(self, tbl: 'FrameT | Any', tbl_name: 'str | None' = None, label: 'str | None' = None) -> 'Validate'
+
+        Set or replace the table associated with the Validate object.
+
+        This method allows you to replace the table associated with a Validate object with a
+        different (but presumably similar) table. This is useful when you want to apply the same
+        validation plan to multiple tables or when you have a validation workflow defined but want
+        to swap in a different data source.
+
+        Parameters
+        ----------
+        tbl
+            The table to replace the existing table with. This can be any supported table type
+            including DataFrame objects, Ibis table objects, CSV file paths, Parquet file paths,
+            GitHub URLs, or database connection strings. The same table type constraints apply as in
+            the `Validate` constructor.
+        tbl_name
+            An optional name to assign to the new input table object. If no value is provided, the
+            existing table name will be retained.
+        label
+            An optional label for the validation plan. If no value is provided, the existing label
+            will be retained.
+
+        Returns
+        -------
+        Validate
+            A new `Validate` object with the replacement table.
+
+        When to Use
+        -----------
+        The `set_tbl()` method is particularly useful in scenarios where you have:
+
+        - multiple similar tables that need the same validation checks
+        - a template validation workflow that should be applied to different data sources
+        - YAML-defined validations where you want to override the table specified in the YAML
+
+        The `set_tbl()` method creates a copy of the validation object with the new table, so the
+        original validation object remains unchanged. This allows you to reuse validation plans
+        across multiple tables without interference.
+
+        Examples
+        --------
+        We will first create two similar tables for our future validation plans.
+
+        ```python
+        import pointblank as pb
+        import polars as pl
+
+        # Create two similar tables
+        table_1 = pl.DataFrame({
+            "x": [1, 2, 3, 4, 5],
+            "y": [5, 4, 3, 2, 1],
+            "z": ["a", "b", "c", "d", "e"]
+        })
+
+        table_2 = pl.DataFrame({
+            "x": [2, 4, 6, 8, 10],
+            "y": [10, 8, 6, 4, 2],
+            "z": ["f", "g", "h", "i", "j"]
+        })
+        ```
+
+        Create a validation plan with the first table.
+
+        ```python
+        validation_table_1 = (
+            pb.Validate(
+                data=table_1,
+                tbl_name="Table 1",
+                label="Validation applied to the first table"
+            )
+            .col_vals_gt(columns="x", value=0)
+            .col_vals_lt(columns="y", value=10)
+        )
+        ```
+
+        Now apply the same validation plan to the second table.
+
+        ```python
+        validation_table_2 = (
+            validation_table_1
+            .set_tbl(
+                tbl=table_2,
+                tbl_name="Table 2",
+                label="Validation applied to the second table"
+            )
+        )
+        ```
+
+        Here is the interrogation of the first table:
+
+        ```python
+        validation_table_1.interrogate()
+        ```
+
+        And the second table:
+
+        ```python
+        validation_table_2.interrogate()
+        ```
         
 
 get_tabular_report(self, title: 'str | None' = ':default:', incl_header: 'bool' = None, incl_footer: 'bool' = None) -> 'GT'
@@ -9900,9 +10313,10 @@ connect_to_table(connection_string: 'str') -> 'Any'
 ## The YAML family
 
 The *YAML* group contains functions that allow for the use of YAML to orchestrate
-validation workflows. The `yaml_interrogate()` function can be used to run a validation workflow from
-YAML strings or files. The `validate_yaml()` function checks if the YAML configuration
-passes its own validity checks.
+validation workflows. The `yaml_interrogate()` function can be used to run a validation workflow
+from YAML strings or files. The `validate_yaml()` function checks if the YAML configuration passes
+its own validity checks. The `yaml_to_python()` function converts YAML configuration to equivalent
+Python code.
 
 yaml_interrogate(yaml: 'Union[str, Path]', set_tbl: 'Union[FrameT, Any, None]' = None, namespaces: 'Optional[Union[Iterable[str], Mapping[str, str]]]' = None) -> 'Validate'
 Execute a YAML-based validation workflow.
@@ -10293,6 +10707,95 @@ Validate YAML configuration against the expected structure.
     See Also
     --------
     yaml_interrogate : execute YAML-based validation workflows
+    
+
+yaml_to_python(yaml: 'Union[str, Path]') -> 'str'
+Convert YAML validation configuration to equivalent Python code.
+
+    This function takes a YAML validation configuration and generates the equivalent Python code
+    that would produce the same validation workflow. This is useful for documentation, code
+    generation, or learning how to translate YAML workflows into programmatic workflows.
+
+    The generated Python code includes all necessary imports, data loading, validation steps,
+    and interrogation execution, formatted as executable Python code.
+
+    Parameters
+    ----------
+    yaml
+        YAML configuration as string or file path. Can be: (1) a YAML string containing the
+        validation configuration, or (2) a Path object or string path to a YAML file.
+
+    Returns
+    -------
+    str
+        A formatted Python code string enclosed in markdown code blocks that replicates the YAML
+        workflow. The code includes import statements, data loading, validation method calls, and
+        interrogation execution.
+
+    Raises
+    ------
+    YAMLValidationError
+        If the YAML is invalid, malformed, or contains unknown validation methods.
+
+    Examples
+    --------
+    Convert a basic YAML configuration to Python code:
+
+    ```python
+    import pointblank as pb
+
+    # Define a YAML validation workflow
+    yaml_config = '''
+    tbl: small_table
+    tbl_name: Data Quality Check
+    steps:
+    - col_vals_not_null:
+        columns: [a, b]
+    - col_vals_gt:
+        columns: [c]
+        value: 0
+    '''
+
+    # Generate equivalent Python code
+    python_code = pb.yaml_to_python(yaml_config)
+    print(python_code)
+    ```
+
+    The generated Python code shows exactly how to replicate the YAML workflow programmatically.
+    This is particularly useful when transitioning from YAML-based workflows to code-based
+    workflows, or when generating documentation that shows both YAML and Python approaches.
+
+    For more complex workflows with thresholds and metadata:
+
+    ```python
+    # Advanced YAML configuration
+    yaml_config = '''
+    tbl: small_table
+    tbl_name: Advanced Validation
+    label: Production data check
+    thresholds:
+      warning: 0.1
+      error: 0.2
+    steps:
+    - col_vals_between:
+        columns: [c]
+        left: 1
+        right: 10
+    - col_vals_regex:
+        columns: [b]
+        pattern: '[0-9]-[a-z]{3}-[0-9]{3}'
+    '''
+
+    # Generate the equivalent Python code
+    python_code = pb.yaml_to_python(yaml_config)
+    print(python_code)
+    ```
+
+    The generated code includes all configuration parameters, thresholds, and maintains the exact
+    same validation logic as the original YAML workflow.
+
+    This function is also useful for educational purposes, helping users understand how YAML
+    configurations map to the underlying Python API calls.
     
 
 
@@ -10713,6 +11216,297 @@ Access validation summary information when authoring final actions.
     --------
     Have a look at [`FinalActions`](`pointblank.FinalActions`) for more information on how to create
     custom actions that are executed after all validation steps have been completed.
+    
+
+write_file(validation: 'Validate', filename: 'str', path: 'str | None' = None, keep_tbl: 'bool' = False, keep_extracts: 'bool' = False, quiet: 'bool' = False) -> 'None'
+
+    Write a Validate object to disk as a serialized file.
+
+    Writing a validation object to disk with `write_file()` can be useful for keeping data
+    validation results close at hand for later retrieval (with `read_file()`). By default, any data
+    table that the validation object holds will be removed before writing to disk (not applicable if
+    no data table is present). This behavior can be changed by setting `keep_tbl=True`, but this
+    only works when the table is not of a database type (e.g., DuckDB, PostgreSQL, etc.), as
+    database connections cannot be serialized.
+
+    Extract data from failing validation steps can also be preserved by setting
+    `keep_extracts=True`, which is useful for later analysis of data quality issues.
+
+    The serialized file uses Python's pickle format for storage of the validation object state,
+    including all validation results, metadata, and optionally the source data.
+
+    **Important note.** If your validation uses custom preprocessing functions (via the `pre=`
+    parameter), these functions must be defined at the module level (not interactively or as lambda
+    functions) to ensure they can be properly restored when loading the validation in a different
+    Python session. Read the *Creating Serializable Validations* section below for more information.
+
+    :::{.callout-warning}
+    The `write_file()` function is currently experimental. Please report any issues you encounter in
+    the [Pointblank issue tracker](https://github.com/posit-dev/pointblank/issues).
+    :::
+
+    Parameters
+    ----------
+    validation
+        The `Validate` object to write to disk.
+    filename
+        The filename to create on disk for the validation object. Should not include the file
+        extension as `.pkl` will be added automatically.
+    path
+        An optional directory path where the file should be saved. If not provided, the file will be
+        saved in the current working directory. The directory will be created if it doesn't exist.
+    keep_tbl
+        An option to keep the data table that is associated with the validation object. The default
+        is `False` where the data table is removed before writing to disk. For database tables
+        (e.g., Ibis tables with database backends), the table is always removed even if
+        `keep_tbl=True`, as database connections cannot be serialized.
+    keep_extracts
+        An option to keep any collected extract data for failing rows from validation steps. By
+        default, this is `False` (i.e., extract data is removed to save space).
+    quiet
+        Should the function not inform when the file is written? By default, this is `False`, so a
+        message will be printed when the file is successfully written.
+
+    Returns
+    -------
+    None
+        This function doesn't return anything but saves the validation object to disk.
+
+    Creating Serializable Validations
+    ---------------------------------
+    To ensure your validations work reliably across different Python sessions, the recommended
+    approach is to use module-Level functions. So, create a separate Python file for your
+    preprocessing functions:
+
+    ```python
+    # preprocessing_functions.py
+    import polars as pl
+
+    def multiply_by_100(df):
+        return df.with_columns(pl.col("value") * 100)
+
+    def add_computed_column(df):
+        return df.with_columns(computed=pl.col("value") * 2 + 10)
+    ```
+
+    Then import and use them in your validation:
+
+    ```python
+    # your_main_script.py
+    import pointblank as pb
+    from preprocessing_functions import multiply_by_100, add_computed_column
+
+    validation = (
+        pb.Validate(data=my_data)
+        .col_vals_gt(columns="value", value=500, pre=multiply_by_100)
+        .col_vals_between(columns="computed", left=50, right=1000, pre=add_computed_column)
+        .interrogate()
+    )
+
+    # Save validation and it will work reliably across sessions
+    pb.write_file(validation, "my_validation", keep_tbl=True)
+    ```
+
+    ### Problematic Patterns to Avoid
+
+    Don't use lambda functions as they will cause immediate errors.
+
+    Don't use interactive function definitions (as they may fail when loading).
+
+    ```python
+    def my_function(df):  # Defined in notebook/REPL
+        return df.with_columns(pl.col("value") * 2)
+
+    validation = pb.Validate(data).col_vals_gt(
+        columns="value", value=100, pre=my_function
+    )
+    ```
+
+    ### Automatic Analysis and Guidance
+
+    When you call `write_file()`, it automatically analyzes your validation and provides:
+
+    - confirmation when all functions will work reliably
+    - warnings for functions that may cause cross-session issues
+    - clear errors for unsupported patterns (lambda functions)
+    - specific recommendations and code examples
+    - loading instructions tailored to your validation
+
+    ### Loading Your Validation
+
+    To load a saved validation in a new Python session:
+
+    ```python
+    # In a new Python session
+    import pointblank as pb
+
+    # Import the same preprocessing functions used when creating the validation
+    from preprocessing_functions import multiply_by_100, add_computed_column
+
+    # Upon loading the validation, functions will be automatically restored
+    validation = pb.read_file("my_validation.pkl")
+    ```
+
+    ** Testing Your Validation:**
+
+    To verify your validation works across sessions:
+
+    1. save your validation in one Python session
+    2. start a fresh Python session (restart kernel/interpreter)
+    3. import required preprocessing functions
+    4. load the validation using `read_file()`
+    5. test that preprocessing functions work as expected
+
+    ### Performance and Storage
+
+    - use `keep_tbl=False` (default) to reduce file size when you don't need the original data
+    - use `keep_extracts=False` (default) to save space by excluding extract data
+    - set `quiet=True` to suppress guidance messages in automated scripts
+    - files are saved using pickle's highest protocol for optimal performance
+
+    Examples
+    --------
+    Let's create a simple validation and save it to disk:
+
+    ```python
+    import pointblank as pb
+
+    # Create a validation
+    validation = (
+        pb.Validate(data=pb.load_dataset("small_table"), label="My validation")
+        .col_vals_gt(columns="d", value=100)
+        .col_vals_regex(columns="b", pattern=r"[0-9]-[a-z]{3}-[0-9]{3}")
+        .interrogate()
+    )
+
+    # Save to disk (without the original table data)
+    pb.write_file(validation, "my_validation")
+    ```
+
+    To keep the original table data for later analysis:
+
+    ```python
+    # Save with the original table data included
+    pb.write_file(validation, "my_validation_with_data", keep_tbl=True)
+    ```
+
+    You can also specify a custom directory and keep extract data:
+
+    ```python
+    pb.write_file(
+        validation,
+        filename="detailed_validation",
+        path="/path/to/validations",
+        keep_tbl=True,
+        keep_extracts=True
+    )
+    ```
+
+    ### Working with Preprocessing Functions
+
+    For validations that use preprocessing functions to be portable across sessions, define your
+    functions in a separate `.py` file:
+
+    ```python
+    # In `preprocessing_functions.py`
+
+    import polars as pl
+
+    def multiply_by_100(df):
+        return df.with_columns(pl.col("value") * 100)
+
+    def add_computed_column(df):
+        return df.with_columns(computed=pl.col("value") * 2 + 10)
+    ```
+
+    Then import and use them in your validation:
+
+    ```python
+    # In your main script
+
+    import pointblank as pb
+    from preprocessing_functions import multiply_by_100, add_computed_column
+
+    validation = (
+        pb.Validate(data=my_data)
+        .col_vals_gt(columns="value", value=500, pre=multiply_by_100)
+        .col_vals_between(columns="computed", left=50, right=1000, pre=add_computed_column)
+        .interrogate()
+    )
+
+    # This validation can now be saved and loaded reliably
+    pb.write_file(validation, "my_validation", keep_tbl=True)
+    ```
+
+    When you load this validation in a new session, simply import the preprocessing functions
+    again and they will be automatically restored.
+
+    See Also
+    --------
+    Use the [`read_file()`](`pointblank.read_file`) function to load a validation object that was
+    previously saved with `write_file()`.
+    
+
+read_file(filepath: 'str | Path') -> 'Validate'
+
+    Read a Validate object from disk that was previously saved with `write_file()`.
+
+    This function loads a validation object that was previously serialized to disk using the
+    `write_file()` function. The validation object will be restored with all its validation results,
+    metadata, and optionally the source data (if it was saved with `keep_tbl=True`).
+
+    :::{.callout-warning}
+    The `read_file()` function is currently experimental. Please report any issues you encounter in
+    the [Pointblank issue tracker](https://github.com/posit-dev/pointblank/issues).
+    :::
+
+    Parameters
+    ----------
+    filepath
+        The path to the saved validation file. Can be a string or Path object.
+
+    Returns
+    -------
+    Validate
+        The restored validation object with all its original state, validation results, and
+        metadata.
+
+    Examples
+    --------
+    Load a validation object that was previously saved:
+
+    ```python
+    import pointblank as pb
+
+    # Load a validation object from disk
+    validation = pb.read_file("my_validation.pkl")
+
+    # View the validation results
+    validation
+    ```
+
+    You can also load using just the filename (without extension):
+
+    ```python
+    # This will automatically look for "my_validation.pkl"
+    validation = pb.read_file("my_validation")
+    ```
+
+    The loaded validation object retains all its functionality:
+
+    ```python
+    # Get validation summary
+    summary = validation.get_json_report()
+
+    # Get sundered data (if original table was saved)
+    if validation.data is not None:
+        failing_rows = validation.get_sundered_data(type="fail")
+    ```
+
+    See Also
+    --------
+    Use the [`write_file()`](`pointblank.Validate.write_file`) method to save a validation object
+    to disk for later retrieval with this function.
     
 
 config(report_incl_header: 'bool' = True, report_incl_footer: 'bool' = True, preview_incl_header: 'bool' = True) -> 'PointblankConfig'

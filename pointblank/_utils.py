@@ -674,14 +674,15 @@ def _get_api_text() -> str:
         "Validate.col_vals_not_null",
         "Validate.col_vals_regex",
         "Validate.col_vals_expr",
-        "Validate.col_exists",
         "Validate.rows_distinct",
         "Validate.rows_complete",
+        "Validate.col_exists",
         "Validate.col_schema_match",
         "Validate.row_count_match",
         "Validate.col_count_match",
         "Validate.conjointly",
         "Validate.specially",
+        "Validate.prompt",
     ]
 
     column_selection_exported = [
@@ -702,6 +703,7 @@ def _get_api_text() -> str:
 
     interrogation_exported = [
         "Validate.interrogate",
+        "Validate.set_tbl",
         "Validate.get_tabular_report",
         "Validate.get_step_report",
         "Validate.get_json_report",
@@ -735,6 +737,7 @@ def _get_api_text() -> str:
     yaml_exported = [
         "yaml_interrogate",
         "validate_yaml",
+        "yaml_to_python",
     ]
 
     utility_exported = [
@@ -742,6 +745,8 @@ def _get_api_text() -> str:
         "get_row_count",
         "get_action_metadata",
         "get_validation_summary",
+        "write_file",
+        "read_file",
         "config",
     ]
 
@@ -786,9 +791,10 @@ datasets included in the package can be accessed via the `load_dataset()` functi
 the `assistant()` function to get help with Pointblank."""
 
     yaml_desc = """The *YAML* group contains functions that allow for the use of YAML to orchestrate
-validation workflows. The `yaml_interrogate()` function can be used to run a validation workflow from
-YAML strings or files. The `validate_yaml()` function checks if the YAML configuration
-passes its own validity checks."""
+validation workflows. The `yaml_interrogate()` function can be used to run a validation workflow
+from YAML strings or files. The `validate_yaml()` function checks if the YAML configuration passes
+its own validity checks. The `yaml_to_python()` function converts YAML configuration to equivalent
+Python code."""
 
     utility_desc = """The Utility Functions group contains functions that are useful for accessing
 metadata about the target data. Use `get_column_count()` or `get_row_count()` to get the number of
