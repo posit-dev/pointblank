@@ -16407,6 +16407,14 @@ def _transform_assertion_str(
         # Use Markdown-to-HTML conversion to format the `brief_str` text
         brief_str = [commonmark.commonmark(x) for x in brief_str]
 
+        # Add inline styles to <p> tags for proper rendering in all environments
+        # In some sandboxed HTML environments (e.g., Streamlit), <p> tags don't inherit
+        # font-size from parent divs, so we add inline styles directly to the <p> tags
+        brief_str = [
+            re.sub(r"<p>", r'<p style="font-size: inherit; margin: 0;">', x) if x.strip() else x
+            for x in brief_str
+        ]
+
     # Obtain the number of characters contained in the assertion
     # string; this is important for sizing components appropriately
     assertion_type_nchar = [len(x) for x in assertion_str]
