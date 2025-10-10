@@ -189,7 +189,6 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
   <li><a href="#notes-on-authentication" id="toc-notes-on-authentication" class="nav-link" data-scroll-target="#notes-on-authentication">Notes on Authentication</a></li>
   <li><a href="#ai-validation-process" id="toc-ai-validation-process" class="nav-link" data-scroll-target="#ai-validation-process">AI Validation Process</a></li>
   <li><a href="#prompt-design-tips" id="toc-prompt-design-tips" class="nav-link" data-scroll-target="#prompt-design-tips">Prompt Design Tips</a></li>
-  <li><a href="#provider-setup" id="toc-provider-setup" class="nav-link" data-scroll-target="#provider-setup">Provider Setup</a></li>
   <li><a href="#performance-considerations" id="toc-performance-considerations" class="nav-link" data-scroll-target="#performance-considerations">Performance Considerations</a></li>
   <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
   </ul>
@@ -374,10 +373,6 @@ OPENAI_API_KEY="your_openai_api_key_here"</code></pre>
 <li>“Describe the quality of each row” (asks for description, not validation)</li>
 <li>“How would you improve this data?” (asks for suggestions, not pass/fail)</li>
 </ul>
-</section>
-<section id="provider-setup" class="level2 doc-section doc-section-provider-setup">
-<h3 class="doc-section doc-section-provider-setup anchored" data-anchor-id="provider-setup">Provider Setup</h3>
-<p><strong>OpenAI</strong>: Set <code>OPENAI_API_KEY</code> environment variable or create <code>.env</code> file. <strong>Anthropic</strong>: Set <code>ANTHROPIC_API_KEY</code> environment variable or create <code>.env</code> file. <strong>Ollama</strong>: Ensure Ollama is running locally (default: http://localhost:11434). <strong>Bedrock</strong>: Configure AWS credentials and region.</p>
 </section>
 <section id="performance-considerations" class="level2 doc-section doc-section-performance-considerations">
 <h3 class="doc-section doc-section-performance-considerations anchored" data-anchor-id="performance-considerations">Performance Considerations</h3>
