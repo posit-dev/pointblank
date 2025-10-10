@@ -9551,13 +9551,6 @@ class Validate:
         - "Describe the quality of each row" (asks for description, not validation)
         - "How would you improve this data?" (asks for suggestions, not pass/fail)
 
-        Provider Setup
-        --------------
-        **OpenAI**: Set `OPENAI_API_KEY` environment variable or create `.env` file.
-        **Anthropic**: Set `ANTHROPIC_API_KEY` environment variable or create `.env` file.
-        **Ollama**: Ensure Ollama is running locally (default: http://localhost:11434).
-        **Bedrock**: Configure AWS credentials and region.
-
         Performance Considerations
         --------------------------
         AI validation is significantly slower than traditional validation methods due to API calls
