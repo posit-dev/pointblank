@@ -85,6 +85,13 @@ The report footer contains a timestamp showing when the interrogation was perfor
 helps track when data quality checks were executed, which is especially useful when archiving
 reports or monitoring data quality over time.
 
+::: {.callout-note}
+Throughout this documentation, the footer is hidden in example reports for brevity. This is
+controlled through a global option (see the section on controlling header and footer display later
+in this guide). In practice, including the footer provides valuable timestamp information for
+tracking when validations were executed.
+:::
+
 ### Report Columns
 
 The validation report table includes the following columns, each providing specific information
