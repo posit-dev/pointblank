@@ -68,7 +68,7 @@ at once) won't be expanded into individual rows yet, as that expansion happens d
 The validation report table consists of several key components that work together to provide a
 complete picture of your data quality:
 
-### Report Header
+#### Report Header
 
 The report header (title and subtitle area) contains important metadata about the validation:
 
@@ -80,7 +80,7 @@ The report header (title and subtitle area) contains important metadata about th
 This header information provides essential context for interpreting the validation results,
 especially when sharing reports with stakeholders or reviewing historical validations.
 
-### Report Footer
+#### Report Footer
 
 The report footer contains a timestamp showing when the interrogation was performed. This timestamp
 helps track when data quality checks were executed, which is especially useful when archiving
@@ -91,7 +91,7 @@ reports or monitoring data quality over time.
 The validation report table includes the following columns, each providing specific information
 about the validation steps:
 
-### Status Indicator (first column, unlabeled)
+#### Status Indicator (first column, unlabeled)
 
 The first column is an unlabeled vertical colored bar that provides instant visual feedback about
 each step's status:
@@ -104,13 +104,13 @@ each step's status:
 
 This visual indicator allows you to quickly scan the report and identify problem areas.
 
-### Step Number (second column, unlabeled)
+#### Step Number (second column, unlabeled)
 
 The second column is unlabeled and contains the sequential step number, starting from 1. This number
 is used when referencing specific steps in other methods like `get_step_report(i=2)` or when
 extracting data from specific validation steps.
 
-### TYPE
+#### TYPE
 
 The TYPE column displays the validation method name along with an icon that visually represents the
 type of validation being performed. The validation method indicates what aspect of data quality is
@@ -150,12 +150,12 @@ validation_with_briefs
 In the above report, you'll see the custom brief message appear below the `col_vals_gt` method name
 in the first step, and an automatically generated brief below `col_vals_in_set` in the second step.
 
-### COLUMNS
+#### COLUMNS
 
 The column(s) being validated in this step. For validation methods that don't target specific
 columns (like `row_count_match`), this will show an em dash (—).
 
-### VALUES
+#### VALUES
 
 The comparison value(s) or criteria used in the validation. For example:
 
@@ -163,7 +163,7 @@ The comparison value(s) or criteria used in the validation. For example:
 - for `col_vals_in_set(set=["A", "B", "C"])`, this shows `A | B | C`
 - for existence checks, this shows an em dash (—)
 
-### TBL
+#### TBL
 
 Icons indicating whether any preprocessing or segmentation was applied:
 
@@ -173,7 +173,7 @@ Icons indicating whether any preprocessing or segmentation was applied:
 
 These icons help you understand if you're validating transformed or segmented data.
 
-### EVAL
+#### EVAL
 
 Indicates whether the validation step was evaluated:
 
@@ -183,7 +183,7 @@ Indicates whether the validation step was evaluated:
 
 This column is crucial for identifying validation steps that couldn't be executed properly.
 
-### UNITS
+#### UNITS
 
 The number of units tested in this validation step. A 'test unit' is the atomic unit being
 validated, which varies by validation type:
@@ -195,7 +195,7 @@ validated, which varies by validation type:
 This number is formatted with locale-appropriate thousand separators for readability. Also, since
 space is limited, values are often abbreviated so a figure like 43,534 will appear as `43.5K`.
 
-### PASS
+#### PASS
 
 The number and fraction of test units that passed the validation, displayed as:
 
@@ -214,7 +214,7 @@ For example, the cell with
 means 8 test units passed out of the total, representing an 80% success rate (though `f_passed` is
 always expressed as a fractional value from `0` to `1`).
 
-### FAIL
+#### FAIL
 
 The number and fraction of test units that failed the validation, displayed similarly to PASS:
 
@@ -234,7 +234,7 @@ means 2 test units failed, representing a 20% failure rate from a fractional val
 that this fractional `f_failed` value is what's used to set failure thresholds for 'warning',
 'error', and 'critical' states.
 
-### W, E, C (Warning, Error, Critical)
+#### W, E, C (Warning, Error, Critical)
 
 Three columns showing whether each threshold level was exceeded for the three different states.
 
@@ -248,7 +248,7 @@ state is red.
 Having visual indicators makes it easy to identify which validation steps have crossed into warning,
 error, or critical territory.
 
-### EXT
+#### EXT
 
 Indicates whether failing row data was extracted for this step:
 
