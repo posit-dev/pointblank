@@ -258,6 +258,18 @@ Indicates whether failing row data was extracted for this step:
 When extracts are available, you can download them directly from the report for further analysis or
 to share with data stewards who need to fix the issues.
 
+## Understanding Validation Status
+
+The validation report helps you quickly understand the overall status of your data:
+
+- **All green status indicators**: all validations passed completely
+- **Light green indicators**: minor failures below warning threshold
+- **Gray, yellow, or red indicators**: threshold exceedances requiring attention
+- **Error icons in EVAL column**: validation steps that couldn't be evaluated
+
+By scanning the status indicators column, you can immediately identify which validation steps need
+attention and prioritize your data quality efforts accordingly.
+
 ## Customizing the Report Title
 
 You can customize the validation report's title using the `title=` parameter in
@@ -454,7 +466,7 @@ pb.config(report_incl_header=True, report_incl_footer=False)
 
 Here are some guidelines for creating effective validation reports:
 
-### 1. Use Descriptive Table Names and Labels
+#### 1. Use Descriptive Table Names and Labels
 
 Provide meaningful names and labels to make reports self-documenting:
 
@@ -466,7 +478,7 @@ validation = pb.Validate(
 )
 ```
 
-### 2. Add Brief Messages for Stakeholder Reports
+#### 2. Add Brief Messages for Stakeholder Reports
 
 When sharing reports with non-technical stakeholders, always include briefs:
 
@@ -478,7 +490,7 @@ When sharing reports with non-technical stakeholders, always include briefs:
 )
 ```
 
-### 3. Set Appropriate Thresholds
+#### 3. Set Appropriate Thresholds
 
 Configure thresholds that align with your data quality requirements:
 
@@ -494,7 +506,7 @@ validation = pb.Validate(
 )
 ```
 
-### 4. Customize for Your Audience
+#### 4. Customize for Your Audience
 
 Tailor the report presentation to your audience:
 
@@ -502,7 +514,7 @@ Tailor the report presentation to your audience:
 - **Management**: hide technical columns, emphasize status indicators
 - **Data stewards**: include extract download buttons, detailed briefs
 
-### 5. Combine with Other Reporting Tools
+#### 5. Combine with Other Reporting Tools
 
 Use validation reports alongside other Pointblank features:
 
@@ -510,7 +522,7 @@ Use validation reports alongside other Pointblank features:
 - **Extracts**: use `get_data_extracts()` to get all failing data for analysis
 - **Sundered data**: use `get_sundered_data()` to split data into passing/failing sets
 
-### 6. Archive Reports for Trend Analysis
+#### 6. Archive Reports for Trend Analysis
 
 Save validation reports over time to track data quality trends:
 
@@ -521,18 +533,6 @@ from datetime import datetime
 timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 validation.get_tabular_report().save(f"validation_report_{timestamp}.html")
 ```
-
-## Understanding Validation Status
-
-The validation report helps you quickly understand the overall status of your data:
-
-- **All green status indicators**: all validations passed completely
-- **Light green indicators**: minor failures below warning threshold
-- **Gray, yellow, or red indicators**: threshold exceedances requiring attention
-- **Error icons in EVAL column**: validation steps that couldn't be evaluated
-
-By scanning the status indicators column, you can immediately identify which validation steps need
-attention and prioritize your data quality efforts accordingly.
 
 ## Conclusion
 
