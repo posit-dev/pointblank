@@ -9,7 +9,6 @@ html-table-processing: none
 #| echo: false
 #| output: false
 import pointblank as pb
-pb.config(report_incl_footer=False)
 ```
 
 After interrogating your data with a validation plan, Pointblank automatically generates a
@@ -380,9 +379,10 @@ report = (
     .get_tabular_report()
     .cols_width(
         cases={
-            "i": "60px",            # Step number column
-            "type_upd": "150px",    # TYPE column
-            "columns_upd": "120px", # COLUMNS column
+            "status_color": "20px", # Status indicator column
+            "i": "40px",            # Step number column
+            "type_upd": "170px",    # TYPE column
+            "columns_upd": "100px", # COLUMNS column
         }
     )
 )
