@@ -2429,8 +2429,8 @@ async def draft_validation_plan(
     dataframe_id: Annotated[str, "ID of the DataFrame to generate validation plan for."],
     model: Annotated[
         str,
-        "AI model to use in format 'provider:model' (e.g., 'anthropic:claude-3-5-sonnet-latest', 'openai:gpt-4'). Supported providers: anthropic, openai, ollama, bedrock.",
-    ] = "anthropic:claude-3-5-sonnet-latest",
+        "AI model to use in format 'provider:model' (e.g., 'anthropic:claude-sonnet-4-5', 'openai:gpt-4'). Supported providers: anthropic, openai, ollama, bedrock.",
+    ] = "anthropic:claude-sonnet-4-5",
     api_key: Annotated[
         Optional[str],
         "API key for the model provider. If not provided, will try to load from environment variables or .env file.",

@@ -50,7 +50,7 @@ def sample_pl_data():
 @pytest.fixture
 def llm_config():
     """Sample LLM configuration."""
-    return _LLMConfig(provider="anthropic", model="claude-3-sonnet-20240229", api_key="test-key")
+    return _LLMConfig(provider="anthropic", model="claude-sonnet-4-5", api_key="test-key")
 
 
 @pytest.fixture
@@ -84,10 +84,10 @@ def test_llm_config_creation():
 
 def test_llm_config_with_api_key():
     """Test LLMConfig with API key."""
-    config = _LLMConfig(provider="anthropic", model="claude-3", api_key="test-key")
+    config = _LLMConfig(provider="anthropic", model="claude-sonnet-4-5", api_key="test-key")
 
     assert config.provider == "anthropic"
-    assert config.model == "claude-3"
+    assert config.model == "claude-sonnet-4-5"
     assert config.api_key == "test-key"
 
 
@@ -529,7 +529,10 @@ def test_ai_validation_engine_init(mock_create_chat, llm_config):
     assert engine.llm_config is llm_config
     assert engine.chat is mock_chat
     mock_create_chat.assert_called_once_with(
-        provider="anthropic", model_name="claude-3-sonnet-20240229", api_key="test-key"
+        provider="anthropic",
+        model_name="claude-sonnet-4-5",
+        api_key="test-key",
+        verify_ssl=True,
     )
 
 
@@ -709,7 +712,10 @@ def test_full_pipeline_pandas(sample_pd_data):
         mock_create_chat.return_value = mock_chat
 
         # Setup components
-        llm_config = _LLMConfig(provider="anthropic", model="claude-3")
+        llm_config = _LLMConfig(
+            provider="anthropic",
+            model="claude-sonnet-4-5",
+        )
         batch_config = _BatchConfig(size=2, max_concurrent=1)
 
         # Create batcher and batches
