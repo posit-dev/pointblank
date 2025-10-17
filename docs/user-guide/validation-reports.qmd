@@ -538,7 +538,7 @@ from datetime import datetime
 
 # Save with timestamp
 timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-validation.get_tabular_report().save(f"validation_report_{timestamp}.html")
+validation.get_tabular_report().write_raw_html(f"validation_report_{timestamp}.html")
 ```
 
 ## Conclusion
