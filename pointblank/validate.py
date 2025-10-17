@@ -9396,10 +9396,10 @@ class Validate:
             so try to include only the columns necessary for the validation.
         model
             The model to be used. This should be in the form of `provider:model` (e.g.,
-            `"anthropic:claude-3-5-sonnet-latest"`). Supported providers are `"anthropic"`,
-            `"openai"`, `"ollama"`, and `"bedrock"`. The model name should be the specific model to
-            be used from the provider. Model names are subject to change so consult the provider's
-            documentation for the most up-to-date model names.
+            `"anthropic:claude-sonnet-4-5"`). Supported providers are `"anthropic"`, `"openai"`,
+            `"ollama"`, and `"bedrock"`. The model name should be the specific model to be used from
+            the provider. Model names are subject to change so consult the provider's documentation
+            for the most up-to-date model names.
         batch_size
             Number of rows to process in each batch. Larger batches are more efficient but may hit
             API limits. Default is `1000`.
