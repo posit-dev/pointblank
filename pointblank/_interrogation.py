@@ -1895,6 +1895,7 @@ def interrogate_prompt(tbl: FrameT, columns_subset: list[str] | None, ai_config:
             provider=llm_provider,
             model=llm_model,
             api_key=None,  # Will be loaded from environment variables
+            verify_ssl=True,  # Default to verifying SSL certificates
         )
 
         # Set up batch configuration
