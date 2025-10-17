@@ -189,6 +189,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
   <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
   <li><a href="#constructing-the-model-argument" id="toc-constructing-the-model-argument" class="nav-link" data-scroll-target="#constructing-the-model-argument">Constructing the <code>model</code> Argument</a></li>
   <li><a href="#notes-on-authentication" id="toc-notes-on-authentication" class="nav-link" data-scroll-target="#notes-on-authentication">Notes on Authentication</a></li>
+  <li><a href="#notes-on-ssl-certificate-verification" id="toc-notes-on-ssl-certificate-verification" class="nav-link" data-scroll-target="#notes-on-ssl-certificate-verification">Notes on SSL Certificate Verification</a></li>
   <li><a href="#notes-on-data-sent-to-the-model-provider" id="toc-notes-on-data-sent-to-the-model-provider" class="nav-link" data-scroll-target="#notes-on-data-sent-to-the-model-provider">Notes on Data Sent to the Model Provider</a></li>
   <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
   </ul></li>
@@ -207,7 +208,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <p style="font-size: 1rem; font-style: italic; margin-top: -10px; line-height: 1;">Draft a validation plan for a given table using an LLM.</p>
 
 <p style="font-size: 12px; color: rgb(170, 170, 170); margin-bottom: -14px;">USAGE</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>DraftValidation(data, model, api_key<span class="op">=</span><span class="va">None</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>DraftValidation(data, model, api_key<span class="op">=</span><span class="va">None</span>, verify_ssl<span class="op">=</span><span class="va">True</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>By using a large language model (LLM) to draft a validation plan, you can quickly generate a starting point for validating a table. This can be useful when you have a new table and you want to get a sense of how to validate it (and adjustments could always be made later). The <a href="../reference/DraftValidation.html#pointblank.DraftValidation" title="0"><code>DraftValidation</code></a> class uses the <code>chatlas</code> package to draft a validation plan for a given table using an LLM from either the <code>"anthropic"</code>, <code>"openai"</code>, <code>"ollama"</code> or <code>"bedrock"</code> provider. You can install all requirements for the class through an optional ‘generate’ install of Pointblank via <code>pip install pointblank[generate]</code>.</p>
 <div class="callout callout-style-default callout-warning callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -231,11 +232,15 @@ Warning
 </dd>
 <dt><code><span class="parameter-name"><strong>model</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><code>str</code></span></code></dt>
 <dd>
-<p>The model to be used. This should be in the form of <code>provider:model</code> (e.g., <code>"anthropic:claude-3-5-sonnet-latest"</code>). Supported providers are <code>"anthropic"</code>, <code>"openai"</code>, <code>"ollama"</code>, and <code>"bedrock"</code>.</p>
+<p>The model to be used. This should be in the form of <code>provider:model</code> (e.g., <code>"anthropic:claude-sonnet-4-5"</code>). Supported providers are <code>"anthropic"</code>, <code>"openai"</code>, <code>"ollama"</code>, and <code>"bedrock"</code>.</p>
 </dd>
 <dt><code><span class="parameter-name"><strong>api_key</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><code>str</code> | None</span> <span class="parameter-default-sep">=</span> <span class="parameter-default">None</span></code></dt>
 <dd>
 <p>The API key to be used for the model.</p>
+</dd>
+<dt><code><span class="parameter-name"><strong>verify_ssl</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><code>bool</code></span> <span class="parameter-default-sep">=</span> <span class="parameter-default">True</span></code></dt>
+<dd>
+<p>Whether to verify SSL certificates when making requests to the LLM provider. Set to <code>False</code> to disable SSL verification (e.g., when behind a corporate firewall with self-signed certificates). Defaults to <code>True</code>. Use with caution as disabling SSL verification can pose security risks.</p>
 </dd>
 </dl>
 </section>
@@ -267,6 +272,34 @@ Warning
 <pre class="plaintext"><code>ANTHROPIC_API_KEY="your_anthropic_api_key_here"
 OPENAI_API_KEY="your_openai_api_key_here"</code></pre>
 <p>There’s no need to have the <code>python-dotenv</code> package installed when using <code>.env</code> files in this way.</p>
+</section>
+<section id="notes-on-ssl-certificate-verification" class="level2 doc-section doc-section-notes-on-ssl-certificate-verification">
+<h3 class="doc-section doc-section-notes-on-ssl-certificate-verification anchored" data-anchor-id="notes-on-ssl-certificate-verification">Notes on SSL Certificate Verification</h3>
+<p>By default, SSL certificate verification is enabled for all requests to LLM providers. However, in certain network environments (such as corporate networks with self-signed certificates or firewall proxies), you may encounter SSL certificate verification errors.</p>
+<p>To disable SSL verification, set the <code>verify_ssl</code> parameter to <code>False</code>:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> pb.load_dataset(dataset<span class="op">=</span><span class="st">"nycflights"</span>, tbl_type<span class="op">=</span><span class="st">"duckdb"</span>)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Disable SSL verification for networks with self-signed certificates</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>pb.DraftValidation(</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    data<span class="op">=</span>data,</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    model<span class="op">=</span><span class="st">"anthropic:claude-sonnet-4-5"</span>,</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    verify_ssl<span class="op">=</span><span class="va">False</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Warning
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Disabling SSL verification (through <code>verify_ssl=False</code>) can expose your API keys and data to man-in-the-middle attacks. Only use this option in trusted network environments and when absolutely necessary.</p>
+</div>
+</div>
 </section>
 <section id="notes-on-data-sent-to-the-model-provider" class="level2 doc-section doc-section-notes-on-data-sent-to-the-model-provider">
 <h3 class="doc-section doc-section-notes-on-data-sent-to-the-model-provider anchored" data-anchor-id="notes-on-data-sent-to-the-model-provider">Notes on Data Sent to the Model Provider</h3>
@@ -301,14 +334,14 @@ OPENAI_API_KEY="your_openai_api_key_here"</code></pre>
         margin: 10px 0;
         border-radius: 2px;
     ">
-<p>Let’s look at how the <a href="../reference/DraftValidation.html#pointblank.DraftValidation" title="0"><code>DraftValidation</code></a> class can be used to draft a validation plan for a table. The table to be used is <code>"nycflights"</code>, which is available here via the <a href="../reference/load_dataset.html#pointblank.load_dataset"><span><code>load_dataset()</code></span></a> function. The model to be used is <code>"anthropic:claude-3-5-sonnet-latest"</code> (which performs very well compared to other LLMs). The example assumes that the API key is stored in an <code>.env</code> file as <code>ANTHROPIC_API_KEY</code>.</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Load the "nycflights" dataset as a DuckDB table</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> pb.load_dataset(dataset<span class="op">=</span><span class="st">"nycflights"</span>, tbl_type<span class="op">=</span><span class="st">"duckdb"</span>)</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Draft a validation plan for the "nycflights" table</span></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>pb.DraftValidation(data<span class="op">=</span>data, model<span class="op">=</span><span class="st">"anthropic:claude-3-5-sonnet-latest"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Let’s look at how the <a href="../reference/DraftValidation.html#pointblank.DraftValidation" title="0"><code>DraftValidation</code></a> class can be used to draft a validation plan for a table. The table to be used is <code>"nycflights"</code>, which is available here via the <a href="../reference/load_dataset.html#pointblank.load_dataset"><span><code>load_dataset()</code></span></a> function. The model to be used is <code>"anthropic:claude-sonnet-4-5"</code> (which performs very well compared to other LLMs). The example assumes that the API key is stored in an <code>.env</code> file as <code>ANTHROPIC_API_KEY</code>.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Load the "nycflights" dataset as a DuckDB table</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> pb.load_dataset(dataset<span class="op">=</span><span class="st">"nycflights"</span>, tbl_type<span class="op">=</span><span class="st">"duckdb"</span>)</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Draft a validation plan for the "nycflights" table</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>pb.DraftValidation(data<span class="op">=</span>data, model<span class="op">=</span><span class="st">"anthropic:claude-sonnet-4-5"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>The output will be a drafted validation plan for the <code>"nycflights"</code> table and this will appear in the console.</p>
 <pre class="plaintext"><code>```python
 import pointblank as pb
