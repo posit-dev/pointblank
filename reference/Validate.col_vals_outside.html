@@ -76,7 +76,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-421a81a0b92e1ede7072f5beb12c1611.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-0a73a3c6678d8b6f803779b3c06f3efb.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -364,7 +364,7 @@ segments=["region", "date"]</code></pre>
         border-radius: 2px;
     ">
 <p>For the examples here, we’ll use a simple Polars DataFrame with three numeric columns (<code>a</code>, <code>b</code>, and <code>c</code>). The table is shown below:</p>
-<div id="0544eed3" class="cell" data-execution_count="2">
+<div id="7f1d3350" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -492,7 +492,7 @@ segments=["region", "date"]</code></pre>
 </div>
 </div>
 <p>Let’s validate that values in column <code>a</code> are all outside the fixed boundary values of <code>1</code> and <code>4</code>. We’ll determine if this validation had any failing test units (there are six test units, one for each row).</p>
-<div id="0942afb9" class="cell" data-execution_count="3">
+<div id="de837d43" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_outside(columns<span class="op">=</span><span class="st">"a"</span>, left<span class="op">=</span><span class="dv">1</span>, right<span class="op">=</span><span class="dv">4</span>)</span>
@@ -651,7 +651,7 @@ segments=["region", "date"]</code></pre>
 <li><code>left=column</code>, <code>right=literal</code></li>
 </ol>
 <p>For the next example, we’ll use <code>col_vals_outside()</code> to check whether the values in column <code>b</code> are outside of the range formed by the corresponding values in columns <code>a</code> (lower bound) and <code>c</code> (upper bound).</p>
-<div id="d45ba431" class="cell" data-execution_count="4">
+<div id="e2fe3c7e" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_outside(columns<span class="op">=</span><span class="st">"b"</span>, left<span class="op">=</span>pb.col(<span class="st">"a"</span>), right<span class="op">=</span>pb.col(<span class="st">"c"</span>))</span>

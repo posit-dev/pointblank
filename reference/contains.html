@@ -76,7 +76,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-421a81a0b92e1ede7072f5beb12c1611.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-0a73a3c6678d8b6f803779b3c06f3efb.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -302,7 +302,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
         border-radius: 2px;
     ">
 <p>Suppose we have a table with columns <code>name</code>, <code>2021_pay_total</code>, <code>2022_pay_total</code>, and <code>person_id</code> and we’d like to validate that the values in columns having <code>"pay"</code> in the name are greater than <code>10</code>. We can use the <a href="../reference/contains.html#pointblank.contains" title="0"><code>contains()</code></a> column selector function to specify the column names that contain <code>"pay"</code> as the columns to validate.</p>
-<div id="bf6fd938" class="cell" data-execution_count="2">
+<div id="75b66215" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -504,7 +504,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 <p>From the results of the validation table we get two validation steps, one for <code>2021_pay_total</code> and one for <code>2022_pay_total</code>. The values in both columns were all greater than <code>10</code>.</p>
 <p>We can also use the <a href="../reference/contains.html#pointblank.contains" title="0"><code>contains()</code></a> function in combination with other column selectors (within <a href="../reference/col.html#pointblank.col"><span><code>col()</code></span></a>) to create more complex column selection criteria (i.e., to select columns that satisfy multiple conditions). For example, to select columns that contain <code>"pay"</code> and match the text <code>"2023"</code> or <code>"2024"</code>, we can use the <code>&amp;</code> operator to combine column selectors.</p>
-<div id="3ed0e490" class="cell" data-execution_count="3">
+<div id="be4ec68a" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>tbl <span class="op">=</span> pl.DataFrame(</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    {</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"name"</span>: [<span class="st">"Alice"</span>, <span class="st">"Bob"</span>, <span class="st">"Charlie"</span>],</span>
