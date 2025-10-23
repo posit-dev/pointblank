@@ -3699,6 +3699,10 @@ class _ValidationInfo:
         The time the validation step was processed. This is in the ISO 8601 format in UTC time.
     proc_duration_s
         The duration of processing for the validation step in seconds.
+    notes
+        An ordered dictionary of notes/footnotes associated with the validation step. Each entry
+        contains both 'markdown' and 'text' versions of the note content. The dictionary preserves
+        insertion order, ensuring notes appear in a consistent sequence in reports and logs.
     """
 
     # Validation plan
@@ -3736,9 +3740,182 @@ class _ValidationInfo:
     val_info: dict[str, any] | None = None
     time_processed: str | None = None
     proc_duration_s: float | None = None
+    notes: dict[str, dict[str, str]] | None = None
 
     def get_val_info(self) -> dict[str, any]:
         return self.val_info
+
+    def _add_note(self, key: str, markdown: str, text: str | None = None) -> None:
+        """
+        Add a note/footnote to the validation step.
+
+        This internal method adds a note entry to the validation step's notes dictionary.
+        Notes are displayed as footnotes in validation reports and included in log output.
+
+        Parameters
+        ----------
+        key
+            A unique identifier for the note. If a note with this key already exists, it will
+            be overwritten.
+        markdown
+            The note content formatted with Markdown. This version is used for display in
+            HTML reports and other rich text formats.
+        text
+            The note content as plain text. This version is used for log files and text-based
+            output. If not provided, the markdown version will be used (with markdown formatting
+            intact).
+
+        Examples
+        --------
+        ```python
+        # Add a note about evaluation failure
+        validation_info._add_note(
+            key="eval_error",
+            markdown="Column expression evaluation **failed**",
+            text="Column expression evaluation failed"
+        )
+
+        # Add a note about LLM response
+        validation_info._add_note(
+            key="llm_response",
+            markdown="LLM validation returned `200` passing rows",
+            text="LLM validation returned 200 passing rows"
+        )
+        ```
+        """
+        # Initialize notes dictionary if it doesn't exist
+        if self.notes is None:
+            self.notes = {}
+
+        # Use markdown as text if text is not provided
+        if text is None:
+            text = markdown
+
+        # Add the note entry
+        self.notes[key] = {"markdown": markdown, "text": text}
+
+    def _get_notes(self, format: str = "dict") -> dict[str, dict[str, str]] | list[str] | None:
+        """
+        Get notes associated with this validation step.
+
+        Parameters
+        ----------
+        format
+            The format to return notes in:
+            - `"dict"`: Returns the full notes dictionary (default)
+            - `"markdown"`: Returns a list of markdown-formatted note values
+            - `"text"`: Returns a list of plain text note values
+            - `"keys"`: Returns a list of note keys
+
+        Returns
+        -------
+        dict, list, or None
+            The notes in the requested format, or `None` if no notes exist.
+
+        Examples
+        --------
+        ```python
+        # Get all notes as dictionary
+        notes = validation_info._get_notes()
+        # Returns: {'key1': {'markdown': '...', 'text': '...'}, ...}
+
+        # Get just markdown versions
+        markdown_notes = validation_info._get_notes(format="markdown")
+        # Returns: ['First note with **emphasis**', 'Second note']
+
+        # Get just plain text versions
+        text_notes = validation_info._get_notes(format="text")
+        # Returns: ['First note with emphasis', 'Second note']
+
+        # Get just the keys
+        keys = validation_info._get_notes(format="keys")
+        # Returns: ['key1', 'key2']
+        ```
+        """
+        if self.notes is None:
+            return None
+
+        if format == "dict":
+            return self.notes
+        elif format == "markdown":
+            return [note["markdown"] for note in self.notes.values()]
+        elif format == "text":
+            return [note["text"] for note in self.notes.values()]
+        elif format == "keys":
+            return list(self.notes.keys())
+        else:
+            raise ValueError(
+                f"Invalid format '{format}'. Must be one of: 'dict', 'markdown', 'text', 'keys'"
+            )
+
+    def _get_note(self, key: str, format: str = "dict") -> dict[str, str] | str | None:
+        """
+        Get a specific note by its key.
+
+        Parameters
+        ----------
+        key
+            The unique identifier of the note to retrieve.
+        format
+            The format to return the note in:
+            - `"dict"`: Returns `{'markdown': '...', 'text': '...'}` (default)
+            - `"markdown"`: Returns just the markdown string
+            - `"text"`: Returns just the plain text string
+
+        Returns
+        -------
+        dict, str, or None
+            The note in the requested format, or `None` if the note doesn't exist.
+
+        Examples
+        --------
+        ```python
+        # Get a specific note as dictionary
+        note = validation_info._get_note("threshold_info")
+        # Returns: {'markdown': 'Using **default** thresholds', 'text': '...'}
+
+        # Get just the markdown version
+        markdown = validation_info._get_note("threshold_info", format="markdown")
+        # Returns: 'Using **default** thresholds'
+
+        # Get just the text version
+        text = validation_info._get_note("threshold_info", format="text")
+        # Returns: 'Using default thresholds'
+        ```
+        """
+        if self.notes is None or key not in self.notes:
+            return None
+
+        note = self.notes[key]
+
+        if format == "dict":
+            return note
+        elif format == "markdown":
+            return note["markdown"]
+        elif format == "text":
+            return note["text"]
+        else:
+            raise ValueError(
+                f"Invalid format '{format}'. Must be one of: 'dict', 'markdown', 'text'"
+            )
+
+    def _has_notes(self) -> bool:
+        """
+        Check if this validation step has any notes.
+
+        Returns
+        -------
+        bool
+            `True` if the validation step has notes, `False` otherwise.
+
+        Examples
+        --------
+        ```python
+        if validation_info._has_notes():
+            print("This step has notes")
+        ```
+        """
+        return self.notes is not None and len(self.notes) > 0
 
 
 def connect_to_table(connection_string: str) -> Any:
@@ -13494,6 +13671,151 @@ class Validate:
 
         return sundered_tbl
 
+    def get_notes(
+        self, i: int, format: str = "dict"
+    ) -> dict[str, dict[str, str]] | list[str] | None:
+        """
+        Get notes from a validation step by its step number.
+
+        This is a convenience method that retrieves notes from a specific validation step using
+        the step number (1-indexed). It provides easier access to step notes without having to
+        navigate through the `validation_info` list.
+
+        Parameters
+        ----------
+        i
+            The step number (1-indexed) to retrieve notes from. This corresponds to the step
+            numbers shown in validation reports.
+        format
+            The format to return notes in:
+            - `"dict"`: Returns the full notes dictionary (default)
+            - `"markdown"`: Returns a list of markdown-formatted note values
+            - `"text"`: Returns a list of plain text note values
+            - `"keys"`: Returns a list of note keys
+
+        Returns
+        -------
+        dict, list, or None
+            The notes in the requested format, or `None` if the step doesn't exist or has no notes.
+
+        Examples
+        --------
+        ```python
+        import pointblank as pb
+        import polars as pl
+
+        # Create validation with notes
+        validation = pb.Validate(pl.DataFrame({"x": [1, 2, 3]}))
+        validation.col_vals_gt(columns="x", value=0)
+
+        # Add a note to step 1
+        validation.validation_info[0]._add_note(
+            key="info",
+            markdown="This is a **test** note",
+            text="This is a test note"
+        )
+
+        # Interrogate
+        validation.interrogate()
+
+        # Get notes from step 1 using the step number
+        notes = validation.get_notes(1)
+        # Returns: {'info': {'markdown': 'This is a **test** note', 'text': '...'}}
+
+        # Get just the markdown versions
+        markdown_notes = validation.get_notes(1, format="markdown")
+        # Returns: ['This is a **test** note']
+
+        # Get just the keys
+        keys = validation.get_notes(1, format="keys")
+        # Returns: ['info']
+        ```
+        """
+        # Validate step number
+        if not isinstance(i, int) or i < 1:
+            raise ValueError(f"Step number must be a positive integer, got: {i}")
+
+        # Find the validation step with the matching step number
+        # Note: validation_info may contain multiple steps after segmentation,
+        # so we need to find the one with the matching `i` value
+        for validation in self.validation_info:
+            if validation.i == i:
+                return validation._get_notes(format=format)
+
+        # Step not found
+        return None
+
+    def get_note(self, i: int, key: str, format: str = "dict") -> dict[str, str] | str | None:
+        """
+        Get a specific note from a validation step by its step number and note key.
+
+        This method retrieves a specific note from a validation step using the step number
+        (1-indexed) and the note key. It provides easier access to individual notes without having
+        to navigate through the `validation_info` list or retrieve all notes.
+
+        Parameters
+        ----------
+        i
+            The step number (1-indexed) to retrieve the note from. This corresponds to the step
+            numbers shown in validation reports.
+        key
+            The key of the note to retrieve.
+        format
+            The format to return the note in:
+            - `"dict"`: Returns the note as a dictionary with 'markdown' and 'text' keys (default)
+            - `"markdown"`: Returns just the markdown-formatted note value
+            - `"text"`: Returns just the plain text note value
+
+        Returns
+        -------
+        dict, str, or None
+            The note in the requested format, or `None` if the step or note doesn't exist.
+
+        Examples
+        --------
+        ```python
+        import pointblank as pb
+        import polars as pl
+
+        # Create validation with notes
+        validation = pb.Validate(pl.DataFrame({"x": [1, 2, 3]}))
+        validation.col_vals_gt(columns="x", value=0)
+
+        # Add a note to step 1
+        validation.validation_info[0]._add_note(
+            key="threshold_info",
+            markdown="Using **default** thresholds",
+            text="Using default thresholds"
+        )
+
+        # Interrogate
+        validation.interrogate()
+
+        # Get a specific note from step 1 using step number and key
+        note = validation.get_note(1, "threshold_info")
+        # Returns: {'markdown': 'Using **default** thresholds', 'text': '...'}
+
+        # Get just the markdown version
+        markdown = validation.get_note(1, "threshold_info", format="markdown")
+        # Returns: 'Using **default** thresholds'
+
+        # Get just the text version
+        text = validation.get_note(1, "threshold_info", format="text")
+        # Returns: 'Using default thresholds'
+        ```
+        """
+        # Validate step number
+        if not isinstance(i, int) or i < 1:
+            raise ValueError(f"Step number must be a positive integer, got: {i}")
+
+        # Find the validation step with the matching step number
+        for validation in self.validation_info:
+            if validation.i == i:
+                return validation._get_note(key=key, format=format)
+
+        # Step not found
+        return None
+
     def get_tabular_report(
         self, title: str | None = ":default:", incl_header: bool = None, incl_footer: bool = None
     ) -> GT:
@@ -14173,6 +14495,7 @@ class Validate:
         validation_info_dict.pop("label")
         validation_info_dict.pop("active")
         validation_info_dict.pop("all_passed")
+        validation_info_dict.pop("notes")
 
         # If no interrogation performed, populate the `i` entry with a sequence of integers
         # from `1` to the number of validation steps
@@ -14357,7 +14680,13 @@ class Validate:
             gt_tbl = gt_tbl.tab_header(title=html(title_text), subtitle=html(combined_subtitle))
 
         if incl_footer:
+            # Add table time as HTML source note
             gt_tbl = gt_tbl.tab_source_note(source_note=html(table_time))
+
+            # Create notes markdown from validation steps and add as separate source note
+            notes_markdown = _create_notes_html(self.validation_info)
+            if notes_markdown:
+                gt_tbl = gt_tbl.tab_source_note(source_note=md(notes_markdown))
 
         # If the interrogation has not been performed, then style the table columns dealing with
         # interrogation data as grayed out
@@ -16057,6 +16386,7 @@ def _validation_info_as_dict(validation_info: _ValidationInfo) -> dict:
         "critical",
         "extract",
         "proc_duration_s",
+        "notes",
     ]
 
     # Filter the validation information to include only the selected fields
@@ -16534,6 +16864,86 @@ def _create_table_time_html(
         f"{time_end_fmt}</span>"
         f"</div>"
     )
+
+
+def _create_notes_html(validation_info: list) -> str:
+    """
+    Create markdown text for validation notes/footnotes.
+
+    This function collects notes from all validation steps and formats them as footnotes
+    for display in the report footer. Each note is prefixed with the step number in
+    uppercase small caps bold formatting, and the note content is rendered as markdown.
+
+    Parameters
+    ----------
+    validation_info
+        List of _ValidationInfo objects from which to extract notes.
+
+    Returns
+    -------
+    str
+        Markdown string containing formatted footnotes, or empty string if no notes exist.
+    """
+    # Collect all notes from validation steps
+    all_notes = []
+    for step in validation_info:
+        if step.notes:
+            for key, content in step.notes.items():
+                # Store note with step number for context
+                all_notes.append(
+                    {
+                        "step": step.i,
+                        "key": key,
+                        "markdown": content["markdown"],
+                        "text": content["text"],
+                    }
+                )
+
+    # If no notes, return empty string
+    if not all_notes:
+        return ""
+
+    # Build markdown for notes section
+    # Start with a styled horizontal rule and bold "Notes" header
+    notes_parts = [
+        (
+            "<hr style='border: none; border-top-width: 1px; border-top-style: dotted; "
+            "border-top-color: #B5B5B5; margin-top: -3px; margin-bottom: 3px;'>"
+        ),
+        "<strong>Notes</strong>",
+        "",
+    ]
+
+    previous_step = None
+    for note in all_notes:
+        # Determine if this is the first note for this step
+        is_first_for_step = note["step"] != previous_step
+        previous_step = note["step"]
+
+        # Format step label with HTML for uppercase small caps bold
+        # Use lighter color for subsequent notes of the same step
+        step_color = "#333333" if is_first_for_step else "#999999"
+        step_label = (
+            f"<span style='font-variant: small-caps; font-weight: bold; font-size: smaller; "
+            f"text-transform: uppercase; color: {step_color};'>Step {note['step']}</span>"
+        )
+
+        # Format note key in monospaced font with smaller size
+        note_key = f"<span style='font-family: \"IBM Plex Mono\", monospace; font-size: smaller;'>({note['key']})</span>"
+
+        # Combine step label, note key, and markdown content
+        note_text = f"{step_label} {note_key} {note['markdown']}"
+        notes_parts.append(note_text)
+        notes_parts.append("")  # Add blank line between notes
+
+    # Remove trailing blank line
+    if notes_parts[-1] == "":
+        notes_parts.pop()
+
+    # Join with newlines to create markdown text
+    notes_markdown = "\n".join(notes_parts)
+
+    return notes_markdown
 
 
 def _create_label_html(label: str | None, start_time: str) -> str:

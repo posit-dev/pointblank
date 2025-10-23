@@ -723,6 +723,7 @@ def test_validation_plan_and_interrogation(request, tbl_fixture):
         "val_info",
         "time_processed",
         "proc_duration_s",
+        "notes",
     ]
 
     # Check the attributes of the `validation_info` object
@@ -754,6 +755,7 @@ def test_validation_plan_and_interrogation(request, tbl_fixture):
     assert val_info.val_info is None
     assert val_info.time_processed is None
     assert val_info.proc_duration_s is None
+    assert val_info.notes is None
 
     # Interrogate the validation plan
     v_int = v.interrogate()
@@ -803,6 +805,7 @@ def test_validation_plan_and_interrogation(request, tbl_fixture):
         "val_info",
         "time_processed",
         "proc_duration_s",
+        "notes",
     ]
 
     # Check the attributes of the `validation_info` object
@@ -834,6 +837,7 @@ def test_validation_plan_and_interrogation(request, tbl_fixture):
     assert val_info.val_info is None
     assert isinstance(val_info.time_processed, str)
     assert val_info.proc_duration_s > 0.0
+    assert val_info.notes is None
 
 
 @pytest.mark.parametrize("tbl_fixture", TBL_LIST)
@@ -9729,6 +9733,7 @@ def test_seg_group_with_auto_brief():
 
 
 def test_process_action_str():
+    """Test the _process_action_str() function."""
     datetime_val = str(datetime.datetime(2025, 1, 1, 0, 0, 0, 0))
 
     partial_process_action_str = partial(
@@ -9761,6 +9766,7 @@ def test_process_action_str():
 
 
 def test_process_data_dataframe_passthrough_polars():
+    """Test that _process_data() returns the same Polars DataFrame object."""
     pl = pytest.importorskip("polars")
 
     # Create test DataFrame
@@ -9771,6 +9777,598 @@ def test_process_data_dataframe_passthrough_polars():
 
     # Should be the same object
     assert result is df
+
+
+def test_notes_field_initialization():
+    """Test that the notes field is properly initialized."""
+    validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
+    validation.col_vals_gt(columns="a", value=0)
+
+    # Access the validation info
+    val_info = validation.validation_info[0]
+
+    # Notes should be None initially
+    assert val_info.notes is None
+
+
+def test_add_note_basic():
+    """Test adding a basic note to a validation step."""
+    validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
+    validation.col_vals_gt(columns="a", value=0)
+
+    # Access the validation info
+    val_info = validation.validation_info[0]
+
+    # Add a note
+    val_info._add_note(
+        key="test_note", markdown="This is a **test** note", text="This is a test note"
+    )
+
+    # Verify note was added
+    assert val_info.notes is not None
+    assert "test_note" in val_info.notes
+    assert val_info.notes["test_note"]["markdown"] == "This is a **test** note"
+    assert val_info.notes["test_note"]["text"] == "This is a test note"
+
+
+def test_add_note_without_text():
+    """Test adding a note without explicit text version."""
+    validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
+    validation.col_vals_gt(columns="a", value=0)
+
+    val_info = validation.validation_info[0]
+
+    # Add a note without text parameter
+    val_info._add_note(key="test_note", markdown="This is a **test** note")
+
+    # Text should default to markdown
+    assert val_info.notes["test_note"]["text"] == "This is a **test** note"
+
+
+def test_add_multiple_notes():
+    """Test adding multiple notes to a validation step."""
+    validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
+    validation.col_vals_gt(columns="a", value=0)
+
+    val_info = validation.validation_info[0]
+
+    # Add multiple notes
+    val_info._add_note(key="note1", markdown="First note")
+    val_info._add_note(key="note2", markdown="Second note")
+    val_info._add_note(key="note3", markdown="Third note")
+
+    # Verify all notes were added
+    assert len(val_info.notes) == 3
+    assert "note1" in val_info.notes
+    assert "note2" in val_info.notes
+    assert "note3" in val_info.notes
+
+
+def test_note_key_overwrite():
+    """Test that adding a note with the same key overwrites the previous one."""
+    validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
+    validation.col_vals_gt(columns="a", value=0)
+
+    val_info = validation.validation_info[0]
+
+    # Add a note
+    val_info._add_note(key="test", markdown="First version")
+    assert val_info.notes["test"]["markdown"] == "First version"
+
+    # Overwrite with same key
+    val_info._add_note(key="test", markdown="Second version")
+    assert val_info.notes["test"]["markdown"] == "Second version"
+    assert len(val_info.notes) == 1  # Should still only have one note
+
+
+def test_notes_persist_through_interrogation():
+    """Test that notes persist through interrogation."""
+    validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
+    validation.col_vals_gt(columns="a", value=0)
+
+    val_info = validation.validation_info[0]
+    val_info._add_note(key="pre_interrogation", markdown="Note added before interrogation")
+
+    # Interrogate
+    validation.interrogate()
+
+    # Note should still be present
+    assert validation.validation_info[0].notes is not None
+    assert "pre_interrogation" in validation.validation_info[0].notes
+
+
+def test_notes_in_validation_info_dict():
+    """Test that notes are included when converting validation info to dict."""
+    validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
+    validation.col_vals_gt(columns="a", value=0)
+
+    val_info = validation.validation_info[0]
+    val_info._add_note(key="test", markdown="Test note")
+
+    # Interrogate to trigger validation info processing
+    validation.interrogate()
+
+    # Get the validation info as dict (this is used in JSON export)
+    from pointblank.validate import _validation_info_as_dict
+
+    val_dict = _validation_info_as_dict(validation.validation_info)
+
+    # Verify notes field is present
+    assert "notes" in val_dict
+    assert val_dict["notes"][0]["test"]["markdown"] == "Test note"
+
+
+def test_notes_display_in_report():
+    """Test that notes are properly displayed in the tabular report."""
+    validation = Validate(data=pl.DataFrame({"a": [1, 2, 3, 4, 5]}))
+    validation.col_vals_gt(columns="a", value=0)
+    validation.col_vals_lt(columns="a", value=10)
+
+    # Add notes to steps
+    validation.validation_info[0]._add_note(
+        key="note1", markdown="First validation note with **emphasis**"
+    )
+    validation.validation_info[1]._add_note(key="note2", markdown="Second validation note")
+
+    # Interrogate
+    validation.interrogate()
+
+    # Get the report
+    report = validation.get_tabular_report()
+
+    # The report should be a GT object
+    assert report is not None
+
+    # Convert to HTML to check for notes
+    html_str = report.as_raw_html()
+
+    # Check that notes section is present
+    assert "Notes" in html_str
+
+    # Check for styled step labels (uppercase small caps bold)
+    assert "Step 1" in html_str
+    assert "font-variant: small-caps" in html_str
+    assert "text-transform: uppercase" in html_str
+
+    # Check that markdown is rendered (bold emphasis should be rendered as <strong>)
+    assert "emphasis" in html_str
+    assert "Step 2" in html_str
+    assert "Second validation note" in html_str
+
+
+def test_empty_notes_no_display():
+    """Test that no notes section appears when there are no notes."""
+    validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
+    validation.col_vals_gt(columns="a", value=0)
+    validation.interrogate()
+
+    # Get the report
+    report = validation.get_tabular_report()
+    html_str = report.as_raw_html()
+
+    # The generic "Notes" header should not appear if there are no notes
+    # (we look for it in a specific style to avoid false positives)
+    assert "border-top: 1px solid #D3D3D3" not in html_str or "Notes</div>" not in html_str
+
+
+def test_notes_ordering_preserved():
+    """Test that notes maintain insertion order."""
+    validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
+    validation.col_vals_gt(columns="a", value=0)
+
+    val_info = validation.validation_info[0]
+
+    # Add notes in specific order
+    val_info._add_note(key="z_note", markdown="Z note")
+    val_info._add_note(key="a_note", markdown="A note")
+    val_info._add_note(key="m_note", markdown="M note")
+
+    # Verify order is preserved (Python dicts maintain insertion order in 3.7+)
+    keys = list(val_info.notes.keys())
+    assert keys == ["z_note", "a_note", "m_note"]
+
+
+def test_get_notes_dict_format():
+    """Test getting notes in dictionary format."""
+    validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
+    validation.col_vals_gt(columns="a", value=0)
+
+    val_info = validation.validation_info[0]
+
+    # Add some notes
+    val_info._add_note(key="note1", markdown="First **note**", text="First note")
+    val_info._add_note(key="note2", markdown="Second note")
+
+    # Get notes as dict (default)
+    notes = val_info._get_notes()
+    assert notes is not None
+    assert len(notes) == 2
+    assert notes["note1"]["markdown"] == "First **note**"
+    assert notes["note1"]["text"] == "First note"
+    assert notes["note2"]["markdown"] == "Second note"
+
+    # Explicitly request dict format
+    notes_dict = val_info._get_notes(format="dict")
+    assert notes_dict == notes
+
+
+def test_get_notes_markdown_format():
+    """Test getting notes as a list of markdown strings."""
+    validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
+    validation.col_vals_gt(columns="a", value=0)
+
+    val_info = validation.validation_info[0]
+
+    val_info._add_note(key="note1", markdown="First **note**", text="First note")
+    val_info._add_note(key="note2", markdown="Second *note*")
+
+    markdown_notes = val_info._get_notes(format="markdown")
+    assert markdown_notes == ["First **note**", "Second *note*"]
+
+
+def test_get_notes_text_format():
+    """Test getting notes as a list of text strings."""
+    validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
+    validation.col_vals_gt(columns="a", value=0)
+
+    val_info = validation.validation_info[0]
+
+    val_info._add_note(key="note1", markdown="First **note**", text="First note")
+    val_info._add_note(key="note2", markdown="Second *note*", text="Second note")
+
+    text_notes = val_info._get_notes(format="text")
+    assert text_notes == ["First note", "Second note"]
+
+
+def test_get_notes_keys_format():
+    """Test getting note keys."""
+    validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
+    validation.col_vals_gt(columns="a", value=0)
+
+    val_info = validation.validation_info[0]
+
+    val_info._add_note(key="alpha", markdown="Alpha")
+    val_info._add_note(key="beta", markdown="Beta")
+    val_info._add_note(key="gamma", markdown="Gamma")
+
+    keys = val_info._get_notes(format="keys")
+    assert keys == ["alpha", "beta", "gamma"]
+
+
+def test_get_notes_no_notes():
+    """Test that get_notes() returns None when there are no notes."""
+    validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
+    validation.col_vals_gt(columns="a", value=0)
+
+    val_info = validation.validation_info[0]
+
+    assert val_info._get_notes() is None
+    assert val_info._get_notes(format="markdown") is None
+    assert val_info._get_notes(format="text") is None
+    assert val_info._get_notes(format="keys") is None
+
+
+def test_get_notes_invalid_format():
+    """Test that invalid format raises ValueError."""
+    validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
+    validation.col_vals_gt(columns="a", value=0)
+
+    val_info = validation.validation_info[0]
+    val_info._add_note(key="test", markdown="Test")
+
+    with pytest.raises(ValueError, match="Invalid format"):
+        val_info._get_notes(format="invalid")
+
+
+def test_get_note_dict_format():
+    """Test getting a specific note in dictionary format."""
+    validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
+    validation.col_vals_gt(columns="a", value=0)
+
+    val_info = validation.validation_info[0]
+    val_info._add_note(key="test_note", markdown="Test **markdown**", text="Test text")
+
+    # Get note as dict (default)
+    note = val_info._get_note(key="test_note")
+    assert note == {"markdown": "Test **markdown**", "text": "Test text"}
+
+    # Explicitly request dict format
+    note_dict = val_info._get_note(key="test_note", format="dict")
+    assert note_dict == note
+
+
+def test_get_note_markdown_format():
+    """Test getting a specific note's markdown."""
+    validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
+    validation.col_vals_gt(columns="a", value=0)
+
+    val_info = validation.validation_info[0]
+    val_info._add_note(key="test_note", markdown="Test **markdown**", text="Test text")
+
+    markdown = val_info._get_note(key="test_note", format="markdown")
+    assert markdown == "Test **markdown**"
+
+
+def test_get_note_text_format():
+    """Test getting a specific note's text."""
+    validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
+    validation.col_vals_gt(columns="a", value=0)
+
+    val_info = validation.validation_info[0]
+    val_info._add_note(key="test_note", markdown="Test **markdown**", text="Test text")
+
+    text = val_info._get_note(key="test_note", format="text")
+    assert text == "Test text"
+
+
+def test_get_note_not_found():
+    """Test that get_note() returns None for a non-existent key."""
+    validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
+    validation.col_vals_gt(columns="a", value=0)
+
+    val_info = validation.validation_info[0]
+    val_info._add_note(key="existing", markdown="Exists")
+
+    assert val_info._get_note(key="nonexistent") is None
+    assert val_info._get_note(key="nonexistent", format="markdown") is None
+    assert val_info._get_note(key="nonexistent", format="text") is None
+
+
+def test_get_note_no_notes():
+    """Test that get_note() returns None when no notes exist."""
+    validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
+    validation.col_vals_gt(columns="a", value=0)
+
+    val_info = validation.validation_info[0]
+
+    assert val_info._get_note("any_key") is None
+
+
+def test_get_note_invalid_format():
+    """Test that an invalid format raises a ValueError."""
+    validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
+    validation.col_vals_gt(columns="a", value=0)
+
+    val_info = validation.validation_info[0]
+    val_info._add_note(key="test", markdown="Test")
+
+    with pytest.raises(ValueError, match="Invalid format"):
+        val_info._get_note("test", format="invalid")
+
+
+def test_has_notes():
+    """Test the has_notes() method."""
+    validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
+    validation.col_vals_gt(columns="a", value=0)
+
+    val_info = validation.validation_info[0]
+
+    # Initially no notes
+    assert val_info._has_notes() is False
+
+    # Add a note
+    val_info._add_note(key="test", markdown="Test")
+    assert val_info._has_notes() is True
+
+
+def test_get_step_notes_basic():
+    """Test getting notes by step number."""
+    validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
+    validation.col_vals_gt(columns="a", value=0)
+    validation.col_vals_lt(columns="a", value=10)
+
+    # Add notes to steps
+    validation.validation_info[0]._add_note(
+        key="note1", markdown="First **note**", text="First note"
+    )
+    validation.validation_info[1]._add_note(
+        key="note2", markdown="Second *note*", text="Second note"
+    )
+
+    # Interrogate to set step numbers
+    validation.interrogate()
+
+    # Get notes from step 1
+    notes_step_1 = validation.get_notes(i=1)
+
+    assert notes_step_1 is not None
+    assert "note1" in notes_step_1
+    assert notes_step_1["note1"]["markdown"] == "First **note**"
+
+    # Get notes from step 2
+    notes_step_2 = validation.get_notes(i=2)
+
+    assert notes_step_2 is not None
+    assert "note2" in notes_step_2
+    assert notes_step_2["note2"]["markdown"] == "Second *note*"
+
+
+def test_get_step_notes_formats():
+    """Test getting notes by step number in different formats."""
+    validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
+    validation.col_vals_gt(columns="a", value=0)
+
+    validation.validation_info[0]._add_note(
+        key="alpha", markdown="Alpha **note**", text="Alpha note"
+    )
+    validation.validation_info[0]._add_note(key="beta", markdown="Beta *note*", text="Beta note")
+
+    validation.interrogate()
+
+    # Get in markdown format
+    markdown_notes = validation.get_notes(i=1, format="markdown")
+    assert markdown_notes == ["Alpha **note**", "Beta *note*"]
+
+    # Get in text format
+    text_notes = validation.get_notes(i=1, format="text")
+    assert text_notes == ["Alpha note", "Beta note"]
+
+    # Get keys
+    keys = validation.get_notes(i=1, format="keys")
+    assert keys == ["alpha", "beta"]
+
+
+def test_get_step_notes_no_notes():
+    """Test get_step_notes() returns None when step has no notes."""
+    validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
+    validation.col_vals_gt(columns="a", value=0)
+    validation.interrogate()
+
+    # Step exists but has no notes
+    assert validation.get_notes(i=1) is None
+
+
+def test_get_step_notes_invalid_step():
+    """Test get_step_notes() returns None for non-existent step."""
+    validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
+    validation.col_vals_gt(columns="a", value=0)
+    validation.interrogate()
+
+    # Step doesn't exist
+    assert validation.get_notes(i=99) is None
+
+
+def test_get_step_notes_invalid_step_number():
+    """Test get_step_notes() raises error for invalid step number."""
+    validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
+    validation.col_vals_gt(columns="a", value=0)
+    validation.interrogate()
+
+    # Negative step number
+    with pytest.raises(ValueError, match="Step number must be a positive integer"):
+        validation.get_notes(i=-1)
+
+    # Zero step number
+    with pytest.raises(ValueError, match="Step number must be a positive integer"):
+        validation.get_notes(i=0)
+
+    # Non-integer step number
+    with pytest.raises(ValueError, match="Step number must be a positive integer"):
+        validation.get_notes(i="1")
+
+
+def test_get_step_notes_before_interrogation():
+    """Test get_step_notes() works before interrogation."""
+    validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
+    validation.col_vals_gt(columns="a", value=0)
+
+    validation.validation_info[0]._add_note(key="test", markdown="Test note")
+
+    # Before interrogation, step numbers aren't set, so this should return None
+    # because validation.i is None
+    assert validation.get_notes(i=1) is None
+
+
+def test_get_step_notes_with_segments():
+    """Test get_step_notes() with segmented validation steps."""
+    validation = Validate(data=pl.DataFrame({"a": [1, 2, 3], "category": ["A", "B", "A"]}))
+    validation.col_vals_gt(columns="a", value=0, segments="category")
+
+    # Add note before segmentation expansion
+    validation.validation_info[0]._add_note(key="seg_note", markdown="Segmented validation")
+
+    validation.interrogate()
+
+    # After interrogation with segments, multiple steps are created
+    # Each segment gets its own step number
+    # We should be able to get notes from the first segment step
+    notes = validation.get_notes(i=1)
+    assert notes is not None
+    assert "seg_note" in notes
+
+
+def test_validate_get_note_basic():
+    """Test get_note() method at Validate level with step number and key."""
+    validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
+    validation.col_vals_gt(columns="a", value=0)
+
+    # Add notes to step 1
+    validation.validation_info[0]._add_note(
+        key="note1", markdown="First **note**", text="First note"
+    )
+    validation.validation_info[0]._add_note(
+        key="note2", markdown="Second *note*", text="Second note"
+    )
+
+    validation.interrogate()
+
+    # Get specific note by step number and key
+    note1 = validation.get_note(i=1, key="note1")
+    assert note1 is not None
+    assert note1["markdown"] == "First **note**"
+    assert note1["text"] == "First note"
+
+    note2 = validation.get_note(i=1, key="note2")
+    assert note2 is not None
+    assert note2["markdown"] == "Second *note*"
+    assert note2["text"] == "Second note"
+
+
+def test_validate_get_note_formats():
+    """Test get_note() with different format options."""
+    validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
+    validation.col_vals_gt(columns="a", value=0)
+
+    validation.validation_info[0]._add_note(
+        key="test", markdown="Test **markdown**", text="Test markdown"
+    )
+
+    validation.interrogate()
+
+    # Dict format (default)
+    note_dict = validation.get_note(i=1, key="test")
+    assert isinstance(note_dict, dict)
+    assert note_dict["markdown"] == "Test **markdown**"
+
+    # Markdown format
+    markdown = validation.get_note(i=1, key="test", format="markdown")
+    assert markdown == "Test **markdown**"
+
+    # Text format
+    text = validation.get_note(i=1, key="test", format="text")
+    assert text == "Test markdown"
+
+
+def test_validate_get_note_not_found():
+    """Test get_note() when note key doesn't exist."""
+    validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
+    validation.col_vals_gt(columns="a", value=0)
+
+    validation.validation_info[0]._add_note(key="exists", markdown="Exists")
+
+    validation.interrogate()
+
+    # Non-existent note key
+    assert validation.get_note(i=1, key="nonexistent") is None
+
+
+def test_validate_get_note_invalid_step():
+    """Test get_note() with invalid step number."""
+    validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
+    validation.col_vals_gt(columns="a", value=0)
+
+    validation.validation_info[0]._add_note(key="test", markdown="Test")
+
+    validation.interrogate()
+
+    # Non-existent step number
+    assert validation.get_note(99, "test") is None
+
+
+def test_validate_get_note_invalid_step_number():
+    """Test get_note() with invalid step number types."""
+    validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
+    validation.col_vals_gt(columns="a", value=0)
+
+    validation.interrogate()
+
+    # Invalid step number (zero)
+    with pytest.raises(ValueError, match="must be a positive integer"):
+        validation.get_note(i=0, key="test")
+
+    # Invalid step number (negative)
+    with pytest.raises(ValueError, match="must be a positive integer"):
+        validation.get_note(i=-1, key="test")
 
 
 def test_process_data_dataframe_passthrough_pandas():
