@@ -76,7 +76,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-0a73a3c6678d8b6f803779b3c06f3efb.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-421a81a0b92e1ede7072f5beb12c1611.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -247,7 +247,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
         border-radius: 2px;
     ">
 <p>In the example below, we’ll use a simple Polars DataFrame with three columns (<code>a</code>, <code>b</code>, and <code>c</code>). There will be three validation steps, and the second step will have a failing test unit (the value <code>10</code> isn’t less than <code>9</code>). The <code>assert_passing()</code> method is used to assert that all validation steps passed perfectly, automatically performing the interrogation if needed.</p>
-<div id="faad5c9b" class="cell" data-execution_count="1">
+<div id="32994e4d" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -272,19 +272,19 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <div class="ansi-escaped-output">
 <pre><span class="ansi-red-fg">---------------------------------------------------------------------------</span>
 <span class="ansi-red-fg">AssertionError</span>                            Traceback (most recent call last)
-<span class="ansi-green-fg">/tmp/ipykernel_5890/2424908189.py</span> in <span class="ansi-cyan-fg">?</span><span class="ansi-blue-fg">()</span>
+<span class="ansi-green-fg">/tmp/ipykernel_4560/2424908189.py</span> in <span class="ansi-cyan-fg">?</span><span class="ansi-blue-fg">()</span>
 <span class="ansi-green-fg">     16</span>     .col_vals_in_set(columns=<span class="ansi-yellow-fg">"c"</span>, set=[<span class="ansi-yellow-fg">"a"</span>, <span class="ansi-yellow-fg">"b"</span>])
 <span class="ansi-green-fg">     17</span> )
 <span class="ansi-green-fg">     18</span> 
 <span class="ansi-green-fg">     19</span> <span style="font-style:italic;color:rgb(95,135,135)"># No need to call [`interrogate()`](`pointblank.Validate.interrogate`) explicitly</span>
 <span class="ansi-green-fg">---&gt; </span><span class="ansi-green-fg">20</span> validation.assert_passing()
 
-<span class="ansi-green-fg">/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/pointblank/validate.py</span> in <span class="ansi-cyan-fg">?</span><span class="ansi-blue-fg">(self)</span>
-<span class="ansi-green-fg">  11938</span>             ]
-<span class="ansi-green-fg">  11939</span>             msg = "The following assertions failed:\n" + "\n".join(
-<span class="ansi-green-fg">  11940</span>                 [<span class="ansi-yellow-fg">f"- Step {i + 1}: {autobrief}"</span> <span style="font-weight:bold;color:rgb(0,135,0)">for</span> i, autobrief <span style="font-weight:bold;color:rgb(0,135,0)">in</span> failed_steps]
-<span class="ansi-green-fg">  11941</span>             )
-<span class="ansi-green-fg">&gt; </span><span class="ansi-green-fg">11942</span>             <span style="font-weight:bold;color:rgb(0,135,0)">raise</span> AssertionError(msg)
+<span class="ansi-green-fg">/opt/hostedtoolcache/Python/3.11.13/x64/lib/python3.11/site-packages/pointblank/validate.py</span> in <span class="ansi-cyan-fg">?</span><span class="ansi-blue-fg">(self)</span>
+<span class="ansi-green-fg">  12115</span>             ]
+<span class="ansi-green-fg">  12116</span>             msg = "The following assertions failed:\n" + "\n".join(
+<span class="ansi-green-fg">  12117</span>                 [<span class="ansi-yellow-fg">f"- Step {i + 1}: {autobrief}"</span> <span style="font-weight:bold;color:rgb(0,135,0)">for</span> i, autobrief <span style="font-weight:bold;color:rgb(0,135,0)">in</span> failed_steps]
+<span class="ansi-green-fg">  12118</span>             )
+<span class="ansi-green-fg">&gt; </span><span class="ansi-green-fg">12119</span>             <span style="font-weight:bold;color:rgb(0,135,0)">raise</span> AssertionError(msg)
 
 <span class="ansi-red-fg">AssertionError</span>: The following assertions failed:
 - Step 2: Expect that values in `b` should be &lt; `9`.</pre>
