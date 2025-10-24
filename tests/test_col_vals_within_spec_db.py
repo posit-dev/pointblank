@@ -173,3 +173,138 @@ def test_fallback_to_regular_for_non_ibis():
     # Result should be a Polars DataFrame (not Ibis)
     assert isinstance(result, pl.DataFrame)
     assert "pb_is_good_" in result.columns
+
+
+@pytest.fixture
+def credit_card_test_data_duckdb():
+    """Create DuckDB table with credit card test data."""
+    con = ibis.connect("duckdb://")
+
+    data = {
+        "id": [1, 2, 3, 4, 5, 6, 7, 8],
+        "card_number": [
+            "4532015112830366",  # Valid Visa
+            "5425233430109903",  # Valid Mastercard
+            "374245455400126",  # Valid Amex (15 digits)
+            "4532-0151-1283-0366",  # Valid Visa with hyphens
+            "4532 0151 1283 0366",  # Valid Visa with spaces
+            "4532015112830367",  # Invalid (wrong check digit)
+            "1234567890123",  # Invalid (fails Luhn)
+            None,  # NULL
+        ],
+    }
+
+    return con.create_table("card_data", data, overwrite=True)
+
+
+@pytest.fixture
+def credit_card_test_data_sqlite():
+    """Create SQLite table with credit card test data."""
+    con = ibis.connect("sqlite://")
+
+    data = {
+        "id": [1, 2, 3, 4, 5, 6, 7, 8],
+        "card_number": [
+            "4532015112830366",  # Valid Visa
+            "5425233430109903",  # Valid Mastercard
+            "374245455400126",  # Valid Amex (15 digits)
+            "4532-0151-1283-0366",  # Valid Visa with hyphens
+            "4532 0151 1283 0366",  # Valid Visa with spaces
+            "4532015112830367",  # Invalid (wrong check digit)
+            "1234567890123",  # Invalid (fails Luhn)
+            None,  # NULL
+        ],
+    }
+
+    return con.create_table("card_data", data, overwrite=True)
+
+
+def test_credit_card_validation_duckdb_basic(credit_card_test_data_duckdb):
+    """Test basic credit card validation with DuckDB (database-native)."""
+    result = interrogate_within_spec_db(
+        tbl=credit_card_test_data_duckdb,
+        column="card_number",
+        values={"spec": "credit_card"},
+        na_pass=False,
+    )
+
+    # Execute to check results
+    result_df = result.execute()
+
+    # First five should be valid (including formatted ones)
+    assert result_df["pb_is_good_"][0] == True  # Valid Visa
+    assert result_df["pb_is_good_"][1] == True  # Valid Mastercard
+    assert result_df["pb_is_good_"][2] == True  # Valid Amex
+    assert result_df["pb_is_good_"][3] == True  # Valid with hyphens
+    assert result_df["pb_is_good_"][4] == True  # Valid with spaces
+
+    # Sixth should be invalid (wrong check digit)
+    assert result_df["pb_is_good_"][5] == False
+
+    # Seventh should be invalid (fails Luhn)
+    assert result_df["pb_is_good_"][6] == False
+
+    # Eighth is NULL, should fail with na_pass=False
+    assert result_df["pb_is_good_"][7] == False
+
+
+def test_credit_card_validation_duckdb_na_pass(credit_card_test_data_duckdb):
+    """Test credit card validation with na_pass=True (DuckDB, database-native)."""
+    result = interrogate_within_spec_db(
+        tbl=credit_card_test_data_duckdb,
+        column="card_number",
+        values={"spec": "credit_card"},
+        na_pass=True,
+    )
+
+    # Execute to check results
+    result_df = result.execute()
+
+    # NULL should pass with na_pass=True
+    assert result_df["pb_is_good_"][7] == True
+
+
+def test_credit_card_validation_sqlite_basic(credit_card_test_data_sqlite):
+    """Test basic credit card validation with SQLite (database-native)."""
+    result = interrogate_within_spec_db(
+        tbl=credit_card_test_data_sqlite,
+        column="card_number",
+        values={"spec": "credit_card"},
+        na_pass=False,
+    )
+
+    # Execute to check results
+    result_df = result.execute()
+
+    # First five should be valid
+    assert result_df["pb_is_good_"][0] == True
+    assert result_df["pb_is_good_"][1] == True
+    assert result_df["pb_is_good_"][2] == True
+    assert result_df["pb_is_good_"][3] == True
+    assert result_df["pb_is_good_"][4] == True
+
+    # Invalid cards should fail
+    assert result_df["pb_is_good_"][5] == False
+    assert result_df["pb_is_good_"][6] == False
+    assert result_df["pb_is_good_"][7] == False
+
+
+def test_credit_card_validation_no_materialization(credit_card_test_data_duckdb):
+    """Verify that database-native credit card validation doesn't materialize data."""
+    result = interrogate_within_spec_db(
+        tbl=credit_card_test_data_duckdb,
+        column="card_number",
+        values={"spec": "credit_card"},
+        na_pass=False,
+    )
+
+    # Result should still be an Ibis table (not materialized)
+    assert hasattr(result, "execute")
+
+    # Should be able to chain more operations without executing
+    filtered = result.filter(result["pb_is_good_"] == True)
+    assert hasattr(filtered, "execute")
+
+    # Only materialize when we explicitly execute
+    materialized = filtered.execute()
+    assert len(materialized) == 5  # 5 valid credit cards
