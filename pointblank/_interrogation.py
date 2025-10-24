@@ -2197,6 +2197,122 @@ def interrogate_not_null(tbl: FrameT, column: str) -> FrameT:
     return result_tbl.to_native()
 
 
+def interrogate_increasing(
+    tbl: FrameT, column: str, allow_stationary: bool, decreasing_tol: float, na_pass: bool
+) -> FrameT:
+    """
+    Increasing interrogation.
+
+    Checks whether column values are increasing row by row.
+
+    Parameters
+    ----------
+    tbl
+        The table to interrogate.
+    column
+        The column to check.
+    allow_stationary
+        Whether to allow consecutive equal values (stationary phases).
+    decreasing_tol
+        Optional tolerance for negative movement (decreasing values).
+    na_pass
+        Whether NA/null values should be considered as passing.
+
+    Returns
+    -------
+    FrameT
+        The table with a `pb_is_good_` column indicating pass/fail for each row.
+    """
+    nw_tbl = nw.from_native(tbl)
+
+    # Create a lagged difference column
+    result_tbl = nw_tbl.with_columns(pb_lagged_difference_=nw.col(column) - nw.col(column).shift(1))
+
+    # Build the condition based on allow_stationary and decreasing_tol
+    if allow_stationary or decreasing_tol != 0:
+        # Allow stationary (diff >= 0) or within tolerance
+        threshold = -abs(decreasing_tol) if decreasing_tol != 0 else 0
+        good_condition = nw.col("pb_lagged_difference_") >= threshold
+    else:
+        # Strictly increasing (diff > 0)
+        good_condition = nw.col("pb_lagged_difference_") > 0
+
+    # Apply the validation logic
+    # The logic is:
+    # 1. If lagged_diff is null AND current value is NOT null -> pass (first row or after NA)
+    # 2. If current value is null -> apply na_pass
+    # 3. Otherwise -> apply the good_condition
+    result_tbl = result_tbl.with_columns(
+        pb_is_good_=nw.when(nw.col("pb_lagged_difference_").is_null() & ~nw.col(column).is_null())
+        .then(nw.lit(True))  # First row or row after NA (can't validate)
+        .otherwise(
+            nw.when(nw.col(column).is_null())
+            .then(nw.lit(na_pass))  # Handle NA values in current row
+            .otherwise(good_condition)
+        )
+    )
+
+    return result_tbl.drop("pb_lagged_difference_").to_native()
+
+
+def interrogate_decreasing(
+    tbl: FrameT, column: str, allow_stationary: bool, increasing_tol: float, na_pass: bool
+) -> FrameT:
+    """
+    Decreasing interrogation.
+
+    Checks whether column values are decreasing row by row.
+
+    Parameters
+    ----------
+    tbl
+        The table to interrogate.
+    column
+        The column to check.
+    allow_stationary
+        Whether to allow consecutive equal values (stationary phases).
+    increasing_tol
+        Optional tolerance for positive movement (increasing values).
+    na_pass
+        Whether NA/null values should be considered as passing.
+
+    Returns
+    -------
+    FrameT
+        The table with a `pb_is_good_` column indicating pass/fail for each row.
+    """
+    nw_tbl = nw.from_native(tbl)
+
+    # Create a lagged difference column
+    result_tbl = nw_tbl.with_columns(pb_lagged_difference_=nw.col(column) - nw.col(column).shift(1))
+
+    # Build the condition based on allow_stationary and increasing_tol
+    if allow_stationary or increasing_tol != 0:
+        # Allow stationary (diff <= 0) or within tolerance
+        threshold = abs(increasing_tol) if increasing_tol != 0 else 0
+        good_condition = nw.col("pb_lagged_difference_") <= threshold
+    else:
+        # Strictly decreasing (diff < 0)
+        good_condition = nw.col("pb_lagged_difference_") < 0
+
+    # Apply the validation logic
+    # The logic is:
+    # 1. If lagged_diff is null AND current value is NOT null -> pass (first row or after NA)
+    # 2. If current value is null -> apply na_pass
+    # 3. Otherwise -> apply the good_condition
+    result_tbl = result_tbl.with_columns(
+        pb_is_good_=nw.when(nw.col("pb_lagged_difference_").is_null() & ~nw.col(column).is_null())
+        .then(nw.lit(True))  # First row or row after NA (can't validate)
+        .otherwise(
+            nw.when(nw.col(column).is_null())
+            .then(nw.lit(na_pass))  # Handle NA values in current row
+            .otherwise(good_condition)
+        )
+    )
+
+    return result_tbl.drop("pb_lagged_difference_").to_native()
+
+
 def _interrogate_comparison_base(
     tbl: FrameT, column: str, compare: any, na_pass: bool, operator: str
 ) -> FrameT:
