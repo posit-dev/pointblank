@@ -9,6 +9,13 @@ from narwhals.dependencies import is_pandas_dataframe, is_polars_dataframe
 from narwhals.typing import FrameT
 
 from pointblank._constants import IBIS_BACKENDS
+from pointblank._spec_utils import (
+    check_credit_card,
+    check_iban,
+    check_isbn,
+    check_postal_code,
+    check_vin,
+)
 from pointblank._utils import (
     _column_test_prep,
     _convert_to_narwhals,
@@ -1719,6 +1726,300 @@ def interrogate_regex(tbl: FrameT, column: str, values: dict | str, na_pass: boo
     ).drop("pb_is_good_1", "pb_is_good_2")
 
     return result_tbl.to_native()
+
+
+def interrogate_within_spec(tbl: FrameT, column: str, values: dict, na_pass: bool) -> FrameT:
+    """Within specification interrogation."""
+    from pointblank._spec_utils import (
+        regex_email,
+        regex_ipv4_address,
+        regex_ipv6_address,
+        regex_mac,
+        regex_phone,
+        regex_swift_bic,
+        regex_url,
+    )
+
+    spec = values["spec"]
+    spec_lower = spec.lower()
+
+    # Parse spec for country-specific formats
+    country = None
+    if "[" in spec and "]" in spec:
+        # Extract country code from spec like "postal_code[US]" or "iban[DE]"
+        base_spec = spec[: spec.index("[")]
+        country = spec[spec.index("[") + 1 : spec.index("]")]
+        spec_lower = base_spec.lower()
+
+    # Convert to Narwhals for cross-backend compatibility
+    nw_tbl = nw.from_native(tbl)
+
+    # Regex-based specifications can use Narwhals directly (no materialization needed)
+    regex_specs = {
+        "email": regex_email(),
+        "url": regex_url(),
+        "phone": regex_phone(),
+        "ipv4": regex_ipv4_address(),
+        "ipv4_address": regex_ipv4_address(),
+        "ipv6": regex_ipv6_address(),
+        "ipv6_address": regex_ipv6_address(),
+        "mac": regex_mac(),
+        "mac_address": regex_mac(),
+        "swift": regex_swift_bic(),
+        "swift_bic": regex_swift_bic(),
+        "bic": regex_swift_bic(),
+    }
+
+    if spec_lower in regex_specs:
+        # Use regex validation through Narwhals (works for all backends including Ibis!)
+        pattern = regex_specs[spec_lower]
+
+        # For SWIFT/BIC, need to uppercase first
+        if spec_lower in ("swift", "swift_bic", "bic"):
+            col_expr = nw.col(column).str.to_uppercase()
+        else:
+            col_expr = nw.col(column)
+
+        result_tbl = nw_tbl.with_columns(
+            pb_is_good_1=nw.col(column).is_null() & na_pass,
+            pb_is_good_2=col_expr.str.contains(f"^{pattern}$", literal=False).fill_null(False),
+        )
+
+        result_tbl = result_tbl.with_columns(
+            pb_is_good_=nw.col("pb_is_good_1") | nw.col("pb_is_good_2")
+        ).drop("pb_is_good_1", "pb_is_good_2")
+
+        return result_tbl.to_native()
+
+    # For specifications requiring checksums or complex logic, materialize data
+    # Get the column data as a list
+    col_data = nw_tbl.select(column).to_native()
+
+    # Convert to list based on backend
+    if hasattr(col_data, "to_list"):  # Polars
+        col_list = col_data[column].to_list()
+    elif hasattr(col_data, "tolist"):  # Pandas
+        col_list = col_data[column].tolist()
+    else:  # For Ibis tables, we need to execute the query first
+        try:
+            # Try to execute if it's an Ibis table
+            if hasattr(col_data, "execute"):
+                col_data_exec = col_data.execute()
+                if hasattr(col_data_exec, "to_list"):  # Polars result
+                    col_list = col_data_exec[column].to_list()
+                elif hasattr(col_data_exec, "tolist"):  # Pandas result
+                    col_list = col_data_exec[column].tolist()
+                else:
+                    col_list = list(col_data_exec[column])
+            else:
+                col_list = list(col_data[column])
+        except Exception:
+            # Fallback to direct list conversion
+            col_list = list(col_data[column])
+
+    # Validate based on spec type (checksum-based validations)
+    if spec_lower in ("isbn", "isbn-10", "isbn-13"):
+        is_valid_list = check_isbn(col_list)
+    elif spec_lower == "vin":
+        is_valid_list = check_vin(col_list)
+    elif spec_lower in ("credit_card", "creditcard"):
+        is_valid_list = check_credit_card(col_list)
+    elif spec_lower == "iban":
+        is_valid_list = check_iban(col_list, country=country)
+    elif spec_lower in ("postal_code", "postalcode", "postcode", "zip"):
+        if country is None:
+            raise ValueError("Country code required for postal code validation")
+        is_valid_list = check_postal_code(col_list, country=country)
+    else:
+        raise ValueError(f"Unknown specification type: {spec}")
+
+    # Create result table with validation results
+    # For Ibis tables, execute to get a materialized dataframe first
+    native_tbl = nw_tbl.to_native()
+    if hasattr(native_tbl, "execute"):
+        native_tbl = native_tbl.execute()
+
+    # Add validation column - convert native table to Series, then back through Narwhals
+    if is_polars_dataframe(native_tbl):
+        import polars as pl
+
+        native_tbl = native_tbl.with_columns(pb_is_good_2=pl.Series(is_valid_list))
+    elif is_pandas_dataframe(native_tbl):
+        import pandas as pd
+
+        native_tbl["pb_is_good_2"] = pd.Series(is_valid_list, index=native_tbl.index)
+    else:
+        raise NotImplementedError(f"Backend type not supported: {type(native_tbl)}")
+
+    result_tbl = nw.from_native(native_tbl)  # Handle NA values and combine validation results
+    result_tbl = result_tbl.with_columns(
+        pb_is_good_1=nw.col(column).is_null() & na_pass,
+    )
+
+    result_tbl = result_tbl.with_columns(
+        pb_is_good_=nw.col("pb_is_good_1") | nw.col("pb_is_good_2")
+    ).drop("pb_is_good_1", "pb_is_good_2")
+
+    return result_tbl.to_native()
+
+
+def interrogate_within_spec_db(tbl: FrameT, column: str, values: dict, na_pass: bool) -> FrameT:
+    """
+    Database-native specification validation (proof of concept).
+
+    This function uses Ibis expressions to perform validation entirely in SQL,
+    avoiding data materialization for remote database tables. Currently only
+    supports VIN validation as a proof of concept.
+
+    Parameters
+    ----------
+    tbl
+        The table to interrogate (must be an Ibis table).
+    column
+        The column to validate.
+    values
+        Dictionary containing 'spec' key with specification type.
+    na_pass
+        Whether to pass null values.
+
+    Returns
+    -------
+    FrameT
+        Result table with pb_is_good_ column indicating validation results.
+
+    Notes
+    -----
+    This is a proof-of-concept implementation demonstrating database-native
+    validation. It translates complex Python validation logic (regex, checksums)
+    into SQL expressions that can be executed directly in the database.
+    """
+    spec = values["spec"]
+    spec_lower = spec.lower()
+
+    # Check if this is an Ibis table
+    native_tbl = tbl
+    if hasattr(tbl, "to_native"):
+        native_tbl = tbl.to_native() if callable(tbl.to_native) else tbl
+
+    is_ibis = hasattr(native_tbl, "execute")
+
+    if not is_ibis:
+        # Fall back to regular implementation for non-Ibis tables
+        return interrogate_within_spec(tbl, column, values, na_pass)
+
+    if spec_lower != "vin":
+        raise NotImplementedError(
+            f"Database-native validation for '{spec}' not yet implemented. "
+            "Currently only 'vin' is supported in interrogate_within_spec_db(). "
+            "Use interrogate_within_spec() for other specifications."
+        )
+
+    # VIN validation using Ibis expressions (database-native)
+    # Implementation based on ISO 3779 standard with check digit algorithm
+    try:
+        import ibis
+    except ImportError:
+        raise ImportError("Ibis is required for database-native validation")
+
+    # VIN transliteration map (character to numeric value for checksum)
+    # Based on ISO 3779 standard for VIN check digit calculation
+    transliteration = {
+        "A": 1,
+        "B": 2,
+        "C": 3,
+        "D": 4,
+        "E": 5,
+        "F": 6,
+        "G": 7,
+        "H": 8,
+        "J": 1,
+        "K": 2,
+        "L": 3,
+        "M": 4,
+        "N": 5,
+        "P": 7,
+        "R": 9,
+        "S": 2,
+        "T": 3,
+        "U": 4,
+        "V": 5,
+        "W": 6,
+        "X": 7,
+        "Y": 8,
+        "Z": 9,
+        "0": 0,
+        "1": 1,
+        "2": 2,
+        "3": 3,
+        "4": 4,
+        "5": 5,
+        "6": 6,
+        "7": 7,
+        "8": 8,
+        "9": 9,
+    }
+
+    # Position weights for checksum calculation
+    weights = [8, 7, 6, 5, 4, 3, 2, 10, 0, 9, 8, 7, 6, 5, 4, 3, 2]
+
+    # Get the column as an Ibis expression
+    col_expr = native_tbl[column]
+
+    # Basic checks: length must be 17, no invalid characters (I, O, Q)
+    valid_length = col_expr.length() == 17
+    no_invalid_chars = (
+        ~col_expr.upper().contains("I")
+        & ~col_expr.upper().contains("O")
+        & ~col_expr.upper().contains("Q")
+    )
+
+    # Calculate checksum using Ibis expressions
+    # For each position, extract character, transliterate to number, multiply by weight, sum
+    checksum = ibis.literal(0)
+
+    for pos in range(17):
+        if pos == 8:  # Position 9 (0-indexed 8) is the check digit itself
+            continue
+
+        # Extract character at position (1-indexed for substr)
+        char = col_expr.upper().substr(pos, 1)
+
+        # Build a case expression for transliteration using ibis.cases()
+        # Add final else condition for invalid characters
+        conditions = [(char == ch, num) for ch, num in transliteration.items()]
+        value = ibis.cases(*conditions, else_=0)  # Default: invalid char = 0 (will fail validation)
+
+        # Multiply by weight and add to checksum
+        checksum = checksum + (value * weights[pos])
+
+    # Check digit calculation: checksum % 11
+    # If result is 10, check digit should be 'X', otherwise it's the digit itself
+    expected_check = checksum % 11
+    actual_check_char = col_expr.upper().substr(8, 1)  # Position 9 (0-indexed 8)
+
+    # Validate check digit using ibis.cases()
+    check_digit_valid = ibis.cases(
+        (expected_check == 10, actual_check_char == "X"),
+        (expected_check < 10, actual_check_char == expected_check.cast(str)),
+        else_=False,
+    )
+
+    # Combine all validation checks
+    is_valid = valid_length & no_invalid_chars & check_digit_valid
+
+    # Handle NULL values
+    if na_pass:
+        # NULL values should pass when na_pass=True
+        is_valid = col_expr.isnull() | is_valid
+    else:
+        # NULL values should explicitly fail when na_pass=False
+        # Use fill_null to convert NULL results to False
+        is_valid = is_valid.fill_null(False)
+
+    # Add validation column to table
+    result_tbl = native_tbl.mutate(pb_is_good_=is_valid)
+
+    return result_tbl
 
 
 def interrogate_null(tbl: FrameT, column: str) -> FrameT:
