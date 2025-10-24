@@ -1791,7 +1791,20 @@ def interrogate_within_spec(tbl: FrameT, column: str, values: dict, na_pass: boo
 
         return result_tbl.to_native()
 
-    # For specifications requiring checksums or complex logic, materialize data
+    # For specifications requiring checksums or complex logic:
+    # Auto-detect Ibis tables and use database-native validation when available
+    native_tbl = nw_tbl.to_native()
+    is_ibis = hasattr(native_tbl, "execute")
+
+    # Use database-native validation for VIN and credit_card when using Ibis
+    if is_ibis and spec_lower == "vin":
+        # Route to database-native VIN validation
+        return interrogate_within_spec_db(tbl, column, values, na_pass)
+    elif is_ibis and spec_lower in ("credit_card", "creditcard"):
+        # Route to database-native credit card validation
+        return interrogate_credit_card_db(tbl, column, values, na_pass)
+
+    # For non-Ibis tables or other specs, materialize data and use Python validation
     # Get the column data as a list
     col_data = nw_tbl.select(column).to_native()
 
@@ -1907,10 +1920,13 @@ def interrogate_within_spec_db(tbl: FrameT, column: str, values: dict, na_pass: 
         # Fall back to regular implementation for non-Ibis tables
         return interrogate_within_spec(tbl, column, values, na_pass)
 
-    if spec_lower != "vin":
+    # Route to appropriate database-native validation
+    if spec_lower == "credit_card":
+        return interrogate_credit_card_db(tbl, column, values, na_pass)
+    elif spec_lower != "vin":
         raise NotImplementedError(
             f"Database-native validation for '{spec}' not yet implemented. "
-            "Currently only 'vin' is supported in interrogate_within_spec_db(). "
+            "Currently 'vin' and 'credit_card' are supported in interrogate_within_spec_db(). "
             "Use interrogate_within_spec() for other specifications."
         )
 
@@ -2014,6 +2030,149 @@ def interrogate_within_spec_db(tbl: FrameT, column: str, values: dict, na_pass: 
     else:
         # NULL values should explicitly fail when na_pass=False
         # Use fill_null to convert NULL results to False
+        is_valid = is_valid.fill_null(False)
+
+    # Add validation column to table
+    result_tbl = native_tbl.mutate(pb_is_good_=is_valid)
+
+    return result_tbl
+
+
+def interrogate_credit_card_db(
+    tbl: FrameT, column: str, values: dict[str, str], na_pass: bool
+) -> FrameT:
+    """
+    Database-native credit card validation using Luhn algorithm in SQL.
+
+    This function implements the Luhn checksum algorithm entirely in SQL using
+    Ibis expressions, avoiding data materialization for remote database tables.
+    This is a unique implementation that validates credit card numbers directly
+    in the database.
+
+    Parameters
+    ----------
+    tbl
+        The table to interrogate (must be an Ibis table).
+    column
+        The column to validate.
+    values
+        Dictionary containing 'spec' key (should be 'credit_card').
+    na_pass
+        Whether to pass null values.
+
+    Returns
+    -------
+    FrameT
+        Result table with pb_is_good_ column indicating validation results.
+
+    Notes
+    -----
+    The Luhn algorithm works as follows:
+    1. Remove spaces and hyphens from the card number
+    2. Starting from the rightmost digit, double every second digit
+    3. If doubled digit > 9, subtract 9
+    4. Sum all digits
+    5. Valid if sum % 10 == 0
+
+    This implementation translates the entire algorithm into SQL expressions.
+    """
+    # Check if this is an Ibis table
+    native_tbl = tbl
+    if hasattr(tbl, "to_native"):
+        native_tbl = tbl.to_native() if callable(tbl.to_native) else tbl
+
+    is_ibis = hasattr(native_tbl, "execute")
+
+    if not is_ibis:
+        # Fall back to regular implementation for non-Ibis tables
+        return interrogate_within_spec(tbl, column, values, na_pass)
+
+    try:
+        import ibis
+    except ImportError:
+        raise ImportError("Ibis is required for database-native validation")
+
+    # Get the column as an Ibis expression
+    col_expr = native_tbl[column]
+
+    # Step 1: Clean the input - remove spaces and hyphens
+    # First check format: only digits, spaces, and hyphens allowed
+    valid_chars = col_expr.re_search(r"^[0-9\s\-]+$").notnull()
+
+    # Clean: remove spaces and hyphens
+    clean_card = col_expr.replace(" ", "").replace("-", "")
+
+    # Step 2: Check length (13-19 digits after cleaning)
+    card_length = clean_card.length()
+    valid_length = (card_length >= 13) & (card_length <= 19)
+
+    # Step 3: Luhn algorithm implementation in SQL
+    # We'll process each digit position and calculate the checksum
+    # Starting from the right, double every second digit
+
+    # Initialize checksum
+    checksum = ibis.literal(0)
+
+    # Process up to 19 digits (maximum credit card length)
+    for pos in range(19):
+        # Calculate position from right (0 = rightmost)
+        pos_from_right = pos
+
+        # Extract digit at this position from the right
+        # substr with negative index or using length - pos
+        digit_pos = card_length - pos_from_right
+        digit_char = clean_card.substr(digit_pos - 1, 1)
+
+        # Convert character to integer (using case statement)
+        digit_val = ibis.cases(
+            (digit_char == "0", 0),
+            (digit_char == "1", 1),
+            (digit_char == "2", 2),
+            (digit_char == "3", 3),
+            (digit_char == "4", 4),
+            (digit_char == "5", 5),
+            (digit_char == "6", 6),
+            (digit_char == "7", 7),
+            (digit_char == "8", 8),
+            (digit_char == "9", 9),
+            else_=-1,  # Invalid character
+        )
+
+        # Check if this position should be processed (within card length)
+        in_range = digit_pos > 0
+
+        # Double every second digit (odd positions from right, 0-indexed)
+        should_double = (pos_from_right % 2) == 1
+
+        # Calculate contribution to checksum
+        # If should_double: double the digit, then if > 9 subtract 9
+        doubled = digit_val * 2
+        adjusted = ibis.cases(
+            (should_double & (doubled > 9), doubled - 9),
+            (should_double, doubled),
+            else_=digit_val,
+        )
+
+        # Add to checksum only if in range
+        contribution = ibis.cases(
+            (in_range, adjusted),
+            else_=0,
+        )
+
+        checksum = checksum + contribution
+
+    # Step 4: Valid if checksum % 10 == 0
+    luhn_valid = (checksum % 10) == 0
+
+    # Combine all validation checks
+    is_valid = valid_chars & valid_length & luhn_valid
+
+    # Handle NULL values
+    if na_pass:
+        # NULL values should pass when na_pass=True
+        is_valid = col_expr.isnull() | is_valid
+    else:
+        # NULL values should explicitly fail when na_pass=False
         is_valid = is_valid.fill_null(False)
 
     # Add validation column to table
