@@ -757,6 +757,161 @@ def col_count_match(data_tbl: FrameT, count, inverse: bool) -> bool:
         return get_column_count(data=data_tbl) != count
 
 
+def tbl_match(data_tbl: FrameT, tbl_compare: FrameT) -> bool:
+    """
+    Check if two tables match exactly in schema, row count, and data.
+
+    This function performs a comprehensive comparison between two tables,
+    checking progressively stricter conditions from least to most stringent:
+
+    1. Column count match
+    2. Row count match
+    3. Schema match (case-insensitive column names, any order)
+    4. Schema match (case-insensitive column names, correct order)
+    5. Schema match (case-sensitive column names, correct order)
+    6. Data match: compares values column-by-column
+
+    Parameters
+    ----------
+    data_tbl
+        The target table to validate.
+    tbl_compare
+        The comparison table to validate against.
+
+    Returns
+    -------
+    bool
+        True if tables match completely, False otherwise.
+    """
+    from pointblank.schema import Schema, _check_schema_match
+    from pointblank.validate import get_column_count, get_row_count
+
+    # Convert both tables to narwhals for compatibility
+    tbl = _convert_to_narwhals(df=data_tbl)
+    tbl_cmp = _convert_to_narwhals(df=tbl_compare)
+
+    # Stage 1: Check column count (least stringent)
+    col_count_matching = get_column_count(data=data_tbl) == get_column_count(data=tbl_compare)
+
+    if not col_count_matching:
+        return False
+
+    # Stage 2: Check row count
+    row_count_matching = get_row_count(data=data_tbl) == get_row_count(data=tbl_compare)
+
+    if not row_count_matching:
+        return False
+
+    # Stage 3: Check schema match - case-insensitive column names, any order
+    schema = Schema(tbl=tbl_compare)
+
+    col_schema_matching_any_order = _check_schema_match(
+        data_tbl=data_tbl,
+        schema=schema,
+        complete=True,
+        in_order=False,
+        case_sensitive_colnames=False,
+        case_sensitive_dtypes=False,
+        full_match_dtypes=False,
+    )
+
+    if not col_schema_matching_any_order:
+        return False
+
+    # Stage 4: Check schema match - case-insensitive column names, correct order
+    col_schema_matching_in_order = _check_schema_match(
+        data_tbl=data_tbl,
+        schema=schema,
+        complete=True,
+        in_order=True,
+        case_sensitive_colnames=False,
+        case_sensitive_dtypes=False,
+        full_match_dtypes=False,
+    )
+
+    if not col_schema_matching_in_order:
+        return False
+
+    # Stage 5: Check schema match - case-sensitive column names, correct order
+    col_schema_matching_exact = _check_schema_match(
+        data_tbl=data_tbl,
+        schema=schema,
+        complete=True,
+        in_order=True,
+        case_sensitive_colnames=True,
+        case_sensitive_dtypes=False,
+        full_match_dtypes=False,
+    )
+
+    if not col_schema_matching_exact:
+        return False
+
+    # Stage 6: Check for exact data by cell across matched columns (most stringent)
+    # Handle edge case where both tables have zero rows (they match)
+    if get_row_count(data=data_tbl) == 0:
+        return True
+
+    column_count = get_column_count(data=data_tbl)
+
+    # Compare column-by-column
+    for i in range(column_count):
+        # Get column name
+        col_name = tbl.columns[i]
+
+        # Get column data from both tables
+        col_data_1 = tbl.select(col_name)
+        col_data_2 = tbl_cmp.select(col_name)
+
+        # Convert to native format for comparison
+        # We need to collect if lazy frames
+        if hasattr(col_data_1, "collect"):
+            col_data_1 = col_data_1.collect()
+        if hasattr(col_data_2, "collect"):
+            col_data_2 = col_data_2.collect()
+
+        # Convert to native and then to lists for comparison
+        col_1_native = col_data_1.to_native()
+        col_2_native = col_data_2.to_native()
+
+        # Extract values as lists for comparison
+        if hasattr(col_1_native, "to_list"):  # Polars Series
+            values_1 = col_1_native[col_name].to_list()
+            values_2 = col_2_native[col_name].to_list()
+        elif hasattr(col_1_native, "tolist"):  # Pandas Series/DataFrame
+            values_1 = col_1_native[col_name].tolist()
+            values_2 = col_2_native[col_name].tolist()
+        elif hasattr(col_1_native, "collect"):  # Ibis
+            values_1 = col_1_native[col_name].to_pandas().tolist()
+            values_2 = col_2_native[col_name].to_pandas().tolist()
+        else:
+            # Fallback: try direct comparison
+            values_1 = list(col_1_native[col_name])
+            values_2 = list(col_2_native[col_name])
+
+        # Compare the two lists element by element, handling NaN/None
+        if len(values_1) != len(values_2):
+            return False
+
+        for v1, v2 in zip(values_1, values_2):
+            # Handle None/NaN comparisons
+            if v1 is None and v2 is None:
+                continue
+            # Check for NaN (float NaN values)
+            try:
+                import math
+
+                if math.isnan(v1) and math.isnan(v2):
+                    continue
+            except (TypeError, ValueError):
+                pass
+
+            # Direct comparison
+            if v1 != v2:
+                return False
+
+    return True
+
+
 def conjointly_validation(data_tbl: FrameT, expressions, threshold: int, tbl_type: str = "local"):
     """
     Perform conjoint validation using multiple expressions.
