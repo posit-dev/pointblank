@@ -7895,6 +7895,382 @@ class Validate:
 
         return self
 
+    def col_vals_increasing(
+        self,
+        columns: str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals,
+        allow_stationary: bool = False,
+        decreasing_tol: float | None = None,
+        na_pass: bool = False,
+        pre: Callable | None = None,
+        segments: SegmentSpec | None = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds = None,
+        actions: Actions | None = None,
+        brief: str | bool | None = None,
+        active: bool = True,
+    ) -> Validate:
+        """
+        Are column data increasing by row?
+
+        The `col_vals_increasing()` validation method checks whether column values in a table are
+        increasing when moving down a table. There are options for allowing missing values in the
+        target column, allowing stationary phases (where consecutive values don't change), and even
+        one for allowing decreasing movements up to a certain threshold. This validation will
+        operate over the number of test units that is equal to the number of rows in the table
+        (determined after any `pre=` mutation has been applied).
+
+        Parameters
+        ----------
+        columns
+            A single column or a list of columns to validate. Can also use
+            [`col()`](`pointblank.col`) with column selectors to specify one or more columns. If
+            multiple columns are supplied or resolved, there will be a separate validation step
+            generated for each column.
+        allow_stationary
+            An option to allow pauses in increasing values. For example, if the values for the test
+            units are `[80, 82, 82, 85, 88]` then the third unit (`82`, appearing a second time)
+            would be marked as failing when `allow_stationary` is `False`. Using
+            `allow_stationary=True` will result in all the test units in `[80, 82, 82, 85, 88]` to
+            be marked as passing.
+        decreasing_tol
+            An optional threshold value that allows for movement of numerical values in the negative
+            direction. By default this is `None` but using a numerical value will set the absolute
+            threshold of negative travel allowed across numerical test units. Note that setting a
+            value here also has the effect of setting `allow_stationary` to `True`.
+        na_pass
+            Should any encountered None, NA, or Null values be considered as passing test units? By
+            default, this is `False`. Set to `True` to pass test units with missing values.
+        pre
+            An optional preprocessing function or lambda to apply to the data table during
+            interrogation. This function should take a table as input and return a modified table.
+            Have a look at the *Preprocessing* section for more information on how to use this
+            argument.
+        segments
+            An optional directive on segmentation, which serves to split a validation step into
+            multiple (one step per segment). Can be a single column name, a tuple that specifies a
+            column name and its corresponding values to segment on, or a combination of both
+            (provided as a list). Read the *Segmentation* section for usage information.
+        thresholds
+            Set threshold failure levels for reporting and reacting to exceedences of the levels.
+            The thresholds are set at the step level and will override any global thresholds set in
+            `Validate(thresholds=...)`. The default is `None`, which means that no thresholds will
+            be set locally and global thresholds (if any) will take effect. Look at the *Thresholds*
+            section for information on how to set threshold levels.
+        actions
+            Optional actions to take when the validation step(s) meets or exceeds any set threshold
+            levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
+            define the actions.
+        brief
+            An optional brief description of the validation step that will be displayed in the
+            reporting table. You can use the templating elements like `"{step}"` to insert
+            the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+            the entire brief will be automatically generated. If `None` (the default) then there
+            won't be a brief.
+        active
+            A boolean value indicating whether the validation step should be active. Using `False`
+            will make the validation step inactive (still reporting its presence and keeping indexes
+            for the steps unchanged).
+
+        Returns
+        -------
+        Validate
+            The `Validate` object with the added validation step.
+
+        Examples
+        --------
+        ```{python}
+        #| echo: false
+        #| output: false
+        import pointblank as pb
+        pb.config(report_incl_header=False, report_incl_footer=False, preview_incl_header=False)
+        ```
+
+        For the examples here, we'll use a simple Polars DataFrame with a numeric column (`a`). The
+        table is shown below:
+
+        ```{python}
+        import pointblank as pb
+        import polars as pl
+
+        tbl = pl.DataFrame(
+            {
+                "a": [1, 2, 3, 4, 5, 6],
+                "b": [1, 2, 2, 3, 4, 5],
+                "c": [1, 2, 1, 3, 4, 5],
+            }
+        )
+
+        pb.preview(tbl)
+        ```
+
+        Let's validate that values in column `a` are increasing. We'll determine if this validation
+        had any failing test units (there are six test units, one for each row).
+
+        ```{python}
+        validation = (
+            pb.Validate(data=tbl)
+            .col_vals_increasing(columns="a")
+            .interrogate()
+        )
+
+        validation
+        ```
+
+        The validation passed as all values in column `a` are increasing. Now let's check column
+        `b` which has a stationary value:
+
+        ```{python}
+        validation = (
+            pb.Validate(data=tbl)
+            .col_vals_increasing(columns="b")
+            .interrogate()
+        )
+
+        validation
+        ```
+
+        This validation fails at the third row because the value `2` is repeated. If we want to
+        allow stationary values, we can use `allow_stationary=True`:
+
+        ```{python}
+        validation = (
+            pb.Validate(data=tbl)
+            .col_vals_increasing(columns="b", allow_stationary=True)
+            .interrogate()
+        )
+
+        validation
+        ```
+        """
+        assertion_type = "col_vals_increasing"
+
+        # Determine threshold to use (global or local) and normalize a local `thresholds=` value
+        thresholds = (
+            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+        )
+
+        # If `columns` is a ColumnSelector or Narwhals selector, call `col()` on it to later
+        # resolve the columns
+        if isinstance(columns, (ColumnSelector, nw.selectors.Selector)):
+            columns = col(columns)
+
+        # If `columns` is Column value or a string, place it in a list for iteration
+        if isinstance(columns, (Column, str)):
+            columns = [columns]
+
+        # Determine brief to use (global or local) and transform any shorthands of `brief=`
+        brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
+
+        # Iterate over the columns and create a validation step for each
+        for column in columns:
+            val_info = _ValidationInfo(
+                assertion_type=assertion_type,
+                column=column,
+                values="",
+                na_pass=na_pass,
+                pre=pre,
+                segments=segments,
+                thresholds=thresholds,
+                actions=actions,
+                brief=brief,
+                active=active,
+                val_info={
+                    "allow_stationary": allow_stationary,
+                    "decreasing_tol": decreasing_tol if decreasing_tol else 0.0,
+                },
+            )
+
+            self._add_validation(validation_info=val_info)
+
+        return self
+
+    def col_vals_decreasing(
+        self,
+        columns: str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals,
+        allow_stationary: bool = False,
+        increasing_tol: float | None = None,
+        na_pass: bool = False,
+        pre: Callable | None = None,
+        segments: SegmentSpec | None = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds = None,
+        actions: Actions | None = None,
+        brief: str | bool | None = None,
+        active: bool = True,
+    ) -> Validate:
+        """
+        Are column data decreasing by row?
+
+        The `col_vals_decreasing()` validation method checks whether column values in a table are
+        decreasing when moving down a table. There are options for allowing missing values in the
+        target column, allowing stationary phases (where consecutive values don't change), and even
+        one for allowing increasing movements up to a certain threshold. This validation will
+        operate over the number of test units that is equal to the number of rows in the table
+        (determined after any `pre=` mutation has been applied).
+
+        Parameters
+        ----------
+        columns
+            A single column or a list of columns to validate. Can also use
+            [`col()`](`pointblank.col`) with column selectors to specify one or more columns. If
+            multiple columns are supplied or resolved, there will be a separate validation step
+            generated for each column.
+        allow_stationary
+            An option to allow pauses in decreasing values. For example, if the values for the test
+            units are `[88, 85, 85, 82, 80]` then the third unit (`85`, appearing a second time)
+            would be marked as failing when `allow_stationary` is `False`. Using
+            `allow_stationary=True` will result in all the test units in `[88, 85, 85, 82, 80]` to
+            be marked as passing.
+        increasing_tol
+            An optional threshold value that allows for movement of numerical values in the positive
+            direction. By default this is `None` but using a numerical value will set the absolute
+            threshold of positive travel allowed across numerical test units. Note that setting a
+            value here also has the effect of setting `allow_stationary` to `True`.
+        na_pass
+            Should any encountered None, NA, or Null values be considered as passing test units? By
+            default, this is `False`. Set to `True` to pass test units with missing values.
+        pre
+            An optional preprocessing function or lambda to apply to the data table during
+            interrogation. This function should take a table as input and return a modified table.
+            Have a look at the *Preprocessing* section for more information on how to use this
+            argument.
+        segments
+            An optional directive on segmentation, which serves to split a validation step into
+            multiple (one step per segment). Can be a single column name, a tuple that specifies a
+            column name and its corresponding values to segment on, or a combination of both
+            (provided as a list). Read the *Segmentation* section for usage information.
+        thresholds
+            Set threshold failure levels for reporting and reacting to exceedences of the levels.
+            The thresholds are set at the step level and will override any global thresholds set in
+            `Validate(thresholds=...)`. The default is `None`, which means that no thresholds will
+            be set locally and global thresholds (if any) will take effect. Look at the *Thresholds*
+            section for information on how to set threshold levels.
+        actions
+            Optional actions to take when the validation step(s) meets or exceeds any set threshold
+            levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
+            define the actions.
+        brief
+            An optional brief description of the validation step that will be displayed in the
+            reporting table. You can use the templating elements like `"{step}"` to insert
+            the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+            the entire brief will be automatically generated. If `None` (the default) then there
+            won't be a brief.
+        active
+            A boolean value indicating whether the validation step should be active. Using `False`
+            will make the validation step inactive (still reporting its presence and keeping indexes
+            for the steps unchanged).
+
+        Returns
+        -------
+        Validate
+            The `Validate` object with the added validation step.
+
+        Examples
+        --------
+        ```{python}
+        #| echo: false
+        #| output: false
+        import pointblank as pb
+        pb.config(report_incl_header=False, report_incl_footer=False, preview_incl_header=False)
+        ```
+
+        For the examples here, we'll use a simple Polars DataFrame with a numeric column (`a`). The
+        table is shown below:
+
+        ```{python}
+        import pointblank as pb
+        import polars as pl
+
+        tbl = pl.DataFrame(
+            {
+                "a": [6, 5, 4, 3, 2, 1],
+                "b": [5, 4, 4, 3, 2, 1],
+                "c": [5, 4, 5, 3, 2, 1],
+            }
+        )
+
+        pb.preview(tbl)
+        ```
+
+        Let's validate that values in column `a` are decreasing. We'll determine if this validation
+        had any failing test units (there are six test units, one for each row).
+
+        ```{python}
+        validation = (
+            pb.Validate(data=tbl)
+            .col_vals_decreasing(columns="a")
+            .interrogate()
+        )
+
+        validation
+        ```
+
+        The validation passed as all values in column `a` are decreasing. Now let's check column
+        `b` which has a stationary value:
+
+        ```{python}
+        validation = (
+            pb.Validate(data=tbl)
+            .col_vals_decreasing(columns="b")
+            .interrogate()
+        )
+
+        validation
+        ```
+
+        This validation fails at the third row because the value `4` is repeated. If we want to
+        allow stationary values, we can use `allow_stationary=True`:
+
+        ```{python}
+        validation = (
+            pb.Validate(data=tbl)
+            .col_vals_decreasing(columns="b", allow_stationary=True)
+            .interrogate()
+        )
+
+        validation
+        ```
+        """
+        assertion_type = "col_vals_decreasing"
+
+        # Determine threshold to use (global or local) and normalize a local `thresholds=` value
+        thresholds = (
+            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+        )
+
+        # If `columns` is a ColumnSelector or Narwhals selector, call `col()` on it to later
+        # resolve the columns
+        if isinstance(columns, (ColumnSelector, nw.selectors.Selector)):
+            columns = col(columns)
+
+        # If `columns` is Column value or a string, place it in a list for iteration
+        if isinstance(columns, (Column, str)):
+            columns = [columns]
+
+        # Determine brief to use (global or local) and transform any shorthands of `brief=`
+        brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
+
+        # Iterate over the columns and create a validation step for each
+        for column in columns:
+            val_info = _ValidationInfo(
+                assertion_type=assertion_type,
+                column=column,
+                values="",
+                na_pass=na_pass,
+                pre=pre,
+                segments=segments,
+                thresholds=thresholds,
+                actions=actions,
+                brief=brief,
+                active=active,
+                val_info={
+                    "allow_stationary": allow_stationary,
+                    "increasing_tol": increasing_tol if increasing_tol else 0.0,
+                },
+            )
+
+            self._add_validation(validation_info=val_info)
+
+        return self
+
     def col_vals_null(
         self,
         columns: str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals,
@@ -11730,6 +12106,8 @@ class Validate:
                         "col_vals_le",
                         "col_vals_null",
                         "col_vals_not_null",
+                        "col_vals_increasing",
+                        "col_vals_decreasing",
                         "col_vals_between",
                         "col_vals_outside",
                         "col_vals_in_set",
@@ -11770,6 +12148,36 @@ class Validate:
                             results_tbl = interrogate_null(tbl=tbl, column=column)
                         elif assertion_method == "not_null":
                             results_tbl = interrogate_not_null(tbl=tbl, column=column)
+
+                        elif assertion_type == "col_vals_increasing":
+                            from pointblank._interrogation import interrogate_increasing
+
+                            # Extract direction options from val_info
+                            allow_stationary = validation.val_info.get("allow_stationary", False)
+                            decreasing_tol = validation.val_info.get("decreasing_tol", 0.0)
+
+                            results_tbl = interrogate_increasing(
+                                tbl=tbl,
+                                column=column,
+                                allow_stationary=allow_stationary,
+                                decreasing_tol=decreasing_tol,
+                                na_pass=na_pass,
+                            )
+
+                        elif assertion_type == "col_vals_decreasing":
+                            from pointblank._interrogation import interrogate_decreasing
+
+                            # Extract direction options from val_info
+                            allow_stationary = validation.val_info.get("allow_stationary", False)
+                            increasing_tol = validation.val_info.get("increasing_tol", 0.0)
+
+                            results_tbl = interrogate_decreasing(
+                                tbl=tbl,
+                                column=column,
+                                allow_stationary=allow_stationary,
+                                increasing_tol=increasing_tol,
+                                na_pass=na_pass,
+                            )
 
                         elif assertion_type == "col_vals_between":
                             results_tbl = interrogate_between(
@@ -14514,6 +14922,9 @@ class Validate:
 
             elif assertion_type[i] in ["col_vals_expr", "conjointly"]:
                 values_upd.append("COLUMN EXPR")
+
+            elif assertion_type[i] in ["col_vals_increasing", "col_vals_decreasing"]:
+                values_upd.append("")
 
             elif assertion_type[i] in ["row_count_match", "col_count_match"]:
                 count = values[i]["count"]
