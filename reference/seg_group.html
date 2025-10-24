@@ -265,7 +265,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
         border-radius: 2px;
     ">
 <p>Let’s say we’re analyzing sales from our local bookstore, and want to check the number of books sold for the month exceeds a certain threshold. We could pass in the argument <code>segments="genre"</code>, which would return a segment for each unique genre in the datasets. We could also pass in <code>segments=("genre", ["Fantasy", "Science Fiction"])</code>, to only create segments for those two genres. However, if we wanted to group these two genres into a single segment, we could use the <a href="../reference/seg_group.html#pointblank.seg_group" title="0"><code>seg_group()</code></a> function.</p>
-<div id="61b24b8d" class="cell" data-execution_count="2">
+<div id="a719d86d" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -451,7 +451,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 </div>
 <p>What’s more, we can create multiple segments, combining the genres in different ways.</p>
-<div id="c71401c1" class="cell" data-execution_count="3">
+<div id="76a2c1a4" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_gt(</span>
