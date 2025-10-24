@@ -4,7 +4,7 @@ import ibis
 import pandas as pd
 import polars as pl
 
-import pointblank as pb
+from pointblank.validate import Validate
 
 
 IBAN_VALID = {
@@ -247,7 +247,7 @@ def test_email_validation_valid(fixture_name, request):
     tbl = request.getfixturevalue(fixture_name)
 
     validation = (
-        pb.Validate(data=tbl).col_vals_within_spec(columns="email", spec="email").interrogate()
+        Validate(data=tbl).col_vals_within_spec(columns="email", spec="email").interrogate()
     )
 
     assert validation.n_passed(i=1, scalar=True) == len(EMAIL_VALID)
@@ -259,7 +259,7 @@ def test_email_validation_invalid():
     tbl = pl.DataFrame({"email": EMAIL_INVALID})
 
     validation = (
-        pb.Validate(data=tbl).col_vals_within_spec(columns="email", spec="email").interrogate()
+        Validate(data=tbl).col_vals_within_spec(columns="email", spec="email").interrogate()
     )
 
     assert validation.n_passed(i=1, scalar=True) == 0
@@ -280,7 +280,7 @@ def test_credit_card_validation_valid(fixture_name, request):
     tbl = request.getfixturevalue(fixture_name)
 
     validation = (
-        pb.Validate(data=tbl).col_vals_within_spec(columns="card", spec="credit_card").interrogate()
+        Validate(data=tbl).col_vals_within_spec(columns="card", spec="credit_card").interrogate()
     )
 
     assert validation.n_passed(i=1, scalar=True) == len(CREDIT_CARD_VALID)
@@ -292,7 +292,7 @@ def test_credit_card_validation_invalid():
     tbl = pl.DataFrame({"card": CREDIT_CARD_INVALID})
 
     validation = (
-        pb.Validate(data=tbl).col_vals_within_spec(columns="card", spec="credit_card").interrogate()
+        Validate(data=tbl).col_vals_within_spec(columns="card", spec="credit_card").interrogate()
     )
 
     assert validation.n_passed(i=1, scalar=True) == 0
@@ -305,7 +305,7 @@ def test_iban_validation_valid(country):
     tbl = pl.DataFrame({"iban": IBAN_VALID[country]})
 
     validation = (
-        pb.Validate(data=tbl)
+        Validate(data=tbl)
         .col_vals_within_spec(columns="iban", spec=f"iban[{country}]")
         .interrogate()
     )
@@ -320,7 +320,7 @@ def test_postal_code_validation_valid(country, column):
     tbl = pl.DataFrame({column: POSTAL_CODE_VALID[country]})
 
     validation = (
-        pb.Validate(data=tbl)
+        Validate(data=tbl)
         .col_vals_within_spec(columns=column, spec=f"postal_code[{country}]")
         .interrogate()
     )
@@ -333,7 +333,7 @@ def test_vin_validation_valid():
     """Test valid VINs."""
     tbl = pl.DataFrame({"vin": VIN_VALID})
 
-    validation = pb.Validate(data=tbl).col_vals_within_spec(columns="vin", spec="vin").interrogate()
+    validation = Validate(data=tbl).col_vals_within_spec(columns="vin", spec="vin").interrogate()
 
     assert validation.n_passed(i=1, scalar=True) == len(VIN_VALID)
     assert validation.n_failed(i=1, scalar=True) == 0
@@ -343,7 +343,7 @@ def test_vin_validation_invalid():
     """Test invalid VINs."""
     tbl = pl.DataFrame({"vin": VIN_INVALID})
 
-    validation = pb.Validate(data=tbl).col_vals_within_spec(columns="vin", spec="vin").interrogate()
+    validation = Validate(data=tbl).col_vals_within_spec(columns="vin", spec="vin").interrogate()
 
     assert validation.n_passed(i=1, scalar=True) == 0
     assert validation.n_failed(i=1, scalar=True) == len(VIN_INVALID)
@@ -353,9 +353,7 @@ def test_isbn_10_validation_valid():
     """Test valid ISBN-10 numbers."""
     tbl = pl.DataFrame({"isbn": ISBN_10_VALID})
 
-    validation = (
-        pb.Validate(data=tbl).col_vals_within_spec(columns="isbn", spec="isbn").interrogate()
-    )
+    validation = Validate(data=tbl).col_vals_within_spec(columns="isbn", spec="isbn").interrogate()
 
     assert validation.n_passed(i=1, scalar=True) == len(ISBN_10_VALID)
     assert validation.n_failed(i=1, scalar=True) == 0
@@ -365,9 +363,7 @@ def test_isbn_13_validation_valid():
     """Test valid ISBN-13 numbers."""
     tbl = pl.DataFrame({"isbn": ISBN_13_VALID})
 
-    validation = (
-        pb.Validate(data=tbl).col_vals_within_spec(columns="isbn", spec="isbn").interrogate()
-    )
+    validation = Validate(data=tbl).col_vals_within_spec(columns="isbn", spec="isbn").interrogate()
 
     assert validation.n_passed(i=1, scalar=True) == len(ISBN_13_VALID)
     assert validation.n_failed(i=1, scalar=True) == 0
@@ -377,9 +373,7 @@ def test_isbn_10_validation_invalid():
     """Test invalid ISBN-10 numbers."""
     tbl = pl.DataFrame({"isbn": ISBN_10_INVALID})
 
-    validation = (
-        pb.Validate(data=tbl).col_vals_within_spec(columns="isbn", spec="isbn").interrogate()
-    )
+    validation = Validate(data=tbl).col_vals_within_spec(columns="isbn", spec="isbn").interrogate()
 
     assert validation.n_passed(i=1, scalar=True) == 0
     assert validation.n_failed(i=1, scalar=True) == len(ISBN_10_INVALID)
@@ -389,9 +383,7 @@ def test_isbn_13_validation_invalid():
     """Test invalid ISBN-13 numbers."""
     tbl = pl.DataFrame({"isbn": ISBN_13_INVALID})
 
-    validation = (
-        pb.Validate(data=tbl).col_vals_within_spec(columns="isbn", spec="isbn").interrogate()
-    )
+    validation = Validate(data=tbl).col_vals_within_spec(columns="isbn", spec="isbn").interrogate()
 
     assert validation.n_passed(i=1, scalar=True) == 0
     assert validation.n_failed(i=1, scalar=True) == len(ISBN_13_INVALID)
@@ -402,7 +394,7 @@ def test_phone_validation_valid():
     tbl = pl.DataFrame({"phone": PHONE_VALID})
 
     validation = (
-        pb.Validate(data=tbl).col_vals_within_spec(columns="phone", spec="phone").interrogate()
+        Validate(data=tbl).col_vals_within_spec(columns="phone", spec="phone").interrogate()
     )
 
     assert validation.n_passed(i=1, scalar=True) == len(PHONE_VALID)
@@ -414,7 +406,7 @@ def test_phone_validation_invalid():
     tbl = pl.DataFrame({"phone": PHONE_INVALID})
 
     validation = (
-        pb.Validate(data=tbl).col_vals_within_spec(columns="phone", spec="phone").interrogate()
+        Validate(data=tbl).col_vals_within_spec(columns="phone", spec="phone").interrogate()
     )
 
     assert validation.n_passed(i=1, scalar=True) == 0
@@ -425,7 +417,7 @@ def test_mac_validation_valid():
     """Test valid MAC addresses."""
     tbl = pl.DataFrame({"mac": MAC_VALID})
 
-    validation = pb.Validate(data=tbl).col_vals_within_spec(columns="mac", spec="mac").interrogate()
+    validation = Validate(data=tbl).col_vals_within_spec(columns="mac", spec="mac").interrogate()
 
     assert validation.n_passed(i=1, scalar=True) == len(MAC_VALID)
     assert validation.n_failed(i=1, scalar=True) == 0
@@ -435,7 +427,7 @@ def test_mac_validation_invalid():
     """Test invalid MAC addresses."""
     tbl = pl.DataFrame({"mac": MAC_INVALID})
 
-    validation = pb.Validate(data=tbl).col_vals_within_spec(columns="mac", spec="mac").interrogate()
+    validation = Validate(data=tbl).col_vals_within_spec(columns="mac", spec="mac").interrogate()
 
     assert validation.n_passed(i=1, scalar=True) == 0
     assert validation.n_failed(i=1, scalar=True) == len(MAC_INVALID)
@@ -446,7 +438,7 @@ def test_swift_bic_validation_valid():
     tbl = pl.DataFrame({"swift": SWIFT_BIC_VALID})
 
     validation = (
-        pb.Validate(data=tbl).col_vals_within_spec(columns="swift", spec="swift").interrogate()
+        Validate(data=tbl).col_vals_within_spec(columns="swift", spec="swift").interrogate()
     )
 
     assert validation.n_passed(i=1, scalar=True) == len(SWIFT_BIC_VALID)
@@ -458,7 +450,7 @@ def test_swift_bic_validation_invalid():
     tbl = pl.DataFrame({"swift": SWIFT_BIC_INVALID})
 
     validation = (
-        pb.Validate(data=tbl).col_vals_within_spec(columns="swift", spec="swift").interrogate()
+        Validate(data=tbl).col_vals_within_spec(columns="swift", spec="swift").interrogate()
     )
 
     assert validation.n_passed(i=1, scalar=True) == 0
@@ -469,7 +461,7 @@ def test_url_validation_valid():
     """Test valid URLs."""
     tbl = pl.DataFrame({"url": URL_VALID})
 
-    validation = pb.Validate(data=tbl).col_vals_within_spec(columns="url", spec="url").interrogate()
+    validation = Validate(data=tbl).col_vals_within_spec(columns="url", spec="url").interrogate()
 
     assert validation.n_passed(i=1, scalar=True) == len(URL_VALID)
     assert validation.n_failed(i=1, scalar=True) == 0
@@ -479,7 +471,7 @@ def test_url_validation_invalid():
     """Test invalid URLs."""
     tbl = pl.DataFrame({"url": URL_INVALID})
 
-    validation = pb.Validate(data=tbl).col_vals_within_spec(columns="url", spec="url").interrogate()
+    validation = Validate(data=tbl).col_vals_within_spec(columns="url", spec="url").interrogate()
 
     assert validation.n_passed(i=1, scalar=True) == 0
     assert validation.n_failed(i=1, scalar=True) == len(URL_INVALID)
@@ -489,7 +481,7 @@ def test_ipv4_validation_valid():
     """Test valid IPv4 addresses."""
     tbl = pl.DataFrame({"ip": IPV4_ADDRESS_VALID})
 
-    validation = pb.Validate(data=tbl).col_vals_within_spec(columns="ip", spec="ipv4").interrogate()
+    validation = Validate(data=tbl).col_vals_within_spec(columns="ip", spec="ipv4").interrogate()
 
     assert validation.n_passed(i=1, scalar=True) == len(IPV4_ADDRESS_VALID)
     assert validation.n_failed(i=1, scalar=True) == 0
@@ -499,7 +491,7 @@ def test_ipv4_validation_invalid():
     """Test invalid IPv4 addresses."""
     tbl = pl.DataFrame({"ip": IPV4_ADDRESS_INVALID})
 
-    validation = pb.Validate(data=tbl).col_vals_within_spec(columns="ip", spec="ipv4").interrogate()
+    validation = Validate(data=tbl).col_vals_within_spec(columns="ip", spec="ipv4").interrogate()
 
     assert validation.n_passed(i=1, scalar=True) == 0
     assert validation.n_failed(i=1, scalar=True) == len(IPV4_ADDRESS_INVALID)
@@ -509,7 +501,7 @@ def test_ipv6_validation_valid():
     """Test valid IPv6 addresses."""
     tbl = pl.DataFrame({"ip": IPV6_ADDRESS_VALID})
 
-    validation = pb.Validate(data=tbl).col_vals_within_spec(columns="ip", spec="ipv6").interrogate()
+    validation = Validate(data=tbl).col_vals_within_spec(columns="ip", spec="ipv6").interrogate()
 
     assert validation.n_passed(i=1, scalar=True) == len(IPV6_ADDRESS_VALID)
     assert validation.n_failed(i=1, scalar=True) == 0
@@ -519,7 +511,7 @@ def test_ipv6_validation_invalid():
     """Test invalid IPv6 addresses."""
     tbl = pl.DataFrame({"ip": IPV6_ADDRESS_INVALID})
 
-    validation = pb.Validate(data=tbl).col_vals_within_spec(columns="ip", spec="ipv6").interrogate()
+    validation = Validate(data=tbl).col_vals_within_spec(columns="ip", spec="ipv6").interrogate()
 
     assert validation.n_passed(i=1, scalar=True) == 0
     assert validation.n_failed(i=1, scalar=True) == len(IPV6_ADDRESS_INVALID)
@@ -530,7 +522,7 @@ def test_na_pass_false():
     tbl = pl.DataFrame({"email": ["test@test.com", None, "invalid"]})
 
     validation = (
-        pb.Validate(data=tbl)
+        Validate(data=tbl)
         .col_vals_within_spec(columns="email", spec="email", na_pass=False)
         .interrogate()
     )
@@ -545,7 +537,7 @@ def test_na_pass_true():
     tbl = pl.DataFrame({"email": ["test@test.com", None, "invalid"]})
 
     validation = (
-        pb.Validate(data=tbl)
+        Validate(data=tbl)
         .col_vals_within_spec(columns="email", spec="email", na_pass=True)
         .interrogate()
     )
@@ -577,7 +569,7 @@ def test_regex_specs_no_materialization_ibis():
 
     # Validate emails - should NOT materialize the table
     validation = (
-        pb.Validate(data=tbl)
+        Validate(data=tbl)
         .col_vals_within_spec(columns="email", spec="email", na_pass=False)
         .interrogate()
     )
@@ -600,7 +592,7 @@ def test_regex_specs_no_materialization_ibis():
         tbl = con.create_table(f"{spec}_test", data, overwrite=True)
 
         validation = (
-            pb.Validate(data=tbl)
+            Validate(data=tbl)
             .col_vals_within_spec(columns="value", spec=spec, na_pass=False)
             .interrogate()
         )
