@@ -5821,6 +5821,169 @@ col_count_match(self, count: 'int | FrameT | Any', inverse: 'bool' = False, pre:
         columns in the target table. So, the single test unit passed.
         
 
+tbl_match(self, tbl_compare: 'FrameT | Any', pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
+
+        Validate whether the target table matches a comparison table.
+
+        The `tbl_match()` method checks whether the target table's composition matches that of a
+        comparison table. The validation performs a comprehensive comparison using progressively
+        stricter checks (from least to most stringent):
+
+        1. **Column count match**: both tables must have the same number of columns
+        2. **Row count match**: both tables must have the same number of rows
+        3. **Schema match (loose)**: column names and dtypes match (case-insensitive, any order)
+        4. **Schema match (order)**: columns in the correct order (case-insensitive names)
+        5. **Schema match (exact)**: column names match exactly (case-sensitive, correct order)
+        6. **Data match**: values in corresponding cells must be identical
+
+        This progressive approach helps identify exactly where tables differ. The validation will
+        fail at the first check that doesn't pass, making it easier to diagnose mismatches. This
+        validation operates over a single test unit (pass/fail for complete table match).
+
+        Parameters
+        ----------
+        tbl_compare
+            The comparison table to validate against. This can be a DataFrame object (Polars or
+            Pandas), an Ibis table object, or a callable that returns a table. If a callable is
+            provided, it will be executed during interrogation to obtain the comparison table.
+        pre
+            An optional preprocessing function or lambda to apply to the data table during
+            interrogation. This function should take a table as input and return a modified table.
+            Have a look at the *Preprocessing* section for more information on how to use this
+            argument.
+        thresholds
+            Set threshold failure levels for reporting and reacting to exceedences of the levels.
+            The thresholds are set at the step level and will override any global thresholds set in
+            `Validate(thresholds=...)`. The default is `None`, which means that no thresholds will
+            be set locally and global thresholds (if any) will take effect. Look at the *Thresholds*
+            section for information on how to set threshold levels.
+        actions
+            Optional actions to take when the validation step meets or exceeds any set threshold
+            levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
+            define the actions.
+        brief
+            An optional brief description of the validation step that will be displayed in the
+            reporting table. You can use the templating elements like `"{step}"` to insert
+            the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+            the entire brief will be automatically generated. If `None` (the default) then there
+            won't be a brief.
+        active
+            A boolean value indicating whether the validation step should be active. Using `False`
+            will make the validation step inactive (still reporting its presence and keeping indexes
+            for the steps unchanged).
+
+        Returns
+        -------
+        Validate
+            The `Validate` object with the added validation step.
+
+        Preprocessing
+        -------------
+        The `pre=` argument allows for a preprocessing function or lambda to be applied to the data
+        table during interrogation. This function should take a table as input and return a modified
+        table. This is useful for performing any necessary transformations or filtering on the data
+        before the validation step is applied.
+
+        The preprocessing function can be any callable that takes a table as input and returns a
+        modified table. For example, you could use a lambda function to filter the table based on
+        certain criteria or to apply a transformation to the data. Note that the same preprocessing
+        is **not** applied to the comparison table; only the target table is preprocessed. Regarding
+        the lifetime of the transformed table, it only exists during the validation step and is not
+        stored in the `Validate` object or used in subsequent validation steps.
+
+        Thresholds
+        ----------
+        The `thresholds=` parameter is used to set the failure-condition levels for the validation
+        step. If they are set here at the step level, these thresholds will override any thresholds
+        set at the global level in `Validate(thresholds=...)`.
+
+        There are three threshold levels: 'warning', 'error', and 'critical'. The threshold values
+        can either be set as a proportion failing of all test units (a value between `0` to `1`),
+        or, the absolute number of failing test units (as integer that's `1` or greater).
+
+        Thresholds can be defined using one of these input schemes:
+
+        1. use the [`Thresholds`](`pointblank.Thresholds`) class (the most direct way to create
+        thresholds)
+        2. provide a tuple of 1-3 values, where position `0` is the 'warning' level, position `1` is
+        the 'error' level, and position `2` is the 'critical' level
+        3. create a dictionary of 1-3 value entries; the valid keys: are 'warning', 'error', and
+        'critical'
+        4. a single integer/float value denoting absolute number or fraction of failing test units
+        for the 'warning' level only
+
+        If the number of failing test units exceeds set thresholds, the validation step will be
+        marked as 'warning', 'error', or 'critical'. All of the threshold levels don't need to be
+        set, you're free to set any combination of them.
+
+        Aside from reporting failure conditions, thresholds can be used to determine the actions to
+        take for each level of failure (using the `actions=` parameter).
+
+        Examples
+        --------
+        For the examples here, we'll create two simple tables to demonstrate the `tbl_match()`
+        validation.
+
+        ```python
+        import pointblank as pb
+        import polars as pl
+
+        # Create the first table
+        tbl_1 = pl.DataFrame({
+            "a": [1, 2, 3, 4],
+            "b": ["w", "x", "y", "z"],
+            "c": [4.0, 5.0, 6.0, 7.0]
+        })
+
+        # Create an identical table
+        tbl_2 = pl.DataFrame({
+            "a": [1, 2, 3, 4],
+            "b": ["w", "x", "y", "z"],
+            "c": [4.0, 5.0, 6.0, 7.0]
+        })
+
+        pb.preview(tbl_1)
+        ```
+
+        Let's validate that `tbl_1` matches `tbl_2`. Since these tables are identical, the
+        validation should pass.
+
+        ```python
+        validation = (
+            pb.Validate(data=tbl_1)
+            .tbl_match(tbl_compare=tbl_2)
+            .interrogate()
+        )
+
+        validation
+        ```
+
+        The validation table shows that the single test unit passed, indicating that the two tables
+        match completely.
+
+        Now, let's create a table with a slight difference and see what happens.
+
+        ```python
+        # Create a table with one different value
+        tbl_3 = pl.DataFrame({
+            "a": [1, 2, 3, 4],
+            "b": ["w", "x", "y", "z"],
+            "c": [4.0, 5.5, 6.0, 7.0]  # Changed 5.0 to 5.5
+        })
+
+        validation = (
+            pb.Validate(data=tbl_1)
+            .tbl_match(tbl_compare=tbl_3)
+            .interrogate()
+        )
+
+        validation
+        ```
+
+        The validation table shows that the test unit failed because the tables don't match (one
+        value is different in column `c`).
+        
+
 conjointly(self, *exprs: 'Callable', pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
 
         Perform multiple row-wise validations for joint validity.
