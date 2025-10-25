@@ -802,7 +802,7 @@ def tbl_match(data_tbl: FrameT, tbl_compare: FrameT) -> bool:
     if not row_count_matching:
         return False
 
-    # Stage 3: Check schema match - case-insensitive column names, any order
+    # Stage 3: Check schema match for case-insensitive column names, any order
     schema = Schema(tbl=tbl_compare)
 
     col_schema_matching_any_order = _check_schema_match(
@@ -818,7 +818,7 @@ def tbl_match(data_tbl: FrameT, tbl_compare: FrameT) -> bool:
     if not col_schema_matching_any_order:
         return False
 
-    # Stage 4: Check schema match - case-insensitive column names, correct order
+    # Stage 4: Check schema match for case-insensitive column names, correct order
     col_schema_matching_in_order = _check_schema_match(
         data_tbl=data_tbl,
         schema=schema,
@@ -832,7 +832,7 @@ def tbl_match(data_tbl: FrameT, tbl_compare: FrameT) -> bool:
     if not col_schema_matching_in_order:
         return False
 
-    # Stage 5: Check schema match - case-sensitive column names, correct order
+    # Stage 5: Check schema match for case-sensitive column names, correct order
     col_schema_matching_exact = _check_schema_match(
         data_tbl=data_tbl,
         schema=schema,
@@ -866,6 +866,7 @@ def tbl_match(data_tbl: FrameT, tbl_compare: FrameT) -> bool:
         # We need to collect if lazy frames
         if hasattr(col_data_1, "collect"):
             col_data_1 = col_data_1.collect()
+
         if hasattr(col_data_2, "collect"):
             col_data_2 = col_data_2.collect()
 
@@ -877,12 +878,15 @@ def tbl_match(data_tbl: FrameT, tbl_compare: FrameT) -> bool:
         if hasattr(col_1_native, "to_list"):  # Polars Series
             values_1 = col_1_native[col_name].to_list()
             values_2 = col_2_native[col_name].to_list()
+
         elif hasattr(col_1_native, "tolist"):  # Pandas Series/DataFrame
             values_1 = col_1_native[col_name].tolist()
             values_2 = col_2_native[col_name].tolist()
+
         elif hasattr(col_1_native, "collect"):  # Ibis
             values_1 = col_1_native[col_name].to_pandas().tolist()
             values_2 = col_2_native[col_name].to_pandas().tolist()
+
         else:
             # Fallback: try direct comparison
             values_1 = list(col_1_native[col_name])
@@ -905,9 +909,24 @@ def tbl_match(data_tbl: FrameT, tbl_compare: FrameT) -> bool:
             except (TypeError, ValueError):
                 pass
 
-            # Direct comparison
-            if v1 != v2:
-                return False
+            # Direct comparison: handle lists/arrays separately
+            try:
+                if v1 != v2:
+                    return False
+            except (TypeError, ValueError):
+                # If direct comparison fails (e.g., for lists/arrays), try element-wise comparison
+                try:
+                    if isinstance(v1, list) and isinstance(v2, list):
+                        if v1 != v2:
+                            return False
+                    elif hasattr(v1, "__eq__") and hasattr(v2, "__eq__"):
+                        # For array-like objects, check if they're equal
+                        if not (v1 == v2).all() if hasattr((v1 == v2), "all") else v1 == v2:
+                            return False
+                    else:
+                        return False
+                except Exception:
+                    return False
 
     return True
 
