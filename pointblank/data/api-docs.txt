@@ -5919,6 +5919,66 @@ tbl_match(self, tbl_compare: 'FrameT | Any', pre: 'Callable | None' = None, thre
         Aside from reporting failure conditions, thresholds can be used to determine the actions to
         take for each level of failure (using the `actions=` parameter).
 
+        Cross-Backend Validation
+        ------------------------
+        The `tbl_match()` method supports **automatic backend coercion** when comparing tables from
+        different backends (e.g., comparing a Polars DataFrame against a Pandas DataFrame, or
+        comparing database tables from DuckDB/SQLite against in-memory DataFrames). When tables with
+        different backends are detected, the comparison table is automatically converted to match the
+        data table's backend before validation proceeds.
+
+        **Certified Backend Combinations:**
+
+        All combinations of the following backends have been tested and certified to work (in both
+        directions):
+
+        - Pandas DataFrame
+        - Polars DataFrame
+        - DuckDB (native)
+        - DuckDB (as Ibis table)
+        - SQLite (via Ibis)
+
+        Note that database backends (DuckDB, SQLite, PostgreSQL, MySQL, Snowflake, BigQuery) are
+        automatically materialized during validation:
+
+        - if comparing **against Polars**: materialized to Polars
+        - if comparing **against Pandas**: materialized to Pandas
+        - if **both tables are database backends**: both materialized to Polars
+
+        This ensures optimal performance and type consistency.
+
+        **Data Types That Work Best in Cross-Backend Validation:**
+
+        - numeric types: int, float columns (including proper NaN handling)
+        - string types: text columns with consistent encodings
+        - boolean types: True/False values
+        - null values: `None` and `NaN` are treated as equivalent across backends
+        - list columns: nested list structures (with basic types)
+
+        **Known Limitations:**
+
+        While many data types work well in cross-backend validation, there are some known
+        limitations to be aware of:
+
+        - date/datetime types: When converting between Polars and Pandas, date objects may be
+          represented differently. For example, `datetime.date` objects in Pandas may become
+          `pd.Timestamp` objects when converted from Polars, leading to false mismatches. To work
+          around this, ensure both tables use the same datetime representation before comparison.
+        - custom types: User-defined types or complex nested structures may not convert cleanly
+          between backends and could cause unexpected comparison failures.
+        - categorical types: Categorical/factor columns may have different internal
+          representations across backends.
+        - timezone-aware datetimes: Timezone handling differs between backends and may cause
+          comparison issues.
+
+        Here are some ideas to overcome such limitations:
+
+        - for date/datetime columns, consider using `pre=` preprocessing to normalize representations
+          before comparison.
+        - when working with custom types, manually convert tables to the same backend before using
+          `tbl_match()`.
+        - use the same datetime precision (e.g., milliseconds vs microseconds) in both tables.
+
         Examples
         --------
         For the examples here, we'll create two simple tables to demonstrate the `tbl_match()`
@@ -5980,8 +6040,8 @@ tbl_match(self, tbl_compare: 'FrameT | Any', pre: 'Callable | None' = None, thre
         validation
         ```
 
-        The validation table shows that the test unit failed because the tables don't match (one
-        value is different in column `c`).
+        The validation table shows that the single test unit failed because the tables don't match
+        (one value is different in column `c`).
         
 
 conjointly(self, *exprs: 'Callable', pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
