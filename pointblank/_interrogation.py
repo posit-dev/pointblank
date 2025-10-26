@@ -757,6 +757,109 @@ def col_count_match(data_tbl: FrameT, count, inverse: bool) -> bool:
         return get_column_count(data=data_tbl) != count
 
 
+def _coerce_to_common_backend(data_tbl: FrameT, tbl_compare: FrameT) -> tuple[FrameT, FrameT]:
+    """
+    Coerce two tables to the same backend if they differ.
+
+    If the tables to compare have different backends (e.g., one is Polars and one is Pandas),
+    this function will convert the comparison table to match the data table's backend.
+    This ensures consistent dtype handling during comparison.
+
+    Parameters
+    ----------
+    data_tbl
+        The primary table (backend is preserved).
+    tbl_compare
+        The comparison table (may be converted to match data_tbl's backend).
+
+    Returns
+    -------
+    tuple[FrameT, FrameT]
+        Both tables, with tbl_compare potentially converted to data_tbl's backend.
+    """
+    # Get backend types for both tables
+    data_backend = _get_tbl_type(data_tbl)
+    compare_backend = _get_tbl_type(tbl_compare)
+
+    # If backends match, no conversion needed
+    if data_backend == compare_backend:
+        return data_tbl, tbl_compare
+
+    # Define database backends (Ibis tables that need materialization)
+    database_backends = {"duckdb", "sqlite", "postgres", "mysql", "snowflake", "bigquery"}
+
+    #
+    # If backends differ, convert tbl_compare to match data_tbl's backend
+    #
+
+    # Handle Ibis/database tables: materialize them to match the target backend
+    if compare_backend in database_backends:
+        # Materialize to Polars if data table is Polars, otherwise Pandas
+        if data_backend == "polars":
+            try:
+                tbl_compare = tbl_compare.to_polars()
+                compare_backend = "polars"
+            except Exception:
+                # Fallback: materialize to Pandas, then convert to Polars
+                try:
+                    tbl_compare = tbl_compare.execute()
+                    compare_backend = "pandas"
+                except Exception:
+                    try:
+                        tbl_compare = tbl_compare.to_pandas()
+                        compare_backend = "pandas"
+                    except Exception:
+                        pass
+        else:
+            # Materialize to Pandas for Pandas or other backends
+            try:
+                tbl_compare = tbl_compare.execute()  # Returns Pandas DataFrame
+                compare_backend = "pandas"
+            except Exception:
+                try:
+                    tbl_compare = tbl_compare.to_pandas()
+                    compare_backend = "pandas"
+                except Exception:
+                    pass
+
+    if data_backend in database_backends:
+        # If data table itself is a database backend, materialize to Polars
+        # (Polars is the default modern backend for optimal performance)
+        try:
+            data_tbl = data_tbl.to_polars()
+            data_backend = "polars"
+        except Exception:
+            # Fallback to Pandas if Polars conversion fails
+            try:
+                data_tbl = data_tbl.execute()
+                data_backend = "pandas"
+            except Exception:
+                try:
+                    data_tbl = data_tbl.to_pandas()
+                    data_backend = "pandas"
+                except Exception:
+                    pass
+
+    # Now handle the Polars/Pandas conversions
+    if data_backend == "polars" and compare_backend == "pandas":
+        try:
+            import polars as pl
+
+            tbl_compare = pl.from_pandas(tbl_compare)
+        except Exception:
+            # If conversion fails, return original tables
+            pass
+
+    elif data_backend == "pandas" and compare_backend == "polars":
+        try:
+            tbl_compare = tbl_compare.to_pandas()
+        except Exception:
+            # If conversion fails, return original tables
+            pass
+
+    return data_tbl, tbl_compare
+
+
 def tbl_match(data_tbl: FrameT, tbl_compare: FrameT) -> bool:
     """
     Check if two tables match exactly in schema, row count, and data.
@@ -770,6 +873,10 @@ def tbl_match(data_tbl: FrameT, tbl_compare: FrameT) -> bool:
     4. Schema match (case-insensitive column names, correct order)
     5. Schema match (case-sensitive column names, correct order)
     6. Data match: compares values column-by-column
+
+    If the two tables have different backends (e.g., one is Polars and one is Pandas),
+    the comparison table will be automatically coerced to match the data table's backend
+    before comparison. This ensures consistent dtype handling.
 
     Parameters
     ----------
@@ -785,6 +892,9 @@ def tbl_match(data_tbl: FrameT, tbl_compare: FrameT) -> bool:
     """
     from pointblank.schema import Schema, _check_schema_match
     from pointblank.validate import get_column_count, get_row_count
+
+    # Coerce to common backend if needed
+    data_tbl, tbl_compare = _coerce_to_common_backend(data_tbl, tbl_compare)
 
     # Convert both tables to narwhals for compatibility
     tbl = _convert_to_narwhals(df=data_tbl)
@@ -897,17 +1007,38 @@ def tbl_match(data_tbl: FrameT, tbl_compare: FrameT) -> bool:
             return False
 
         for v1, v2 in zip(values_1, values_2):
-            # Handle None/NaN comparisons
-            if v1 is None and v2 is None:
-                continue
-            # Check for NaN (float NaN values)
-            try:
-                import math
+            # Handle None/NaN comparisons and check both None and NaN
+            # Note: When Pandas NaN is converted to Polars, it may become None
+            v1_is_null = v1 is None
+            v2_is_null = v2 is None
 
-                if math.isnan(v1) and math.isnan(v2):
-                    continue
-            except (TypeError, ValueError):
-                pass
+            # Check if v1 is NaN
+            if not v1_is_null:
+                try:
+                    import math
+
+                    if math.isnan(v1):
+                        v1_is_null = True
+                except (TypeError, ValueError):
+                    pass
+
+            # Check if v2 is NaN
+            if not v2_is_null:
+                try:
+                    import math
+
+                    if math.isnan(v2):
+                        v2_is_null = True
+                except (TypeError, ValueError):
+                    pass
+
+            # If both are null (None or NaN), they match
+            if v1_is_null and v2_is_null:
+                continue
+
+            # If only one is null, they don't match
+            if v1_is_null or v2_is_null:
+                return False
 
             # Direct comparison: handle lists/arrays separately
             try:
@@ -1803,7 +1934,7 @@ def interrogate_outside(
         pb_is_good_4=nw.lit(na_pass),  # Pass if any Null in lb, val, or ub
     )
 
-    # Note: Logic is inverted for "outside" - when inclusive[0] is True,
+    # Note: Logic is inverted for "outside"; when inclusive[0] is True,
     # we want values < low_val (not <= low_val) to be "outside"
     if inclusive[0]:
         result_tbl = result_tbl.with_columns(pb_is_good_5=nw.col(column) < low_val)
@@ -2026,7 +2157,7 @@ def interrogate_within_spec(tbl: FrameT, column: str, values: dict, na_pass: boo
     if hasattr(native_tbl, "execute"):
         native_tbl = native_tbl.execute()
 
-    # Add validation column - convert native table to Series, then back through Narwhals
+    # Add validation column: convert native table to Series, then back through Narwhals
     if is_polars_dataframe(native_tbl):
         import polars as pl
 
@@ -2269,7 +2400,7 @@ def interrogate_credit_card_db(
     # Get the column as an Ibis expression
     col_expr = native_tbl[column]
 
-    # Step 1: Clean the input - remove spaces and hyphens
+    # Step 1: Clean the input and remove spaces and hyphens
     # First check format: only digits, spaces, and hyphens allowed
     valid_chars = col_expr.re_search(r"^[0-9\s\-]+$").notnull()
 
