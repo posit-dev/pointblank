@@ -683,6 +683,7 @@ def _get_api_text() -> str:
         "Validate.col_schema_match",
         "Validate.row_count_match",
         "Validate.col_count_match",
+        "Validate.tbl_match",
         "Validate.conjointly",
         "Validate.specially",
         "Validate.prompt",
