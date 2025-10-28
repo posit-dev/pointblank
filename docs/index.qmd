@@ -1,314 +1,223 @@
 ---
+title: Introduction
 jupyter: python3
+toc-expand: 2
 html-table-processing: none
 ---
-
-<div style="text-align: center;">
-
-![](/assets/pointblank_logo.svg){width=75%}
-
-_Data validation made beautiful and powerful_
-
-</div>
-
-Pointblank is a powerful, yet elegant data validation framework for Python that transforms how you
-ensure data quality. With its intuitive, chainable API, you can quickly validate your data against
-comprehensive quality checks and visualize results through stunning, interactive reports that make
-data issues immediately actionable.
-
-Whether you're a data scientist, data engineer, or analyst, Pointblank helps you catch data quality
-issues before they impact your analyses or downstream systems.
-
-## Getting Started in 30 Seconds
-
-```python
+```{python}
+#| echo: false
+#| output: false
 import pointblank as pb
-
-validation = (
-   pb.Validate(data=pb.load_dataset(dataset="small_table"))
-   .col_vals_gt(columns="d", value=100)             # Validate values > 100
-   .col_vals_le(columns="c", value=5)               # Validate values <= 5
-   .col_exists(columns=["date", "date_time"])       # Check columns exist
-   .interrogate()                                   # Execute and collect results
-)
-
-# Get the validation report from the REPL with:
-validation.get_tabular_report().show()
-
-# From a notebook simply use:
-validation
+pb.config(report_incl_footer=False)
 ```
 
-<div style="text-align: center;">
+The Pointblank library is all about assessing the state of data quality for a table. You provide the
+validation rules and the library will dutifully interrogate the data and provide useful reporting.
+We can use different types of tables like Polars and Pandas DataFrames, Parquet files, or various
+database tables. Let's walk through what data validation looks like in Pointblank.
 
-![](/assets/pointblank-tabular-report.png){width=100%}
+## A Simple Validation Table
 
-</div>
+This is a validation report table that is produced from a validation of a Polars DataFrame:
 
-## Real-World Example
-
-```python
+```{python}
+#| code-fold: true
+#| code-summary: "Show the code"
 import pointblank as pb
-import polars as pl
 
-# Load your data
-sales_data = pl.read_csv("sales_data.csv")
-
-# Create a comprehensive validation
-validation = (
-   pb.Validate(
-      data=sales_data,
-      tbl_name="sales_data",           # Name of the table for reporting
-      label="Real-world example.",     # Label for the validation, appears in reports
-      thresholds=(0.01, 0.02, 0.05),   # Set thresholds for warnings, errors, and critical issues
-      actions=pb.Actions(              # Define actions for any threshold exceedance
-         critical="Major data quality issue found in step {step} ({time})."
-      ),
-      final_actions=pb.FinalActions(   # Define final actions for the entire validation
-         pb.send_slack_notification(
-            webhook_url="https://hooks.slack.com/services/your/webhook/url"
-         )
-      ),
-      brief=True,                      # Add automatically-generated briefs for each step
-   )
-   .col_vals_between(            # Check numeric ranges with precision
-      columns=["price", "quantity"],
-      left=0, right=1000
-   )
-   .col_vals_not_null(           # Ensure that columns ending with '_id' don't have null values
-      columns=pb.ends_with("_id")
-   )
-   .col_vals_regex(              # Validate patterns with regex
-      columns="email",
-      pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
-   )
-   .col_vals_in_set(             # Check categorical values
-      columns="status",
-      set=["pending", "shipped", "delivered", "returned"]
-   )
-   .conjointly(                  # Combine multiple conditions
-      lambda df: pb.expr_col("revenue") == pb.expr_col("price") * pb.expr_col("quantity"),
-      lambda df: pb.expr_col("tax") >= pb.expr_col("revenue") * 0.05
-   )
-   .interrogate()
+(
+    pb.Validate(data=pb.load_dataset(dataset="small_table"), label="Example Validation")
+    .col_vals_lt(columns="a", value=10)
+    .col_vals_between(columns="d", left=0, right=5000)
+    .col_vals_in_set(columns="f", set=["low", "mid", "high"])
+    .col_vals_regex(columns="b", pattern=r"^[0-9]-[a-z]{3}-[0-9]{3}$")
+    .interrogate()
 )
 ```
 
-```
-Major data quality issue found in step 7 (2025-04-16 15:03:04.685612+00:00).
-```
+Each row in this reporting table constitutes a single validation step. Roughly, the left-hand side
+outlines the validation rules and the right-hand side provides the results of each validation step.
+While simple in principle, there's a lot of useful information packed into this validation table.
 
-```python
-# Get an HTML report you can share with your team
-validation.get_tabular_report().show("browser")
-```
+Here's a diagram that describes a few of the important parts of the validation table:
 
-<div style="text-align: center;">
+![](/assets/validation-table-diagram.png){width=100%}
 
-![](/assets/pointblank-sales-data.png){width=100%}
+There are three things that should be noted here:
 
-</div>
+- validation steps: each step is a separate test on the table, focused on a certain aspect of the
+table
+- validation rules: the validation type is provided here along with key constraints
+- validation results: interrogation results are provided here, with a breakdown of test units
+(*total*, *passing*, and *failing*), threshold flags, and more
 
-```python
-# Get a report of failing records from a specific step
-validation.get_step_report(i=3).show("browser")  # Get failing records from step 3
-```
+The intent is to provide the key information in one place, and have it be interpretable by data
+stakeholders. For example, a failure can be seen in the second row (notice there's a CSV button). A
+data quality stakeholder could click this to download a CSV of the failing rows for that step.
 
-<div style="text-align: center;">
+## Example Code, Step-by-Step
 
-![](/assets/pointblank-step-report.png){width=100%}
-
-</div>
-
-## YAML Configuration
-
-For teams that need portable, version-controlled validation workflows, Pointblank supports YAML
-configuration files. This makes it easy to share validation logic across different environments and
-team members, ensuring everyone is on the same page.
-
-**validation.yaml**
-
-```yaml
-validate:
-  data: small_table
-  tbl_name: "small_table"
-  label: "Getting started validation"
-
-steps:
-  - col_vals_gt:
-      columns: "d"
-      value: 100
-  - col_vals_le:
-      columns: "c"
-      value: 5
-  - col_exists:
-      columns: ["date", "date_time"]
-```
-
-**Execute the YAML validation**
+This section will walk you through the example code used above.
 
 ```python
 import pointblank as pb
 
-# Run validation from YAML configuration
-validation = pb.yaml_interrogate("validation.yaml")
-
-# Get the results just like any other validation
-validation.get_tabular_report().show()
+(
+    pb.Validate(data=pb.load_dataset(dataset="small_table"))
+    .col_vals_lt(columns="a", value=10)
+    .col_vals_between(columns="d", left=0, right=5000)
+    .col_vals_in_set(columns="f", set=["low", "mid", "high"])
+    .col_vals_regex(columns="b", pattern=r"^[0-9]-[a-z]{3}-[0-9]{3}$")
+    .interrogate()
+)
 ```
 
-This approach is perfect for:
+Note these three key pieces in the code:
 
-- **CI/CD pipelines**: Store validation rules alongside your code
-- **Team collaboration**: Share validation logic in a readable format
-- **Environment consistency**: Use the same validation across dev, staging, and production
-- **Documentation**: YAML files serve as living documentation of your data quality requirements
+- **data**: the `Validate(data=)` argument takes a DataFrame or database table that you want to validate
+- **steps**: the methods starting with `col_vals_` specify validation steps that run on specific columns
+- **execution**: the `~~Validate.interrogate()` method executes the validation plan on the table
 
-## Command Line Interface
+This common pattern is used in a validation workflow, where `Validate` and
+`~~Validate.interrogate()` bookend a validation plan generated through calling validation methods.
 
-Pointblank includes a powerful CLI utility called `pb` that lets you run data validation workflows
-directly from the command line. Perfect for CI/CD pipelines, scheduled data quality checks, or quick
-validation tasks.
+In the next few sections we'll go a bit further by understanding how we can measure data quality and
+respond to failures.
 
-<div style="text-align: center;">
+## Understanding Test Units
 
-![](/assets/vhs/cli-complete-workflow.gif){width=100%}
+Each validation step will execute a type of validation test on the target table. For example, a
+`~~Validate.col_vals_lt()` validation step can test that each value in a column is less than a
+specified number. And the key finding that's reported in each step is the number of *test units*
+that pass or fail.
 
-</div>
+In the validation report table, test unit metrics are displayed under the `UNITS`, `PASS`, and
+`FAIL` columns. This diagram explains what the tabulated values signify:
 
-**Explore Your Data**
+![](/assets/validation-test-units.png){width=100%}
 
-```bash
-# Get a quick preview of your data
-pb preview small_table
+Test units are dependent on the test being run. Some validation methods might test every value in a
+particular column, so each value will be a test unit. Others will only have a single test unit since
+they aren't testing individual values but rather if the overall test passes or fails.
 
-# Check for missing values
-pb missing small_table
+## Setting Thresholds for Data Quality Signals
 
-# Generate column summaries
-pb scan small_table
+Understanding test units is essential because they form the foundation of Pointblank's threshold
+system. Thresholds let you define acceptable levels of data quality, triggering different severity
+signals ('warning', 'error', or 'critical') when certain failure conditions are met.
+
+Here's a simple example that uses a single validation step along with thresholds set using the
+`Thresholds` class:
+
+```{python}
+(
+    pb.Validate(data=pb.load_dataset(dataset="small_table"))
+    .col_vals_lt(
+        columns="a",
+        value=7,
+
+        # Set the 'warning' and 'error' thresholds ---
+        thresholds=pb.Thresholds(warning=2, error=4)
+    )
+    .interrogate()
+)
 ```
 
-**Run Essential Validations**
+If you look at the validation report table, we can see:
 
-```bash
-# Run validation from YAML configuration file
-pb run validation.yaml
+- the `FAIL` column shows that 2 tests units have failed
+- the `W` column (short for 'warning') shows a filled gray circle indicating those failing test
+units reached that threshold value
+- the `E` column (short for 'error') shows an open yellow circle indicating that the number of
+failing test units is below that threshold
 
-# Run validation from Python file
-pb run validation.py
+The one final threshold level, `C` (for 'critical'), wasn't set so it appears on the validation
+table as a long dash.
 
-# Check for duplicate rows
-pb validate small_table --check rows-distinct
+## Taking Action on Threshold Exceedances
 
-# Verify no null values
-pb validate small_table --check col-vals-not-null --column a
+Pointblank becomes even more powerful when you combine thresholds with actions. The
+`Actions` class lets you trigger responses when validation failures exceed threshold levels, turning
+passive reporting into active notifications.
 
-# Extract failing data for debugging
-pb validate small_table --check col-vals-gt --column a --value 5 --show-extract
+Here's a simple example that adds an action to the previous validation:
+
+```{python}
+(
+    pb.Validate(data=pb.load_dataset(dataset="small_table"))
+    .col_vals_lt(
+        columns="a",
+        value=7,
+        thresholds=pb.Thresholds(warning=2, error=4),
+
+        # Set an action for the 'warning' threshold ---
+        actions=pb.Actions(
+            warning="WARNING: Column 'a' has values that aren't less than 7."
+        )
+    )
+    .interrogate()
+)
 ```
 
-**Integrate with CI/CD**
+Notice the printed warning message: `"WARNING: Column 'a' has values that aren't less than
+7."`. The warning indicator (filled gray circle) visually confirms this threshold was reached and
+the action should trigger.
 
-```bash
-# Use exit codes for automation in one-liner validations (0 = pass, 1 = fail)
-pb validate small_table --check rows-distinct --exit-code
+Actions make your validation workflows more responsive and integrated with your data pipelines. For
+example, you can generate console messages, Slack notifications, and more.
 
-# Run validation workflows with exit codes
-pb run validation.yaml --exit-code
-pb run validation.py --exit-code
-```
+## Navigating the User Guide
 
-## Join the Community
+As you continue exploring Pointblank's capabilities, you'll find the **User Guide** organized into
+sections that will help you navigate the various features.
 
-We'd love to hear from you! Connect with us:
+### Getting Started
 
-- [GitHub Issues](https://github.com/posit-dev/pointblank/issues) for bug reports and feature requests
-- [_Discord server_](https://discord.com/invite/YH7CybCNCQ) for discussions and help
-- [Contributing guidelines](https://github.com/posit-dev/pointblank/blob/main/CONTRIBUTING.md) if you'd like to help improve Pointblank
+The *Getting Started* section introduces you to Pointblank:
 
-## Installation
+- [Introduction](index.qmd): Overview of Pointblank and core concepts (**this article**)
+- [Installation](user-guide/installation.qmd): How to install and set up Pointblank
 
-You can install Pointblank using pip:
+### Validation Plan
 
-```bash
-pip install pointblank
-```
+The *Validation Plan* section covers everything you need to know about creating robust
+validation plans:
 
-You can also install Pointblank from Conda-Forge by using:
+- [Overview](user-guide/validation-overview.qmd): Survey of validation methods and their shared parameters
+- [Validation Methods](user-guide/validation-methods.qmd): A closer look at the more common validation methods
+- [Column Selection Patterns](user-guide/column-selection-patterns.qmd): Techniques for targeting specific columns
+- [Preprocessing](user-guide/preprocessing.qmd): Transform data before validation
+- [Segmentation](user-guide/segmentation.qmd): Apply validations to specific segments of your data
+- [Thresholds](user-guide/thresholds.qmd): Set quality standards and trigger severity levels
+- [Actions](user-guide/actions.qmd): Respond to threshold exceedances with notifications or custom functions
+- [Briefs](user-guide/briefs.qmd): Add context to validation steps
 
-```bash
-conda install conda-forge::pointblank
-```
+### Advanced Validation
 
-If you don't have Polars or Pandas installed, you'll need to install one of them to use Pointblank.
+The *Advanced Validation* section explores more specialized validation techniques:
 
-```bash
-pip install "pointblank[pl]" # Install Pointblank with Polars
-pip install "pointblank[pd]" # Install Pointblank with Pandas
-```
+- [Expression-Based Validation](user-guide/expressions.qmd): Use column expressions for advanced validation
+- [Schema Validation](user-guide/schema-validation.qmd): Enforce table structure and column types
+- [Assertions](user-guide/assertions.qmd): Raise exceptions to enforce data quality requirements
+- [Draft Validation](user-guide/draft-validation.qmd): Create validation plans from existing data
 
-To use Pointblank with DuckDB, MySQL, PostgreSQL, or SQLite, install Ibis with the appropriate backend:
+### Post Interrogation
 
-```bash
-pip install "pointblank[duckdb]"   # Install Pointblank with Ibis + DuckDB
-pip install "pointblank[mysql]"    # Install Pointblank with Ibis + MySQL
-pip install "pointblank[postgres]" # Install Pointblank with Ibis + PostgreSQL
-pip install "pointblank[sqlite]"   # Install Pointblank with Ibis + SQLite
-```
+After validating your data, the *Post Interrogation* section helps you analyze and respond to
+results:
 
-## Technical Details
+- [Validation Reports](user-guide/validation-reports.qmd): Understand and customize the validation report table
+- [Step Reports](user-guide/step-reports.qmd): View detailed results for individual validation steps
+- [Data Extracts](user-guide/extracts.qmd): Extract and analyze failing data
+- [Sundering Validated Data](user-guide/sundering.qmd): Split data based on validation results
 
-Pointblank uses [Narwhals](https://github.com/narwhals-dev/narwhals) to work with Polars and Pandas
-DataFrames, and integrates with [Ibis](https://github.com/ibis-project/ibis) for database and file
-format support. This architecture provides a consistent API for validating tabular data from various
-sources.
+### Data Inspection
 
-## Contributing to Pointblank
+The *Data Inspection* section provides tools to explore and understand your data:
 
-There are many ways to contribute to the ongoing development of Pointblank. Some contributions can
-be simple (like fixing typos, improving documentation, filing issues for feature requests or
-problems, etc.) and others might take more time and care (like answering questions and submitting
-PRs with code changes). Just know that anything you can do to help would be very much appreciated!
+- [Previewing Data](user-guide/preview.qmd): View samples of your data
+- [Column Summaries](user-guide/col-summary-tbl.qmd): Get statistical summaries of your data
+- [Missing Values Reporting](user-guide/missing-vals-tbl.qmd): Identify and visualize missing data
 
-Please read over the [contributing guidelines](https://github.com/posit-dev/pointblank/blob/main/CONTRIBUTING.md)
-for information on how to get started.
-
-## Pointblank for R
-
-There's also a version of Pointblank for R, which has been around since 2017 and is widely used in
-the R community. You can find it at <https://github.com/rstudio/pointblank>.
-
-## Roadmap
-
-We're actively working on enhancing Pointblank with:
-
-1. Additional validation methods for comprehensive data quality checks
-2. Advanced logging capabilities
-3. Messaging actions (Slack, email) for threshold exceedances
-4. LLM-powered validation suggestions and data dictionary generation
-5. JSON/YAML configuration for pipeline portability
-6. CLI utility for validation from the command line
-7. Expanded backend support and certification
-8. High-quality documentation and examples
-
-If you have any ideas for features or improvements, don't hesitate to share them with us! We are
-always looking for ways to make Pointblank better.
-
-## Code of Conduct
-
-Please note that the Pointblank project is released with a
-[contributor code of conduct](https://www.contributor-covenant.org/version/2/1/code_of_conduct/).
-<br>By participating in this project you agree to abide by its terms.
-
-## 📄 License
-
-Pointblank is licensed under the MIT license.
-
-© Posit Software, PBC.
-
-## 🏛️ Governance
-
-This project is primarily maintained by
-[Rich Iannone](https://bsky.app/profile/richmeister.bsky.social). Other authors may occasionally
-assist with some of these duties.
+By following this guide, you'll gain a comprehensive understanding of how to validate, monitor, and
+maintain high-quality data with Pointblank.
