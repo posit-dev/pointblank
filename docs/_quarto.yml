@@ -47,6 +47,7 @@ website:
   description: "Find out if your data is what you think it is"
   navbar:
     logo: assets/pointblank_logo.svg
+    title: false
     left:
       - text: Examples
         file: demos/index.qmd
