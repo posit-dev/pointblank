@@ -66,7 +66,8 @@ website:
             - text: "Welcome to Pointblank"
               href: index.qmd
             - user-guide/quickstart.qmd
-            - user-guide/installation.qmd
+            - text: "Installation"
+              href: user-guide/installation.qmd
         - section: "Validation Plan"
           contents:
             - user-guide/validation-overview.qmd
