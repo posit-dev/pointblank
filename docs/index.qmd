@@ -59,7 +59,7 @@ validation = (
     .interrogate()
 )
 
-validation.get_tabular_report(title="Game Revenue Validation Report").show("browser")
+validation.get_tabular_report(title="Game Revenue Validation Report")
 ```
 
 Ready to validate? Start with our [Installation](user-guide/installation.qmd) guide or jump straight
