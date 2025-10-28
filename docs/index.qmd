@@ -68,7 +68,7 @@ validation plan from your existing data (great for getting started fast).
 Ready to validate? Start with our [Installation](user-guide/installation.qmd) guide or jump straight
 to the [User Guide](user-guide/index.qmd).
 
-Pointblank is made with 💙 by [Posit](https://posit.co/).
+By the way, Pointblank is made with 💙 by [Posit](https://posit.co/).
 
 ## What is Data Validation?
 
@@ -98,16 +98,6 @@ Pointblank is designed for the entire data team, not just engineers:
 - 📋 **Rich Inspection**: Preview data, analyze columns, and visualize missing values
 
 ## Quick Examples
-
-### Interactive Reports
-
-Validation reports aren't just for engineers. They're designed for data stakeholders and are
-highly customizable and publishable as HTML:
-
-```python
-validation.get_tabular_report().show()  # In REPL
-validation  # In notebooks: it just works
-```
 
 ### Threshold-Based Quality
 
