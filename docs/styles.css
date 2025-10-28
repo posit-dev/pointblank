@@ -8,6 +8,11 @@
     text-decoration-thickness: 2px;
 }
 
+/* Make navbar logo bigger */
+.navbar-brand img {
+    max-height: 45px;
+}
+
 body {
     background-color: #FCFEFF;
 }
