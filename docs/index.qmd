@@ -1,5 +1,5 @@
 ---
-title: Welcome to Pointblank
+title: ""
 jupyter: python3
 html-table-processing: none
 ---
@@ -16,15 +16,12 @@ Pointblank is a data validation framework for Python that makes data quality che
 powerful, and stakeholder-friendly. Instead of cryptic error messages, get stunning interactive
 reports that turn data issues into conversations.
 
-```{python}
-#| echo: false
-#| output: false
-import pointblank as pb
-pb.config(report_incl_footer=False)
-```
+Here's what a validation looks like (click "Show the code" to see how it's done):
 
 ```{python}
-#| echo: false
+#| code-fold: true
+#| code-summary: "Show the code"
+
 import pointblank as pb
 import polars as pl
 
@@ -62,6 +59,12 @@ validation = (
 validation.get_tabular_report(title="Game Revenue Validation Report")
 ```
 
+That's the kind of report you get from Pointblank: clear, interactive, and designed for everyone on
+your team. And if you need help getting started or want to work faster, Pointblank has built-in AI
+support through the [`assistant()`](reference/assistant.qmd) function to guide you along the way.
+You can also use [`DraftValidation`](user-guide/draft-validation.qmd) to quickly generate a
+validation plan from your existing data (great for getting started fast).
+
 Ready to validate? Start with our [Installation](user-guide/installation.qmd) guide or jump straight
 to the [User Guide](user-guide/index.qmd).
 
@@ -91,7 +94,7 @@ Pointblank is designed for the entire data team, not just engineers:
 🔗 **Universal Compatibility**: Works with Polars, Pandas, DuckDB, MySQL, PostgreSQL, SQLite, and more
 📝 **YAML Support**: Write validations in YAML for version control and team collaboration
 ⚡ **CLI Tools**: Run validations from the command line for CI/CD pipelines or as quick checks
-� **Rich Inspection**: Preview data, analyze columns, and visualize missing values
+📋 **Rich Inspection**: Preview data, analyze columns, and visualize missing values
 
 ## Quick Examples
 
