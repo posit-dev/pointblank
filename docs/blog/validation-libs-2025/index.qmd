@@ -548,7 +548,7 @@ class UserSchema(dy.Schema):
 
     # Use @dy.rule() for age range validation
     @dy.rule()
-    def age_in_range() -> pl.Expr:
+    def age_in_range(cls) -> pl.Expr:
         return pl.col("age").is_between(18, 80, closed="both")
 
 # Validate using the schema

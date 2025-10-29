@@ -43,11 +43,12 @@ website:
   bread-crumbs: false
   favicon: assets/fav-logo.png
   site-url: https://posit-dev.github.io/pointblank/
+  repo-url: https://github.com/posit-dev/pointblank
   description: "Find out if your data is what you think it is"
   navbar:
+    logo: assets/pointblank_logo.svg
+    title: false
     left:
-      - text: User Guide
-        file: user-guide/index.qmd
       - text: Examples
         file: demos/index.qmd
       - href: reference/index.qmd
@@ -64,7 +65,9 @@ website:
       contents:
         - section: "Getting Started"
           contents:
-            - user-guide/index.qmd
+            - text: "Welcome to Pointblank"
+              href: index.qmd
+            - user-guide/quickstart.qmd
             - user-guide/installation.qmd
         - section: "Validation Plan"
           contents:

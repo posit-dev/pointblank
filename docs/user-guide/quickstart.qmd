@@ -1,13 +1,22 @@
 ---
-title: "Introduction"
-format:
-  html:
-    include-in-header:
-      - text: |
-          <meta http-equiv="refresh" content="0; url=../index.html">
+title: Quickstart
+jupyter: python3
+toc-expand: 2
+html-table-processing: none
+bread-crumbs: true
 ---
 
-Redirecting to the [Introduction](../index.qmd)...
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_footer=False)
+```
+
+The Pointblank library is all about assessing the state of data quality for a table. You provide the
+validation rules and the library will dutifully interrogate the data and provide useful reporting.
+We can use different types of tables like Polars and Pandas DataFrames, Parquet files, or various
+database tables. Let's walk through what data validation looks like in Pointblank.
 
 ## A Simple Validation Table
 
@@ -169,48 +178,48 @@ sections that will help you navigate the various features.
 The *Getting Started* section introduces you to Pointblank:
 
 - [Introduction](index.qmd): Overview of Pointblank and core concepts (**this article**)
-- [Installation](installation.qmd): How to install and set up Pointblank
+- [Installation](user-guide/installation.qmd): How to install and set up Pointblank
 
 ### Validation Plan
 
 The *Validation Plan* section covers everything you need to know about creating robust
 validation plans:
 
-- [Overview](validation-overview.qmd): Survey of validation methods and their shared parameters
-- [Validation Methods](validation-methods.qmd): A closer look at the more common validation methods
-- [Column Selection Patterns](column-selection-patterns.qmd): Techniques for targeting specific columns
-- [Preprocessing](preprocessing.qmd): Transform data before validation
-- [Segmentation](segmentation.qmd): Apply validations to specific segments of your data
-- [Thresholds](thresholds.qmd): Set quality standards and trigger severity levels
-- [Actions](actions.qmd): Respond to threshold exceedances with notifications or custom functions
-- [Briefs](briefs.qmd): Add context to validation steps
+- [Overview](user-guide/validation-overview.qmd): Survey of validation methods and their shared parameters
+- [Validation Methods](user-guide/validation-methods.qmd): A closer look at the more common validation methods
+- [Column Selection Patterns](user-guide/column-selection-patterns.qmd): Techniques for targeting specific columns
+- [Preprocessing](user-guide/preprocessing.qmd): Transform data before validation
+- [Segmentation](user-guide/segmentation.qmd): Apply validations to specific segments of your data
+- [Thresholds](user-guide/thresholds.qmd): Set quality standards and trigger severity levels
+- [Actions](user-guide/actions.qmd): Respond to threshold exceedances with notifications or custom functions
+- [Briefs](user-guide/briefs.qmd): Add context to validation steps
 
 ### Advanced Validation
 
 The *Advanced Validation* section explores more specialized validation techniques:
 
-- [Expression-Based Validation](expressions.qmd): Use column expressions for advanced validation
-- [Schema Validation](schema-validation.qmd): Enforce table structure and column types
-- [Assertions](assertions.qmd): Raise exceptions to enforce data quality requirements
-- [Draft Validation](draft-validation.qmd): Create validation plans from existing data
+- [Expression-Based Validation](user-guide/expressions.qmd): Use column expressions for advanced validation
+- [Schema Validation](user-guide/schema-validation.qmd): Enforce table structure and column types
+- [Assertions](user-guide/assertions.qmd): Raise exceptions to enforce data quality requirements
+- [Draft Validation](user-guide/draft-validation.qmd): Create validation plans from existing data
 
 ### Post Interrogation
 
 After validating your data, the *Post Interrogation* section helps you analyze and respond to
 results:
 
-- [Validation Reports](validation-reports.qmd): Understand and customize the validation report table
-- [Step Reports](step-reports.qmd): View detailed results for individual validation steps
-- [Data Extracts](extracts.qmd): Extract and analyze failing data
-- [Sundering Validated Data](sundering.qmd): Split data based on validation results
+- [Validation Reports](user-guide/validation-reports.qmd): Understand and customize the validation report table
+- [Step Reports](user-guide/step-reports.qmd): View detailed results for individual validation steps
+- [Data Extracts](user-guide/extracts.qmd): Extract and analyze failing data
+- [Sundering Validated Data](user-guide/sundering.qmd): Split data based on validation results
 
 ### Data Inspection
 
 The *Data Inspection* section provides tools to explore and understand your data:
 
-- [Previewing Data](preview.qmd): View samples of your data
-- [Column Summaries](col-summary-tbl.qmd): Get statistical summaries of your data
-- [Missing Values Reporting](missing-vals-tbl.qmd): Identify and visualize missing data
+- [Previewing Data](user-guide/preview.qmd): View samples of your data
+- [Column Summaries](user-guide/col-summary-tbl.qmd): Get statistical summaries of your data
+- [Missing Values Reporting](user-guide/missing-vals-tbl.qmd): Identify and visualize missing data
 
 By following this guide, you'll gain a comprehensive understanding of how to validate, monitor, and
 maintain high-quality data with Pointblank.
