@@ -8,7 +8,6 @@
     text-decoration-thickness: 2px;
 }
 
-/* Make navbar logo bigger */
 .navbar-brand img {
     max-height: 45px;
     padding-right: 0px;
@@ -16,6 +15,12 @@
     border-style: solid;
     border-width: 2px;
     border-radius: 5px;
+    border-color: darkgray;
+    transition: transform 0.3s ease;
+}
+
+.navbar-brand img:hover {
+    transform: scale(1.15);
 }
 
 body {
