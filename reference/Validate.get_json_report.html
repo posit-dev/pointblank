@@ -128,9 +128,8 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
     <a href="../index.html" class="navbar-brand navbar-brand-logo">
-    </a>
-    <a class="navbar-brand" href="../index.html">
-    <span class="navbar-title">Pointblank</span>
+    <img src="../assets/pointblank_logo.svg" alt="" class="navbar-logo light-content">
+    <img src="../assets/pointblank_logo.svg" alt="" class="navbar-logo dark-content">
     </a>
   </div>
             <div id="quarto-search" class="" title="Search"></div>
@@ -139,10 +138,6 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </button>
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
-  <li class="nav-item">
-    <a class="nav-link" href="../user-guide/index.html"> 
-<span class="menu-text">User Guide</span></a>
-  </li>  
   <li class="nav-item">
     <a class="nav-link" href="../demos/index.html"> 
 <span class="menu-text">Examples</span></a>
@@ -289,7 +284,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
         border-radius: 2px;
     ">
 <p>Let’s create a validation plan with a few validation steps and generate a JSON report of the results:</p>
-<div id="ec661b05" class="cell" data-execution_count="1">
+<div id="d769dd76" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -336,8 +331,8 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
         "warning": null,
         "error": null,
         "critical": null,
-        "time_processed": "2025-10-26T04:16:58.197+00:00",
-        "proc_duration_s": 0.007738
+        "time_processed": "2025-10-29T04:34:25.670+00:00",
+        "proc_duration_s": 0.007063
     },
     {
         "i": 2,
@@ -362,14 +357,14 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
         "warning": null,
         "error": null,
         "critical": null,
-        "time_processed": "2025-10-26T04:16:58.200+00:00",
-        "proc_duration_s": 0.002796
+        "time_processed": "2025-10-29T04:34:25.673+00:00",
+        "proc_duration_s": 0.002799
     }
 ]</code></pre>
 </div>
 </div>
 <p>You can also customize which fields to include:</p>
-<div id="f9300fcc" class="cell" data-execution_count="2">
+<div id="403740d3" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>json_report <span class="op">=</span> validation.get_json_report(</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    use_fields<span class="op">=</span>[<span class="st">"i"</span>, <span class="st">"assertion_type"</span>, <span class="st">"column"</span>, <span class="st">"n_passed"</span>, <span class="st">"n_failed"</span>]</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>)</span>
@@ -395,7 +390,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 </div>
 <p>Or which fields to exclude:</p>
-<div id="423406cb" class="cell" data-execution_count="3">
+<div id="87544d07" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>json_report <span class="op">=</span> validation.get_json_report(</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    exclude_fields<span class="op">=</span>[</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"i_o"</span>, <span class="st">"thresholds"</span>, <span class="st">"pre"</span>, <span class="st">"segments"</span>, <span class="st">"values"</span>,</span>
@@ -439,7 +434,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 </div>
 <p>The JSON output can be further processed or analyzed programmatically:</p>
-<div id="a213a278" class="cell" data-execution_count="4">
+<div id="3e79b11d" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Parse the JSON report</span></span>
