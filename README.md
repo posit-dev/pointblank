@@ -356,7 +356,7 @@ Click the following headings to see some video demonstrations of the CLI:
 - **Practical outputs**: Get exactly what you need: counts, extracts, summaries, or full reports
 - **Flexible deployment**: Use in notebooks, scripts, or data pipelines
 - **Customizable**: Tailor validation steps and reporting to your specific needs
-- **Internationalization**: Reports can be generated in over 20 languages, including English, Spanish, French, and German
+- **Internationalization**: Reports can be generated in 30+ languages, including English, Spanish, French, and German
 
 ## Documentation and Examples
 
