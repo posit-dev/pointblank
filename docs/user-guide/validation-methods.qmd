@@ -21,11 +21,12 @@ validating the table structure and detecting duplicates. Combined into validatio
 the foundation of your data quality workflow.
 
 Pointblank provides [over 20 validation methods](https://posit-dev.github.io/pointblank/reference/#validation-steps)
-to handle diverse data quality requirements. These are grouped into three main categories:
+to handle diverse data quality requirements. These are grouped into four main categories:
 
 1. Column Value Validations
 2. Row-based Validations
 3. Table Structure Validations
+4. AI-Powered Validations
 
 Within each of these categories, we'll walk through several examples showing how each validation
 method creates steps in your validation plan.
@@ -105,8 +106,11 @@ validating values against predefined sets
 - **Null value checks** (`~~Validate.col_vals_null()`, `~~Validate.col_vals_not_null()`) for testing
 presence or absence of null values
 
-- **Pattern matching checks** (`~~Validate.col_vals_regex()`) for validating text patterns with
-regular expressions
+- **Pattern matching checks** (`~~Validate.col_vals_regex()`, `~~Validate.col_vals_within_spec()`)
+for validating text patterns with regular expressions or against standard specifications
+
+- **Trending value checks** (`~~Validate.col_vals_increasing()`, `~~Validate.col_vals_decreasing()`)
+for verifying that values increase or decrease as you move down the rows
 
 - **Custom expression checks** (`~~Validate.col_vals_expr()`) for complex validations using custom
 expressions
@@ -184,6 +188,62 @@ each checking text values in a column:
     .interrogate()
 )
 ```
+
+### Checking Strings Against Specifications
+
+The `~~Validate.col_vals_within_spec()` method validates column values against common data
+specifications like email addresses, URLs, postal codes, credit card numbers, ISBNs, VINs, and
+IBANs. This is particularly useful when you need to validate that text data conforms to standard
+formats:
+
+```{python}
+import polars as pl
+
+# Create a sample table with various data types
+sample_data = pl.DataFrame({
+    "isbn": ["978-0-306-40615-7", "0-306-40615-2", "invalid"],
+    "email": ["test@example.com", "user@domain.co.uk", "not-an-email"],
+    "zip": ["12345", "90210", "invalid"]
+})
+
+(
+    pb.Validate(data=sample_data)
+    .col_vals_within_spec(columns="isbn", spec="isbn")
+    .col_vals_within_spec(columns="email", spec="email")
+    .col_vals_within_spec(columns="zip", spec="postal_code[US]")
+    .interrogate()
+)
+```
+
+### Checking for Trending Values
+
+The `~~Validate.col_vals_increasing()` and `~~Validate.col_vals_decreasing()` validation methods
+check whether column values are increasing or decreasing as you move down the rows. These are useful
+for validating time series data, sequential identifiers, or any data where you expect monotonic
+trends:
+
+```{python}
+import polars as pl
+
+# Create a sample table with increasing and decreasing values
+trend_data = pl.DataFrame({
+    "id": [1, 2, 3, 4, 5],
+    "temperature": [20, 22, 25, 28, 30],
+    "countdown": [100, 80, 60, 40, 20]
+})
+
+(
+    pb.Validate(data=trend_data)
+    .col_vals_increasing(columns="id")
+    .col_vals_increasing(columns="temperature")
+    .col_vals_decreasing(columns="countdown")
+    .interrogate()
+)
+```
+
+The `allow_stationary=` parameter lets you control whether consecutive identical values should pass
+validation. By default, stationary values (e.g., `[1, 2, 2, 3]`) will fail the increasing check,
+but setting `allow_stationary=True` will allow them to pass.
 
 ### Handling Missing Values with `na_pass=`
 
@@ -269,6 +329,7 @@ These structural checks form a foundation for more detailed data quality assessm
 - `~~Validate.col_schema_match()`: ensures table matches a defined schema
 - `~~Validate.col_count_match()`: confirms the table has the expected number of columns
 - `~~Validate.row_count_match()`: verifies the table has the expected number of rows
+- `~~Validate.tbl_match()`: validates that the target table matches a comparison table
 
 These structural validations provide essential checks on the fundamental organization of your data
 tables, ensuring they have the expected dimensions and components needed for reliable data analysis.
@@ -347,6 +408,36 @@ These parameters all default to `True`, providing strict schema validation. Sett
 relaxes the validation requirements, making the checks more flexible when exact matching isn't
 necessary or practical for your use case.
 
+### Comparing Tables with `tbl_match()`
+
+The `~~Validate.tbl_match()` validation method provides a comprehensive way to verify that two
+tables are identical. It performs a progressive series of checks, from least to most stringent:
+
+1. Column count match
+2. Row count match
+3. Schema match (loose - case-insensitive, any order)
+4. Schema match (order - columns in correct order)
+5. Schema match (exact - case-sensitive, correct order)
+6. Data match (cell-by-cell comparison)
+
+This progressive approach helps identify exactly where tables differ. Here's an example comparing
+the `small_table` dataset with itself:
+
+```{python}
+(
+    pb.Validate(data=pb.load_dataset(dataset="small_table", tbl_type="polars"))
+    .tbl_match(tbl_compare=pb.load_dataset(dataset="small_table", tbl_type="polars"))
+    .interrogate()
+)
+```
+
+This validation method is especially useful for:
+
+- Verifying that data transformations preserve expected properties
+- Comparing production data against a golden dataset
+- Ensuring data consistency across different environments
+- Validating that imported data matches source data
+
 ### Checking Counts of Row and Columns
 
 Row and column count validations check the number of rows and columns in a table.
@@ -376,10 +467,65 @@ matches a specified count.
 Expectations on column and row counts can be useful in certain situations and they align nicely with
 schema checks.
 
+## 4. AI-Powered Validations
+
+AI-powered validations use Large Language Models (LLMs) to validate data based on natural language
+criteria. This opens up new possibilities for complex validation rules that are difficult to express
+with traditional programmatic methods.
+
+### Validating with Natural Language Prompts
+
+The `~~Validate.prompt()` validation method allows you to describe validation criteria in plain
+language. The LLM interprets your prompt and evaluates each row, producing pass/fail results just
+like other Pointblank validation methods.
+
+This is particularly useful for:
+
+- Semantic checks (e.g., "descriptions should mention a product name")
+- Context-dependent validation (e.g., "prices should be reasonable for the product category")
+- Subjective quality assessments (e.g., "comments should be professional and constructive")
+- Complex rules that would require extensive regex patterns or custom functions
+
+Here's a simple example that validates whether text descriptions contain specific information:
+
+```{python}
+#| eval: false
+import polars as pl
+
+# Create sample data with product descriptions
+products = pl.DataFrame({
+    "product": ["Widget A", "Gadget B", "Tool C"],
+    "description": [
+        "High-quality widget made in USA",
+        "Innovative gadget with warranty",
+        "Professional tool"
+    ],
+    "price": [29.99, 49.99, 19.99]
+})
+
+# Validate that descriptions mention quality or features
+(
+    pb.Validate(data=products)
+    .prompt(
+        prompt="Each description should mention either quality, features, or warranty",
+        columns_subset=["description"],
+        model="anthropic:claude-sonnet-4-5"
+    )
+    .interrogate()
+)
+```
+
+The `columns_subset=` parameter lets you specify which columns to include in the validation,
+improving performance and reducing API costs by only sending relevant data to the LLM.
+
+**Note:** To use `~~Validate.prompt()`, you need to have the appropriate API credentials configured
+for your chosen LLM provider (Anthropic, OpenAI, Ollama, or AWS Bedrock).
+
 ## Conclusion
 
 In this article, we've explored the various types of validation methods that Pointblank offers for
 ensuring data quality. These methods provide a framework for validating column values, checking row
-properties, and verifying table structures. By combining these validation methods into comprehensive
-plans, you can systematically test your data against business rules and quality expectations. And
-this all helps to ensure your data remains reliable and trustworthy.
+properties, verifying table structures, and even using AI for complex semantic validations. By
+combining these validation methods into comprehensive plans, you can systematically test your data
+against business rules and quality expectations. And this all helps to ensure your data remains
+reliable and trustworthy.
