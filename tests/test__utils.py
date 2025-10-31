@@ -8,6 +8,11 @@ import pandas as pd
 import polars as pl
 import pytest
 
+from pointblank._utils_llms_txt import (
+    _get_api_and_examples_text,
+    _get_api_text,
+    _get_examples_text,
+)
 from pointblank._utils import (
     _check_any_df_lib,
     _check_column_exists,
@@ -23,11 +28,8 @@ from pointblank._utils import (
     _derive_single_bound,
     _format_to_float_value,
     _format_to_integer_value,
-    _get_api_and_examples_text,
-    _get_api_text,
     _get_assertion_from_fname,
     _get_column_dtype,
-    _get_examples_text,
     _get_fn_name,
     _get_tbl_type,
     _is_date_or_datetime_dtype,
