@@ -63,5 +63,10 @@ docs-build:
 	  && quartodoc build --verbose \
 	  && quarto render
 
+docs-llms: ## Generate llms.txt and llms-full.txt files for LLM consumption
+	@uv run python scripts/generate_llms_txt.py
+
+docs-full: docs-build docs-llms ## Build docs and generate llms.txt files
+
 install: dist ## install the package to the active Python's site-packages
 	python3 -m pip install --force-reinstall dist/pointblank*.whl
