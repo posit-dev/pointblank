@@ -14217,11 +14217,15 @@ class Validate:
         - [`col_vals_outside()`](`pointblank.Validate.col_vals_outside`)
         - [`col_vals_in_set()`](`pointblank.Validate.col_vals_in_set`)
         - [`col_vals_not_in_set()`](`pointblank.Validate.col_vals_not_in_set`)
+        - [`col_vals_increasing()`](`pointblank.Validate.col_vals_increasing`)
+        - [`col_vals_decreasing()`](`pointblank.Validate.col_vals_decreasing`)
         - [`col_vals_null()`](`pointblank.Validate.col_vals_null`)
         - [`col_vals_not_null()`](`pointblank.Validate.col_vals_not_null`)
         - [`col_vals_regex()`](`pointblank.Validate.col_vals_regex`)
+        - [`col_vals_within_spec()`](`pointblank.Validate.col_vals_within_spec`)
         - [`col_vals_expr()`](`pointblank.Validate.col_vals_expr`)
         - [`conjointly()`](`pointblank.Validate.conjointly`)
+        - [`prompt()`](`pointblank.Validate.prompt`)
 
         An extracted row for these validation methods means that a test unit failed for that row in
         the validation step.
@@ -15795,11 +15799,15 @@ class Validate:
         - [`col_vals_outside()`](`pointblank.Validate.col_vals_outside`)
         - [`col_vals_in_set()`](`pointblank.Validate.col_vals_in_set`)
         - [`col_vals_not_in_set()`](`pointblank.Validate.col_vals_not_in_set`)
+        - [`col_vals_increasing()`](`pointblank.Validate.col_vals_increasing`)
+        - [`col_vals_decreasing()`](`pointblank.Validate.col_vals_decreasing`)
         - [`col_vals_null()`](`pointblank.Validate.col_vals_null`)
         - [`col_vals_not_null()`](`pointblank.Validate.col_vals_not_null`)
         - [`col_vals_regex()`](`pointblank.Validate.col_vals_regex`)
+        - [`col_vals_within_spec()`](`pointblank.Validate.col_vals_within_spec`)
         - [`col_vals_expr()`](`pointblank.Validate.col_vals_expr`)
         - [`conjointly()`](`pointblank.Validate.conjointly`)
+        - [`prompt()`](`pointblank.Validate.prompt`)
         - [`rows_complete()`](`pointblank.Validate.rows_complete`)
 
         The [`rows_distinct()`](`pointblank.Validate.rows_distinct`) validation step will produce a
