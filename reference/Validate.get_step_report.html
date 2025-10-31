@@ -273,11 +273,15 @@ Warning
 <li><a href="../reference/Validate.col_vals_outside.html#pointblank.Validate.col_vals_outside"><code>col_vals_outside()</code></a></li>
 <li><a href="../reference/Validate.col_vals_in_set.html#pointblank.Validate.col_vals_in_set"><code>col_vals_in_set()</code></a></li>
 <li><a href="../reference/Validate.col_vals_not_in_set.html#pointblank.Validate.col_vals_not_in_set"><code>col_vals_not_in_set()</code></a></li>
+<li><a href="../reference/Validate.col_vals_increasing.html#pointblank.Validate.col_vals_increasing"><code>col_vals_increasing()</code></a></li>
+<li><a href="../reference/Validate.col_vals_decreasing.html#pointblank.Validate.col_vals_decreasing"><code>col_vals_decreasing()</code></a></li>
 <li><a href="../reference/Validate.col_vals_null.html#pointblank.Validate.col_vals_null"><code>col_vals_null()</code></a></li>
 <li><a href="../reference/Validate.col_vals_not_null.html#pointblank.Validate.col_vals_not_null"><code>col_vals_not_null()</code></a></li>
 <li><a href="../reference/Validate.col_vals_regex.html#pointblank.Validate.col_vals_regex"><code>col_vals_regex()</code></a></li>
+<li><a href="../reference/Validate.col_vals_within_spec.html#pointblank.Validate.col_vals_within_spec"><code>col_vals_within_spec()</code></a></li>
 <li><a href="../reference/Validate.col_vals_expr.html#pointblank.Validate.col_vals_expr"><code>col_vals_expr()</code></a></li>
 <li><a href="../reference/Validate.conjointly.html#pointblank.Validate.conjointly"><code>conjointly()</code></a></li>
+<li><a href="../reference/Validate.prompt.html#pointblank.Validate.prompt"><code>prompt()</code></a></li>
 <li><a href="../reference/Validate.rows_complete.html#pointblank.Validate.rows_complete"><code>rows_complete()</code></a></li>
 </ul>
 <p>The <a href="../reference/Validate.rows_distinct.html#pointblank.Validate.rows_distinct"><code>rows_distinct()</code></a> validation step will produce a report that shows duplicate rows (or duplicate values in one or a set of columns as defined in that method’s <code>columns_subset=</code> parameter.</p>
@@ -304,7 +308,7 @@ Warning
         border-radius: 2px;
     ">
 <p>Let’s create a validation plan with a few validation steps and interrogate the data. With that, we’ll have a look at the validation reporting table for the entire collection of steps and what went well or what failed.</p>
-<div id="01d82bf2" class="cell" data-execution_count="2">
+<div id="8c892028" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
@@ -588,7 +592,7 @@ Warning
 </div>
 </div>
 <p>There were four validation steps performed, where the first three steps had failing test units and the last step had no failures. Let’s get a detailed report for the first step by using the <code>get_step_report()</code> method.</p>
-<div id="5f85f90d" class="cell" data-execution_count="3">
+<div id="ccead8b2" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>validation.get_step_report(i<span class="op">=</span><span class="dv">1</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="3">
 <div id="pb_preview_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
@@ -706,7 +710,7 @@ Warning
 <p>The report for the first step is displayed. The report includes a summary of the validation step and a detailed breakdown of the interrogation results. The report provides details on what the validation step was checking, the extent to which the test units failed, and a table that shows the failing rows of the data with the column of interest highlighted.</p>
 <p>The second and third steps also had failing test units. Reports for those steps can be viewed by using <code>get_step_report(i=2)</code> and <code>get_step_report(i=3)</code> respectively.</p>
 <p>The final step did not have any failing test units. A report for the final step can still be viewed by using <code>get_step_report(i=4)</code>. The report will indicate that every test unit passed and a prview of the target table will be provided.</p>
-<div id="34b38db6" class="cell" data-execution_count="4">
+<div id="928f7e42" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>validation.get_step_report(i<span class="op">=</span><span class="dv">4</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="4">
 <div id="pb_preview_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
@@ -910,7 +914,7 @@ Warning
 </div>
 </div>
 <p>If you’d like to trim down the number of columns shown in the report, you can provide a subset of columns to display. For example, if you only want to see the columns <code>a</code>, <code>b</code>, and <code>c</code>, you can provide those column names as a list.</p>
-<div id="9bab9586" class="cell" data-execution_count="5">
+<div id="441fe775" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>validation.get_step_report(i<span class="op">=</span><span class="dv">1</span>, columns_subset<span class="op">=</span>[<span class="st">"a"</span>, <span class="st">"b"</span>, <span class="st">"c"</span>])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="5">
 <div id="pb_preview_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
@@ -1006,7 +1010,7 @@ Warning
 </div>
 </div>
 <p>If you’d like to increase or reduce the maximum number of rows shown in the report, you can provide a different value for the <code>limit</code> parameter. For example, if you’d like to see only up to 5 rows, you can set <code>limit=5</code>.</p>
-<div id="cb61ed90" class="cell" data-execution_count="6">
+<div id="699476ac" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>validation.get_step_report(i<span class="op">=</span><span class="dv">3</span>, limit<span class="op">=</span><span class="dv">5</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="6">
 <div id="pb_preview_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
