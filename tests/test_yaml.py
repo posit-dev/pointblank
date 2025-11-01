@@ -4442,3 +4442,399 @@ steps:
     result = yaml_to_python(yaml_content)
     # Should handle highest_only=False
     assert "highest_only=False" in result
+
+
+def test_col_vals_increasing_yaml_basic():
+    """Test basic col_vals_increasing() YAML translation and execution"""
+    yaml_content = """
+tbl: small_table
+steps:
+- col_vals_increasing:
+    columns: a
+"""
+
+    result = yaml_interrogate(yaml_content)
+    assert result is not None
+    assert len(result.validation_info) == 1
+    assert result.validation_info[0].assertion_type == "col_vals_increasing"
+
+
+def test_col_vals_increasing_yaml_with_all_params():
+    """Test col_vals_increasing() with all parameters in YAML"""
+    yaml_content = """
+tbl: small_table
+tbl_name: "Increasing Values Test"
+label: "Test col_vals_increasing"
+steps:
+- col_vals_increasing:
+    columns: [a, d]
+    allow_stationary: true
+    decreasing_tol: 0.5
+    na_pass: true
+    thresholds:
+      warning: 0.1
+      error: 0.2
+    brief: "Values should be increasing"
+    active: true
+"""
+
+    result = yaml_interrogate(yaml_content)
+    assert result is not None
+    # Two columns = 2 validation steps
+    assert len(result.validation_info) == 2
+
+    # Check first step parameters
+    val_info = result.validation_info[0]
+    assert val_info.assertion_type == "col_vals_increasing"
+    assert val_info.na_pass is True
+    assert val_info.brief == "Values should be increasing"
+    assert val_info.active is True
+    assert val_info.val_info["allow_stationary"] is True
+    assert val_info.val_info["decreasing_tol"] == 0.5
+
+
+def test_col_vals_increasing_yaml_to_python():
+    """Test yaml_to_python() for col_vals_increasing()"""
+    yaml_content = """
+tbl: small_table
+steps:
+- col_vals_increasing:
+    columns: a
+    allow_stationary: true
+    decreasing_tol: 1.0
+    na_pass: true
+"""
+
+    python_code = yaml_to_python(yaml_content)
+    assert "import pointblank as pb" in python_code
+    assert ".col_vals_increasing(" in python_code
+    assert 'columns="a"' in python_code
+    assert "allow_stationary=True" in python_code
+    assert "decreasing_tol=1.0" in python_code
+    assert "na_pass=True" in python_code
+
+
+def test_col_vals_decreasing_yaml_basic():
+    """Test basic col_vals_decreasing() YAML translation and execution"""
+    yaml_content = """
+tbl: small_table
+steps:
+- col_vals_decreasing:
+    columns: a
+"""
+
+    result = yaml_interrogate(yaml_content)
+    assert result is not None
+    assert len(result.validation_info) == 1
+    assert result.validation_info[0].assertion_type == "col_vals_decreasing"
+
+
+def test_col_vals_decreasing_yaml_with_all_params():
+    """Test col_vals_decreasing() with all parameters in YAML"""
+    yaml_content = """
+tbl: small_table
+tbl_name: "Decreasing Values Test"
+label: "Test col_vals_decreasing"
+steps:
+- col_vals_decreasing:
+    columns: [c, d]
+    allow_stationary: true
+    increasing_tol: 2.0
+    na_pass: false
+    thresholds:
+      warning: 0.15
+      error: 0.3
+    brief: "Values should be decreasing"
+    active: true
+"""
+
+    result = yaml_interrogate(yaml_content)
+    assert result is not None
+    # Two columns = 2 validation steps
+    assert len(result.validation_info) == 2
+
+    # Check first step parameters
+    val_info = result.validation_info[0]
+    assert val_info.assertion_type == "col_vals_decreasing"
+    assert val_info.na_pass is False
+    assert val_info.brief == "Values should be decreasing"
+    assert val_info.active is True
+    assert val_info.val_info["allow_stationary"] is True
+    assert val_info.val_info["increasing_tol"] == 2.0
+
+
+def test_col_vals_decreasing_yaml_to_python():
+    """Test yaml_to_python() for col_vals_decreasing()"""
+    yaml_content = """
+tbl: small_table
+steps:
+- col_vals_decreasing:
+    columns: d
+    allow_stationary: false
+    increasing_tol: 0.5
+    na_pass: true
+"""
+
+    python_code = yaml_to_python(yaml_content)
+    assert "import pointblank as pb" in python_code
+    assert ".col_vals_decreasing(" in python_code
+    assert 'columns="d"' in python_code
+    assert "allow_stationary=False" in python_code
+    assert "increasing_tol=0.5" in python_code
+    assert "na_pass=True" in python_code
+
+
+def test_col_vals_within_spec_yaml_basic():
+    """Test basic col_vals_within_spec() YAML translation and execution"""
+    yaml_content = """
+tbl: small_table
+steps:
+- col_vals_within_spec:
+    columns: b
+    spec: "email"
+"""
+
+    result = yaml_interrogate(yaml_content)
+    assert result is not None
+    assert len(result.validation_info) == 1
+    assert result.validation_info[0].assertion_type == "col_vals_within_spec"
+
+
+def test_col_vals_within_spec_yaml_with_all_params():
+    """Test col_vals_within_spec() with all parameters in YAML"""
+    yaml_content = """
+tbl: small_table
+tbl_name: "Spec Validation Test"
+label: "Test col_vals_within_spec"
+steps:
+- col_vals_within_spec:
+    columns: [b]
+    spec: "url"
+    na_pass: true
+    thresholds:
+      warning: 0.2
+      error: 0.4
+    brief: "Values should match URL spec"
+    active: true
+"""
+
+    result = yaml_interrogate(yaml_content)
+    assert result is not None
+    assert len(result.validation_info) == 1
+
+    # Check step parameters
+    val_info = result.validation_info[0]
+    assert val_info.assertion_type == "col_vals_within_spec"
+    assert val_info.na_pass is True
+    assert val_info.brief == "Values should match URL spec"
+    assert val_info.active is True
+
+
+def test_col_vals_within_spec_yaml_to_python():
+    """Test yaml_to_python() for col_vals_within_spec()"""
+    yaml_content = """
+tbl: small_table
+steps:
+- col_vals_within_spec:
+    columns: b
+    spec: "email"
+    na_pass: false
+"""
+
+    python_code = yaml_to_python(yaml_content)
+    assert "import pointblank as pb" in python_code
+    assert ".col_vals_within_spec(" in python_code
+    assert 'columns="b"' in python_code
+    assert 'spec="email"' in python_code
+    assert "na_pass=False" in python_code
+
+
+def test_col_vals_within_spec_yaml_various_specs():
+    """Test col_vals_within_spec() with various spec types"""
+    yaml_content = """
+tbl: small_table
+steps:
+- col_vals_within_spec:
+    columns: b
+    spec: "postal_code[US]"
+- col_vals_within_spec:
+    columns: b
+    spec: "iban[DE]"
+- col_vals_within_spec:
+    columns: b
+    spec: "credit_card"
+"""
+
+    result = yaml_interrogate(yaml_content)
+    assert result is not None
+    assert len(result.validation_info) == 3
+
+
+def test_tbl_match_yaml_basic():
+    """Test basic tbl_match() YAML translation and execution"""
+    yaml_content = """
+tbl: small_table
+steps:
+- tbl_match:
+    tbl_compare:
+      python: |
+        pb.load_dataset("small_table", tbl_type="polars")
+"""
+
+    result = yaml_interrogate(yaml_content)
+    assert result is not None
+    assert len(result.validation_info) == 1
+    assert result.validation_info[0].assertion_type == "tbl_match"
+
+
+def test_tbl_match_yaml_with_all_params():
+    """Test tbl_match() with all parameters in YAML"""
+    yaml_content = """
+tbl: small_table
+tbl_name: "Table Match Test"
+label: "Test tbl_match"
+steps:
+- tbl_match:
+    tbl_compare:
+      python: |
+        pb.load_dataset("small_table", tbl_type="polars")
+    thresholds:
+      warning: 0.0
+      error: 0.5
+    brief: "Tables should match"
+    active: true
+"""
+
+    result = yaml_interrogate(yaml_content)
+    assert result is not None
+    assert len(result.validation_info) == 1
+
+    # Check step parameters
+    val_info = result.validation_info[0]
+    assert val_info.assertion_type == "tbl_match"
+    assert val_info.brief == "Tables should match"
+    assert val_info.active is True
+
+
+def test_tbl_match_yaml_to_python():
+    """Test yaml_to_python() for tbl_match()"""
+    yaml_content = """
+tbl: small_table
+steps:
+- tbl_match:
+    tbl_compare:
+      python: |
+        pb.load_dataset("small_table", tbl_type="polars")
+"""
+
+    python_code = yaml_to_python(yaml_content)
+    assert "import pointblank as pb" in python_code
+    assert ".tbl_match(" in python_code
+    assert "tbl_compare=" in python_code
+    assert 'pb.load_dataset("small_table", tbl_type="polars")' in python_code
+
+
+def test_prompt_yaml_to_python():
+    """Test yaml_to_python() for prompt"""
+    yaml_content = """
+tbl: small_table
+steps:
+- prompt:
+    prompt: "Check data quality"
+    model: "openai:gpt-4"
+    columns_subset: [a, b]
+    batch_size: 1000
+    max_concurrent: 3
+"""
+
+    python_code = yaml_to_python(yaml_content)
+    assert "import pointblank as pb" in python_code
+    assert ".prompt(" in python_code
+    assert 'prompt="Check data quality"' in python_code
+    assert 'model="openai:gpt-4"' in python_code
+    assert 'columns_subset=["a", "b"]' in python_code
+    assert "batch_size=1000" in python_code
+    assert "max_concurrent=3" in python_code
+
+
+def test_new_methods_comprehensive_yaml():
+    """Test all several methods together in one YAML workflow"""
+    yaml_content = """
+tbl: small_table
+tbl_name: "Comprehensive New Methods Test"
+label: "Testing several validation methods"
+thresholds:
+  warning: 0.1
+  error: 0.25
+steps:
+- col_vals_increasing:
+    columns: a
+    allow_stationary: false
+- col_vals_decreasing:
+    columns: d
+    allow_stationary: true
+- col_vals_within_spec:
+    columns: b
+    spec: "email"
+    na_pass: true
+- tbl_match:
+    tbl_compare:
+      python: |
+        pb.load_dataset("small_table", tbl_type="polars")
+- prompt:
+    prompt: "Data should be reasonable"
+    model: "anthropic:claude-sonnet-4"
+    columns_subset: [a, d]
+"""
+
+    result = yaml_interrogate(yaml_content)
+    assert result is not None
+    assert len(result.validation_info) == 5
+    assert result.validation_info[0].assertion_type == "col_vals_increasing"
+    assert result.validation_info[1].assertion_type == "col_vals_decreasing"
+    assert result.validation_info[2].assertion_type == "col_vals_within_spec"
+    assert result.validation_info[3].assertion_type == "tbl_match"
+    assert result.validation_info[4].assertion_type == "prompt"
+
+
+def test_new_methods_yaml_to_python_comprehensive():
+    """Test yaml_to_python() for a group of validation methods"""
+    yaml_content = """
+tbl: small_table
+tbl_name: "New Methods Demo"
+steps:
+- col_vals_increasing:
+    columns: a
+    allow_stationary: true
+    decreasing_tol: 0.1
+- col_vals_decreasing:
+    columns: d
+    increasing_tol: 0.2
+- col_vals_within_spec:
+    columns: b
+    spec: "url"
+- tbl_match:
+    tbl_compare:
+      python: |
+        pb.load_dataset("small_table", tbl_type="polars")
+- prompt:
+    prompt: "Validate data quality"
+    model: "openai:gpt-4"
+"""
+
+    python_code = yaml_to_python(yaml_content)
+
+    # Check all methods are present
+    assert "import pointblank as pb" in python_code
+    assert ".col_vals_increasing(" in python_code
+    assert ".col_vals_decreasing(" in python_code
+    assert ".col_vals_within_spec(" in python_code
+    assert ".tbl_match(" in python_code
+    assert ".prompt(" in python_code
+
+    # Check key parameters
+    assert "allow_stationary=True" in python_code
+    assert "decreasing_tol=0.1" in python_code
+    assert "increasing_tol=0.2" in python_code
+    assert 'spec="url"' in python_code
+    assert 'model="openai:gpt-4"' in python_code

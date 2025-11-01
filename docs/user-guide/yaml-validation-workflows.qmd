@@ -409,6 +409,105 @@ steps:
       count: 4
 ```
 
+### Trend Validations
+
+Validate that values follow increasing or decreasing patterns across rows:
+
+```yaml
+tbl: time_series_data.csv
+steps:
+  # Ensure timestamp values increase
+  - col_vals_increasing:
+      columns: timestamp
+      brief: "Timestamps must be in chronological order"
+
+  # Validate countdown timer decreases
+  - col_vals_decreasing:
+      columns: countdown
+      allow_stationary: true
+      brief: "Countdown values should decrease (ties allowed)"
+
+  # Check trend with tolerance
+  - col_vals_increasing:
+      columns: temperature
+      decreasing_tol: 0.5
+      brief: "Temperature trends upward (small drops < 0.5°C allowed)"
+```
+
+### Specification-based Validations
+
+Validate values against common data specifications like email addresses, URLs, postal codes, and
+more:
+
+```yaml
+tbl: user_contact_info.csv
+steps:
+  # Validate email addresses
+  - col_vals_within_spec:
+      columns: email
+      spec: "email"
+
+  # Validate US ZIP codes
+  - col_vals_within_spec:
+      columns: zip_code
+      spec: "postal_code[US]"
+
+  # Validate URLs
+  - col_vals_within_spec:
+      columns: website
+      spec: "url"
+      na_pass: true
+```
+
+Available specifications include: `"email"`, `"url"`, `"phone"`, `"ipv4"`, `"ipv6"`, `"mac"`,
+`"isbn"`, `"vin"`, `"credit_card"`, `"swift"`, `"postal_code[<country>]"`, `"iban[<country>]"`.
+
+### Table Comparison
+
+Validate that an entire table matches a reference table:
+
+```yaml
+tbl: processed_output.csv
+steps:
+  # Compare against expected output
+  - tbl_match:
+      tbl_compare:
+        python: |
+          pb.load_dataset("expected_output", tbl_type="polars")
+      brief: "Output matches expected results"
+```
+
+The `tbl_match()` validation performs comprehensive comparison including column count, row count,
+schema, and data values. It supports cross-backend validation (e.g., comparing Polars vs. Pandas
+DataFrames).
+
+### AI-Powered Validation
+
+Use Large Language Models to validate data based on natural language criteria:
+
+```yaml
+tbl: customer_feedback.csv
+steps:
+  # Validate sentiment
+  - prompt:
+      prompt: "Customer feedback should express positive sentiment"
+      model: "anthropic:claude-sonnet-4"
+      columns_subset: [feedback_text, rating]
+      batch_size: 500
+      thresholds:
+        warning: 0.1
+
+  # Validate semantic correctness
+  - prompt:
+      prompt: "Product descriptions should mention the product category and at least one benefit"
+      model: "openai:gpt-4"
+      columns_subset: [product_name, description, category]
+```
+
+**Note**: AI validations require API keys to be set as environment variables (e.g.,
+`ANTHROPIC_API_KEY`, `OPENAI_API_KEY`) or in a `.env` file. These validations are best suited for
+semantic, context-dependent, or subjective quality checks rather than simple numeric comparisons.
+
 ## Thresholds and Severity Levels
 
 Thresholds determine when validation failures trigger different severity levels. You can set global
