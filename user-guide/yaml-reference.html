@@ -471,6 +471,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
   <li><a href="#row-based-validations" id="toc-row-based-validations" class="nav-link" data-scroll-target="#row-based-validations">Row-based Validations</a></li>
   <li><a href="#structure-validations" id="toc-structure-validations" class="nav-link" data-scroll-target="#structure-validations">Structure Validations</a></li>
   <li><a href="#special-validation-methods" id="toc-special-validation-methods" class="nav-link" data-scroll-target="#special-validation-methods">Special Validation Methods</a></li>
+  <li><a href="#ai-powered-validation" id="toc-ai-powered-validation" class="nav-link" data-scroll-target="#ai-powered-validation">AI-Powered Validation</a></li>
   </ul></li>
   <li><a href="#column-selection-patterns" id="toc-column-selection-patterns" class="nav-link" data-scroll-target="#column-selection-patterns">Column Selection Patterns</a></li>
   <li><a href="#parameter-details" id="toc-parameter-details" class="nav-link" data-scroll-target="#parameter-details">Parameter Details</a>
@@ -782,145 +783,406 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">actions</span><span class="kw">:</span><span class="co">                           # OPTIONAL: Step-level actions</span></span>
 <span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">warning</span><span class="kw">:</span><span class="at"> </span><span class="st">"Custom message"</span></span>
 <span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">brief</span><span class="kw">:</span><span class="at"> </span><span class="st">"Values match pattern"</span><span class="co">      # OPTIONAL: Step description</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><code>col_vals_within_spec</code>: do column data conform to a specification (email, URL, postal codes, etc.)?</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb22"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">col_vals_within_spec</span><span class="kw">:</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">columns</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">column_name</span><span class="kw">]</span><span class="co">             # REQUIRED: Column(s) to validate</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">spec</span><span class="kw">:</span><span class="at"> </span><span class="st">"email"</span><span class="co">                      # REQUIRED: Specification type</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">na_pass</span><span class="kw">:</span><span class="at"> </span><span class="ch">false</span><span class="co">                     # OPTIONAL: Pass NULL values</span></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a><span class="fu">    pre</span><span class="kw">: </span><span class="ch">|</span><span class="co">                             # OPTIONAL: Data preprocessing</span></span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>      lambda df: df.filter(condition)</span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">thresholds</span><span class="kw">:</span><span class="co">                        # OPTIONAL: Step-level thresholds</span></span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">warning</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.1</span></span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">actions</span><span class="kw">:</span><span class="co">                           # OPTIONAL: Step-level actions</span></span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">warning</span><span class="kw">:</span><span class="at"> </span><span class="st">"Custom message"</span></span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">brief</span><span class="kw">:</span><span class="at"> </span><span class="st">"Values match spec"</span><span class="co">         # OPTIONAL: Step description</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Available specification types:</p>
+<ul>
+<li><code>"email"</code> - Email addresses</li>
+<li><code>"url"</code> - Internet URLs</li>
+<li><code>"phone"</code> - Phone numbers</li>
+<li><code>"ipv4"</code> - IPv4 addresses</li>
+<li><code>"ipv6"</code> - IPv6 addresses</li>
+<li><code>"mac"</code> - MAC addresses</li>
+<li><code>"isbn"</code> - International Standard Book Numbers (10 or 13 digit)</li>
+<li><code>"vin"</code> - Vehicle Identification Numbers</li>
+<li><code>"credit_card"</code> - Credit card numbers (uses Luhn algorithm)</li>
+<li><code>"swift"</code> - Business Identifier Codes (SWIFT-BIC)</li>
+<li><code>"postal_code[&lt;country_code&gt;]"</code> - Postal codes for specific countries (e.g., <code>"postal_code[US]"</code>, <code>"postal_code[CA]"</code>)</li>
+<li><code>"zip"</code> - Alias for US ZIP codes (<code>"postal_code[US]"</code>)</li>
+<li><code>"iban[&lt;country_code&gt;]"</code> - International Bank Account Numbers (e.g., <code>"iban[DE]"</code>, <code>"iban[FR]"</code>)</li>
+</ul>
+<p>Examples:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb23"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Email validation</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">col_vals_within_spec</span><span class="kw">:</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">columns</span><span class="kw">:</span><span class="at"> user_email</span></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">spec</span><span class="kw">:</span><span class="at"> </span><span class="st">"email"</span></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a><span class="co"># US postal codes</span></span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">col_vals_within_spec</span><span class="kw">:</span></span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">columns</span><span class="kw">:</span><span class="at"> zip_code</span></span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">spec</span><span class="kw">:</span><span class="at"> </span><span class="st">"postal_code[US]"</span></span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a><span class="co"># German IBAN</span></span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">col_vals_within_spec</span><span class="kw">:</span></span>
+<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">columns</span><span class="kw">:</span><span class="at"> account_number</span></span>
+<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">spec</span><span class="kw">:</span><span class="at"> </span><span class="st">"iban[DE]"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section>
 <section id="custom-expression-methods" class="level4">
 <h4 class="anchored" data-anchor-id="custom-expression-methods">Custom Expression Methods</h4>
 <p><code>col_vals_expr</code>: do column data agree with a predicate expression?</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb22"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">col_vals_expr</span><span class="kw">:</span></span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">expr</span><span class="kw">:</span><span class="co">                              # REQUIRED: Custom validation expression</span></span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="fu">      python</span><span class="kw">: </span><span class="ch">|</span></span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>        pl.when(pl.col("status") == "active")</span>
-<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>        .then(pl.col("value") &gt; 0)</span>
-<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>        .otherwise(pl.lit(True))</span>
-<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a><span class="fu">    pre</span><span class="kw">: </span><span class="ch">|</span><span class="co">                             # OPTIONAL: Data preprocessing</span></span>
-<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>      lambda df: df.filter(condition)</span>
-<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">thresholds</span><span class="kw">:</span><span class="co">                        # OPTIONAL: Step-level thresholds</span></span>
-<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">warning</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.1</span></span>
-<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">actions</span><span class="kw">:</span><span class="co">                           # OPTIONAL: Step-level actions</span></span>
-<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">warning</span><span class="kw">:</span><span class="at"> </span><span class="st">"Custom message"</span></span>
-<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">brief</span><span class="kw">:</span><span class="at"> </span><span class="st">"Custom validation rule"</span><span class="co">    # OPTIONAL: Step description</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb24"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">col_vals_expr</span><span class="kw">:</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">expr</span><span class="kw">:</span><span class="co">                              # REQUIRED: Custom validation expression</span></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="fu">      python</span><span class="kw">: </span><span class="ch">|</span></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>        pl.when(pl.col("status") == "active")</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>        .then(pl.col("value") &gt; 0)</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>        .otherwise(pl.lit(True))</span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a><span class="fu">    pre</span><span class="kw">: </span><span class="ch">|</span><span class="co">                             # OPTIONAL: Data preprocessing</span></span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>      lambda df: df.filter(condition)</span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">thresholds</span><span class="kw">:</span><span class="co">                        # OPTIONAL: Step-level thresholds</span></span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">warning</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.1</span></span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">actions</span><span class="kw">:</span><span class="co">                           # OPTIONAL: Step-level actions</span></span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">warning</span><span class="kw">:</span><span class="at"> </span><span class="st">"Custom message"</span></span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">brief</span><span class="kw">:</span><span class="at"> </span><span class="st">"Custom validation rule"</span><span class="co">    # OPTIONAL: Step description</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="trend-validation-methods" class="level4">
+<h4 class="anchored" data-anchor-id="trend-validation-methods">Trend Validation Methods</h4>
+<p><code>col_vals_increasing</code>: are column data increasing row-by-row?</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb25"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">col_vals_increasing</span><span class="kw">:</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">columns</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">column_name</span><span class="kw">]</span><span class="co">             # REQUIRED: Column(s) to validate</span></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">allow_stationary</span><span class="kw">:</span><span class="at"> </span><span class="ch">false</span><span class="co">            # OPTIONAL: Allow consecutive equal values (default: false)</span></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">decreasing_tol</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.5</span><span class="co">                # OPTIONAL: Tolerance for negative movement (default: null)</span></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">na_pass</span><span class="kw">:</span><span class="at"> </span><span class="ch">false</span><span class="co">                     # OPTIONAL: Pass NULL values</span></span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a><span class="fu">    pre</span><span class="kw">: </span><span class="ch">|</span><span class="co">                             # OPTIONAL: Data preprocessing</span></span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>      lambda df: df.filter(condition)</span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">thresholds</span><span class="kw">:</span><span class="co">                        # OPTIONAL: Step-level thresholds</span></span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">warning</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.1</span></span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">actions</span><span class="kw">:</span><span class="co">                           # OPTIONAL: Step-level actions</span></span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">warning</span><span class="kw">:</span><span class="at"> </span><span class="st">"Custom message"</span></span>
+<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">brief</span><span class="kw">:</span><span class="at"> </span><span class="st">"Values must increase"</span><span class="co">      # OPTIONAL: Step description</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>This validation checks whether values in a column increase as you move down the rows. Useful for validating time-series data, sequence numbers, or any monotonically increasing values.</p>
+<p>Parameters:</p>
+<ul>
+<li><code>allow_stationary</code>: If <code>true</code>, allows consecutive values to be equal (stationary phases). For example, <code>[1, 2, 2, 3]</code> would pass when <code>true</code> but fail at the third value when <code>false</code>.</li>
+<li><code>decreasing_tol</code>: Absolute tolerance for negative movement. Setting this to <code>0.5</code> means values can decrease by up to 0.5 units and still pass. Setting any value also sets <code>allow_stationary</code> to <code>true</code>.</li>
+</ul>
+<p>Examples:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb26"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Strict increasing validation</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">col_vals_increasing</span><span class="kw">:</span></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">columns</span><span class="kw">:</span><span class="at"> timestamp_seconds</span></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">brief</span><span class="kw">:</span><span class="at"> </span><span class="st">"Timestamps must strictly increase"</span></span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Allow stationary values</span></span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">col_vals_increasing</span><span class="kw">:</span></span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">columns</span><span class="kw">:</span><span class="at"> version_number</span></span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">allow_stationary</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">brief</span><span class="kw">:</span><span class="at"> </span><span class="st">"Version numbers should increase (ties allowed)"</span></span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a><span class="co"># With tolerance for small decreases</span></span>
+<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">col_vals_increasing</span><span class="kw">:</span></span>
+<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">columns</span><span class="kw">:</span><span class="at"> temperature</span></span>
+<span id="cb26-15"><a href="#cb26-15" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">decreasing_tol</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.1</span></span>
+<span id="cb26-16"><a href="#cb26-16" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">brief</span><span class="kw">:</span><span class="at"> </span><span class="st">"Temperature trend (small drops allowed)"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><code>col_vals_decreasing</code>: are column data decreasing row-by-row?</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb27"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">col_vals_decreasing</span><span class="kw">:</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">columns</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">column_name</span><span class="kw">]</span><span class="co">             # REQUIRED: Column(s) to validate</span></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">allow_stationary</span><span class="kw">:</span><span class="at"> </span><span class="ch">false</span><span class="co">            # OPTIONAL: Allow consecutive equal values (default: false)</span></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">increasing_tol</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.5</span><span class="co">                # OPTIONAL: Tolerance for positive movement (default: null)</span></span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">na_pass</span><span class="kw">:</span><span class="at"> </span><span class="ch">false</span><span class="co">                     # OPTIONAL: Pass NULL values</span></span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a><span class="fu">    pre</span><span class="kw">: </span><span class="ch">|</span><span class="co">                             # OPTIONAL: Data preprocessing</span></span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>      lambda df: df.filter(condition)</span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">thresholds</span><span class="kw">:</span><span class="co">                        # OPTIONAL: Step-level thresholds</span></span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">warning</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.1</span></span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">actions</span><span class="kw">:</span><span class="co">                           # OPTIONAL: Step-level actions</span></span>
+<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">warning</span><span class="kw">:</span><span class="at"> </span><span class="st">"Custom message"</span></span>
+<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">brief</span><span class="kw">:</span><span class="at"> </span><span class="st">"Values must decrease"</span><span class="co">      # OPTIONAL: Step description</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>This validation checks whether values in a column decrease as you move down the rows. Useful for countdown timers, inventory depletion, or any monotonically decreasing values.</p>
+<p>Parameters:</p>
+<ul>
+<li><code>allow_stationary</code>: If <code>true</code>, allows consecutive values to be equal (stationary phases). For example, <code>[10, 8, 8, 5]</code> would pass when <code>true</code> but fail at the third value when <code>false</code>.</li>
+<li><code>increasing_tol</code>: Absolute tolerance for positive movement. Setting this to <code>0.5</code> means values can increase by up to 0.5 units and still pass. Setting any value also sets <code>allow_stationary</code> to <code>true</code>.</li>
+</ul>
+<p>Examples:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb28"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Strict decreasing validation</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">col_vals_decreasing</span><span class="kw">:</span></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">columns</span><span class="kw">:</span><span class="at"> countdown_timer</span></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">brief</span><span class="kw">:</span><span class="at"> </span><span class="st">"Timer must strictly decrease"</span></span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Allow stationary values</span></span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">col_vals_decreasing</span><span class="kw">:</span></span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">columns</span><span class="kw">:</span><span class="at"> priority_score</span></span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">allow_stationary</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">brief</span><span class="kw">:</span><span class="at"> </span><span class="st">"Priority scores should decrease (ties allowed)"</span></span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a><span class="co"># With tolerance for small increases</span></span>
+<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">col_vals_decreasing</span><span class="kw">:</span></span>
+<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">columns</span><span class="kw">:</span><span class="at"> stock_level</span></span>
+<span id="cb28-15"><a href="#cb28-15" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">increasing_tol</span><span class="kw">:</span><span class="at"> </span><span class="dv">5</span></span>
+<span id="cb28-16"><a href="#cb28-16" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">brief</span><span class="kw">:</span><span class="at"> </span><span class="st">"Stock levels decrease (small restocks allowed)"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section>
 </section>
 <section id="row-based-validations" class="level3">
 <h3 class="anchored" data-anchor-id="row-based-validations">Row-based Validations</h3>
 <p><code>rows_distinct</code>: are row data distinct?</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb23"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> rows_distinct</span><span class="co">                        # Simple form</span></span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">rows_distinct</span><span class="kw">:</span><span class="co">                       # With parameters</span></span>
-<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">columns_subset</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">col1</span><span class="kw">,</span><span class="at"> col2</span><span class="kw">]</span><span class="co">       # OPTIONAL: Check subset of columns</span></span>
-<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a><span class="fu">    pre</span><span class="kw">: </span><span class="ch">|</span><span class="co">                             # OPTIONAL: Data preprocessing</span></span>
-<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>      lambda df: df.filter(condition)</span>
-<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">thresholds</span><span class="kw">:</span><span class="co">                        # OPTIONAL: Step-level thresholds</span></span>
-<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">warning</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.1</span></span>
-<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">actions</span><span class="kw">:</span><span class="co">                           # OPTIONAL: Step-level actions</span></span>
-<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">warning</span><span class="kw">:</span><span class="at"> </span><span class="st">"Custom message"</span></span>
-<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">brief</span><span class="kw">:</span><span class="at"> </span><span class="st">"No duplicate rows"</span><span class="co">         # OPTIONAL: Step description</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb29"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> rows_distinct</span><span class="co">                        # Simple form</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">rows_distinct</span><span class="kw">:</span><span class="co">                       # With parameters</span></span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">columns_subset</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">col1</span><span class="kw">,</span><span class="at"> col2</span><span class="kw">]</span><span class="co">       # OPTIONAL: Check subset of columns</span></span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a><span class="fu">    pre</span><span class="kw">: </span><span class="ch">|</span><span class="co">                             # OPTIONAL: Data preprocessing</span></span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>      lambda df: df.filter(condition)</span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">thresholds</span><span class="kw">:</span><span class="co">                        # OPTIONAL: Step-level thresholds</span></span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">warning</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.1</span></span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">actions</span><span class="kw">:</span><span class="co">                           # OPTIONAL: Step-level actions</span></span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">warning</span><span class="kw">:</span><span class="at"> </span><span class="st">"Custom message"</span></span>
+<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">brief</span><span class="kw">:</span><span class="at"> </span><span class="st">"No duplicate rows"</span><span class="co">         # OPTIONAL: Step description</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><code>rows_complete</code>: are row data complete?</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb24"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> rows_complete</span><span class="co">                        # Simple form</span></span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">rows_complete</span><span class="kw">:</span><span class="co">                       # With parameters</span></span>
-<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">columns_subset</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">col1</span><span class="kw">,</span><span class="at"> col2</span><span class="kw">]</span><span class="co">       # OPTIONAL: Check subset of columns</span></span>
-<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a><span class="fu">    pre</span><span class="kw">: </span><span class="ch">|</span><span class="co">                             # OPTIONAL: Data preprocessing</span></span>
-<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>      lambda df: df.filter(condition)</span>
-<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">thresholds</span><span class="kw">:</span><span class="co">                        # OPTIONAL: Step-level thresholds</span></span>
-<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">warning</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.1</span></span>
-<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">actions</span><span class="kw">:</span><span class="co">                           # OPTIONAL: Step-level actions</span></span>
-<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">warning</span><span class="kw">:</span><span class="at"> </span><span class="st">"Custom message"</span></span>
-<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">brief</span><span class="kw">:</span><span class="at"> </span><span class="st">"Complete rows only"</span><span class="co">        # OPTIONAL: Step description</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb30"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> rows_complete</span><span class="co">                        # Simple form</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">rows_complete</span><span class="kw">:</span><span class="co">                       # With parameters</span></span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">columns_subset</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">col1</span><span class="kw">,</span><span class="at"> col2</span><span class="kw">]</span><span class="co">       # OPTIONAL: Check subset of columns</span></span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a><span class="fu">    pre</span><span class="kw">: </span><span class="ch">|</span><span class="co">                             # OPTIONAL: Data preprocessing</span></span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>      lambda df: df.filter(condition)</span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">thresholds</span><span class="kw">:</span><span class="co">                        # OPTIONAL: Step-level thresholds</span></span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">warning</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.1</span></span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">actions</span><span class="kw">:</span><span class="co">                           # OPTIONAL: Step-level actions</span></span>
+<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">warning</span><span class="kw">:</span><span class="at"> </span><span class="st">"Custom message"</span></span>
+<span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">brief</span><span class="kw">:</span><span class="at"> </span><span class="st">"Complete rows only"</span><span class="co">        # OPTIONAL: Step description</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section>
 <section id="structure-validations" class="level3">
 <h3 class="anchored" data-anchor-id="structure-validations">Structure Validations</h3>
 <p><code>col_exists</code>: does column exist in the table?</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb25"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">col_exists</span><span class="kw">:</span></span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">columns</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">col1</span><span class="kw">,</span><span class="at"> col2</span><span class="kw">,</span><span class="at"> col3</span><span class="kw">]</span><span class="co">        # REQUIRED: Column(s) that must exist</span></span>
-<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">thresholds</span><span class="kw">:</span><span class="co">                        # OPTIONAL: Step-level thresholds</span></span>
-<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">warning</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.1</span></span>
-<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">actions</span><span class="kw">:</span><span class="co">                           # OPTIONAL: Step-level actions</span></span>
-<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">warning</span><span class="kw">:</span><span class="at"> </span><span class="st">"Custom message"</span></span>
-<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">brief</span><span class="kw">:</span><span class="at"> </span><span class="st">"Required columns exist"</span><span class="co">    # OPTIONAL: Step description</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb31"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">col_exists</span><span class="kw">:</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">columns</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">col1</span><span class="kw">,</span><span class="at"> col2</span><span class="kw">,</span><span class="at"> col3</span><span class="kw">]</span><span class="co">        # REQUIRED: Column(s) that must exist</span></span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">thresholds</span><span class="kw">:</span><span class="co">                        # OPTIONAL: Step-level thresholds</span></span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">warning</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.1</span></span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">actions</span><span class="kw">:</span><span class="co">                           # OPTIONAL: Step-level actions</span></span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">warning</span><span class="kw">:</span><span class="at"> </span><span class="st">"Custom message"</span></span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">brief</span><span class="kw">:</span><span class="at"> </span><span class="st">"Required columns exist"</span><span class="co">    # OPTIONAL: Step description</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><code>col_schema_match</code>: does the table have expected column names and data types?</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb26"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">col_schema_match</span><span class="kw">:</span></span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">schema</span><span class="kw">:</span><span class="co">                            # REQUIRED: Expected schema</span></span>
-<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">columns</span><span class="kw">:</span></span>
-<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="kw">-</span><span class="at"> </span><span class="kw">[</span><span class="at">column_name</span><span class="kw">,</span><span class="at"> </span><span class="st">"data_type"</span><span class="kw">]</span><span class="co">   # Column with type validation</span></span>
-<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="kw">-</span><span class="at"> column_name</span><span class="co">                  # Column name only (no type check)</span></span>
-<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="kw">-</span><span class="at"> </span><span class="kw">[</span><span class="at">column_name</span><span class="kw">]</span><span class="co">                # Alternative syntax</span></span>
-<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">complete</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span><span class="co">                     # OPTIONAL: Require exact column set</span></span>
-<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">in_order</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span><span class="co">                     # OPTIONAL: Require exact column order</span></span>
-<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">case_sensitive_colnames</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span><span class="co">      # OPTIONAL: Case-sensitive column names</span></span>
-<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">case_sensitive_dtypes</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span><span class="co">        # OPTIONAL: Case-sensitive data types</span></span>
-<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">full_match_dtypes</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span><span class="co">            # OPTIONAL: Exact type matching</span></span>
-<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">thresholds</span><span class="kw">:</span><span class="co">                        # OPTIONAL: Step-level thresholds</span></span>
-<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">warning</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.1</span></span>
-<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">actions</span><span class="kw">:</span><span class="co">                           # OPTIONAL: Step-level actions</span></span>
-<span id="cb26-15"><a href="#cb26-15" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">warning</span><span class="kw">:</span><span class="at"> </span><span class="st">"Custom message"</span></span>
-<span id="cb26-16"><a href="#cb26-16" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">brief</span><span class="kw">:</span><span class="at"> </span><span class="st">"Schema validation"</span><span class="co">         # OPTIONAL: Step description</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb32"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">col_schema_match</span><span class="kw">:</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">schema</span><span class="kw">:</span><span class="co">                            # REQUIRED: Expected schema</span></span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">columns</span><span class="kw">:</span></span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="kw">-</span><span class="at"> </span><span class="kw">[</span><span class="at">column_name</span><span class="kw">,</span><span class="at"> </span><span class="st">"data_type"</span><span class="kw">]</span><span class="co">   # Column with type validation</span></span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="kw">-</span><span class="at"> column_name</span><span class="co">                  # Column name only (no type check)</span></span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="kw">-</span><span class="at"> </span><span class="kw">[</span><span class="at">column_name</span><span class="kw">]</span><span class="co">                # Alternative syntax</span></span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">complete</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span><span class="co">                     # OPTIONAL: Require exact column set</span></span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">in_order</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span><span class="co">                     # OPTIONAL: Require exact column order</span></span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">case_sensitive_colnames</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span><span class="co">      # OPTIONAL: Case-sensitive column names</span></span>
+<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">case_sensitive_dtypes</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span><span class="co">        # OPTIONAL: Case-sensitive data types</span></span>
+<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">full_match_dtypes</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span><span class="co">            # OPTIONAL: Exact type matching</span></span>
+<span id="cb32-12"><a href="#cb32-12" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">thresholds</span><span class="kw">:</span><span class="co">                        # OPTIONAL: Step-level thresholds</span></span>
+<span id="cb32-13"><a href="#cb32-13" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">warning</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.1</span></span>
+<span id="cb32-14"><a href="#cb32-14" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">actions</span><span class="kw">:</span><span class="co">                           # OPTIONAL: Step-level actions</span></span>
+<span id="cb32-15"><a href="#cb32-15" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">warning</span><span class="kw">:</span><span class="at"> </span><span class="st">"Custom message"</span></span>
+<span id="cb32-16"><a href="#cb32-16" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">brief</span><span class="kw">:</span><span class="at"> </span><span class="st">"Schema validation"</span><span class="co">         # OPTIONAL: Step description</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><code>row_count_match</code>: does the table have n rows?</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb27"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">row_count_match</span><span class="kw">:</span></span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">count</span><span class="kw">:</span><span class="at"> </span><span class="dv">1000</span><span class="co">                        # REQUIRED: Expected row count</span></span>
-<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">thresholds</span><span class="kw">:</span><span class="co">                        # OPTIONAL: Step-level thresholds</span></span>
-<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">warning</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.1</span></span>
-<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">actions</span><span class="kw">:</span><span class="co">                           # OPTIONAL: Step-level actions</span></span>
-<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">warning</span><span class="kw">:</span><span class="at"> </span><span class="st">"Custom message"</span></span>
-<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">brief</span><span class="kw">:</span><span class="at"> </span><span class="st">"Expected row count"</span><span class="co">        # OPTIONAL: Step description</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb33"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">row_count_match</span><span class="kw">:</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">count</span><span class="kw">:</span><span class="at"> </span><span class="dv">1000</span><span class="co">                        # REQUIRED: Expected row count</span></span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">thresholds</span><span class="kw">:</span><span class="co">                        # OPTIONAL: Step-level thresholds</span></span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">warning</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.1</span></span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">actions</span><span class="kw">:</span><span class="co">                           # OPTIONAL: Step-level actions</span></span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">warning</span><span class="kw">:</span><span class="at"> </span><span class="st">"Custom message"</span></span>
+<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">brief</span><span class="kw">:</span><span class="at"> </span><span class="st">"Expected row count"</span><span class="co">        # OPTIONAL: Step description</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><code>col_count_match</code>: does the table have n columns?</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb28"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">col_count_match</span><span class="kw">:</span></span>
-<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">count</span><span class="kw">:</span><span class="at"> </span><span class="dv">10</span><span class="co">                          # REQUIRED: Expected column count</span></span>
-<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">thresholds</span><span class="kw">:</span><span class="co">                        # OPTIONAL: Step-level thresholds</span></span>
-<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">warning</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.1</span></span>
-<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">actions</span><span class="kw">:</span><span class="co">                           # OPTIONAL: Step-level actions</span></span>
-<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">warning</span><span class="kw">:</span><span class="at"> </span><span class="st">"Custom message"</span></span>
-<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">brief</span><span class="kw">:</span><span class="at"> </span><span class="st">"Expected column count"</span><span class="co">     # OPTIONAL: Step description</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb34"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">col_count_match</span><span class="kw">:</span></span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">count</span><span class="kw">:</span><span class="at"> </span><span class="dv">10</span><span class="co">                          # REQUIRED: Expected column count</span></span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">thresholds</span><span class="kw">:</span><span class="co">                        # OPTIONAL: Step-level thresholds</span></span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">warning</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.1</span></span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">actions</span><span class="kw">:</span><span class="co">                           # OPTIONAL: Step-level actions</span></span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">warning</span><span class="kw">:</span><span class="at"> </span><span class="st">"Custom message"</span></span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">brief</span><span class="kw">:</span><span class="at"> </span><span class="st">"Expected column count"</span><span class="co">     # OPTIONAL: Step description</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><code>tbl_match</code>: does the table match a comparison table?</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb35"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">tbl_match</span><span class="kw">:</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">tbl_compare</span><span class="kw">:</span><span class="co">                       # REQUIRED: Comparison table</span></span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a><span class="fu">      python</span><span class="kw">: </span><span class="ch">|</span></span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>        pb.load_dataset("reference_table", tbl_type="polars")</span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a><span class="fu">    pre</span><span class="kw">: </span><span class="ch">|</span><span class="co">                             # OPTIONAL: Data preprocessing</span></span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>      lambda df: df.filter(condition)</span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">thresholds</span><span class="kw">:</span><span class="co">                        # OPTIONAL: Step-level thresholds</span></span>
+<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">warning</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.0</span></span>
+<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">actions</span><span class="kw">:</span><span class="co">                           # OPTIONAL: Step-level actions</span></span>
+<span id="cb35-10"><a href="#cb35-10" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">warning</span><span class="kw">:</span><span class="at"> </span><span class="st">"Custom message"</span></span>
+<span id="cb35-11"><a href="#cb35-11" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">brief</span><span class="kw">:</span><span class="at"> </span><span class="st">"Table structure matches"</span><span class="co">   # OPTIONAL: Step description</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>This validation performs a comprehensive comparison between the target table and a comparison table, using progressively stricter checks:</p>
+<ol type="1">
+<li><strong>Column count match</strong>: both tables have the same number of columns</li>
+<li><strong>Row count match</strong>: both tables have the same number of rows</li>
+<li><strong>Schema match (loose)</strong>: column names and dtypes match (case-insensitive, any order)</li>
+<li><strong>Schema match (order)</strong>: columns in correct order (case-insensitive names)</li>
+<li><strong>Schema match (exact)</strong>: column names match exactly (case-sensitive, correct order)</li>
+<li><strong>Data match</strong>: values in corresponding cells are identical</li>
+</ol>
+<p>The validation fails at the first check that doesn’t pass, making it easy to diagnose mismatches. This operates over a single test unit (pass/fail for complete table match).</p>
+<p><strong>Cross-backend validation</strong>: <code>tbl_match()</code> supports automatic backend coercion when comparing tables from different backends (e.g., Polars vs.&nbsp;Pandas, DuckDB vs.&nbsp;SQLite). The comparison table is automatically converted to match the target table’s backend.</p>
+<p>Examples:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb36"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Compare against reference dataset</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">tbl_match</span><span class="kw">:</span></span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">tbl_compare</span><span class="kw">:</span></span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a><span class="fu">      python</span><span class="kw">: </span><span class="ch">|</span></span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>        pb.load_dataset("expected_output", tbl_type="polars")</span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">brief</span><span class="kw">:</span><span class="at"> </span><span class="st">"Output matches expected results"</span></span>
+<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Compare against CSV file</span></span>
+<span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">tbl_match</span><span class="kw">:</span></span>
+<span id="cb36-10"><a href="#cb36-10" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">tbl_compare</span><span class="kw">:</span></span>
+<span id="cb36-11"><a href="#cb36-11" aria-hidden="true" tabindex="-1"></a><span class="fu">      python</span><span class="kw">: </span><span class="ch">|</span></span>
+<span id="cb36-12"><a href="#cb36-12" aria-hidden="true" tabindex="-1"></a>        pl.read_csv("reference_data.csv")</span>
+<span id="cb36-13"><a href="#cb36-13" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">brief</span><span class="kw">:</span><span class="at"> </span><span class="st">"Matches reference CSV"</span></span>
+<span id="cb36-14"><a href="#cb36-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-15"><a href="#cb36-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Compare with preprocessing on target table only</span></span>
+<span id="cb36-16"><a href="#cb36-16" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">tbl_match</span><span class="kw">:</span></span>
+<span id="cb36-17"><a href="#cb36-17" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">tbl_compare</span><span class="kw">:</span></span>
+<span id="cb36-18"><a href="#cb36-18" aria-hidden="true" tabindex="-1"></a><span class="fu">      python</span><span class="kw">: </span><span class="ch">|</span></span>
+<span id="cb36-19"><a href="#cb36-19" aria-hidden="true" tabindex="-1"></a>        pb.load_dataset("reference_table", tbl_type="polars")</span>
+<span id="cb36-20"><a href="#cb36-20" aria-hidden="true" tabindex="-1"></a><span class="fu">    pre</span><span class="kw">: </span><span class="ch">|</span></span>
+<span id="cb36-21"><a href="#cb36-21" aria-hidden="true" tabindex="-1"></a>      lambda df: df.select(["id", "name", "value"])</span>
+<span id="cb36-22"><a href="#cb36-22" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">brief</span><span class="kw">:</span><span class="at"> </span><span class="st">"Selected columns match reference"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section>
 <section id="special-validation-methods" class="level3">
 <h3 class="anchored" data-anchor-id="special-validation-methods">Special Validation Methods</h3>
 <p><code>conjointly</code>: are multiple validations having a joint dependency?</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb29"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">conjointly</span><span class="kw">:</span></span>
-<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">expressions</span><span class="kw">:</span><span class="co">                       # REQUIRED: List of lambda expressions</span></span>
-<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="st">"lambda df: df['d'] &gt; df['a']"</span></span>
-<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="st">"lambda df: df['a'] &gt; 0"</span></span>
-<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="st">"lambda df: df['a'] + df['d'] &lt; 12000"</span></span>
-<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">thresholds</span><span class="kw">:</span><span class="co">                        # OPTIONAL: Step-level thresholds</span></span>
-<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">warning</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.1</span></span>
-<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">actions</span><span class="kw">:</span><span class="co">                           # OPTIONAL: Step-level actions</span></span>
-<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">warning</span><span class="kw">:</span><span class="at"> </span><span class="st">"Custom message"</span></span>
-<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">brief</span><span class="kw">:</span><span class="at"> </span><span class="st">"All conditions must pass"</span><span class="co">  # OPTIONAL: Step description</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb37"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">conjointly</span><span class="kw">:</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">expressions</span><span class="kw">:</span><span class="co">                       # REQUIRED: List of lambda expressions</span></span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="st">"lambda df: df['d'] &gt; df['a']"</span></span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="st">"lambda df: df['a'] &gt; 0"</span></span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="st">"lambda df: df['a'] + df['d'] &lt; 12000"</span></span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">thresholds</span><span class="kw">:</span><span class="co">                        # OPTIONAL: Step-level thresholds</span></span>
+<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">warning</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.1</span></span>
+<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">actions</span><span class="kw">:</span><span class="co">                           # OPTIONAL: Step-level actions</span></span>
+<span id="cb37-9"><a href="#cb37-9" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">warning</span><span class="kw">:</span><span class="at"> </span><span class="st">"Custom message"</span></span>
+<span id="cb37-10"><a href="#cb37-10" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">brief</span><span class="kw">:</span><span class="at"> </span><span class="st">"All conditions must pass"</span><span class="co">  # OPTIONAL: Step description</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><code>specially</code>: do table data pass a custom validation function?</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb30"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">specially</span><span class="kw">:</span></span>
-<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">expr</span><span class="kw">:</span><span class="co">                              # REQUIRED: Custom validation function</span></span>
-<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="st">"lambda df: df.select(pl.col('a') + pl.col('d') &gt; 0)"</span></span>
-<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">thresholds</span><span class="kw">:</span><span class="co">                        # OPTIONAL: Step-level thresholds</span></span>
-<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">warning</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.1</span></span>
-<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">actions</span><span class="kw">:</span><span class="co">                           # OPTIONAL: Step-level actions</span></span>
-<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">warning</span><span class="kw">:</span><span class="at"> </span><span class="st">"Custom message"</span></span>
-<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">brief</span><span class="kw">:</span><span class="at"> </span><span class="st">"Custom validation"</span><span class="co">         # OPTIONAL: Step description</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb38"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">specially</span><span class="kw">:</span></span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">expr</span><span class="kw">:</span><span class="co">                              # REQUIRED: Custom validation function</span></span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="st">"lambda df: df.select(pl.col('a') + pl.col('d') &gt; 0)"</span></span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">thresholds</span><span class="kw">:</span><span class="co">                        # OPTIONAL: Step-level thresholds</span></span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">warning</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.1</span></span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">actions</span><span class="kw">:</span><span class="co">                           # OPTIONAL: Step-level actions</span></span>
+<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">warning</span><span class="kw">:</span><span class="at"> </span><span class="st">"Custom message"</span></span>
+<span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">brief</span><span class="kw">:</span><span class="at"> </span><span class="st">"Custom validation"</span><span class="co">         # OPTIONAL: Step description</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Alternative syntax with Python expressions:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb31"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">specially</span><span class="kw">:</span></span>
-<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">expr</span><span class="kw">:</span></span>
-<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a><span class="fu">      python</span><span class="kw">: </span><span class="ch">|</span></span>
-<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>        lambda df: df.select(pl.col('amount') &gt; 0)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb39"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">specially</span><span class="kw">:</span></span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">expr</span><span class="kw">:</span></span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a><span class="fu">      python</span><span class="kw">: </span><span class="ch">|</span></span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>        lambda df: df.select(pl.col('amount') &gt; 0)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>For Pandas DataFrames (when using <code>df_library: pandas</code>):</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb32"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">specially</span><span class="kw">:</span></span>
-<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">expr</span><span class="kw">:</span><span class="at"> </span><span class="st">"lambda df: df.assign(is_valid=df['a'] + df['d'] &gt; 0)"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb40"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">specially</span><span class="kw">:</span></span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">expr</span><span class="kw">:</span><span class="at"> </span><span class="st">"lambda df: df.assign(is_valid=df['a'] + df['d'] &gt; 0)"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="ai-powered-validation" class="level3">
+<h3 class="anchored" data-anchor-id="ai-powered-validation">AI-Powered Validation</h3>
+<p><code>prompt</code>: validate rows using AI/LLM-powered analysis</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb41"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">prompt</span><span class="kw">:</span></span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">prompt</span><span class="kw">:</span><span class="at"> </span><span class="st">"Values should be positive and realistic"</span><span class="co">  # REQUIRED: Natural language criteria</span></span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">model</span><span class="kw">:</span><span class="at"> </span><span class="st">"anthropic:claude-sonnet-4"</span><span class="co">                 # REQUIRED: Model identifier</span></span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">columns_subset</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">column1</span><span class="kw">,</span><span class="at"> column2</span><span class="kw">]</span><span class="co">                 # OPTIONAL: Columns to validate</span></span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">batch_size</span><span class="kw">:</span><span class="at"> </span><span class="dv">1000</span><span class="co">                                   # OPTIONAL: Rows per batch (default: 1000)</span></span>
+<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">max_concurrent</span><span class="kw">:</span><span class="at"> </span><span class="dv">3</span><span class="co">                                  # OPTIONAL: Concurrent API requests (default: 3)</span></span>
+<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a><span class="fu">    pre</span><span class="kw">: </span><span class="ch">|</span><span class="co">                                             # OPTIONAL: Data preprocessing</span></span>
+<span id="cb41-8"><a href="#cb41-8" aria-hidden="true" tabindex="-1"></a>      lambda df: df.filter(condition)</span>
+<span id="cb41-9"><a href="#cb41-9" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">thresholds</span><span class="kw">:</span><span class="co">                                        # OPTIONAL: Step-level thresholds</span></span>
+<span id="cb41-10"><a href="#cb41-10" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">warning</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.1</span></span>
+<span id="cb41-11"><a href="#cb41-11" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">actions</span><span class="kw">:</span><span class="co">                                           # OPTIONAL: Step-level actions</span></span>
+<span id="cb41-12"><a href="#cb41-12" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">warning</span><span class="kw">:</span><span class="at"> </span><span class="st">"Custom message"</span></span>
+<span id="cb41-13"><a href="#cb41-13" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">brief</span><span class="kw">:</span><span class="at"> </span><span class="st">"AI validation"</span><span class="co">                             # OPTIONAL: Step description</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>This validation method uses Large Language Models (LLMs) to validate rows of data based on natural language criteria. Each row becomes a test unit that either passes or fails the validation criteria, producing binary True/False results that integrate with standard Pointblank reporting.</p>
+<p><strong>Supported models:</strong></p>
+<ul>
+<li><strong>Anthropic</strong>: <code>"anthropic:claude-sonnet-4"</code>, <code>"anthropic:claude-opus-4"</code></li>
+<li><strong>OpenAI</strong>: <code>"openai:gpt-4"</code>, <code>"openai:gpt-4-turbo"</code>, <code>"openai:gpt-3.5-turbo"</code></li>
+<li><strong>Ollama</strong>: <code>"ollama:&lt;model-name&gt;"</code> (e.g., <code>"ollama:llama3"</code>)</li>
+<li><strong>Bedrock</strong>: <code>"bedrock:&lt;model-name&gt;"</code></li>
+</ul>
+<p><strong>Authentication</strong>: API keys are automatically loaded from environment variables or <code>.env</code> files:</p>
+<ul>
+<li><strong>OpenAI</strong>: Set <code>OPENAI_API_KEY</code> environment variable or add to <code>.env</code> file</li>
+<li><strong>Anthropic</strong>: Set <code>ANTHROPIC_API_KEY</code> environment variable or add to <code>.env</code> file</li>
+<li><strong>Ollama</strong>: No API key required (runs locally)</li>
+<li><strong>Bedrock</strong>: Configure AWS credentials through standard AWS methods</li>
+</ul>
+<p>Example <code>.env</code> file:</p>
+<pre class="plaintext"><code>ANTHROPIC_API_KEY="your_anthropic_api_key_here"
+OPENAI_API_KEY="your_openai_api_key_here"</code></pre>
+<p><strong>Performance optimization</strong>: The validation process uses row signature memoization to avoid redundant LLM calls. When multiple rows have identical values in the selected columns, only one representative row is validated, and the result is applied to all matching rows. This dramatically reduces API costs and processing time for datasets with repetitive patterns.</p>
+<p>Examples:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb43"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Basic AI validation</span></span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">prompt</span><span class="kw">:</span></span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">prompt</span><span class="kw">:</span><span class="at"> </span><span class="st">"Email addresses should look realistic and professional"</span></span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">model</span><span class="kw">:</span><span class="at"> </span><span class="st">"anthropic:claude-sonnet-4"</span></span>
+<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">columns_subset</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">email</span><span class="kw">]</span></span>
+<span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-7"><a href="#cb43-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Complex semantic validation</span></span>
+<span id="cb43-8"><a href="#cb43-8" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">prompt</span><span class="kw">:</span></span>
+<span id="cb43-9"><a href="#cb43-9" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">prompt</span><span class="kw">:</span><span class="at"> </span><span class="st">"Product descriptions should mention the product category and include at least one benefit"</span></span>
+<span id="cb43-10"><a href="#cb43-10" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">model</span><span class="kw">:</span><span class="at"> </span><span class="st">"openai:gpt-4"</span></span>
+<span id="cb43-11"><a href="#cb43-11" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">columns_subset</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">product_name</span><span class="kw">,</span><span class="at"> description</span><span class="kw">,</span><span class="at"> category</span><span class="kw">]</span></span>
+<span id="cb43-12"><a href="#cb43-12" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">batch_size</span><span class="kw">:</span><span class="at"> </span><span class="dv">500</span></span>
+<span id="cb43-13"><a href="#cb43-13" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">max_concurrent</span><span class="kw">:</span><span class="at"> </span><span class="dv">5</span></span>
+<span id="cb43-14"><a href="#cb43-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-15"><a href="#cb43-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Sentiment analysis</span></span>
+<span id="cb43-16"><a href="#cb43-16" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">prompt</span><span class="kw">:</span></span>
+<span id="cb43-17"><a href="#cb43-17" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">prompt</span><span class="kw">:</span><span class="at"> </span><span class="st">"Customer feedback should express positive sentiment"</span></span>
+<span id="cb43-18"><a href="#cb43-18" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">model</span><span class="kw">:</span><span class="at"> </span><span class="st">"anthropic:claude-sonnet-4"</span></span>
+<span id="cb43-19"><a href="#cb43-19" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">columns_subset</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">feedback_text</span><span class="kw">,</span><span class="at"> rating</span><span class="kw">]</span></span>
+<span id="cb43-20"><a href="#cb43-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-21"><a href="#cb43-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Context-dependent validation</span></span>
+<span id="cb43-22"><a href="#cb43-22" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">prompt</span><span class="kw">:</span></span>
+<span id="cb43-23"><a href="#cb43-23" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">prompt</span><span class="kw">:</span><span class="at"> </span><span class="st">"For high-value transactions (amount &gt; 1000), a detailed justification should be provided"</span></span>
+<span id="cb43-24"><a href="#cb43-24" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">model</span><span class="kw">:</span><span class="at"> </span><span class="st">"openai:gpt-4"</span></span>
+<span id="cb43-25"><a href="#cb43-25" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">columns_subset</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">amount</span><span class="kw">,</span><span class="at"> justification</span><span class="kw">,</span><span class="at"> approver</span><span class="kw">]</span></span>
+<span id="cb43-26"><a href="#cb43-26" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">thresholds</span><span class="kw">:</span></span>
+<span id="cb43-27"><a href="#cb43-27" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">warning</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.05</span></span>
+<span id="cb43-28"><a href="#cb43-28" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">error</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.15</span></span>
+<span id="cb43-29"><a href="#cb43-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-30"><a href="#cb43-30" aria-hidden="true" tabindex="-1"></a><span class="co"># Local model with Ollama</span></span>
+<span id="cb43-31"><a href="#cb43-31" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">prompt</span><span class="kw">:</span></span>
+<span id="cb43-32"><a href="#cb43-32" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">prompt</span><span class="kw">:</span><span class="at"> </span><span class="st">"Transaction descriptions should be clear and professional"</span></span>
+<span id="cb43-33"><a href="#cb43-33" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">model</span><span class="kw">:</span><span class="at"> </span><span class="st">"ollama:llama3"</span></span>
+<span id="cb43-34"><a href="#cb43-34" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">columns_subset</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">description</span><span class="kw">]</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><strong>Best practices for AI validation:</strong></p>
+<ul>
+<li>Be specific and clear in your prompt criteria</li>
+<li>Include only necessary columns in <code>columns_subset</code> to reduce API costs</li>
+<li>Start with smaller <code>batch_size</code> for testing, increase for production</li>
+<li>Adjust <code>max_concurrent</code> based on API rate limits</li>
+<li>Use thresholds appropriate for probabilistic validation results</li>
+<li>Consider cost implications for large datasets</li>
+<li>Test prompts on sample data before full deployment</li>
+</ul>
+<p><strong>When to use AI validation:</strong></p>
+<ul>
+<li>Semantic checks (e.g., “does the description match the category?”)</li>
+<li>Context-dependent validation (e.g., “is the justification appropriate for the amount?”)</li>
+<li>Subjective quality assessment (e.g., “is the text professional?”)</li>
+<li>Pattern recognition that’s hard to express programmatically</li>
+<li>Natural language understanding tasks</li>
+</ul>
+<p><strong>When NOT to use AI validation:</strong></p>
+<ul>
+<li>Simple numeric comparisons (use <code>col_vals_gt</code>, <code>col_vals_lt</code>, etc.)</li>
+<li>Exact pattern matching (use <code>col_vals_regex</code>)</li>
+<li>Schema validation (use <code>col_schema_match</code>)</li>
+<li>Performance-critical validations with large datasets</li>
+<li>When deterministic results are required</li>
+</ul>
 </section>
 </section>
 <section id="column-selection-patterns" class="level2">
 <h2 class="anchored" data-anchor-id="column-selection-patterns">Column Selection Patterns</h2>
 <p>All validation methods that accept a <code>columns</code> parameter support these selection patterns:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb33"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Single column</span></span>
-<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="fu">columns</span><span class="kw">:</span><span class="at"> column_name</span></span>
-<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Multiple columns as list</span></span>
-<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a><span class="fu">columns</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">col1</span><span class="kw">,</span><span class="at"> col2</span><span class="kw">,</span><span class="at"> col3</span><span class="kw">]</span></span>
-<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Column selector functions (when used in Python expressions)</span></span>
-<span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a><span class="fu">columns</span><span class="kw">:</span></span>
-<span id="cb33-9"><a href="#cb33-9" aria-hidden="true" tabindex="-1"></a><span class="fu">  python</span><span class="kw">: </span><span class="ch">|</span></span>
-<span id="cb33-10"><a href="#cb33-10" aria-hidden="true" tabindex="-1"></a>    starts_with("prefix_")</span>
-<span id="cb33-11"><a href="#cb33-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-12"><a href="#cb33-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Examples of common patterns</span></span>
-<span id="cb33-13"><a href="#cb33-13" aria-hidden="true" tabindex="-1"></a><span class="fu">columns</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">customer_id</span><span class="kw">,</span><span class="at"> order_id</span><span class="kw">]</span><span class="co">     # Specific columns</span></span>
-<span id="cb33-14"><a href="#cb33-14" aria-hidden="true" tabindex="-1"></a><span class="fu">columns</span><span class="kw">:</span><span class="at"> user_email</span><span class="co">                  # Single column</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb44"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Single column</span></span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a><span class="fu">columns</span><span class="kw">:</span><span class="at"> column_name</span></span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Multiple columns as list</span></span>
+<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a><span class="fu">columns</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">col1</span><span class="kw">,</span><span class="at"> col2</span><span class="kw">,</span><span class="at"> col3</span><span class="kw">]</span></span>
+<span id="cb44-6"><a href="#cb44-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-7"><a href="#cb44-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Column selector functions (when used in Python expressions)</span></span>
+<span id="cb44-8"><a href="#cb44-8" aria-hidden="true" tabindex="-1"></a><span class="fu">columns</span><span class="kw">:</span></span>
+<span id="cb44-9"><a href="#cb44-9" aria-hidden="true" tabindex="-1"></a><span class="fu">  python</span><span class="kw">: </span><span class="ch">|</span></span>
+<span id="cb44-10"><a href="#cb44-10" aria-hidden="true" tabindex="-1"></a>    starts_with("prefix_")</span>
+<span id="cb44-11"><a href="#cb44-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-12"><a href="#cb44-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Examples of common patterns</span></span>
+<span id="cb44-13"><a href="#cb44-13" aria-hidden="true" tabindex="-1"></a><span class="fu">columns</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">customer_id</span><span class="kw">,</span><span class="at"> order_id</span><span class="kw">]</span><span class="co">     # Specific columns</span></span>
+<span id="cb44-14"><a href="#cb44-14" aria-hidden="true" tabindex="-1"></a><span class="fu">columns</span><span class="kw">:</span><span class="at"> user_email</span><span class="co">                  # Single column</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section>
 <section id="parameter-details" class="level2">
 <h2 class="anchored" data-anchor-id="parameter-details">Parameter Details</h2>
@@ -939,41 +1201,41 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="brief-parameter-options" class="level3">
 <h3 class="anchored" data-anchor-id="brief-parameter-options">Brief Parameter Options</h3>
 <p>The <code>brief</code> parameter supports several formats:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb34"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="fu">brief</span><span class="kw">:</span><span class="at"> </span><span class="st">"Custom description"</span><span class="co">          # Custom text</span></span>
-<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a><span class="fu">brief</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span><span class="co">                         # Auto-generated description</span></span>
-<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a><span class="fu">brief</span><span class="kw">:</span><span class="at"> </span><span class="ch">false</span><span class="co">                        # No description</span></span>
-<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a><span class="fu">brief</span><span class="kw">:</span><span class="at"> </span><span class="st">"Step {step}: {auto}"</span><span class="co">        # Template with auto-generated text</span></span>
-<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a><span class="fu">brief</span><span class="kw">:</span><span class="at"> </span><span class="st">"Column '{col}' validation"</span><span class="co">  # Template with variables</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb45"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="fu">brief</span><span class="kw">:</span><span class="at"> </span><span class="st">"Custom description"</span><span class="co">          # Custom text</span></span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a><span class="fu">brief</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span><span class="co">                         # Auto-generated description</span></span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a><span class="fu">brief</span><span class="kw">:</span><span class="at"> </span><span class="ch">false</span><span class="co">                        # No description</span></span>
+<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a><span class="fu">brief</span><span class="kw">:</span><span class="at"> </span><span class="st">"Step {step}: {auto}"</span><span class="co">        # Template with auto-generated text</span></span>
+<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a><span class="fu">brief</span><span class="kw">:</span><span class="at"> </span><span class="st">"Column '{col}' validation"</span><span class="co">  # Template with variables</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>template variables: <code>{step}</code>, <code>{col}</code>, <code>{value}</code>, <code>{set}</code>, <code>{pattern}</code>, <code>{auto}</code></p>
 </section>
 <section id="python-expressions" class="level3">
 <h3 class="anchored" data-anchor-id="python-expressions">Python Expressions</h3>
 <p>Several parameters support Python expressions using the <code>python:</code> block syntax:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb35"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Data source loading</span></span>
-<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tbl</span><span class="kw">:</span></span>
-<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a><span class="fu">  python</span><span class="kw">: </span><span class="ch">|</span></span>
-<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>    pl.scan_csv("data.csv").filter(pl.col("active") == True)</span>
-<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Preprocessing</span></span>
-<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a><span class="fu">pre</span><span class="kw">:</span></span>
-<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a><span class="fu">  python</span><span class="kw">: </span><span class="ch">|</span></span>
-<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a>    lambda df: df.filter(pl.col("date") &gt;= "2024-01-01")</span>
-<span id="cb35-10"><a href="#cb35-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb35-11"><a href="#cb35-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Custom expressions</span></span>
-<span id="cb35-12"><a href="#cb35-12" aria-hidden="true" tabindex="-1"></a><span class="fu">expr</span><span class="kw">:</span></span>
-<span id="cb35-13"><a href="#cb35-13" aria-hidden="true" tabindex="-1"></a><span class="fu">  python</span><span class="kw">: </span><span class="ch">|</span></span>
-<span id="cb35-14"><a href="#cb35-14" aria-hidden="true" tabindex="-1"></a>    pl.col("value").is_between(0, 100)</span>
-<span id="cb35-15"><a href="#cb35-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb35-16"><a href="#cb35-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Callable actions</span></span>
-<span id="cb35-17"><a href="#cb35-17" aria-hidden="true" tabindex="-1"></a><span class="fu">actions</span><span class="kw">:</span></span>
-<span id="cb35-18"><a href="#cb35-18" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">error</span><span class="kw">:</span></span>
-<span id="cb35-19"><a href="#cb35-19" aria-hidden="true" tabindex="-1"></a><span class="fu">    python</span><span class="kw">: </span><span class="ch">|</span></span>
-<span id="cb35-20"><a href="#cb35-20" aria-hidden="true" tabindex="-1"></a>      lambda: print("VALIDATION ERROR: Critical data quality issue detected!")</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb46"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Data source loading</span></span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tbl</span><span class="kw">:</span></span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a><span class="fu">  python</span><span class="kw">: </span><span class="ch">|</span></span>
+<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a>    pl.scan_csv("data.csv").filter(pl.col("active") == True)</span>
+<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-6"><a href="#cb46-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Preprocessing</span></span>
+<span id="cb46-7"><a href="#cb46-7" aria-hidden="true" tabindex="-1"></a><span class="fu">pre</span><span class="kw">:</span></span>
+<span id="cb46-8"><a href="#cb46-8" aria-hidden="true" tabindex="-1"></a><span class="fu">  python</span><span class="kw">: </span><span class="ch">|</span></span>
+<span id="cb46-9"><a href="#cb46-9" aria-hidden="true" tabindex="-1"></a>    lambda df: df.filter(pl.col("date") &gt;= "2024-01-01")</span>
+<span id="cb46-10"><a href="#cb46-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-11"><a href="#cb46-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Custom expressions</span></span>
+<span id="cb46-12"><a href="#cb46-12" aria-hidden="true" tabindex="-1"></a><span class="fu">expr</span><span class="kw">:</span></span>
+<span id="cb46-13"><a href="#cb46-13" aria-hidden="true" tabindex="-1"></a><span class="fu">  python</span><span class="kw">: </span><span class="ch">|</span></span>
+<span id="cb46-14"><a href="#cb46-14" aria-hidden="true" tabindex="-1"></a>    pl.col("value").is_between(0, 100)</span>
+<span id="cb46-15"><a href="#cb46-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-16"><a href="#cb46-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Callable actions</span></span>
+<span id="cb46-17"><a href="#cb46-17" aria-hidden="true" tabindex="-1"></a><span class="fu">actions</span><span class="kw">:</span></span>
+<span id="cb46-18"><a href="#cb46-18" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">error</span><span class="kw">:</span></span>
+<span id="cb46-19"><a href="#cb46-19" aria-hidden="true" tabindex="-1"></a><span class="fu">    python</span><span class="kw">: </span><span class="ch">|</span></span>
+<span id="cb46-20"><a href="#cb46-20" aria-hidden="true" tabindex="-1"></a>      lambda: print("VALIDATION ERROR: Critical data quality issue detected!")</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Note: The Python environment in YAML is restricted for security. Only built-in functions (<code>print</code>, <code>len</code>, <code>str</code>, etc.), <code>Path</code> from pathlib, and available DataFrame libraries (<code>pl</code>, <code>pd</code>) are accessible. You cannot import additional modules like <code>requests</code>, <code>logging</code>, or custom libraries.</p>
 <p>You can also use the shortcut syntax for lambda expressions:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb36"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Shortcut syntax (equivalent to python: block)</span></span>
-<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a><span class="fu">pre</span><span class="kw">: </span><span class="ch">|</span></span>
-<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>  lambda df: df.filter(pl.col("status") == "active")</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb47"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Shortcut syntax (equivalent to python: block)</span></span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a><span class="fu">pre</span><span class="kw">: </span><span class="ch">|</span></span>
+<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a>  lambda df: df.filter(pl.col("status") == "active")</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section>
 <section id="restricted-python-environment" class="level3">
 <h3 class="anchored" data-anchor-id="restricted-python-environment">Restricted Python Environment</h3>
@@ -999,27 +1261,27 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <li>file operations are limited to <code>Path</code> functionality</li>
 </ul>
 <p><strong>Examples of valid callable actions:</strong></p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb37"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Simple output with built-in functions</span></span>
-<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a><span class="fu">actions</span><span class="kw">:</span></span>
-<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">warning</span><span class="kw">:</span></span>
-<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a><span class="fu">    python</span><span class="kw">: </span><span class="ch">|</span></span>
-<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>      lambda: print(f"WARNING: {sum([1, 2, 3])} validation issues detected")</span>
-<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Using available variables and string formatting</span></span>
-<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a><span class="fu">actions</span><span class="kw">:</span></span>
-<span id="cb37-9"><a href="#cb37-9" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">error</span><span class="kw">:</span></span>
-<span id="cb37-10"><a href="#cb37-10" aria-hidden="true" tabindex="-1"></a><span class="fu">    python</span><span class="kw">: </span><span class="ch">|</span></span>
-<span id="cb37-11"><a href="#cb37-11" aria-hidden="true" tabindex="-1"></a>      lambda: print("ERROR: Data validation failed at " + str(len("validation")))</span>
-<span id="cb37-12"><a href="#cb37-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb37-13"><a href="#cb37-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Multiple statements in lambda (using parentheses)</span></span>
-<span id="cb37-14"><a href="#cb37-14" aria-hidden="true" tabindex="-1"></a><span class="fu">actions</span><span class="kw">:</span></span>
-<span id="cb37-15"><a href="#cb37-15" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">critical</span><span class="kw">:</span></span>
-<span id="cb37-16"><a href="#cb37-16" aria-hidden="true" tabindex="-1"></a><span class="fu">    python</span><span class="kw">: </span><span class="ch">|</span></span>
-<span id="cb37-17"><a href="#cb37-17" aria-hidden="true" tabindex="-1"></a>      lambda: (</span>
-<span id="cb37-18"><a href="#cb37-18" aria-hidden="true" tabindex="-1"></a>          print("CRITICAL ALERT:"),</span>
-<span id="cb37-19"><a href="#cb37-19" aria-hidden="true" tabindex="-1"></a>          print("Immediate attention required"),</span>
-<span id="cb37-20"><a href="#cb37-20" aria-hidden="true" tabindex="-1"></a>          print("Contact data team")</span>
-<span id="cb37-21"><a href="#cb37-21" aria-hidden="true" tabindex="-1"></a>      )[-1]  # Return the last value</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb48"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Simple output with built-in functions</span></span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a><span class="fu">actions</span><span class="kw">:</span></span>
+<span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">warning</span><span class="kw">:</span></span>
+<span id="cb48-4"><a href="#cb48-4" aria-hidden="true" tabindex="-1"></a><span class="fu">    python</span><span class="kw">: </span><span class="ch">|</span></span>
+<span id="cb48-5"><a href="#cb48-5" aria-hidden="true" tabindex="-1"></a>      lambda: print(f"WARNING: {sum([1, 2, 3])} validation issues detected")</span>
+<span id="cb48-6"><a href="#cb48-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-7"><a href="#cb48-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Using available variables and string formatting</span></span>
+<span id="cb48-8"><a href="#cb48-8" aria-hidden="true" tabindex="-1"></a><span class="fu">actions</span><span class="kw">:</span></span>
+<span id="cb48-9"><a href="#cb48-9" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">error</span><span class="kw">:</span></span>
+<span id="cb48-10"><a href="#cb48-10" aria-hidden="true" tabindex="-1"></a><span class="fu">    python</span><span class="kw">: </span><span class="ch">|</span></span>
+<span id="cb48-11"><a href="#cb48-11" aria-hidden="true" tabindex="-1"></a>      lambda: print("ERROR: Data validation failed at " + str(len("validation")))</span>
+<span id="cb48-12"><a href="#cb48-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-13"><a href="#cb48-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Multiple statements in lambda (using parentheses)</span></span>
+<span id="cb48-14"><a href="#cb48-14" aria-hidden="true" tabindex="-1"></a><span class="fu">actions</span><span class="kw">:</span></span>
+<span id="cb48-15"><a href="#cb48-15" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">critical</span><span class="kw">:</span></span>
+<span id="cb48-16"><a href="#cb48-16" aria-hidden="true" tabindex="-1"></a><span class="fu">    python</span><span class="kw">: </span><span class="ch">|</span></span>
+<span id="cb48-17"><a href="#cb48-17" aria-hidden="true" tabindex="-1"></a>      lambda: (</span>
+<span id="cb48-18"><a href="#cb48-18" aria-hidden="true" tabindex="-1"></a>          print("CRITICAL ALERT:"),</span>
+<span id="cb48-19"><a href="#cb48-19" aria-hidden="true" tabindex="-1"></a>          print("Immediate attention required"),</span>
+<span id="cb48-20"><a href="#cb48-20" aria-hidden="true" tabindex="-1"></a>          print("Contact data team")</span>
+<span id="cb48-21"><a href="#cb48-21" aria-hidden="true" tabindex="-1"></a>      )[-1]  # Return the last value</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>For complex alerting, logging, or external system integration, use string template actions instead of callable actions, and handle the external communication in your application code after validation completes.</p>
 </section>
 </section>
