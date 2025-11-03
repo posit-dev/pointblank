@@ -273,12 +273,20 @@ a.sidebar-item-text.sidebar-link.text-start > span {
         font-weight: 600;
         color: white;
         vertical-align: middle;
+        display: inline;
     }
 
     button.quarto-btn-toggle[data-bs-target=".quarto-sidebar-collapse-item"] {
-        color: white;
+        color: white !important;
         border-color: rgba(255, 255, 255, 0.3);
         padding: 6px 12px;
+        opacity: 1 !important;
+        visibility: visible !important;
+    }
+
+    button.quarto-btn-toggle[data-bs-target=".quarto-sidebar-collapse-item"] i {
+        color: white !important;
+        opacity: 1 !important;
     }
 
     button.quarto-btn-toggle[data-bs-target=".quarto-sidebar-collapse-item"]:hover {
