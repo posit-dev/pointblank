@@ -2,7 +2,7 @@
 
 <a href="https://posit-dev.github.io/pointblank/"><img src="https://posit-dev.github.io/pointblank/assets/pointblank_logo.svg" width="75%"/></a>
 
-_Datavalidatie gemaakt mooi en krachtig_
+_Datavalidatie toolkit voor het beoordelen en monitoren van datakwaliteit_
 
 [![Python Versions](https://img.shields.io/pypi/pyversions/pointblank.svg)](https://pypi.python.org/pypi/pointblank)
 [![PyPI](https://img.shields.io/pypi/v/pointblank)](https://pypi.org/project/pointblank/#history)

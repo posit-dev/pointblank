@@ -2,7 +2,7 @@
 
 <a href="https://posit-dev.github.io/pointblank/"><img src="https://posit-dev.github.io/pointblank/assets/pointblank_logo.svg" width="75%"/></a>
 
-_Validação de dados bonita e poderosa_
+_Kit de ferramentas de validação de dados para avaliar e monitorar a qualidade dos dados_
 
 [![Python Versions](https://img.shields.io/pypi/pyversions/pointblank.svg)](https://pypi.python.org/pypi/pointblank)
 [![PyPI](https://img.shields.io/pypi/v/pointblank)](https://pypi.org/project/pointblank/#history)

@@ -2,7 +2,7 @@
 
 <a href="https://posit-dev.github.io/pointblank/"><img src="https://posit-dev.github.io/pointblank/assets/pointblank_logo.svg" width="75%"/></a>
 
-_아름답고 강력한 데이터 검증_
+_데이터 품질 평가 및 모니터링을 위한 데이터 검증 툴킷_
 
 [![Python Versions](https://img.shields.io/pypi/pyversions/pointblank.svg)](https://pypi.python.org/pypi/pointblank)
 [![PyPI](https://img.shields.io/pypi/v/pointblank)](https://pypi.org/project/pointblank/#history)

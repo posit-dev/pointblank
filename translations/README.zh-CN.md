@@ -2,7 +2,7 @@
 
 <a href="https://posit-dev.github.io/pointblank/"><img src="https://posit-dev.github.io/pointblank/assets/pointblank_logo.svg" width="75%"/></a>
 
-\_数据验证，既美观又强**运行基本验证**
+_用于评估和监控数据质量的数据验证工具包_
 
 ````bash
 # 检查重复行
