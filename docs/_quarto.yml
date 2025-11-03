@@ -3,6 +3,7 @@ project:
   post-render: scripts/post-render.py
   resources:
     - "assets/**"
+    - "user-guide.pdf"
 
 format:
   html:
@@ -55,6 +56,9 @@ website:
         text: API Reference
       - href: blog/index.qmd
         text: Pointblog
+      - text: "User Guide (PDF)"
+        icon: file-pdf
+        href: user-guide.pdf
     right:
       - icon: discord
         href: https://discord.com/invite/YH7CybCNCQ

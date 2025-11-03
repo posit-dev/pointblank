@@ -1,0 +1,97 @@
+---
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    embed-resources: true
+    theme: flatly
+    css:
+      - styles.css
+      - print-styles.css
+    page-layout: full
+    self-contained: true
+jupyter: python3
+---
+
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_footer=False)
+```
+
+::: {.title-page}
+
+![](assets/pointblank_logo.png){width=400px style="display: block; margin: 0 auto; margin-top: 2in; margin-bottom: 0.75in;"}
+
+<p style="text-align: center; font-size: 18pt; line-height: 1.6; max-width: 700px; margin: 0 auto;">
+Data validation toolkit for assessing and monitoring data quality.
+</p>
+
+<p style="text-align: center; font-size: 10pt; color: #666; position: absolute; bottom: 1in; left: 0; right: 0;">
+&copy; 2024&ndash;2025 Posit Software, PBC
+</p>
+
+:::
+
+# Validation Plan
+
+{{< include user-guide/validation-overview.qmd >}}
+
+{{< include user-guide/validation-methods.qmd >}}
+
+{{< include user-guide/column-selection-patterns.qmd >}}
+
+{{< include user-guide/preprocessing.qmd >}}
+
+{{< include user-guide/segmentation.qmd >}}
+
+{{< include user-guide/thresholds.qmd >}}
+
+{{< include user-guide/actions.qmd >}}
+
+{{< include user-guide/briefs.qmd >}}
+
+# Advanced Validation
+
+{{< include user-guide/expressions.qmd >}}
+
+{{< include user-guide/schema-validation.qmd >}}
+
+{{< include user-guide/assertions.qmd >}}
+
+{{< include user-guide/draft-validation.qmd >}}
+
+# YAML
+
+{{< include user-guide/yaml-validation-workflows.qmd >}}
+
+{{< include user-guide/yaml-reference.qmd >}}
+
+# Post Interrogation
+
+{{< include user-guide/validation-reports.qmd >}}
+
+{{< include user-guide/step-reports.qmd >}}
+
+{{< include user-guide/extracts.qmd >}}
+
+{{< include user-guide/sundering.qmd >}}
+
+# Data Inspection
+
+{{< include user-guide/preview.qmd >}}
+
+{{< include user-guide/col-summary-tbl.qmd >}}
+
+{{< include user-guide/missing-vals-tbl.qmd >}}
+
+# The Pointblank CLI
+
+{{< include user-guide/cli-data-inspection.qmd >}}
+
+{{< include user-guide/cli-data-validation.qmd >}}
+
+{{< include user-guide/cli-reference.qmd >}}
+
