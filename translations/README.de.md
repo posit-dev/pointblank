@@ -309,7 +309,7 @@ pb run validation.py --exit-code
 - **Praktische Ausgaben**: Erhalten Sie genau das, was Sie brauchen: Zählungen, Auszüge, Zusammenfassungen oder vollständige Berichte
 - **Flexible Einsatzmöglichkeiten**: Verwenden Sie es in Notebooks, Skripten oder Datenpipelines
 - **Anpassbar**: Passen Sie Validierungsschritte und Berichterstattung an Ihre spezifischen Anforderungen an
-- **Internationalisierung**: Berichte können in über 20 Sprachen generiert werden, darunter Englisch, Spanisch, Französisch und Deutsch
+- **Internationalisierung**: Berichte können in 40 Sprachen generiert werden, darunter Englisch, Spanisch, Französisch und Deutsch
 
 ## Dokumentation und Beispiele
 
