@@ -362,4 +362,25 @@ else:
     print(f"Index file not found: {index_file}")
 
 
+# Update quarto-secondary-nav-title to display "User Guide" text
+# This improves the mobile navigation by making it clear what the sidebar toggle reveals
+all_html_files = glob.glob("_site/**/*.html", recursive=True)
+print(f"Found {len(all_html_files)} HTML files to check for secondary nav title")
+
+for html_file in all_html_files:
+    with open(html_file, "r") as file:
+        content = file.read()
+
+    # Replace empty h1.quarto-secondary-nav-title with h5 containing "User Guide"
+    original_pattern = r'<h1 class="quarto-secondary-nav-title"></h1>'
+    replacement = '<h5 class="quarto-secondary-nav-title">User Guide</h5>'
+
+    if original_pattern in content:
+        print(f"Updating secondary nav title in: {html_file}")
+        content = content.replace(original_pattern, replacement)
+
+        with open(html_file, "w") as file:
+            file.write(content)
+
+
 print("Finished processing all files")
