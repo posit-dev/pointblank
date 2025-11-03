@@ -1,0 +1,217 @@
+/* Print-specific styles for PDF generation */
+
+@media print {
+  /* Page settings - page numbers added via post-processing */
+  @page {
+    size: letter landscape;
+    margin: 0.5in;
+  }
+
+  /* Hide navigation and other UI elements for PDF (but keep TOC) */
+  nav.navbar:not(#TOC),
+  .nav-footer,
+  #quarto-header,
+  .quarto-title-banner,
+  .quarto-title,
+  header.quarto-title-block,
+  .sidebar,
+  #quarto-sidebar,
+  .page-navigation {
+    display: none !important;
+  }
+
+  /* Show and style the TOC for PDF */
+  #TOC,
+  nav#TOC {
+    display: block !important;
+    page-break-after: always;
+    page-break-before: auto;
+    margin: 1in auto;
+    max-width: 8in;
+    padding: 1em;
+  }
+
+  #TOC::before,
+  nav#TOC::before {
+    content: "Table of Contents";
+    display: block;
+    font-size: 24pt;
+    font-weight: bold;
+    margin-bottom: 0.75em;
+  }
+
+  #TOC ul,
+  nav#TOC ul {
+    list-style: none;
+    padding-left: 0;
+  }
+
+  #TOC li,
+  nav#TOC li {
+    margin: 0.5em 0;
+    line-height: 1.4;
+  }
+
+  #TOC ul ul,
+  nav#TOC ul ul {
+    padding-left: 1.5em;
+    font-size: 0.9em;
+  }
+
+  #TOC a,
+  nav#TOC a {
+    text-decoration: none;
+    color: #333;
+  }
+
+  #TOC a::after,
+  nav#TOC a::after {
+    content: leader('.') target-counter(attr(href), page);
+  }
+
+  /* Manual Table of Contents */
+  .manual-toc {
+    page-break-after: always;
+    page-break-inside: avoid;
+    padding: 2em;
+    max-width: 8in;
+    margin: 0 auto;
+  }
+
+  .manual-toc h1 {
+    font-size: 24pt;
+    margin-bottom: 1.5em;
+    text-align: center;
+  }
+
+  .manual-toc ol {
+    list-style: none;
+    padding: 0;
+    font-size: 14pt;
+    line-height: 2.5;
+  }
+
+  .manual-toc li {
+    margin: 0.75em 0;
+    position: relative;
+  }
+
+  .manual-toc a {
+    text-decoration: none;
+    color: #333;
+  }
+
+  /* Style the title page */
+  .title-page {
+    page-break-after: always;
+    page-break-inside: avoid;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+    min-height: 8in;
+  }
+
+  /* Page break utility */
+  .page-break {
+    page-break-after: always;
+    height: 0;
+    margin: 0;
+    padding: 0;
+  }
+
+  .title-page * {
+    page-break-before: avoid !important;
+    page-break-after: avoid !important;
+  }
+
+  /* Page break helper */
+  .page-break {
+    page-break-after: always;
+    height: 0;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Avoid page breaks inside important elements */
+  .validation-report,
+  pre,
+  code,
+  img {
+    page-break-inside: avoid;
+  }
+
+  /* Ensure links are visible */
+  a[href]:after {
+    content: none !important;
+  }
+
+  /* Optimize table rendering - reduce font size for wide tables */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 9pt;
+    page-break-inside: avoid;
+    page-break-before: auto;
+    page-break-after: auto;
+  }
+
+  table th, table td {
+    padding: 4px 6px;
+    font-size: 8pt;
+    page-break-inside: avoid;
+  }
+
+  /* Make validation tables more compact */
+  .validation-report table {
+    font-size: 7pt;
+  }
+
+  .validation-report table th,
+  .validation-report table td {
+    padding: 2px 4px;
+  }
+
+  /* Ensure table containers don't break */
+  .cell-output,
+  .cell-output-display,
+  div:has(> table) {
+    page-break-inside: avoid;
+  }
+
+  /* Ensure code blocks fit */
+  pre code {
+    font-size: 8pt;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+  }
+
+  /* Better header spacing and page breaks */
+  h1 {
+    page-break-before: always;
+    page-break-after: avoid;
+    page-break-inside: avoid;
+    margin-top: 0;
+  }
+
+  /* Don't break page before the first h1 */
+  body > h1:first-of-type,
+  main > h1:first-of-type,
+  #quarto-content > h1:first-of-type {
+    page-break-before: avoid;
+  }
+
+  h2, h3, h4, h5, h6 {
+    page-break-after: avoid;
+    page-break-inside: avoid;
+  }
+
+  /* Ensure images fit on page */
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+}
+
+@media screen {
+  /* Screen-only: add print preview button styles if needed */
+}
