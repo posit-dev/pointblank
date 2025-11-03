@@ -309,7 +309,7 @@ pb run validation.py --exit-code
 - **Praktische uitvoer**: Krijg precies wat je nodig hebt: aantallen, extracten, samenvattingen of volledige rapporten
 - **Flexibele implementatie**: Gebruik in notebooks, scripts of datapipelines
 - **Aanpasbaar**: Stem validatiestappen en rapportage af op jouw specifieke behoeften
-- **Internationalisatie**: Rapporten kunnen worden gegenereerd in meer dan 20 talen, waaronder Engels, Spaans, Frans en Duits
+- **Internationalisatie**: Rapporten kunnen worden gegenereerd in 40 talen, waaronder Engels, Spaans, Frans en Duits
 
 ## Documentatie en voorbeelden
 

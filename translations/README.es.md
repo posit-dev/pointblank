@@ -309,7 +309,7 @@ pb run validation.py --exit-code
 - **Salidas prácticas**: Obtén exactamente lo que necesitas: recuentos, extractos, resúmenes o informes completos
 - **Implementación flexible**: Úsalo en notebooks, scripts o pipelines de datos
 - **Personalizable**: Adapta los pasos de validación e informes a tus necesidades específicas
-- **Internacionalización**: Los informes pueden generarse en más de 20 idiomas, incluidos inglés, español, francés y alemán
+- **Internacionalización**: Los informes pueden generarse en 40 idiomas, incluidos inglés, español, francés y alemán
 
 ## Documentación y ejemplos
 
