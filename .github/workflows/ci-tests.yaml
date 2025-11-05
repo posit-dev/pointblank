@@ -16,7 +16,13 @@ jobs:
     strategy:
       matrix:
         python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
+        include:
+          # Python 3.14 is allowed to fail due to PySpark incompatibility (segfaults in cloudpickle)
+          # Tests run for diagnostic purposes but don't block CI
+          - python-version: "3.14"
+            experimental: true
       fail-fast: false
+    continue-on-error: ${{ matrix.experimental || false }}
 
     steps:
       - uses: actions/checkout@v4
