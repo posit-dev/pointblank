@@ -19102,3 +19102,162 @@ def test_column_selector_with_different_table_types():
         assert reinterrogated_polars.n_passed(scalar=True) == validation_polars.n_passed(
             scalar=True
         )
+
+
+def test_threshold_notes_local_thresholds():
+    """Test that local threshold notes appear when step-specific thresholds differ from global."""
+
+    small_table = load_dataset(dataset="small_table")
+
+    validation = (
+        Validate(
+            data=small_table,
+            thresholds=Thresholds(warning=0.1, error=0.2, critical=0.3),
+            locale="en",
+        )
+        .col_vals_gt(columns="a", value=5)  # Uses global thresholds
+        .col_vals_between(
+            columns="d", left=0, right=10000, thresholds=Thresholds(warning=0.05, error=0.15)
+        )  # Local thresholds
+        .interrogate()
+    )
+
+    html = validation.get_tabular_report()._repr_html_()
+
+    # Check that local threshold note appears
+    assert "Step-specific thresholds set with" in html
+
+    # Check that the note includes W and E markers
+    assert ">W<" in html
+    assert ">E<" in html
+
+    # Check that the values appear (English uses period as decimal separator)
+    assert "0.05" in html
+    assert "0.15" in html
+
+
+def test_threshold_notes_reset_thresholds():
+    """Test that threshold reset notes appear when thresholds are explicitly set to empty."""
+
+    small_table = load_dataset(dataset="small_table")
+
+    validation = (
+        Validate(
+            data=small_table,
+            thresholds=Thresholds(warning=0.1, error=0.2, critical=0.3),
+            locale="en",
+        )
+        .col_vals_gt(columns="a", value=5)  # Uses global thresholds
+        .col_vals_not_null(columns="c", thresholds=Thresholds())  # Explicitly reset
+        .interrogate()
+    )
+
+    html = validation.get_tabular_report()._repr_html_()
+
+    # Check that threshold reset note appears
+    assert "Global thresholds explicitly not used" in html
+
+
+def test_threshold_notes_localization():
+    """Test that threshold notes are properly localized."""
+
+    small_table = load_dataset(dataset="small_table")
+
+    # Test French locale
+    validation_fr = (
+        Validate(
+            data=small_table,
+            thresholds=Thresholds(warning=0.1, error=0.2, critical=0.3),
+            locale="fr",
+        )
+        .col_vals_not_null(columns="c", thresholds=Thresholds())
+        .interrogate()
+    )
+
+    html_fr = validation_fr.get_tabular_report()._repr_html_()
+    assert "Seuils globaux explicitement non utilisés" in html_fr
+
+    # Test German locale
+    validation_de = (
+        Validate(
+            data=small_table,
+            thresholds=Thresholds(warning=0.1, error=0.2, critical=0.3),
+            locale="de",
+        )
+        .col_vals_not_null(columns="c", thresholds=Thresholds())
+        .interrogate()
+    )
+
+    html_de = validation_de.get_tabular_report()._repr_html_()
+    assert "Globale Schwellenwerte für diesen Schritt explizit nicht verwendet" in html_de
+
+
+def test_threshold_notes_locale_number_formatting():
+    """Test that threshold note values use locale-specific number formatting."""
+
+    small_table = load_dataset(dataset="small_table")
+
+    # Test German locale (uses comma as decimal separator)
+    validation_de = (
+        Validate(
+            data=small_table,
+            thresholds=Thresholds(warning=0.1, error=0.2, critical=0.3),
+            locale="de",
+        )
+        .col_vals_between(
+            columns="d", left=0, right=10000, thresholds=Thresholds(warning=0.05, error=0.15)
+        )
+        .interrogate()
+    )
+
+    html_de = validation_de.get_tabular_report()._repr_html_()
+
+    # German uses comma as decimal separator
+    assert "0,05" in html_de
+    assert "0,15" in html_de
+
+    # Test French locale (also uses comma as decimal separator)
+    validation_fr = (
+        Validate(
+            data=small_table,
+            thresholds=Thresholds(warning=0.1, error=0.2, critical=0.3),
+            locale="fr",
+        )
+        .col_vals_between(
+            columns="d", left=0, right=10000, thresholds=Thresholds(warning=0.25, error=0.5)
+        )
+        .interrogate()
+    )
+
+    html_fr = validation_fr.get_tabular_report()._repr_html_()
+
+    # French uses comma as decimal separator
+    assert "0,25" in html_fr
+    assert "0,5" in html_fr
+
+
+def test_threshold_notes_no_note_when_thresholds_match():
+    """Test that no threshold note appears when step thresholds match global thresholds."""
+
+    small_table = load_dataset(dataset="small_table")
+
+    global_thresholds = Thresholds(warning=0.1, error=0.2, critical=0.3)
+
+    validation = (
+        Validate(
+            data=small_table,
+            thresholds=global_thresholds,
+            locale="en",
+        )
+        .col_vals_gt(columns="a", value=5)  # Uses global thresholds
+        .col_vals_between(
+            columns="d", left=0, right=10000, thresholds=global_thresholds
+        )  # Same as global
+        .interrogate()
+    )
+
+    html = validation.get_tabular_report()._repr_html_()
+
+    # No threshold notes should appear
+    assert "Step-specific thresholds set with" not in html
+    assert "Global thresholds explicitly not used" not in html
