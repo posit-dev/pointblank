@@ -12734,19 +12734,31 @@ class Validate:
                 )
 
             # Add note for local thresholds (if they differ from global thresholds)
-            if threshold != self.thresholds and threshold != Thresholds():
-                # Generate the threshold note with a miniature HTML representation
-                threshold_note_html = _create_local_threshold_note_html(
-                    thresholds=threshold, locale=self.locale
-                )
-                threshold_note_text = _create_local_threshold_note_text(thresholds=threshold)
+            if threshold != self.thresholds:
+                if threshold != Thresholds():
+                    # Local thresholds are set - generate threshold note
+                    threshold_note_html = _create_local_threshold_note_html(
+                        thresholds=threshold, locale=self.locale
+                    )
+                    threshold_note_text = _create_local_threshold_note_text(thresholds=threshold)
 
-                # Add the note to the validation step
-                validation._add_note(
-                    key="local_thresholds",
-                    markdown=threshold_note_html,
-                    text=threshold_note_text,
-                )
+                    # Add the note to the validation step
+                    validation._add_note(
+                        key="local_thresholds",
+                        markdown=threshold_note_html,
+                        text=threshold_note_text,
+                    )
+                elif self.thresholds != Thresholds():
+                    # Thresholds explicitly reset to empty when global thresholds exist
+                    reset_note_html = _create_threshold_reset_note_html(locale=self.locale)
+                    reset_note_text = _create_threshold_reset_note_text()
+
+                    # Add the note to the validation step
+                    validation._add_note(
+                        key="local_threshold_reset",
+                        markdown=reset_note_html,
+                        text=reset_note_text,
+                    )
 
             # If there is any threshold level that has been exceeded, then produce and
             # set the general failure text for the validation step
@@ -18343,6 +18355,38 @@ def _create_local_threshold_note_text(thresholds: Thresholds) -> str:
         return "Step-specific thresholds set: " + ", ".join(parts)
     else:
         return ""
+
+
+def _create_threshold_reset_note_html(locale: str = "en") -> str:
+    """
+    Create an HTML note for when thresholds are explicitly reset to empty.
+
+    Parameters
+    ----------
+    locale
+        The locale string (e.g., 'en', 'fr').
+
+    Returns
+    -------
+    str
+        HTML-formatted note text.
+    """
+    text = NOTES_TEXT.get("local_threshold_reset", {}).get(
+        locale, NOTES_TEXT.get("local_threshold_reset", {}).get("en", "")
+    )
+    return text
+
+
+def _create_threshold_reset_note_text() -> str:
+    """
+    Create a plain text note for when thresholds are explicitly reset to empty.
+
+    Returns
+    -------
+    str
+        Plain text note.
+    """
+    return "Global thresholds explicitly not used for this step."
 
 
 def _step_report_row_based(
