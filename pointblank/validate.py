@@ -45,6 +45,7 @@ from pointblank._constants import (
 )
 from pointblank._constants_translations import (
     EXPECT_FAIL_TEXT,
+    NOTES_TEXT,
     STEP_REPORT_TEXT,
     VALIDATION_REPORT_TEXT,
 )
@@ -12732,6 +12733,33 @@ class Validate:
                     ),
                 )
 
+            # Add note for local thresholds (if they differ from global thresholds)
+            if threshold != self.thresholds:
+                if threshold != Thresholds():
+                    # Local thresholds are set - generate threshold note
+                    threshold_note_html = _create_local_threshold_note_html(
+                        thresholds=threshold, locale=self.locale
+                    )
+                    threshold_note_text = _create_local_threshold_note_text(thresholds=threshold)
+
+                    # Add the note to the validation step
+                    validation._add_note(
+                        key="local_thresholds",
+                        markdown=threshold_note_html,
+                        text=threshold_note_text,
+                    )
+                elif self.thresholds != Thresholds():
+                    # Thresholds explicitly reset to empty when global thresholds exist
+                    reset_note_html = _create_threshold_reset_note_html(locale=self.locale)
+                    reset_note_text = _create_threshold_reset_note_text()
+
+                    # Add the note to the validation step
+                    validation._add_note(
+                        key="local_threshold_reset",
+                        markdown=reset_note_html,
+                        text=reset_note_text,
+                    )
+
             # If there is any threshold level that has been exceeded, then produce and
             # set the general failure text for the validation step
             if validation.warning or validation.error or validation.critical:
@@ -18048,60 +18076,93 @@ def _format_single_float_with_gt_custom(
     return formatted_values[0]  # Return the single formatted value
 
 
+def _format_number_safe(
+    value: float, decimals: int, drop_trailing_zeros: bool = False, locale: str = "en", df_lib=None
+) -> str:
+    """
+    Safely format a float value with locale support.
+
+    Uses GT-based formatting when a DataFrame library is available, otherwise falls back to
+    vals.fmt_number. This helper is used by threshold formatting functions.
+    """
+    if df_lib is not None and value is not None:
+        # Use GT-based formatting to avoid Pandas dependency completely
+        return _format_single_float_with_gt_custom(
+            value,
+            decimals=decimals,
+            drop_trailing_zeros=drop_trailing_zeros,
+            locale=locale,
+            df_lib=df_lib,
+        )
+    else:
+        # Fallback to the original behavior
+        return fmt_number(
+            value, decimals=decimals, drop_trailing_zeros=drop_trailing_zeros, locale=locale
+        )[0]  # pragma: no cover
+
+
+def _format_integer_safe(value: int, locale: str = "en", df_lib=None) -> str:
+    """
+    Safely format an integer value with locale support.
+
+    Uses GT-based formatting when a DataFrame library is available, otherwise falls back to
+    vals.fmt_integer. This helper is used by threshold formatting functions.
+    """
+    if df_lib is not None and value is not None:
+        # Use GT-based formatting to avoid Pandas dependency completely
+        return _format_single_integer_with_gt(value, locale=locale, df_lib=df_lib)
+    else:
+        # Fallback to the original behavior
+        return fmt_integer(value, locale=locale)[0]
+
+
 def _create_thresholds_html(thresholds: Thresholds, locale: str, df_lib=None) -> str:
     if thresholds == Thresholds():
         return ""
 
-    # Helper functions to format numbers safely
-    def _format_number_safe(value: float, decimals: int, drop_trailing_zeros: bool = False) -> str:
-        if df_lib is not None and value is not None:
-            # Use GT-based formatting to avoid Pandas dependency completely
-            return _format_single_float_with_gt_custom(
-                value,
-                decimals=decimals,
-                drop_trailing_zeros=drop_trailing_zeros,
-                locale=locale,
-                df_lib=df_lib,
-            )
-        else:
-            # Fallback to the original behavior
-            return fmt_number(
-                value, decimals=decimals, drop_trailing_zeros=drop_trailing_zeros, locale=locale
-            )[0]  # pragma: no cover
-
-    def _format_integer_safe(value: int) -> str:
-        if df_lib is not None and value is not None:
-            # Use GT-based formatting to avoid Pandas dependency completely
-            return _format_single_integer_with_gt(value, locale=locale, df_lib=df_lib)
-        else:
-            # Fallback to the original behavior
-            return fmt_integer(value, locale=locale)[0]
-
     warning = (
-        _format_number_safe(thresholds.warning_fraction, decimals=3, drop_trailing_zeros=True)
+        _format_number_safe(
+            thresholds.warning_fraction,
+            decimals=3,
+            drop_trailing_zeros=True,
+            locale=locale,
+            df_lib=df_lib,
+        )
         if thresholds.warning_fraction is not None
         else (
-            _format_integer_safe(thresholds.warning_count)
+            _format_integer_safe(thresholds.warning_count, locale=locale, df_lib=df_lib)
             if thresholds.warning_count is not None
             else "&mdash;"
         )
     )
 
     error = (
-        _format_number_safe(thresholds.error_fraction, decimals=3, drop_trailing_zeros=True)
+        _format_number_safe(
+            thresholds.error_fraction,
+            decimals=3,
+            drop_trailing_zeros=True,
+            locale=locale,
+            df_lib=df_lib,
+        )
         if thresholds.error_fraction is not None
         else (
-            _format_integer_safe(thresholds.error_count)
+            _format_integer_safe(thresholds.error_count, locale=locale, df_lib=df_lib)
             if thresholds.error_count is not None
             else "&mdash;"
         )
     )
 
     critical = (
-        _format_number_safe(thresholds.critical_fraction, decimals=3, drop_trailing_zeros=True)
+        _format_number_safe(
+            thresholds.critical_fraction,
+            decimals=3,
+            drop_trailing_zeros=True,
+            locale=locale,
+            df_lib=df_lib,
+        )
         if thresholds.critical_fraction is not None
         else (
-            _format_integer_safe(thresholds.critical_count)
+            _format_integer_safe(thresholds.critical_count, locale=locale, df_lib=df_lib)
             if thresholds.critical_count is not None
             else "&mdash;"
         )
@@ -18145,6 +18206,187 @@ def _create_thresholds_html(thresholds: Thresholds, locale: str, df_lib=None) ->
         "</span>"
         "</span>"
     )
+
+
+def _create_local_threshold_note_html(thresholds: Thresholds, locale: str = "en") -> str:
+    """
+    Create a miniature HTML representation of local thresholds for display in notes.
+
+    This function generates a compact HTML representation of threshold values that is suitable for
+    display in validation step notes/footnotes. It follows a similar visual style to the global
+    thresholds shown in the header, but with a more compact format.
+
+    Parameters
+    ----------
+    thresholds
+        The Thresholds object containing the local threshold values.
+    locale
+        The locale to use for formatting numbers (default: "en").
+
+    Returns
+    -------
+    str
+        HTML string containing the formatted threshold information.
+    """
+    if thresholds == Thresholds():
+        return ""
+
+    # Get df_lib for formatting
+    df_lib = None
+    if _is_lib_present("polars"):
+        import polars as pl
+
+        df_lib = pl
+    elif _is_lib_present("pandas"):
+        import pandas as pd
+
+        df_lib = pd
+
+    # Helper function to format threshold values using the shared formatting functions
+    def _format_threshold_value(fraction: float | None, count: int | None) -> str:
+        if fraction is not None:
+            # Format as fraction/percentage with locale formatting
+            if fraction == 0:
+                return "0"
+            elif fraction < 0.01:
+                # For very small fractions, show "<0.01" with locale formatting
+                formatted = _format_number_safe(0.01, decimals=2, locale=locale, df_lib=df_lib)
+                return f"&lt;{formatted}"
+            else:
+                # Use shared formatting function with drop_trailing_zeros
+                formatted = _format_number_safe(
+                    fraction, decimals=2, drop_trailing_zeros=True, locale=locale, df_lib=df_lib
+                )
+                return formatted
+        elif count is not None:
+            # Format integer count using shared formatting function
+            return _format_integer_safe(count, locale=locale, df_lib=df_lib)
+        else:
+            return "&mdash;"
+
+    warning = _format_threshold_value(thresholds.warning_fraction, thresholds.warning_count)
+    error = _format_threshold_value(thresholds.error_fraction, thresholds.error_count)
+    critical = _format_threshold_value(thresholds.critical_fraction, thresholds.critical_count)
+
+    warning_color = SEVERITY_LEVEL_COLORS["warning"]
+    error_color = SEVERITY_LEVEL_COLORS["error"]
+    critical_color = SEVERITY_LEVEL_COLORS["critical"]
+
+    # Build threshold parts with colored letters in monospace font
+    threshold_parts = []
+
+    # Add warning threshold if set
+    if thresholds.warning is not None:
+        threshold_parts.append(
+            f'<span style="color: {warning_color}; font-weight: bold;">W</span>:{warning}'
+        )
+
+    # Add error threshold if set
+    if thresholds.error is not None:
+        threshold_parts.append(
+            f'<span style="color: {error_color}; font-weight: bold;">E</span>:{error}'
+        )
+
+    # Add critical threshold if set
+    if thresholds.critical is not None:
+        threshold_parts.append(
+            f'<span style="color: {critical_color}; font-weight: bold;">C</span>:{critical}'
+        )
+
+    # Join with "|" separator (only between multiple thresholds)
+    thresholds_html = f'<span style="font-family: monospace;">{"|".join(threshold_parts)}</span>'
+
+    # Get localized text and format with threshold HTML
+    localized_text = NOTES_TEXT["local_threshold"].get(locale, NOTES_TEXT["local_threshold"]["en"])
+    note_html = localized_text.replace("{thresholds}", thresholds_html)
+
+    return note_html
+
+
+def _create_local_threshold_note_text(thresholds: Thresholds) -> str:
+    """
+    Create a plain text representation of local thresholds for display in logs.
+
+    This function generates a plain text representation of threshold values that is
+    suitable for display in text-based output such as logs or console output.
+
+    Parameters
+    ----------
+    thresholds
+        The Thresholds object containing the local threshold values.
+
+    Returns
+    -------
+    str
+        Plain text string containing the formatted threshold information.
+    """
+    if thresholds == Thresholds():
+        return ""
+
+    # Helper function to format threshold values
+    def _format_threshold_value(fraction: float | None, count: int | None) -> str:
+        if fraction is not None:
+            if fraction == 0:
+                return "0"
+            elif fraction < 0.01:
+                return "<0.01"
+            else:
+                return f"{fraction:.2f}".rstrip("0").rstrip(".")
+        elif count is not None:
+            return str(count)
+        else:
+            return "—"
+
+    parts = []
+
+    if thresholds.warning is not None:
+        warning = _format_threshold_value(thresholds.warning_fraction, thresholds.warning_count)
+        parts.append(f"W: {warning}")
+
+    if thresholds.error is not None:
+        error = _format_threshold_value(thresholds.error_fraction, thresholds.error_count)
+        parts.append(f"E: {error}")
+
+    if thresholds.critical is not None:
+        critical = _format_threshold_value(thresholds.critical_fraction, thresholds.critical_count)
+        parts.append(f"C: {critical}")
+
+    if parts:
+        return "Step-specific thresholds set: " + ", ".join(parts)
+    else:
+        return ""
+
+
+def _create_threshold_reset_note_html(locale: str = "en") -> str:
+    """
+    Create an HTML note for when thresholds are explicitly reset to empty.
+
+    Parameters
+    ----------
+    locale
+        The locale string (e.g., 'en', 'fr').
+
+    Returns
+    -------
+    str
+        HTML-formatted note text.
+    """
+    text = NOTES_TEXT.get("local_threshold_reset", {}).get(
+        locale, NOTES_TEXT.get("local_threshold_reset", {}).get("en", "")
+    )
+    return text
+
+
+def _create_threshold_reset_note_text() -> str:
+    """
+    Create a plain text note for when thresholds are explicitly reset to empty.
+
+    Returns
+    -------
+    str
+        Plain text note.
+    """
+    return "Global thresholds explicitly not used for this step."
 
 
 def _step_report_row_based(
