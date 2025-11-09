@@ -4026,8 +4026,35 @@ def connect_to_table(connection_string: str) -> Any:
         table = conn.table(table_name)
         return table
     except Exception as e:
-        _handle_connection_errors(e, base_connection)
+        error_str = str(e).lower()
 
+        # Check if this is a "table not found" error
+        if "table" in error_str and ("not found" in error_str or "does not exist" in error_str or "not exist" in error_str):
+            # Try to get available tables for a helpful error message
+            try:
+                available_tables = conn.list_tables()
+                if available_tables:
+                    table_list = "\n".join(f"  - {table}" for table in available_tables)
+                    raise ValueError(
+                        f"Table '{table_name}' not found in database.\n\n"
+                        f"Available tables:\n{table_list}\n\n"
+                        f"Connection: {base_connection}"
+                    ) from e
+            except ValueError:
+                # Re-raise the table-specific ValueError
+                raise
+            except Exception:
+                # If we can't list tables, just raise a simple error
+                pass
+
+            raise ValueError(
+                f"Table '{table_name}' not found in database.\n"
+                f"Connection: {base_connection}\n\n"
+                f"Original error: {e}"
+            ) from e
+
+        # For other errors, use the generic connection error handler
+        _handle_connection_errors(e, base_connection)
 
 def print_database_tables(connection_string: str) -> list[str]:
     """
