@@ -4056,15 +4056,14 @@ def print_database_tables(connection_string: str) -> list[str]:
     try:
         # Connect to database
         conn = ibis.connect(connection_string)
-
-    except Exception:
-        _handle_connection_errors(connection_string)
-
         # Get all tables and filter out temporary Ibis tables
         all_tables = conn.list_tables()
         user_tables = [t for t in all_tables if "memtable" not in t]
 
         return user_tables
+
+    except Exception:
+        _handle_connection_errors(e, connection_string)
 
 
 @dataclass
