@@ -4151,6 +4151,37 @@ def connect_to_table(connection_string: str) -> Any:
         ) from e
 
 
+def print_database_tables(connection_string: str) -> list[str]:
+    """
+    List all tables in a database from a connection string.
+
+    Parameters
+    ----------
+    connection_string
+        A database connection string WITHOUT the ::table_name suffix.
+        Example: "duckdb:///path/to/database.ddb"
+
+    Returns
+    -------
+    list[str]
+        List of table names, excluding temporary Ibis tables.
+    """
+    if not _is_lib_present(lib_name="ibis"):
+        raise ImportError(
+            "The Ibis library is required for database connections.\n"
+            "Install it with: pip install 'ibis-framework[duckdb]'"
+        )
+
+    # Connect to database
+    conn = ibis.connect(connection_string)
+
+    # Get all tables and filter out temporary Ibis tables
+    all_tables = conn.list_tables()
+    user_tables = [t for t in all_tables if "memtable" not in t]
+
+    return user_tables
+
+
 @dataclass
 class Validate:
     """
