@@ -142,6 +142,10 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
+    <a class="nav-link" href="../index.html"> 
+<span class="menu-text">Get Started</span></a>
+  </li>  
+  <li class="nav-item">
     <a class="nav-link" href="../demos/index.html"> 
 <span class="menu-text">Examples</span></a>
   </li>  
@@ -152,11 +156,6 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
   <li class="nav-item">
     <a class="nav-link" href="../blog/index.html"> 
 <span class="menu-text">Pointblog</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../user-guide.pdf"> <i class="bi bi-file-pdf" role="img">
-</i> 
-<span class="menu-text">User Guide (PDF)</span></a>
   </li>  
 </ul>
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
@@ -284,7 +283,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
         border-radius: 2px;
     ">
 <p>Load the <code>"small_table"</code> dataset as a Polars DataFrame by calling <a href="../reference/load_dataset.html#pointblank.load_dataset" title="0"><code>load_dataset()</code></a> with <code>dataset="small_table"</code> and <code>tbl_type="polars"</code>:</p>
-<div id="a58051e3" class="cell" data-execution_count="1">
+<div id="8ff8e2b1" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>small_table <span class="op">=</span> pb.load_dataset(dataset<span class="op">=</span><span class="st">"small_table"</span>, tbl_type<span class="op">=</span><span class="st">"polars"</span>)</span>
@@ -496,7 +495,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 <p>Note that the <code>"small_table"</code> dataset is a Polars DataFrame and using the <a href="../reference/preview.html#pointblank.preview"><span><code>preview()</code></span></a> function will display the table in an HTML viewing environment.</p>
 <p>The <code>"game_revenue"</code> dataset can be loaded as a Pandas DataFrame by specifying the dataset name and setting <code>tbl_type="pandas"</code>:</p>
-<div id="a406dc90" class="cell" data-execution_count="2">
+<div id="a15dc6ee" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>game_revenue <span class="op">=</span> pb.load_dataset(dataset<span class="op">=</span><span class="st">"game_revenue"</span>, tbl_type<span class="op">=</span><span class="st">"pandas"</span>)</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>pb.preview(game_revenue)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -742,7 +741,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 <p>The <code>"game_revenue"</code> dataset is a more real-world dataset with a mix of data types, and it’s significantly larger than the <code>small_table</code> dataset at 2000 rows and 11 columns.</p>
 <p>The <code>"nycflights"</code> dataset can be loaded as a DuckDB table by specifying the dataset name and setting <code>tbl_type="duckdb"</code>:</p>
-<div id="f876a37c" class="cell" data-execution_count="3">
+<div id="552c9706" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>nycflights <span class="op">=</span> pb.load_dataset(dataset<span class="op">=</span><span class="st">"nycflights"</span>, tbl_type<span class="op">=</span><span class="st">"duckdb"</span>)</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>pb.preview(nycflights)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -1072,7 +1071,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 <p>The <code>"nycflights"</code> dataset is a large dataset with 336,776 rows and 18 columns. This dataset is truly a real-world dataset and provides information about flights originating from New York City airports in 2013.</p>
 <p>Finally, the <code>"global_sales"</code> dataset can be loaded as a Polars table by specifying the dataset name. Since <code>tbl_type=</code> is set to <code>"polars"</code> by default, we don’t need to specify it:</p>
-<div id="9435dcc9" class="cell" data-execution_count="4">
+<div id="7b821f17" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>global_sales <span class="op">=</span> pb.load_dataset(dataset<span class="op">=</span><span class="st">"global_sales"</span>)</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>pb.preview(global_sales)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
