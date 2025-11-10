@@ -50,15 +50,14 @@ website:
     logo: assets/pointblank_logo_small.svg
     title: false
     left:
-      - text: Examples
-        file: demos/index.qmd
+      - href: index.qmd
+        text: Get Started
+      - href: demos/index.qmd
+        text: Examples
       - href: reference/index.qmd
         text: API Reference
       - href: blog/index.qmd
         text: Pointblog
-      - text: "User Guide (PDF)"
-        icon: file-pdf
-        href: user-guide.pdf
     right:
       - icon: discord
         href: https://discord.com/invite/YH7CybCNCQ
@@ -67,7 +66,7 @@ website:
   sidebar:
       id: user-guide
       contents:
-        - section: "Getting Started"
+        - section: "Get Started"
           contents:
             - text: "Welcome to Pointblank"
               href: index.qmd
