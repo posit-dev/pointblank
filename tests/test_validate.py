@@ -95,6 +95,7 @@ from pointblank.validate import (
     missing_vals_tbl,
     PointblankConfig,
     preview,
+    print_database_tables,
     read_file,
     Validate,
     write_file,
@@ -11768,6 +11769,14 @@ def test_connect_to_table_ibis_not_available():
             connect_to_table("duckdb://test.db::table")
 
 
+def test_print_database_tables_ibis_not_available():
+    with patch("pointblank.validate._is_lib_present") as mock_is_lib:
+        mock_is_lib.return_value = False  # Ibis not available
+
+        with pytest.raises(ImportError, match="The Ibis library is not installed"):
+            print_database_tables("duckdb://test.db::table")
+
+
 def test_connect_to_table_no_table_specified_with_tables():
     with patch("pointblank.validate._is_lib_present") as mock_is_lib:
         mock_is_lib.return_value = True
@@ -11790,6 +11799,31 @@ def test_connect_to_table_no_table_specified_with_tables():
             assert "table2" in error_msg
             assert "table3" in error_msg
             assert "duckdb://test.db::table1" in error_msg
+
+
+def test_print_database_tables_table_specified():
+    with patch("pointblank.validate._is_lib_present") as mock_is_lib:
+        mock_is_lib.return_value = True
+
+        # Mock ibis module
+        mock_ibis = Mock()
+        mock_conn = Mock()
+        mock_ibis.connect.return_value = mock_conn
+
+        with patch.dict("sys.modules", {"ibis": mock_ibis}):
+            # This should trigger the error path for invalid database
+            with pytest.raises(ValueError) as exc_info:
+                print_database_tables(
+                    "duckdb://superbadpath.ddb::fogeltable"
+                )  # With a :: table specification
+
+            error_msg = str(exc_info.value)
+            assert "You've supplied an invalid connection string format:" in error_msg
+            assert (
+                "To print database tables, connection strings must follow this format without a table suffix:"
+                in error_msg
+            )
+            assert "duckdb://superbadpath.ddb::fogeltable" in error_msg
 
 
 def test_connect_to_table_no_table_specified_empty_db():
@@ -11826,6 +11860,23 @@ def test_connect_to_table_backend_dependency_missing():
             error_msg = str(exc_info.value)
             assert "Missing DUCKDB backend for Ibis" in error_msg
             assert "pip install 'ibis-framework[duckdb]'" in error_msg
+
+
+def test_print_database_tables_backend_dependency_missing():
+    with patch("pointblank.validate._is_lib_present") as mock_is_lib:
+        mock_is_lib.return_value = True
+
+        # Mock ibis module that raises backend-specific error
+        mock_ibis = Mock()
+        mock_ibis.connect.side_effect = Exception("sqlite not found")
+
+        with patch.dict("sys.modules", {"ibis": mock_ibis}):
+            with pytest.raises(ConnectionError) as exc_info:
+                print_database_tables("sqlite://test.db")
+
+            error_msg = str(exc_info.value)
+            assert "Missing SQLITE backend for Ibis" in error_msg
+            assert "pip install 'ibis-framework[sqlite]'" in error_msg
 
 
 def test_connect_to_table_invalid_connection_string_format():

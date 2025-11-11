@@ -99,7 +99,13 @@ from pointblank._utils_check_args import (
     _check_thresholds,
 )
 from pointblank._utils_html import _create_table_dims_html, _create_table_type_html
-from pointblank.column import Column, ColumnLiteral, ColumnSelector, ColumnSelectorNarwhals, col
+from pointblank.column import (
+    Column,
+    ColumnLiteral,
+    ColumnSelector,
+    ColumnSelectorNarwhals,
+    col,
+)
 from pointblank.schema import Schema, _get_schema_validation_info
 from pointblank.segments import Segment
 from pointblank.thresholds import (
@@ -122,6 +128,7 @@ __all__ = [
     "write_file",
     "config",
     "connect_to_table",
+    "print_database_tables",
     "preview",
     "missing_vals_tbl",
     "get_action_metadata",
@@ -409,7 +416,9 @@ def config(
 
 
 def load_dataset(
-    dataset: Literal["small_table", "game_revenue", "nycflights", "global_sales"] = "small_table",
+    dataset: Literal[
+        "small_table", "game_revenue", "nycflights", "global_sales"
+    ] = "small_table",
     tbl_type: Literal["polars", "pandas", "duckdb"] = "polars",
 ) -> FrameT | Any:
     """
@@ -544,7 +553,9 @@ def load_dataset(
 
         import polars as pl
 
-        dataset = pl.read_csv(ZipFile(data_path).read(f"{dataset}.csv"), try_parse_dates=True)
+        dataset = pl.read_csv(
+            ZipFile(data_path).read(f"{dataset}.csv"), try_parse_dates=True
+        )
 
     if tbl_type == "pandas":
         if not _is_lib_present(lib_name="pandas"):
@@ -702,7 +713,9 @@ def read_file(filepath: str | Path) -> Validate:
                         pass  # pragma: no cover
 
                     # Execute the function source code with the enhanced namespace
-                    exec(source_code, execution_namespace, execution_namespace)  # pragma: no cover
+                    exec(
+                        source_code, execution_namespace, execution_namespace
+                    )  # pragma: no cover
 
                     # The function should now be in the execution namespace
                     if func_name in execution_namespace:  # pragma: no cover
@@ -724,13 +737,17 @@ def read_file(filepath: str | Path) -> Validate:
                     and validation_info._pb_function_name in restored_functions
                 ):
                     func_name = validation_info._pb_function_name  # pragma: no cover
-                    validation_info.pre = restored_functions[func_name]  # pragma: no cover
+                    validation_info.pre = restored_functions[
+                        func_name
+                    ]  # pragma: no cover
                     # Clean up the temporary attribute
                     delattr(validation_info, "_pb_function_name")  # pragma: no cover
 
         # Verify that we loaded a Validate object
         if not isinstance(validation, Validate):  # pragma: no cover
-            raise RuntimeError(f"File does not contain a valid Validate object: {file_path}")
+            raise RuntimeError(
+                f"File does not contain a valid Validate object: {file_path}"
+            )
 
         return validation
 
@@ -738,7 +755,9 @@ def read_file(filepath: str | Path) -> Validate:
         raise RuntimeError(f"Failed to read validation object from {file_path}: {e}")
 
 
-def _check_for_unpicklable_objects(validation: Validate) -> tuple[dict[str, str], list[int]]:
+def _check_for_unpicklable_objects(
+    validation: Validate,
+) -> tuple[dict[str, str], list[int]]:
     """
     Check for functions and capture source code for preservation across sessions.
 
@@ -791,19 +810,27 @@ def _check_for_unpicklable_objects(validation: Validate) -> tuple[dict[str, str]
             except (OSError, TypeError):  # pragma: no cover
                 # If we can't get source, check if it's at least picklable
                 try:  # pragma: no cover
-                    pickle.dumps(func, protocol=pickle.HIGHEST_PROTOCOL)  # pragma: no cover
+                    pickle.dumps(
+                        func, protocol=pickle.HIGHEST_PROTOCOL
+                    )  # pragma: no cover
                     # It's picklable but no source: this might cause issues across sessions
                     print(  # pragma: no cover
                         f"Warning: Function '{func_name}' is picklable but source code could not be captured. "
                         f"It may not be available when loading in a different session."
                     )
-                except (pickle.PicklingError, AttributeError, TypeError):  # pragma: no cover
+                except (
+                    pickle.PicklingError,
+                    AttributeError,
+                    TypeError,
+                ):  # pragma: no cover
                     # Not picklable and no source: treat as problematic
                     print(  # pragma: no cover
                         f"Warning: Function '{func_name}' is not picklable and source could not be captured. "
                         f"It will not be available after saving/loading."
                     )
-                    unpicklable_lambda_steps.append((i, validation_info))  # pragma: no cover
+                    unpicklable_lambda_steps.append(
+                        (i, validation_info)
+                    )  # pragma: no cover
 
     # Only raise error for lambda functions now
     if unpicklable_lambda_steps:
@@ -887,7 +914,11 @@ def _provide_serialization_guidance(validation: Validate) -> None:
             try:  # pragma: no cover
                 pickle.dumps(func, protocol=pickle.HIGHEST_PROTOCOL)  # pragma: no cover
                 can_pickle = True  # pragma: no cover
-            except (pickle.PicklingError, AttributeError, TypeError):  # pragma: no cover
+            except (
+                pickle.PicklingError,
+                AttributeError,
+                TypeError,
+            ):  # pragma: no cover
                 can_pickle = False  # pragma: no cover
                 functions_analysis["unpicklable_functions"].append(
                     (i, func_name, func_module)
@@ -896,7 +927,9 @@ def _provide_serialization_guidance(validation: Validate) -> None:
 
             # Check if it's likely to work across sessions
             if (
-                func_module == "__main__" or not func_module or func_module == "<unknown>"
+                func_module == "__main__"
+                or not func_module
+                or func_module == "<unknown>"
             ):  # pragma: no cover
                 # Function defined interactively - risky for cross-session use
                 functions_analysis["interactive_functions"].append(
@@ -1282,7 +1315,10 @@ def write_file(
     function_sources, lambda_steps = _check_for_unpicklable_objects(validation_copy)
 
     # Create a validation package that includes both the object and function sources
-    validation_package = {"validation": validation_copy, "function_sources": function_sources}
+    validation_package = {
+        "validation": validation_copy,
+        "function_sources": function_sources,
+    }
 
     # Serialize to disk using pickle
     try:
@@ -1298,7 +1334,9 @@ def write_file(
                 )
                 for func_name in function_sources.keys():
                     print(f"      • {func_name}")
-                print("   📥 These functions will be automatically restored when loading")
+                print(
+                    "   📥 These functions will be automatically restored when loading"
+                )
 
             # Provide loading instructions
             preprocessing_funcs = [
@@ -1316,7 +1354,9 @@ def write_file(
                     for info in preprocessing_funcs
                     if hasattr(info, "pre") and info.pre
                 ):
-                    print("      # Import any preprocessing functions from their modules")
+                    print(
+                        "      # Import any preprocessing functions from their modules"
+                    )
                     modules_mentioned = set()
                     for info in preprocessing_funcs:
                         if (
@@ -1331,7 +1371,11 @@ def write_file(
                                 modules_mentioned.add(info.pre.__module__)
                 print(f"      validation = pb.read_file('{file_path.name}')")
             else:
-                print("   📖 To load: validation = pb.read_file('{}')".format(file_path.name))
+                print(
+                    "   📖 To load: validation = pb.read_file('{}')".format(
+                        file_path.name
+                    )
+                )
 
     except Exception as e:  # pragma: no cover
         raise RuntimeError(
@@ -1340,7 +1384,9 @@ def write_file(
 
 
 def get_data_path(
-    dataset: Literal["small_table", "game_revenue", "nycflights", "global_sales"] = "small_table",
+    dataset: Literal[
+        "small_table", "game_revenue", "nycflights", "global_sales"
+    ] = "small_table",
     file_type: Literal["csv", "parquet", "duckdb"] = "csv",
 ) -> str:
     """
@@ -1464,7 +1510,9 @@ def get_data_path(
 
         # For CSV files, we need to extract from zip to a temporary location
         # since most libraries expect actual file paths, not zip contents
-        with tempfile.NamedTemporaryFile(mode="wb", suffix=".csv", delete=False) as tmp_file:
+        with tempfile.NamedTemporaryFile(
+            mode="wb", suffix=".csv", delete=False
+        ) as tmp_file:
             with ZipFile(data_path) as zip_file:
                 csv_content = zip_file.read(f"{dataset}.csv")
                 tmp_file.write(csv_content)
@@ -1475,12 +1523,16 @@ def get_data_path(
         data_path = files("pointblank.data") / f"{dataset}.zip"
 
         # We'll need to convert CSV to Parquet temporarily
-        with tempfile.NamedTemporaryFile(mode="wb", suffix=".parquet", delete=False) as tmp_file:
+        with tempfile.NamedTemporaryFile(
+            mode="wb", suffix=".parquet", delete=False
+        ) as tmp_file:
             # Load CSV data and save as Parquet
             if _is_lib_present(lib_name="polars"):
                 import polars as pl
 
-                df = pl.read_csv(ZipFile(data_path).read(f"{dataset}.csv"), try_parse_dates=True)
+                df = pl.read_csv(
+                    ZipFile(data_path).read(f"{dataset}.csv"), try_parse_dates=True
+                )
                 df.write_parquet(tmp_file.name)
             elif _is_lib_present(lib_name="pandas"):
                 import pandas as pd
@@ -1498,7 +1550,9 @@ def get_data_path(
         data_path = files("pointblank.data") / f"{dataset}-duckdb.zip"
 
         # Extract DuckDB file to temporary location
-        with tempfile.NamedTemporaryFile(mode="wb", suffix=".ddb", delete=False) as tmp_file:
+        with tempfile.NamedTemporaryFile(
+            mode="wb", suffix=".ddb", delete=False
+        ) as tmp_file:
             with ZipFile(data_path) as zip_file:
                 ddb_content = zip_file.read(f"{dataset}.ddb")
                 tmp_file.write(ddb_content)
@@ -1631,7 +1685,9 @@ def _process_github_url(data: FrameT | Any) -> FrameT | Any:
             return data
 
         user, repo, branch, file_path = match.groups()
-        raw_url = f"https://raw.githubusercontent.com/{user}/{repo}/{branch}/{file_path}"
+        raw_url = (
+            f"https://raw.githubusercontent.com/{user}/{repo}/{branch}/{file_path}"
+        )
 
     # Download the file content to a temporary file
     try:
@@ -1642,7 +1698,9 @@ def _process_github_url(data: FrameT | Any) -> FrameT | Any:
         file_ext = ".csv" if path_lower.endswith(".csv") else ".parquet"
 
         # Create a temporary file
-        with tempfile.NamedTemporaryFile(mode="wb", suffix=file_ext, delete=False) as tmp_file:
+        with tempfile.NamedTemporaryFile(
+            mode="wb", suffix=file_ext, delete=False
+        ) as tmp_file:
             tmp_file.write(content)
             tmp_file_path = tmp_file.name
 
@@ -1876,7 +1934,9 @@ def _process_parquet_input(data: FrameT | Any) -> FrameT | Any:
                 dfs = [pd.read_parquet(path) for path in parquet_paths]
                 return pd.concat(dfs, ignore_index=True)
         except Exception as e:
-            raise RuntimeError(f"Failed to read Parquet file(s) with Pandas: {e}") from e
+            raise RuntimeError(
+                f"Failed to read Parquet file(s) with Pandas: {e}"
+            ) from e
     else:
         raise ImportError(
             "Neither Polars nor Pandas is available for reading Parquet files. "
@@ -2180,7 +2240,9 @@ def _generate_display_table(
 
     # Check that the n_head and n_tail aren't greater than the limit
     if n_head + n_tail > limit:
-        raise ValueError(f"The sum of `n_head=` and `n_tail=` cannot exceed the limit ({limit}).")
+        raise ValueError(
+            f"The sum of `n_head=` and `n_tail=` cannot exceed the limit ({limit})."
+        )
 
     # Do we have a DataFrame library to work with? We need at least one to display
     # the table using Great Tables
@@ -2224,7 +2286,9 @@ def _generate_display_table(
 
     # If `columns_subset=` is not None, resolve the columns to display
     if columns_subset is not None:
-        col_names = _get_column_names(data, ibis_tbl=ibis_tbl, df_lib_name_gt=df_lib_name_gt)
+        col_names = _get_column_names(
+            data, ibis_tbl=ibis_tbl, df_lib_name_gt=df_lib_name_gt
+        )
 
         resolved_columns = _validate_columns_subset(
             columns_subset=columns_subset, col_names=col_names
@@ -2241,7 +2305,10 @@ def _generate_display_table(
 
         # Select the columns to display in the table with the `resolved_columns` value
         data = _select_columns(
-            data, resolved_columns=resolved_columns, ibis_tbl=ibis_tbl, tbl_type=tbl_type
+            data,
+            resolved_columns=resolved_columns,
+            ibis_tbl=ibis_tbl,
+            tbl_type=tbl_type,
         )
 
     # From an Ibis table:
@@ -2257,7 +2324,11 @@ def _generate_display_table(
 
         # Get the row count for the table
         ibis_rows = data.count()
-        n_rows = ibis_rows.to_polars() if df_lib_name_gt == "polars" else int(ibis_rows.to_pandas())
+        n_rows = (
+            ibis_rows.to_polars()
+            if df_lib_name_gt == "polars"
+            else int(ibis_rows.to_pandas())
+        )
 
         # If n_head + n_tail is greater than the row count, display the entire table
         if n_head + n_tail > n_rows:
@@ -2396,7 +2467,9 @@ def _generate_display_table(
         # method can be used
         none_values = {k: data[k].isnull() for k in col_names}
 
-    none_values = [(k, i) for k, v in none_values.items() for i, val in enumerate(v) if val]
+    none_values = [
+        (k, i) for k, v in none_values.items() for i, val in enumerate(v) if val
+    ]
 
     # Import Great Tables to get preliminary renders of the columns
     import great_tables as gt
@@ -2415,8 +2488,12 @@ def _generate_display_table(
             data_col = data.select([column])
 
         # Using Great Tables, render the columns and get the list of values as formatted strings
-        built_gt = GT(data=data_col).fmt_markdown(columns=column)._build_data(context="html")
-        column_values = gt.gt._get_column_of_values(built_gt, column_name=column, context="html")
+        built_gt = (
+            GT(data=data_col).fmt_markdown(columns=column)._build_data(context="html")
+        )
+        column_values = gt.gt._get_column_of_values(
+            built_gt, column_name=column, context="html"
+        )
 
         # Get the maximum number of characters in the column
         if column_values:  # Check if column_values is not empty
@@ -2452,7 +2529,9 @@ def _generate_display_table(
     if sum_col_widths < min_tbl_width:
         remaining_width = min_tbl_width - sum_col_widths
         n_remaining_cols = len(col_widths)
-        col_widths = [width + remaining_width // n_remaining_cols for width in col_widths]
+        col_widths = [
+            width + remaining_width // n_remaining_cols for width in col_widths
+        ]
 
     # Add the `px` suffix to each of the column widths, stringifying them
     col_widths = [f"{width}px" for width in col_widths]
@@ -2511,9 +2590,13 @@ def _generate_display_table(
         col_dtype_labels_dict = {"_row_num_": ""} | col_dtype_labels_dict
 
     # Create the label, table type, and thresholds HTML fragments
-    table_type_html = _create_table_type_html(tbl_type=tbl_type, tbl_name=None, font_size="10px")
+    table_type_html = _create_table_type_html(
+        tbl_type=tbl_type, tbl_name=None, font_size="10px"
+    )
 
-    tbl_dims_html = _create_table_dims_html(columns=n_columns, rows=n_rows, font_size="10px")
+    tbl_dims_html = _create_table_dims_html(
+        columns=n_columns, rows=n_rows, font_size="10px"
+    )
 
     # Compose the subtitle HTML fragment
     combined_subtitle = (
@@ -2538,11 +2621,15 @@ def _generate_display_table(
             locations=loc.body(),
         )
         .tab_style(
-            style=style.text(color="black", font=google_font(name="IBM Plex Mono"), size="12px"),
+            style=style.text(
+                color="black", font=google_font(name="IBM Plex Mono"), size="12px"
+            ),
             locations=loc.body(),
         )
         .tab_style(
-            style=style.text(color="gray20", font=google_font(name="IBM Plex Mono"), size="12px"),
+            style=style.text(
+                color="gray20", font=google_font(name="IBM Plex Mono"), size="12px"
+            ),
             locations=loc.column_labels(),
         )
         .tab_style(
@@ -2582,15 +2669,21 @@ def _generate_display_table(
 
     if not full_dataset:
         gt_tbl = gt_tbl.tab_style(
-            style=style.borders(sides="bottom", color="#6699CC80", style="solid", weight="2px"),
+            style=style.borders(
+                sides="bottom", color="#6699CC80", style="solid", weight="2px"
+            ),
             locations=loc.body(rows=n_head - 1),
         )
 
     if show_row_numbers:
         gt_tbl = gt_tbl.tab_style(
             style=[
-                style.text(color="gray", font=google_font(name="IBM Plex Mono"), size="10px"),
-                style.borders(sides="right", color="#6699CC80", style="solid", weight="2px"),
+                style.text(
+                    color="gray", font=google_font(name="IBM Plex Mono"), size="10px"
+                ),
+                style.borders(
+                    sides="right", color="#6699CC80", style="solid", weight="2px"
+                ),
             ],
             locations=loc.body(columns="_row_num_"),
         )
@@ -2766,9 +2859,13 @@ def missing_vals_tbl(data: FrameT | Any) -> GT:
 
                         # Apply the appropriate conversion method
                         if use_polars_conversion:
-                            null_sum_converted = null_sum.to_polars()  # pragma: no cover
+                            null_sum_converted = (
+                                null_sum.to_polars()
+                            )  # pragma: no cover
                         else:
-                            null_sum_converted = null_sum.to_pandas()  # pragma: no cover
+                            null_sum_converted = (
+                                null_sum.to_pandas()
+                            )  # pragma: no cover
 
                         missing_prop = (null_sum_converted / sector_size) * 100
                         col_missing_props.append(missing_prop)
@@ -2839,7 +2936,9 @@ def missing_vals_tbl(data: FrameT | Any) -> GT:
                 col: [
                     (
                         getattr(
-                            data[(cut_points[i - 1] if i > 0 else 0) : cut_points[i]][col],
+                            data[(cut_points[i - 1] if i > 0 else 0) : cut_points[i]][
+                                col
+                            ],
                             null_method,
                         )().sum()
                         / (cut_points[i] - (cut_points[i - 1] if i > 0 else 0))
@@ -2911,13 +3010,17 @@ def missing_vals_tbl(data: FrameT | Any) -> GT:
                         window = Window.orderBy(
                             pyspark_col(data.columns[0])
                         )  # Order by first column
-                        sector_data = data.withColumn("row_num", row_number().over(window)).filter(
+                        sector_data = data.withColumn(
+                            "row_num", row_number().over(window)
+                        ).filter(
                             (pyspark_col("row_num") > start_row)
                             & (pyspark_col("row_num") <= end_row)
                         )
 
                         # Count nulls in this sector
-                        null_count = sector_data.filter(pyspark_col(col_name).isNull()).count()
+                        null_count = sector_data.filter(
+                            pyspark_col(col_name).isNull()
+                        ).count()
                         missing_prop = (null_count / sector_size) * 100
                         col_missing_props.append(missing_prop)
                     else:
@@ -2933,11 +3036,13 @@ def missing_vals_tbl(data: FrameT | Any) -> GT:
                     from pyspark.sql.window import Window
 
                     window = Window.orderBy(pyspark_col(data.columns[0]))
-                    sector_data = data.withColumn("row_num", row_number().over(window)).filter(
-                        pyspark_col("row_num") > start_row
-                    )
+                    sector_data = data.withColumn(
+                        "row_num", row_number().over(window)
+                    ).filter(pyspark_col("row_num") > start_row)
 
-                    null_count = sector_data.filter(pyspark_col(col_name).isNull()).count()
+                    null_count = sector_data.filter(
+                        pyspark_col(col_name).isNull()
+                    ).count()
                     missing_prop = (null_count / sector_size) * 100
                     col_missing_props.append(missing_prop)
                 else:
@@ -2980,9 +3085,13 @@ def missing_vals_tbl(data: FrameT | Any) -> GT:
     n_missing_total_fmt = _format_to_integer_value(n_missing_total)
 
     # Create the label, table type, and thresholds HTML fragments
-    table_type_html = _create_table_type_html(tbl_type=tbl_type, tbl_name=None, font_size="10px")
+    table_type_html = _create_table_type_html(
+        tbl_type=tbl_type, tbl_name=None, font_size="10px"
+    )
 
-    tbl_dims_html = _create_table_dims_html(columns=len(col_names), rows=n_rows, font_size="10px")
+    tbl_dims_html = _create_table_dims_html(
+        columns=len(col_names), rows=n_rows, font_size="10px"
+    )
 
     check_mark = '<span style="color:#4CA64C;">&check;</span>'
 
@@ -3011,7 +3120,10 @@ def missing_vals_tbl(data: FrameT | Any) -> GT:
     row_ranges_html = (
         "<div style='font-size: 8px;'><ol style='margin-top: 2px; margin-left: -15px;'>"
         + "".join(
-            [f"<li>{row_range[0]} &ndash; {row_range[1]}</li>" for row_range in zip(*row_ranges)]
+            [
+                f"<li>{row_range[0]} &ndash; {row_range[1]}</li>"
+                for row_range in zip(*row_ranges)
+            ]
         )
         + "</ol></div>"
     )
@@ -3079,7 +3191,9 @@ def missing_vals_tbl(data: FrameT | Any) -> GT:
             locations=loc.body(),
         )
         .tab_style(
-            style=style.text(color="black", font=google_font(name="IBM Plex Mono"), size="12px"),
+            style=style.text(
+                color="black", font=google_font(name="IBM Plex Mono"), size="12px"
+            ),
             locations=loc.body(),
         )
         .tab_style(
@@ -3098,7 +3212,8 @@ def missing_vals_tbl(data: FrameT | Any) -> GT:
         import polars.selectors as cs
 
         missing_vals_tbl = missing_vals_tbl.tab_style(
-            style=style.fill(color="lightblue"), locations=loc.body(mask=cs.numeric().eq(0))
+            style=style.fill(color="lightblue"),
+            locations=loc.body(mask=cs.numeric().eq(0)),
         )
 
     if df_lib_name_gt == "pandas":
@@ -3203,7 +3318,9 @@ def _get_column_names_safe(data: Any) -> list[str]:
         return list(data.columns)  # pragma: no cover
 
 
-def _get_column_names(data: FrameT | Any, ibis_tbl: bool, df_lib_name_gt: str) -> list[str]:
+def _get_column_names(
+    data: FrameT | Any, ibis_tbl: bool, df_lib_name_gt: str
+) -> list[str]:
     if ibis_tbl:
         return data.columns if df_lib_name_gt == "polars" else list(data.columns)
 
@@ -3216,7 +3333,9 @@ def _validate_columns_subset(
 ) -> list[str]:
     if isinstance(columns_subset, str):
         if columns_subset not in col_names:
-            raise ValueError("The `columns_subset=` value doesn't match any columns in the table.")
+            raise ValueError(
+                "The `columns_subset=` value doesn't match any columns in the table."
+            )
         return [columns_subset]
 
     if isinstance(columns_subset, list):
@@ -3407,7 +3526,9 @@ def get_column_count(data: FrameT | Any) -> int:
         if "pandas" in str(type(data)):
             return data.shape[1]  # pragma: no cover
         else:
-            raise ValueError("The input table type supplied in `data=` is not supported.")
+            raise ValueError(
+                "The input table type supplied in `data=` is not supported."
+            )
 
 
 def _extract_enum_values(set_values: Any) -> list[Any]:
@@ -3627,7 +3748,9 @@ def get_row_count(data: FrameT | Any) -> int:
         elif "pyspark" in str(type(data)):  # pragma: no cover
             return data.count()
         else:
-            raise ValueError("The input table type supplied in `data=` is not supported.")
+            raise ValueError(
+                "The input table type supplied in `data=` is not supported."
+            )
 
 
 @dataclass
@@ -3794,7 +3917,9 @@ class _ValidationInfo:
         # Add the note entry
         self.notes[key] = {"markdown": markdown, "text": text}
 
-    def _get_notes(self, format: str = "dict") -> dict[str, dict[str, str]] | list[str] | None:
+    def _get_notes(
+        self, format: str = "dict"
+    ) -> dict[str, dict[str, str]] | list[str] | None:
         """
         Get notes associated with this validation step.
 
@@ -3938,7 +4063,9 @@ def _handle_connection_errors(e: Exception, connection_string: str) -> None:
 
     # Check if this is a missing backend dependency
     for backend, install_cmd in backend_install_map.items():
-        if backend in error_str and ("not found" in error_str or "no module" in error_str):
+        if backend in error_str and (
+            "not found" in error_str or "no module" in error_str
+        ):
             raise ConnectionError(
                 f"Missing {backend.upper()} backend for Ibis. Install it with:\n"
                 f"  {install_cmd}\n\n"
@@ -4029,7 +4156,11 @@ def connect_to_table(connection_string: str) -> Any:
         error_str = str(e).lower()
 
         # Check if this is a "table not found" error
-        if "table" in error_str and ("not found" in error_str or "does not exist" in error_str or "not exist" in error_str):
+        if "table" in error_str and (
+            "not found" in error_str
+            or "does not exist" in error_str
+            or "not exist" in error_str
+        ):
             # Try to get available tables for a helpful error message
             try:
                 available_tables = conn.list_tables()
@@ -4053,8 +4184,9 @@ def connect_to_table(connection_string: str) -> Any:
                 f"Original error: {e}"
             ) from e
 
-        # For other errors, use the generic connection error handler
-        _handle_connection_errors(e, base_connection)
+            # For other errors, use the generic connection error handler
+            _handle_connection_errors(e, base_connection)
+
 
 def print_database_tables(connection_string: str) -> list[str]:
     """
@@ -4080,6 +4212,19 @@ def print_database_tables(connection_string: str) -> list[str]:
 
     import ibis
 
+    # Validate connection string format before attempting connection
+    # Ensure its a proper connection string w/ no table suffix
+    if "://" not in connection_string or "::" in connection_string:
+        raise ValueError(
+            f"You've supplied an invalid connection string format: '{connection_string}'\n\n"
+            f"To print database tables, connection strings must follow this format without a table suffix: backend://connection_details\n"
+            f"Examples:\n"
+            f"- DuckDB: 'duckdb:///path/to/file.ddb'\n"
+            f"- SQLite: 'sqlite:///path/to/file.db'\n"
+            f"- PostgreSQL: 'postgresql://user:pass@host:port/db'\n"
+            f"- MySQL: 'mysql://user:pass@host:port/db'"
+        )
+
     try:
         # Connect to database
         conn = ibis.connect(connection_string)
@@ -4089,7 +4234,7 @@ def print_database_tables(connection_string: str) -> list[str]:
 
         return user_tables
 
-    except Exception:
+    except Exception as e:
         _handle_connection_errors(e, connection_string)
 
 
@@ -4680,7 +4825,9 @@ class Validate:
 
         # Check that `actions` is an Actions object if provided
         # TODO: allow string, callable, of list of either and upgrade to Actions object
-        if self.actions is not None and not isinstance(self.actions, Actions):  # pragma: no cover
+        if self.actions is not None and not isinstance(
+            self.actions, Actions
+        ):  # pragma: no cover
             raise TypeError(
                 "The `actions=` parameter must be an `Actions` object. "
                 "Please use `Actions()` to wrap your actions."
@@ -5112,7 +5259,9 @@ class Validate:
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
-            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+            self.thresholds
+            if thresholds is None
+            else _normalize_thresholds_creation(thresholds)
         )
 
         # If `columns` is a ColumnSelector or Narwhals selector, call `col()` on it to later
@@ -5403,7 +5552,9 @@ class Validate:
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
-            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+            self.thresholds
+            if thresholds is None
+            else _normalize_thresholds_creation(thresholds)
         )
 
         # If `columns` is a ColumnSelector or Narwhals selector, call `col()` on it to later
@@ -5690,11 +5841,15 @@ class Validate:
 
         # If value is a string-based date or datetime, convert it to the appropriate type
         # Allow regular strings to pass through for string comparisons
-        value = _conditional_string_date_dttm_conversion(value=value, allow_regular_strings=True)
+        value = _conditional_string_date_dttm_conversion(
+            value=value, allow_regular_strings=True
+        )
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
-            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+            self.thresholds
+            if thresholds is None
+            else _normalize_thresholds_creation(thresholds)
         )
 
         # If `columns` is a ColumnSelector or Narwhals selector, call `col()` on it to later
@@ -5979,11 +6134,15 @@ class Validate:
 
         # If value is a string-based date or datetime, convert it to the appropriate type
         # Allow regular strings to pass through for string comparisons
-        value = _conditional_string_date_dttm_conversion(value=value, allow_regular_strings=True)
+        value = _conditional_string_date_dttm_conversion(
+            value=value, allow_regular_strings=True
+        )
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
-            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+            self.thresholds
+            if thresholds is None
+            else _normalize_thresholds_creation(thresholds)
         )
 
         # If `columns` is a ColumnSelector or Narwhals selector, call `col()` on it to later
@@ -6275,7 +6434,9 @@ class Validate:
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
-            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+            self.thresholds
+            if thresholds is None
+            else _normalize_thresholds_creation(thresholds)
         )
 
         # If `columns` is a ColumnSelector or Narwhals selector, call `col()` on it to later
@@ -6567,7 +6728,9 @@ class Validate:
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
-            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+            self.thresholds
+            if thresholds is None
+            else _normalize_thresholds_creation(thresholds)
         )
 
         # If `columns` is a ColumnSelector or Narwhals selector, call `col()` on it to later
@@ -6886,7 +7049,9 @@ class Validate:
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
-            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+            self.thresholds
+            if thresholds is None
+            else _normalize_thresholds_creation(thresholds)
         )
 
         # If `columns` is a ColumnSelector or Narwhals selector, call `col()` on it to later
@@ -7206,7 +7371,9 @@ class Validate:
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
-            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+            self.thresholds
+            if thresholds is None
+            else _normalize_thresholds_creation(thresholds)
         )
 
         # If `columns` is a ColumnSelector or Narwhals selector, call `col()` on it to later
@@ -7515,7 +7682,9 @@ class Validate:
             if val is None:
                 continue
             if not isinstance(val, (float, int, str)):
-                raise ValueError("`set=` must be a list of floats, integers, or strings.")
+                raise ValueError(
+                    "`set=` must be a list of floats, integers, or strings."
+                )
 
         _check_pre(pre=pre)
         # TODO: add check for segments
@@ -7525,7 +7694,9 @@ class Validate:
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
-            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+            self.thresholds
+            if thresholds is None
+            else _normalize_thresholds_creation(thresholds)
         )
 
         # If `columns` is a ColumnSelector or Narwhals selector, call `col()` on it to later
@@ -7814,7 +7985,9 @@ class Validate:
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
-            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+            self.thresholds
+            if thresholds is None
+            else _normalize_thresholds_creation(thresholds)
         )
 
         # If `columns` is a ColumnSelector or Narwhals selector, call `col()` on it to later
@@ -7997,7 +8170,9 @@ class Validate:
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
-            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+            self.thresholds
+            if thresholds is None
+            else _normalize_thresholds_creation(thresholds)
         )
 
         # If `columns` is a ColumnSelector or Narwhals selector, call `col()` on it to later
@@ -8185,7 +8360,9 @@ class Validate:
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
-            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+            self.thresholds
+            if thresholds is None
+            else _normalize_thresholds_creation(thresholds)
         )
 
         # If `columns` is a ColumnSelector or Narwhals selector, call `col()` on it to later
@@ -8434,7 +8611,9 @@ class Validate:
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
-            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+            self.thresholds
+            if thresholds is None
+            else _normalize_thresholds_creation(thresholds)
         )
 
         # If `columns` is a ColumnSelector or Narwhals selector, call `col()` on it to later
@@ -8677,7 +8856,9 @@ class Validate:
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
-            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+            self.thresholds
+            if thresholds is None
+            else _normalize_thresholds_creation(thresholds)
         )
 
         # If `columns` is a ColumnSelector or Narwhals selector, call `col()` on it to later
@@ -8936,7 +9117,9 @@ class Validate:
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
-            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+            self.thresholds
+            if thresholds is None
+            else _normalize_thresholds_creation(thresholds)
         )
 
         # If `columns` is a ColumnSelector or Narwhals selector, call `col()` on it to later
@@ -9221,7 +9404,9 @@ class Validate:
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
-            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+            self.thresholds
+            if thresholds is None
+            else _normalize_thresholds_creation(thresholds)
         )
 
         # If `columns` is a ColumnSelector or Narwhals selector, call `col()` on it to later
@@ -9456,7 +9641,9 @@ class Validate:
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
-            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+            self.thresholds
+            if thresholds is None
+            else _normalize_thresholds_creation(thresholds)
         )
 
         # Determine brief to use (global or local) and transform any shorthands of `brief=`
@@ -9621,7 +9808,9 @@ class Validate:
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
-            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+            self.thresholds
+            if thresholds is None
+            else _normalize_thresholds_creation(thresholds)
         )
 
         # If `columns` is a ColumnSelector or Narwhals selector, call `col()` on it to later
@@ -9867,7 +10056,9 @@ class Validate:
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
-            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+            self.thresholds
+            if thresholds is None
+            else _normalize_thresholds_creation(thresholds)
         )
 
         if columns_subset is not None and isinstance(columns_subset, str):
@@ -10108,10 +10299,14 @@ class Validate:
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
-            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+            self.thresholds
+            if thresholds is None
+            else _normalize_thresholds_creation(thresholds)
         )
 
-        if columns_subset is not None and isinstance(columns_subset, str):  # pragma: no cover
+        if columns_subset is not None and isinstance(
+            columns_subset, str
+        ):  # pragma: no cover
             columns_subset = [columns_subset]  # pragma: no cover
 
         # TODO: incorporate Column object
@@ -10474,7 +10669,9 @@ class Validate:
         try:
             provider, model_name = model.split(sep=":", maxsplit=1)
         except ValueError:
-            raise ValueError(f"Model must be in format 'provider:model_name', got: {model}")
+            raise ValueError(
+                f"Model must be in format 'provider:model_name', got: {model}"
+            )
 
         # Error if an unsupported provider is used
         if provider not in MODEL_PROVIDERS:
@@ -10498,7 +10695,9 @@ class Validate:
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
-            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+            self.thresholds
+            if thresholds is None
+            else _normalize_thresholds_creation(thresholds)
         )
 
         # Determine brief to use (global or local) and transform any shorthands of `brief=`
@@ -10716,13 +10915,19 @@ class Validate:
         _check_boolean_input(param=active, param_name="active")
         _check_boolean_input(param=complete, param_name="complete")
         _check_boolean_input(param=in_order, param_name="in_order")
-        _check_boolean_input(param=case_sensitive_colnames, param_name="case_sensitive_colnames")
-        _check_boolean_input(param=case_sensitive_dtypes, param_name="case_sensitive_dtypes")
+        _check_boolean_input(
+            param=case_sensitive_colnames, param_name="case_sensitive_colnames"
+        )
+        _check_boolean_input(
+            param=case_sensitive_dtypes, param_name="case_sensitive_dtypes"
+        )
         _check_boolean_input(param=full_match_dtypes, param_name="full_match_dtypes")
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
-            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+            self.thresholds
+            if thresholds is None
+            else _normalize_thresholds_creation(thresholds)
         )
 
         # Package up the `schema=` and boolean params into a dictionary for later interrogation
@@ -10940,12 +11145,16 @@ class Validate:
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
-            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+            self.thresholds
+            if thresholds is None
+            else _normalize_thresholds_creation(thresholds)
         )
 
         # If `count` is a DataFrame or table then use the row count of the DataFrame as
         # the expected count
-        if _is_value_a_df(count) or "ibis.expr.types.relations.Table" in str(type(count)):
+        if _is_value_a_df(count) or "ibis.expr.types.relations.Table" in str(
+            type(count)
+        ):
             count = get_row_count(count)
 
         # Check the integrity of tolerance
@@ -11119,12 +11328,16 @@ class Validate:
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
-            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+            self.thresholds
+            if thresholds is None
+            else _normalize_thresholds_creation(thresholds)
         )
 
         # If `count` is a DataFrame or table then use the column count of the DataFrame as
         # the expected count
-        if _is_value_a_df(count) or "ibis.expr.types.relations.Table" in str(type(count)):
+        if _is_value_a_df(count) or "ibis.expr.types.relations.Table" in str(
+            type(count)
+        ):
             count = get_column_count(count)
 
         # Package up the `count=` and boolean params into a dictionary for later interrogation
@@ -11393,7 +11606,9 @@ class Validate:
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
-            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+            self.thresholds
+            if thresholds is None
+            else _normalize_thresholds_creation(thresholds)
         )
 
         # Package up the `tbl_compare` into a dictionary for later interrogation
@@ -11640,7 +11855,9 @@ class Validate:
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
-            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+            self.thresholds
+            if thresholds is None
+            else _normalize_thresholds_creation(thresholds)
         )
 
         # Determine brief to use (global or local) and transform any shorthands of `brief=`
@@ -11988,7 +12205,9 @@ class Validate:
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
-            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+            self.thresholds
+            if thresholds is None
+            else _normalize_thresholds_creation(thresholds)
         )
 
         # Determine brief to use (global or local) and transform any shorthands of `brief=`
@@ -12119,7 +12338,9 @@ class Validate:
         """
 
         # Raise if `get_first_n` and either or `sample_n` or `sample_frac` arguments are provided
-        if get_first_n is not None and (sample_n is not None or sample_frac is not None):
+        if get_first_n is not None and (
+            sample_n is not None or sample_frac is not None
+        ):
             raise ValueError(
                 "The `get_first_n=` argument cannot be provided with the `sample_n=` or "
                 "`sample_frac=` arguments."
@@ -12256,7 +12477,9 @@ class Validate:
                     validation.eval_error = True
                     end_time = datetime.datetime.now(datetime.timezone.utc)
                     validation.proc_duration_s = (end_time - start_time).total_seconds()
-                    validation.time_processed = end_time.isoformat(timespec="milliseconds")
+                    validation.time_processed = end_time.isoformat(
+                        timespec="milliseconds"
+                    )
                     validation.active = False
                     continue
 
@@ -12286,9 +12509,9 @@ class Validate:
             # Set the number of test units
             # ------------------------------------------------
 
-            validation.n = NumberOfTestUnits(df=data_tbl_step, column=column).get_test_units(
-                tbl_type=tbl_type
-            )
+            validation.n = NumberOfTestUnits(
+                df=data_tbl_step, column=column
+            ).get_test_units(tbl_type=tbl_type)
 
             # Check if preprocessing or segmentation resulted in zero rows
             # Only apply this check to row-based validations, not table-level validations
@@ -12338,7 +12561,9 @@ class Validate:
                     ]:
                         # Process table for column validation
                         tbl = _column_test_prep(
-                            df=data_tbl_step, column=column, allowed_types=compatible_dtypes
+                            df=data_tbl_step,
+                            column=column,
+                            allowed_types=compatible_dtypes,
                         )
 
                         if assertion_method == "gt":
@@ -12374,8 +12599,12 @@ class Validate:
                             from pointblank._interrogation import interrogate_increasing
 
                             # Extract direction options from val_info
-                            allow_stationary = validation.val_info.get("allow_stationary", False)
-                            decreasing_tol = validation.val_info.get("decreasing_tol", 0.0)
+                            allow_stationary = validation.val_info.get(
+                                "allow_stationary", False
+                            )
+                            decreasing_tol = validation.val_info.get(
+                                "decreasing_tol", 0.0
+                            )
 
                             results_tbl = interrogate_increasing(
                                 tbl=tbl,
@@ -12389,8 +12618,12 @@ class Validate:
                             from pointblank._interrogation import interrogate_decreasing
 
                             # Extract direction options from val_info
-                            allow_stationary = validation.val_info.get("allow_stationary", False)
-                            increasing_tol = validation.val_info.get("increasing_tol", 0.0)
+                            allow_stationary = validation.val_info.get(
+                                "allow_stationary", False
+                            )
+                            increasing_tol = validation.val_info.get(
+                                "increasing_tol", 0.0
+                            )
 
                             results_tbl = interrogate_decreasing(
                                 tbl=tbl,
@@ -12421,7 +12654,9 @@ class Validate:
                             )
 
                         elif assertion_type == "col_vals_in_set":
-                            results_tbl = interrogate_isin(tbl=tbl, column=column, set_values=value)
+                            results_tbl = interrogate_isin(
+                                tbl=tbl, column=column, set_values=value
+                            )
 
                         elif assertion_type == "col_vals_not_in_set":
                             results_tbl = interrogate_notin(
@@ -12434,7 +12669,9 @@ class Validate:
                             )
 
                         elif assertion_type == "col_vals_within_spec":
-                            from pointblank._interrogation import interrogate_within_spec
+                            from pointblank._interrogation import (
+                                interrogate_within_spec,
+                            )
 
                             results_tbl = interrogate_within_spec(
                                 tbl=tbl, column=column, values=value, na_pass=na_pass
@@ -12451,7 +12688,9 @@ class Validate:
                         )
 
                     elif assertion_type == "rows_complete":
-                        results_tbl = rows_complete(data_tbl=data_tbl_step, columns_subset=column)
+                        results_tbl = rows_complete(
+                            data_tbl=data_tbl_step, columns_subset=column
+                        )
 
                     elif assertion_type == "prompt":
                         from pointblank._interrogation import interrogate_prompt
@@ -12523,7 +12762,9 @@ class Validate:
 
                     elif assertion_type == "col_count_match":
                         result_bool = col_count_match(
-                            data_tbl=data_tbl_step, count=value["count"], inverse=value["inverse"]
+                            data_tbl=data_tbl_step,
+                            count=value["count"],
+                            inverse=value["inverse"],
                         )
 
                         validation.all_passed = result_bool
@@ -12543,7 +12784,9 @@ class Validate:
                         if callable(tbl_compare):
                             tbl_compare = tbl_compare()
 
-                        result_bool = tbl_match(data_tbl=data_tbl_step, tbl_compare=tbl_compare)
+                        result_bool = tbl_match(
+                            data_tbl=data_tbl_step, tbl_compare=tbl_compare
+                        )
 
                         validation.all_passed = result_bool
                         validation.n = 1
@@ -12581,7 +12824,9 @@ class Validate:
                     if is_comparison_error:  # pragma: no cover
                         # If data quality comparison fails, mark the validation as having an eval_error
                         validation.eval_error = True  # pragma: no cover
-                        end_time = datetime.datetime.now(datetime.timezone.utc)  # pragma: no cover
+                        end_time = datetime.datetime.now(
+                            datetime.timezone.utc
+                        )  # pragma: no cover
                         validation.proc_duration_s = (
                             end_time - start_time
                         ).total_seconds()  # pragma: no cover
@@ -12639,7 +12884,9 @@ class Validate:
                 # Solely for the col_vals_in_set assertion type, any Null values in the
                 # `pb_is_good_` column are counted as failing test units
                 if assertion_type == "col_vals_in_set":
-                    null_count = _count_null_values_in_column(tbl=results_tbl, column="pb_is_good_")
+                    null_count = _count_null_values_in_column(
+                        tbl=results_tbl, column="pb_is_good_"
+                    )
                     validation.n_failed += null_count
 
                 # For column-value validations, the number of test units is the number of rows
@@ -12670,7 +12917,9 @@ class Validate:
                     validation,
                     level,
                     threshold._threshold_result(
-                        fraction_failing=validation.f_failed, test_units=validation.n, level=level
+                        fraction_failing=validation.f_failed,
+                        test_units=validation.n,
+                        level=level,
                     ),
                 )
 
@@ -12809,7 +13058,9 @@ class Validate:
                 # Handle LazyFrame row indexing which requires order_by parameter
                 try:
                     # Try without order_by first (for DataFrames)
-                    validation_extract_nw = validation_extract_nw.with_row_index(name="_row_num_")
+                    validation_extract_nw = validation_extract_nw.with_row_index(
+                        name="_row_num_"
+                    )
                 except TypeError:
                     # LazyFrames require order_by parameter: use first column for ordering
                     first_col = validation_extract_nw.columns[0]
@@ -12817,12 +13068,14 @@ class Validate:
                         name="_row_num_", order_by=first_col
                     )
 
-                validation_extract_nw = validation_extract_nw.filter(~nw.col("pb_is_good_")).drop(
-                    "pb_is_good_"
-                )  # noqa
+                validation_extract_nw = validation_extract_nw.filter(
+                    ~nw.col("pb_is_good_")
+                ).drop("pb_is_good_")  # noqa
 
                 # Add 1 to the row numbers to make them 1-indexed
-                validation_extract_nw = validation_extract_nw.with_columns(nw.col("_row_num_") + 1)
+                validation_extract_nw = validation_extract_nw.with_columns(
+                    nw.col("_row_num_") + 1
+                )
 
                 # Apply any sampling or limiting to the number of rows to extract
                 if get_first_n is not None:
@@ -12833,13 +13086,18 @@ class Validate:
                         validation_extract_nw = validation_extract_nw.sample(n=sample_n)
                     except AttributeError:
                         # For LazyFrames without sample method, collect first then sample
-                        validation_extract_native = validation_extract_nw.collect().to_native()
-                        if hasattr(validation_extract_native, "sample"):  # pragma: no cover
+                        validation_extract_native = (
+                            validation_extract_nw.collect().to_native()
+                        )
+                        if hasattr(
+                            validation_extract_native, "sample"
+                        ):  # pragma: no cover
                             # PySpark DataFrame has sample method
                             validation_extract_native = (
                                 validation_extract_native.sample(  # pragma: no cover
                                     fraction=min(
-                                        1.0, sample_n / validation_extract_native.count()
+                                        1.0,
+                                        sample_n / validation_extract_native.count(),
                                     )  # pragma: no cover
                                 ).limit(sample_n)
                             )  # pragma: no cover
@@ -12848,32 +13106,40 @@ class Validate:
                             )  # pragma: no cover
                         else:
                             # Fallback: just take first n rows after collecting
-                            validation_extract_nw = validation_extract_nw.collect().head(
-                                sample_n
+                            validation_extract_nw = (
+                                validation_extract_nw.collect().head(sample_n)
                             )  # pragma: no cover
                 elif sample_frac is not None:
                     try:
-                        validation_extract_nw = validation_extract_nw.sample(fraction=sample_frac)
+                        validation_extract_nw = validation_extract_nw.sample(
+                            fraction=sample_frac
+                        )
                     except AttributeError:  # pragma: no cover
                         # For LazyFrames without sample method, collect first then sample
                         validation_extract_native = (
                             validation_extract_nw.collect().to_native()
                         )  # pragma: no cover
-                        if hasattr(validation_extract_native, "sample"):  # pragma: no cover
+                        if hasattr(
+                            validation_extract_native, "sample"
+                        ):  # pragma: no cover
                             # PySpark DataFrame has sample method
-                            validation_extract_native = validation_extract_native.sample(
-                                fraction=sample_frac
+                            validation_extract_native = (
+                                validation_extract_native.sample(fraction=sample_frac)
                             )  # pragma: no cover
                             validation_extract_nw = nw.from_native(
                                 validation_extract_native
                             )  # pragma: no cover
                         else:
                             # Fallback: use fraction to calculate head size
-                            collected = validation_extract_nw.collect()  # pragma: no cover
+                            collected = (
+                                validation_extract_nw.collect()
+                            )  # pragma: no cover
                             sample_size = max(
                                 1, int(len(collected) * sample_frac)
                             )  # pragma: no cover
-                            validation_extract_nw = collected.head(sample_size)  # pragma: no cover
+                            validation_extract_nw = collected.head(
+                                sample_size
+                            )  # pragma: no cover
 
                 # Ensure a limit is set on the number of rows to extract
                 try:
@@ -12902,7 +13168,9 @@ class Validate:
                     if column is not None:
                         column_names = column
                         column_names_subset = ["_row_num_"] + column
-                        validation_extract_nw = validation_extract_nw.select(column_names_subset)
+                        validation_extract_nw = validation_extract_nw.select(
+                            column_names_subset
+                        )
 
                     validation_extract_nw = (
                         validation_extract_nw.with_columns(
@@ -13205,7 +13473,8 @@ class Validate:
                 validation_step = self.validation_info[step_num - 1]
                 step_descriptor = (
                     validation_step.autobrief
-                    if hasattr(validation_step, "autobrief") and validation_step.autobrief
+                    if hasattr(validation_step, "autobrief")
+                    and validation_step.autobrief
                     else f"Validation step {step_num}"
                 )
                 failures.append(f"Step {step_num}: {step_descriptor}")
@@ -13215,8 +13484,9 @@ class Validate:
             if message:
                 msg = message
             else:
-                msg = f"The following steps exceeded the {level} threshold level:\n" + "\n".join(
-                    failures
+                msg = (
+                    f"The following steps exceeded the {level} threshold level:\n"
+                    + "\n".join(failures)
                 )
             raise AssertionError(msg)
 
@@ -13359,7 +13629,9 @@ class Validate:
         # Return True if any steps exceeded the threshold
         return any(status.values())
 
-    def n(self, i: int | list[int] | None = None, scalar: bool = False) -> dict[int, int] | int:
+    def n(
+        self, i: int | list[int] | None = None, scalar: bool = False
+    ) -> dict[int, int] | int:
         """
         Provides a dictionary of the number of test units for each validation step.
 
@@ -14272,7 +14544,9 @@ class Validate:
         return result
 
     def get_json_report(
-        self, use_fields: list[str] | None = None, exclude_fields: list[str] | None = None
+        self,
+        use_fields: list[str] | None = None,
+        exclude_fields: list[str] | None = None,
     ) -> str:
         """
         Get a report of the validation results as a JSON-formatted string.
@@ -14426,7 +14700,8 @@ class Validate:
 
         for validation_info in self.validation_info:
             report_entry = {
-                field: getattr(validation_info, field) for field in VALIDATION_REPORT_FIELDS
+                field: getattr(validation_info, field)
+                for field in VALIDATION_REPORT_FIELDS
             }
 
             # If preprocessing functions are included in the report, convert them to strings
@@ -14533,14 +14808,17 @@ class Validate:
         validation_info = [
             validation
             for validation in self.validation_info
-            if validation.assertion_type in ROW_BASED_VALIDATION_TYPES and validation.active
+            if validation.assertion_type in ROW_BASED_VALIDATION_TYPES
+            and validation.active
         ]
 
         # TODO: ensure that the stored evaluation tables across all steps have not been mutated
         # from the original table (via any `pre=` functions)
 
         # Obtain the validation steps that are to be used for sundering
-        validation_steps_i = [validation.assertion_type for validation in validation_info]
+        validation_steps_i = [
+            validation.assertion_type for validation in validation_info
+        ]
 
         if len(validation_steps_i) == 0:
             if type == "pass":
@@ -14591,7 +14869,9 @@ class Validate:
             if i == 0:
                 labeled_tbl_nw = results_tbl
             else:
-                labeled_tbl_nw = labeled_tbl_nw.join(results_tbl, on=index_name, how="left")
+                labeled_tbl_nw = labeled_tbl_nw.join(
+                    results_tbl, on=index_name, how="left"
+                )
 
         # Get list of columns that are the `pb_is_good_` columns
         pb_is_good_cols = [f"pb_is_good_{i}" for i in range(len(validation_steps_i))]
@@ -14690,7 +14970,9 @@ class Validate:
         # Step not found
         return None
 
-    def get_note(self, i: int, key: str, format: str = "dict") -> dict[str, str] | str | None:
+    def get_note(
+        self, i: int, key: str, format: str = "dict"
+    ) -> dict[str, str] | str | None:
         """
         Get a specific note from a validation step by its step number and note key.
 
@@ -14762,7 +15044,10 @@ class Validate:
         return None
 
     def get_tabular_report(
-        self, title: str | None = ":default:", incl_header: bool = None, incl_footer: bool = None
+        self,
+        title: str | None = ":default:",
+        incl_header: bool = None,
+        incl_footer: bool = None,
     ) -> GT:
         """
         Validation report as a GT table.
@@ -14918,7 +15203,9 @@ class Validate:
 
             # Create the label, table type, and thresholds HTML fragments
             label_html = _create_label_html(label=self.label, start_time="")
-            table_type_html = _create_table_type_html(tbl_type=tbl_info, tbl_name=self.tbl_name)
+            table_type_html = _create_table_type_html(
+                tbl_type=tbl_info, tbl_name=self.tbl_name
+            )
             thresholds_html = _create_thresholds_html(
                 thresholds=thresholds, locale=locale, df_lib=df_lib
             )
@@ -14938,7 +15225,9 @@ class Validate:
                 {
                     "status_color": "",
                     "i": "",
-                    "type_upd": VALIDATION_REPORT_TEXT["no_validation_steps_text"][lang],
+                    "type_upd": VALIDATION_REPORT_TEXT["no_validation_steps_text"][
+                        lang
+                    ],
                     "columns_upd": "",
                     "values_upd": "",
                     "tbl": "",
@@ -14960,10 +15249,13 @@ class Validate:
                 .opt_align_table_header(align=before)
                 .tab_style(style=style.css("height: 20px;"), locations=loc.body())
                 .tab_style(
-                    style=style.text(weight="bold", color="#666666"), locations=loc.column_labels()
+                    style=style.text(weight="bold", color="#666666"),
+                    locations=loc.column_labels(),
                 )
                 .tab_style(
-                    style=style.text(size="28px", weight="bold", align=before, color="#444444"),
+                    style=style.text(
+                        size="28px", weight="bold", align=before, color="#444444"
+                    ),
                     locations=loc.title(),
                 )
                 .tab_style(
@@ -14983,7 +15275,9 @@ class Validate:
                         "status_color": "",
                         "i": "",
                         "type_upd": VALIDATION_REPORT_TEXT["report_col_step"][lang],
-                        "columns_upd": VALIDATION_REPORT_TEXT["report_col_columns"][lang],
+                        "columns_upd": VALIDATION_REPORT_TEXT["report_col_columns"][
+                            lang
+                        ],
                         "values_upd": VALIDATION_REPORT_TEXT["report_col_values"][lang],
                         "tbl": "TBL",
                         "eval": "EVAL",
@@ -15019,11 +15313,15 @@ class Validate:
                     columns=["tbl", "eval", "w_upd", "e_upd", "c_upd", "extract_upd"],
                 )
                 .cols_align(align="right", columns=["test_units", "pass", "fail"])
-                .cols_align(align=before, columns=["type_upd", "columns_upd", "values_upd"])
+                .cols_align(
+                    align=before, columns=["type_upd", "columns_upd", "values_upd"]
+                )
                 .cols_move_to_start(columns=column_order)
                 .tab_options(table_font_size="90%")
                 .tab_source_note(
-                    source_note=VALIDATION_REPORT_TEXT["use_validation_methods_text"][lang]
+                    source_note=VALIDATION_REPORT_TEXT["use_validation_methods_text"][
+                        lang
+                    ]
                 )
             )
 
@@ -15033,7 +15331,9 @@ class Validate:
                 )  # pragma: no cover
 
             if incl_header:
-                gt_tbl = gt_tbl.tab_header(title=html(title_text), subtitle=html(combined_subtitle))
+                gt_tbl = gt_tbl.tab_header(
+                    title=html(title_text), subtitle=html(combined_subtitle)
+                )
 
             # If the version of `great_tables` is `>=0.17.0` then disable Quarto table processing
             if version("great_tables") >= "0.17.0":
@@ -15042,12 +15342,16 @@ class Validate:
             return gt_tbl
 
         # Convert the `validation_info` object to a dictionary
-        validation_info_dict = _validation_info_as_dict(validation_info=self.validation_info)
+        validation_info_dict = _validation_info_as_dict(
+            validation_info=self.validation_info
+        )
 
         # Has the validation been performed? We can check the first `time_processed` entry in the
         # dictionary to see if it is `None` or not; The output of many cells in the reporting table
         # will be made blank if the validation has not been performed
-        interrogation_performed = validation_info_dict.get("proc_duration_s", [None])[0] is not None
+        interrogation_performed = (
+            validation_info_dict.get("proc_duration_s", [None])[0] is not None
+        )
 
         # Determine which steps are those using segmented data
         segmented_steps = [
@@ -15144,7 +15448,9 @@ class Validate:
             elif assertion_type[i] in ["col_vals_between", "col_vals_outside"]:
                 left_bracket = "[" if inclusive[i][0] else "("
                 right_bracket = "]" if inclusive[i][1] else ")"
-                values_upd.append(f"{left_bracket}{value[0]}, {value[1]}{right_bracket}")
+                values_upd.append(
+                    f"{left_bracket}{value[0]}, {value[1]}{right_bracket}"
+                )
 
             # If the assertion type is a comparison of a set of values; strip the leading and
             # trailing square brackets and single quotes
@@ -15335,7 +15641,9 @@ class Validate:
                 status_color_list.append(SEVERITY_LEVEL_COLORS["warning"])  # CASE 4
             else:
                 # No threshold exceeded for {W, E, C} and NOT `all_passed`
-                status_color_list.append(SEVERITY_LEVEL_COLORS["green"] + "66")  # CASE 5
+                status_color_list.append(
+                    SEVERITY_LEVEL_COLORS["green"] + "66"
+                )  # CASE 5
 
         # Add the `status_color` entry to the dictionary
         validation_info_dict["status_color"] = status_color_list
@@ -15387,7 +15695,9 @@ class Validate:
             csv_text = extract_nw.write_csv()
 
             # Use Base64 encoding to encode the CSV text
-            csv_text_encoded = base64.b64encode(csv_text.encode("utf-8")).decode("utf-8")
+            csv_text_encoded = base64.b64encode(csv_text.encode("utf-8")).decode(
+                "utf-8"
+            )
 
             output_file_name = f"extract_{format(step_num, '04d')}.csv"
 
@@ -15456,10 +15766,14 @@ class Validate:
         # If no interrogation performed, populate the `i` entry with a sequence of integers
         # from `1` to the number of validation steps
         if not interrogation_performed:
-            validation_info_dict["i"] = list(range(1, len(validation_info_dict["type_upd"]) + 1))
+            validation_info_dict["i"] = list(
+                range(1, len(validation_info_dict["type_upd"]) + 1)
+            )
 
         # Create a table time string
-        table_time = _create_table_time_html(time_start=self.time_start, time_end=self.time_end)
+        table_time = _create_table_time_html(
+            time_start=self.time_start, time_end=self.time_end
+        )
 
         # Create the title text
         title_text = _get_title_text(
@@ -15471,7 +15785,9 @@ class Validate:
 
         # Create the label, table type, and thresholds HTML fragments
         label_html = _create_label_html(label=self.label, start_time=self.time_start)
-        table_type_html = _create_table_type_html(tbl_type=tbl_info, tbl_name=self.tbl_name)
+        table_type_html = _create_table_type_html(
+            tbl_type=tbl_info, tbl_name=self.tbl_name
+        )
         thresholds_html = _create_thresholds_html(
             thresholds=thresholds, locale=locale, df_lib=df_lib
         )
@@ -15503,10 +15819,13 @@ class Validate:
                 locations=loc.body(columns="i"),
             )
             .tab_style(
-                style=style.text(weight="bold", color="#666666"), locations=loc.column_labels()
+                style=style.text(weight="bold", color="#666666"),
+                locations=loc.column_labels(),
             )
             .tab_style(
-                style=style.text(size="28px", weight="bold", align=before, color="#444444"),
+                style=style.text(
+                    size="28px", weight="bold", align=before, color="#444444"
+                ),
                 locations=loc.title(),
             )
             .tab_style(
@@ -15514,7 +15833,14 @@ class Validate:
                     color="black", font=google_font(name="IBM Plex Mono"), size="11px"
                 ),
                 locations=loc.body(
-                    columns=["type_upd", "columns_upd", "values_upd", "test_units", "pass", "fail"]
+                    columns=[
+                        "type_upd",
+                        "columns_upd",
+                        "values_upd",
+                        "test_units",
+                        "pass",
+                        "fail",
+                    ]
                 ),
             )
             .tab_style(
@@ -15522,11 +15848,15 @@ class Validate:
                 locations=loc.body(columns="type_upd", rows=segmented_steps),
             )
             .tab_style(
-                style=style.fill(color="#FCFCFC" if interrogation_performed else "white"),
+                style=style.fill(
+                    color="#FCFCFC" if interrogation_performed else "white"
+                ),
                 locations=loc.body(columns=["w_upd", "e_upd", "c_upd"]),
             )
             .tab_style(
-                style=style.fill(color="#FCFCFC" if interrogation_performed else "white"),
+                style=style.fill(
+                    color="#FCFCFC" if interrogation_performed else "white"
+                ),
                 locations=loc.body(columns=["tbl", "eval"]),
             )
             .tab_style(
@@ -15575,7 +15905,9 @@ class Validate:
             )
             .tab_style(
                 style=style.fill(
-                    color=from_column(column="status_color") if interrogation_performed else "white"
+                    color=from_column(column="status_color")
+                    if interrogation_performed
+                    else "white"
                 ),
                 locations=loc.body(columns="status_color"),
             )
@@ -15584,7 +15916,9 @@ class Validate:
                 locations=loc.body(columns="status_color"),
             )
             .tab_style(
-                style=style.css("white-space: nowrap; text-overflow: ellipsis; overflow: hidden;"),
+                style=style.css(
+                    "white-space: nowrap; text-overflow: ellipsis; overflow: hidden;"
+                ),
                 locations=loc.body(columns=["columns_upd", "values_upd"]),
             )
             .cols_label(
@@ -15624,7 +15958,8 @@ class Validate:
                 }
             )
             .cols_align(
-                align="center", columns=["tbl", "eval", "w_upd", "e_upd", "c_upd", "extract_upd"]
+                align="center",
+                columns=["tbl", "eval", "w_upd", "e_upd", "c_upd", "extract_upd"],
             )
             .cols_align(align="right", columns=["test_units", "pass", "fail"])
             .cols_align(align=before, columns=["type_upd", "columns_upd", "values_upd"])
@@ -15633,7 +15968,9 @@ class Validate:
         )
 
         if incl_header:
-            gt_tbl = gt_tbl.tab_header(title=html(title_text), subtitle=html(combined_subtitle))
+            gt_tbl = gt_tbl.tab_header(
+                title=html(title_text), subtitle=html(combined_subtitle)
+            )
 
         if incl_footer:
             # Add table time as HTML source note
@@ -15650,7 +15987,16 @@ class Validate:
             gt_tbl = gt_tbl.tab_style(
                 style=style.fill(color="#F2F2F2"),
                 locations=loc.body(
-                    columns=["tbl", "eval", "test_units", "pass", "fail", "w_upd", "e_upd", "c_upd"]
+                    columns=[
+                        "tbl",
+                        "eval",
+                        "test_units",
+                        "pass",
+                        "fail",
+                        "w_upd",
+                        "e_upd",
+                        "c_upd",
+                    ]
                 ),
             )
 
@@ -15670,12 +16016,15 @@ class Validate:
         if eval_error:
             gt_tbl = gt_tbl.tab_style(
                 style=style.fill(color="#FFC1C159"),
-                locations=loc.body(rows=[i for i, error in enumerate(eval_error) if error]),
+                locations=loc.body(
+                    rows=[i for i, error in enumerate(eval_error) if error]
+                ),
             )
             gt_tbl = gt_tbl.tab_style(
                 style=style.text(color="#B22222"),
                 locations=loc.body(
-                    columns="columns_upd", rows=[i for i, error in enumerate(eval_error) if error]
+                    columns="columns_upd",
+                    rows=[i for i, error in enumerate(eval_error) if error],
                 ),
             )
 
@@ -15863,7 +16212,9 @@ class Validate:
             raise ValueError("The limit must be an integer value greater than 0.")
 
         # Convert the `validation_info` object to a dictionary
-        validation_info_dict = _validation_info_as_dict(validation_info=self.validation_info)
+        validation_info_dict = _validation_info_as_dict(
+            validation_info=self.validation_info
+        )
 
         # Obtain the language and locale
         lang = self.lang
@@ -15871,7 +16222,9 @@ class Validate:
 
         # Filter the dictionary to include only the information for the selected step
         validation_step = {
-            key: value[i - 1] for key, value in validation_info_dict.items() if key != "i"
+            key: value[i - 1]
+            for key, value in validation_info_dict.items()
+            if key != "i"
         }
 
         # From `validation_step` pull out key values for the report
@@ -15893,7 +16246,9 @@ class Validate:
                 column_list = list(self.data.columns)
                 column_position = column_list.index(column) + 1
             elif isinstance(column, list):
-                column_position = [list(self.data.columns).index(col) + 1 for col in column]
+                column_position = [
+                    list(self.data.columns).index(col) + 1 for col in column
+                ]
             else:
                 column_position = None  # pragma: no cover
         else:
@@ -16002,7 +16357,9 @@ class Validate:
         """
 
         # Get the largest value of `i_o` in the `validation_info`
-        max_i_o = max([validation.i_o for validation in self.validation_info], default=0)
+        max_i_o = max(
+            [validation.i_o for validation in self.validation_info], default=0
+        )
 
         # Set the `i_o` attribute to the largest value of `i_o` plus 1
         validation_info.i_o = max_i_o + 1
@@ -16053,7 +16410,9 @@ class Validate:
 
                 # Evaluate the column expression
                 if isinstance(column_expr, ColumnSelectorNarwhals):
-                    columns_resolved = ColumnSelectorNarwhals(column_expr).resolve(table=table)
+                    columns_resolved = ColumnSelectorNarwhals(column_expr).resolve(
+                        table=table
+                    )
                 else:
                     columns_resolved = column_expr.resolve(columns=columns, table=table)
 
@@ -16125,7 +16484,9 @@ class Validate:
                 # If the `segments` expression is a string, that string is taken as a column name
                 # for which segmentation should occur across unique values in the column
                 if isinstance(segments_expr, str):
-                    seg_tuples = _seg_expr_from_string(data_tbl=table, segments_expr=segments_expr)
+                    seg_tuples = _seg_expr_from_string(
+                        data_tbl=table, segments_expr=segments_expr
+                    )
 
                 # If the 'segments' expression is a tuple, then normalize it to a list of tuples
                 # - ("col", "value") -> [("col", "value")]
@@ -16172,7 +16533,9 @@ class Validate:
 
         return self
 
-    def _get_validation_dict(self, i: int | list[int] | None, attr: str) -> dict[int, int]:
+    def _get_validation_dict(
+        self, i: int | list[int] | None, attr: str
+    ) -> dict[int, int]:
         """
         Utility function to get a dictionary of validation attributes for each validation step.
 
@@ -16193,7 +16556,10 @@ class Validate:
             i = [i]
 
         if i is None:
-            return {validation.i: getattr(validation, attr) for validation in self.validation_info}
+            return {
+                validation.i: getattr(validation, attr)
+                for validation in self.validation_info
+            }
 
         return {
             validation.i: getattr(validation, attr)
@@ -16223,13 +16589,23 @@ class Validate:
         # Create a summary of validation results as a dictionary
         summary = {
             "n_steps": len(self.validation_info),
-            "n_passing_steps": sum(1 for step in self.validation_info if step.all_passed),
-            "n_failing_steps": sum(1 for step in self.validation_info if not step.all_passed),
+            "n_passing_steps": sum(
+                1 for step in self.validation_info if step.all_passed
+            ),
+            "n_failing_steps": sum(
+                1 for step in self.validation_info if not step.all_passed
+            ),
             "n_warning_steps": sum(1 for step in self.validation_info if step.warning),
             "n_error_steps": sum(1 for step in self.validation_info if step.error),
-            "n_critical_steps": sum(1 for step in self.validation_info if step.critical),
-            "list_passing_steps": [step.i for step in self.validation_info if step.all_passed],
-            "list_failing_steps": [step.i for step in self.validation_info if not step.all_passed],
+            "n_critical_steps": sum(
+                1 for step in self.validation_info if step.critical
+            ),
+            "list_passing_steps": [
+                step.i for step in self.validation_info if step.all_passed
+            ],
+            "list_failing_steps": [
+                step.i for step in self.validation_info if not step.all_passed
+            ],
             "dict_n": {step.i: step.n for step in self.validation_info},
             "dict_n_passed": {step.i: step.n_passed for step in self.validation_info},
             "dict_n_failed": {step.i: step.n_failed for step in self.validation_info},
@@ -16543,7 +16919,9 @@ def _process_brief(
                 segment_value_str = ", ".join(str(v) for v in segments[0])
             else:
                 # Multiple segments: join each segment with commas, separate segments with " | "
-                segment_value_str = " | ".join([", ".join(str(v) for v in seg) for seg in segments])
+                segment_value_str = " | ".join(
+                    [", ".join(str(v) for v in seg) for seg in segments]
+                )
         else:
             # For regular lists or other types, convert to string
             if isinstance(segment_value, list):
@@ -16624,7 +17002,11 @@ def _process_action_str(
 
 
 def _create_autobrief_or_failure_text(
-    assertion_type: str, lang: str, column: str | None, values: str | None, for_failure: bool
+    assertion_type: str,
+    lang: str,
+    column: str | None,
+    values: str | None,
+    for_failure: bool,
 ) -> str:
     if assertion_type in [
         "col_vals_gt",
@@ -16829,7 +17211,11 @@ def _create_text_between(
 
 
 def _create_text_set(
-    lang: str, column: str | None, values: list[any], not_: bool = False, for_failure: bool = False
+    lang: str,
+    column: str | None,
+    values: list[any],
+    not_: bool = False,
+    for_failure: bool = False,
 ) -> str:
     type_ = _expect_failure_type(for_failure=for_failure)
 
@@ -16904,12 +17290,16 @@ def _create_text_expr(lang: str, for_failure: bool) -> str:
     return EXPECT_FAIL_TEXT[f"col_vals_expr_{type_}_text"][lang]
 
 
-def _create_text_col_exists(lang: str, column: str | None, for_failure: bool = False) -> str:
+def _create_text_col_exists(
+    lang: str, column: str | None, for_failure: bool = False
+) -> str:
     type_ = _expect_failure_type(for_failure=for_failure)
 
     column_text = _prep_column_text(column=column)
 
-    return EXPECT_FAIL_TEXT[f"col_exists_{type_}_text"][lang].format(column_text=column_text)
+    return EXPECT_FAIL_TEXT[f"col_exists_{type_}_text"][lang].format(
+        column_text=column_text
+    )
 
 
 def _create_text_col_schema_match(lang: str, for_failure: bool) -> str:
@@ -16954,20 +17344,28 @@ def _create_text_rows_complete(
     return text
 
 
-def _create_text_row_count_match(lang: str, value: int, for_failure: bool = False) -> str:
+def _create_text_row_count_match(
+    lang: str, value: int, for_failure: bool = False
+) -> str:
     type_ = _expect_failure_type(for_failure=for_failure)
 
     values_text = _prep_values_text(value["count"], lang=lang)
 
-    return EXPECT_FAIL_TEXT[f"row_count_match_n_{type_}_text"][lang].format(values_text=values_text)
+    return EXPECT_FAIL_TEXT[f"row_count_match_n_{type_}_text"][lang].format(
+        values_text=values_text
+    )
 
 
-def _create_text_col_count_match(lang: str, value: int, for_failure: bool = False) -> str:
+def _create_text_col_count_match(
+    lang: str, value: int, for_failure: bool = False
+) -> str:
     type_ = _expect_failure_type(for_failure=for_failure)
 
     values_text = _prep_values_text(value["count"], lang=lang)
 
-    return EXPECT_FAIL_TEXT[f"col_count_match_n_{type_}_text"][lang].format(values_text=values_text)
+    return EXPECT_FAIL_TEXT[f"col_count_match_n_{type_}_text"][lang].format(
+        values_text=values_text
+    )
 
 
 def _create_text_conjointly(lang: str, for_failure: bool = False) -> str:
@@ -17148,7 +17546,9 @@ def _seg_expr_from_tuple(segments_expr: tuple) -> list[tuple[str, Any]]:
             seg_tuples = [(column, segment)]
     # If the first element is not a string, raise an error
     else:  # pragma: no cover
-        raise ValueError("The first element of the segments expression must be a string.")
+        raise ValueError(
+            "The first element of the segments expression must be a string."
+        )
 
     return seg_tuples
 
@@ -17240,16 +17640,22 @@ def _apply_segments(data_tbl: any, segments_expr: tuple[str, Any]) -> any:
                     content = segment_str[2:-2]  # pragma: no cover
 
                     # Try parsing as date first
-                    if len(content) == 10 and content.count("-") == 2:  # pragma: no cover
+                    if (
+                        len(content) == 10 and content.count("-") == 2
+                    ):  # pragma: no cover
                         try:  # pragma: no cover
-                            parsed_value = date.fromisoformat(content)  # pragma: no cover
+                            parsed_value = date.fromisoformat(
+                                content
+                            )  # pragma: no cover
                         except ValueError:  # pragma: no cover
                             pass  # pragma: no cover
 
                     # Try parsing as datetime
                     if parsed_value is None:  # pragma: no cover
                         try:  # pragma: no cover
-                            parsed_dt = datetime.fromisoformat(content.replace(" UTC", ""))
+                            parsed_dt = datetime.fromisoformat(
+                                content.replace(" UTC", "")
+                            )
                             if parsed_dt.time() == datetime.min.time():
                                 parsed_value = parsed_dt.date()
                             else:
@@ -17298,7 +17704,9 @@ def _apply_segments(data_tbl: any, segments_expr: tuple[str, Any]) -> any:
         if segment is None:
             data_tbl = data_tbl.filter(data_tbl[column].isnull())  # pragma: no cover
         elif isinstance(segment, list):
-            data_tbl = data_tbl.filter(data_tbl[column].isin(segment))  # pragma: no cover
+            data_tbl = data_tbl.filter(
+                data_tbl[column].isin(segment)
+            )  # pragma: no cover
         else:
             data_tbl = data_tbl.filter(data_tbl[column] == segment)
 
@@ -17392,7 +17800,9 @@ def _get_title_text(
     if interrogation_performed:
         return title
 
-    no_interrogation_text = VALIDATION_REPORT_TEXT["no_interrogation_performed_text"][lang]
+    no_interrogation_text = VALIDATION_REPORT_TEXT["no_interrogation_performed_text"][
+        lang
+    ]
 
     # If no interrogation was performed, return title text indicating that
     if lang not in RTL_LANGUAGES:
@@ -17426,7 +17836,9 @@ def _get_title_text(
 
 
 def _process_title_text(title: str | None, tbl_name: str | None, lang: str) -> str:
-    default_title_text = VALIDATION_REPORT_TEXT["pointblank_validation_title_text"][lang]
+    default_title_text = VALIDATION_REPORT_TEXT["pointblank_validation_title_text"][
+        lang
+    ]
 
     if title is None:
         title_text = ""
@@ -17445,7 +17857,9 @@ def _process_title_text(title: str | None, tbl_name: str | None, lang: str) -> s
     return title_text
 
 
-def _transform_tbl_preprocessed(pre: any, seg: any, interrogation_performed: bool) -> list[str]:
+def _transform_tbl_preprocessed(
+    pre: any, seg: any, interrogation_performed: bool
+) -> list[str]:
     # If no interrogation was performed, return a list of empty strings
     if not interrogation_performed:
         return ["" for _ in range(len(pre))]
@@ -17473,7 +17887,10 @@ def _get_preprocessed_table_icon(icon: list[str]) -> list[str]:
 
 
 def _transform_eval(
-    n: list[int], interrogation_performed: bool, eval_error: list[bool], active: list[bool]
+    n: list[int],
+    interrogation_performed: bool,
+    eval_error: list[bool],
+    active: list[bool],
 ) -> list[str]:
     # If no interrogation was performed, return a list of empty strings
     if not interrogation_performed:
@@ -17521,10 +17938,14 @@ def _format_single_number_with_gt(
     df = df_lib.DataFrame({"value": [value]})
 
     # Create GT object and format the column
-    gt_obj = GT(df).fmt_number(columns="value", n_sigfig=n_sigfig, compact=compact, locale=locale)
+    gt_obj = GT(df).fmt_number(
+        columns="value", n_sigfig=n_sigfig, compact=compact, locale=locale
+    )
 
     # Extract the formatted value using _get_column_of_values
-    formatted_values = _get_column_of_values(gt_obj, column_name="value", context="html")
+    formatted_values = _get_column_of_values(
+        gt_obj, column_name="value", context="html"
+    )
 
     return formatted_values[0]  # Return the single formatted value
 
@@ -17549,11 +17970,17 @@ def _transform_test_units(
             )
         else:
             # Fallback to the original behavior
-            return str(vals.fmt_number(value, n_sigfig=3, compact=True, locale=locale)[0])
+            return str(
+                vals.fmt_number(value, n_sigfig=3, compact=True, locale=locale)[0]
+            )
 
     return [
         (
-            (str(test_units[i]) if test_units[i] < 10000 else _format_number_safe(test_units[i]))
+            (
+                str(test_units[i])
+                if test_units[i] < 10000
+                else _format_number_safe(test_units[i])
+            )
             if active[i]
             else "&mdash;"
         )
@@ -17597,7 +18024,9 @@ def _format_single_float_with_gt(
     gt_obj = GT(df).fmt_number(columns="value", decimals=decimals, locale=locale)
 
     # Extract the formatted value using _get_column_of_values
-    formatted_values = _get_column_of_values(gt_obj, column_name="value", context="html")
+    formatted_values = _get_column_of_values(
+        gt_obj, column_name="value", context="html"
+    )
 
     return formatted_values[0]  # Return the single formatted value
 
@@ -17617,10 +18046,14 @@ def _transform_passed_failed(
     def _format_float_safe(value: float) -> str:
         if df_lib is not None:
             # Use GT-based formatting to avoid Pandas dependency completely
-            return _format_single_float_with_gt(value, decimals=2, locale=locale, df_lib=df_lib)
+            return _format_single_float_with_gt(
+                value, decimals=2, locale=locale, df_lib=df_lib
+            )
         else:
             # Fallback to the original behavior
-            return vals.fmt_number(value, decimals=2, locale=locale)[0]  # pragma: no cover
+            return vals.fmt_number(value, decimals=2, locale=locale)[
+                0
+            ]  # pragma: no cover
 
     passed_failed = [
         (
@@ -17694,7 +18127,9 @@ def _transform_assertion_str(
         # In some sandboxed HTML environments (e.g., Streamlit), <p> tags don't inherit
         # font-size from parent divs, so we add inline styles directly to the <p> tags
         brief_str = [
-            re.sub(r"<p>", r'<p style="font-size: inherit; margin: 0;">', x) if x.strip() else x
+            re.sub(r"<p>", r'<p style="font-size: inherit; margin: 0;">', x)
+            if x.strip()
+            else x
             for x in brief_str
         ]
 
@@ -17727,7 +18162,9 @@ def _transform_assertion_str(
         </div>
         {brief_div}
         """
-        for assertion, svg, size, brief_div in zip(assertion_str, svg_icon, text_size, brief_divs)
+        for assertion, svg, size, brief_div in zip(
+            assertion_str, svg_icon, text_size, brief_divs
+        )
     ]
 
     # If the `segments` list is not empty, prepend a segmentation div to the `type_upd` strings
@@ -17948,7 +18385,9 @@ def _format_single_integer_with_gt(value: int, locale: str = "en", df_lib=None) 
     gt_obj = GT(df).fmt_integer(columns="value", locale=locale)
 
     # Extract the formatted value using _get_column_of_values
-    formatted_values = _get_column_of_values(gt_obj, column_name="value", context="html")
+    formatted_values = _get_column_of_values(
+        gt_obj, column_name="value", context="html"
+    )
 
     return formatted_values[0]  # Return the single formatted value
 
@@ -17981,11 +18420,16 @@ def _format_single_float_with_gt_custom(
 
     # Create GT object and format the column
     gt_obj = GT(df).fmt_number(
-        columns="value", decimals=decimals, drop_trailing_zeros=drop_trailing_zeros, locale=locale
+        columns="value",
+        decimals=decimals,
+        drop_trailing_zeros=drop_trailing_zeros,
+        locale=locale,
     )
 
     # Extract the formatted value using _get_column_of_values
-    formatted_values = _get_column_of_values(gt_obj, column_name="value", context="html")
+    formatted_values = _get_column_of_values(
+        gt_obj, column_name="value", context="html"
+    )
 
     return formatted_values[0]  # Return the single formatted value
 
@@ -17995,7 +18439,9 @@ def _create_thresholds_html(thresholds: Thresholds, locale: str, df_lib=None) ->
         return ""
 
     # Helper functions to format numbers safely
-    def _format_number_safe(value: float, decimals: int, drop_trailing_zeros: bool = False) -> str:
+    def _format_number_safe(
+        value: float, decimals: int, drop_trailing_zeros: bool = False
+    ) -> str:
         if df_lib is not None and value is not None:
             # Use GT-based formatting to avoid Pandas dependency completely
             return _format_single_float_with_gt_custom(
@@ -18008,7 +18454,10 @@ def _create_thresholds_html(thresholds: Thresholds, locale: str, df_lib=None) ->
         else:
             # Fallback to the original behavior
             return fmt_number(
-                value, decimals=decimals, drop_trailing_zeros=drop_trailing_zeros, locale=locale
+                value,
+                decimals=decimals,
+                drop_trailing_zeros=drop_trailing_zeros,
+                locale=locale,
             )[0]  # pragma: no cover
 
     def _format_integer_safe(value: int) -> str:
@@ -18020,7 +18469,9 @@ def _create_thresholds_html(thresholds: Thresholds, locale: str, df_lib=None) ->
             return fmt_integer(value, locale=locale)[0]
 
     warning = (
-        _format_number_safe(thresholds.warning_fraction, decimals=3, drop_trailing_zeros=True)
+        _format_number_safe(
+            thresholds.warning_fraction, decimals=3, drop_trailing_zeros=True
+        )
         if thresholds.warning_fraction is not None
         else (
             _format_integer_safe(thresholds.warning_count)
@@ -18030,7 +18481,9 @@ def _create_thresholds_html(thresholds: Thresholds, locale: str, df_lib=None) ->
     )
 
     error = (
-        _format_number_safe(thresholds.error_fraction, decimals=3, drop_trailing_zeros=True)
+        _format_number_safe(
+            thresholds.error_fraction, decimals=3, drop_trailing_zeros=True
+        )
         if thresholds.error_fraction is not None
         else (
             _format_integer_safe(thresholds.error_count)
@@ -18040,7 +18493,9 @@ def _create_thresholds_html(thresholds: Thresholds, locale: str, df_lib=None) ->
     )
 
     critical = (
-        _format_number_safe(thresholds.critical_fraction, decimals=3, drop_trailing_zeros=True)
+        _format_number_safe(
+            thresholds.critical_fraction, decimals=3, drop_trailing_zeros=True
+        )
         if thresholds.critical_fraction is not None
         else (
             _format_integer_safe(thresholds.critical_count)
@@ -18133,7 +18588,9 @@ def _step_report_row_based(
     elif assertion_type == "col_vals_outside":
         symbol_left = "&lt;" if inclusive[0] else "&le;"
         symbol_right = "&gt;" if inclusive[1] else "&ge;"
-        text = f"{column} {symbol_left} {values[0]}, {column} {symbol_right} {values[1]}"
+        text = (
+            f"{column} {symbol_left} {values[0]}, {column} {symbol_right} {values[1]}"
+        )
     elif assertion_type == "col_vals_in_set":
         elements = ", ".join(map(str, values))
         text = f"{column} &isinv; {{{elements}}}"
@@ -18142,7 +18599,9 @@ def _step_report_row_based(
         text = f"{column} &NotElement; {{{elements}}}"
     elif assertion_type == "col_vals_regex":
         pattern = values["pattern"]
-        text = STEP_REPORT_TEXT["column_matches_regex"][lang].format(column=column, values=pattern)
+        text = STEP_REPORT_TEXT["column_matches_regex"][lang].format(
+            column=column, values=pattern
+        )
     elif assertion_type == "col_vals_null":
         text = STEP_REPORT_TEXT["column_is_null"][lang].format(column=column)
     elif assertion_type == "col_vals_not_null":
@@ -18156,9 +18615,7 @@ def _step_report_row_based(
             text = STEP_REPORT_TEXT["rows_complete_subset"][lang]
 
     # Wrap assertion text in a <code> tag
-    text = (
-        f"<code style='color: #303030; font-family: monospace; font-size: smaller;'>{text}</code>"
-    )
+    text = f"<code style='color: #303030; font-family: monospace; font-size: smaller;'>{text}</code>"
 
     if all_passed:
         # Style the target column in green and add borders but only if that column is present
@@ -18181,7 +18638,10 @@ def _step_report_row_based(
                 locations=loc.body(columns=column),
             ).tab_style(
                 style=style.borders(
-                    sides=["left", "right"], color="#1B4D3E80", style="solid", weight="2px"
+                    sides=["left", "right"],
+                    color="#1B4D3E80",
+                    style="solid",
+                    weight="2px",
                 ),
                 locations=loc.column_labels(columns=column),
             )
@@ -18192,7 +18652,11 @@ def _step_report_row_based(
         if header is None:
             return step_report
 
-        title = STEP_REPORT_TEXT["report_for_step_i"][lang].format(i=i) + " " + CHECK_MARK_SPAN
+        title = (
+            STEP_REPORT_TEXT["report_for_step_i"][lang].format(i=i)
+            + " "
+            + CHECK_MARK_SPAN
+        )
         assertion_header_text = STEP_REPORT_TEXT["assertion_header_text"][lang]
 
         # Use 'success_statement_no_column' for col_vals_expr() since it doesn't target
@@ -18263,7 +18727,10 @@ def _step_report_row_based(
                     style.text(color="#B22222"),
                     style.fill(color="#FFC1C159"),
                     style.borders(
-                        sides=["left", "right"], color="black", style="solid", weight="2px"
+                        sides=["left", "right"],
+                        color="black",
+                        style="solid",
+                        weight="2px",
                     ),
                 ],
                 locations=loc.body(columns=column),
@@ -18287,9 +18754,9 @@ def _step_report_row_based(
 
         # Use failure_rate_summary_no_column for col_vals_expr since it doesn't target a specific column
         if assertion_type == "col_vals_expr":
-            failure_rate_stmt = STEP_REPORT_TEXT["failure_rate_summary_no_column"][lang].format(
-                failure_rate=failure_rate_metrics
-            )
+            failure_rate_stmt = STEP_REPORT_TEXT["failure_rate_summary_no_column"][
+                lang
+            ].format(failure_rate=failure_rate_metrics)
         else:
             failure_rate_stmt = STEP_REPORT_TEXT["failure_rate_summary"][lang].format(
                 failure_rate=failure_rate_metrics,
@@ -18299,13 +18766,15 @@ def _step_report_row_based(
         if limit < extract_length:
             extract_length_resolved = limit
             extract_text = STEP_REPORT_TEXT["extract_text_first"][lang].format(
-                extract_length_resolved=extract_length_resolved, shown_failures=shown_failures
+                extract_length_resolved=extract_length_resolved,
+                shown_failures=shown_failures,
             )
 
         else:
             extract_length_resolved = extract_length
             extract_text = STEP_REPORT_TEXT["extract_text_all"][lang].format(
-                extract_length_resolved=extract_length_resolved, shown_failures=shown_failures
+                extract_length_resolved=extract_length_resolved,
+                shown_failures=shown_failures,
             )
 
         details = (
@@ -18368,7 +18837,9 @@ def _step_report_rows_distinct(
         text = STEP_REPORT_TEXT["rows_distinct_all"][lang].format(column=column)
     else:
         columns_list = ", ".join(column)
-        text = STEP_REPORT_TEXT["rows_distinct_subset"][lang].format(columns_subset=columns_list)
+        text = STEP_REPORT_TEXT["rows_distinct_subset"][lang].format(
+            columns_subset=columns_list
+        )
 
     if all_passed:
         step_report = tbl_preview
@@ -18376,7 +18847,11 @@ def _step_report_rows_distinct(
         if header is None:
             return step_report
 
-        title = STEP_REPORT_TEXT["report_for_step_i"][lang].format(i=i) + " " + CHECK_MARK_SPAN
+        title = (
+            STEP_REPORT_TEXT["report_for_step_i"][lang].format(i=i)
+            + " "
+            + CHECK_MARK_SPAN
+        )
 
         success_stmt = STEP_REPORT_TEXT["success_statement_no_column"][lang].format(
             n=n,
@@ -18428,22 +18903,24 @@ def _step_report_rows_distinct(
         title = STEP_REPORT_TEXT["report_for_step_i"][lang].format(i=i)
         failure_rate_metrics = f"<strong>{n_failed}</strong> / <strong>{n}</strong>"
 
-        failure_rate_stmt = STEP_REPORT_TEXT["failure_rate_summary_rows_distinct"][lang].format(
+        failure_rate_stmt = STEP_REPORT_TEXT["failure_rate_summary_rows_distinct"][
+            lang
+        ].format(
             failure_rate=failure_rate_metrics,
             column_position=column_position,
         )
 
         if limit < extract_length:  # pragma: no cover
             extract_length_resolved = limit
-            extract_text = STEP_REPORT_TEXT["extract_text_first_rows_distinct"][lang].format(
-                extract_length_resolved=extract_length_resolved
-            )
+            extract_text = STEP_REPORT_TEXT["extract_text_first_rows_distinct"][
+                lang
+            ].format(extract_length_resolved=extract_length_resolved)
 
         else:
             extract_length_resolved = extract_length
-            extract_text = STEP_REPORT_TEXT["extract_text_all_rows_distinct"][lang].format(
-                extract_length_resolved=extract_length_resolved
-            )
+            extract_text = STEP_REPORT_TEXT["extract_text_all_rows_distinct"][
+                lang
+            ].format(extract_length_resolved=extract_length_resolved)
 
         details = (
             f"<div style='font-size: 13.6px; {direction_rtl}'>"
@@ -18677,7 +19154,9 @@ def _step_report_schema_in_order(
             }
         )
         .tab_style(
-            style=style.text(color="black", font=google_font(name="IBM Plex Mono"), size="13px"),
+            style=style.text(
+                color="black", font=google_font(name="IBM Plex Mono"), size="13px"
+            ),
             locations=loc.body(
                 columns=["col_name_target", "dtype_target", "col_name_exp", "dtype_exp"]
             ),
@@ -18687,11 +19166,15 @@ def _step_report_schema_in_order(
             locations=loc.body(columns=["index_target", "index_exp"]),
         )
         .tab_style(
-            style=style.borders(sides="left", color="#E5E5E5", style="double", weight="3px"),
+            style=style.borders(
+                sides="left", color="#E5E5E5", style="double", weight="3px"
+            ),
             locations=loc.body(columns="index_exp"),
         )
         .tab_style(
-            style=style.css("white-space: nowrap; text-overflow: ellipsis; overflow: hidden;"),
+            style=style.css(
+                "white-space: nowrap; text-overflow: ellipsis; overflow: hidden;"
+            ),
             locations=loc.body(
                 columns=["col_name_target", "dtype_target", "col_name_exp", "dtype_exp"]
             ),
@@ -18767,7 +19250,9 @@ def _step_report_schema_in_order(
 
         # Add a border below the row that terminates the target table schema
         step_report = step_report.tab_style(
-            style=style.borders(sides="bottom", color="#6699CC80", style="solid", weight="1px"),
+            style=style.borders(
+                sides="bottom", color="#6699CC80", style="solid", weight="1px"
+            ),
             locations=loc.body(rows=len(colnames_tgt) - 1),
         )
 
@@ -18788,7 +19273,11 @@ def _step_report_schema_in_order(
     passing_symbol = CHECK_MARK_SPAN if all_passed else CROSS_MARK_SPAN
 
     # Generate the title for the step report
-    title = STEP_REPORT_TEXT["report_for_step_i"][lang].format(i=step) + " " + passing_symbol
+    title = (
+        STEP_REPORT_TEXT["report_for_step_i"][lang].format(i=step)
+        + " "
+        + passing_symbol
+    )
 
     # Generate the details for the step report
     details = _create_col_schema_match_params_html(
@@ -19006,7 +19495,9 @@ def _step_report_schema_any_order(
                 dtype_exp.append("")  # pragma: no cover
 
             elif len(exp_columns_dict[column_name_exp_i]["dtype_input"]) > 1:
-                dtype = exp_columns_dict[column_name_exp_i]["dtype_input"]  # pragma: no cover
+                dtype = exp_columns_dict[column_name_exp_i][
+                    "dtype_input"
+                ]  # pragma: no cover
 
                 if (
                     exp_columns_dict[column_name_exp_i]["dtype_matched_pos"] is not None
@@ -19043,9 +19534,13 @@ def _step_report_schema_any_order(
 
             if not exp_columns_dict[column_name_exp_i]["colname_matched"]:
                 dtype_exp_correct.append("&mdash;")
-            elif not exp_columns_dict[column_name_exp_i]["dtype_present"]:  # pragma: no cover
+            elif not exp_columns_dict[column_name_exp_i][
+                "dtype_present"
+            ]:  # pragma: no cover
                 dtype_exp_correct.append("")  # pragma: no cover
-            elif exp_columns_dict[column_name_exp_i]["dtype_matched"]:  # pragma: no cover
+            elif exp_columns_dict[column_name_exp_i][
+                "dtype_matched"
+            ]:  # pragma: no cover
                 dtype_exp_correct.append(CHECK_MARK_SPAN)  # pragma: no cover
             else:  # pragma: no cover
                 dtype_exp_correct.append(CROSS_MARK_SPAN)  # pragma: no cover
@@ -19060,7 +19555,9 @@ def _step_report_schema_any_order(
             # Generate the range and convert to strings
             index_exp = [
                 str(i + len(columns_found) - 1)
-                for i in range(last_index_int, last_index_int + len(colnames_exp_unmatched))
+                for i in range(
+                    last_index_int, last_index_int + len(colnames_exp_unmatched)
+                )
             ]
 
         else:
@@ -19125,7 +19622,9 @@ def _step_report_schema_any_order(
         )
         .cols_align(align="right", columns="index_exp")
         .tab_style(
-            style=style.text(color="black", font=google_font(name="IBM Plex Mono"), size="13px"),
+            style=style.text(
+                color="black", font=google_font(name="IBM Plex Mono"), size="13px"
+            ),
             locations=loc.body(
                 columns=["col_name_target", "dtype_target", "col_name_exp", "dtype_exp"]
             ),
@@ -19135,11 +19634,15 @@ def _step_report_schema_any_order(
             locations=loc.body(columns=["index_target", "index_exp"]),
         )
         .tab_style(
-            style=style.borders(sides="left", color="#E5E5E5", style="double", weight="3px"),
+            style=style.borders(
+                sides="left", color="#E5E5E5", style="double", weight="3px"
+            ),
             locations=loc.body(columns="index_exp"),
         )
         .tab_style(
-            style=style.css("white-space: nowrap; text-overflow: ellipsis; overflow: hidden;"),
+            style=style.css(
+                "white-space: nowrap; text-overflow: ellipsis; overflow: hidden;"
+            ),
             locations=loc.body(
                 columns=["col_name_target", "dtype_target", "col_name_exp", "dtype_exp"]
             ),
@@ -19214,7 +19717,11 @@ def _step_report_schema_any_order(
     passing_symbol = CHECK_MARK_SPAN if all_passed else CROSS_MARK_SPAN
 
     # Generate the title for the step report
-    title = STEP_REPORT_TEXT["report_for_step_i"][lang].format(i=step) + " " + passing_symbol
+    title = (
+        STEP_REPORT_TEXT["report_for_step_i"][lang].format(i=step)
+        + " "
+        + passing_symbol
+    )
 
     # Generate the details for the step report
     details = _create_col_schema_match_params_html(
@@ -19258,9 +19765,7 @@ def _create_label_text_html(
     margin_top: str = "2px",
 ) -> str:
     if strikethrough:
-        strikethrough_rules = (
-            f" text-decoration: line-through; text-decoration-color: {strikethrough_color};"
-        )
+        strikethrough_rules = f" text-decoration: line-through; text-decoration-color: {strikethrough_color};"
     else:
         strikethrough_rules = ""
 
