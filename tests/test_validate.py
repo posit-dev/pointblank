@@ -11763,8 +11763,8 @@ def test_parquet_pandas_fails_when_only_pandas_available():
 
 def test_connect_to_table_ibis_not_available():
     # Patch it where it's actually called in the validate module
-    with patch("pointblank.validate._is_lib_present", return_value = False):
-        with pytest.raises(ImportError, match = "The Ibis library is not installed"):
+    with patch("pointblank.validate._is_lib_present", return_value=False):
+        with pytest.raises(ImportError, match="The Ibis library is not installed"):
             connect_to_table("duckdb://test.db::table")
 
 
@@ -11774,6 +11774,7 @@ def test_print_database_tables_ibis_not_available():
 
         with pytest.raises(ImportError, match="The Ibis library is not installed"):
             print_database_tables("duckdb://test.db")
+
 
 def test_connect_to_table_no_table_specified_with_tables():
     with patch("pointblank.validate._is_lib_present") as mock_is_lib:
@@ -11798,6 +11799,7 @@ def test_connect_to_table_no_table_specified_with_tables():
             assert "table3" in error_msg
             assert "duckdb://test.db::table1" in error_msg
 
+
 def test_print_database_tables_table_specified():
     with patch("pointblank.validate._is_lib_present") as mock_is_lib:
         mock_is_lib.return_value = True
@@ -11813,10 +11815,17 @@ def test_print_database_tables_table_specified():
                 print_database_tables("duckdb:///superbadpath.ddb::fogel_table")
 
             error_msg = str(exc_info.value)
-            assert "Connection string should not include table specification (::table_name)" in error_msg
+            assert (
+                "Connection string should not include table specification (::table_name)"
+                in error_msg
+            )
             assert "You've supplied: duckdb:///superbadpath.ddb::fogel_table" in error_msg
-            assert "Expected format: 'duckdb:///path/to/database.ddb' (without ::table_name)" in error_msg
+            assert (
+                "Expected format: 'duckdb:///path/to/database.ddb' (without ::table_name)"
+                in error_msg
+            )
             assert "duckdb:///superbadpath.ddb::fogel_table" in error_msg
+
 
 def test_print_database_tables_names_returned():
     pytest.importorskip("ibis")
@@ -11858,6 +11867,7 @@ def test_print_database_tables_names_returned():
         # Clean up temporary file
         if os.path.exists(temp_db_path):
             os.unlink(temp_db_path)
+
 
 def test_connect_to_table_no_table_specified_empty_db():
     with patch("pointblank.validate._is_lib_present") as mock_is_lib:
@@ -11927,6 +11937,7 @@ def test_connect_to_table_invalid_connection_string_format():
                 # Any exception is acceptable here as this is an edge case
                 pass
 
+
 def test_connect_to_table_table_not_found():
     with patch("pointblank.validate._is_lib_present") as mock_is_lib:
         mock_is_lib.return_value = True
@@ -11946,6 +11957,7 @@ def test_connect_to_table_table_not_found():
 
             error_msg = str(exc_info.value)
             assert "Table 'nonexistent' not found in database" in error_msg
+
 
 def test_print_database_tables_filters_memtables():
     """Test that memtable entries are filtered out from the results."""
@@ -12000,6 +12012,7 @@ def test_print_database_tables_generic_connection_error():
             assert "Failed to connect using: duckdb://test.db" in error_msg
             assert "Generic connection failure" in error_msg
 
+
 def test_connect_to_table_success():
     """Test successful connection to a table."""
     pytest.importorskip("ibis")
@@ -12023,25 +12036,27 @@ def test_connect_to_table_success():
 
         # Verify it's a table object
         assert table is not None
-        assert hasattr(table, 'execute')  # Ibis tables have execute method
+        assert hasattr(table, "execute")  # Ibis tables have execute method
 
         # Close the connection to the database before cleanup
         # Get the backend connection and disconnect it
-        if hasattr(table, '_find_backend'):
+        if hasattr(table, "_find_backend"):
             backend = table._find_backend()
-            if hasattr(backend, 'disconnect'):
+            if hasattr(backend, "disconnect"):
                 backend.disconnect()
 
     finally:
         if os.path.exists(temp_db_path):
             # Add a small delay to ensure file handle is released on Windows
             import time
+
             time.sleep(0.1)
             try:
                 os.unlink(temp_db_path)
             except PermissionError:
                 # If still locked, skip deletion (will be cleaned up by OS eventually)
                 pass
+
 
 def test_connect_to_table_table_not_found_with_available_tables():
     """Test error when table not found but other tables exist."""

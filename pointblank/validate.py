@@ -3947,7 +3947,7 @@ def _handle_connection_errors(e: Exception, connection_string: str) -> None:
             ) from e
 
     # Generic connection error
-    raise ConnectionError( # pragma: no cover
+    raise ConnectionError(  # pragma: no cover
         f"Failed to connect using: {connection_string}\n"
         f"Error: {e}\n\n"
         f"Supported connection string formats:\n"
@@ -3961,180 +3961,183 @@ def _handle_connection_errors(e: Exception, connection_string: str) -> None:
 
 
 def connect_to_table(connection_string: str) -> Any:
-        """
-            Connect to a database table using a connection string.
+    """
+    Connect to a database table using a connection string.
 
-            This utility function tests whether a connection string leads to a valid table and returns
-            the table object if successful. It provides helpful error messages when no table is specified
-            or when backend dependencies are missing.
+    This utility function tests whether a connection string leads to a valid table and returns
+    the table object if successful. It provides helpful error messages when no table is specified
+    or when backend dependencies are missing.
 
-            Parameters
-            ----------
-            connection_string
-                A database connection string with a required table specification using the `::table_name`
-                suffix. Supported formats are outlined in the *Supported Connection String Formats* section.
+    Parameters
+    ----------
+    connection_string
+        A database connection string with a required table specification using the `::table_name`
+        suffix. Supported formats are outlined in the *Supported Connection String Formats* section.
 
-            Returns
-            -------
-            Any
-                An Ibis table object for the specified database table.
+    Returns
+    -------
+    Any
+        An Ibis table object for the specified database table.
 
-            Supported Connection String Formats
-            -----------------------------------
-            The `connection_string` parameter must include a valid connection string with a table name
-            specified using the `::` syntax. Here are some examples on how to format connection strings
-            for various backends:
+    Supported Connection String Formats
+    -----------------------------------
+    The `connection_string` parameter must include a valid connection string with a table name
+    specified using the `::` syntax. Here are some examples on how to format connection strings
+    for various backends:
 
-            ```
-            DuckDB:     "duckdb:///path/to/database.ddb::table_name"
-            SQLite:     "sqlite:///path/to/database.db::table_name"
-            PostgreSQL: "postgresql://user:password@localhost:5432/database::table_name"
-            MySQL:      "mysql://user:password@localhost:3306/database::table_name"
-            BigQuery:   "bigquery://project/dataset::table_name"
-            Snowflake:  "snowflake://user:password@account/database/schema::table_name"
-            ```
+    ```
+    DuckDB:     "duckdb:///path/to/database.ddb::table_name"
+    SQLite:     "sqlite:///path/to/database.db::table_name"
+    PostgreSQL: "postgresql://user:password@localhost:5432/database::table_name"
+    MySQL:      "mysql://user:password@localhost:3306/database::table_name"
+    BigQuery:   "bigquery://project/dataset::table_name"
+    Snowflake:  "snowflake://user:password@account/database/schema::table_name"
+    ```
 
-            If the connection string does not include a table name, the function will attempt to connect to
-            the database and list available tables, providing guidance on how to specify a table.
+    If the connection string does not include a table name, the function will attempt to connect to
+    the database and list available tables, providing guidance on how to specify a table.
 
-            Examples
-            --------
-            Connect to a DuckDB table:
+    Examples
+    --------
+    Connect to a DuckDB table:
 
-            ```{python}
-            import pointblank as pb
+    ```{python}
+    import pointblank as pb
 
-            # Get path to a DuckDB database file from package data
-            duckdb_path = pb.get_data_path("game_revenue", "duckdb")
+    # Get path to a DuckDB database file from package data
+    duckdb_path = pb.get_data_path("game_revenue", "duckdb")
 
-            # Connect to the `game_revenue` table in the DuckDB database
-            game_revenue = pb.connect_to_table(f"duckdb:///{duckdb_path}::game_revenue")
+    # Connect to the `game_revenue` table in the DuckDB database
+    game_revenue = pb.connect_to_table(f"duckdb:///{duckdb_path}::game_revenue")
 
-            # Use with the `preview()` function
-            pb.preview(game_revenue)
-            ```
+    # Use with the `preview()` function
+    pb.preview(game_revenue)
+    ```
 
-            Here are some backend-specific connection examples:
+    Here are some backend-specific connection examples:
 
-            ```python
-            # PostgreSQL
-            pg_table = pb.connect_to_table(
-                "postgresql://user:password@localhost:5432/warehouse::customer_data"
-            )
+    ```python
+    # PostgreSQL
+    pg_table = pb.connect_to_table(
+        "postgresql://user:password@localhost:5432/warehouse::customer_data"
+    )
 
-            # SQLite
-            sqlite_table = pb.connect_to_table("sqlite:///local_data.db::products")
+    # SQLite
+    sqlite_table = pb.connect_to_table("sqlite:///local_data.db::products")
 
-            # BigQuery
-            bq_table = pb.connect_to_table("bigquery://my-project/analytics::daily_metrics")
-            ```
+    # BigQuery
+    bq_table = pb.connect_to_table("bigquery://my-project/analytics::daily_metrics")
+    ```
 
-            This function requires the Ibis library with appropriate backend drivers:
+    This function requires the Ibis library with appropriate backend drivers:
 
-            ```bash
-            # You can install a set of common backends:
-            pip install 'ibis-framework[duckdb,postgres,mysql,sqlite]'
+    ```bash
+    # You can install a set of common backends:
+    pip install 'ibis-framework[duckdb,postgres,mysql,sqlite]'
 
-            # ...or specific backends as needed:
-            pip install 'ibis-framework[duckdb]'    # for DuckDB
-            pip install 'ibis-framework[postgres]'  # for PostgreSQL
-            ```
-            See Also
-            --------
-            print_database_tables : List all available tables in a database for discovery
-            """
+    # ...or specific backends as needed:
+    pip install 'ibis-framework[duckdb]'    # for DuckDB
+    pip install 'ibis-framework[postgres]'  # for PostgreSQL
+    ```
+    See Also
+    --------
+    print_database_tables : List all available tables in a database for discovery
+    """
 
-        # Check if Ibis is available
-        if not _is_lib_present(lib_name="ibis"):
-            raise ImportError(
-                "The Ibis library is not installed but is required for database connection strings.\n"
-                "Install it with: pip install 'ibis-framework[duckdb]' (or other backend as needed)"
-            )
+    # Check if Ibis is available
+    if not _is_lib_present(lib_name="ibis"):
+        raise ImportError(
+            "The Ibis library is not installed but is required for database connection strings.\n"
+            "Install it with: pip install 'ibis-framework[duckdb]' (or other backend as needed)"
+        )
 
-        import ibis
+    import ibis
 
-        # Check if connection string includes table specification
-        if "::" not in connection_string:
-            # Try to connect to get available tables for helpful error message
-            try:
-                base_connection = connection_string
-                conn = ibis.connect(base_connection)
+    # Check if connection string includes table specification
+    if "::" not in connection_string:
+        # Try to connect to get available tables for helpful error message
+        try:
+            base_connection = connection_string
+            conn = ibis.connect(base_connection)
 
-                try: # pragma: no cover
-                    available_tables = conn.list_tables()
-                except Exception: # pragma: no cover
-                    available_tables = []
+            try:  # pragma: no cover
+                available_tables = conn.list_tables()
+            except Exception:  # pragma: no cover
+                available_tables = []
 
-                conn.disconnect()
+            conn.disconnect()
 
-                # Create helpful error message
+            # Create helpful error message
+            if available_tables:
+                table_list = "\n".join(f"  - {table}" for table in available_tables)
+                error_msg = (
+                    f"No table specified in connection string: {connection_string}\n\n"
+                    f"Available tables in the database:\n{table_list}\n\n"
+                    f"To access a specific table, use the format:\n"
+                    f"  {connection_string}::TABLE_NAME\n\n"
+                    f"Examples:\n"
+                )
+                for table in available_tables[:3]:
+                    error_msg += f"  {connection_string}::{table}\n"
+            else:
+                error_msg = (
+                    f"No table specified in connection string: {connection_string}\n\n"
+                    f"No tables found in the database or unable to list tables.\n\n"
+                    f"To access a specific table, use the format:\n"
+                    f"  {connection_string}::TABLE_NAME"
+                )
+
+            raise ValueError(error_msg)
+
+        except Exception as e:
+            if isinstance(e, ValueError):
+                raise
+            _handle_connection_errors(e, connection_string)
+
+    # Split connection string and table name
+    try:
+        base_connection, table_name = connection_string.rsplit("::", 1)
+    except ValueError:  # pragma: no cover
+        raise ValueError(f"Invalid connection string format: {connection_string}")
+
+    # Connect to database and get table
+    try:
+        conn = ibis.connect(base_connection)
+        table = conn.table(table_name)
+        return table
+    except Exception as e:
+        error_str = str(e).lower()
+
+        # Check if this is a "table not found" error
+        if "table" in error_str and (
+            "not found" in error_str or "does not exist" in error_str or "not exist" in error_str
+        ):
+            # Try to get available tables for a helpful error message
+            try:  # pragma: no cover
+                available_tables = conn.list_tables()
                 if available_tables:
                     table_list = "\n".join(f"  - {table}" for table in available_tables)
-                    error_msg = (
-                        f"No table specified in connection string: {connection_string}\n\n"
-                        f"Available tables in the database:\n{table_list}\n\n"
-                        f"To access a specific table, use the format:\n"
-                        f"  {connection_string}::TABLE_NAME\n\n"
-                        f"Examples:\n"
-                    )
-                    for table in available_tables[:3]:
-                        error_msg += f"  {connection_string}::{table}\n"
-                else:
-                    error_msg = (
-                        f"No table specified in connection string: {connection_string}\n\n"
-                        f"No tables found in the database or unable to list tables.\n\n"
-                        f"To access a specific table, use the format:\n"
-                        f"  {connection_string}::TABLE_NAME"
-                    )
+                    raise ValueError(
+                        f"Table '{table_name}' not found in database.\n\n"
+                        f"Available tables:\n{table_list}\n\n"
+                        f"Connection: {base_connection}"
+                    ) from e
+            except ValueError:
+                # Re-raise the table-specific ValueError
+                raise
+            except Exception:
+                # If we can't list tables, just raise a simple error
+                pass
 
-                raise ValueError(error_msg)
+            raise ValueError(
+                f"Table '{table_name}' not found in database.\n"
+                f"Connection: {base_connection}\n\n"
+                f"Original error: {e}"
+            ) from e
 
-            except Exception as e:
-                if isinstance(e, ValueError):
-                    raise
-                _handle_connection_errors(e, connection_string)
+        # For other errors, use the generic connection error handler
+        _handle_connection_errors(e, base_connection)
 
-        # Split connection string and table name
-        try:
-            base_connection, table_name = connection_string.rsplit("::", 1)
-        except ValueError: # pragma: no cover
-            raise ValueError(f"Invalid connection string format: {connection_string}")
-
-        # Connect to database and get table
-        try:
-            conn = ibis.connect(base_connection)
-            table = conn.table(table_name)
-            return table
-        except Exception as e:
-            error_str = str(e).lower()
-
-            # Check if this is a "table not found" error
-            if "table" in error_str and ("not found" in error_str or "does not exist" in error_str or "not exist" in error_str):
-                # Try to get available tables for a helpful error message
-                try: # pragma: no cover
-                    available_tables = conn.list_tables()
-                    if available_tables:
-                        table_list = "\n".join(f"  - {table}" for table in available_tables)
-                        raise ValueError(
-                            f"Table '{table_name}' not found in database.\n\n"
-                            f"Available tables:\n{table_list}\n\n"
-                            f"Connection: {base_connection}"
-                        ) from e
-                except ValueError:
-                    # Re-raise the table-specific ValueError
-                    raise
-                except Exception:
-                    # If we can't list tables, just raise a simple error
-                    pass
-
-                raise ValueError(
-                    f"Table '{table_name}' not found in database.\n"
-                    f"Connection: {base_connection}\n\n"
-                    f"Original error: {e}"
-                ) from e
-
-            # For other errors, use the generic connection error handler
-            _handle_connection_errors(e, base_connection)
 
 def print_database_tables(connection_string: str) -> list[str]:
     """
