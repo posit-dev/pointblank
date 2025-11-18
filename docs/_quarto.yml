@@ -249,6 +249,7 @@ quartodoc:
         - name: load_dataset
         - name: get_data_path
         - name: connect_to_table
+        - name: print_database_tables
     - title: YAML
       desc: >
         The *YAML* group contains functions that allow for the use of YAML to orchestrate validation
