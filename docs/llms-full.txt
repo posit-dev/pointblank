@@ -11097,7 +11097,7 @@ print_database_tables(connection_string: 'str') -> 'list[str]'
     Parameters
     ----------
     connection_string
-        A database connection string WITHOUT the ::table_name suffix. Example:
+        A database connection string *without* the `::table_name` suffix. Example:
         `"duckdb:///path/to/database.ddb"`.
 
     Returns
