@@ -160,6 +160,7 @@ def _get_api_text() -> str:
         "load_dataset",
         "get_data_path",
         "connect_to_table",
+        "print_database_tables",
     ]
 
     yaml_exported = [
