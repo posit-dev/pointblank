@@ -1,10 +1,6 @@
-<div align="center">
-
 > [!TIP] > **📺 Featured Talk: ['Making Things Nice in Python'](https://www.youtube.com/watch?v=J6e2BKjHyPg)**
 >
 > Discover how Pointblank and Great Tables (used in this library) prioritize user experience in Python package design. I go over why convenient options, extensive documentation, and thoughtful API decisions is better for everyone (even when they challenge conventional Python patterns/practices).
-
-</div>
 
 <div align="center">
 
