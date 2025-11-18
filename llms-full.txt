@@ -289,6 +289,16 @@ Validate(data: 'FrameT | Any', tbl_name: 'str | None' = None, label: 'str | None
     - Vietnamese (`"vi"`)
     - Indonesian (`"id"`)
     - Ukrainian (`"uk"`)
+    - Bulgarian (`"bg"`)
+    - Croatian (`"hr"`)
+    - Estonian (`"et"`)
+    - Hungarian (`"hu"`)
+    - Irish (`"ga"`)
+    - Latvian (`"lv"`)
+    - Lithuanian (`"lt"`)
+    - Maltese (`"mt"`)
+    - Slovak (`"sk"`)
+    - Slovenian (`"sl"`)
     - Hebrew (`"he"`)
     - Thai (`"th"`)
     - Persian (`"fa"`)
@@ -11068,6 +11078,36 @@ connect_to_table(connection_string: 'str') -> 'Any'
     pip install 'ibis-framework[duckdb]'    # for DuckDB
     pip install 'ibis-framework[postgres]'  # for PostgreSQL
     ```
+    See Also
+    --------
+    print_database_tables : List all available tables in a database for discovery
+    
+
+print_database_tables(connection_string: 'str') -> 'list[str]'
+
+    List all tables in a database from a connection string.
+
+    The `print_database_tables()` function connects to a database and returns a list of all
+    available tables. This is particularly useful for discovering what tables exist in a database
+    before connecting to a specific table with `connect_to_table(). The function automatically
+    filters out temporary Ibis tables (memtables) to show only user tables. It supports all database
+    backends available through Ibis, including DuckDB, SQLite, PostgreSQL, MySQL, BigQuery, and
+    Snowflake.
+
+    Parameters
+    ----------
+    connection_string
+        A database connection string WITHOUT the ::table_name suffix. Example:
+        `"duckdb:///path/to/database.ddb"`.
+
+    Returns
+    -------
+    list[str]
+        List of table names, excluding temporary Ibis tables.
+
+    See Also
+    --------
+    connect_to_table : Connect to a database table with full connection string documentation
     
 
 
