@@ -95,6 +95,7 @@ from pointblank.validate import (
     missing_vals_tbl,
     PointblankConfig,
     preview,
+    print_database_tables,
     read_file,
     Validate,
     write_file,
@@ -11761,11 +11762,18 @@ def test_parquet_pandas_fails_when_only_pandas_available():
 
 
 def test_connect_to_table_ibis_not_available():
+    # Patch it where it's actually called in the validate module
+    with patch("pointblank.validate._is_lib_present", return_value=False):
+        with pytest.raises(ImportError, match="The Ibis library is not installed"):
+            connect_to_table("duckdb://test.db::table")
+
+
+def test_print_database_tables_ibis_not_available():
     with patch("pointblank.validate._is_lib_present") as mock_is_lib:
         mock_is_lib.return_value = False  # Ibis not available
 
         with pytest.raises(ImportError, match="The Ibis library is not installed"):
-            connect_to_table("duckdb://test.db::table")
+            print_database_tables("duckdb://test.db")
 
 
 def test_connect_to_table_no_table_specified_with_tables():
@@ -11790,6 +11798,75 @@ def test_connect_to_table_no_table_specified_with_tables():
             assert "table2" in error_msg
             assert "table3" in error_msg
             assert "duckdb://test.db::table1" in error_msg
+
+
+def test_print_database_tables_table_specified():
+    with patch("pointblank.validate._is_lib_present") as mock_is_lib:
+        mock_is_lib.return_value = True
+
+        # Mock ibis module
+        mock_ibis = Mock()
+        mock_conn = Mock()
+        mock_ibis.connect.return_value = mock_conn
+
+        with patch.dict("sys.modules", {"ibis": mock_ibis}):
+            # This should trigger the error path for including table spec when not allowed
+            with pytest.raises(ValueError) as exc_info:
+                print_database_tables("duckdb:///superbadpath.ddb::fogel_table")
+
+            error_msg = str(exc_info.value)
+            assert (
+                "Connection string should not include table specification (::table_name)"
+                in error_msg
+            )
+            assert "You've supplied: duckdb:///superbadpath.ddb::fogel_table" in error_msg
+            assert (
+                "Expected format: 'duckdb:///path/to/database.ddb' (without ::table_name)"
+                in error_msg
+            )
+            assert "duckdb:///superbadpath.ddb::fogel_table" in error_msg
+
+
+def test_print_database_tables_names_returned():
+    pytest.importorskip("ibis")
+
+    # Create a temporary DuckDB database file
+    with tempfile.NamedTemporaryFile(suffix=".ddb", delete=False) as tmp_file:
+        temp_db_path = tmp_file.name
+
+    # Remove empty file so DuckDB can create proper database
+    os.unlink(temp_db_path)
+
+    try:
+        # Create and populate the database
+        conn = ibis.duckdb.connect(temp_db_path)
+
+        # Create test data
+        df_test = pl.DataFrame({"id": [1, 2, 3], "value": [10, 20, 30]})
+        tbl_ibis = ibis.memtable(df_test.to_pandas())
+
+        # Create multiple tables
+        conn.create_table("supercooltable_1", tbl_ibis, overwrite=True)
+        conn.create_table("supercooltable_2", tbl_ibis, overwrite=True)
+        conn.create_table("supercooltable_3", tbl_ibis, overwrite=True)
+        conn.disconnect()
+
+        # Test the actual function without mocking
+        # Use single slash for Windows absolute paths
+        connection_string = f"duckdb://{temp_db_path}"
+        table_names = print_database_tables(connection_string)
+
+        # Verify it returns the expected table names
+        assert isinstance(table_names, list)
+        assert len(table_names) == 3
+        assert "supercooltable_1" in table_names
+        assert "supercooltable_2" in table_names
+        assert "supercooltable_3" in table_names
+
+    finally:
+        # Clean up temporary file
+        if os.path.exists(temp_db_path):
+            os.unlink(temp_db_path)
 
 
 def test_connect_to_table_no_table_specified_empty_db():
@@ -11828,6 +11905,23 @@ def test_connect_to_table_backend_dependency_missing():
             assert "pip install 'ibis-framework[duckdb]'" in error_msg
 
 
+def test_print_database_tables_backend_dependency_missing():
+    with patch("pointblank.validate._is_lib_present") as mock_is_lib:
+        mock_is_lib.return_value = True
+
+        # Mock ibis module that raises backend-specific error
+        mock_ibis = Mock()
+        mock_ibis.connect.side_effect = Exception("sqlite not found")
+
+        with patch.dict("sys.modules", {"ibis": mock_ibis}):
+            with pytest.raises(ConnectionError) as exc_info:
+                print_database_tables("sqlite://test.db")
+
+            error_msg = str(exc_info.value)
+            assert "Missing SQLITE backend for Ibis" in error_msg
+            assert "pip install 'ibis-framework[sqlite]'" in error_msg
+
+
 def test_connect_to_table_invalid_connection_string_format():
     with patch("pointblank.validate._is_lib_present") as mock_is_lib:
         mock_is_lib.return_value = True
@@ -11863,6 +11957,184 @@ def test_connect_to_table_table_not_found():
 
             error_msg = str(exc_info.value)
             assert "Table 'nonexistent' not found in database" in error_msg
+
+
+def test_print_database_tables_filters_memtables():
+    """Test that memtable entries are filtered out from the results."""
+    pytest.importorskip("ibis")
+
+    with tempfile.NamedTemporaryFile(suffix=".ddb", delete=False) as tmp_file:
+        temp_db_path = tmp_file.name
+
+    os.unlink(temp_db_path)
+
+    try:
+        conn = ibis.duckdb.connect(temp_db_path)
+
+        # Create test data
+        df_test = pl.DataFrame({"id": [1, 2, 3], "value": [10, 20, 30]})
+        tbl_ibis = ibis.memtable(df_test.to_pandas())
+
+        # Create regular tables and one that contains "memtable" in the name
+        conn.create_table("a_table", tbl_ibis, overwrite=True)
+        conn.create_table("ibis_memtable_12345", tbl_ibis, overwrite=True)
+
+        # Close the connection
+        conn.disconnect()
+
+        connection_string = f"duckdb://{temp_db_path}"
+        table_names = print_database_tables(connection_string)
+
+        # Verify memtable is filtered out
+        assert isinstance(table_names, list)
+        assert "a_table" in table_names
+        assert "ibis_memtable_12345" not in table_names
+
+    finally:
+        if os.path.exists(temp_db_path):
+            os.unlink(temp_db_path)
+
+
+def test_print_database_tables_generic_connection_error():
+    """Test error handling for generic connection failures."""
+    with patch("pointblank.validate._is_lib_present") as mock_is_lib:
+        mock_is_lib.return_value = True
+
+        # Mock ibis module that raises a generic connection error
+        mock_ibis = Mock()
+        mock_ibis.connect.side_effect = Exception("Generic connection failure")
+
+        with patch.dict("sys.modules", {"ibis": mock_ibis}):
+            with pytest.raises(ConnectionError) as exc_info:
+                print_database_tables("duckdb://test.db")
+
+            error_msg = str(exc_info.value)
+            assert "Failed to connect using: duckdb://test.db" in error_msg
+            assert "Generic connection failure" in error_msg
+
+
+def test_connect_to_table_success():
+    """Test successful connection to a table."""
+    pytest.importorskip("ibis")
+
+    with tempfile.NamedTemporaryFile(suffix=".ddb", delete=False) as tmp_file:
+        temp_db_path = tmp_file.name
+
+    os.unlink(temp_db_path)
+
+    try:
+        # Create database with a table
+        conn = ibis.duckdb.connect(temp_db_path)
+        df_test = pl.DataFrame({"id": [1, 2, 3], "value": [10, 20, 30]})
+        tbl_ibis = ibis.memtable(df_test.to_pandas())
+        conn.create_table("test_table", tbl_ibis, overwrite=True)
+        conn.disconnect()
+
+        # Connect to the table
+        connection_string = f"duckdb://{temp_db_path}::test_table"
+        table = connect_to_table(connection_string)
+
+        # Verify it's a table object
+        assert table is not None
+        assert hasattr(table, "execute")  # Ibis tables have execute method
+
+        # Close the connection to the database before cleanup
+        # Get the backend connection and disconnect it
+        if hasattr(table, "_find_backend"):
+            backend = table._find_backend()
+            if hasattr(backend, "disconnect"):
+                backend.disconnect()
+
+    finally:
+        if os.path.exists(temp_db_path):
+            # Add a small delay to ensure file handle is released on Windows
+            import time
+
+            time.sleep(0.1)
+            try:
+                os.unlink(temp_db_path)
+            except PermissionError:
+                # If still locked, skip deletion (will be cleaned up by OS eventually)
+                pass
+
+
+def test_connect_to_table_table_not_found_with_available_tables():
+    """Test error when table not found but other tables exist."""
+    with patch("pointblank.validate._is_lib_present") as mock_is_lib:
+        mock_is_lib.return_value = True
+
+        # Mock ibis module
+        mock_ibis = Mock()
+        mock_conn = Mock()
+        mock_conn.table.side_effect = Exception("table 'nonexistent' does not exist")
+        mock_conn.list_tables.return_value = ["table1", "table2", "table3"]
+        mock_ibis.connect.return_value = mock_conn
+
+        with patch.dict("sys.modules", {"ibis": mock_ibis}):
+            with pytest.raises(ValueError) as exc_info:
+                connect_to_table("duckdb://test.db::nonexistent")
+
+            error_msg = str(exc_info.value)
+            assert "Table 'nonexistent' not found in database" in error_msg
+            assert "Available tables:" in error_msg
+            assert "table1" in error_msg
+            assert "table2" in error_msg
+            assert "table3" in error_msg
+
+
+def test_connect_to_table_generic_connection_error():
+    """Test generic connection error that's not backend-specific."""
+    with patch("pointblank.validate._is_lib_present") as mock_is_lib:
+        mock_is_lib.return_value = True
+
+        # Mock ibis module that raises a non-backend-specific error
+        mock_ibis = Mock()
+        mock_ibis.connect.side_effect = Exception("Network timeout")
+
+        with patch.dict("sys.modules", {"ibis": mock_ibis}):
+            with pytest.raises(ConnectionError) as exc_info:
+                connect_to_table("duckdb://test.db::table")
+
+            error_msg = str(exc_info.value)
+            assert "Failed to connect using: duckdb://test.db" in error_msg
+            assert "Network timeout" in error_msg
+
+
+def test_connect_to_table_no_table_spec_connection_fails():
+    """Test when connection fails in the 'no table specified' path."""
+    with patch("pointblank.validate._is_lib_present") as mock_is_lib:
+        mock_is_lib.return_value = True
+
+        # Mock ibis module that fails to connect
+        mock_ibis = Mock()
+        mock_ibis.connect.side_effect = Exception("Cannot connect to database")
+
+        with patch.dict("sys.modules", {"ibis": mock_ibis}):
+            with pytest.raises(ConnectionError) as exc_info:
+                connect_to_table("duckdb://invalid.db")  # No table spec
+
+            error_msg = str(exc_info.value)
+            assert "Failed to connect" in error_msg or "Cannot connect" in error_msg
+
+
+def test_connect_to_table_list_tables_raises_exception():
+    """Test when list_tables() raises an exception in no-table-spec path."""
+    with patch("pointblank.validate._is_lib_present") as mock_is_lib:
+        mock_is_lib.return_value = True
+
+        # Mock ibis module
+        mock_ibis = Mock()
+        mock_conn = Mock()
+        mock_conn.list_tables.side_effect = Exception("Permission denied")
+        mock_ibis.connect.return_value = mock_conn
+
+        with patch.dict("sys.modules", {"ibis": mock_ibis}):
+            with pytest.raises(ValueError) as exc_info:
+                connect_to_table("duckdb://test.db")  # No table spec
+
+            error_msg = str(exc_info.value)
+            assert "No table specified in connection string" in error_msg
+            assert "No tables found in the database or unable to list tables" in error_msg
 
 
 def test_process_connection_string_not_a_connection_string():

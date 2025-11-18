@@ -123,6 +123,7 @@ __all__ = [
     "write_file",
     "config",
     "connect_to_table",
+    "print_database_tables",
     "preview",
     "missing_vals_tbl",
     "get_action_metadata",
@@ -3919,6 +3920,47 @@ class _ValidationInfo:
         return self.notes is not None and len(self.notes) > 0
 
 
+def _handle_connection_errors(e: Exception, connection_string: str) -> None:
+    """
+    Shared error handling for database connection failures.
+
+    Raises appropriate ConnectionError with helpful messages based on the exception.
+    """
+
+    error_str = str(e).lower()
+    backend_install_map = {
+        "duckdb": "pip install 'ibis-framework[duckdb]'",
+        "postgresql": "pip install 'ibis-framework[postgres]'",
+        "postgres": "pip install 'ibis-framework[postgres]'",
+        "mysql": "pip install 'ibis-framework[mysql]'",
+        "sqlite": "pip install 'ibis-framework[sqlite]'",
+        "bigquery": "pip install 'ibis-framework[bigquery]'",
+        "snowflake": "pip install 'ibis-framework[snowflake]'",
+    }
+
+    # Check if this is a missing backend dependency
+    for backend, install_cmd in backend_install_map.items():
+        if backend in error_str and ("not found" in error_str or "no module" in error_str):
+            raise ConnectionError(
+                f"Missing {backend.upper()} backend for Ibis. Install it with:\n"
+                f"  {install_cmd}\n\n"
+                f"Original error: {e}"
+            ) from e
+
+    # Generic connection error
+    raise ConnectionError(  # pragma: no cover
+        f"Failed to connect using: {connection_string}\n"
+        f"Error: {e}\n\n"
+        f"Supported connection string formats:\n"
+        f"- DuckDB: 'duckdb:///path/to/file.ddb'\n"
+        f"- SQLite: 'sqlite:///path/to/file.db'\n"
+        f"- PostgreSQL: 'postgresql://user:pass@host:port/db'\n"
+        f"- MySQL: 'mysql://user:pass@host:port/db'\n"
+        f"- BigQuery: 'bigquery://project/dataset'\n"
+        f"- Snowflake: 'snowflake://user:pass@account/db/schema'"
+    ) from e
+
+
 def connect_to_table(connection_string: str) -> Any:
     """
     Connect to a database table using a connection string.
@@ -3998,7 +4040,11 @@ def connect_to_table(connection_string: str) -> Any:
     pip install 'ibis-framework[duckdb]'    # for DuckDB
     pip install 'ibis-framework[postgres]'  # for PostgreSQL
     ```
+    See Also
+    --------
+    print_database_tables : List all available tables in a database for discovery
     """
+
     # Check if Ibis is available
     if not _is_lib_present(lib_name="ibis"):
         raise ImportError(
@@ -4012,14 +4058,10 @@ def connect_to_table(connection_string: str) -> Any:
     if "::" not in connection_string:
         # Try to connect to get available tables for helpful error message
         try:
-            # Extract the base connection string (without table name)
             base_connection = connection_string
-
-            # Connect to the database
             conn = ibis.connect(base_connection)
 
-            # Get list of available tables
-            try:
+            try:  # pragma: no cover
                 available_tables = conn.list_tables()
             except Exception:  # pragma: no cover
                 available_tables = []
@@ -4036,7 +4078,6 @@ def connect_to_table(connection_string: str) -> Any:
                     f"  {connection_string}::TABLE_NAME\n\n"
                     f"Examples:\n"
                 )
-                # Add examples with first few table names
                 for table in available_tables[:3]:
                     error_msg += f"  {connection_string}::{table}\n"
             else:
@@ -4051,43 +4092,8 @@ def connect_to_table(connection_string: str) -> Any:
 
         except Exception as e:
             if isinstance(e, ValueError):
-                raise  # Re-raise our custom ValueError
-
-            # Check for backend-specific errors and provide installation guidance
-            error_str = str(e).lower()
-            backend_install_map = {
-                "duckdb": "pip install 'ibis-framework[duckdb]'",
-                "postgresql": "pip install 'ibis-framework[postgres]'",
-                "postgres": "pip install 'ibis-framework[postgres]'",
-                "mysql": "pip install 'ibis-framework[mysql]'",
-                "sqlite": "pip install 'ibis-framework[sqlite]'",
-                "bigquery": "pip install 'ibis-framework[bigquery]'",
-                "snowflake": "pip install 'ibis-framework[snowflake]'",
-            }
-
-            # Check if this is a missing backend dependency
-            for backend, install_cmd in backend_install_map.items():  # pragma: no cover
-                if backend in error_str and ("not found" in error_str or "no module" in error_str):
-                    raise ConnectionError(
-                        f"Missing {backend.upper()} backend for Ibis. Install it with:\n"
-                        f"  {install_cmd}\n\n"
-                        f"Original error: {e}\n\n"
-                        f"Supported connection string formats:\n"
-                        f"- DuckDB: 'duckdb:///path/to/file.ddb::table_name'\n"
-                        f"- SQLite: 'sqlite:///path/to/file.db::table_name'\n"
-                        f"- PostgreSQL: 'postgresql://user:pass@host:port/db::table_name'\n"
-                        f"- MySQL: 'mysql://user:pass@host:port/db::table_name'\n"
-                        f"- BigQuery: 'bigquery://project/dataset::table_name'\n"
-                        f"- Snowflake: 'snowflake://user:pass@account/db/schema::table_name'\n"
-                        f"\nNote: Use '::table_name' to specify the table within the database."
-                    ) from e
-
-            # Generic connection error
-            raise ConnectionError(  # pragma: no cover
-                f"Failed to connect to database using connection string: {connection_string}\n"
-                f"Error: {e}\n\n"
-                f"No table specified. Use the format: {connection_string}::TABLE_NAME"
-            ) from e
+                raise
+            _handle_connection_errors(e, connection_string)
 
     # Split connection string and table name
     try:
@@ -4100,32 +4106,14 @@ def connect_to_table(connection_string: str) -> Any:
         conn = ibis.connect(base_connection)
         table = conn.table(table_name)
         return table
-
     except Exception as e:
-        # Check for backend-specific errors and provide installation guidance
         error_str = str(e).lower()
-        backend_install_map = {
-            "duckdb": "pip install 'ibis-framework[duckdb]'",
-            "postgresql": "pip install 'ibis-framework[postgres]'",
-            "postgres": "pip install 'ibis-framework[postgres]'",
-            "mysql": "pip install 'ibis-framework[mysql]'",
-            "sqlite": "pip install 'ibis-framework[sqlite]'",
-            "bigquery": "pip install 'ibis-framework[bigquery]'",
-            "snowflake": "pip install 'ibis-framework[snowflake]'",
-        }
 
-        # Check if this is a missing backend dependency
-        for backend, install_cmd in backend_install_map.items():
-            if backend in error_str and ("not found" in error_str or "no module" in error_str):
-                raise ConnectionError(
-                    f"Missing {backend.upper()} backend for Ibis. Install it with:\n"
-                    f"  {install_cmd}\n\n"
-                    f"Original error: {e}"
-                ) from e
-
-        # Check if table doesn't exist
-        if "table" in error_str and ("not found" in error_str or "does not exist" in error_str):
-            # Try to get available tables for helpful message
+        # Check if this is a "table not found" error
+        if "table" in error_str and (
+            "not found" in error_str or "does not exist" in error_str or "not exist" in error_str
+        ):
+            # Try to get available tables for a helpful error message
             try:  # pragma: no cover
                 available_tables = conn.list_tables()
                 if available_tables:
@@ -4133,23 +4121,79 @@ def connect_to_table(connection_string: str) -> Any:
                     raise ValueError(
                         f"Table '{table_name}' not found in database.\n\n"
                         f"Available tables:\n{table_list}\n\n"
-                        f"Check the table name and try again with:\n"
-                        f"  {base_connection}::CORRECT_TABLE_NAME"
+                        f"Connection: {base_connection}"
                     ) from e
-                else:
-                    raise ValueError(
-                        f"Table '{table_name}' not found and no tables available in database."
-                    ) from e
+            except ValueError:
+                # Re-raise the table-specific ValueError
+                raise
             except Exception:
-                raise ValueError(
-                    f"Table '{table_name}' not found in database. "
-                    f"Check the table name and connection string."
-                ) from e
+                # If we can't list tables, just raise a simple error
+                pass
 
-        # Generic connection error
-        raise ConnectionError(
-            f"Failed to connect to table '{table_name}' using: {base_connection}\nError: {e}"
-        ) from e
+            raise ValueError(
+                f"Table '{table_name}' not found in database.\n"
+                f"Connection: {base_connection}\n\n"
+                f"Original error: {e}"
+            ) from e
+
+        # For other errors, use the generic connection error handler
+        _handle_connection_errors(e, base_connection)
+
+
+def print_database_tables(connection_string: str) -> list[str]:
+    """
+    List all tables in a database from a connection string.
+
+    The `print_database_tables()` function connects to a database and returns a list of all
+    available tables. This is particularly useful for discovering what tables exist in a database
+    before connecting to a specific table with `connect_to_table(). The function automatically
+    filters out temporary Ibis tables (memtables) to show only user tables. It supports all database
+    backends available through Ibis, including DuckDB, SQLite, PostgreSQL, MySQL, BigQuery, and
+    Snowflake.
+
+    Parameters
+    ----------
+    connection_string
+        A database connection string WITHOUT the ::table_name suffix. Example:
+        `"duckdb:///path/to/database.ddb"`.
+
+    Returns
+    -------
+    list[str]
+        List of table names, excluding temporary Ibis tables.
+
+    See Also
+    --------
+    connect_to_table : Connect to a database table with full connection string documentation
+    """
+    # Check if connection string includes table specification (which is not allowed)
+    if "::" in connection_string:
+        raise ValueError(
+            "Connection string should not include table specification (::table_name).\n"
+            f"You've supplied: {connection_string}\n"
+            f"Expected format: 'duckdb:///path/to/database.ddb' (without ::table_name)"
+        )
+
+    # Check if Ibis is available
+    if not _is_lib_present(lib_name="ibis"):
+        raise ImportError(
+            "The Ibis library is not installed but is required for database connection strings.\n"
+            "Install it with: pip install 'ibis-framework[duckdb]' (or other backend as needed)"
+        )
+
+    import ibis
+
+    try:
+        # Connect to database
+        conn = ibis.connect(connection_string)
+        # Get all tables and filter out temporary Ibis tables
+        all_tables = conn.list_tables()
+        user_tables = [t for t in all_tables if "memtable" not in t]
+
+        return user_tables
+
+    except Exception as e:
+        _handle_connection_errors(e, connection_string)
 
 
 @dataclass
