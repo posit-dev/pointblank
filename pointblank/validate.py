@@ -19069,16 +19069,33 @@ def _step_report_schema_in_order(
     dtype_exp = []
     dtype_exp_correct = []
 
-    for i in range(len(exp_columns_dict)):
+    for i in range(len(expect_schema)):
         #
         # `col_name_exp` values
         #
 
-        # The column name is the key in the dictionary, get the column name and
-        # append it to the `col_name_exp` list
-        col_name_exp.append(list(exp_columns_dict.keys())[i])
+        # Get the column name from expect_schema (which can have duplicates)
+        column_name_exp_i = expect_schema[i][0]
+        col_name_exp.append(column_name_exp_i)
 
-        column_name_exp_i = col_name_exp[i]
+        # Check if this column exists in exp_columns_dict (it might not if it's a duplicate)
+        # For duplicates, we need to handle them specially
+        if column_name_exp_i not in exp_columns_dict:
+            # This is a duplicate or invalid column, mark it as incorrect
+            col_exp_correct.append(CROSS_MARK_SPAN)
+
+            # For dtype, check if there's a dtype specified in the schema
+            if len(expect_schema[i]) > 1:
+                dtype_value = expect_schema[i][1]
+                if isinstance(dtype_value, list):
+                    dtype_exp.append(" | ".join(dtype_value))
+                else:
+                    dtype_exp.append(str(dtype_value))
+            else:
+                dtype_exp.append("&mdash;")
+
+            dtype_exp_correct.append("&mdash;")
+            continue
 
         #
         # `col_exp_correct` values
