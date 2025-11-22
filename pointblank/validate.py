@@ -18471,9 +18471,23 @@ def _create_col_schema_match_note_html(schema_info: dict, locale: str = "en") ->
     columns_dict = schema_info["columns"]
     in_order = params["in_order"]
 
+    # Get translations for the locale
+    passed_text = VALIDATION_REPORT_TEXT["note_schema_comparison_passed"].get(
+        locale, VALIDATION_REPORT_TEXT["note_schema_comparison_passed"]["en"]
+    )
+    failed_text = VALIDATION_REPORT_TEXT["note_schema_comparison_failed"].get(
+        locale, VALIDATION_REPORT_TEXT["note_schema_comparison_failed"]["en"]
+    )
+    disclosure_text = VALIDATION_REPORT_TEXT["note_schema_comparison_disclosure"].get(
+        locale, VALIDATION_REPORT_TEXT["note_schema_comparison_disclosure"]["en"]
+    )
+    settings_title_text = VALIDATION_REPORT_TEXT["note_schema_comparison_match_settings_title"].get(
+        locale, VALIDATION_REPORT_TEXT["note_schema_comparison_match_settings_title"]["en"]
+    )
+
     # Build summary message
     if passed:
-        summary = '<span style="color:#4CA64C;">✓</span> Schema validation **passed**.'
+        summary = f'<span style="color:#4CA64C;">✓</span> {passed_text}.'
     else:
         # Analyze what failed
         failures = []
@@ -18482,12 +18496,18 @@ def _create_col_schema_match_note_html(schema_info: dict, locale: str = "en") ->
         n_expect = len(expect_schema)
         n_target = len(target_schema)
         if n_expect != n_target:
-            failures.append(f"column count mismatch (expected: {n_expect}, actual: {n_target})")
+            count_mismatch_text = VALIDATION_REPORT_TEXT["note_schema_column_count_mismatch"].get(
+                locale, VALIDATION_REPORT_TEXT["note_schema_column_count_mismatch"]["en"]
+            )
+            failures.append(count_mismatch_text.format(n_expect=n_expect, n_target=n_target))
 
         # Check for unmatched columns
         unmatched_cols = [col for col, info in columns_dict.items() if not info["colname_matched"]]
         if unmatched_cols:
-            failures.append(f"{len(unmatched_cols)} unmatched column(s)")
+            unmatched_text = VALIDATION_REPORT_TEXT["note_schema_unmatched_columns"].get(
+                locale, VALIDATION_REPORT_TEXT["note_schema_unmatched_columns"]["en"]
+            )
+            failures.append(unmatched_text.format(n=len(unmatched_cols)))
 
         # Check for wrong order (if in_order=True)
         if params["in_order"]:
@@ -18497,7 +18517,10 @@ def _create_col_schema_match_note_html(schema_info: dict, locale: str = "en") ->
                 if info["colname_matched"] and not info["index_matched"]
             ]
             if wrong_order:
-                failures.append(f"{len(wrong_order)} column(s) in wrong order")
+                wrong_order_text = VALIDATION_REPORT_TEXT["note_schema_wrong_order"].get(
+                    locale, VALIDATION_REPORT_TEXT["note_schema_wrong_order"]["en"]
+                )
+                failures.append(wrong_order_text.format(n=len(wrong_order)))
 
         # Check for dtype mismatches
         dtype_mismatches = [
@@ -18506,16 +18529,17 @@ def _create_col_schema_match_note_html(schema_info: dict, locale: str = "en") ->
             if info["colname_matched"] and info["dtype_present"] and not info["dtype_matched"]
         ]
         if dtype_mismatches:
-            failures.append(f"{len(dtype_mismatches)} dtype mismatch(es)")
+            dtype_mismatch_text = VALIDATION_REPORT_TEXT["note_schema_dtype_mismatch"].get(
+                locale, VALIDATION_REPORT_TEXT["note_schema_dtype_mismatch"]["en"]
+            )
+            failures.append(dtype_mismatch_text.format(n=len(dtype_mismatches)))
 
         if failures:
             summary = (
-                '<span style="color:#FF3300;">✗</span> Schema validation **failed**: '
-                + ", ".join(failures)
-                + "."
+                f'<span style="color:#FF3300;">✗</span> {failed_text}: ' + ", ".join(failures) + "."
             )
         else:
-            summary = '<span style="color:#FF3300;">✗</span> Schema validation **failed**.'
+            summary = f'<span style="color:#FF3300;">✗</span> {failed_text}.'
 
     # Generate the step report table using the existing function
     # We'll call either _step_report_schema_in_order or _step_report_schema_any_order
@@ -18545,12 +18569,9 @@ def _create_col_schema_match_note_html(schema_info: dict, locale: str = "en") ->
     # Change padding-top from 7px to 2px
     settings_html = settings_html.replace("padding-top: 7px;", "padding-top: 2px;")
 
-    # Get text for "Schema Match Settings" header
-    schema_match_settings_str = "Schema Match Settings:"
-
     # Create new source note HTML that includes both settings and schema
     source_note_html = f"""
-<div style='padding-bottom: 2px;'>{schema_match_settings_str}</div>
+<div style='padding-bottom: 2px;'>{settings_title_text}</div>
 <div style='padding-bottom: 4px;'>{settings_html}</div>
 """
 
@@ -18565,7 +18586,7 @@ def _create_col_schema_match_note_html(schema_info: dict, locale: str = "en") ->
 {summary}
 
 <details style="margin-top: 2px; margin-bottom: 8px; font-size: 12px; text-indent: 12px;">
-<summary style="cursor: pointer; font-weight: bold; color: #555;">Schema Comparison</summary>
+<summary style="cursor: pointer; font-weight: bold; color: #555;">{disclosure_text}</summary>
 <div style="margin-top: 6px; padding-left: 15px; padding-right: 15px;">
 
 {step_report_html}
