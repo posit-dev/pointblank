@@ -12602,6 +12602,17 @@ class Validate:
                         # Add the schema validation info to the validation object
                         validation.val_info = schema_validation_info
 
+                        # Add a note with the schema expectation and results
+                        schema_note_html = _create_col_schema_match_note_html(
+                            schema_info=schema_validation_info, locale=self.locale
+                        )
+                        schema_note_text = _create_col_schema_match_note_text(
+                            schema_info=schema_validation_info
+                        )
+                        validation._add_note(
+                            key="schema_check", markdown=schema_note_html, text=schema_note_text
+                        )
+
                         validation.all_passed = result_bool
                         validation.n = 1
                         validation.n_passed = int(result_bool)
@@ -18431,6 +18442,163 @@ def _create_threshold_reset_note_text() -> str:
         Plain text note.
     """
     return "Global thresholds explicitly not used for this step."
+
+
+def _create_col_schema_match_note_html(schema_info: dict, locale: str = "en") -> str:
+    """
+    Create an HTML note with collapsible schema expectation and results.
+
+    This generates a disclosure-style note showing:
+    1. A summary of what failed (if anything)
+    2. The full step report table (collapsible)
+
+    Parameters
+    ----------
+    schema_info
+        The schema validation information dictionary from interrogation.
+    locale
+        The locale string (e.g., 'en', 'fr').
+
+    Returns
+    -------
+    str
+        HTML-formatted note with collapsible schema details.
+    """
+    passed = schema_info["passed"]
+    expect_schema = schema_info["expect_schema"]
+    target_schema = schema_info["target_schema"]
+    params = schema_info["params"]
+    columns_dict = schema_info["columns"]
+    in_order = params["in_order"]
+
+    # Build summary message
+    if passed:
+        summary = '<span style="color:#4CA64C;">✓</span> Schema validation **passed**.'
+    else:
+        # Analyze what failed
+        failures = []
+
+        # Check column count mismatch
+        n_expect = len(expect_schema)
+        n_target = len(target_schema)
+        if n_expect != n_target:
+            failures.append(f"column count mismatch (expected: {n_expect}, actual: {n_target})")
+
+        # Check for unmatched columns
+        unmatched_cols = [col for col, info in columns_dict.items() if not info["colname_matched"]]
+        if unmatched_cols:
+            failures.append(f"{len(unmatched_cols)} unmatched column(s)")
+
+        # Check for wrong order (if in_order=True)
+        if params["in_order"]:
+            wrong_order = [
+                col
+                for col, info in columns_dict.items()
+                if info["colname_matched"] and not info["index_matched"]
+            ]
+            if wrong_order:
+                failures.append(f"{len(wrong_order)} column(s) in wrong order")
+
+        # Check for dtype mismatches
+        dtype_mismatches = [
+            col
+            for col, info in columns_dict.items()
+            if info["colname_matched"] and info["dtype_present"] and not info["dtype_matched"]
+        ]
+        if dtype_mismatches:
+            failures.append(f"{len(dtype_mismatches)} dtype mismatch(es)")
+
+        if failures:
+            summary = (
+                '<span style="color:#FF3300;">✗</span> Schema validation **failed**: '
+                + ", ".join(failures)
+                + "."
+            )
+        else:
+            summary = '<span style="color:#FF3300;">✗</span> Schema validation **failed**.'
+
+    # Generate the step report table using the existing function
+    # We'll call either _step_report_schema_in_order or _step_report_schema_any_order
+    # depending on the in_order parameter
+    if in_order:
+        step_report_gt = _step_report_schema_in_order(
+            step=1, schema_info=schema_info, header=None, lang=locale, debug_return_df=False
+        )
+    else:
+        step_report_gt = _step_report_schema_any_order(
+            step=1, schema_info=schema_info, header=None, lang=locale, debug_return_df=False
+        )
+
+    # Generate the settings HTML using the existing function
+    settings_html = _create_col_schema_match_params_html(
+        lang=locale,
+        complete=params["complete"],
+        in_order=params["in_order"],
+        case_sensitive_colnames=params["case_sensitive_colnames"],
+        case_sensitive_dtypes=params["case_sensitive_dtypes"],
+        full_match_dtypes=params["full_match_dtypes"],
+    )
+
+    # Remove the inner div containing column_schema_match_str
+    settings_html = re.sub(r'<div style="margin-right: 5px;">.*?</div>', "", settings_html, count=1)
+
+    # Change padding-top from 7px to 2px
+    settings_html = settings_html.replace("padding-top: 7px;", "padding-top: 2px;")
+
+    # Get text for "Schema Match Settings" header
+    schema_match_settings_str = "Schema Match Settings:"
+
+    # Create new source note HTML that includes both settings and schema
+    source_note_html = f"""
+<div style='padding-bottom: 2px;'>{schema_match_settings_str}</div>
+<div style='padding-bottom: 4px;'>{settings_html}</div>
+"""
+
+    # Add the settings as an additional source note to the step report
+    step_report_gt = step_report_gt.tab_source_note(source_note=html(source_note_html))
+
+    # Extract the HTML from the GT object
+    step_report_html = step_report_gt._repr_html_()
+
+    # Create collapsible section with the step report
+    note_html = f"""
+{summary}
+
+<details style="margin-top: 2px; margin-bottom: 8px; font-size: 12px; text-indent: 12px;">
+<summary style="cursor: pointer; font-weight: bold; color: #555;">Schema Comparison</summary>
+<div style="margin-top: 6px; padding-left: 15px; padding-right: 15px;">
+
+{step_report_html}
+
+</div>
+</details>
+"""
+
+    return note_html.strip()
+
+
+def _create_col_schema_match_note_text(schema_info: dict) -> str:
+    """
+    Create a plain text note for schema validation.
+
+    Parameters
+    ----------
+    schema_info
+        The schema validation information dictionary from interrogation.
+
+    Returns
+    -------
+    str
+        Plain text note.
+    """
+    passed = schema_info["passed"]
+    expect_schema = schema_info["expect_schema"]
+    target_schema = schema_info["target_schema"]
+
+    if passed:
+        return f"Schema validation passed. Expected {len(expect_schema)} column(s), found {len(target_schema)}."
+    else:
+        return f"Schema validation failed. Expected {len(expect_schema)} column(s), found {len(target_schema)}."
 
 
 def _step_report_row_based(
