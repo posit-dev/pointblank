@@ -12602,6 +12602,17 @@ class Validate:
                         # Add the schema validation info to the validation object
                         validation.val_info = schema_validation_info
 
+                        # Add a note with the schema expectation and results
+                        schema_note_html = _create_col_schema_match_note_html(
+                            schema_info=schema_validation_info, locale=self.locale
+                        )
+                        schema_note_text = _create_col_schema_match_note_text(
+                            schema_info=schema_validation_info
+                        )
+                        validation._add_note(
+                            key="schema_check", markdown=schema_note_html, text=schema_note_text
+                        )
+
                         validation.all_passed = result_bool
                         validation.n = 1
                         validation.n_passed = int(result_bool)
@@ -18433,6 +18444,184 @@ def _create_threshold_reset_note_text() -> str:
     return "Global thresholds explicitly not used for this step."
 
 
+def _create_col_schema_match_note_html(schema_info: dict, locale: str = "en") -> str:
+    """
+    Create an HTML note with collapsible schema expectation and results.
+
+    This generates a disclosure-style note showing:
+    1. A summary of what failed (if anything)
+    2. The full step report table (collapsible)
+
+    Parameters
+    ----------
+    schema_info
+        The schema validation information dictionary from interrogation.
+    locale
+        The locale string (e.g., 'en', 'fr').
+
+    Returns
+    -------
+    str
+        HTML-formatted note with collapsible schema details.
+    """
+    passed = schema_info["passed"]
+    expect_schema = schema_info["expect_schema"]
+    target_schema = schema_info["target_schema"]
+    params = schema_info["params"]
+    columns_dict = schema_info["columns"]
+    in_order = params["in_order"]
+
+    # Get translations for the locale
+    passed_text = VALIDATION_REPORT_TEXT["note_schema_comparison_passed"].get(
+        locale, VALIDATION_REPORT_TEXT["note_schema_comparison_passed"]["en"]
+    )
+    failed_text = VALIDATION_REPORT_TEXT["note_schema_comparison_failed"].get(
+        locale, VALIDATION_REPORT_TEXT["note_schema_comparison_failed"]["en"]
+    )
+    disclosure_text = VALIDATION_REPORT_TEXT["note_schema_comparison_disclosure"].get(
+        locale, VALIDATION_REPORT_TEXT["note_schema_comparison_disclosure"]["en"]
+    )
+    settings_title_text = VALIDATION_REPORT_TEXT["note_schema_comparison_match_settings_title"].get(
+        locale, VALIDATION_REPORT_TEXT["note_schema_comparison_match_settings_title"]["en"]
+    )
+
+    # Build summary message
+    if passed:
+        summary = f'<span style="color:#4CA64C;">✓</span> {passed_text}.'
+    else:
+        # Analyze what failed
+        failures = []
+
+        # Check column count mismatch
+        n_expect = len(expect_schema)
+        n_target = len(target_schema)
+        if n_expect != n_target:
+            count_mismatch_text = VALIDATION_REPORT_TEXT["note_schema_column_count_mismatch"].get(
+                locale, VALIDATION_REPORT_TEXT["note_schema_column_count_mismatch"]["en"]
+            )
+            failures.append(count_mismatch_text.format(n_expect=n_expect, n_target=n_target))
+
+        # Check for unmatched columns
+        unmatched_cols = [col for col, info in columns_dict.items() if not info["colname_matched"]]
+        if unmatched_cols:
+            unmatched_text = VALIDATION_REPORT_TEXT["note_schema_unmatched_columns"].get(
+                locale, VALIDATION_REPORT_TEXT["note_schema_unmatched_columns"]["en"]
+            )
+            failures.append(unmatched_text.format(n=len(unmatched_cols)))
+
+        # Check for wrong order (if in_order=True)
+        if params["in_order"]:
+            wrong_order = [
+                col
+                for col, info in columns_dict.items()
+                if info["colname_matched"] and not info["index_matched"]
+            ]
+            if wrong_order:
+                wrong_order_text = VALIDATION_REPORT_TEXT["note_schema_wrong_order"].get(
+                    locale, VALIDATION_REPORT_TEXT["note_schema_wrong_order"]["en"]
+                )
+                failures.append(wrong_order_text.format(n=len(wrong_order)))
+
+        # Check for dtype mismatches
+        dtype_mismatches = [
+            col
+            for col, info in columns_dict.items()
+            if info["colname_matched"] and info["dtype_present"] and not info["dtype_matched"]
+        ]
+        if dtype_mismatches:
+            dtype_mismatch_text = VALIDATION_REPORT_TEXT["note_schema_dtype_mismatch"].get(
+                locale, VALIDATION_REPORT_TEXT["note_schema_dtype_mismatch"]["en"]
+            )
+            failures.append(dtype_mismatch_text.format(n=len(dtype_mismatches)))
+
+        if failures:
+            summary = (
+                f'<span style="color:#FF3300;">✗</span> {failed_text}: ' + ", ".join(failures) + "."
+            )
+        else:
+            summary = f'<span style="color:#FF3300;">✗</span> {failed_text}.'
+
+    # Generate the step report table using the existing function
+    # We'll call either _step_report_schema_in_order or _step_report_schema_any_order
+    # depending on the in_order parameter
+    if in_order:
+        step_report_gt = _step_report_schema_in_order(
+            step=1, schema_info=schema_info, header=None, lang=locale, debug_return_df=False
+        )
+    else:
+        step_report_gt = _step_report_schema_any_order(
+            step=1, schema_info=schema_info, header=None, lang=locale, debug_return_df=False
+        )
+
+    # Generate the settings HTML using the existing function
+    settings_html = _create_col_schema_match_params_html(
+        lang=locale,
+        complete=params["complete"],
+        in_order=params["in_order"],
+        case_sensitive_colnames=params["case_sensitive_colnames"],
+        case_sensitive_dtypes=params["case_sensitive_dtypes"],
+        full_match_dtypes=params["full_match_dtypes"],
+    )
+
+    # Remove the inner div containing column_schema_match_str
+    settings_html = re.sub(r'<div style="margin-right: 5px;">.*?</div>', "", settings_html, count=1)
+
+    # Change padding-top from 7px to 2px
+    settings_html = settings_html.replace("padding-top: 7px;", "padding-top: 2px;")
+
+    # Create new source note HTML that includes both settings and schema
+    source_note_html = f"""
+<div style='padding-bottom: 2px;'>{settings_title_text}</div>
+<div style='padding-bottom: 4px;'>{settings_html}</div>
+"""
+
+    # Add the settings as an additional source note to the step report
+    step_report_gt = step_report_gt.tab_source_note(source_note=html(source_note_html))
+
+    # Extract the HTML from the GT object
+    step_report_html = step_report_gt._repr_html_()
+
+    # Create collapsible section with the step report
+    note_html = f"""
+{summary}
+
+<details style="margin-top: 2px; margin-bottom: 8px; font-size: 12px; text-indent: 12px;">
+<summary style="cursor: pointer; font-weight: bold; color: #555;">{disclosure_text}</summary>
+<div style="margin-top: 6px; padding-left: 15px; padding-right: 15px;">
+
+{step_report_html}
+
+</div>
+</details>
+"""
+
+    return note_html.strip()
+
+
+def _create_col_schema_match_note_text(schema_info: dict) -> str:
+    """
+    Create a plain text note for schema validation.
+
+    Parameters
+    ----------
+    schema_info
+        The schema validation information dictionary from interrogation.
+
+    Returns
+    -------
+    str
+        Plain text note.
+    """
+    passed = schema_info["passed"]
+    expect_schema = schema_info["expect_schema"]
+    target_schema = schema_info["target_schema"]
+
+    if passed:
+        return f"Schema validation passed. Expected {len(expect_schema)} column(s), found {len(target_schema)}."
+    else:
+        return f"Schema validation failed. Expected {len(expect_schema)} column(s), found {len(target_schema)}."
+
+
 def _step_report_row_based(
     assertion_type: str,
     i: int,
@@ -18880,16 +19069,33 @@ def _step_report_schema_in_order(
     dtype_exp = []
     dtype_exp_correct = []
 
-    for i in range(len(exp_columns_dict)):
+    for i in range(len(expect_schema)):
         #
         # `col_name_exp` values
         #
 
-        # The column name is the key in the dictionary, get the column name and
-        # append it to the `col_name_exp` list
-        col_name_exp.append(list(exp_columns_dict.keys())[i])
+        # Get the column name from expect_schema (which can have duplicates)
+        column_name_exp_i = expect_schema[i][0]
+        col_name_exp.append(column_name_exp_i)
 
-        column_name_exp_i = col_name_exp[i]
+        # Check if this column exists in exp_columns_dict (it might not if it's a duplicate)
+        # For duplicates, we need to handle them specially
+        if column_name_exp_i not in exp_columns_dict:
+            # This is a duplicate or invalid column, mark it as incorrect
+            col_exp_correct.append(CROSS_MARK_SPAN)
+
+            # For dtype, check if there's a dtype specified in the schema
+            if len(expect_schema[i]) > 1:
+                dtype_value = expect_schema[i][1]
+                if isinstance(dtype_value, list):
+                    dtype_exp.append(" | ".join(dtype_value))
+                else:
+                    dtype_exp.append(str(dtype_value))
+            else:
+                dtype_exp.append("&mdash;")
+
+            dtype_exp_correct.append("&mdash;")
+            continue
 
         #
         # `col_exp_correct` values
