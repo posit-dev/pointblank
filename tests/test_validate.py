@@ -85,12 +85,14 @@ from pointblank._constants import REPORTING_LANGUAGES
 from pointblank.validate import (
     Actions,
     FinalActions,
+    config,
     connect_to_table,
     get_action_metadata,
     get_column_count,
     get_data_path,
     get_row_count,
     get_validation_summary,
+    global_config,
     load_dataset,
     missing_vals_tbl,
     PointblankConfig,
@@ -11018,7 +11020,7 @@ def test_pointblank_config_class():
 
     assert (
         str(config)
-        == "PointblankConfig(report_incl_header=True, report_incl_footer=True, preview_incl_header=True)"
+        == "PointblankConfig(report_incl_header=True, report_incl_footer=True, report_incl_footer_timings=True, report_incl_footer_notes=True, preview_incl_header=True)"
     )
 
 
@@ -19865,3 +19867,236 @@ def test_threshold_notes_no_note_when_thresholds_match():
     # No threshold notes should appear
     assert "Step-specific thresholds set with" not in html
     assert "Global thresholds explicitly not used" not in html
+
+
+def test_config_footer_timings_and_notes():
+    """Test footer timings and notes configuration options."""
+
+    # Test default configuration includes selected fields
+    config = PointblankConfig()
+    assert config.report_incl_footer_timings is True
+    assert config.report_incl_footer_notes is True
+
+    # Test configuration with the two fields disabled
+    config_no_footer_details = PointblankConfig(
+        report_incl_header=True,
+        report_incl_footer=True,
+        report_incl_footer_timings=False,
+        report_incl_footer_notes=False,
+        preview_incl_header=True,
+    )
+    assert config_no_footer_details.report_incl_footer_timings is False
+    assert config_no_footer_details.report_incl_footer_notes is False
+
+    # Test string representation for inclusion of the fields
+    str_repr = str(config)
+    assert "report_incl_footer_timings=True" in str_repr
+    assert "report_incl_footer_notes=True" in str_repr
+
+
+def test_get_tabular_report_footer_timings_control():
+    """Test that incl_footer_timings= parameter controls timing display in reports."""
+
+    small_table = load_dataset(dataset="small_table")
+
+    # Create validation with an error to trigger a note
+    validation = (
+        Validate(data=small_table, label="Test Validation")
+        .col_vals_gt(columns="d", value=100)
+        .col_vals_regex(columns="invalid_column", pattern=r"test")
+        .interrogate()
+    )
+
+    # Test with default settings (timings should be present)
+    html_with_timings = validation.get_tabular_report()._repr_html_()
+
+    # Timing information is rendered with specific styling in _create_table_time_html
+    assert "font-variant-numeric: tabular-nums" in html_with_timings
+    assert "solid 1px #999999" in html_with_timings  # Part of timing badge styling
+
+    # Test with timings disabled
+    html_no_timings = validation.get_tabular_report(incl_footer_timings=False)._repr_html_()
+
+    # When timings are disabled, there should be fewer timing-related style elements so
+    # count occurrences to verify reduction
+    timing_style_count_with = html_with_timings.count("font-variant-numeric: tabular-nums")
+    timing_style_count_without = html_no_timings.count("font-variant-numeric: tabular-nums")
+
+    assert timing_style_count_without < timing_style_count_with
+
+
+def test_get_tabular_report_footer_notes_control():
+    """Test that incl_footer_notes= parameter controls notes display in reports."""
+
+    small_table = load_dataset(dataset="small_table")
+
+    # Create validation with an error to trigger a note
+    validation = (
+        Validate(data=small_table, label="Test Validation")
+        .col_vals_gt(columns="d", value=100)
+        .col_vals_regex(columns="invalid_column", pattern=r"test")
+        .interrogate()
+    )
+
+    # Test with default settings (notes should be present)
+    html_with_notes = validation.get_tabular_report()._repr_html_()
+
+    assert "<strong>Notes</strong>" in html_with_notes
+    # Notes include step references with small caps formatting
+    assert "font-variant: small-caps" in html_with_notes or "Step" in html_with_notes.lower()
+
+    # Test with notes disabled
+    html_no_notes = validation.get_tabular_report(incl_footer_notes=False)._repr_html_()
+
+    assert "<strong>Notes</strong>" not in html_no_notes
+
+
+def test_get_tabular_report_footer_controls_combined():
+    """Test combinations of footer timing and notes controls."""
+
+    small_table = load_dataset(dataset="small_table")
+
+    validation = (
+        Validate(data=small_table, label="Test Validation")
+        .col_vals_gt(columns="d", value=100)
+        .col_vals_regex(columns="invalid_column", pattern=r"test")
+        .interrogate()
+    )
+
+    # Test with both timings and notes enabled (default)
+    html_both = validation.get_tabular_report()._repr_html_()
+
+    assert "font-variant-numeric: tabular-nums" in html_both
+    assert "<strong>Notes</strong>" in html_both
+
+    # Test with both disabled but footer still enabled
+    html_neither = validation.get_tabular_report(
+        incl_footer_timings=False, incl_footer_notes=False
+    )._repr_html_()
+    timing_count = html_neither.count("font-variant-numeric: tabular-nums")
+
+    assert "<strong>Notes</strong>" not in html_neither
+    assert timing_count < html_both.count("font-variant-numeric: tabular-nums")
+
+    # Test with timings enabled, notes disabled
+    html_timings_only = validation.get_tabular_report(incl_footer_notes=False)._repr_html_()
+
+    assert "font-variant-numeric: tabular-nums" in html_timings_only
+    assert "<strong>Notes</strong>" not in html_timings_only
+
+    # Test with notes enabled, timings disabled
+    html_notes_only = validation.get_tabular_report(incl_footer_timings=False)._repr_html_()
+
+    assert "<strong>Notes</strong>" in html_notes_only
+
+
+def test_global_config_footer_controls():
+    """Test that global config settings for footer controls work correctly."""
+
+    small_table = load_dataset(dataset="small_table")
+
+    validation = (
+        Validate(data=small_table, label="Test Validation")
+        .col_vals_gt(columns="d", value=100)
+        .col_vals_regex(columns="invalid_column", pattern=r"test")
+        .interrogate()
+    )
+
+    # Save original config
+    original_config = PointblankConfig(
+        report_incl_header=global_config.report_incl_header,
+        report_incl_footer=global_config.report_incl_footer,
+        report_incl_footer_timings=global_config.report_incl_footer_timings,
+        report_incl_footer_notes=global_config.report_incl_footer_notes,
+        preview_incl_header=global_config.preview_incl_header,
+    )
+
+    try:
+        # Set global config to disable timings
+        config(
+            report_incl_header=True,
+            report_incl_footer=True,
+            report_incl_footer_timings=False,
+            report_incl_footer_notes=True,
+            preview_incl_header=True,
+        )
+
+        # Report should respect global config
+        html = validation.get_tabular_report()._repr_html_()
+        timing_count = html.count("font-variant-numeric: tabular-nums")
+        assert "<strong>Notes</strong>" in html
+        # Should have fewer timing elements
+        assert timing_count < 3
+
+        # Set global config to disable notes
+        config(
+            report_incl_header=True,
+            report_incl_footer=True,
+            report_incl_footer_timings=True,
+            report_incl_footer_notes=False,
+            preview_incl_header=True,
+        )
+
+        html = validation.get_tabular_report()._repr_html_()
+        assert "font-variant-numeric: tabular-nums" in html
+        assert "<strong>Notes</strong>" not in html
+
+    finally:
+        # Restore original config
+        config(
+            report_incl_header=original_config.report_incl_header,
+            report_incl_footer=original_config.report_incl_footer,
+            report_incl_footer_timings=original_config.report_incl_footer_timings,
+            report_incl_footer_notes=original_config.report_incl_footer_notes,
+            preview_incl_header=original_config.preview_incl_header,
+        )
+
+
+def test_footer_controls_override_global_config():
+    """Test that method parameters override global config settings."""
+
+    small_table = load_dataset(dataset="small_table")
+
+    validation = (
+        Validate(data=small_table, label="Test Validation")
+        .col_vals_gt(columns="d", value=100)
+        .col_vals_regex(columns="invalid_column", pattern=r"test")
+        .interrogate()
+    )
+
+    # Save original config
+    original_config = PointblankConfig(
+        report_incl_header=global_config.report_incl_header,
+        report_incl_footer=global_config.report_incl_footer,
+        report_incl_footer_timings=global_config.report_incl_footer_timings,
+        report_incl_footer_notes=global_config.report_incl_footer_notes,
+        preview_incl_header=global_config.preview_incl_header,
+    )
+
+    try:
+        # Set global config to disable both
+        config(
+            report_incl_header=True,
+            report_incl_footer=True,
+            report_incl_footer_timings=False,
+            report_incl_footer_notes=False,
+            preview_incl_header=True,
+        )
+
+        # Override with method parameters to enable both
+        html = validation.get_tabular_report(
+            incl_footer_timings=True, incl_footer_notes=True
+        )._repr_html_()
+
+        assert "font-variant-numeric: tabular-nums" in html
+        assert "<strong>Notes</strong>" in html
+
+    finally:
+        # Restore original config
+        config(
+            report_incl_header=original_config.report_incl_header,
+            report_incl_footer=original_config.report_incl_footer,
+            report_incl_footer_timings=original_config.report_incl_footer_timings,
+            report_incl_footer_notes=original_config.report_incl_footer_notes,
+            preview_incl_header=original_config.preview_incl_header,
+        )
