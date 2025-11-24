@@ -16200,12 +16200,34 @@ class Validate:
 
             except Exception:  # pragma: no cover
                 validation.eval_error = True
+                columns_resolved = []
+                # Store columns list for note generation
+                try:
+                    columns = list(table.columns) if "table" in locals() else []
+                except Exception:
+                    columns = []
 
             # If no columns were resolved, then create a patched validation step with the
             # `eval_error` and `column` attributes set
             if not columns_resolved:
                 validation.eval_error = True
                 validation.column = str(column_expr)
+
+                # Add a helpful note explaining the column not found error
+                note_html = _create_column_not_found_note_html(
+                    column_expr=str(column_expr),
+                    available_columns=columns,
+                    locale=self.locale,
+                )
+                note_text = _create_column_not_found_note_text(
+                    column_expr=str(column_expr),
+                    available_columns=columns,
+                )
+                validation._add_note(
+                    key="column_not_found",
+                    markdown=note_html,
+                    text=note_text,
+                )
 
                 expanded_validation_info.append(validation)
                 continue
@@ -18442,6 +18464,65 @@ def _create_threshold_reset_note_text() -> str:
         Plain text note.
     """
     return "Global thresholds explicitly not used for this step."
+
+
+def _create_column_not_found_note_html(
+    column_expr: str, available_columns: list[str], locale: str = "en"
+) -> str:
+    """
+    Create an HTML note explaining that a column expression could not be evaluated.
+
+    Parameters
+    ----------
+    column_expr
+        The column expression that failed to evaluate (as a string).
+    available_columns
+        List of available column names in the table.
+    locale
+        The locale string (e.g., 'en', 'fr').
+
+    Returns
+    -------
+    str
+        HTML-formatted note text with guidance on the column not found error.
+    """
+    # Get translated strings
+    intro = NOTES_TEXT.get("column_not_found_intro", {}).get(
+        locale, NOTES_TEXT.get("column_not_found_intro", {}).get("en", "The column expression")
+    )
+    no_resolve = NOTES_TEXT.get("column_not_found_no_resolve", {}).get(
+        locale,
+        NOTES_TEXT.get("column_not_found_no_resolve", {}).get(
+            "en", "does not resolve to any columns"
+        ),
+    )
+
+    # Format the column expression
+    col_expr_html = f"<code>{column_expr}</code>"
+
+    # Build the HTML note
+    html = f"{intro} {col_expr_html} {no_resolve}."
+
+    return html
+
+
+def _create_column_not_found_note_text(column_expr: str, available_columns: list[str]) -> str:
+    """
+    Create a plain text note explaining that a column expression could not be evaluated.
+
+    Parameters
+    ----------
+    column_expr
+        The column expression that failed to evaluate (as a string).
+    available_columns
+        List of available column names in the table.
+
+    Returns
+    -------
+    str
+        Plain text note with guidance on the column not found error.
+    """
+    return f"The column expression `{column_expr}` does not resolve to any columns."
 
 
 def _create_col_schema_match_note_html(schema_info: dict, locale: str = "en") -> str:
