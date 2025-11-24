@@ -10373,7 +10373,7 @@ def test_validate_get_note_invalid_step_number():
 
 
 def test_column_not_found_note_basic():
-    """Test that column_not_found note is generated when selector matches no columns."""
+    """Test that no_columns_resolved note is generated when selector matches no columns."""
     from pointblank.column import starts_with
 
     validation = (
@@ -10385,13 +10385,13 @@ def test_column_not_found_note_basic():
     # Check that eval_error is set
     assert validation.validation_info[0].eval_error is True
 
-    # Check that column_not_found note exists
+    # Check that no_columns_resolved note exists
     notes = validation.get_notes(i=1)
     assert notes is not None
-    assert "column_not_found" in notes
+    assert "no_columns_resolved" in notes
 
     # Check note content
-    note = validation.get_note(i=1, key="column_not_found")
+    note = validation.get_note(i=1, key="no_columns_resolved")
     assert note is not None
     assert "StartsWith" in note["text"]
     assert "does not resolve to any columns" in note["text"]
@@ -10407,14 +10407,14 @@ def test_column_not_found_note_expression_in_text():
         .interrogate()
     )
 
-    note_text = validation.get_note(i=1, key="column_not_found", format="text")
+    note_text = validation.get_note(i=1, key="no_columns_resolved", format="text")
     assert note_text is not None
     assert "EndsWith(text='_total'" in note_text
     assert "does not resolve" in note_text
 
 
 def test_column_not_found_note_multilingual():
-    """Test that column_not_found note works in multiple languages."""
+    """Test that no_columns_resolved note works in multiple languages."""
     from pointblank.column import contains
 
     # Test French
@@ -10423,7 +10423,7 @@ def test_column_not_found_note_multilingual():
         .col_vals_gt(columns=contains("xyz"), value=0)
         .interrogate()
     )
-    note_fr = validation_fr.get_note(i=1, key="column_not_found", format="markdown")
+    note_fr = validation_fr.get_note(i=1, key="no_columns_resolved", format="markdown")
     assert note_fr is not None
     assert "L'expression de colonne" in note_fr or "colonne" in note_fr
     assert "Contains" in note_fr
@@ -10434,7 +10434,7 @@ def test_column_not_found_note_multilingual():
         .col_vals_gt(columns=contains("xyz"), value=0)
         .interrogate()
     )
-    note_ja = validation_ja.get_note(i=1, key="column_not_found", format="markdown")
+    note_ja = validation_ja.get_note(i=1, key="no_columns_resolved", format="markdown")
     assert note_ja is not None
     assert "列式" in note_ja
     assert "Contains" in note_ja
@@ -10452,17 +10452,17 @@ def test_column_not_found_note_multiple_selectors():
         .interrogate()
     )
 
-    # All three steps should have eval_error and column_not_found notes
+    # All three steps should have eval_error and no_columns_resolved notes
     for i in range(1, 4):
         assert validation.validation_info[i - 1].eval_error is True
-        note = validation.get_note(i=i, key="column_not_found")
+        note = validation.get_note(i=i, key="no_columns_resolved")
         assert note is not None
         assert "does not resolve to any columns" in note["text"]
 
 
 @pytest.mark.parametrize("tbl_fixture", ["tbl_pl", "tbl_pd"])
 def test_column_not_found_note_different_table_types(request, tbl_fixture):
-    """Test that column_not_found note works with different table types."""
+    """Test that no_columns_resolved note works with different table types."""
     from pointblank.column import starts_with
 
     tbl = request.getfixturevalue(tbl_fixture)
@@ -10472,10 +10472,66 @@ def test_column_not_found_note_different_table_types(request, tbl_fixture):
     )
 
     # Should have note regardless of table type
-    note = validation.get_note(i=1, key="column_not_found")
+    note = validation.get_note(i=1, key="no_columns_resolved")
     assert note is not None
     assert "StartsWith" in note["text"]
     assert "does not resolve" in note["text"]
+
+
+def test_simple_column_not_found_note_basic():
+    """Test that column_not_found note is generated when a simple column name doesn't exist."""
+    validation = (
+        Validate(data=pl.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]}))
+        .col_vals_gt(columns="zz", value=0)
+        .interrogate()
+    )
+
+    # Check that eval_error is set
+    assert validation.validation_info[0].eval_error is True
+
+    # Check that column_not_found note exists
+    notes = validation.get_notes(i=1)
+    assert notes is not None
+    assert "column_not_found" in notes
+
+    # Check note content
+    note = validation.get_note(i=1, key="column_not_found")
+    assert note is not None
+    assert "zz" in note["text"]
+    assert "does not match any columns in the table" in note["text"]
+
+
+def test_simple_column_not_found_note_multiple_validations():
+    """Test column_not_found notes for multiple missing columns."""
+    validation = (
+        Validate(data=pl.DataFrame({"a": [1, 2], "b": [3, 4]}))
+        .col_vals_gt(columns="missing_col1", value=0)
+        .col_vals_lt(columns="missing_col2", value=100)
+        .col_vals_ne(columns="missing_col3", value=0)
+        .interrogate()
+    )
+
+    # All three steps should have eval_error and column_not_found notes
+    for i, col_name in enumerate(["missing_col1", "missing_col2", "missing_col3"], start=1):
+        assert validation.validation_info[i - 1].eval_error is True
+        note = validation.get_note(i=i, key="column_not_found")
+        assert note is not None
+        assert col_name in note["text"]
+        assert "does not match any columns in the table" in note["text"]
+
+
+@pytest.mark.parametrize("tbl_fixture", ["tbl_pl", "tbl_pd"])
+def test_simple_column_not_found_note_different_table_types(request, tbl_fixture):
+    """Test that column_not_found note works with different table types for simple column names."""
+    tbl = request.getfixturevalue(tbl_fixture)
+
+    validation = Validate(data=tbl).col_vals_gt(columns="nonexistent_column", value=0).interrogate()
+
+    # Should have note regardless of table type
+    note = validation.get_note(i=1, key="column_not_found")
+    assert note is not None
+    assert "nonexistent_column" in note["text"]
+    assert "does not match any columns" in note["text"]
 
 
 def test_process_data_dataframe_passthrough_pandas():
@@ -17001,9 +17057,13 @@ def test_set_tbl_error_handling():
     incompatible_validation = validation.set_tbl(table2)
     assert incompatible_validation is not None
 
-    # Test that interrogation fails gracefully with incompatible structure
-    with pytest.raises(Exception):  # Should raise an error during interrogation
-        incompatible_validation.interrogate()
+    # Test that interrogation handles incompatible structure gracefully with a note
+    result = incompatible_validation.interrogate()
+    assert result.validation_info[0].eval_error is True
+    # Should have a column_not_found note
+    note = result.get_note(i=1, key="column_not_found")
+    assert note is not None
+    assert "a" in note["text"]  # The missing column name
 
 
 def test_set_tbl_with_different_dataframe_libraries():
