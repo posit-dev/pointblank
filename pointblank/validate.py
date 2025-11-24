@@ -363,12 +363,16 @@ class PointblankConfig:
 
     report_incl_header: bool = True
     report_incl_footer: bool = True
+    report_incl_footer_timings: bool = True
+    report_incl_footer_notes: bool = True
     preview_incl_header: bool = True
 
     def __repr__(self):
         return (
             f"PointblankConfig(report_incl_header={self.report_incl_header}, "
             f"report_incl_footer={self.report_incl_footer}, "
+            f"report_incl_footer_timings={self.report_incl_footer_timings}, "
+            f"report_incl_footer_notes={self.report_incl_footer_notes}, "
             f"preview_incl_header={self.preview_incl_header})"
         )
 
@@ -380,6 +384,8 @@ global_config = PointblankConfig()
 def config(
     report_incl_header: bool = True,
     report_incl_footer: bool = True,
+    report_incl_footer_timings: bool = True,
+    report_incl_footer_notes: bool = True,
     preview_incl_header: bool = True,
 ) -> PointblankConfig:
     """
@@ -393,7 +399,13 @@ def config(
         threshold levels (if set).
     report_incl_footer
         Should the footer of the validation table report be displayed? The footer contains the
-        starting and ending times of the interrogation.
+        starting and ending times of the interrogation and any notes added to validation steps.
+    report_incl_footer_timings
+        Controls whether the validation timing information (start time, duration, and end time)
+        should be displayed in the footer. Only applies when `report_incl_footer=True`.
+    report_incl_footer_notes
+        Controls whether the notes from validation steps should be displayed in the footer. Only
+        applies when `report_incl_footer=True`.
     preview_incl_header
         Whether the header should be present in any preview table (generated via the
         [`preview()`](`pointblank.preview`) function).
@@ -407,6 +419,8 @@ def config(
     global global_config
     global_config.report_incl_header = report_incl_header  # pragma: no cover
     global_config.report_incl_footer = report_incl_footer  # pragma: no cover
+    global_config.report_incl_footer_timings = report_incl_footer_timings  # pragma: no cover
+    global_config.report_incl_footer_notes = report_incl_footer_notes  # pragma: no cover
     global_config.preview_incl_header = preview_incl_header  # pragma: no cover
 
 
@@ -14986,7 +15000,12 @@ class Validate:
         return None
 
     def get_tabular_report(
-        self, title: str | None = ":default:", incl_header: bool = None, incl_footer: bool = None
+        self,
+        title: str | None = ":default:",
+        incl_header: bool = None,
+        incl_footer: bool = None,
+        incl_footer_timings: bool = None,
+        incl_footer_notes: bool = None,
     ) -> GT:
         """
         Validation report as a GT table.
@@ -15009,6 +15028,20 @@ class Validate:
             name of the table as the title for the report. If no title is wanted, then `":none:"`
             can be used. Aside from keyword options, text can be provided for the title. This will
             be interpreted as Markdown text and transformed internally to HTML.
+        incl_header
+            Controls whether the header section should be displayed. If `None`, uses the global
+            configuration setting. The header contains the table name, label, and threshold
+            information.
+        incl_footer
+            Controls whether the footer section should be displayed. If `None`, uses the global
+            configuration setting. The footer can contain validation timing information and notes.
+        incl_footer_timings
+            Controls whether validation timing information (start time, duration, end time) should
+            be displayed in the footer. If `None`, uses the global configuration setting. Only
+            applies when `incl_footer=True`.
+        incl_footer_notes
+            Controls whether notes from validation steps should be displayed in the footer. If
+            `None`, uses the global configuration setting. Only applies when `incl_footer=True`.
 
         Returns
         -------
@@ -15068,6 +15101,10 @@ class Validate:
             incl_header = global_config.report_incl_header
         if incl_footer is None:
             incl_footer = global_config.report_incl_footer
+        if incl_footer_timings is None:
+            incl_footer_timings = global_config.report_incl_footer_timings
+        if incl_footer_notes is None:
+            incl_footer_notes = global_config.report_incl_footer_notes
 
         # Do we have a DataFrame library to work with?
         _check_any_df_lib(method_used="get_tabular_report")
@@ -15860,13 +15897,15 @@ class Validate:
             gt_tbl = gt_tbl.tab_header(title=html(title_text), subtitle=html(combined_subtitle))
 
         if incl_footer:
-            # Add table time as HTML source note
-            gt_tbl = gt_tbl.tab_source_note(source_note=html(table_time))
+            # Add table time as HTML source note if enabled
+            if incl_footer_timings:
+                gt_tbl = gt_tbl.tab_source_note(source_note=html(table_time))
 
-            # Create notes markdown from validation steps and add as separate source note
-            notes_markdown = _create_notes_html(self.validation_info)
-            if notes_markdown:
-                gt_tbl = gt_tbl.tab_source_note(source_note=md(notes_markdown))
+            # Create notes markdown from validation steps and add as separate source note if enabled
+            if incl_footer_notes:
+                notes_markdown = _create_notes_html(self.validation_info)
+                if notes_markdown:
+                    gt_tbl = gt_tbl.tab_source_note(source_note=md(notes_markdown))
 
         # If the interrogation has not been performed, then style the table columns dealing with
         # interrogation data as grayed out
