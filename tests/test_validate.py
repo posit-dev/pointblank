@@ -10372,6 +10372,112 @@ def test_validate_get_note_invalid_step_number():
         validation.get_note(i=-1, key="test")
 
 
+def test_column_not_found_note_basic():
+    """Test that column_not_found note is generated when selector matches no columns."""
+    from pointblank.column import starts_with
+
+    validation = (
+        Validate(data=pl.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]}))
+        .col_vals_gt(columns=starts_with("xyz"), value=0)
+        .interrogate()
+    )
+
+    # Check that eval_error is set
+    assert validation.validation_info[0].eval_error is True
+
+    # Check that column_not_found note exists
+    notes = validation.get_notes(i=1)
+    assert notes is not None
+    assert "column_not_found" in notes
+
+    # Check note content
+    note = validation.get_note(i=1, key="column_not_found")
+    assert note is not None
+    assert "StartsWith" in note["text"]
+    assert "does not resolve to any columns" in note["text"]
+
+
+def test_column_not_found_note_expression_in_text():
+    """Test that the column expression appears correctly in the note text."""
+    from pointblank.column import ends_with
+
+    validation = (
+        Validate(data=pl.DataFrame({"a": [1, 2], "b": [3, 4]}))
+        .col_vals_lt(columns=ends_with("_total"), value=100)
+        .interrogate()
+    )
+
+    note_text = validation.get_note(i=1, key="column_not_found", format="text")
+    assert note_text is not None
+    assert "EndsWith(text='_total'" in note_text
+    assert "does not resolve" in note_text
+
+
+def test_column_not_found_note_multilingual():
+    """Test that column_not_found note works in multiple languages."""
+    from pointblank.column import contains
+
+    # Test French
+    validation_fr = (
+        Validate(data=pl.DataFrame({"a": [1, 2], "b": [3, 4]}), lang="fr")
+        .col_vals_gt(columns=contains("xyz"), value=0)
+        .interrogate()
+    )
+    note_fr = validation_fr.get_note(i=1, key="column_not_found", format="markdown")
+    assert note_fr is not None
+    assert "L'expression de colonne" in note_fr or "colonne" in note_fr
+    assert "Contains" in note_fr
+
+    # Test Japanese
+    validation_ja = (
+        Validate(data=pl.DataFrame({"a": [1, 2], "b": [3, 4]}), lang="ja")
+        .col_vals_gt(columns=contains("xyz"), value=0)
+        .interrogate()
+    )
+    note_ja = validation_ja.get_note(i=1, key="column_not_found", format="markdown")
+    assert note_ja is not None
+    assert "列式" in note_ja
+    assert "Contains" in note_ja
+
+
+def test_column_not_found_note_multiple_selectors():
+    """Test note generation with multiple different selector types."""
+    from pointblank.column import starts_with, ends_with, contains
+
+    validation = (
+        Validate(data=pl.DataFrame({"col1": [1, 2], "col2": [3, 4]}))
+        .col_vals_gt(columns=starts_with("xyz_"), value=0)
+        .col_vals_lt(columns=ends_with("_total"), value=100)
+        .col_vals_ne(columns=contains("missing"), value=0)
+        .interrogate()
+    )
+
+    # All three steps should have eval_error and column_not_found notes
+    for i in range(1, 4):
+        assert validation.validation_info[i - 1].eval_error is True
+        note = validation.get_note(i=i, key="column_not_found")
+        assert note is not None
+        assert "does not resolve to any columns" in note["text"]
+
+
+@pytest.mark.parametrize("tbl_fixture", ["tbl_pl", "tbl_pd"])
+def test_column_not_found_note_different_table_types(request, tbl_fixture):
+    """Test that column_not_found note works with different table types."""
+    from pointblank.column import starts_with
+
+    tbl = request.getfixturevalue(tbl_fixture)
+
+    validation = (
+        Validate(data=tbl).col_vals_gt(columns=starts_with("nonexistent"), value=0).interrogate()
+    )
+
+    # Should have note regardless of table type
+    note = validation.get_note(i=1, key="column_not_found")
+    assert note is not None
+    assert "StartsWith" in note["text"]
+    assert "does not resolve" in note["text"]
+
+
 def test_process_data_dataframe_passthrough_pandas():
     pd = pytest.importorskip("pandas")
 
