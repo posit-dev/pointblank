@@ -12682,6 +12682,7 @@ class Validate:
                 except Exception as e:
                     # Catch data quality errors and column not found errors
                     error_msg = str(e).lower()
+
                     is_comparison_error = (
                         "boolean value of na is ambiguous" in error_msg
                         or "cannot compare" in error_msg
@@ -12691,13 +12692,20 @@ class Validate:
                         )
                         or ("dtype" in error_msg and "compare" in error_msg)
                     )
+
                     is_column_not_found = "column" in error_msg and "not found" in error_msg
 
-                    if is_comparison_error or is_column_not_found:  # pragma: no cover
+                    is_comparison_column_not_found = (
+                        "unable to find column" in error_msg and "valid columns" in error_msg
+                    )
+
+                    if (
+                        is_comparison_error or is_column_not_found or is_comparison_column_not_found
+                    ):  # pragma: no cover
                         # If data quality comparison fails or column not found, mark as eval_error
                         validation.eval_error = True  # pragma: no cover
 
-                        # Add a note for column not found errors
+                        # Add a note for column not found errors (target column)
                         if is_column_not_found:
                             note_html = _create_column_not_found_note_html(
                                 column_name=column,
@@ -12718,14 +12726,65 @@ class Validate:
                                 text=note_text,
                             )
 
+                        # Add a note for comparison column not found errors
+                        elif is_comparison_column_not_found:
+                            # Extract column name from error message
+                            # Error format: 'unable to find column "col_name"; valid columns: ...'
+                            match = re.search(r'unable to find column "([^"]+)"', str(e))
+
+                            if match:
+                                missing_col_name = match.group(1)
+
+                                # Determine position for between/outside validations
+                                position = None
+                                if assertion_type in ["col_vals_between", "col_vals_outside"]:
+                                    # Check if missing column is in left or right position
+                                    from pointblank.column import Column
+
+                                    if (
+                                        isinstance(value[0], Column)
+                                        and value[0].exprs == missing_col_name
+                                    ):
+                                        position = "left"
+                                    elif (
+                                        isinstance(value[1], Column)
+                                        and value[1].exprs == missing_col_name
+                                    ):
+                                        position = "right"
+
+                                note_html = _create_comparison_column_not_found_note_html(
+                                    column_name=missing_col_name,
+                                    position=position,
+                                    available_columns=list(data_tbl_step.columns)
+                                    if hasattr(data_tbl_step, "columns")
+                                    else [],
+                                    locale=self.locale,
+                                )
+                                note_text = _create_comparison_column_not_found_note_text(
+                                    column_name=missing_col_name,
+                                    position=position,
+                                    available_columns=list(data_tbl_step.columns)
+                                    if hasattr(data_tbl_step, "columns")
+                                    else [],
+                                )
+                                validation._add_note(
+                                    key="comparison_column_not_found",
+                                    markdown=note_html,
+                                    text=note_text,
+                                )
+
                         end_time = datetime.datetime.now(datetime.timezone.utc)  # pragma: no cover
+
                         validation.proc_duration_s = (
                             end_time - start_time
                         ).total_seconds()  # pragma: no cover
+
                         validation.time_processed = end_time.isoformat(
                             timespec="milliseconds"
                         )  # pragma: no cover
+
                         validation.active = False  # pragma: no cover
+
                         continue  # pragma: no cover
                     else:
                         # For other unexpected errors, let them propagate
@@ -12826,6 +12885,7 @@ class Validate:
                         markdown=threshold_note_html,
                         text=threshold_note_text,
                     )
+
                 elif self.thresholds != Thresholds():
                     # Thresholds explicitly reset to empty when global thresholds exist
                     reset_note_html = _create_threshold_reset_note_html(locale=self.locale)
@@ -18520,8 +18580,8 @@ def _create_no_columns_resolved_note_html(
         ),
     )
 
-    # Format the column expression
-    col_expr_html = f"<code>{column_expr}</code>"
+    # Format the column expression with monospace font
+    col_expr_html = f"<code style='font-family: \"IBM Plex Mono\", monospace;'>{column_expr}</code>"
 
     # Build the HTML note
     html = f"{intro} {col_expr_html} {no_resolve}."
@@ -18579,8 +18639,8 @@ def _create_column_not_found_note_html(
         ),
     )
 
-    # Format the column name
-    col_name_html = f"<code>{column_name}</code>"
+    # Format the column name with monospace font
+    col_name_html = f"<code style='font-family: \"IBM Plex Mono\", monospace;'>{column_name}</code>"
 
     # Build the HTML note
     html = f"{intro} ({col_name_html}) {not_found}."
@@ -18605,6 +18665,95 @@ def _create_column_not_found_note_text(column_name: str, available_columns: list
         Plain text note.
     """
     return f"The target column provided ({column_name}) does not match any columns in the table."
+
+
+def _create_comparison_column_not_found_note_html(
+    column_name: str, position: str | None, available_columns: list[str], locale: str = "en"
+) -> str:
+    """
+    Create an HTML note explaining that a comparison column was not found.
+
+    Parameters
+    ----------
+    column_name
+        The comparison column name that was not found.
+    position
+        Optional position indicator ("left", "right") for between/outside validations.
+    available_columns
+        List of available column names in the table.
+    locale
+        The locale string (e.g., 'en', 'fr').
+
+    Returns
+    -------
+    str
+        HTML-formatted note text.
+    """
+    # Get translated strings
+    intro = NOTES_TEXT.get("comparison_column_provided", {}).get(
+        locale,
+        NOTES_TEXT.get("comparison_column_provided", {}).get(
+            "en", "The comparison column provided"
+        ),
+    )
+    intro_with_for = NOTES_TEXT.get("comparison_column_for", {}).get(
+        locale,
+        NOTES_TEXT.get("comparison_column_for", {}).get("en", "The comparison column provided for"),
+    )
+    not_found = NOTES_TEXT.get("does_not_match_any_columns", {}).get(
+        locale,
+        NOTES_TEXT.get("does_not_match_any_columns", {}).get(
+            "en", "does not match any columns in the table"
+        ),
+    )
+
+    # Format the column name with monospace font
+    col_name_html = f"<code style='font-family: \"IBM Plex Mono\", monospace;'>{column_name}</code>"
+
+    # Add position if provided (for between/outside validations)
+    if position:
+        # Format position parameter with monospace font (e.g., "left=", "right=")
+        position_param = (
+            f"<code style='font-family: \"IBM Plex Mono\", monospace;'>{position}=</code>"
+        )
+        # Use the "for" version of the intro text
+        html = f"{intro_with_for} {position_param} ({col_name_html}) {not_found}."
+    else:
+        # Use the standard intro text without "for"
+        html = f"{intro} ({col_name_html}) {not_found}."
+
+    return html
+
+
+def _create_comparison_column_not_found_note_text(
+    column_name: str, position: str | None, available_columns: list[str]
+) -> str:
+    """
+    Create a plain text note explaining that a comparison column was not found.
+
+    Parameters
+    ----------
+    column_name
+        The comparison column name that was not found.
+    position
+        Optional position indicator ("left", "right") for between/outside validations.
+    available_columns
+        List of available column names in the table.
+
+    Returns
+    -------
+    str
+        Plain text note.
+    """
+    if position:
+        position_text = f" for {position}="
+    else:
+        position_text = ""
+
+    return (
+        f"The comparison column provided{position_text} ({column_name}) "
+        f"does not match any columns in the table."
+    )
 
 
 def _create_col_schema_match_note_html(schema_info: dict, locale: str = "en") -> str:
