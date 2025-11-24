@@ -10534,6 +10534,172 @@ def test_simple_column_not_found_note_different_table_types(request, tbl_fixture
     assert "does not match any columns" in note["text"]
 
 
+def test_comparison_column_not_found_note_basic():
+    """Test that comparison_column_not_found note is generated for missing comparison columns."""
+
+    validation = (
+        Validate(data=pl.DataFrame({"a": [5, 6, 5], "b": [4, 2, 3]}))
+        .col_vals_gt(columns="a", value=col("missing_comparison"))
+        .interrogate()
+    )
+
+    # Check that eval_error is set
+    assert validation.validation_info[0].eval_error is True
+
+    # Check that comparison_column_not_found note exists
+    notes = validation.get_notes(i=1)
+    assert notes is not None
+    assert "comparison_column_not_found" in notes
+
+    # Check note content
+    note = validation.get_note(i=1, key="comparison_column_not_found")
+    assert note is not None
+    assert "missing_comparison" in note["text"]
+    assert "does not match any columns in the table" in note["text"]
+
+
+def test_comparison_column_not_found_note_between_left():
+    """Test comparison_column_not_found note for missing LEFT column in col_vals_between."""
+
+    validation = (
+        Validate(data=pl.DataFrame({"a": [5, 6, 5], "b": [4, 2, 3]}))
+        .col_vals_between(columns="a", left=col("missing_left"), right=10)
+        .interrogate()
+    )
+
+    # Check that eval_error is set
+    assert validation.validation_info[0].eval_error is True
+
+    # Check note content includes position
+    note = validation.get_note(i=1, key="comparison_column_not_found")
+    assert note is not None
+    assert "missing_left" in note["text"]
+    assert "for left=" in note["text"]
+    assert "does not match any columns" in note["text"]
+
+
+def test_comparison_column_not_found_note_between_right():
+    """Test comparison_column_not_found note for missing RIGHT column in col_vals_between."""
+
+    validation = (
+        Validate(data=pl.DataFrame({"a": [5, 6, 5], "b": [4, 2, 3]}))
+        .col_vals_between(columns="a", left=0, right=col("missing_right"))
+        .interrogate()
+    )
+
+    # Check that eval_error is set
+    assert validation.validation_info[0].eval_error is True
+
+    # Check note content includes position
+    note = validation.get_note(i=1, key="comparison_column_not_found")
+    assert note is not None
+    assert "missing_right" in note["text"]
+    assert "for right=" in note["text"]
+    assert "does not match any columns" in note["text"]
+
+
+def test_comparison_column_not_found_note_outside():
+    """Test comparison_column_not_found note for missing column in col_vals_outside."""
+
+    validation = (
+        Validate(data=pl.DataFrame({"a": [5, 6, 5], "b": [4, 2, 3]}))
+        .col_vals_outside(columns="a", left=col("missing_low"), right=100)
+        .interrogate()
+    )
+
+    # Check that eval_error is set
+    assert validation.validation_info[0].eval_error is True
+
+    # Check note content includes position
+    note = validation.get_note(i=1, key="comparison_column_not_found")
+    assert note is not None
+    assert "missing_low" in note["text"]
+    assert "for left=" in note["text"]
+
+
+def test_comparison_column_not_found_note_multilingual():
+    """Test that comparison_column_not_found note works in multiple languages."""
+
+    # Test French
+    validation_fr = (
+        Validate(data=pl.DataFrame({"a": [5, 6], "b": [4, 2]}), lang="fr")
+        .col_vals_gt(columns="a", value=col("missing"))
+        .interrogate()
+    )
+    note_fr = validation_fr.get_note(i=1, key="comparison_column_not_found", format="markdown")
+    assert note_fr is not None
+    assert "La colonne de comparaison fournie" in note_fr or "comparaison" in note_fr
+    assert "missing" in note_fr
+
+    # Test Japanese
+    validation_ja = (
+        Validate(data=pl.DataFrame({"a": [5, 6], "b": [4, 2]}), lang="ja")
+        .col_vals_gt(columns="a", value=col("missing"))
+        .interrogate()
+    )
+    note_ja = validation_ja.get_note(i=1, key="comparison_column_not_found", format="markdown")
+    assert note_ja is not None
+    assert "比較列" in note_ja
+    assert "missing" in note_ja
+
+
+def test_comparison_column_not_found_note_multiple_methods():
+    """Test comparison_column_not_found notes across different validation methods."""
+
+    validation = (
+        Validate(data=pl.DataFrame({"a": [5, 6, 5], "b": [4, 2, 3]}))
+        .col_vals_gt(columns="a", value=col("miss1"))
+        .col_vals_lt(columns="a", value=col("miss2"))
+        .col_vals_ge(columns="a", value=col("miss3"))
+        .interrogate()
+    )
+
+    # All three steps should have eval_error and comparison_column_not_found notes
+    for i, col_name in enumerate(["miss1", "miss2", "miss3"], start=1):
+        assert validation.validation_info[i - 1].eval_error is True
+        note = validation.get_note(i=i, key="comparison_column_not_found")
+        assert note is not None
+        assert col_name in note["text"]
+
+
+def test_column_error_notes_monospace_font():
+    """Test that column names and parameter names use monospace font in HTML notes."""
+
+    validation = (
+        Validate(data=pl.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]}))
+        # Simple column error
+        .col_vals_not_null(columns="missing_col")
+        # Selector error
+        .col_vals_gt(columns=starts_with("xyz_"), value=0)
+        # Comparison column error without position
+        .col_vals_gt(columns="a", value=col("missing_comp"))
+        # Comparison column error with position
+        .col_vals_between(columns="a", left=col("missing_left"), right=10)
+        .interrogate()
+    )
+
+    # Check simple column error has monospace font
+    note_1 = validation.get_note(i=1, key="column_not_found", format="markdown")
+    assert "IBM Plex Mono" in note_1
+    assert "missing_col" in note_1
+
+    # Check selector error has monospace font
+    note_2 = validation.get_note(i=2, key="no_columns_resolved", format="markdown")
+    assert "IBM Plex Mono" in note_2
+    assert "StartsWith" in note_2
+
+    # Check comparison column error has monospace font for column name
+    note_3 = validation.get_note(i=3, key="comparison_column_not_found", format="markdown")
+    assert "IBM Plex Mono" in note_3
+    assert "missing_comp" in note_3
+
+    # Check comparison column error with position has monospace font for both column and parameter
+    note_4 = validation.get_note(i=4, key="comparison_column_not_found", format="markdown")
+    assert note_4.count("IBM Plex Mono") >= 2  # Should appear for both parameter and column
+    assert "missing_left" in note_4
+    assert "left=" in note_4
+
+
 def test_process_data_dataframe_passthrough_pandas():
     pd = pytest.importorskip("pandas")
 
