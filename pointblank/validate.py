@@ -12329,6 +12329,12 @@ class Validate:
             # This prevents modifications from one validation step affecting others
             data_tbl_step = _copy_dataframe(data_tbl)
 
+            # Capture original table dimensions and columns before preprocessing
+            # (only if preprocessing is present - we'll set these inside the preprocessing block)
+            original_rows = None
+            original_cols = None
+            original_column_names = None
+
             # ------------------------------------------------
             # Preprocessing stage
             # ------------------------------------------------
@@ -12336,6 +12342,16 @@ class Validate:
             # Determine whether any preprocessing functions are to be applied to the table
             if validation.pre is not None:
                 try:
+                    # Capture original table dimensions before preprocessing
+                    # Use get_row_count() instead of len() for compatibility with PySpark, etc.
+                    original_rows = get_row_count(data_tbl_step)
+                    original_cols = get_column_count(data_tbl_step)
+                    original_column_names = set(
+                        data_tbl_step.columns
+                        if hasattr(data_tbl_step, "columns")
+                        else list(data_tbl_step.columns)
+                    )
+
                     # Read the text of the preprocessing function
                     pre_text = _pre_processing_funcs_to_str(validation.pre)
 
@@ -12367,6 +12383,62 @@ class Validate:
                     # If the preprocessing function is a function, apply it to the table
                     elif isinstance(validation.pre, Callable):
                         data_tbl_step = validation.pre(data_tbl_step)
+
+                    # After successful preprocessing, check dimensions and create notes
+                    # Use get_row_count() and get_column_count() for compatibility
+                    processed_rows = get_row_count(data_tbl_step)
+                    processed_cols = get_column_count(data_tbl_step)
+
+                    # Always add a note when preprocessing is applied
+                    if original_rows != processed_rows or original_cols != processed_cols:
+                        # Dimensions changed - show the change
+                        note_html = _create_preprocessing_note_html(
+                            original_rows=original_rows,
+                            original_cols=original_cols,
+                            processed_rows=processed_rows,
+                            processed_cols=processed_cols,
+                            locale=self.locale,
+                        )
+                        note_text = _create_preprocessing_note_text(
+                            original_rows=original_rows,
+                            original_cols=original_cols,
+                            processed_rows=processed_rows,
+                            processed_cols=processed_cols,
+                        )
+                    else:
+                        # No dimension change - just indicate preprocessing was applied
+                        note_html = _create_preprocessing_no_change_note_html(locale=self.locale)
+                        note_text = _create_preprocessing_no_change_note_text()
+
+                    validation._add_note(
+                        key="pre_applied",
+                        markdown=note_html,
+                        text=note_text,
+                    )
+
+                    # Check if target column is synthetic (exists in processed but not original)
+                    # Only check for single column names (not lists used in rows_distinct, etc.)
+                    if column is not None and isinstance(column, str):
+                        processed_column_names = set(
+                            data_tbl_step.columns
+                            if hasattr(data_tbl_step, "columns")
+                            else list(data_tbl_step.columns)
+                        )
+
+                        # Check if the target column is in the processed table but not in original
+                        if column in processed_column_names and column not in original_column_names:
+                            note_html = _create_synthetic_target_column_note_html(
+                                column_name=column,
+                                locale=self.locale,
+                            )
+                            note_text = _create_synthetic_target_column_note_text(
+                                column_name=column,
+                            )
+                            validation._add_note(
+                                key="syn_target_col",
+                                markdown=note_html,
+                                text=note_text,
+                            )
 
                 except Exception:
                     # If preprocessing fails, mark the validation as having an eval_error
@@ -15343,30 +15415,53 @@ class Validate:
         columns_upd = []
 
         columns = validation_info_dict["column"]
+        notes = validation_info_dict["notes"]
 
         assertion_type = validation_info_dict["assertion_type"]
 
         # Iterate over the values in the `column` entry
         for i, column in enumerate(columns):
+            # Check if this validation has a synthetic target column note
+            has_synthetic_column = (
+                notes[i] is not None and isinstance(notes[i], dict) and "syn_target_col" in notes[i]
+            )
+
+            column_text = None
+
             if assertion_type[i] in [
                 "col_schema_match",
                 "row_count_match",
                 "col_count_match",
                 "col_vals_expr",
             ]:
-                columns_upd.append("&mdash;")
+                column_text = "&mdash;"
             elif assertion_type[i] in ["rows_distinct", "rows_complete", "prompt"]:
                 if not column:
                     # If there is no column subset, then all columns are used
-                    columns_upd.append("ALL COLUMNS")
+                    column_text = "ALL COLUMNS"
                 else:
                     # With a column subset list, format with commas between the column names
-                    columns_upd.append(", ".join(column))
-
+                    column_text = ", ".join(column)
             elif assertion_type[i] in ["conjointly", "specially"]:
-                columns_upd.append("")
+                column_text = ""
             else:
-                columns_upd.append(str(column))
+                column_text = str(column)
+
+            # Apply underline styling for synthetic columns (using the purple color from the icon)
+            # Only apply styling if column_text is not empty and not a special marker
+            if (
+                has_synthetic_column
+                and column_text
+                and column_text not in ["&mdash;", "ALL COLUMNS", ""]
+            ):
+                column_text = (
+                    f'<span style="text-decoration: underline; '
+                    f"text-decoration-color: #9A7CB4; text-decoration-thickness: 1px; "
+                    f'text-underline-offset: 3px;">'
+                    f"{column_text}</span>"
+                )
+
+            columns_upd.append(column_text)
 
         # Add the `columns_upd` entry to the dictionary
         validation_info_dict["columns_upd"] = columns_upd
@@ -18795,6 +18890,218 @@ def _create_comparison_column_not_found_note_text(
     )
 
 
+def _create_preprocessing_note_html(
+    original_rows: int,
+    original_cols: int,
+    processed_rows: int,
+    processed_cols: int,
+    locale: str = "en",
+) -> str:
+    """
+    Create an HTML note showing table dimension changes from preprocessing.
+
+    Parameters
+    ----------
+    original_rows
+        Number of rows in the original table.
+    original_cols
+        Number of columns in the original table.
+    processed_rows
+        Number of rows after preprocessing.
+    processed_cols
+        Number of columns after preprocessing.
+    locale
+        The locale string (e.g., 'en', 'fr').
+
+    Returns
+    -------
+    str
+        HTML-formatted note text.
+    """
+    # Get translated strings
+    precondition_text = NOTES_TEXT.get("precondition_applied", {}).get(
+        locale, NOTES_TEXT.get("precondition_applied", {}).get("en", "Precondition applied")
+    )
+    table_dims_text = NOTES_TEXT.get("table_dimensions", {}).get(
+        locale, NOTES_TEXT.get("table_dimensions", {}).get("en", "table dimensions")
+    )
+
+    # Helper function to get singular or plural form
+    def get_row_text(count: int) -> str:
+        if count == 1:
+            return NOTES_TEXT.get("row", {}).get(locale, NOTES_TEXT.get("row", {}).get("en", "row"))
+        return NOTES_TEXT.get("rows", {}).get(locale, NOTES_TEXT.get("rows", {}).get("en", "rows"))
+
+    def get_col_text(count: int) -> str:
+        if count == 1:
+            return NOTES_TEXT.get("column", {}).get(
+                locale, NOTES_TEXT.get("column", {}).get("en", "column")
+            )
+        return NOTES_TEXT.get("columns", {}).get(
+            locale, NOTES_TEXT.get("columns", {}).get("en", "columns")
+        )
+
+    # Determine which dimensions changed
+    rows_changed = original_rows != processed_rows
+    cols_changed = original_cols != processed_cols
+
+    # Format original dimensions
+    original_rows_text = get_row_text(original_rows)
+    original_cols_text = get_col_text(original_cols)
+    original_dim = (
+        f'<span style="font-family: monospace;">'
+        f"[{original_rows:,} {original_rows_text}, {original_cols} {original_cols_text}]"
+        f"</span>"
+    )
+
+    # Format processed dimensions with bold for changed values
+    processed_rows_text = get_row_text(processed_rows)
+    processed_cols_text = get_col_text(processed_cols)
+
+    if rows_changed:
+        rows_display = f"<strong>{processed_rows:,}</strong> {processed_rows_text}"
+    else:
+        rows_display = f"{processed_rows:,} {processed_rows_text}"
+
+    if cols_changed:
+        cols_display = f"<strong>{processed_cols}</strong> {processed_cols_text}"
+    else:
+        cols_display = f"{processed_cols} {processed_cols_text}"
+
+    processed_dim = f'<span style="font-family: monospace;">[{rows_display}, {cols_display}]</span>'
+
+    # Build the HTML note
+    html = f"{precondition_text}: {table_dims_text} {original_dim} → {processed_dim}."
+
+    return html
+
+
+def _create_preprocessing_note_text(
+    original_rows: int,
+    original_cols: int,
+    processed_rows: int,
+    processed_cols: int,
+) -> str:
+    """
+    Create a plain text note showing table dimension changes from preprocessing.
+
+    Parameters
+    ----------
+    original_rows
+        Number of rows in the original table.
+    original_cols
+        Number of columns in the original table.
+    processed_rows
+        Number of rows after preprocessing.
+    processed_cols
+        Number of columns after preprocessing.
+
+    Returns
+    -------
+    str
+        Plain text note.
+    """
+    # Get singular or plural forms
+    original_rows_text = "row" if original_rows == 1 else "rows"
+    original_cols_text = "column" if original_cols == 1 else "columns"
+    processed_rows_text = "row" if processed_rows == 1 else "rows"
+    processed_cols_text = "column" if processed_cols == 1 else "columns"
+
+    return (
+        f"Precondition applied: table dimensions "
+        f"[{original_rows:,} {original_rows_text}, {original_cols} {original_cols_text}] → "
+        f"[{processed_rows:,} {processed_rows_text}, {processed_cols} {processed_cols_text}]."
+    )
+
+
+def _create_preprocessing_no_change_note_html(locale: str = "en") -> str:
+    """
+    Create an HTML note indicating preprocessing was applied with no dimension change.
+
+    Parameters
+    ----------
+    locale
+        The locale string (e.g., 'en', 'fr').
+
+    Returns
+    -------
+    str
+        HTML-formatted note text.
+    """
+    # Get translated string
+    note_text = NOTES_TEXT.get("precondition_applied_no_change", {}).get(
+        locale,
+        NOTES_TEXT.get("precondition_applied_no_change", {}).get(
+            "en", "Precondition applied: no table dimension change"
+        ),
+    )
+
+    return f"{note_text}."
+
+
+def _create_preprocessing_no_change_note_text() -> str:
+    """
+    Create a plain text note indicating preprocessing was applied with no dimension change.
+
+    Returns
+    -------
+    str
+        Plain text note.
+    """
+    return "Precondition applied: no table dimension change."
+
+
+def _create_synthetic_target_column_note_html(column_name: str, locale: str = "en") -> str:
+    """
+    Create an HTML note indicating that the target column was created via preprocessing.
+
+    Parameters
+    ----------
+    column_name
+        The name of the synthetic target column.
+    locale
+        The locale string (e.g., 'en', 'fr').
+
+    Returns
+    -------
+    str
+        HTML-formatted note text.
+    """
+    # Get translated strings
+    synthetic_text = NOTES_TEXT.get("synthetic_target_column", {}).get(
+        locale, NOTES_TEXT.get("synthetic_target_column", {}).get("en", "Synthetic target column")
+    )
+    created_via_text = NOTES_TEXT.get("created_via_preprocessing", {}).get(
+        locale,
+        NOTES_TEXT.get("created_via_preprocessing", {}).get("en", "created via preprocessing"),
+    )
+
+    # Format the column name with monospace font
+    col_name_html = f"<code style='font-family: \"IBM Plex Mono\", monospace;'>{column_name}</code>"
+
+    # Build the HTML note
+    html = f"{synthetic_text} {col_name_html} {created_via_text}."
+
+    return html
+
+
+def _create_synthetic_target_column_note_text(column_name: str) -> str:
+    """
+    Create a plain text note indicating that the target column was created via preprocessing.
+
+    Parameters
+    ----------
+    column_name
+        The name of the synthetic target column.
+
+    Returns
+    -------
+    str
+        Plain text note.
+    """
+    return f"Synthetic target column ({column_name}) created via preprocessing."
+
+
 def _create_col_schema_match_note_html(schema_info: dict, locale: str = "en") -> str:
     """
     Create an HTML note with collapsible schema expectation and results.
@@ -18937,7 +19244,7 @@ def _create_col_schema_match_note_html(schema_info: dict, locale: str = "en") ->
 {summary}
 
 <details style="margin-top: 2px; margin-bottom: 8px; font-size: 12px; text-indent: 12px;">
-<summary style="cursor: pointer; font-weight: bold; color: #555;">{disclosure_text}</summary>
+<summary style="cursor: pointer; font-weight: bold; color: #555; margin-bottom: -5px;">{disclosure_text}</summary>
 <div style="margin-top: 6px; padding-left: 15px; padding-right: 15px;">
 
 {step_report_html}
