@@ -17,6 +17,7 @@ from pointblank._spec_utils import (
     check_postal_code,
     check_vin,
 )
+from pointblank._typing import AbsoluteBounds
 from pointblank._utils import (
     _column_test_prep,
     _convert_to_narwhals,

@@ -55,7 +55,6 @@ from pointblank._interrogation import (
     SpeciallyValidation,
     col_count_match,
     col_exists,
-    col_pct_null,
     col_schema_match,
     col_vals_expr,
     conjointly_validation,
