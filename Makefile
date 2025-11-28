@@ -13,6 +13,10 @@ test:
 test-update:
 	pytest --snapshot-update
 
+.PHONY: pre-commit
+pre-commit: ## Run pre-commit hooks
+	@uvx pre-commit run --all-files
+
 .PHONY: lint
 lint: ## Run ruff formatter and linter
 	@uv run ruff format
