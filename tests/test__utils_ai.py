@@ -50,7 +50,7 @@ def sample_pl_data():
 @pytest.fixture
 def llm_config():
     """Sample LLM configuration."""
-    return _LLMConfig(provider="anthropic", model="claude-3-sonnet-20240229", api_key="test-key")
+    return _LLMConfig(provider="anthropic", model="claude-sonnet-4-5", api_key="test-key")
 
 
 @pytest.fixture
@@ -84,10 +84,10 @@ def test_llm_config_creation():
 
 def test_llm_config_with_api_key():
     """Test LLMConfig with API key."""
-    config = _LLMConfig(provider="anthropic", model="claude-3", api_key="test-key")
+    config = _LLMConfig(provider="anthropic", model="claude-sonnet-4-5", api_key="test-key")
 
     assert config.provider == "anthropic"
-    assert config.model == "claude-3"
+    assert config.model == "claude-sonnet-4-5"
     assert config.api_key == "test-key"
 
 
@@ -529,7 +529,10 @@ def test_ai_validation_engine_init(mock_create_chat, llm_config):
     assert engine.llm_config is llm_config
     assert engine.chat is mock_chat
     mock_create_chat.assert_called_once_with(
-        provider="anthropic", model_name="claude-3-sonnet-20240229", api_key="test-key"
+        provider="anthropic",
+        model_name="claude-sonnet-4-5",
+        api_key="test-key",
+        verify_ssl=True,
     )
 
 
@@ -625,6 +628,61 @@ def test_validate_batches(mock_create_chat, llm_config, mock_chat_response):
     assert mock_chat.chat.call_count == 2
 
 
+@patch("pointblank._utils_ai._create_chat_instance")
+def test_validate_batches_with_many_results(mock_create_chat, llm_config):
+    """Test validating a batch with more than 5 results to trigger debug logging."""
+
+    # Create a mock response with 7 results (more than 5)
+    mock_chat_response = """[
+        {"index": 0, "result": true},
+        {"index": 1, "result": false},
+        {"index": 2, "result": true},
+        {"index": 3, "result": true},
+        {"index": 4, "result": false},
+        {"index": 5, "result": true},
+        {"index": 6, "result": false}
+    ]"""
+
+    mock_chat = Mock()
+    mock_chat.chat.return_value = mock_chat_response
+    mock_create_chat.return_value = mock_chat
+
+    engine = _AIValidationEngine(llm_config)
+
+    # Create a batch with 7 rows
+    batches = [
+        {
+            "batch_id": 0,
+            "start_row": 0,
+            "end_row": 7,
+            "data": {
+                "columns": ["name"],
+                "rows": [
+                    {"name": "Alice"},
+                    {"name": "Bob"},
+                    {"name": "Charlie"},
+                    {"name": "David"},
+                    {"name": "Eve"},
+                    {"name": "Frank"},
+                    {"name": "Grace"},
+                ],
+            },
+        }
+    ]
+
+    prompt_builder = _PromptBuilder("Check names")
+
+    results = engine.validate_batches(batches, prompt_builder)
+
+    assert len(results) == 1  # One batch
+    assert len(results[0]) == 7  # Batch has 7 results
+
+    # Verify the results
+    assert results[0][0]["result"] is True
+    assert results[0][1]["result"] is False
+    assert results[0][6]["result"] is False
+
+
 # ============================================================================
 # Integration Tests
 # ============================================================================
@@ -654,7 +712,10 @@ def test_full_pipeline_pandas(sample_pd_data):
         mock_create_chat.return_value = mock_chat
 
         # Setup components
-        llm_config = _LLMConfig(provider="anthropic", model="claude-3")
+        llm_config = _LLMConfig(
+            provider="anthropic",
+            model="claude-sonnet-4-5",
+        )
         batch_config = _BatchConfig(size=2, max_concurrent=1)
 
         # Create batcher and batches

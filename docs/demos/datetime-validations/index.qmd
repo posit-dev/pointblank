@@ -1,0 +1,155 @@
+---
+pagetitle: "Examples: Date and Datetime Validations"
+notebook-links: false
+page-navigation: false
+toc: false
+html-table-processing: none
+---
+
+### Date and Datetime Validations
+
+**pointblank** provides comprehensive support for validating date and datetime values, including timezone-aware comparisons. This ensures temporal data quality in applications that handle time-sensitive information.
+
+```{python}
+#| echo: false
+
+import pointblank as pb
+import polars as pl
+from datetime import date, datetime
+import pytz
+
+# Create sample data with various temporal data types
+temporal_data = pl.DataFrame({
+    "order_date": [
+        date(2023, 1, 15),
+        date(2023, 6, 10),
+        date(2023, 12, 5),
+        date(2024, 3, 20)
+    ],
+    "created_at": [
+        datetime(2023, 1, 15, 9, 30, 0),
+        datetime(2023, 6, 10, 14, 45, 30),
+        datetime(2023, 12, 5, 8, 15, 0),
+        datetime(2024, 3, 20, 17, 22, 45)
+    ],
+    "event_time_tz": [
+        datetime(2023, 1, 15, 9, 0, tzinfo=pytz.timezone("America/New_York")),
+        datetime(2023, 6, 10, 12, 30, tzinfo=pytz.timezone("America/New_York")),
+        datetime(2023, 12, 5, 15, 45, tzinfo=pytz.timezone("America/New_York")),
+        datetime(2024, 3, 20, 18, 15, tzinfo=pytz.timezone("America/New_York"))
+    ],
+    "order_id": [1001, 1002, 1003, 1004],
+    "amount": [150.0, 275.5, 89.99, 420.00]
+})
+
+validation = (
+    pb.Validate(temporal_data)
+    .col_vals_ge(
+        columns="order_date",
+        value=date(2023, 1, 1),
+        brief="Orders are from 2023 or later"
+    )
+    .col_vals_between(
+        columns="created_at",
+        left=datetime(2023, 1, 1, 0, 0, 0),
+        right=datetime(2024, 12, 31, 23, 59, 59),
+        brief="Creation timestamps within expected range"
+    )
+    .col_vals_ge(
+        columns="event_time_tz",
+        value=datetime(2023, 1, 1, 8, 0, tzinfo=pytz.timezone("America/New_York")),
+        brief="Timezone-aware events after 8 AM Eastern"
+    )
+    .col_schema_match(
+        pb.Schema(
+            columns=[
+                ("order_date", "Date"),
+                ("created_at", "Datetime(time_unit='us', time_zone=None)"),
+                ("event_time_tz", "Datetime(time_unit='us', time_zone='America/New_York')"),
+                ("order_id", "Int64"),
+                ("amount", "Float64")
+            ]
+        ),
+        brief="Schema includes proper date/datetime types"
+    )
+    .interrogate()
+)
+
+validation
+```
+
+```python
+import pointblank as pb
+import polars as pl
+from datetime import date, datetime
+import pytz
+
+# Create sample data with various temporal data types
+temporal_data = pl.DataFrame({
+    "order_date": [
+        date(2023, 1, 15),
+        date(2023, 6, 10),
+        date(2023, 12, 5),
+        date(2024, 3, 20)
+    ],
+    "created_at": [
+        datetime(2023, 1, 15, 9, 30, 0),
+        datetime(2023, 6, 10, 14, 45, 30),
+        datetime(2023, 12, 5, 8, 15, 0),
+        datetime(2024, 3, 20, 17, 22, 45)
+    ],
+    "event_time_tz": [
+        datetime(2023, 1, 15, 9, 0, tzinfo=pytz.timezone("America/New_York")),
+        datetime(2023, 6, 10, 12, 30, tzinfo=pytz.timezone("America/New_York")),
+        datetime(2023, 12, 5, 15, 45, tzinfo=pytz.timezone("America/New_York")),
+        datetime(2024, 3, 20, 18, 15, tzinfo=pytz.timezone("America/New_York"))
+    ],
+    "order_id": [1001, 1002, 1003, 1004],
+    "amount": [150.0, 275.5, 89.99, 420.00]
+})
+
+validation = (
+    pb.Validate(temporal_data)
+    .col_vals_ge(
+        columns="order_date",
+        value=date(2023, 1, 1),
+        brief="Orders are from 2023 or later"
+    )
+    .col_vals_between(
+        columns="created_at",
+        left=datetime(2023, 1, 1, 0, 0, 0),
+        right=datetime(2024, 12, 31, 23, 59, 59),
+        brief="Creation timestamps within expected range"
+    )
+    .col_vals_ge(
+        columns="event_time_tz",
+        value=datetime(2023, 1, 1, 8, 0, tzinfo=pytz.timezone("America/New_York")),
+        brief="Timezone-aware events after 8 AM Eastern"
+    )
+    .col_schema_match(
+        pb.Schema(
+            columns=[
+                ("order_date", "Date"),
+                ("created_at", "Datetime(time_unit='us', time_zone=None)"),
+                ("event_time_tz", "Datetime(time_unit='us', time_zone='America/New_York')"),
+                ("order_id", "Int64"),
+                ("amount", "Float64")
+            ]
+        ),
+        brief="Schema includes proper date/datetime types"
+    )
+    .interrogate()
+)
+
+validation
+```
+
+<details>
+<summary>Preview of Input Table</summary>
+
+```{python}
+# | echo: false
+pb.preview(temporal_data)
+```
+
+</details>

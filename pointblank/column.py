@@ -219,7 +219,7 @@ class ColumnSelectorNarwhals(Column):
         # Use `collect_schema()` for LazyFrame to avoid performance warnings
         if hasattr(selected_df, "collect_schema"):
             return list(selected_df.collect_schema().keys())
-        else:
+        else:  # pragma: no cover
             return list(selected_df.columns)
 
 
@@ -268,9 +268,12 @@ def col(
     - [`col_vals_outside()`](`pointblank.Validate.col_vals_outside`)
     - [`col_vals_in_set()`](`pointblank.Validate.col_vals_in_set`)
     - [`col_vals_not_in_set()`](`pointblank.Validate.col_vals_not_in_set`)
+    - [`col_vals_increasing()`](`pointblank.Validate.col_vals_increasing`)
+    - [`col_vals_decreasing()`](`pointblank.Validate.col_vals_decreasing`)
     - [`col_vals_null()`](`pointblank.Validate.col_vals_null`)
     - [`col_vals_not_null()`](`pointblank.Validate.col_vals_not_null`)
     - [`col_vals_regex()`](`pointblank.Validate.col_vals_regex`)
+    - [`col_vals_within_spec()`](`pointblank.Validate.col_vals_within_spec`)
     - [`col_exists()`](`pointblank.Validate.col_exists`)
 
     If specifying a single column with certainty (you have the exact name), `col()` is not necessary
@@ -568,9 +571,12 @@ def starts_with(text: str, case_sensitive: bool = False) -> StartsWith:
     - [`col_vals_outside()`](`pointblank.Validate.col_vals_outside`)
     - [`col_vals_in_set()`](`pointblank.Validate.col_vals_in_set`)
     - [`col_vals_not_in_set()`](`pointblank.Validate.col_vals_not_in_set`)
+    - [`col_vals_increasing()`](`pointblank.Validate.col_vals_increasing`)
+    - [`col_vals_decreasing()`](`pointblank.Validate.col_vals_decreasing`)
     - [`col_vals_null()`](`pointblank.Validate.col_vals_null`)
     - [`col_vals_not_null()`](`pointblank.Validate.col_vals_not_null`)
     - [`col_vals_regex()`](`pointblank.Validate.col_vals_regex`)
+    - [`col_vals_within_spec()`](`pointblank.Validate.col_vals_within_spec`)
     - [`col_exists()`](`pointblank.Validate.col_exists`)
 
     The `starts_with()` selector function doesn't need to be used in isolation. Read the next
@@ -727,9 +733,12 @@ def ends_with(text: str, case_sensitive: bool = False) -> EndsWith:
     - [`col_vals_outside()`](`pointblank.Validate.col_vals_outside`)
     - [`col_vals_in_set()`](`pointblank.Validate.col_vals_in_set`)
     - [`col_vals_not_in_set()`](`pointblank.Validate.col_vals_not_in_set`)
+    - [`col_vals_increasing()`](`pointblank.Validate.col_vals_increasing`)
+    - [`col_vals_decreasing()`](`pointblank.Validate.col_vals_decreasing`)
     - [`col_vals_null()`](`pointblank.Validate.col_vals_null`)
     - [`col_vals_not_null()`](`pointblank.Validate.col_vals_not_null`)
     - [`col_vals_regex()`](`pointblank.Validate.col_vals_regex`)
+    - [`col_vals_within_spec()`](`pointblank.Validate.col_vals_within_spec`)
     - [`col_exists()`](`pointblank.Validate.col_exists`)
 
     The `ends_with()` selector function doesn't need to be used in isolation. Read the next section
@@ -887,9 +896,12 @@ def contains(text: str, case_sensitive: bool = False) -> Contains:
     - [`col_vals_outside()`](`pointblank.Validate.col_vals_outside`)
     - [`col_vals_in_set()`](`pointblank.Validate.col_vals_in_set`)
     - [`col_vals_not_in_set()`](`pointblank.Validate.col_vals_not_in_set`)
+    - [`col_vals_increasing()`](`pointblank.Validate.col_vals_increasing`)
+    - [`col_vals_decreasing()`](`pointblank.Validate.col_vals_decreasing`)
     - [`col_vals_null()`](`pointblank.Validate.col_vals_null`)
     - [`col_vals_not_null()`](`pointblank.Validate.col_vals_not_null`)
     - [`col_vals_regex()`](`pointblank.Validate.col_vals_regex`)
+    - [`col_vals_within_spec()`](`pointblank.Validate.col_vals_within_spec`)
     - [`col_exists()`](`pointblank.Validate.col_exists`)
 
     The `contains()` selector function doesn't need to be used in isolation. Read the next section
@@ -1047,9 +1059,12 @@ def matches(pattern: str, case_sensitive: bool = False) -> Matches:
     - [`col_vals_outside()`](`pointblank.Validate.col_vals_outside`)
     - [`col_vals_in_set()`](`pointblank.Validate.col_vals_in_set`)
     - [`col_vals_not_in_set()`](`pointblank.Validate.col_vals_not_in_set`)
+    - [`col_vals_increasing()`](`pointblank.Validate.col_vals_increasing`)
+    - [`col_vals_decreasing()`](`pointblank.Validate.col_vals_decreasing`)
     - [`col_vals_null()`](`pointblank.Validate.col_vals_null`)
     - [`col_vals_not_null()`](`pointblank.Validate.col_vals_not_null`)
     - [`col_vals_regex()`](`pointblank.Validate.col_vals_regex`)
+    - [`col_vals_within_spec()`](`pointblank.Validate.col_vals_within_spec`)
     - [`col_exists()`](`pointblank.Validate.col_exists`)
 
     The `matches()` selector function doesn't need to be used in isolation. Read the next section
@@ -1189,9 +1204,12 @@ def everything() -> Everything:
     - [`col_vals_outside()`](`pointblank.Validate.col_vals_outside`)
     - [`col_vals_in_set()`](`pointblank.Validate.col_vals_in_set`)
     - [`col_vals_not_in_set()`](`pointblank.Validate.col_vals_not_in_set`)
+    - [`col_vals_increasing()`](`pointblank.Validate.col_vals_increasing`)
+    - [`col_vals_decreasing()`](`pointblank.Validate.col_vals_decreasing`)
     - [`col_vals_null()`](`pointblank.Validate.col_vals_null`)
     - [`col_vals_not_null()`](`pointblank.Validate.col_vals_not_null`)
     - [`col_vals_regex()`](`pointblank.Validate.col_vals_regex`)
+    - [`col_vals_within_spec()`](`pointblank.Validate.col_vals_within_spec`)
     - [`col_exists()`](`pointblank.Validate.col_exists`)
 
     The `everything()` selector function doesn't need to be used in isolation. Read the next section
@@ -1341,9 +1359,12 @@ def first_n(n: int, offset: int = 0) -> FirstN:
     - [`col_vals_outside()`](`pointblank.Validate.col_vals_outside`)
     - [`col_vals_in_set()`](`pointblank.Validate.col_vals_in_set`)
     - [`col_vals_not_in_set()`](`pointblank.Validate.col_vals_not_in_set`)
+    - [`col_vals_increasing()`](`pointblank.Validate.col_vals_increasing`)
+    - [`col_vals_decreasing()`](`pointblank.Validate.col_vals_decreasing`)
     - [`col_vals_null()`](`pointblank.Validate.col_vals_null`)
     - [`col_vals_not_null()`](`pointblank.Validate.col_vals_not_null`)
     - [`col_vals_regex()`](`pointblank.Validate.col_vals_regex`)
+    - [`col_vals_within_spec()`](`pointblank.Validate.col_vals_within_spec`)
     - [`col_exists()`](`pointblank.Validate.col_exists`)
 
     The `first_n()` selector function doesn't need to be used in isolation. Read the next section
@@ -1497,9 +1518,12 @@ def last_n(n: int, offset: int = 0) -> LastN:
     - [`col_vals_outside()`](`pointblank.Validate.col_vals_outside`)
     - [`col_vals_in_set()`](`pointblank.Validate.col_vals_in_set`)
     - [`col_vals_not_in_set()`](`pointblank.Validate.col_vals_not_in_set`)
+    - [`col_vals_increasing()`](`pointblank.Validate.col_vals_increasing`)
+    - [`col_vals_decreasing()`](`pointblank.Validate.col_vals_decreasing`)
     - [`col_vals_null()`](`pointblank.Validate.col_vals_null`)
     - [`col_vals_not_null()`](`pointblank.Validate.col_vals_not_null`)
     - [`col_vals_regex()`](`pointblank.Validate.col_vals_regex`)
+    - [`col_vals_within_spec()`](`pointblank.Validate.col_vals_within_spec`)
     - [`col_exists()`](`pointblank.Validate.col_exists`)
 
     The `last_n()` selector function doesn't need to be used in isolation. Read the next section for

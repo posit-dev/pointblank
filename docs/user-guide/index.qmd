@@ -1,20 +1,13 @@
 ---
-title: Introduction
-jupyter: python3
-toc-expand: 2
-html-table-processing: none
+title: "Introduction"
+format:
+  html:
+    include-in-header:
+      - text: |
+          <meta http-equiv="refresh" content="0; url=../index.html">
 ---
-```{python}
-#| echo: false
-#| output: false
-import pointblank as pb
-pb.config(report_incl_footer=False)
-```
 
-The Pointblank library is all about assessing the state of data quality for a table. You provide the
-validation rules and the library will dutifully interrogate the data and provide useful reporting.
-We can use different types of tables like Polars and Pandas DataFrames, Parquet files, or various
-database tables. Let's walk through what data validation looks like in Pointblank.
+Redirecting to the [Introduction](../index.qmd)...
 
 ## A Simple Validation Table
 
@@ -206,6 +199,7 @@ The *Advanced Validation* section explores more specialized validation technique
 After validating your data, the *Post Interrogation* section helps you analyze and respond to
 results:
 
+- [Validation Reports](validation-reports.qmd): Understand and customize the validation report table
 - [Step Reports](step-reports.qmd): View detailed results for individual validation steps
 - [Data Extracts](extracts.qmd): Extract and analyze failing data
 - [Sundering Validated Data](sundering.qmd): Split data based on validation results

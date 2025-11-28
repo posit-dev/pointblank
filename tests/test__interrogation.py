@@ -4,11 +4,13 @@ import polars as pl
 from unittest.mock import Mock, patch
 
 from pointblank._interrogation import (
-    _safe_modify_datetime_compare_val,
-    _modify_datetime_compare_val,
     _column_has_null_values,
+    _modify_datetime_compare_val,
+    _safe_is_nan_or_null_expr,
+    _safe_modify_datetime_compare_val,
     ConjointlyValidation,
 )
+from pointblank.column import Column
 
 
 @pytest.fixture
@@ -50,6 +52,7 @@ COLUMN_LIST_DISTINCT = ["col_1", "col_2", "col_3", "pb_is_good_"]
 
 def test_safe_modify_datetime_with_collect_schema():
     """Test using collect_schema method."""
+
     # Create a mock dataframe with collect_schema
     mock_df = Mock()
     mock_schema = {"date_col": "datetime64[ns]"}
@@ -67,6 +70,7 @@ def test_safe_modify_datetime_with_collect_schema():
 
 def test_safe_modify_datetime_with_schema_attribute():
     """Test using schema attribute."""
+
     # Create a mock dataframe with schema attribute
     mock_df = Mock()
     del mock_df.collect_schema  # Remove collect_schema
@@ -82,6 +86,7 @@ def test_safe_modify_datetime_with_schema_attribute():
 
 def test_safe_modify_datetime_fallback_sample_collect():
     """Test fallback to sample collection."""
+
     # Create mock dataframe without schema methods
     mock_df = Mock()
     del mock_df.collect_schema
@@ -103,6 +108,7 @@ def test_safe_modify_datetime_fallback_sample_collect():
 
 def test_safe_modify_datetime_fallback_sample_exception():
     """Test exception in sample collection."""
+
     mock_df = Mock()
     del mock_df.collect_schema
     del mock_df.schema
@@ -115,6 +121,7 @@ def test_safe_modify_datetime_fallback_sample_exception():
 
 def test_safe_modify_datetime_direct_access_fallback():
     """Test direct dtypes access fallback."""
+
     mock_df = Mock()
     del mock_df.collect_schema
     del mock_df.schema
@@ -134,10 +141,12 @@ def test_safe_modify_datetime_direct_access_fallback():
 
 def test_safe_modify_datetime_direct_access_exception():
     """Test exception in direct access."""
+
     mock_df = Mock()
     del mock_df.collect_schema
     del mock_df.schema
     mock_df.head.side_effect = Exception("Cannot collect")
+
     # Make dtypes access raise exception
     type(mock_df).dtypes = Mock(side_effect=Exception("No dtypes"))
 
@@ -147,7 +156,9 @@ def test_safe_modify_datetime_direct_access_exception():
 
 def test_safe_modify_datetime_outer_exception():
     """Test outer exception handling."""
+
     mock_df = Mock()
+
     # Make the entire try block raise an exception
     mock_df.collect_schema.side_effect = Exception("Major failure")
 
@@ -158,6 +169,7 @@ def test_safe_modify_datetime_outer_exception():
 @patch("pointblank._interrogation._get_tbl_type")
 def test_pyspark_expression_handling_with_error(mock_get_tbl_type):
     """Test PySpark expression error handling."""
+
     mock_get_tbl_type.return_value = "pyspark"
 
     # Create a mock PySpark DataFrame
@@ -202,6 +214,7 @@ def test_pyspark_expression_handling_with_error(mock_get_tbl_type):
 
 def test_pyspark_results_table_creation_default_case():
     """Test default case in PySpark results."""
+
     mock_df = Mock()
 
     conjointly = ConjointlyValidation(
@@ -224,6 +237,7 @@ def test_pyspark_results_table_creation_default_case():
 
 def test_pyspark_nested_exception_print():
     """Test the nested exception print statement."""
+
     mock_df = Mock()
 
     conjointly = ConjointlyValidation(
@@ -257,6 +271,7 @@ def test_pyspark_nested_exception_print():
 
 def test_check_column_has_nulls_attribute_error():
     """Test AttributeError handling in null checking."""
+
     # Create a mock table without null_count method
     mock_table = Mock()
     del mock_table.select().null_count  # Remove null_count method
@@ -272,6 +287,7 @@ def test_check_column_has_nulls_attribute_error():
 
 def test_check_column_has_nulls_nested_exceptions():
     """Test nested exception handling in null checking."""
+
     # Create a mock that raises AttributeError for null_count
     mock_table = Mock()
 
@@ -283,7 +299,7 @@ def test_check_column_has_nulls_nested_exceptions():
     # Make collect() also fail
     mock_select_result.collect.side_effect = Exception("Collect failed")
 
-    # Mock narwhals scenario that also fails
+    # Mock Narwhals scenario that also fails
     with patch("pointblank._interrogation.nw") as mock_nw:
         mock_nw.col.return_value.is_null.return_value.sum.return_value.alias.return_value = (
             "null_expr"
@@ -295,8 +311,7 @@ def test_check_column_has_nulls_nested_exceptions():
 
 
 def test_modify_datetime_column_isinstance_check():
-    """Test the isinstance check that's currently not covered."""
-    from pointblank.column import Column
+    """Test the isinstance check in the _modify_datetime_compare_val() function."""
 
     mock_column = Mock()
     mock_column.dtype = "datetime64[ns]"
@@ -307,3 +322,79 @@ def test_modify_datetime_column_isinstance_check():
     # This should return the column instance itself
     result = _modify_datetime_compare_val(mock_column, column_instance)
     assert result == column_instance
+
+
+def test_safe_is_nan_or_null_expr_with_schema_attribute():
+    """Test _safe_is_nan_or_null_expr() using schema attribute."""
+
+    # Create a mock dataframe with schema attribute
+    mock_df = Mock(spec=["schema"])  # spec ensures only 'schema' attribute exists
+
+    # Set up schema attribute with a float column
+    mock_df.schema = {"float_col": "Float64"}
+
+    # Create a mock column expression
+    mock_col_expr = Mock()
+    mock_is_null = Mock()
+    mock_is_nan = Mock()
+    mock_col_expr.is_null.return_value = mock_is_null
+    mock_col_expr.is_nan.return_value = mock_is_nan
+
+    # Mock the OR operation
+    mock_is_null.__or__ = Mock(return_value="null_or_nan_check")
+
+    # Call the function
+    result = _safe_is_nan_or_null_expr(mock_df, mock_col_expr, "float_col")
+
+    # Should have called is_nan() for numeric type
+    assert result == "null_or_nan_check"
+    mock_col_expr.is_null.assert_called_once()
+    mock_col_expr.is_nan.assert_called_once()
+
+
+def test_safe_is_nan_or_null_expr_schema_non_numeric():
+    """Test _safe_is_nan_or_null_expr() with schema attribute for non-numeric column."""
+
+    # Create a mock dataframe with schema attribute (but not collect_schema)
+    mock_df = Mock(spec=["schema"])  # spec ensures only 'schema' attribute exists
+
+    # Set up schema attribute with a string column (non-numeric)
+    mock_df.schema = {"string_col": "String"}
+
+    # Create a mock column expression
+    mock_col_expr = Mock()
+    mock_is_null_result = "null_check"
+    mock_col_expr.is_null.return_value = mock_is_null_result
+
+    # Call the function
+    result = _safe_is_nan_or_null_expr(mock_df, mock_col_expr, "string_col")
+
+    # Should only check for null (not NaN) for string column
+    # The result is what is_null() returned (null_check = column_expr.is_null())
+    assert result == mock_is_null_result
+    mock_col_expr.is_null.assert_called_once()
+    # is_nan should not be called for string column
+    mock_col_expr.is_nan.assert_not_called()
+
+
+def test_safe_is_nan_or_null_expr_schema_is_nan_fails():
+    """Test _safe_is_nan_or_null_expr() when is_nan() raises exception."""
+
+    # Create a mock dataframe with schema attribute
+    mock_df = Mock(spec=["schema"])  # spec ensures only 'schema' attribute exists
+    mock_df.schema = {"float_col": "Float64"}
+
+    # Create a mock column expression where is_nan() fails
+    mock_col_expr = Mock()
+    mock_is_null_result = "null_check_only"
+    mock_col_expr.is_null.return_value = mock_is_null_result
+    mock_col_expr.is_nan.side_effect = Exception("is_nan not supported")
+
+    # Call the function
+    result = _safe_is_nan_or_null_expr(mock_df, mock_col_expr, "float_col")
+
+    # Should fall back to null check only when is_nan() fails
+    # The result is what is_null() returned (since null_check = column_expr.is_null())
+    assert result == mock_is_null_result
+    mock_col_expr.is_null.assert_called_once()
+    mock_col_expr.is_nan.assert_called_once()

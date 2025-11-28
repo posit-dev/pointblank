@@ -1,0 +1,28 @@
+[
+    {
+        "i": 1,
+        "i_o": 1,
+        "assertion_type": "col_vals_gt",
+        "column": "a",
+        "values": 5,
+        "inclusive": null,
+        "na_pass": false,
+        "pre": "def narwhals_median_transform(df):\n    \"\"\"Use narwhals to compute median - cross-backend compatible.\"\"\"\n    return nw.from_native(df).select(nw.median(\"a\"), nw.median(\"d\"))",
+        "segments": null,
+        "thresholds": "Thresholds(warning=None, error=None, critical=None)",
+        "label": null,
+        "brief": null,
+        "active": true,
+        "all_passed": true,
+        "n": 1,
+        "n_passed": 1,
+        "n_failed": 0,
+        "f_passed": 1.0,
+        "f_failed": 0.0,
+        "warning": null,
+        "error": null,
+        "critical": null,
+        "time_processed": "2025-10-02T04:16:44.710+00:00",
+        "proc_duration_s": 0.001455
+    }
+]

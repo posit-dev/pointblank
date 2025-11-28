@@ -3,9 +3,13 @@ project:
   post-render: scripts/post-render.py
   resources:
     - "assets/**"
+    - "user-guide.pdf"
 
 format:
   html:
+    include-in-header:
+      - text: |
+          <script src="https://cdn.jsdelivr.net/gh/posit-dev/supported-by-posit/js/badge.min.js"></script>
     theme: flatly
     css:
       - styles.css
@@ -40,13 +44,16 @@ website:
   bread-crumbs: false
   favicon: assets/fav-logo.png
   site-url: https://posit-dev.github.io/pointblank/
+  repo-url: https://github.com/posit-dev/pointblank
   description: "Find out if your data is what you think it is"
   navbar:
+    logo: assets/pointblank_logo_small.svg
+    title: false
     left:
-      - text: User Guide
-        file: user-guide/index.qmd
-      - text: Examples
-        file: demos/index.qmd
+      - href: index.qmd
+        text: Get Started
+      - href: demos/index.qmd
+        text: Examples
       - href: reference/index.qmd
         text: API Reference
       - href: blog/index.qmd
@@ -59,9 +66,11 @@ website:
   sidebar:
       id: user-guide
       contents:
-        - section: "Getting Started"
+        - section: "Get Started"
           contents:
-            - user-guide/index.qmd
+            - text: "Welcome to Pointblank"
+              href: index.qmd
+            - user-guide/quickstart.qmd
             - user-guide/installation.qmd
         - section: "Validation Plan"
           contents:
@@ -85,6 +94,7 @@ website:
             - user-guide/yaml-reference.qmd
         - section: "Post Interrogation"
           contents:
+            - user-guide/validation-reports.qmd
             - user-guide/step-reports.qmd
             - user-guide/extracts.qmd
             - user-guide/sundering.qmd
@@ -153,9 +163,12 @@ quartodoc:
         - name: Validate.col_vals_outside
         - name: Validate.col_vals_in_set
         - name: Validate.col_vals_not_in_set
+        - name: Validate.col_vals_increasing
+        - name: Validate.col_vals_decreasing
         - name: Validate.col_vals_null
         - name: Validate.col_vals_not_null
         - name: Validate.col_vals_regex
+        - name: Validate.col_vals_within_spec
         - name: Validate.col_vals_expr
         - name: Validate.rows_distinct
         - name: Validate.rows_complete
@@ -163,6 +176,7 @@ quartodoc:
         - name: Validate.col_schema_match
         - name: Validate.row_count_match
         - name: Validate.col_count_match
+        - name: Validate.tbl_match
         - name: Validate.conjointly
         - name: Validate.specially
         - name: Validate.prompt
@@ -234,15 +248,18 @@ quartodoc:
         - name: load_dataset
         - name: get_data_path
         - name: connect_to_table
+        - name: print_database_tables
     - title: YAML
       desc: >
         The *YAML* group contains functions that allow for the use of YAML to orchestrate validation
         workflows. The `yaml_interrogate()` function can be used to run a validation workflow from
         YAML strings or files. The `validate_yaml()` function checks if the YAML configuration
-        passes its own validity checks.
+        passes its own validity checks. The `yaml_to_python()` function converts YAML configuration
+        to equivalent Python code.
       contents:
         - name: yaml_interrogate
         - name: validate_yaml
+        - name: yaml_to_python
     - title: Utility Functions
       desc: >
         The *Utility Functions* group contains functions that are useful accessing metadata about
@@ -255,6 +272,8 @@ quartodoc:
         - name: get_row_count
         - name: get_action_metadata
         - name: get_validation_summary
+        - name: write_file
+        - name: read_file
         - name: config
     - title: Prebuilt Actions
       desc: >

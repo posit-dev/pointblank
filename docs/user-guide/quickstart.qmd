@@ -1,0 +1,229 @@
+---
+title: Quickstart
+jupyter: python3
+toc-expand: 2
+html-table-processing: none
+bread-crumbs: true
+---
+
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_footer=False)
+```
+
+The Pointblank library is all about assessing the state of data quality for a table. You provide the
+validation rules and the library will dutifully interrogate the data and provide useful reporting.
+We can use different types of tables like Polars and Pandas DataFrames, Parquet files, or various
+database tables. Let's walk through what data validation looks like in Pointblank.
+
+## A Simple Validation Table
+
+This is a validation report table that is produced from a validation of a Polars DataFrame:
+
+```{python}
+#| code-fold: true
+#| code-summary: "Show the code"
+import pointblank as pb
+
+(
+    pb.Validate(data=pb.load_dataset(dataset="small_table"), label="Example Validation")
+    .col_vals_lt(columns="a", value=10)
+    .col_vals_between(columns="d", left=0, right=5000)
+    .col_vals_in_set(columns="f", set=["low", "mid", "high"])
+    .col_vals_regex(columns="b", pattern=r"^[0-9]-[a-z]{3}-[0-9]{3}$")
+    .interrogate()
+)
+```
+
+Each row in this reporting table constitutes a single validation step. Roughly, the left-hand side
+outlines the validation rules and the right-hand side provides the results of each validation step.
+While simple in principle, there's a lot of useful information packed into this validation table.
+
+Here's a diagram that describes a few of the important parts of the validation table:
+
+![](/assets/validation-table-diagram.png){width=100%}
+
+There are three things that should be noted here:
+
+- validation steps: each step is a separate test on the table, focused on a certain aspect of the
+table
+- validation rules: the validation type is provided here along with key constraints
+- validation results: interrogation results are provided here, with a breakdown of test units
+(*total*, *passing*, and *failing*), threshold flags, and more
+
+The intent is to provide the key information in one place, and have it be interpretable by data
+stakeholders. For example, a failure can be seen in the second row (notice there's a CSV button). A
+data quality stakeholder could click this to download a CSV of the failing rows for that step.
+
+## Example Code, Step-by-Step
+
+This section will walk you through the example code used above.
+
+```python
+import pointblank as pb
+
+(
+    pb.Validate(data=pb.load_dataset(dataset="small_table"))
+    .col_vals_lt(columns="a", value=10)
+    .col_vals_between(columns="d", left=0, right=5000)
+    .col_vals_in_set(columns="f", set=["low", "mid", "high"])
+    .col_vals_regex(columns="b", pattern=r"^[0-9]-[a-z]{3}-[0-9]{3}$")
+    .interrogate()
+)
+```
+
+Note these three key pieces in the code:
+
+- **data**: the `Validate(data=)` argument takes a DataFrame or database table that you want to validate
+- **steps**: the methods starting with `col_vals_` specify validation steps that run on specific columns
+- **execution**: the `~~Validate.interrogate()` method executes the validation plan on the table
+
+This common pattern is used in a validation workflow, where `Validate` and
+`~~Validate.interrogate()` bookend a validation plan generated through calling validation methods.
+
+In the next few sections we'll go a bit further by understanding how we can measure data quality and
+respond to failures.
+
+## Understanding Test Units
+
+Each validation step will execute a type of validation test on the target table. For example, a
+`~~Validate.col_vals_lt()` validation step can test that each value in a column is less than a
+specified number. And the key finding that's reported in each step is the number of *test units*
+that pass or fail.
+
+In the validation report table, test unit metrics are displayed under the `UNITS`, `PASS`, and
+`FAIL` columns. This diagram explains what the tabulated values signify:
+
+![](/assets/validation-test-units.png){width=100%}
+
+Test units are dependent on the test being run. Some validation methods might test every value in a
+particular column, so each value will be a test unit. Others will only have a single test unit since
+they aren't testing individual values but rather if the overall test passes or fails.
+
+## Setting Thresholds for Data Quality Signals
+
+Understanding test units is essential because they form the foundation of Pointblank's threshold
+system. Thresholds let you define acceptable levels of data quality, triggering different severity
+signals ('warning', 'error', or 'critical') when certain failure conditions are met.
+
+Here's a simple example that uses a single validation step along with thresholds set using the
+`Thresholds` class:
+
+```{python}
+(
+    pb.Validate(data=pb.load_dataset(dataset="small_table"))
+    .col_vals_lt(
+        columns="a",
+        value=7,
+
+        # Set the 'warning' and 'error' thresholds ---
+        thresholds=pb.Thresholds(warning=2, error=4)
+    )
+    .interrogate()
+)
+```
+
+If you look at the validation report table, we can see:
+
+- the `FAIL` column shows that 2 tests units have failed
+- the `W` column (short for 'warning') shows a filled gray circle indicating those failing test
+units reached that threshold value
+- the `E` column (short for 'error') shows an open yellow circle indicating that the number of
+failing test units is below that threshold
+
+The one final threshold level, `C` (for 'critical'), wasn't set so it appears on the validation
+table as a long dash.
+
+## Taking Action on Threshold Exceedances
+
+Pointblank becomes even more powerful when you combine thresholds with actions. The
+`Actions` class lets you trigger responses when validation failures exceed threshold levels, turning
+passive reporting into active notifications.
+
+Here's a simple example that adds an action to the previous validation:
+
+```{python}
+(
+    pb.Validate(data=pb.load_dataset(dataset="small_table"))
+    .col_vals_lt(
+        columns="a",
+        value=7,
+        thresholds=pb.Thresholds(warning=2, error=4),
+
+        # Set an action for the 'warning' threshold ---
+        actions=pb.Actions(
+            warning="WARNING: Column 'a' has values that aren't less than 7."
+        )
+    )
+    .interrogate()
+)
+```
+
+Notice the printed warning message: `"WARNING: Column 'a' has values that aren't less than
+7."`. The warning indicator (filled gray circle) visually confirms this threshold was reached and
+the action should trigger.
+
+Actions make your validation workflows more responsive and integrated with your data pipelines. For
+example, you can generate console messages, Slack notifications, and more.
+
+## Navigating the User Guide
+
+As you continue exploring Pointblank's capabilities, you'll find the **User Guide** organized into
+sections that will help you navigate the various features.
+
+### Getting Started
+
+The *Getting Started* section introduces you to Pointblank:
+
+- [Introduction](index.qmd): Overview of Pointblank and core concepts (**this article**)
+- [Installation](user-guide/installation.qmd): How to install and set up Pointblank
+
+### Validation Plan
+
+The *Validation Plan* section covers everything you need to know about creating robust
+validation plans:
+
+- [Overview](user-guide/validation-overview.qmd): Survey of validation methods and their shared parameters
+- [Validation Methods](user-guide/validation-methods.qmd): A closer look at the more common validation methods
+- [Column Selection Patterns](user-guide/column-selection-patterns.qmd): Techniques for targeting specific columns
+- [Preprocessing](user-guide/preprocessing.qmd): Transform data before validation
+- [Segmentation](user-guide/segmentation.qmd): Apply validations to specific segments of your data
+- [Thresholds](user-guide/thresholds.qmd): Set quality standards and trigger severity levels
+- [Actions](user-guide/actions.qmd): Respond to threshold exceedances with notifications or custom functions
+- [Briefs](user-guide/briefs.qmd): Add context to validation steps
+
+### Advanced Validation
+
+The *Advanced Validation* section explores more specialized validation techniques:
+
+- [Expression-Based Validation](user-guide/expressions.qmd): Use column expressions for advanced validation
+- [Schema Validation](user-guide/schema-validation.qmd): Enforce table structure and column types
+- [Assertions](user-guide/assertions.qmd): Raise exceptions to enforce data quality requirements
+- [Draft Validation](user-guide/draft-validation.qmd): Create validation plans from existing data
+
+### Post Interrogation
+
+After validating your data, the *Post Interrogation* section helps you analyze and respond to
+results:
+
+- [Validation Reports](user-guide/validation-reports.qmd): Understand and customize the validation report table
+- [Step Reports](user-guide/step-reports.qmd): View detailed results for individual validation steps
+- [Data Extracts](user-guide/extracts.qmd): Extract and analyze failing data
+- [Sundering Validated Data](user-guide/sundering.qmd): Split data based on validation results
+
+### Data Inspection
+
+The *Data Inspection* section provides tools to explore and understand your data:
+
+- [Previewing Data](user-guide/preview.qmd): View samples of your data
+- [Column Summaries](user-guide/col-summary-tbl.qmd): Get statistical summaries of your data
+- [Missing Values Reporting](user-guide/missing-vals-tbl.qmd): Identify and visualize missing data
+
+By following this guide, you'll gain a comprehensive understanding of how to validate, monitor, and
+maintain high-quality data with Pointblank.
+
+::: {.callout-note}
+A [PDF version of the User Guide](../user-guide.pdf) is also available for offline reading.
+:::

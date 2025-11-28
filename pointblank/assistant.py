@@ -55,7 +55,7 @@ def assistant(
     ----------
     model
         The model to be used. This should be in the form of `provider:model` (e.g.,
-        `"anthropic:claude-3-5-sonnet-latest"`). Supported providers are `"anthropic"`, `"openai"`,
+        `"anthropic:claude-sonnet-4-5"`). Supported providers are `"anthropic"`, `"openai"`,
         `"ollama"`, and `"bedrock"`.
     data
         An optional data table to focus on during discussion with the PbA, which could be a

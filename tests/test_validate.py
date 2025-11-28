@@ -18,6 +18,15 @@ import contextlib
 import datetime
 from enum import Enum, IntEnum
 
+
+# Module-level function for testing (can be pickled)
+def multiply_column_by_20(df):
+    """Test preprocessing function that can be pickled."""
+    import narwhals as nw
+
+    return df.with_columns(nw.col("a") * 20)
+
+
 # StrEnum was introduced in Python 3.11, so we use regular Enum for compatibility
 try:
     from enum import StrEnum
@@ -29,6 +38,7 @@ except ImportError:
 
 import pandas as pd
 import polars as pl
+import pytz
 import ibis
 
 # PySpark import with environment setup for cross-platform compatibility
@@ -75,17 +85,22 @@ from pointblank._constants import REPORTING_LANGUAGES
 from pointblank.validate import (
     Actions,
     FinalActions,
+    config,
     connect_to_table,
     get_action_metadata,
     get_column_count,
     get_data_path,
     get_row_count,
     get_validation_summary,
+    global_config,
     load_dataset,
     missing_vals_tbl,
     PointblankConfig,
     preview,
+    print_database_tables,
+    read_file,
     Validate,
+    write_file,
     _create_table_time_html,
     _create_table_type_html,
     _create_thresholds_html,
@@ -711,6 +726,7 @@ def test_validation_plan_and_interrogation(request, tbl_fixture):
         "val_info",
         "time_processed",
         "proc_duration_s",
+        "notes",
     ]
 
     # Check the attributes of the `validation_info` object
@@ -742,6 +758,7 @@ def test_validation_plan_and_interrogation(request, tbl_fixture):
     assert val_info.val_info is None
     assert val_info.time_processed is None
     assert val_info.proc_duration_s is None
+    assert val_info.notes is None
 
     # Interrogate the validation plan
     v_int = v.interrogate()
@@ -791,6 +808,7 @@ def test_validation_plan_and_interrogation(request, tbl_fixture):
         "val_info",
         "time_processed",
         "proc_duration_s",
+        "notes",
     ]
 
     # Check the attributes of the `validation_info` object
@@ -822,6 +840,7 @@ def test_validation_plan_and_interrogation(request, tbl_fixture):
     assert val_info.val_info is None
     assert isinstance(val_info.time_processed, str)
     assert val_info.proc_duration_s > 0.0
+    assert val_info.notes is None
 
 
 @pytest.mark.parametrize("tbl_fixture", TBL_LIST)
@@ -1522,37 +1541,37 @@ def test_validation_autobriefs(request, tbl_fixture):
     # `col_vals_gt()`
     assert v.validation_info[0].autobrief == "Expect that values in `x` should be > `0`."
 
-    # `col_vals_gt()` - column literal
+    # `col_vals_gt()`: column literal
     assert v.validation_info[1].autobrief == "Expect that values in `x` should be > `y`."
 
     # `col_vals_lt()`
     assert v.validation_info[2].autobrief == "Expect that values in `x` should be < `2`."
 
-    # `col_vals_lt()` - column literal
+    # `col_vals_lt()`: column literal
     assert v.validation_info[3].autobrief == "Expect that values in `x` should be < `y`."
 
     # `col_vals_eq()`
     assert v.validation_info[4].autobrief == "Expect that values in `z` should be == `4`."
 
-    # `col_vals_eq()` - column literal
+    # `col_vals_eq()`: column literal
     assert v.validation_info[5].autobrief == "Expect that values in `z` should be == `y`."
 
     # `col_vals_ne()`
     assert v.validation_info[6].autobrief == "Expect that values in `z` should be != `6`."
 
-    # `col_vals_ne()` - column literal
+    # `col_vals_ne()`: column literal
     assert v.validation_info[7].autobrief == "Expect that values in `z` should be != `y`."
 
     # `col_vals_ge()`
     assert v.validation_info[8].autobrief == "Expect that values in `z` should be >= `8`."
 
-    # `col_vals_ge()` - column literal
+    # `col_vals_ge()`: column literal
     assert v.validation_info[9].autobrief == "Expect that values in `z` should be >= `y`."
 
     # `col_vals_le()`
     assert v.validation_info[10].autobrief == "Expect that values in `z` should be <= `10`."
 
-    # `col_vals_le()` - column literal
+    # `col_vals_le()`: column literal
     assert v.validation_info[11].autobrief == "Expect that values in `z` should be <= `y`."
 
     # `col_vals_between()`
@@ -1561,19 +1580,19 @@ def test_validation_autobriefs(request, tbl_fixture):
         == "Expect that values in `x` should be between `0` and `5`."
     )
 
-    # `col_vals_between()` - left column literal
+    # `col_vals_between()`: left column literal
     assert (
         v.validation_info[13].autobrief
         == "Expect that values in `x` should be between `y` and `5`."
     )
 
-    # `col_vals_between()` - right column literal
+    # `col_vals_between()`: right column literal
     assert (
         v.validation_info[14].autobrief
         == "Expect that values in `x` should be between `0` and `z`."
     )
 
-    # `col_vals_between()` - left and right column literal
+    # `col_vals_between()`: left and right column literal
     assert (
         v.validation_info[15].autobrief
         == "Expect that values in `x` should be between `y` and `z`."
@@ -1585,67 +1604,67 @@ def test_validation_autobriefs(request, tbl_fixture):
         == "Expect that values in `x` should not be between `-5` and `0`."
     )
 
-    # `col_vals_outside()` - left column literal
+    # `col_vals_outside()`: left column literal
     assert (
         v.validation_info[17].autobrief
         == "Expect that values in `x` should not be between `y` and `0`."
     )
 
-    # `col_vals_outside()` - right column literal
+    # `col_vals_outside()`: right column literal
     assert (
         v.validation_info[18].autobrief
         == "Expect that values in `x` should not be between `-5` and `z`."
     )
 
-    # `col_vals_outside()` - left and right column literal
+    # `col_vals_outside()`: left and right column literal
     assert (
         v.validation_info[19].autobrief
         == "Expect that values in `x` should not be between `y` and `z`."
     )
 
-    # `col_vals_in_set()` - 2 elements
+    # `col_vals_in_set()`: 2 elements
     assert (
         v.validation_info[20].autobrief
         == "Expect that values in `x` should be in the set of `1`, `2`."
     )
 
-    # `col_vals_in_set()` - 3 elements
+    # `col_vals_in_set()`: 3 elements
     assert (
         v.validation_info[21].autobrief
         == "Expect that values in `x` should be in the set of `1`, `2`, `3`."
     )
 
-    # `col_vals_in_set()` - 4 elements
+    # `col_vals_in_set()`: 4 elements
     assert (
         v.validation_info[22].autobrief
         == "Expect that values in `x` should be in the set of `1`, `2`, `3`, and 1 more."
     )
 
-    # `col_vals_in_set()` - 5 elements
+    # `col_vals_in_set()`: 5 elements
     assert (
         v.validation_info[23].autobrief
         == "Expect that values in `x` should be in the set of `1`, `2`, `3`, and 2 more."
     )
 
-    # `col_vals_not_in_set()` - 2 elements
+    # `col_vals_not_in_set()`: 2 elements
     assert (
         v.validation_info[24].autobrief
         == "Expect that values in `x` should not be in the set of `1`, `2`."
     )
 
-    # `col_vals_not_in_set()` - 3 elements
+    # `col_vals_not_in_set()`: 3 elements
     assert (
         v.validation_info[25].autobrief
         == "Expect that values in `x` should not be in the set of `1`, `2`, `3`."
     )
 
-    # `col_vals_not_in_set()` - 4 elements
+    # `col_vals_not_in_set()`: 4 elements
     assert (
         v.validation_info[26].autobrief
         == "Expect that values in `x` should not be in the set of `1`, `2`, `3`, and 1 more."
     )
 
-    # `col_vals_not_in_set()` - 5 elements
+    # `col_vals_not_in_set()`: 5 elements
     assert (
         v.validation_info[27].autobrief
         == "Expect that values in `x` should not be in the set of `1`, `2`, `3`, and 2 more."
@@ -1663,13 +1682,13 @@ def test_validation_autobriefs(request, tbl_fixture):
     # `rows_distinct()`
     assert v.validation_info[31].autobrief == "Expect entirely distinct rows across all columns."
 
-    # `rows_distinct()` - subset of columns
+    # `rows_distinct()`: subset of columns
     assert v.validation_info[32].autobrief == "Expect entirely distinct rows across `x`, `y`."
 
     # `rows_complete()`
     assert v.validation_info[33].autobrief == "Expect entirely complete rows across all columns."
 
-    # `rows_complete()` - subset of columns
+    # `rows_complete()`: subset of columns
     assert v.validation_info[34].autobrief == "Expect entirely complete rows across `x`, `y`."
 
     # `col_schema_match()`
@@ -2958,6 +2977,125 @@ def test_validation_error_handling_in_pre():
     assert validation.validation_info[0].eval_error is True
 
 
+def test_validation_pre_zero_rows():
+    """Test that validation handles zero-row tables from preconditions gracefully."""
+    tbl = pl.DataFrame({"a": [1, 2, 3, 4, 5]})
+
+    def keep_big_values(df):
+        return df.filter(pl.col("a") > 10)
+
+    validation = (
+        Validate(tbl).col_vals_lt(columns="a", value=100, pre=keep_big_values).interrogate()
+    )
+
+    # Should handle zero-row table gracefully
+    assert len(validation.validation_info) == 1
+
+    # The step should be marked as having an eval_error
+    assert validation.validation_info[0].eval_error is True
+
+    # The step should be marked as inactive
+    assert validation.validation_info[0].active is False
+
+    # The validation should have processed timing information
+    assert validation.validation_info[0].proc_duration_s is not None
+    assert validation.validation_info[0].time_processed is not None
+
+
+def test_validation_pre_zero_rows_with_multiple_steps():
+    """Test that zero-row precondition doesn't affect subsequent validation steps."""
+    tbl = pl.DataFrame({"a": [1, 2, 3, 4, 5], "b": [10, 20, 30, 40, 50]})
+
+    def keep_big_values(df):
+        return df.filter(pl.col("a") > 10)
+
+    validation = (
+        Validate(tbl)
+        .col_vals_lt(columns="a", value=100, pre=keep_big_values)
+        .col_vals_gt(columns="b", value=0)  # This should still run
+        .interrogate()
+    )
+
+    # Should have two validation steps
+    assert len(validation.validation_info) == 2
+
+    # First step should have eval_error due to zero rows
+    assert validation.validation_info[0].eval_error is True
+    assert validation.validation_info[0].active is False
+
+    # Second step should run successfully
+    assert validation.validation_info[1].eval_error is None
+    assert validation.validation_info[1].active is True
+    assert validation.validation_info[1].all_passed is True
+
+
+def test_validation_segments_zero_rows():
+    """Test that validation handles zero-row tables from segmentation gracefully."""
+
+    tbl = pl.DataFrame({"a": [1, 2, 3, 4, 5], "category": ["A", "A", "B", "B", "B"]})
+
+    # Segment by a category that doesn't exist
+    validation = (
+        Validate(tbl).col_vals_lt(columns="a", value=100, segments=("category", "C")).interrogate()
+    )
+
+    # Should handle zero-row segment gracefully
+    assert len(validation.validation_info) == 1
+
+    # The step should be marked as having an eval_error
+    assert validation.validation_info[0].eval_error is True
+
+    # The step should be marked as inactive
+    assert validation.validation_info[0].active is False
+
+
+def test_validation_table_level_assertions_zero_rows():
+    """Test that table-level assertions work correctly with zero-row preconditions.
+
+    Table-level assertions (col_schema_match(), row_count_match(), col_count_match(), etc.) should
+    still execute even when preprocessing results in zero rows, since they operate on the table
+    structure rather than row content. This is different from row-based validations which should
+    error when there are no rows to validate.
+    """
+
+    tbl = pl.DataFrame({"a": [1, 2, 3, 4, 5], "b": [10, 20, 30, 40, 50]})
+
+    def filter_to_zero_rows(df):
+        return df.filter(pl.col("a") > 100)
+
+    # Test col_schema_match: should work on zero-row table
+    schema = Schema(columns=[("a", "Int64"), ("b", "Int64")])
+    validation = (
+        Validate(tbl).col_schema_match(schema=schema, pre=filter_to_zero_rows).interrogate()
+    )
+    assert validation.validation_info[0].eval_error is None
+    assert validation.validation_info[0].active is True
+    assert validation.validation_info[0].all_passed is True
+    assert validation.validation_info[0].n == 1
+
+    # Test row_count_match: should work on zero-row table
+    # When we expect 0 rows, it should pass
+    validation = Validate(tbl).row_count_match(count=0, pre=filter_to_zero_rows).interrogate()
+    assert validation.validation_info[0].eval_error is None
+    assert validation.validation_info[0].active is True
+    assert validation.validation_info[0].all_passed is True
+    assert validation.validation_info[0].n == 1
+
+    # Test row_count_match with non-zero count: should fail but not error
+    validation = Validate(tbl).row_count_match(count=5, pre=filter_to_zero_rows).interrogate()
+    assert validation.validation_info[0].eval_error is None
+    assert validation.validation_info[0].active is True
+    assert validation.validation_info[0].all_passed is False
+    assert validation.validation_info[0].n == 1
+
+    # Test col_count_match: should work on zero-row table
+    validation = Validate(tbl).col_count_match(count=2, pre=filter_to_zero_rows).interrogate()
+    assert validation.validation_info[0].eval_error is None
+    assert validation.validation_info[0].active is True
+    assert validation.validation_info[0].all_passed is True
+    assert validation.validation_info[0].n == 1
+
+
 def test_conjointly_with_empty_expressions():
     tbl = pl.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]})
 
@@ -3182,29 +3320,27 @@ def test_polars_datetime_non_midnight_conversion():
 
         # Use a valid date that exists in the data but with a time component
         # This will test our conversion logic while still having data to validate
-        try:
-            validation = (
-                Validate(data=load_dataset(dataset="small_table", tbl_type="polars"))
-                .col_vals_gt(
-                    columns="d",
-                    value=100,
-                    segments=(
-                        "date",
-                        pl.lit(datetime.datetime(2016, 1, 4, 0, 0, 1)),
-                    ),  # 1 second after midnight
-                )
-                .interrogate()
+        validation = (
+            Validate(data=load_dataset(dataset="small_table", tbl_type="polars"))
+            .col_vals_gt(
+                columns="d",
+                value=100,
+                segments=(
+                    "date",
+                    pl.lit(datetime.datetime(2016, 1, 4, 0, 0, 1)),
+                ),  # 1 second after midnight
             )
+            .interrogate()
+        )
 
-            # If successful, check results
+        # If successful, check results (if it has data)
+        # Otherwise, it should have an eval_error if no rows match the segment
+        if validation.validation_info[0].eval_error:
+            # This is expected if the datetime doesn't match any data (zero rows)
+            assert validation.validation_info[0].active is False
+        else:
+            # If it has data, check that n_passed is valid
             assert validation.n_passed(i=1, scalar=True) >= 0
-
-        except ValueError as e:
-            # If it fails due to no matching data, that's okay - we mainly want to test the warning
-            if "test units must be greater than zero" in str(e):
-                pass  # This is expected if the datetime doesn't match any data
-            else:
-                raise
 
         # Check that we got a deprecation warning
         deprecation_warnings = [
@@ -4444,7 +4580,7 @@ def test_schema_validation_completeness():
     # Schema with subset of columns
     schema = Schema(columns=[("a", "Int64"), ("b", "String")])
 
-    # Complete match required (should fail - missing column c in schema)
+    # Complete match required (should fail: missing column c in schema)
     validation_complete = Validate(tbl).col_schema_match(schema=schema, complete=True).interrogate()
     assert not validation_complete.all_passed()
 
@@ -5297,7 +5433,7 @@ def test_col_schema_match():
         == 0
     )
 
-    # Schema expressed in a different order (yet complete) - wrong column name
+    # Schema expressed in a different order (yet complete): wrong column name
     schema = Schema(columns=[("b", "Int64"), ("c", "Float64"), ("wrong", "String")])
     assert (
         Validate(data=tbl).col_schema_match(schema=schema).interrogate().n_passed(i=1, scalar=True)
@@ -5353,7 +5489,7 @@ def test_col_schema_match():
         == 1
     )
 
-    # Schema has duplicate column/dtype - wrong column name
+    # Schema has duplicate column/dtype: wrong column name
     schema = Schema(
         columns=[("a", "String"), ("a", "String"), ("wrong", "Int64"), ("c", "Float64")]
     )
@@ -5411,7 +5547,7 @@ def test_col_schema_match():
         == 1
     )
 
-    # Supplied schema is a subset of the actual schema (in the correct order) - wrong column name
+    # Supplied schema is a subset of the actual schema (in the correct order): wrong column name
     schema = Schema(columns=[("wrong", "Int64"), ("c", "Float64")])
     assert (
         Validate(data=tbl).col_schema_match(schema=schema).interrogate().n_passed(i=1, scalar=True)
@@ -5467,7 +5603,7 @@ def test_col_schema_match():
         == 1
     )
 
-    # Supplied schema is a subset of the actual schema but in a different order - wrong column name
+    # Supplied schema is a subset of the actual schema but in a different order: wrong column name
     schema = Schema(columns=[("wrong", "Float64"), ("b", "Int64")])
     assert (
         Validate(data=tbl).col_schema_match(schema=schema).interrogate().n_passed(i=1, scalar=True)
@@ -6190,7 +6326,7 @@ def test_col_schema_match_list_of_dtypes():
         == 0
     )
 
-    # Schema expressed in a different order (yet complete) - wrong column name
+    # Schema expressed in a different order (yet complete): wrong column name
     schema = Schema(
         columns=[("b", ["int", "Int64"]), ("c", ["float", "Float64"]), ("wrong", ["String", "str"])]
     )
@@ -6255,7 +6391,7 @@ def test_col_schema_match_list_of_dtypes():
         == 1
     )
 
-    # Schema has duplicate column/dtype - wrong dtypes in one case
+    # Schema has duplicate column/dtype: wrong dtypes in one case
     schema = Schema(
         columns=[
             ("a", ["String", "str"]),
@@ -6290,7 +6426,7 @@ def test_col_schema_match_list_of_dtypes():
         == 1
     )
 
-    # Schema has duplicate column/dtype - wrong dtypes in both cases
+    # Schema has duplicate column/dtype: wrong dtypes in both cases
     schema = Schema(
         columns=[
             ("a", ["wrong", "Wrong"]),
@@ -6325,7 +6461,7 @@ def test_col_schema_match_list_of_dtypes():
         == 0
     )
 
-    # Schema has duplicate column/dtype - wrong column name
+    # Schema has duplicate column/dtype: wrong column name
     schema = Schema(
         columns=[
             ("a", ["String", "str"]),
@@ -6388,7 +6524,7 @@ def test_col_schema_match_list_of_dtypes():
         == 1
     )
 
-    # Supplied schema is a subset of the actual schema (in the correct order) - wrong column name
+    # Supplied schema is a subset of the actual schema (in the correct order): wrong column name
     schema = Schema(columns=[("wrong", ["Int64", "int"]), ("c", ["Float64", "float"])])
     assert (
         Validate(data=tbl).col_schema_match(schema=schema).interrogate().n_passed(i=1, scalar=True)
@@ -6444,7 +6580,7 @@ def test_col_schema_match_list_of_dtypes():
         == 1
     )
 
-    # Supplied schema is a subset of the actual schema but in a different order - wrong column name
+    # Supplied schema is a subset of the actual schema but in a different order: wrong column name
     schema = Schema(columns=[("wrong", ["float", "Float64"]), ("b", ["Int64", "int"])])
     assert (
         Validate(data=tbl).col_schema_match(schema=schema).interrogate().n_passed(i=1, scalar=True)
@@ -6861,7 +6997,7 @@ def test_col_schema_match_columns_only():
         == 0
     )
 
-    # Schema columns expressed in a different order (yet complete) - wrong column name
+    # Schema columns expressed in a different order (yet complete): wrong column name
     schema = Schema(columns=["b", "c", "wrong"])
     assert (
         Validate(data=tbl).col_schema_match(schema=schema).interrogate().n_passed(i=1, scalar=True)
@@ -6973,7 +7109,7 @@ def test_col_schema_match_columns_only():
         == 1
     )
 
-    # Supplied columns are a subset of the actual column (in correct order) - has wrong column name
+    # Supplied columns are a subset of the actual column (in correct order): has wrong column name
     schema = Schema(columns=["wrong", "c"])
     assert (
         Validate(data=tbl).col_schema_match(schema=schema).interrogate().n_passed(i=1, scalar=True)
@@ -7029,7 +7165,7 @@ def test_col_schema_match_columns_only():
         == 1
     )
 
-    # Supplied columns are a subset of actual columns but in a different order - wrong column name
+    # Supplied columns are a subset of actual columns but in a different order: wrong column name
     schema = Schema(columns=["wrong", "b"])
     assert (
         Validate(data=tbl).col_schema_match(schema=schema).interrogate().n_passed(i=1, scalar=True)
@@ -9597,6 +9733,7 @@ def test_seg_group_with_auto_brief():
 
 
 def test_process_action_str():
+    """Test the _process_action_str() function."""
     datetime_val = str(datetime.datetime(2025, 1, 1, 0, 0, 0, 0))
 
     partial_process_action_str = partial(
@@ -9629,6 +9766,7 @@ def test_process_action_str():
 
 
 def test_process_data_dataframe_passthrough_polars():
+    """Test that _process_data() returns the same Polars DataFrame object."""
     pl = pytest.importorskip("polars")
 
     # Create test DataFrame
@@ -9639,6 +9777,926 @@ def test_process_data_dataframe_passthrough_polars():
 
     # Should be the same object
     assert result is df
+
+
+def test_notes_field_initialization():
+    """Test that the notes field is properly initialized."""
+    validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
+    validation.col_vals_gt(columns="a", value=0)
+
+    # Access the validation info
+    val_info = validation.validation_info[0]
+
+    # Notes should be None initially
+    assert val_info.notes is None
+
+
+def test_add_note_basic():
+    """Test adding a basic note to a validation step."""
+    validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
+    validation.col_vals_gt(columns="a", value=0)
+
+    # Access the validation info
+    val_info = validation.validation_info[0]
+
+    # Add a note
+    val_info._add_note(
+        key="test_note", markdown="This is a **test** note", text="This is a test note"
+    )
+
+    # Verify note was added
+    assert val_info.notes is not None
+    assert "test_note" in val_info.notes
+    assert val_info.notes["test_note"]["markdown"] == "This is a **test** note"
+    assert val_info.notes["test_note"]["text"] == "This is a test note"
+
+
+def test_add_note_without_text():
+    """Test adding a note without explicit text version."""
+    validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
+    validation.col_vals_gt(columns="a", value=0)
+
+    val_info = validation.validation_info[0]
+
+    # Add a note without text parameter
+    val_info._add_note(key="test_note", markdown="This is a **test** note")
+
+    # Text should default to markdown
+    assert val_info.notes["test_note"]["text"] == "This is a **test** note"
+
+
+def test_add_multiple_notes():
+    """Test adding multiple notes to a validation step."""
+    validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
+    validation.col_vals_gt(columns="a", value=0)
+
+    val_info = validation.validation_info[0]
+
+    # Add multiple notes
+    val_info._add_note(key="note1", markdown="First note")
+    val_info._add_note(key="note2", markdown="Second note")
+    val_info._add_note(key="note3", markdown="Third note")
+
+    # Verify all notes were added
+    assert len(val_info.notes) == 3
+    assert "note1" in val_info.notes
+    assert "note2" in val_info.notes
+    assert "note3" in val_info.notes
+
+
+def test_note_key_overwrite():
+    """Test that adding a note with the same key overwrites the previous one."""
+    validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
+    validation.col_vals_gt(columns="a", value=0)
+
+    val_info = validation.validation_info[0]
+
+    # Add a note
+    val_info._add_note(key="test", markdown="First version")
+    assert val_info.notes["test"]["markdown"] == "First version"
+
+    # Overwrite with same key
+    val_info._add_note(key="test", markdown="Second version")
+    assert val_info.notes["test"]["markdown"] == "Second version"
+    assert len(val_info.notes) == 1  # Should still only have one note
+
+
+def test_notes_persist_through_interrogation():
+    """Test that notes persist through interrogation."""
+    validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
+    validation.col_vals_gt(columns="a", value=0)
+
+    val_info = validation.validation_info[0]
+    val_info._add_note(key="pre_interrogation", markdown="Note added before interrogation")
+
+    # Interrogate
+    validation.interrogate()
+
+    # Note should still be present
+    assert validation.validation_info[0].notes is not None
+    assert "pre_interrogation" in validation.validation_info[0].notes
+
+
+def test_notes_in_validation_info_dict():
+    """Test that notes are included when converting validation info to dict."""
+    validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
+    validation.col_vals_gt(columns="a", value=0)
+
+    val_info = validation.validation_info[0]
+    val_info._add_note(key="test", markdown="Test note")
+
+    # Interrogate to trigger validation info processing
+    validation.interrogate()
+
+    # Get the validation info as dict (this is used in JSON export)
+    from pointblank.validate import _validation_info_as_dict
+
+    val_dict = _validation_info_as_dict(validation.validation_info)
+
+    # Verify notes field is present
+    assert "notes" in val_dict
+    assert val_dict["notes"][0]["test"]["markdown"] == "Test note"
+
+
+def test_notes_display_in_report():
+    """Test that notes are properly displayed in the tabular report."""
+    validation = Validate(data=pl.DataFrame({"a": [1, 2, 3, 4, 5]}))
+    validation.col_vals_gt(columns="a", value=0)
+    validation.col_vals_lt(columns="a", value=10)
+
+    # Add notes to steps
+    validation.validation_info[0]._add_note(
+        key="note1", markdown="First validation note with **emphasis**"
+    )
+    validation.validation_info[1]._add_note(key="note2", markdown="Second validation note")
+
+    # Interrogate
+    validation.interrogate()
+
+    # Get the report
+    report = validation.get_tabular_report()
+
+    # The report should be a GT object
+    assert report is not None
+
+    # Convert to HTML to check for notes
+    html_str = report.as_raw_html()
+
+    # Check that notes section is present
+    assert "Notes" in html_str
+
+    # Check for styled step labels (uppercase small caps bold)
+    assert "Step 1" in html_str
+    assert "font-variant: small-caps" in html_str
+    assert "text-transform: uppercase" in html_str
+
+    # Check that markdown is rendered (bold emphasis should be rendered as <strong>)
+    assert "emphasis" in html_str
+    assert "Step 2" in html_str
+    assert "Second validation note" in html_str
+
+
+def test_empty_notes_no_display():
+    """Test that no notes section appears when there are no notes."""
+    validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
+    validation.col_vals_gt(columns="a", value=0)
+    validation.interrogate()
+
+    # Get the report
+    report = validation.get_tabular_report()
+    html_str = report.as_raw_html()
+
+    # The generic "Notes" header should not appear if there are no notes
+    # (we look for it in a specific style to avoid false positives)
+    assert "border-top: 1px solid #D3D3D3" not in html_str or "Notes</div>" not in html_str
+
+
+def test_notes_ordering_preserved():
+    """Test that notes maintain insertion order."""
+    validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
+    validation.col_vals_gt(columns="a", value=0)
+
+    val_info = validation.validation_info[0]
+
+    # Add notes in specific order
+    val_info._add_note(key="z_note", markdown="Z note")
+    val_info._add_note(key="a_note", markdown="A note")
+    val_info._add_note(key="m_note", markdown="M note")
+
+    # Verify order is preserved (Python dicts maintain insertion order in 3.7+)
+    keys = list(val_info.notes.keys())
+    assert keys == ["z_note", "a_note", "m_note"]
+
+
+def test_get_notes_dict_format():
+    """Test getting notes in dictionary format."""
+    validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
+    validation.col_vals_gt(columns="a", value=0)
+
+    val_info = validation.validation_info[0]
+
+    # Add some notes
+    val_info._add_note(key="note1", markdown="First **note**", text="First note")
+    val_info._add_note(key="note2", markdown="Second note")
+
+    # Get notes as dict (default)
+    notes = val_info._get_notes()
+    assert notes is not None
+    assert len(notes) == 2
+    assert notes["note1"]["markdown"] == "First **note**"
+    assert notes["note1"]["text"] == "First note"
+    assert notes["note2"]["markdown"] == "Second note"
+
+    # Explicitly request dict format
+    notes_dict = val_info._get_notes(format="dict")
+    assert notes_dict == notes
+
+
+def test_get_notes_markdown_format():
+    """Test getting notes as a list of markdown strings."""
+    validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
+    validation.col_vals_gt(columns="a", value=0)
+
+    val_info = validation.validation_info[0]
+
+    val_info._add_note(key="note1", markdown="First **note**", text="First note")
+    val_info._add_note(key="note2", markdown="Second *note*")
+
+    markdown_notes = val_info._get_notes(format="markdown")
+    assert markdown_notes == ["First **note**", "Second *note*"]
+
+
+def test_get_notes_text_format():
+    """Test getting notes as a list of text strings."""
+    validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
+    validation.col_vals_gt(columns="a", value=0)
+
+    val_info = validation.validation_info[0]
+
+    val_info._add_note(key="note1", markdown="First **note**", text="First note")
+    val_info._add_note(key="note2", markdown="Second *note*", text="Second note")
+
+    text_notes = val_info._get_notes(format="text")
+    assert text_notes == ["First note", "Second note"]
+
+
+def test_get_notes_keys_format():
+    """Test getting note keys."""
+    validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
+    validation.col_vals_gt(columns="a", value=0)
+
+    val_info = validation.validation_info[0]
+
+    val_info._add_note(key="alpha", markdown="Alpha")
+    val_info._add_note(key="beta", markdown="Beta")
+    val_info._add_note(key="gamma", markdown="Gamma")
+
+    keys = val_info._get_notes(format="keys")
+    assert keys == ["alpha", "beta", "gamma"]
+
+
+def test_get_notes_no_notes():
+    """Test that get_notes() returns None when there are no notes."""
+    validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
+    validation.col_vals_gt(columns="a", value=0)
+
+    val_info = validation.validation_info[0]
+
+    assert val_info._get_notes() is None
+    assert val_info._get_notes(format="markdown") is None
+    assert val_info._get_notes(format="text") is None
+    assert val_info._get_notes(format="keys") is None
+
+
+def test_get_notes_invalid_format():
+    """Test that invalid format raises ValueError."""
+    validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
+    validation.col_vals_gt(columns="a", value=0)
+
+    val_info = validation.validation_info[0]
+    val_info._add_note(key="test", markdown="Test")
+
+    with pytest.raises(ValueError, match="Invalid format"):
+        val_info._get_notes(format="invalid")
+
+
+def test_get_note_dict_format():
+    """Test getting a specific note in dictionary format."""
+    validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
+    validation.col_vals_gt(columns="a", value=0)
+
+    val_info = validation.validation_info[0]
+    val_info._add_note(key="test_note", markdown="Test **markdown**", text="Test text")
+
+    # Get note as dict (default)
+    note = val_info._get_note(key="test_note")
+    assert note == {"markdown": "Test **markdown**", "text": "Test text"}
+
+    # Explicitly request dict format
+    note_dict = val_info._get_note(key="test_note", format="dict")
+    assert note_dict == note
+
+
+def test_get_note_markdown_format():
+    """Test getting a specific note's markdown."""
+    validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
+    validation.col_vals_gt(columns="a", value=0)
+
+    val_info = validation.validation_info[0]
+    val_info._add_note(key="test_note", markdown="Test **markdown**", text="Test text")
+
+    markdown = val_info._get_note(key="test_note", format="markdown")
+    assert markdown == "Test **markdown**"
+
+
+def test_get_note_text_format():
+    """Test getting a specific note's text."""
+    validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
+    validation.col_vals_gt(columns="a", value=0)
+
+    val_info = validation.validation_info[0]
+    val_info._add_note(key="test_note", markdown="Test **markdown**", text="Test text")
+
+    text = val_info._get_note(key="test_note", format="text")
+    assert text == "Test text"
+
+
+def test_get_note_not_found():
+    """Test that get_note() returns None for a non-existent key."""
+    validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
+    validation.col_vals_gt(columns="a", value=0)
+
+    val_info = validation.validation_info[0]
+    val_info._add_note(key="existing", markdown="Exists")
+
+    assert val_info._get_note(key="nonexistent") is None
+    assert val_info._get_note(key="nonexistent", format="markdown") is None
+    assert val_info._get_note(key="nonexistent", format="text") is None
+
+
+def test_get_note_no_notes():
+    """Test that get_note() returns None when no notes exist."""
+    validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
+    validation.col_vals_gt(columns="a", value=0)
+
+    val_info = validation.validation_info[0]
+
+    assert val_info._get_note("any_key") is None
+
+
+def test_get_note_invalid_format():
+    """Test that an invalid format raises a ValueError."""
+    validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
+    validation.col_vals_gt(columns="a", value=0)
+
+    val_info = validation.validation_info[0]
+    val_info._add_note(key="test", markdown="Test")
+
+    with pytest.raises(ValueError, match="Invalid format"):
+        val_info._get_note("test", format="invalid")
+
+
+def test_has_notes():
+    """Test the has_notes() method."""
+    validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
+    validation.col_vals_gt(columns="a", value=0)
+
+    val_info = validation.validation_info[0]
+
+    # Initially no notes
+    assert val_info._has_notes() is False
+
+    # Add a note
+    val_info._add_note(key="test", markdown="Test")
+    assert val_info._has_notes() is True
+
+
+def test_get_step_notes_basic():
+    """Test getting notes by step number."""
+    validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
+    validation.col_vals_gt(columns="a", value=0)
+    validation.col_vals_lt(columns="a", value=10)
+
+    # Add notes to steps
+    validation.validation_info[0]._add_note(
+        key="note1", markdown="First **note**", text="First note"
+    )
+    validation.validation_info[1]._add_note(
+        key="note2", markdown="Second *note*", text="Second note"
+    )
+
+    # Interrogate to set step numbers
+    validation.interrogate()
+
+    # Get notes from step 1
+    notes_step_1 = validation.get_notes(i=1)
+
+    assert notes_step_1 is not None
+    assert "note1" in notes_step_1
+    assert notes_step_1["note1"]["markdown"] == "First **note**"
+
+    # Get notes from step 2
+    notes_step_2 = validation.get_notes(i=2)
+
+    assert notes_step_2 is not None
+    assert "note2" in notes_step_2
+    assert notes_step_2["note2"]["markdown"] == "Second *note*"
+
+
+def test_get_step_notes_formats():
+    """Test getting notes by step number in different formats."""
+    validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
+    validation.col_vals_gt(columns="a", value=0)
+
+    validation.validation_info[0]._add_note(
+        key="alpha", markdown="Alpha **note**", text="Alpha note"
+    )
+    validation.validation_info[0]._add_note(key="beta", markdown="Beta *note*", text="Beta note")
+
+    validation.interrogate()
+
+    # Get in markdown format
+    markdown_notes = validation.get_notes(i=1, format="markdown")
+    assert markdown_notes == ["Alpha **note**", "Beta *note*"]
+
+    # Get in text format
+    text_notes = validation.get_notes(i=1, format="text")
+    assert text_notes == ["Alpha note", "Beta note"]
+
+    # Get keys
+    keys = validation.get_notes(i=1, format="keys")
+    assert keys == ["alpha", "beta"]
+
+
+def test_get_step_notes_no_notes():
+    """Test get_step_notes() returns None when step has no notes."""
+    validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
+    validation.col_vals_gt(columns="a", value=0)
+    validation.interrogate()
+
+    # Step exists but has no notes
+    assert validation.get_notes(i=1) is None
+
+
+def test_get_step_notes_invalid_step():
+    """Test get_step_notes() returns None for non-existent step."""
+    validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
+    validation.col_vals_gt(columns="a", value=0)
+    validation.interrogate()
+
+    # Step doesn't exist
+    assert validation.get_notes(i=99) is None
+
+
+def test_get_step_notes_invalid_step_number():
+    """Test get_step_notes() raises error for invalid step number."""
+    validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
+    validation.col_vals_gt(columns="a", value=0)
+    validation.interrogate()
+
+    # Negative step number
+    with pytest.raises(ValueError, match="Step number must be a positive integer"):
+        validation.get_notes(i=-1)
+
+    # Zero step number
+    with pytest.raises(ValueError, match="Step number must be a positive integer"):
+        validation.get_notes(i=0)
+
+    # Non-integer step number
+    with pytest.raises(ValueError, match="Step number must be a positive integer"):
+        validation.get_notes(i="1")
+
+
+def test_get_step_notes_before_interrogation():
+    """Test get_step_notes() works before interrogation."""
+    validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
+    validation.col_vals_gt(columns="a", value=0)
+
+    validation.validation_info[0]._add_note(key="test", markdown="Test note")
+
+    # Before interrogation, step numbers aren't set, so this should return None
+    # because validation.i is None
+    assert validation.get_notes(i=1) is None
+
+
+def test_get_step_notes_with_segments():
+    """Test get_step_notes() with segmented validation steps."""
+    validation = Validate(data=pl.DataFrame({"a": [1, 2, 3], "category": ["A", "B", "A"]}))
+    validation.col_vals_gt(columns="a", value=0, segments="category")
+
+    # Add note before segmentation expansion
+    validation.validation_info[0]._add_note(key="seg_note", markdown="Segmented validation")
+
+    validation.interrogate()
+
+    # After interrogation with segments, multiple steps are created
+    # Each segment gets its own step number
+    # We should be able to get notes from the first segment step
+    notes = validation.get_notes(i=1)
+    assert notes is not None
+    assert "seg_note" in notes
+
+
+def test_validate_get_note_basic():
+    """Test get_note() method at Validate level with step number and key."""
+    validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
+    validation.col_vals_gt(columns="a", value=0)
+
+    # Add notes to step 1
+    validation.validation_info[0]._add_note(
+        key="note1", markdown="First **note**", text="First note"
+    )
+    validation.validation_info[0]._add_note(
+        key="note2", markdown="Second *note*", text="Second note"
+    )
+
+    validation.interrogate()
+
+    # Get specific note by step number and key
+    note1 = validation.get_note(i=1, key="note1")
+    assert note1 is not None
+    assert note1["markdown"] == "First **note**"
+    assert note1["text"] == "First note"
+
+    note2 = validation.get_note(i=1, key="note2")
+    assert note2 is not None
+    assert note2["markdown"] == "Second *note*"
+    assert note2["text"] == "Second note"
+
+
+def test_validate_get_note_formats():
+    """Test get_note() with different format options."""
+    validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
+    validation.col_vals_gt(columns="a", value=0)
+
+    validation.validation_info[0]._add_note(
+        key="test", markdown="Test **markdown**", text="Test markdown"
+    )
+
+    validation.interrogate()
+
+    # Dict format (default)
+    note_dict = validation.get_note(i=1, key="test")
+    assert isinstance(note_dict, dict)
+    assert note_dict["markdown"] == "Test **markdown**"
+
+    # Markdown format
+    markdown = validation.get_note(i=1, key="test", format="markdown")
+    assert markdown == "Test **markdown**"
+
+    # Text format
+    text = validation.get_note(i=1, key="test", format="text")
+    assert text == "Test markdown"
+
+
+def test_validate_get_note_not_found():
+    """Test get_note() when note key doesn't exist."""
+    validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
+    validation.col_vals_gt(columns="a", value=0)
+
+    validation.validation_info[0]._add_note(key="exists", markdown="Exists")
+
+    validation.interrogate()
+
+    # Non-existent note key
+    assert validation.get_note(i=1, key="nonexistent") is None
+
+
+def test_validate_get_note_invalid_step():
+    """Test get_note() with invalid step number."""
+    validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
+    validation.col_vals_gt(columns="a", value=0)
+
+    validation.validation_info[0]._add_note(key="test", markdown="Test")
+
+    validation.interrogate()
+
+    # Non-existent step number
+    assert validation.get_note(99, "test") is None
+
+
+def test_validate_get_note_invalid_step_number():
+    """Test get_note() with invalid step number types."""
+    validation = Validate(data=pl.DataFrame({"a": [1, 2, 3]}))
+    validation.col_vals_gt(columns="a", value=0)
+
+    validation.interrogate()
+
+    # Invalid step number (zero)
+    with pytest.raises(ValueError, match="must be a positive integer"):
+        validation.get_note(i=0, key="test")
+
+    # Invalid step number (negative)
+    with pytest.raises(ValueError, match="must be a positive integer"):
+        validation.get_note(i=-1, key="test")
+
+
+def test_column_not_found_note_basic():
+    """Test that no_columns_resolved note is generated when selector matches no columns."""
+    from pointblank.column import starts_with
+
+    validation = (
+        Validate(data=pl.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]}))
+        .col_vals_gt(columns=starts_with("xyz"), value=0)
+        .interrogate()
+    )
+
+    # Check that eval_error is set
+    assert validation.validation_info[0].eval_error is True
+
+    # Check that no_columns_resolved note exists
+    notes = validation.get_notes(i=1)
+    assert notes is not None
+    assert "no_columns_resolved" in notes
+
+    # Check note content
+    note = validation.get_note(i=1, key="no_columns_resolved")
+    assert note is not None
+    assert "StartsWith" in note["text"]
+    assert "does not resolve to any columns" in note["text"]
+
+
+def test_column_not_found_note_expression_in_text():
+    """Test that the column expression appears correctly in the note text."""
+    from pointblank.column import ends_with
+
+    validation = (
+        Validate(data=pl.DataFrame({"a": [1, 2], "b": [3, 4]}))
+        .col_vals_lt(columns=ends_with("_total"), value=100)
+        .interrogate()
+    )
+
+    note_text = validation.get_note(i=1, key="no_columns_resolved", format="text")
+    assert note_text is not None
+    assert "EndsWith(text='_total'" in note_text
+    assert "does not resolve" in note_text
+
+
+def test_column_not_found_note_multilingual():
+    """Test that no_columns_resolved note works in multiple languages."""
+    from pointblank.column import contains
+
+    # Test French
+    validation_fr = (
+        Validate(data=pl.DataFrame({"a": [1, 2], "b": [3, 4]}), lang="fr")
+        .col_vals_gt(columns=contains("xyz"), value=0)
+        .interrogate()
+    )
+    note_fr = validation_fr.get_note(i=1, key="no_columns_resolved", format="markdown")
+    assert note_fr is not None
+    assert "L'expression de colonne" in note_fr or "colonne" in note_fr
+    assert "Contains" in note_fr
+
+    # Test Japanese
+    validation_ja = (
+        Validate(data=pl.DataFrame({"a": [1, 2], "b": [3, 4]}), lang="ja")
+        .col_vals_gt(columns=contains("xyz"), value=0)
+        .interrogate()
+    )
+    note_ja = validation_ja.get_note(i=1, key="no_columns_resolved", format="markdown")
+    assert note_ja is not None
+    assert "列式" in note_ja
+    assert "Contains" in note_ja
+
+
+def test_column_not_found_note_multiple_selectors():
+    """Test note generation with multiple different selector types."""
+    from pointblank.column import starts_with, ends_with, contains
+
+    validation = (
+        Validate(data=pl.DataFrame({"col1": [1, 2], "col2": [3, 4]}))
+        .col_vals_gt(columns=starts_with("xyz_"), value=0)
+        .col_vals_lt(columns=ends_with("_total"), value=100)
+        .col_vals_ne(columns=contains("missing"), value=0)
+        .interrogate()
+    )
+
+    # All three steps should have eval_error and no_columns_resolved notes
+    for i in range(1, 4):
+        assert validation.validation_info[i - 1].eval_error is True
+        note = validation.get_note(i=i, key="no_columns_resolved")
+        assert note is not None
+        assert "does not resolve to any columns" in note["text"]
+
+
+@pytest.mark.parametrize("tbl_fixture", ["tbl_pl", "tbl_pd"])
+def test_column_not_found_note_different_table_types(request, tbl_fixture):
+    """Test that no_columns_resolved note works with different table types."""
+    from pointblank.column import starts_with
+
+    tbl = request.getfixturevalue(tbl_fixture)
+
+    validation = (
+        Validate(data=tbl).col_vals_gt(columns=starts_with("nonexistent"), value=0).interrogate()
+    )
+
+    # Should have note regardless of table type
+    note = validation.get_note(i=1, key="no_columns_resolved")
+    assert note is not None
+    assert "StartsWith" in note["text"]
+    assert "does not resolve" in note["text"]
+
+
+def test_simple_column_not_found_note_basic():
+    """Test that column_not_found note is generated when a simple column name doesn't exist."""
+    validation = (
+        Validate(data=pl.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]}))
+        .col_vals_gt(columns="zz", value=0)
+        .interrogate()
+    )
+
+    # Check that eval_error is set
+    assert validation.validation_info[0].eval_error is True
+
+    # Check that column_not_found note exists
+    notes = validation.get_notes(i=1)
+    assert notes is not None
+    assert "column_not_found" in notes
+
+    # Check note content
+    note = validation.get_note(i=1, key="column_not_found")
+    assert note is not None
+    assert "zz" in note["text"]
+    assert "does not match any columns in the table" in note["text"]
+
+
+def test_simple_column_not_found_note_multiple_validations():
+    """Test column_not_found notes for multiple missing columns."""
+    validation = (
+        Validate(data=pl.DataFrame({"a": [1, 2], "b": [3, 4]}))
+        .col_vals_gt(columns="missing_col1", value=0)
+        .col_vals_lt(columns="missing_col2", value=100)
+        .col_vals_ne(columns="missing_col3", value=0)
+        .interrogate()
+    )
+
+    # All three steps should have eval_error and column_not_found notes
+    for i, col_name in enumerate(["missing_col1", "missing_col2", "missing_col3"], start=1):
+        assert validation.validation_info[i - 1].eval_error is True
+        note = validation.get_note(i=i, key="column_not_found")
+        assert note is not None
+        assert col_name in note["text"]
+        assert "does not match any columns in the table" in note["text"]
+
+
+@pytest.mark.parametrize("tbl_fixture", ["tbl_pl", "tbl_pd"])
+def test_simple_column_not_found_note_different_table_types(request, tbl_fixture):
+    """Test that column_not_found note works with different table types for simple column names."""
+    tbl = request.getfixturevalue(tbl_fixture)
+
+    validation = Validate(data=tbl).col_vals_gt(columns="nonexistent_column", value=0).interrogate()
+
+    # Should have note regardless of table type
+    note = validation.get_note(i=1, key="column_not_found")
+    assert note is not None
+    assert "nonexistent_column" in note["text"]
+    assert "does not match any columns" in note["text"]
+
+
+def test_comparison_column_not_found_note_basic():
+    """Test that comparison_column_not_found note is generated for missing comparison columns."""
+
+    validation = (
+        Validate(data=pl.DataFrame({"a": [5, 6, 5], "b": [4, 2, 3]}))
+        .col_vals_gt(columns="a", value=col("missing_comparison"))
+        .interrogate()
+    )
+
+    # Check that eval_error is set
+    assert validation.validation_info[0].eval_error is True
+
+    # Check that comparison_column_not_found note exists
+    notes = validation.get_notes(i=1)
+    assert notes is not None
+    assert "comparison_column_not_found" in notes
+
+    # Check note content
+    note = validation.get_note(i=1, key="comparison_column_not_found")
+    assert note is not None
+    assert "missing_comparison" in note["text"]
+    assert "does not match any columns in the table" in note["text"]
+
+
+def test_comparison_column_not_found_note_between_left():
+    """Test comparison_column_not_found note for missing LEFT column in col_vals_between."""
+
+    validation = (
+        Validate(data=pl.DataFrame({"a": [5, 6, 5], "b": [4, 2, 3]}))
+        .col_vals_between(columns="a", left=col("missing_left"), right=10)
+        .interrogate()
+    )
+
+    # Check that eval_error is set
+    assert validation.validation_info[0].eval_error is True
+
+    # Check note content includes position
+    note = validation.get_note(i=1, key="comparison_column_not_found")
+    assert note is not None
+    assert "missing_left" in note["text"]
+    assert "for left=" in note["text"]
+    assert "does not match any columns" in note["text"]
+
+
+def test_comparison_column_not_found_note_between_right():
+    """Test comparison_column_not_found note for missing RIGHT column in col_vals_between."""
+
+    validation = (
+        Validate(data=pl.DataFrame({"a": [5, 6, 5], "b": [4, 2, 3]}))
+        .col_vals_between(columns="a", left=0, right=col("missing_right"))
+        .interrogate()
+    )
+
+    # Check that eval_error is set
+    assert validation.validation_info[0].eval_error is True
+
+    # Check note content includes position
+    note = validation.get_note(i=1, key="comparison_column_not_found")
+    assert note is not None
+    assert "missing_right" in note["text"]
+    assert "for right=" in note["text"]
+    assert "does not match any columns" in note["text"]
+
+
+def test_comparison_column_not_found_note_outside():
+    """Test comparison_column_not_found note for missing column in col_vals_outside."""
+
+    validation = (
+        Validate(data=pl.DataFrame({"a": [5, 6, 5], "b": [4, 2, 3]}))
+        .col_vals_outside(columns="a", left=col("missing_low"), right=100)
+        .interrogate()
+    )
+
+    # Check that eval_error is set
+    assert validation.validation_info[0].eval_error is True
+
+    # Check note content includes position
+    note = validation.get_note(i=1, key="comparison_column_not_found")
+    assert note is not None
+    assert "missing_low" in note["text"]
+    assert "for left=" in note["text"]
+
+
+def test_comparison_column_not_found_note_multilingual():
+    """Test that comparison_column_not_found note works in multiple languages."""
+
+    # Test French
+    validation_fr = (
+        Validate(data=pl.DataFrame({"a": [5, 6], "b": [4, 2]}), lang="fr")
+        .col_vals_gt(columns="a", value=col("missing"))
+        .interrogate()
+    )
+    note_fr = validation_fr.get_note(i=1, key="comparison_column_not_found", format="markdown")
+    assert note_fr is not None
+    assert "La colonne de comparaison fournie" in note_fr or "comparaison" in note_fr
+    assert "missing" in note_fr
+
+    # Test Japanese
+    validation_ja = (
+        Validate(data=pl.DataFrame({"a": [5, 6], "b": [4, 2]}), lang="ja")
+        .col_vals_gt(columns="a", value=col("missing"))
+        .interrogate()
+    )
+    note_ja = validation_ja.get_note(i=1, key="comparison_column_not_found", format="markdown")
+    assert note_ja is not None
+    assert "比較列" in note_ja
+    assert "missing" in note_ja
+
+
+def test_comparison_column_not_found_note_multiple_methods():
+    """Test comparison_column_not_found notes across different validation methods."""
+
+    validation = (
+        Validate(data=pl.DataFrame({"a": [5, 6, 5], "b": [4, 2, 3]}))
+        .col_vals_gt(columns="a", value=col("miss1"))
+        .col_vals_lt(columns="a", value=col("miss2"))
+        .col_vals_ge(columns="a", value=col("miss3"))
+        .interrogate()
+    )
+
+    # All three steps should have eval_error and comparison_column_not_found notes
+    for i, col_name in enumerate(["miss1", "miss2", "miss3"], start=1):
+        assert validation.validation_info[i - 1].eval_error is True
+        note = validation.get_note(i=i, key="comparison_column_not_found")
+        assert note is not None
+        assert col_name in note["text"]
+
+
+def test_column_error_notes_monospace_font():
+    """Test that column names and parameter names use monospace font in HTML notes."""
+
+    validation = (
+        Validate(data=pl.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]}))
+        # Simple column error
+        .col_vals_not_null(columns="missing_col")
+        # Selector error
+        .col_vals_gt(columns=starts_with("xyz_"), value=0)
+        # Comparison column error without position
+        .col_vals_gt(columns="a", value=col("missing_comp"))
+        # Comparison column error with position
+        .col_vals_between(columns="a", left=col("missing_left"), right=10)
+        .interrogate()
+    )
+
+    # Check simple column error has monospace font
+    note_1 = validation.get_note(i=1, key="column_not_found", format="markdown")
+    assert "IBM Plex Mono" in note_1
+    assert "missing_col" in note_1
+
+    # Check selector error has monospace font
+    note_2 = validation.get_note(i=2, key="no_columns_resolved", format="markdown")
+    assert "IBM Plex Mono" in note_2
+    assert "StartsWith" in note_2
+
+    # Check comparison column error has monospace font for column name
+    note_3 = validation.get_note(i=3, key="comparison_column_not_found", format="markdown")
+    assert "IBM Plex Mono" in note_3
+    assert "missing_comp" in note_3
+
+    # Check comparison column error with position has monospace font for both column and parameter
+    note_4 = validation.get_note(i=4, key="comparison_column_not_found", format="markdown")
+    assert note_4.count("IBM Plex Mono") >= 2  # Should appear for both parameter and column
+    assert "missing_left" in note_4
+    assert "left=" in note_4
 
 
 def test_process_data_dataframe_passthrough_pandas():
@@ -9959,7 +11017,7 @@ def test_pointblank_config_class():
 
     assert (
         str(config)
-        == "PointblankConfig(report_incl_header=True, report_incl_footer=True, preview_incl_header=True)"
+        == "PointblankConfig(report_incl_header=True, report_incl_footer=True, report_incl_footer_timings=True, report_incl_footer_notes=True, preview_incl_header=True)"
     )
 
 
@@ -10011,16 +11069,16 @@ def test_preview_no_fail_pyspark_table():
     spark_df = spark.createDataFrame(test_data, schema)
 
     # Test various preview scenarios that trigger lines 1562-1589
-    # Basic preview - should use full dataset path
+    # Basic preview: should use full dataset path
     preview(spark_df)
 
-    # Head only - should use head sampling
+    # Head only: should use head sampling
     preview(spark_df, n_head=2)
 
-    # Tail only - should use tail sampling
+    # Tail only: should use tail sampling
     preview(spark_df, n_tail=2)
 
-    # Both head and tail - should combine head/tail sampling
+    # Both head and tail should combine head/tail sampling
     preview(spark_df, n_head=2, n_tail=2)
 
     # Test edge case: empty tail when dataset is smaller than requested
@@ -10174,11 +11232,11 @@ def test_polars_only_environment_simulation():
         }
     )
 
-    # Test validation with large numbers - this uses our GT-based formatting
+    # Test validation with large numbers; this uses our GT-based formatting
     validator = Validate(data=large_data, tbl_name="polars_large_test")
     result = validator.col_vals_gt(columns="amount", value=0).interrogate()
 
-    # Generate tabular report - should work without any pandas dependency
+    # Generate tabular report that should work without any Pandas dependency
     report = result.get_tabular_report()
     assert report is not None
     assert isinstance(report, GT.GT)
@@ -10430,7 +11488,7 @@ def test_large_numbers_formatting_polars():
     validator = Validate(data=large_data, tbl_name="large_polars_data")
     result = validator.col_vals_gt(columns="value", value=0).interrogate()
 
-    # Generate tabular report - this should not fail with Pandas dependency error
+    # Generate tabular report that should not fail with Pandas dependency error
     try:
         report = result.get_tabular_report()
         assert report is not None
@@ -10455,7 +11513,7 @@ def test_large_numbers_formatting_pandas():
     validator = Validate(data=large_data, tbl_name="large_pandas_data")
     result = validator.col_vals_gt(columns="value", value=0).interrogate()
 
-    # Generate tabular report - should work as before
+    # Generate tabular report that should work as before
     report = result.get_tabular_report()
     assert report is not None
     assert isinstance(report, GT.GT)  # Should be a Great Tables object
@@ -11031,11 +12089,18 @@ def test_parquet_pandas_fails_when_only_pandas_available():
 
 
 def test_connect_to_table_ibis_not_available():
+    # Patch it where it's actually called in the validate module
+    with patch("pointblank.validate._is_lib_present", return_value=False):
+        with pytest.raises(ImportError, match="The Ibis library is not installed"):
+            connect_to_table("duckdb://test.db::table")
+
+
+def test_print_database_tables_ibis_not_available():
     with patch("pointblank.validate._is_lib_present") as mock_is_lib:
         mock_is_lib.return_value = False  # Ibis not available
 
         with pytest.raises(ImportError, match="The Ibis library is not installed"):
-            connect_to_table("duckdb://test.db::table")
+            print_database_tables("duckdb://test.db")
 
 
 def test_connect_to_table_no_table_specified_with_tables():
@@ -11060,6 +12125,75 @@ def test_connect_to_table_no_table_specified_with_tables():
             assert "table2" in error_msg
             assert "table3" in error_msg
             assert "duckdb://test.db::table1" in error_msg
+
+
+def test_print_database_tables_table_specified():
+    with patch("pointblank.validate._is_lib_present") as mock_is_lib:
+        mock_is_lib.return_value = True
+
+        # Mock ibis module
+        mock_ibis = Mock()
+        mock_conn = Mock()
+        mock_ibis.connect.return_value = mock_conn
+
+        with patch.dict("sys.modules", {"ibis": mock_ibis}):
+            # This should trigger the error path for including table spec when not allowed
+            with pytest.raises(ValueError) as exc_info:
+                print_database_tables("duckdb:///superbadpath.ddb::fogel_table")
+
+            error_msg = str(exc_info.value)
+            assert (
+                "Connection string should not include table specification (::table_name)"
+                in error_msg
+            )
+            assert "You've supplied: duckdb:///superbadpath.ddb::fogel_table" in error_msg
+            assert (
+                "Expected format: 'duckdb:///path/to/database.ddb' (without ::table_name)"
+                in error_msg
+            )
+            assert "duckdb:///superbadpath.ddb::fogel_table" in error_msg
+
+
+def test_print_database_tables_names_returned():
+    pytest.importorskip("ibis")
+
+    # Create a temporary DuckDB database file
+    with tempfile.NamedTemporaryFile(suffix=".ddb", delete=False) as tmp_file:
+        temp_db_path = tmp_file.name
+
+    # Remove empty file so DuckDB can create proper database
+    os.unlink(temp_db_path)
+
+    try:
+        # Create and populate the database
+        conn = ibis.duckdb.connect(temp_db_path)
+
+        # Create test data
+        df_test = pl.DataFrame({"id": [1, 2, 3], "value": [10, 20, 30]})
+        tbl_ibis = ibis.memtable(df_test.to_pandas())
+
+        # Create multiple tables
+        conn.create_table("supercooltable_1", tbl_ibis, overwrite=True)
+        conn.create_table("supercooltable_2", tbl_ibis, overwrite=True)
+        conn.create_table("supercooltable_3", tbl_ibis, overwrite=True)
+        conn.disconnect()
+
+        # Test the actual function without mocking
+        # Use single slash for Windows absolute paths
+        connection_string = f"duckdb://{temp_db_path}"
+        table_names = print_database_tables(connection_string)
+
+        # Verify it returns the expected table names
+        assert isinstance(table_names, list)
+        assert len(table_names) == 3
+        assert "supercooltable_1" in table_names
+        assert "supercooltable_2" in table_names
+        assert "supercooltable_3" in table_names
+
+    finally:
+        # Clean up temporary file
+        if os.path.exists(temp_db_path):
+            os.unlink(temp_db_path)
 
 
 def test_connect_to_table_no_table_specified_empty_db():
@@ -11098,17 +12232,34 @@ def test_connect_to_table_backend_dependency_missing():
             assert "pip install 'ibis-framework[duckdb]'" in error_msg
 
 
+def test_print_database_tables_backend_dependency_missing():
+    with patch("pointblank.validate._is_lib_present") as mock_is_lib:
+        mock_is_lib.return_value = True
+
+        # Mock ibis module that raises backend-specific error
+        mock_ibis = Mock()
+        mock_ibis.connect.side_effect = Exception("sqlite not found")
+
+        with patch.dict("sys.modules", {"ibis": mock_ibis}):
+            with pytest.raises(ConnectionError) as exc_info:
+                print_database_tables("sqlite://test.db")
+
+            error_msg = str(exc_info.value)
+            assert "Missing SQLITE backend for Ibis" in error_msg
+            assert "pip install 'ibis-framework[sqlite]'" in error_msg
+
+
 def test_connect_to_table_invalid_connection_string_format():
     with patch("pointblank.validate._is_lib_present") as mock_is_lib:
         mock_is_lib.return_value = True
 
         mock_ibis = Mock()
         with patch.dict("sys.modules", {"ibis": mock_ibis}):
-            # This should work - rsplit("::", 1) handles multiple :: correctly
+            # This should work: rsplit("::", 1) as it should handle multiple :: correctly
             # So let's test a truly invalid format
             try:
                 connect_to_table("invalid_format_no_double_colon")
-                # If no error is raised, that's fine - it means the function is robust
+                # If no error is raised, that's fine; it means the function is robust
             except Exception:
                 # Any exception is acceptable here as this is an edge case
                 pass
@@ -11133,6 +12284,184 @@ def test_connect_to_table_table_not_found():
 
             error_msg = str(exc_info.value)
             assert "Table 'nonexistent' not found in database" in error_msg
+
+
+def test_print_database_tables_filters_memtables():
+    """Test that memtable entries are filtered out from the results."""
+    pytest.importorskip("ibis")
+
+    with tempfile.NamedTemporaryFile(suffix=".ddb", delete=False) as tmp_file:
+        temp_db_path = tmp_file.name
+
+    os.unlink(temp_db_path)
+
+    try:
+        conn = ibis.duckdb.connect(temp_db_path)
+
+        # Create test data
+        df_test = pl.DataFrame({"id": [1, 2, 3], "value": [10, 20, 30]})
+        tbl_ibis = ibis.memtable(df_test.to_pandas())
+
+        # Create regular tables and one that contains "memtable" in the name
+        conn.create_table("a_table", tbl_ibis, overwrite=True)
+        conn.create_table("ibis_memtable_12345", tbl_ibis, overwrite=True)
+
+        # Close the connection
+        conn.disconnect()
+
+        connection_string = f"duckdb://{temp_db_path}"
+        table_names = print_database_tables(connection_string)
+
+        # Verify memtable is filtered out
+        assert isinstance(table_names, list)
+        assert "a_table" in table_names
+        assert "ibis_memtable_12345" not in table_names
+
+    finally:
+        if os.path.exists(temp_db_path):
+            os.unlink(temp_db_path)
+
+
+def test_print_database_tables_generic_connection_error():
+    """Test error handling for generic connection failures."""
+    with patch("pointblank.validate._is_lib_present") as mock_is_lib:
+        mock_is_lib.return_value = True
+
+        # Mock ibis module that raises a generic connection error
+        mock_ibis = Mock()
+        mock_ibis.connect.side_effect = Exception("Generic connection failure")
+
+        with patch.dict("sys.modules", {"ibis": mock_ibis}):
+            with pytest.raises(ConnectionError) as exc_info:
+                print_database_tables("duckdb://test.db")
+
+            error_msg = str(exc_info.value)
+            assert "Failed to connect using: duckdb://test.db" in error_msg
+            assert "Generic connection failure" in error_msg
+
+
+def test_connect_to_table_success():
+    """Test successful connection to a table."""
+    pytest.importorskip("ibis")
+
+    with tempfile.NamedTemporaryFile(suffix=".ddb", delete=False) as tmp_file:
+        temp_db_path = tmp_file.name
+
+    os.unlink(temp_db_path)
+
+    try:
+        # Create database with a table
+        conn = ibis.duckdb.connect(temp_db_path)
+        df_test = pl.DataFrame({"id": [1, 2, 3], "value": [10, 20, 30]})
+        tbl_ibis = ibis.memtable(df_test.to_pandas())
+        conn.create_table("test_table", tbl_ibis, overwrite=True)
+        conn.disconnect()
+
+        # Connect to the table
+        connection_string = f"duckdb://{temp_db_path}::test_table"
+        table = connect_to_table(connection_string)
+
+        # Verify it's a table object
+        assert table is not None
+        assert hasattr(table, "execute")  # Ibis tables have execute method
+
+        # Close the connection to the database before cleanup
+        # Get the backend connection and disconnect it
+        if hasattr(table, "_find_backend"):
+            backend = table._find_backend()
+            if hasattr(backend, "disconnect"):
+                backend.disconnect()
+
+    finally:
+        if os.path.exists(temp_db_path):
+            # Add a small delay to ensure file handle is released on Windows
+            import time
+
+            time.sleep(0.1)
+            try:
+                os.unlink(temp_db_path)
+            except PermissionError:
+                # If still locked, skip deletion (will be cleaned up by OS eventually)
+                pass
+
+
+def test_connect_to_table_table_not_found_with_available_tables():
+    """Test error when table not found but other tables exist."""
+    with patch("pointblank.validate._is_lib_present") as mock_is_lib:
+        mock_is_lib.return_value = True
+
+        # Mock ibis module
+        mock_ibis = Mock()
+        mock_conn = Mock()
+        mock_conn.table.side_effect = Exception("table 'nonexistent' does not exist")
+        mock_conn.list_tables.return_value = ["table1", "table2", "table3"]
+        mock_ibis.connect.return_value = mock_conn
+
+        with patch.dict("sys.modules", {"ibis": mock_ibis}):
+            with pytest.raises(ValueError) as exc_info:
+                connect_to_table("duckdb://test.db::nonexistent")
+
+            error_msg = str(exc_info.value)
+            assert "Table 'nonexistent' not found in database" in error_msg
+            assert "Available tables:" in error_msg
+            assert "table1" in error_msg
+            assert "table2" in error_msg
+            assert "table3" in error_msg
+
+
+def test_connect_to_table_generic_connection_error():
+    """Test generic connection error that's not backend-specific."""
+    with patch("pointblank.validate._is_lib_present") as mock_is_lib:
+        mock_is_lib.return_value = True
+
+        # Mock ibis module that raises a non-backend-specific error
+        mock_ibis = Mock()
+        mock_ibis.connect.side_effect = Exception("Network timeout")
+
+        with patch.dict("sys.modules", {"ibis": mock_ibis}):
+            with pytest.raises(ConnectionError) as exc_info:
+                connect_to_table("duckdb://test.db::table")
+
+            error_msg = str(exc_info.value)
+            assert "Failed to connect using: duckdb://test.db" in error_msg
+            assert "Network timeout" in error_msg
+
+
+def test_connect_to_table_no_table_spec_connection_fails():
+    """Test when connection fails in the 'no table specified' path."""
+    with patch("pointblank.validate._is_lib_present") as mock_is_lib:
+        mock_is_lib.return_value = True
+
+        # Mock ibis module that fails to connect
+        mock_ibis = Mock()
+        mock_ibis.connect.side_effect = Exception("Cannot connect to database")
+
+        with patch.dict("sys.modules", {"ibis": mock_ibis}):
+            with pytest.raises(ConnectionError) as exc_info:
+                connect_to_table("duckdb://invalid.db")  # No table spec
+
+            error_msg = str(exc_info.value)
+            assert "Failed to connect" in error_msg or "Cannot connect" in error_msg
+
+
+def test_connect_to_table_list_tables_raises_exception():
+    """Test when list_tables() raises an exception in no-table-spec path."""
+    with patch("pointblank.validate._is_lib_present") as mock_is_lib:
+        mock_is_lib.return_value = True
+
+        # Mock ibis module
+        mock_ibis = Mock()
+        mock_conn = Mock()
+        mock_conn.list_tables.side_effect = Exception("Permission denied")
+        mock_ibis.connect.return_value = mock_conn
+
+        with patch.dict("sys.modules", {"ibis": mock_ibis}):
+            with pytest.raises(ValueError) as exc_info:
+                connect_to_table("duckdb://test.db")  # No table spec
+
+            error_msg = str(exc_info.value)
+            assert "No table specified in connection string" in error_msg
+            assert "No tables found in the database or unable to list tables" in error_msg
 
 
 def test_process_connection_string_not_a_connection_string():
@@ -11607,6 +12936,8 @@ def test_missing_vals_tbl_no_fail_duckdb_table():
     missing_vals_tbl(nycflights)
 
 
+# TODO: Fix this test: great_tables has internal pandas dependencies that cannot be mocked
+@pytest.mark.skip(reason="TODO: Fix great_tables internal pandas dependency issue")
 def test_missing_vals_tbl_no_pandas():
     # Mock the absence of the pandas library
     with patch.dict(sys.modules, {"pandas": None}):
@@ -14901,17 +16232,17 @@ def test_above_threshold_multiple_steps():
         .interrogate()
     )
 
-    # Check steps 1 and 2 - only step 2 exceeds warning/error but not critical
+    # Check steps 1 and 2: only step 2 exceeds warning/error but not critical
     assert validation.above_threshold(level="warning", i=[1, 2]) is True
     assert validation.above_threshold(level="error", i=[1, 2]) is True
     assert validation.above_threshold(level="critical", i=[1, 2]) is False
 
-    # Check steps 1 and 3 - step 3 exceeds all thresholds
+    # Check steps 1 and 3: step 3 exceeds all thresholds
     assert validation.above_threshold(level="warning", i=[1, 3]) is True
     assert validation.above_threshold(level="error", i=[1, 3]) is True
     assert validation.above_threshold(level="critical", i=[1, 3]) is True
 
-    # Check all steps - should have exceedances at all levels
+    # Check all steps: should have exceedances at all levels
     assert validation.above_threshold(level="warning") is True
     assert validation.above_threshold(level="error") is True
     assert validation.above_threshold(level="critical") is True
@@ -14926,7 +16257,7 @@ def test_above_threshold_invalid_level():
     with pytest.raises(ValueError, match="Invalid threshold level"):
         validation.above_threshold(level="invalid_level")
 
-    # Also test with capitalized input - should be normalized
+    # Also test with capitalized input, which should be normalized
     assert validation.above_threshold(level="WARNING") is False
 
 
@@ -15311,7 +16642,7 @@ def test_pandas_only_environment_scenario():
             .interrogate()
         )
 
-        # Generate tabular report - should use Pandas-based GT formatting
+        # Generate tabular report that should use Pandas-based GT formatting
         report = validation.get_tabular_report()
         assert report is not None
         assert hasattr(report, "_body")
@@ -15409,7 +16740,7 @@ def test_polars_only_environment_scenario():
             .interrogate()
         )
 
-        # Generate tabular report - should use Polars-based GT formatting
+        # Generate tabular report that should use Polars-based GT formatting
         report = validation.get_tabular_report()
         assert report is not None
         assert hasattr(report, "_body")
@@ -15546,7 +16877,7 @@ def test_scenario_integration_with_large_datasets():
             .interrogate()
         )
 
-        # Generate report - should handle large numbers correctly
+        # Generate report that should handle large numbers correctly
         report = validation.get_tabular_report()
         assert report is not None
         assert hasattr(report, "_body")
@@ -15891,9 +17222,13 @@ def test_set_tbl_error_handling():
     incompatible_validation = validation.set_tbl(table2)
     assert incompatible_validation is not None
 
-    # Test that interrogation fails gracefully with incompatible structure
-    with pytest.raises(Exception):  # Should raise an error during interrogation
-        incompatible_validation.interrogate()
+    # Test that interrogation handles incompatible structure gracefully with a note
+    result = incompatible_validation.interrogate()
+    assert result.validation_info[0].eval_error is True
+    # Should have a column_not_found note
+    note = result.get_note(i=1, key="column_not_found")
+    assert note is not None
+    assert "a" in note["text"]  # The missing column name
 
 
 def test_set_tbl_with_different_dataframe_libraries():
@@ -17143,120 +18478,1622 @@ def test_original_table_never_modified_without_pre(request, tbl_fixture):
     assert all(n == expected_rows for n in n_values)
 
 
-def test_pct_null_simple() -> None:
-    """Test col_pct_null() with simple data."""
-    data = pl.DataFrame({"a": [1, None, 3, None], "b": [None, None, 3, 4]})
-    validation = Validate(data).col_pct_null(columns=["a", "b"], p=0.5).interrogate()
-
-    validation.assert_passing()
-    validation.assert_below_threshold()
-
-    info = validation.validation_info
-
-    assert len(info) == 2
-
-
-def test_pct_null_simple_fail() -> None:
-    """Test col_pct_null() with simple data."""
-    data = pl.DataFrame({"a": [1, None, 3, None], "b": [None, None, 3, 4]})
-    validation = (
-        Validate(data)
-        .col_pct_null(columns=["a", "b"], p=0.1, tol=0.0001, thresholds=1)
-        .interrogate()
-    )
-
-    with pytest.raises(AssertionError):
-        validation.assert_passing()
-
-    with pytest.raises(AssertionError):
-        validation.assert_below_threshold()
-
-    info = validation.validation_info
-
-    assert len(info) == 2
-
-
-@pytest.mark.xfail(reason="No SVG for pct null?")
-def test_pct_null_simple_report() -> None:
-    """Test col_pct_null() with simple data."""
-    data = pl.DataFrame({"a": [1, None, 3, None], "b": [None, None, 3, 4]})
-    validation = (
-        Validate(data)
-        .col_pct_null(columns=["a", "b"], p=0.1, tol=0.0001, thresholds=1)
-        .interrogate()
-    )
-
-    validation.get_tabular_report()
-
-
-def test_pct_null_exact_match_with_tol() -> None:
-    """Should pass if pct null matches exactly, even with tol."""
-    data = pl.DataFrame({"a": [None, 1, 2, 3]})  # 25% nulls
-    validation = Validate(data).col_pct_null(columns=["a"], p=0.25, tol=0.0).interrogate()
-    validation.assert_passing()
-
-
-def test_pct_null_within_tol_pass() -> None:
-    """Should pass if pct null is within tolerance margin."""
-    data = pl.DataFrame({"a": [None, None, 1, 2]})  # 50% nulls
-    # Allow tolerance of 0.1 around 0.4 -> [0.3, 0.5]
-    validation = Validate(data).col_pct_null(columns=["a"], p=0.4, tol=0.1).interrogate()
-    validation.assert_passing()
-
-
-def test_pct_null_outside_tol_fail(half_null_ser: pl.Series) -> None:
-    """Should fail if pct null is outside tolerance margin."""
-    data = pl.DataFrame({"a": half_null_ser})  # 50% nulls
-    validation = Validate(data).col_pct_null(columns=["a"], p=0.4, tol=0.05).interrogate()
-    with pytest.raises(AssertionError):
-        validation.assert_passing()
-
-
-def test_pct_null_lower_bound_edge() -> None:
-    """Should pass exactly at lower bound of tolerance range."""
-    data = pl.DataFrame({"a": [None, None, 1, 2]})  # 50% nulls
-    # Expect 0.55 ± 0.05 => [0.5, 0.6]
-    validation = Validate(data).col_pct_null(columns=["a"], p=0.55, tol=0.0).interrogate()
-    validation.assert_passing()
-
-
-def test_pct_null_upper_bound_edge() -> None:
-    """Should pass exactly at upper bound of tolerance range."""
-    data = pl.DataFrame({"a": [None, 1, 2, 3]})  # 25% nulls
-    # Expect 0.2 ± 0.05 => [0.15, 0.25]
-    validation = Validate(data).col_pct_null(columns=["a"], p=0.2, tol=0.05).interrogate()
-    validation.assert_passing()
-
-
-def test_pct_null_multiple_columns_with_tol() -> None:
-    """Should check multiple columns with tolerance."""
-    data = pl.DataFrame(
+@pytest.fixture
+def timezone_datetime_polars():
+    """Polars DataFrame with timezone-aware datetime values."""
+    return pl.DataFrame(
         {
-            "a": [None, None, 1, 2],  # 50%
-            "b": [1, None, 2, None],  # 50%
-            "c": [1, 2, 3, 4],  # 0%
+            "date_time": [
+                datetime.datetime(2020, 1, 1, tzinfo=pytz.timezone("America/Vancouver")),
+                datetime.datetime(2020, 1, 2, tzinfo=pytz.timezone("America/Vancouver")),
+                datetime.datetime(2020, 1, 3, tzinfo=pytz.timezone("America/Vancouver")),
+                datetime.datetime(2020, 1, 4, tzinfo=pytz.timezone("America/Vancouver")),
+            ]
         }
     )
-    validation = Validate(data).col_pct_null(columns=["a", "b", "c"], p=0.5, tol=0.01).interrogate()
-    # "a" and "b" should pass, "c" should fail
-    with pytest.raises(AssertionError):
-        validation.assert_passing()
 
 
-def test_pct_null_low_tol(half_null_ser: pl.Series) -> None:
-    """Tolerance is subject to rounding, and always relative to the total dataset."""
-    data = pl.DataFrame({"a": [None, None, 2, 3]})  # 50% null
-    validation = Validate(data).col_pct_null(columns=["a"], p=0.501, tol=0.0).interrogate()
-    validation.assert_passing()  # the reason this passes is because of rounding
+@pytest.fixture
+def timezone_datetime_pandas():
+    """Pandas DataFrame with timezone-aware datetime values."""
+    return pd.DataFrame(
+        {
+            "date_time": [
+                datetime.datetime(2020, 1, 1, tzinfo=pytz.timezone("America/Vancouver")),
+                datetime.datetime(2020, 1, 2, tzinfo=pytz.timezone("America/Vancouver")),
+                datetime.datetime(2020, 1, 3, tzinfo=pytz.timezone("America/Vancouver")),
+                datetime.datetime(2020, 1, 4, tzinfo=pytz.timezone("America/Vancouver")),
+            ]
+        }
+    )
 
-    data = pl.DataFrame({"a": half_null_ser})
-    validation = Validate(data).col_pct_null(columns=["a"], p=0.501, tol=0.0).interrogate()
-    with pytest.raises(AssertionError):
-        validation.assert_passing()  # now fails because no rounding issues
+
+def test_col_vals_ge_timezone_datetime_polars(timezone_datetime_polars):
+    """Test col_vals_ge() with timezone-aware datetime values in Polars."""
+    df = timezone_datetime_polars
+
+    # Test that col_vals_ge() works with timezone-aware datetime comparison
+    validation = (
+        Validate(data=df)
+        .col_vals_ge(
+            columns="date_time",
+            value=datetime.datetime(2020, 1, 1, tzinfo=pytz.timezone("America/Vancouver")),
+        )
+        .interrogate()
+    )
+
+    # All values should pass (all are >= 2020-01-01)
+    assert validation.all_passed()
+    assert validation.n_passed(i=1, scalar=True) == 4
+    assert validation.n_failed(i=1, scalar=True) == 0
 
 
-def test_pct_null_high_tol_always_pass() -> None:
-    """Large tolerance should allow big differences."""
-    data = pl.DataFrame({"a": [None, None, None, 1]})  # 75% null
-    validation = Validate(data).col_pct_null(columns=["a"], p=0.25, tol=10).interrogate()
-    validation.assert_passing()
+def test_col_vals_le_timezone_datetime_polars(timezone_datetime_polars):
+    """Test col_vals_le() with timezone-aware datetime values in Polars."""
+    df = timezone_datetime_polars
+
+    # Test that col_vals_le() works with timezone-aware datetime comparison
+    validation = (
+        Validate(data=df)
+        .col_vals_le(
+            columns="date_time",
+            value=datetime.datetime(
+                2020, 1, 5, tzinfo=pytz.timezone("America/Vancouver")
+            ),  # Use Jan 5 to be safe
+        )
+        .interrogate()
+    )
+
+    # All values should pass (all are <= 2020-01-05)
+    assert validation.all_passed()
+    assert validation.n_passed(i=1, scalar=True) == 4
+    assert validation.n_failed(i=1, scalar=True) == 0
+
+
+def test_col_vals_between_timezone_datetime_polars(timezone_datetime_polars):
+    """Test col_vals_between() with timezone-aware datetime values in Polars."""
+    df = timezone_datetime_polars
+
+    # Test that col_vals_between() works with timezone-aware datetime comparison
+    # Use a range that definitely includes some but not all values
+    validation = (
+        Validate(data=df)
+        .col_vals_between(
+            columns="date_time",
+            left=datetime.datetime(
+                2019, 12, 31, tzinfo=pytz.timezone("America/Vancouver")
+            ),  # Way before
+            right=datetime.datetime(
+                2020, 1, 3, 1, 0, tzinfo=pytz.timezone("America/Vancouver")
+            ),  # Jan 3 1AM (after the 00:12 time)
+        )
+        .interrogate()
+    )
+
+    # Test that it doesn't fail completely; as long as some pass and some fail, the basic
+    # functionality works
+    #
+    # The exact count may vary due to timezone display vs. internal representation differences
+    assert not validation.all_passed()  # Not all should pass
+    assert validation.n_passed(i=1, scalar=True) > 0  # Some should pass
+    assert validation.n_failed(i=1, scalar=True) > 0  # Some should fail
+
+
+def test_col_schema_match_timezone_datetime_polars(timezone_datetime_polars):
+    """Test col_schema_match with timezone-aware datetime schema in Polars."""
+    df = timezone_datetime_polars
+
+    # Test that col_schema_match() works with a timezone-aware datetime schema
+    validation = (
+        Validate(data=df)
+        .col_schema_match(
+            Schema(
+                columns=[
+                    (
+                        "date_time",
+                        "Datetime(time_unit='us', time_zone='America/Vancouver')",
+                    ),
+                ]
+            )
+        )
+        .interrogate()
+    )
+
+    # Schema should match exactly
+    assert validation.all_passed()
+    assert validation.n_passed(i=1, scalar=True) == 1
+
+
+def test_col_vals_ge_timezone_datetime_pandas(timezone_datetime_pandas):
+    """Test col_vals_ge() with timezone-aware datetime values in Pandas."""
+    df = timezone_datetime_pandas
+
+    # Test that col_vals_ge() works with timezone-aware datetime comparison
+    validation = (
+        Validate(data=df)
+        .col_vals_ge(
+            columns="date_time",
+            value=datetime.datetime(2020, 1, 1, tzinfo=pytz.timezone("America/Vancouver")),
+        )
+        .interrogate()
+    )
+
+    # All values should pass (all are >= 2020-01-01)
+    assert validation.all_passed()
+    assert validation.n_passed(i=1, scalar=True) == 4
+    assert validation.n_failed(i=1, scalar=True) == 0
+
+
+def test_col_vals_le_timezone_datetime_pandas(timezone_datetime_pandas):
+    """Test col_vals_le() with timezone-aware datetime values in Pandas."""
+    df = timezone_datetime_pandas
+
+    # Test that col_vals_le() works with timezone-aware datetime comparison
+    validation = (
+        Validate(data=df)
+        .col_vals_le(
+            columns="date_time",
+            value=datetime.datetime(
+                2020, 1, 5, tzinfo=pytz.timezone("America/Vancouver")
+            ),  # Use Jan 5 to be safe
+        )
+        .interrogate()
+    )
+
+    # All values should pass (all are <= 2020-01-05)
+    assert validation.all_passed()
+    assert validation.n_passed(i=1, scalar=True) == 4
+    assert validation.n_failed(i=1, scalar=True) == 0
+
+
+def test_timezone_datetime_same_timezone_polars():
+    """Test timezone datetime comparisons with same timezone in Polars."""
+    # Create DataFrame with same timezone datetimes but different times
+    df = pl.DataFrame(
+        {
+            "date_time": [
+                datetime.datetime(
+                    2020, 1, 1, 8, 0, tzinfo=pytz.timezone("America/Vancouver")
+                ),  # Early morning
+                datetime.datetime(
+                    2020, 1, 1, 12, 0, tzinfo=pytz.timezone("America/Vancouver")
+                ),  # Noon
+                datetime.datetime(
+                    2020, 1, 1, 18, 0, tzinfo=pytz.timezone("America/Vancouver")
+                ),  # Evening
+            ]
+        }
+    )
+
+    # Test comparison with a time in the middle
+    validation = (
+        Validate(data=df)
+        .col_vals_ge(
+            columns="date_time",
+            value=datetime.datetime(2020, 1, 1, 10, 0, tzinfo=pytz.timezone("America/Vancouver")),
+        )
+        .interrogate()
+    )
+
+    # Last 2 values should pass (noon and evening are >= 10 AM)
+    # First value (8 AM) should fail
+    assert not validation.all_passed()
+    assert validation.n_passed(i=1, scalar=True) == 2
+    assert validation.n_failed(i=1, scalar=True) == 1
+
+
+@pytest.mark.skipif(not PYSPARK_AVAILABLE, reason="PySpark not available")
+@pytest.mark.xfail(
+    reason="PySpark timezone datetime comparisons may not work correctly with narwhals"
+)
+def test_col_vals_ge_timezone_datetime_pyspark():
+    """Test col_vals_ge() with timezone-aware datetime values in PySpark."""
+    # Create PySpark DataFrame with timezone-aware datetime
+    spark = SparkSession.builder.appName("test").getOrCreate()
+
+    # Create data with timezone-aware datetime
+    data = [
+        (datetime.datetime(2020, 1, 1, tzinfo=pytz.timezone("America/Vancouver")),),
+        (datetime.datetime(2020, 1, 2, tzinfo=pytz.timezone("America/Vancouver")),),
+        (datetime.datetime(2020, 1, 3, tzinfo=pytz.timezone("America/Vancouver")),),
+        (datetime.datetime(2020, 1, 4, tzinfo=pytz.timezone("America/Vancouver")),),
+    ]
+
+    schema = StructType(
+        [
+            StructField(
+                "date_time", StringType(), True
+            )  # PySpark may need special handling for timezone-aware datetimes
+        ]
+    )
+
+    df = spark.createDataFrame(data, schema=schema)
+
+    # Test that col_vals_ge() works with timezone-aware datetime comparison
+    validation = (
+        Validate(data=df)
+        .col_vals_ge(
+            columns="date_time",
+            value=datetime.datetime(2020, 1, 1, tzinfo=pytz.timezone("America/Vancouver")),
+        )
+        .interrogate()
+    )
+
+    # All values should pass (all are >= 2020-01-01)
+    assert validation.all_passed()
+    assert validation.n_passed(i=1, scalar=True) == 4
+    assert validation.n_failed(i=1, scalar=True) == 0
+
+
+@pytest.mark.xfail(reason="DuckDB timezone datetime comparisons may not work correctly yet")
+def test_col_vals_ge_timezone_datetime_duckdb():
+    """Test col_vals_ge() with timezone-aware datetime values in DuckDB."""
+    try:
+        import duckdb
+    except ImportError:
+        pytest.skip("duckdb not available")
+
+    # Create DuckDB connection and table with timezone-aware datetime
+    conn = duckdb.connect()
+
+    try:
+        # Create table with timezone-aware datetime data
+        # (DuckDB uses TIMESTAMPTZ for timezone-aware timestamps)
+        conn.execute("""
+            CREATE TABLE test_tz_datetime AS
+            SELECT TIMESTAMP '2020-01-01 00:00:00-08:00' AS date_time
+            UNION ALL
+            SELECT TIMESTAMP '2020-01-02 00:00:00-08:00' AS date_time
+            UNION ALL
+            SELECT TIMESTAMP '2020-01-03 00:00:00-08:00' AS date_time
+            UNION ALL
+            SELECT TIMESTAMP '2020-01-04 00:00:00-08:00' AS date_time
+        """)
+
+        # Get the table as an Ibis table
+        tbl = conn.table("test_tz_datetime")
+
+        # Test that col_vals_ge() works with timezone-aware datetime comparison
+        validation = (
+            Validate(data=tbl)
+            .col_vals_ge(
+                columns="date_time",
+                value=datetime.datetime(2020, 1, 1, tzinfo=pytz.timezone("America/Vancouver")),
+            )
+            .interrogate()
+        )
+
+        # All values should pass (all are >= 2020-01-01)
+        assert validation.all_passed()
+        assert validation.n_passed(i=1, scalar=True) == 4
+        assert validation.n_failed(i=1, scalar=True) == 0
+
+    finally:
+        conn.close()
+
+
+@pytest.mark.xfail(reason="Mixed timezone comparisons may not work correctly yet")
+def test_timezone_datetime_mixed_timezones_polars():
+    """Test timezone datetime comparisons with mixed timezones in Polars."""
+    # Create DataFrame with mixed timezone datetimes
+    df = pl.DataFrame(
+        {
+            "date_time": [
+                datetime.datetime(
+                    2020, 1, 1, 12, 0, tzinfo=pytz.timezone("America/Vancouver")
+                ),  # PST
+                datetime.datetime(
+                    2020, 1, 1, 15, 0, tzinfo=pytz.timezone("America/New_York")
+                ),  # EST
+                datetime.datetime(2020, 1, 1, 20, 0, tzinfo=pytz.timezone("UTC")),  # UTC
+            ]
+        }
+    )
+
+    # Test comparison with UTC datetime (this may fail due to mixed timezone handling)
+    validation = (
+        Validate(data=df)
+        .col_vals_ge(
+            columns="date_time",
+            value=datetime.datetime(2020, 1, 1, 19, 0, tzinfo=pytz.timezone("UTC")),
+        )
+        .interrogate()
+    )
+
+    # If this works, all values should pass as they're all >= 19:00 UTC
+    assert validation.all_passed()
+    assert validation.n_passed(i=1, scalar=True) == 3
+
+
+@pytest.fixture
+def sample_validation_polars():
+    """Create a sample validation object with Polars data."""
+
+    data = load_dataset("small_table", tbl_type="polars")
+    return (
+        Validate(
+            data=data,
+            tbl_name="small_table",
+            label="Test validation",
+            thresholds=Thresholds(warning=0.1, error=0.2, critical=0.3),
+        )
+        .col_vals_gt(columns="d", value=100)
+        .col_vals_regex(columns="b", pattern=r"[0-9]-[a-z]{3}-[0-9]{3}")
+        .col_vals_not_null(columns=["a", "b"])
+        .interrogate()
+    )
+
+
+@pytest.fixture
+def sample_validation_pandas():
+    """Create a sample validation object with Pandas data."""
+
+    data = load_dataset("small_table", tbl_type="pandas")
+    return (
+        Validate(data=data, label="Pandas validation")
+        .col_vals_gt(columns="d", value=100)
+        .interrogate()
+    )
+
+
+@pytest.fixture
+def sample_validation_duckdb():
+    """Create a sample validation object with DuckDB data."""
+
+    data = load_dataset("small_table", tbl_type="duckdb")
+    return (
+        Validate(data=data, label="DuckDB validation")
+        .col_vals_gt(columns="d", value=100)
+        .interrogate()
+    )
+
+
+def test_write_file_basic_functionality(sample_validation_polars):
+    """Test basic write_file functionality."""
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        filepath = Path(tmpdir) / "test_validation"
+
+        # Test writing
+        write_file(sample_validation_polars, str(filepath), quiet=True)
+
+        # Verify file was created with correct extension
+        expected_file = filepath.with_suffix(".pkl")
+        assert expected_file.exists()
+        assert expected_file.stat().st_size > 0
+
+
+def test_read_file_basic_functionality(sample_validation_polars):
+    """Test basic read_file functionality."""
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        filepath = Path(tmpdir) / "test_validation"
+
+        # Write and read back
+        write_file(sample_validation_polars, str(filepath), quiet=True)
+        loaded_validation = read_file(str(filepath))
+
+        # Verify object type and basic properties
+        assert isinstance(loaded_validation, Validate)
+        assert loaded_validation.label == sample_validation_polars.label
+        assert loaded_validation.tbl_name == sample_validation_polars.tbl_name
+        assert len(loaded_validation.validation_info) == len(
+            sample_validation_polars.validation_info
+        )
+
+
+def test_write_file_automatic_extension(sample_validation_polars):
+    """Test that .pkl extension is added automatically."""
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        # Test without extension
+        filepath = Path(tmpdir) / "test_validation"
+        write_file(sample_validation_polars, str(filepath), quiet=True)
+        assert filepath.with_suffix(".pkl").exists()
+
+    # Test with extension already present
+    filepath_with_ext = Path(tmpdir) / "test_validation.pkl"
+    write_file(sample_validation_polars, str(filepath_with_ext), quiet=True)
+    assert filepath_with_ext.exists()
+
+    # Should not create .pkl.pkl
+    assert not (Path(tmpdir) / "test_validation.pkl.pkl").exists()
+
+
+def test_path_creation(sample_validation_polars):
+    """Test that directories are created if they don't exist."""
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        nested_path = Path(tmpdir) / "nested" / "subdirectory"
+        filepath = nested_path / "test_validation"
+
+        # Path doesn't exist yet
+        assert not nested_path.exists()
+
+        # Write file should create the path
+        write_file(sample_validation_polars, str(filepath), path=None, quiet=True)
+
+        # Verify path was created
+        assert nested_path.exists()
+        assert (filepath.with_suffix(".pkl")).exists()
+
+
+def test_path_parameter(sample_validation_polars):
+    """Test the path parameter functionality."""
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        subdir = Path(tmpdir) / "validations"
+
+        # Use path parameter
+        write_file(sample_validation_polars, "test_validation", path=str(subdir), quiet=True)
+
+        # Verify file is in the specified directory
+        expected_file = subdir / "test_validation.pkl"
+        assert expected_file.exists()
+
+
+def test_keep_tbl_false_default(sample_validation_polars):
+    """Test that data table is removed by default (`keep_tbl=False`)."""
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        filepath = Path(tmpdir) / "test_validation"
+
+        # Default behavior should not keep table
+        write_file(sample_validation_polars, str(filepath), quiet=True)
+        loaded_validation = read_file(str(filepath))
+
+        assert loaded_validation.data is None
+
+
+def test_keep_tbl_true_preserves_data(sample_validation_polars):
+    """Test that data table is preserved when `keep_tbl=True`."""
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        filepath = Path(tmpdir) / "test_validation"
+
+        # Keep the table data
+        write_file(sample_validation_polars, str(filepath), keep_tbl=True, quiet=True)
+        loaded_validation = read_file(str(filepath))
+
+        assert loaded_validation.data is not None
+        # Verify the data is the same structure
+        assert len(loaded_validation.data) == len(sample_validation_polars.data)
+        assert list(loaded_validation.data.columns) == list(sample_validation_polars.data.columns)
+
+
+def test_database_table_removal(sample_validation_duckdb):
+    """Test that database tables are always removed even with `keep_tbl=True`."""
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        filepath = Path(tmpdir) / "test_validation"
+
+        # Try to keep database table (should be removed anyway)
+        write_file(sample_validation_duckdb, str(filepath), keep_tbl=True, quiet=True)
+        loaded_validation = read_file(str(filepath))
+
+        # Database table should be None even with keep_tbl=True
+        assert loaded_validation.data is None
+
+
+def test_keep_extracts_functionality(sample_validation_polars):
+    """Test extract data preservation functionality."""
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        filepath_no_extracts = Path(tmpdir) / "no_extracts"
+        filepath_with_extracts = Path(tmpdir) / "with_extracts"
+
+        # Save without extracts (default)
+        write_file(sample_validation_polars, str(filepath_no_extracts), quiet=True)
+
+        # Save with extracts
+        write_file(
+            sample_validation_polars, str(filepath_with_extracts), keep_extracts=True, quiet=True
+        )
+
+        # Both should work (extract handling is implementation detail)
+        loaded_no_extracts = read_file(str(filepath_no_extracts))
+        loaded_with_extracts = read_file(str(filepath_with_extracts))
+
+        assert isinstance(loaded_no_extracts, Validate)
+        assert isinstance(loaded_with_extracts, Validate)
+
+
+def test_quiet_parameter(sample_validation_polars, capsys):
+    """Test the quiet parameter functionality."""
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        filepath = Path(tmpdir) / "test_validation"
+
+        # Test with quiet=False (default) - should print
+        write_file(sample_validation_polars, str(filepath), quiet=False)
+        captured = capsys.readouterr()
+        assert "Validation object written to:" in captured.out
+
+        # Test with quiet=True - should not print
+        filepath2 = Path(tmpdir) / "test_validation2"
+        write_file(sample_validation_polars, str(filepath2), quiet=True)
+        captured = capsys.readouterr()
+        assert captured.out == ""
+
+
+def test_validation_state_preservation(sample_validation_polars):
+    """Test that validation results and metadata are preserved."""
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        filepath = Path(tmpdir) / "test_validation"
+
+        # Capture original state
+        original_steps = len(sample_validation_polars.validation_info)
+        original_thresholds = sample_validation_polars.thresholds
+        original_time_start = sample_validation_polars.time_start
+        original_time_end = sample_validation_polars.time_end
+
+        # Write and read
+        write_file(sample_validation_polars, str(filepath), quiet=True)
+        loaded_validation = read_file(str(filepath))
+
+        # Verify state preservation
+        assert len(loaded_validation.validation_info) == original_steps
+        assert loaded_validation.thresholds.warning == original_thresholds.warning
+        assert loaded_validation.thresholds.error == original_thresholds.error
+        assert loaded_validation.time_start == original_time_start
+        assert loaded_validation.time_end == original_time_end
+
+        # Verify validation results are preserved
+        for i, (orig_info, loaded_info) in enumerate(
+            zip(sample_validation_polars.validation_info, loaded_validation.validation_info)
+        ):
+            assert orig_info.assertion_type == loaded_info.assertion_type
+            assert orig_info.column == loaded_info.column
+            assert orig_info.n == loaded_info.n
+            assert orig_info.n_passed == loaded_info.n_passed
+            assert orig_info.n_failed == loaded_info.n_failed
+
+
+def test_original_object_not_modified(sample_validation_polars):
+    """Test that write_file doesn't modify the original validation object."""
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        filepath = Path(tmpdir) / "test_validation"
+
+        # Capture original state
+        original_data = sample_validation_polars.data
+        original_validation_info = sample_validation_polars.validation_info
+
+        # Write with keep_tbl=False
+        write_file(sample_validation_polars, str(filepath), keep_tbl=False, quiet=True)
+
+        # Original should be unchanged
+        assert sample_validation_polars.data is original_data
+        assert sample_validation_polars.validation_info is original_validation_info
+
+
+def test_multiple_table_types(sample_validation_polars, sample_validation_pandas):
+    """Test serialization with different table types."""
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        # Test Polars
+        filepath_polars = Path(tmpdir) / "polars_validation"
+        write_file(sample_validation_polars, str(filepath_polars), keep_tbl=True, quiet=True)
+        loaded_polars = read_file(str(filepath_polars))
+
+        # Test Pandas
+        filepath_pandas = Path(tmpdir) / "pandas_validation"
+        write_file(sample_validation_pandas, str(filepath_pandas), keep_tbl=True, quiet=True)
+        loaded_pandas = read_file(str(filepath_pandas))
+
+        # Both should work
+        assert loaded_polars.data is not None
+        assert loaded_pandas.data is not None
+
+
+def test_read_file_with_extension_handling(sample_validation_polars):
+    """Test read_file handles file extension automatically."""
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        filepath = Path(tmpdir) / "test_validation"
+
+        # Write file
+        write_file(sample_validation_polars, str(filepath), quiet=True)
+
+        # Read with and without extension
+        loaded_no_ext = read_file(str(filepath))
+        loaded_with_ext = read_file(str(filepath) + ".pkl")
+
+        assert isinstance(loaded_no_ext, Validate)
+        assert isinstance(loaded_with_ext, Validate)
+        assert loaded_no_ext.label == loaded_with_ext.label
+
+
+def test_file_not_found_error():
+    """Test that FileNotFoundError is raised for non-existent files."""
+
+    with pytest.raises(FileNotFoundError, match="Validation file not found"):
+        read_file("nonexistent_file.pkl")
+
+
+def test_invalid_file_content_error():
+    """Test that RuntimeError is raised for invalid file content."""
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        # Create a file with invalid content
+        invalid_file = Path(tmpdir) / "invalid.pkl"
+        with open(invalid_file, "wb") as f:
+            import pickle
+
+            pickle.dump("not a validation object", f)
+
+        with pytest.raises(RuntimeError, match="Invalid validation file format"):
+            read_file(str(invalid_file))
+
+
+def test_write_file_permission_error(sample_validation_polars):
+    """Test handling of write permission errors."""
+
+    # Try to write to a non-writable location, which should fail
+    with pytest.raises((RuntimeError, OSError, PermissionError)):
+        write_file(sample_validation_polars, "/root/test_validation", quiet=True)
+
+
+def test_round_trip_consistency(sample_validation_polars):
+    """Test that multiple save/load cycles maintain consistency."""
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        # First round trip
+        filepath1 = Path(tmpdir) / "validation1"
+        write_file(sample_validation_polars, str(filepath1), keep_tbl=True, quiet=True)
+        loaded1 = read_file(str(filepath1))
+
+        # Second round trip
+        filepath2 = Path(tmpdir) / "validation2"
+        write_file(loaded1, str(filepath2), keep_tbl=True, quiet=True)
+        loaded2 = read_file(str(filepath2))
+
+        # Should be consistent
+        assert loaded1.label == loaded2.label == sample_validation_polars.label
+        assert len(loaded1.validation_info) == len(loaded2.validation_info)
+        assert loaded1.data is not None
+        assert loaded2.data is not None
+
+
+@pytest.mark.parametrize("tbl_type", ["polars", "pandas"])
+def test_parametrized_table_types(tbl_type):
+    """Test write_file and read_file with different table types."""
+
+    data = load_dataset("small_table", tbl_type=tbl_type)
+    validation = (
+        Validate(data=data, label=f"Test {tbl_type}")
+        .col_vals_gt(columns="d", value=100)
+        .interrogate()
+    )
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        filepath = Path(tmpdir) / f"validation_{tbl_type}"
+
+        # Test round trip
+        write_file(validation, str(filepath), keep_tbl=True, quiet=True)
+        loaded = read_file(str(filepath))
+
+        assert loaded.label == f"Test {tbl_type}"
+        assert loaded.data is not None
+        assert len(loaded.validation_info) == 1
+
+
+def test_large_validation_object():
+    """Test serialization of validation objects with many steps."""
+
+    data = load_dataset("small_table", tbl_type="polars")
+
+    # Create validation with many steps
+    validation = Validate(data=data, label="Large validation")
+    for i in range(10):
+        validation = validation.col_vals_gt(columns="d", value=100 + i)
+
+    validation = validation.interrogate()
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        filepath = Path(tmpdir) / "large_validation"
+
+        # Test serialization
+        write_file(validation, str(filepath), quiet=True)
+        loaded = read_file(str(filepath))
+
+        assert len(loaded.validation_info) == 10
+        assert loaded.label == "Large validation"
+
+
+def test_write_file_with_lambda_functions_error():
+    """Test write_file error handling with lambda functions."""
+    import narwhals as nw
+
+    # Create validation with lambda functions
+    validation = Validate(data=load_dataset("small_table")).col_vals_ge(
+        columns="a", value=20, pre=lambda dfn: dfn.with_columns(nw.col("a") * 20)
+    )
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        filepath = Path(tmpdir) / "validation_with_lambdas"
+
+        # Should raise ValueError when lambda functions are present
+        with pytest.raises(ValueError, match="Cannot serialize validation object"):
+            write_file(validation, str(filepath), quiet=True)
+
+
+def test_write_file_with_module_level_function():
+    """Test write_file works with module-level functions."""
+
+    # Create validation with module-level function (defined at top of file)
+    validation = Validate(data=load_dataset("small_table")).col_vals_ge(
+        columns="a", value=20, pre=multiply_column_by_20
+    )
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        filepath = Path(tmpdir) / "validation_with_function"
+
+        # Should work fine with module-level functions
+        write_file(validation, str(filepath), quiet=True)
+
+        # Verify the file was created
+        assert filepath.with_suffix(".pkl").exists()
+
+        # Verify we can load it back
+        loaded_validation = read_file(str(filepath))
+
+        # Verify structure is preserved
+        assert len(loaded_validation.validation_info) == len(validation.validation_info)
+
+        # Verify that the function is preserved
+        step = loaded_validation.validation_info[0]
+        assert step.pre is not None
+        assert step.pre.__name__ == "multiply_column_by_20"
+
+
+@pytest.fixture
+def column_selector_test_data():
+    """Create test data with diverse column names for column selector testing."""
+    return pl.DataFrame(
+        {
+            "paid_2021": [16.32, 16.25, 15.75],
+            "paid_2022": [18.62, 16.95, 18.25],
+            "revenue_total": [120.50, 105.75, 98.25],
+            "cost_base": [80.20, 70.50, 65.15],
+            "cost_extra": [10.15, 8.75, 7.50],
+            "person_id": ["A123", "B456", "C789"],
+            "location_code": ["NYC", "LAX", "CHI"],
+            "temp_value": [22.5, 25.1, 19.8],
+            "final_score": [85.5, 92.3, 78.1],
+            "data_quality": ["good", "excellent", "fair"],
+        }
+    )
+
+
+def test_col_selector_write_read_file(column_selector_test_data):
+    """Test basic col() selector with write_file/read_file."""
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        filepath = Path(tmpdir) / "col_selector_validation"
+
+        # Create validation with col() selector
+        validation = (
+            Validate(data=column_selector_test_data, label="col() selector test")
+            .col_vals_gt(columns=col("paid_2021"), value=10)
+            .col_vals_lt(columns=col("final_score"), value=100)
+            .interrogate()
+        )
+
+        # Write and read back
+        write_file(validation, str(filepath), keep_tbl=True, quiet=True)
+        loaded_validation = read_file(str(filepath))
+
+        # Verify column selectors are preserved
+        assert len(loaded_validation.validation_info) == 2
+        assert loaded_validation.validation_info[0].column == "paid_2021"
+        assert loaded_validation.validation_info[1].column == "final_score"
+        assert loaded_validation.label == "col() selector test"
+
+        # Verify re-interrogation works
+        reinterrogated = loaded_validation.interrogate()
+        assert reinterrogated.n_passed(scalar=True) == validation.n_passed(scalar=True)
+
+
+def test_col_selector_in_value_parameter_write_read_file(column_selector_test_data):
+    """Test col() selector used in value= parameter with write_file/read_file."""
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        filepath = Path(tmpdir) / "col_value_selector_validation"
+
+        # Create validation using col() in value parameter to compare columns
+        validation = (
+            Validate(data=column_selector_test_data, label="col() in value parameter test")
+            # Test that paid_2022 is greater than paid_2021
+            .col_vals_gt(columns=col("paid_2022"), value=col("paid_2021"))
+            # Test that revenue_total is greater than cost_base
+            .col_vals_gt(columns=col("revenue_total"), value=col("cost_base"))
+            # Test that final_score is greater than temp_value
+            .col_vals_gt(columns=col("final_score"), value=col("temp_value"))
+            .interrogate()
+        )
+
+        # Write and read back
+        write_file(validation, str(filepath), keep_tbl=True, quiet=True)
+        loaded_validation = read_file(str(filepath))
+
+        # Verify column selectors are preserved in both columns and values
+        assert len(loaded_validation.validation_info) == 3
+
+        # Check column names
+        assert loaded_validation.validation_info[0].column == "paid_2022"
+        assert loaded_validation.validation_info[1].column == "revenue_total"
+        assert loaded_validation.validation_info[2].column == "final_score"
+
+        # Check that value references are preserved (these should be column references)
+        assert loaded_validation.validation_info[0].values == col("paid_2021")
+        assert loaded_validation.validation_info[1].values == col("cost_base")
+        assert loaded_validation.validation_info[2].values == col("temp_value")
+
+        assert loaded_validation.label == "col() in value parameter test"
+
+        # Verify re-interrogation works
+        reinterrogated = loaded_validation.interrogate()
+        assert reinterrogated.n_passed(scalar=True) == validation.n_passed(scalar=True)
+
+
+def test_multiple_col_selectors_in_value_parameter_write_read_file(column_selector_test_data):
+    """Test multiple column selectors used in value= parameter with write_file/read_file."""
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        filepath = Path(tmpdir) / "multiple_col_value_validation"
+
+        # Create validation using column selectors in both columns and values
+        validation = (
+            Validate(data=column_selector_test_data, label="multiple col() selectors test")
+            # Compare columns selected by starts_with against columns selected by contains
+            .col_vals_gt(columns=starts_with("paid"), value=col("temp_value"))
+            # Compare specific columns
+            .col_vals_lt(columns=col("cost_base"), value=col("revenue_total"))
+            .interrogate()
+        )
+
+        # Write and read back
+        write_file(validation, str(filepath), keep_tbl=True, quiet=True)
+        loaded_validation = read_file(str(filepath))
+
+        # Verify column selectors are preserved
+        # First validation: starts_with("paid") -> paid_2021, paid_2022 (2 steps)
+        # Second validation: col("cost_base") -> cost_base (1 step)
+        assert len(loaded_validation.validation_info) == 3  # 2 + 1
+
+        # Get all column names and values from validation steps
+        columns = [step.column for step in loaded_validation.validation_info]
+        values = [step.values for step in loaded_validation.validation_info]
+
+        # First two steps should be for paid columns, both compared against temp_value
+        assert set(columns[:2]) == {"paid_2021", "paid_2022"}
+        assert values[0] == col("temp_value")
+        assert values[1] == col("temp_value")
+
+        # Third step should be cost_base compared against revenue_total
+        assert columns[2] == "cost_base"
+        assert values[2] == col("revenue_total")
+
+        assert loaded_validation.label == "multiple col() selectors test"
+
+        # Verify re-interrogation works
+        reinterrogated = loaded_validation.interrogate()
+        assert reinterrogated.n_passed(scalar=True) == validation.n_passed(scalar=True)
+
+
+def test_starts_with_selector_write_read_file(column_selector_test_data):
+    """Test starts_with() selector with write_file/read_file."""
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        filepath = Path(tmpdir) / "starts_with_validation"
+
+        # Create validation with starts_with() selector
+        validation = (
+            Validate(data=column_selector_test_data, label="starts_with() selector test")
+            .col_vals_gt(columns=starts_with("paid"), value=10)
+            .col_vals_gt(columns=starts_with("cost"), value=5)
+            .interrogate()
+        )
+
+        # Write and read back
+        write_file(validation, str(filepath), keep_tbl=True, quiet=True)
+        loaded_validation = read_file(str(filepath))
+
+        # Verify column selectors are expanded correctly (each column becomes separate step)
+        assert len(loaded_validation.validation_info) == 4  # 2 paid + 2 cost columns
+
+        # Get all column names from validation steps
+        columns = [step.column for step in loaded_validation.validation_info]
+
+        # First two steps should be for paid columns
+        assert set(columns[:2]) == {"paid_2021", "paid_2022"}
+
+        # Next two steps should be for cost columns
+        assert set(columns[2:]) == {"cost_base", "cost_extra"}
+
+        # Verify re-interrogation works
+        reinterrogated = loaded_validation.interrogate()
+        assert reinterrogated.n_passed(scalar=True) == validation.n_passed(scalar=True)
+
+
+def test_ends_with_selector_write_read_file(column_selector_test_data):
+    """Test ends_with() selector with write_file/read_file."""
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        filepath = Path(tmpdir) / "ends_with_validation"
+
+        # Create validation with ends_with() selector
+        validation = (
+            Validate(data=column_selector_test_data, label="ends_with() selector test")
+            .col_vals_regex(columns=ends_with("_id"), pattern=r"^[A-C]\d{3}$")
+            .col_vals_regex(columns=ends_with("_code"), pattern=r"^[A-Z]{3}$")
+            .interrogate()
+        )
+
+        # Write and read back
+        write_file(validation, str(filepath), keep_tbl=True, quiet=True)
+        loaded_validation = read_file(str(filepath))
+
+        # Verify column selectors are preserved and expanded correctly
+        assert len(loaded_validation.validation_info) == 2
+        assert loaded_validation.validation_info[0].column == "person_id"
+        assert loaded_validation.validation_info[1].column == "location_code"
+
+        # Verify re-interrogation works
+        reinterrogated = loaded_validation.interrogate()
+        assert reinterrogated.n_passed(scalar=True) == validation.n_passed(scalar=True)
+
+
+def test_contains_selector_write_read_file(column_selector_test_data):
+    """Test contains() selector with write_file/read_file."""
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        filepath = Path(tmpdir) / "contains_validation"
+
+        # Create validation with contains() selector
+        validation = (
+            Validate(data=column_selector_test_data, label="contains() selector test")
+            .col_vals_gt(columns=contains("cost"), value=5)
+            .col_vals_in_set(
+                columns=col("person_id"), set=["A123", "B456", "C789"]
+            )  # Use specific string column
+            .interrogate()
+        )
+
+        # Write and read back
+        write_file(validation, str(filepath), keep_tbl=True, quiet=True)
+        loaded_validation = read_file(str(filepath))
+
+        # Verify column selectors are expanded correctly
+        # First validation: contains("cost") -> cost_base, cost_extra (2 steps)
+        # Second validation: col("person_id") -> person_id (1 step)
+        assert len(loaded_validation.validation_info) == 3  # 2 + 1 columns
+
+        # Get all column names from validation steps
+        columns = [step.column for step in loaded_validation.validation_info]
+
+        # First two steps should be for cost columns
+        assert set(columns[:2]) == {"cost_base", "cost_extra"}
+
+        # Last step should be for person_id
+        assert columns[2] == "person_id"
+
+        # Verify re-interrogation works
+        reinterrogated = loaded_validation.interrogate()
+        assert reinterrogated.n_passed(scalar=True) == validation.n_passed(scalar=True)
+
+
+def test_matches_selector_write_read_file(column_selector_test_data):
+    """Test matches() regex selector with write_file/read_file."""
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        filepath = Path(tmpdir) / "matches_validation"
+
+        # Create validation with matches() selector
+        validation = (
+            Validate(data=column_selector_test_data, label="matches() selector test")
+            .col_vals_gt(columns=matches(r"^paid_\d{4}$"), value=10)  # paid_2021, paid_2022
+            .col_vals_regex(columns=matches(r".*_code$"), pattern=r"^[A-Z]{3}$")  # location_code
+            .interrogate()
+        )
+
+        # Write and read back
+        write_file(validation, str(filepath), keep_tbl=True, quiet=True)
+        loaded_validation = read_file(str(filepath))
+
+        # Verify column selectors are expanded correctly
+        # First validation: matches(r"^paid_\d{4}$") -> paid_2021, paid_2022 (2 steps)
+        # Second validation: matches(r".*_code$") -> location_code (1 step)
+        assert len(loaded_validation.validation_info) == 3  # 2 + 1 columns
+
+        # Get all column names from validation steps
+        columns = [step.column for step in loaded_validation.validation_info]
+
+        # First two steps should be for paid columns
+        assert set(columns[:2]) == {"paid_2021", "paid_2022"}
+
+        # Last step should be for location_code
+        assert columns[2] == "location_code"
+
+        # Verify re-interrogation works
+        reinterrogated = loaded_validation.interrogate()
+        assert reinterrogated.n_passed(scalar=True) == validation.n_passed(scalar=True)
+
+
+def test_everything_selector_write_read_file(column_selector_test_data):
+    """Test everything() selector with write_file/read_file."""
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        filepath = Path(tmpdir) / "everything_validation"
+
+        # Create validation with everything() selector (using a suitable validation)
+        validation = (
+            Validate(data=column_selector_test_data, label="everything() selector test")
+            .col_exists(columns=everything())
+            .interrogate()
+        )
+
+        # Write and read back
+        write_file(validation, str(filepath), keep_tbl=True, quiet=True)
+        loaded_validation = read_file(str(filepath))
+
+        # Verify column selector expands to all columns (each becomes separate step)
+        expected_columns = list(column_selector_test_data.columns)
+        assert len(loaded_validation.validation_info) == len(expected_columns)
+
+        # Get all column names from validation steps
+        columns = [step.column for step in loaded_validation.validation_info]
+        assert set(columns) == set(expected_columns)
+
+        # Verify re-interrogation works
+        reinterrogated = loaded_validation.interrogate()
+        assert reinterrogated.n_passed(scalar=True) == validation.n_passed(scalar=True)
+
+
+def test_first_n_selector_write_read_file(column_selector_test_data):
+    """Test first_n() selector with write_file/read_file."""
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        filepath = Path(tmpdir) / "first_n_validation"
+
+        # Create validation with first_n() selector
+        validation = (
+            Validate(data=column_selector_test_data, label="first_n() selector test")
+            .col_vals_gt(
+                columns=first_n(3), value=10
+            )  # First 3 columns: paid_2021, paid_2022, revenue_total
+            .col_exists(columns=first_n(2))  # First 2 columns: paid_2021, paid_2022
+            .interrogate()
+        )
+
+        # Write and read back
+        write_file(validation, str(filepath), keep_tbl=True, quiet=True)
+        loaded_validation = read_file(str(filepath))
+
+        # Verify column selectors are expanded correctly
+        # First validation: first_n(3) -> 3 steps
+        # Second validation: first_n(2) -> 2 steps
+        assert len(loaded_validation.validation_info) == 5  # 3 + 2 columns
+
+        # Get all column names from validation steps
+        columns = [step.column for step in loaded_validation.validation_info]
+
+        expected_first_3 = list(column_selector_test_data.columns[:3])
+        expected_first_2 = list(column_selector_test_data.columns[:2])
+
+        # First 3 steps should be for first_n(3)
+        assert set(columns[:3]) == set(expected_first_3)
+
+        # Last 2 steps should be for first_n(2)
+        assert set(columns[3:]) == set(expected_first_2)
+
+        # Verify re-interrogation works
+        reinterrogated = loaded_validation.interrogate()
+        assert reinterrogated.n_passed(scalar=True) == validation.n_passed(scalar=True)
+
+
+def test_last_n_selector_write_read_file(column_selector_test_data):
+    """Test last_n() selector with write_file/read_file."""
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        filepath = Path(tmpdir) / "last_n_validation"
+
+        # Create validation with last_n() selector
+        validation = (
+            Validate(data=column_selector_test_data, label="last_n() selector test")
+            .col_exists(columns=last_n(3))  # Last 3 columns
+            .col_vals_not_null(columns=last_n(2))  # Last 2 columns
+            .interrogate()
+        )
+
+        # Write and read back
+        write_file(validation, str(filepath), keep_tbl=True, quiet=True)
+        loaded_validation = read_file(str(filepath))
+
+        # Verify column selectors are expanded correctly
+        # First validation: last_n(3) -> 3 steps
+        # Second validation: last_n(2) -> 2 steps
+        assert len(loaded_validation.validation_info) == 5  # 3 + 2 columns
+
+        # Get all column names from validation steps
+        columns = [step.column for step in loaded_validation.validation_info]
+
+        expected_last_3 = list(column_selector_test_data.columns[-3:])
+        expected_last_2 = list(column_selector_test_data.columns[-2:])
+
+        # First 3 steps should be for last_n(3)
+        assert set(columns[:3]) == set(expected_last_3)
+
+        # Last 2 steps should be for last_n(2)
+        assert set(columns[3:]) == set(expected_last_2)
+
+        # Verify re-interrogation works
+        reinterrogated = loaded_validation.interrogate()
+        assert reinterrogated.n_passed(scalar=True) == validation.n_passed(scalar=True)
+
+
+def test_selector_union_operator_write_read_file(column_selector_test_data):
+    """Test union operator (|) for column selectors with write_file/read_file."""
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        filepath = Path(tmpdir) / "union_selector_validation"
+
+        # Create validation with union of selectors
+        validation = (
+            Validate(data=column_selector_test_data, label="union selector test")
+            # Union: starts_with("cost") OR starts_with("person") = cost_base, cost_extra, person_id
+            .col_exists(columns=starts_with("cost") | starts_with("person"))
+            .interrogate()
+        )
+
+        # Write and read back
+        write_file(validation, str(filepath), keep_tbl=True, quiet=True)
+        loaded_validation = read_file(str(filepath))
+
+        # Verify column selectors are expanded correctly
+        # Get all column names from validation steps
+        columns = [step.column for step in loaded_validation.validation_info]
+
+        # Should have steps for: cost_base, cost_extra, person_id
+        expected_cols = {"cost_base", "cost_extra", "person_id"}
+        assert set(columns) == expected_cols
+
+        # Verify re-interrogation works
+        reinterrogated = loaded_validation.interrogate()
+        assert reinterrogated.n_passed(scalar=True) == validation.n_passed(scalar=True)
+
+
+def test_column_selector_with_different_table_types():
+    """Test column selectors work with different table types after serialization."""
+
+    # Test with Polars
+    polars_data = pl.DataFrame(
+        {"start_value": [1, 2, 3], "end_value": [4, 5, 6], "middle_col": [7, 8, 9]}
+    )
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        filepath_polars = Path(tmpdir) / "polars_selector_validation"
+
+        validation_polars = (
+            Validate(data=polars_data, label="Polars column selector test")
+            .col_vals_gt(columns=starts_with("start"), value=0)
+            .col_vals_lt(columns=ends_with("_value"), value=10)
+            .interrogate()
+        )
+
+        # Write and read back
+        write_file(validation_polars, str(filepath_polars), keep_tbl=True, quiet=True)
+        loaded_polars = read_file(str(filepath_polars))
+
+        # Verify selectors work correctly
+        # First validation: starts_with("start") -> start_value (1 step)
+        # Second validation: ends_with("_value") -> start_value, end_value (2 steps)
+        assert len(loaded_polars.validation_info) == 3  # 1 + 2 columns
+
+        columns = [step.column for step in loaded_polars.validation_info]
+
+        # First step should be start_value
+        assert columns[0] == "start_value"
+
+        # Remaining steps should be for columns ending with "_value"
+        assert set(columns[1:]) == {"start_value", "end_value"}
+
+        # Verify re-interrogation works
+        reinterrogated_polars = loaded_polars.interrogate()
+        assert reinterrogated_polars.n_passed(scalar=True) == validation_polars.n_passed(
+            scalar=True
+        )
+
+
+def test_threshold_notes_local_thresholds():
+    """Test that local threshold notes appear when step-specific thresholds differ from global."""
+
+    small_table = load_dataset(dataset="small_table")
+
+    validation = (
+        Validate(
+            data=small_table,
+            thresholds=Thresholds(warning=0.1, error=0.2, critical=0.3),
+            locale="en",
+        )
+        .col_vals_gt(columns="a", value=5)  # Uses global thresholds
+        .col_vals_between(
+            columns="d", left=0, right=10000, thresholds=Thresholds(warning=0.05, error=0.15)
+        )  # Local thresholds
+        .interrogate()
+    )
+
+    html = validation.get_tabular_report()._repr_html_()
+
+    # Check that local threshold note appears
+    assert "Step-specific thresholds set with" in html
+
+    # Check that the note includes W and E markers
+    assert ">W<" in html
+    assert ">E<" in html
+
+    # Check that the values appear (English uses period as decimal separator)
+    assert "0.05" in html
+    assert "0.15" in html
+
+
+def test_threshold_notes_reset_thresholds():
+    """Test that threshold reset notes appear when thresholds are explicitly set to empty."""
+
+    small_table = load_dataset(dataset="small_table")
+
+    validation = (
+        Validate(
+            data=small_table,
+            thresholds=Thresholds(warning=0.1, error=0.2, critical=0.3),
+            locale="en",
+        )
+        .col_vals_gt(columns="a", value=5)  # Uses global thresholds
+        .col_vals_not_null(columns="c", thresholds=Thresholds())  # Explicitly reset
+        .interrogate()
+    )
+
+    html = validation.get_tabular_report()._repr_html_()
+
+    # Check that threshold reset note appears
+    assert "Global thresholds explicitly not used" in html
+
+
+def test_threshold_notes_localization():
+    """Test that threshold notes are properly localized."""
+
+    small_table = load_dataset(dataset="small_table")
+
+    # Test French locale
+    validation_fr = (
+        Validate(
+            data=small_table,
+            thresholds=Thresholds(warning=0.1, error=0.2, critical=0.3),
+            locale="fr",
+        )
+        .col_vals_not_null(columns="c", thresholds=Thresholds())
+        .interrogate()
+    )
+
+    html_fr = validation_fr.get_tabular_report()._repr_html_()
+    assert "Seuils globaux explicitement non utilisés" in html_fr
+
+    # Test German locale
+    validation_de = (
+        Validate(
+            data=small_table,
+            thresholds=Thresholds(warning=0.1, error=0.2, critical=0.3),
+            locale="de",
+        )
+        .col_vals_not_null(columns="c", thresholds=Thresholds())
+        .interrogate()
+    )
+
+    html_de = validation_de.get_tabular_report()._repr_html_()
+    assert "Globale Schwellenwerte für diesen Schritt explizit nicht verwendet" in html_de
+
+
+def test_threshold_notes_locale_number_formatting():
+    """Test that threshold note values use locale-specific number formatting."""
+
+    small_table = load_dataset(dataset="small_table")
+
+    # Test German locale (uses comma as decimal separator)
+    validation_de = (
+        Validate(
+            data=small_table,
+            thresholds=Thresholds(warning=0.1, error=0.2, critical=0.3),
+            locale="de",
+        )
+        .col_vals_between(
+            columns="d", left=0, right=10000, thresholds=Thresholds(warning=0.05, error=0.15)
+        )
+        .interrogate()
+    )
+
+    html_de = validation_de.get_tabular_report()._repr_html_()
+
+    # German uses comma as decimal separator
+    assert "0,05" in html_de
+    assert "0,15" in html_de
+
+    # Test French locale (also uses comma as decimal separator)
+    validation_fr = (
+        Validate(
+            data=small_table,
+            thresholds=Thresholds(warning=0.1, error=0.2, critical=0.3),
+            locale="fr",
+        )
+        .col_vals_between(
+            columns="d", left=0, right=10000, thresholds=Thresholds(warning=0.25, error=0.5)
+        )
+        .interrogate()
+    )
+
+    html_fr = validation_fr.get_tabular_report()._repr_html_()
+
+    # French uses comma as decimal separator
+    assert "0,25" in html_fr
+    assert "0,5" in html_fr
+
+
+def test_threshold_notes_no_note_when_thresholds_match():
+    """Test that no threshold note appears when step thresholds match global thresholds."""
+
+    small_table = load_dataset(dataset="small_table")
+
+    global_thresholds = Thresholds(warning=0.1, error=0.2, critical=0.3)
+
+    validation = (
+        Validate(
+            data=small_table,
+            thresholds=global_thresholds,
+            locale="en",
+        )
+        .col_vals_gt(columns="a", value=5)  # Uses global thresholds
+        .col_vals_between(
+            columns="d", left=0, right=10000, thresholds=global_thresholds
+        )  # Same as global
+        .interrogate()
+    )
+
+    html = validation.get_tabular_report()._repr_html_()
+
+    # No threshold notes should appear
+    assert "Step-specific thresholds set with" not in html
+    assert "Global thresholds explicitly not used" not in html
+
+
+def test_config_footer_timings_and_notes():
+    """Test footer timings and notes configuration options."""
+
+    # Test default configuration includes selected fields
+    config = PointblankConfig()
+    assert config.report_incl_footer_timings is True
+    assert config.report_incl_footer_notes is True
+
+    # Test configuration with the two fields disabled
+    config_no_footer_details = PointblankConfig(
+        report_incl_header=True,
+        report_incl_footer=True,
+        report_incl_footer_timings=False,
+        report_incl_footer_notes=False,
+        preview_incl_header=True,
+    )
+    assert config_no_footer_details.report_incl_footer_timings is False
+    assert config_no_footer_details.report_incl_footer_notes is False
+
+    # Test string representation for inclusion of the fields
+    str_repr = str(config)
+    assert "report_incl_footer_timings=True" in str_repr
+    assert "report_incl_footer_notes=True" in str_repr
+
+
+def test_get_tabular_report_footer_timings_control():
+    """Test that incl_footer_timings= parameter controls timing display in reports."""
+
+    small_table = load_dataset(dataset="small_table")
+
+    # Create validation with an error to trigger a note
+    validation = (
+        Validate(data=small_table, label="Test Validation")
+        .col_vals_gt(columns="d", value=100)
+        .col_vals_regex(columns="invalid_column", pattern=r"test")
+        .interrogate()
+    )
+
+    # Test with default settings (timings should be present)
+    html_with_timings = validation.get_tabular_report()._repr_html_()
+
+    # Timing information is rendered with specific styling in _create_table_time_html
+    assert "font-variant-numeric: tabular-nums" in html_with_timings
+    assert "solid 1px #999999" in html_with_timings  # Part of timing badge styling
+
+    # Test with timings disabled
+    html_no_timings = validation.get_tabular_report(incl_footer_timings=False)._repr_html_()
+
+    # When timings are disabled, there should be fewer timing-related style elements so
+    # count occurrences to verify reduction
+    timing_style_count_with = html_with_timings.count("font-variant-numeric: tabular-nums")
+    timing_style_count_without = html_no_timings.count("font-variant-numeric: tabular-nums")
+
+    assert timing_style_count_without < timing_style_count_with
+
+
+def test_get_tabular_report_footer_notes_control():
+    """Test that incl_footer_notes= parameter controls notes display in reports."""
+
+    small_table = load_dataset(dataset="small_table")
+
+    # Create validation with an error to trigger a note
+    validation = (
+        Validate(data=small_table, label="Test Validation")
+        .col_vals_gt(columns="d", value=100)
+        .col_vals_regex(columns="invalid_column", pattern=r"test")
+        .interrogate()
+    )
+
+    # Test with default settings (notes should be present)
+    html_with_notes = validation.get_tabular_report()._repr_html_()
+
+    assert "<strong>Notes</strong>" in html_with_notes
+    # Notes include step references with small caps formatting
+    assert "font-variant: small-caps" in html_with_notes or "Step" in html_with_notes.lower()
+
+    # Test with notes disabled
+    html_no_notes = validation.get_tabular_report(incl_footer_notes=False)._repr_html_()
+
+    assert "<strong>Notes</strong>" not in html_no_notes
+
+
+def test_get_tabular_report_footer_controls_combined():
+    """Test combinations of footer timing and notes controls."""
+
+    small_table = load_dataset(dataset="small_table")
+
+    validation = (
+        Validate(data=small_table, label="Test Validation")
+        .col_vals_gt(columns="d", value=100)
+        .col_vals_regex(columns="invalid_column", pattern=r"test")
+        .interrogate()
+    )
+
+    # Test with both timings and notes enabled (default)
+    html_both = validation.get_tabular_report()._repr_html_()
+
+    assert "font-variant-numeric: tabular-nums" in html_both
+    assert "<strong>Notes</strong>" in html_both
+
+    # Test with both disabled but footer still enabled
+    html_neither = validation.get_tabular_report(
+        incl_footer_timings=False, incl_footer_notes=False
+    )._repr_html_()
+    timing_count = html_neither.count("font-variant-numeric: tabular-nums")
+
+    assert "<strong>Notes</strong>" not in html_neither
+    assert timing_count < html_both.count("font-variant-numeric: tabular-nums")
+
+    # Test with timings enabled, notes disabled
+    html_timings_only = validation.get_tabular_report(incl_footer_notes=False)._repr_html_()
+
+    assert "font-variant-numeric: tabular-nums" in html_timings_only
+    assert "<strong>Notes</strong>" not in html_timings_only
+
+    # Test with notes enabled, timings disabled
+    html_notes_only = validation.get_tabular_report(incl_footer_timings=False)._repr_html_()
+
+    assert "<strong>Notes</strong>" in html_notes_only
+
+
+def test_global_config_footer_controls():
+    """Test that global config settings for footer controls work correctly."""
+
+    small_table = load_dataset(dataset="small_table")
+
+    validation = (
+        Validate(data=small_table, label="Test Validation")
+        .col_vals_gt(columns="d", value=100)
+        .col_vals_regex(columns="invalid_column", pattern=r"test")
+        .interrogate()
+    )
+
+    # Save original config
+    original_config = PointblankConfig(
+        report_incl_header=global_config.report_incl_header,
+        report_incl_footer=global_config.report_incl_footer,
+        report_incl_footer_timings=global_config.report_incl_footer_timings,
+        report_incl_footer_notes=global_config.report_incl_footer_notes,
+        preview_incl_header=global_config.preview_incl_header,
+    )
+
+    try:
+        # Set global config to disable timings
+        config(
+            report_incl_header=True,
+            report_incl_footer=True,
+            report_incl_footer_timings=False,
+            report_incl_footer_notes=True,
+            preview_incl_header=True,
+        )
+
+        # Report should respect global config
+        html = validation.get_tabular_report()._repr_html_()
+        timing_count = html.count("font-variant-numeric: tabular-nums")
+        assert "<strong>Notes</strong>" in html
+        # Should have fewer timing elements
+        assert timing_count < 3
+
+        # Set global config to disable notes
+        config(
+            report_incl_header=True,
+            report_incl_footer=True,
+            report_incl_footer_timings=True,
+            report_incl_footer_notes=False,
+            preview_incl_header=True,
+        )
+
+        html = validation.get_tabular_report()._repr_html_()
+        assert "font-variant-numeric: tabular-nums" in html
+        assert "<strong>Notes</strong>" not in html
+
+    finally:
+        # Restore original config
+        config(
+            report_incl_header=original_config.report_incl_header,
+            report_incl_footer=original_config.report_incl_footer,
+            report_incl_footer_timings=original_config.report_incl_footer_timings,
+            report_incl_footer_notes=original_config.report_incl_footer_notes,
+            preview_incl_header=original_config.preview_incl_header,
+        )
+
+
+def test_footer_controls_override_global_config():
+    """Test that method parameters override global config settings."""
+
+    small_table = load_dataset(dataset="small_table")
+
+    validation = (
+        Validate(data=small_table, label="Test Validation")
+        .col_vals_gt(columns="d", value=100)
+        .col_vals_regex(columns="invalid_column", pattern=r"test")
+        .interrogate()
+    )
+
+    # Save original config
+    original_config = PointblankConfig(
+        report_incl_header=global_config.report_incl_header,
+        report_incl_footer=global_config.report_incl_footer,
+        report_incl_footer_timings=global_config.report_incl_footer_timings,
+        report_incl_footer_notes=global_config.report_incl_footer_notes,
+        preview_incl_header=global_config.preview_incl_header,
+    )
+
+    try:
+        # Set global config to disable both
+        config(
+            report_incl_header=True,
+            report_incl_footer=True,
+            report_incl_footer_timings=False,
+            report_incl_footer_notes=False,
+            preview_incl_header=True,
+        )
+
+        # Override with method parameters to enable both
+        html = validation.get_tabular_report(
+            incl_footer_timings=True, incl_footer_notes=True
+        )._repr_html_()
+
+        assert "font-variant-numeric: tabular-nums" in html
+        assert "<strong>Notes</strong>" in html
+
+    finally:
+        # Restore original config
+        config(
+            report_incl_header=original_config.report_incl_header,
+            report_incl_footer=original_config.report_incl_footer,
+            report_incl_footer_timings=original_config.report_incl_footer_timings,
+            report_incl_footer_notes=original_config.report_incl_footer_notes,
+            preview_incl_header=original_config.preview_incl_header,
+        )

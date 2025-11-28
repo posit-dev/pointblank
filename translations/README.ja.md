@@ -2,7 +2,7 @@
 
 <a href="https://posit-dev.github.io/pointblank/"><img src="https://posit-dev.github.io/pointblank/assets/pointblank_logo.svg" width="75%"/></a>
 
-_美しく強力なデータ検証_
+_データ品質の評価と監視のためのデータ検証ツールキット_
 
 [![Python Versions](https://img.shields.io/pypi/pyversions/pointblank.svg)](https://pypi.python.org/pypi/pointblank)
 [![PyPI](https://img.shields.io/pypi/v/pointblank)](https://pypi.org/project/pointblank/#history)
@@ -35,13 +35,61 @@ _美しく強力なデータ検証_
    <a href="README.ar.md">العربية</a>
 </div>
 
-## Pointblank とは？
+Pointblank はデータ品質に対して異なるアプローチを取っています。それは退屈な技術的な作業である必要はありません。むしろ、チームメンバー間の明確なコミュニケーションに焦点を当てたプロセスになりえます。他の検証ライブラリがエラーの検出のみに焦点を当てているのに対し、Pointblank は**問題の発見と洞察の共有**の両方で優れています。美しくカスタマイズ可能なレポートは、検証結果をステークホルダーとの会話に変え、データ品質の問題をチーム全体にとって即座に理解でき、行動可能なものにします。
 
-Pointblank は、データ品質を確保する方法を変革する、強力かつエレガントな Python 向けデータ検証フレームワークです。直感的で連鎖可能な API により、包括的な品質チェックに対してデータをすばやく検証し、データの問題をすぐに対処可能にする素晴らしいインタラクティブなレポートを通じて結果を視覚化できます。
+**数時間ではなく数分で開始。** Pointblank の AI 驱動型 [`DraftValidation`](https://posit-dev.github.io/pointblank/user-guide/draft-validation.html) 機能は、データを分析し、自動的に知的な検証ルールを提案します。空の検証スクリプトを見つめて、どこから始めるか悩む必要はありません。Pointblank があなたのデータ品質の旅をキックスタートし、最も重要なことに集中できるようにします。
 
-あなたがデータサイエンティスト、データエンジニア、またはアナリストであっても、Pointblank は分析やダウンストリームシステムに影響を与える前にデータ品質の問題を捉えるのに役立ちます。
+データ品質の発見を素早く伝える必要があるデータサイエンティスト、堅牢なパイプラインを構築するデータエンジニア、ビジネスステークホルダーにデータ品質結果を発表するアナリストのいずれであっても、Pointblank はデータ品質を後からの思いつきから競争上の優位性に変えるのに役立ちます。
 
-## 30 秒でスタート
+## AI 驱動型検証ドラフトの始め方
+
+`DraftValidation` クラスは LLM を使用してデータを分析し、知的な提案を含む完全な検証プランを生成します。これにより、データ検証を素早く開始したり、新しいプロジェクトをジャンプスタートしたりできます。
+
+```python
+import pointblank as pb
+
+# データを読み込み
+data = pb.load_dataset("game_revenue")              # サンプルデータセット
+
+# DraftValidation を使用して検証プランを生成
+pb.DraftValidation(data=data, model="anthropic:claude-sonnet-4-5")
+```
+
+出力は、データに基づいた知的な提案を含む完全な検証プランです：
+
+```python
+import pointblank as pb
+
+# 検証プラン
+validation = (
+    pb.Validate(
+        data=data,
+        label="Draft Validation",
+        thresholds=pb.Thresholds(warning=0.10, error=0.25, critical=0.35)
+    )
+    .col_vals_in_set(columns="item_type", set=["iap", "ad"])
+    .col_vals_gt(columns="item_revenue", value=0)
+    .col_vals_between(columns="session_duration", left=3.2, right=41.0)
+    .col_count_match(count=11)
+    .row_count_match(count=2000)
+    .rows_distinct()
+    .interrogate()
+)
+
+validation
+```
+
+<div align="center">
+<img src="https://posit-dev.github.io/pointblank/assets/pointblank-draft-validation-report.png" width="800px">
+</div>
+
+<br>
+
+必要に応じて生成された検証プランをコピー、ペースト、カスタマイズしてください。
+
+## チェーン可能な検証 API
+
+Pointblank のチェーン可能な API は検証をシンプルかつ読みやすくします。同じパターンが常に適用されます：(1) `Validate` から始め、(2) 検証ステップを追加し、(3) `interrogate()` で終了します。
 
 ```python
 import pointblank as pb
@@ -66,6 +114,12 @@ validation
 </div>
 
 <br>
+
+質問された `validation` オブジェクトを持っている場合、次のような様々なメソッドを使用して洞察を抽出できます：
+
+- 個別のステップの詳細レポートを取得して何が間違っていたかを確認する
+- 検証結果に基づいてテーブルをフィルタリングする
+- デバッグのために問題のあるデータを抽出する
 
 ## なぜ Pointblank を選ぶのか？
 
@@ -255,7 +309,7 @@ pb run validation.py --exit-code
 - **実用的な出力**: 必要なものを正確に取得：カウント、抽出、要約、または完全なレポート
 - **柔軟な展開**: ノートブック、スクリプト、またはデータパイプラインで使用
 - **カスタマイズ可能**: 特定のニーズに合わせて検証ステップとレポートを調整
-- **国際化**: レポートは英語、スペイン語、フランス語、ドイツ語を含む 20 以上の言語で生成可能
+- **国際化**: レポートは英語、スペイン語、フランス語、ドイツ語を含む 40 の言語で生成可能
 
 ## ドキュメントと例
 

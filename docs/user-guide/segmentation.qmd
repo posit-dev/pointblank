@@ -3,6 +3,7 @@ title: Segmentation
 jupyter: python3
 toc-expand: 2
 html-table-processing: none
+bread-crumbs: true
 ---
 
 ```{python}
@@ -135,6 +136,12 @@ segment on:
 ```{python}
 import polars as pl
 
+# Define preprocessing function for creating a categorical column
+def add_d_category_column(df):
+    return df.with_columns(
+        d_category=pl.when(pl.col("d") > 150).then(pl.lit("high")).otherwise(pl.lit("low"))
+    )
+
 validation_4 = (
     pb.Validate(
         data=pb.load_dataset(tbl_type="polars"),
@@ -145,9 +152,7 @@ validation_4 = (
         columns="d", value=100,
 
         # Create a column containing categorical values ---
-        pre=lambda df: df.with_columns(
-            d_category=pl.when(pl.col("d") > 150).then(pl.lit("high")).otherwise(pl.lit("low"))
-        ),
+        pre=add_d_category_column,
 
         # Segment by the computed column `d_category` generated via `pre=` ---
         segments="d_category",

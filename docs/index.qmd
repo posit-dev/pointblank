@@ -1,314 +1,191 @@
 ---
+title: ""
 jupyter: python3
 html-table-processing: none
 ---
 
 <div style="text-align: center;">
 
-![](/assets/pointblank_logo.svg){width=75%}
+![](assets/pointblank_logo.svg){width=85%}
 
-_Data validation made beautiful and powerful_
-
-</div>
-
-Pointblank is a powerful, yet elegant data validation framework for Python that transforms how you
-ensure data quality. With its intuitive, chainable API, you can quickly validate your data against
-comprehensive quality checks and visualize results through stunning, interactive reports that make
-data issues immediately actionable.
-
-Whether you're a data scientist, data engineer, or analyst, Pointblank helps you catch data quality
-issues before they impact your analyses or downstream systems.
-
-## Getting Started in 30 Seconds
-
-```python
-import pointblank as pb
-
-validation = (
-   pb.Validate(data=pb.load_dataset(dataset="small_table"))
-   .col_vals_gt(columns="d", value=100)             # Validate values > 100
-   .col_vals_le(columns="c", value=5)               # Validate values <= 5
-   .col_exists(columns=["date", "date_time"])       # Check columns exist
-   .interrogate()                                   # Execute and collect results
-)
-
-# Get the validation report from the REPL with:
-validation.get_tabular_report().show()
-
-# From a notebook simply use:
-validation
-```
-
-<div style="text-align: center;">
-
-![](/assets/pointblank-tabular-report.png){width=100%}
+**Data validation toolkit for assessing and monitoring data quality.**
 
 </div>
 
-## Real-World Example
+Pointblank is a data validation framework for Python that makes data quality checks beautiful,
+powerful, and stakeholder-friendly. Instead of cryptic error messages, get stunning interactive
+reports that turn data issues into conversations.
 
-```python
+Here's what a validation looks like (click "Show the code" to see how it's done):
+
+```{python}
+#| code-fold: true
+#| code-summary: "Show the code"
+
 import pointblank as pb
 import polars as pl
 
-# Load your data
-sales_data = pl.read_csv("sales_data.csv")
-
-# Create a comprehensive validation
 validation = (
-   pb.Validate(
-      data=sales_data,
-      tbl_name="sales_data",           # Name of the table for reporting
-      label="Real-world example.",     # Label for the validation, appears in reports
-      thresholds=(0.01, 0.02, 0.05),   # Set thresholds for warnings, errors, and critical issues
-      actions=pb.Actions(              # Define actions for any threshold exceedance
-         critical="Major data quality issue found in step {step} ({time})."
-      ),
-      final_actions=pb.FinalActions(   # Define final actions for the entire validation
-         pb.send_slack_notification(
-            webhook_url="https://hooks.slack.com/services/your/webhook/url"
-         )
-      ),
-      brief=True,                      # Add automatically-generated briefs for each step
-   )
-   .col_vals_between(            # Check numeric ranges with precision
-      columns=["price", "quantity"],
-      left=0, right=1000
-   )
-   .col_vals_not_null(           # Ensure that columns ending with '_id' don't have null values
-      columns=pb.ends_with("_id")
-   )
-   .col_vals_regex(              # Validate patterns with regex
-      columns="email",
-      pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
-   )
-   .col_vals_in_set(             # Check categorical values
-      columns="status",
-      set=["pending", "shipped", "delivered", "returned"]
-   )
-   .conjointly(                  # Combine multiple conditions
-      lambda df: pb.expr_col("revenue") == pb.expr_col("price") * pb.expr_col("quantity"),
-      lambda df: pb.expr_col("tax") >= pb.expr_col("revenue") * 0.05
-   )
-   .interrogate()
+    pb.Validate(
+        data=pb.load_dataset(dataset="game_revenue", tbl_type="polars"),
+        tbl_name="game_revenue",
+        label="Comprehensive validation of game revenue data",
+        thresholds=pb.Thresholds(warning=0.10, error=0.25, critical=0.35),
+        brief=True
+    )
+    .col_vals_regex(columns="player_id", pattern=r"^[A-Z]{12}[0-9]{3}$")        # STEP 1
+    .col_vals_gt(columns="session_duration", value=20)                          # STEP 2
+    .col_vals_ge(columns="item_revenue", value=0.20)                            # STEP 3
+    .col_vals_in_set(columns="item_type", set=["iap", "ad"])                    # STEP 4
+    .col_vals_in_set(                                                           # STEP 5
+        columns="acquisition",
+        set=["google", "facebook", "organic", "crosspromo", "other_campaign"]
+    )
+    .col_vals_not_in_set(columns="country", set=["Mongolia", "Germany"])        # STEP 6
+    .col_vals_between(                                                          # STEP 7
+        columns="session_duration",
+        left=10, right=50,
+        pre = lambda df: df.select(pl.median("session_duration")),
+        brief="Expect that the median of `session_duration` should be between `10` and `50`."
+    )
+    .rows_distinct(columns_subset=["player_id", "session_id", "time"])          # STEP 8
+    .row_count_match(count=2000)                                                # STEP 9
+    .col_count_match(count=11)                                                  # STEP 10
+    .col_vals_not_null(columns="item_type")                                     # STEP 11
+    .col_exists(columns="start_day")                                            # STEP 12
+    .interrogate()
+)
+
+validation.get_tabular_report(title="Game Revenue Validation Report")
+```
+
+That's the kind of report you get from Pointblank: clear, interactive, and designed for everyone on
+your team. And if you need help getting started or want to work faster, Pointblank has built-in AI
+support through the [`assistant()`](reference/assistant.qmd) function to guide you along the way.
+You can also use [`DraftValidation`](user-guide/draft-validation.qmd) to quickly generate a
+validation plan from your existing data (great for getting started fast).
+
+Ready to validate? Start with our [Installation](user-guide/installation.qmd) guide or jump straight
+to the [User Guide](user-guide/index.qmd).
+
+By the way, Pointblank is made with 💙 by [Posit](https://posit.co/).
+
+## What is Data Validation?
+
+Data validation ensures your data meets quality standards before it's used in analysis, reports, or
+downstream systems. Pointblank provides a structured way to define validation rules, execute them,
+and communicate results to both technical and non-technical stakeholders.
+
+With Pointblank you can:
+
+- **Validate data** through a fluent, chainable API with [25+ validation methods](reference/index.qmd#validation-steps)
+- **Set thresholds** to define acceptable levels of data quality (warning, error, critical)
+- **Take actions** when thresholds are exceeded (notifications, logging, custom functions)
+- **Generate reports** that make data quality issues immediately understandable
+- **Inspect data** with built-in tools for previewing, summarizing, and finding missing values
+
+## Why Pointblank?
+
+Pointblank is designed for the entire data team, not just engineers:
+
+- 🎨 **Beautiful Reports**: Interactive validation reports that stakeholders actually want to read
+- 📊 **Threshold Management**: Define quality standards with warning, error, and critical levels
+- 🔍 **Error Drill-Down**: Inspect failing data to get to root causes quickly
+- 🔗 **Universal Compatibility**: Works with Polars, Pandas, DuckDB, MySQL, PostgreSQL, SQLite, and more
+- 🌍 **Multilingual Support**: Reports available in 40 languages for global teams
+- 📝 **YAML Support**: Write validations in YAML for version control and team collaboration
+- ⚡ **CLI Tools**: Run validations from the command line for CI/CD pipelines or as quick checks
+- 📋 **Rich Inspection**: Preview data, analyze columns, and visualize missing values
+
+## Quick Examples
+
+### Threshold-Based Quality
+
+Set expectations and react when data quality degrades (with alerts, logging, or custom functions):
+
+```python
+validation = (
+    pb.Validate(data=sales_data, thresholds=(0.01, 0.02, 0.05)) # Three threhold levels set
+    .col_vals_not_null(columns="customer_id")
+    .col_vals_in_set(columns="status", set=["pending", "shipped", "delivered"])
+    .interrogate()
 )
 ```
 
-```
-Major data quality issue found in step 7 (2025-04-16 15:03:04.685612+00:00).
-```
+### YAML Workflows
 
-```python
-# Get an HTML report you can share with your team
-validation.get_tabular_report().show("browser")
-```
-
-<div style="text-align: center;">
-
-![](/assets/pointblank-sales-data.png){width=100%}
-
-</div>
-
-```python
-# Get a report of failing records from a specific step
-validation.get_step_report(i=3).show("browser")  # Get failing records from step 3
-```
-
-<div style="text-align: center;">
-
-![](/assets/pointblank-step-report.png){width=100%}
-
-</div>
-
-## YAML Configuration
-
-For teams that need portable, version-controlled validation workflows, Pointblank supports YAML
-configuration files. This makes it easy to share validation logic across different environments and
-team members, ensuring everyone is on the same page.
-
-**validation.yaml**
+Works wonderfully for CI/CD pipelines and team collaboration:
 
 ```yaml
 validate:
-  data: small_table
-  tbl_name: "small_table"
-  label: "Getting started validation"
+  data: sales_data
+  tbl_name: "sales_data"
+  thresholds: [0.01, 0.02, 0.05]
 
 steps:
-  - col_vals_gt:
-      columns: "d"
-      value: 100
-  - col_vals_le:
-      columns: "c"
-      value: 5
-  - col_exists:
-      columns: ["date", "date_time"]
+  - col_vals_not_null:
+      columns: "customer_id"
+  - col_vals_in_set:
+      columns: "status"
+      set: ["pending", "shipped", "delivered"]
 ```
-
-**Execute the YAML validation**
 
 ```python
-import pointblank as pb
-
-# Run validation from YAML configuration
 validation = pb.yaml_interrogate("validation.yaml")
-
-# Get the results just like any other validation
-validation.get_tabular_report().show()
 ```
 
-This approach is perfect for:
+### Command Line Power
 
-- **CI/CD pipelines**: Store validation rules alongside your code
-- **Team collaboration**: Share validation logic in a readable format
-- **Environment consistency**: Use the same validation across dev, staging, and production
-- **Documentation**: YAML files serve as living documentation of your data quality requirements
-
-## Command Line Interface
-
-Pointblank includes a powerful CLI utility called `pb` that lets you run data validation workflows
-directly from the command line. Perfect for CI/CD pipelines, scheduled data quality checks, or quick
-validation tasks.
-
-<div style="text-align: center;">
-
-![](/assets/vhs/cli-complete-workflow.gif){width=100%}
-
-</div>
-
-**Explore Your Data**
+Run validations without writing code:
 
 ```bash
-# Get a quick preview of your data
-pb preview small_table
+# Quick validation
+pb validate sales_data.csv --check col-vals-not-null --column customer_id
 
-# Check for missing values
-pb missing small_table
+# Run YAML workflows
+pb run validation.yaml --exit-code  # <- Great for CI/CD!
 
-# Generate column summaries
-pb scan small_table
+# Explore your data
+pb scan sales_data.csv
+pb missing sales_data.csv
 ```
 
-**Run Essential Validations**
+## Installation
+
+Install Pointblank using pip or conda:
 
 ```bash
-# Run validation from YAML configuration file
-pb run validation.yaml
-
-# Run validation from Python file
-pb run validation.py
-
-# Check for duplicate rows
-pb validate small_table --check rows-distinct
-
-# Verify no null values
-pb validate small_table --check col-vals-not-null --column a
-
-# Extract failing data for debugging
-pb validate small_table --check col-vals-gt --column a --value 5 --show-extract
+pip install pointblank
+# or
+conda install conda-forge::pointblank
 ```
 
-**Integrate with CI/CD**
+For specific backends:
 
 ```bash
-# Use exit codes for automation in one-liner validations (0 = pass, 1 = fail)
-pb validate small_table --check rows-distinct --exit-code
-
-# Run validation workflows with exit codes
-pb run validation.yaml --exit-code
-pb run validation.py --exit-code
+pip install "pointblank[pl]"       # Polars support
+pip install "pointblank[pd]"       # Pandas support
+pip install "pointblank[duckdb]"   # DuckDB support
+pip install "pointblank[postgres]" # PostgreSQL support
 ```
+
+See the [Installation guide](user-guide/installation.qmd) for more details.
+
+## Text Formats
+
+The docs are also available in `llms.txt` format:
+
+- [`llms.txt`](llms.txt): a sitemap listing all documentation pages
+- [`llms-full.txt`](llms-full.txt): all the documentation in one file
 
 ## Join the Community
 
 We'd love to hear from you! Connect with us:
 
 - [GitHub Issues](https://github.com/posit-dev/pointblank/issues) for bug reports and feature requests
-- [_Discord server_](https://discord.com/invite/YH7CybCNCQ) for discussions and help
-- [Contributing guidelines](https://github.com/posit-dev/pointblank/blob/main/CONTRIBUTING.md) if you'd like to help improve Pointblank
+- [Discord server](https://discord.com/invite/YH7CybCNCQ) for discussions and help
+- [Contributing guidelines](https://github.com/posit-dev/pointblank/blob/main/CONTRIBUTING.md) if you'd like to contribute
 
-## Installation
+---
 
-You can install Pointblank using pip:
-
-```bash
-pip install pointblank
-```
-
-You can also install Pointblank from Conda-Forge by using:
-
-```bash
-conda install conda-forge::pointblank
-```
-
-If you don't have Polars or Pandas installed, you'll need to install one of them to use Pointblank.
-
-```bash
-pip install "pointblank[pl]" # Install Pointblank with Polars
-pip install "pointblank[pd]" # Install Pointblank with Pandas
-```
-
-To use Pointblank with DuckDB, MySQL, PostgreSQL, or SQLite, install Ibis with the appropriate backend:
-
-```bash
-pip install "pointblank[duckdb]"   # Install Pointblank with Ibis + DuckDB
-pip install "pointblank[mysql]"    # Install Pointblank with Ibis + MySQL
-pip install "pointblank[postgres]" # Install Pointblank with Ibis + PostgreSQL
-pip install "pointblank[sqlite]"   # Install Pointblank with Ibis + SQLite
-```
-
-## Technical Details
-
-Pointblank uses [Narwhals](https://github.com/narwhals-dev/narwhals) to work with Polars and Pandas
-DataFrames, and integrates with [Ibis](https://github.com/ibis-project/ibis) for database and file
-format support. This architecture provides a consistent API for validating tabular data from various
-sources.
-
-## Contributing to Pointblank
-
-There are many ways to contribute to the ongoing development of Pointblank. Some contributions can
-be simple (like fixing typos, improving documentation, filing issues for feature requests or
-problems, etc.) and others might take more time and care (like answering questions and submitting
-PRs with code changes). Just know that anything you can do to help would be very much appreciated!
-
-Please read over the [contributing guidelines](https://github.com/posit-dev/pointblank/blob/main/CONTRIBUTING.md)
-for information on how to get started.
-
-## Pointblank for R
-
-There's also a version of Pointblank for R, which has been around since 2017 and is widely used in
-the R community. You can find it at <https://github.com/rstudio/pointblank>.
-
-## Roadmap
-
-We're actively working on enhancing Pointblank with:
-
-1. Additional validation methods for comprehensive data quality checks
-2. Advanced logging capabilities
-3. Messaging actions (Slack, email) for threshold exceedances
-4. LLM-powered validation suggestions and data dictionary generation
-5. JSON/YAML configuration for pipeline portability
-6. CLI utility for validation from the command line
-7. Expanded backend support and certification
-8. High-quality documentation and examples
-
-If you have any ideas for features or improvements, don't hesitate to share them with us! We are
-always looking for ways to make Pointblank better.
-
-## Code of Conduct
-
-Please note that the Pointblank project is released with a
-[contributor code of conduct](https://www.contributor-covenant.org/version/2/1/code_of_conduct/).
-<br>By participating in this project you agree to abide by its terms.
-
-## 📄 License
-
-Pointblank is licensed under the MIT license.
-
-© Posit Software, PBC.
-
-## 🏛️ Governance
-
-This project is primarily maintained by
-[Rich Iannone](https://bsky.app/profile/richmeister.bsky.social). Other authors may occasionally
-assist with some of these duties.
+**License**: MIT | **© 2024-2025 Posit Software, PBC**

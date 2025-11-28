@@ -3,6 +3,7 @@ title: YAML Reference
 jupyter: python3
 toc-expand: 2
 html-table-processing: none
+bread-crumbs: true
 ---
 
 This reference provides a comprehensive guide to all YAML keys and parameters supported by
@@ -354,6 +355,57 @@ Template variables available for action strings:
     brief: "Values match pattern"      # OPTIONAL: Step description
 ```
 
+`col_vals_within_spec`: do column data conform to a specification (email, URL, postal codes, etc.)?
+
+```yaml
+- col_vals_within_spec:
+    columns: [column_name]             # REQUIRED: Column(s) to validate
+    spec: "email"                      # REQUIRED: Specification type
+    na_pass: false                     # OPTIONAL: Pass NULL values
+    pre: |                             # OPTIONAL: Data preprocessing
+      lambda df: df.filter(condition)
+    thresholds:                        # OPTIONAL: Step-level thresholds
+      warning: 0.1
+    actions:                           # OPTIONAL: Step-level actions
+      warning: "Custom message"
+    brief: "Values match spec"         # OPTIONAL: Step description
+```
+
+Available specification types:
+
+- `"email"` - Email addresses
+- `"url"` - Internet URLs
+- `"phone"` - Phone numbers
+- `"ipv4"` - IPv4 addresses
+- `"ipv6"` - IPv6 addresses
+- `"mac"` - MAC addresses
+- `"isbn"` - International Standard Book Numbers (10 or 13 digit)
+- `"vin"` - Vehicle Identification Numbers
+- `"credit_card"` - Credit card numbers (uses Luhn algorithm)
+- `"swift"` - Business Identifier Codes (SWIFT-BIC)
+- `"postal_code[<country_code>]"` - Postal codes for specific countries (e.g., `"postal_code[US]"`, `"postal_code[CA]"`)
+- `"zip"` - Alias for US ZIP codes (`"postal_code[US]"`)
+- `"iban[<country_code>]"` - International Bank Account Numbers (e.g., `"iban[DE]"`, `"iban[FR]"`)
+
+Examples:
+
+```yaml
+# Email validation
+- col_vals_within_spec:
+    columns: user_email
+    spec: "email"
+
+# US postal codes
+- col_vals_within_spec:
+    columns: zip_code
+    spec: "postal_code[US]"
+
+# German IBAN
+- col_vals_within_spec:
+    columns: account_number
+    spec: "iban[DE]"
+```
+
 #### Custom Expression Methods
 
 `col_vals_expr`: do column data agree with a predicate expression?
@@ -372,6 +424,104 @@ Template variables available for action strings:
     actions:                           # OPTIONAL: Step-level actions
       warning: "Custom message"
     brief: "Custom validation rule"    # OPTIONAL: Step description
+```
+
+#### Trend Validation Methods
+
+`col_vals_increasing`: are column data increasing row-by-row?
+
+```yaml
+- col_vals_increasing:
+    columns: [column_name]             # REQUIRED: Column(s) to validate
+    allow_stationary: false            # OPTIONAL: Allow consecutive equal values (default: false)
+    decreasing_tol: 0.5                # OPTIONAL: Tolerance for negative movement (default: null)
+    na_pass: false                     # OPTIONAL: Pass NULL values
+    pre: |                             # OPTIONAL: Data preprocessing
+      lambda df: df.filter(condition)
+    thresholds:                        # OPTIONAL: Step-level thresholds
+      warning: 0.1
+    actions:                           # OPTIONAL: Step-level actions
+      warning: "Custom message"
+    brief: "Values must increase"      # OPTIONAL: Step description
+```
+
+This validation checks whether values in a column increase as you move down the rows. Useful for
+validating time-series data, sequence numbers, or any monotonically increasing values.
+
+Parameters:
+
+- `allow_stationary`: If `true`, allows consecutive values to be equal (stationary phases). For
+example, `[1, 2, 2, 3]` would pass when `true` but fail at the third value when `false`.
+- `decreasing_tol`: Absolute tolerance for negative movement. Setting this to `0.5` means values can
+decrease by up to 0.5 units and still pass. Setting any value also sets `allow_stationary` to `true`.
+
+Examples:
+
+```yaml
+# Strict increasing validation
+- col_vals_increasing:
+    columns: timestamp_seconds
+    brief: "Timestamps must strictly increase"
+
+# Allow stationary values
+- col_vals_increasing:
+    columns: version_number
+    allow_stationary: true
+    brief: "Version numbers should increase (ties allowed)"
+
+# With tolerance for small decreases
+- col_vals_increasing:
+    columns: temperature
+    decreasing_tol: 0.1
+    brief: "Temperature trend (small drops allowed)"
+```
+
+`col_vals_decreasing`: are column data decreasing row-by-row?
+
+```yaml
+- col_vals_decreasing:
+    columns: [column_name]             # REQUIRED: Column(s) to validate
+    allow_stationary: false            # OPTIONAL: Allow consecutive equal values (default: false)
+    increasing_tol: 0.5                # OPTIONAL: Tolerance for positive movement (default: null)
+    na_pass: false                     # OPTIONAL: Pass NULL values
+    pre: |                             # OPTIONAL: Data preprocessing
+      lambda df: df.filter(condition)
+    thresholds:                        # OPTIONAL: Step-level thresholds
+      warning: 0.1
+    actions:                           # OPTIONAL: Step-level actions
+      warning: "Custom message"
+    brief: "Values must decrease"      # OPTIONAL: Step description
+```
+
+This validation checks whether values in a column decrease as you move down the rows. Useful for
+countdown timers, inventory depletion, or any monotonically decreasing values.
+
+Parameters:
+
+- `allow_stationary`: If `true`, allows consecutive values to be equal (stationary phases). For
+example, `[10, 8, 8, 5]` would pass when `true` but fail at the third value when `false`.
+- `increasing_tol`: Absolute tolerance for positive movement. Setting this to `0.5` means values can
+increase by up to 0.5 units and still pass. Setting any value also sets `allow_stationary` to `true`.
+
+Examples:
+
+```yaml
+# Strict decreasing validation
+- col_vals_decreasing:
+    columns: countdown_timer
+    brief: "Timer must strictly decrease"
+
+# Allow stationary values
+- col_vals_decreasing:
+    columns: priority_score
+    allow_stationary: true
+    brief: "Priority scores should decrease (ties allowed)"
+
+# With tolerance for small increases
+- col_vals_decreasing:
+    columns: stock_level
+    increasing_tol: 5
+    brief: "Stock levels decrease (small restocks allowed)"
 ```
 
 ### Row-based Validations
@@ -467,6 +617,66 @@ Template variables available for action strings:
     brief: "Expected column count"     # OPTIONAL: Step description
 ```
 
+`tbl_match`: does the table match a comparison table?
+
+```yaml
+- tbl_match:
+    tbl_compare:                       # REQUIRED: Comparison table
+      python: |
+        pb.load_dataset("reference_table", tbl_type="polars")
+    pre: |                             # OPTIONAL: Data preprocessing
+      lambda df: df.filter(condition)
+    thresholds:                        # OPTIONAL: Step-level thresholds
+      warning: 0.0
+    actions:                           # OPTIONAL: Step-level actions
+      warning: "Custom message"
+    brief: "Table structure matches"   # OPTIONAL: Step description
+```
+
+This validation performs a comprehensive comparison between the target table and a comparison table,
+using progressively stricter checks:
+
+1. **Column count match**: both tables have the same number of columns
+2. **Row count match**: both tables have the same number of rows
+3. **Schema match (loose)**: column names and dtypes match (case-insensitive, any order)
+4. **Schema match (order)**: columns in correct order (case-insensitive names)
+5. **Schema match (exact)**: column names match exactly (case-sensitive, correct order)
+6. **Data match**: values in corresponding cells are identical
+
+The validation fails at the first check that doesn't pass, making it easy to diagnose mismatches.
+This operates over a single test unit (pass/fail for complete table match).
+
+**Cross-backend validation**: `tbl_match()` supports automatic backend coercion when comparing tables
+from different backends (e.g., Polars vs. Pandas, DuckDB vs. SQLite). The comparison table is
+automatically converted to match the target table's backend.
+
+Examples:
+
+```yaml
+# Compare against reference dataset
+- tbl_match:
+    tbl_compare:
+      python: |
+        pb.load_dataset("expected_output", tbl_type="polars")
+    brief: "Output matches expected results"
+
+# Compare against CSV file
+- tbl_match:
+    tbl_compare:
+      python: |
+        pl.read_csv("reference_data.csv")
+    brief: "Matches reference CSV"
+
+# Compare with preprocessing on target table only
+- tbl_match:
+    tbl_compare:
+      python: |
+        pb.load_dataset("reference_table", tbl_type="polars")
+    pre: |
+      lambda df: df.select(["id", "name", "value"])
+    brief: "Selected columns match reference"
+```
+
 ### Special Validation Methods
 
 `conjointly`: are multiple validations having a joint dependency?
@@ -512,6 +722,121 @@ For Pandas DataFrames (when using `df_library: pandas`):
 - specially:
     expr: "lambda df: df.assign(is_valid=df['a'] + df['d'] > 0)"
 ```
+
+### AI-Powered Validation
+
+`prompt`: validate rows using AI/LLM-powered analysis
+
+```yaml
+- prompt:
+    prompt: "Values should be positive and realistic"  # REQUIRED: Natural language criteria
+    model: "anthropic:claude-sonnet-4"                 # REQUIRED: Model identifier
+    columns_subset: [column1, column2]                 # OPTIONAL: Columns to validate
+    batch_size: 1000                                   # OPTIONAL: Rows per batch (default: 1000)
+    max_concurrent: 3                                  # OPTIONAL: Concurrent API requests (default: 3)
+    pre: |                                             # OPTIONAL: Data preprocessing
+      lambda df: df.filter(condition)
+    thresholds:                                        # OPTIONAL: Step-level thresholds
+      warning: 0.1
+    actions:                                           # OPTIONAL: Step-level actions
+      warning: "Custom message"
+    brief: "AI validation"                             # OPTIONAL: Step description
+```
+
+This validation method uses Large Language Models (LLMs) to validate rows of data based on natural
+language criteria. Each row becomes a test unit that either passes or fails the validation criteria,
+producing binary True/False results that integrate with standard Pointblank reporting.
+
+**Supported models:**
+
+- **Anthropic**: `"anthropic:claude-sonnet-4"`, `"anthropic:claude-opus-4"`
+- **OpenAI**: `"openai:gpt-4"`, `"openai:gpt-4-turbo"`, `"openai:gpt-3.5-turbo"`
+- **Ollama**: `"ollama:<model-name>"` (e.g., `"ollama:llama3"`)
+- **Bedrock**: `"bedrock:<model-name>"`
+
+**Authentication**: API keys are automatically loaded from environment variables or `.env` files:
+
+- **OpenAI**: Set `OPENAI_API_KEY` environment variable or add to `.env` file
+- **Anthropic**: Set `ANTHROPIC_API_KEY` environment variable or add to `.env` file
+- **Ollama**: No API key required (runs locally)
+- **Bedrock**: Configure AWS credentials through standard AWS methods
+
+Example `.env` file:
+
+```plaintext
+ANTHROPIC_API_KEY="your_anthropic_api_key_here"
+OPENAI_API_KEY="your_openai_api_key_here"
+```
+
+**Performance optimization**: The validation process uses row signature memoization to avoid
+redundant LLM calls. When multiple rows have identical values in the selected columns, only one
+representative row is validated, and the result is applied to all matching rows. This dramatically
+reduces API costs and processing time for datasets with repetitive patterns.
+
+Examples:
+
+```yaml
+# Basic AI validation
+- prompt:
+    prompt: "Email addresses should look realistic and professional"
+    model: "anthropic:claude-sonnet-4"
+    columns_subset: [email]
+
+# Complex semantic validation
+- prompt:
+    prompt: "Product descriptions should mention the product category and include at least one benefit"
+    model: "openai:gpt-4"
+    columns_subset: [product_name, description, category]
+    batch_size: 500
+    max_concurrent: 5
+
+# Sentiment analysis
+- prompt:
+    prompt: "Customer feedback should express positive sentiment"
+    model: "anthropic:claude-sonnet-4"
+    columns_subset: [feedback_text, rating]
+
+# Context-dependent validation
+- prompt:
+    prompt: "For high-value transactions (amount > 1000), a detailed justification should be provided"
+    model: "openai:gpt-4"
+    columns_subset: [amount, justification, approver]
+    thresholds:
+      warning: 0.05
+      error: 0.15
+
+# Local model with Ollama
+- prompt:
+    prompt: "Transaction descriptions should be clear and professional"
+    model: "ollama:llama3"
+    columns_subset: [description]
+```
+
+**Best practices for AI validation:**
+
+- Be specific and clear in your prompt criteria
+- Include only necessary columns in `columns_subset` to reduce API costs
+- Start with smaller `batch_size` for testing, increase for production
+- Adjust `max_concurrent` based on API rate limits
+- Use thresholds appropriate for probabilistic validation results
+- Consider cost implications for large datasets
+- Test prompts on sample data before full deployment
+
+**When to use AI validation:**
+
+- Semantic checks (e.g., "does the description match the category?")
+- Context-dependent validation (e.g., "is the justification appropriate for the amount?")
+- Subjective quality assessment (e.g., "is the text professional?")
+- Pattern recognition that's hard to express programmatically
+- Natural language understanding tasks
+
+**When NOT to use AI validation:**
+
+- Simple numeric comparisons (use `col_vals_gt`, `col_vals_lt`, etc.)
+- Exact pattern matching (use `col_vals_regex`)
+- Schema validation (use `col_schema_match`)
+- Performance-critical validations with large datasets
+- When deterministic results are required
 
 ## Column Selection Patterns
 

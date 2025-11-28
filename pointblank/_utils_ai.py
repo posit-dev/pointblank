@@ -28,17 +28,22 @@ class _LLMConfig:
     provider
         LLM provider name (e.g., 'anthropic', 'openai', 'ollama', 'bedrock').
     model
-        Model name (e.g., 'claude-3-sonnet-20240229', 'gpt-4').
+        Model name (e.g., 'claude-sonnet-4-5', 'gpt-4').
     api_key
         API key for the provider. If None, will be read from environment.
+    verify_ssl
+        Whether to verify SSL certificates when making requests. Defaults to True.
     """
 
     provider: str
     model: str
     api_key: Optional[str] = None
+    verify_ssl: bool = True
 
 
-def _create_chat_instance(provider: str, model_name: str, api_key: Optional[str] = None):
+def _create_chat_instance(
+    provider: str, model_name: str, api_key: Optional[str] = None, verify_ssl: bool = True
+):
     """
     Create a chatlas chat instance for the specified provider.
 
@@ -50,6 +55,8 @@ def _create_chat_instance(provider: str, model_name: str, api_key: Optional[str]
         The model name for the provider.
     api_key
         Optional API key. If None, will be read from environment.
+    verify_ssl
+        Whether to verify SSL certificates when making requests. Defaults to True.
 
     Returns
     -------
@@ -89,6 +96,17 @@ EXAMPLE OUTPUT FORMAT:
   {"index": 2, "result": true}
 ]"""
 
+    # Create httpx client with SSL verification settings
+    try:
+        import httpx  # noqa
+    except ImportError:  # pragma: no cover
+        raise ImportError(  # pragma: no cover
+            "The `httpx` package is required for SSL configuration. "
+            "Please install it using `pip install httpx`."
+        )
+
+    http_client = httpx.AsyncClient(verify=verify_ssl)
+
     # Create provider-specific chat instance
     if provider == "anthropic":  # pragma: no cover
         # Check that the anthropic package is installed
@@ -106,6 +124,7 @@ EXAMPLE OUTPUT FORMAT:
             model=model_name,
             api_key=api_key,
             system_prompt=system_prompt,
+            kwargs={"http_client": http_client},
         )
 
     elif provider == "openai":  # pragma: no cover
@@ -124,6 +143,7 @@ EXAMPLE OUTPUT FORMAT:
             model=model_name,
             api_key=api_key,
             system_prompt=system_prompt,
+            kwargs={"http_client": http_client},
         )
 
     elif provider == "ollama":  # pragma: no cover
@@ -141,6 +161,7 @@ EXAMPLE OUTPUT FORMAT:
         chat = ChatOllama(
             model=model_name,
             system_prompt=system_prompt,
+            kwargs={"http_client": http_client},
         )
 
     elif provider == "bedrock":  # pragma: no cover
@@ -149,6 +170,7 @@ EXAMPLE OUTPUT FORMAT:
         chat = ChatBedrockAnthropic(
             model=model_name,
             system_prompt=system_prompt,
+            kwargs={"http_client": http_client},
         )
 
     else:
@@ -722,7 +744,10 @@ class _AIValidationEngine:
         """
         self.llm_config = llm_config
         self.chat = _create_chat_instance(
-            provider=llm_config.provider, model_name=llm_config.model, api_key=llm_config.api_key
+            provider=llm_config.provider,
+            model_name=llm_config.model,
+            api_key=llm_config.api_key,
+            verify_ssl=llm_config.verify_ssl,
         )
 
     def validate_batches(
@@ -791,15 +816,15 @@ class _AIValidationEngine:
                 logger.info(f"Successfully validated batch {batch['batch_id']}")
                 return results
 
-            except Exception as e:
+            except Exception as e:  # pragma: no cover
                 logger.error(
                     f"Failed to validate batch {batch['batch_id']}: {e}"
                 )  # pragma: no cover
                 # Return default results (all False) for failed batches
-                default_results = []
-                for i in range(batch["start_row"], batch["end_row"]):
-                    default_results.append({"index": i, "result": False})
-                return default_results
+                default_results = []  # pragma: no cover
+                for i in range(batch["start_row"], batch["end_row"]):  # pragma: no cover
+                    default_results.append({"index": i, "result": False})  # pragma: no cover
+                return default_results  # pragma: no cover
 
         # Execute all batch validations sequentially (chatlas is synchronous)
         final_results = []

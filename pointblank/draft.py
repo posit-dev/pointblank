@@ -38,10 +38,15 @@ class DraftValidation:
         The data to be used for drafting a validation plan.
     model
         The model to be used. This should be in the form of `provider:model` (e.g.,
-        `"anthropic:claude-3-5-sonnet-latest"`). Supported providers are `"anthropic"`, `"openai"`,
+        `"anthropic:claude-sonnet-4-5"`). Supported providers are `"anthropic"`, `"openai"`,
         `"ollama"`, and `"bedrock"`.
     api_key
         The API key to be used for the model.
+    verify_ssl
+        Whether to verify SSL certificates when making requests to the LLM provider. Set to `False`
+        to disable SSL verification (e.g., when behind a corporate firewall with self-signed
+        certificates). Defaults to `True`. Use with caution as disabling SSL verification can pose
+        security risks.
 
     Returns
     -------
@@ -83,6 +88,33 @@ class DraftValidation:
     There's no need to have the `python-dotenv` package installed when using `.env` files in this
     way.
 
+    Notes on SSL Certificate Verification
+    --------------------------------------
+    By default, SSL certificate verification is enabled for all requests to LLM providers. However,
+    in certain network environments (such as corporate networks with self-signed certificates or
+    firewall proxies), you may encounter SSL certificate verification errors.
+
+    To disable SSL verification, set the `verify_ssl` parameter to `False`:
+
+    ```python
+    import pointblank as pb
+
+    data = pb.load_dataset(dataset="nycflights", tbl_type="duckdb")
+
+    # Disable SSL verification for networks with self-signed certificates
+    pb.DraftValidation(
+        data=data,
+        model="anthropic:claude-sonnet-4-5",
+        verify_ssl=False
+    )
+    ```
+
+    :::{.callout-warning}
+    Disabling SSL verification (through `verify_ssl=False`) can expose your API keys and data to
+    man-in-the-middle attacks. Only use this option in trusted network environments and when
+    absolutely necessary.
+    :::
+
     Notes on Data Sent to the Model Provider
     ----------------------------------------
     The data sent to the model provider is a JSON summary of the table. This data summary is
@@ -109,7 +141,7 @@ class DraftValidation:
     Let's look at how the `DraftValidation` class can be used to draft a validation plan for a
     table. The table to be used is `"nycflights"`, which is available here via the
     [`load_dataset()`](`pointblank.load_dataset`) function. The model to be used is
-    `"anthropic:claude-3-5-sonnet-latest"` (which performs very well compared to other LLMs). The
+    `"anthropic:claude-sonnet-4-5"` (which performs very well compared to other LLMs). The
     example assumes that the API key is stored in an `.env` file as `ANTHROPIC_API_KEY`.
 
     ```python
@@ -119,7 +151,7 @@ class DraftValidation:
     data = pb.load_dataset(dataset="nycflights", tbl_type="duckdb")
 
     # Draft a validation plan for the "nycflights" table
-    pb.DraftValidation(data=data, model="anthropic:claude-3-5-sonnet-latest")
+    pb.DraftValidation(data=data, model="anthropic:claude-sonnet-4-5")
     ```
 
     The output will be a drafted validation plan for the `"nycflights"` table and this will appear
@@ -194,6 +226,7 @@ class DraftValidation:
     data: FrameT | Any
     model: str
     api_key: str | None = None
+    verify_ssl: bool = True
     response: str = field(init=False)
 
     def __post_init__(self):
@@ -280,6 +313,18 @@ class DraftValidation:
             "    per line)"
         )
 
+        # Create httpx client with SSL verification settings
+        # This will be passed to the LLM provider's chat client
+        try:
+            import httpx  # noqa
+        except ImportError:  # pragma: no cover
+            raise ImportError(  # pragma: no cover
+                "The `httpx` package is required for SSL configuration. "
+                "Please install it using `pip install httpx`."
+            )
+
+        http_client = httpx.AsyncClient(verify=self.verify_ssl)
+
         if provider == "anthropic":  # pragma: no cover
             # Check that the anthropic package is installed
             try:
@@ -296,6 +341,7 @@ class DraftValidation:
                 model=model_name,
                 system_prompt="You are a terse assistant and a Python expert.",
                 api_key=self.api_key,
+                kwargs={"http_client": http_client},
             )
 
         if provider == "openai":  # pragma: no cover
@@ -314,6 +360,7 @@ class DraftValidation:
                 model=model_name,
                 system_prompt="You are a terse assistant and a Python expert.",
                 api_key=self.api_key,
+                kwargs={"http_client": http_client},
             )
 
         if provider == "ollama":  # pragma: no cover
@@ -331,6 +378,7 @@ class DraftValidation:
             chat = ChatOllama(  # pragma: no cover
                 model=model_name,
                 system_prompt="You are a terse assistant and a Python expert.",
+                kwargs={"http_client": http_client},
             )
 
         if provider == "bedrock":  # pragma: no cover
@@ -339,6 +387,7 @@ class DraftValidation:
             chat = ChatBedrockAnthropic(  # pragma: no cover
                 model=model_name,
                 system_prompt="You are a terse assistant and a Python expert.",
+                kwargs={"http_client": http_client},
             )
 
         self.response = str(chat.chat(prompt, stream=False, echo="none"))  # pragma: no cover

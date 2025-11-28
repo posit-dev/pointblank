@@ -10,7 +10,13 @@ from narwhals.dependencies import is_pandas_dataframe, is_polars_dataframe
 from narwhals.typing import FrameT
 
 from pointblank._constants import IBIS_BACKENDS
-from pointblank._typing import AbsoluteBounds
+from pointblank._spec_utils import (
+    check_credit_card,
+    check_iban,
+    check_isbn,
+    check_postal_code,
+    check_vin,
+)
 from pointblank._utils import (
     _column_test_prep,
     _convert_to_narwhals,
@@ -121,8 +127,8 @@ def _safe_is_nan_or_null_expr(data_frame: Any, column_expr: Any, column_name: st
         # The namespace is the actual module, so we check its name
         if hasattr(native_namespace, "__name__") and "ibis" in native_namespace.__name__:
             return null_check
-    except Exception:
-        pass
+    except Exception:  # pragma: no cover
+        pass  # pragma: no cover
 
     # For non-Ibis backends, try to use `is_nan()` if the column type supports it
     try:
@@ -130,8 +136,8 @@ def _safe_is_nan_or_null_expr(data_frame: Any, column_expr: Any, column_name: st
             schema = data_frame.collect_schema()
         elif hasattr(data_frame, "schema"):
             schema = data_frame.schema
-        else:
-            schema = None
+        else:  # pragma: no cover
+            schema = None  # pragma: no cover
 
         if schema and column_name:
             column_dtype = schema.get(column_name)
@@ -150,8 +156,8 @@ def _safe_is_nan_or_null_expr(data_frame: Any, column_expr: Any, column_name: st
                     except Exception:
                         # If `is_nan()` fails for any reason, fall back to Null only
                         pass
-    except Exception:
-        pass
+    except Exception:  # pragma: no cover
+        pass  # pragma: no cover
 
     # Fallback: just check Null values
     return null_check
@@ -372,7 +378,7 @@ class ConjointlyValidation:
                 else:
                     raise TypeError(
                         f"Expression returned {type(expr_result)}, expected PySpark Column"
-                    )
+                    )  # pragma: no cover
 
             except Exception as e:
                 try:
@@ -384,7 +390,9 @@ class ConjointlyValidation:
                         pyspark_expr = col_expr.to_pyspark_expr(self.data_tbl)
                         pyspark_columns.append(pyspark_expr)
                     else:
-                        raise TypeError(f"Cannot convert {type(col_expr)} to PySpark Column")
+                        raise TypeError(
+                            f"Cannot convert {type(col_expr)} to PySpark Column"
+                        )  # pragma: no cover
                 except Exception as nested_e:
                     print(f"Error evaluating PySpark expression: {e} -> {nested_e}")
 
@@ -658,7 +666,7 @@ def col_vals_expr(data_tbl: FrameT, expr, tbl_type: str = "local"):
             return data_tbl.assign(pb_is_good_=expr)
 
     # For remote backends, return original table (placeholder)
-    return data_tbl
+    return data_tbl  # pragma: no cover
 
 
 def rows_complete(data_tbl: FrameT, columns_subset: list[str] | None):
@@ -774,6 +782,311 @@ def col_count_match(data_tbl: FrameT, count, inverse: bool) -> bool:
         return get_column_count(data=data_tbl) == count
     else:
         return get_column_count(data=data_tbl) != count
+
+
+def _coerce_to_common_backend(data_tbl: FrameT, tbl_compare: FrameT) -> tuple[FrameT, FrameT]:
+    """
+    Coerce two tables to the same backend if they differ.
+
+    If the tables to compare have different backends (e.g., one is Polars and one is Pandas),
+    this function will convert the comparison table to match the data table's backend.
+    This ensures consistent dtype handling during comparison.
+
+    Parameters
+    ----------
+    data_tbl
+        The primary table (backend is preserved).
+    tbl_compare
+        The comparison table (may be converted to match data_tbl's backend).
+
+    Returns
+    -------
+    tuple[FrameT, FrameT]
+        Both tables, with tbl_compare potentially converted to data_tbl's backend.
+    """
+    # Get backend types for both tables
+    data_backend = _get_tbl_type(data_tbl)
+    compare_backend = _get_tbl_type(tbl_compare)
+
+    # If backends match, no conversion needed
+    if data_backend == compare_backend:
+        return data_tbl, tbl_compare
+
+    # Define database backends (Ibis tables that need materialization)
+    database_backends = {"duckdb", "sqlite", "postgres", "mysql", "snowflake", "bigquery"}
+
+    #
+    # If backends differ, convert tbl_compare to match data_tbl's backend
+    #
+
+    # Handle Ibis/database tables: materialize them to match the target backend
+    if compare_backend in database_backends:
+        # Materialize to Polars if data table is Polars, otherwise Pandas
+        if data_backend == "polars":
+            try:
+                tbl_compare = tbl_compare.to_polars()
+                compare_backend = "polars"
+            except Exception:
+                # Fallback: materialize to Pandas, then convert to Polars
+                try:
+                    tbl_compare = tbl_compare.execute()
+                    compare_backend = "pandas"
+                except Exception:
+                    try:
+                        tbl_compare = tbl_compare.to_pandas()
+                        compare_backend = "pandas"
+                    except Exception:
+                        pass
+        else:
+            # Materialize to Pandas for Pandas or other backends
+            try:
+                tbl_compare = tbl_compare.execute()  # Returns Pandas DataFrame
+                compare_backend = "pandas"
+            except Exception:
+                try:
+                    tbl_compare = tbl_compare.to_pandas()
+                    compare_backend = "pandas"
+                except Exception:
+                    pass
+
+    if data_backend in database_backends:
+        # If data table itself is a database backend, materialize to Polars
+        # (Polars is the default modern backend for optimal performance)
+        try:
+            data_tbl = data_tbl.to_polars()
+            data_backend = "polars"
+        except Exception:
+            # Fallback to Pandas if Polars conversion fails
+            try:
+                data_tbl = data_tbl.execute()
+                data_backend = "pandas"
+            except Exception:
+                try:
+                    data_tbl = data_tbl.to_pandas()
+                    data_backend = "pandas"
+                except Exception:
+                    pass
+
+    # Now handle the Polars/Pandas conversions
+    if data_backend == "polars" and compare_backend == "pandas":
+        try:
+            import polars as pl
+
+            tbl_compare = pl.from_pandas(tbl_compare)
+        except Exception:
+            # If conversion fails, return original tables
+            pass
+
+    elif data_backend == "pandas" and compare_backend == "polars":
+        try:
+            tbl_compare = tbl_compare.to_pandas()
+        except Exception:
+            # If conversion fails, return original tables
+            pass
+
+    return data_tbl, tbl_compare
+
+
+def tbl_match(data_tbl: FrameT, tbl_compare: FrameT) -> bool:
+    """
+    Check if two tables match exactly in schema, row count, and data.
+
+    This function performs a comprehensive comparison between two tables,
+    checking progressively stricter conditions from least to most stringent:
+
+    1. Column count match
+    2. Row count match
+    3. Schema match (case-insensitive column names, any order)
+    4. Schema match (case-insensitive column names, correct order)
+    5. Schema match (case-sensitive column names, correct order)
+    6. Data match: compares values column-by-column
+
+    If the two tables have different backends (e.g., one is Polars and one is Pandas),
+    the comparison table will be automatically coerced to match the data table's backend
+    before comparison. This ensures consistent dtype handling.
+
+    Parameters
+    ----------
+    data_tbl
+        The target table to validate.
+    tbl_compare
+        The comparison table to validate against.
+
+    Returns
+    -------
+    bool
+        True if tables match completely, False otherwise.
+    """
+    from pointblank.schema import Schema, _check_schema_match
+    from pointblank.validate import get_column_count, get_row_count
+
+    # Coerce to common backend if needed
+    data_tbl, tbl_compare = _coerce_to_common_backend(data_tbl, tbl_compare)
+
+    # Convert both tables to narwhals for compatibility
+    tbl = _convert_to_narwhals(df=data_tbl)
+    tbl_cmp = _convert_to_narwhals(df=tbl_compare)
+
+    # Stage 1: Check column count (least stringent)
+    col_count_matching = get_column_count(data=data_tbl) == get_column_count(data=tbl_compare)
+
+    if not col_count_matching:
+        return False
+
+    # Stage 2: Check row count
+    row_count_matching = get_row_count(data=data_tbl) == get_row_count(data=tbl_compare)
+
+    if not row_count_matching:
+        return False
+
+    # Stage 3: Check schema match for case-insensitive column names, any order
+    schema = Schema(tbl=tbl_compare)
+
+    col_schema_matching_any_order = _check_schema_match(
+        data_tbl=data_tbl,
+        schema=schema,
+        complete=True,
+        in_order=False,
+        case_sensitive_colnames=False,
+        case_sensitive_dtypes=False,
+        full_match_dtypes=False,
+    )
+
+    if not col_schema_matching_any_order:
+        return False
+
+    # Stage 4: Check schema match for case-insensitive column names, correct order
+    col_schema_matching_in_order = _check_schema_match(
+        data_tbl=data_tbl,
+        schema=schema,
+        complete=True,
+        in_order=True,
+        case_sensitive_colnames=False,
+        case_sensitive_dtypes=False,
+        full_match_dtypes=False,
+    )
+
+    if not col_schema_matching_in_order:
+        return False
+
+    # Stage 5: Check schema match for case-sensitive column names, correct order
+    col_schema_matching_exact = _check_schema_match(
+        data_tbl=data_tbl,
+        schema=schema,
+        complete=True,
+        in_order=True,
+        case_sensitive_colnames=True,
+        case_sensitive_dtypes=False,
+        full_match_dtypes=False,
+    )
+
+    if not col_schema_matching_exact:
+        return False
+
+    # Stage 6: Check for exact data by cell across matched columns (most stringent)
+    # Handle edge case where both tables have zero rows (they match)
+    if get_row_count(data=data_tbl) == 0:
+        return True
+
+    column_count = get_column_count(data=data_tbl)
+
+    # Compare column-by-column
+    for i in range(column_count):
+        # Get column name
+        col_name = tbl.columns[i]
+
+        # Get column data from both tables
+        col_data_1 = tbl.select(col_name)
+        col_data_2 = tbl_cmp.select(col_name)
+
+        # Convert to native format for comparison
+        # We need to collect if lazy frames
+        if hasattr(col_data_1, "collect"):
+            col_data_1 = col_data_1.collect()
+
+        if hasattr(col_data_2, "collect"):
+            col_data_2 = col_data_2.collect()
+
+        # Convert to native and then to lists for comparison
+        col_1_native = col_data_1.to_native()
+        col_2_native = col_data_2.to_native()
+
+        # Extract values as lists for comparison
+        if hasattr(col_1_native, "to_list"):  # Polars Series
+            values_1 = col_1_native[col_name].to_list()
+            values_2 = col_2_native[col_name].to_list()
+
+        elif hasattr(col_1_native, "tolist"):  # Pandas Series/DataFrame
+            values_1 = col_1_native[col_name].tolist()
+            values_2 = col_2_native[col_name].tolist()
+
+        elif hasattr(col_1_native, "collect"):  # Ibis
+            values_1 = col_1_native[col_name].to_pandas().tolist()
+            values_2 = col_2_native[col_name].to_pandas().tolist()
+
+        else:
+            # Fallback: try direct comparison
+            values_1 = list(col_1_native[col_name])
+            values_2 = list(col_2_native[col_name])
+
+        # Compare the two lists element by element, handling NaN/None
+        if len(values_1) != len(values_2):
+            return False
+
+        for v1, v2 in zip(values_1, values_2):
+            # Handle None/NaN comparisons and check both None and NaN
+            # Note: When Pandas NaN is converted to Polars, it may become None
+            v1_is_null = v1 is None
+            v2_is_null = v2 is None
+
+            # Check if v1 is NaN
+            if not v1_is_null:
+                try:
+                    import math
+
+                    if math.isnan(v1):
+                        v1_is_null = True
+                except (TypeError, ValueError):
+                    pass
+
+            # Check if v2 is NaN
+            if not v2_is_null:
+                try:
+                    import math
+
+                    if math.isnan(v2):
+                        v2_is_null = True
+                except (TypeError, ValueError):
+                    pass
+
+            # If both are null (None or NaN), they match
+            if v1_is_null and v2_is_null:
+                continue
+
+            # If only one is null, they don't match
+            if v1_is_null or v2_is_null:
+                return False
+
+            # Direct comparison: handle lists/arrays separately
+            try:
+                if v1 != v2:
+                    return False
+            except (TypeError, ValueError):
+                # If direct comparison fails (e.g., for lists/arrays), try element-wise comparison
+                try:
+                    if isinstance(v1, list) and isinstance(v2, list):
+                        if v1 != v2:
+                            return False
+                    elif hasattr(v1, "__eq__") and hasattr(v2, "__eq__"):
+                        # For array-like objects, check if they're equal
+                        if not (v1 == v2).all() if hasattr((v1 == v2), "all") else v1 == v2:
+                            return False
+                    else:
+                        return False
+                except Exception:
+                    return False
+
+    return True
 
 
 def conjointly_validation(data_tbl: FrameT, expressions, threshold: int, tbl_type: str = "local"):
@@ -1648,7 +1961,7 @@ def interrogate_outside(
         pb_is_good_4=nw.lit(na_pass),  # Pass if any Null in lb, val, or ub
     )
 
-    # Note: Logic is inverted for "outside" - when inclusive[0] is True,
+    # Note: Logic is inverted for "outside"; when inclusive[0] is True,
     # we want values < low_val (not <= low_val) to be "outside"
     if inclusive[0]:
         result_tbl = result_tbl.with_columns(pb_is_good_5=nw.col(column) < low_val)
@@ -1747,6 +2060,459 @@ def interrogate_regex(tbl: FrameT, column: str, values: dict | str, na_pass: boo
     return result_tbl.to_native()
 
 
+def interrogate_within_spec(tbl: FrameT, column: str, values: dict, na_pass: bool) -> FrameT:
+    """Within specification interrogation."""
+    from pointblank._spec_utils import (
+        regex_email,
+        regex_ipv4_address,
+        regex_ipv6_address,
+        regex_mac,
+        regex_phone,
+        regex_swift_bic,
+        regex_url,
+    )
+
+    spec = values["spec"]
+    spec_lower = spec.lower()
+
+    # Parse spec for country-specific formats
+    country = None
+    if "[" in spec and "]" in spec:
+        # Extract country code from spec like "postal_code[US]" or "iban[DE]"
+        base_spec = spec[: spec.index("[")]
+        country = spec[spec.index("[") + 1 : spec.index("]")]
+        spec_lower = base_spec.lower()
+
+    # Convert to Narwhals for cross-backend compatibility
+    nw_tbl = nw.from_native(tbl)
+
+    # Regex-based specifications can use Narwhals directly (no materialization needed)
+    regex_specs = {
+        "email": regex_email(),
+        "url": regex_url(),
+        "phone": regex_phone(),
+        "ipv4": regex_ipv4_address(),
+        "ipv4_address": regex_ipv4_address(),
+        "ipv6": regex_ipv6_address(),
+        "ipv6_address": regex_ipv6_address(),
+        "mac": regex_mac(),
+        "mac_address": regex_mac(),
+        "swift": regex_swift_bic(),
+        "swift_bic": regex_swift_bic(),
+        "bic": regex_swift_bic(),
+    }
+
+    if spec_lower in regex_specs:
+        # Use regex validation through Narwhals (works for all backends including Ibis!)
+        pattern = regex_specs[spec_lower]
+
+        # For SWIFT/BIC, need to uppercase first
+        if spec_lower in ("swift", "swift_bic", "bic"):
+            col_expr = nw.col(column).str.to_uppercase()
+        else:
+            col_expr = nw.col(column)
+
+        result_tbl = nw_tbl.with_columns(
+            pb_is_good_1=nw.col(column).is_null() & na_pass,
+            pb_is_good_2=col_expr.str.contains(f"^{pattern}$", literal=False).fill_null(False),
+        )
+
+        result_tbl = result_tbl.with_columns(
+            pb_is_good_=nw.col("pb_is_good_1") | nw.col("pb_is_good_2")
+        ).drop("pb_is_good_1", "pb_is_good_2")
+
+        return result_tbl.to_native()
+
+    # For specifications requiring checksums or complex logic:
+    # Auto-detect Ibis tables and use database-native validation when available
+    native_tbl = nw_tbl.to_native()
+    is_ibis = hasattr(native_tbl, "execute")
+
+    # Use database-native validation for VIN and credit_card when using Ibis
+    if is_ibis and spec_lower == "vin":
+        # Route to database-native VIN validation
+        return interrogate_within_spec_db(tbl, column, values, na_pass)
+    elif is_ibis and spec_lower in ("credit_card", "creditcard"):
+        # Route to database-native credit card validation
+        return interrogate_credit_card_db(tbl, column, values, na_pass)
+
+    # For non-Ibis tables or other specs, materialize data and use Python validation
+    # Get the column data as a list
+    col_data = nw_tbl.select(column).to_native()
+
+    # Convert to list based on backend
+    if hasattr(col_data, "to_list"):  # Polars
+        col_list = col_data[column].to_list()
+    elif hasattr(col_data, "tolist"):  # Pandas
+        col_list = col_data[column].tolist()
+    else:  # For Ibis tables, we need to execute the query first
+        try:
+            # Try to execute if it's an Ibis table
+            if hasattr(col_data, "execute"):
+                col_data_exec = col_data.execute()
+                if hasattr(col_data_exec, "to_list"):  # Polars result
+                    col_list = col_data_exec[column].to_list()
+                elif hasattr(col_data_exec, "tolist"):  # Pandas result
+                    col_list = col_data_exec[column].tolist()
+                else:
+                    col_list = list(col_data_exec[column])
+            else:
+                col_list = list(col_data[column])
+        except Exception:
+            # Fallback to direct list conversion
+            col_list = list(col_data[column])
+
+    # Validate based on spec type (checksum-based validations)
+    if spec_lower in ("isbn", "isbn-10", "isbn-13"):
+        is_valid_list = check_isbn(col_list)
+    elif spec_lower == "vin":
+        is_valid_list = check_vin(col_list)
+    elif spec_lower in ("credit_card", "creditcard"):
+        is_valid_list = check_credit_card(col_list)
+    elif spec_lower == "iban":
+        is_valid_list = check_iban(col_list, country=country)
+    elif spec_lower in ("postal_code", "postalcode", "postcode", "zip"):
+        if country is None:
+            raise ValueError("Country code required for postal code validation")
+        is_valid_list = check_postal_code(col_list, country=country)
+    else:
+        raise ValueError(f"Unknown specification type: {spec}")
+
+    # Create result table with validation results
+    # For Ibis tables, execute to get a materialized dataframe first
+    native_tbl = nw_tbl.to_native()
+    if hasattr(native_tbl, "execute"):
+        native_tbl = native_tbl.execute()
+
+    # Add validation column: convert native table to Series, then back through Narwhals
+    if is_polars_dataframe(native_tbl):
+        import polars as pl
+
+        native_tbl = native_tbl.with_columns(pb_is_good_2=pl.Series(is_valid_list))
+    elif is_pandas_dataframe(native_tbl):
+        import pandas as pd
+
+        native_tbl["pb_is_good_2"] = pd.Series(is_valid_list, index=native_tbl.index)
+    else:
+        raise NotImplementedError(f"Backend type not supported: {type(native_tbl)}")
+
+    result_tbl = nw.from_native(native_tbl)  # Handle NA values and combine validation results
+    result_tbl = result_tbl.with_columns(
+        pb_is_good_1=nw.col(column).is_null() & na_pass,
+    )
+
+    result_tbl = result_tbl.with_columns(
+        pb_is_good_=nw.col("pb_is_good_1") | nw.col("pb_is_good_2")
+    ).drop("pb_is_good_1", "pb_is_good_2")
+
+    return result_tbl.to_native()
+
+
+def interrogate_within_spec_db(tbl: FrameT, column: str, values: dict, na_pass: bool) -> FrameT:
+    """
+    Database-native specification validation (proof of concept).
+
+    This function uses Ibis expressions to perform validation entirely in SQL,
+    avoiding data materialization for remote database tables. Currently only
+    supports VIN validation as a proof of concept.
+
+    Parameters
+    ----------
+    tbl
+        The table to interrogate (must be an Ibis table).
+    column
+        The column to validate.
+    values
+        Dictionary containing 'spec' key with specification type.
+    na_pass
+        Whether to pass null values.
+
+    Returns
+    -------
+    FrameT
+        Result table with pb_is_good_ column indicating validation results.
+
+    Notes
+    -----
+    This is a proof-of-concept implementation demonstrating database-native
+    validation. It translates complex Python validation logic (regex, checksums)
+    into SQL expressions that can be executed directly in the database.
+    """
+    spec = values["spec"]
+    spec_lower = spec.lower()
+
+    # Check if this is an Ibis table
+    native_tbl = tbl
+    if hasattr(tbl, "to_native"):
+        native_tbl = tbl.to_native() if callable(tbl.to_native) else tbl
+
+    is_ibis = hasattr(native_tbl, "execute")
+
+    if not is_ibis:
+        # Fall back to regular implementation for non-Ibis tables
+        return interrogate_within_spec(tbl, column, values, na_pass)
+
+    # Route to appropriate database-native validation
+    if spec_lower == "credit_card":
+        return interrogate_credit_card_db(tbl, column, values, na_pass)
+    elif spec_lower != "vin":
+        raise NotImplementedError(
+            f"Database-native validation for '{spec}' not yet implemented. "
+            "Currently 'vin' and 'credit_card' are supported in interrogate_within_spec_db(). "
+            "Use interrogate_within_spec() for other specifications."
+        )
+
+    # VIN validation using Ibis expressions (database-native)
+    # Implementation based on ISO 3779 standard with check digit algorithm
+    try:
+        import ibis
+    except ImportError:
+        raise ImportError("Ibis is required for database-native validation")
+
+    # VIN transliteration map (character to numeric value for checksum)
+    # Based on ISO 3779 standard for VIN check digit calculation
+    transliteration = {
+        "A": 1,
+        "B": 2,
+        "C": 3,
+        "D": 4,
+        "E": 5,
+        "F": 6,
+        "G": 7,
+        "H": 8,
+        "J": 1,
+        "K": 2,
+        "L": 3,
+        "M": 4,
+        "N": 5,
+        "P": 7,
+        "R": 9,
+        "S": 2,
+        "T": 3,
+        "U": 4,
+        "V": 5,
+        "W": 6,
+        "X": 7,
+        "Y": 8,
+        "Z": 9,
+        "0": 0,
+        "1": 1,
+        "2": 2,
+        "3": 3,
+        "4": 4,
+        "5": 5,
+        "6": 6,
+        "7": 7,
+        "8": 8,
+        "9": 9,
+    }
+
+    # Position weights for checksum calculation
+    weights = [8, 7, 6, 5, 4, 3, 2, 10, 0, 9, 8, 7, 6, 5, 4, 3, 2]
+
+    # Get the column as an Ibis expression
+    col_expr = native_tbl[column]
+
+    # Basic checks: length must be 17, no invalid characters (I, O, Q)
+    valid_length = col_expr.length() == 17
+    no_invalid_chars = (
+        ~col_expr.upper().contains("I")
+        & ~col_expr.upper().contains("O")
+        & ~col_expr.upper().contains("Q")
+    )
+
+    # Calculate checksum using Ibis expressions
+    # For each position, extract character, transliterate to number, multiply by weight, sum
+    checksum = ibis.literal(0)
+
+    for pos in range(17):
+        if pos == 8:  # Position 9 (0-indexed 8) is the check digit itself
+            continue
+
+        # Extract character at position (1-indexed for substr)
+        char = col_expr.upper().substr(pos, 1)
+
+        # Build a case expression for transliteration using ibis.cases()
+        # Add final else condition for invalid characters
+        conditions = [(char == ch, num) for ch, num in transliteration.items()]
+        value = ibis.cases(*conditions, else_=0)  # Default: invalid char = 0 (will fail validation)
+
+        # Multiply by weight and add to checksum
+        checksum = checksum + (value * weights[pos])
+
+    # Check digit calculation: checksum % 11
+    # If result is 10, check digit should be 'X', otherwise it's the digit itself
+    expected_check = checksum % 11
+    actual_check_char = col_expr.upper().substr(8, 1)  # Position 9 (0-indexed 8)
+
+    # Validate check digit using ibis.cases()
+    check_digit_valid = ibis.cases(
+        (expected_check == 10, actual_check_char == "X"),
+        (expected_check < 10, actual_check_char == expected_check.cast(str)),
+        else_=False,
+    )
+
+    # Combine all validation checks
+    is_valid = valid_length & no_invalid_chars & check_digit_valid
+
+    # Handle NULL values
+    if na_pass:
+        # NULL values should pass when na_pass=True
+        is_valid = col_expr.isnull() | is_valid
+    else:
+        # NULL values should explicitly fail when na_pass=False
+        # Use fill_null to convert NULL results to False
+        is_valid = is_valid.fill_null(False)
+
+    # Add validation column to table
+    result_tbl = native_tbl.mutate(pb_is_good_=is_valid)
+
+    return result_tbl
+
+
+def interrogate_credit_card_db(
+    tbl: FrameT, column: str, values: dict[str, str], na_pass: bool
+) -> FrameT:
+    """
+    Database-native credit card validation using Luhn algorithm in SQL.
+
+    This function implements the Luhn checksum algorithm entirely in SQL using
+    Ibis expressions, avoiding data materialization for remote database tables.
+    This is a unique implementation that validates credit card numbers directly
+    in the database.
+
+    Parameters
+    ----------
+    tbl
+        The table to interrogate (must be an Ibis table).
+    column
+        The column to validate.
+    values
+        Dictionary containing 'spec' key (should be 'credit_card').
+    na_pass
+        Whether to pass null values.
+
+    Returns
+    -------
+    FrameT
+        Result table with pb_is_good_ column indicating validation results.
+
+    Notes
+    -----
+    The Luhn algorithm works as follows:
+    1. Remove spaces and hyphens from the card number
+    2. Starting from the rightmost digit, double every second digit
+    3. If doubled digit > 9, subtract 9
+    4. Sum all digits
+    5. Valid if sum % 10 == 0
+
+    This implementation translates the entire algorithm into SQL expressions.
+    """
+    # Check if this is an Ibis table
+    native_tbl = tbl
+    if hasattr(tbl, "to_native"):
+        native_tbl = tbl.to_native() if callable(tbl.to_native) else tbl
+
+    is_ibis = hasattr(native_tbl, "execute")
+
+    if not is_ibis:
+        # Fall back to regular implementation for non-Ibis tables
+        return interrogate_within_spec(tbl, column, values, na_pass)
+
+    try:
+        import ibis
+    except ImportError:
+        raise ImportError("Ibis is required for database-native validation")
+
+    # Get the column as an Ibis expression
+    col_expr = native_tbl[column]
+
+    # Step 1: Clean the input and remove spaces and hyphens
+    # First check format: only digits, spaces, and hyphens allowed
+    valid_chars = col_expr.re_search(r"^[0-9\s\-]+$").notnull()
+
+    # Clean: remove spaces and hyphens
+    clean_card = col_expr.replace(" ", "").replace("-", "")
+
+    # Step 2: Check length (13-19 digits after cleaning)
+    card_length = clean_card.length()
+    valid_length = (card_length >= 13) & (card_length <= 19)
+
+    # Step 3: Luhn algorithm implementation in SQL
+    # We'll process each digit position and calculate the checksum
+    # Starting from the right, double every second digit
+
+    # Initialize checksum
+    checksum = ibis.literal(0)
+
+    # Process up to 19 digits (maximum credit card length)
+    for pos in range(19):
+        # Calculate position from right (0 = rightmost)
+        pos_from_right = pos
+
+        # Extract digit at this position from the right
+        # substr with negative index or using length - pos
+        digit_pos = card_length - pos_from_right
+        digit_char = clean_card.substr(digit_pos - 1, 1)
+
+        # Convert character to integer (using case statement)
+        digit_val = ibis.cases(
+            (digit_char == "0", 0),
+            (digit_char == "1", 1),
+            (digit_char == "2", 2),
+            (digit_char == "3", 3),
+            (digit_char == "4", 4),
+            (digit_char == "5", 5),
+            (digit_char == "6", 6),
+            (digit_char == "7", 7),
+            (digit_char == "8", 8),
+            (digit_char == "9", 9),
+            else_=-1,  # Invalid character
+        )
+
+        # Check if this position should be processed (within card length)
+        in_range = digit_pos > 0
+
+        # Double every second digit (odd positions from right, 0-indexed)
+        should_double = (pos_from_right % 2) == 1
+
+        # Calculate contribution to checksum
+        # If should_double: double the digit, then if > 9 subtract 9
+        doubled = digit_val * 2
+        adjusted = ibis.cases(
+            (should_double & (doubled > 9), doubled - 9),
+            (should_double, doubled),
+            else_=digit_val,
+        )
+
+        # Add to checksum only if in range
+        contribution = ibis.cases(
+            (in_range, adjusted),
+            else_=0,
+        )
+
+        checksum = checksum + contribution
+
+    # Step 4: Valid if checksum % 10 == 0
+    luhn_valid = (checksum % 10) == 0
+
+    # Combine all validation checks
+    is_valid = valid_chars & valid_length & luhn_valid
+
+    # Handle NULL values
+    if na_pass:
+        # NULL values should pass when na_pass=True
+        is_valid = col_expr.isnull() | is_valid
+    else:
+        # NULL values should explicitly fail when na_pass=False
+        is_valid = is_valid.fill_null(False)
+
+    # Add validation column to table
+    result_tbl = native_tbl.mutate(pb_is_good_=is_valid)
+
+    return result_tbl
+
+
 def interrogate_null(tbl: FrameT, column: str) -> FrameT:
     """Null interrogation."""
 
@@ -1761,6 +2527,122 @@ def interrogate_not_null(tbl: FrameT, column: str) -> FrameT:
     nw_tbl = nw.from_native(tbl)
     result_tbl = nw_tbl.with_columns(pb_is_good_=~nw.col(column).is_null())
     return result_tbl.to_native()
+
+
+def interrogate_increasing(
+    tbl: FrameT, column: str, allow_stationary: bool, decreasing_tol: float, na_pass: bool
+) -> FrameT:
+    """
+    Increasing interrogation.
+
+    Checks whether column values are increasing row by row.
+
+    Parameters
+    ----------
+    tbl
+        The table to interrogate.
+    column
+        The column to check.
+    allow_stationary
+        Whether to allow consecutive equal values (stationary phases).
+    decreasing_tol
+        Optional tolerance for negative movement (decreasing values).
+    na_pass
+        Whether NA/null values should be considered as passing.
+
+    Returns
+    -------
+    FrameT
+        The table with a `pb_is_good_` column indicating pass/fail for each row.
+    """
+    nw_tbl = nw.from_native(tbl)
+
+    # Create a lagged difference column
+    result_tbl = nw_tbl.with_columns(pb_lagged_difference_=nw.col(column) - nw.col(column).shift(1))
+
+    # Build the condition based on allow_stationary and decreasing_tol
+    if allow_stationary or decreasing_tol != 0:
+        # Allow stationary (diff >= 0) or within tolerance
+        threshold = -abs(decreasing_tol) if decreasing_tol != 0 else 0
+        good_condition = nw.col("pb_lagged_difference_") >= threshold
+    else:
+        # Strictly increasing (diff > 0)
+        good_condition = nw.col("pb_lagged_difference_") > 0
+
+    # Apply the validation logic
+    # The logic is:
+    # 1. If lagged_diff is null AND current value is NOT null -> pass (first row or after NA)
+    # 2. If current value is null -> apply na_pass
+    # 3. Otherwise -> apply the good_condition
+    result_tbl = result_tbl.with_columns(
+        pb_is_good_=nw.when(nw.col("pb_lagged_difference_").is_null() & ~nw.col(column).is_null())
+        .then(nw.lit(True))  # First row or row after NA (can't validate)
+        .otherwise(
+            nw.when(nw.col(column).is_null())
+            .then(nw.lit(na_pass))  # Handle NA values in current row
+            .otherwise(good_condition)
+        )
+    )
+
+    return result_tbl.drop("pb_lagged_difference_").to_native()
+
+
+def interrogate_decreasing(
+    tbl: FrameT, column: str, allow_stationary: bool, increasing_tol: float, na_pass: bool
+) -> FrameT:
+    """
+    Decreasing interrogation.
+
+    Checks whether column values are decreasing row by row.
+
+    Parameters
+    ----------
+    tbl
+        The table to interrogate.
+    column
+        The column to check.
+    allow_stationary
+        Whether to allow consecutive equal values (stationary phases).
+    increasing_tol
+        Optional tolerance for positive movement (increasing values).
+    na_pass
+        Whether NA/null values should be considered as passing.
+
+    Returns
+    -------
+    FrameT
+        The table with a `pb_is_good_` column indicating pass/fail for each row.
+    """
+    nw_tbl = nw.from_native(tbl)
+
+    # Create a lagged difference column
+    result_tbl = nw_tbl.with_columns(pb_lagged_difference_=nw.col(column) - nw.col(column).shift(1))
+
+    # Build the condition based on allow_stationary and increasing_tol
+    if allow_stationary or increasing_tol != 0:
+        # Allow stationary (diff <= 0) or within tolerance
+        threshold = abs(increasing_tol) if increasing_tol != 0 else 0
+        good_condition = nw.col("pb_lagged_difference_") <= threshold
+    else:
+        # Strictly decreasing (diff < 0)
+        good_condition = nw.col("pb_lagged_difference_") < 0
+
+    # Apply the validation logic
+    # The logic is:
+    # 1. If lagged_diff is null AND current value is NOT null -> pass (first row or after NA)
+    # 2. If current value is null -> apply na_pass
+    # 3. Otherwise -> apply the good_condition
+    result_tbl = result_tbl.with_columns(
+        pb_is_good_=nw.when(nw.col("pb_lagged_difference_").is_null() & ~nw.col(column).is_null())
+        .then(nw.lit(True))  # First row or row after NA (can't validate)
+        .otherwise(
+            nw.when(nw.col(column).is_null())
+            .then(nw.lit(na_pass))  # Handle NA values in current row
+            .otherwise(good_condition)
+        )
+    )
+
+    return result_tbl.drop("pb_lagged_difference_").to_native()
 
 
 def _interrogate_comparison_base(
@@ -1921,6 +2803,7 @@ def interrogate_prompt(tbl: FrameT, columns_subset: list[str] | None, ai_config:
             provider=llm_provider,
             model=llm_model,
             api_key=None,  # Will be loaded from environment variables
+            verify_ssl=True,  # Default to verifying SSL certificates
         )
 
         # Set up batch configuration
