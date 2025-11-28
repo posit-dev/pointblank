@@ -55,6 +55,7 @@ from pointblank._interrogation import (
     SpeciallyValidation,
     col_count_match,
     col_exists,
+    col_pct_null,
     col_schema_match,
     col_vals_expr,
     conjointly_validation,
@@ -4986,6 +4987,13 @@ class Validate:
             columns (str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals): _description_
             p (float): Percentage that should be null.
             tol (Tolerance, optional): Tolerance allowed against the total dataset.
+            thresholds (int | float | None | bool | tuple | dict | Thresholds, optional): Thresholds for the validation step.
+            brief (str | bool | None, optional): Brief description for the validation step.
+
+        Examples:
+            >>> import pointblank as pb
+            >>> import polars as pl
+            >>> df =
         """
         # If `columns` is a ColumnSelector or Narwhals selector, call `col()` on it to later
         # resolve the columns
@@ -12678,6 +12686,21 @@ class Validate:
                             results_tbl = interrogate_within_spec(
                                 tbl=tbl, column=column, values=value, na_pass=na_pass
                             )
+
+                    elif assertion_type == "col_pct_null":
+                        result_bool = col_pct_null(
+                            data_tbl=data_tbl_step,
+                            column=column,
+                            p=value["p"],
+                            bound_finder=value["bound_finder"],
+                        )
+
+                        validation.all_passed = result_bool
+                        validation.n = 1
+                        validation.n_passed = int(result_bool)
+                        validation.n_failed = 1 - result_bool
+
+                        results_tbl = None
 
                     elif assertion_type == "col_vals_expr":
                         results_tbl = col_vals_expr(
