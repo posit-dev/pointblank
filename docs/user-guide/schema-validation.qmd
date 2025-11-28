@@ -379,14 +379,6 @@ validation.get_step_report(i=1)
 
 This section explores common patterns for applying schema validation to different scenarios. Each
 pattern addresses specific validation needs you might encounter when working with real-world data.
-We'll examine the step reports for these validations since they provide more detailed information
-about what was checked and how the validation performed, offering an intuitive way to understand
-the results beyond simple pass/fail indicators.
-
-## Common Schema Validation Patterns
-
-This section explores common patterns for applying schema validation to different scenarios. Each
-pattern addresses specific validation needs you might encounter when working with real-world data.
 We'll examine the step reports (`~~Validate.get_step_report()`) for these validations since they
 provide more detailed information about what was checked and how the validation performed, offering
 an intuitive way to understand the results beyond simple pass/fail indicators.
