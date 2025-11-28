@@ -23,7 +23,7 @@ COMPATIBLE_DTYPES = {
 }
 
 ASSERTION_TYPE_METHOD_MAP: dict[str, str] = {
-    "col_vals_pct_null": "pct_null",
+    "col_pct_null": "pct_null",
     "col_vals_gt": "gt",
     "col_vals_lt": "lt",
     "col_vals_eq": "eq",

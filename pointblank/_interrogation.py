@@ -738,7 +738,7 @@ def row_count_match(data_tbl: FrameT, count, inverse: bool, abs_tol_bounds) -> b
         return row_count >= min_val and row_count <= max_val
 
 
-def col_vals_pct_null(
+def col_pct_null(
     data_tbl: FrameT, column: str, p: float, bound_finder: Callable[[int], AbsoluteBounds]
 ) -> bool:
     """Check if the pct of null vales are within p given the absolute bounds.

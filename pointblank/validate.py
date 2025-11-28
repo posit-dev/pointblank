@@ -52,9 +52,9 @@ from pointblank._interrogation import (
     SpeciallyValidation,
     col_count_match,
     col_exists,
+    col_pct_null,
     col_schema_match,
     col_vals_expr,
-    col_vals_pct_null,
     conjointly_validation,
     interrogate_between,
     interrogate_eq,
@@ -3965,7 +3965,7 @@ class Validate:
     def _repr_html_(self) -> str:
         return self.get_tabular_report()._repr_html_()  # pragma: no cover
 
-    def col_vals_pct_null(
+    def col_pct_null(
         self,
         columns: str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals,
         p: float,
@@ -4002,7 +4002,7 @@ class Validate:
         for column in columns:
             val_info = _ValidationInfo(
                 # TODO: should type hint these as required args i think
-                assertion_type="col_vals_pct_null",
+                assertion_type="col_pct_null",
                 column=column,
                 values={"p": p, "bound_finder": bound_finder},
                 brief=brief,
@@ -10706,8 +10706,8 @@ class Validate:
 
                         results_tbl = None
 
-                    elif assertion_type == "col_vals_pct_null":
-                        results_bool: bool = col_vals_pct_null(
+                    elif assertion_type == "col_pct_null":
+                        results_bool: bool = col_pct_null(
                             data_tbl=data_tbl_step,
                             column=column,
                             p=value["p"],
