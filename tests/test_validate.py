@@ -20216,7 +20216,3 @@ def test_pct_null_high_tol_always_pass() -> None:
     data = pl.DataFrame({"a": [None, None, None, 1]})  # 75% null
     validation = Validate(data).col_pct_null(columns=["a"], p=0.25, tol=10).interrogate()
     validation.assert_passing()
-
-
-if __name__ == "__main__":
-    pytest.main([__file__, "-sv", "-k", "test_pct_null"])
