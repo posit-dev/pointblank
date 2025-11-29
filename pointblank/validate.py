@@ -12,6 +12,7 @@ import tempfile
 import threading
 from dataclasses import dataclass
 from enum import Enum
+from functools import partial
 from importlib.metadata import version
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Callable, Literal
@@ -54,6 +55,7 @@ from pointblank._interrogation import (
     SpeciallyValidation,
     col_count_match,
     col_exists,
+    col_pct_null,
     col_schema_match,
     col_vals_expr,
     conjointly_validation,
@@ -4970,6 +4972,62 @@ class Validate:
 
     def _repr_html_(self) -> str:
         return self.get_tabular_report()._repr_html_()  # pragma: no cover
+
+    def col_pct_null(
+        self,
+        columns: str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals,
+        p: float,
+        tol: Tolerance = 0,
+        thresholds: int | float | None | bool | tuple | dict | Thresholds = None,
+        brief: str | bool | None = None,
+    ) -> Validate:
+        """Assert the number of values in a column are null.
+
+        Args:
+            columns (str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals): _description_
+            p (float): Percentage that should be null.
+            tol (Tolerance, optional): Tolerance allowed against the total dataset.
+            thresholds (int | float | None | bool | tuple | dict | Thresholds, optional): Thresholds for the validation step.
+            brief (str | bool | None, optional): Brief description for the validation step.
+
+        Examples:
+            >>> import pointblank as pb
+            >>> import polars as pl
+            >>> df =
+        """
+        # If `columns` is a ColumnSelector or Narwhals selector, call `col()` on it to later
+        # resolve the columns
+        if isinstance(columns, (ColumnSelector, nw.selectors.Selector)):
+            columns = col(columns)
+
+        # If `columns` is Column value or a string, place it in a list for iteration
+        if isinstance(columns, (Column, str)):
+            columns = [columns]
+
+        # Determine brief to use (global or local) and transform any shorthands of `brief=`
+        brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
+
+        bound_finder: Callable[[int], AbsoluteBounds] = partial(_derive_bounds, tol=tol)
+
+        thresholds = (
+            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+        )
+
+        # Iterate over the columns and create a validation step for each
+        for column in columns:
+            val_info = _ValidationInfo(
+                # TODO: should type hint these as required args i think
+                assertion_type="col_pct_null",
+                column=column,
+                values={"p": p, "bound_finder": bound_finder},
+                brief=brief,
+                active=True,
+                thresholds=thresholds,
+            )
+
+            self._add_validation(validation_info=val_info)
+
+        return self
 
     def col_vals_gt(
         self,
@@ -12628,6 +12686,21 @@ class Validate:
                             results_tbl = interrogate_within_spec(
                                 tbl=tbl, column=column, values=value, na_pass=na_pass
                             )
+
+                    elif assertion_type == "col_pct_null":
+                        result_bool = col_pct_null(
+                            data_tbl=data_tbl_step,
+                            column=column,
+                            p=value["p"],
+                            bound_finder=value["bound_finder"],
+                        )
+
+                        validation.all_passed = result_bool
+                        validation.n = 1
+                        validation.n_passed = int(result_bool)
+                        validation.n_failed = 1 - result_bool
+
+                        results_tbl = None
 
                     elif assertion_type == "col_vals_expr":
                         results_tbl = col_vals_expr(
