@@ -2,13 +2,14 @@
 
 .PHONY: test
 test:
-	@uv run pytest \
+	@uv run pytest tests \
 		--cov=pointblank \
 		--cov-report=term-missing \
 		--randomly-seed 123 \
 		-n auto \
 		--reruns 3 \
-		--reruns-delay 1
+		--reruns-delay 1 \
+		--doctest-modules pointblank
 
 test-update:
 	pytest --snapshot-update

@@ -4991,9 +4991,17 @@ class Validate:
             brief (str | bool | None, optional): Brief description for the validation step.
 
         Examples:
-            >>> import pointblank as pb
             >>> import polars as pl
-            >>> df =
+            >>> # Columns should have less than 50% null values
+            >>> data = pl.DataFrame({"a": [1, None, 3, None], "b": [None, None, 3, 4]})
+            >>> validation = Validate(data).col_pct_null(columns=["a", "b"], p=0.5).interrogate()
+            >>> validation.assert_below_threshold()
+
+            >>> # Values should be around 40% nulls with a tolerance of 10%; this will pass
+            >>> data = pl.DataFrame({"a": [None, None, 1, 2]})  # 50% nulls
+            >>> validation = Validate(data).col_pct_null(columns=["a"], p=0.4, tol=0.1).interrogate()
+            >>> validation.assert_passing()
+
         """
         # If `columns` is a ColumnSelector or Narwhals selector, call `col()` on it to later
         # resolve the columns

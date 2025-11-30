@@ -189,11 +189,14 @@ def _process_python_expressions(
 
     Examples
     --------
-    >>> _process_python_expressions({"python": "pl.scan_csv('data.csv').head(10)"})
     # Returns the result of the Python expression
+    >>> import polars as pl
+    >>> expr = _process_python_expressions({"python": "pl.scan_csv('data.csv').head(10)"})
+    >>> assert isinstance(expr, pl.LazyFrame)
 
-    >>> _process_python_expressions({"python": "import polars as pl\\npl.scan_csv('data.csv')"})
     # Returns the result of multiline Python code
+    >>> expr = _process_python_expressions({"python": "import polars as pl\\npl.scan_csv('data.csv')"})
+    >>> assert isinstance(expr, pl.LazyFrame)
     """
     if isinstance(value, dict):
         # Handle python: block syntax
