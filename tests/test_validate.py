@@ -20132,7 +20132,6 @@ def test_pct_null_simple_fail() -> None:
     assert len(info) == 2
 
 
-@pytest.mark.xfail(reason="No SVG for pct null?")
 def test_pct_null_simple_report() -> None:
     """Test col_pct_null() with simple data."""
     data = pl.DataFrame({"a": [1, None, 3, None], "b": [None, None, 3, 4]})

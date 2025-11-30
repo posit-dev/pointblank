@@ -17829,6 +17829,7 @@ def _validation_info_as_dict(validation_info: _ValidationInfo) -> dict:
 
 def _get_assertion_icon(icon: list[str], length_val: int = 30) -> list[str]:
     # For each icon, get the assertion icon SVG test from SVG_ICONS_FOR_ASSERTION_TYPES dictionary
+    # TODO: No point in using `get` if we can't handle missing keys anyways
     icon_svg = [SVG_ICONS_FOR_ASSERTION_TYPES.get(icon) for icon in icon]
 
     # Replace the width and height in the SVG string
