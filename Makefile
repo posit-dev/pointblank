@@ -9,7 +9,8 @@ test:
 		-n auto \
 		--reruns 3 \
 		--reruns-delay 1 \
-		--doctest-modules pointblank
+		--doctest-modules pointblank \
+		--durations 10
 
 test-update:
 	pytest --snapshot-update
