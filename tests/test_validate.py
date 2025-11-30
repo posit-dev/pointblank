@@ -75,6 +75,13 @@ try:
 except ImportError:
     PYSPARK_AVAILABLE = False
 
+## If we specifically disable tests in pytest set the availability to False
+if os.environ.get("SKIP_PYSPARK_TESTS", "").lower() in ("true", "1", "yes"):
+    PYSPARK_AVAILABLE = False
+if os.environ.get("SKIP_SQLITE_TESTS", "").lower() in ("true", "1", "yes"):
+    SQLITE_AVAILABLE = False
+if os.environ.get("SKIP_PARQUET_TESTS", "").lower() in ("true", "1", "yes"):
+    PARQUET_AVAILABLE = False
 
 from great_tables import vals
 import great_tables as GT
@@ -180,12 +187,15 @@ TEST_DATA_DIR = Path("tests") / "tbl_files"
 TBL_LIST = [
     "tbl_pd",
     "tbl_pl",
-    "tbl_parquet",
     "tbl_duckdb",
-    "tbl_sqlite",
 ]
 
-# Add PySpark to lists if available
+if PARQUET_AVAILABLE:
+    TBL_LIST.append("tbl_parquet")
+
+if SQLITE_AVAILABLE:
+    TBL_LIST.append("tbl_sqlite")
+
 if PYSPARK_AVAILABLE:
     TBL_LIST.append("tbl_pyspark")
 

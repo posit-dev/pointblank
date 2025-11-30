@@ -10,6 +10,19 @@ test:
 		--reruns 3 \
 		--reruns-delay 1
 
+.PHONY: test-core
+test-core: ## Run core libraries only; useful for local CI
+	@SKIP_PYSPARK_TESTS=1 \
+		SKIP_SQLITE_TESTS=1 \
+		SKIP_PARQUET_TESTS=1 \
+		uv run pytest \
+		--cov=pointblank \
+		--cov-report=term-missing \
+		--randomly-seed 123 \
+		-n auto \
+		--durations=10
+
+
 test-update:
 	pytest --snapshot-update
 
