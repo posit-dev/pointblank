@@ -78,8 +78,10 @@ except ImportError:
 ## If we specifically disable tests in pytest set the availability to False
 if os.environ.get("SKIP_PYSPARK_TESTS", "").lower() in ("true", "1", "yes"):
     PYSPARK_AVAILABLE = False
+SQLITE_AVAILABLE = True
 if os.environ.get("SKIP_SQLITE_TESTS", "").lower() in ("true", "1", "yes"):
     SQLITE_AVAILABLE = False
+PARQUET_AVAILABLE = True
 if os.environ.get("SKIP_PARQUET_TESTS", "").lower() in ("true", "1", "yes"):
     PARQUET_AVAILABLE = False
 
