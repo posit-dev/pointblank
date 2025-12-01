@@ -25,6 +25,7 @@ from great_tables.vals import fmt_integer, fmt_number
 from importlib_resources import files
 from narwhals.typing import FrameT
 
+from pointblank._agg import is_valid_agg, resolve_agg_registries
 from pointblank._constants import (
     ASSERTION_TYPE_METHOD_MAP,
     CHECK_MARK_SPAN,
@@ -90,6 +91,8 @@ from pointblank._utils import (
     _is_lib_present,
     _is_narwhals_table,
     _is_value_a_df,
+    _PBUnresolvedColumn,
+    _resolve_columns,
     _select_df_lib,
 )
 from pointblank._utils_check_args import (
@@ -3721,6 +3724,30 @@ class _ValidationInfo:
         insertion order, ensuring notes appear in a consistent sequence in reports and logs.
     """
 
+    @classmethod
+    def from_agg_validator(
+        cls,
+        assertion_type: str,
+        columns: _PBUnresolvedColumn,
+        value: float | Column,
+        tol: Tolerance = 0,
+        thresholds: float | bool | tuple | dict | Thresholds | None = None,
+        brief: str | bool = False,
+        actions: Actions | None = None,
+        active: bool = True,
+    ) -> _ValidationInfo:
+        _check_thresholds(thresholds=thresholds)
+
+        return cls(
+            assertion_type=assertion_type,
+            column=_resolve_columns(columns),
+            values={"value": value, "tol": tol},
+            thresholds=_normalize_thresholds_creation(thresholds),
+            brief=_transform_auto_brief(brief=brief),
+            actions=actions,
+            active=active,
+        )
+
     # Validation plan
     i: int | None = None
     i_o: int | None = None
@@ -4971,6 +4998,46 @@ class Validate:
     def _repr_html_(self) -> str:
         return self.get_tabular_report()._repr_html_()  # pragma: no cover
 
+    def col_sum_eq(
+        self,
+        # TODO: Public type alias
+        columns: _PBUnresolvedColumn,
+        value: float | Column,
+        tol: Tolerance = 0,
+        # TODO: type alias this, especially the tuple/dict parts
+        thresholds: float | bool | tuple | dict | Thresholds | None = None,
+        brief: str | bool = False,
+        actions: Actions | None = None,
+        active: bool = True,
+    ) -> Validate:
+        """Assert the sum of the values in a column is equal to some `value`.
+
+        Args:
+            columns (str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals): _description_
+            value (float | Column): _description_
+            thresholds (float | bool | tuple | dict | Thresholds | None, optional): _description_. Defaults to None.
+            brief (str | bool, optional): _description_. Defaults to False.
+            actions (Actions | None, optional): _description_. Defaults to None.
+
+        Returns:
+            Validate: _description_
+        """
+        for column in columns:  # TODO: Not typed correctly
+            val_info = _ValidationInfo.from_agg_validator(
+                assertion_type=_get_fn_name(),
+                columns=column,
+                value=value,
+                tol=tol,
+                thresholds=self.thresholds if thresholds is None else thresholds,
+                actions=self.actions if actions is None else actions,
+                brief=self.brief if brief is None else brief,
+                active=active,
+            )
+
+            self._add_validation(validation_info=val_info)
+
+        return self
+
     def col_vals_gt(
         self,
         columns: str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals,
@@ -5212,6 +5279,7 @@ class Validate:
         - Row 1: `c` is `1` and `b` is `2`.
         - Row 3: `c` is `2` and `b` is `2`.
         """
+        columns = _resolve_columns(columns)
 
         assertion_type = _get_fn_name()
 
@@ -5232,14 +5300,7 @@ class Validate:
             self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
         )
 
-        # If `columns` is a ColumnSelector or Narwhals selector, call `col()` on it to later
-        # resolve the columns
-        if isinstance(columns, (ColumnSelector, nw.selectors.Selector)):
-            columns = col(columns)
-
-        # If `columns` is Column value or a string, place it in a list for iteration
-        if isinstance(columns, (Column, str)):
-            columns = [columns]
+        columns = _resolve_columns(columns)
 
         # Determine brief to use (global or local) and transform any shorthands of `brief=`
         brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
@@ -12760,6 +12821,26 @@ class Validate:
                             tbl_type=tbl_type,
                         )
 
+                    elif is_valid_agg(assertion_type):
+                        agg, comp = resolve_agg_registries(assertion_type)
+
+                        # Produce a 1-column Narwhals DataFrame
+                        # TODO: Should be able to take lazy too
+                        vec: nw.DataFrame = nw.from_native(data_tbl_step).select(column)
+                        real = agg(vec)
+
+                        target = value["value"]
+                        tol = value["tol"]
+                        lower_bound, upper_bound = _derive_bounds(target, tol)
+
+                        result_bool = comp(real, target - lower_bound, target + upper_bound)
+
+                        validation.all_passed = result_bool
+                        validation.n = 1
+                        validation.n_passed = int(result_bool)
+                        validation.n_failed = 1 - result_bool
+
+                        results_tbl = None
                     else:
                         raise ValueError(
                             f"Unknown assertion type: {assertion_type}"
