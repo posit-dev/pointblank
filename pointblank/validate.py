@@ -9777,7 +9777,9 @@ class Validate:
         p: float,
         tol: Tolerance = 0,
         thresholds: int | float | None | bool | tuple | dict | Thresholds = None,
+        actions: Actions | None = None,
         brief: str | bool | None = None,
+        active: bool = True,
     ) -> Validate:
         """
         Validate whether a column has a specific percentage of Null values.
@@ -9810,12 +9812,20 @@ class Validate:
             `Validate(thresholds=...)`. The default is `None`, which means that no thresholds will
             be set locally and global thresholds (if any) will take effect. Look at the *Thresholds*
             section for information on how to set threshold levels.
+        actions
+            Optional actions to take when the validation step(s) meets or exceeds any set threshold
+            levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
+            define the actions.
         brief
             An optional brief description of the validation step that will be displayed in the
             reporting table. You can use the templating elements like `"{step}"` to insert
             the step number, or `"{auto}"` to include an automatically generated brief. If `True`
             the entire brief will be automatically generated. If `None` (the default) then there
             won't be a brief.
+        active
+            A boolean value indicating whether the validation step should be active. Using `False`
+            will make the validation step inactive (still reporting its presence and keeping indexes
+            for the steps unchanged).
 
         Returns
         -------
@@ -10016,6 +10026,17 @@ class Validate:
         This passes because 4 Null values falls within the acceptable range (3 - 0.3 to 3 + 0.9,
         which is 2.7 to 3.9).
         """
+        assertion_type = _get_fn_name()
+
+        _check_column(column=columns)
+        _check_thresholds(thresholds=thresholds)
+        _check_boolean_input(param=active, param_name="active")
+
+        # Determine threshold to use (global or local) and normalize a local `thresholds=` value
+        thresholds = (
+            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+        )
+
         # If `columns` is a ColumnSelector or Narwhals selector, call `col()` on it to later
         # resolve the columns
         if isinstance(columns, (ColumnSelector, nw.selectors.Selector)):
@@ -10030,20 +10051,16 @@ class Validate:
 
         bound_finder: Callable[[int], AbsoluteBounds] = partial(_derive_bounds, tol=tol)
 
-        thresholds = (
-            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
-        )
-
         # Iterate over the columns and create a validation step for each
         for column in columns:
             val_info = _ValidationInfo(
-                # TODO: should type hint these as required args i think
-                assertion_type="col_pct_null",
+                assertion_type=assertion_type,
                 column=column,
                 values={"p": p, "bound_finder": bound_finder},
-                brief=brief,
-                active=True,
                 thresholds=thresholds,
+                actions=actions,
+                brief=brief,
+                active=active,
             )
 
             self._add_validation(validation_info=val_info)
