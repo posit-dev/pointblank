@@ -9961,7 +9961,7 @@ class Validate:
         different ways to specify tolerance using column `b`, which has exactly 50% Null values
         (4 out of 8 values).
 
-        **Using an absolute tolerance (integer)**: Specify the exact number of rows that can
+        *Using an absolute tolerance (integer)*: Specify the exact number of rows that can
         deviate. With `tol=1`, we allow the count to differ by 1 row in either direction.
 
         ```{python}
@@ -9977,7 +9977,7 @@ class Validate:
         This passes because column `b` has 4 Null values, which falls within the acceptable range
         of 2 to 4 (3 ± 1).
 
-        **Using a relative tolerance (float)**: Specify the tolerance as a proportion of the
+        *Using a relative tolerance (float)*: Specify the tolerance as a proportion of the
         expected count. With `tol=0.25`, we allow a 25% deviation from the expected count.
 
         ```{python}
@@ -9990,17 +9990,17 @@ class Validate:
         validation
         ```
 
-        This passes because 4 Null values falls within the acceptable range (3 ± 0.75, which is
-        2.25 to 3.75).
+        This passes because 4 Null values falls within the acceptable range (3 ± 0.75 calculates
+        to 2.25 to 3.75, which rounds down to 2 to 3 rows).
 
-        **Using asymmetric absolute bounds (tuple of integers)**: Specify different lower and
+        *Using asymmetric absolute bounds (tuple of integers)*: Specify different lower and
         upper bounds as absolute values. With `tol=(0, 2)`, we allow no deviation below but up
         to 2 rows above the expected count.
 
         ```{python}
         validation = (
             pb.Validate(data=tbl)
-            .col_pct_null(columns="b", p=0.25, tol=(0, 2)  # Expect 2 nulls, allow +0/-2 (range: 2-4)
+            .col_pct_null(columns="b", p=0.25, tol=(0, 2))  # Expect 2 Nulls, allow +0/-2 (range: 2-4)
             .interrogate()
         )
 
@@ -10009,22 +10009,22 @@ class Validate:
 
         This passes because 4 Null values falls within the acceptable range of 2 to 4.
 
-        **Using asymmetric relative bounds (tuple of floats)**: Specify different lower and upper
+        *Using asymmetric relative bounds (tuple of floats)*: Specify different lower and upper
         bounds as proportions. With `tol=(0.1, 0.3)`, we allow 10% below and 30% above the
         expected count.
 
         ```{python}
         validation = (
             pb.Validate(data=tbl)
-            .col_pct_null(columns="b", p=0.375, tol=(0.1, 0.3)  # Expect 3 nulls, allow -10%/+30%
+            .col_pct_null(columns="b", p=0.375, tol=(0.1, 0.3)  # Expect 3 Nulls, allow -10%/+30%
             .interrogate()
         )
 
         validation
         ```
 
-        This passes because 4 Null values falls within the acceptable range (3 - 0.3 to 3 + 0.9,
-        which is 2.7 to 3.9).
+        This passes because 4 Null values falls within the acceptable range (3 - 0.3 to 3 + 0.9
+        calculates to 2.7 to 3.9, which rounds down to 2 to 3 rows).
         """
         assertion_type = _get_fn_name()
 
