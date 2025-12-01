@@ -558,15 +558,14 @@ _PBResolvedColumn = Column | ColumnLiteral | ColumnSelectorNarwhals | list[Colum
 def _resolve_columns(columns: _PBUnresolvedColumn) -> _PBResolvedColumn:
     # If `columns` is a ColumnSelector or Narwhals selector, call `col()` on it to later
     # resolve the columns
-    # TODO: I feel like there are several functions that do basically this same thing; consolidate?
     if isinstance(columns, (ColumnSelector, nw.selectors.Selector)):
-        return [col(columns)]
+        columns = col(columns)
 
     # If `columns` is Column value or a string, place it in a list for iteration
     if isinstance(columns, (Column, str)):
-        return [columns]
+        columns = [columns]
 
-    raise NotImplementedError  # pragma: no cover
+    return columns
 
 
 def _get_fn_name() -> str:

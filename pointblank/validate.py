@@ -5639,8 +5639,6 @@ class Validate:
         - Row 1: `c` is `1` and `b` is `2`.
         - Row 3: `c` is `2` and `b` is `2`.
         """
-        columns = _resolve_columns(columns)
-
         assertion_type = _get_fn_name()
 
         _check_column(column=columns)
