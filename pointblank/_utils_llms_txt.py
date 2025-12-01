@@ -104,6 +104,7 @@ def _get_api_text() -> str:
         "Validate.rows_distinct",
         "Validate.rows_complete",
         "Validate.col_exists",
+        "Validate.col_pct_null",
         "Validate.col_schema_match",
         "Validate.row_count_match",
         "Validate.col_count_match",
