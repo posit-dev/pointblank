@@ -10016,7 +10016,7 @@ class Validate:
         ```{python}
         validation = (
             pb.Validate(data=tbl)
-            .col_pct_null(columns="b", p=0.375, tol=(0.1, 0.3)  # Expect 3 Nulls, allow -10%/+30%
+            .col_pct_null(columns="b", p=0.375, tol=(0.1, 0.3))  # Expect 3 Nulls, allow -10%/+30%
             .interrogate()
         )
 
