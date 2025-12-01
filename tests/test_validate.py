@@ -20144,20 +20144,20 @@ def test_footer_controls_override_global_config():
         )
 
 
-@pytest.mark.parametrize("tbl_fixture", TBL_LIST)
+@pytest.mark.parametrize("tbl_fixture", ["tbl_pd", "tbl_pl"])
 def test_pct_null_parametrized(tbl_fixture, request) -> None:
-    """Test col_pct_null() across different backends."""
-    tbl = request.getfixturevalue(tbl_fixture)
-    
-    # Filter to get a subset with known null percentages
-    # Using city column which has some nulls in the test data
-    validation = (
-        Validate(tbl)
-        .col_pct_null(columns="city", p=0.0, tol=1.0)  # Allow wide tolerance to pass
-        .interrogate()
-    )
-    
-    # Should pass with wide tolerance
+    """Test col_pct_null() across different backends with simple custom data."""
+    # Create simple test data with known null percentages
+    if tbl_fixture == "tbl_pd":
+        import pandas as pd
+
+        tbl = pd.DataFrame({"a": [1, None, 3, None], "b": [None, None, 3, 4]})
+    else:  # tbl_pl
+        tbl = pl.DataFrame({"a": [1, None, 3, None], "b": [None, None, 3, 4]})
+
+    # Test with 50% nulls - should pass
+    validation = Validate(tbl).col_pct_null(columns="a", p=0.5).interrogate()
+
     validation.assert_passing()
 
 
