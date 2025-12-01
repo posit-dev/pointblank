@@ -5038,6 +5038,166 @@ class Validate:
 
         return self
 
+    def col_sum_gt(
+        self,
+        columns: _PBUnresolvedColumn,
+        value: float | Column,
+        tol: Tolerance = 0,
+        thresholds: float | bool | tuple | dict | Thresholds | None = None,
+        brief: str | bool = False,
+        actions: Actions | None = None,
+        active: bool = True,
+    ) -> Validate:
+        """Assert the values in a column sum to a value greater than some `value`.
+
+        Args:
+            columns (_PBUnresolvedColumn): _description_
+            value (float | Column): _description_
+            tol (Tolerance, optional): _description_. Defaults to 0.
+            thresholds (float | bool | tuple | dict | Thresholds | None, optional): _description_. Defaults to None.
+            brief (str | bool, optional): _description_. Defaults to False.
+            actions (Actions | None, optional): _description_. Defaults to None.
+            active (bool, optional): _description_. Defaults to True.
+
+        Returns:
+            Validate: _description_
+        """
+        for column in columns:  # TODO: Not typed correctly
+            val_info = _ValidationInfo.from_agg_validator(
+                assertion_type=_get_fn_name(),
+                columns=column,
+                value=value,
+                tol=tol,
+                thresholds=self.thresholds if thresholds is None else thresholds,
+                actions=self.actions if actions is None else actions,
+                brief=self.brief if brief is None else brief,
+                active=active,
+            )
+
+            self._add_validation(validation_info=val_info)
+
+        return self
+
+    def col_sum_ge(
+        self,
+        columns: _PBUnresolvedColumn,
+        value: float | Column,
+        tol: Tolerance = 0,
+        thresholds: float | bool | tuple | dict | Thresholds | None = None,
+        brief: str | bool = False,
+        actions: Actions | None = None,
+        active: bool = True,
+    ) -> Validate:
+        """Assert the values in a column sum to a value greater or equal than some `value`.
+
+        Args:
+            columns (_PBUnresolvedColumn): _description_
+            value (float | Column): _description_
+            tol (Tolerance, optional): _description_. Defaults to 0.
+            thresholds (float | bool | tuple | dict | Thresholds | None, optional): _description_. Defaults to None.
+            brief (str | bool, optional): _description_. Defaults to False.
+            actions (Actions | None, optional): _description_. Defaults to None.
+            active (bool, optional): _description_. Defaults to True.
+
+        Returns:
+            Validate: _description_
+        """
+        for column in columns:  # TODO: Not typed correctly
+            val_info = _ValidationInfo.from_agg_validator(
+                assertion_type=_get_fn_name(),
+                columns=column,
+                value=value,
+                tol=tol,
+                thresholds=self.thresholds if thresholds is None else thresholds,
+                actions=self.actions if actions is None else actions,
+                brief=self.brief if brief is None else brief,
+                active=active,
+            )
+
+            self._add_validation(validation_info=val_info)
+
+        return self
+
+    def col_sum_lt(
+        self,
+        columns: _PBUnresolvedColumn,
+        value: float | Column,
+        tol: Tolerance = 0,
+        thresholds: float | bool | tuple | dict | Thresholds | None = None,
+        brief: str | bool = False,
+        actions: Actions | None = None,
+        active: bool = True,
+    ) -> Validate:
+        """Assert the values in a column sum to a value less than some `value`.
+
+        Args:
+            columns (_PBUnresolvedColumn): _description_
+            value (float | Column): _description_
+            tol (Tolerance, optional): _description_. Defaults to 0.
+            thresholds (float | bool | tuple | dict | Thresholds | None, optional): _description_. Defaults to None.
+            brief (str | bool, optional): _description_. Defaults to False.
+            actions (Actions | None, optional): _description_. Defaults to None.
+            active (bool, optional): _description_. Defaults to True.
+
+        Returns:
+            Validate: _description_
+        """
+        for column in columns:  # TODO: Not typed correctly
+            val_info = _ValidationInfo.from_agg_validator(
+                assertion_type=_get_fn_name(),
+                columns=column,
+                value=value,
+                tol=tol,
+                thresholds=self.thresholds if thresholds is None else thresholds,
+                actions=self.actions if actions is None else actions,
+                brief=self.brief if brief is None else brief,
+                active=active,
+            )
+
+            self._add_validation(validation_info=val_info)
+
+        return self
+
+    def col_sum_le(
+        self,
+        columns: _PBUnresolvedColumn,
+        value: float | Column,
+        tol: Tolerance = 0,
+        thresholds: float | bool | tuple | dict | Thresholds | None = None,
+        brief: str | bool = False,
+        actions: Actions | None = None,
+        active: bool = True,
+    ) -> Validate:
+        """Assert the values in a column sum to a value less than or equal to some `value`.
+
+        Args:
+            columns (_PBUnresolvedColumn): _description_
+            value (float | Column): _description_
+            tol (Tolerance, optional): _description_. Defaults to 0.
+            thresholds (float | bool | tuple | dict | Thresholds | None, optional): _description_. Defaults to None.
+            brief (str | bool, optional): _description_. Defaults to False.
+            actions (Actions | None, optional): _description_. Defaults to None.
+            active (bool, optional): _description_. Defaults to True.
+
+        Returns:
+            Validate: _description_
+        """
+        for column in columns:  # TODO: Not typed correctly
+            val_info = _ValidationInfo.from_agg_validator(
+                assertion_type=_get_fn_name(),
+                columns=column,
+                value=value,
+                tol=tol,
+                thresholds=self.thresholds if thresholds is None else thresholds,
+                actions=self.actions if actions is None else actions,
+                brief=self.brief if brief is None else brief,
+                active=active,
+            )
+
+            self._add_validation(validation_info=val_info)
+
+        return self
+
     def col_vals_gt(
         self,
         columns: str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals,
@@ -12340,7 +12500,7 @@ class Validate:
             segment = validation.segments
 
             # Get compatible data types for this assertion type
-            assertion_method = ASSERTION_TYPE_METHOD_MAP[assertion_type]
+            assertion_method = ASSERTION_TYPE_METHOD_MAP.get(assertion_type, assertion_type)
             compatible_dtypes = COMPATIBLE_DTYPES.get(assertion_method, [])
 
             # Process the `brief` text for the validation step by including template variables to

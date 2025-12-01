@@ -51,6 +51,20 @@ def comp_ge(real: Any, lower: float, upper: float) -> bool:
     return bool(real >= lower)
 
 
+@register
+def comp_lt(real: float, lower: float, upper: float) -> bool:
+    if lower == upper:
+        return bool(real < lower)
+    return bool(real < upper)
+
+
+@register
+def comp_le(real: float, lower: float, upper: float) -> bool:
+    if lower == upper:
+        return bool(real <= lower)
+    return bool(real <= upper)
+
+
 def _generic_between(real: Any, lower: Any, upper: Any) -> bool:
     """Call if comparator needs to check between two values."""
     return bool(lower <= real <= upper)
