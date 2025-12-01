@@ -9801,7 +9801,9 @@ class Validate:
         tol
             The tolerance allowed when comparing the actual percentage of Null values to the
             expected percentage `p=`. The validation passes if the actual percentage falls within
-            the range `[p - tol, p + tol]`. Default is `0`, meaning an exact match is required.
+            the range `[p - tol, p + tol]`. Default is `0`, meaning an exact match is required. See
+            the *Tolerance* section for details on all supported formats (absolute, relative,
+            symmetric, and asymmetric bounds).
         thresholds
             Set threshold failure levels for reporting and reacting to exceedences of the levels.
             The thresholds are set at the step level and will override any global thresholds set in
