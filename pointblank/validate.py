@@ -12825,7 +12825,7 @@ class Validate:
                         validation.all_passed = result_bool
                         validation.n = 1
                         validation.n_passed = int(result_bool)
-                        validation.n_failed = 1 - result_bool
+                        validation.n_failed = 1 - int(result_bool)
 
                         results_tbl = None
 
@@ -12902,7 +12902,7 @@ class Validate:
                         validation.all_passed = result_bool
                         validation.n = 1
                         validation.n_passed = int(result_bool)
-                        validation.n_failed = 1 - result_bool
+                        validation.n_failed = 1 - int(result_bool)
 
                         results_tbl = None
 
@@ -12917,7 +12917,7 @@ class Validate:
                         validation.all_passed = result_bool
                         validation.n = 1
                         validation.n_passed = int(result_bool)
-                        validation.n_failed = 1 - result_bool
+                        validation.n_failed = 1 - int(result_bool)
 
                         results_tbl = None
 
@@ -12929,7 +12929,7 @@ class Validate:
                         validation.all_passed = result_bool
                         validation.n = 1
                         validation.n_passed = int(result_bool)
-                        validation.n_failed = 1 - result_bool
+                        validation.n_failed = 1 - int(result_bool)
 
                         results_tbl = None
 
@@ -12948,7 +12948,7 @@ class Validate:
                         validation.all_passed = result_bool
                         validation.n = 1
                         validation.n_passed = int(result_bool)
-                        validation.n_failed = 1 - result_bool
+                        validation.n_failed = 1 - int(result_bool)
 
                         results_tbl = None
 
@@ -15716,6 +15716,15 @@ class Validate:
                 "rows_complete",
             ]:
                 values_upd.append("&mdash;")
+
+            elif assertion_type[i] in ["col_pct_null"]:
+                # Extract p and tol from the values dict for nice formatting
+                p_value = value["p"]
+
+                # Extract tol from the bound_finder partial function
+                bound_finder = value.get("bound_finder")
+                tol_value = bound_finder.keywords.get("tol", 0) if bound_finder else 0
+                values_upd.append(f"p = {p_value}<br/>tol = {tol_value}")
 
             elif assertion_type[i] in ["col_schema_match"]:
                 values_upd.append("SCHEMA")
