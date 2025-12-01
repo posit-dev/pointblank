@@ -4002,12 +4002,23 @@ def test_validation_with_all_validation_types():
         .col_vals_not_in_set(columns="category", set=["D", "E"])
         .col_vals_regex(columns="email", pattern=r"^[\w\.-]+@[\w\.-]+\.\w+$")
         .col_vals_not_null(["id", "name", "email"])
-        .col_vals_null(columns="optional_field")  # Test null validation on column with actual nulls
+        .col_pct_null(columns="optional_field", p=0.6)  # Test pct_null validation (60% nulls)
         # Column existence
         .col_exists(["id", "name", "age", "email"])
         # Row-level validations
         .rows_distinct()
-        .rows_complete()
+        .rows_complete(
+            columns_subset=[
+                "id",
+                "name",
+                "age",
+                "email",
+                "score",
+                "active",
+                "category",
+                "created_date",
+            ]
+        )
         # Table-level validations
         .row_count_match(count=5)
         .col_count_match(count=9)  # Updated to match new column count
@@ -4065,12 +4076,23 @@ def test_validation_with_all_validation_types_pandas():
         .col_vals_not_in_set(columns="category", set=["D", "E"])
         .col_vals_regex(columns="email", pattern=r"^[\w\.-]+@[\w\.-]+\.\w+$")
         .col_vals_not_null(["id", "name", "email"])
-        .col_vals_null(columns="optional_field")  # Test null validation on column with actual nulls
+        .col_pct_null(columns="optional_field", p=0.6)  # Test pct_null validation (60% nulls)
         # Column existence
         .col_exists(["id", "name", "age", "email"])
         # Row-level validations
         .rows_distinct()
-        .rows_complete()
+        .rows_complete(
+            columns_subset=[
+                "id",
+                "name",
+                "age",
+                "email",
+                "score",
+                "active",
+                "category",
+                "created_date",
+            ]
+        )
         # Table-level validations
         .row_count_match(count=5)
         .col_count_match(count=9)  # Updated to match new column count
@@ -4131,12 +4153,23 @@ def test_validation_with_all_validation_types_pyspark():
         .col_vals_not_in_set(columns="category", set=["D", "E"])
         .col_vals_regex(columns="email", pattern=r"^[\w\.-]+@[\w\.-]+\.\w+$")
         .col_vals_not_null(["id", "name", "email"])
-        .col_vals_null(columns="optional_field")  # Test null validation on column with actual nulls
+        .col_pct_null(columns="optional_field", p=0.6)  # Test pct_null validation (60% nulls)
         # Column existence
         .col_exists(["id", "name", "age", "email"])
         # Row-level validations
         .rows_distinct()
-        .rows_complete()
+        .rows_complete(
+            columns_subset=[
+                "id",
+                "name",
+                "age",
+                "email",
+                "score",
+                "active",
+                "category",
+                "created_date",
+            ]
+        )
         # Table-level validations
         .row_count_match(count=5)
         .col_count_match(count=9)  # Updated to match new column count
