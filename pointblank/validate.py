@@ -12487,6 +12487,7 @@ class Validate:
                 column=column,
                 values=value,
                 for_failure=False,
+                locale=self.locale,
             )
 
             validation.autobrief = autobrief
@@ -13194,6 +13195,7 @@ class Validate:
                     column=column,
                     values=value,
                     for_failure=True,
+                    locale=self.locale,
                 )
 
                 # Set the failure text in the validation step
@@ -17213,7 +17215,12 @@ def _process_action_str(
 
 
 def _create_autobrief_or_failure_text(
-    assertion_type: str, lang: str, column: str | None, values: str | None, for_failure: bool
+    assertion_type: str,
+    lang: str,
+    column: str | None,
+    values: str | None,
+    for_failure: bool,
+    locale: str | None = None,
 ) -> str:
     if assertion_type in [
         "col_vals_gt",
@@ -17335,6 +17342,15 @@ def _create_autobrief_or_failure_text(
             lang=lang,
             value=values,
             for_failure=for_failure,
+        )
+
+    if assertion_type == "col_pct_null":
+        return _create_text_col_pct_null(
+            lang=lang,
+            column=column,
+            value=values,
+            for_failure=for_failure,
+            locale=locale if locale else lang,
         )
 
     if assertion_type == "conjointly":
@@ -17557,6 +17573,58 @@ def _create_text_col_count_match(lang: str, value: int, for_failure: bool = Fals
     values_text = _prep_values_text(value["count"], lang=lang)
 
     return EXPECT_FAIL_TEXT[f"col_count_match_n_{type_}_text"][lang].format(values_text=values_text)
+
+
+def _create_text_col_pct_null(
+    lang: str, column: str | None, value: dict, for_failure: bool = False, locale: str | None = None
+) -> str:
+    """Create text for col_pct_null validation with tolerance handling."""
+    type_ = _expect_failure_type(for_failure=for_failure)
+
+    column_text = _prep_column_text(column=column)
+
+    # Use locale for number formatting, defaulting to lang if not provided
+    fmt_locale = locale if locale else lang
+
+    # Extract p and tol from the values dict
+    p_value = value.get("p", 0) * 100  # Convert to percentage
+
+    # Extract tol from the bound_finder partial function
+    bound_finder = value.get("bound_finder")
+    tol_value = bound_finder.keywords.get("tol", 0) if bound_finder else 0
+    tol_pct = tol_value * 100  # Convert to percentage
+
+    # Calculate the range for display
+    lower = max(0, p_value - tol_pct)
+    upper = min(100, p_value + tol_pct)
+
+    # Format numbers with locale-aware formatting
+    p_formatted = _format_number_safe(p_value, decimals=1, locale=fmt_locale)
+    lower_formatted = _format_number_safe(lower, decimals=1, locale=fmt_locale)
+    upper_formatted = _format_number_safe(upper, decimals=1, locale=fmt_locale)
+
+    # Choose the appropriate translation key based on tolerance
+    if tol_value == 0:
+        # No tolerance - use simple text
+        text = EXPECT_FAIL_TEXT[f"col_pct_null_{type_}_text"][lang].format(
+            column_text=column_text,
+            p=p_formatted,
+        )
+    elif tol_pct > 0:
+        # With tolerance - show as range
+        text = EXPECT_FAIL_TEXT[f"col_pct_null_{type_}_text_tol_range"][lang].format(
+            column_text=column_text,
+            lower=lower_formatted,
+            upper=upper_formatted,
+        )
+    else:
+        # Fallback (should not reach here)
+        text = EXPECT_FAIL_TEXT[f"col_pct_null_{type_}_text"][lang].format(
+            column_text=column_text,
+            p=p_formatted,
+        )
+
+    return text
 
 
 def _create_text_conjointly(lang: str, for_failure: bool = False) -> str:
