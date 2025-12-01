@@ -750,25 +750,21 @@ def row_count_match(data_tbl: FrameT, count, inverse: bool, abs_tol_bounds) -> b
 def col_pct_null(
     data_tbl: FrameT, column: str, p: float, bound_finder: Callable[[int], AbsoluteBounds]
 ) -> bool:
-    """Check if the pct of null vales are within p given the absolute bounds.
+    """Check if the percentage of null vales are within p given the absolute bounds."""
+    # Convert to narwhals for consistent API across backends
+    nw_tbl = nw.from_native(data_tbl)
 
-    Args:
-        data_tbl (FrameT): Data
-        column (str): Column in the data.
-        p (float): Percentage of null values out of the total allowed.
-        bound_finder (Callable[[int], AbsoluteBounds]): Function that takes a target number of
-            null values and returns the absolute bounds.
+    # Handle LazyFrames by collecting them first
+    if hasattr(nw_tbl, "collect"):
+        nw_tbl = nw_tbl.collect()
 
-    Returns:
-        bool: _description_
-    """
-    # TODO: Shouldn't be passing the whole dataframe for things like this.
-    # Extract the absolute target to use with the absolute bounds.
-    total_rows: int = data_tbl[column].len()
+    # Get total rows using narwhals
+    total_rows: int = nw_tbl.select(nw.len()).item()
     abs_target: float = round(total_rows * p)
     lower_bound, upper_bound = bound_finder(abs_target)
 
-    n_null: int = nw.from_native(data_tbl).select(nw.col(column).is_null().sum()).item()
+    # Count null values
+    n_null: int = nw_tbl.select(nw.col(column).is_null().sum()).item()
 
     return n_null >= (abs_target - lower_bound) and n_null <= (abs_target + upper_bound)
 
