@@ -174,6 +174,32 @@ A very common thing to validate is that there are no Null/NA/missing values in a
 
 Column `a` has no missing values and the above validation proves this.
 
+### Checking Percentage of Missing Values
+
+While `~~Validate.col_vals_not_null()` ensures there are no missing values at all, sometimes you
+need to validate that missing values match a specific percentage. The `~~Validate.col_pct_null()`
+method checks whether the percentage of missing values in a column matches an expected value:
+
+```{python}
+(
+    pb.Validate(data=pb.load_dataset(dataset="small_table", tbl_type="polars"))
+    .col_pct_null(columns="c", p=0.15, tol=0.05)  # Expect ~15% missing values (±5%)
+    .interrogate()
+)
+```
+
+This validation checks that approximately 15% of values in column `c` are missing, allowing a
+tolerance of ±5% (so the acceptable range is 10-20%). The `tol=` parameter can accept various
+formats including absolute counts or percentage ranges:
+
+```{python}
+(
+    pb.Validate(data=pb.load_dataset(dataset="small_table", tbl_type="polars"))
+    .col_pct_null(columns="c", p=0.15, tol=(0.05, 0.10))  # Asymmetric tolerance: -5%/+10%
+    .interrogate()
+)
+```
+
 ### Checking Strings with Regexes
 
 A regular expression (regex) validation via the `~~Validate.col_vals_regex()` validation method
