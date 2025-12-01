@@ -2,13 +2,15 @@
 
 .PHONY: test
 test:
-	@uv run pytest \
+	@uv run pytest tests \
 		--cov=pointblank \
 		--cov-report=term-missing \
 		--randomly-seed 123 \
 		-n auto \
 		--reruns 3 \
-		--reruns-delay 1
+		--reruns-delay 1 \
+		--doctest-modules pointblank \
+		--durations 10
 
 .PHONY: test-core
 test-core: ## Run core libraries only; useful for local CI
@@ -25,6 +27,10 @@ test-core: ## Run core libraries only; useful for local CI
 
 test-update:
 	pytest --snapshot-update
+
+.PHONY: pre-commit
+pre-commit: ## Run pre-commit hooks
+	@uvx pre-commit run --all-files
 
 .PHONY: lint
 lint: ## Run ruff formatter and linter

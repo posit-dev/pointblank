@@ -12,6 +12,7 @@ import tempfile
 import threading
 from dataclasses import dataclass
 from enum import Enum
+from functools import partial
 from importlib.metadata import version
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Callable, Literal
@@ -54,6 +55,7 @@ from pointblank._interrogation import (
     SpeciallyValidation,
     col_count_match,
     col_exists,
+    col_pct_null,
     col_schema_match,
     col_vals_expr,
     conjointly_validation,
@@ -4970,6 +4972,189 @@ class Validate:
 
     def _repr_html_(self) -> str:
         return self.get_tabular_report()._repr_html_()  # pragma: no cover
+
+    def col_pct_null(
+        self,
+        columns: str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals,
+        p: float,
+        tol: Tolerance = 0,
+        thresholds: int | float | None | bool | tuple | dict | Thresholds = None,
+        brief: str | bool | None = None,
+    ) -> Validate:
+        """
+        Validate whether a column has a specific percentage of Null values.
+
+        The `col_pct_null()` validation method checks whether the percentage of Null values in a
+        column matches a specified percentage `p=` (within an optional tolerance `tol=`). This
+        validation operates at the column level, generating a single validation step per column that
+        passes or fails based on whether the actual percentage of Null values falls within the
+        acceptable range defined by `p ± tol`.
+
+        Parameters
+        ----------
+        columns
+            A single column or a list of columns to validate. Can also use
+            [`col()`](`pointblank.col`) with column selectors to specify one or more columns. If
+            multiple columns are supplied or resolved, there will be a separate validation step
+            generated for each column.
+        p
+            The expected percentage of Null values in the column, expressed as a decimal between
+            `0.0` and `1.0`. For example, `p=0.5` means 50% of values should be Null.
+        tol
+            The tolerance allowed when comparing the actual percentage of Null values to the
+            expected percentage `p=`. The validation passes if the actual percentage falls within
+            the range `[p - tol, p + tol]`. Default is `0`, meaning an exact match is required.
+        thresholds
+            Set threshold failure levels for reporting and reacting to exceedences of the levels.
+            The thresholds are set at the step level and will override any global thresholds set in
+            `Validate(thresholds=...)`. The default is `None`, which means that no thresholds will
+            be set locally and global thresholds (if any) will take effect. Look at the *Thresholds*
+            section for information on how to set threshold levels.
+        brief
+            An optional brief description of the validation step that will be displayed in the
+            reporting table. You can use the templating elements like `"{step}"` to insert
+            the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+            the entire brief will be automatically generated. If `None` (the default) then there
+            won't be a brief.
+
+        Returns
+        -------
+        Validate
+            The `Validate` object with the added validation step.
+
+        Thresholds
+        ----------
+        The `thresholds=` parameter is used to set the failure-condition levels for the validation
+        step. If they are set here at the step level, these thresholds will override any thresholds
+        set at the global level in `Validate(thresholds=...)`.
+
+        There are three threshold levels: 'warning', 'error', and 'critical'. The threshold values
+        can either be set as a proportion failing of all test units (a value between `0` to `1`),
+        or, the absolute number of failing test units (as integer that's `1` or greater).
+
+        Thresholds can be defined using one of these input schemes:
+
+        1. use the [`Thresholds`](`pointblank.Thresholds`) class (the most direct way to create
+        thresholds)
+        2. provide a tuple of 1-3 values, where position `0` is the 'warning' level, position `1` is
+        the 'error' level, and position `2` is the 'critical' level
+        3. create a dictionary of 1-3 value entries; the valid keys: are 'warning', 'error', and
+        'critical'
+        4. a single integer/float value denoting absolute number or fraction of failing test units
+        for the 'warning' level only
+
+        If the number of failing test units exceeds set thresholds, the validation step will be
+        marked as 'warning', 'error', or 'critical'. All of the threshold levels don't need to be
+        set, you're free to set any combination of them.
+
+        Aside from reporting failure conditions, thresholds can be used to determine the actions to
+        take for each level of failure (using the `actions=` parameter).
+
+        Examples
+        --------
+        ```{python}
+        #| echo: false
+        #| output: false
+        import pointblank as pb
+        pb.config(report_incl_header=False, report_incl_footer=False, preview_incl_header=False)
+        ```
+        For the examples here, we'll use a simple Polars DataFrame with three columns (`a`, `b`,
+        and `c`) that have different percentages of Null values. The table is shown below:
+
+        ```{python}
+        import pointblank as pb
+        import polars as pl
+
+        tbl = pl.DataFrame(
+            {
+                "a": [1, 2, 3, 4, 5, 6, 7, 8],
+                "b": [1, None, 3, None, 5, None, 7, None],
+                "c": [None, None, None, None, None, None, 1, 2],
+            }
+        )
+
+        pb.preview(tbl)
+        ```
+
+        Let's validate that column `a` has 0% Null values (i.e., no Null values at all).
+
+        ```{python}
+        validation = (
+            pb.Validate(data=tbl)
+            .col_pct_null(columns="a", p=0.0)
+            .interrogate()
+        )
+
+        validation
+        ```
+
+        Printing the `validation` object shows the validation table in an HTML viewing environment.
+        The validation table shows the single entry that corresponds to the validation step created
+        by using `col_pct_null()`. The validation passed since column `a` has no Null values.
+
+        Now, let's check that column `b` has exactly 50% Null values.
+
+        ```{python}
+        validation = (
+            pb.Validate(data=tbl)
+            .col_pct_null(columns="b", p=0.5)
+            .interrogate()
+        )
+
+        validation
+        ```
+
+        This validation also passes, as column `b` has exactly 4 out of 8 values as Null (50%).
+
+        Finally, let's validate column `c` with a tolerance. Column `c` has 75% Null values, so
+        we'll check if it's approximately 70% Null with a tolerance of 10%.
+
+        ```{python}
+        validation = (
+            pb.Validate(data=tbl)
+            .col_pct_null(columns="c", p=0.70, tol=0.10)
+            .interrogate()
+        )
+
+        validation
+        ```
+
+        This validation passes because the actual percentage (75%) falls within the acceptable
+        range of 60% to 80% (70% ± 10%).
+        """
+        # If `columns` is a ColumnSelector or Narwhals selector, call `col()` on it to later
+        # resolve the columns
+        if isinstance(columns, (ColumnSelector, nw.selectors.Selector)):
+            columns = col(columns)
+
+        # If `columns` is Column value or a string, place it in a list for iteration
+        if isinstance(columns, (Column, str)):
+            columns = [columns]
+
+        # Determine brief to use (global or local) and transform any shorthands of `brief=`
+        brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
+
+        bound_finder: Callable[[int], AbsoluteBounds] = partial(_derive_bounds, tol=tol)
+
+        thresholds = (
+            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+        )
+
+        # Iterate over the columns and create a validation step for each
+        for column in columns:
+            val_info = _ValidationInfo(
+                # TODO: should type hint these as required args i think
+                assertion_type="col_pct_null",
+                column=column,
+                values={"p": p, "bound_finder": bound_finder},
+                brief=brief,
+                active=True,
+                thresholds=thresholds,
+            )
+
+            self._add_validation(validation_info=val_info)
+
+        return self
 
     def col_vals_gt(
         self,
@@ -12302,6 +12487,7 @@ class Validate:
                 column=column,
                 values=value,
                 for_failure=False,
+                locale=self.locale,
             )
 
             validation.autobrief = autobrief
@@ -12629,6 +12815,21 @@ class Validate:
                                 tbl=tbl, column=column, values=value, na_pass=na_pass
                             )
 
+                    elif assertion_type == "col_pct_null":
+                        result_bool = col_pct_null(
+                            data_tbl=data_tbl_step,
+                            column=column,
+                            p=value["p"],
+                            bound_finder=value["bound_finder"],
+                        )
+
+                        validation.all_passed = result_bool
+                        validation.n = 1
+                        validation.n_passed = int(result_bool)
+                        validation.n_failed = 1 - int(result_bool)
+
+                        results_tbl = None
+
                     elif assertion_type == "col_vals_expr":
                         results_tbl = col_vals_expr(
                             data_tbl=data_tbl_step, expr=value, tbl_type=tbl_type
@@ -12702,7 +12903,7 @@ class Validate:
                         validation.all_passed = result_bool
                         validation.n = 1
                         validation.n_passed = int(result_bool)
-                        validation.n_failed = 1 - result_bool
+                        validation.n_failed = 1 - int(result_bool)
 
                         results_tbl = None
 
@@ -12717,7 +12918,7 @@ class Validate:
                         validation.all_passed = result_bool
                         validation.n = 1
                         validation.n_passed = int(result_bool)
-                        validation.n_failed = 1 - result_bool
+                        validation.n_failed = 1 - int(result_bool)
 
                         results_tbl = None
 
@@ -12729,7 +12930,7 @@ class Validate:
                         validation.all_passed = result_bool
                         validation.n = 1
                         validation.n_passed = int(result_bool)
-                        validation.n_failed = 1 - result_bool
+                        validation.n_failed = 1 - int(result_bool)
 
                         results_tbl = None
 
@@ -12748,7 +12949,7 @@ class Validate:
                         validation.all_passed = result_bool
                         validation.n = 1
                         validation.n_passed = int(result_bool)
-                        validation.n_failed = 1 - result_bool
+                        validation.n_failed = 1 - int(result_bool)
 
                         results_tbl = None
 
@@ -12994,6 +13195,7 @@ class Validate:
                     column=column,
                     values=value,
                     for_failure=True,
+                    locale=self.locale,
                 )
 
                 # Set the failure text in the validation step
@@ -15517,6 +15719,15 @@ class Validate:
             ]:
                 values_upd.append("&mdash;")
 
+            elif assertion_type[i] in ["col_pct_null"]:
+                # Extract p and tol from the values dict for nice formatting
+                p_value = value["p"]
+
+                # Extract tol from the bound_finder partial function
+                bound_finder = value.get("bound_finder")
+                tol_value = bound_finder.keywords.get("tol", 0) if bound_finder else 0
+                values_upd.append(f"p = {p_value}<br/>tol = {tol_value}")
+
             elif assertion_type[i] in ["col_schema_match"]:
                 values_upd.append("SCHEMA")
 
@@ -17004,7 +17215,12 @@ def _process_action_str(
 
 
 def _create_autobrief_or_failure_text(
-    assertion_type: str, lang: str, column: str | None, values: str | None, for_failure: bool
+    assertion_type: str,
+    lang: str,
+    column: str | None,
+    values: str | None,
+    for_failure: bool,
+    locale: str | None = None,
 ) -> str:
     if assertion_type in [
         "col_vals_gt",
@@ -17126,6 +17342,15 @@ def _create_autobrief_or_failure_text(
             lang=lang,
             value=values,
             for_failure=for_failure,
+        )
+
+    if assertion_type == "col_pct_null":
+        return _create_text_col_pct_null(
+            lang=lang,
+            column=column,
+            value=values,
+            for_failure=for_failure,
+            locale=locale if locale else lang,
         )
 
     if assertion_type == "conjointly":
@@ -17348,6 +17573,58 @@ def _create_text_col_count_match(lang: str, value: int, for_failure: bool = Fals
     values_text = _prep_values_text(value["count"], lang=lang)
 
     return EXPECT_FAIL_TEXT[f"col_count_match_n_{type_}_text"][lang].format(values_text=values_text)
+
+
+def _create_text_col_pct_null(
+    lang: str, column: str | None, value: dict, for_failure: bool = False, locale: str | None = None
+) -> str:
+    """Create text for col_pct_null validation with tolerance handling."""
+    type_ = _expect_failure_type(for_failure=for_failure)
+
+    column_text = _prep_column_text(column=column)
+
+    # Use locale for number formatting, defaulting to lang if not provided
+    fmt_locale = locale if locale else lang
+
+    # Extract p and tol from the values dict
+    p_value = value.get("p", 0) * 100  # Convert to percentage
+
+    # Extract tol from the bound_finder partial function
+    bound_finder = value.get("bound_finder")
+    tol_value = bound_finder.keywords.get("tol", 0) if bound_finder else 0
+    tol_pct = tol_value * 100  # Convert to percentage
+
+    # Calculate the range for display
+    lower = max(0, p_value - tol_pct)
+    upper = min(100, p_value + tol_pct)
+
+    # Format numbers with locale-aware formatting
+    p_formatted = _format_number_safe(p_value, decimals=1, locale=fmt_locale)
+    lower_formatted = _format_number_safe(lower, decimals=1, locale=fmt_locale)
+    upper_formatted = _format_number_safe(upper, decimals=1, locale=fmt_locale)
+
+    # Choose the appropriate translation key based on tolerance
+    if tol_value == 0:
+        # No tolerance - use simple text
+        text = EXPECT_FAIL_TEXT[f"col_pct_null_{type_}_text"][lang].format(
+            column_text=column_text,
+            p=p_formatted,
+        )
+    elif tol_pct > 0:
+        # With tolerance - show as range
+        text = EXPECT_FAIL_TEXT[f"col_pct_null_{type_}_text_tol_range"][lang].format(
+            column_text=column_text,
+            lower=lower_formatted,
+            upper=upper_formatted,
+        )
+    else:
+        # Fallback (should not reach here)
+        text = EXPECT_FAIL_TEXT[f"col_pct_null_{type_}_text"][lang].format(
+            column_text=column_text,
+            p=p_formatted,
+        )
+
+    return text
 
 
 def _create_text_conjointly(lang: str, for_failure: bool = False) -> str:
@@ -17748,6 +18025,7 @@ def _validation_info_as_dict(validation_info: _ValidationInfo) -> dict:
 
 def _get_assertion_icon(icon: list[str], length_val: int = 30) -> list[str]:
     # For each icon, get the assertion icon SVG test from SVG_ICONS_FOR_ASSERTION_TYPES dictionary
+    # TODO: No point in using `get` if we can't handle missing keys anyways
     icon_svg = [SVG_ICONS_FOR_ASSERTION_TYPES.get(icon) for icon in icon]
 
     # Replace the width and height in the SVG string

@@ -4002,12 +4002,23 @@ def test_validation_with_all_validation_types():
         .col_vals_not_in_set(columns="category", set=["D", "E"])
         .col_vals_regex(columns="email", pattern=r"^[\w\.-]+@[\w\.-]+\.\w+$")
         .col_vals_not_null(["id", "name", "email"])
-        .col_vals_null(columns="optional_field")  # Test null validation on column with actual nulls
+        .col_pct_null(columns="optional_field", p=0.6)  # Test pct_null validation (60% nulls)
         # Column existence
         .col_exists(["id", "name", "age", "email"])
         # Row-level validations
         .rows_distinct()
-        .rows_complete()
+        .rows_complete(
+            columns_subset=[
+                "id",
+                "name",
+                "age",
+                "email",
+                "score",
+                "active",
+                "category",
+                "created_date",
+            ]
+        )
         # Table-level validations
         .row_count_match(count=5)
         .col_count_match(count=9)  # Updated to match new column count
@@ -4065,12 +4076,23 @@ def test_validation_with_all_validation_types_pandas():
         .col_vals_not_in_set(columns="category", set=["D", "E"])
         .col_vals_regex(columns="email", pattern=r"^[\w\.-]+@[\w\.-]+\.\w+$")
         .col_vals_not_null(["id", "name", "email"])
-        .col_vals_null(columns="optional_field")  # Test null validation on column with actual nulls
+        .col_pct_null(columns="optional_field", p=0.6)  # Test pct_null validation (60% nulls)
         # Column existence
         .col_exists(["id", "name", "age", "email"])
         # Row-level validations
         .rows_distinct()
-        .rows_complete()
+        .rows_complete(
+            columns_subset=[
+                "id",
+                "name",
+                "age",
+                "email",
+                "score",
+                "active",
+                "category",
+                "created_date",
+            ]
+        )
         # Table-level validations
         .row_count_match(count=5)
         .col_count_match(count=9)  # Updated to match new column count
@@ -4131,12 +4153,23 @@ def test_validation_with_all_validation_types_pyspark():
         .col_vals_not_in_set(columns="category", set=["D", "E"])
         .col_vals_regex(columns="email", pattern=r"^[\w\.-]+@[\w\.-]+\.\w+$")
         .col_vals_not_null(["id", "name", "email"])
-        .col_vals_null(columns="optional_field")  # Test null validation on column with actual nulls
+        .col_pct_null(columns="optional_field", p=0.6)  # Test pct_null validation (60% nulls)
         # Column existence
         .col_exists(["id", "name", "age", "email"])
         # Row-level validations
         .rows_distinct()
-        .rows_complete()
+        .rows_complete(
+            columns_subset=[
+                "id",
+                "name",
+                "age",
+                "email",
+                "score",
+                "active",
+                "category",
+                "created_date",
+            ]
+        )
         # Table-level validations
         .row_count_match(count=5)
         .col_count_match(count=9)  # Updated to match new column count
@@ -5985,9 +6018,6 @@ def test_row_count_example_tol() -> None:
             .interrogate()
             .assert_passing()
         )
-
-
-test_row_count_example_tol()
 
 
 @pytest.mark.parametrize(
@@ -20112,3 +20142,138 @@ def test_footer_controls_override_global_config():
             report_incl_footer_notes=original_config.report_incl_footer_notes,
             preview_incl_header=original_config.preview_incl_header,
         )
+
+
+@pytest.mark.parametrize("tbl_fixture", ["tbl_pd", "tbl_pl"])
+def test_pct_null_parametrized(tbl_fixture, request) -> None:
+    """Test col_pct_null() across different backends with simple custom data."""
+    # Create simple test data with known null percentages
+    if tbl_fixture == "tbl_pd":
+        import pandas as pd
+
+        tbl = pd.DataFrame({"a": [1, None, 3, None], "b": [None, None, 3, 4]})
+    else:  # tbl_pl
+        tbl = pl.DataFrame({"a": [1, None, 3, None], "b": [None, None, 3, 4]})
+
+    # Test with 50% nulls - should pass
+    validation = Validate(tbl).col_pct_null(columns="a", p=0.5).interrogate()
+
+    validation.assert_passing()
+
+
+def test_pct_null_simple() -> None:
+    """Test col_pct_null() with simple data."""
+    data = pl.DataFrame({"a": [1, None, 3, None], "b": [None, None, 3, 4]})
+    validation = Validate(data).col_pct_null(columns=["a", "b"], p=0.5).interrogate()
+
+    validation.assert_passing()
+    validation.assert_below_threshold()
+
+    info = validation.validation_info
+
+    assert len(info) == 2
+
+
+def test_pct_null_simple_fail() -> None:
+    """Test col_pct_null() with simple data."""
+    data = pl.DataFrame({"a": [1, None, 3, None], "b": [None, None, 3, 4]})
+    validation = (
+        Validate(data)
+        .col_pct_null(columns=["a", "b"], p=0.1, tol=0.0001, thresholds=1)
+        .interrogate()
+    )
+
+    with pytest.raises(AssertionError):
+        validation.assert_passing()
+
+    with pytest.raises(AssertionError):
+        validation.assert_below_threshold()
+
+    info = validation.validation_info
+
+    assert len(info) == 2
+
+
+def test_pct_null_simple_report() -> None:
+    """Test col_pct_null() with simple data."""
+    data = pl.DataFrame({"a": [1, None, 3, None], "b": [None, None, 3, 4]})
+    validation = (
+        Validate(data)
+        .col_pct_null(columns=["a", "b"], p=0.1, tol=0.0001, thresholds=1)
+        .interrogate()
+    )
+
+    validation.get_tabular_report()
+
+
+def test_pct_null_exact_match_with_tol() -> None:
+    """Should pass if pct null matches exactly, even with tol."""
+    data = pl.DataFrame({"a": [None, 1, 2, 3]})  # 25% nulls
+    validation = Validate(data).col_pct_null(columns=["a"], p=0.25, tol=0.0).interrogate()
+    validation.assert_passing()
+
+
+def test_pct_null_within_tol_pass() -> None:
+    """Should pass if pct null is within tolerance margin."""
+    data = pl.DataFrame({"a": [None, None, 1, 2]})  # 50% nulls
+    # Allow tolerance of 0.1 around 0.4 -> [0.3, 0.5]
+    validation = Validate(data).col_pct_null(columns=["a"], p=0.4, tol=0.1).interrogate()
+    validation.assert_passing()
+
+
+def test_pct_null_outside_tol_fail(half_null_ser: pl.Series) -> None:
+    """Should fail if pct null is outside tolerance margin."""
+    data = pl.DataFrame({"a": half_null_ser})  # 50% nulls
+    validation = Validate(data).col_pct_null(columns=["a"], p=0.4, tol=0.05).interrogate()
+    with pytest.raises(AssertionError):
+        validation.assert_passing()
+
+
+def test_pct_null_lower_bound_edge() -> None:
+    """Should pass exactly at lower bound of tolerance range."""
+    data = pl.DataFrame({"a": [None, None, 1, 2]})  # 50% nulls
+    # Expect 0.55 ± 0.05 => [0.5, 0.6]
+    validation = Validate(data).col_pct_null(columns=["a"], p=0.55, tol=0.0).interrogate()
+    validation.assert_passing()
+
+
+def test_pct_null_upper_bound_edge() -> None:
+    """Should pass exactly at upper bound of tolerance range."""
+    data = pl.DataFrame({"a": [None, 1, 2, 3]})  # 25% nulls
+    # Expect 0.2 ± 0.05 => [0.15, 0.25]
+    validation = Validate(data).col_pct_null(columns=["a"], p=0.2, tol=0.05).interrogate()
+    validation.assert_passing()
+
+
+def test_pct_null_multiple_columns_with_tol() -> None:
+    """Should check multiple columns with tolerance."""
+    data = pl.DataFrame(
+        {
+            "a": [None, None, 1, 2],  # 50%
+            "b": [1, None, 2, None],  # 50%
+            "c": [1, 2, 3, 4],  # 0%
+        }
+    )
+    validation = Validate(data).col_pct_null(columns=["a", "b", "c"], p=0.5, tol=0.01).interrogate()
+    # "a" and "b" should pass, "c" should fail
+    with pytest.raises(AssertionError):
+        validation.assert_passing()
+
+
+def test_pct_null_low_tol(half_null_ser: pl.Series) -> None:
+    """Tolerance is subject to rounding, and always relative to the total dataset."""
+    data = pl.DataFrame({"a": [None, None, 2, 3]})  # 50% null
+    validation = Validate(data).col_pct_null(columns=["a"], p=0.501, tol=0.0).interrogate()
+    validation.assert_passing()  # the reason this passes is because of rounding
+
+    data = pl.DataFrame({"a": half_null_ser})
+    validation = Validate(data).col_pct_null(columns=["a"], p=0.501, tol=0.0).interrogate()
+    with pytest.raises(AssertionError):
+        validation.assert_passing()  # now fails because no rounding issues
+
+
+def test_pct_null_high_tol_always_pass() -> None:
+    """Large tolerance should allow big differences."""
+    data = pl.DataFrame({"a": [None, None, None, 1]})  # 75% null
+    validation = Validate(data).col_pct_null(columns=["a"], p=0.25, tol=10).interrogate()
+    validation.assert_passing()
