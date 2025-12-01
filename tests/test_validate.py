@@ -20112,6 +20112,3 @@ def test_footer_controls_override_global_config():
             report_incl_footer_notes=original_config.report_incl_footer_notes,
             preview_incl_header=original_config.preview_incl_header,
         )
-
-
-pytest.main([__file__, "-k", "test_col_selector_in_value_parameter_write_read_file"])
