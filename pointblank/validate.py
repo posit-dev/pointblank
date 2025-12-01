@@ -136,6 +136,50 @@ __all__ = [
     "get_validation_summary",
 ]
 
+from functools import wraps
+from typing import Callable, ParamSpec, TypeVar
+
+P = ParamSpec("P")
+R = TypeVar("R")
+
+
+def _register_agg_validations(func: Callable[P, R]) -> Callable[P, R]:
+    """
+    Decorator that handles the standard validation pattern for aggregate validators.
+
+    The decorated function should just be a stub that defines the signature.
+    """
+
+    @wraps(func)
+    def wrapper(
+        self: Validate,
+        columns,
+        value,
+        tol=0,
+        thresholds=None,
+        brief=False,
+        actions=None,
+        active=True,
+    ):
+        for column in columns:
+            val_info = _ValidationInfo.from_agg_validator(
+                assertion_type=func.__name__,  # Use the function name
+                columns=column,
+                value=value,
+                tol=tol,
+                thresholds=self.thresholds if thresholds is None else thresholds,
+                actions=self.actions if actions is None else actions,
+                brief=self.brief if brief is None else brief,
+                active=active,
+            )
+
+            self._add_validation(validation_info=val_info)
+
+        return self
+
+    return wrapper
+
+
 # Create a thread-local storage for the metadata
 _action_context = threading.local()
 
@@ -4998,6 +5042,7 @@ class Validate:
     def _repr_html_(self) -> str:
         return self.get_tabular_report()._repr_html_()  # pragma: no cover
 
+    @_register_agg_validations
     def col_avg_eq(
         self,
         # TODO: Public type alias
@@ -5022,22 +5067,9 @@ class Validate:
         Returns:
             Validate: _description_
         """
-        for column in columns:  # TODO: Not typed correctly
-            val_info = _ValidationInfo.from_agg_validator(
-                assertion_type=_get_fn_name(),
-                columns=column,
-                value=value,
-                tol=tol,
-                thresholds=self.thresholds if thresholds is None else thresholds,
-                actions=self.actions if actions is None else actions,
-                brief=self.brief if brief is None else brief,
-                active=active,
-            )
+        pass
 
-            self._add_validation(validation_info=val_info)
-
-        return self
-
+    @_register_agg_validations
     def col_sd_eq(
         self,
         # TODO: Public type alias
@@ -5062,22 +5094,9 @@ class Validate:
         Returns:
             Validate: _description_
         """
-        for column in columns:  # TODO: Not typed correctly
-            val_info = _ValidationInfo.from_agg_validator(
-                assertion_type=_get_fn_name(),
-                columns=column,
-                value=value,
-                tol=tol,
-                thresholds=self.thresholds if thresholds is None else thresholds,
-                actions=self.actions if actions is None else actions,
-                brief=self.brief if brief is None else brief,
-                active=active,
-            )
+        pass
 
-            self._add_validation(validation_info=val_info)
-
-        return self
-
+    @_register_agg_validations
     def col_sd_gt(
         self,
         # TODO: Public type alias
@@ -5102,22 +5121,9 @@ class Validate:
         Returns:
             Validate: _description_
         """
-        for column in columns:  # TODO: Not typed correctly
-            val_info = _ValidationInfo.from_agg_validator(
-                assertion_type=_get_fn_name(),
-                columns=column,
-                value=value,
-                tol=tol,
-                thresholds=self.thresholds if thresholds is None else thresholds,
-                actions=self.actions if actions is None else actions,
-                brief=self.brief if brief is None else brief,
-                active=active,
-            )
+        pass
 
-            self._add_validation(validation_info=val_info)
-
-        return self
-
+    @_register_agg_validations
     def col_sd_ge(
         self,
         # TODO: Public type alias
@@ -5142,22 +5148,9 @@ class Validate:
         Returns:
             Validate: _description_
         """
-        for column in columns:  # TODO: Not typed correctly
-            val_info = _ValidationInfo.from_agg_validator(
-                assertion_type=_get_fn_name(),
-                columns=column,
-                value=value,
-                tol=tol,
-                thresholds=self.thresholds if thresholds is None else thresholds,
-                actions=self.actions if actions is None else actions,
-                brief=self.brief if brief is None else brief,
-                active=active,
-            )
+        pass
 
-            self._add_validation(validation_info=val_info)
-
-        return self
-
+    @_register_agg_validations
     def col_sd_lt(
         self,
         # TODO: Public type alias
@@ -5182,22 +5175,9 @@ class Validate:
         Returns:
             Validate: _description_
         """
-        for column in columns:  # TODO: Not typed correctly
-            val_info = _ValidationInfo.from_agg_validator(
-                assertion_type=_get_fn_name(),
-                columns=column,
-                value=value,
-                tol=tol,
-                thresholds=self.thresholds if thresholds is None else thresholds,
-                actions=self.actions if actions is None else actions,
-                brief=self.brief if brief is None else brief,
-                active=active,
-            )
+        pass
 
-            self._add_validation(validation_info=val_info)
-
-        return self
-
+    @_register_agg_validations
     def col_sd_le(
         self,
         # TODO: Public type alias
@@ -5222,22 +5202,9 @@ class Validate:
         Returns:
             Validate: _description_
         """
-        for column in columns:  # TODO: Not typed correctly
-            val_info = _ValidationInfo.from_agg_validator(
-                assertion_type=_get_fn_name(),
-                columns=column,
-                value=value,
-                tol=tol,
-                thresholds=self.thresholds if thresholds is None else thresholds,
-                actions=self.actions if actions is None else actions,
-                brief=self.brief if brief is None else brief,
-                active=active,
-            )
+        pass
 
-            self._add_validation(validation_info=val_info)
-
-        return self
-
+    @_register_agg_validations
     def col_avg_ge(
         self,
         # TODO: Public type alias
@@ -5262,22 +5229,9 @@ class Validate:
         Returns:
             Validate: _description_
         """
-        for column in columns:  # TODO: Not typed correctly
-            val_info = _ValidationInfo.from_agg_validator(
-                assertion_type=_get_fn_name(),
-                columns=column,
-                value=value,
-                tol=tol,
-                thresholds=self.thresholds if thresholds is None else thresholds,
-                actions=self.actions if actions is None else actions,
-                brief=self.brief if brief is None else brief,
-                active=active,
-            )
+        pass
 
-            self._add_validation(validation_info=val_info)
-
-        return self
-
+    @_register_agg_validations
     def col_avg_gt(
         self,
         # TODO: Public type alias
@@ -5302,22 +5256,9 @@ class Validate:
         Returns:
             Validate: _description_
         """
-        for column in columns:  # TODO: Not typed correctly
-            val_info = _ValidationInfo.from_agg_validator(
-                assertion_type=_get_fn_name(),
-                columns=column,
-                value=value,
-                tol=tol,
-                thresholds=self.thresholds if thresholds is None else thresholds,
-                actions=self.actions if actions is None else actions,
-                brief=self.brief if brief is None else brief,
-                active=active,
-            )
+        pass
 
-            self._add_validation(validation_info=val_info)
-
-        return self
-
+    @_register_agg_validations
     def col_avg_le(
         self,
         # TODO: Public type alias
@@ -5342,22 +5283,9 @@ class Validate:
         Returns:
             Validate: _description_
         """
-        for column in columns:  # TODO: Not typed correctly
-            val_info = _ValidationInfo.from_agg_validator(
-                assertion_type=_get_fn_name(),
-                columns=column,
-                value=value,
-                tol=tol,
-                thresholds=self.thresholds if thresholds is None else thresholds,
-                actions=self.actions if actions is None else actions,
-                brief=self.brief if brief is None else brief,
-                active=active,
-            )
+        pass
 
-            self._add_validation(validation_info=val_info)
-
-        return self
-
+    @_register_agg_validations
     def col_avg_lt(
         self,
         # TODO: Public type alias
@@ -5382,22 +5310,9 @@ class Validate:
         Returns:
             Validate: _description_
         """
-        for column in columns:  # TODO: Not typed correctly
-            val_info = _ValidationInfo.from_agg_validator(
-                assertion_type=_get_fn_name(),
-                columns=column,
-                value=value,
-                tol=tol,
-                thresholds=self.thresholds if thresholds is None else thresholds,
-                actions=self.actions if actions is None else actions,
-                brief=self.brief if brief is None else brief,
-                active=active,
-            )
+        pass
 
-            self._add_validation(validation_info=val_info)
-
-        return self
-
+    @_register_agg_validations
     def col_sum_eq(
         self,
         # TODO: Public type alias
@@ -5422,22 +5337,9 @@ class Validate:
         Returns:
             Validate: _description_
         """
-        for column in columns:  # TODO: Not typed correctly
-            val_info = _ValidationInfo.from_agg_validator(
-                assertion_type=_get_fn_name(),
-                columns=column,
-                value=value,
-                tol=tol,
-                thresholds=self.thresholds if thresholds is None else thresholds,
-                actions=self.actions if actions is None else actions,
-                brief=self.brief if brief is None else brief,
-                active=active,
-            )
+        pass
 
-            self._add_validation(validation_info=val_info)
-
-        return self
-
+    @_register_agg_validations
     def col_sum_gt(
         self,
         columns: _PBUnresolvedColumn,
@@ -5462,22 +5364,9 @@ class Validate:
         Returns:
             Validate: _description_
         """
-        for column in columns:  # TODO: Not typed correctly
-            val_info = _ValidationInfo.from_agg_validator(
-                assertion_type=_get_fn_name(),
-                columns=column,
-                value=value,
-                tol=tol,
-                thresholds=self.thresholds if thresholds is None else thresholds,
-                actions=self.actions if actions is None else actions,
-                brief=self.brief if brief is None else brief,
-                active=active,
-            )
+        pass
 
-            self._add_validation(validation_info=val_info)
-
-        return self
-
+    @_register_agg_validations
     def col_sum_ge(
         self,
         columns: _PBUnresolvedColumn,
@@ -5502,22 +5391,9 @@ class Validate:
         Returns:
             Validate: _description_
         """
-        for column in columns:  # TODO: Not typed correctly
-            val_info = _ValidationInfo.from_agg_validator(
-                assertion_type=_get_fn_name(),
-                columns=column,
-                value=value,
-                tol=tol,
-                thresholds=self.thresholds if thresholds is None else thresholds,
-                actions=self.actions if actions is None else actions,
-                brief=self.brief if brief is None else brief,
-                active=active,
-            )
+        pass
 
-            self._add_validation(validation_info=val_info)
-
-        return self
-
+    @_register_agg_validations
     def col_sum_lt(
         self,
         columns: _PBUnresolvedColumn,
@@ -5542,22 +5418,9 @@ class Validate:
         Returns:
             Validate: _description_
         """
-        for column in columns:  # TODO: Not typed correctly
-            val_info = _ValidationInfo.from_agg_validator(
-                assertion_type=_get_fn_name(),
-                columns=column,
-                value=value,
-                tol=tol,
-                thresholds=self.thresholds if thresholds is None else thresholds,
-                actions=self.actions if actions is None else actions,
-                brief=self.brief if brief is None else brief,
-                active=active,
-            )
+        pass
 
-            self._add_validation(validation_info=val_info)
-
-        return self
-
+    @_register_agg_validations
     def col_sum_le(
         self,
         columns: _PBUnresolvedColumn,
@@ -5582,21 +5445,7 @@ class Validate:
         Returns:
             Validate: _description_
         """
-        for column in columns:  # TODO: Not typed correctly
-            val_info = _ValidationInfo.from_agg_validator(
-                assertion_type=_get_fn_name(),
-                columns=column,
-                value=value,
-                tol=tol,
-                thresholds=self.thresholds if thresholds is None else thresholds,
-                actions=self.actions if actions is None else actions,
-                brief=self.brief if brief is None else brief,
-                active=active,
-            )
-
-            self._add_validation(validation_info=val_info)
-
-        return self
+        pass
 
     def col_vals_gt(
         self,
