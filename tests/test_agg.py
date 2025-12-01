@@ -32,19 +32,29 @@ def test_sums_old(tol, simple_pl) -> None:
     v.get_tabular_report()
 
 
+# TODO: Expand expression types
+# TODO: Expand table types
 @pytest.mark.parametrize(
     ("method", "vals"),
     [
+        # Sum -> 3, 6, 9
         ("col_sum_eq", (3, 6, 9)),
         ("col_sum_gt", (2, 5, 8)),
         ("col_sum_ge", (3, 6, 9)),
         ("col_sum_lt", (4, 7, 10)),
         ("col_sum_le", (3, 6, 9)),
+        # Average -> 1, 2, 3
         ("col_avg_eq", (1, 2, 3)),
         ("col_avg_gt", (0, 1, 2)),
         ("col_avg_ge", (1, 2, 3)),
         ("col_avg_lt", (2, 3, 4)),
         ("col_avg_le", (1, 2, 3)),
+        # Standard Deviation -> 0, 0, 0
+        ("col_sd_eq", (0, 0, 0)),
+        ("col_sd_gt", (-1, -1, -1)),
+        ("col_sd_ge", (0, 0, 0)),
+        ("col_sd_lt", (1, 1, 1)),
+        ("col_sd_le", (0, 0, 0)),
     ],
 )
 def test_aggs(simple_pl: pl.DataFrame, method: str, vals: tuple[int, int, int]):

@@ -34,6 +34,11 @@ def agg_avg(column: nw.DataFrame) -> float:
     return column.select(nw.all().mean()).item()
 
 
+@register
+def agg_sd(column: nw.DataFrame) -> float:
+    return column.select(nw.all().std()).item()
+
+
 ## Comparator functions
 @register
 def comp_eq(real: float, lower: float, upper: float) -> bool:
