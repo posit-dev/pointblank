@@ -52,5 +52,25 @@ def test_sums(simple_pl: pl.DataFrame, method: str, vals: tuple[int, int, int]):
     v.get_tabular_report()
 
 
+@pytest.mark.parametrize(
+    ("method", "vals"),
+    [
+        ("col_avg_eq", (1, 2, 3)),
+        ("col_avg_gt", (0, 1, 2)),
+        ("col_avg_ge", (1, 2, 3)),
+        ("col_avg_lt", (2, 3, 4)),
+        ("col_avg_le", (1, 2, 3)),
+    ],
+)
+def test_avgs(simple_pl: pl.DataFrame, method: str, vals: tuple[int, int, int]):
+    v = Validate(simple_pl)
+    for col, val in zip(["a", "b", "c"], vals):
+        getattr(v, method)(col, val)
+    v = v.interrogate()
+
+    v.assert_below_threshold()
+    v.get_tabular_report()
+
+
 if __name__ == "__main__":
     pytest.main([__file__])

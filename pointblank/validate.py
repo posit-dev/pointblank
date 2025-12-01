@@ -4998,6 +4998,206 @@ class Validate:
     def _repr_html_(self) -> str:
         return self.get_tabular_report()._repr_html_()  # pragma: no cover
 
+    def col_avg_eq(
+        self,
+        # TODO: Public type alias
+        columns: _PBUnresolvedColumn,
+        value: float | Column,
+        tol: Tolerance = 0,
+        # TODO: type alias this, especially the tuple/dict parts
+        thresholds: float | bool | tuple | dict | Thresholds | None = None,
+        brief: str | bool = False,
+        actions: Actions | None = None,
+        active: bool = True,
+    ) -> Validate:
+        """Assert the avg of the values in a column is equal to some `value`.
+
+        Args:
+            columns (str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals): _description_
+            value (float | Column): _description_
+            thresholds (float | bool | tuple | dict | Thresholds | None, optional): _description_. Defaults to None.
+            brief (str | bool, optional): _description_. Defaults to False.
+            actions (Actions | None, optional): _description_. Defaults to None.
+
+        Returns:
+            Validate: _description_
+        """
+        for column in columns:  # TODO: Not typed correctly
+            val_info = _ValidationInfo.from_agg_validator(
+                assertion_type=_get_fn_name(),
+                columns=column,
+                value=value,
+                tol=tol,
+                thresholds=self.thresholds if thresholds is None else thresholds,
+                actions=self.actions if actions is None else actions,
+                brief=self.brief if brief is None else brief,
+                active=active,
+            )
+
+            self._add_validation(validation_info=val_info)
+
+        return self
+
+    def col_avg_ge(
+        self,
+        # TODO: Public type alias
+        columns: _PBUnresolvedColumn,
+        value: float | Column,
+        tol: Tolerance = 0,
+        # TODO: type alias this, especially the tuple/dict parts
+        thresholds: float | bool | tuple | dict | Thresholds | None = None,
+        brief: str | bool = False,
+        actions: Actions | None = None,
+        active: bool = True,
+    ) -> Validate:
+        """Assert the avg of the values in a column is greater or equal to some `value`.
+
+        Args:
+            columns (str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals): _description_
+            value (float | Column): _description_
+            thresholds (float | bool | tuple | dict | Thresholds | None, optional): _description_. Defaults to None.
+            brief (str | bool, optional): _description_. Defaults to False.
+            actions (Actions | None, optional): _description_. Defaults to None.
+
+        Returns:
+            Validate: _description_
+        """
+        for column in columns:  # TODO: Not typed correctly
+            val_info = _ValidationInfo.from_agg_validator(
+                assertion_type=_get_fn_name(),
+                columns=column,
+                value=value,
+                tol=tol,
+                thresholds=self.thresholds if thresholds is None else thresholds,
+                actions=self.actions if actions is None else actions,
+                brief=self.brief if brief is None else brief,
+                active=active,
+            )
+
+            self._add_validation(validation_info=val_info)
+
+        return self
+
+    def col_avg_gt(
+        self,
+        # TODO: Public type alias
+        columns: _PBUnresolvedColumn,
+        value: float | Column,
+        tol: Tolerance = 0,
+        # TODO: type alias this, especially the tuple/dict parts
+        thresholds: float | bool | tuple | dict | Thresholds | None = None,
+        brief: str | bool = False,
+        actions: Actions | None = None,
+        active: bool = True,
+    ) -> Validate:
+        """Assert the avg of the values in a column greater than some `value`.
+
+        Args:
+            columns (str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals): _description_
+            value (float | Column): _description_
+            thresholds (float | bool | tuple | dict | Thresholds | None, optional): _description_. Defaults to None.
+            brief (str | bool, optional): _description_. Defaults to False.
+            actions (Actions | None, optional): _description_. Defaults to None.
+
+        Returns:
+            Validate: _description_
+        """
+        for column in columns:  # TODO: Not typed correctly
+            val_info = _ValidationInfo.from_agg_validator(
+                assertion_type=_get_fn_name(),
+                columns=column,
+                value=value,
+                tol=tol,
+                thresholds=self.thresholds if thresholds is None else thresholds,
+                actions=self.actions if actions is None else actions,
+                brief=self.brief if brief is None else brief,
+                active=active,
+            )
+
+            self._add_validation(validation_info=val_info)
+
+        return self
+
+    def col_avg_le(
+        self,
+        # TODO: Public type alias
+        columns: _PBUnresolvedColumn,
+        value: float | Column,
+        tol: Tolerance = 0,
+        # TODO: type alias this, especially the tuple/dict parts
+        thresholds: float | bool | tuple | dict | Thresholds | None = None,
+        brief: str | bool = False,
+        actions: Actions | None = None,
+        active: bool = True,
+    ) -> Validate:
+        """Assert the avg of the values in a column is less than or equal to some `value`.
+
+        Args:
+            columns (str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals): _description_
+            value (float | Column): _description_
+            thresholds (float | bool | tuple | dict | Thresholds | None, optional): _description_. Defaults to None.
+            brief (str | bool, optional): _description_. Defaults to False.
+            actions (Actions | None, optional): _description_. Defaults to None.
+
+        Returns:
+            Validate: _description_
+        """
+        for column in columns:  # TODO: Not typed correctly
+            val_info = _ValidationInfo.from_agg_validator(
+                assertion_type=_get_fn_name(),
+                columns=column,
+                value=value,
+                tol=tol,
+                thresholds=self.thresholds if thresholds is None else thresholds,
+                actions=self.actions if actions is None else actions,
+                brief=self.brief if brief is None else brief,
+                active=active,
+            )
+
+            self._add_validation(validation_info=val_info)
+
+        return self
+
+    def col_avg_lt(
+        self,
+        # TODO: Public type alias
+        columns: _PBUnresolvedColumn,
+        value: float | Column,
+        tol: Tolerance = 0,
+        # TODO: type alias this, especially the tuple/dict parts
+        thresholds: float | bool | tuple | dict | Thresholds | None = None,
+        brief: str | bool = False,
+        actions: Actions | None = None,
+        active: bool = True,
+    ) -> Validate:
+        """Assert the avg of the values in a column is less than `value`.
+
+        Args:
+            columns (str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals): _description_
+            value (float | Column): _description_
+            thresholds (float | bool | tuple | dict | Thresholds | None, optional): _description_. Defaults to None.
+            brief (str | bool, optional): _description_. Defaults to False.
+            actions (Actions | None, optional): _description_. Defaults to None.
+
+        Returns:
+            Validate: _description_
+        """
+        for column in columns:  # TODO: Not typed correctly
+            val_info = _ValidationInfo.from_agg_validator(
+                assertion_type=_get_fn_name(),
+                columns=column,
+                value=value,
+                tol=tol,
+                thresholds=self.thresholds if thresholds is None else thresholds,
+                actions=self.actions if actions is None else actions,
+                brief=self.brief if brief is None else brief,
+                active=active,
+            )
+
+            self._add_validation(validation_info=val_info)
+
+        return self
+
     def col_sum_eq(
         self,
         # TODO: Public type alias

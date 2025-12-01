@@ -29,6 +29,11 @@ def agg_sum(column: nw.DataFrame) -> float:
     return column.select(nw.all().sum()).item()
 
 
+@register
+def agg_avg(column: nw.DataFrame) -> float:
+    return column.select(nw.all().mean()).item()
+
+
 ## Comparator functions
 @register
 def comp_eq(real: float, lower: float, upper: float) -> bool:
