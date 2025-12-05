@@ -1,5 +1,9 @@
 .PHONY: check
 
+.PHONY: pyi
+pyi: ## Generate .pyi stub files
+	@uv run scripts/generate_agg_validate_pyi.py
+
 .PHONY: test
 test:
 	@uv run pytest \

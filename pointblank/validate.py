@@ -12,9 +12,10 @@ import tempfile
 import threading
 from dataclasses import dataclass
 from enum import Enum
+from functools import wraps
 from importlib.metadata import version
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Callable, Literal
+from typing import TYPE_CHECKING, Any, Callable, Literal, ParamSpec, TypeVar
 from zipfile import ZipFile
 
 import commonmark
@@ -119,6 +120,9 @@ if TYPE_CHECKING:
 
     from pointblank._typing import AbsoluteBounds, Tolerance
 
+
+P = ParamSpec("P")
+R = TypeVar("R")
 __all__ = [
     "Validate",
     "load_dataset",
@@ -135,12 +139,6 @@ __all__ = [
     "get_row_count",
     "get_validation_summary",
 ]
-
-from functools import wraps
-from typing import Callable, ParamSpec, TypeVar
-
-P = ParamSpec("P")
-R = TypeVar("R")
 
 
 def _register_agg_validations(func: Callable[P, R]) -> Callable[P, R]:
@@ -5394,31 +5392,7 @@ class Validate:
         pass
 
     @_register_agg_validations
-    def col_sum_lt(
-        self,
-        columns: _PBUnresolvedColumn,
-        value: float | Column,
-        tol: Tolerance = 0,
-        thresholds: float | bool | tuple | dict | Thresholds | None = None,
-        brief: str | bool = False,
-        actions: Actions | None = None,
-        active: bool = True,
-    ) -> Validate:
-        """Assert the values in a column sum to a value less than some `value`.
-
-        Args:
-            columns (_PBUnresolvedColumn): _description_
-            value (float | Column): _description_
-            tol (Tolerance, optional): _description_. Defaults to 0.
-            thresholds (float | bool | tuple | dict | Thresholds | None, optional): _description_. Defaults to None.
-            brief (str | bool, optional): _description_. Defaults to False.
-            actions (Actions | None, optional): _description_. Defaults to None.
-            active (bool, optional): _description_. Defaults to True.
-
-        Returns:
-            Validate: _description_
-        """
-        pass
+    def col_sum_lt(*args, **kwargs): ...
 
     @_register_agg_validations
     def col_sum_le(
