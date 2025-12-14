@@ -2,6 +2,9 @@
 
 .PHONY: pyi
 pyi: ## Generate .pyi stub files
+	@uv run stubgen ./pointblank/validate.py \
+		--include-private \
+		-o  .
 	@uv run scripts/generate_agg_validate_pyi.py
 
 .PHONY: test
