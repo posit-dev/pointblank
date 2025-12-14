@@ -20667,5 +20667,5 @@ def make_agg_validator(name: str):
 
 # Finally, we grab all the valid aggregation method names and attach them to
 # the Validate class, registering each one appropriately.
-for method in load_validation_method_grid():
+for method in load_validation_method_grid():  # -> `col_sum_*`, `col_mean_*`, etc.
     setattr(Validate, method, make_agg_validator(method))
