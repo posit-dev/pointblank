@@ -43,7 +43,7 @@ def agg_sd(column: nw.DataFrame) -> float:
     return column.select(nw.all().std()).item()
 
 
-## Comparator functions
+## Comparator functions:
 @register
 def comp_eq(real: float, lower: float, upper: float) -> bool:
     if lower == upper:
