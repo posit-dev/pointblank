@@ -15536,10 +15536,10 @@ class Validate:
     def get_tabular_report(
         self,
         title: str | None = ":default:",
-        incl_header: bool = None,
-        incl_footer: bool = None,
-        incl_footer_timings: bool = None,
-        incl_footer_notes: bool = None,
+        incl_header: bool | None = None,
+        incl_footer: bool | None = None,
+        incl_footer_timings: bool | None = None,
+        incl_footer_notes: bool | None = None,
     ) -> GT:
         """
         Validation report as a GT table.
