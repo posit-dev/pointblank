@@ -32,44 +32,44 @@ DOCSTRING = '''
             """
 '''
 
-CLS = "Validate:"
+CLS = "Validate"
 
 IMPORT_HEADER = """
-from __future__ import annotations
-
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from pointblank import Actions, Thresholds
-    from pointblank._utils import _PBUnresolvedColumn
-    from pointblank.column import Column
-    from pointblank._typing import Tolerance
-
+from pointblank import Actions, Thresholds
+from pointblank._utils import _PBUnresolvedColumn
+from pointblank.column import Column
+from pointblank._typing import Tolerance
 """
 
-## Clear File:
-VALIDATE_PYI_PATH.write_text("")
-
-## Write headers:
+# Write the headers to the end. Ruff will take care of sorting imports.
+with VALIDATE_PYI_PATH.open() as f:
+    content = f.read()
 with VALIDATE_PYI_PATH.open("w") as f:
-    f.write(IMPORT_HEADER + "\n\n")
-    f.write(f"class {CLS}\n")
+    f.write(IMPORT_HEADER + "\n\n" + content)
 
 ## Create grid of aggs and comparators
-for agg_name, comp_name in itertools.product(
-    AGGREGATOR_REGISTRY.keys(), COMPARATOR_REGISTRY.keys()
-):
-    method = f"col_{agg_name}_{comp_name}"
+with VALIDATE_PYI_PATH.open("a") as f:
+    f.write("    # === GENERATED START ===\n")
 
-    first_line = f'"""Assert the values in a column {agg_name.replace("_", " ")} to a value {comp_name.replace("_", " ")} some `value`.\n\n'
+    for agg_name, comp_name in itertools.product(
+        AGGREGATOR_REGISTRY.keys(), COMPARATOR_REGISTRY.keys()
+    ):
+        method = f"col_{agg_name}_{comp_name}"
 
-    temp = f"""
-    def {method}({SIGNATURE}\t) -> Validate:
-        {first_line}{DOCSTRING}
-    """
+        # Build docstring
+        first_line = (
+            f'"""Assert the values in a column '
+            f"{agg_name.replace('_', ' ')} to a value "
+            f"{comp_name.replace('_', ' ')} some `value`."
+            f'"""\n'
+        )
 
-    with VALIDATE_PYI_PATH.open("a") as f:
+        # Build the .pyi stub method
+        temp = f"    def {method}({SIGNATURE}\t) -> {CLS}:\n        {first_line}        ...\n\n"
+
         f.write(temp)
+
+    f.write("    # === GENERATED END ===\n")
 
 ## Run formatter and linter on the generated file:
 subprocess.run(["uv", "run", "ruff", "format", str(VALIDATE_PYI_PATH)])
