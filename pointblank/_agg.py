@@ -1,3 +1,6 @@
+from __future__ import annotations
+
+import itertools
 from collections.abc import Callable
 from typing import Any
 
@@ -13,6 +16,7 @@ COMPARATOR_REGISTRY: dict[str, Comparator] = {}
 
 
 def register(fn):
+    """Register an aggregator or comparator function."""
     name: str = fn.__name__
     if name.startswith("comp_"):
         COMPARATOR_REGISTRY[name.removeprefix("comp_")] = fn
@@ -110,3 +114,15 @@ def is_valid_agg(name: str) -> bool:
         return True
     except ValueError:
         return False
+
+
+def load_validation_method_grid() -> tuple[str, ...]:
+    """Generate all possible validation methods."""
+    methods = []
+    for agg_name, comp_name in itertools.product(
+        AGGREGATOR_REGISTRY.keys(), COMPARATOR_REGISTRY.keys()
+    ):
+        method = f"col_{agg_name}_{comp_name}"
+        methods.append(method)
+
+    return tuple(methods)

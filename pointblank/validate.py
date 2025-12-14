@@ -12,7 +12,6 @@ import tempfile
 import threading
 from dataclasses import dataclass
 from enum import Enum
-from functools import wraps
 from importlib.metadata import version
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Callable, Literal, ParamSpec, TypeVar
@@ -26,7 +25,7 @@ from great_tables.vals import fmt_integer, fmt_number
 from importlib_resources import files
 from narwhals.typing import FrameT
 
-from pointblank._agg import is_valid_agg, resolve_agg_registries
+from pointblank._agg import is_valid_agg, load_validation_method_grid, resolve_agg_registries
 from pointblank._constants import (
     ASSERTION_TYPE_METHOD_MAP,
     CHECK_MARK_SPAN,
@@ -115,14 +114,15 @@ from pointblank.thresholds import (
     _normalize_thresholds_creation,
 )
 
+P = ParamSpec("P")
+R = TypeVar("R")
+
 if TYPE_CHECKING:
     from collections.abc import Collection
 
     from pointblank._typing import AbsoluteBounds, Tolerance
 
 
-P = ParamSpec("P")
-R = TypeVar("R")
 __all__ = [
     "Validate",
     "load_dataset",
@@ -139,43 +139,6 @@ __all__ = [
     "get_row_count",
     "get_validation_summary",
 ]
-
-
-def _register_agg_validations(func: Callable[P, R]) -> Callable[P, R]:
-    """
-    Decorator that handles the standard validation pattern for aggregate validators.
-
-    The decorated function should just be a stub that defines the signature.
-    """
-
-    @wraps(func)
-    def wrapper(
-        self: Validate,
-        columns,
-        value,
-        tol=0,
-        thresholds=None,
-        brief=False,
-        actions=None,
-        active=True,
-    ):
-        for column in columns:
-            val_info = _ValidationInfo.from_agg_validator(
-                assertion_type=func.__name__,  # Use the function name
-                columns=column,
-                value=value,
-                tol=tol,
-                thresholds=self.thresholds if thresholds is None else thresholds,
-                actions=self.actions if actions is None else actions,
-                brief=self.brief if brief is None else brief,
-                active=active,
-            )
-
-            self._add_validation(validation_info=val_info)
-
-        return self
-
-    return wrapper
 
 
 # Create a thread-local storage for the metadata
@@ -3778,6 +3741,10 @@ class _ValidationInfo:
         actions: Actions | None = None,
         active: bool = True,
     ) -> _ValidationInfo:
+        # This factory method creates a `_ValidationInfo` instance for aggregate
+        # methods. The reason this is created, is because all agg methods share the same
+        # signature so instead of instantiating the class directly each time, this method
+        # can be used to reduce redundancy, boilerplate and mistakes :)
         _check_thresholds(thresholds=thresholds)
 
         return cls(
@@ -4902,6 +4869,36 @@ class Validate:
 
         self.validation_info = []
 
+    def _add_agg_validation(
+        self,
+        *,
+        assertion_type: str,
+        columns,
+        value,
+        tol=0,
+        thresholds=None,
+        brief=False,
+        actions=None,
+        active=True,
+    ):
+        # For each column and assertion, create a validation info object and add it to
+        # the plan. This is used by all aggregation-based column validation methods and
+        # relies heavily on the `_ValidationInfo.from_agg_validator()` class method.
+        for column in columns:
+            val_info = _ValidationInfo.from_agg_validator(
+                assertion_type=assertion_type,
+                columns=column,
+                value=value,
+                tol=tol,
+                thresholds=self.thresholds if thresholds is None else thresholds,
+                actions=self.actions if actions is None else actions,
+                brief=self.brief if brief is None else brief,
+                active=active,
+            )
+            self._add_validation(validation_info=val_info)
+
+        return self
+
     def set_tbl(
         self,
         tbl: FrameT | Any,
@@ -5039,387 +5036,6 @@ class Validate:
 
     def _repr_html_(self) -> str:
         return self.get_tabular_report()._repr_html_()  # pragma: no cover
-
-    @_register_agg_validations
-    def col_avg_eq(
-        self,
-        # TODO: Public type alias
-        columns: _PBUnresolvedColumn,
-        value: float | Column,
-        tol: Tolerance = 0,
-        # TODO: type alias this, especially the tuple/dict parts
-        thresholds: float | bool | tuple | dict | Thresholds | None = None,
-        brief: str | bool = False,
-        actions: Actions | None = None,
-        active: bool = True,
-    ) -> Validate:
-        """Assert the avg of the values in a column is equal to some `value`.
-
-        Args:
-            columns (str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals): _description_
-            value (float | Column): _description_
-            thresholds (float | bool | tuple | dict | Thresholds | None, optional): _description_. Defaults to None.
-            brief (str | bool, optional): _description_. Defaults to False.
-            actions (Actions | None, optional): _description_. Defaults to None.
-
-        Returns:
-            Validate: _description_
-        """
-        pass
-
-    @_register_agg_validations
-    def col_sd_eq(
-        self,
-        # TODO: Public type alias
-        columns: _PBUnresolvedColumn,
-        value: float | Column,
-        tol: Tolerance = 0,
-        # TODO: type alias this, especially the tuple/dict parts
-        thresholds: float | bool | tuple | dict | Thresholds | None = None,
-        brief: str | bool = False,
-        actions: Actions | None = None,
-        active: bool = True,
-    ) -> Validate:
-        """Assert the standard deviation of the values in a column is equal to some `value`.
-
-        Args:
-            columns (str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals): _description_
-            value (float | Column): _description_
-            thresholds (float | bool | tuple | dict | Thresholds | None, optional): _description_. Defaults to None.
-            brief (str | bool, optional): _description_. Defaults to False.
-            actions (Actions | None, optional): _description_. Defaults to None.
-
-        Returns:
-            Validate: _description_
-        """
-        pass
-
-    @_register_agg_validations
-    def col_sd_gt(
-        self,
-        # TODO: Public type alias
-        columns: _PBUnresolvedColumn,
-        value: float | Column,
-        tol: Tolerance = 0,
-        # TODO: type alias this, especially the tuple/dict parts
-        thresholds: float | bool | tuple | dict | Thresholds | None = None,
-        brief: str | bool = False,
-        actions: Actions | None = None,
-        active: bool = True,
-    ) -> Validate:
-        """Assert the standard deviation of the values in a column is greater than some `value`.
-
-        Args:
-            columns (str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals): _description_
-            value (float | Column): _description_
-            thresholds (float | bool | tuple | dict | Thresholds | None, optional): _description_. Defaults to None.
-            brief (str | bool, optional): _description_. Defaults to False.
-            actions (Actions | None, optional): _description_. Defaults to None.
-
-        Returns:
-            Validate: _description_
-        """
-        pass
-
-    @_register_agg_validations
-    def col_sd_ge(
-        self,
-        # TODO: Public type alias
-        columns: _PBUnresolvedColumn,
-        value: float | Column,
-        tol: Tolerance = 0,
-        # TODO: type alias this, especially the tuple/dict parts
-        thresholds: float | bool | tuple | dict | Thresholds | None = None,
-        brief: str | bool = False,
-        actions: Actions | None = None,
-        active: bool = True,
-    ) -> Validate:
-        """Assert the standard deviation of the values in a column is greater than or equal to some `value`.
-
-        Args:
-            columns (str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals): _description_
-            value (float | Column): _description_
-            thresholds (float | bool | tuple | dict | Thresholds | None, optional): _description_. Defaults to None.
-            brief (str | bool, optional): _description_. Defaults to False.
-            actions (Actions | None, optional): _description_. Defaults to None.
-
-        Returns:
-            Validate: _description_
-        """
-        pass
-
-    @_register_agg_validations
-    def col_sd_lt(
-        self,
-        # TODO: Public type alias
-        columns: _PBUnresolvedColumn,
-        value: float | Column,
-        tol: Tolerance = 0,
-        # TODO: type alias this, especially the tuple/dict parts
-        thresholds: float | bool | tuple | dict | Thresholds | None = None,
-        brief: str | bool = False,
-        actions: Actions | None = None,
-        active: bool = True,
-    ) -> Validate:
-        """Assert the standard deviation of the values in a column is less than some `value`.
-
-        Args:
-            columns (str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals): _description_
-            value (float | Column): _description_
-            thresholds (float | bool | tuple | dict | Thresholds | None, optional): _description_. Defaults to None.
-            brief (str | bool, optional): _description_. Defaults to False.
-            actions (Actions | None, optional): _description_. Defaults to None.
-
-        Returns:
-            Validate: _description_
-        """
-        pass
-
-    @_register_agg_validations
-    def col_sd_le(
-        self,
-        # TODO: Public type alias
-        columns: _PBUnresolvedColumn,
-        value: float | Column,
-        tol: Tolerance = 0,
-        # TODO: type alias this, especially the tuple/dict parts
-        thresholds: float | bool | tuple | dict | Thresholds | None = None,
-        brief: str | bool = False,
-        actions: Actions | None = None,
-        active: bool = True,
-    ) -> Validate:
-        """Assert the standard deviation of the values in a column is less than or equal to some `value`.
-
-        Args:
-            columns (str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals): _description_
-            value (float | Column): _description_
-            thresholds (float | bool | tuple | dict | Thresholds | None, optional): _description_. Defaults to None.
-            brief (str | bool, optional): _description_. Defaults to False.
-            actions (Actions | None, optional): _description_. Defaults to None.
-
-        Returns:
-            Validate: _description_
-        """
-        pass
-
-    @_register_agg_validations
-    def col_avg_ge(
-        self,
-        # TODO: Public type alias
-        columns: _PBUnresolvedColumn,
-        value: float | Column,
-        tol: Tolerance = 0,
-        # TODO: type alias this, especially the tuple/dict parts
-        thresholds: float | bool | tuple | dict | Thresholds | None = None,
-        brief: str | bool = False,
-        actions: Actions | None = None,
-        active: bool = True,
-    ) -> Validate:
-        """Assert the avg of the values in a column is greater or equal to some `value`.
-
-        Args:
-            columns (str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals): _description_
-            value (float | Column): _description_
-            thresholds (float | bool | tuple | dict | Thresholds | None, optional): _description_. Defaults to None.
-            brief (str | bool, optional): _description_. Defaults to False.
-            actions (Actions | None, optional): _description_. Defaults to None.
-
-        Returns:
-            Validate: _description_
-        """
-        pass
-
-    @_register_agg_validations
-    def col_avg_gt(
-        self,
-        # TODO: Public type alias
-        columns: _PBUnresolvedColumn,
-        value: float | Column,
-        tol: Tolerance = 0,
-        # TODO: type alias this, especially the tuple/dict parts
-        thresholds: float | bool | tuple | dict | Thresholds | None = None,
-        brief: str | bool = False,
-        actions: Actions | None = None,
-        active: bool = True,
-    ) -> Validate:
-        """Assert the avg of the values in a column greater than some `value`.
-
-        Args:
-            columns (str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals): _description_
-            value (float | Column): _description_
-            thresholds (float | bool | tuple | dict | Thresholds | None, optional): _description_. Defaults to None.
-            brief (str | bool, optional): _description_. Defaults to False.
-            actions (Actions | None, optional): _description_. Defaults to None.
-
-        Returns:
-            Validate: _description_
-        """
-        pass
-
-    @_register_agg_validations
-    def col_avg_le(
-        self,
-        # TODO: Public type alias
-        columns: _PBUnresolvedColumn,
-        value: float | Column,
-        tol: Tolerance = 0,
-        # TODO: type alias this, especially the tuple/dict parts
-        thresholds: float | bool | tuple | dict | Thresholds | None = None,
-        brief: str | bool = False,
-        actions: Actions | None = None,
-        active: bool = True,
-    ) -> Validate:
-        """Assert the avg of the values in a column is less than or equal to some `value`.
-
-        Args:
-            columns (str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals): _description_
-            value (float | Column): _description_
-            thresholds (float | bool | tuple | dict | Thresholds | None, optional): _description_. Defaults to None.
-            brief (str | bool, optional): _description_. Defaults to False.
-            actions (Actions | None, optional): _description_. Defaults to None.
-
-        Returns:
-            Validate: _description_
-        """
-        pass
-
-    @_register_agg_validations
-    def col_avg_lt(
-        self,
-        # TODO: Public type alias
-        columns: _PBUnresolvedColumn,
-        value: float | Column,
-        tol: Tolerance = 0,
-        # TODO: type alias this, especially the tuple/dict parts
-        thresholds: float | bool | tuple | dict | Thresholds | None = None,
-        brief: str | bool = False,
-        actions: Actions | None = None,
-        active: bool = True,
-    ) -> Validate:
-        """Assert the avg of the values in a column is less than `value`.
-
-        Args:
-            columns (str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals): _description_
-            value (float | Column): _description_
-            thresholds (float | bool | tuple | dict | Thresholds | None, optional): _description_. Defaults to None.
-            brief (str | bool, optional): _description_. Defaults to False.
-            actions (Actions | None, optional): _description_. Defaults to None.
-
-        Returns:
-            Validate: _description_
-        """
-        pass
-
-    @_register_agg_validations
-    def col_sum_eq(
-        self,
-        # TODO: Public type alias
-        columns: _PBUnresolvedColumn,
-        value: float | Column,
-        tol: Tolerance = 0,
-        # TODO: type alias this, especially the tuple/dict parts
-        thresholds: float | bool | tuple | dict | Thresholds | None = None,
-        brief: str | bool = False,
-        actions: Actions | None = None,
-        active: bool = True,
-    ) -> Validate:
-        """Assert the sum of the values in a column is equal to some `value`.
-
-        Args:
-            columns (str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals): _description_
-            value (float | Column): _description_
-            thresholds (float | bool | tuple | dict | Thresholds | None, optional): _description_. Defaults to None.
-            brief (str | bool, optional): _description_. Defaults to False.
-            actions (Actions | None, optional): _description_. Defaults to None.
-
-        Returns:
-            Validate: _description_
-        """
-        pass
-
-    @_register_agg_validations
-    def col_sum_gt(
-        self,
-        columns: _PBUnresolvedColumn,
-        value: float | Column,
-        tol: Tolerance = 0,
-        thresholds: float | bool | tuple | dict | Thresholds | None = None,
-        brief: str | bool = False,
-        actions: Actions | None = None,
-        active: bool = True,
-    ) -> Validate:
-        """Assert the values in a column sum to a value greater than some `value`.
-
-        Args:
-            columns (_PBUnresolvedColumn): _description_
-            value (float | Column): _description_
-            tol (Tolerance, optional): _description_. Defaults to 0.
-            thresholds (float | bool | tuple | dict | Thresholds | None, optional): _description_. Defaults to None.
-            brief (str | bool, optional): _description_. Defaults to False.
-            actions (Actions | None, optional): _description_. Defaults to None.
-            active (bool, optional): _description_. Defaults to True.
-
-        Returns:
-            Validate: _description_
-        """
-        pass
-
-    @_register_agg_validations
-    def col_sum_ge(
-        self,
-        columns: _PBUnresolvedColumn,
-        value: float | Column,
-        tol: Tolerance = 0,
-        thresholds: float | bool | tuple | dict | Thresholds | None = None,
-        brief: str | bool = False,
-        actions: Actions | None = None,
-        active: bool = True,
-    ) -> Validate:
-        """Assert the values in a column sum to a value greater or equal than some `value`.
-
-        Args:
-            columns (_PBUnresolvedColumn): _description_
-            value (float | Column): _description_
-            tol (Tolerance, optional): _description_. Defaults to 0.
-            thresholds (float | bool | tuple | dict | Thresholds | None, optional): _description_. Defaults to None.
-            brief (str | bool, optional): _description_. Defaults to False.
-            actions (Actions | None, optional): _description_. Defaults to None.
-            active (bool, optional): _description_. Defaults to True.
-
-        Returns:
-            Validate: _description_
-        """
-        pass
-
-    @_register_agg_validations
-    def col_sum_lt(*args, **kwargs): ...
-
-    @_register_agg_validations
-    def col_sum_le(
-        self,
-        columns: _PBUnresolvedColumn,
-        value: float | Column,
-        tol: Tolerance = 0,
-        thresholds: float | bool | tuple | dict | Thresholds | None = None,
-        brief: str | bool = False,
-        actions: Actions | None = None,
-        active: bool = True,
-    ) -> Validate:
-        """Assert the values in a column sum to a value less than or equal to some `value`.
-
-        Args:
-            columns (_PBUnresolvedColumn): _description_
-            value (float | Column): _description_
-            tol (Tolerance, optional): _description_. Defaults to 0.
-            thresholds (float | bool | tuple | dict | Thresholds | None, optional): _description_. Defaults to None.
-            brief (str | bool, optional): _description_. Defaults to False.
-            actions (Actions | None, optional): _description_. Defaults to None.
-            active (bool, optional): _description_. Defaults to True.
-
-        Returns:
-            Validate: _description_
-        """
-        pass
 
     def col_vals_gt(
         self,
@@ -20488,7 +20104,7 @@ def _step_report_schema_in_order(
 
 def _step_report_schema_any_order(
     step: int, schema_info: dict, header: str, lang: str, debug_return_df: bool = False
-) -> GT | any:
+) -> GT | Any:
     """
     This is the case for schema validation where the schema is permitted to not have to be in the
     same column order as the target table.
@@ -20998,3 +20614,58 @@ def _create_col_schema_match_params_html(
         f"{full_match_dtypes_text}"
         "</div>"
     )
+
+
+def make_agg_validator(name: str):
+    """Factory for dynamically generated aggregate validation methods.
+
+    Why this exists:
+    Aggregate validators all share identical behavior. The only thing that differs
+    between them is the semantic assertion type (their name). The implementation
+    of each aggregate validator is fetched from `from_agg_validator`.
+
+    Instead of copy/pasting dozens of identical methods, we generate
+    them dynamically and attach them to the Validate class. The types are generated
+    at build time with `make pyi` to allow the methods to be visible to the type checker,
+    documentation builders and the IDEs/LSPs.
+
+    The returned function is a thin adapter that forwards all arguments to
+    `_add_agg_validation`, supplying the assertion type explicitly.
+    """
+
+    def agg_validator(
+        self: Validate,
+        columns,
+        value,
+        tol=0,
+        thresholds=None,
+        brief=False,
+        actions=None,
+        active=True,
+    ):
+        # Dynamically generated aggregate validator.
+        # This method is generated per assertion type and forwards all arguments
+        # to the shared aggregate validation implementation.
+        return self._add_agg_validation(
+            assertion_type=name,  # do NOT rely on __name__
+            columns=columns,
+            value=value,
+            tol=tol,
+            thresholds=thresholds,
+            brief=brief,
+            actions=actions,
+            active=active,
+        )
+
+    # Manually set function identity so this behaves like a real method.
+    # These must be set before attaching the function to the class.
+    agg_validator.__name__ = name
+    agg_validator.__qualname__ = f"Validate.{name}"
+
+    return agg_validator
+
+
+# Finally, we grab all the valid aggregation method names and attach them to
+# the Validate class, registering each one appropriately.
+for method in load_validation_method_grid():
+    setattr(Validate, method, make_agg_validator(method))
