@@ -53,29 +53,21 @@ def comp_eq(real: float, lower: float, upper: float) -> bool:
 
 @register
 def comp_gt(real: float, lower: float, upper: float) -> bool:
-    if lower == upper:
-        return bool(real > lower)
     return bool(real > lower)
 
 
 @register
 def comp_ge(real: Any, lower: float, upper: float) -> bool:
-    if lower == upper:
-        return bool(real >= lower)
     return bool(real >= lower)
 
 
 @register
 def comp_lt(real: float, lower: float, upper: float) -> bool:
-    if lower == upper:
-        return bool(real < lower)
     return bool(real < upper)
 
 
 @register
 def comp_le(real: float, lower: float, upper: float) -> bool:
-    if lower == upper:
-        return bool(real <= lower)
     return bool(real <= upper)
 
 
@@ -99,10 +91,10 @@ def resolve_agg_registries(name: str) -> tuple[Aggregator, Comparator]:
     aggregator = AGGREGATOR_REGISTRY.get(agg_name)
     comparator = COMPARATOR_REGISTRY.get(comp_name)
 
-    if aggregator is None:
+    if aggregator is None:  # pragma: no cover
         raise ValueError(f"Aggregator '{agg_name}' not found in registry.")
 
-    if comparator is None:
+    if comparator is None:  # pragma: no cover
         raise ValueError(f"Comparator '{comp_name}' not found in registry.")
 
     return aggregator, comparator

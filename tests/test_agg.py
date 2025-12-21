@@ -2,7 +2,7 @@ import pytest
 
 from pointblank import Validate
 import polars as pl
-from pointblank._agg import load_validation_method_grid
+from pointblank._agg import load_validation_method_grid, is_valid_agg
 
 
 @pytest.fixture
@@ -382,6 +382,11 @@ def test_all_methods_can_be_accessed():
 
     for meth in load_validation_method_grid():
         assert hasattr(v, meth)
+
+
+def test_invalid_agg():
+    assert not is_valid_agg("not_a_real_method")
+    assert is_valid_agg("col_sum_eq")
 
 
 if __name__ == "__main__":
