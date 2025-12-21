@@ -2,6 +2,7 @@ import pytest
 
 from pointblank import Validate
 import polars as pl
+from pointblank._agg import load_validation_method_grid
 
 
 @pytest.fixture
@@ -374,6 +375,13 @@ def test_extreme_standard_deviations():
     Validate(df).col_sd_eq("uniform", 0).col_sd_gt(
         "extreme_range", 400
     ).interrogate().assert_passing()
+
+
+def test_all_methods_can_be_accessed():
+    v = Validate(pl.DataFrame())
+
+    for meth in load_validation_method_grid():
+        assert hasattr(v, meth)
 
 
 if __name__ == "__main__":
