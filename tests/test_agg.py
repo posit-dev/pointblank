@@ -362,21 +362,6 @@ def test_floating_point_precision():
     v.assert_passing()
 
 
-# Test empty DataFrame
-def test_empty_dataframe():
-    df = pl.DataFrame({"a": [], "b": [], "c": []})
-
-    v = Validate(df)
-    # Operations on empty DataFrames should handle gracefully
-    # Behavior depends on implementation (might return null, 0, or raise error)
-    # This test documents expected behavior
-
-    # Uncomment based on actual expected behavior:
-    # v.col_sum_eq("a", 0)  # or
-    # with pytest.raises(ValueError):
-    #     v.col_sum_eq("a", 0)
-
-
 # Test with extreme standard deviations
 def test_extreme_standard_deviations():
     df = pl.DataFrame(
