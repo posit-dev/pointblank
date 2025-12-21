@@ -36,6 +36,7 @@ def transpose_dicts(list_of_dicts: list[dict[str, Any]]) -> dict[str, list[Any]]
     return dict(result)
 
 
+# TODO: doctest
 def _derive_single_bound(ref: int, tol: int | float) -> int:
     """Derive a single bound using the reference."""
     if not isinstance(tol, float | int):
@@ -45,6 +46,7 @@ def _derive_single_bound(ref: int, tol: int | float) -> int:
     return int(tol * ref) if tol < 1 else int(tol)
 
 
+# TODO: doctest
 def _derive_bounds(ref: int, tol: Tolerance) -> AbsoluteBounds:
     """Validate and extract the absolute bounds of the tolerance."""
     if isinstance(tol, tuple):

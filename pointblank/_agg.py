@@ -7,8 +7,8 @@ from typing import Any
 import narwhals as nw
 
 # TODO: Should take any frame type
-Aggregator = Callable[[nw.DataFrame], Any]
-Comparator = Callable[[Any, Any], bool]
+Aggregator = Callable[[nw.DataFrame], float | int]
+Comparator = Callable[[Any, Any, Any], bool]
 
 AGGREGATOR_REGISTRY: dict[str, Aggregator] = {}
 
@@ -91,7 +91,7 @@ def resolve_agg_registries(name: str) -> tuple[Aggregator, Comparator]:
         name (str): The name of the assertion.
 
     Returns:
-        tuple[Aggregator, Comparator]: _description_
+        tuple[Aggregator, Comparator]: The aggregator and comparator functions.
     """
     name = name.removeprefix("col_")
     agg_name, comp_name = name.split("_")[-2:]
