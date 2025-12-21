@@ -4873,7 +4873,7 @@ class Validate:
         self,
         *,
         assertion_type: str,
-        columns,
+        columns: str | Collection[str],
         value,
         tol=0,
         thresholds=None,
@@ -4884,6 +4884,8 @@ class Validate:
         # For each column and assertion, create a validation info object and add it to
         # the plan. This is used by all aggregation-based column validation methods and
         # relies heavily on the `_ValidationInfo.from_agg_validator()` class method.
+        if isinstance(columns, str):
+            columns = [columns]
         for column in columns:
             val_info = _ValidationInfo.from_agg_validator(
                 assertion_type=assertion_type,
@@ -12826,11 +12828,13 @@ class Validate:
                         vec: nw.DataFrame = nw.from_native(data_tbl_step).select(column)
                         real = agg(vec)
 
-                        target = value["value"]
+                        target: float | int = value["value"]
                         tol = value["tol"]
-                        lower_bound, upper_bound = _derive_bounds(target, tol)
+                        lower_diff, upper_diff = _derive_bounds(target, tol)
 
-                        result_bool = comp(real, target - lower_bound, target + upper_bound)
+                        lower_bound = target - lower_diff
+                        upper_bound = target + upper_diff
+                        result_bool: bool = comp(real, lower_bound, upper_bound)
 
                         validation.all_passed = result_bool
                         validation.n = 1
@@ -20635,7 +20639,7 @@ def make_agg_validator(name: str):
 
     def agg_validator(
         self: Validate,
-        columns,
+        columns: str | Collection[str],
         value,
         tol=0,
         thresholds=None,
@@ -20647,7 +20651,7 @@ def make_agg_validator(name: str):
         # This method is generated per assertion type and forwards all arguments
         # to the shared aggregate validation implementation.
         return self._add_agg_validation(
-            assertion_type=name,  # do NOT rely on __name__
+            assertion_type=name,
             columns=columns,
             value=value,
             tol=tol,
