@@ -115,8 +115,9 @@ from pointblank.thresholds import (
 
 if TYPE_CHECKING:
     from collections.abc import Collection
+    from typing import Any
 
-    from pointblank._typing import AbsoluteBounds, Tolerance
+    from pointblank._typing import AbsoluteBounds, Tolerance, _CompliantValue, _CompliantValues
 
 __all__ = [
     "Validate",
@@ -3729,12 +3730,12 @@ class _ValidationInfo:
     step_id: str | None = None
     sha1: str | None = None
     assertion_type: str | None = None
-    column: any | None = None
-    values: any | list[any] | tuple | None = None
+    column: Any | None = None
+    values: Any | list[any] | tuple | None = None
     inclusive: tuple[bool, bool] | None = None
     na_pass: bool | None = None
     pre: Callable | None = None
-    segments: any | None = None
+    segments: Any | None = None
     thresholds: Thresholds | None = None
     actions: Actions | None = None
     label: str | None = None
@@ -9379,7 +9380,7 @@ class Validate:
 
     def col_vals_expr(
         self,
-        expr: any,
+        expr: Any,
         pre: Callable | None = None,
         segments: SegmentSpec | None = None,
         thresholds: int | float | bool | tuple | dict | Thresholds = None,
@@ -17116,7 +17117,7 @@ def _convert_string_to_datetime(value: str) -> datetime.datetime:
             return datetime.datetime.strptime(value, "%Y-%m-%d %H:%M:%S")
 
 
-def _string_date_dttm_conversion(value: any) -> any:
+def _string_date_dttm_conversion(value: Any) -> Any:
     """
     Convert a string to a date or datetime object if it is in the correct format.
     If the value is not a string, it is returned as is.
@@ -17196,9 +17197,9 @@ def _process_brief(
     brief: str | None,
     step: int,
     col: str | list[str] | None,
-    values: any | None,
-    thresholds: any | None,
-    segment: any | None,
+    values: Any | None,
+    thresholds: Any | None,
+    segment: Any | None,
 ) -> str:
     # If there is no brief, return `None`
     if brief is None:
@@ -17285,7 +17286,7 @@ def _process_action_str(
     action_str: str,
     step: int,
     col: str | None,
-    value: any,
+    value: Any,
     type: str,
     level: str,
     time: str,
@@ -17337,7 +17338,7 @@ def _process_action_str(
 def _create_autobrief_or_failure_text(
     assertion_type: str,
     lang: str,
-    column: str | None,
+    column: str,
     values: str | None,
     for_failure: bool,
     locale: str | None = None,
@@ -17490,7 +17491,7 @@ def _create_autobrief_or_failure_text(
             for_failure=for_failure,
         )
 
-    return None  # pragma: no cover
+    return None
 
 
 def _expect_failure_type(for_failure: bool) -> str:
@@ -17500,7 +17501,7 @@ def _expect_failure_type(for_failure: bool) -> str:
 def _create_text_comparison(
     assertion_type: str,
     lang: str,
-    column: str | list[str] | None,
+    column: str | list[str],
     values: str | None,
     for_failure: bool = False,
 ) -> str:
@@ -17526,7 +17527,7 @@ def _create_text_comparison(
 
 def _create_text_between(
     lang: str,
-    column: str | None,
+    column: str,
     value_1: str,
     value_2: str,
     not_: bool = False,
@@ -17556,7 +17557,7 @@ def _create_text_between(
 
 
 def _create_text_set(
-    lang: str, column: str | None, values: list[any], not_: bool = False, for_failure: bool = False
+    lang: str, column: str, values: list[Any], not_: bool = False, for_failure: bool = False
 ) -> str:
     type_ = _expect_failure_type(for_failure=for_failure)
 
@@ -17578,9 +17579,7 @@ def _create_text_set(
     return text
 
 
-def _create_text_null(
-    lang: str, column: str | None, not_: bool = False, for_failure: bool = False
-) -> str:
+def _create_text_null(lang: str, column: str, not_: bool = False, for_failure: bool = False) -> str:
     type_ = _expect_failure_type(for_failure=for_failure)
 
     column_text = _prep_column_text(column=column)
@@ -17597,9 +17596,7 @@ def _create_text_null(
     return text
 
 
-def _create_text_regex(
-    lang: str, column: str | None, pattern: str | dict, for_failure: bool = False
-) -> str:
+def _create_text_regex(lang: str, column: str, pattern: str, for_failure: bool = False) -> str:
     type_ = _expect_failure_type(for_failure=for_failure)
 
     column_text = _prep_column_text(column=column)
@@ -17631,7 +17628,7 @@ def _create_text_expr(lang: str, for_failure: bool) -> str:
     return EXPECT_FAIL_TEXT[f"col_vals_expr_{type_}_text"][lang]
 
 
-def _create_text_col_exists(lang: str, column: str | None, for_failure: bool = False) -> str:
+def _create_text_col_exists(lang: str, column: str, for_failure: bool = False) -> str:
     type_ = _expect_failure_type(for_failure=for_failure)
 
     column_text = _prep_column_text(column=column)
@@ -17681,7 +17678,7 @@ def _create_text_rows_complete(
     return text
 
 
-def _create_text_row_count_match(lang: str, value: int, for_failure: bool = False) -> str:
+def _create_text_row_count_match(lang: str, value: dict, for_failure: bool = False) -> str:
     type_ = _expect_failure_type(for_failure=for_failure)
 
     values_text = _prep_values_text(value["count"], lang=lang)
@@ -17689,7 +17686,7 @@ def _create_text_row_count_match(lang: str, value: int, for_failure: bool = Fals
     return EXPECT_FAIL_TEXT[f"row_count_match_n_{type_}_text"][lang].format(values_text=values_text)
 
 
-def _create_text_col_count_match(lang: str, value: int, for_failure: bool = False) -> str:
+def _create_text_col_count_match(lang: str, value: dict, for_failure: bool = False) -> str:
     type_ = _expect_failure_type(for_failure=for_failure)
 
     values_text = _prep_values_text(value["count"], lang=lang)
@@ -17826,19 +17823,13 @@ def _create_text_prompt(lang: str, prompt: str, for_failure: bool = False) -> st
 def _prep_column_text(column: str | list[str]) -> str:
     if isinstance(column, list):
         return "`" + str(column[0]) + "`"
-    elif isinstance(column, str):
+    if isinstance(column, str):
         return "`" + column + "`"
-    else:
-        return ""
+    raise AssertionError
 
 
 def _prep_values_text(
-    values: str
-    | int
-    | float
-    | datetime.datetime
-    | datetime.date
-    | list[str | int | float | datetime.datetime | datetime.date],
+    values: _CompliantValue | _CompliantValues,
     lang: str,
     limit: int = 3,
 ) -> str:
@@ -17886,7 +17877,7 @@ def _prep_values_text(
     return values_str
 
 
-def _seg_expr_from_string(data_tbl: any, segments_expr: str) -> list[tuple[str, str]]:
+def _seg_expr_from_string(data_tbl: Any, segments_expr: str) -> tuple[str, str]:
     """
     Obtain the segmentation categories from a table column.
 
@@ -17989,7 +17980,7 @@ def _seg_expr_from_tuple(segments_expr: tuple) -> list[tuple[str, Any]]:
     return seg_tuples
 
 
-def _apply_segments(data_tbl: any, segments_expr: tuple[str, Any]) -> any:
+def _apply_segments(data_tbl: Any, segments_expr: tuple[str, str]) -> Any:
     """
     Apply the segments expression to the data table.
 
@@ -18214,11 +18205,9 @@ def _get_assertion_icon(icon: list[str], length_val: int = 30) -> list[str]:
     return icon_svg
 
 
-def _replace_svg_dimensions(svg: list[str], height_width: int | float) -> list[str]:
+def _replace_svg_dimensions(svg: str, height_width: int | float) -> str:
     svg = re.sub(r'width="[0-9]*?px', f'width="{height_width}px', svg)
-    svg = re.sub(r'height="[0-9]*?px', f'height="{height_width}px', svg)
-
-    return svg
+    return re.sub(r'height="[0-9]*?px', f'height="{height_width}px', svg)
 
 
 def _get_title_text(
@@ -18282,7 +18271,7 @@ def _process_title_text(title: str | None, tbl_name: str | None, lang: str) -> s
     return title_text
 
 
-def _transform_tbl_preprocessed(pre: any, seg: any, interrogation_performed: bool) -> list[str]:
+def _transform_tbl_preprocessed(pre: Any, seg: Any, interrogation_performed: bool) -> list[str]:
     # If no interrogation was performed, return a list of empty strings
     if not interrogation_performed:
         return ["" for _ in range(len(pre))]
@@ -18590,22 +18579,21 @@ def _transform_assertion_str(
     return type_upd
 
 
-def _pre_processing_funcs_to_str(pre: Callable) -> str | list[str]:
+def _pre_processing_funcs_to_str(pre: Callable) -> str | list[str] | None:
     if isinstance(pre, Callable):
         return _get_callable_source(fn=pre)
+    return None
 
 
 def _get_callable_source(fn: Callable) -> str:
-    if isinstance(fn, Callable):
-        try:
-            source_lines, _ = inspect.getsourcelines(fn)
-            source = "".join(source_lines).strip()
-            # Extract the `pre` argument from the source code
-            pre_arg = _extract_pre_argument(source)
-            return pre_arg
-        except (OSError, TypeError):  # pragma: no cover
-            return fn.__name__
-    return fn  # pragma: no cover
+    try:
+        source_lines, _ = inspect.getsourcelines(fn)
+        source = "".join(source_lines).strip()
+        # Extract the `pre` argument from the source code
+        pre_arg = _extract_pre_argument(source)
+        return pre_arg
+    except (OSError, TypeError):  # pragma: no cover
+        return fn.__name__
 
 
 def _extract_pre_argument(source: str) -> str:
@@ -18631,6 +18619,7 @@ def _create_table_time_html(
     if time_start is None:
         return ""
 
+    assert time_end is not None  # typing
     # Get the time duration (difference between `time_end` and `time_start`) in seconds
     time_duration = (time_end - time_start).total_seconds()
 
@@ -19743,12 +19732,12 @@ def _step_report_row_based(
     column: str,
     column_position: int,
     columns_subset: list[str] | None,
-    values: any,
+    values: Any,
     inclusive: tuple[bool, bool] | None,
     n: int,
     n_failed: int,
     all_passed: bool,
-    extract: any,
+    extract: Any,
     tbl_preview: GT,
     header: str,
     limit: int | None,
@@ -19775,10 +19764,12 @@ def _step_report_row_based(
     elif assertion_type == "col_vals_le":
         text = f"{column} &le; {values}"
     elif assertion_type == "col_vals_between":
+        assert inclusive is not None
         symbol_left = "&le;" if inclusive[0] else "&lt;"
         symbol_right = "&le;" if inclusive[1] else "&lt;"
         text = f"{values[0]} {symbol_left} {column} {symbol_right} {values[1]}"
     elif assertion_type == "col_vals_outside":
+        assert inclusive is not None
         symbol_left = "&lt;" if inclusive[0] else "&le;"
         symbol_right = "&gt;" if inclusive[1] else "&ge;"
         text = f"{column} {symbol_left} {values[0]}, {column} {symbol_right} {values[1]}"
@@ -19999,7 +19990,7 @@ def _step_report_rows_distinct(
     n: int,
     n_failed: int,
     all_passed: bool,
-    extract: any,
+    extract: Any,
     tbl_preview: GT,
     header: str,
     limit: int | None,
@@ -20127,7 +20118,7 @@ def _step_report_rows_distinct(
 
 def _step_report_schema_in_order(
     step: int, schema_info: dict, header: str, lang: str, debug_return_df: bool = False
-) -> GT | any:
+) -> GT | Any:
     """
     This is the case for schema validation where the schema is supposed to have the same column
     order as the target table.
@@ -20483,7 +20474,7 @@ def _step_report_schema_in_order(
 
 def _step_report_schema_any_order(
     step: int, schema_info: dict, header: str, lang: str, debug_return_df: bool = False
-) -> GT | any:
+) -> GT | Any:
     """
     This is the case for schema validation where the schema is permitted to not have to be in the
     same column order as the target table.

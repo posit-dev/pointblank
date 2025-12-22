@@ -141,3 +141,6 @@ benchmark/data/*.json
 uv.lock
 memory
 .vscode/mcp.json
+
+# While typing is experimental, don't mark the entire package as typed
+pointblank/py.typed

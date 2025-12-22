@@ -45,6 +45,11 @@ install-pre-commit: # Install pre-commit hooks
 run-pre-commit: # Run pre-commit hooks
 	@uvx pre-commit run --all-files
 
+
+type: ## Run experimental type checking
+	@uv run ty check pointblank
+
+
 check:
 	pyright --pythonversion 3.8 pointblank
 	pyright --pythonversion 3.9 pointblank

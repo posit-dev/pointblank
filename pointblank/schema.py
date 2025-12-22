@@ -2,11 +2,15 @@ from __future__ import annotations
 
 import copy
 from dataclasses import dataclass
+from typing import TYPE_CHECKING
 
 import narwhals as nw
 
 from pointblank._constants import IBIS_BACKENDS
 from pointblank._utils import _get_tbl_type, _is_lazy_frame, _is_lib_present, _is_narwhals_table
+
+if TYPE_CHECKING:
+    from typing import Any
 
 __all__ = ["Schema", "_check_schema_match"]
 
@@ -272,14 +276,14 @@ class Schema:
     columns: str | list[str] | list[tuple[str, str]] | list[tuple[str]] | dict[str, str] | None = (
         None
     )
-    tbl: any | None = None
+    tbl: Any | None = None
 
     def __init__(
         self,
         columns: (
             str | list[str] | list[tuple[str, str]] | list[tuple[str]] | dict[str, str] | None
         ) = None,
-        tbl: any | None = None,
+        tbl: Any | None = None,
         **kwargs,
     ):
         if tbl is None and columns is None and not kwargs:
@@ -889,7 +893,7 @@ def _schema_info_generate_params_dict(
 
 
 def _get_schema_validation_info(
-    data_tbl: any,
+    data_tbl: Any,
     schema: Schema,
     passed: bool,
     complete: bool,
