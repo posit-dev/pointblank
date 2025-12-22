@@ -1,11 +1,10 @@
 ---
-title: Installation
+title: "Installation"
 jupyter: python3
 toc-expand: 2
 html-table-processing: none
+bread-crumbs: true
 ---
-
-# Installing Pointblank
 
 Pointblank can be installed using various package managers. The base installation gives you the core
 validation functionality, with optional dependencies for working with different data sources.
@@ -31,6 +30,15 @@ uv pip install pointblank
 
 ```bash
 conda install -c conda-forge pointblank
+```
+
+## pixi
+
+```bash
+# add pointblank to project
+pixi init name-of-project
+cd name-of-project
+pixi add pointblank
 ```
 :::
 
@@ -122,6 +130,23 @@ conda install -c conda-forge pointblank-snowflake   # Snowflake
 # Example of installing multiple backends
 conda install -c conda-forge pointblank-duckdb pointblank-postgres pointblank-sqlite
 ```
+
+## pixi
+
+```bash
+pixi add pointblank-sqlite      # SQLite
+pixi add pointblank-duckdb      # DuckDB
+pixi add pointblank-postgres    # PostgreSQL
+pixi add pointblank-mysql       # MySQL
+pixi add pointblank-mssql       # Microsoft SQL Server
+pixi add pointblank-bigquery    # BigQuery
+pixi add pointblank-pyspark     # Apache Spark
+pixi add pointblank-databricks  # Databricks
+pixi add pointblank-snowflake   # Snowflake
+
+# Example of installing multiple backends
+pixi add pointblank-duckdb pointblank-postgres pointblank-sqlite
+```
 :::
 
 ::: {.callout-note}
@@ -164,8 +189,8 @@ print(pb.__version__)
 ## System Requirements
 
 - Python 3.10 or higher
-- A supported DataFrame library (Pandas or Polars)
-- Optional: Ibis (for database connectivity)
+- a supported DataFrame library (Pandas or Polars)
+- optional: Ibis (for database connectivity)
 
 ## Next Steps
 
@@ -195,3 +220,31 @@ validation = (
 # Display the validation results
 validation
 ```
+
+## Command Line Interface
+
+Once installed, Pointblank also provides a powerful command-line interface for quick data validation tasks:
+
+```bash
+# Test the CLI with a built-in dataset
+pb validate small_table --check rows-distinct
+
+# Check if a column exists
+pb validate small_table --check col-exists --column a
+
+# Validate data ranges
+pb validate small_table --check col-vals-lt --column a --value 10
+```
+
+The CLI is perfect for:
+
+- quick data quality checks in CI/CD pipelines
+- exploratory data analysis from the terminal
+- integration with shell scripts and automation workflows
+
+::: {.callout-tip}
+## See the CLI in Action
+Watch our [interactive CLI demonstrations](../demos/cli-interactive/index.qmd) to see these commands executing in real-time with actual output formatting.
+:::
+
+Learn more about the CLI capabilities in the [Command Line Interface](cli.qmd) guide.

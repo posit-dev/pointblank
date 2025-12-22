@@ -4,13 +4,15 @@ import copy
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
+import narwhals as nw
+
 from pointblank._constants import IBIS_BACKENDS
 from pointblank._utils import _get_tbl_type, _is_lazy_frame, _is_lib_present, _is_narwhals_table
 
 if TYPE_CHECKING:
     from typing import Any
 
-__all__ = ["Schema"]
+__all__ = ["Schema", "_check_schema_match"]
 
 
 @dataclass
@@ -63,10 +65,15 @@ class Schema:
 
     - Polars DataFrame (`"polars"`)
     - Pandas DataFrame (`"pandas"`)
+    - PySpark table (`"pyspark"`)
     - DuckDB table (`"duckdb"`)*
     - MySQL table (`"mysql"`)*
     - PostgreSQL table (`"postgresql"`)*
     - SQLite table (`"sqlite"`)*
+    - Microsoft SQL Server table (`"mssql"`)*
+    - Snowflake table (`"snowflake"`)*
+    - Databricks table (`"databricks"`)*
+    - BigQuery table (`"bigquery"`)*
     - Parquet table (`"parquet"`)*
 
     The table types marked with an asterisk need to be prepared as Ibis tables (with type of
@@ -339,6 +346,16 @@ class Schema:
                 schema_dict = dict(self.tbl.schema.items())
             schema_dict = {k: str(v) for k, v in schema_dict.items()}
             self.columns = list(schema_dict.items())
+
+        elif table_type == "pyspark":  # pragma: no cover
+            # Convert PySpark DataFrame to Narwhals to get schema
+            nw_df = nw.from_native(self.tbl)  # pragma: no cover
+            if _is_lazy_frame(data=nw_df):  # pragma: no cover
+                schema_dict = dict(nw_df.collect_schema())  # pragma: no cover
+            else:  # pragma: no cover
+                schema_dict = dict(nw_df.schema.items())  # pragma: no cover
+            schema_dict = {k: str(v) for k, v in schema_dict.items()}  # pragma: no cover
+            self.columns = list(schema_dict.items())  # pragma: no cover
 
         elif table_type in IBIS_BACKENDS:
             schema_dict = dict(self.tbl.schema().items())
@@ -1168,3 +1185,83 @@ def _get_schema_validation_info(
     )
 
     return schema_info
+
+
+def _check_schema_match(
+    data_tbl,
+    schema,
+    complete: bool = True,
+    in_order: bool = True,
+    case_sensitive_colnames: bool = True,
+    case_sensitive_dtypes: bool = True,
+    full_match_dtypes: bool = True,
+):
+    """
+    Check if a column exists in a DataFrame or has a certain data type.
+
+    Parameters
+    ----------
+    data_tbl
+        A data table.
+    schema
+        A schema to check against.
+    complete
+        `True` to check if the schema is complete, `False` otherwise.
+    in_order
+        `True` to check if the schema is in order, `False` otherwise.
+    case_sensitive_colnames
+        `True` to perform column-name matching in a case-sensitive manner, `False` otherwise.
+    case_sensitive_dtypes
+        `True` to perform data-type matching in a case-sensitive manner, `False` otherwise.
+    full_match_dtypes
+        `True` to perform a full match of data types, `False` otherwise.
+
+    Returns
+    -------
+    bool
+        `True` when schema matches, `False` otherwise.
+    """
+    schema_expect = schema
+    schema_actual = Schema(tbl=data_tbl)
+
+    if complete and in_order:
+        # Check if the schema is complete and in order (most restrictive check)
+        # complete: True, in_order: True
+        res = schema_expect._compare_schema_columns_complete_in_order(
+            other=schema_actual,
+            case_sensitive_colnames=case_sensitive_colnames,
+            case_sensitive_dtypes=case_sensitive_dtypes,
+            full_match_dtypes=full_match_dtypes,
+        )
+
+    elif not complete and not in_order:
+        # Check if the schema is at least a subset, and, order of columns does not matter
+        # complete: False, in_order: False
+        res = schema_expect._compare_schema_columns_subset_any_order(
+            other=schema_actual,
+            case_sensitive_colnames=case_sensitive_colnames,
+            case_sensitive_dtypes=case_sensitive_dtypes,
+            full_match_dtypes=full_match_dtypes,
+        )
+
+    elif complete:
+        # Check if the schema is complete, but the order of columns does not matter
+        # complete: True, in_order: False
+        res = schema_expect._compare_schema_columns_complete_any_order(
+            other=schema_actual,
+            case_sensitive_colnames=case_sensitive_colnames,
+            case_sensitive_dtypes=case_sensitive_dtypes,
+            full_match_dtypes=full_match_dtypes,
+        )
+
+    else:
+        # Check if the schema is a subset (doesn't need to be complete) and in order
+        # complete: False, in_order: True
+        res = schema_expect._compare_schema_columns_subset_in_order(
+            other=schema_actual,
+            case_sensitive_colnames=case_sensitive_colnames,
+            case_sensitive_dtypes=case_sensitive_dtypes,
+            full_match_dtypes=full_match_dtypes,
+        )
+
+    return res

@@ -43,13 +43,15 @@ Validate(data: 'FrameT | Any', tbl_name: 'str | None' = None, label: 'str | None
     ----------
     data
         The table to validate, which could be a DataFrame object, an Ibis table object, a CSV
-        file path, a Parquet file path, or a database connection string. When providing a CSV or
-        Parquet file path (as a string or `pathlib.Path` object), the file will be automatically
-        loaded using an available DataFrame library (Polars or Pandas). Parquet input also supports
-        glob patterns, directories containing .parquet files, and Spark-style partitioned datasets.
-        Connection strings enable direct database access via Ibis with optional table specification
-        using the `::table_name` suffix. Read the *Supported Input Table Types* section for details
-        on the supported table types.
+        file path, a Parquet file path, a GitHub URL pointing to a CSV or Parquet file, or a
+        database connection string. When providing a CSV or Parquet file path (as a string or
+        `pathlib.Path` object), the file will be automatically loaded using an available DataFrame
+        library (Polars or Pandas). Parquet input also supports glob patterns, directories
+        containing .parquet files, and Spark-style partitioned datasets. GitHub URLs are
+        automatically transformed to raw content URLs and downloaded. Connection strings enable
+        direct database access via Ibis with optional table specification using the `::table_name`
+        suffix. Read the *Supported Input Table Types* section for details on the supported table
+        types.
     tbl_name
         An optional name to assign to the input table object. If no value is provided, a name will
         be generated based on whatever information is available. This table name will be displayed
@@ -109,6 +111,7 @@ Validate(data: 'FrameT | Any', tbl_name: 'str | None' = None, label: 'str | None
 
     - Polars DataFrame (`"polars"`)
     - Pandas DataFrame (`"pandas"`)
+    - PySpark table (`"pyspark"`)
     - DuckDB table (`"duckdb"`)*
     - MySQL table (`"mysql"`)*
     - PostgreSQL table (`"postgresql"`)*
@@ -116,7 +119,6 @@ Validate(data: 'FrameT | Any', tbl_name: 'str | None' = None, label: 'str | None
     - Microsoft SQL Server table (`"mssql"`)*
     - Snowflake table (`"snowflake"`)*
     - Databricks table (`"databricks"`)*
-    - PySpark table (`"pyspark"`)*
     - BigQuery table (`"bigquery"`)*
     - Parquet table (`"parquet"`)*
     - CSV files (string path or `pathlib.Path` object with `.csv` extension)
@@ -237,7 +239,7 @@ Validate(data: 'FrameT | Any', tbl_name: 'str | None' = None, label: 'str | None
         summary = pb.get_validation_summary()
         if summary["status"] == "CRITICAL":
             send_alert_email(
-                subject=f"CRITICAL validation failures in {summary['table_name']}",
+                subject=f"CRITICAL validation failures in {summary['tbl_name']}",
                 body=f"{summary['critical_steps']} steps failed with critical severity."
             )
 
@@ -285,6 +287,21 @@ Validate(data: 'FrameT | Any', tbl_name: 'str | None' = None, label: 'str | None
     - Japanese (`"ja"`)
     - Korean (`"ko"`)
     - Vietnamese (`"vi"`)
+    - Indonesian (`"id"`)
+    - Ukrainian (`"uk"`)
+    - Bulgarian (`"bg"`)
+    - Croatian (`"hr"`)
+    - Estonian (`"et"`)
+    - Hungarian (`"hu"`)
+    - Irish (`"ga"`)
+    - Latvian (`"lv"`)
+    - Lithuanian (`"lt"`)
+    - Maltese (`"mt"`)
+    - Slovak (`"sk"`)
+    - Slovenian (`"sl"`)
+    - Hebrew (`"he"`)
+    - Thai (`"th"`)
+    - Persian (`"fa"`)
 
     Automatically generated briefs (produced by using `brief=True` or `brief="...{auto}..."`) will
     be written in the selected language. The language setting will also used when generating the
@@ -856,7 +873,7 @@ FinalActions(*args)
     def send_alert():
         summary = pb.get_validation_summary()
         if summary["highest_severity"] == "critical":
-            print(f"ALERT: Critical validation failures found in {summary['table_name']}")
+            print(f"ALERT: Critical validation failures found in {summary['tbl_name']}")
 
     validation = (
         pb.Validate(
@@ -948,10 +965,15 @@ Definition of a schema object.
 
     - Polars DataFrame (`"polars"`)
     - Pandas DataFrame (`"pandas"`)
+    - PySpark table (`"pyspark"`)
     - DuckDB table (`"duckdb"`)*
     - MySQL table (`"mysql"`)*
     - PostgreSQL table (`"postgresql"`)*
     - SQLite table (`"sqlite"`)*
+    - Microsoft SQL Server table (`"mssql"`)*
+    - Snowflake table (`"snowflake"`)*
+    - Databricks table (`"databricks"`)*
+    - BigQuery table (`"bigquery"`)*
     - Parquet table (`"parquet"`)*
 
     The table types marked with an asterisk need to be prepared as Ibis tables (with type of
@@ -1145,7 +1167,7 @@ Definition of a schema object.
     `Schema` object is used in a validation workflow.
     
 
-DraftValidation(data: 'FrameT | Any', model: 'str', api_key: 'str | None' = None) -> None
+DraftValidation(data: 'FrameT | Any', model: 'str', api_key: 'str | None' = None, verify_ssl: 'bool' = True) -> None
 
     Draft a validation plan for a given table using an LLM.
 
@@ -1168,10 +1190,15 @@ DraftValidation(data: 'FrameT | Any', model: 'str', api_key: 'str | None' = None
         The data to be used for drafting a validation plan.
     model
         The model to be used. This should be in the form of `provider:model` (e.g.,
-        `"anthropic:claude-3-5-sonnet-latest"`). Supported providers are `"anthropic"`, `"openai"`,
+        `"anthropic:claude-sonnet-4-5"`). Supported providers are `"anthropic"`, `"openai"`,
         `"ollama"`, and `"bedrock"`.
     api_key
         The API key to be used for the model.
+    verify_ssl
+        Whether to verify SSL certificates when making requests to the LLM provider. Set to `False`
+        to disable SSL verification (e.g., when behind a corporate firewall with self-signed
+        certificates). Defaults to `True`. Use with caution as disabling SSL verification can pose
+        security risks.
 
     Returns
     -------
@@ -1213,6 +1240,33 @@ DraftValidation(data: 'FrameT | Any', model: 'str', api_key: 'str | None' = None
     There's no need to have the `python-dotenv` package installed when using `.env` files in this
     way.
 
+    Notes on SSL Certificate Verification
+    --------------------------------------
+    By default, SSL certificate verification is enabled for all requests to LLM providers. However,
+    in certain network environments (such as corporate networks with self-signed certificates or
+    firewall proxies), you may encounter SSL certificate verification errors.
+
+    To disable SSL verification, set the `verify_ssl` parameter to `False`:
+
+    ```python
+    import pointblank as pb
+
+    data = pb.load_dataset(dataset="nycflights", tbl_type="duckdb")
+
+    # Disable SSL verification for networks with self-signed certificates
+    pb.DraftValidation(
+        data=data,
+        model="anthropic:claude-sonnet-4-5",
+        verify_ssl=False
+    )
+    ```
+
+    :::{.callout-warning}
+    Disabling SSL verification (through `verify_ssl=False`) can expose your API keys and data to
+    man-in-the-middle attacks. Only use this option in trusted network environments and when
+    absolutely necessary.
+    :::
+
     Notes on Data Sent to the Model Provider
     ----------------------------------------
     The data sent to the model provider is a JSON summary of the table. This data summary is
@@ -1239,7 +1293,7 @@ DraftValidation(data: 'FrameT | Any', model: 'str', api_key: 'str | None' = None
     Let's look at how the `DraftValidation` class can be used to draft a validation plan for a
     table. The table to be used is `"nycflights"`, which is available here via the
     [`load_dataset()`](`pointblank.load_dataset`) function. The model to be used is
-    `"anthropic:claude-3-5-sonnet-latest"` (which performs very well compared to other LLMs). The
+    `"anthropic:claude-sonnet-4-5"` (which performs very well compared to other LLMs). The
     example assumes that the API key is stored in an `.env` file as `ANTHROPIC_API_KEY`.
 
     ```python
@@ -1249,7 +1303,7 @@ DraftValidation(data: 'FrameT | Any', model: 'str', api_key: 'str | None' = None
     data = pb.load_dataset(dataset="nycflights", tbl_type="duckdb")
 
     # Draft a validation plan for the "nycflights" table
-    pb.DraftValidation(data=data, model="anthropic:claude-3-5-sonnet-latest")
+    pb.DraftValidation(data=data, model="anthropic:claude-sonnet-4-5")
     ```
 
     The output will be a drafted validation plan for the `"nycflights"` table and this will appear
@@ -3179,7 +3233,10 @@ col_vals_in_set(self, columns: 'str | list[str] | Column | ColumnSelector | Colu
             multiple columns are supplied or resolved, there will be a separate validation step
             generated for each column.
         set
-            A list of values to compare against.
+            A collection of values to compare against. Can be a list of values, a Python Enum class,
+            or a collection containing Enum instances. When an Enum class is provided, all enum
+            values will be used. When a collection contains Enum instances, their values will be
+            extracted automatically.
         pre
             An optional preprocessing function or lambda to apply to the data table during
             interrogation. This function should take a table as input and return a modified table.
@@ -3350,9 +3407,63 @@ col_vals_in_set(self, columns: 'str | list[str] | Column | ColumnSelector | Colu
 
         The validation table reports two failing test units. The specific failing cases are for the
         column `b` values of `8` and `1`, which are not in the set of `[2, 3, 4, 5, 6]`.
+
+        **Using Python Enums**
+
+        The `col_vals_in_set()` method also supports Python Enum classes and instances, which can
+        make validations more readable and maintainable:
+
+        ```python
+        from enum import Enum
+
+        class Color(Enum):
+            RED = "red"
+            GREEN = "green"
+            BLUE = "blue"
+
+        # Create a table with color data
+        tbl_colors = pl.DataFrame({
+            "product": ["shirt", "pants", "hat", "shoes"],
+            "color": ["red", "blue", "green", "yellow"]
+        })
+
+        # Validate using an Enum class (all enum values are allowed)
+        validation = (
+            pb.Validate(data=tbl_colors)
+            .col_vals_in_set(columns="color", set=Color)
+            .interrogate()
+        )
+
+        validation
+        ```
+
+        This validation will fail for the `"yellow"` value since it's not in the `Color` enum.
+
+        You can also use specific Enum instances or mix them with regular values:
+
+        ```python
+        # Validate using specific Enum instances
+        validation = (
+            pb.Validate(data=tbl_colors)
+            .col_vals_in_set(columns="color", set=[Color.RED, Color.BLUE])
+            .interrogate()
+        )
+
+        # Mix Enum instances with regular values
+        validation = (
+            pb.Validate(data=tbl_colors)
+            .col_vals_in_set(columns="color", set=[Color.RED, Color.BLUE, "yellow"])
+            .interrogate()
+        )
+
+        validation
+        ```
+
+        In this case, the `"green"` value will cause a failing test unit since it's not part of the
+        specified set.
         
 
-col_vals_not_in_set(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', set: 'list[float | int]', pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
+col_vals_not_in_set(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', set: 'Collection[Any]', pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
 
         Validate whether column values are not in a set of values.
 
@@ -3369,7 +3480,10 @@ col_vals_not_in_set(self, columns: 'str | list[str] | Column | ColumnSelector | 
             multiple columns are supplied or resolved, there will be a separate validation step
             generated for each column.
         set
-            A list of values to compare against.
+            A collection of values to compare against. Can be a list of values, a Python Enum class,
+            or a collection containing Enum instances. When an Enum class is provided, all enum
+            values will be used. When a collection contains Enum instances, their values will be
+            extracted automatically.
         pre
             An optional preprocessing function or lambda to apply to the data table during
             interrogation. This function should take a table as input and return a modified table.
@@ -3541,6 +3655,292 @@ col_vals_not_in_set(self, columns: 'str | list[str] | Column | ColumnSelector | 
 
         The validation table reports two failing test units. The specific failing cases are for the
         column `b` values of `2` and `6`, both of which are in the set of `[2, 3, 4, 5, 6]`.
+
+        **Using Python Enums**
+
+        Like `col_vals_in_set()`, this method also supports Python Enum classes and instances:
+
+        ```python
+        from enum import Enum
+
+        class InvalidStatus(Enum):
+            DELETED = "deleted"
+            ARCHIVED = "archived"
+
+        # Create a table with status data
+        status_table = pl.DataFrame({
+            "product": ["widget", "gadget", "tool", "device"],
+            "status": ["active", "pending", "deleted", "active"]
+        })
+
+        # Validate that no values are in the invalid status set
+        validation = (
+            pb.Validate(data=status_table)
+            .col_vals_not_in_set(columns="status", set=InvalidStatus)
+            .interrogate()
+        )
+
+        validation
+        ```
+
+        This `"deleted"` value in the `status` column will fail since it matches one of the invalid
+        statuses in the `InvalidStatus` enum.
+        
+
+col_vals_increasing(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', allow_stationary: 'bool' = False, decreasing_tol: 'float | None' = None, na_pass: 'bool' = False, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
+
+        Are column data increasing by row?
+
+        The `col_vals_increasing()` validation method checks whether column values in a table are
+        increasing when moving down a table. There are options for allowing missing values in the
+        target column, allowing stationary phases (where consecutive values don't change), and even
+        one for allowing decreasing movements up to a certain threshold. This validation will
+        operate over the number of test units that is equal to the number of rows in the table
+        (determined after any `pre=` mutation has been applied).
+
+        Parameters
+        ----------
+        columns
+            A single column or a list of columns to validate. Can also use
+            [`col()`](`pointblank.col`) with column selectors to specify one or more columns. If
+            multiple columns are supplied or resolved, there will be a separate validation step
+            generated for each column.
+        allow_stationary
+            An option to allow pauses in increasing values. For example, if the values for the test
+            units are `[80, 82, 82, 85, 88]` then the third unit (`82`, appearing a second time)
+            would be marked as failing when `allow_stationary` is `False`. Using
+            `allow_stationary=True` will result in all the test units in `[80, 82, 82, 85, 88]` to
+            be marked as passing.
+        decreasing_tol
+            An optional threshold value that allows for movement of numerical values in the negative
+            direction. By default this is `None` but using a numerical value will set the absolute
+            threshold of negative travel allowed across numerical test units. Note that setting a
+            value here also has the effect of setting `allow_stationary` to `True`.
+        na_pass
+            Should any encountered None, NA, or Null values be considered as passing test units? By
+            default, this is `False`. Set to `True` to pass test units with missing values.
+        pre
+            An optional preprocessing function or lambda to apply to the data table during
+            interrogation. This function should take a table as input and return a modified table.
+            Have a look at the *Preprocessing* section for more information on how to use this
+            argument.
+        segments
+            An optional directive on segmentation, which serves to split a validation step into
+            multiple (one step per segment). Can be a single column name, a tuple that specifies a
+            column name and its corresponding values to segment on, or a combination of both
+            (provided as a list). Read the *Segmentation* section for usage information.
+        thresholds
+            Set threshold failure levels for reporting and reacting to exceedences of the levels.
+            The thresholds are set at the step level and will override any global thresholds set in
+            `Validate(thresholds=...)`. The default is `None`, which means that no thresholds will
+            be set locally and global thresholds (if any) will take effect. Look at the *Thresholds*
+            section for information on how to set threshold levels.
+        actions
+            Optional actions to take when the validation step(s) meets or exceeds any set threshold
+            levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
+            define the actions.
+        brief
+            An optional brief description of the validation step that will be displayed in the
+            reporting table. You can use the templating elements like `"{step}"` to insert
+            the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+            the entire brief will be automatically generated. If `None` (the default) then there
+            won't be a brief.
+        active
+            A boolean value indicating whether the validation step should be active. Using `False`
+            will make the validation step inactive (still reporting its presence and keeping indexes
+            for the steps unchanged).
+
+        Returns
+        -------
+        Validate
+            The `Validate` object with the added validation step.
+
+        Examples
+        --------
+        For the examples here, we'll use a simple Polars DataFrame with a numeric column (`a`). The
+        table is shown below:
+
+        ```python
+        import pointblank as pb
+        import polars as pl
+
+        tbl = pl.DataFrame(
+            {
+                "a": [1, 2, 3, 4, 5, 6],
+                "b": [1, 2, 2, 3, 4, 5],
+                "c": [1, 2, 1, 3, 4, 5],
+            }
+        )
+
+        pb.preview(tbl)
+        ```
+
+        Let's validate that values in column `a` are increasing. We'll determine if this validation
+        had any failing test units (there are six test units, one for each row).
+
+        ```python
+        validation = (
+            pb.Validate(data=tbl)
+            .col_vals_increasing(columns="a")
+            .interrogate()
+        )
+
+        validation
+        ```
+
+        The validation passed as all values in column `a` are increasing. Now let's check column
+        `b` which has a stationary value:
+
+        ```python
+        validation = (
+            pb.Validate(data=tbl)
+            .col_vals_increasing(columns="b")
+            .interrogate()
+        )
+
+        validation
+        ```
+
+        This validation fails at the third row because the value `2` is repeated. If we want to
+        allow stationary values, we can use `allow_stationary=True`:
+
+        ```python
+        validation = (
+            pb.Validate(data=tbl)
+            .col_vals_increasing(columns="b", allow_stationary=True)
+            .interrogate()
+        )
+
+        validation
+        ```
+        
+
+col_vals_decreasing(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', allow_stationary: 'bool' = False, increasing_tol: 'float | None' = None, na_pass: 'bool' = False, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
+
+        Are column data decreasing by row?
+
+        The `col_vals_decreasing()` validation method checks whether column values in a table are
+        decreasing when moving down a table. There are options for allowing missing values in the
+        target column, allowing stationary phases (where consecutive values don't change), and even
+        one for allowing increasing movements up to a certain threshold. This validation will
+        operate over the number of test units that is equal to the number of rows in the table
+        (determined after any `pre=` mutation has been applied).
+
+        Parameters
+        ----------
+        columns
+            A single column or a list of columns to validate. Can also use
+            [`col()`](`pointblank.col`) with column selectors to specify one or more columns. If
+            multiple columns are supplied or resolved, there will be a separate validation step
+            generated for each column.
+        allow_stationary
+            An option to allow pauses in decreasing values. For example, if the values for the test
+            units are `[88, 85, 85, 82, 80]` then the third unit (`85`, appearing a second time)
+            would be marked as failing when `allow_stationary` is `False`. Using
+            `allow_stationary=True` will result in all the test units in `[88, 85, 85, 82, 80]` to
+            be marked as passing.
+        increasing_tol
+            An optional threshold value that allows for movement of numerical values in the positive
+            direction. By default this is `None` but using a numerical value will set the absolute
+            threshold of positive travel allowed across numerical test units. Note that setting a
+            value here also has the effect of setting `allow_stationary` to `True`.
+        na_pass
+            Should any encountered None, NA, or Null values be considered as passing test units? By
+            default, this is `False`. Set to `True` to pass test units with missing values.
+        pre
+            An optional preprocessing function or lambda to apply to the data table during
+            interrogation. This function should take a table as input and return a modified table.
+            Have a look at the *Preprocessing* section for more information on how to use this
+            argument.
+        segments
+            An optional directive on segmentation, which serves to split a validation step into
+            multiple (one step per segment). Can be a single column name, a tuple that specifies a
+            column name and its corresponding values to segment on, or a combination of both
+            (provided as a list). Read the *Segmentation* section for usage information.
+        thresholds
+            Set threshold failure levels for reporting and reacting to exceedences of the levels.
+            The thresholds are set at the step level and will override any global thresholds set in
+            `Validate(thresholds=...)`. The default is `None`, which means that no thresholds will
+            be set locally and global thresholds (if any) will take effect. Look at the *Thresholds*
+            section for information on how to set threshold levels.
+        actions
+            Optional actions to take when the validation step(s) meets or exceeds any set threshold
+            levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
+            define the actions.
+        brief
+            An optional brief description of the validation step that will be displayed in the
+            reporting table. You can use the templating elements like `"{step}"` to insert
+            the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+            the entire brief will be automatically generated. If `None` (the default) then there
+            won't be a brief.
+        active
+            A boolean value indicating whether the validation step should be active. Using `False`
+            will make the validation step inactive (still reporting its presence and keeping indexes
+            for the steps unchanged).
+
+        Returns
+        -------
+        Validate
+            The `Validate` object with the added validation step.
+
+        Examples
+        --------
+        For the examples here, we'll use a simple Polars DataFrame with a numeric column (`a`). The
+        table is shown below:
+
+        ```python
+        import pointblank as pb
+        import polars as pl
+
+        tbl = pl.DataFrame(
+            {
+                "a": [6, 5, 4, 3, 2, 1],
+                "b": [5, 4, 4, 3, 2, 1],
+                "c": [5, 4, 5, 3, 2, 1],
+            }
+        )
+
+        pb.preview(tbl)
+        ```
+
+        Let's validate that values in column `a` are decreasing. We'll determine if this validation
+        had any failing test units (there are six test units, one for each row).
+
+        ```python
+        validation = (
+            pb.Validate(data=tbl)
+            .col_vals_decreasing(columns="a")
+            .interrogate()
+        )
+
+        validation
+        ```
+
+        The validation passed as all values in column `a` are decreasing. Now let's check column
+        `b` which has a stationary value:
+
+        ```python
+        validation = (
+            pb.Validate(data=tbl)
+            .col_vals_decreasing(columns="b")
+            .interrogate()
+        )
+
+        validation
+        ```
+
+        This validation fails at the third row because the value `4` is repeated. If we want to
+        allow stationary values, we can use `allow_stationary=True`:
+
+        ```python
+        validation = (
+            pb.Validate(data=tbl)
+            .col_vals_decreasing(columns="b", allow_stationary=True)
+            .interrogate()
+        )
+
+        validation
+        ```
         
 
 col_vals_null(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
@@ -3915,7 +4315,7 @@ col_vals_not_null(self, columns: 'str | list[str] | Column | ColumnSelector | Co
         two Null values in column `b`.
         
 
-col_vals_regex(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', pattern: 'str', na_pass: 'bool' = False, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
+col_vals_regex(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', pattern: 'str', na_pass: 'bool' = False, inverse: 'bool' = False, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
 
         Validate whether column values match a regular expression pattern.
 
@@ -3936,6 +4336,9 @@ col_vals_regex(self, columns: 'str | list[str] | Column | ColumnSelector | Colum
         na_pass
             Should any encountered None, NA, or Null values be considered as passing test units? By
             default, this is `False`. Set to `True` to pass test units with missing values.
+        inverse
+            Should the validation step be inverted? If `True`, then the expectation is that column
+            values should *not* match the specified `pattern=` regex.
         pre
             An optional preprocessing function or lambda to apply to the data table during
             interrogation. This function should take a table as input and return a modified table.
@@ -4108,6 +4511,224 @@ col_vals_regex(self, columns: 'str | list[str] | Column | ColumnSelector | Colum
         string values of rows 1 and 2 in column `b`.
         
 
+col_vals_within_spec(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', spec: 'str', na_pass: 'bool' = False, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
+
+        Validate whether column values fit within a specification.
+
+        The `col_vals_within_spec()` validation method checks whether column values in a table
+        correspond to a specification (`spec=`) type (details of which are available in the
+        *Specifications* section). Specifications include common data types like email addresses,
+        URLs, postal codes, vehicle identification numbers (VINs), International Bank Account
+        Numbers (IBANs), and more. This validation will operate over the number of test units that
+        is equal to the number of rows in the table.
+
+        Parameters
+        ----------
+        columns
+            A single column or a list of columns to validate. Can also use
+            [`col()`](`pointblank.col`) with column selectors to specify one or more columns. If
+            multiple columns are supplied or resolved, there will be a separate validation step
+            generated for each column.
+        spec
+            A specification string for defining the specification type. Examples are `"email"`,
+            `"url"`, and `"postal_code[USA]"`. See the *Specifications* section for all available
+            options.
+        na_pass
+            Should any encountered None, NA, or Null values be considered as passing test units? By
+            default, this is `False`. Set to `True` to pass test units with missing values.
+        pre
+            An optional preprocessing function or lambda to apply to the data table during
+            interrogation. This function should take a table as input and return a modified table.
+            Have a look at the *Preprocessing* section for more information on how to use this
+            argument.
+        segments
+            An optional directive on segmentation, which serves to split a validation step into
+            multiple (one step per segment). Can be a single column name, a tuple that specifies a
+            column name and its corresponding values to segment on, or a combination of both
+            (provided as a list). Read the *Segmentation* section for usage information.
+        thresholds
+            Set threshold failure levels for reporting and reacting to exceedences of the levels.
+            The thresholds are set at the step level and will override any global thresholds set in
+            `Validate(thresholds=...)`. The default is `None`, which means that no thresholds will
+            be set locally and global thresholds (if any) will take effect. Look at the *Thresholds*
+            section for information on how to set threshold levels.
+        actions
+            Optional actions to take when the validation step(s) meets or exceeds any set threshold
+            levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
+            define the actions.
+        brief
+            An optional brief description of the validation step that will be displayed in the
+            reporting table. You can use the templating elements like `"{step}"` to insert
+            the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+            the entire brief will be automatically generated. If `None` (the default) then there
+            won't be a brief.
+        active
+            A boolean value indicating whether the validation step should be active. Using `False`
+            will make the validation step inactive (still reporting its presence and keeping indexes
+            for the steps unchanged).
+
+        Returns
+        -------
+        Validate
+            The `Validate` object with the added validation step.
+
+        Specifications
+        --------------
+        A specification type must be used with the `spec=` argument. This is a string-based keyword
+        that corresponds to the type of data in the specified columns. The following keywords can
+        be used:
+
+        - `"isbn"`: The International Standard Book Number (ISBN) is a unique numerical identifier
+          for books. This keyword validates both 10-digit and 13-digit ISBNs.
+
+        - `"vin"`: A vehicle identification number (VIN) is a unique code used by the automotive
+          industry to identify individual motor vehicles.
+
+        - `"postal_code[<country_code>]"`: A postal code (also known as postcodes, PIN, or ZIP
+          codes) is a series of letters, digits, or both included in a postal address. Because the
+          coding varies by country, a country code in either the 2-letter (ISO 3166-1 alpha-2) or
+          3-letter (ISO 3166-1 alpha-3) format needs to be supplied (e.g., `"postal_code[US]"` or
+          `"postal_code[USA]"`). The keyword alias `"zip"` can be used for US ZIP codes.
+
+        - `"credit_card"`: A credit card number can be validated across a variety of issuers. The
+          validation uses the Luhn algorithm.
+
+        - `"iban[<country_code>]"`: The International Bank Account Number (IBAN) is a system of
+          identifying bank accounts across countries. Because the length and coding varies by
+          country, a country code needs to be supplied (e.g., `"iban[DE]"` or `"iban[DEU]"`).
+
+        - `"swift"`: Business Identifier Codes (also known as SWIFT-BIC, BIC, or SWIFT code) are
+          unique identifiers for financial and non-financial institutions.
+
+        - `"phone"`, `"email"`, `"url"`, `"ipv4"`, `"ipv6"`, `"mac"`: Phone numbers, email
+          addresses, Internet URLs, IPv4 or IPv6 addresses, and MAC addresses can be validated with
+          their respective keywords.
+
+        Only a single `spec=` value should be provided per function call.
+
+        Preprocessing
+        -------------
+        The `pre=` argument allows for a preprocessing function or lambda to be applied to the data
+        table during interrogation. This function should take a table as input and return a modified
+        table. This is useful for performing any necessary transformations or filtering on the data
+        before the validation step is applied.
+
+        The preprocessing function can be any callable that takes a table as input and returns a
+        modified table. For example, you could use a lambda function to filter the table based on
+        certain criteria or to apply a transformation to the data. Note that you can refer to
+        a column via `columns=` that is expected to be present in the transformed table, but may not
+        exist in the table before preprocessing. Regarding the lifetime of the transformed table, it
+        only exists during the validation step and is not stored in the `Validate` object or used in
+        subsequent validation steps.
+
+        Segmentation
+        ------------
+        The `segments=` argument allows for the segmentation of a validation step into multiple
+        segments. This is useful for applying the same validation step to different subsets of the
+        data. The segmentation can be done based on a single column or specific fields within a
+        column.
+
+        Providing a single column name will result in a separate validation step for each unique
+        value in that column. For example, if you have a column called `"region"` with values
+        `"North"`, `"South"`, and `"East"`, the validation step will be applied separately to each
+        region.
+
+        Alternatively, you can provide a tuple that specifies a column name and its corresponding
+        values to segment on. For example, if you have a column called `"date"` and you want to
+        segment on only specific dates, you can provide a tuple like
+        `("date", ["2023-01-01", "2023-01-02"])`. Any other values in the column will be disregarded
+        (i.e., no validation steps will be created for them).
+
+        A list with a combination of column names and tuples can be provided as well. This allows
+        for more complex segmentation scenarios. The following inputs are both valid:
+
+        ```
+        # Segments from all unique values in the `region` column
+        # and specific dates in the `date` column
+        segments=["region", ("date", ["2023-01-01", "2023-01-02"])]
+
+        # Segments from all unique values in the `region` and `date` columns
+        segments=["region", "date"]
+        ```
+
+        The segmentation is performed during interrogation, and the resulting validation steps will
+        be numbered sequentially. Each segment will have its own validation step, and the results
+        will be reported separately. This allows for a more granular analysis of the data and helps
+        identify issues within specific segments.
+
+        Importantly, the segmentation process will be performed after any preprocessing of the data
+        table. Because of this, one can conceivably use the `pre=` argument to generate a column
+        that can be used for segmentation. For example, you could create a new column called
+        `"segment"` through use of `pre=` and then use that column for segmentation.
+
+        Thresholds
+        ----------
+        The `thresholds=` parameter is used to set the failure-condition levels for the validation
+        step. If they are set here at the step level, these thresholds will override any thresholds
+        set at the global level in `Validate(thresholds=...)`.
+
+        There are three threshold levels: 'warning', 'error', and 'critical'. The threshold values
+        can either be set as a proportion failing of all test units (a value between `0` to `1`),
+        or, the absolute number of failing test units (as integer that's `1` or greater).
+
+        Thresholds can be defined using one of these input schemes:
+
+        1. use the [`Thresholds`](`pointblank.Thresholds`) class (the most direct way to create
+        thresholds)
+        2. provide a tuple of 1-3 values, where position `0` is the 'warning' level, position `1` is
+        the 'error' level, and position `2` is the 'critical' level
+        3. create a dictionary of 1-3 value entries; the valid keys: are 'warning', 'error', and
+        'critical'
+        4. a single integer/float value denoting absolute number or fraction of failing test units
+        for the 'warning' level only
+
+        If the number of failing test units exceeds set thresholds, the validation step will be
+        marked as 'warning', 'error', or 'critical'. All of the threshold levels don't need to be
+        set, you're free to set any combination of them.
+
+        Aside from reporting failure conditions, thresholds can be used to determine the actions to
+        take for each level of failure (using the `actions=` parameter).
+
+        Examples
+        --------
+        For the examples here, we'll use a simple Polars DataFrame with an email column. The table
+        is shown below:
+
+        ```python
+        import pointblank as pb
+        import polars as pl
+
+        tbl = pl.DataFrame(
+            {
+                "email": [
+                    "user@example.com",
+                    "admin@test.org",
+                    "invalid-email",
+                    "contact@company.co.uk",
+                ],
+            }
+        )
+
+        pb.preview(tbl)
+        ```
+
+        Let's validate that all of the values in the `email` column are valid email addresses.
+        We'll determine if this validation had any failing test units (there are four test units,
+        one for each row).
+
+        ```python
+        validation = (
+            pb.Validate(data=tbl)
+            .col_vals_within_spec(columns="email", spec="email")
+            .interrogate()
+        )
+
+        validation
+        ```
+
+        The validation table shows that one test unit failed (the invalid email address in row 3).
+        
+
 col_vals_expr(self, expr: 'any', pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
 
         Validate column values using a custom expression.
@@ -4277,128 +4898,6 @@ col_vals_expr(self, expr: 'any', pre: 'Callable | None' = None, segments: 'Segme
         Printing the `validation` object shows the validation table in an HTML viewing environment.
         The validation table shows the single entry that corresponds to the validation step created
         by using `col_vals_expr()`. All test units passed, with no failing test units.
-        
-
-col_exists(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', thresholds: 'int | float | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
-
-        Validate whether one or more columns exist in the table.
-
-        The `col_exists()` method checks whether one or more columns exist in the target table. The
-        only requirement is specification of the column names. Each validation step or expectation
-        will operate over a single test unit, which is whether the column exists or not.
-
-        Parameters
-        ----------
-        columns
-            A single column or a list of columns to validate. Can also use
-            [`col()`](`pointblank.col`) with column selectors to specify one or more columns. If
-            multiple columns are supplied or resolved, there will be a separate validation step
-            generated for each column.
-        thresholds
-            Set threshold failure levels for reporting and reacting to exceedences of the levels.
-            The thresholds are set at the step level and will override any global thresholds set in
-            `Validate(thresholds=...)`. The default is `None`, which means that no thresholds will
-            be set locally and global thresholds (if any) will take effect. Look at the *Thresholds*
-            section for information on how to set threshold levels.
-        actions
-            Optional actions to take when the validation step(s) meets or exceeds any set threshold
-            levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
-            define the actions.
-        brief
-            An optional brief description of the validation step that will be displayed in the
-            reporting table. You can use the templating elements like `"{step}"` to insert
-            the step number, or `"{auto}"` to include an automatically generated brief. If `True`
-            the entire brief will be automatically generated. If `None` (the default) then there
-            won't be a brief.
-        active
-            A boolean value indicating whether the validation step should be active. Using `False`
-            will make the validation step inactive (still reporting its presence and keeping indexes
-            for the steps unchanged).
-
-        Returns
-        -------
-        Validate
-            The `Validate` object with the added validation step.
-
-        Thresholds
-        ----------
-        The `thresholds=` parameter is used to set the failure-condition levels for the validation
-        step. If they are set here at the step level, these thresholds will override any thresholds
-        set at the global level in `Validate(thresholds=...)`.
-
-        There are three threshold levels: 'warning', 'error', and 'critical'. The threshold values
-        can either be set as a proportion failing of all test units (a value between `0` to `1`),
-        or, the absolute number of failing test units (as integer that's `1` or greater).
-
-        Thresholds can be defined using one of these input schemes:
-
-        1. use the [`Thresholds`](`pointblank.Thresholds`) class (the most direct way to create
-        thresholds)
-        2. provide a tuple of 1-3 values, where position `0` is the 'warning' level, position `1` is
-        the 'error' level, and position `2` is the 'critical' level
-        3. create a dictionary of 1-3 value entries; the valid keys: are 'warning', 'error', and
-        'critical'
-        4. a single integer/float value denoting absolute number or fraction of failing test units
-        for the 'warning' level only
-
-        If the number of failing test units exceeds set thresholds, the validation step will be
-        marked as 'warning', 'error', or 'critical'. All of the threshold levels don't need to be
-        set, you're free to set any combination of them.
-
-        Aside from reporting failure conditions, thresholds can be used to determine the actions to
-        take for each level of failure (using the `actions=` parameter).
-
-        Examples
-        --------
-        For the examples here, we'll use a simple Polars DataFrame with a string columns (`a`) and a
-        numeric column (`b`). The table is shown below:
-
-        ```python
-        import pointblank as pb
-        import polars as pl
-
-        tbl = pl.DataFrame(
-            {
-                "a": ["apple", "banana", "cherry", "date"],
-                "b": [1, 6, 3, 5],
-            }
-        )
-
-        pb.preview(tbl)
-        ```
-
-        Let's validate that the columns `a` and `b` actually exist in the table. We'll determine if
-        this validation had any failing test units (each validation will have a single test unit).
-
-        ```python
-        validation = (
-            pb.Validate(data=tbl)
-            .col_exists(columns=["a", "b"])
-            .interrogate()
-        )
-
-        validation
-        ```
-
-        Printing the `validation` object shows the validation table in an HTML viewing environment.
-        The validation table shows two entries (one check per column) generated by the
-        `col_exists()` validation step. Both steps passed since both columns provided in `columns=`
-        are present in the table.
-
-        Now, let's check for the existence of a different set of columns.
-
-        ```python
-        validation = (
-            pb.Validate(data=tbl)
-            .col_exists(columns=["b", "c"])
-            .interrogate()
-        )
-
-        validation
-        ```
-
-        The validation table reports one passing validation step (the check for column `b`) and one
-        failing validation step (the check for column `c`, which doesn't exist).
         
 
 rows_distinct(self, columns_subset: 'str | list[str] | None' = None, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
@@ -4779,6 +5278,369 @@ rows_complete(self, columns_subset: 'str | list[str] | None' = None, pre: 'Calla
         The validation table reports a single failing test units. The last row contains missing
         values in both the `col_2` and `col_3` columns.
         others.
+        
+
+col_exists(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', thresholds: 'int | float | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
+
+        Validate whether one or more columns exist in the table.
+
+        The `col_exists()` method checks whether one or more columns exist in the target table. The
+        only requirement is specification of the column names. Each validation step or expectation
+        will operate over a single test unit, which is whether the column exists or not.
+
+        Parameters
+        ----------
+        columns
+            A single column or a list of columns to validate. Can also use
+            [`col()`](`pointblank.col`) with column selectors to specify one or more columns. If
+            multiple columns are supplied or resolved, there will be a separate validation step
+            generated for each column.
+        thresholds
+            Set threshold failure levels for reporting and reacting to exceedences of the levels.
+            The thresholds are set at the step level and will override any global thresholds set in
+            `Validate(thresholds=...)`. The default is `None`, which means that no thresholds will
+            be set locally and global thresholds (if any) will take effect. Look at the *Thresholds*
+            section for information on how to set threshold levels.
+        actions
+            Optional actions to take when the validation step(s) meets or exceeds any set threshold
+            levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
+            define the actions.
+        brief
+            An optional brief description of the validation step that will be displayed in the
+            reporting table. You can use the templating elements like `"{step}"` to insert
+            the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+            the entire brief will be automatically generated. If `None` (the default) then there
+            won't be a brief.
+        active
+            A boolean value indicating whether the validation step should be active. Using `False`
+            will make the validation step inactive (still reporting its presence and keeping indexes
+            for the steps unchanged).
+
+        Returns
+        -------
+        Validate
+            The `Validate` object with the added validation step.
+
+        Thresholds
+        ----------
+        The `thresholds=` parameter is used to set the failure-condition levels for the validation
+        step. If they are set here at the step level, these thresholds will override any thresholds
+        set at the global level in `Validate(thresholds=...)`.
+
+        There are three threshold levels: 'warning', 'error', and 'critical'. The threshold values
+        can either be set as a proportion failing of all test units (a value between `0` to `1`),
+        or, the absolute number of failing test units (as integer that's `1` or greater).
+
+        Thresholds can be defined using one of these input schemes:
+
+        1. use the [`Thresholds`](`pointblank.Thresholds`) class (the most direct way to create
+        thresholds)
+        2. provide a tuple of 1-3 values, where position `0` is the 'warning' level, position `1` is
+        the 'error' level, and position `2` is the 'critical' level
+        3. create a dictionary of 1-3 value entries; the valid keys: are 'warning', 'error', and
+        'critical'
+        4. a single integer/float value denoting absolute number or fraction of failing test units
+        for the 'warning' level only
+
+        If the number of failing test units exceeds set thresholds, the validation step will be
+        marked as 'warning', 'error', or 'critical'. All of the threshold levels don't need to be
+        set, you're free to set any combination of them.
+
+        Aside from reporting failure conditions, thresholds can be used to determine the actions to
+        take for each level of failure (using the `actions=` parameter).
+
+        Examples
+        --------
+        For the examples here, we'll use a simple Polars DataFrame with a string columns (`a`) and a
+        numeric column (`b`). The table is shown below:
+
+        ```python
+        import pointblank as pb
+        import polars as pl
+
+        tbl = pl.DataFrame(
+            {
+                "a": ["apple", "banana", "cherry", "date"],
+                "b": [1, 6, 3, 5],
+            }
+        )
+
+        pb.preview(tbl)
+        ```
+
+        Let's validate that the columns `a` and `b` actually exist in the table. We'll determine if
+        this validation had any failing test units (each validation will have a single test unit).
+
+        ```python
+        validation = (
+            pb.Validate(data=tbl)
+            .col_exists(columns=["a", "b"])
+            .interrogate()
+        )
+
+        validation
+        ```
+
+        Printing the `validation` object shows the validation table in an HTML viewing environment.
+        The validation table shows two entries (one check per column) generated by the
+        `col_exists()` validation step. Both steps passed since both columns provided in `columns=`
+        are present in the table.
+
+        Now, let's check for the existence of a different set of columns.
+
+        ```python
+        validation = (
+            pb.Validate(data=tbl)
+            .col_exists(columns=["b", "c"])
+            .interrogate()
+        )
+
+        validation
+        ```
+
+        The validation table reports one passing validation step (the check for column `b`) and one
+        failing validation step (the check for column `c`, which doesn't exist).
+        
+
+col_pct_null(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', p: 'float', tol: 'Tolerance' = 0, thresholds: 'int | float | None | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
+
+        Validate whether a column has a specific percentage of Null values.
+
+        The `col_pct_null()` validation method checks whether the percentage of Null values in a
+        column matches a specified percentage `p=` (within an optional tolerance `tol=`). This
+        validation operates at the column level, generating a single validation step per column that
+        passes or fails based on whether the actual percentage of Null values falls within the
+        acceptable range defined by `p ± tol`.
+
+        Parameters
+        ----------
+        columns
+            A single column or a list of columns to validate. Can also use
+            [`col()`](`pointblank.col`) with column selectors to specify one or more columns. If
+            multiple columns are supplied or resolved, there will be a separate validation step
+            generated for each column.
+        p
+            The expected percentage of Null values in the column, expressed as a decimal between
+            `0.0` and `1.0`. For example, `p=0.5` means 50% of values should be Null.
+        tol
+            The tolerance allowed when comparing the actual percentage of Null values to the
+            expected percentage `p=`. The validation passes if the actual percentage falls within
+            the range `[p - tol, p + tol]`. Default is `0`, meaning an exact match is required. See
+            the *Tolerance* section for details on all supported formats (absolute, relative,
+            symmetric, and asymmetric bounds).
+        thresholds
+            Set threshold failure levels for reporting and reacting to exceedences of the levels.
+            The thresholds are set at the step level and will override any global thresholds set in
+            `Validate(thresholds=...)`. The default is `None`, which means that no thresholds will
+            be set locally and global thresholds (if any) will take effect. Look at the *Thresholds*
+            section for information on how to set threshold levels.
+        actions
+            Optional actions to take when the validation step(s) meets or exceeds any set threshold
+            levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
+            define the actions.
+        brief
+            An optional brief description of the validation step that will be displayed in the
+            reporting table. You can use the templating elements like `"{step}"` to insert
+            the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+            the entire brief will be automatically generated. If `None` (the default) then there
+            won't be a brief.
+        active
+            A boolean value indicating whether the validation step should be active. Using `False`
+            will make the validation step inactive (still reporting its presence and keeping indexes
+            for the steps unchanged).
+
+        Returns
+        -------
+        Validate
+            The `Validate` object with the added validation step.
+
+        Tolerance
+        ---------
+        The `tol=` parameter accepts several different formats to specify the acceptable deviation
+        from the expected percentage `p=`. The tolerance can be expressed as:
+
+        1. *single integer* (absolute tolerance): the exact number of test units that can deviate.
+        For example, `tol=2` means the actual count can differ from the expected count by up to 2
+        units in either direction.
+
+        2. *single float between 0 and 1* (relative tolerance): a proportion of the expected
+        count. For example, if the expected count is 50 and `tol=0.1`, the acceptable range is
+        45 to 55 (50 ± 10% of 50 = 50 ± 5).
+
+        3. *tuple of two integers* (absolute bounds): explicitly specify the lower and upper
+        bounds as absolute deviations. For example, `tol=(1, 3)` means the actual count can be
+        1 unit below or 3 units above the expected count.
+
+        4. *tuple of two floats between 0 and 1* (relative bounds): explicitly specify the lower
+        and upper bounds as proportional deviations. For example, `tol=(0.05, 0.15)` means the
+        lower bound is 5% below and the upper bound is 15% above the expected count.
+
+        When using a single value (integer or float), the tolerance is applied symmetrically in both
+        directions. When using a tuple, you can specify asymmetric tolerances where the lower and
+        upper bounds differ.
+
+        Thresholds
+        ----------
+        The `thresholds=` parameter is used to set the failure-condition levels for the validation
+        step. If they are set here at the step level, these thresholds will override any thresholds
+        set at the global level in `Validate(thresholds=...)`.
+
+        There are three threshold levels: 'warning', 'error', and 'critical'. The threshold values
+        can either be set as a proportion failing of all test units (a value between `0` to `1`),
+        or, the absolute number of failing test units (as integer that's `1` or greater).
+
+        Thresholds can be defined using one of these input schemes:
+
+        1. use the [`Thresholds`](`pointblank.Thresholds`) class (the most direct way to create
+        thresholds)
+        2. provide a tuple of 1-3 values, where position `0` is the 'warning' level, position `1` is
+        the 'error' level, and position `2` is the 'critical' level
+        3. create a dictionary of 1-3 value entries; the valid keys: are 'warning', 'error', and
+        'critical'
+        4. a single integer/float value denoting absolute number or fraction of failing test units
+        for the 'warning' level only
+
+        If the number of failing test units exceeds set thresholds, the validation step will be
+        marked as 'warning', 'error', or 'critical'. All of the threshold levels don't need to be
+        set, you're free to set any combination of them.
+
+        Aside from reporting failure conditions, thresholds can be used to determine the actions to
+        take for each level of failure (using the `actions=` parameter).
+
+        Examples
+        --------
+        For the examples here, we'll use a simple Polars DataFrame with three columns (`a`, `b`,
+        and `c`) that have different percentages of Null values. The table is shown below:
+
+        ```python
+        import pointblank as pb
+        import polars as pl
+
+        tbl = pl.DataFrame(
+            {
+                "a": [1, 2, 3, 4, 5, 6, 7, 8],
+                "b": [1, None, 3, None, 5, None, 7, None],
+                "c": [None, None, None, None, None, None, 1, 2],
+            }
+        )
+
+        pb.preview(tbl)
+        ```
+
+        Let's validate that column `a` has 0% Null values (i.e., no Null values at all).
+
+        ```python
+        validation = (
+            pb.Validate(data=tbl)
+            .col_pct_null(columns="a", p=0.0)
+            .interrogate()
+        )
+
+        validation
+        ```
+
+        Printing the `validation` object shows the validation table in an HTML viewing environment.
+        The validation table shows the single entry that corresponds to the validation step created
+        by using `col_pct_null()`. The validation passed since column `a` has no Null values.
+
+        Now, let's check that column `b` has exactly 50% Null values.
+
+        ```python
+        validation = (
+            pb.Validate(data=tbl)
+            .col_pct_null(columns="b", p=0.5)
+            .interrogate()
+        )
+
+        validation
+        ```
+
+        This validation also passes, as column `b` has exactly 4 out of 8 values as Null (50%).
+
+        Finally, let's validate column `c` with a tolerance. Column `c` has 75% Null values, so
+        we'll check if it's approximately 70% Null with a tolerance of 10%.
+
+        ```python
+        validation = (
+            pb.Validate(data=tbl)
+            .col_pct_null(columns="c", p=0.70, tol=0.10)
+            .interrogate()
+        )
+
+        validation
+        ```
+
+        This validation passes because the actual percentage (75%) falls within the acceptable
+        range of 60% to 80% (70% ± 10%).
+
+        The `tol=` parameter supports multiple formats to express tolerance. Let's explore all the
+        different ways to specify tolerance using column `b`, which has exactly 50% Null values
+        (4 out of 8 values).
+
+        *Using an absolute tolerance (integer)*: Specify the exact number of rows that can
+        deviate. With `tol=1`, we allow the count to differ by 1 row in either direction.
+
+        ```python
+        validation = (
+            pb.Validate(data=tbl)
+            .col_pct_null(columns="b", p=0.375, tol=1)  # Expect 3 nulls, allow ±1 (range: 2-4)
+            .interrogate()
+        )
+
+        validation
+        ```
+
+        This passes because column `b` has 4 Null values, which falls within the acceptable range
+        of 2 to 4 (3 ± 1).
+
+        *Using a relative tolerance (float)*: Specify the tolerance as a proportion of the
+        expected count. With `tol=0.25`, we allow a 25% deviation from the expected count.
+
+        ```python
+        validation = (
+            pb.Validate(data=tbl)
+            .col_pct_null(columns="b", p=0.375, tol=0.25)  # Expect 3 nulls, allow ±25% (range: 2.25-3.75)
+            .interrogate()
+        )
+
+        validation
+        ```
+
+        This passes because 4 Null values falls within the acceptable range (3 ± 0.75 calculates
+        to 2.25 to 3.75, which rounds down to 2 to 3 rows).
+
+        *Using asymmetric absolute bounds (tuple of integers)*: Specify different lower and
+        upper bounds as absolute values. With `tol=(0, 2)`, we allow no deviation below but up
+        to 2 rows above the expected count.
+
+        ```python
+        validation = (
+            pb.Validate(data=tbl)
+            .col_pct_null(columns="b", p=0.25, tol=(0, 2))  # Expect 2 Nulls, allow +0/-2 (range: 2-4)
+            .interrogate()
+        )
+
+        validation
+        ```
+
+        This passes because 4 Null values falls within the acceptable range of 2 to 4.
+
+        *Using asymmetric relative bounds (tuple of floats)*: Specify different lower and upper
+        bounds as proportions. With `tol=(0.1, 0.3)`, we allow 10% below and 30% above the
+        expected count.
+
+        ```python
+        validation = (
+            pb.Validate(data=tbl)
+            .col_pct_null(columns="b", p=0.375, tol=(0.1, 0.3)  # Expect 3 Nulls, allow -10%/+30%
+            .interrogate()
+        )
+
+        validation
+        ```
+
+        This passes because 4 Null values falls within the acceptable range (3 - 0.3 to 3 + 0.9
+        calculates to 2.7 to 3.9, which rounds down to 2 to 3 rows).
         
 
 col_schema_match(self, schema: 'Schema', complete: 'bool' = True, in_order: 'bool' = True, case_sensitive_colnames: 'bool' = True, case_sensitive_dtypes: 'bool' = True, full_match_dtypes: 'bool' = True, pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
@@ -5210,6 +6072,229 @@ col_count_match(self, count: 'int | FrameT | Any', inverse: 'bool' = False, pre:
         columns in the target table. So, the single test unit passed.
         
 
+tbl_match(self, tbl_compare: 'FrameT | Any', pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
+
+        Validate whether the target table matches a comparison table.
+
+        The `tbl_match()` method checks whether the target table's composition matches that of a
+        comparison table. The validation performs a comprehensive comparison using progressively
+        stricter checks (from least to most stringent):
+
+        1. **Column count match**: both tables must have the same number of columns
+        2. **Row count match**: both tables must have the same number of rows
+        3. **Schema match (loose)**: column names and dtypes match (case-insensitive, any order)
+        4. **Schema match (order)**: columns in the correct order (case-insensitive names)
+        5. **Schema match (exact)**: column names match exactly (case-sensitive, correct order)
+        6. **Data match**: values in corresponding cells must be identical
+
+        This progressive approach helps identify exactly where tables differ. The validation will
+        fail at the first check that doesn't pass, making it easier to diagnose mismatches. This
+        validation operates over a single test unit (pass/fail for complete table match).
+
+        Parameters
+        ----------
+        tbl_compare
+            The comparison table to validate against. This can be a DataFrame object (Polars or
+            Pandas), an Ibis table object, or a callable that returns a table. If a callable is
+            provided, it will be executed during interrogation to obtain the comparison table.
+        pre
+            An optional preprocessing function or lambda to apply to the data table during
+            interrogation. This function should take a table as input and return a modified table.
+            Have a look at the *Preprocessing* section for more information on how to use this
+            argument.
+        thresholds
+            Set threshold failure levels for reporting and reacting to exceedences of the levels.
+            The thresholds are set at the step level and will override any global thresholds set in
+            `Validate(thresholds=...)`. The default is `None`, which means that no thresholds will
+            be set locally and global thresholds (if any) will take effect. Look at the *Thresholds*
+            section for information on how to set threshold levels.
+        actions
+            Optional actions to take when the validation step meets or exceeds any set threshold
+            levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
+            define the actions.
+        brief
+            An optional brief description of the validation step that will be displayed in the
+            reporting table. You can use the templating elements like `"{step}"` to insert
+            the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+            the entire brief will be automatically generated. If `None` (the default) then there
+            won't be a brief.
+        active
+            A boolean value indicating whether the validation step should be active. Using `False`
+            will make the validation step inactive (still reporting its presence and keeping indexes
+            for the steps unchanged).
+
+        Returns
+        -------
+        Validate
+            The `Validate` object with the added validation step.
+
+        Preprocessing
+        -------------
+        The `pre=` argument allows for a preprocessing function or lambda to be applied to the data
+        table during interrogation. This function should take a table as input and return a modified
+        table. This is useful for performing any necessary transformations or filtering on the data
+        before the validation step is applied.
+
+        The preprocessing function can be any callable that takes a table as input and returns a
+        modified table. For example, you could use a lambda function to filter the table based on
+        certain criteria or to apply a transformation to the data. Note that the same preprocessing
+        is **not** applied to the comparison table; only the target table is preprocessed. Regarding
+        the lifetime of the transformed table, it only exists during the validation step and is not
+        stored in the `Validate` object or used in subsequent validation steps.
+
+        Thresholds
+        ----------
+        The `thresholds=` parameter is used to set the failure-condition levels for the validation
+        step. If they are set here at the step level, these thresholds will override any thresholds
+        set at the global level in `Validate(thresholds=...)`.
+
+        There are three threshold levels: 'warning', 'error', and 'critical'. The threshold values
+        can either be set as a proportion failing of all test units (a value between `0` to `1`),
+        or, the absolute number of failing test units (as integer that's `1` or greater).
+
+        Thresholds can be defined using one of these input schemes:
+
+        1. use the [`Thresholds`](`pointblank.Thresholds`) class (the most direct way to create
+        thresholds)
+        2. provide a tuple of 1-3 values, where position `0` is the 'warning' level, position `1` is
+        the 'error' level, and position `2` is the 'critical' level
+        3. create a dictionary of 1-3 value entries; the valid keys: are 'warning', 'error', and
+        'critical'
+        4. a single integer/float value denoting absolute number or fraction of failing test units
+        for the 'warning' level only
+
+        If the number of failing test units exceeds set thresholds, the validation step will be
+        marked as 'warning', 'error', or 'critical'. All of the threshold levels don't need to be
+        set, you're free to set any combination of them.
+
+        Aside from reporting failure conditions, thresholds can be used to determine the actions to
+        take for each level of failure (using the `actions=` parameter).
+
+        Cross-Backend Validation
+        ------------------------
+        The `tbl_match()` method supports **automatic backend coercion** when comparing tables from
+        different backends (e.g., comparing a Polars DataFrame against a Pandas DataFrame, or
+        comparing database tables from DuckDB/SQLite against in-memory DataFrames). When tables with
+        different backends are detected, the comparison table is automatically converted to match the
+        data table's backend before validation proceeds.
+
+        **Certified Backend Combinations:**
+
+        All combinations of the following backends have been tested and certified to work (in both
+        directions):
+
+        - Pandas DataFrame
+        - Polars DataFrame
+        - DuckDB (native)
+        - DuckDB (as Ibis table)
+        - SQLite (via Ibis)
+
+        Note that database backends (DuckDB, SQLite, PostgreSQL, MySQL, Snowflake, BigQuery) are
+        automatically materialized during validation:
+
+        - if comparing **against Polars**: materialized to Polars
+        - if comparing **against Pandas**: materialized to Pandas
+        - if **both tables are database backends**: both materialized to Polars
+
+        This ensures optimal performance and type consistency.
+
+        **Data Types That Work Best in Cross-Backend Validation:**
+
+        - numeric types: int, float columns (including proper NaN handling)
+        - string types: text columns with consistent encodings
+        - boolean types: True/False values
+        - null values: `None` and `NaN` are treated as equivalent across backends
+        - list columns: nested list structures (with basic types)
+
+        **Known Limitations:**
+
+        While many data types work well in cross-backend validation, there are some known
+        limitations to be aware of:
+
+        - date/datetime types: When converting between Polars and Pandas, date objects may be
+          represented differently. For example, `datetime.date` objects in Pandas may become
+          `pd.Timestamp` objects when converted from Polars, leading to false mismatches. To work
+          around this, ensure both tables use the same datetime representation before comparison.
+        - custom types: User-defined types or complex nested structures may not convert cleanly
+          between backends and could cause unexpected comparison failures.
+        - categorical types: Categorical/factor columns may have different internal
+          representations across backends.
+        - timezone-aware datetimes: Timezone handling differs between backends and may cause
+          comparison issues.
+
+        Here are some ideas to overcome such limitations:
+
+        - for date/datetime columns, consider using `pre=` preprocessing to normalize representations
+          before comparison.
+        - when working with custom types, manually convert tables to the same backend before using
+          `tbl_match()`.
+        - use the same datetime precision (e.g., milliseconds vs microseconds) in both tables.
+
+        Examples
+        --------
+        For the examples here, we'll create two simple tables to demonstrate the `tbl_match()`
+        validation.
+
+        ```python
+        import pointblank as pb
+        import polars as pl
+
+        # Create the first table
+        tbl_1 = pl.DataFrame({
+            "a": [1, 2, 3, 4],
+            "b": ["w", "x", "y", "z"],
+            "c": [4.0, 5.0, 6.0, 7.0]
+        })
+
+        # Create an identical table
+        tbl_2 = pl.DataFrame({
+            "a": [1, 2, 3, 4],
+            "b": ["w", "x", "y", "z"],
+            "c": [4.0, 5.0, 6.0, 7.0]
+        })
+
+        pb.preview(tbl_1)
+        ```
+
+        Let's validate that `tbl_1` matches `tbl_2`. Since these tables are identical, the
+        validation should pass.
+
+        ```python
+        validation = (
+            pb.Validate(data=tbl_1)
+            .tbl_match(tbl_compare=tbl_2)
+            .interrogate()
+        )
+
+        validation
+        ```
+
+        The validation table shows that the single test unit passed, indicating that the two tables
+        match completely.
+
+        Now, let's create a table with a slight difference and see what happens.
+
+        ```python
+        # Create a table with one different value
+        tbl_3 = pl.DataFrame({
+            "a": [1, 2, 3, 4],
+            "b": ["w", "x", "y", "z"],
+            "c": [4.0, 5.5, 6.0, 7.0]  # Changed 5.0 to 5.5
+        })
+
+        validation = (
+            pb.Validate(data=tbl_1)
+            .tbl_match(tbl_compare=tbl_3)
+            .interrogate()
+        )
+
+        validation
+        ```
+
+        The validation table shows that the single test unit failed because the tables don't match
+        (one value is different in column `c`).
+        
+
 conjointly(self, *exprs: 'Callable', pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
 
         Perform multiple row-wise validations for joint validity.
@@ -5351,13 +6436,17 @@ conjointly(self, *exprs: 'Callable', pre: 'Callable | None' = None, thresholds: 
         We can also use preprocessing to filter the data before applying the conjoint validation:
 
         ```python
+        # Define preprocessing function for serialization compatibility
+        def filter_by_c_gt_5(df):
+            return df.filter(pl.col("c") > 5)
+
         validation = (
             pb.Validate(data=tbl)
             .conjointly(
                 lambda df: pl.col("a") > 2,
                 lambda df: pl.col("b") < 7,
                 lambda df: pl.col("a") + pl.col("b") < pl.col("c"),
-                pre=lambda df: df.filter(pl.col("c") > 5)
+                pre=filter_by_c_gt_5
             )
             .interrogate()
         )
@@ -5705,6 +6794,317 @@ specially(self, expr: 'Callable', pre: 'Callable | None' = None, thresholds: 'in
         virtually any data quality requirement in your organization.
         
 
+prompt(self, prompt: 'str', model: 'str', columns_subset: 'str | list[str] | None' = None, batch_size: 'int' = 1000, max_concurrent: 'int' = 3, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
+
+        Validate rows using AI/LLM-powered analysis.
+
+        The `prompt()` validation method uses Large Language Models (LLMs) to validate rows of data
+        based on natural language criteria. Similar to other Pointblank validation methods, this
+        generates binary test results (pass/fail) that integrate seamlessly with the standard
+        reporting framework.
+
+        Like `col_vals_*()` methods, `prompt()` evaluates data against specific criteria, but
+        instead of using programmatic rules, it uses natural language prompts interpreted by an LLM.
+        Like `rows_distinct()` and `rows_complete()`, it operates at the row level and allows you to
+        specify a subset of columns for evaluation using `columns_subset=`.
+
+        The system automatically combines your validation criteria from the `prompt=` parameter with
+        the necessary technical context, data formatting instructions, and response structure
+        requirements. This is all so you only need to focus on describing your validation logic in
+        plain language.
+
+        Each row becomes a test unit that either passes or fails the validation criteria, producing
+        the familiar True/False results that appear in Pointblank validation reports. This method
+        is particularly useful for complex validation rules that are difficult to express with
+        traditional validation methods, such as semantic checks, context-dependent validation, or
+        subjective quality assessments.
+
+        Parameters
+        ----------
+        prompt
+            A natural language description of the validation criteria. This prompt should clearly
+            describe what constitutes valid vs invalid rows. Some examples:
+            `"Each row should contain a valid email address and a realistic person name"`,
+            `"Values should indicate positive sentiment"`,
+            `"The description should mention a country name"`.
+        columns_subset
+            A single column or list of columns to include in the validation. If `None`, all columns
+            will be included. Specifying fewer columns can improve performance and reduce API costs
+            so try to include only the columns necessary for the validation.
+        model
+            The model to be used. This should be in the form of `provider:model` (e.g.,
+            `"anthropic:claude-sonnet-4-5"`). Supported providers are `"anthropic"`, `"openai"`,
+            `"ollama"`, and `"bedrock"`. The model name should be the specific model to be used from
+            the provider. Model names are subject to change so consult the provider's documentation
+            for the most up-to-date model names.
+        batch_size
+            Number of rows to process in each batch. Larger batches are more efficient but may hit
+            API limits. Default is `1000`.
+        max_concurrent
+            Maximum number of concurrent API requests. Higher values speed up processing but may
+            hit rate limits. Default is `3`.
+        pre
+            An optional preprocessing function or lambda to apply to the data table during
+            interrogation. This function should take a table as input and return a modified table.
+        segments
+            An optional directive on segmentation, which serves to split a validation step into
+            multiple (one step per segment). Can be a single column name, a tuple that specifies a
+            column name and its corresponding values to segment on, or a combination of both
+            (provided as a list).
+        thresholds
+            Set threshold failure levels for reporting and reacting to exceedences of the levels.
+            The thresholds are set at the step level and will override any global thresholds set in
+            `Validate(thresholds=...)`. The default is `None`, which means that no thresholds will
+            be set locally and global thresholds (if any) will take effect.
+        actions
+            Optional actions to take when the validation step meets or exceeds any set threshold
+            levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
+            define the actions.
+        brief
+            An optional brief description of the validation step that will be displayed in the
+            reporting table. You can use the templating elements like `"{step}"` to insert
+            the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+            the entire brief will be automatically generated. If `None` (the default) then there
+            won't be a brief.
+        active
+            A boolean value indicating whether the validation step should be active. Using `False`
+            will make the validation step inactive (still reporting its presence and keeping indexes
+            for the steps unchanged).
+
+        Returns
+        -------
+        Validate
+            The `Validate` object with the added validation step.
+
+        Constructing the `model` Argument
+        ---------------------------------
+        The `model=` argument should be constructed using the provider and model name separated by a
+        colon (`provider:model`). The provider text can any of:
+
+        - `"anthropic"` (Anthropic)
+        - `"openai"` (OpenAI)
+        - `"ollama"` (Ollama)
+        - `"bedrock"` (Amazon Bedrock)
+
+        The model name should be the specific model to be used from the provider. Model names are
+        subject to change so consult the provider's documentation for the most up-to-date model
+        names.
+
+        Notes on Authentication
+        -----------------------
+        API keys are automatically loaded from environment variables or `.env` files and are **not**
+        stored in the validation object for security reasons. You should consider using a secure
+        method for handling API keys.
+
+        One way to do this is to load the API key from an environment variable and retrieve it using
+        the `os` module (specifically the `os.getenv()` function). Places to store the API key might
+        include `.bashrc`, `.bash_profile`, `.zshrc`, or `.zsh_profile`.
+
+        Another solution is to store one or more model provider API keys in an `.env` file (in the
+        root of your project). If the API keys have correct names (e.g., `ANTHROPIC_API_KEY` or
+        `OPENAI_API_KEY`) then the AI validation will automatically load the API key from the `.env`
+        file. An `.env` file might look like this:
+
+        ```plaintext
+        ANTHROPIC_API_KEY="your_anthropic_api_key_here"
+        OPENAI_API_KEY="your_openai_api_key_here"
+        ```
+
+        There's no need to have the `python-dotenv` package installed when using `.env` files in
+        this way.
+
+        **Provider-specific setup**:
+
+        - **OpenAI**: set `OPENAI_API_KEY` environment variable or create `.env` file
+        - **Anthropic**: set `ANTHROPIC_API_KEY` environment variable or create `.env` file
+        - **Ollama**: no API key required, just ensure Ollama is running locally
+        - **Bedrock**: configure AWS credentials through standard AWS methods
+
+        AI Validation Process
+        ---------------------
+        The AI validation process works as follows:
+
+        1. data batching: the data is split into batches of the specified size
+        2. row deduplication: duplicate rows (based on selected columns) are identified and only
+        unique combinations are sent to the LLM for analysis
+        3. json conversion: each batch of unique rows is converted to JSON format for the LLM
+        4. prompt construction: the user prompt is embedded in a structured system prompt
+        5. llm processing: each batch is sent to the LLM for analysis
+        6. response parsing: LLM responses are parsed to extract validation results
+        7. result projection: results are mapped back to all original rows using row signatures
+        8. result aggregation: results from all batches are combined
+
+        **Performance Optimization**: the process uses row signature memoization to avoid redundant
+        LLM calls. When multiple rows have identical values in the selected columns, only one
+        representative row is validated, and the result is applied to all matching rows. This can
+        dramatically reduce API costs and processing time for datasets with repetitive patterns.
+
+        The LLM receives data in this JSON format:
+
+        ```json
+        {
+          "columns": ["col1", "col2", "col3"],
+          "rows": [
+            {"col1": "value1", "col2": "value2", "col3": "value3", "_pb_row_index": 0},
+            {"col1": "value4", "col2": "value5", "col3": "value6", "_pb_row_index": 1}
+          ]
+        }
+        ```
+
+        The LLM returns validation results in this format:
+        ```json
+        [
+          {"index": 0, "result": true},
+          {"index": 1, "result": false}
+        ]
+        ```
+
+        Prompt Design Tips
+        ------------------
+        For best results, design prompts that are:
+
+        - boolean-oriented: frame validation criteria to elicit clear valid/invalid responses
+        - specific: clearly define what makes a row valid/invalid
+        - unambiguous: avoid subjective language that could be interpreted differently
+        - context-aware: include relevant business rules or domain knowledge
+        - example-driven: consider providing examples in the prompt when helpful
+
+        **Critical**: Prompts must be designed so the LLM can determine whether each row passes or
+        fails the validation criteria. The system expects binary validation responses, so avoid
+        open-ended questions or prompts that might generate explanatory text instead of clear
+        pass/fail judgments.
+
+        Good prompt examples:
+
+        - "Each row should contain a valid email address in the 'email' column and a non-empty name
+        in the 'name' column"
+        - "The 'sentiment' column should contain positive sentiment words (happy, good, excellent,
+        etc.)"
+        - "Product descriptions should mention at least one technical specification"
+
+        Poor prompt examples (avoid these):
+
+        - "What do you think about this data?" (too open-ended)
+        - "Describe the quality of each row" (asks for description, not validation)
+        - "How would you improve this data?" (asks for suggestions, not pass/fail)
+
+        Performance Considerations
+        --------------------------
+        AI validation is significantly slower than traditional validation methods due to API calls
+        to LLM providers. However, performance varies dramatically based on data characteristics:
+
+        **High Memoization Scenarios** (seconds to minutes):
+
+        - data with many duplicate rows in the selected columns
+        - low cardinality data (repeated patterns)
+        - small number of unique row combinations
+
+        **Low Memoization Scenarios** (minutes to hours):
+
+        - high cardinality data with mostly unique rows
+        - large datasets with few repeated patterns
+        - all or most rows requiring individual LLM evaluation
+
+        The row signature memoization optimization can reduce processing time significantly when
+        data has repetitive patterns. For datasets where every row is unique, expect longer
+        processing times similar to validating each row individually.
+
+        **Strategies to Reduce Processing Time**:
+
+        - test on data slices: define a sampling function like `def sample_1000(df): return df.head(1000)`
+        and use `pre=sample_1000` to validate on smaller samples
+        - filter relevant data: define filter functions like `def active_only(df): return df.filter(df["status"] == "active")`
+        and use `pre=active_only` to focus on a specific subset
+        - optimize column selection: use `columns_subset=` to include only the columns necessary
+        for validation
+        - start with smaller batches: begin with `batch_size=100` for testing, then increase
+        gradually
+        - reduce concurrency: lower `max_concurrent=1` if hitting rate limits
+        - use faster/cheaper models: consider using smaller or more efficient models for initial
+        testing before switching to more capable models
+
+        Examples
+        --------
+        The following examples demonstrate how to use AI validation for different types of data
+        quality checks. These examples show both basic usage and more advanced configurations with
+        custom thresholds and actions.
+
+        **Basic AI validation example:**
+
+        This first example shows a simple validation scenario where we want to check that customer
+        records have both valid email addresses and non-empty names. Notice how we use
+        `columns_subset=` to focus only on the relevant columns, which improves both performance
+        and cost-effectiveness.
+
+        ```python
+        import pointblank as pb
+        import polars as pl
+
+        # Sample data with email and name columns
+        tbl = pl.DataFrame({
+            "email": ["john@example.com", "invalid-email", "jane@test.org"],
+            "name": ["John Doe", "", "Jane Smith"],
+            "age": [25, 30, 35]
+        })
+
+        # Validate using AI
+        validation = (
+            pb.Validate(data=tbl)
+            .prompt(
+                prompt="Each row should have a valid email address and a non-empty name",
+                columns_subset=["email", "name"],  # Only check these columns
+                model="openai:gpt-4o-mini",
+            )
+            .interrogate()
+        )
+
+        validation
+        ```
+
+        In this example, the AI will identify that the second row fails validation because it has
+        an invalid email format (`"invalid-email"`) and the third row also fails because it has an
+        empty name field. The validation results will show 2 out of 3 rows failing the criteria.
+
+        **Advanced example with custom thresholds:**
+
+        This more sophisticated example demonstrates how to use AI validation with custom thresholds
+        and actions. Here we're validating phone number formats to ensure they include area codes,
+        which is a common data quality requirement for customer contact information.
+
+        ```python
+        customer_data = pl.DataFrame({
+            "customer_id": [1, 2, 3, 4, 5],
+            "name": ["John Doe", "Jane Smith", "Bob Johnson", "Alice Brown", "Charlie Davis"],
+            "phone_number": [
+                "(555) 123-4567",  # Valid with area code
+                "555-987-6543",    # Valid with area code
+                "123-4567",        # Missing area code
+                "(800) 555-1234",  # Valid with area code
+                "987-6543"         # Missing area code
+            ]
+        })
+
+        validation = (
+            pb.Validate(data=customer_data)
+            .prompt(
+                prompt="Do all the phone numbers include an area code?",
+                columns_subset="phone_number",  # Only check the `phone_number` column
+                model="openai:gpt-4o",
+                batch_size=500,
+                max_concurrent=5,
+                thresholds=pb.Thresholds(warning=0.1, error=0.2, critical=0.3),
+                actions=pb.Actions(error="Too many phone numbers missing area codes.")
+            )
+            .interrogate()
+        )
+        ```
+
+        This validation will identify that 2 out of 5 phone numbers (40%) are missing area codes,
+        which exceeds all threshold levels. The validation will trigger the specified error action
+        since the failure rate (40%) is above the error threshold (20%). The AI can recognize
+        various phone number formats and determine whether they include area codes.
+        
+
 
 ## The Column Selection family
 
@@ -5758,9 +7158,12 @@ col(exprs: 'str | ColumnSelector | ColumnSelectorNarwhals') -> 'Column | ColumnL
     - [`col_vals_outside()`](`pointblank.Validate.col_vals_outside`)
     - [`col_vals_in_set()`](`pointblank.Validate.col_vals_in_set`)
     - [`col_vals_not_in_set()`](`pointblank.Validate.col_vals_not_in_set`)
+    - [`col_vals_increasing()`](`pointblank.Validate.col_vals_increasing`)
+    - [`col_vals_decreasing()`](`pointblank.Validate.col_vals_decreasing`)
     - [`col_vals_null()`](`pointblank.Validate.col_vals_null`)
     - [`col_vals_not_null()`](`pointblank.Validate.col_vals_not_null`)
     - [`col_vals_regex()`](`pointblank.Validate.col_vals_regex`)
+    - [`col_vals_within_spec()`](`pointblank.Validate.col_vals_within_spec`)
     - [`col_exists()`](`pointblank.Validate.col_exists`)
 
     If specifying a single column with certainty (you have the exact name), `col()` is not necessary
@@ -6042,9 +7445,12 @@ starts_with(text: 'str', case_sensitive: 'bool' = False) -> 'StartsWith'
     - [`col_vals_outside()`](`pointblank.Validate.col_vals_outside`)
     - [`col_vals_in_set()`](`pointblank.Validate.col_vals_in_set`)
     - [`col_vals_not_in_set()`](`pointblank.Validate.col_vals_not_in_set`)
+    - [`col_vals_increasing()`](`pointblank.Validate.col_vals_increasing`)
+    - [`col_vals_decreasing()`](`pointblank.Validate.col_vals_decreasing`)
     - [`col_vals_null()`](`pointblank.Validate.col_vals_null`)
     - [`col_vals_not_null()`](`pointblank.Validate.col_vals_not_null`)
     - [`col_vals_regex()`](`pointblank.Validate.col_vals_regex`)
+    - [`col_vals_within_spec()`](`pointblank.Validate.col_vals_within_spec`)
     - [`col_exists()`](`pointblank.Validate.col_exists`)
 
     The `starts_with()` selector function doesn't need to be used in isolation. Read the next
@@ -6192,9 +7598,12 @@ ends_with(text: 'str', case_sensitive: 'bool' = False) -> 'EndsWith'
     - [`col_vals_outside()`](`pointblank.Validate.col_vals_outside`)
     - [`col_vals_in_set()`](`pointblank.Validate.col_vals_in_set`)
     - [`col_vals_not_in_set()`](`pointblank.Validate.col_vals_not_in_set`)
+    - [`col_vals_increasing()`](`pointblank.Validate.col_vals_increasing`)
+    - [`col_vals_decreasing()`](`pointblank.Validate.col_vals_decreasing`)
     - [`col_vals_null()`](`pointblank.Validate.col_vals_null`)
     - [`col_vals_not_null()`](`pointblank.Validate.col_vals_not_null`)
     - [`col_vals_regex()`](`pointblank.Validate.col_vals_regex`)
+    - [`col_vals_within_spec()`](`pointblank.Validate.col_vals_within_spec`)
     - [`col_exists()`](`pointblank.Validate.col_exists`)
 
     The `ends_with()` selector function doesn't need to be used in isolation. Read the next section
@@ -6343,9 +7752,12 @@ contains(text: 'str', case_sensitive: 'bool' = False) -> 'Contains'
     - [`col_vals_outside()`](`pointblank.Validate.col_vals_outside`)
     - [`col_vals_in_set()`](`pointblank.Validate.col_vals_in_set`)
     - [`col_vals_not_in_set()`](`pointblank.Validate.col_vals_not_in_set`)
+    - [`col_vals_increasing()`](`pointblank.Validate.col_vals_increasing`)
+    - [`col_vals_decreasing()`](`pointblank.Validate.col_vals_decreasing`)
     - [`col_vals_null()`](`pointblank.Validate.col_vals_null`)
     - [`col_vals_not_null()`](`pointblank.Validate.col_vals_not_null`)
     - [`col_vals_regex()`](`pointblank.Validate.col_vals_regex`)
+    - [`col_vals_within_spec()`](`pointblank.Validate.col_vals_within_spec`)
     - [`col_exists()`](`pointblank.Validate.col_exists`)
 
     The `contains()` selector function doesn't need to be used in isolation. Read the next section
@@ -6494,9 +7906,12 @@ matches(pattern: 'str', case_sensitive: 'bool' = False) -> 'Matches'
     - [`col_vals_outside()`](`pointblank.Validate.col_vals_outside`)
     - [`col_vals_in_set()`](`pointblank.Validate.col_vals_in_set`)
     - [`col_vals_not_in_set()`](`pointblank.Validate.col_vals_not_in_set`)
+    - [`col_vals_increasing()`](`pointblank.Validate.col_vals_increasing`)
+    - [`col_vals_decreasing()`](`pointblank.Validate.col_vals_decreasing`)
     - [`col_vals_null()`](`pointblank.Validate.col_vals_null`)
     - [`col_vals_not_null()`](`pointblank.Validate.col_vals_not_null`)
     - [`col_vals_regex()`](`pointblank.Validate.col_vals_regex`)
+    - [`col_vals_within_spec()`](`pointblank.Validate.col_vals_within_spec`)
     - [`col_exists()`](`pointblank.Validate.col_exists`)
 
     The `matches()` selector function doesn't need to be used in isolation. Read the next section
@@ -6627,9 +8042,12 @@ everything() -> 'Everything'
     - [`col_vals_outside()`](`pointblank.Validate.col_vals_outside`)
     - [`col_vals_in_set()`](`pointblank.Validate.col_vals_in_set`)
     - [`col_vals_not_in_set()`](`pointblank.Validate.col_vals_not_in_set`)
+    - [`col_vals_increasing()`](`pointblank.Validate.col_vals_increasing`)
+    - [`col_vals_decreasing()`](`pointblank.Validate.col_vals_decreasing`)
     - [`col_vals_null()`](`pointblank.Validate.col_vals_null`)
     - [`col_vals_not_null()`](`pointblank.Validate.col_vals_not_null`)
     - [`col_vals_regex()`](`pointblank.Validate.col_vals_regex`)
+    - [`col_vals_within_spec()`](`pointblank.Validate.col_vals_within_spec`)
     - [`col_exists()`](`pointblank.Validate.col_exists`)
 
     The `everything()` selector function doesn't need to be used in isolation. Read the next section
@@ -6770,9 +8188,12 @@ first_n(n: 'int', offset: 'int' = 0) -> 'FirstN'
     - [`col_vals_outside()`](`pointblank.Validate.col_vals_outside`)
     - [`col_vals_in_set()`](`pointblank.Validate.col_vals_in_set`)
     - [`col_vals_not_in_set()`](`pointblank.Validate.col_vals_not_in_set`)
+    - [`col_vals_increasing()`](`pointblank.Validate.col_vals_increasing`)
+    - [`col_vals_decreasing()`](`pointblank.Validate.col_vals_decreasing`)
     - [`col_vals_null()`](`pointblank.Validate.col_vals_null`)
     - [`col_vals_not_null()`](`pointblank.Validate.col_vals_not_null`)
     - [`col_vals_regex()`](`pointblank.Validate.col_vals_regex`)
+    - [`col_vals_within_spec()`](`pointblank.Validate.col_vals_within_spec`)
     - [`col_exists()`](`pointblank.Validate.col_exists`)
 
     The `first_n()` selector function doesn't need to be used in isolation. Read the next section
@@ -6917,9 +8338,12 @@ last_n(n: 'int', offset: 'int' = 0) -> 'LastN'
     - [`col_vals_outside()`](`pointblank.Validate.col_vals_outside`)
     - [`col_vals_in_set()`](`pointblank.Validate.col_vals_in_set`)
     - [`col_vals_not_in_set()`](`pointblank.Validate.col_vals_not_in_set`)
+    - [`col_vals_increasing()`](`pointblank.Validate.col_vals_increasing`)
+    - [`col_vals_decreasing()`](`pointblank.Validate.col_vals_decreasing`)
     - [`col_vals_null()`](`pointblank.Validate.col_vals_null`)
     - [`col_vals_not_null()`](`pointblank.Validate.col_vals_not_null`)
     - [`col_vals_regex()`](`pointblank.Validate.col_vals_regex`)
+    - [`col_vals_within_spec()`](`pointblank.Validate.col_vals_within_spec`)
     - [`col_exists()`](`pointblank.Validate.col_exists`)
 
     The `last_n()` selector function doesn't need to be used in isolation. Read the next section for
@@ -7079,6 +8503,129 @@ expr_col(column_name: 'str') -> 'ColumnExpression'
     
 
 
+## The Segments family
+
+Combine multiple values into a single segment using `seg_*()` helper functions.
+
+seg_group(values: 'list[Any]') -> 'Segment'
+
+    Group together values for segmentation.
+
+    Many validation methods have a `segments=` argument that can be used to specify one or more
+    columns, or certain values within a column, to create segments for validation (e.g.,
+    [`col_vals_gt()`](`pointblank.Validate.col_vals_gt`),
+    [`col_vals_regex()`](`pointblank.Validate.col_vals_regex`), etc.). When passing in a column, or
+    a tuple with a column and certain values, a segment will be created for each individual value
+    within the column or given values. The `seg_group()` selector enables values to be grouped
+    together into a segment. For example, if you were to create a segment for a column "region",
+    investigating just "North" and "South" regions, a typical segment would look like:
+
+    `segments=("region", ["North", "South"])`
+
+    This would create two validation steps, one for each of the regions. If you wanted to group
+    these two regions into a single segment, you could use the `seg_group()` function like this:
+
+    `segments=("region", pb.seg_group(["North", "South"]))`
+
+    You could create a second segment for "East" and "West" regions like this:
+
+    `segments=("region", pb.seg_group([["North", "South"], ["East", "West"]]))`
+
+    There will be a validation step created for every segment. Note that if there aren't any
+    segments created using `seg_group()` (or any other segment expression), the validation step will
+    fail to be evaluated during the interrogation process. Such a failure to evaluate will be
+    reported in the validation results but it won't affect the interrogation process overall
+    (i.e., the process won't be halted).
+
+    Parameters
+    ----------
+    values
+        A list of values to be grouped into a segment. This can be a single list or a list of lists.
+
+    Returns
+    -------
+    Segment
+        A `Segment` object, which can be used to combine values into a segment.
+
+    Examples
+    --------
+    Let's say we're analyzing sales from our local bookstore, and want to check the number of books
+    sold for the month exceeds a certain threshold. We could pass in the argument
+    `segments="genre"`, which would return a segment for each unique genre in the datasets. We could
+    also pass in `segments=("genre", ["Fantasy", "Science Fiction"])`, to only create segments for
+    those two genres. However, if we wanted to group these two genres into a single segment, we
+    could use the `seg_group()` function.
+
+    ```python
+    import pointblank as pb
+    import polars as pl
+
+    tbl = pl.DataFrame(
+        {
+            "title": [
+                "The Hobbit",
+                "Harry Potter and the Sorcerer's Stone",
+                "The Lord of the Rings",
+                "A Game of Thrones",
+                "The Name of the Wind",
+                "The Girl with the Dragon Tattoo",
+                "The Da Vinci Code",
+                "The Hitchhiker's Guide to the Galaxy",
+                "The Martian",
+                "Brave New World"
+            ],
+            "genre": [
+                "Fantasy",
+                "Fantasy",
+                "Fantasy",
+                "Fantasy",
+                "Fantasy",
+                "Mystery",
+                "Mystery",
+                "Science Fiction",
+                "Science Fiction",
+                "Science Fiction",
+            ],
+            "units_sold": [875, 932, 756, 623, 445, 389, 678, 534, 712, 598],
+        }
+    )
+
+    validation = (
+        pb.Validate(data=tbl)
+        .col_vals_gt(
+            columns="units_sold",
+            value=500,
+            segments=("genre", pb.seg_group(["Fantasy", "Science Fiction"]))
+        )
+        .interrogate()
+    )
+
+    validation
+    ```
+
+    What's more, we can create multiple segments, combining the genres in different ways.
+
+    ```python
+    validation = (
+        pb.Validate(data=tbl)
+        .col_vals_gt(
+            columns="units_sold",
+            value=500,
+            segments=("genre", pb.seg_group([
+                ["Fantasy", "Science Fiction"],
+                ["Fantasy", "Mystery"],
+                ["Mystery", "Science Fiction"]
+            ]))
+        )
+        .interrogate()
+    )
+
+    validation
+    ```
+
+    
+
+
 ## The Interrogation and Reporting family
 
 The validation plan is put into action when `interrogate()` is called.
@@ -7188,7 +8735,109 @@ interrogate(self, collect_extracts: 'bool' = True, collect_tbl_checked: 'bool' =
         `get_first_n=10`.
         
 
-get_tabular_report(self, title: 'str | None' = ':default:', incl_header: 'bool' = None, incl_footer: 'bool' = None) -> 'GT'
+set_tbl(self, tbl: 'FrameT | Any', tbl_name: 'str | None' = None, label: 'str | None' = None) -> 'Validate'
+
+        Set or replace the table associated with the Validate object.
+
+        This method allows you to replace the table associated with a Validate object with a
+        different (but presumably similar) table. This is useful when you want to apply the same
+        validation plan to multiple tables or when you have a validation workflow defined but want
+        to swap in a different data source.
+
+        Parameters
+        ----------
+        tbl
+            The table to replace the existing table with. This can be any supported table type
+            including DataFrame objects, Ibis table objects, CSV file paths, Parquet file paths,
+            GitHub URLs, or database connection strings. The same table type constraints apply as in
+            the `Validate` constructor.
+        tbl_name
+            An optional name to assign to the new input table object. If no value is provided, the
+            existing table name will be retained.
+        label
+            An optional label for the validation plan. If no value is provided, the existing label
+            will be retained.
+
+        Returns
+        -------
+        Validate
+            A new `Validate` object with the replacement table.
+
+        When to Use
+        -----------
+        The `set_tbl()` method is particularly useful in scenarios where you have:
+
+        - multiple similar tables that need the same validation checks
+        - a template validation workflow that should be applied to different data sources
+        - YAML-defined validations where you want to override the table specified in the YAML
+
+        The `set_tbl()` method creates a copy of the validation object with the new table, so the
+        original validation object remains unchanged. This allows you to reuse validation plans
+        across multiple tables without interference.
+
+        Examples
+        --------
+        We will first create two similar tables for our future validation plans.
+
+        ```python
+        import pointblank as pb
+        import polars as pl
+
+        # Create two similar tables
+        table_1 = pl.DataFrame({
+            "x": [1, 2, 3, 4, 5],
+            "y": [5, 4, 3, 2, 1],
+            "z": ["a", "b", "c", "d", "e"]
+        })
+
+        table_2 = pl.DataFrame({
+            "x": [2, 4, 6, 8, 10],
+            "y": [10, 8, 6, 4, 2],
+            "z": ["f", "g", "h", "i", "j"]
+        })
+        ```
+
+        Create a validation plan with the first table.
+
+        ```python
+        validation_table_1 = (
+            pb.Validate(
+                data=table_1,
+                tbl_name="Table 1",
+                label="Validation applied to the first table"
+            )
+            .col_vals_gt(columns="x", value=0)
+            .col_vals_lt(columns="y", value=10)
+        )
+        ```
+
+        Now apply the same validation plan to the second table.
+
+        ```python
+        validation_table_2 = (
+            validation_table_1
+            .set_tbl(
+                tbl=table_2,
+                tbl_name="Table 2",
+                label="Validation applied to the second table"
+            )
+        )
+        ```
+
+        Here is the interrogation of the first table:
+
+        ```python
+        validation_table_1.interrogate()
+        ```
+
+        And the second table:
+
+        ```python
+        validation_table_2.interrogate()
+        ```
+        
+
+get_tabular_report(self, title: 'str | None' = ':default:', incl_header: 'bool' = None, incl_footer: 'bool' = None, incl_footer_timings: 'bool' = None, incl_footer_notes: 'bool' = None) -> 'GT'
 
         Validation report as a GT table.
 
@@ -7210,6 +8859,20 @@ get_tabular_report(self, title: 'str | None' = ':default:', incl_header: 'bool' 
             name of the table as the title for the report. If no title is wanted, then `":none:"`
             can be used. Aside from keyword options, text can be provided for the title. This will
             be interpreted as Markdown text and transformed internally to HTML.
+        incl_header
+            Controls whether the header section should be displayed. If `None`, uses the global
+            configuration setting. The header contains the table name, label, and threshold
+            information.
+        incl_footer
+            Controls whether the footer section should be displayed. If `None`, uses the global
+            configuration setting. The footer can contain validation timing information and notes.
+        incl_footer_timings
+            Controls whether validation timing information (start time, duration, end time) should
+            be displayed in the footer. If `None`, uses the global configuration setting. Only
+            applies when `incl_footer=True`.
+        incl_footer_notes
+            Controls whether notes from validation steps should be displayed in the footer. If
+            `None`, uses the global configuration setting. Only applies when `incl_footer=True`.
 
         Returns
         -------
@@ -7325,11 +8988,15 @@ get_step_report(self, i: 'int', columns_subset: 'str | list[str] | Column | None
         - [`col_vals_outside()`](`pointblank.Validate.col_vals_outside`)
         - [`col_vals_in_set()`](`pointblank.Validate.col_vals_in_set`)
         - [`col_vals_not_in_set()`](`pointblank.Validate.col_vals_not_in_set`)
+        - [`col_vals_increasing()`](`pointblank.Validate.col_vals_increasing`)
+        - [`col_vals_decreasing()`](`pointblank.Validate.col_vals_decreasing`)
         - [`col_vals_null()`](`pointblank.Validate.col_vals_null`)
         - [`col_vals_not_null()`](`pointblank.Validate.col_vals_not_null`)
         - [`col_vals_regex()`](`pointblank.Validate.col_vals_regex`)
+        - [`col_vals_within_spec()`](`pointblank.Validate.col_vals_within_spec`)
         - [`col_vals_expr()`](`pointblank.Validate.col_vals_expr`)
         - [`conjointly()`](`pointblank.Validate.conjointly`)
+        - [`prompt()`](`pointblank.Validate.prompt`)
         - [`rows_complete()`](`pointblank.Validate.rows_complete`)
 
         The [`rows_distinct()`](`pointblank.Validate.rows_distinct`) validation step will produce a
@@ -7666,11 +9333,15 @@ get_data_extracts(self, i: 'int | list[int] | None' = None, frame: 'bool' = Fals
         - [`col_vals_outside()`](`pointblank.Validate.col_vals_outside`)
         - [`col_vals_in_set()`](`pointblank.Validate.col_vals_in_set`)
         - [`col_vals_not_in_set()`](`pointblank.Validate.col_vals_not_in_set`)
+        - [`col_vals_increasing()`](`pointblank.Validate.col_vals_increasing`)
+        - [`col_vals_decreasing()`](`pointblank.Validate.col_vals_decreasing`)
         - [`col_vals_null()`](`pointblank.Validate.col_vals_null`)
         - [`col_vals_not_null()`](`pointblank.Validate.col_vals_not_null`)
         - [`col_vals_regex()`](`pointblank.Validate.col_vals_regex`)
+        - [`col_vals_within_spec()`](`pointblank.Validate.col_vals_within_spec`)
         - [`col_vals_expr()`](`pointblank.Validate.col_vals_expr`)
         - [`conjointly()`](`pointblank.Validate.conjointly`)
+        - [`prompt()`](`pointblank.Validate.prompt`)
 
         An extracted row for these validation methods means that a test unit failed for that row in
         the validation step.
@@ -8119,11 +9790,15 @@ n(self, i: 'int | list[int] | None' = None, scalar: 'bool' = False) -> 'dict[int
             }
         )
 
+        # Define a preprocessing function
+        def filter_by_a_gt_1(df):
+            return df.filter(pl.col("a") > 1)
+
         validation = (
             pb.Validate(data=tbl)
             .col_vals_gt(columns="a", value=0)
             .col_exists(columns="b")
-            .col_vals_lt(columns="b", value=9, pre=lambda df: df.filter(pl.col("a") > 1))
+            .col_vals_lt(columns="b", value=9, pre=filter_by_a_gt_1)
             .interrogate()
         )
         ```
@@ -8826,7 +10501,9 @@ DataScan(data: 'IntoFrameT', tbl_name: 'str | None' = None) -> 'None'
     Parameters
     ----------
     data
-        The data to scan and summarize.
+        The data to scan and summarize. This could be a DataFrame object, an Ibis table object,
+        a CSV file path, a Parquet file path, a GitHub URL pointing to a CSV or Parquet file,
+        or a database connection string.
     tbl_name
         Optionally, the name of the table could be provided as `tbl_name`.
 
@@ -8958,6 +10635,7 @@ preview(data: 'FrameT | Any', columns_subset: 'str | list[str] | Column | None' 
 
     - Polars DataFrame (`"polars"`)
     - Pandas DataFrame (`"pandas"`)
+    - PySpark table (`"pyspark"`)
     - DuckDB table (`"duckdb"`)*
     - MySQL table (`"mysql"`)*
     - PostgreSQL table (`"postgresql"`)*
@@ -8965,7 +10643,6 @@ preview(data: 'FrameT | Any', columns_subset: 'str | list[str] | Column | None' 
     - Microsoft SQL Server table (`"mssql"`)*
     - Snowflake table (`"snowflake"`)*
     - Databricks table (`"databricks"`)*
-    - PySpark table (`"pyspark"`)*
     - BigQuery table (`"bigquery"`)*
     - Parquet table (`"parquet"`)*
     - CSV files (string path or `pathlib.Path` object with `.csv` extension)
@@ -9116,8 +10793,9 @@ col_summary_tbl(data: 'FrameT | Any', tbl_name: 'str | None' = None) -> 'GT'
     Parameters
     ----------
     data
-        The table to summarize, which could be a DataFrame object or an Ibis table object. Read the
-        *Supported Input Table Types* section for details on the supported table types.
+        The table to summarize, which could be a DataFrame object, an Ibis table object, a CSV
+        file path, a Parquet file path, or a database connection string. Read the *Supported Input
+        Table Types* section for details on the supported table types.
     tbl_name
         Optionally, the name of the table could be provided as `tbl_name=`.
 
@@ -9137,6 +10815,11 @@ col_summary_tbl(data: 'FrameT | Any', tbl_name: 'str | None' = None) -> 'GT'
     - PostgreSQL table (`"postgresql"`)*
     - SQLite table (`"sqlite"`)*
     - Parquet table (`"parquet"`)*
+    - CSV files (string path or `pathlib.Path` object with `.csv` extension)
+    - Parquet files (string path, `pathlib.Path` object, glob pattern, directory with `.parquet`
+    extension, or partitioned dataset)
+    - GitHub URLs (direct links to CSV or Parquet files on GitHub)
+    - Database connection strings (URI format with optional table specification)
 
     The table types marked with an asterisk need to be prepared as Ibis tables (with type of
     `ibis.expr.types.relations.Table`). Furthermore, using `col_summary_tbl()` with these types of
@@ -9171,9 +10854,9 @@ missing_vals_tbl(data: 'FrameT | Any') -> 'GT'
     Parameters
     ----------
     data
-        The table for which to display the missing values. This could be a DataFrame object or an
-        Ibis table object. Read the *Supported Input Table Types* section for details on the
-        supported table types.
+        The table for which to display the missing values. This could be a DataFrame object, an
+        Ibis table object, a CSV file path, a Parquet file path, or a database connection string.
+        Read the *Supported Input Table Types* section for details on the supported table types.
 
     Returns
     -------
@@ -9186,6 +10869,7 @@ missing_vals_tbl(data: 'FrameT | Any') -> 'GT'
 
     - Polars DataFrame (`"polars"`)
     - Pandas DataFrame (`"pandas"`)
+    - PySpark table (`"pyspark"`)
     - DuckDB table (`"duckdb"`)*
     - MySQL table (`"mysql"`)*
     - PostgreSQL table (`"postgresql"`)*
@@ -9193,9 +10877,12 @@ missing_vals_tbl(data: 'FrameT | Any') -> 'GT'
     - Microsoft SQL Server table (`"mssql"`)*
     - Snowflake table (`"snowflake"`)*
     - Databricks table (`"databricks"`)*
-    - PySpark table (`"pyspark"`)*
     - BigQuery table (`"bigquery"`)*
     - Parquet table (`"parquet"`)*
+    - CSV files (string path or `pathlib.Path` object with `.csv` extension)
+    - Parquet files (string path, `pathlib.Path` object, glob pattern, directory with `.parquet`
+    extension, or partitioned dataset)
+    - Database connection strings (URI format with optional table specification)
 
     The table types marked with an asterisk need to be prepared as Ibis tables (with type of
     `ibis.expr.types.relations.Table`). Furthermore, using `missing_vals_tbl()` with these types of
@@ -9266,12 +10953,13 @@ assistant(model: 'str', data: 'FrameT | Any | None' = None, tbl_name: 'str | Non
     ----------
     model
         The model to be used. This should be in the form of `provider:model` (e.g.,
-        `"anthropic:claude-3-5-sonnet-latest"`). Supported providers are `"anthropic"`, `"openai"`,
+        `"anthropic:claude-sonnet-4-5"`). Supported providers are `"anthropic"`, `"openai"`,
         `"ollama"`, and `"bedrock"`.
     data
         An optional data table to focus on during discussion with the PbA, which could be a
-        DataFrame object or an Ibis table object. Read the *Supported Input Table Types* section for
-        details on the supported table types.
+        DataFrame object, an Ibis table object, a CSV file path, a Parquet file path, or a database
+        connection string. Read the *Supported Input Table Types* section for details on the
+        supported table types.
     tbl_name : str, optional
         The name of the data table. This is optional and is only used to provide a more detailed
         prompt to the PbA.
@@ -9348,16 +11036,29 @@ assistant(model: 'str', data: 'FrameT | Any | None' = None, tbl_name: 'str | Non
 
     - Polars DataFrame (`"polars"`)
     - Pandas DataFrame (`"pandas"`)
+    - PySpark table (`"pyspark"`)
     - DuckDB table (`"duckdb"`)*
     - MySQL table (`"mysql"`)*
     - PostgreSQL table (`"postgresql"`)*
     - SQLite table (`"sqlite"`)*
+    - Microsoft SQL Server table (`"mssql"`)*
+    - Snowflake table (`"snowflake"`)*
+    - Databricks table (`"databricks"`)*
+    - BigQuery table (`"bigquery"`)*
     - Parquet table (`"parquet"`)*
+    - CSV files (string path or `pathlib.Path` object with `.csv` extension)
+    - Parquet files (string path, `pathlib.Path` object, glob pattern, directory with `.parquet`
+    extension, or partitioned dataset)
+    - Database connection strings (URI format with optional table specification)
 
     The table types marked with an asterisk need to be prepared as Ibis tables (with type of
-    `ibis.expr.types.relations.Table`). Furthermore, using `preview()` with these types of tables
+    `ibis.expr.types.relations.Table`). Furthermore, using `assistant()` with these types of tables
     requires the Ibis library (`v9.5.0` or above) to be installed. If the input table is a Polars or
     Pandas DataFrame, the availability of Ibis is not needed.
+
+    To use a CSV file, ensure that a string or `pathlib.Path` object with a `.csv` extension is
+    provided. The file will be automatically detected and loaded using the best available DataFrame
+    library. The loading preference is Polars first, then Pandas as a fallback.
     
 
 load_dataset(dataset: "Literal['small_table', 'game_revenue', 'nycflights', 'global_sales']" = 'small_table', tbl_type: "Literal['polars', 'pandas', 'duckdb']" = 'polars') -> 'FrameT | Any'
@@ -9553,6 +11254,606 @@ get_data_path(dataset: "Literal['small_table', 'game_revenue', 'nycflights', 'gl
     [`load_dataset()`](`pointblank.load_dataset`) for loading datasets directly as table objects.
     
 
+connect_to_table(connection_string: 'str') -> 'Any'
+
+    Connect to a database table using a connection string.
+
+    This utility function tests whether a connection string leads to a valid table and returns
+    the table object if successful. It provides helpful error messages when no table is specified
+    or when backend dependencies are missing.
+
+    Parameters
+    ----------
+    connection_string
+        A database connection string with a required table specification using the `::table_name`
+        suffix. Supported formats are outlined in the *Supported Connection String Formats* section.
+
+    Returns
+    -------
+    Any
+        An Ibis table object for the specified database table.
+
+    Supported Connection String Formats
+    -----------------------------------
+    The `connection_string` parameter must include a valid connection string with a table name
+    specified using the `::` syntax. Here are some examples on how to format connection strings
+    for various backends:
+
+    ```
+    DuckDB:     "duckdb:///path/to/database.ddb::table_name"
+    SQLite:     "sqlite:///path/to/database.db::table_name"
+    PostgreSQL: "postgresql://user:password@localhost:5432/database::table_name"
+    MySQL:      "mysql://user:password@localhost:3306/database::table_name"
+    BigQuery:   "bigquery://project/dataset::table_name"
+    Snowflake:  "snowflake://user:password@account/database/schema::table_name"
+    ```
+
+    If the connection string does not include a table name, the function will attempt to connect to
+    the database and list available tables, providing guidance on how to specify a table.
+
+    Examples
+    --------
+    Connect to a DuckDB table:
+
+    ```python
+    import pointblank as pb
+
+    # Get path to a DuckDB database file from package data
+    duckdb_path = pb.get_data_path("game_revenue", "duckdb")
+
+    # Connect to the `game_revenue` table in the DuckDB database
+    game_revenue = pb.connect_to_table(f"duckdb:///{duckdb_path}::game_revenue")
+
+    # Use with the `preview()` function
+    pb.preview(game_revenue)
+    ```
+
+    Here are some backend-specific connection examples:
+
+    ```python
+    # PostgreSQL
+    pg_table = pb.connect_to_table(
+        "postgresql://user:password@localhost:5432/warehouse::customer_data"
+    )
+
+    # SQLite
+    sqlite_table = pb.connect_to_table("sqlite:///local_data.db::products")
+
+    # BigQuery
+    bq_table = pb.connect_to_table("bigquery://my-project/analytics::daily_metrics")
+    ```
+
+    This function requires the Ibis library with appropriate backend drivers:
+
+    ```bash
+    # You can install a set of common backends:
+    pip install 'ibis-framework[duckdb,postgres,mysql,sqlite]'
+
+    # ...or specific backends as needed:
+    pip install 'ibis-framework[duckdb]'    # for DuckDB
+    pip install 'ibis-framework[postgres]'  # for PostgreSQL
+    ```
+    See Also
+    --------
+    print_database_tables : List all available tables in a database for discovery
+    
+
+print_database_tables(connection_string: 'str') -> 'list[str]'
+
+    List all tables in a database from a connection string.
+
+    The `print_database_tables()` function connects to a database and returns a list of all
+    available tables. This is particularly useful for discovering what tables exist in a database
+    before connecting to a specific table with `connect_to_table(). The function automatically
+    filters out temporary Ibis tables (memtables) to show only user tables. It supports all database
+    backends available through Ibis, including DuckDB, SQLite, PostgreSQL, MySQL, BigQuery, and
+    Snowflake.
+
+    Parameters
+    ----------
+    connection_string
+        A database connection string *without* the `::table_name` suffix. Example:
+        `"duckdb:///path/to/database.ddb"`.
+
+    Returns
+    -------
+    list[str]
+        List of table names, excluding temporary Ibis tables.
+
+    See Also
+    --------
+    connect_to_table : Connect to a database table with full connection string documentation
+    
+
+
+## The YAML family
+
+The *YAML* group contains functions that allow for the use of YAML to orchestrate
+validation workflows. The `yaml_interrogate()` function can be used to run a validation workflow
+from YAML strings or files. The `validate_yaml()` function checks if the YAML configuration passes
+its own validity checks. The `yaml_to_python()` function converts YAML configuration to equivalent
+Python code.
+
+yaml_interrogate(yaml: 'Union[str, Path]', set_tbl: 'Union[FrameT, Any, None]' = None, namespaces: 'Optional[Union[Iterable[str], Mapping[str, str]]]' = None) -> 'Validate'
+Execute a YAML-based validation workflow.
+
+    This is the main entry point for YAML-based validation workflows. It takes YAML configuration
+    (as a string or file path) and returns a validated `Validate` object with interrogation results.
+
+    The YAML configuration defines the data source, validation steps, and optional settings like
+    thresholds and labels. This function automatically loads the data, builds the validation plan,
+    executes all validation steps, and returns the interrogated results.
+
+    Parameters
+    ----------
+    yaml
+        YAML configuration as string or file path. Can be: (1) a YAML string containing the
+        validation configuration, or (2) a Path object or string path to a YAML file.
+    set_tbl
+        An optional table to override the table specified in the YAML configuration. This allows you
+        to apply a YAML-defined validation workflow to a different table than what's specified in
+        the configuration. If provided, this table will replace the table defined in the YAML's
+        `tbl` field before executing the validation workflow. This can be any supported table type
+        including DataFrame objects, Ibis table objects, CSV file paths, Parquet file paths, GitHub
+        URLs, or database connection strings.
+    namespaces
+        Optional module namespaces to make available for Python code execution in YAML
+        configurations. Can be a dictionary mapping aliases to module names or a list of module
+        names. See the "Using Namespaces" section below for detailed examples.
+
+    Returns
+    -------
+    Validate
+        An instance of the `Validate` class that has been configured based on the YAML input. This
+        object contains the results of the validation steps defined in the YAML configuration. It
+        includes metadata like table name, label, language, and thresholds if specified.
+
+    Raises
+    ------
+    YAMLValidationError
+        If the YAML is invalid, malformed, or execution fails. This includes syntax errors, missing
+        required fields, unknown validation methods, or data loading failures.
+
+    Using Namespaces
+    ----------------
+    The `namespaces=` parameter enables custom Python modules and functions in YAML configurations.
+    This is particularly useful for custom action functions and advanced Python expressions.
+
+    **Namespace formats:**
+
+    - Dictionary format: `{"alias": "module.name"}` maps aliases to module names
+    - List format: `["module.name", "another.module"]` imports modules directly
+
+    **Option 1: Inline expressions (no namespaces needed)**
+
+    ```python
+    import pointblank as pb
+
+    # Simple inline custom action
+    yaml_config = '''
+    tbl: small_table
+    thresholds:
+      warning: 0.01
+    actions:
+      warning:
+        python: "lambda: print('Custom warning triggered')"
+    steps:
+    - col_vals_gt:
+        columns: [a]
+        value: 1000
+    '''
+
+    result = pb.yaml_interrogate(yaml_config)
+    result
+    ```
+
+    **Option 2: External functions with namespaces**
+
+    ```python
+    # Define a custom action function
+    def my_custom_action():
+        print("Data validation failed: please check your data.")
+
+    # Add to current module for demo
+    import sys
+    sys.modules[__name__].my_custom_action = my_custom_action
+
+    # YAML that references the external function
+    yaml_config = '''
+    tbl: small_table
+    thresholds:
+      warning: 0.01
+    actions:
+      warning:
+        python: actions.my_custom_action
+    steps:
+    - col_vals_gt:
+        columns: [a]
+        value: 1000  # This will fail
+    '''
+
+    # Use namespaces to make the function available
+    result = pb.yaml_interrogate(yaml_config, namespaces={'actions': '__main__'})
+    result
+    ```
+
+    This approach enables modular, reusable validation workflows with custom business logic.
+
+    Examples
+    --------
+    For the examples here, we'll use YAML configurations to define validation workflows. Let's start
+    with a basic YAML workflow that validates the built-in `small_table` dataset.
+
+    ```python
+    import pointblank as pb
+
+    # Define a basic YAML validation workflow
+    yaml_config = '''
+    tbl: small_table
+    steps:
+    - rows_distinct
+    - col_exists:
+        columns: [date, a, b]
+    '''
+
+    # Execute the validation workflow
+    result = pb.yaml_interrogate(yaml_config)
+    result
+    ```
+
+    The validation table shows the results of our YAML-defined workflow. We can see that the
+    `rows_distinct()` validation failed (because there are duplicate rows in the table), while the
+    column existence checks passed.
+
+    Now let's create a more comprehensive validation workflow with thresholds and metadata:
+
+    ```python
+    # Advanced YAML configuration with thresholds and metadata
+    yaml_config = '''
+    tbl: small_table
+    tbl_name: small_table_demo
+    label: Comprehensive data validation
+    thresholds:
+      warning: 0.1
+      error: 0.25
+      critical: 0.35
+    steps:
+    - col_vals_gt:
+        columns: [d]
+        value: 100
+    - col_vals_regex:
+        columns: [b]
+        pattern: '[0-9]-[a-z]{3}-[0-9]{3}'
+    - col_vals_not_null:
+        columns: [date, a]
+    '''
+
+    # Execute the validation workflow
+    result = pb.yaml_interrogate(yaml_config)
+    print(f"Table name: {result.tbl_name}")
+    print(f"Label: {result.label}")
+    print(f"Total validation steps: {len(result.validation_info)}")
+    ```
+
+    The validation results now include our custom table name and label. The thresholds we defined
+    will determine when validation steps are marked as warnings, errors, or critical failures.
+
+    You can also load YAML configurations from files. Here's how you would work with a YAML file:
+
+    ```python
+    from pathlib import Path
+    import tempfile
+
+    # Create a temporary YAML file for demonstration
+    yaml_content = '''
+    tbl: small_table
+    tbl_name: File-based Validation
+    steps:
+    - col_vals_between:
+        columns: [c]
+        left: 1
+        right: 10
+    - col_vals_in_set:
+        columns: [f]
+        set: [low, mid, high]
+    '''
+
+    with tempfile.NamedTemporaryFile(mode='w', suffix='.yaml', delete=False) as f:
+        f.write(yaml_content)
+        yaml_file_path = Path(f.name)
+
+    # Load and execute validation from file
+    result = pb.yaml_interrogate(yaml_file_path)
+    result
+    ```
+
+    This approach is particularly useful for storing validation configurations as part of your data
+    pipeline or version control system, allowing you to maintain validation rules alongside your
+    code.
+
+    ### Using `set_tbl=` to Override the Table
+
+    The `set_tbl=` parameter allows you to override the table specified in the YAML configuration.
+    This is useful when you have a template validation workflow but want to apply it to different
+    tables:
+
+    ```python
+    import polars as pl
+
+    # Create a test table with similar structure to small_table
+    test_table = pl.DataFrame({
+        "date": ["2023-01-01", "2023-01-02", "2023-01-03"],
+        "a": [1, 2, 3],
+        "b": ["1-abc-123", "2-def-456", "3-ghi-789"],
+        "d": [150, 200, 250]
+    })
+
+    # Use the same YAML config but apply it to our test table
+    yaml_config = '''
+    tbl: small_table  # This will be overridden
+    tbl_name: Test Table  # This name will be used
+    steps:
+    - col_exists:
+        columns: [date, a, b, d]
+    - col_vals_gt:
+        columns: [d]
+        value: 100
+    '''
+
+    # Execute with table override
+    result = pb.yaml_interrogate(yaml_config, set_tbl=test_table)
+    print(f"Validation applied to: {result.tbl_name}")
+    result
+    ```
+
+    This feature makes YAML configurations more reusable and flexible, allowing you to define
+    validation logic once and apply it to multiple similar tables.
+    
+
+validate_yaml(yaml: 'Union[str, Path]') -> 'None'
+Validate YAML configuration against the expected structure.
+
+    This function validates that a YAML configuration conforms to the expected structure for
+    validation workflows. It checks for required fields, proper data types, and valid
+    validation method names. This is useful for validating configurations before execution or
+    for building configuration editors and validators.
+
+    The function performs comprehensive validation including:
+
+    - required fields ('tbl' and 'steps')
+    - proper data types for all fields
+    - valid threshold configurations
+    - known validation method names
+    - proper step configuration structure
+
+    Parameters
+    ----------
+    yaml
+        YAML configuration as string or file path. Can be: (1) a YAML string containing the
+        validation configuration, or (2) a Path object or string path to a YAML file.
+
+    Raises
+    ------
+    YAMLValidationError
+        If the YAML is invalid, malformed, or execution fails. This includes syntax errors,
+        missing required fields, unknown validation methods, or data loading failures.
+
+    Examples
+    --------
+    For the examples here, we'll demonstrate how to validate YAML configurations before using them
+    with validation workflows. This is particularly useful for building robust data validation
+    systems where you want to catch configuration errors early.
+
+    Let's start with validating a basic configuration:
+
+    ```python
+    import pointblank as pb
+
+    # Define a basic YAML validation configuration
+    yaml_config = '''
+    tbl: small_table
+    steps:
+    - rows_distinct
+    - col_exists:
+        columns: [a, b]
+    '''
+
+    # Validate the configuration: no exception means it's valid
+    pb.validate_yaml(yaml_config)
+    print("Basic YAML configuration is valid")
+    ```
+
+    The function completed without raising an exception, which means our configuration is valid and
+    follows the expected structure.
+
+    Now let's validate a more complex configuration with thresholds and metadata:
+
+    ```python
+    # Complex YAML configuration with all optional fields
+    yaml_config = '''
+    tbl: small_table
+    tbl_name: My Dataset
+    label: Quality check
+    lang: en
+    locale: en
+    thresholds:
+      warning: 0.1
+      error: 0.25
+      critical: 0.35
+    steps:
+    - rows_distinct
+    - col_vals_gt:
+        columns: [d]
+        value: 100
+    - col_vals_regex:
+        columns: [b]
+        pattern: '[0-9]-[a-z]{3}-[0-9]{3}'
+    '''
+
+    # Validate the configuration
+    pb.validate_yaml(yaml_config)
+    print("Complex YAML configuration is valid")
+
+    # Count the validation steps
+    import pointblank.yaml as pby
+    config = pby.load_yaml_config(yaml_config)
+    print(f"Configuration has {len(config['steps'])} validation steps")
+    ```
+
+    This configuration includes all the optional metadata fields and complex validation steps,
+    demonstrating that the validation handles the full range of supported options.
+
+    Let's see what happens when we try to validate an invalid configuration:
+
+    ```python
+    # Invalid YAML configuration: missing required 'tbl' field
+    invalid_yaml = '''
+    steps:
+    - rows_distinct
+    '''
+
+    try:
+        pb.validate_yaml(invalid_yaml)
+    except pb.yaml.YAMLValidationError as e:
+        print(f"Validation failed: {e}")
+    ```
+
+    The validation correctly identifies that our configuration is missing the required `'tbl'`
+    field.
+
+    Here's a practical example of using validation in a workflow builder:
+
+    ```python
+    def safe_yaml_interrogate(yaml_config):
+        """Safely execute a YAML configuration after validation."""
+        try:
+            # Validate the YAML configuration first
+            pb.validate_yaml(yaml_config)
+            print("✓ YAML configuration is valid")
+
+            # Then execute the workflow
+            result = pb.yaml_interrogate(yaml_config)
+            print(f"Validation completed with {len(result.validation_info)} steps")
+            return result
+
+        except pb.yaml.YAMLValidationError as e:
+            print(f"Configuration error: {e}")
+            return None
+
+    # Test with a valid YAML configuration
+    test_yaml = '''
+    tbl: small_table
+    steps:
+    - col_vals_between:
+        columns: [c]
+        left: 1
+        right: 10
+    '''
+
+    result = safe_yaml_interrogate(test_yaml)
+    ```
+
+    This pattern of validating before executing helps build more reliable data validation pipelines
+    by catching configuration errors early in the process.
+
+    Note that this function only validates the structure and does not check if the specified data
+    source ('tbl') exists or is accessible. Data source validation occurs during execution with
+    `yaml_interrogate()`.
+
+    See Also
+    --------
+    yaml_interrogate : execute YAML-based validation workflows
+    
+
+yaml_to_python(yaml: 'Union[str, Path]') -> 'str'
+Convert YAML validation configuration to equivalent Python code.
+
+    This function takes a YAML validation configuration and generates the equivalent Python code
+    that would produce the same validation workflow. This is useful for documentation, code
+    generation, or learning how to translate YAML workflows into programmatic workflows.
+
+    The generated Python code includes all necessary imports, data loading, validation steps,
+    and interrogation execution, formatted as executable Python code.
+
+    Parameters
+    ----------
+    yaml
+        YAML configuration as string or file path. Can be: (1) a YAML string containing the
+        validation configuration, or (2) a Path object or string path to a YAML file.
+
+    Returns
+    -------
+    str
+        A formatted Python code string enclosed in markdown code blocks that replicates the YAML
+        workflow. The code includes import statements, data loading, validation method calls, and
+        interrogation execution.
+
+    Raises
+    ------
+    YAMLValidationError
+        If the YAML is invalid, malformed, or contains unknown validation methods.
+
+    Examples
+    --------
+    Convert a basic YAML configuration to Python code:
+
+    ```python
+    import pointblank as pb
+
+    # Define a YAML validation workflow
+    yaml_config = '''
+    tbl: small_table
+    tbl_name: Data Quality Check
+    steps:
+    - col_vals_not_null:
+        columns: [a, b]
+    - col_vals_gt:
+        columns: [c]
+        value: 0
+    '''
+
+    # Generate equivalent Python code
+    python_code = pb.yaml_to_python(yaml_config)
+    print(python_code)
+    ```
+
+    The generated Python code shows exactly how to replicate the YAML workflow programmatically.
+    This is particularly useful when transitioning from YAML-based workflows to code-based
+    workflows, or when generating documentation that shows both YAML and Python approaches.
+
+    For more complex workflows with thresholds and metadata:
+
+    ```python
+    # Advanced YAML configuration
+    yaml_config = '''
+    tbl: small_table
+    tbl_name: Advanced Validation
+    label: Production data check
+    thresholds:
+      warning: 0.1
+      error: 0.2
+    steps:
+    - col_vals_between:
+        columns: [c]
+        left: 1
+        right: 10
+    - col_vals_regex:
+        columns: [b]
+        pattern: '[0-9]-[a-z]{3}-[0-9]{3}'
+    '''
+
+    # Generate the equivalent Python code
+    python_code = pb.yaml_to_python(yaml_config)
+    print(python_code)
+    ```
+
+    The generated code includes all configuration parameters, thresholds, and maintains the exact
+    same validation logic as the original YAML workflow.
+
+    This function is also useful for educational purposes, helping users understand how YAML
+    configurations map to the underlying Python API calls.
+    
+
 
 ## The Utility Functions family
 
@@ -9568,14 +11869,15 @@ get_column_count(data: 'FrameT | Any') -> 'int'
 
     The `get_column_count()` function returns the number of columns in a table. The function works
     with any table that is supported by the `pointblank` library, including Pandas, Polars, and Ibis
-    backend tables (e.g., DuckDB, MySQL, PostgreSQL, SQLite, Parquet, etc.).
+    backend tables (e.g., DuckDB, MySQL, PostgreSQL, SQLite, Parquet, etc.). It also supports
+    direct input of CSV files, Parquet files, and database connection strings.
 
     Parameters
     ----------
     data
-        The table for which to get the column count, which could be a DataFrame object or an Ibis
-        table object. Read the *Supported Input Table Types* section for details on the supported
-        table types.
+        The table for which to get the column count, which could be a DataFrame object, an Ibis
+        table object, a CSV file path, a Parquet file path, or a database connection string.
+        Read the *Supported Input Table Types* section for details on the supported table types.
 
     Returns
     -------
@@ -9588,6 +11890,7 @@ get_column_count(data: 'FrameT | Any') -> 'int'
 
     - Polars DataFrame (`"polars"`)
     - Pandas DataFrame (`"pandas"`)
+    - PySpark table (`"pyspark"`)
     - DuckDB table (`"duckdb"`)*
     - MySQL table (`"mysql"`)*
     - PostgreSQL table (`"postgresql"`)*
@@ -9595,14 +11898,40 @@ get_column_count(data: 'FrameT | Any') -> 'int'
     - Microsoft SQL Server table (`"mssql"`)*
     - Snowflake table (`"snowflake"`)*
     - Databricks table (`"databricks"`)*
-    - PySpark table (`"pyspark"`)*
     - BigQuery table (`"bigquery"`)*
     - Parquet table (`"parquet"`)*
+    - CSV files (string path or `pathlib.Path` object with `.csv` extension)
+    - Parquet files (string path, `pathlib.Path` object, glob pattern, directory with `.parquet`
+    extension, or partitioned dataset)
+    - Database connection strings (URI format with optional table specification)
 
     The table types marked with an asterisk need to be prepared as Ibis tables (with type of
     `ibis.expr.types.relations.Table`). Furthermore, using `get_column_count()` with these types of
     tables requires the Ibis library (`v9.5.0` or above) to be installed. If the input table is a
     Polars or Pandas DataFrame, the availability of Ibis is not needed.
+
+    To use a CSV file, ensure that a string or `pathlib.Path` object with a `.csv` extension is
+    provided. The file will be automatically detected and loaded using the best available DataFrame
+    library. The loading preference is Polars first, then Pandas as a fallback.
+
+    GitHub URLs pointing to CSV or Parquet files are automatically detected and converted to raw
+    content URLs for downloading. The URL format should be:
+    `https://github.com/user/repo/blob/branch/path/file.csv` or
+    `https://github.com/user/repo/blob/branch/path/file.parquet`
+
+    Connection strings follow database URL formats and must also specify a table using the
+    `::table_name` suffix. Examples include:
+
+    ```
+    "duckdb:///path/to/database.ddb::table_name"
+    "sqlite:///path/to/database.db::table_name"
+    "postgresql://user:password@localhost:5432/database::table_name"
+    "mysql://user:password@localhost:3306/database::table_name"
+    "bigquery://project/dataset::table_name"
+    "snowflake://user:password@account/database/schema::table_name"
+    ```
+
+    When using connection strings, the Ibis library with the appropriate backend driver is required.
 
     Examples
     --------
@@ -9620,6 +11949,31 @@ get_column_count(data: 'FrameT | Any') -> 'int'
     pb.get_column_count(small_table_duckdb)
     ```
 
+    #### Working with CSV Files
+
+    The `get_column_count()` function can directly accept CSV file paths:
+
+    #### Working with Parquet Files
+
+    The function supports various Parquet input formats:
+
+    You can also use glob patterns and directories:
+
+    ```python
+    # Multiple Parquet files with glob patterns
+    pb.get_column_count("data/sales_*.parquet")
+
+    # Directory containing Parquet files
+    pb.get_column_count("parquet_data/")
+
+    # Partitioned Parquet dataset
+    pb.get_column_count("sales_data/")  # Auto-discovers partition columns
+    ```
+
+    #### Working with Database Connection Strings
+
+    The function supports database connection strings for direct access to database tables:
+
     The function always returns the number of columns in the table as an integer value, which is
     `8` for the `small_table` dataset.
     
@@ -9630,14 +11984,15 @@ get_row_count(data: 'FrameT | Any') -> 'int'
 
     The `get_row_count()` function returns the number of rows in a table. The function works with
     any table that is supported by the `pointblank` library, including Pandas, Polars, and Ibis
-    backend tables (e.g., DuckDB, MySQL, PostgreSQL, SQLite, Parquet, etc.).
+    backend tables (e.g., DuckDB, MySQL, PostgreSQL, SQLite, Parquet, etc.). It also supports
+    direct input of CSV files, Parquet files, and database connection strings.
 
     Parameters
     ----------
     data
-        The table for which to get the row count, which could be a DataFrame object or an Ibis table
-        object. Read the *Supported Input Table Types* section for details on the supported table
-        types.
+        The table for which to get the row count, which could be a DataFrame object, an Ibis table
+        object, a CSV file path, a Parquet file path, or a database connection string.
+        Read the *Supported Input Table Types* section for details on the supported table types.
 
     Returns
     -------
@@ -9650,6 +12005,7 @@ get_row_count(data: 'FrameT | Any') -> 'int'
 
     - Polars DataFrame (`"polars"`)
     - Pandas DataFrame (`"pandas"`)
+    - PySpark table (`"pyspark"`)
     - DuckDB table (`"duckdb"`)*
     - MySQL table (`"mysql"`)*
     - PostgreSQL table (`"postgresql"`)*
@@ -9657,14 +12013,41 @@ get_row_count(data: 'FrameT | Any') -> 'int'
     - Microsoft SQL Server table (`"mssql"`)*
     - Snowflake table (`"snowflake"`)*
     - Databricks table (`"databricks"`)*
-    - PySpark table (`"pyspark"`)*
     - BigQuery table (`"bigquery"`)*
     - Parquet table (`"parquet"`)*
+    - CSV files (string path or `pathlib.Path` object with `.csv` extension)
+    - Parquet files (string path, `pathlib.Path` object, glob pattern, directory with `.parquet`
+    extension, or partitioned dataset)
+    - GitHub URLs (direct links to CSV or Parquet files on GitHub)
+    - Database connection strings (URI format with optional table specification)
 
     The table types marked with an asterisk need to be prepared as Ibis tables (with type of
     `ibis.expr.types.relations.Table`). Furthermore, using `get_row_count()` with these types of
     tables requires the Ibis library (`v9.5.0` or above) to be installed. If the input table is a
     Polars or Pandas DataFrame, the availability of Ibis is not needed.
+
+    To use a CSV file, ensure that a string or `pathlib.Path` object with a `.csv` extension is
+    provided. The file will be automatically detected and loaded using the best available DataFrame
+    library. The loading preference is Polars first, then Pandas as a fallback.
+
+    GitHub URLs pointing to CSV or Parquet files are automatically detected and converted to raw
+    content URLs for downloading. The URL format should be:
+    `https://github.com/user/repo/blob/branch/path/file.csv` or
+    `https://github.com/user/repo/blob/branch/path/file.parquet`
+
+    Connection strings follow database URL formats and must also specify a table using the
+    `::table_name` suffix. Examples include:
+
+    ```
+    "duckdb:///path/to/database.ddb::table_name"
+    "sqlite:///path/to/database.db::table_name"
+    "postgresql://user:password@localhost:5432/database::table_name"
+    "mysql://user:password@localhost:3306/database::table_name"
+    "bigquery://project/dataset::table_name"
+    "snowflake://user:password@account/database/schema::table_name"
+    ```
+
+    When using connection strings, the Ibis library with the appropriate backend driver is required.
 
     Examples
     --------
@@ -9681,6 +12064,31 @@ get_row_count(data: 'FrameT | Any') -> 'int'
 
     pb.get_row_count(game_revenue_duckdb)
     ```
+
+    #### Working with CSV Files
+
+    The `get_row_count()` function can directly accept CSV file paths:
+
+    #### Working with Parquet Files
+
+    The function supports various Parquet input formats:
+
+    You can also use glob patterns and directories:
+
+    ```python
+    # Multiple Parquet files with glob patterns
+    pb.get_row_count("data/sales_*.parquet")
+
+    # Directory containing Parquet files
+    pb.get_row_count("parquet_data/")
+
+    # Partitioned Parquet dataset
+    pb.get_row_count("sales_data/")  # Auto-discovers partition columns
+    ```
+
+    #### Working with Database Connection Strings
+
+    The function supports database connection strings for direct access to database tables:
 
     The function always returns the number of rows in the table as an integer value, which is `2000`
     for the `game_revenue` dataset.
@@ -9866,7 +12274,298 @@ Access validation summary information when authoring final actions.
     custom actions that are executed after all validation steps have been completed.
     
 
-config(report_incl_header: 'bool' = True, report_incl_footer: 'bool' = True, preview_incl_header: 'bool' = True) -> 'PointblankConfig'
+write_file(validation: 'Validate', filename: 'str', path: 'str | None' = None, keep_tbl: 'bool' = False, keep_extracts: 'bool' = False, quiet: 'bool' = False) -> 'None'
+
+    Write a Validate object to disk as a serialized file.
+
+    Writing a validation object to disk with `write_file()` can be useful for keeping data
+    validation results close at hand for later retrieval (with `read_file()`). By default, any data
+    table that the validation object holds will be removed before writing to disk (not applicable if
+    no data table is present). This behavior can be changed by setting `keep_tbl=True`, but this
+    only works when the table is not of a database type (e.g., DuckDB, PostgreSQL, etc.), as
+    database connections cannot be serialized.
+
+    Extract data from failing validation steps can also be preserved by setting
+    `keep_extracts=True`, which is useful for later analysis of data quality issues.
+
+    The serialized file uses Python's pickle format for storage of the validation object state,
+    including all validation results, metadata, and optionally the source data.
+
+    **Important note.** If your validation uses custom preprocessing functions (via the `pre=`
+    parameter), these functions must be defined at the module level (not interactively or as lambda
+    functions) to ensure they can be properly restored when loading the validation in a different
+    Python session. Read the *Creating Serializable Validations* section below for more information.
+
+    :::{.callout-warning}
+    The `write_file()` function is currently experimental. Please report any issues you encounter in
+    the [Pointblank issue tracker](https://github.com/posit-dev/pointblank/issues).
+    :::
+
+    Parameters
+    ----------
+    validation
+        The `Validate` object to write to disk.
+    filename
+        The filename to create on disk for the validation object. Should not include the file
+        extension as `.pkl` will be added automatically.
+    path
+        An optional directory path where the file should be saved. If not provided, the file will be
+        saved in the current working directory. The directory will be created if it doesn't exist.
+    keep_tbl
+        An option to keep the data table that is associated with the validation object. The default
+        is `False` where the data table is removed before writing to disk. For database tables
+        (e.g., Ibis tables with database backends), the table is always removed even if
+        `keep_tbl=True`, as database connections cannot be serialized.
+    keep_extracts
+        An option to keep any collected extract data for failing rows from validation steps. By
+        default, this is `False` (i.e., extract data is removed to save space).
+    quiet
+        Should the function not inform when the file is written? By default, this is `False`, so a
+        message will be printed when the file is successfully written.
+
+    Returns
+    -------
+    None
+        This function doesn't return anything but saves the validation object to disk.
+
+    Creating Serializable Validations
+    ---------------------------------
+    To ensure your validations work reliably across different Python sessions, the recommended
+    approach is to use module-Level functions. So, create a separate Python file for your
+    preprocessing functions:
+
+    ```python
+    # preprocessing_functions.py
+    import polars as pl
+
+    def multiply_by_100(df):
+        return df.with_columns(pl.col("value") * 100)
+
+    def add_computed_column(df):
+        return df.with_columns(computed=pl.col("value") * 2 + 10)
+    ```
+
+    Then import and use them in your validation:
+
+    ```python
+    # your_main_script.py
+    import pointblank as pb
+    from preprocessing_functions import multiply_by_100, add_computed_column
+
+    validation = (
+        pb.Validate(data=my_data)
+        .col_vals_gt(columns="value", value=500, pre=multiply_by_100)
+        .col_vals_between(columns="computed", left=50, right=1000, pre=add_computed_column)
+        .interrogate()
+    )
+
+    # Save validation and it will work reliably across sessions
+    pb.write_file(validation, "my_validation", keep_tbl=True)
+    ```
+
+    ### Problematic Patterns to Avoid
+
+    Don't use lambda functions as they will cause immediate errors.
+
+    Don't use interactive function definitions (as they may fail when loading).
+
+    ```python
+    def my_function(df):  # Defined in notebook/REPL
+        return df.with_columns(pl.col("value") * 2)
+
+    validation = pb.Validate(data).col_vals_gt(
+        columns="value", value=100, pre=my_function
+    )
+    ```
+
+    ### Automatic Analysis and Guidance
+
+    When you call `write_file()`, it automatically analyzes your validation and provides:
+
+    - confirmation when all functions will work reliably
+    - warnings for functions that may cause cross-session issues
+    - clear errors for unsupported patterns (lambda functions)
+    - specific recommendations and code examples
+    - loading instructions tailored to your validation
+
+    ### Loading Your Validation
+
+    To load a saved validation in a new Python session:
+
+    ```python
+    # In a new Python session
+    import pointblank as pb
+
+    # Import the same preprocessing functions used when creating the validation
+    from preprocessing_functions import multiply_by_100, add_computed_column
+
+    # Upon loading the validation, functions will be automatically restored
+    validation = pb.read_file("my_validation.pkl")
+    ```
+
+    ** Testing Your Validation:**
+
+    To verify your validation works across sessions:
+
+    1. save your validation in one Python session
+    2. start a fresh Python session (restart kernel/interpreter)
+    3. import required preprocessing functions
+    4. load the validation using `read_file()`
+    5. test that preprocessing functions work as expected
+
+    ### Performance and Storage
+
+    - use `keep_tbl=False` (default) to reduce file size when you don't need the original data
+    - use `keep_extracts=False` (default) to save space by excluding extract data
+    - set `quiet=True` to suppress guidance messages in automated scripts
+    - files are saved using pickle's highest protocol for optimal performance
+
+    Examples
+    --------
+    Let's create a simple validation and save it to disk:
+
+    ```python
+    import pointblank as pb
+
+    # Create a validation
+    validation = (
+        pb.Validate(data=pb.load_dataset("small_table"), label="My validation")
+        .col_vals_gt(columns="d", value=100)
+        .col_vals_regex(columns="b", pattern=r"[0-9]-[a-z]{3}-[0-9]{3}")
+        .interrogate()
+    )
+
+    # Save to disk (without the original table data)
+    pb.write_file(validation, "my_validation")
+    ```
+
+    To keep the original table data for later analysis:
+
+    ```python
+    # Save with the original table data included
+    pb.write_file(validation, "my_validation_with_data", keep_tbl=True)
+    ```
+
+    You can also specify a custom directory and keep extract data:
+
+    ```python
+    pb.write_file(
+        validation,
+        filename="detailed_validation",
+        path="/path/to/validations",
+        keep_tbl=True,
+        keep_extracts=True
+    )
+    ```
+
+    ### Working with Preprocessing Functions
+
+    For validations that use preprocessing functions to be portable across sessions, define your
+    functions in a separate `.py` file:
+
+    ```python
+    # In `preprocessing_functions.py`
+
+    import polars as pl
+
+    def multiply_by_100(df):
+        return df.with_columns(pl.col("value") * 100)
+
+    def add_computed_column(df):
+        return df.with_columns(computed=pl.col("value") * 2 + 10)
+    ```
+
+    Then import and use them in your validation:
+
+    ```python
+    # In your main script
+
+    import pointblank as pb
+    from preprocessing_functions import multiply_by_100, add_computed_column
+
+    validation = (
+        pb.Validate(data=my_data)
+        .col_vals_gt(columns="value", value=500, pre=multiply_by_100)
+        .col_vals_between(columns="computed", left=50, right=1000, pre=add_computed_column)
+        .interrogate()
+    )
+
+    # This validation can now be saved and loaded reliably
+    pb.write_file(validation, "my_validation", keep_tbl=True)
+    ```
+
+    When you load this validation in a new session, simply import the preprocessing functions
+    again and they will be automatically restored.
+
+    See Also
+    --------
+    Use the [`read_file()`](`pointblank.read_file`) function to load a validation object that was
+    previously saved with `write_file()`.
+    
+
+read_file(filepath: 'str | Path') -> 'Validate'
+
+    Read a Validate object from disk that was previously saved with `write_file()`.
+
+    This function loads a validation object that was previously serialized to disk using the
+    `write_file()` function. The validation object will be restored with all its validation results,
+    metadata, and optionally the source data (if it was saved with `keep_tbl=True`).
+
+    :::{.callout-warning}
+    The `read_file()` function is currently experimental. Please report any issues you encounter in
+    the [Pointblank issue tracker](https://github.com/posit-dev/pointblank/issues).
+    :::
+
+    Parameters
+    ----------
+    filepath
+        The path to the saved validation file. Can be a string or Path object.
+
+    Returns
+    -------
+    Validate
+        The restored validation object with all its original state, validation results, and
+        metadata.
+
+    Examples
+    --------
+    Load a validation object that was previously saved:
+
+    ```python
+    import pointblank as pb
+
+    # Load a validation object from disk
+    validation = pb.read_file("my_validation.pkl")
+
+    # View the validation results
+    validation
+    ```
+
+    You can also load using just the filename (without extension):
+
+    ```python
+    # This will automatically look for "my_validation.pkl"
+    validation = pb.read_file("my_validation")
+    ```
+
+    The loaded validation object retains all its functionality:
+
+    ```python
+    # Get validation summary
+    summary = validation.get_json_report()
+
+    # Get sundered data (if original table was saved)
+    if validation.data is not None:
+        failing_rows = validation.get_sundered_data(type="fail")
+    ```
+
+    See Also
+    --------
+    Use the [`write_file()`](`pointblank.Validate.write_file`) method to save a validation object
+    to disk for later retrieval with this function.
+    
+
+config(report_incl_header: 'bool' = True, report_incl_footer: 'bool' = True, report_incl_footer_timings: 'bool' = True, report_incl_footer_notes: 'bool' = True, preview_incl_header: 'bool' = True) -> 'PointblankConfig'
 
     Configuration settings for the Pointblank library.
 
@@ -9878,7 +12577,13 @@ config(report_incl_header: 'bool' = True, report_incl_footer: 'bool' = True, pre
         threshold levels (if set).
     report_incl_footer
         Should the footer of the validation table report be displayed? The footer contains the
-        starting and ending times of the interrogation.
+        starting and ending times of the interrogation and any notes added to validation steps.
+    report_incl_footer_timings
+        Controls whether the validation timing information (start time, duration, and end time)
+        should be displayed in the footer. Only applies when `report_incl_footer=True`.
+    report_incl_footer_notes
+        Controls whether the notes from validation steps should be displayed in the footer. Only
+        applies when `report_incl_footer=True`.
     preview_incl_header
         Whether the header should be present in any preview table (generated via the
         [`preview()`](`pointblank.preview`) function).
@@ -10633,6 +13338,18 @@ import pointblank as pb
 import polars as pl
 import narwhals as nw
 
+# Define preprocessing functions
+def get_median_a(df):
+    """Use a Polars expression to aggregate column `a`."""
+    return df.select(pl.median("a"))
+
+def add_b_length_column(df):
+    """Use Narwhals to add a string length column `b_len`."""
+    return (
+        nw.from_native(df)
+        .with_columns(b_len=nw.col("b").str.len_chars())
+    )
+
 validation = (
     pb.Validate(
         data=pb.load_dataset(dataset="small_table", tbl_type="polars")
@@ -10640,14 +13357,12 @@ validation = (
     .col_vals_between(
         columns="a",
         left=3, right=6,
-        pre=lambda df: df.select(pl.median("a"))    # Use a Polars expression to aggregate
+        pre=get_median_a
     )
     .col_vals_eq(
         columns="b_len",
         value=9,
-        pre=lambda dfn: dfn.with_columns(           # Use a Narwhals expression, identified
-            b_len=nw.col("b").str.len_chars()       # by the 'dfn' here
-        )
+        pre=add_b_length_column
     )
     .interrogate()
 )

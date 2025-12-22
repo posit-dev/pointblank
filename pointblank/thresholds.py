@@ -559,7 +559,7 @@ class FinalActions:
     def send_alert():
         summary = pb.get_validation_summary()
         if summary["highest_severity"] == "critical":
-            print(f"ALERT: Critical validation failures found in {summary['table_name']}")
+            print(f"ALERT: Critical validation failures found in {summary['tbl_name']}")
 
     validation = (
         pb.Validate(

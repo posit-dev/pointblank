@@ -2,7 +2,7 @@
 
 <a href="https://posit-dev.github.io/pointblank/"><img src="https://posit-dev.github.io/pointblank/assets/pointblank_logo.svg" width="75%"/></a>
 
-_아름답고 강력한 데이터 검증_
+_데이터 품질 평가 및 모니터링을 위한 데이터 검증 툴킷_
 
 [![Python Versions](https://img.shields.io/pypi/pyversions/pointblank.svg)](https://pypi.python.org/pypi/pointblank)
 [![PyPI](https://img.shields.io/pypi/v/pointblank)](https://pypi.org/project/pointblank/#history)
@@ -35,13 +35,61 @@ _아름답고 강력한 데이터 검증_
    <a href="README.ar.md">العربية</a>
 </div>
 
-## Pointblank이란?
+Pointblank은 데이터 품질에 대해 다른 접근 방식을 취합니다. 지루한 기술적 작업일 필요가 없습닄. 오히려 팀 구성원 간의 명확한 커뮤니케이션에 초점을 맞춘 프로세스가 될 수 있습니다. 다른 검증 라이브러리가 오류 감지에만 집중하는 반면, Pointblank은 **문제 발견과 인사이트 공유** 모두에서 뛰어납니다. 아름답고 커스터마이지 가능한 보고서는 검증 결과를 이해관계자와의 대화로 바꿔주어, 데이터 품질 문제를 전체 팀에게 즉시 이해하기 쉭고 실행 가능하게 만듭니다.
 
-Pointblank은 데이터 품질을 보장하는 방식을 변화시키는 강력하면서도 우아한 Python용 데이터 검증 프레임워크입니다. 직관적이고 연쇄 가능한 API를 통해 포괄적인 품질 검사에 데이터를 빠르게 검증하고, 데이터 문제를 즉시 조치할 수 있게 만드는 멋진 대화형 보고서를 통해 결과를 시각화할 수 있습니다.
+**몇 시간이 아닌 몇 분 내에 시작하세요.** Pointblank의 AI 기반 [`DraftValidation`](https://posit-dev.github.io/pointblank/user-guide/draft-validation.html) 기능이 데이터를 분석하고 지능적인 검증 규칙을 자동으로 제안합니다. 빈 검증 스크립트를 센쓀센쓀 보며 어디서부터 시작할지 고민할 필요가 없습니다. Pointblank이 데이터 품질 여정을 킥시트하여 가장 중요한 일에 집중할 수 있도록 도와줍니다.
 
-당신이 데이터 과학자, 데이터 엔지니어, 또는 분석가인지에 관계없이 Pointblank은 데이터 품질 문제가 분석이나 다운스트림 시스템에 영향을 미치기 전에 발견하는 데 도움을 줍니다.
+데이터 품질 발견 사항을 빠르게 전달해야 하는 데이터 과학자, 견고한 파이프라인을 구축하는 데이터 엔지니어, 비즈니스 이해관계자에게 데이터 품질 결과를 발표하는 애널리스트 누구나 Pointblank을 통해 데이터 품질을 단순한 사후 고려 사항에서 경쟁 우위로 바꿀 수 있습니다.
 
-## 30초 시작하기
+## AI 기반 검증 초안 작성 시작하기
+
+`DraftValidation` 클래스는 LLM을 사용하여 데이터를 분석하고 지능적인 제안이 포함된 완전한 검증 계획을 생성합니다. 이를 통해 데이터 검증을 빠르게 시작하거나 새 프로젝트를 시작할 수 있습니다.
+
+```python
+import pointblank as pb
+
+# 데이터 로드
+data = pb.load_dataset("game_revenue")              # 예제 데이터셋
+
+# DraftValidation을 사용하여 검증 계획 생성
+pb.DraftValidation(data=data, model="anthropic:claude-sonnet-4-5")
+```
+
+결과는 데이터에 기반한 지능적 제안이 포함된 완전한 검증 계획입니다:
+
+```python
+import pointblank as pb
+
+# 검증 계획
+validation = (
+    pb.Validate(
+        data=data,
+        label="Draft Validation",
+        thresholds=pb.Thresholds(warning=0.10, error=0.25, critical=0.35)
+    )
+    .col_vals_in_set(columns="item_type", set=["iap", "ad"])
+    .col_vals_gt(columns="item_revenue", value=0)
+    .col_vals_between(columns="session_duration", left=3.2, right=41.0)
+    .col_count_match(count=11)
+    .row_count_match(count=2000)
+    .rows_distinct()
+    .interrogate()
+)
+
+validation
+```
+
+<div align="center">
+<img src="https://posit-dev.github.io/pointblank/assets/pointblank-draft-validation-report.png" width="800px">
+</div>
+
+<br>
+
+필요에 따라 생성된 검증 계획을 복사, 붙여넣기 및 커스터마이지하세요.
+
+## 체이닝 가능한 검증 API
+
+Pointblank의 체이닝 가능한 API는 검증을 간단하고 읽기 쉬답게 만듭니다. 동일한 패턴이 항상 적용됩니다: (1) `Validate`로 시작, (2) 검증 단계 추가, (3) `interrogate()`로 마무리.
 
 ```python
 import pointblank as pb
@@ -67,13 +115,19 @@ validation
 
 <br>
 
+질의된 `validation` 객체가 있으면 다음과 같은 다양한 메서드를 활용하여 인사이트를 추출할 수 있습니다:
+
+- 개별 단계에 대한 상세 보고서를 얻어 무엇이 잘못되었는지 확인
+- 검증 결과에 기반하여 테이블 필터링
+- 디버깅을 위해 문제가 있는 데이터 추출
+
 ## Pointblank을 선택해야 하는 이유?
 
-- **현재 스택과 작동** - Polars, Pandas, DuckDB, MySQL, PostgreSQL, SQLite, Parquet, PySpark, Snowflake 등과 완벽하게 통합!
-- **아름다운 대화형 보고서** - 문제를 강조하고 데이터 품질 소통에 도움이 되는 명확한 검증 결과
-- **구성 가능한 검증 파이프라인** - 완전한 데이터 품질 워크플로우로 검증 단계 연결
-- **임계값 기반 알림** - 사용자 정의 작업으로 '경고', '오류', '심각' 임계값 설정
-- **실용적인 출력** - 테이블 필터링, 문제 데이터 추출 또는 다운스트림 프로세스 트리거에 결과 사용
+- **현재 스택과 작동**: Polars, Pandas, DuckDB, MySQL, PostgreSQL, SQLite, Parquet, PySpark, Snowflake 등과 완벽하게 통합!
+- **아름다운 대화형 보고서**: 문제를 강조하고 데이터 품질 소통에 도움이 되는 명확한 검증 결과
+- **구성 가능한 검증 파이프라인**: 완전한 데이터 품질 워크플로우로 검증 단계 연결
+- **임계값 기반 알림**: 사용자 정의 작업으로 '경고', '오류', '심각' 임계값 설정
+- **실용적인 출력**: 테이블 필터링, 문제 데이터 추출 또는 다운스트림 프로세스 트리거에 결과 사용
 
 ## 실제 예제
 
@@ -149,14 +203,113 @@ validation.get_step_report(i=3).show("browser")  # 단계 3의 실패 레코드 
 
 <br>
 
+## YAML 구성
+
+휴대 가능하고 버전 관리되는 검증 워크플로우가 필요한 팀을 위해 Pointblank은 YAML 구성 파일을 지원합니다. 이를 통해 다양한 환경과 팀원 간에 검증 로직을 쉽게 공유할 수 있어 모든 사람이 같은 페이지에 있을 수 있습니다.
+
+**validation.yaml**
+
+```yaml
+validate:
+  data: small_table
+  tbl_name: "small_table"
+  label: "시작하기 검증"
+
+steps:
+  - col_vals_gt:
+      columns: "d"
+      value: 100
+  - col_vals_le:
+      columns: "c"
+      value: 5
+  - col_exists:
+      columns: ["date", "date_time"]
+```
+
+**YAML 검증 실행**
+
+```python
+import pointblank as pb
+
+# YAML 구성에서 검증 실행
+validation = pb.yaml_interrogate("validation.yaml")
+
+# 다른 검증과 마찬가지로 결과 얻기
+validation.get_tabular_report().show()
+```
+
+이 접근 방식은 다음에 완벽합니다:
+
+- **CI/CD 파이프라인**: 코드와 함께 검증 규칙 저장
+- **팀 협업**: 읽기 쉬운 형식으로 검증 로직 공유
+- **환경 일관성**: 개발, 스테이징, 프로덕션에서 동일한 검증 사용
+- **문서화**: YAML 파일이 데이터 품질 요구사항의 살아있는 문서 역할
+
+## 명령줄 인터페이스 (CLI)
+
+Pointblank은 `pb`라는 강력한 CLI 유틸리티를 포함하여 명령줄에서 직접 데이터 검증 워크플로우를 실행할 수 있습니다. CI/CD 파이프라인, 예약된 데이터 품질 검사 또는 빠른 검증 작업에 완벽합니다.
+
+<div align="center">
+<img src="https://posit-dev.github.io/pointblank/assets/vhs/cli-complete-workflow.gif" width="800px">
+</div>
+
+**데이터 탐색**
+
+```bash
+# 데이터의 빠른 미리보기 얻기
+pb preview small_table
+
+# GitHub URL에서 데이터 미리보기
+pb preview "https://github.com/user/repo/blob/main/data.csv"
+
+# Parquet 파일의 누락된 값 확인
+pb missing data.parquet
+
+# 데이터베이스 연결에서 열 요약 생성
+pb scan "duckdb:///data/sales.ddb::customers"
+```
+
+**필수 검증 실행**
+
+```bash
+# YAML 구성 파일에서 검증 실행
+pb run validation.yaml
+
+# Python 파일에서 검증 실행
+pb run validation.py
+
+# 중복 행 확인
+pb validate small_table --check rows-distinct
+
+# GitHub에서 직접 데이터 검증
+pb validate "https://github.com/user/repo/blob/main/sales.csv" --check col-vals-not-null --column customer_id
+
+# Parquet 데이터셋에서 null 값이 없는지 확인
+pb validate "data/*.parquet" --check col-vals-not-null --column a
+
+# 디버깅을 위해 실패 데이터 추출
+pb validate small_table --check col-vals-gt --column a --value 5 --show-extract
+```
+
+**CI/CD와 통합**
+
+```bash
+# 한 줄 검증에서 자동화를 위한 종료 코드 사용 (0 = 통과, 1 = 실패)
+pb validate small_table --check rows-distinct --exit-code
+
+# 종료 코드로 검증 워크플로우 실행
+pb run validation.yaml --exit-code
+pb run validation.py --exit-code
+```
+
 ## Pointblank을 차별화하는 기능
 
-- **완전한 검증 워크플로우** - 단일 파이프라인에서 데이터 액세스부터 검증, 보고까지
-- **협업을 위한 설계** - 아름다운 대화형 보고서를 통해 동료들과 결과 공유
-- **실용적인 출력** - 필요한 것을 정확히 얻기: 개수, 추출, 요약 또는 완전한 보고서
-- **유연한 배포** - 노트북, 스크립트 또는 데이터 파이프라인에서 사용
-- **맞춤형 설정** - 특정 요구에 맞게 검증 단계와 보고 조정
-- **국제화** - 보고서는 영어, 스페인어, 프랑스어, 독일어 등 20개 이상의 언어로 생성 가능
+- **완전한 검증 워크플로우**: 단일 파이프라인에서 데이터 액세스부터 검증, 보고까지
+- **협업을 위한 설계**: 아름다운 대화형 보고서를 통해 동료들과 결과 공유
+- **실용적인 출력**: 필요한 것을 정확히 얻기: 개수, 추출, 요약 또는 완전한 보고서
+- **유연한 배포**: 노트북, 스크립트 또는 데이터 파이프라인에서 사용
+- **맞춤형 설정**: 특정 요구에 맞게 검증 단계와 보고 조정
+- **국제화**: 보고서는 영어, 스페인어, 프랑스어, 독일어 등 40개의 언어로 생성 가능
 
 ## 문서 및 예제
 

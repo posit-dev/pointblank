@@ -3,6 +3,7 @@ title: Thresholds
 jupyter: python3
 toc-expand: 2
 html-table-processing: none
+bread-crumbs: true
 ---
 
 ```{python}
@@ -85,6 +86,20 @@ thresholds_proportional = pb.Thresholds(error=0.1)
 
 With this configuration, the 'error' threshold would be triggered if 10% or more of the test units
 fail.
+
+### Boolean Shorthand
+
+For cases where you want to allow exactly 1 failing test unit, you can use `True` as a convenient
+shorthand:
+
+```python
+# Critical threshold of exactly 1 failing test unit
+thresholds_boolean = pb.Thresholds(critical=True)
+```
+
+This is equivalent to setting `critical=1` but provides a more intuitive way to express "allow at
+most one failure". This shorthand is particularly useful for strict validations where any failure
+beyond a single edge case should trigger immediate attention.
 
 ## Understanding Severity Levels
 

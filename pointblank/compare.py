@@ -10,6 +10,15 @@ if TYPE_CHECKING:
 
 class Compare:
     def __init__(self, a: IntoFrame, b: IntoFrame) -> None:
+        # Import processing functions from validate module
+        from pointblank.validate import _process_data
+
+        # Process input data for table a
+        a = _process_data(a)
+
+        # Process input data for table b
+        b = _process_data(b)
+
         self.a: IntoFrame = a
         self.b: IntoFrame = b
 

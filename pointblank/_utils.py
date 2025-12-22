@@ -10,7 +10,7 @@ from great_tables import GT
 from great_tables.gt import _get_column_of_values
 from narwhals.typing import FrameT
 
-from pointblank._constants import ASSERTION_TYPE_METHOD_MAP, GENERAL_COLUMN_TYPES
+from pointblank._constants import ASSERTION_TYPE_METHOD_MAP, GENERAL_COLUMN_TYPES, IBIS_BACKENDS
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
@@ -66,11 +66,13 @@ def _get_tbl_type(data: FrameT | Any) -> str:
         except Exception as e:
             raise TypeError("The `data` object is not a DataFrame or Ibis Table.") from e
 
-        # Detect through regex if the table is a polars or pandas DataFrame
+        # Detect through regex if the table is a polars, pandas, or Spark DataFrame
         if re.search(r"polars", df_ns_str, re.IGNORECASE):
             return "polars"
         elif re.search(r"pandas", df_ns_str, re.IGNORECASE):
             return "pandas"
+        elif re.search(r"pyspark", df_ns_str, re.IGNORECASE):
+            return "pyspark"
 
     # If ibis is present, then get the table's backend name
     ibis_present = _is_lib_present(lib_name="ibis")
@@ -100,12 +102,47 @@ def _get_tbl_type(data: FrameT | Any) -> str:
                 if "read_parquet" in tbl_name:
                     return "parquet"
 
-            else:
+            else:  # pragma: no cover
                 return "duckdb"
 
         return backend
 
     return "unknown"  # pragma: no cover
+
+
+def _process_ibis_through_narwhals(data: FrameT | Any, tbl_type: str) -> tuple[FrameT | Any, str]:
+    """
+    Process Ibis tables through Narwhals to unify the processing pathway.
+
+    This function takes an Ibis table and wraps it with Narwhals, allowing
+    all downstream processing to use the unified Narwhals API instead of
+    Ibis-specific code paths.
+
+    Parameters
+    ----------
+    data : FrameT | Any
+        The data table, potentially an Ibis table
+    tbl_type : str
+        The detected table type
+
+    Returns
+    -------
+    tuple[FrameT | Any, str]
+        A tuple of (processed_data, updated_tbl_type) where:
+        - processed_data is the Narwhals-wrapped table if it was Ibis, otherwise original data
+        - updated_tbl_type is "narwhals" if it was Ibis, otherwise original tbl_type
+    """
+    # Check if this is an Ibis table type
+    if tbl_type in IBIS_BACKENDS:
+        try:
+            # Wrap with Narwhals
+            narwhals_wrapped = nw.from_native(data)
+            return narwhals_wrapped, "narwhals"
+        except Exception:
+            # If Narwhals can't handle it, fall back to original approach
+            return data, tbl_type
+
+    return data, tbl_type
 
 
 def _is_narwhals_table(data: any) -> bool:
@@ -164,7 +201,7 @@ def _check_any_df_lib(method_used: str) -> None:
 def _is_value_a_df(value: Any) -> bool:
     try:
         ns = nw.get_native_namespace(value)
-        if "polars" in str(ns) or "pandas" in str(ns):
+        if "polars" in str(ns) or "pandas" in str(ns) or "pyspark" in str(ns):
             return True
         else:  # pragma: no cover
             return False
@@ -201,6 +238,46 @@ def _select_df_lib(preference: str = "polars") -> Any:
             return pd
 
     return pl if pl is not None else pd
+
+
+def _copy_dataframe(df):
+    """
+    Create a copy of a DataFrame, handling different DataFrame types.
+
+    This function attempts to create a proper copy of the DataFrame using
+    the most appropriate method for each DataFrame type.
+    """
+    # Try standard copy methods first
+    if hasattr(df, "copy") and callable(getattr(df, "copy")):
+        try:
+            return df.copy()
+        except Exception:
+            pass
+
+    if hasattr(df, "clone") and callable(getattr(df, "clone")):
+        try:
+            return df.clone()
+        except Exception:
+            pass
+
+    # Try the select('*') approach for DataFrames that support it
+    # This works well for PySpark and other SQL-like DataFrames
+    if hasattr(df, "select") and callable(getattr(df, "select")):
+        try:
+            return df.select("*")
+        except Exception:
+            pass
+
+    # For DataFrames that can't be copied, return original
+    # This provides some protection while avoiding crashes
+    try:
+        import copy
+
+        return copy.deepcopy(df)
+    except Exception:  # pragma: no cover
+        # If all else fails, return the original DataFrame
+        # This is better than crashing the validation
+        return df  # pragma: no cover
 
 
 def _convert_to_narwhals(df: FrameT) -> nw.DataFrame:
@@ -509,326 +586,6 @@ def _check_invalid_fields(fields: list[str], valid_fields: list[str]):
     for field in fields:
         if field not in valid_fields:
             raise ValueError(f"Invalid field: {field}")
-
-
-def get_api_details(module, exported_list):
-    """
-    Retrieve the signatures and docstrings of the functions/classes in the exported list.
-
-    Parameters
-    ----------
-    module : module
-        The module from which to retrieve the functions/classes.
-    exported_list : list
-        A list of function/class names as strings.
-
-    Returns
-    -------
-    str
-        A string containing the combined class name, signature, and docstring.
-    """
-    api_text = ""
-
-    for fn in exported_list:
-        # Split the attribute path to handle nested attributes
-        parts = fn.split(".")
-        obj = module
-        for part in parts:
-            obj = getattr(obj, part)
-
-        # Get the name of the object
-        obj_name = obj.__name__
-
-        # Get the function signature
-        sig = inspect.signature(obj)
-
-        # Get the docstring
-        doc = obj.__doc__
-
-        # Combine the class name, signature, and docstring
-        api_text += f"{obj_name}{sig}\n{doc}\n\n"
-
-    return api_text
-
-
-def _get_api_text() -> str:
-    """
-    Get the API documentation for the Pointblank library.
-
-    Returns
-    -------
-    str
-        The API documentation for the Pointblank library.
-    """
-
-    import pointblank
-
-    sep_line = "-" * 70
-
-    api_text = (
-        f"{sep_line}\nThis is the API documentation for the Pointblank library.\n{sep_line}\n\n"
-    )
-
-    #
-    # Lists of exported functions and methods in different families
-    #
-
-    validate_exported = [
-        "Validate",
-        "Thresholds",
-        "Actions",
-        "FinalActions",
-        "Schema",
-        "DraftValidation",
-    ]
-
-    val_steps_exported = [
-        "Validate.col_vals_gt",
-        "Validate.col_vals_lt",
-        "Validate.col_vals_ge",
-        "Validate.col_vals_le",
-        "Validate.col_vals_eq",
-        "Validate.col_vals_ne",
-        "Validate.col_vals_between",
-        "Validate.col_vals_outside",
-        "Validate.col_vals_in_set",
-        "Validate.col_vals_not_in_set",
-        "Validate.col_vals_null",
-        "Validate.col_vals_not_null",
-        "Validate.col_vals_regex",
-        "Validate.col_vals_expr",
-        "Validate.col_exists",
-        "Validate.rows_distinct",
-        "Validate.rows_complete",
-        "Validate.col_schema_match",
-        "Validate.row_count_match",
-        "Validate.col_count_match",
-        "Validate.conjointly",
-        "Validate.specially",
-    ]
-
-    column_selection_exported = [
-        "col",
-        "starts_with",
-        "ends_with",
-        "contains",
-        "matches",
-        "everything",
-        "first_n",
-        "last_n",
-        "expr_col",
-    ]
-
-    interrogation_exported = [
-        "Validate.interrogate",
-        "Validate.get_tabular_report",
-        "Validate.get_step_report",
-        "Validate.get_json_report",
-        "Validate.get_sundered_data",
-        "Validate.get_data_extracts",
-        "Validate.all_passed",
-        "Validate.assert_passing",
-        "Validate.assert_below_threshold",
-        "Validate.above_threshold",
-        "Validate.n",
-        "Validate.n_passed",
-        "Validate.n_failed",
-        "Validate.f_passed",
-        "Validate.f_failed",
-        "Validate.warning",
-        "Validate.error",
-        "Validate.critical",
-    ]
-
-    inspect_exported = [
-        "DataScan",
-        "preview",
-        "col_summary_tbl",
-        "missing_vals_tbl",
-        "assistant",
-        "load_dataset",
-        "get_data_path",
-    ]
-
-    utility_exported = [
-        "get_column_count",
-        "get_row_count",
-        "get_action_metadata",
-        "get_validation_summary",
-        "config",
-    ]
-
-    prebuilt_actions_exported = [
-        "send_slack_notification",
-    ]
-
-    validate_desc = """When peforming data validation, you'll need the `Validate` class to get the
-process started. It's given the target table and you can optionally provide some metadata and/or
-failure thresholds (using the `Thresholds` class or through shorthands for this task). The
-`Validate` class has numerous methods for defining validation steps and for obtaining
-post-interrogation metrics and data."""
-
-    val_steps_desc = """Validation steps can be thought of as sequential validations on the target
-data. We call `Validate`'s validation methods to build up a validation plan: a collection of steps
-that, in the aggregate, provides good validation coverage."""
-
-    column_selection_desc = """A flexible way to select columns for validation is to use the `col()`
-function along with column selection helper functions. A combination of `col()` + `starts_with()`,
-`matches()`, etc., allows for the selection of multiple target columns (mapping a validation across
-many steps). Furthermore, the `col()` function can be used to declare a comparison column (e.g.,
-for the `value=` argument in many `col_vals_*()` methods) when you can't use a fixed value
-for comparison."""
-
-    interrogation_desc = """The validation plan is put into action when `interrogate()` is called.
-The workflow for performing a comprehensive validation is then: (1) `Validate()`, (2) adding
-validation steps, (3) `interrogate()`. After interrogation of the data, we can view a validation
-report table (by printing the object or using `get_tabular_report()`), extract key metrics, or we
-can split the data based on the validation results (with `get_sundered_data()`)."""
-
-    inspect_desc = """The *Inspection and Assistance* group contains functions that are helpful for
-getting to grips on a new data table. Use the `DataScan` class to get a quick overview of the data,
-`preview()` to see the first and last few rows of a table, `col_summary_tbl()` for a column-level
-summary of a table, `missing_vals_tbl()` to see where there are missing values in a table, and
-`get_column_count()`/`get_row_count()` to get the number of columns and rows in a table. Several
-datasets included in the package can be accessed via the `load_dataset()` function. Finally, the
-`config()` utility lets us set global configuration parameters. Want to chat with an assistant? Use
-the `assistant()` function to get help with Pointblank."""
-
-    utility_desc = """The Utility Functions group contains functions that are useful for accessing
-metadata about the target data. Use `get_column_count()` or `get_row_count()` to get the number of
-columns or rows in a table. The `get_action_metadata()` function is useful when building custom
-actions since it returns metadata about the validation step that's triggering the action. Lastly,
-the `config()` utility lets us set global configuration parameters."""
-
-    prebuilt_actions_desc = """The Prebuilt Actions group contains a function that can be used to
-send a Slack notification when validation steps exceed failure threshold levels or just to provide a
-summary of the validation results, including the status, number of steps, passing and failing steps,
-table information, and timing details."""
-
-    #
-    # Add headings (`*_desc` text) and API details for each family of functions/methods
-    #
-
-    api_text += f"""\n## The Validate family\n\n{validate_desc}\n\n"""
-    api_text += get_api_details(module=pointblank, exported_list=validate_exported)
-
-    api_text += f"""\n## The Validation Steps family\n\n{val_steps_desc}\n\n"""
-    api_text += get_api_details(module=pointblank, exported_list=val_steps_exported)
-
-    api_text += f"""\n## The Column Selection family\n\n{column_selection_desc}\n\n"""
-    api_text += get_api_details(module=pointblank, exported_list=column_selection_exported)
-
-    api_text += f"""\n## The Interrogation and Reporting family\n\n{interrogation_desc}\n\n"""
-    api_text += get_api_details(module=pointblank, exported_list=interrogation_exported)
-
-    api_text += f"""\n## The Inspection and Assistance family\n\n{inspect_desc}\n\n"""
-    api_text += get_api_details(module=pointblank, exported_list=inspect_exported)
-
-    api_text += f"""\n## The Utility Functions family\n\n{utility_desc}\n\n"""
-    api_text += get_api_details(module=pointblank, exported_list=utility_exported)
-
-    api_text += f"""\n## The Prebuilt Actions family\n\n{prebuilt_actions_desc}\n\n"""
-    api_text += get_api_details(module=pointblank, exported_list=prebuilt_actions_exported)
-
-    # Modify language syntax in all code cells
-    api_text = api_text.replace("{python}", "python")
-
-    # Remove code cells that contain `#| echo: false` (i.e., don't display the code)
-    api_text = re.sub(r"```python\n\s*.*\n\s*.*\n.*\n.*\n.*```\n\s*", "", api_text)
-
-    return api_text
-
-
-def _get_examples_text() -> str:
-    """
-    Get the examples for the Pointblank library. These examples are extracted from the Quarto
-    documents in the `docs/demos` directory.
-
-    Returns
-    -------
-    str
-        The examples for the Pointblank library.
-    """
-
-    sep_line = "-" * 70
-
-    examples_text = (
-        f"{sep_line}\nThis is a set of examples for the Pointblank library.\n{sep_line}\n\n"
-    )
-
-    # A large set of examples is available in the docs/demos directory, and each of the
-    # subdirectories contains a different example (in the form of a Quarto document)
-
-    example_dirs = [
-        "01-starter",
-        "02-advanced",
-        "03-data-extracts",
-        "04-sundered-data",
-        "05-step-report-column-check",
-        "06-step-report-schema-check",
-        "apply-checks-to-several-columns",
-        "check-row-column-counts",
-        "checks-for-missing",
-        "col-vals-custom-expr",
-        "column-selector-functions",
-        "comparisons-across-columns",
-        "expect-no-duplicate-rows",
-        "expect-no-duplicate-values",
-        "expect-text-pattern",
-        "failure-thresholds",
-        "mutate-table-in-step",
-        "numeric-comparisons",
-        "schema-check",
-        "set-membership",
-        "using-parquet-data",
-    ]
-
-    for example_dir in example_dirs:
-        link = f"https://posit-dev.github.io/pointblank/demos/{example_dir}/"
-
-        # Read in the index.qmd file for each example
-        with open(f"docs/demos/{example_dir}/index.qmd", "r") as f:
-            example_text = f.read()
-
-            # Remove the first eight lines of the example text (contains the YAML front matter)
-            example_text = "\n".join(example_text.split("\n")[8:])
-
-            # Extract the title of the example (the line beginning with `###`)
-            title = re.search(r"### (.*)", example_text).group(1)
-
-            # The next line with text is the short description of the example
-            desc = re.search(r"(.*)\.", example_text).group(1)
-
-            # Get all of the Python code blocks in the example
-            # these can be identified as starting with ```python and ending with ```
-            code_blocks = re.findall(r"```python\n(.*?)```", example_text, re.DOTALL)
-
-            # Wrap each code block with a leading ```python and trailing ```
-            code_blocks = [f"```python\n{code}```" for code in code_blocks]
-
-            # Collapse all code blocks into a single string
-            code_text = "\n\n".join(code_blocks)
-
-            # Add the example title, description, and code to the examples text
-            examples_text += f"### {title} ({link})\n\n{desc}\n\n{code_text}\n\n"
-
-    return examples_text
-
-
-def _get_api_and_examples_text() -> str:
-    """
-    Get the combined API and examples text for the Pointblank library.
-
-    Returns
-    -------
-    str
-        The combined API and examples text for the Pointblank library.
-    """
-
-    api_text = _get_api_text()
-    examples_text = _get_examples_text()
-
-    return f"{api_text}\n\n{examples_text}"
 
 
 def _format_to_integer_value(x: int | float, locale: str = "en") -> str:

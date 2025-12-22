@@ -3,6 +3,7 @@ title: Overview
 jupyter: python3
 toc-expand: 2
 html-table-processing: none
+bread-crumbs: true
 ---
 
 ```{python}
@@ -97,6 +98,13 @@ original dataset:
 ```{python}
 import polars as pl
 
+# Define preprocessing functions for `pre=` parameters
+def double_column_a(df):
+    return df.with_columns(pl.col("a") * 2)
+
+def square_column_c(df):
+    return df.with_columns(pl.col("c").pow(2))
+
 (
     pb.Validate(
         data=pb.load_dataset(dataset="small_table", tbl_type="polars"),
@@ -106,17 +114,13 @@ import polars as pl
         columns="a", value=5,
 
         # Apply transformation before validation ---
-        pre=lambda df: df.with_columns(
-            pl.col("a") * 2  # Double values before checking
-        )
+        pre=double_column_a  # Double values before checking
     )
     .col_vals_lt(
         columns="c", value=100,
 
         # Apply more complex transformation ---
-        pre=lambda df: df.with_columns(
-            pl.col("c").pow(2)  # Square values before checking
-        )
+        pre=square_column_c  # Square values before checking
     )
     .interrogate()
 )

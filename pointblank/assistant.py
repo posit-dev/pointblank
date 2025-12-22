@@ -55,12 +55,13 @@ def assistant(
     ----------
     model
         The model to be used. This should be in the form of `provider:model` (e.g.,
-        `"anthropic:claude-3-5-sonnet-latest"`). Supported providers are `"anthropic"`, `"openai"`,
+        `"anthropic:claude-sonnet-4-5"`). Supported providers are `"anthropic"`, `"openai"`,
         `"ollama"`, and `"bedrock"`.
     data
         An optional data table to focus on during discussion with the PbA, which could be a
-        DataFrame object or an Ibis table object. Read the *Supported Input Table Types* section for
-        details on the supported table types.
+        DataFrame object, an Ibis table object, a CSV file path, a Parquet file path, or a database
+        connection string. Read the *Supported Input Table Types* section for details on the
+        supported table types.
     tbl_name : str, optional
         The name of the data table. This is optional and is only used to provide a more detailed
         prompt to the PbA.
@@ -137,16 +138,29 @@ def assistant(
 
     - Polars DataFrame (`"polars"`)
     - Pandas DataFrame (`"pandas"`)
+    - PySpark table (`"pyspark"`)
     - DuckDB table (`"duckdb"`)*
     - MySQL table (`"mysql"`)*
     - PostgreSQL table (`"postgresql"`)*
     - SQLite table (`"sqlite"`)*
+    - Microsoft SQL Server table (`"mssql"`)*
+    - Snowflake table (`"snowflake"`)*
+    - Databricks table (`"databricks"`)*
+    - BigQuery table (`"bigquery"`)*
     - Parquet table (`"parquet"`)*
+    - CSV files (string path or `pathlib.Path` object with `.csv` extension)
+    - Parquet files (string path, `pathlib.Path` object, glob pattern, directory with `.parquet`
+    extension, or partitioned dataset)
+    - Database connection strings (URI format with optional table specification)
 
     The table types marked with an asterisk need to be prepared as Ibis tables (with type of
-    `ibis.expr.types.relations.Table`). Furthermore, using `preview()` with these types of tables
+    `ibis.expr.types.relations.Table`). Furthermore, using `assistant()` with these types of tables
     requires the Ibis library (`v9.5.0` or above) to be installed. If the input table is a Polars or
     Pandas DataFrame, the availability of Ibis is not needed.
+
+    To use a CSV file, ensure that a string or `pathlib.Path` object with a `.csv` extension is
+    provided. The file will be automatically detected and loaded using the best available DataFrame
+    library. The loading preference is Polars first, then Pandas as a fallback.
     """
 
     # Check that the chatlas package is installed
@@ -174,6 +188,12 @@ def assistant(
 
     # If a dataset is provided, generate a table summary in JSON format
     if data is not None:
+        # Import processing functions from validate module
+        from pointblank.validate import _process_data
+
+        # Process input data to handle different data source types
+        data = _process_data(data)
+
         scan = DataScan(data=data)
 
         tbl_type: str = scan.profile.implementation.name.lower()

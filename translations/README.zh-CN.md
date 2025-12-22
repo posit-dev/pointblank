@@ -2,7 +2,7 @@
 
 <a href="https://posit-dev.github.io/pointblank/"><img src="https://posit-dev.github.io/pointblank/assets/pointblank_logo.svg" width="75%"/></a>
 
-_数据验证，既美观又强大_
+_用于评估和监控数据质量的数据验证工具包_
 
 [![Python Versions](https://img.shields.io/pypi/pyversions/pointblank.svg)](https://pypi.python.org/pypi/pointblank)
 [![PyPI](https://img.shields.io/pypi/v/pointblank)](https://pypi.org/project/pointblank/#history)
@@ -35,13 +35,61 @@ _数据验证，既美观又强大_
    <a href="README.ar.md">العربية</a>
 </div>
 
-## Pointblank 是什么？
+Pointblank 采用了不同的数据质量方法。它不必是一项繁琐的技术任务。相反，它可以成为一个专注于团队成员之间清晰沟通的过程。虽然其他验证库只专注于捕获错误，但 Pointblank 在**发现问题和分享见解**方面都表现出色。我们美观、可定制的报告将验证结果转化为与利益相关者的对话，使数据质量问题对您的整个团队来说立即可理解和可操作。
 
-Pointblank 是一个强大而优雅的 Python 数据验证框架，它改变了您确保数据质量的方式。通过其直观、可链接的 API，您可以快速验证您的数据是否符合全面的质量检查标准，并通过精美、交互式的报告可视化结果，使数据问题能够立即采取行动。
+**几分钟内开始，而不是几小时。** Pointblank 的 AI 驱动的 [`DraftValidation`](https://posit-dev.github.io/pointblank/user-guide/draft-validation.html) 功能分析您的数据并自动建议智能验证规则。因此无需盯着空白的验证脚本想知道从哪里开始。Pointblank 可以启动您的数据质量之旅，让您专注于最重要的事情。
 
-无论您是数据科学家、数据工程师还是分析师，Pointblank 都可以帮助您在数据质量问题影响您的分析或下游系统之前捕获它们。
+无论您是需要快速传达数据质量发现的数据科学家、构建稳健管道的数据工程师，还是向业务利益相关者展示数据质量结果的分析师，Pointblank 都能帮助您将数据质量从事后想法转变为竞争优势。
 
-## 30 秒内快速入门
+## AI 驱动的验证起草入门
+
+`DraftValidation` 类使用 LLM 来分析您的数据并生成具有智能建议的完整验证计划。这可以帮助您快速开始数据验证或启动新项目。
+
+```python
+import pointblank as pb
+
+# 加载您的数据
+data = pb.load_dataset("game_revenue")              # 示例数据集
+
+# 使用 DraftValidation 生成验证计划
+pb.DraftValidation(data=data, model="anthropic:claude-sonnet-4-5")
+```
+
+输出是基于您的数据的具有智能建议的完整验证计划：
+
+```python
+import pointblank as pb
+
+# 验证计划
+validation = (
+    pb.Validate(
+        data=data,
+        label="Draft Validation",
+        thresholds=pb.Thresholds(warning=0.10, error=0.25, critical=0.35)
+    )
+    .col_vals_in_set(columns="item_type", set=["iap", "ad"])
+    .col_vals_gt(columns="item_revenue", value=0)
+    .col_vals_between(columns="session_duration", left=3.2, right=41.0)
+    .col_count_match(count=11)
+    .row_count_match(count=2000)
+    .rows_distinct()
+    .interrogate()
+)
+
+validation
+```
+
+<div align="center">
+<img src="https://posit-dev.github.io/pointblank/assets/pointblank-draft-validation-report.png" width="800px">
+</div>
+
+<br>
+
+根据您的需要复制、粘贴和自定义生成的验证计划。
+
+## 可链接的验证 API
+
+Pointblank 的可链接 API 使验证变得简单易读。相同的模式始终适用：(1) 从 `Validate` 开始，(2) 添加验证步骤，(3) 以 `interrogate()` 结束。
 
 ```python
 import pointblank as pb
@@ -67,13 +115,21 @@ validation
 
 <br>
 
+一旦您拥有已询问的 `validation` 对象，您就可以利用各种方法来提取见解，例如：
+
+- 获取单个步骤的详细报告以查看出了什么问题
+- 根据验证结果过滤表格
+- 提取有问题的数据进行调试
+
+<br>
+
 为什么选择 Pointblank？
 
-- **与现有技术栈无缝集成** - 与 Polars、Pandas、DuckDB、MySQL、PostgreSQL、SQLite、Parquet、PySpark、Snowflake 等无缝集成！
-- **美观、交互式报告** - 清晰明了的验证结果，突出问题并帮助传达数据质量
-- **可组合的验证管道** - 将验证步骤链接成完整的数据质量工作流
-- **基于阈值的警报** - 设置"警告"、"错误"和"严重"阈值，配合自定义操作
-- **实用的输出** - 使用验证结果过滤表格、提取有问题的数据或触发下游流程
+- **与现有技术栈无缝集成**: 与 Polars、Pandas、DuckDB、MySQL、PostgreSQL、SQLite、Parquet、PySpark、Snowflake 等无缝集成！
+- **美观、交互式报告**: 清晰明了的验证结果，突出问题并帮助传达数据质量
+- **可组合的验证管道**: 将验证步骤链接成完整的数据质量工作流
+- **基于阈值的警报**: 设置"警告"、"错误"和"严重"阈值，配合自定义操作
+- **实用的输出**: 使用验证结果过滤表格、提取有问题的数据或触发下游流程
 
 ## 实际应用示例
 
@@ -144,14 +200,113 @@ validation.get_step_report(i=3).show("browser")  # 获取步骤 3 的失败记�
 
 <br>
 
-## Pointblank 的独特功能
+## YAML 配置
 
-- **完整的验证工作流** - 在单个管道中从数据访问到验证再到报告
-- **为协作而构建** - 通过精美的交互式报告与同事分享结果
-- **实用的输出** - 获取您所需的内容：计数、提取、摘要或完整报告
-- **灵活部署** - 可用于笔记本、脚本或数据管道
-- **可定制** - 根据您的特定需求定制验证步骤和报告
-- **国际化** - 报告可以用超过 20 种语言生成，包括英语、西班牙语、法语和德语
+对于需要可移植、版本控制的验证工作流的团队，Pointblank 支持 YAML 配置文件。这使得在不同环境和团队成员之间轻松共享验证逻辑，确保每个人都在同一页面上。
+
+**validation.yaml**
+
+```yaml
+validate:
+  data: small_table
+  tbl_name: "small_table"
+  label: "入门验证"
+
+steps:
+  - col_vals_gt:
+      columns: "d"
+      value: 100
+  - col_vals_le:
+      columns: "c"
+      value: 5
+  - col_exists:
+      columns: ["date", "date_time"]
+```
+
+**执行 YAML 验证**
+
+```python
+import pointblank as pb
+
+# 从 YAML 配置运行验证
+validation = pb.yaml_interrogate("validation.yaml")
+
+# 获取结果，就像任何其他验证一样
+validation.get_tabular_report().show()
+```
+
+这种方法非常适合：
+
+- **CI/CD 管道**: 将验证规则与代码一起存储
+- **团队协作**: 以可读格式共享验证逻辑
+- **环境一致性**: 在开发、测试和生产环境中使用相同的验证
+- **文档**: YAML 文件作为数据质量要求的活文档
+
+## 命令行界面 (CLI)
+
+Pointblank 包含一个强大的 CLI 工具称为 `pb`，让您可以直接从命令行运行数据验证工作流。非常适合 CI/CD 管道、定时数据质量检查或快速验证任务。
+
+<div align="center">
+<img src="https://posit-dev.github.io/pointblank/assets/vhs/cli-complete-workflow.gif" width="800px">
+</div>
+
+**探索您的数据**
+
+```bash
+# 快速预览您的数据
+pb preview small_table
+
+# 从 GitHub URL 预览数据
+pb preview "https://github.com/user/repo/blob/main/data.csv"
+
+# 检查 Parquet 文件中的缺失值
+pb missing data.parquet
+
+# 从数据库连接生成列摘要
+pb scan "duckdb:///data/sales.ddb::customers"
+```
+
+**运行基本验证**
+
+```bash
+# 从 YAML 配置文件运行验证
+pb run validation.yaml
+
+# 从 Python 文件运行验证
+pb run validation.py
+
+# 检查重复行
+pb validate small_table --check rows-distinct
+
+# 直接从 GitHub 验证数据
+pb validate "https://github.com/user/repo/blob/main/sales.csv" --check col-vals-not-null --column customer_id
+
+# 验证 Parquet 数据集中没有空值
+pb validate "data/*.parquet" --check col-vals-not-null --column a
+
+# 提取失败数据进行调试
+pb validate small_table --check col-vals-gt --column a --value 5 --show-extract
+```
+
+**与 CI/CD 集成**
+
+```bash
+# 在单行验证中使用退出代码进行自动化（0 = 通过，1 = 失败）
+pb validate small_table --check rows-distinct --exit-code
+
+# 使用退出代码运行验证工作流
+pb run validation.yaml --exit-code
+pb run validation.py --exit-code
+```
+
+## Pointblank 的突出特点
+
+- **完整的验证工作流**: 在单个管道中从数据访问到验证再到报告
+- **为协作而构建**: 通过精美的交互式报告与同事分享结果
+- **实用的输出**: 获取您所需的内容：计数、提取、摘要或完整报告
+- **灵活部署**: 可用于笔记本、脚本或数据管道
+- **可定制**: 根据您的特定需求定制验证步骤和报告
+- **国际化**: 报告可以用 40 种语言生成，包括英语、西班牙语、法语和德语
 
 ## 文档和示例
 

@@ -1,12 +1,17 @@
+> [!TIP]
+> **📺 Featured Talk: ['Making Things Nice in Python'](https://www.youtube.com/watch?v=J6e2BKjHyPg)**
+>
+> Discover how Pointblank and Great Tables (used in this library) prioritize user experience in Python package design. I go over why convenient options, extensive documentation, and thoughtful API decisions is better for everyone (even when they challenge conventional Python patterns/practices).
+
 <div align="center">
 
 <a href="https://posit-dev.github.io/pointblank/"><img src="https://posit-dev.github.io/pointblank/assets/pointblank_logo.svg" width="85%"/></a>
 
-_Data validation made beautiful and powerful_
+_Data validation toolkit for assessing and monitoring data quality._
 
 [![Python Versions](https://img.shields.io/pypi/pyversions/pointblank.svg)](https://pypi.python.org/pypi/pointblank)
 [![PyPI](https://img.shields.io/pypi/v/pointblank)](https://pypi.org/project/pointblank/#history)
-[![PyPI Downloads](https://img.shields.io/pypi/dm/pointblank)](https://pypistats.org/packages/pointblank)
+[![PyPI Downloads](https://static.pepy.tech/badge/pointblank)](https://pepy.tech/projects/pointblank)
 [![Conda Version](https://img.shields.io/conda/vn/conda-forge/pointblank.svg)](https://anaconda.org/conda-forge/pointblank)
 [![License](https://img.shields.io/github/license/posit-dev/pointblank)](https://img.shields.io/github/license/posit-dev/pointblank)
 
@@ -36,13 +41,63 @@ _Data validation made beautiful and powerful_
    <a href="translations/README.ar.md">العربية</a>
 </div>
 
-## What is Pointblank?
+<br>
 
-Pointblank is a powerful, yet elegant data validation framework for Python that transforms how you ensure data quality. With its intuitive, chainable API, you can quickly validate your data against comprehensive quality checks and visualize results through stunning, interactive reports that make data issues immediately actionable.
+Pointblank takes a different approach to data quality. It doesn't have to be a tedious technical task. Rather, it can become a process focused on clear communication between team members. While other validation libraries focus solely on catching errors, Pointblank is great at both **finding issues and sharing insights**. Our beautiful, customizable reports turn validation results into conversations with stakeholders, making data quality issues immediately understandable and actionable for everyone on your team.
 
-Whether you're a data scientist, data engineer, or analyst, Pointblank helps you catch data quality issues before they impact your analyses or downstream systems.
+**Get started in minutes, not hours.** Pointblank's AI-powered [`DraftValidation`](https://posit-dev.github.io/pointblank/user-guide/draft-validation.html) feature analyzes your data and suggests intelligent validation rules automatically. So there's no need to stare at an empty validation script wondering where to begin. Pointblank can kickstart your data quality journey so you can focus on what matters most.
 
-## Getting Started in 30 Seconds
+Whether you're a data scientist who needs to quickly communicate data quality findings, a data engineer building robust pipelines, or an analyst presenting data quality results to business stakeholders, Pointblank helps you to turn data quality from an afterthought into a competitive advantage.
+
+## Getting Started with AI-Powered Validation Drafting
+
+The `DraftValidation` class uses LLMs to analyze your data and generate a complete validation plan with intelligent suggestions. This helps you quickly get started with data validation or jumpstart a new project.
+
+```python
+import pointblank as pb
+
+# Load your data
+data = pb.load_dataset("game_revenue")              # A sample dataset
+
+# Use DraftValidation to generate a validation plan
+pb.DraftValidation(data=data, model="anthropic:claude-sonnet-4-5")
+```
+
+The output is a complete validation plan with intelligent suggestions based on your data:
+
+```python
+import pointblank as pb
+
+# The validation plan
+validation = (
+    pb.Validate(
+        data=data,
+        label="Draft Validation",
+        thresholds=pb.Thresholds(warning=0.10, error=0.25, critical=0.35)
+    )
+    .col_vals_in_set(columns="item_type", set=["iap", "ad"])
+    .col_vals_gt(columns="item_revenue", value=0)
+    .col_vals_between(columns="session_duration", left=3.2, right=41.0)
+    .col_count_match(count=11)
+    .row_count_match(count=2000)
+    .rows_distinct()
+    .interrogate()
+)
+
+validation
+```
+
+<div align="center">
+<img src="https://posit-dev.github.io/pointblank/assets/pointblank-draft-validation-report.png" width="800px">
+</div>
+
+<br>
+
+Copy, paste, and customize the generated validation plan for your needs.
+
+## Chainable Validation API
+
+Pointblank's chainable API makes validation simple and readable. The same pattern always applies: (1) start with `Validate`, (2) add validation steps, and (3) finish with `interrogate()`.
 
 ```python
 import pointblank as pb
@@ -68,15 +123,23 @@ validation
 
 <br>
 
+Once you have an interrogated `validation` object, you can leverage a variety of methods to extract insights like:
+
+- getting detailed reports for single steps to see what went wrong
+- filtering tables based on validation results
+- extracting problematic data for debugging
+
 ## Why Choose Pointblank?
 
-- **Works with your existing stack** - Seamlessly integrates with Polars, Pandas, DuckDB, MySQL, PostgreSQL, SQLite, Parquet, PySpark, Snowflake, and more!
-- **Beautiful, interactive reports** - Crystal-clear validation results that highlight issues and help communicate data quality
-- **Composable validation pipeline** - Chain validation steps into a complete data quality workflow
-- **Threshold-based alerts** - Set 'warning', 'error', and 'critical' thresholds with custom actions
-- **Practical outputs** - Use validation results to filter tables, extract problematic data, or trigger downstream processes
+- **Works with your existing stack**: Seamlessly integrates with Polars, Pandas, DuckDB, MySQL, PostgreSQL, SQLite, Parquet, PySpark, Snowflake, and more!
+- **Beautiful, interactive reports**: Crystal-clear validation results that highlight issues and help communicate data quality
+- **Composable validation pipeline**: Chain validation steps into a complete data quality workflow
+- **Threshold-based alerts**: Set 'warning', 'error', and 'critical' thresholds with custom actions
+- **Practical outputs**: Use validation results to filter tables, extract problematic data, or trigger downstream processes
 
-## Real-World Example
+## Production-Ready Validation Pipeline
+
+Here's how Pointblank handles complex, real-world scenarios with advanced features like threshold management, automated alerts, and comprehensive business rule validation:
 
 ```python
 import pointblank as pb
@@ -149,14 +212,156 @@ validation.get_step_report(i=3).show("browser")  # Get failing records from step
 
 <br>
 
+## YAML Configuration
+
+For teams that need portable, version-controlled validation workflows, Pointblank supports YAML configuration files. This makes it easy to share validation logic across different environments and team members, ensuring everyone is on the same page.
+
+**validation.yaml**
+
+```yaml
+validate:
+  data: small_table
+  tbl_name: "small_table"
+  label: "Getting started validation"
+
+steps:
+  - col_vals_gt:
+      columns: "d"
+      value: 100
+  - col_vals_le:
+      columns: "c"
+      value: 5
+  - col_exists:
+      columns: ["date", "date_time"]
+```
+
+**Execute the YAML validation**
+
+```python
+import pointblank as pb
+
+# Run validation from YAML configuration
+validation = pb.yaml_interrogate("validation.yaml")
+
+# Get the results just like any other validation
+validation.get_tabular_report().show()
+```
+
+This approach is suitable for:
+
+- **CI/CD pipelines**: Store validation rules alongside your code
+- **Team collaboration**: Share validation logic in a readable format
+- **Environment consistency**: Use the same validation across dev, staging, and production
+- **Documentation**: YAML files serve as living documentation of your data quality requirements
+
+## Command Line Interface (CLI)
+
+Pointblank includes a powerful CLI utility called `pb` that lets you run data validation workflows directly from the command line. Perfect for CI/CD pipelines, scheduled data quality checks, or quick validation tasks.
+
+<div align="center">
+<img src="https://posit-dev.github.io/pointblank/assets/vhs/cli-complete-workflow.gif" width="100%">
+</div>
+
+**Explore Your Data**
+
+```bash
+# Get a quick preview of your data
+pb preview small_table
+
+# Preview data from GitHub URLs
+pb preview "https://github.com/user/repo/blob/main/data.csv"
+
+# Check for missing values in Parquet files
+pb missing data.parquet
+
+# Generate column summaries from database connections
+pb scan "duckdb:///data/sales.ddb::customers"
+```
+
+**Run Essential Validations**
+
+```bash
+# Run validation from YAML configuration file
+pb run validation.yaml
+
+# Run validation from Python file
+pb run validation.py
+
+# Check for duplicate rows
+pb validate small_table --check rows-distinct
+
+# Validate data directly from GitHub
+pb validate "https://github.com/user/repo/blob/main/sales.csv" --check col-vals-not-null --column customer_id
+
+# Verify no null values in Parquet datasets
+pb validate "data/*.parquet" --check col-vals-not-null --column a
+
+# Extract failing data for debugging
+pb validate small_table --check col-vals-gt --column a --value 5 --show-extract
+```
+
+**Integrate with CI/CD**
+
+```bash
+# Use exit codes for automation in one-liner validations (0 = pass, 1 = fail)
+pb validate small_table --check rows-distinct --exit-code
+
+# Run validation workflows with exit codes
+pb run validation.yaml --exit-code
+pb run validation.py --exit-code
+```
+
+Click the following headings to see some video demonstrations of the CLI:
+
+<details>
+<summary>Getting Started with the Pointblank CLI</summary>
+
+<div align="center">
+<img src="https://posit-dev.github.io/pointblank/assets/vhs/cli-getting-started.gif" width="100%">
+</div>
+
+</details>
+<details>
+<summary>Doing Some Data Exploration</summary>
+
+<div align="center">
+<img src="https://posit-dev.github.io/pointblank/assets/vhs/cli-data-exploration.gif" width="100%">
+</div>
+
+</details>
+<details>
+<summary>Validating Data with the CLI</summary>
+
+<div align="center">
+<img src="https://posit-dev.github.io/pointblank/assets/vhs/cli-essential-validations.gif" width="100%">
+</div>
+
+</details>
+<details>
+<summary>Using Polars in the CLI</summary>
+
+<div align="center">
+<img src="https://posit-dev.github.io/pointblank/assets/vhs/cli-using-polars.gif" width="100%">
+</div>
+
+</details>
+<details>
+<summary>Integrating Pointblank with CI/CD</summary>
+
+<div align="center">
+<img src="https://posit-dev.github.io/pointblank/assets/vhs/cli-cicd-workflows.gif" width="100%">
+</div>
+
+</details>
+
 ## Features That Set Pointblank Apart
 
-- **Complete validation workflow** - From data access to validation to reporting in a single pipeline
-- **Built for collaboration** - Share results with colleagues through beautiful interactive reports
-- **Practical outputs** - Get exactly what you need: counts, extracts, summaries, or full reports
-- **Flexible deployment** - Use in notebooks, scripts, or data pipelines
-- **Customizable** - Tailor validation steps and reporting to your specific needs
-- **Internationalization** - Reports can be generated in over 20 languages, including English, Spanish, French, and German
+- **Complete validation workflow**: From data access to validation to reporting in a single pipeline
+- **Built for collaboration**: Share results with colleagues through beautiful interactive reports
+- **Practical outputs**: Get exactly what you need: counts, extracts, summaries, or full reports
+- **Flexible deployment**: Use in notebooks, scripts, or data pipelines
+- **Customizable**: Tailor validation steps and reporting to your specific needs
+- **Internationalization**: Reports can be generated in 40 languages, including English, Spanish, French, and German
 
 ## Documentation and Examples
 
@@ -215,6 +420,10 @@ There are many ways to contribute to the ongoing development of Pointblank. Some
 
 Please read over the [contributing guidelines](https://github.com/posit-dev/pointblank/blob/main/CONTRIBUTING.md) for
 information on how to get started.
+
+## Pointblank for R
+
+There's also a version of Pointblank for R, which has been around since 2017 and is widely used in the R community. You can find it at https://github.com/rstudio/pointblank.
 
 ## Roadmap
 

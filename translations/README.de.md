@@ -2,7 +2,7 @@
 
 <a href="https://posit-dev.github.io/pointblank/"><img src="https://posit-dev.github.io/pointblank/assets/pointblank_logo.svg" width="75%"/></a>
 
-_Datenvalidierung, schön und leistungsstark_
+_Datenvalidierungs-Toolkit zur Bewertung und Überwachung der Datenqualität_
 
 [![Python Versions](https://img.shields.io/pypi/pyversions/pointblank.svg)](https://pypi.python.org/pypi/pointblank)
 [![PyPI](https://img.shields.io/pypi/v/pointblank)](https://pypi.org/project/pointblank/#history)
@@ -35,13 +35,61 @@ _Datenvalidierung, schön und leistungsstark_
    <a href="README.ar.md">العربية</a>
 </div>
 
-## Was ist Pointblank?
+Pointblank verfolgt einen anderen Ansatz für Datenqualität. Es muss keine mühsame technische Aufgabe sein. Vielmehr kann es zu einem Prozess werden, der auf klare Kommunikation zwischen Teammitgliedern fokussiert ist. Während andere Validierungsbibliotheken sich ausschließlich auf das Erkennen von Fehlern konzentrieren, ist Pointblank hervorragend sowohl im **Finden von Problemen als auch im Teilen von Erkenntnissen**. Unsere schönen, anpassbaren Berichte verwandeln Validierungsergebnisse in Gespräche mit Stakeholdern und machen Datenqualitätsprobleme für Ihr gesamtes Team sofort verständlich und handhabbar.
 
-Pointblank ist ein leistungsstarkes und zugleich elegantes Datenvalidierungsframework für Python, das die Art und Weise verändert, wie Sie Datenqualität sicherstellen. Mit seiner intuitiven, verkettbaren API können Sie Ihre Daten schnell gegen umfassende Qualitätsprüfungen validieren und die Ergebnisse durch beeindruckende, interaktive Berichte visualisieren, die Datenprobleme sofort handhabbar machen.
+**Starten Sie in Minuten, nicht in Stunden.** Pointblanks KI-gestützte [`DraftValidation`](https://posit-dev.github.io/pointblank/user-guide/draft-validation.html)-Funktion analysiert Ihre Daten und schlägt automatisch intelligente Validierungsregeln vor. So müssen Sie nicht mehr auf ein leeres Validierungsskript starren und sich fragen, wo Sie anfangen sollen. Pointblank kann Ihre Datenqualitäts-Reise starten, damit Sie sich auf das Wesentliche konzentrieren können.
 
-Ob Sie Data Scientist, Data Engineer oder Analyst sind - Pointblank hilft Ihnen dabei, Datenqualitätsprobleme zu erkennen, bevor sie Ihre Analysen oder nachgelagerte Systeme beeinträchtigen.
+Ob Sie ein Data Scientist sind, der schnell Datenqualitätsergebnisse kommunizieren muss, ein Data Engineer, der robuste Pipelines erstellt, oder ein Analyst, der Datenqualitätsergebnisse an Business-Stakeholder präsentiert – Pointblank hilft Ihnen dabei, Datenqualität von einem Nachgedanken zu einem Wettbewerbsvorteil zu machen.
 
-## In 30 Sekunden loslegen
+## Erste Schritte mit KI-gestützter Validierungserstellung
+
+Die `DraftValidation`-Klasse verwendet LLMs, um Ihre Daten zu analysieren und einen vollständigen Validierungsplan mit intelligenten Vorschlägen zu generieren. Dies hilft Ihnen, schnell mit der Datenvalidierung zu beginnen oder ein neues Projekt zu starten.
+
+```python
+import pointblank as pb
+
+# Laden Sie Ihre Daten
+data = pb.load_dataset("game_revenue")              # Ein Beispieldatensatz
+
+# Verwenden Sie DraftValidation, um einen Validierungsplan zu generieren
+pb.DraftValidation(data=data, model="anthropic:claude-sonnet-4-5")
+```
+
+Die Ausgabe ist ein vollständiger Validierungsplan mit intelligenten Vorschlägen basierend auf Ihren Daten:
+
+```python
+import pointblank as pb
+
+# Der Validierungsplan
+validation = (
+    pb.Validate(
+        data=data,
+        label="Draft Validation",
+        thresholds=pb.Thresholds(warning=0.10, error=0.25, critical=0.35)
+    )
+    .col_vals_in_set(columns="item_type", set=["iap", "ad"])
+    .col_vals_gt(columns="item_revenue", value=0)
+    .col_vals_between(columns="session_duration", left=3.2, right=41.0)
+    .col_count_match(count=11)
+    .row_count_match(count=2000)
+    .rows_distinct()
+    .interrogate()
+)
+
+validation
+```
+
+<div align="center">
+<img src="https://posit-dev.github.io/pointblank/assets/pointblank-draft-validation-report.png" width="800px">
+</div>
+
+<br>
+
+Kopieren, einfügen und passen Sie den generierten Validierungsplan an Ihre Bedürfnisse an.
+
+## Verkettbare Validierungs-API
+
+Pointblanks verkettbare API macht Validierung einfach und lesbar. Das gleiche Muster gilt immer: (1) beginnen Sie mit `Validate`, (2) fügen Sie Validierungsschritte hinzu, und (3) beenden Sie mit `interrogate()`.
 
 ```python
 import pointblank as pb
@@ -67,13 +115,19 @@ validation
 
 <br>
 
+Sobald Sie ein interrogiertes `validation`-Objekt haben, können Sie eine Vielzahl von Methoden nutzen, um Erkenntnisse zu extrahieren wie:
+
+- detaillierte Berichte für einzelne Schritte zu erhalten, um zu sehen, was schiefgelaufen ist
+- Tabellen basierend auf Validierungsergebnissen zu filtern
+- problematische Daten für das Debugging zu extrahieren
+
 ## Warum Pointblank wählen?
 
-- **Funktioniert mit Ihrem bestehenden Stack** - Nahtlose Integration mit Polars, Pandas, DuckDB, MySQL, PostgreSQL, SQLite, Parquet, PySpark, Snowflake und mehr!
-- **Schöne, interaktive Berichte** - Kristallklare Validierungsergebnisse, die Probleme hervorheben und die Kommunikation der Datenqualität unterstützen
-- **Komponierbare Validierungs-Pipeline** - Verketten Sie Validierungsschritte zu einem vollständigen Datenqualitäts-Workflow
-- **Schwellenwertbasierte Warnungen** - Setzen Sie 'Warnung', 'Fehler' und 'Kritisch'-Schwellenwerte mit benutzerdefinierten Aktionen
-- **Praktische Ausgaben** - Nutzen Sie Validierungsergebnisse, um Tabellen zu filtern, problematische Daten zu extrahieren oder nachgelagerte Prozesse auszulösen
+- **Funktioniert mit Ihrem bestehenden Stack**: Nahtlose Integration mit Polars, Pandas, DuckDB, MySQL, PostgreSQL, SQLite, Parquet, PySpark, Snowflake und mehr!
+- **Schöne, interaktive Berichte**: Kristallklare Validierungsergebnisse, die Probleme hervorheben und die Kommunikation der Datenqualität unterstützen
+- **Komponierbare Validierungs-Pipeline**: Verketten Sie Validierungsschritte zu einem vollständigen Datenqualitäts-Workflow
+- **Schwellenwertbasierte Warnungen**: Setzen Sie 'Warnung', 'Fehler' und 'Kritisch'-Schwellenwerte mit benutzerdefinierten Aktionen
+- **Praktische Ausgaben**: Nutzen Sie Validierungsergebnisse, um Tabellen zu filtern, problematische Daten zu extrahieren oder nachgelagerte Prozesse auszulösen
 
 ## Praxisbeispiel
 
@@ -149,14 +203,113 @@ validation.get_step_report(i=3).show("browser")  # Fehlgeschlagene Datensätze a
 
 <br>
 
+## YAML-Konfiguration
+
+Für Teams, die portable, versionskontrollierte Validierungs-Workflows benötigen, unterstützt Pointblank YAML-Konfigurationsdateien. Dies macht es einfach, Validierungslogik zwischen verschiedenen Umgebungen und Teammitgliedern zu teilen und sicherzustellen, dass alle auf derselben Seite stehen.
+
+**validation.yaml**
+
+```yaml
+validate:
+  data: small_table
+  tbl_name: "small_table"
+  label: "Einstiegs-Validierung"
+
+steps:
+  - col_vals_gt:
+      columns: "d"
+      value: 100
+  - col_vals_le:
+      columns: "c"
+      value: 5
+  - col_exists:
+      columns: ["date", "date_time"]
+```
+
+**YAML-Validierung ausführen**
+
+```python
+import pointblank as pb
+
+# Validierung aus YAML-Konfiguration ausführen
+validation = pb.yaml_interrogate("validation.yaml")
+
+# Ergebnisse wie bei jeder anderen Validierung erhalten
+validation.get_tabular_report().show()
+```
+
+Dieser Ansatz ist perfekt für:
+
+- **CI/CD-Pipelines**: Validierungsregeln zusammen mit Ihrem Code speichern
+- **Team-Zusammenarbeit**: Validierungslogik in lesbarem Format teilen
+- **Umgebungskonsistenz**: Dieselbe Validierung in Entwicklung, Staging und Produktion verwenden
+- **Dokumentation**: YAML-Dateien dienen als lebende Dokumentation Ihrer Datenqualitätsanforderungen
+
+## Kommandozeilenschnittstelle (CLI)
+
+Pointblank enthält ein leistungsstarkes CLI-Dienstprogramm namens `pb`, mit dem Sie Datenvalidierungsworkflows direkt von der Kommandozeile aus ausführen können. Perfekt für CI/CD-Pipelines, geplante Datenqualitätsprüfungen oder schnelle Validierungsaufgaben.
+
+<div align="center">
+<img src="https://posit-dev.github.io/pointblank/assets/vhs/cli-complete-workflow.gif" width="800px">
+</div>
+
+**Erkunden Sie Ihre Daten**
+
+```bash
+# Schnelle Vorschau Ihrer Daten
+pb preview small_table
+
+# Datenvorschau von GitHub-URLs
+pb preview "https://github.com/user/repo/blob/main/data.csv"
+
+# Auf fehlende Werte in Parquet-Dateien prüfen
+pb missing data.parquet
+
+# Spaltenzusammenfassungen aus Datenbankverbindungen generieren
+pb scan "duckdb:///data/sales.ddb::customers"
+```
+
+**Führen Sie grundlegende Validierungen durch**
+
+```bash
+# Validierung aus YAML-Konfigurationsdatei ausführen
+pb run validation.yaml
+
+# Validierung aus Python-Datei ausführen
+pb run validation.py
+
+# Auf doppelte Zeilen prüfen
+pb validate small_table --check rows-distinct
+
+# Daten direkt von GitHub validieren
+pb validate "https://github.com/user/repo/blob/main/sales.csv" --check col-vals-not-null --column customer_id
+
+# Keine Null-Werte in Parquet-Datensätzen verifizieren
+pb validate "data/*.parquet" --check col-vals-not-null --column a
+
+# Fehlerhafte Daten für Debugging extrahieren
+pb validate small_table --check col-vals-gt --column a --value 5 --show-extract
+```
+
+**Integration mit CI/CD**
+
+```bash
+# Exit-Codes für Automatisierung in einzeiligen Validierungen verwenden (0 = Erfolg, 1 = Fehler)
+pb validate small_table --check rows-distinct --exit-code
+
+# Validierungs-Workflows mit Exit-Codes ausführen
+pb run validation.yaml --exit-code
+pb run validation.py --exit-code
+```
+
 ## Funktionen, die Pointblank auszeichnen
 
-- **Vollständiger Validierungs-Workflow** - Von Datenzugriff über Validierung bis hin zur Berichterstattung in einer einzigen Pipeline
-- **Für die Zusammenarbeit konzipiert** - Teilen Sie Ergebnisse mit Kollegen durch schöne interaktive Berichte
-- **Praktische Ausgaben** - Erhalten Sie genau das, was Sie brauchen: Zählungen, Auszüge, Zusammenfassungen oder vollständige Berichte
-- **Flexible Einsatzmöglichkeiten** - Verwenden Sie es in Notebooks, Skripten oder Datenpipelines
-- **Anpassbar** - Passen Sie Validierungsschritte und Berichterstattung an Ihre spezifischen Anforderungen an
-- **Internationalisierung** - Berichte können in über 20 Sprachen generiert werden, darunter Englisch, Spanisch, Französisch und Deutsch
+- **Vollständiger Validierungs-Workflow**: Von Datenzugriff über Validierung bis hin zur Berichterstattung in einer einzigen Pipeline
+- **Für die Zusammenarbeit konzipiert**: Teilen Sie Ergebnisse mit Kollegen durch schöne interaktive Berichte
+- **Praktische Ausgaben**: Erhalten Sie genau das, was Sie brauchen: Zählungen, Auszüge, Zusammenfassungen oder vollständige Berichte
+- **Flexible Einsatzmöglichkeiten**: Verwenden Sie es in Notebooks, Skripten oder Datenpipelines
+- **Anpassbar**: Passen Sie Validierungsschritte und Berichterstattung an Ihre spezifischen Anforderungen an
+- **Internationalisierung**: Berichte können in 40 Sprachen generiert werden, darunter Englisch, Spanisch, Französisch und Deutsch
 
 ## Dokumentation und Beispiele
 

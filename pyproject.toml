@@ -37,29 +37,36 @@ classifiers = [
 dependencies = [
     "commonmark>=0.9.1",
     "importlib-metadata",
-    "great_tables>=0.17.0",
-    "narwhals>=1.41.0",
+    "great_tables>=0.20.0",
+    "narwhals>=2.0.1",
     "typing_extensions>=3.10.0.0",
     "requests>=2.31.0",
+    "click>=8.0.0",
+    "rich>=13.0.0",
+    "pyyaml>=6.0.0",
 ]
 requires-python = ">=3.10"
 
 [project.optional-dependencies]
 pd = ["pandas>=2.2.3"]
-pl = ["polars>=1.24.0"]
+pl = ["polars>=1.33.0"]
+pyspark = ["pyspark==3.5.6"]
 generate = [
     "chatlas>=0.3.0",
     "anthropic[bedrock]>=0.45.2",
     "openai>=1.63.0",
+    "httpx>=0.28.0",
     "shiny>=1.3.0",
 ]
+mcp = ["mcp[cli]>=1.10.1", "fastmcp>=2.11.3", "pytest-asyncio>=1.0.0"]
+
+excel = ["openpyxl>=3.0.0"]
 bigquery = ["ibis-framework[bigquery]>=9.5.0"]
 databricks = ["ibis-framework[databricks]>=9.5.0"]
 duckdb = ["ibis-framework[duckdb]>=9.5.0"]
 mysql = ["ibis-framework[mysql]>=9.5.0"]
 mssql = ["ibis-framework[mssql]>=9.5.0"]
 postgres = ["ibis-framework[postgres]>=9.5.0"]
-pyspark = ["ibis-framework[pyspark]>=9.5.0"]
 snowflake = ["ibis-framework[snowflake]>=9.5.0"]
 sqlite = ["ibis-framework[sqlite]>=9.5.0"]
 docs = [
@@ -69,12 +76,15 @@ docs = [
     "quartodoc>=0.8.1; python_version >= '3.9'",
     "pandas>=2.2.3",
     "polars>=1.17.1",
+    "pyspark==3.5.6",
+    "openpyxl>=3.0.0",
+    "duckdb>=1.2.0,<1.3.3",                      # Pin to stable versions avoiding 1.4.0+ RecordBatchReader issues
 ]
 
 [dependency-groups]
 dev = [
     "chatlas>=0.6.1",
-    "duckdb>=1.1.3",
+    "duckdb>=1.2.0,<1.3.3",                                # Pin to stable versions avoiding 1.4.0+ RecordBatchReader issues
     "griffe==0.38.1",
     "hypothesis>=6.129.2",
     "ibis-framework[duckdb,mysql,postgres,sqlite]>=9.5.0",
@@ -86,20 +96,29 @@ dev = [
     "pre-commit==2.15.0",
     "pyarrow",
     "pyarrow-stubs>=19.4",
-    "pytest>=3",
+    "pyspark==3.5.6",
+    "pytest>=8.4.1",
+    "pytest-asyncio>=1.0.0",
     "pytest-cov",
     "pytest-randomly>=3.16.0",
     "pytest-rerunfailures>=15.0",
     "pytest-snapshot",
     "pytest-xdist>=3.6.1",
+    "pytz>=2025.2",
     "quartodoc>=0.8.1; python_version >= '3.9'",
     "ruff>=0.9.9",
     "shiny>=1.4.0",
+    "openpyxl>=3.0.0",
+    "mcp[cli]>=1.10.1",
+    "fastmcp>=2.10.5",
     "ty>=0.0.1a31",
 ]
 
 [project.urls]
 homepage = "https://github.com/posit-dev/pointblank"
+
+[project.scripts]
+pb = "pointblank.cli:cli"
 
 [tool.pytest.ini_options]
 minversion = "6.0"
@@ -123,3 +142,9 @@ ignore = [
 
 [tool.coverage.report]
 exclude_also = ["if TYPE_CHECKING:"]
+
+[tool.coverage.run]
+omit = [
+    "pointblank/_typing.py",
+    "pointblank/data/validations/preprocessing_functions.py",
+]

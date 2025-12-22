@@ -56,7 +56,9 @@ class DataScan:
     Parameters
     ----------
     data
-        The data to scan and summarize.
+        The data to scan and summarize. This could be a DataFrame object, an Ibis table object,
+        a CSV file path, a Parquet file path, a GitHub URL pointing to a CSV or Parquet file,
+        or a database connection string.
     tbl_name
         Optionally, the name of the table could be provided as `tbl_name`.
 
@@ -122,6 +124,14 @@ class DataScan:
 
     # TODO: This needs to be generically typed at the class level, ie. DataScan[T]
     def __init__(self, data: IntoFrameT, tbl_name: str | None = None) -> None:
+        # Import processing functions from validate module
+        from pointblank.validate import (
+            _process_data,
+        )
+
+        # Process input data to handle different data source types
+        data = _process_data(data)
+
         as_native = nw.from_native(data)
 
         if as_native.implementation.name == "IBIS" and as_native._level == "lazy":
@@ -133,17 +143,17 @@ class DataScan:
             for conv_method in valid_conversion_methods:
                 try:
                     valid_native = getattr(ibis_native, conv_method)()
-                except (NotImplementedError, ImportError, ModuleNotFoundError):
-                    continue
+                except (NotImplementedError, ImportError, ModuleNotFoundError):  # pragma: no cover
+                    continue  # pragma: no cover
                 break
-            else:
+            else:  # pragma: no cover
                 msg = (
                     "To use `ibis` as input, you must have one of arrow, pandas, polars or numpy "
                     "available in the process. Until `ibis` is fully supported by Narwhals, this is "
                     "necessary. Additionally, the data must be collected in order to calculate some "
                     "structural statistics, which may be performance detrimental."
                 )
-                raise ImportError(msg)
+                raise ImportError(msg)  # pragma: no cover
             as_native = nw.from_native(valid_native)
 
         self.nw_data: Frame = nw.from_native(as_native)
@@ -152,14 +162,15 @@ class DataScan:
         self.profile: _DataProfile = self._generate_profile_df()
 
     def _generate_profile_df(self) -> _DataProfile:
-        columns: list[str] = self.nw_data.columns
+        # Get schema and extract all column names from it
+        schema: Mapping[str, Any] = self.nw_data.collect_schema()
+        columns: list[str] = list(schema.keys())
 
         profile = _DataProfile(
             table_name=self.tbl_name,
             columns=columns,
             implementation=self.nw_data.implementation,
         )
-        schema: Mapping[str, Any] = self.nw_data.schema
         for column in columns:
             col_data: DataFrame = self.nw_data.select(column)
 
@@ -514,8 +525,9 @@ def col_summary_tbl(data: FrameT | Any, tbl_name: str | None = None) -> GT:
     Parameters
     ----------
     data
-        The table to summarize, which could be a DataFrame object or an Ibis table object. Read the
-        *Supported Input Table Types* section for details on the supported table types.
+        The table to summarize, which could be a DataFrame object, an Ibis table object, a CSV
+        file path, a Parquet file path, or a database connection string. Read the *Supported Input
+        Table Types* section for details on the supported table types.
     tbl_name
         Optionally, the name of the table could be provided as `tbl_name=`.
 
@@ -535,6 +547,11 @@ def col_summary_tbl(data: FrameT | Any, tbl_name: str | None = None) -> GT:
     - PostgreSQL table (`"postgresql"`)*
     - SQLite table (`"sqlite"`)*
     - Parquet table (`"parquet"`)*
+    - CSV files (string path or `pathlib.Path` object with `.csv` extension)
+    - Parquet files (string path, `pathlib.Path` object, glob pattern, directory with `.parquet`
+    extension, or partitioned dataset)
+    - GitHub URLs (direct links to CSV or Parquet files on GitHub)
+    - Database connection strings (URI format with optional table specification)
 
     The table types marked with an asterisk need to be prepared as Ibis tables (with type of
     `ibis.expr.types.relations.Table`). Furthermore, using `col_summary_tbl()` with these types of
@@ -565,6 +582,12 @@ def col_summary_tbl(data: FrameT | Any, tbl_name: str | None = None) -> GT:
     pb.col_summary_tbl(data=nycflights, tbl_name="nycflights")
     ```
     """
+
+    # Import processing functions from validate module
+    from pointblank.validate import _process_data
+
+    # Process input data to handle different data source types
+    data = _process_data(data)
 
     scanner = DataScan(data=data, tbl_name=tbl_name)
     return scanner.get_tabular_report()

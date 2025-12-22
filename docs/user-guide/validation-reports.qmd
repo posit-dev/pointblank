@@ -1,0 +1,560 @@
+---
+title: "Validation Reports"
+jupyter: python3
+toc-expand: 2
+html-table-processing: none
+bread-crumbs: true
+---
+
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+```
+
+After interrogating your data with a validation plan, Pointblank automatically generates a
+*validation report*. That tabular report comprehensively summarizes the results of all validation
+steps. It'll be your primary tool for understanding data quality at a glance, identifying issues,
+and communicating results to stakeholders.
+
+Validation reports are [Great Tables](https://github.com/posit-dev/great-tables) objects that
+provide rich information about each validation step. It includes: identifying information for the
+step, pass/fail statistics, threshold exceedances, and visual status indicators. The report makes it
+easy to quickly assess overall data quality and pinpoint specific areas that need attention.
+
+## Viewing the Validation Report
+
+The most straightforward way to view a validation report is to simply print the `Validate` object
+after calling `interrogate()`:
+
+```{python}
+import pointblank as pb
+import polars as pl
+
+# Sample data
+data = pl.DataFrame({
+    "id": range(1, 11),
+    "value": [120, 85, 47, 210, 30, 155, 175, 95, 205, 140],
+    "category": ["A", "B", "C", "A", "D", "B", "A", "E", "A", "C"],
+    "ratio": [0.5, 0.7, 0.3, 1.2, 0.8, 0.9, 0.4, 1.5, 0.6, 0.2],
+})
+
+# Create and interrogate a validation
+validation = (
+    pb.Validate(data=data, tbl_name="sales_data")
+    .col_vals_gt(columns="value", value=50, brief=True)
+    .col_vals_in_set(columns="category", set=["A", "B", "C"], brief=True)
+    .col_exists(columns=["id", "value"], brief=True)
+    .interrogate()
+)
+
+# Display the validation report
+validation
+```
+
+In a notebook or interactive environment, simply typing the validation object name displays the
+report automatically. In a script or REPL, you might need to explicitly call
+`validation.get_tabular_report().show()` to display the table.
+
+::: {.callout-note}
+You can display a validation report even before calling `interrogate()`. The report will show your
+validation plan with all the steps you've defined, but it won't contain any interrogation results.
+Additionally, validation steps that use column selection patterns (like validating multiple columns
+at once) won't be expanded into individual rows yet, as that expansion happens during interrogation.
+:::
+
+## Understanding Report Components
+
+The validation report table consists of several key components that work together to provide a
+complete picture of your data quality:
+
+#### Report Header
+
+The report header (title and subtitle area) contains important metadata about the validation:
+
+- **Title**: by default, shows "Pointblank Validation" but can be customized
+- **Label**: your custom label for the validation (if provided via the `label=` parameter)
+- **Table Information**: the table name and type (Polars, Pandas, DuckDB, etc.)
+- **Thresholds**: the warning, error, and critical threshold values used
+
+This header information provides essential context for interpreting the validation results,
+especially when sharing reports with stakeholders or reviewing historical validations.
+
+#### Report Footer
+
+The report footer contains a timestamp showing when the interrogation was performed. This timestamp
+helps track when data quality checks were executed, which is especially useful when archiving
+reports or monitoring data quality over time.
+
+::: {.callout-note}
+Throughout this documentation, the footer is hidden in example reports for brevity. This is
+controlled through a global option (see the section on controlling header and footer display later
+in this guide). In practice, including the footer provides valuable timestamp information for
+tracking when validations were executed.
+:::
+
+### Report Columns
+
+The validation report table includes the following columns, each providing specific information
+about the validation steps:
+
+#### Status Indicator (first column, unlabeled)
+
+The first column is an unlabeled vertical colored bar that provides instant visual feedback about
+each step's status:
+
+- **Green**: all test units passed the validation
+- **Light green (semi-transparent)**: some test units failed but no thresholds were exceeded
+- **Gray**: the 'warning' threshold was exceeded
+- **Yellow**: the 'error' threshold was exceeded
+- **Red**: the 'critical' threshold was exceeded
+
+This visual indicator allows you to quickly scan the report and identify problem areas.
+
+#### Step Number (second column, unlabeled)
+
+The second column is unlabeled and contains the sequential step number, starting from 1. This number
+is used when referencing specific steps in other methods like `get_step_report(i=2)` or when
+extracting data from specific validation steps.
+
+#### TYPE
+
+The TYPE column displays the validation method name along with an icon that visually represents the
+type of validation being performed. The validation method indicates what aspect of data quality is
+being checked, such as:
+
+- `col_vals_gt()`: column values greater than
+- `col_vals_in_set()`: column values in a set
+- `col_exists()`: column existence check
+- `rows_distinct()`: row uniqueness check
+- and many others...
+
+When you provide a brief message (via `brief=True` for auto-generated briefs or `brief="custom
+text"` for custom messages), it appears within the TYPE column below the validation method name.
+These briefs provide human-readable explanations of what each validation step is checking, making
+the report more accessible to non-technical stakeholders.
+
+```{python}
+# Example showing brief messages in the TYPE column
+validation_with_briefs = (
+    pb.Validate(data=data, tbl_name="sales_data")
+    .col_vals_gt(
+        columns="value",
+        value=50,
+        brief="Sales values should always exceed the $50 threshold"
+    )
+    .col_vals_in_set(
+        columns="category",
+        set=["A", "B", "C"],
+        brief=True  # Auto-generated brief
+    )
+    .interrogate()
+)
+
+validation_with_briefs
+```
+
+In the above report, you'll see the custom brief message appear below the `col_vals_gt` method name
+in the first step, and an automatically generated brief below `col_vals_in_set` in the second step.
+
+#### COLUMNS
+
+The column(s) being validated in this step. For validation methods that don't target specific
+columns (like `row_count_match`), this will show an em dash (—).
+
+#### VALUES
+
+The comparison value(s) or criteria used in the validation. For example:
+
+- for `col_vals_gt(value=100)`, this shows `100`
+- for `col_vals_in_set(set=["A", "B", "C"])`, this shows `A | B | C`
+- for existence checks, this shows an em dash (—)
+
+#### TBL
+
+Icons indicating whether any preprocessing or segmentation was applied:
+
+- **Table icon**: standard validation on the original data
+- **Transformation icon**: preprocessing function was applied via `pre=`
+- **Segmentation icon**: data was segmented via `segments=`
+
+These icons help you understand if you're validating transformed or segmented data.
+
+#### EVAL
+
+Indicates whether the validation step was evaluated:
+
+- **Checkmark**: step was successfully evaluated
+- **Error icon**: an evaluation error occurred (e.g., column not found)
+- **Inactive icon**: step was marked as inactive
+
+This column is crucial for identifying validation steps that couldn't be executed properly.
+
+#### UNITS
+
+The number of units tested in this validation step. A 'test unit' is the atomic unit being
+validated, which varies by validation type:
+
+- for column value checks: each cell in the target column(s)
+- for row checks: each row
+- for table checks: typically 1 (the table itself)
+
+This number is formatted with locale-appropriate thousand separators for readability. Also, since
+space is limited, values are often abbreviated so a figure like 43,534 will appear as `43.5K`.
+
+#### PASS
+
+The number and fraction of test units that passed the validation, displayed as:
+
+```
+n_passed
+f_passed
+```
+
+For example, the cell with
+
+```
+8
+0.80
+```
+
+means 8 test units passed out of the total, representing an 80% success rate (though `f_passed` is
+always expressed as a fractional value from `0` to `1`).
+
+#### FAIL
+
+The number and fraction of test units that failed the validation, displayed similarly to PASS:
+
+```
+n_failed
+f_failed
+```
+
+For example, the cell with
+
+```
+2
+0.20
+```
+
+means 2 test units failed, representing a 20% failure rate from a fractional value of `0.20`. Note
+that this fractional `f_failed` value is what's used to set failure thresholds for 'warning',
+'error', and 'critical' states.
+
+#### W, E, C (Warning, Error, Critical)
+
+Three columns showing whether each threshold level was exceeded for the three different states.
+
+- **Long dash**: threshold wasn't set for a state
+- **Empty colored circle**: threshold was set but wasn't exceeded for a given state
+- **Filled colored circle**: threshold was set and exceeded
+
+In terms of colors, the 'warning' state is gray, the 'error' state is yellow, and the 'critical'
+state is red.
+
+Having visual indicators makes it easy to identify which validation steps have crossed into warning,
+error, or critical territory.
+
+#### EXT
+
+Indicates whether failing row data was extracted for this step:
+
+- **Em dash (—)**: no extract available
+- **Download button**: click to download failing rows as CSV
+
+When extracts are available, you can download them directly from the report for further analysis or
+to share with data stewards who need to fix the issues.
+
+## Understanding Validation Status
+
+The validation report helps you quickly understand the overall status of your data:
+
+- **All green status indicators**: all validations passed completely
+- **Light green indicators**: minor failures below warning threshold
+- **Gray, yellow, or red indicators**: threshold exceedances requiring attention
+- **Error icons in EVAL column**: validation steps that couldn't be evaluated
+
+By scanning the status indicators column, you can immediately identify which validation steps need
+attention and prioritize your data quality efforts accordingly.
+
+## Customizing the Report Title
+
+You can customize the validation report's title using the `title=` parameter in
+`get_tabular_report()`. This is particularly useful when generating multiple reports or when you
+want to provide more context:
+
+```{python}
+# Default title
+validation.get_tabular_report()
+```
+
+```{python}
+# Use the table name as the title
+validation.get_tabular_report(title=":tbl_name:")
+```
+
+```{python}
+# Provide a custom title (supports Markdown)
+validation.get_tabular_report(title="**Sales Data** Quality Report")
+```
+
+```{python}
+# No title
+validation.get_tabular_report(title=":none:")
+```
+
+The title customization options are:
+
+- `":default:"` (default): shows `"Pointblank Validation"`
+- `":tbl_name:"`: uses the table name from `tbl_name=` parameter
+- `":none:"`: hides the title completely
+- Any string: custom title text (Markdown is supported)
+
+## Customizing with Great Tables
+
+Since the validation report is a Great Tables object, you can leverage the full power of Great
+Tables to customize its appearance. This allows you to match your organization's branding, highlight
+specific information, or adjust the presentation for different audiences.
+
+### Guide to Internal Column Names
+
+When working with Great Tables methods to customize the validation report, you'll need to use the
+*internal column names* rather than the display labels you see in the rendered table. This is
+because Great Tables operates on the underlying data table structure, where columns have technical
+names that differ from their user-facing labels.
+
+For example, the column labeled `"STEP"` in the report is actually stored internally as `"i"`, and
+the `"TYPE"` column is internally named `"type_upd"`. Most Great Tables methods that target specific
+columns (like `tab_style()`, `cols_width()`, `cols_hide()`, etc.) require these internal names.
+
+Here's the complete mapping from display labels to internal column names:
+
+1. Status indicator (no label): `"status_color"`
+2. Step number (no label): `"i"`
+3. `TYPE`: `"type_upd"`
+4. `COLUMNS`: `"columns_upd"`
+5. `VALUES`: `"values_upd"`
+6. `TBL`: `"tbl"`
+7. `EVAL`: `"eval"`
+8. `UNITS`: `"test_units"`
+9. `PASS`: `"pass"`
+10. `FAIL`: `"fail"`
+11. `W`: `"w_upd"`
+12. `E`: `"e_upd"`
+13. `C`: `"c_upd"`
+14. `EXT`: `"extract_upd"`
+
+Always use these internal names when calling Great Tables methods. Using the display labels (like
+`"STEP"` or `"TYPE"`) will result in errors since these labels only exist in the rendered output,
+not in the underlying data structure.
+
+In the examples that follow, you'll see how to use these internal column names to customize various
+aspects of the validation report.
+
+### Adding Custom Styling
+
+You can apply custom styles to the report table:
+
+```{python}
+from great_tables import style, loc
+
+# Get the report as a Great Tables object
+report = validation.get_tabular_report()
+
+# Add custom styling using internal column names
+report = (
+    report
+    .tab_style(
+        style=style.fill(color="#F0F8FF"),
+        locations=loc.body(columns="i")  # Internal name for step number
+    )
+    .tab_style(
+        style=style.text(weight="bold"),
+        locations=loc.body(columns="type_upd")  # Internal name for TYPE
+    )
+)
+
+report
+```
+
+### Modifying Column Widths
+
+Adjust column widths to optimize the layout:
+
+```{python}
+report = (
+    validation
+    .get_tabular_report()
+    .cols_width(
+        cases={
+            "status_color": "20px", # Status indicator column
+            "i": "40px",            # Step number column
+            "type_upd": "170px",    # TYPE column
+            "columns_upd": "100px", # COLUMNS column
+        }
+    )
+)
+
+report
+```
+
+### Hiding Columns
+
+Hide specific columns that aren't relevant for your audience:
+
+```{python}
+# Hide the TBL and EVAL columns for a cleaner presentation (using internal names)
+report = (
+    validation
+    .get_tabular_report()
+    .cols_hide(columns=["tbl", "eval"])  # Use internal column names
+)
+
+report
+```
+
+### Adding a Source Note
+
+Add information about data source or validation context:
+
+```{python}
+report = (
+    validation
+    .get_tabular_report()
+    .tab_source_note(
+        source_note="Data validated on 2025-10-10 | Production database snapshot"
+    )
+)
+
+report
+```
+
+## Exporting the Report
+
+Great Tables provides multiple export options for sharing validation reports:
+
+```python
+# Save as a standalone HTML file
+validation.get_tabular_report().write_raw_html("validation_report.html")
+
+# Save as a PNG image
+validation.get_tabular_report().save("validation_report.png")
+
+# Open in browser
+validation.get_tabular_report().show("browser")
+```
+
+## Controlling Header and Footer Display
+
+You can control whether the header and footer appear in the validation report:
+
+```{python}
+# Hide the footer
+validation.get_tabular_report(incl_footer=False)
+```
+
+```{python}
+# Hide the header
+validation.get_tabular_report(incl_header=False)
+```
+
+```{python}
+# Hide both
+validation.get_tabular_report(incl_header=False, incl_footer=False)
+```
+
+You can also set these preferences globally using `pb.config()`:
+
+```python
+# Set global preferences
+pb.config(report_incl_header=True, report_incl_footer=False)
+```
+
+## Best Practices for Validation Reports
+
+Here are some guidelines for creating effective validation reports:
+
+#### 1. Use Descriptive Table Names and Labels
+
+Provide meaningful names and labels to make reports self-documenting:
+
+```python
+validation = pb.Validate(
+    data=sales_df,
+    tbl_name="Q3_2025_sales",
+    label="Quarterly sales data validation for financial reporting"
+)
+```
+
+#### 2. Add Brief Messages for Stakeholder Reports
+
+When sharing reports with non-technical stakeholders, always include briefs:
+
+```python
+.col_vals_between(
+    columns="price",
+    left=0, right=10000,
+    brief="Product prices must be between $0 and $10,000"
+)
+```
+
+#### 3. Set Appropriate Thresholds
+
+Configure thresholds that align with your data quality requirements:
+
+```python
+validation = pb.Validate(
+    data=data,
+    tbl_name="customer_data",
+    thresholds=pb.Thresholds(
+        warning=0.01,  # 1% failure triggers warning
+        error=0.05,    # 5% failure triggers error
+        critical=0.10  # 10% failure triggers critical
+    )
+)
+```
+
+#### 4. Customize for Your Audience
+
+Tailor the report presentation to your audience:
+
+- **Technical teams**: include all columns, show preprocessing indicators
+- **Management**: hide technical columns, emphasize status indicators
+- **Data stewards**: include extract download buttons, detailed briefs
+
+#### 5. Combine with Other Reporting Tools
+
+Use validation reports alongside other Pointblank features:
+
+- **Step reports**: drill down into specific failing steps with `get_step_report()`
+- **Extracts**: use `get_data_extracts()` to get all failing data for analysis
+- **Sundered data**: use `get_sundered_data()` to split data into passing/failing sets
+
+#### 6. Archive Reports for Trend Analysis
+
+Save validation reports over time to track data quality trends:
+
+```python
+from datetime import datetime
+
+# Save with timestamp
+timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+validation.get_tabular_report().write_raw_html(f"validation_report_{timestamp}.html")
+```
+
+## Conclusion
+
+The validation report is your primary interface for understanding data quality after running a
+validation. By providing a comprehensive overview of all validation steps, visual status indicators,
+and detailed statistics, it enables you to:
+
+- quickly assess overall data quality across multiple dimensions
+- identify specific validation steps that need attention
+- communicate data quality status to technical and non-technical stakeholders
+- track threshold exceedances and their severity levels
+- access failing data through extract downloads
+
+Combined with customization options from Great Tables, you can create reports that perfectly match
+your organization's needs and workflows. Whether you're validating data in an interactive notebook,
+generating automated quality reports, or presenting findings to stakeholders, the validation report
+provides the clarity and detail you need to maintain high data quality standards.

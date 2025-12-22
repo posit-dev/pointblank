@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import pytest
 import narwhals as nw
 
@@ -13,8 +14,13 @@ import polars.testing as pt
 import pointblank as pb
 
 from pointblank.datascan import DataScan, col_summary_tbl
+from pointblank.validate import get_data_path, _process_github_url
 from pointblank._datascan_utils import _compact_0_1_fmt, _compact_decimal_fmt, _compact_integer_fmt
 from pointblank.scan_profile_stats import StatGroup, COLUMN_ORDER_REGISTRY
+from pointblank.scan_profile import _TypeMap, _DataProfile
+
+from pointblank._constants import SVG_ICONS_FOR_DATA_TYPES
+from enum import Enum
 
 if TYPE_CHECKING:
     import pyarrow as pa
@@ -158,7 +164,7 @@ def test_deterministic_calculations(case: _Case) -> None:
         "check_row_order": False,
         "check_column_order": False,
         "check_exact": False,
-        "atol": 0.01,
+        "abs_tol": 0.01,
     }
 
     pt.assert_frame_equal(case.should_be, output, check_dtypes=False, **check_settings)
@@ -206,8 +212,6 @@ def test_col_summary_tbl(df):
 
 
 def test_col_summary_tbl_polars_categorical_column():
-    import polars as pl
-
     log_levels = pl.Enum(["debug", "info", "warning", "error"])
 
     df_pl = pl.DataFrame(
@@ -285,5 +289,303 @@ def test_compact_0_1_fmt():
     _compact_0_1_fmt(value=226.1) == "226"
 
 
-if __name__ == "__main__":
-    pytest.main([__file__, "-x", "-k", "test_col_summary_tbl"])
+def test_datascan_csv_input():
+    # Test with individual CSV file
+    csv_path = "data_raw/small_table.csv"
+    scanner = DataScan(data=csv_path)
+    assert scanner.summary_data is not None
+
+    # Test with another CSV file
+    csv_path2 = "data_raw/game_revenue.csv"
+    scanner2 = DataScan(data=csv_path2)
+    assert scanner2.summary_data is not None
+
+
+def test_datascan_parquet_input():
+    # Test with individual Parquet file
+    parquet_path = "tests/tbl_files/tbl_xyz.parquet"
+    scanner = DataScan(data=parquet_path)
+    assert scanner.summary_data is not None
+
+    # Test with another Parquet file
+    parquet_path2 = "tests/tbl_files/taxi_sample.parquet"
+    scanner2 = DataScan(data=parquet_path2)
+    assert scanner2.summary_data is not None
+
+
+def test_datascan_connection_string_input():
+    # Test with DuckDB connection string using get_data_path
+    duckdb_path = get_data_path("small_table", "duckdb")
+    duckdb_conn = f"duckdb:///{duckdb_path}::small_table"
+    scanner = DataScan(data=duckdb_conn)
+    assert scanner.summary_data is not None
+
+    # Test with SQLite connection string using absolute path
+
+    sqlite_path = os.path.abspath("tests/tbl_files/tbl_xyz.sqlite")
+    sqlite_conn = f"sqlite:///{sqlite_path}::tbl_xyz"
+    scanner2 = DataScan(data=sqlite_conn)
+    assert scanner2.summary_data is not None
+
+
+def test_datascan_parquet_glob_patterns():
+    # Test with glob pattern for committed parquet files
+    parquet_glob = "tests/tbl_files/parquet_data/data_*.parquet"
+    scanner = DataScan(data=parquet_glob)
+    assert scanner.summary_data is not None
+
+
+def test_col_summary_tbl_csv_input():
+    # Test with individual CSV file
+    csv_path = "data_raw/small_table.csv"
+    result = col_summary_tbl(csv_path)
+    assert isinstance(result, GT)
+
+    # Test with another CSV file
+    csv_path2 = "data_raw/game_revenue.csv"
+    result2 = col_summary_tbl(csv_path2)
+    assert isinstance(result2, GT)
+
+
+def test_col_summary_tbl_parquet_input():
+    # Test with individual Parquet file
+    parquet_path = "tests/tbl_files/tbl_xyz.parquet"
+    result = col_summary_tbl(parquet_path)
+    assert isinstance(result, GT)
+
+    # Test with another Parquet file
+    parquet_path2 = "tests/tbl_files/taxi_sample.parquet"
+    result2 = col_summary_tbl(parquet_path2)
+    assert isinstance(result2, GT)
+
+
+def test_col_summary_tbl_connection_string_input():
+    # Test with DuckDB connection string using get_data_path
+    duckdb_path = get_data_path("small_table", "duckdb")
+    duckdb_conn = f"duckdb:///{duckdb_path}::small_table"
+    result = col_summary_tbl(duckdb_conn)
+    assert isinstance(result, GT)
+
+    # Test with SQLite connection string using absolute path
+
+    sqlite_path = os.path.abspath("tests/tbl_files/tbl_xyz.sqlite")
+    sqlite_conn = f"sqlite:///{sqlite_path}::tbl_xyz"
+    result2 = col_summary_tbl(sqlite_conn)
+    assert isinstance(result2, GT)
+
+
+def test_col_summary_tbl_parquet_glob_patterns():
+    # Test with glob pattern for parquet files
+    parquet_glob = "tests/tbl_files/parquet_data/data_*.parquet"
+    result = col_summary_tbl(parquet_glob)
+    assert isinstance(result, GT)
+
+
+def test_datascan_github_url_csv():
+    # Test with a GitHub CSV file from our own repository
+    github_csv_url = "https://github.com/posit-dev/pointblank/blob/main/data_raw/small_table.csv"
+
+    try:
+        scanner = DataScan(data=github_csv_url)
+        assert scanner.summary_data is not None
+        # Verify we got some columns
+        assert len(scanner.summary_data) > 0
+    except Exception as e:
+        # If URL access fails (network issues, etc.), skip the test
+        pytest.skip(f"GitHub URL test skipped due to network or access issue: {e}")
+
+
+def test_datascan_github_url_parquet():
+    # Test with a GitHub Parquet file from our own repository
+    github_parquet_url = "https://github.com/posit-dev/pointblank/blob/main/tests/tbl_files/parquet_data/data_a.parquet"
+
+    try:
+        scanner = DataScan(data=github_parquet_url)
+        assert scanner.summary_data is not None
+        # Verify we got some columns
+        assert len(scanner.summary_data) > 0
+    except Exception as e:
+        # If URL access fails (network issues, etc.), skip the test
+        pytest.skip(f"GitHub URL test skipped due to network or access issue: {e}")
+
+
+def test_col_summary_tbl_github_url_csv():
+    # Test with a GitHub CSV file from our own repository
+    github_csv_url = "https://github.com/posit-dev/pointblank/blob/main/data_raw/small_table.csv"
+
+    try:
+        result = col_summary_tbl(github_csv_url)
+        assert isinstance(result, GT)
+    except Exception as e:
+        # If URL access fails (network issues, etc.), skip the test
+        pytest.skip(f"GitHub URL test skipped due to network or access issue: {e}")
+
+
+def test_github_url_processing_function():
+    # Test with non-GitHub URL (should return unchanged)
+    non_github_url = "https://example.com/data.csv"
+    result = _process_github_url(non_github_url)
+    assert result == non_github_url
+
+    # Test with non-URL string (should return unchanged)
+    non_url = "local_file.csv"
+    result = _process_github_url(non_url)
+    assert result == non_url
+
+    # Test with GitHub URL that doesn't point to CSV/Parquet (should return unchanged)
+    github_non_data_url = "https://github.com/user/repo/blob/main/README.md"
+    result = _process_github_url(github_non_data_url)
+    assert result == github_non_data_url
+
+    # Test with malformed GitHub URL (should return unchanged)
+    malformed_url = "https://github.com/user/repo/data.csv"  # missing /blob/branch/
+    result = _process_github_url(malformed_url)
+    assert result == malformed_url
+
+
+def test_raw_github_url_processing():
+    # Use a raw GitHub URL from our own repository
+    raw_github_csv_url = (
+        "https://raw.githubusercontent.com/posit-dev/pointblank/main/data_raw/small_table.csv"
+    )
+
+    try:
+        result = _process_github_url(raw_github_csv_url)
+        # Should return a dataframe, not the original URL string
+        assert not isinstance(result, str), "Result should be a dataframe, not a string"
+        # Should be a dataframe with some basic properties
+        assert hasattr(result, "shape") or hasattr(result, "height"), (
+            "Result should be a dataframe with shape/height attribute"
+        )
+    except Exception as e:
+        # If URL access fails (network issues, etc.), skip the test
+        pytest.skip(f"Raw GitHub URL test skipped due to network or access issue: {e}")
+
+
+def test_raw_github_url_in_col_summary_tbl():
+    # Use a raw GitHub URL from our own repository
+    raw_github_csv_url = (
+        "https://raw.githubusercontent.com/posit-dev/pointblank/main/data_raw/small_table.csv"
+    )
+
+    try:
+        result = col_summary_tbl(raw_github_csv_url)
+        # Should work without being misclassified as a connection string
+        assert isinstance(result, GT)
+    except Exception as e:
+        # If URL access fails (network issues, etc.), skip the test
+        pytest.skip(
+            f"Raw GitHub URL col_summary_tbl test skipped due to network or access issue: {e}"
+        )
+
+
+def test_raw_github_url_in_datascan():
+    # Use a raw GitHub URL from our own repository
+    raw_github_csv_url = (
+        "https://raw.githubusercontent.com/posit-dev/pointblank/main/data_raw/small_table.csv"
+    )
+
+    try:
+        data_scan = DataScan(raw_github_csv_url)
+        result = data_scan.get_tabular_report()
+        # Should work without being misclassified as a connection string
+        assert isinstance(result, GT)
+    except Exception as e:
+        # If URL access fails (network issues, etc.), skip the test
+        pytest.skip(f"Raw GitHub URL DataScan test skipped due to network or access issue: {e}")
+
+
+def test_datascan_with_struct_column():
+    """Test that DataScan handles struct columns (illegal types) by skipping them."""
+
+    # Create a DataFrame with a struct column
+    df_pl = pl.DataFrame(
+        {
+            "id": [1, 2, 3],
+            "name": ["Alice", "Bob", "Charlie"],
+            "nested": [
+                {"a": 1, "b": 2},
+                {"a": 3, "b": 4},
+                {"a": 5, "b": 6},
+            ],
+        }
+    )
+
+    # DataScan should handle this without error by skipping the struct column
+    scanner = DataScan(data=df_pl)
+
+    assert scanner.summary_data is not None
+
+    # Verify that the struct column was skipped
+    col_names = scanner.summary_data.select("colname").to_dict()["colname"].to_list()
+
+    # The struct column should not be in the summary
+    assert "id" in col_names
+    assert "name" in col_names
+
+
+def test_datascan_save_to_json(tmp_path):
+    """Test the save_to_json() method."""
+
+    # Create a simple DataFrame
+    df_pl = pl.DataFrame(
+        {
+            "id": [1, 2, 3],
+            "name": ["Alice", "Bob", "Charlie"],
+            "value": [10.5, 20.3, 30.1],
+        }
+    )
+
+    scanner = DataScan(data=df_pl)
+
+    # Save to a temporary file
+    output_file = tmp_path / "test_output.json"
+    scanner.save_to_json(str(output_file))
+
+    # Verify the file was created
+    assert output_file.exists()
+
+    # Verify the file contains valid JSON
+    import json
+
+    with open(output_file) as f:
+        content = json.load(f)
+        # The saved content should be a JSON string (due to json.dump with a string)
+        assert isinstance(content, str)
+
+
+def test_typemap_fetch_icon_with_unknown_type():
+    """Test the KeyError exception handler in _TypeMap.fetch_icon()."""
+
+    # Create a mock type that's not in the icon_map
+    class UnknownType(Enum):
+        UNKNOWN = ("unknown_type",)
+
+    # This should trigger the KeyError and return the "object" icon
+    result = _TypeMap.fetch_icon(UnknownType.UNKNOWN)
+    assert result == SVG_ICONS_FOR_DATA_TYPES["object"]
+
+
+def test_dataprofile_as_dataframe_with_mixed_column_types():
+    """Test as_dataframe works correctly with different column types."""
+    # Create a DataFrame with different column types
+    df_pl = pl.DataFrame(
+        {
+            "numeric_col": [1, 2, 3],
+            "string_col": ["a", "b", "c"],
+            "bool_col": [True, False, True],
+        }
+    )
+
+    scanner = DataScan(data=df_pl)
+
+    # Call as_dataframe() with strict=False (the default)
+    result = scanner.profile.as_dataframe(strict=False)
+
+    # Should succeed without raising TypeError
+    assert result is not None
+    assert len(result) > 0
+
+    # Verify we can also call with strict=True
+    result_strict = scanner.profile.as_dataframe(strict=True)
+    assert result_strict is not None

@@ -8,6 +8,22 @@
     text-decoration-thickness: 2px;
 }
 
+.navbar-brand img {
+    max-height: 45px;
+    padding-right: 0px;
+    margin-left: 5px;
+    margin-right: 12px;
+    border-style: solid;
+    border-width: 2px;
+    border-radius: 5px;
+    border-color: darkgray;
+    transition: transform 0.3s ease;
+}
+
+.navbar-brand img:hover {
+    transform: scale(1.15);
+}
+
 body {
     background-color: #FCFEFF;
 }
@@ -36,6 +52,12 @@ code {
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
     font-size: 0.875em;
     color: rgb(18, 18, 18);
+}
+
+.blockquote {
+    font-size: 13px;
+    background-color: #E8E8E8;
+    border-left-color: #4682B4;
 }
 
 p,h1,h2,h3,#toc-title,#toc-function-reference,.nav-link,.table {
@@ -239,5 +261,17 @@ a.sidebar-item-text.sidebar-link.text-start > span {
     }
     100% {
         background-position: 0% 50%;
+    }
+}
+
+/* Adjust mobile secondary nav positioning */
+@media (max-width: 991.98px) {
+    #quarto-header .container-fluid.d-flex {
+        margin-left: 0;
+        padding-left: 5px;
+    }
+
+    .quarto-secondary-nav-title {
+        padding-top: 7px;
     }
 }
