@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from importlib import import_module
 from pathlib import Path
-from typing import Any, Iterable, Mapping, Optional, Union
+from typing import TYPE_CHECKING, Any, Iterable, Mapping, Optional, Union
 
 import yaml
 from narwhals.typing import FrameT
@@ -10,6 +10,9 @@ from narwhals.typing import FrameT
 from pointblank._utils import _is_lib_present
 from pointblank.thresholds import Actions
 from pointblank.validate import Validate, load_dataset
+
+if TYPE_CHECKING:
+    from typing import Literal
 
 
 class YAMLValidationError(Exception):
@@ -376,7 +379,9 @@ class YAMLValidator:
                             f"or list of strings/dictionaries"
                         )
 
-    def _load_data_source(self, tbl_spec: str, df_library: str = "polars") -> Any:
+    def _load_data_source(
+        self, tbl_spec: str, df_library: Literal["polars", "pandas", "duckdb"]
+    ) -> Any:
         """Load data source based on table specification.
 
         Parameters
