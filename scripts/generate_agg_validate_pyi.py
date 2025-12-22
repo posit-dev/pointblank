@@ -17,20 +17,20 @@ SIGNATURE = """
         active: bool = True,
 """
 
-DOCSTRING = '''
+DOCSTRING = """
         Args:
-            columns (_PBUnresolvedColumn): _description_
-            value (float | Column): _description_
-            tol (Tolerance, optional): _description_. Defaults to 0.
-            thresholds (float | bool | tuple | dict | Thresholds | None, optional): _description_. Defaults to None.
-            brief (str | bool, optional): _description_. Defaults to False.
-            actions (Actions | None, optional): _description_. Defaults to None.
-            active (bool, optional): _description_. Defaults to True.
+            columns (_PBUnresolvedColumn): Column or collection of columns to validate.
+            value (float | Column): Target value to validate against.
+            tol (Tolerance, optional): Tolerance for validation distance to target. Defaults to 0.
+            thresholds (float | bool | tuple | dict | Thresholds | None, optional): Custom thresholds for
+                the bounds. See examples for usage. Defaults to None.
+            brief (str | bool, optional): Explanation of validation operation. Defaults to False.
+            actions (Actions | None, optional): Actions to take after validation. Defaults to None.
+            active (bool, optional): Whether to activate the validation. Defaults to True.
 
         Returns:
-            Validate: _description_
-            """
-'''
+            Validate: A `Validate` instance with the new validation method added.
+"""
 
 CLS = "Validate"
 
@@ -60,7 +60,8 @@ with VALIDATE_PYI_PATH.open("a") as f:
         first_line = (
             f'"""Assert the values in a column '
             f"{agg_name.replace('_', ' ')} to a value "
-            f"{comp_name.replace('_', ' ')} some `value`."
+            f"{comp_name.replace('_', ' ')} some `value`.\n"
+            f"{DOCSTRING}"
             f'"""\n'
         )
 
