@@ -161,7 +161,7 @@ class Validate:
         self,
         *,
         assertion_type: str,
-        columns,
+        columns: str | Collection[str],
         value,
         tol: int = 0,
         thresholds=None,
@@ -560,7 +560,20 @@ class Validate:
         actions: Actions | None = None,
         active: bool = True,
     ) -> Validate:
-        """Assert the values in a column sum to a value eq some `value`."""
+        """Assert the values in a column sum to a value eq some `value`.
+        Args:
+            columns (_PBUnresolvedColumn): Column or collection of columns to validate.
+            value (float | Column): Target value to validate against.
+            tol (Tolerance, optional): Tolerance for validation distance to target. Defaults to 0.
+            thresholds (float | bool | tuple | dict | Thresholds | None, optional): Custom thresholds for
+                the bounds. See examples for usage. Defaults to None.
+            brief (str | bool, optional): Explanation of validation operation. Defaults to False.
+            actions (Actions | None, optional): Actions to take after validation. Defaults to None.
+            active (bool, optional): Whether to activate the validation. Defaults to True.
+
+        Returns:
+            Validate: A `Validate` instance with the new validation method added.
+        """
         ...
 
     def col_sum_gt(
@@ -573,7 +586,20 @@ class Validate:
         actions: Actions | None = None,
         active: bool = True,
     ) -> Validate:
-        """Assert the values in a column sum to a value gt some `value`."""
+        """Assert the values in a column sum to a value gt some `value`.
+        Args:
+            columns (_PBUnresolvedColumn): Column or collection of columns to validate.
+            value (float | Column): Target value to validate against.
+            tol (Tolerance, optional): Tolerance for validation distance to target. Defaults to 0.
+            thresholds (float | bool | tuple | dict | Thresholds | None, optional): Custom thresholds for
+                the bounds. See examples for usage. Defaults to None.
+            brief (str | bool, optional): Explanation of validation operation. Defaults to False.
+            actions (Actions | None, optional): Actions to take after validation. Defaults to None.
+            active (bool, optional): Whether to activate the validation. Defaults to True.
+
+        Returns:
+            Validate: A `Validate` instance with the new validation method added.
+        """
         ...
 
     def col_sum_ge(
@@ -586,7 +612,20 @@ class Validate:
         actions: Actions | None = None,
         active: bool = True,
     ) -> Validate:
-        """Assert the values in a column sum to a value ge some `value`."""
+        """Assert the values in a column sum to a value ge some `value`.
+        Args:
+            columns (_PBUnresolvedColumn): Column or collection of columns to validate.
+            value (float | Column): Target value to validate against.
+            tol (Tolerance, optional): Tolerance for validation distance to target. Defaults to 0.
+            thresholds (float | bool | tuple | dict | Thresholds | None, optional): Custom thresholds for
+                the bounds. See examples for usage. Defaults to None.
+            brief (str | bool, optional): Explanation of validation operation. Defaults to False.
+            actions (Actions | None, optional): Actions to take after validation. Defaults to None.
+            active (bool, optional): Whether to activate the validation. Defaults to True.
+
+        Returns:
+            Validate: A `Validate` instance with the new validation method added.
+        """
         ...
 
     def col_sum_lt(
@@ -599,7 +638,20 @@ class Validate:
         actions: Actions | None = None,
         active: bool = True,
     ) -> Validate:
-        """Assert the values in a column sum to a value lt some `value`."""
+        """Assert the values in a column sum to a value lt some `value`.
+        Args:
+            columns (_PBUnresolvedColumn): Column or collection of columns to validate.
+            value (float | Column): Target value to validate against.
+            tol (Tolerance, optional): Tolerance for validation distance to target. Defaults to 0.
+            thresholds (float | bool | tuple | dict | Thresholds | None, optional): Custom thresholds for
+                the bounds. See examples for usage. Defaults to None.
+            brief (str | bool, optional): Explanation of validation operation. Defaults to False.
+            actions (Actions | None, optional): Actions to take after validation. Defaults to None.
+            active (bool, optional): Whether to activate the validation. Defaults to True.
+
+        Returns:
+            Validate: A `Validate` instance with the new validation method added.
+        """
         ...
 
     def col_sum_le(
@@ -612,7 +664,20 @@ class Validate:
         actions: Actions | None = None,
         active: bool = True,
     ) -> Validate:
-        """Assert the values in a column sum to a value le some `value`."""
+        """Assert the values in a column sum to a value le some `value`.
+        Args:
+            columns (_PBUnresolvedColumn): Column or collection of columns to validate.
+            value (float | Column): Target value to validate against.
+            tol (Tolerance, optional): Tolerance for validation distance to target. Defaults to 0.
+            thresholds (float | bool | tuple | dict | Thresholds | None, optional): Custom thresholds for
+                the bounds. See examples for usage. Defaults to None.
+            brief (str | bool, optional): Explanation of validation operation. Defaults to False.
+            actions (Actions | None, optional): Actions to take after validation. Defaults to None.
+            active (bool, optional): Whether to activate the validation. Defaults to True.
+
+        Returns:
+            Validate: A `Validate` instance with the new validation method added.
+        """
         ...
 
     def col_avg_eq(
@@ -625,7 +690,20 @@ class Validate:
         actions: Actions | None = None,
         active: bool = True,
     ) -> Validate:
-        """Assert the values in a column avg to a value eq some `value`."""
+        """Assert the values in a column avg to a value eq some `value`.
+        Args:
+            columns (_PBUnresolvedColumn): Column or collection of columns to validate.
+            value (float | Column): Target value to validate against.
+            tol (Tolerance, optional): Tolerance for validation distance to target. Defaults to 0.
+            thresholds (float | bool | tuple | dict | Thresholds | None, optional): Custom thresholds for
+                the bounds. See examples for usage. Defaults to None.
+            brief (str | bool, optional): Explanation of validation operation. Defaults to False.
+            actions (Actions | None, optional): Actions to take after validation. Defaults to None.
+            active (bool, optional): Whether to activate the validation. Defaults to True.
+
+        Returns:
+            Validate: A `Validate` instance with the new validation method added.
+        """
         ...
 
     def col_avg_gt(
@@ -638,7 +716,20 @@ class Validate:
         actions: Actions | None = None,
         active: bool = True,
     ) -> Validate:
-        """Assert the values in a column avg to a value gt some `value`."""
+        """Assert the values in a column avg to a value gt some `value`.
+        Args:
+            columns (_PBUnresolvedColumn): Column or collection of columns to validate.
+            value (float | Column): Target value to validate against.
+            tol (Tolerance, optional): Tolerance for validation distance to target. Defaults to 0.
+            thresholds (float | bool | tuple | dict | Thresholds | None, optional): Custom thresholds for
+                the bounds. See examples for usage. Defaults to None.
+            brief (str | bool, optional): Explanation of validation operation. Defaults to False.
+            actions (Actions | None, optional): Actions to take after validation. Defaults to None.
+            active (bool, optional): Whether to activate the validation. Defaults to True.
+
+        Returns:
+            Validate: A `Validate` instance with the new validation method added.
+        """
         ...
 
     def col_avg_ge(
@@ -651,7 +742,20 @@ class Validate:
         actions: Actions | None = None,
         active: bool = True,
     ) -> Validate:
-        """Assert the values in a column avg to a value ge some `value`."""
+        """Assert the values in a column avg to a value ge some `value`.
+        Args:
+            columns (_PBUnresolvedColumn): Column or collection of columns to validate.
+            value (float | Column): Target value to validate against.
+            tol (Tolerance, optional): Tolerance for validation distance to target. Defaults to 0.
+            thresholds (float | bool | tuple | dict | Thresholds | None, optional): Custom thresholds for
+                the bounds. See examples for usage. Defaults to None.
+            brief (str | bool, optional): Explanation of validation operation. Defaults to False.
+            actions (Actions | None, optional): Actions to take after validation. Defaults to None.
+            active (bool, optional): Whether to activate the validation. Defaults to True.
+
+        Returns:
+            Validate: A `Validate` instance with the new validation method added.
+        """
         ...
 
     def col_avg_lt(
@@ -664,7 +768,20 @@ class Validate:
         actions: Actions | None = None,
         active: bool = True,
     ) -> Validate:
-        """Assert the values in a column avg to a value lt some `value`."""
+        """Assert the values in a column avg to a value lt some `value`.
+        Args:
+            columns (_PBUnresolvedColumn): Column or collection of columns to validate.
+            value (float | Column): Target value to validate against.
+            tol (Tolerance, optional): Tolerance for validation distance to target. Defaults to 0.
+            thresholds (float | bool | tuple | dict | Thresholds | None, optional): Custom thresholds for
+                the bounds. See examples for usage. Defaults to None.
+            brief (str | bool, optional): Explanation of validation operation. Defaults to False.
+            actions (Actions | None, optional): Actions to take after validation. Defaults to None.
+            active (bool, optional): Whether to activate the validation. Defaults to True.
+
+        Returns:
+            Validate: A `Validate` instance with the new validation method added.
+        """
         ...
 
     def col_avg_le(
@@ -677,7 +794,20 @@ class Validate:
         actions: Actions | None = None,
         active: bool = True,
     ) -> Validate:
-        """Assert the values in a column avg to a value le some `value`."""
+        """Assert the values in a column avg to a value le some `value`.
+        Args:
+            columns (_PBUnresolvedColumn): Column or collection of columns to validate.
+            value (float | Column): Target value to validate against.
+            tol (Tolerance, optional): Tolerance for validation distance to target. Defaults to 0.
+            thresholds (float | bool | tuple | dict | Thresholds | None, optional): Custom thresholds for
+                the bounds. See examples for usage. Defaults to None.
+            brief (str | bool, optional): Explanation of validation operation. Defaults to False.
+            actions (Actions | None, optional): Actions to take after validation. Defaults to None.
+            active (bool, optional): Whether to activate the validation. Defaults to True.
+
+        Returns:
+            Validate: A `Validate` instance with the new validation method added.
+        """
         ...
 
     def col_sd_eq(
@@ -690,7 +820,20 @@ class Validate:
         actions: Actions | None = None,
         active: bool = True,
     ) -> Validate:
-        """Assert the values in a column sd to a value eq some `value`."""
+        """Assert the values in a column sd to a value eq some `value`.
+        Args:
+            columns (_PBUnresolvedColumn): Column or collection of columns to validate.
+            value (float | Column): Target value to validate against.
+            tol (Tolerance, optional): Tolerance for validation distance to target. Defaults to 0.
+            thresholds (float | bool | tuple | dict | Thresholds | None, optional): Custom thresholds for
+                the bounds. See examples for usage. Defaults to None.
+            brief (str | bool, optional): Explanation of validation operation. Defaults to False.
+            actions (Actions | None, optional): Actions to take after validation. Defaults to None.
+            active (bool, optional): Whether to activate the validation. Defaults to True.
+
+        Returns:
+            Validate: A `Validate` instance with the new validation method added.
+        """
         ...
 
     def col_sd_gt(
@@ -703,7 +846,20 @@ class Validate:
         actions: Actions | None = None,
         active: bool = True,
     ) -> Validate:
-        """Assert the values in a column sd to a value gt some `value`."""
+        """Assert the values in a column sd to a value gt some `value`.
+        Args:
+            columns (_PBUnresolvedColumn): Column or collection of columns to validate.
+            value (float | Column): Target value to validate against.
+            tol (Tolerance, optional): Tolerance for validation distance to target. Defaults to 0.
+            thresholds (float | bool | tuple | dict | Thresholds | None, optional): Custom thresholds for
+                the bounds. See examples for usage. Defaults to None.
+            brief (str | bool, optional): Explanation of validation operation. Defaults to False.
+            actions (Actions | None, optional): Actions to take after validation. Defaults to None.
+            active (bool, optional): Whether to activate the validation. Defaults to True.
+
+        Returns:
+            Validate: A `Validate` instance with the new validation method added.
+        """
         ...
 
     def col_sd_ge(
@@ -716,7 +872,20 @@ class Validate:
         actions: Actions | None = None,
         active: bool = True,
     ) -> Validate:
-        """Assert the values in a column sd to a value ge some `value`."""
+        """Assert the values in a column sd to a value ge some `value`.
+        Args:
+            columns (_PBUnresolvedColumn): Column or collection of columns to validate.
+            value (float | Column): Target value to validate against.
+            tol (Tolerance, optional): Tolerance for validation distance to target. Defaults to 0.
+            thresholds (float | bool | tuple | dict | Thresholds | None, optional): Custom thresholds for
+                the bounds. See examples for usage. Defaults to None.
+            brief (str | bool, optional): Explanation of validation operation. Defaults to False.
+            actions (Actions | None, optional): Actions to take after validation. Defaults to None.
+            active (bool, optional): Whether to activate the validation. Defaults to True.
+
+        Returns:
+            Validate: A `Validate` instance with the new validation method added.
+        """
         ...
 
     def col_sd_lt(
@@ -729,7 +898,20 @@ class Validate:
         actions: Actions | None = None,
         active: bool = True,
     ) -> Validate:
-        """Assert the values in a column sd to a value lt some `value`."""
+        """Assert the values in a column sd to a value lt some `value`.
+        Args:
+            columns (_PBUnresolvedColumn): Column or collection of columns to validate.
+            value (float | Column): Target value to validate against.
+            tol (Tolerance, optional): Tolerance for validation distance to target. Defaults to 0.
+            thresholds (float | bool | tuple | dict | Thresholds | None, optional): Custom thresholds for
+                the bounds. See examples for usage. Defaults to None.
+            brief (str | bool, optional): Explanation of validation operation. Defaults to False.
+            actions (Actions | None, optional): Actions to take after validation. Defaults to None.
+            active (bool, optional): Whether to activate the validation. Defaults to True.
+
+        Returns:
+            Validate: A `Validate` instance with the new validation method added.
+        """
         ...
 
     def col_sd_le(
@@ -742,7 +924,20 @@ class Validate:
         actions: Actions | None = None,
         active: bool = True,
     ) -> Validate:
-        """Assert the values in a column sd to a value le some `value`."""
+        """Assert the values in a column sd to a value le some `value`.
+        Args:
+            columns (_PBUnresolvedColumn): Column or collection of columns to validate.
+            value (float | Column): Target value to validate against.
+            tol (Tolerance, optional): Tolerance for validation distance to target. Defaults to 0.
+            thresholds (float | bool | tuple | dict | Thresholds | None, optional): Custom thresholds for
+                the bounds. See examples for usage. Defaults to None.
+            brief (str | bool, optional): Explanation of validation operation. Defaults to False.
+            actions (Actions | None, optional): Actions to take after validation. Defaults to None.
+            active (bool, optional): Whether to activate the validation. Defaults to True.
+
+        Returns:
+            Validate: A `Validate` instance with the new validation method added.
+        """
         ...
 
     # === GENERATED END ===
