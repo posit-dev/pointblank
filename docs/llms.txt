@@ -54,6 +54,7 @@
 - [Validate.col_vals_regex](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_regex.html): Validate whether column values match a regular expression pattern.
 - [Validate.col_vals_expr](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_expr.html): Validate column values using a custom expression.
 - [Validate.col_exists](https://posit-dev.github.io/pointblank/reference/Validate.col_exists.html): Validate whether one or more columns exist in the table.
+- [Validate.col_pct_null](https://posit-dev.github.io/pointblank/reference/Validate.col_pct_null.html): Validate whether a column has a specific percentage of Null values.
 - [Validate.rows_distinct](https://posit-dev.github.io/pointblank/reference/Validate.rows_distinct.html): Validate whether rows in the table are distinct.
 - [Validate.col_schema_match](https://posit-dev.github.io/pointblank/reference/Validate.col_schema_match.html): Do columns in the table (and their types) match a predefined schema?
 - [Validate.row_count_match](https://posit-dev.github.io/pointblank/reference/Validate.row_count_match.html): Validate whether the row count of the table matches a specified count.

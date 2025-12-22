@@ -25,11 +25,12 @@ Once there is consensus that a PR based on the issue would be helpful, adhering 
 
 ### Setting Up Your Development Environment
 
-To set up your development environment, you can follow these steps:
+To set up your development environment, first clone the posit-dev/pointblank repository.
 
-- Clone the posit-dev/pointblank repository
-- Create a virtual environment for the folder
-- Install the package in editable mode with `pip install -e .` from the root of the project folder
+If you're using UV, you may run `uv sync` and your environment is setup! If using pip or another package manager, keep following these steps:
+
+- Create a virtual environment for the folder.
+- Install the package in editable mode with `pip install -e .` from the root of the project folder.
 - Install the development dependencies with `pip install '.[dev]'` (have a look at the `pyproject.toml` file for the list of development dependencies)
 
 Our documentation uses `quartodoc` which in turn requires a local install of the Quarto CLI. To install Quarto, go to <https://quarto.org/docs/get-started/> to get the latest build for your platform.
@@ -66,3 +67,6 @@ for method in load_validation_method_grid():  # -> `col_sum_*`, `col_mean_*`, et
 ```
 
 At this point, the methods will exist AND the docs/signature are loaded properly in the type checker and IDE/LSPs, which is very important for usability.
+### Linting and Type Checking
+
+We use `ruff` for linting, the settings used are fairly loose and objective. Linting is run in pre-commit in CI. You can run it locally with `make lint`. Type checking is currently not enforced, but we intend on gradually typing the codebase. You can run `make type` to run Astral's new experimental type checker `ty`. Feel free to leverage type hints and occasionally type checking but it's not obligatory at this time.

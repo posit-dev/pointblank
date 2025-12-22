@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import functools
+from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Any
 
@@ -16,6 +17,7 @@ from pointblank._spec_utils import (
     check_postal_code,
     check_vin,
 )
+from pointblank._typing import AbsoluteBounds
 from pointblank._utils import (
     _column_test_prep,
     _convert_to_narwhals,
@@ -743,6 +745,28 @@ def row_count_match(data_tbl: FrameT, count, inverse: bool, abs_tol_bounds) -> b
         return not (row_count >= min_val and row_count <= max_val)
     else:
         return row_count >= min_val and row_count <= max_val
+
+
+def col_pct_null(
+    data_tbl: FrameT, column: str, p: float, bound_finder: Callable[[int], AbsoluteBounds]
+) -> bool:
+    """Check if the percentage of null vales are within p given the absolute bounds."""
+    # Convert to narwhals for consistent API across backends
+    nw_tbl = nw.from_native(data_tbl)
+
+    # Handle LazyFrames by collecting them first
+    if hasattr(nw_tbl, "collect"):
+        nw_tbl = nw_tbl.collect()
+
+    # Get total rows using narwhals
+    total_rows: int = nw_tbl.select(nw.len()).item()
+    abs_target: float = round(total_rows * p)
+    lower_bound, upper_bound = bound_finder(abs_target)
+
+    # Count null values
+    n_null: int = nw_tbl.select(nw.col(column).is_null().sum()).item()
+
+    return n_null >= (abs_target - lower_bound) and n_null <= (abs_target + upper_bound)
 
 
 def col_count_match(data_tbl: FrameT, count, inverse: bool) -> bool:

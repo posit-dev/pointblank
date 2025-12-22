@@ -12,6 +12,7 @@ import tempfile
 import threading
 from dataclasses import dataclass
 from enum import Enum
+from functools import partial
 from importlib.metadata import version
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Callable, Literal, ParamSpec, TypeVar
@@ -55,6 +56,7 @@ from pointblank._interrogation import (
     SpeciallyValidation,
     col_count_match,
     col_exists,
+    col_pct_null,
     col_schema_match,
     col_vals_expr,
     conjointly_validation,
@@ -119,8 +121,9 @@ R = TypeVar("R")
 
 if TYPE_CHECKING:
     from collections.abc import Collection
+    from typing import Any
 
-    from pointblank._typing import AbsoluteBounds, Tolerance
+    from pointblank._typing import AbsoluteBounds, Tolerance, _CompliantValue, _CompliantValues
 
 
 __all__ = [
@@ -3763,12 +3766,12 @@ class _ValidationInfo:
     step_id: str | None = None
     sha1: str | None = None
     assertion_type: str | None = None
-    column: any | None = None
-    values: any | list[any] | tuple | None = None
+    column: Any | None = None
+    values: Any | list[any] | tuple | None = None
     inclusive: tuple[bool, bool] | None = None
     na_pass: bool | None = None
     pre: Callable | None = None
-    segments: any | None = None
+    segments: Any | None = None
     thresholds: Thresholds | None = None
     actions: Actions | None = None
     label: str | None = None
@@ -9437,7 +9440,7 @@ class Validate:
 
     def col_vals_expr(
         self,
-        expr: any,
+        expr: Any,
         pre: Callable | None = None,
         segments: SegmentSpec | None = None,
         thresholds: int | float | bool | tuple | dict | Thresholds = None,
@@ -9819,6 +9822,302 @@ class Validate:
                 assertion_type=assertion_type,
                 column=column,
                 values=None,
+                thresholds=thresholds,
+                actions=actions,
+                brief=brief,
+                active=active,
+            )
+
+            self._add_validation(validation_info=val_info)
+
+        return self
+
+    def col_pct_null(
+        self,
+        columns: str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals,
+        p: float,
+        tol: Tolerance = 0,
+        thresholds: int | float | None | bool | tuple | dict | Thresholds = None,
+        actions: Actions | None = None,
+        brief: str | bool | None = None,
+        active: bool = True,
+    ) -> Validate:
+        """
+        Validate whether a column has a specific percentage of Null values.
+
+        The `col_pct_null()` validation method checks whether the percentage of Null values in a
+        column matches a specified percentage `p=` (within an optional tolerance `tol=`). This
+        validation operates at the column level, generating a single validation step per column that
+        passes or fails based on whether the actual percentage of Null values falls within the
+        acceptable range defined by `p ± tol`.
+
+        Parameters
+        ----------
+        columns
+            A single column or a list of columns to validate. Can also use
+            [`col()`](`pointblank.col`) with column selectors to specify one or more columns. If
+            multiple columns are supplied or resolved, there will be a separate validation step
+            generated for each column.
+        p
+            The expected percentage of Null values in the column, expressed as a decimal between
+            `0.0` and `1.0`. For example, `p=0.5` means 50% of values should be Null.
+        tol
+            The tolerance allowed when comparing the actual percentage of Null values to the
+            expected percentage `p=`. The validation passes if the actual percentage falls within
+            the range `[p - tol, p + tol]`. Default is `0`, meaning an exact match is required. See
+            the *Tolerance* section for details on all supported formats (absolute, relative,
+            symmetric, and asymmetric bounds).
+        thresholds
+            Set threshold failure levels for reporting and reacting to exceedences of the levels.
+            The thresholds are set at the step level and will override any global thresholds set in
+            `Validate(thresholds=...)`. The default is `None`, which means that no thresholds will
+            be set locally and global thresholds (if any) will take effect. Look at the *Thresholds*
+            section for information on how to set threshold levels.
+        actions
+            Optional actions to take when the validation step(s) meets or exceeds any set threshold
+            levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
+            define the actions.
+        brief
+            An optional brief description of the validation step that will be displayed in the
+            reporting table. You can use the templating elements like `"{step}"` to insert
+            the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+            the entire brief will be automatically generated. If `None` (the default) then there
+            won't be a brief.
+        active
+            A boolean value indicating whether the validation step should be active. Using `False`
+            will make the validation step inactive (still reporting its presence and keeping indexes
+            for the steps unchanged).
+
+        Returns
+        -------
+        Validate
+            The `Validate` object with the added validation step.
+
+        Tolerance
+        ---------
+        The `tol=` parameter accepts several different formats to specify the acceptable deviation
+        from the expected percentage `p=`. The tolerance can be expressed as:
+
+        1. *single integer* (absolute tolerance): the exact number of test units that can deviate.
+        For example, `tol=2` means the actual count can differ from the expected count by up to 2
+        units in either direction.
+
+        2. *single float between 0 and 1* (relative tolerance): a proportion of the expected
+        count. For example, if the expected count is 50 and `tol=0.1`, the acceptable range is
+        45 to 55 (50 ± 10% of 50 = 50 ± 5).
+
+        3. *tuple of two integers* (absolute bounds): explicitly specify the lower and upper
+        bounds as absolute deviations. For example, `tol=(1, 3)` means the actual count can be
+        1 unit below or 3 units above the expected count.
+
+        4. *tuple of two floats between 0 and 1* (relative bounds): explicitly specify the lower
+        and upper bounds as proportional deviations. For example, `tol=(0.05, 0.15)` means the
+        lower bound is 5% below and the upper bound is 15% above the expected count.
+
+        When using a single value (integer or float), the tolerance is applied symmetrically in both
+        directions. When using a tuple, you can specify asymmetric tolerances where the lower and
+        upper bounds differ.
+
+        Thresholds
+        ----------
+        The `thresholds=` parameter is used to set the failure-condition levels for the validation
+        step. If they are set here at the step level, these thresholds will override any thresholds
+        set at the global level in `Validate(thresholds=...)`.
+
+        There are three threshold levels: 'warning', 'error', and 'critical'. The threshold values
+        can either be set as a proportion failing of all test units (a value between `0` to `1`),
+        or, the absolute number of failing test units (as integer that's `1` or greater).
+
+        Thresholds can be defined using one of these input schemes:
+
+        1. use the [`Thresholds`](`pointblank.Thresholds`) class (the most direct way to create
+        thresholds)
+        2. provide a tuple of 1-3 values, where position `0` is the 'warning' level, position `1` is
+        the 'error' level, and position `2` is the 'critical' level
+        3. create a dictionary of 1-3 value entries; the valid keys: are 'warning', 'error', and
+        'critical'
+        4. a single integer/float value denoting absolute number or fraction of failing test units
+        for the 'warning' level only
+
+        If the number of failing test units exceeds set thresholds, the validation step will be
+        marked as 'warning', 'error', or 'critical'. All of the threshold levels don't need to be
+        set, you're free to set any combination of them.
+
+        Aside from reporting failure conditions, thresholds can be used to determine the actions to
+        take for each level of failure (using the `actions=` parameter).
+
+        Examples
+        --------
+        ```{python}
+        #| echo: false
+        #| output: false
+        import pointblank as pb
+        pb.config(report_incl_header=False, report_incl_footer=False, preview_incl_header=False)
+        ```
+        For the examples here, we'll use a simple Polars DataFrame with three columns (`a`, `b`,
+        and `c`) that have different percentages of Null values. The table is shown below:
+
+        ```{python}
+        import pointblank as pb
+        import polars as pl
+
+        tbl = pl.DataFrame(
+            {
+                "a": [1, 2, 3, 4, 5, 6, 7, 8],
+                "b": [1, None, 3, None, 5, None, 7, None],
+                "c": [None, None, None, None, None, None, 1, 2],
+            }
+        )
+
+        pb.preview(tbl)
+        ```
+
+        Let's validate that column `a` has 0% Null values (i.e., no Null values at all).
+
+        ```{python}
+        validation = (
+            pb.Validate(data=tbl)
+            .col_pct_null(columns="a", p=0.0)
+            .interrogate()
+        )
+
+        validation
+        ```
+
+        Printing the `validation` object shows the validation table in an HTML viewing environment.
+        The validation table shows the single entry that corresponds to the validation step created
+        by using `col_pct_null()`. The validation passed since column `a` has no Null values.
+
+        Now, let's check that column `b` has exactly 50% Null values.
+
+        ```{python}
+        validation = (
+            pb.Validate(data=tbl)
+            .col_pct_null(columns="b", p=0.5)
+            .interrogate()
+        )
+
+        validation
+        ```
+
+        This validation also passes, as column `b` has exactly 4 out of 8 values as Null (50%).
+
+        Finally, let's validate column `c` with a tolerance. Column `c` has 75% Null values, so
+        we'll check if it's approximately 70% Null with a tolerance of 10%.
+
+        ```{python}
+        validation = (
+            pb.Validate(data=tbl)
+            .col_pct_null(columns="c", p=0.70, tol=0.10)
+            .interrogate()
+        )
+
+        validation
+        ```
+
+        This validation passes because the actual percentage (75%) falls within the acceptable
+        range of 60% to 80% (70% ± 10%).
+
+        The `tol=` parameter supports multiple formats to express tolerance. Let's explore all the
+        different ways to specify tolerance using column `b`, which has exactly 50% Null values
+        (4 out of 8 values).
+
+        *Using an absolute tolerance (integer)*: Specify the exact number of rows that can
+        deviate. With `tol=1`, we allow the count to differ by 1 row in either direction.
+
+        ```{python}
+        validation = (
+            pb.Validate(data=tbl)
+            .col_pct_null(columns="b", p=0.375, tol=1)  # Expect 3 nulls, allow ±1 (range: 2-4)
+            .interrogate()
+        )
+
+        validation
+        ```
+
+        This passes because column `b` has 4 Null values, which falls within the acceptable range
+        of 2 to 4 (3 ± 1).
+
+        *Using a relative tolerance (float)*: Specify the tolerance as a proportion of the
+        expected count. With `tol=0.25`, we allow a 25% deviation from the expected count.
+
+        ```{python}
+        validation = (
+            pb.Validate(data=tbl)
+            .col_pct_null(columns="b", p=0.375, tol=0.25)  # Expect 3 nulls, allow ±25% (range: 2.25-3.75)
+            .interrogate()
+        )
+
+        validation
+        ```
+
+        This passes because 4 Null values falls within the acceptable range (3 ± 0.75 calculates
+        to 2.25 to 3.75, which rounds down to 2 to 3 rows).
+
+        *Using asymmetric absolute bounds (tuple of integers)*: Specify different lower and
+        upper bounds as absolute values. With `tol=(0, 2)`, we allow no deviation below but up
+        to 2 rows above the expected count.
+
+        ```{python}
+        validation = (
+            pb.Validate(data=tbl)
+            .col_pct_null(columns="b", p=0.25, tol=(0, 2))  # Expect 2 Nulls, allow +0/-2 (range: 2-4)
+            .interrogate()
+        )
+
+        validation
+        ```
+
+        This passes because 4 Null values falls within the acceptable range of 2 to 4.
+
+        *Using asymmetric relative bounds (tuple of floats)*: Specify different lower and upper
+        bounds as proportions. With `tol=(0.1, 0.3)`, we allow 10% below and 30% above the
+        expected count.
+
+        ```{python}
+        validation = (
+            pb.Validate(data=tbl)
+            .col_pct_null(columns="b", p=0.375, tol=(0.1, 0.3))  # Expect 3 Nulls, allow -10%/+30%
+            .interrogate()
+        )
+
+        validation
+        ```
+
+        This passes because 4 Null values falls within the acceptable range (3 - 0.3 to 3 + 0.9
+        calculates to 2.7 to 3.9, which rounds down to 2 to 3 rows).
+        """
+        assertion_type = _get_fn_name()
+
+        _check_column(column=columns)
+        _check_thresholds(thresholds=thresholds)
+        _check_boolean_input(param=active, param_name="active")
+
+        # Determine threshold to use (global or local) and normalize a local `thresholds=` value
+        thresholds = (
+            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+        )
+
+        # If `columns` is a ColumnSelector or Narwhals selector, call `col()` on it to later
+        # resolve the columns
+        if isinstance(columns, (ColumnSelector, nw.selectors.Selector)):
+            columns = col(columns)
+
+        # If `columns` is Column value or a string, place it in a list for iteration
+        if isinstance(columns, (Column, str)):
+            columns = [columns]
+
+        # Determine brief to use (global or local) and transform any shorthands of `brief=`
+        brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
+
+        bound_finder: Callable[[int], AbsoluteBounds] = partial(_derive_bounds, tol=tol)
+
+        # Iterate over the columns and create a validation step for each
+        for column in columns:
+            val_info = _ValidationInfo(
+                assertion_type=assertion_type,
+                column=column,
+                values={"p": p, "bound_finder": bound_finder},
                 thresholds=thresholds,
                 actions=actions,
                 brief=brief,
@@ -12356,12 +12655,19 @@ class Validate:
             # Generate the autobrief description for the validation step; it's important to perform
             # that here since text components like the column and the value(s) have been resolved
             # at this point
+            # Get row count for col_pct_null to properly calculate absolute tolerance percentages
+            n_rows = None
+            if assertion_type == "col_pct_null":
+                n_rows = get_row_count(data_tbl)
+
             autobrief = _create_autobrief_or_failure_text(
                 assertion_type=assertion_type,
                 lang=self.lang,
                 column=column,
                 values=value,
                 for_failure=False,
+                locale=self.locale,
+                n_rows=n_rows,
             )
 
             validation.autobrief = autobrief
@@ -12689,6 +12995,21 @@ class Validate:
                                 tbl=tbl, column=column, values=value, na_pass=na_pass
                             )
 
+                    elif assertion_type == "col_pct_null":
+                        result_bool = col_pct_null(
+                            data_tbl=data_tbl_step,
+                            column=column,
+                            p=value["p"],
+                            bound_finder=value["bound_finder"],
+                        )
+
+                        validation.all_passed = result_bool
+                        validation.n = 1
+                        validation.n_passed = int(result_bool)
+                        validation.n_failed = 1 - int(result_bool)
+
+                        results_tbl = None
+
                     elif assertion_type == "col_vals_expr":
                         results_tbl = col_vals_expr(
                             data_tbl=data_tbl_step, expr=value, tbl_type=tbl_type
@@ -12762,7 +13083,7 @@ class Validate:
                         validation.all_passed = result_bool
                         validation.n = 1
                         validation.n_passed = int(result_bool)
-                        validation.n_failed = 1 - result_bool
+                        validation.n_failed = 1 - int(result_bool)
 
                         results_tbl = None
 
@@ -12777,7 +13098,7 @@ class Validate:
                         validation.all_passed = result_bool
                         validation.n = 1
                         validation.n_passed = int(result_bool)
-                        validation.n_failed = 1 - result_bool
+                        validation.n_failed = 1 - int(result_bool)
 
                         results_tbl = None
 
@@ -12789,7 +13110,7 @@ class Validate:
                         validation.all_passed = result_bool
                         validation.n = 1
                         validation.n_passed = int(result_bool)
-                        validation.n_failed = 1 - result_bool
+                        validation.n_failed = 1 - int(result_bool)
 
                         results_tbl = None
 
@@ -12808,7 +13129,7 @@ class Validate:
                         validation.all_passed = result_bool
                         validation.n = 1
                         validation.n_passed = int(result_bool)
-                        validation.n_failed = 1 - result_bool
+                        validation.n_failed = 1 - int(result_bool)
 
                         results_tbl = None
 
@@ -13076,6 +13397,8 @@ class Validate:
                     column=column,
                     values=value,
                     for_failure=True,
+                    locale=self.locale,
+                    n_rows=n_rows,
                 )
 
                 # Set the failure text in the validation step
@@ -15599,6 +15922,15 @@ class Validate:
             ]:
                 values_upd.append("&mdash;")
 
+            elif assertion_type[i] in ["col_pct_null"]:
+                # Extract p and tol from the values dict for nice formatting
+                p_value = value["p"]
+
+                # Extract tol from the bound_finder partial function
+                bound_finder = value.get("bound_finder")
+                tol_value = bound_finder.keywords.get("tol", 0) if bound_finder else 0
+                values_upd.append(f"p = {p_value}<br/>tol = {tol_value}")
+
             elif assertion_type[i] in ["col_schema_match"]:
                 values_upd.append("SCHEMA")
 
@@ -16867,7 +17199,7 @@ def _convert_string_to_datetime(value: str) -> datetime.datetime:
             return datetime.datetime.strptime(value, "%Y-%m-%d %H:%M:%S")
 
 
-def _string_date_dttm_conversion(value: any) -> any:
+def _string_date_dttm_conversion(value: Any) -> Any:
     """
     Convert a string to a date or datetime object if it is in the correct format.
     If the value is not a string, it is returned as is.
@@ -16947,9 +17279,9 @@ def _process_brief(
     brief: str | None,
     step: int,
     col: str | list[str] | None,
-    values: any | None,
-    thresholds: any | None,
-    segment: any | None,
+    values: Any | None,
+    thresholds: Any | None,
+    segment: Any | None,
 ) -> str:
     # If there is no brief, return `None`
     if brief is None:
@@ -17036,7 +17368,7 @@ def _process_action_str(
     action_str: str,
     step: int,
     col: str | None,
-    value: any,
+    value: Any,
     type: str,
     level: str,
     time: str,
@@ -17086,7 +17418,13 @@ def _process_action_str(
 
 
 def _create_autobrief_or_failure_text(
-    assertion_type: str, lang: str, column: str | None, values: str | None, for_failure: bool
+    assertion_type: str,
+    lang: str,
+    column: str,
+    values: str | None,
+    for_failure: bool,
+    locale: str | None = None,
+    n_rows: int | None = None,
 ) -> str:
     if assertion_type in [
         "col_vals_gt",
@@ -17210,6 +17548,16 @@ def _create_autobrief_or_failure_text(
             for_failure=for_failure,
         )
 
+    if assertion_type == "col_pct_null":
+        return _create_text_col_pct_null(
+            lang=lang,
+            column=column,
+            value=values,
+            for_failure=for_failure,
+            locale=locale if locale else lang,
+            n_rows=n_rows,
+        )
+
     if assertion_type == "conjointly":
         return _create_text_conjointly(lang=lang, for_failure=for_failure)
 
@@ -17225,7 +17573,7 @@ def _create_autobrief_or_failure_text(
             for_failure=for_failure,
         )
 
-    return None  # pragma: no cover
+    return None
 
 
 def _expect_failure_type(for_failure: bool) -> str:
@@ -17235,7 +17583,7 @@ def _expect_failure_type(for_failure: bool) -> str:
 def _create_text_comparison(
     assertion_type: str,
     lang: str,
-    column: str | list[str] | None,
+    column: str | list[str],
     values: str | None,
     for_failure: bool = False,
 ) -> str:
@@ -17261,7 +17609,7 @@ def _create_text_comparison(
 
 def _create_text_between(
     lang: str,
-    column: str | None,
+    column: str,
     value_1: str,
     value_2: str,
     not_: bool = False,
@@ -17291,7 +17639,7 @@ def _create_text_between(
 
 
 def _create_text_set(
-    lang: str, column: str | None, values: list[any], not_: bool = False, for_failure: bool = False
+    lang: str, column: str, values: list[Any], not_: bool = False, for_failure: bool = False
 ) -> str:
     type_ = _expect_failure_type(for_failure=for_failure)
 
@@ -17313,9 +17661,7 @@ def _create_text_set(
     return text
 
 
-def _create_text_null(
-    lang: str, column: str | None, not_: bool = False, for_failure: bool = False
-) -> str:
+def _create_text_null(lang: str, column: str, not_: bool = False, for_failure: bool = False) -> str:
     type_ = _expect_failure_type(for_failure=for_failure)
 
     column_text = _prep_column_text(column=column)
@@ -17332,9 +17678,7 @@ def _create_text_null(
     return text
 
 
-def _create_text_regex(
-    lang: str, column: str | None, pattern: str | dict, for_failure: bool = False
-) -> str:
+def _create_text_regex(lang: str, column: str, pattern: str, for_failure: bool = False) -> str:
     type_ = _expect_failure_type(for_failure=for_failure)
 
     column_text = _prep_column_text(column=column)
@@ -17366,7 +17710,7 @@ def _create_text_expr(lang: str, for_failure: bool) -> str:
     return EXPECT_FAIL_TEXT[f"col_vals_expr_{type_}_text"][lang]
 
 
-def _create_text_col_exists(lang: str, column: str | None, for_failure: bool = False) -> str:
+def _create_text_col_exists(lang: str, column: str, for_failure: bool = False) -> str:
     type_ = _expect_failure_type(for_failure=for_failure)
 
     column_text = _prep_column_text(column=column)
@@ -17416,7 +17760,7 @@ def _create_text_rows_complete(
     return text
 
 
-def _create_text_row_count_match(lang: str, value: int, for_failure: bool = False) -> str:
+def _create_text_row_count_match(lang: str, value: dict, for_failure: bool = False) -> str:
     type_ = _expect_failure_type(for_failure=for_failure)
 
     values_text = _prep_values_text(value["count"], lang=lang)
@@ -17424,12 +17768,121 @@ def _create_text_row_count_match(lang: str, value: int, for_failure: bool = Fals
     return EXPECT_FAIL_TEXT[f"row_count_match_n_{type_}_text"][lang].format(values_text=values_text)
 
 
-def _create_text_col_count_match(lang: str, value: int, for_failure: bool = False) -> str:
+def _create_text_col_count_match(lang: str, value: dict, for_failure: bool = False) -> str:
     type_ = _expect_failure_type(for_failure=for_failure)
 
     values_text = _prep_values_text(value["count"], lang=lang)
 
     return EXPECT_FAIL_TEXT[f"col_count_match_n_{type_}_text"][lang].format(values_text=values_text)
+
+
+def _create_text_col_pct_null(
+    lang: str,
+    column: str | None,
+    value: dict,
+    for_failure: bool = False,
+    locale: str | None = None,
+    n_rows: int | None = None,
+) -> str:
+    """Create text for col_pct_null validation with tolerance handling."""
+    type_ = _expect_failure_type(for_failure=for_failure)
+
+    column_text = _prep_column_text(column=column)
+
+    # Use locale for number formatting, defaulting to lang if not provided
+    fmt_locale = locale if locale else lang
+
+    # Extract p and tol from the values dict
+    p_value = value.get("p", 0) * 100  # Convert to percentage
+    p_value_original = value.get("p", 0)  # Keep original value for deviation format
+
+    # Extract tol from the bound_finder partial function
+    bound_finder = value.get("bound_finder")
+    tol_value = bound_finder.keywords.get("tol", 0) if bound_finder else 0
+
+    # Handle different tolerance types
+    has_tolerance = False
+    is_asymmetric = False
+
+    if isinstance(tol_value, tuple):
+        # Tuple tolerance: can be (lower, upper) in absolute or relative terms
+        tol_lower, tol_upper = tol_value
+
+        # Check if we have any non-zero tolerance
+        has_tolerance = tol_lower != 0 or tol_upper != 0
+        is_asymmetric = tol_lower != tol_upper
+
+        # For relative tolerances (floats < 1), we can compute exact percentage bounds
+        # For absolute tolerances (ints >= 1), calculate based on actual row count if available
+        if tol_lower < 1:
+            # Relative tolerance (float)
+            lower_pct_delta = tol_lower * 100
+        else:
+            # Absolute tolerance (int); uses actual row count if available
+            if n_rows is not None and n_rows > 0:
+                lower_pct_delta = (tol_lower / n_rows) * 100
+            else:
+                lower_pct_delta = tol_lower  # Fallback approximation
+
+        if tol_upper < 1:
+            # Relative tolerance (float)
+            upper_pct_delta = tol_upper * 100
+        else:
+            # Absolute tolerance (int); uses actual row count if available
+            if n_rows is not None and n_rows > 0:
+                upper_pct_delta = (tol_upper / n_rows) * 100
+            else:
+                upper_pct_delta = tol_upper  # Fallback approximation
+    else:
+        # Single value tolerance: symmetric
+        has_tolerance = tol_value != 0
+
+        if tol_value < 1:
+            # Relative tolerance (float)
+            tol_pct = tol_value * 100
+        else:
+            # Absolute tolerance (int) - use actual row count if available
+            if n_rows is not None and n_rows > 0:
+                tol_pct = (tol_value / n_rows) * 100
+            else:
+                tol_pct = tol_value  # Fallback approximation
+
+        lower_pct_delta = tol_pct
+        upper_pct_delta = tol_pct
+
+    # Format numbers with locale-aware formatting
+    p_formatted = _format_number_safe(p_value, decimals=1, locale=fmt_locale)
+    p_original_formatted = _format_number_safe(p_value_original, decimals=2, locale=fmt_locale)
+
+    # Choose the appropriate translation key based on tolerance
+    if not has_tolerance:
+        # No tolerance - use simple text
+        text = EXPECT_FAIL_TEXT[f"col_pct_null_{type_}_text"][lang].format(
+            column_text=column_text,
+            p=p_formatted,
+        )
+    elif is_asymmetric or isinstance(tol_value, tuple):
+        # Use deviation format for tuple tolerances (including symmetric ones)
+        # Format the deviation values with signs (using proper minus sign U+2212)
+        lower_dev = f"−{_format_number_safe(lower_pct_delta, decimals=1, locale=fmt_locale)}%"
+        upper_dev = f"+{_format_number_safe(upper_pct_delta, decimals=1, locale=fmt_locale)}%"
+
+        text = EXPECT_FAIL_TEXT[f"col_pct_null_{type_}_text_tol_deviation"][lang].format(
+            column_text=column_text,
+            lower_dev=lower_dev,
+            upper_dev=upper_dev,
+            p=p_original_formatted,
+        )
+    else:
+        # Single value tolerance - use the symmetric ± format
+        tol_formatted = _format_number_safe(lower_pct_delta, decimals=1, locale=fmt_locale)
+        text = EXPECT_FAIL_TEXT[f"col_pct_null_{type_}_text_tol"][lang].format(
+            column_text=column_text,
+            p=p_formatted,
+            tol=tol_formatted,
+        )
+
+    return text
 
 
 def _create_text_conjointly(lang: str, for_failure: bool = False) -> str:
@@ -17452,19 +17905,13 @@ def _create_text_prompt(lang: str, prompt: str, for_failure: bool = False) -> st
 def _prep_column_text(column: str | list[str]) -> str:
     if isinstance(column, list):
         return "`" + str(column[0]) + "`"
-    elif isinstance(column, str):
+    if isinstance(column, str):
         return "`" + column + "`"
-    else:
-        return ""
+    raise AssertionError
 
 
 def _prep_values_text(
-    values: str
-    | int
-    | float
-    | datetime.datetime
-    | datetime.date
-    | list[str | int | float | datetime.datetime | datetime.date],
+    values: _CompliantValue | _CompliantValues,
     lang: str,
     limit: int = 3,
 ) -> str:
@@ -17512,7 +17959,7 @@ def _prep_values_text(
     return values_str
 
 
-def _seg_expr_from_string(data_tbl: any, segments_expr: str) -> list[tuple[str, str]]:
+def _seg_expr_from_string(data_tbl: Any, segments_expr: str) -> tuple[str, str]:
     """
     Obtain the segmentation categories from a table column.
 
@@ -17615,7 +18062,7 @@ def _seg_expr_from_tuple(segments_expr: tuple) -> list[tuple[str, Any]]:
     return seg_tuples
 
 
-def _apply_segments(data_tbl: any, segments_expr: tuple[str, Any]) -> any:
+def _apply_segments(data_tbl: Any, segments_expr: tuple[str, str]) -> Any:
     """
     Apply the segments expression to the data table.
 
@@ -17830,6 +18277,7 @@ def _validation_info_as_dict(validation_info: _ValidationInfo) -> dict:
 
 def _get_assertion_icon(icon: list[str], length_val: int = 30) -> list[str]:
     # For each icon, get the assertion icon SVG test from SVG_ICONS_FOR_ASSERTION_TYPES dictionary
+    # TODO: No point in using `get` if we can't handle missing keys anyways
     icon_svg = [SVG_ICONS_FOR_ASSERTION_TYPES.get(icon) for icon in icon]
 
     # Replace the width and height in the SVG string
@@ -17839,11 +18287,9 @@ def _get_assertion_icon(icon: list[str], length_val: int = 30) -> list[str]:
     return icon_svg
 
 
-def _replace_svg_dimensions(svg: list[str], height_width: int | float) -> list[str]:
+def _replace_svg_dimensions(svg: str, height_width: int | float) -> str:
     svg = re.sub(r'width="[0-9]*?px', f'width="{height_width}px', svg)
-    svg = re.sub(r'height="[0-9]*?px', f'height="{height_width}px', svg)
-
-    return svg
+    return re.sub(r'height="[0-9]*?px', f'height="{height_width}px', svg)
 
 
 def _get_title_text(
@@ -17907,7 +18353,7 @@ def _process_title_text(title: str | None, tbl_name: str | None, lang: str) -> s
     return title_text
 
 
-def _transform_tbl_preprocessed(pre: any, seg: any, interrogation_performed: bool) -> list[str]:
+def _transform_tbl_preprocessed(pre: Any, seg: Any, interrogation_performed: bool) -> list[str]:
     # If no interrogation was performed, return a list of empty strings
     if not interrogation_performed:
         return ["" for _ in range(len(pre))]
@@ -18215,22 +18661,21 @@ def _transform_assertion_str(
     return type_upd
 
 
-def _pre_processing_funcs_to_str(pre: Callable) -> str | list[str]:
+def _pre_processing_funcs_to_str(pre: Callable) -> str | list[str] | None:
     if isinstance(pre, Callable):
         return _get_callable_source(fn=pre)
+    return None
 
 
 def _get_callable_source(fn: Callable) -> str:
-    if isinstance(fn, Callable):
-        try:
-            source_lines, _ = inspect.getsourcelines(fn)
-            source = "".join(source_lines).strip()
-            # Extract the `pre` argument from the source code
-            pre_arg = _extract_pre_argument(source)
-            return pre_arg
-        except (OSError, TypeError):  # pragma: no cover
-            return fn.__name__
-    return fn  # pragma: no cover
+    try:
+        source_lines, _ = inspect.getsourcelines(fn)
+        source = "".join(source_lines).strip()
+        # Extract the `pre` argument from the source code
+        pre_arg = _extract_pre_argument(source)
+        return pre_arg
+    except (OSError, TypeError):  # pragma: no cover
+        return fn.__name__
 
 
 def _extract_pre_argument(source: str) -> str:
@@ -18256,6 +18701,7 @@ def _create_table_time_html(
     if time_start is None:
         return ""
 
+    assert time_end is not None  # typing
     # Get the time duration (difference between `time_end` and `time_start`) in seconds
     time_duration = (time_end - time_start).total_seconds()
 
@@ -19368,12 +19814,12 @@ def _step_report_row_based(
     column: str,
     column_position: int,
     columns_subset: list[str] | None,
-    values: any,
+    values: Any,
     inclusive: tuple[bool, bool] | None,
     n: int,
     n_failed: int,
     all_passed: bool,
-    extract: any,
+    extract: Any,
     tbl_preview: GT,
     header: str,
     limit: int | None,
@@ -19400,10 +19846,12 @@ def _step_report_row_based(
     elif assertion_type == "col_vals_le":
         text = f"{column} &le; {values}"
     elif assertion_type == "col_vals_between":
+        assert inclusive is not None
         symbol_left = "&le;" if inclusive[0] else "&lt;"
         symbol_right = "&le;" if inclusive[1] else "&lt;"
         text = f"{values[0]} {symbol_left} {column} {symbol_right} {values[1]}"
     elif assertion_type == "col_vals_outside":
+        assert inclusive is not None
         symbol_left = "&lt;" if inclusive[0] else "&le;"
         symbol_right = "&gt;" if inclusive[1] else "&ge;"
         text = f"{column} {symbol_left} {values[0]}, {column} {symbol_right} {values[1]}"
@@ -19624,7 +20072,7 @@ def _step_report_rows_distinct(
     n: int,
     n_failed: int,
     all_passed: bool,
-    extract: any,
+    extract: Any,
     tbl_preview: GT,
     header: str,
     limit: int | None,
@@ -19752,7 +20200,7 @@ def _step_report_rows_distinct(
 
 def _step_report_schema_in_order(
     step: int, schema_info: dict, header: str, lang: str, debug_return_df: bool = False
-) -> GT | any:
+) -> GT | Any:
     """
     This is the case for schema validation where the schema is supposed to have the same column
     order as the target table.
