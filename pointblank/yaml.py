@@ -100,8 +100,8 @@ def _safe_eval_python_code(
             namespaces.items() if isinstance(namespaces, dict) else ((m, m) for m in namespaces)
         ):
             try:
-                safe_namespace[alias] = import_module(module_name)
-            except ImportError as e:
+                safe_namespace[alias] = import_module(str(module_name))
+            except ImportError as e:  # TODO: This is basically redundant, remove?
                 raise ImportError(
                     f"Could not import requested namespace '{module_name}': {e}"
                 ) from e
