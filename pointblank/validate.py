@@ -20524,7 +20524,9 @@ def _step_report_schema_in_order(
         # Add a border below the row that terminates the target table schema
         step_report = step_report.tab_style(
             style=style.borders(sides="bottom", color="#6699CC80", style="solid", weight="1px"),
-            locations=loc.body(rows=len(colnames_tgt) - 1),
+            locations=loc.body(
+                rows=len(colnames_tgt) - 1
+            ),  # ty: ignore (bug in GT, should allow an int)
         )
 
     # If the version of `great_tables` is `>=0.17.0` then disable Quarto table processing
