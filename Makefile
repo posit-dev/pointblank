@@ -19,8 +19,8 @@ lint: ## Run ruff formatter and linter
 	@uv run ruff check --fix
 
 
-type: ## Run experimental(!) type checking
-	@uvx ty check pointblank
+type: ## Run experimental type checking
+	@uv run ty check pointblank
 
 
 check:
