@@ -1,6 +1,5 @@
-import pytest
-from typing import Protocol
 from pointblank import Validate
+from collections.abc import Callable
 
 ## IMPORTANT: READ THIS
 # This test file is unique, it's designed to create the doctests for the `col_*` aggregate functions.
@@ -14,11 +13,13 @@ from pointblank import Validate
 # 3. Run `uv run pytest tests/test_agg_doctests.py` to run these tests and ensure they pass.
 # 4. Run `make pyi` to update the `pyi` files to reflect the new examples.
 
-_TEST_FUNCTION_REGISTRY = []
+_TEST_FUNCTION_REGISTRY: dict[str, Callable] = {}
 
 
 def _test(fn):
-    _TEST_FUNCTION_REGISTRY.append(fn)
+    nm: str = fn.__name__
+    name_no_test = nm.removeprefix("test_")
+    _TEST_FUNCTION_REGISTRY[name_no_test] = fn
     return fn
 
 

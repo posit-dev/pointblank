@@ -561,6 +561,7 @@ class Validate:
         active: bool = True,
     ) -> Validate:
         """Assert the values in a column sum to a value eq some `value`.
+
         Args:
             columns (_PBUnresolvedColumn): Column or collection of columns to validate.
             value (float | Column): Target value to validate against.
@@ -573,6 +574,13 @@ class Validate:
 
         Returns:
             Validate: A `Validate` instance with the new validation method added.
+
+        Examples:
+        >>> import polars as pl
+        >>>
+        >>> data = pl.DataFrame({"a": [1, 2, 3, 4, 5]})
+        >>> v = Validate(data).col_sum_eq("a", 15)
+        >>> v.assert_passing()
         """
         ...
 
@@ -587,6 +595,7 @@ class Validate:
         active: bool = True,
     ) -> Validate:
         """Assert the values in a column sum to a value gt some `value`.
+
         Args:
             columns (_PBUnresolvedColumn): Column or collection of columns to validate.
             value (float | Column): Target value to validate against.
@@ -599,6 +608,13 @@ class Validate:
 
         Returns:
             Validate: A `Validate` instance with the new validation method added.
+
+        Examples:
+        >>> import polars as pl
+        >>>
+        >>> data = pl.DataFrame({"a": [1, 2, 3, 4, 5]})
+        >>> v = Validate(data).col_sum_gt("a", 10)
+        >>> v.assert_passing()
         """
         ...
 
@@ -613,6 +629,7 @@ class Validate:
         active: bool = True,
     ) -> Validate:
         """Assert the values in a column sum to a value ge some `value`.
+
         Args:
             columns (_PBUnresolvedColumn): Column or collection of columns to validate.
             value (float | Column): Target value to validate against.
@@ -625,6 +642,13 @@ class Validate:
 
         Returns:
             Validate: A `Validate` instance with the new validation method added.
+
+        Examples:
+        >>> import polars as pl
+        >>>
+        >>> data = pl.DataFrame({"a": [1, 2, 3, 4, 5]})
+        >>> v = Validate(data).col_sum_ge("a", 15)
+        >>> v.assert_passing()
         """
         ...
 
@@ -639,6 +663,7 @@ class Validate:
         active: bool = True,
     ) -> Validate:
         """Assert the values in a column sum to a value lt some `value`.
+
         Args:
             columns (_PBUnresolvedColumn): Column or collection of columns to validate.
             value (float | Column): Target value to validate against.
@@ -651,6 +676,13 @@ class Validate:
 
         Returns:
             Validate: A `Validate` instance with the new validation method added.
+
+        Examples:
+        >>> import polars as pl
+        >>>
+        >>> data = pl.DataFrame({"a": [1, 2, 3, 4, 5]})
+        >>> v = Validate(data).col_sum_lt("a", 20)
+        >>> v.assert_passing()
         """
         ...
 
@@ -665,6 +697,7 @@ class Validate:
         active: bool = True,
     ) -> Validate:
         """Assert the values in a column sum to a value le some `value`.
+
         Args:
             columns (_PBUnresolvedColumn): Column or collection of columns to validate.
             value (float | Column): Target value to validate against.
@@ -677,6 +710,13 @@ class Validate:
 
         Returns:
             Validate: A `Validate` instance with the new validation method added.
+
+        Examples:
+        >>> import polars as pl
+        >>>
+        >>> data = pl.DataFrame({"a": [1, 2, 3, 4, 5]})
+        >>> v = Validate(data).col_sum_le("a", 15)
+        >>> v.assert_passing()
         """
         ...
 
@@ -691,6 +731,7 @@ class Validate:
         active: bool = True,
     ) -> Validate:
         """Assert the values in a column avg to a value eq some `value`.
+
         Args:
             columns (_PBUnresolvedColumn): Column or collection of columns to validate.
             value (float | Column): Target value to validate against.
@@ -703,6 +744,13 @@ class Validate:
 
         Returns:
             Validate: A `Validate` instance with the new validation method added.
+
+        Examples:
+        >>> import polars as pl
+        >>>
+        >>> data = pl.DataFrame({"a": [1, 2, 3, 4, 5]})
+        >>> v = Validate(data).col_avg_eq("a", 3)
+        >>> v.assert_passing()
         """
         ...
 
@@ -717,6 +765,7 @@ class Validate:
         active: bool = True,
     ) -> Validate:
         """Assert the values in a column avg to a value gt some `value`.
+
         Args:
             columns (_PBUnresolvedColumn): Column or collection of columns to validate.
             value (float | Column): Target value to validate against.
@@ -729,6 +778,13 @@ class Validate:
 
         Returns:
             Validate: A `Validate` instance with the new validation method added.
+
+        Examples:
+        >>> import polars as pl
+        >>>
+        >>> data = pl.DataFrame({"a": [1, 2, 3, 4, 5]})
+        >>> v = Validate(data).col_avg_gt("a", 2)
+        >>> v.assert_passing()
         """
         ...
 
@@ -743,6 +799,7 @@ class Validate:
         active: bool = True,
     ) -> Validate:
         """Assert the values in a column avg to a value ge some `value`.
+
         Args:
             columns (_PBUnresolvedColumn): Column or collection of columns to validate.
             value (float | Column): Target value to validate against.
@@ -755,6 +812,13 @@ class Validate:
 
         Returns:
             Validate: A `Validate` instance with the new validation method added.
+
+        Examples:
+        >>> import polars as pl
+        >>>
+        >>> data = pl.DataFrame({"a": [1, 2, 3, 4, 5]})
+        >>> v = Validate(data).col_avg_ge("a", 3)
+        >>> v.assert_passing()
         """
         ...
 
@@ -769,6 +833,7 @@ class Validate:
         active: bool = True,
     ) -> Validate:
         """Assert the values in a column avg to a value lt some `value`.
+
         Args:
             columns (_PBUnresolvedColumn): Column or collection of columns to validate.
             value (float | Column): Target value to validate against.
@@ -781,6 +846,13 @@ class Validate:
 
         Returns:
             Validate: A `Validate` instance with the new validation method added.
+
+        Examples:
+        >>> import polars as pl
+        >>>
+        >>> data = pl.DataFrame({"a": [1, 2, 3, 4, 5]})
+        >>> v = Validate(data).col_avg_lt("a", 5)
+        >>> v.assert_passing()
         """
         ...
 
@@ -795,6 +867,7 @@ class Validate:
         active: bool = True,
     ) -> Validate:
         """Assert the values in a column avg to a value le some `value`.
+
         Args:
             columns (_PBUnresolvedColumn): Column or collection of columns to validate.
             value (float | Column): Target value to validate against.
@@ -807,6 +880,13 @@ class Validate:
 
         Returns:
             Validate: A `Validate` instance with the new validation method added.
+
+        Examples:
+        >>> import polars as pl
+        >>>
+        >>> data = pl.DataFrame({"a": [1, 2, 3, 4, 5]})
+        >>> v = Validate(data).col_avg_le("a", 3)
+        >>> v.assert_passing()
         """
         ...
 
@@ -821,6 +901,7 @@ class Validate:
         active: bool = True,
     ) -> Validate:
         """Assert the values in a column sd to a value eq some `value`.
+
         Args:
             columns (_PBUnresolvedColumn): Column or collection of columns to validate.
             value (float | Column): Target value to validate against.
@@ -833,6 +914,13 @@ class Validate:
 
         Returns:
             Validate: A `Validate` instance with the new validation method added.
+
+        Examples:
+        >>> import polars as pl
+        >>>
+        >>> data = pl.DataFrame({"a": [2, 4, 6, 8, 10]})
+        >>> v = Validate(data).col_sd_eq("a", 3.1622776601683795)
+        >>> v.assert_passing()
         """
         ...
 
@@ -847,6 +935,7 @@ class Validate:
         active: bool = True,
     ) -> Validate:
         """Assert the values in a column sd to a value gt some `value`.
+
         Args:
             columns (_PBUnresolvedColumn): Column or collection of columns to validate.
             value (float | Column): Target value to validate against.
@@ -859,6 +948,13 @@ class Validate:
 
         Returns:
             Validate: A `Validate` instance with the new validation method added.
+
+        Examples:
+        >>> import polars as pl
+        >>>
+        >>> data = pl.DataFrame({"a": [1, 2, 3, 4, 5]})
+        >>> v = Validate(data).col_sd_gt("a", 1)
+        >>> v.assert_passing()
         """
         ...
 
@@ -873,6 +969,7 @@ class Validate:
         active: bool = True,
     ) -> Validate:
         """Assert the values in a column sd to a value ge some `value`.
+
         Args:
             columns (_PBUnresolvedColumn): Column or collection of columns to validate.
             value (float | Column): Target value to validate against.
@@ -885,6 +982,13 @@ class Validate:
 
         Returns:
             Validate: A `Validate` instance with the new validation method added.
+
+        Examples:
+        >>> import polars as pl
+        >>>
+        >>> data = pl.DataFrame({"a": [2, 4, 4, 4, 6]})
+        >>> v = Validate(data).col_sd_ge("a", 1.4142135623730951)
+        >>> v.assert_passing()
         """
         ...
 
@@ -899,6 +1003,7 @@ class Validate:
         active: bool = True,
     ) -> Validate:
         """Assert the values in a column sd to a value lt some `value`.
+
         Args:
             columns (_PBUnresolvedColumn): Column or collection of columns to validate.
             value (float | Column): Target value to validate against.
@@ -911,6 +1016,13 @@ class Validate:
 
         Returns:
             Validate: A `Validate` instance with the new validation method added.
+
+        Examples:
+        >>> import polars as pl
+        >>>
+        >>> data = pl.DataFrame({"a": [1, 2, 3, 4, 5]})
+        >>> v = Validate(data).col_sd_lt("a", 2)
+        >>> v.assert_passing()
         """
         ...
 
@@ -925,6 +1037,7 @@ class Validate:
         active: bool = True,
     ) -> Validate:
         """Assert the values in a column sd to a value le some `value`.
+
         Args:
             columns (_PBUnresolvedColumn): Column or collection of columns to validate.
             value (float | Column): Target value to validate against.
@@ -937,6 +1050,13 @@ class Validate:
 
         Returns:
             Validate: A `Validate` instance with the new validation method added.
+
+        Examples:
+        >>> import polars as pl
+        >>>
+        >>> data = pl.DataFrame({"a": [2, 4, 4, 4, 6]})
+        >>> v = Validate(data).col_sd_le("a", 1.4142135623730951)
+        >>> v.assert_passing()
         """
         ...
 

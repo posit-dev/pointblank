@@ -1,8 +1,16 @@
+import inspect
 import itertools
 import subprocess
+import sys
 from pathlib import Path
 
-from pointblank._agg import AGGREGATOR_REGISTRY, COMPARATOR_REGISTRY
+from pointblank._agg import AGGREGATOR_REGISTRY, COMPARATOR_REGISTRY, is_valid_agg
+
+# Go from `.scripts/__file__.py` to `.`, allowing us to import `tests` which lives
+# at the root.
+project_root = Path(__file__).parent.parent
+sys.path.append(str(project_root))
+from tests.test_agg_doctests import _TEST_FUNCTION_REGISTRY
 
 VALIDATE_PYI_PATH = Path("pointblank/validate.pyi")
 
@@ -30,6 +38,8 @@ DOCSTRING = """
 
         Returns:
             Validate: A `Validate` instance with the new validation method added.
+
+        Examples:
 """
 
 CLS = "Validate"
@@ -55,18 +65,34 @@ with VALIDATE_PYI_PATH.open("a") as f:
         AGGREGATOR_REGISTRY.keys(), COMPARATOR_REGISTRY.keys()
     ):
         method = f"col_{agg_name}_{comp_name}"
+        assert is_valid_agg(method)  # internal sanity check
+
+        # Extract examples from the doctest registry.
+        doctest_fn = _TEST_FUNCTION_REGISTRY[method]
+        try:
+            lines_to_skip = len(doctest_fn.__doc__.split("\n"))
+        except AttributeError:
+            lines_to_skip = 0
+
+        lines: list[str] = inspect.getsourcelines(doctest_fn)[0]
+        cleaned_lines: list[str] = [line.strip() for line in lines]
+        body: str = "\n".join(cleaned_lines[lines_to_skip + 2 :])
+
+        # Add >>> to each line in the body so doctest can run it
+        body_with_arrows: str = "\n".join(f"\t>>> {line}" for line in body.split("\n"))
 
         # Build docstring
-        first_line = (
+        meth_body = (
             f'"""Assert the values in a column '
             f"{agg_name.replace('_', ' ')} to a value "
             f"{comp_name.replace('_', ' ')} some `value`.\n"
             f"{DOCSTRING}"
+            f"{body_with_arrows}\n"
             f'"""\n'
         )
 
         # Build the .pyi stub method
-        temp = f"    def {method}({SIGNATURE}\t) -> {CLS}:\n        {first_line}        ...\n\n"
+        temp = f"    def {method}({SIGNATURE}\t) -> {CLS}:\n        {meth_body}        ...\n\n"
 
         f.write(temp)
 
