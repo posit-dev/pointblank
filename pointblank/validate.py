@@ -15,7 +15,7 @@ from enum import Enum
 from functools import partial
 from importlib.metadata import version
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Callable, Literal
+from typing import TYPE_CHECKING, Any, Callable, Literal, ParamSpec, TypeVar
 from zipfile import ZipFile
 
 import commonmark
@@ -26,6 +26,7 @@ from great_tables.vals import fmt_integer, fmt_number
 from importlib_resources import files
 from narwhals.typing import FrameT
 
+from pointblank._agg import is_valid_agg, load_validation_method_grid, resolve_agg_registries
 from pointblank._constants import (
     ASSERTION_TYPE_METHOD_MAP,
     CHECK_MARK_SPAN,
@@ -92,6 +93,8 @@ from pointblank._utils import (
     _is_lib_present,
     _is_narwhals_table,
     _is_value_a_df,
+    _PBUnresolvedColumn,
+    _resolve_columns,
     _select_df_lib,
 )
 from pointblank._utils_check_args import (
@@ -113,11 +116,15 @@ from pointblank.thresholds import (
     _normalize_thresholds_creation,
 )
 
+P = ParamSpec("P")
+R = TypeVar("R")
+
 if TYPE_CHECKING:
     from collections.abc import Collection
     from typing import Any
 
     from pointblank._typing import AbsoluteBounds, Tolerance, _CompliantValue, _CompliantValues
+
 
 __all__ = [
     "Validate",
@@ -135,6 +142,7 @@ __all__ = [
     "get_row_count",
     "get_validation_summary",
 ]
+
 
 # Create a thread-local storage for the metadata
 _action_context = threading.local()
@@ -3724,6 +3732,34 @@ class _ValidationInfo:
         insertion order, ensuring notes appear in a consistent sequence in reports and logs.
     """
 
+    @classmethod
+    def from_agg_validator(
+        cls,
+        assertion_type: str,
+        columns: _PBUnresolvedColumn,
+        value: float | Column,
+        tol: Tolerance = 0,
+        thresholds: float | bool | tuple | dict | Thresholds | None = None,
+        brief: str | bool = False,
+        actions: Actions | None = None,
+        active: bool = True,
+    ) -> _ValidationInfo:
+        # This factory method creates a `_ValidationInfo` instance for aggregate
+        # methods. The reason this is created, is because all agg methods share the same
+        # signature so instead of instantiating the class directly each time, this method
+        # can be used to reduce redundancy, boilerplate and mistakes :)
+        _check_thresholds(thresholds=thresholds)
+
+        return cls(
+            assertion_type=assertion_type,
+            column=_resolve_columns(columns),
+            values={"value": value, "tol": tol},
+            thresholds=_normalize_thresholds_creation(thresholds),
+            brief=_transform_auto_brief(brief=brief),
+            actions=actions,
+            active=active,
+        )
+
     # Validation plan
     i: int | None = None
     i_o: int | None = None
@@ -4836,6 +4872,38 @@ class Validate:
 
         self.validation_info = []
 
+    def _add_agg_validation(
+        self,
+        *,
+        assertion_type: str,
+        columns: str | Collection[str],
+        value,
+        tol=0,
+        thresholds=None,
+        brief=False,
+        actions=None,
+        active=True,
+    ):
+        # For each column and assertion, create a validation info object and add it to
+        # the plan. This is used by all aggregation-based column validation methods and
+        # relies heavily on the `_ValidationInfo.from_agg_validator()` class method.
+        if isinstance(columns, str):
+            columns = [columns]
+        for column in columns:
+            val_info = _ValidationInfo.from_agg_validator(
+                assertion_type=assertion_type,
+                columns=column,
+                value=value,
+                tol=tol,
+                thresholds=self.thresholds if thresholds is None else thresholds,
+                actions=self.actions if actions is None else actions,
+                brief=self.brief if brief is None else brief,
+                active=active,
+            )
+            self._add_validation(validation_info=val_info)
+
+        return self
+
     def set_tbl(
         self,
         tbl: FrameT | Any,
@@ -5215,7 +5283,6 @@ class Validate:
         - Row 1: `c` is `1` and `b` is `2`.
         - Row 3: `c` is `2` and `b` is `2`.
         """
-
         assertion_type = _get_fn_name()
 
         _check_column(column=columns)
@@ -5235,14 +5302,7 @@ class Validate:
             self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
         )
 
-        # If `columns` is a ColumnSelector or Narwhals selector, call `col()` on it to later
-        # resolve the columns
-        if isinstance(columns, (ColumnSelector, nw.selectors.Selector)):
-            columns = col(columns)
-
-        # If `columns` is Column value or a string, place it in a list for iteration
-        if isinstance(columns, (Column, str)):
-            columns = [columns]
+        columns = _resolve_columns(columns)
 
         # Determine brief to use (global or local) and transform any shorthands of `brief=`
         brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
@@ -12578,7 +12638,7 @@ class Validate:
             segment = validation.segments
 
             # Get compatible data types for this assertion type
-            assertion_method = ASSERTION_TYPE_METHOD_MAP[assertion_type]
+            assertion_method = ASSERTION_TYPE_METHOD_MAP.get(assertion_type, assertion_type)
             compatible_dtypes = COMPATIBLE_DTYPES.get(assertion_method, [])
 
             # Process the `brief` text for the validation step by including template variables to
@@ -13081,6 +13141,28 @@ class Validate:
                             tbl_type=tbl_type,
                         )
 
+                    elif is_valid_agg(assertion_type):
+                        agg, comp = resolve_agg_registries(assertion_type)
+
+                        # Produce a 1-column Narwhals DataFrame
+                        # TODO: Should be able to take lazy too
+                        vec: nw.DataFrame = nw.from_native(data_tbl_step).select(column)
+                        real = agg(vec)
+
+                        target: float | int = value["value"]
+                        tol = value["tol"]
+                        lower_diff, upper_diff = _derive_bounds(target, tol)
+
+                        lower_bound = target - lower_diff
+                        upper_bound = target + upper_diff
+                        result_bool: bool = comp(real, lower_bound, upper_bound)
+
+                        validation.all_passed = result_bool
+                        validation.n = 1
+                        validation.n_passed = int(result_bool)
+                        validation.n_failed = 1 - result_bool
+
+                        results_tbl = None
                     else:
                         raise ValueError(
                             f"Unknown assertion type: {assertion_type}"
@@ -15397,10 +15479,10 @@ class Validate:
     def get_tabular_report(
         self,
         title: str | None = ":default:",
-        incl_header: bool = None,
-        incl_footer: bool = None,
-        incl_footer_timings: bool = None,
-        incl_footer_notes: bool = None,
+        incl_header: bool | None = None,
+        incl_footer: bool | None = None,
+        incl_footer_timings: bool | None = None,
+        incl_footer_notes: bool | None = None,
     ) -> GT:
         """
         Validation report as a GT table.
@@ -20984,3 +21066,58 @@ def _create_col_schema_match_params_html(
         f"{full_match_dtypes_text}"
         "</div>"
     )
+
+
+def make_agg_validator(name: str):
+    """Factory for dynamically generated aggregate validation methods.
+
+    Why this exists:
+    Aggregate validators all share identical behavior. The only thing that differs
+    between them is the semantic assertion type (their name). The implementation
+    of each aggregate validator is fetched from `from_agg_validator`.
+
+    Instead of copy/pasting dozens of identical methods, we generate
+    them dynamically and attach them to the Validate class. The types are generated
+    at build time with `make pyi` to allow the methods to be visible to the type checker,
+    documentation builders and the IDEs/LSPs.
+
+    The returned function is a thin adapter that forwards all arguments to
+    `_add_agg_validation`, supplying the assertion type explicitly.
+    """
+
+    def agg_validator(
+        self: Validate,
+        columns: str | Collection[str],
+        value,
+        tol=0,
+        thresholds=None,
+        brief=False,
+        actions=None,
+        active=True,
+    ):
+        # Dynamically generated aggregate validator.
+        # This method is generated per assertion type and forwards all arguments
+        # to the shared aggregate validation implementation.
+        return self._add_agg_validation(
+            assertion_type=name,
+            columns=columns,
+            value=value,
+            tol=tol,
+            thresholds=thresholds,
+            brief=brief,
+            actions=actions,
+            active=active,
+        )
+
+    # Manually set function identity so this behaves like a real method.
+    # These must be set before attaching the function to the class.
+    agg_validator.__name__ = name
+    agg_validator.__qualname__ = f"Validate.{name}"
+
+    return agg_validator
+
+
+# Finally, we grab all the valid aggregation method names and attach them to
+# the Validate class, registering each one appropriately.
+for method in load_validation_method_grid():  # -> `col_sum_*`, `col_mean_*`, etc.
+    setattr(Validate, method, make_agg_validator(method))

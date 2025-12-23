@@ -45,6 +45,28 @@ The tests are located in the `tests` folder and we use `pytest` for running them
 
 If you create new tests involving snapshots, please ensure that the resulting snapshots are relatively small. After adding snapshots, use `make test-update` (this runs `pytest --snapshot-update`). A subsequent use of `make test` should pass without any issues.
 
+### Creating Aggregation Methods
+
+Aggregation methods are generated dynamically! This is done because they all have the same signature and they're registered on the `Validate` class in the same way. So, to add a new method, go to `pointblank/_agg.py` and add either a comparison or statistical aggregation function.
+
+Comparison functions are defined by `comp_*`, for example `comp_gt` for "greater than". Statistical functions are defined by `agg_*`, for example `agg_sum` for "sum". At build time, these are registered and a grid of all combinations are created:
+```{python}
+Aggregator = Callable[[nw.DataFrame], Any]
+Comparator = Callable[[Any, Any], bool]
+
+AGGREGATOR_REGISTRY: dict[str, Aggregator] = {}
+
+COMPARATOR_REGISTRY: dict[str, Comparator] = {}
+```
+
+Once you've added a new method(s), run `make pyi` to generate the updated type stubs in `pointblank/validate.pyi` which contains the new signatures for the aggregation methods. At runtime, or import time to be precise, the methods are added to the `Validate` class and resolved internally through the registry.
+```{python}
+# pointblank/validate.py
+for method in load_validation_method_grid():  # -> `col_sum_*`, `col_mean_*`, etc.
+    setattr(Validate, method, make_agg_validator(method))
+```
+
+At this point, the methods will exist AND the docs/signature are loaded properly in the type checker and IDE/LSPs, which is very important for usability.
 ### Linting and Type Checking
 
 We use `ruff` for linting, the settings used are fairly loose and objective. Linting is run in pre-commit in CI. You can run it locally with `make lint`. Type checking is currently not enforced, but we intend on gradually typing the codebase. You can run `make type` to run Astral's new experimental type checker `ty`. Feel free to leverage type hints and occasionally type checking but it's not obligatory at this time.

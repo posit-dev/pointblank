@@ -11,6 +11,7 @@ from great_tables.gt import _get_column_of_values
 from narwhals.typing import FrameT
 
 from pointblank._constants import ASSERTION_TYPE_METHOD_MAP, GENERAL_COLUMN_TYPES, IBIS_BACKENDS
+from pointblank.column import Column, ColumnLiteral, ColumnSelector, ColumnSelectorNarwhals, col
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
@@ -35,6 +36,7 @@ def transpose_dicts(list_of_dicts: list[dict[str, Any]]) -> dict[str, list[Any]]
     return dict(result)
 
 
+# TODO: doctest
 def _derive_single_bound(ref: int, tol: int | float) -> int:
     """Derive a single bound using the reference."""
     if not isinstance(tol, float | int):
@@ -44,6 +46,7 @@ def _derive_single_bound(ref: int, tol: int | float) -> int:
     return int(tol * ref) if tol < 1 else int(tol)
 
 
+# TODO: doctest
 def _derive_bounds(ref: int, tol: Tolerance) -> AbsoluteBounds:
     """Validate and extract the absolute bounds of the tolerance."""
     if isinstance(tol, tuple):
@@ -550,6 +553,23 @@ def _column_subset_test_prep(
     return dfn
 
 
+_PBUnresolvedColumn = str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals
+_PBResolvedColumn = Column | ColumnLiteral | ColumnSelectorNarwhals | list[Column] | list[str]
+
+
+def _resolve_columns(columns: _PBUnresolvedColumn) -> _PBResolvedColumn:
+    # If `columns` is a ColumnSelector or Narwhals selector, call `col()` on it to later
+    # resolve the columns
+    if isinstance(columns, (ColumnSelector, nw.selectors.Selector)):
+        columns = col(columns)
+
+    # If `columns` is Column value or a string, place it in a list for iteration
+    if isinstance(columns, (Column, str)):
+        columns = [columns]
+
+    return columns
+
+
 def _get_fn_name() -> str:
     # Get the current function name
     fn_name = inspect.currentframe().f_back.f_code.co_name
@@ -660,10 +680,10 @@ def _format_to_float_value(
 
 def _pivot_to_dict(col_dict: Mapping[str, Any]):  # TODO : Type hint and unit test
     result_dict = {}
-    for col, sub_dict in col_dict.items():
+    for _col, sub_dict in col_dict.items():
         for key, value in sub_dict.items():
             # add columns fields not present
             if key not in result_dict:
                 result_dict[key] = [None] * len(col_dict)
-            result_dict[key][list(col_dict.keys()).index(col)] = value
+            result_dict[key][list(col_dict.keys()).index(_col)] = value
     return result_dict
