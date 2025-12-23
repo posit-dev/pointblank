@@ -123,6 +123,8 @@ if TYPE_CHECKING:
     from collections.abc import Collection
     from typing import Any
 
+    import polars as pl
+
     from pointblank._typing import AbsoluteBounds, Tolerance, _CompliantValue, _CompliantValues
 
 
@@ -20217,7 +20219,7 @@ def _step_report_rows_distinct(
 
 
 def _step_report_schema_in_order(
-    step: int, schema_info: dict, header: str, lang: str, debug_return_df: bool = False
+    step: int, schema_info: dict, header: str | None, lang: str, debug_return_df: bool = False
 ) -> GT | Any:
     """
     This is the case for schema validation where the schema is supposed to have the same column
@@ -20525,8 +20527,8 @@ def _step_report_schema_in_order(
         step_report = step_report.tab_style(
             style=style.borders(sides="bottom", color="#6699CC80", style="solid", weight="1px"),
             locations=loc.body(
-                rows=len(colnames_tgt) - 1
-            ),  # ty: ignore (bug in GT, should allow an int)
+                rows=len(colnames_tgt) - 1  # ty: ignore (bug in GT, should allow an int)
+            ),
         )
 
     # If the version of `great_tables` is `>=0.17.0` then disable Quarto table processing
@@ -20575,8 +20577,8 @@ def _step_report_schema_in_order(
 
 
 def _step_report_schema_any_order(
-    step: int, schema_info: dict, header: str, lang: str, debug_return_df: bool = False
-) -> GT | Any:
+    step: int, schema_info: dict, header: str | None, lang: str, debug_return_df: bool = False
+) -> GT | pl.DataFrame:
     """
     This is the case for schema validation where the schema is permitted to not have to be in the
     same column order as the target table.
@@ -20995,9 +20997,7 @@ def _step_report_schema_any_order(
     header = header.format(title=title, details=details)
 
     # Create the header with `header` string
-    step_report = step_report.tab_header(title=md(header))
-
-    return step_report
+    return step_report.tab_header(title=md(header))
 
 
 def _create_label_text_html(
