@@ -94,7 +94,9 @@ def _safe_modify_datetime_compare_val(data_frame: Any, column: str, compare_val:
     return compare_val
 
 
-def _safe_is_nan_or_null_expr(data_frame: Any, column_expr: Any, column_name: str = None) -> Any:
+def _safe_is_nan_or_null_expr(
+    data_frame: Any, column_expr: Any, column_name: str | None = None
+) -> Any:
     """
     Create an expression that safely checks for both Null and NaN values.
 

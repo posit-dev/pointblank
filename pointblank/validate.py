@@ -18394,9 +18394,7 @@ def _transform_tbl_preprocessed(pre: Any, seg: Any, interrogation_performed: boo
 
 def _get_preprocessed_table_icon(icon: list[str]) -> list[str]:
     # For each icon, get the SVG icon from the SVG_ICONS_FOR_TBL_STATUS dictionary
-    icon_svg = [SVG_ICONS_FOR_TBL_STATUS.get(icon) for icon in icon]
-
-    return icon_svg
+    return [SVG_ICONS_FOR_TBL_STATUS[icon] for icon in icon]
 
 
 def _transform_eval(
@@ -18474,9 +18472,9 @@ def _transform_test_units(
             return _format_single_number_with_gt(
                 value, n_sigfig=3, compact=True, locale=locale, df_lib=df_lib
             )
-        else:
-            # Fallback to the original behavior
-            return str(vals.fmt_number(value, n_sigfig=3, compact=True, locale=locale)[0])
+        formatted = vals.fmt_number(value, n_sigfig=3, compact=True, locale=locale)
+        assert isinstance(formatted, list)
+        return formatted[0]
 
     return [
         (
@@ -18694,7 +18692,7 @@ def _get_callable_source(fn: Callable) -> str:
         pre_arg = _extract_pre_argument(source)
         return pre_arg
     except (OSError, TypeError):  # pragma: no cover
-        return fn.__name__
+        return fn.__name__  # ty: ignore
 
 
 def _extract_pre_argument(source: str) -> str:
