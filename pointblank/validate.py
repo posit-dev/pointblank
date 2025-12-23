@@ -18126,8 +18126,26 @@ def _apply_segments(data_tbl: Any, segments_expr: tuple[str, str]) -> Any:
                 except ValueError:  # pragma: no cover
                     pass  # pragma: no cover
 
-            # Format 2: Datetime strings with UTC timezone like
-            # "2016-01-04 00:00:01 UTC.strict_cast(...)"
+            # Format 2: Direct datetime strings like "2016-01-04 00:00:01" (Polars 1.36+)
+            # These don't have UTC suffix anymore
+            elif (
+                " " in segment_str
+                and "UTC" not in segment_str
+                and "[" not in segment_str
+                and ".alias" not in segment_str
+            ):
+                try:
+                    parsed_dt = datetime.fromisoformat(segment_str)
+                    # Convert midnight datetimes to dates for consistency
+                    if parsed_dt.time() == datetime.min.time():
+                        parsed_value = parsed_dt.date()  # pragma: no cover
+                    else:
+                        parsed_value = parsed_dt
+                except ValueError:  # pragma: no cover
+                    pass  # pragma: no cover
+
+            # Format 3: Datetime strings with UTC timezone like
+            # "2016-01-04 00:00:01 UTC.strict_cast(...)" (Polars < 1.36)
             elif " UTC" in segment_str:
                 try:
                     # Extract just the datetime part before "UTC"
@@ -18142,7 +18160,7 @@ def _apply_segments(data_tbl: Any, segments_expr: tuple[str, str]) -> Any:
                 except (ValueError, IndexError):  # pragma: no cover
                     pass  # pragma: no cover
 
-            # Format 3: Bracketed expressions like ['2016-01-04']
+            # Format 4: Bracketed expressions like ['2016-01-04']
             elif segment_str.startswith("[") and segment_str.endswith("]"):
                 try:  # pragma: no cover
                     # Remove [' and ']
