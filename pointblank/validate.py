@@ -18935,11 +18935,11 @@ def _format_number_safe(
             locale=locale,
             df_lib=df_lib,
         )
-    else:
-        # Fallback to the original behavior
-        return fmt_number(
-            value, decimals=decimals, drop_trailing_zeros=drop_trailing_zeros, locale=locale
-        )[0]  # pragma: no cover
+    ints = fmt_number(
+        value, decimals=decimals, drop_trailing_zeros=drop_trailing_zeros, locale=locale
+    )
+    assert isinstance(ints, list)
+    return ints[0]
 
 
 def _format_integer_safe(value: int, locale: str = "en", df_lib=None) -> str:
@@ -18952,9 +18952,10 @@ def _format_integer_safe(value: int, locale: str = "en", df_lib=None) -> str:
     if df_lib is not None and value is not None:
         # Use GT-based formatting to avoid Pandas dependency completely
         return _format_single_integer_with_gt(value, locale=locale, df_lib=df_lib)
-    else:
-        # Fallback to the original behavior
-        return fmt_integer(value, locale=locale)[0]
+
+    ints = fmt_integer(value, locale=locale)
+    assert isinstance(ints, list)
+    return ints[0]
 
 
 def _create_thresholds_html(thresholds: Thresholds, locale: str, df_lib=None) -> str:
