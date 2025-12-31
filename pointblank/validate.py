@@ -15,7 +15,7 @@ from enum import Enum
 from functools import partial
 from importlib.metadata import version
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Callable, Literal, ParamSpec, TypeVar
+from typing import TYPE_CHECKING, Any, Callable, Literal, NoReturn, ParamSpec, TypeVar
 from zipfile import ZipFile
 
 import commonmark
@@ -435,6 +435,7 @@ def config(
     global_config.report_incl_footer_timings = report_incl_footer_timings  # pragma: no cover
     global_config.report_incl_footer_notes = report_incl_footer_notes  # pragma: no cover
     global_config.preview_incl_header = preview_incl_header  # pragma: no cover
+    return global_config  # pragma: no cover
 
 
 def load_dataset(
@@ -3799,7 +3800,7 @@ class _ValidationInfo:
     proc_duration_s: float | None = None
     notes: dict[str, dict[str, str]] | None = None
 
-    def get_val_info(self) -> dict[str, Any]:
+    def get_val_info(self) -> dict[str, Any] | None:
         return self.val_info
 
     def _add_note(self, key: str, markdown: str, text: str | None = None) -> None:
@@ -3975,7 +3976,7 @@ class _ValidationInfo:
         return self.notes is not None and len(self.notes) > 0
 
 
-def _handle_connection_errors(e: Exception, connection_string: str) -> None:
+def _handle_connection_errors(e: Exception, connection_string: str) -> NoReturn:
     """
     Shared error handling for database connection failures.
 
@@ -17424,7 +17425,7 @@ def _create_autobrief_or_failure_text(
     assertion_type: str,
     lang: str,
     column: str,
-    values: str | None,
+    values: Any,
     for_failure: bool,
     locale: str | None = None,
     n_rows: int | None = None,

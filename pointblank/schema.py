@@ -812,9 +812,12 @@ def _process_columns(
     if columns is not None:
         if isinstance(columns, list):
             if all(isinstance(col, str) for col in columns):
-                return [(col,) for col in columns]
+                # Type narrowing: after the all() check, columns contains only strings
+                str_columns: list[str] = columns  # type: ignore[assignment]
+                return [(col,) for col in str_columns]
             else:
-                return columns
+                # Type narrowing: columns contains tuples
+                return columns  # type: ignore[return-value]
 
         if isinstance(columns, str):
             return [(columns,)]
@@ -831,10 +834,10 @@ def _schema_info_generate_colname_dict(
     index_matched: bool,
     matched_to: str | None,
     dtype_present: bool,
-    dtype_input: str | list[str],
+    dtype_input: str | list[str] | None,
     dtype_matched: bool,
     dtype_multiple: bool,
-    dtype_matched_pos: int,
+    dtype_matched_pos: int | None,
 ) -> dict[str, Any]:
     return {
         "colname_matched": colname_matched,
@@ -868,6 +871,7 @@ def _schema_info_generate_columns_dict(
     dict[str, dict[str, any]]
         The columns dictionary.
     """
+    assert colnames is not None and colname_dict is not None
     return {colnames[i]: colname_dict[i] for i in range(len(colnames))}
 
 
@@ -969,6 +973,10 @@ def _get_schema_validation_info(
 
     schema_exp = schema
     schema_tgt = Schema(tbl=data_tbl)
+
+    # Both schemas must have columns for validation
+    assert schema_exp.columns is not None, "Expected schema must have columns"
+    assert schema_tgt.columns is not None, "Target schema must have columns"
 
     # Initialize the schema information dictionary
     schema_info = {
@@ -1143,6 +1151,11 @@ def _get_schema_validation_info(
         #
 
         if colname_matched and dtype_present:
+            # Type narrowing: matched_to is not None when colname_matched is True
+            # and dtype_input is not None when dtype_present is True
+            assert matched_to is not None
+            assert dtype_input is not None
+
             # Get the dtype of the column in the target table
             dtype_tgt = schema_tgt.columns[tgt_colnames.index(matched_to)][1]
 
