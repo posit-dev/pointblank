@@ -211,7 +211,12 @@ class ColumnSelectorNarwhals(Column):
 
     exprs: nw.selectors.Selector
 
-    def resolve(self, table) -> list[str]:
+    def resolve(
+        self, columns: list[str] | None = None, table: IntoDataFrame | None = None
+    ) -> list[str]:
+        # Note: columns parameter is unused - Narwhals selectors need the actual table
+        if table is None:
+            raise ValueError("ColumnSelectorNarwhals requires a table for resolution")
         # Convert the native table to a Narwhals DataFrame
         dfn = nw.from_native(table)
         # Use the selector to select columns and return their names

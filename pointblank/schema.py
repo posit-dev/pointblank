@@ -273,9 +273,7 @@ class Schema:
     `Schema` object is used in a validation workflow.
     """
 
-    columns: str | list[str] | list[tuple[str, str]] | list[tuple[str]] | dict[str, str] | None = (
-        None
-    )
+    columns: list[tuple[str, ...]] | None = None
     tbl: Any | None = None
 
     def __init__(
@@ -775,7 +773,7 @@ class Schema:
 
 def _process_columns(
     *, columns: str | list[str] | list[tuple[str, str]] | dict[str, str] | None = None, **kwargs
-) -> list[tuple[str, str]]:
+) -> list[tuple[str, ...]]:
     """
     Process column information provided as individual arguments or as a list of
     tuples/dictionary.
@@ -789,8 +787,8 @@ def _process_columns(
 
     Returns
     -------
-    list[tuple[str, str]]
-        A list of tuples containing column information.
+    list[tuple[str, ...]]
+        A list of tuples containing column information (name only or name and dtype).
     """
     if columns is not None:
         if isinstance(columns, list):
