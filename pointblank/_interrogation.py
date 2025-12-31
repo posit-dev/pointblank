@@ -3,11 +3,15 @@ from __future__ import annotations
 import functools
 from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import narwhals as nw
-from narwhals.dependencies import is_pandas_dataframe, is_polars_dataframe
-from narwhals.typing import FrameT
+from narwhals.dependencies import (
+    is_narwhals_dataframe,
+    is_narwhals_lazyframe,
+    is_pandas_dataframe,
+    is_polars_dataframe,
+)
 
 from pointblank._constants import IBIS_BACKENDS
 from pointblank._spec_utils import (
@@ -24,6 +28,9 @@ from pointblank._utils import (
     _get_tbl_type,
 )
 from pointblank.column import Column
+
+if TYPE_CHECKING:
+    from narwhals.typing import FrameT, IntoFrame
 
 
 def _safe_modify_datetime_compare_val(data_frame: Any, column: str, compare_val: Any) -> Any:
@@ -752,23 +759,28 @@ def row_count_match(data_tbl: FrameT, count, inverse: bool, abs_tol_bounds) -> b
 
 
 def col_pct_null(
-    data_tbl: FrameT, column: str, p: float, bound_finder: Callable[[int], AbsoluteBounds]
+    data_tbl: IntoFrame, column: str, p: float, bound_finder: Callable[[int], AbsoluteBounds]
 ) -> bool:
     """Check if the percentage of null vales are within p given the absolute bounds."""
-    # Convert to narwhals for consistent API across backends
-    nw_tbl = nw.from_native(data_tbl)
-
+    nw_frame = nw.from_native(data_tbl)
     # Handle LazyFrames by collecting them first
-    if hasattr(nw_tbl, "collect"):
-        nw_tbl = nw_tbl.collect()
+    if is_narwhals_lazyframe(nw_frame):
+        nw_frame = nw_frame.collect()
 
-    # Get total rows using narwhals
-    total_rows: int = nw_tbl.select(nw.len()).item()
+    assert is_narwhals_dataframe(nw_frame)
+
+    # We cast as int because it could come back as an arbitary type. For example if the backend
+    # is numpy-like, we might get a scalar from `item()`. `int()` expects a certain signature though
+    # and `object` does not satisfy so we have to go with the type ignore.
+    total_rows: object = nw_frame.select(nw.len()).item()
+    total_rows: int = int(total_rows)  # type: ignore
+
     abs_target: float = round(total_rows * p)
     lower_bound, upper_bound = bound_finder(abs_target)
 
-    # Count null values
-    n_null: int = nw_tbl.select(nw.col(column).is_null().sum()).item()
+    # Count null values (see above comment on typing shenanigans)
+    n_null: object = nw_frame.select(nw.col(column).is_null().sum()).item()
+    n_null: int = int(n_null)  # type: ignore
 
     return n_null >= (abs_target - lower_bound) and n_null <= (abs_target + upper_bound)
 
@@ -1105,6 +1117,7 @@ def conjointly_validation(data_tbl: FrameT, expressions, threshold: int, tbl_typ
     return conjointly_instance.get_test_results()
 
 
+# TODO: we can certainly simplify this
 def interrogate_gt(tbl: FrameT, column: str, compare: Any, na_pass: bool) -> FrameT:
     """Greater than interrogation."""
     return _interrogate_comparison_base(tbl, column, compare, na_pass, "gt")
@@ -1125,10 +1138,11 @@ def interrogate_le(tbl: FrameT, column: str, compare: Any, na_pass: bool) -> Fra
     return _interrogate_comparison_base(tbl, column, compare, na_pass, "le")
 
 
-def interrogate_eq(tbl: FrameT, column: str, compare: Any, na_pass: bool) -> FrameT:
+def interrogate_eq(tbl: IntoFrame, column: str, compare: Any, na_pass: bool) -> FrameT:
     """Equal interrogation."""
 
     nw_tbl = nw.from_native(tbl)
+    assert is_narwhals_dataframe(nw_tbl) or is_narwhals_lazyframe(nw_tbl)
 
     if isinstance(compare, Column):
         compare_expr = _get_compare_expr_nw(compare=compare)
@@ -1319,6 +1333,7 @@ def interrogate_ne(tbl: FrameT, column: str, compare: Any, na_pass: bool) -> Fra
     """Not equal interrogation."""
 
     nw_tbl = nw.from_native(tbl)
+    assert isinstance(nw_tbl, (nw.DataFrame, nw.LazyFrame))
 
     # Determine if the reference and comparison columns have any null values
     ref_col_has_null_vals = _column_has_null_values(table=nw_tbl, column=column)
@@ -1879,6 +1894,7 @@ def interrogate_between(
     high_val = _get_compare_expr_nw(compare=high)
 
     nw_tbl = nw.from_native(tbl)
+    assert isinstance(nw_tbl, (nw.DataFrame, nw.LazyFrame))
     low_val = _safe_modify_datetime_compare_val(nw_tbl, column, low_val)
     high_val = _safe_modify_datetime_compare_val(nw_tbl, column, high_val)
 
@@ -1948,6 +1964,7 @@ def interrogate_outside(
     high_val = _get_compare_expr_nw(compare=high)
 
     nw_tbl = nw.from_native(tbl)
+    assert isinstance(nw_tbl, (nw.DataFrame, nw.LazyFrame))
     low_val = _safe_modify_datetime_compare_val(nw_tbl, column, low_val)
     high_val = _safe_modify_datetime_compare_val(nw_tbl, column, high_val)
 
@@ -2010,6 +2027,7 @@ def interrogate_isin(tbl: FrameT, column: str, set_values: Any) -> FrameT:
     """In set interrogation."""
 
     nw_tbl = nw.from_native(tbl)
+    assert isinstance(nw_tbl, (nw.DataFrame, nw.LazyFrame))
 
     can_be_null: bool = None in set_values
     base_expr: nw.Expr = nw.col(column).is_in(set_values)
@@ -2024,6 +2042,7 @@ def interrogate_notin(tbl: FrameT, column: str, set_values: Any) -> FrameT:
     """Not in set interrogation."""
 
     nw_tbl = nw.from_native(tbl)
+    assert isinstance(nw_tbl, (nw.DataFrame, nw.LazyFrame))
     result_tbl = nw_tbl.with_columns(
         pb_is_good_=nw.col(column).is_in(set_values),
     ).with_columns(pb_is_good_=~nw.col("pb_is_good_"))
@@ -2042,6 +2061,7 @@ def interrogate_regex(tbl: FrameT, column: str, values: dict | str, na_pass: boo
         inverse = values["inverse"]
 
     nw_tbl = nw.from_native(tbl)
+    assert isinstance(nw_tbl, (nw.DataFrame, nw.LazyFrame))
     result_tbl = nw_tbl.with_columns(
         pb_is_good_1=nw.col(column).is_null() & na_pass,
         pb_is_good_2=nw.col(column).str.contains(pattern, literal=False).fill_null(False),
@@ -2086,6 +2106,7 @@ def interrogate_within_spec(tbl: FrameT, column: str, values: dict, na_pass: boo
 
     # Convert to Narwhals for cross-backend compatibility
     nw_tbl = nw.from_native(tbl)
+    assert isinstance(nw_tbl, (nw.DataFrame, nw.LazyFrame))
 
     # Regex-based specifications can use Narwhals directly (no materialization needed)
     regex_specs = {
@@ -2518,6 +2539,7 @@ def interrogate_null(tbl: FrameT, column: str) -> FrameT:
     """Null interrogation."""
 
     nw_tbl = nw.from_native(tbl)
+    assert isinstance(nw_tbl, (nw.DataFrame, nw.LazyFrame))
     result_tbl = nw_tbl.with_columns(pb_is_good_=nw.col(column).is_null())
     return result_tbl.to_native()
 
@@ -2526,6 +2548,7 @@ def interrogate_not_null(tbl: FrameT, column: str) -> FrameT:
     """Not null interrogation."""
 
     nw_tbl = nw.from_native(tbl)
+    assert isinstance(nw_tbl, (nw.DataFrame, nw.LazyFrame))
     result_tbl = nw_tbl.with_columns(pb_is_good_=~nw.col(column).is_null())
     return result_tbl.to_native()
 
@@ -2557,6 +2580,7 @@ def interrogate_increasing(
         The table with a `pb_is_good_` column indicating pass/fail for each row.
     """
     nw_tbl = nw.from_native(tbl)
+    assert isinstance(nw_tbl, (nw.DataFrame, nw.LazyFrame))
 
     # Create a lagged difference column
     result_tbl = nw_tbl.with_columns(pb_lagged_difference_=nw.col(column) - nw.col(column).shift(1))
@@ -2615,6 +2639,7 @@ def interrogate_decreasing(
         The table with a `pb_is_good_` column indicating pass/fail for each row.
     """
     nw_tbl = nw.from_native(tbl)
+    assert isinstance(nw_tbl, (nw.DataFrame, nw.LazyFrame))
 
     # Create a lagged difference column
     result_tbl = nw_tbl.with_columns(pb_lagged_difference_=nw.col(column) - nw.col(column).shift(1))
@@ -2674,6 +2699,7 @@ def _interrogate_comparison_base(
     compare_expr = _get_compare_expr_nw(compare=compare)
 
     nw_tbl = nw.from_native(tbl)
+    assert isinstance(nw_tbl, (nw.DataFrame, nw.LazyFrame))
     compare_expr = _safe_modify_datetime_compare_val(nw_tbl, column, compare_expr)
 
     # Create the comparison expression based on the operator
@@ -2741,6 +2767,7 @@ def interrogate_rows_distinct(data_tbl: FrameT, columns_subset: list[str] | None
         A DataFrame with a `pb_is_good_` column indicating which rows pass the test.
     """
     tbl = nw.from_native(data_tbl)
+    assert isinstance(tbl, (nw.DataFrame, nw.LazyFrame))
 
     # Get the column subset to use for the test
     if columns_subset is None:

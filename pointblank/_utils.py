@@ -16,6 +16,8 @@ from pointblank.column import Column, ColumnLiteral, ColumnSelector, ColumnSelec
 if TYPE_CHECKING:
     from collections.abc import Mapping
 
+    from narwhals.typing import IntoFrameT
+
     from pointblank._typing import AbsoluteBounds, Tolerance
 
 
@@ -243,7 +245,7 @@ def _select_df_lib(preference: str = "polars") -> Any:
     return pl if pl is not None else pd
 
 
-def _copy_dataframe(df):
+def _copy_dataframe(df: IntoFrameT) -> IntoFrameT:
     """
     Create a copy of a DataFrame, handling different DataFrame types.
 

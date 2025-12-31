@@ -124,6 +124,7 @@ if TYPE_CHECKING:
     from typing import Any
 
     import polars as pl
+    from narwhals.typing import IntoDataFrame
 
     from pointblank._typing import AbsoluteBounds, Tolerance, _CompliantValue, _CompliantValues
 
@@ -4821,7 +4822,7 @@ class Validate:
     when table specifications are missing or backend dependencies are not installed.
     """
 
-    data: FrameT | Any
+    data: IntoDataFrame
     tbl_name: str | None = None
     label: str | None = None
     thresholds: int | float | bool | tuple | dict | Thresholds | None = None
@@ -12700,7 +12701,11 @@ class Validate:
 
             # Make a deep copy of the table for this step to ensure proper isolation
             # This prevents modifications from one validation step affecting others
-            data_tbl_step = _copy_dataframe(data_tbl)
+            try:
+                # TODO: This copying should be scrutinized further
+                data_tbl_step: IntoDataFrame = _copy_dataframe(data_tbl)
+            except Exception as e:  # try not to crash the whole validation
+                data_tbl_step: IntoDataFrame = data_tbl
 
             # Capture original table dimensions and columns before preprocessing
             # (only if preprocessing is present - we'll set these inside the preprocessing block)
