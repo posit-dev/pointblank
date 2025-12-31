@@ -5,7 +5,6 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any, Iterable, Mapping, Optional, Union
 
 import yaml
-from narwhals.typing import FrameT
 
 from pointblank._utils import _is_lib_present
 from pointblank.thresholds import Actions
@@ -798,7 +797,7 @@ class YAMLValidator:
 
 def yaml_interrogate(
     yaml: Union[str, Path],
-    set_tbl: Union[FrameT, Any, None] = None,
+    set_tbl: Any = None,
     namespaces: Optional[Union[Iterable[str], Mapping[str, str]]] = None,
 ) -> Validate:
     """Execute a YAML-based validation workflow.

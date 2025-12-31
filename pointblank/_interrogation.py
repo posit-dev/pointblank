@@ -2264,7 +2264,7 @@ def interrogate_within_spec_db(
 
     Returns
     -------
-    FrameT
+    Any
         Result table with pb_is_good_ column indicating validation results.
 
     Notes
@@ -2429,7 +2429,7 @@ def interrogate_credit_card_db(
 
     Returns
     -------
-    FrameT
+    Any
         Result table with pb_is_good_ column indicating validation results.
 
     Notes
@@ -2589,7 +2589,7 @@ def interrogate_increasing(
 
     Returns
     -------
-    FrameT
+    Any
         The table with a `pb_is_good_` column indicating pass/fail for each row.
     """
     nw_tbl = nw.from_native(tbl)
@@ -2648,7 +2648,7 @@ def interrogate_decreasing(
 
     Returns
     -------
-    FrameT
+    Any
         The table with a `pb_is_good_` column indicating pass/fail for each row.
     """
     nw_tbl = nw.from_native(tbl)
@@ -2776,7 +2776,7 @@ def interrogate_rows_distinct(data_tbl: IntoFrame, columns_subset: list[str] | N
 
     Returns
     -------
-    FrameT
+    Any
         A DataFrame with a `pb_is_good_` column indicating which rows pass the test.
     """
     tbl = nw.from_native(data_tbl)

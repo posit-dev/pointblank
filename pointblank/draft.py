@@ -4,7 +4,6 @@ from dataclasses import dataclass, field
 from typing import Any
 
 from importlib_resources import files
-from narwhals.typing import FrameT
 
 from pointblank._constants import MODEL_PROVIDERS
 from pointblank.datascan import DataScan
@@ -223,7 +222,7 @@ class DraftValidation:
     be replaced with the actual data variable.
     """
 
-    data: FrameT | Any
+    data: Any
     model: str
     api_key: str | None = None
     verify_ssl: bool = True

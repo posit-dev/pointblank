@@ -8,7 +8,6 @@ from typing import TYPE_CHECKING, Any
 import narwhals as nw
 from great_tables import GT, google_font, html, loc, style
 from narwhals.dataframe import LazyFrame
-from narwhals.typing import FrameT
 
 from pointblank._utils_html import _create_table_dims_html, _create_table_type_html, _fmt_frac
 from pointblank.scan_profile import ColumnProfile, _as_physical, _DataProfile, _TypeMap
@@ -18,7 +17,7 @@ if TYPE_CHECKING:
     from collections.abc import Mapping, Sequence
 
     from narwhals.dataframe import DataFrame
-    from narwhals.typing import Frame, IntoFrameT
+    from narwhals.typing import Frame
 
     from pointblank.scan_profile_stats import StatGroup
 
@@ -123,7 +122,7 @@ class DataScan:
     """
 
     # TODO: This needs to be generically typed at the class level, ie. DataScan[T]
-    def __init__(self, data: IntoFrameT, tbl_name: str | None = None) -> None:
+    def __init__(self, data: Any, tbl_name: str | None = None) -> None:
         # Import processing functions from validate module
         from pointblank.validate import (
             _process_data,
@@ -205,7 +204,7 @@ class DataScan:
         return profile
 
     @property
-    def summary_data(self) -> IntoFrameT:
+    def summary_data(self) -> Any:
         return self.profile.as_dataframe(strict=False).to_native()
 
     def get_tabular_report(self, *, show_sample_data: bool = False) -> GT:
@@ -498,7 +497,7 @@ class DataScan:
             json.dump(json_string, f, indent=4)
 
 
-def col_summary_tbl(data: FrameT | Any, tbl_name: str | None = None) -> GT:
+def col_summary_tbl(data: Any, tbl_name: str | None = None) -> GT:
     """
     Generate a column-level summary table of a dataset.
 

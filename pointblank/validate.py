@@ -24,7 +24,6 @@ from great_tables import GT, from_column, google_font, html, loc, md, style, val
 from great_tables.gt import _get_column_of_values
 from great_tables.vals import fmt_integer, fmt_number
 from importlib_resources import files
-from narwhals.typing import FrameT
 
 from pointblank._agg import is_valid_agg, load_validation_method_grid, resolve_agg_registries
 from pointblank._constants import (
@@ -442,7 +441,7 @@ def config(
 def load_dataset(
     dataset: Literal["small_table", "game_revenue", "nycflights", "global_sales"] = "small_table",
     tbl_type: Literal["polars", "pandas", "duckdb"] = "polars",
-) -> FrameT | Any:
+) -> Any:
     """
     Load a dataset hosted in the library as specified table type.
 
@@ -463,7 +462,7 @@ def load_dataset(
 
     Returns
     -------
-    FrameT | Any
+    Any
         The dataset for the `Validate` object. This could be a Polars DataFrame, a Pandas DataFrame,
         or a DuckDB table as an Ibis table.
 
@@ -1536,7 +1535,7 @@ def get_data_path(
                 return tmp_file.name
 
 
-def _process_data(data: FrameT | Any) -> FrameT | Any:
+def _process_data(data: Any) -> Any:
     """
     Centralized data processing pipeline that handles all supported input types.
 
@@ -1553,7 +1552,7 @@ def _process_data(data: FrameT | Any) -> FrameT | Any:
 
     Parameters
     ----------
-    data : FrameT | Any
+    data
         The input data which could be:
         - a DataFrame object (Polars, Pandas, Ibis, etc.)
         - a GitHub URL pointing to a CSV or Parquet file
@@ -1564,7 +1563,7 @@ def _process_data(data: FrameT | Any) -> FrameT | Any:
 
     Returns
     -------
-    FrameT | Any
+    Any
         Processed data as a DataFrame if input was a supported data source type,
         otherwise the original data unchanged.
     """
@@ -1583,7 +1582,7 @@ def _process_data(data: FrameT | Any) -> FrameT | Any:
     return data
 
 
-def _process_github_url(data: FrameT | Any) -> FrameT | Any:
+def _process_github_url(data: Any) -> Any:
     """
     Process data parameter to handle GitHub URLs pointing to CSV or Parquet files.
 
@@ -1598,12 +1597,12 @@ def _process_github_url(data: FrameT | Any) -> FrameT | Any:
 
     Parameters
     ----------
-    data : FrameT | Any
+    data
         The data parameter which may be a GitHub URL string or any other data type.
 
     Returns
     -------
-    FrameT | Any
+    Any
         If the input is a supported GitHub URL, returns a DataFrame loaded from the downloaded file.
         Otherwise, returns the original data unchanged.
 
@@ -1688,7 +1687,7 @@ def _process_github_url(data: FrameT | Any) -> FrameT | Any:
         return data
 
 
-def _process_connection_string(data: FrameT | Any) -> FrameT | Any:
+def _process_connection_string(data: Any) -> Any:
     """
     Process data parameter to handle database connection strings.
 
@@ -1715,7 +1714,7 @@ def _process_connection_string(data: FrameT | Any) -> FrameT | Any:
     return connect_to_table(data)
 
 
-def _process_csv_input(data: FrameT | Any) -> FrameT | Any:
+def _process_csv_input(data: Any) -> Any:
     """
     Process data parameter to handle CSV file inputs.
 
@@ -1773,7 +1772,7 @@ def _process_csv_input(data: FrameT | Any) -> FrameT | Any:
         )
 
 
-def _process_parquet_input(data: FrameT | Any) -> FrameT | Any:
+def _process_parquet_input(data: Any) -> Any:
     """
     Process data parameter to handle Parquet file inputs.
 
@@ -1916,7 +1915,7 @@ def _process_parquet_input(data: FrameT | Any) -> FrameT | Any:
 
 
 def preview(
-    data: FrameT | Any,
+    data: Any,
     columns_subset: str | list[str] | Column | None = None,
     n_head: int = 5,
     n_tail: int = 5,
@@ -2182,7 +2181,7 @@ def preview(
 
 
 def _generate_display_table(
-    data: FrameT | Any,
+    data: Any,
     columns_subset: str | list[str] | Column | None = None,
     n_head: int = 5,
     n_tail: int = 5,
@@ -2637,7 +2636,7 @@ def _generate_display_table(
     return gt_tbl
 
 
-def missing_vals_tbl(data: FrameT | Any) -> GT:
+def missing_vals_tbl(data: Any) -> GT:
     """
     Display a table that shows the missing values in the input table.
 
@@ -3238,7 +3237,7 @@ def _get_column_names_safe(data: Any) -> list[str]:
         return list(data.columns)  # pragma: no cover
 
 
-def _get_column_names(data: FrameT | Any, ibis_tbl: bool, df_lib_name_gt: str) -> list[str]:
+def _get_column_names(data: Any, ibis_tbl: bool, df_lib_name_gt: str) -> list[str]:
     if ibis_tbl:
         return data.columns if df_lib_name_gt == "polars" else list(data.columns)
 
@@ -3265,9 +3264,7 @@ def _validate_columns_subset(
     return columns_subset.resolve(columns=col_names)  # type: ignore[union-attr]
 
 
-def _select_columns(
-    data: FrameT | Any, resolved_columns: list[str], ibis_tbl: bool, tbl_type: str
-) -> FrameT | Any:
+def _select_columns(data: Any, resolved_columns: list[str], ibis_tbl: bool, tbl_type: str) -> Any:
     if ibis_tbl:
         return data[resolved_columns]
     if tbl_type == "polars":
@@ -3275,7 +3272,7 @@ def _select_columns(
     return data[resolved_columns]
 
 
-def get_column_count(data: FrameT | Any) -> int:
+def get_column_count(data: Any) -> int:
     """
     Get the number of columns in a table.
 
@@ -3487,7 +3484,7 @@ def _extract_enum_values(set_values: Any) -> list[Any]:
     return [set_values]
 
 
-def get_row_count(data: FrameT | Any) -> int:
+def get_row_count(data: Any) -> int:
     """
     Get the number of rows in a table.
 
@@ -3798,8 +3795,8 @@ class _ValidationInfo:
     error: bool | None = None
     critical: bool | None = None
     failure_text: str | None = None
-    tbl_checked: FrameT | None = None
-    extract: FrameT | None = None
+    tbl_checked: Any = None
+    extract: Any = None
     val_info: dict[str, Any] | None = None
     time_processed: str | None = None
     proc_duration_s: float | None = None
@@ -4914,7 +4911,7 @@ class Validate:
 
     def set_tbl(
         self,
-        tbl: FrameT | Any,
+        tbl: Any,
         tbl_name: str | None = None,
         label: str | None = None,
     ) -> Validate:
@@ -11238,7 +11235,7 @@ class Validate:
 
     def row_count_match(
         self,
-        count: int | FrameT | Any,
+        count: int | Any,
         tol: Tolerance = 0,
         inverse: bool = False,
         pre: Callable | None = None,
@@ -11457,7 +11454,7 @@ class Validate:
 
     def col_count_match(
         self,
-        count: int | FrameT | Any,
+        count: int | Any,
         inverse: bool = False,
         pre: Callable | None = None,
         thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
@@ -11633,7 +11630,7 @@ class Validate:
 
     def tbl_match(
         self,
-        tbl_compare: FrameT | Any,
+        tbl_compare: Any,
         pre: Callable | None = None,
         thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
@@ -14858,7 +14855,7 @@ class Validate:
 
     def get_data_extracts(
         self, i: int | list[int] | None = None, frame: bool = False
-    ) -> dict[int, FrameT | None] | FrameT | None:
+    ) -> dict[int, Any] | Any:
         """
         Get the rows that failed for each validation step.
 
@@ -14881,7 +14878,7 @@ class Validate:
 
         Returns
         -------
-        dict[int, FrameT | None] | FrameT | None
+        dict[int, Any] | Any
             A dictionary of tables containing the rows that failed in every compatible validation
             step. Alternatively, it can be a DataFrame if `frame=True` and `i=` is a scalar.
 
@@ -15171,7 +15168,7 @@ class Validate:
 
         return json.dumps(report, indent=4, default=str)
 
-    def get_sundered_data(self, type="pass") -> FrameT:
+    def get_sundered_data(self, type="pass") -> Any:
         """
         Get the data that passed or failed the validation steps.
 
@@ -15207,7 +15204,7 @@ class Validate:
 
         Returns
         -------
-        FrameT
+        Any
             A table containing the data that passed or failed the validation steps.
 
         Examples

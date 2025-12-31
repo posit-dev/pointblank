@@ -7,7 +7,6 @@ from dataclasses import dataclass
 from typing import Any, Dict, List, Optional, Tuple
 
 import narwhals as nw
-from narwhals.typing import FrameT
 
 from pointblank._constants import MODEL_PROVIDERS
 
@@ -205,7 +204,7 @@ class _DataBatcher:
 
     def __init__(
         self,
-        data: FrameT,
+        data: Any,
         columns: Optional[List[str]] = None,
         config: Optional[_BatchConfig] = None,
     ):
@@ -265,13 +264,13 @@ class _DataBatcher:
         signature_str = json.dumps(signature_data, sort_keys=True, default=str)
         return hashlib.md5(signature_str.encode()).hexdigest()
 
-    def _build_unique_rows_table(self) -> Tuple[FrameT, Dict[str, List[int]]]:
+    def _build_unique_rows_table(self) -> Tuple[Any, Dict[str, List[int]]]:
         """
         Build unique rows table and mapping back to original indices.
 
         Returns
         -------
-        Tuple[FrameT, Dict[str, List[int]]]
+        Tuple[Any, Dict[str, List[int]]]
             Unique rows table and signature-to-indices mapping.
         """
         nw_data = self._nw_data
