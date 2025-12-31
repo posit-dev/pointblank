@@ -569,26 +569,23 @@ def _get_compare_expr_nw(compare: Any) -> Any:
 
 def _column_has_null_values(table: nw.DataFrame[Any] | nw.LazyFrame[Any], column: str) -> bool:
     try:
-        # Try the standard null_count() method
-        null_count = (table.select(column).null_count())[column][0]
+        # Try the standard null_count() method (DataFrame)
+        null_count = (table.select(column).null_count())[column][0]  # type: ignore[union-attr]
     except AttributeError:
         # For LazyFrames, collect first then get null count
         try:
-            collected = table.select(column).collect()
+            collected = table.select(column).collect()  # type: ignore[union-attr]
             null_count = (collected.null_count())[column][0]
         except Exception:
             # Fallback: check if any values are null
             try:
-                result = table.select(nw.col(column).is_null().sum().alias("null_count")).collect()
+                result = table.select(nw.col(column).is_null().sum().alias("null_count")).collect()  # type: ignore[union-attr]
                 null_count = result["null_count"][0]
             except Exception:
                 # Last resort: return False (assume no nulls)
                 return False
 
-    if null_count is None or null_count == 0:
-        return False
-
-    return True
+    return null_count is not None and null_count > 0
 
 
 def _check_nulls_across_columns_nw(table, columns_subset):
@@ -1195,10 +1192,10 @@ def interrogate_eq(tbl: IntoFrame, column: str, compare: Any, na_pass: bool) -> 
                     )
                     result_tbl = result_tbl.rename({"pb_is_good_4_tmp": "pb_is_good_4"})
                 elif "cannot compare" in str(e).lower():
-                    # Handle genuine type incompatibility
-                    native_df: Any = result_tbl.to_native()
-                    col_dtype = str(native_df[column].dtype)
-                    compare_dtype = str(native_df[compare.name].dtype)
+                    # Handle genuine type incompatibility - native_df type varies by backend
+                    native_df = result_tbl.to_native()
+                    col_dtype = str(native_df[column].dtype)  # type: ignore[index]
+                    compare_dtype = str(native_df[compare.name].dtype)  # type: ignore[index]
 
                     raise TypeError(
                         f"Cannot compare columns '{column}' (dtype: {col_dtype}) and "
@@ -1233,21 +1230,19 @@ def interrogate_eq(tbl: IntoFrame, column: str, compare: Any, na_pass: bool) -> 
                     or "conversion" in error_msg
                     and "failed" in error_msg
                 ):
-                    # Get column types for a descriptive error message
+                    # Get column types for a descriptive error message - native type varies by backend
+                    col_dtype = "unknown"
+                    compare_dtype = "unknown"
                     try:
                         native_df = result_tbl.to_native()
                         if hasattr(native_df, "dtypes"):
-                            col_dtype = str(native_df.dtypes.get(column, "unknown"))
-                            compare_dtype = str(native_df.dtypes.get(compare.name, "unknown"))
+                            col_dtype = str(native_df.dtypes.get(column, "unknown"))  # type: ignore[union-attr]
+                            compare_dtype = str(native_df.dtypes.get(compare.name, "unknown"))  # type: ignore[union-attr]
                         elif hasattr(native_df, "schema"):
-                            col_dtype = str(native_df.schema.get(column, "unknown"))
-                            compare_dtype = str(native_df.schema.get(compare.name, "unknown"))
-                        else:
-                            col_dtype = "unknown"
-                            compare_dtype = "unknown"
+                            col_dtype = str(native_df.schema.get(column, "unknown"))  # type: ignore[union-attr]
+                            compare_dtype = str(native_df.schema.get(compare.name, "unknown"))  # type: ignore[union-attr]
                     except Exception:
-                        col_dtype = "unknown"
-                        compare_dtype = "unknown"
+                        pass
 
                     raise TypeError(
                         f"Cannot compare columns '{column}' (dtype: {col_dtype}) and "
@@ -1296,17 +1291,16 @@ def interrogate_eq(tbl: IntoFrame, column: str, compare: Any, na_pass: bool) -> 
                 or "conversion" in error_msg
                 and "failed" in error_msg
             ):
-                # Get column type for a descriptive error message
+                # Get column type for a descriptive error message - native type varies by backend
+                col_dtype = "unknown"
                 try:
                     native_df = result_tbl.to_native()
                     if hasattr(native_df, "dtypes"):
-                        col_dtype = str(native_df.dtypes.get(column, "unknown"))
+                        col_dtype = str(native_df.dtypes.get(column, "unknown"))  # type: ignore[union-attr]
                     elif hasattr(native_df, "schema"):
-                        col_dtype = str(native_df.schema.get(column, "unknown"))
-                    else:
-                        col_dtype = "unknown"
+                        col_dtype = str(native_df.schema.get(column, "unknown"))  # type: ignore[union-attr]
                 except Exception:
-                    col_dtype = "unknown"
+                    pass
 
                 compare_type = type(compare).__name__
                 compare_value = str(compare)
@@ -2171,18 +2165,18 @@ def interrogate_within_spec(
 
     # For non-Ibis tables or other specs, materialize data and use Python validation
     # Get the column data as a list
-    col_data = nw_tbl.select(column).to_native()
+    col_data: Any = nw_tbl.select(column).to_native()
 
-    # Convert to list based on backend
+    # Convert to list based on backend - type varies so use duck typing
     if hasattr(col_data, "to_list"):  # Polars
-        col_list = col_data[column].to_list()
+        col_list = col_data[column].to_list()  # type: ignore[index]
     elif hasattr(col_data, "tolist"):  # Pandas
-        col_list = col_data[column].tolist()
+        col_list = col_data[column].tolist()  # type: ignore[index]
     else:  # For Ibis tables, we need to execute the query first
         try:
             # Try to execute if it's an Ibis table
             if hasattr(col_data, "execute"):
-                col_data_exec = col_data.execute()
+                col_data_exec = col_data.execute()  # type: ignore[operator]
                 if hasattr(col_data_exec, "to_list"):  # Polars result
                     col_list = col_data_exec[column].to_list()
                 elif hasattr(col_data_exec, "tolist"):  # Pandas result
@@ -2194,6 +2188,8 @@ def interrogate_within_spec(
         except Exception:
             # Fallback to direct list conversion
             col_list = list(col_data[column])
+
+    assert isinstance(col_list, list)
 
     # Validate based on spec type (checksum-based validations)
     if spec_lower in ("isbn", "isbn-10", "isbn-13"):
@@ -2277,7 +2273,7 @@ def interrogate_within_spec_db(
     spec_lower = spec.lower()
 
     # Check if this is an Ibis table
-    native_tbl = tbl
+    native_tbl: Any = tbl
     if hasattr(tbl, "to_native"):
         native_tbl = tbl.to_native() if callable(tbl.to_native) else tbl
 
@@ -2346,7 +2342,7 @@ def interrogate_within_spec_db(
     weights = [8, 7, 6, 5, 4, 3, 2, 10, 0, 9, 8, 7, 6, 5, 4, 3, 2]
 
     # Get the column as an Ibis expression
-    col_expr = native_tbl[column]
+    col_expr = native_tbl[column]  # type: ignore[index]
 
     # Basic checks: length must be 17, no invalid characters (I, O, Q)
     valid_length = col_expr.length() == 17
@@ -2373,11 +2369,11 @@ def interrogate_within_spec_db(
         value = ibis.cases(*conditions, else_=0)  # Default: invalid char = 0 (will fail validation)
 
         # Multiply by weight and add to checksum
-        checksum = checksum + (value * weights[pos])
+        checksum = checksum + (value * weights[pos])  # type: ignore[operator]
 
     # Check digit calculation: checksum % 11
     # If result is 10, check digit should be 'X', otherwise it's the digit itself
-    expected_check = checksum % 11
+    expected_check = checksum % 11  # type: ignore[operator]
     actual_check_char = col_expr.upper().substr(8, 1)  # Position 9 (0-indexed 8)
 
     # Validate check digit using ibis.cases()
@@ -2400,7 +2396,7 @@ def interrogate_within_spec_db(
         is_valid = is_valid.fill_null(False)
 
     # Add validation column to table
-    result_tbl = native_tbl.mutate(pb_is_good_=is_valid)
+    result_tbl = native_tbl.mutate(pb_is_good_=is_valid)  # type: ignore[union-attr]
 
     return result_tbl
 
@@ -2446,7 +2442,7 @@ def interrogate_credit_card_db(
     # Check if this is an Ibis table
     native_tbl = tbl
     if hasattr(tbl, "to_native"):
-        native_tbl = tbl.to_native() if callable(tbl.to_native) else tbl
+        native_tbl = tbl.to_native() if callable(tbl.to_native) else tbl  # type: ignore[operator]
 
     is_ibis = hasattr(native_tbl, "execute")
 
@@ -2460,7 +2456,7 @@ def interrogate_credit_card_db(
         raise ImportError("Ibis is required for database-native validation")
 
     # Get the column as an Ibis expression
-    col_expr = native_tbl[column]
+    col_expr = native_tbl[column]  # type: ignore[index]
 
     # Step 1: Clean the input and remove spaces and hyphens
     # First check format: only digits, spaces, and hyphens allowed
@@ -2513,7 +2509,7 @@ def interrogate_credit_card_db(
 
         # Calculate contribution to checksum
         # If should_double: double the digit, then if > 9 subtract 9
-        doubled = digit_val * 2
+        doubled = digit_val * 2  # type: ignore[operator]
         adjusted = ibis.cases(
             (should_double & (doubled > 9), doubled - 9),
             (should_double, doubled),
@@ -2526,10 +2522,10 @@ def interrogate_credit_card_db(
             else_=0,
         )
 
-        checksum = checksum + contribution
+        checksum = checksum + contribution  # type: ignore[operator]
 
     # Step 4: Valid if checksum % 10 == 0
-    luhn_valid = (checksum % 10) == 0
+    luhn_valid = (checksum % 10) == 0  # type: ignore[operator]
 
     # Combine all validation checks
     is_valid = valid_chars & valid_length & luhn_valid
@@ -2543,7 +2539,7 @@ def interrogate_credit_card_db(
         is_valid = is_valid.fill_null(False)
 
     # Add validation column to table
-    result_tbl = native_tbl.mutate(pb_is_good_=is_valid)
+    result_tbl = native_tbl.mutate(pb_is_good_=is_valid)  # type: ignore[union-attr]
 
     return result_tbl
 
