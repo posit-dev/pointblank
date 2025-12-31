@@ -15285,6 +15285,7 @@ class Validate:
         # Get all validation step result tables and join together the `pb_is_good_` columns
         # ensuring that the columns are named uniquely (e.g., `pb_is_good_1`, `pb_is_good_2`, ...)
         # and that the index is reset
+        labeled_tbl_nw: nw.DataFrame | nw.LazyFrame | None = None
         for i, validation in enumerate(validation_info):
             results_tbl = nw.from_native(validation.tbl_checked)
 
@@ -15305,7 +15306,7 @@ class Validate:
             )
 
             # Add the results table to the list of tables
-            if i == 0:
+            if labeled_tbl_nw is None:
                 labeled_tbl_nw = results_tbl
             else:
                 labeled_tbl_nw = labeled_tbl_nw.join(results_tbl, on=index_name, how="left")

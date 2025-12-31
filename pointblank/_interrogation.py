@@ -548,6 +548,8 @@ class NumberOfTestUnits:
             # TODO: check whether pandas or polars is available
             return self.df.count().to_polars()
 
+        raise ValueError(f"Unsupported table type: {tbl_type}")
+
 
 def _get_compare_expr_nw(compare: Any) -> Any:
     if isinstance(compare, Column):

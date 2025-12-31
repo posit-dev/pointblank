@@ -50,7 +50,7 @@ def _derive_single_bound(ref: int, tol: int | float) -> int:
 def _derive_bounds(ref: int, tol: Tolerance) -> AbsoluteBounds:
     """Validate and extract the absolute bounds of the tolerance."""
     if isinstance(tol, tuple):
-        return tuple(_derive_single_bound(ref, t) for t in tol)
+        return (_derive_single_bound(ref, tol[0]), _derive_single_bound(ref, tol[1]))
 
     bound = _derive_single_bound(ref, tol)
     return bound, bound
@@ -285,7 +285,7 @@ def _copy_dataframe(df):
 
 def _convert_to_narwhals(df: FrameT) -> nw.DataFrame:
     # Convert the DataFrame to a format that narwhals can work with
-    return nw.from_native(df)
+    return nw.from_native(df)  # type: ignore[return-value]
 
 
 def _check_column_exists(dfn: nw.DataFrame, column: str) -> None:
@@ -439,7 +439,7 @@ def _is_duration_dtype(dtype: str) -> bool:
 
 def _get_column_dtype(
     dfn: nw.DataFrame, column: str, raw: bool = False, lowercased: bool = True
-) -> str:
+) -> str | nw.dtypes.DType | None:
     """
     Get the data type of a column in a DataFrame.
 
@@ -450,14 +450,14 @@ def _get_column_dtype(
     column
         The column from which to get the data type.
     raw
-        If `True`, return the raw data type string.
+        If `True`, return the raw DType object (or None if column not found).
     lowercased
         If `True`, return the data type string in lowercase.
 
     Returns
     -------
-    str
-        The data type of the column.
+    str | nw.dtypes.DType | None
+        The data type of the column as a string, or the raw DType object if `raw=True`.
     """
 
     if raw:  # pragma: no cover
@@ -570,21 +570,23 @@ def _resolve_columns(columns: _PBUnresolvedColumn) -> _PBResolvedColumn:
     return columns
 
 
-def _get_fn_name() -> str:
+def _get_fn_name() -> str | None:
     # Get the current function name
-    fn_name = inspect.currentframe().f_back.f_code.co_name
+    frame = inspect.currentframe()
+    if frame is None or frame.f_back is None:
+        return None
+    return frame.f_back.f_code.co_name
 
-    return fn_name
 
-
-def _get_assertion_from_fname() -> str:
+def _get_assertion_from_fname() -> str | None:
     # Get the current function name
-    func_name = inspect.currentframe().f_back.f_code.co_name
+    frame = inspect.currentframe()
+    if frame is None or frame.f_back is None:
+        return None
+    func_name = frame.f_back.f_code.co_name
 
     # Use the `ASSERTION_TYPE_METHOD_MAP` dictionary to get the assertion type
-    assertion = ASSERTION_TYPE_METHOD_MAP.get(func_name)
-
-    return assertion
+    return ASSERTION_TYPE_METHOD_MAP.get(func_name)
 
 
 def _check_invalid_fields(fields: list[str], valid_fields: list[str]):
