@@ -3769,7 +3769,7 @@ class _ValidationInfo:
     sha1: str | None = None
     assertion_type: str | None = None
     column: Any | None = None
-    values: Any | list[any] | tuple | None = None
+    values: Any | list[Any] | tuple | None = None
     inclusive: tuple[bool, bool] | None = None
     na_pass: bool | None = None
     pre: Callable | None = None
@@ -3794,12 +3794,12 @@ class _ValidationInfo:
     failure_text: str | None = None
     tbl_checked: FrameT | None = None
     extract: FrameT | None = None
-    val_info: dict[str, any] | None = None
+    val_info: dict[str, Any] | None = None
     time_processed: str | None = None
     proc_duration_s: float | None = None
     notes: dict[str, dict[str, str]] | None = None
 
-    def get_val_info(self) -> dict[str, any]:
+    def get_val_info(self) -> dict[str, Any]:
         return self.val_info
 
     def _add_note(self, key: str, markdown: str, text: str | None = None) -> None:
@@ -17236,8 +17236,8 @@ def _string_date_dttm_conversion(value: Any) -> Any:
 
 
 def _conditional_string_date_dttm_conversion(
-    value: any, allow_regular_strings: bool = False
-) -> any:
+    value: Any, allow_regular_strings: bool = False
+) -> Any:
     """
     Conditionally convert a string to a date or datetime object if it is in the correct format. If
     `allow_regular_strings=` is `True`, regular strings are allowed to pass through unchanged. If

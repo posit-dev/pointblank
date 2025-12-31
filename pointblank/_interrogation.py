@@ -427,7 +427,7 @@ class SpeciallyValidation:
         else:
             self.tbl_type = tbl_type
 
-    def get_test_results(self) -> any | list[bool]:
+    def get_test_results(self) -> Any | list[bool]:
         """Evaluate the expression get either a list of booleans or a results table."""
 
         # Get the expression and inspect whether there is a `data` argument
@@ -598,7 +598,7 @@ def _check_nulls_across_columns_nw(table, columns_subset):
     return result
 
 
-def _modify_datetime_compare_val(tgt_column: any, compare_val: any) -> any:
+def _modify_datetime_compare_val(tgt_column: Any, compare_val: Any) -> Any:
     tgt_col_dtype_str = str(tgt_column.dtype).lower()
 
     if compare_val is isinstance(compare_val, Column):  # pragma: no cover
@@ -1103,27 +1103,27 @@ def conjointly_validation(data_tbl: FrameT, expressions, threshold: int, tbl_typ
     return conjointly_instance.get_test_results()
 
 
-def interrogate_gt(tbl: FrameT, column: str, compare: any, na_pass: bool) -> FrameT:
+def interrogate_gt(tbl: FrameT, column: str, compare: Any, na_pass: bool) -> FrameT:
     """Greater than interrogation."""
     return _interrogate_comparison_base(tbl, column, compare, na_pass, "gt")
 
 
-def interrogate_lt(tbl: FrameT, column: str, compare: any, na_pass: bool) -> FrameT:
+def interrogate_lt(tbl: FrameT, column: str, compare: Any, na_pass: bool) -> FrameT:
     """Less than interrogation."""
     return _interrogate_comparison_base(tbl, column, compare, na_pass, "lt")
 
 
-def interrogate_ge(tbl: FrameT, column: str, compare: any, na_pass: bool) -> FrameT:
+def interrogate_ge(tbl: FrameT, column: str, compare: Any, na_pass: bool) -> FrameT:
     """Greater than or equal interrogation."""
     return _interrogate_comparison_base(tbl, column, compare, na_pass, "ge")
 
 
-def interrogate_le(tbl: FrameT, column: str, compare: any, na_pass: bool) -> FrameT:
+def interrogate_le(tbl: FrameT, column: str, compare: Any, na_pass: bool) -> FrameT:
     """Less than or equal interrogation."""
     return _interrogate_comparison_base(tbl, column, compare, na_pass, "le")
 
 
-def interrogate_eq(tbl: FrameT, column: str, compare: any, na_pass: bool) -> FrameT:
+def interrogate_eq(tbl: FrameT, column: str, compare: Any, na_pass: bool) -> FrameT:
     """Equal interrogation."""
 
     nw_tbl = nw.from_native(tbl)
@@ -1313,7 +1313,7 @@ def interrogate_eq(tbl: FrameT, column: str, compare: any, na_pass: bool) -> Fra
         return result_tbl.drop("pb_is_good_1", "pb_is_good_2", "pb_is_good_3").to_native()
 
 
-def interrogate_ne(tbl: FrameT, column: str, compare: any, na_pass: bool) -> FrameT:
+def interrogate_ne(tbl: FrameT, column: str, compare: Any, na_pass: bool) -> FrameT:
     """Not equal interrogation."""
 
     nw_tbl = nw.from_native(tbl)
@@ -1869,7 +1869,7 @@ def interrogate_ne(tbl: FrameT, column: str, compare: any, na_pass: bool) -> Fra
 
 
 def interrogate_between(
-    tbl: FrameT, column: str, low: any, high: any, inclusive: tuple, na_pass: bool
+    tbl: FrameT, column: str, low: Any, high: Any, inclusive: tuple, na_pass: bool
 ) -> FrameT:
     """Between interrogation."""
 
@@ -1938,7 +1938,7 @@ def interrogate_between(
 
 
 def interrogate_outside(
-    tbl: FrameT, column: str, low: any, high: any, inclusive: tuple, na_pass: bool
+    tbl: FrameT, column: str, low: Any, high: Any, inclusive: tuple, na_pass: bool
 ) -> FrameT:
     """Outside range interrogation."""
 
@@ -2004,7 +2004,7 @@ def interrogate_outside(
     return result_tbl.to_native()
 
 
-def interrogate_isin(tbl: FrameT, column: str, set_values: any) -> FrameT:
+def interrogate_isin(tbl: FrameT, column: str, set_values: Any) -> FrameT:
     """In set interrogation."""
 
     nw_tbl = nw.from_native(tbl)
@@ -2018,7 +2018,7 @@ def interrogate_isin(tbl: FrameT, column: str, set_values: any) -> FrameT:
     return result_tbl.to_native()
 
 
-def interrogate_notin(tbl: FrameT, column: str, set_values: any) -> FrameT:
+def interrogate_notin(tbl: FrameT, column: str, set_values: Any) -> FrameT:
     """Not in set interrogation."""
 
     nw_tbl = nw.from_native(tbl)
@@ -2645,7 +2645,7 @@ def interrogate_decreasing(
 
 
 def _interrogate_comparison_base(
-    tbl: FrameT, column: str, compare: any, na_pass: bool, operator: str
+    tbl: FrameT, column: str, compare: Any, na_pass: bool, operator: str
 ) -> FrameT:
     """
     Unified base function for comparison operations (gt, ge, lt, le, eq, ne).

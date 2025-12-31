@@ -148,7 +148,7 @@ def _process_ibis_through_narwhals(data: FrameT | Any, tbl_type: str) -> tuple[F
     return data, tbl_type
 
 
-def _is_narwhals_table(data: any) -> bool:
+def _is_narwhals_table(data: Any) -> bool:
     # Check if the data is a Narwhals DataFrame
     type_str = str(type(data)).lower()
 
@@ -159,7 +159,7 @@ def _is_narwhals_table(data: any) -> bool:
     return False
 
 
-def _is_lazy_frame(data: any) -> bool:
+def _is_lazy_frame(data: Any) -> bool:
     # Check if the data is a Polars or Narwhals DataFrame
     type_str = str(type(data)).lower()
 

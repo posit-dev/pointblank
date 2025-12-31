@@ -818,7 +818,7 @@ def _schema_info_generate_colname_dict(
     dtype_matched: bool,
     dtype_multiple: bool,
     dtype_matched_pos: int,
-) -> dict[str, any]:
+) -> dict[str, Any]:
     return {
         "colname_matched": colname_matched,
         "index_matched": index_matched,
@@ -833,8 +833,8 @@ def _schema_info_generate_colname_dict(
 
 def _schema_info_generate_columns_dict(
     colnames: list[str] | None,
-    colname_dict: list[dict[str, any]] | None,
-) -> dict[str, dict[str, any]]:
+    colname_dict: list[dict[str, Any]] | None,
+) -> dict[str, dict[str, Any]]:
     """
     Generate the columns dictionary for the schema information dictionary.
 
@@ -860,7 +860,7 @@ def _schema_info_generate_params_dict(
     case_sensitive_colnames: bool,
     case_sensitive_dtypes: bool,
     full_match_dtypes: bool,
-) -> dict[str, any]:
+) -> dict[str, Any]:
     """
     Generate the parameters dictionary for the schema information dictionary.
 
@@ -901,7 +901,7 @@ def _get_schema_validation_info(
     case_sensitive_colnames: bool,
     case_sensitive_dtypes: bool,
     full_match_dtypes: bool,
-) -> dict[str, any]:
+) -> dict[str, Any]:
     """
     Get the schema validation information dictionary.
 

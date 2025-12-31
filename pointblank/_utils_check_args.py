@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Callable
+from typing import Any, Callable
 
 import narwhals as nw
 
@@ -59,7 +59,7 @@ def _check_column(column: str | list[str]):
 
 
 # TODO: allow for checking of dates/datetimes
-def _check_value_float_int(value: float | int | any):
+def _check_value_float_int(value: float | int | Any):
     """
     Check that input value of the `value=` parameter is a float or integer.
 
