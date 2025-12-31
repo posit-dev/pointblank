@@ -2274,8 +2274,8 @@ def interrogate_within_spec_db(
 
     # Check if this is an Ibis table
     native_tbl: Any = tbl
-    if hasattr(tbl, "to_native"):
-        native_tbl = tbl.to_native() if callable(tbl.to_native) else tbl
+    if is_narwhals_dataframe(tbl) or is_narwhals_lazyframe(tbl):
+        native_tbl = tbl.to_native()
 
     is_ibis = hasattr(native_tbl, "execute")
 
@@ -2776,7 +2776,7 @@ def interrogate_rows_distinct(data_tbl: IntoFrame, columns_subset: list[str] | N
         A DataFrame with a `pb_is_good_` column indicating which rows pass the test.
     """
     tbl = nw.from_native(data_tbl)
-    assert isinstance(tbl, (nw.DataFrame, nw.LazyFrame))
+    assert is_narwhals_dataframe(tbl) or is_narwhals_lazyframe(tbl)
 
     # Get the column subset to use for the test
     if columns_subset is None:
@@ -2784,15 +2784,20 @@ def interrogate_rows_distinct(data_tbl: IntoFrame, columns_subset: list[str] | N
 
     # Create a count of duplicates using group_by approach
     # Group by the columns of interest and count occurrences
-    count_tbl = tbl.group_by(columns_subset).agg(nw.len().alias("pb_count_"))
-
-    # Join back to original table to get count for each row
-    tbl = tbl.join(count_tbl, on=columns_subset, how="left")
-
-    # Passing rows will have the value `1` (no duplicates, so True), otherwise False applies
-    tbl = tbl.with_columns(pb_is_good_=nw.col("pb_count_") == 1).drop("pb_count_")
-
-    return tbl.to_native()
+    # Handle DataFrame and LazyFrame separately for proper type narrowing
+    if is_narwhals_dataframe(tbl):
+        count_tbl = tbl.group_by(columns_subset).agg(nw.len().alias("pb_count_"))
+        result = tbl.join(count_tbl, on=columns_subset, how="left")
+        result = result.with_columns(pb_is_good_=nw.col("pb_count_") == 1).drop("pb_count_")
+        return result.to_native()
+    elif is_narwhals_lazyframe(tbl):
+        count_tbl = tbl.group_by(columns_subset).agg(nw.len().alias("pb_count_"))
+        result = tbl.join(count_tbl, on=columns_subset, how="left")
+        result = result.with_columns(pb_is_good_=nw.col("pb_count_") == 1).drop("pb_count_")
+        return result.to_native()
+    else:
+        msg = f"Expected DataFrame or LazyFrame, got {type(tbl)}"
+        raise TypeError(msg)
 
 
 def interrogate_rows_complete(tbl: IntoFrame, columns_subset: list[str] | None) -> Any:
@@ -2818,6 +2823,17 @@ def interrogate_prompt(
     import logging
 
     logger = logging.getLogger(__name__)
+
+    # Convert to narwhals early for consistent row counting
+    nw_tbl = nw.from_native(tbl)
+    # Get row count - for LazyFrame we need to use select/collect
+    if is_narwhals_lazyframe(nw_tbl):
+        row_count = nw_tbl.select(nw.len()).collect().item()
+        assert isinstance(row_count, int)
+        total_rows = row_count
+    else:
+        assert is_narwhals_dataframe(nw_tbl)
+        total_rows = len(nw_tbl)
 
     try:
         # Import AI validation modules
@@ -2875,28 +2891,25 @@ def interrogate_prompt(
         )
 
         # Parse and combine results with signature mapping optimization
-        parser = _ValidationResponseParser(total_rows=len(tbl))
+        parser = _ValidationResponseParser(total_rows=total_rows)
         combined_results = parser.combine_batch_results(batch_results, signature_mapping)
 
         # Debug: Log table info and combined results
         logger.debug("🏁 Final result conversion:")
-        logger.debug(f"   - Table length: {len(tbl)}")
+        logger.debug(f"   - Table length: {total_rows}")
         logger.debug(
             f"   - Combined results keys: {sorted(combined_results.keys()) if combined_results else 'None'}"
         )
 
-        # Convert results to narwhals format
-        nw_tbl = nw.from_native(tbl)
-
         # Create a boolean column for validation results
         validation_results = []
-        for i in range(len(tbl)):
+        for i in range(total_rows):
             # Default to False if row wasn't processed
             result = combined_results.get(i, False)
             validation_results.append(result)
 
             # Debug: Log first few conversions
-            if i < 5 or len(tbl) - i <= 2:
+            if i < 5 or total_rows - i <= 2:
                 logger.debug(f"   Row {i}: {result} (from combined_results.get({i}, False))")
 
         logger.debug(f"   - Final validation_results length: {len(validation_results)}")
@@ -2935,10 +2948,9 @@ def interrogate_prompt(
         logger.error(f"Missing dependencies for AI validation: {e}")
         logger.error("Install required packages: pip install openai anthropic aiohttp")
 
-        # Return all False results as fallback
-        nw_tbl = nw.from_native(tbl)
+        # Return all False results as fallback (nw_tbl and total_rows defined at function start)
         native_tbl = nw_tbl.to_native()
-        validation_results = [False] * len(tbl)
+        validation_results = [False] * total_rows
 
         if hasattr(native_tbl, "with_columns"):  # Polars
             import polars as pl
@@ -2960,10 +2972,9 @@ def interrogate_prompt(
     except Exception as e:
         logger.error(f"AI validation failed: {e}")
 
-        # Return all False results as fallback
-        nw_tbl = nw.from_native(tbl)
+        # Return all False results as fallback (nw_tbl and total_rows defined at function start)
         native_tbl = nw_tbl.to_native()
-        validation_results = [False] * len(tbl)
+        validation_results = [False] * total_rows
 
         if hasattr(native_tbl, "with_columns"):  # Polars
             import polars as pl
