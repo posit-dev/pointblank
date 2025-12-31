@@ -30,7 +30,7 @@ from pointblank._utils import (
 from pointblank.column import Column
 
 if TYPE_CHECKING:
-    from narwhals.typing import FrameT, IntoFrame
+    from narwhals.typing import IntoFrame
 
 
 def _safe_modify_datetime_compare_val(data_frame: Any, column: str, compare_val: Any) -> Any:
@@ -528,7 +528,7 @@ class NumberOfTestUnits:
     Count the number of test units in a column.
     """
 
-    df: IntoFrame
+    df: Any  # Can be IntoFrame or Ibis table
     column: str
 
     def get_test_units(self, tbl_type: str) -> int:
@@ -545,15 +545,16 @@ class NumberOfTestUnits:
             )
 
             # Handle LazyFrames which don't have len()
-            if hasattr(dfn, "collect"):
+            if is_narwhals_lazyframe(dfn):
                 dfn = dfn.collect()
 
+            assert is_narwhals_dataframe(dfn)
             return len(dfn)
 
         if tbl_type in IBIS_BACKENDS:
             # Get the count of test units and convert to a native format
             # TODO: check whether pandas or polars is available
-            return self.df.count().to_polars()
+            return self.df.count().to_polars()  # type: ignore[union-attr]
 
         raise ValueError(f"Unsupported table type: {tbl_type}")
 
@@ -651,7 +652,7 @@ def _modify_datetime_compare_val(tgt_column: Any, compare_val: Any) -> Any:
     return compare_expr
 
 
-def col_vals_expr(data_tbl: IntoFrame, expr: Any, tbl_type: str = "local") -> Any:
+def col_vals_expr(data_tbl: Any, expr: Any, tbl_type: str = "local") -> Any:
     """Check if values in a column evaluate to True for a given predicate expression."""
     if tbl_type == "local":
         # Check the type of expression provided
@@ -687,10 +688,8 @@ def rows_complete(data_tbl: IntoFrame, columns_subset: list[str] | None) -> Any:
 
     This function replaces the RowsComplete dataclass for direct usage.
     """
-    tbl = _convert_to_narwhals(df=data_tbl)
-
     return interrogate_rows_complete(
-        tbl=tbl,
+        tbl=data_tbl,
         columns_subset=columns_subset,
     )
 
@@ -1016,33 +1015,37 @@ def tbl_match(data_tbl: IntoFrame, tbl_compare: IntoFrame) -> bool:
 
         # Convert to native format for comparison
         # We need to collect if lazy frames
-        if hasattr(col_data_1, "collect"):
+        if is_narwhals_lazyframe(col_data_1):
             col_data_1 = col_data_1.collect()
 
-        if hasattr(col_data_2, "collect"):
+        if is_narwhals_lazyframe(col_data_2):
             col_data_2 = col_data_2.collect()
 
         # Convert to native and then to lists for comparison
-        col_1_native = col_data_1.to_native()
-        col_2_native = col_data_2.to_native()
+        # Native frames could be Polars, Pandas, or Ibis - use Any for dynamic access
+        col_1_native: Any = col_data_1.to_native()
+        col_2_native: Any = col_data_2.to_native()
 
         # Extract values as lists for comparison
-        if hasattr(col_1_native, "to_list"):  # Polars Series
-            values_1 = col_1_native[col_name].to_list()
-            values_2 = col_2_native[col_name].to_list()
+        # Note: We use hasattr for runtime detection but maintain Any typing
+        values_1: list[Any]
+        values_2: list[Any]
+        if hasattr(col_1_native, "to_list"):  # Polars DataFrame
+            values_1 = col_1_native[col_name].to_list()  # type: ignore[index]
+            values_2 = col_2_native[col_name].to_list()  # type: ignore[index]
 
-        elif hasattr(col_1_native, "tolist"):  # Pandas Series/DataFrame
-            values_1 = col_1_native[col_name].tolist()
-            values_2 = col_2_native[col_name].tolist()
+        elif hasattr(col_1_native, "tolist"):  # Pandas DataFrame
+            values_1 = col_1_native[col_name].tolist()  # type: ignore[index]
+            values_2 = col_2_native[col_name].tolist()  # type: ignore[index]
 
         elif hasattr(col_1_native, "collect"):  # Ibis
-            values_1 = col_1_native[col_name].to_pandas().tolist()
-            values_2 = col_2_native[col_name].to_pandas().tolist()
+            values_1 = col_1_native[col_name].to_pandas().tolist()  # type: ignore[index]
+            values_2 = col_2_native[col_name].to_pandas().tolist()  # type: ignore[index]
 
         else:
             # Fallback: try direct comparison
-            values_1 = list(col_1_native[col_name])
-            values_2 = list(col_2_native[col_name])
+            values_1 = list(col_1_native[col_name])  # type: ignore[index]
+            values_2 = list(col_2_native[col_name])  # type: ignore[index]
 
         # Compare the two lists element by element, handling NaN/None
         if len(values_1) != len(values_2):
@@ -1193,7 +1196,7 @@ def interrogate_eq(tbl: IntoFrame, column: str, compare: Any, na_pass: bool) -> 
                     result_tbl = result_tbl.rename({"pb_is_good_4_tmp": "pb_is_good_4"})
                 elif "cannot compare" in str(e).lower():
                     # Handle genuine type incompatibility
-                    native_df = result_tbl.to_native()
+                    native_df: Any = result_tbl.to_native()
                     col_dtype = str(native_df[column].dtype)
                     compare_dtype = str(native_df[compare.name].dtype)
 
@@ -1960,8 +1963,8 @@ def interrogate_between(
 
 
 def interrogate_outside(
-    tbl: FrameT, column: str, low: Any, high: Any, inclusive: tuple, na_pass: bool
-) -> FrameT:
+    tbl: IntoFrame, column: str, low: Any, high: Any, inclusive: tuple[bool, bool], na_pass: bool
+) -> Any:
     """Outside range interrogation."""
 
     low_val = _get_compare_expr_nw(compare=low)
@@ -2027,7 +2030,7 @@ def interrogate_outside(
     return result_tbl.to_native()
 
 
-def interrogate_isin(tbl: FrameT, column: str, set_values: Any) -> FrameT:
+def interrogate_isin(tbl: IntoFrame, column: str, set_values: Any) -> Any:
     """In set interrogation."""
 
     nw_tbl = nw.from_native(tbl)
@@ -2042,7 +2045,7 @@ def interrogate_isin(tbl: FrameT, column: str, set_values: Any) -> FrameT:
     return result_tbl.to_native()
 
 
-def interrogate_notin(tbl: FrameT, column: str, set_values: Any) -> FrameT:
+def interrogate_notin(tbl: IntoFrame, column: str, set_values: Any) -> Any:
     """Not in set interrogation."""
 
     nw_tbl = nw.from_native(tbl)
@@ -2053,7 +2056,9 @@ def interrogate_notin(tbl: FrameT, column: str, set_values: Any) -> FrameT:
     return result_tbl.to_native()
 
 
-def interrogate_regex(tbl: FrameT, column: str, values: dict | str, na_pass: bool) -> FrameT:
+def interrogate_regex(
+    tbl: IntoFrame, column: str, values: dict[str, Any] | str, na_pass: bool
+) -> Any:
     """Regex interrogation."""
 
     # Handle both old and new formats for backward compatibility
@@ -2085,7 +2090,9 @@ def interrogate_regex(tbl: FrameT, column: str, values: dict | str, na_pass: boo
     return result_tbl.to_native()
 
 
-def interrogate_within_spec(tbl: FrameT, column: str, values: dict, na_pass: bool) -> FrameT:
+def interrogate_within_spec(
+    tbl: IntoFrame, column: str, values: dict[str, Any], na_pass: bool
+) -> Any:
     """Within specification interrogation."""
     from pointblank._spec_utils import (
         regex_email,
@@ -2234,7 +2241,9 @@ def interrogate_within_spec(tbl: FrameT, column: str, values: dict, na_pass: boo
     return result_tbl.to_native()
 
 
-def interrogate_within_spec_db(tbl: FrameT, column: str, values: dict, na_pass: bool) -> FrameT:
+def interrogate_within_spec_db(
+    tbl: IntoFrame, column: str, values: dict[str, Any], na_pass: bool
+) -> Any:
     """
     Database-native specification validation (proof of concept).
 
@@ -2397,8 +2406,8 @@ def interrogate_within_spec_db(tbl: FrameT, column: str, values: dict, na_pass: 
 
 
 def interrogate_credit_card_db(
-    tbl: FrameT, column: str, values: dict[str, str], na_pass: bool
-) -> FrameT:
+    tbl: IntoFrame, column: str, values: dict[str, str], na_pass: bool
+) -> Any:
     """
     Database-native credit card validation using Luhn algorithm in SQL.
 
@@ -2539,7 +2548,7 @@ def interrogate_credit_card_db(
     return result_tbl
 
 
-def interrogate_null(tbl: FrameT, column: str) -> FrameT:
+def interrogate_null(tbl: IntoFrame, column: str) -> Any:
     """Null interrogation."""
 
     nw_tbl = nw.from_native(tbl)
@@ -2548,7 +2557,7 @@ def interrogate_null(tbl: FrameT, column: str) -> FrameT:
     return result_tbl.to_native()
 
 
-def interrogate_not_null(tbl: FrameT, column: str) -> FrameT:
+def interrogate_not_null(tbl: IntoFrame, column: str) -> Any:
     """Not null interrogation."""
 
     nw_tbl = nw.from_native(tbl)
@@ -2558,8 +2567,8 @@ def interrogate_not_null(tbl: FrameT, column: str) -> FrameT:
 
 
 def interrogate_increasing(
-    tbl: FrameT, column: str, allow_stationary: bool, decreasing_tol: float, na_pass: bool
-) -> FrameT:
+    tbl: IntoFrame, column: str, allow_stationary: bool, decreasing_tol: float, na_pass: bool
+) -> Any:
     """
     Increasing interrogation.
 
@@ -2617,8 +2626,8 @@ def interrogate_increasing(
 
 
 def interrogate_decreasing(
-    tbl: FrameT, column: str, allow_stationary: bool, increasing_tol: float, na_pass: bool
-) -> FrameT:
+    tbl: IntoFrame, column: str, allow_stationary: bool, increasing_tol: float, na_pass: bool
+) -> Any:
     """
     Decreasing interrogation.
 
@@ -2750,7 +2759,7 @@ def _interrogate_comparison_base(
     return result_tbl.to_native()
 
 
-def interrogate_rows_distinct(data_tbl: FrameT, columns_subset: list[str] | None) -> FrameT:
+def interrogate_rows_distinct(data_tbl: IntoFrame, columns_subset: list[str] | None) -> Any:
     """
     Check if rows in a DataFrame are distinct.
 
@@ -2790,7 +2799,7 @@ def interrogate_rows_distinct(data_tbl: FrameT, columns_subset: list[str] | None
     return tbl.to_native()
 
 
-def interrogate_rows_complete(tbl: FrameT, columns_subset: list[str] | None) -> FrameT:
+def interrogate_rows_complete(tbl: IntoFrame, columns_subset: list[str] | None) -> Any:
     """Rows complete interrogation."""
     nw_tbl = nw.from_native(tbl)
 
@@ -2806,7 +2815,9 @@ def interrogate_rows_complete(tbl: FrameT, columns_subset: list[str] | None) -> 
     return result_tbl.to_native()
 
 
-def interrogate_prompt(tbl: FrameT, columns_subset: list[str] | None, ai_config: dict) -> FrameT:
+def interrogate_prompt(
+    tbl: IntoFrame, columns_subset: list[str] | None, ai_config: dict[str, Any]
+) -> Any:
     """AI-powered interrogation of rows."""
     import logging
 
