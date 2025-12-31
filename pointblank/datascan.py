@@ -3,7 +3,7 @@ from __future__ import annotations
 import contextlib
 import json
 from importlib.metadata import version
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 import narwhals as nw
 from great_tables import GT, google_font, html, loc, style
@@ -171,7 +171,7 @@ class DataScan:
             implementation=self.nw_data.implementation,
         )
         for column in columns:
-            col_data: DataFrame = self.nw_data.select(column)
+            col_data: Frame = self.nw_data.select(column)
 
             ## Handle dtyping:
             native_dtype = schema[column]
@@ -182,7 +182,7 @@ class DataScan:
             except NotImplementedError:
                 continue
 
-            col_profile = ColumnProfile(colname=column, coltype=native_dtype)
+            col_profile = ColumnProfile(colname=column, coltype=str(native_dtype))
 
             ## Collect Sample Data:
             ## This is the most consistent way (i think) to get the samples out of the data.
@@ -317,11 +317,10 @@ class DataScan:
 
         # format fractions:
         # this is an anti-pattern but there's no serious alternative
+        _backend = cast(Any, self.profile.implementation)
         for _fmt_col in ("__frac_n_unique", "__frac_n_missing"):
             _formatted: list[str | None] = _fmt_frac(formatted_data[_fmt_col])
-            formatted: nw.Series = nw.new_series(
-                _fmt_col, values=_formatted, backend=self.profile.implementation
-            )
+            formatted: nw.Series = nw.new_series(_fmt_col, values=_formatted, backend=_backend)
             formatted_data = formatted_data.drop(_fmt_col)
             formatted_data = formatted_data.with_columns(formatted.alias(_fmt_col))
 
@@ -364,10 +363,10 @@ class DataScan:
                         trues.append(None)
                         falses.append(None)
                 true_ser: nw.Series = nw.new_series(
-                    name="__freq_true", values=trues, backend=self.profile.implementation
+                    name="__freq_true", values=trues, backend=_backend
                 )
                 false_ser: nw.Series = nw.new_series(
-                    name="__freq_false", values=falses, backend=self.profile.implementation
+                    name="__freq_false", values=falses, backend=_backend
                 )
                 formatted_data = formatted_data.with_columns(
                     __freq_true=true_ser, __freq_false=false_ser
@@ -381,9 +380,7 @@ class DataScan:
             )
             for _fmt_col in ("__pct_true", "__pct_false"):
                 _formatted: list[str | None] = _fmt_frac(formatted_data[_fmt_col])
-                formatted = nw.new_series(
-                    name=_fmt_col, values=_formatted, backend=self.profile.implementation
-                )
+                formatted = nw.new_series(name=_fmt_col, values=_formatted, backend=_backend)
                 formatted_data = formatted_data.drop(_fmt_col)
                 formatted_data = formatted_data.with_columns(formatted.alias(_fmt_col))
 
@@ -458,7 +455,11 @@ class DataScan:
             )
             .tab_style(style=style.text(size="12px"), locations=loc.body(columns="colname"))
             .cols_width(
-                icon="35px", colname="200px", **{stat_col: "60px" for stat_col in present_stat_cols}
+                cases={
+                    "icon": "35px",
+                    "colname": "200px",
+                    **{stat_col: "60px" for stat_col in present_stat_cols},
+                }
             )
         )
 

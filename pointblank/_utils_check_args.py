@@ -28,7 +28,7 @@ def _check_boolean_input(param: bool, param_name: str):
         raise ValueError(f"`{param_name}=` must be a boolean value.")
 
 
-def _check_column(column: str | list[str]):
+def _check_column(column: str | list[str] | Column | ColumnSelector | nw.selectors.Selector):
     """
     Check the input value of the `column=` parameter.
 

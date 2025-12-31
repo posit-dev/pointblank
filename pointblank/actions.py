@@ -15,7 +15,7 @@ def send_slack_notification(
     step_msg: str | None = None,
     summary_msg: str | None = None,
     debug: bool = False,
-) -> Callable:
+) -> Callable | None:
     """
     Create a Slack notification function using a webhook URL.
 

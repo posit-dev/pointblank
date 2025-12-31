@@ -791,7 +791,14 @@ class Schema:
 
 
 def _process_columns(
-    *, columns: str | list[str] | list[tuple[str, str]] | dict[str, str] | None = None, **kwargs
+    *,
+    columns: str
+    | list[str]
+    | list[tuple[str, str]]
+    | list[tuple[str]]
+    | dict[str, str]
+    | None = None,
+    **kwargs,
 ) -> list[tuple[str, ...]]:
     """
     Process column information provided as individual arguments or as a list of

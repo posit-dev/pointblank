@@ -110,7 +110,7 @@ EXAMPLE OUTPUT FORMAT:
     if provider == "anthropic":  # pragma: no cover
         # Check that the anthropic package is installed
         try:
-            import anthropic  # noqa
+            import anthropic  # noqa  # type: ignore[import-not-found]
         except ImportError:
             raise ImportError(
                 "The `anthropic` package is required to use AI validation with "

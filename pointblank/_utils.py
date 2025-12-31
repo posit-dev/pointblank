@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, Any
 
 import narwhals as nw
 from great_tables import GT
+from narwhals.dependencies import is_narwhals_dataframe, is_narwhals_lazyframe
 from great_tables.gt import _get_column_of_values
 
 from pointblank._constants import ASSERTION_TYPE_METHOD_MAP, GENERAL_COLUMN_TYPES, IBIS_BACKENDS
@@ -184,15 +185,17 @@ def _is_lib_present(lib_name: str) -> bool:
 
 def _check_any_df_lib(method_used: str) -> None:
     # Determine whether Pandas or Polars is available
+    pd = None
     try:
         import pandas as pd
     except ImportError:
-        pd = None
+        pass
 
+    pl = None
     try:
         import polars as pl
     except ImportError:
-        pl = None
+        pass
 
     # If neither Pandas nor Polars is available, raise an ImportError
     if pd is None and pl is None:
@@ -215,16 +218,18 @@ def _is_value_a_df(value: Any) -> bool:
 
 def _select_df_lib(preference: str = "polars") -> Any:
     # Determine whether Pandas is available
+    pd = None
     try:
         import pandas as pd
     except ImportError:
-        pd = None
+        pass
 
-    # Determine whether Pandas is available
+    # Determine whether Polars is available
+    pl = None
     try:
         import polars as pl
     except ImportError:
-        pl = None
+        pass
 
     # TODO: replace this with the `_check_any_df_lib()` function, introduce `method_used=` param
     # If neither Pandas nor Polars is available, raise an ImportError
@@ -288,7 +293,9 @@ def _copy_dataframe(df: IntoFrameT) -> IntoFrameT:
 # TODO: Should straight up remove this
 def _convert_to_narwhals(df: IntoFrame) -> nw.DataFrame[Any] | nw.LazyFrame[Any]:
     # Convert the DataFrame to a format that narwhals can work with
-    return nw.from_native(df)
+    result = nw.from_native(df)
+    assert is_narwhals_dataframe(result) or is_narwhals_lazyframe(result)
+    return result
 
 
 def _check_column_exists(dfn: nw.DataFrame[Any] | nw.LazyFrame[Any], column: str) -> None:
@@ -343,7 +350,7 @@ def _count_true_values_in_column(
     tbl_filtered = tbl_nw.filter(nw.col(column) if not inverse else ~nw.col(column))
 
     # Always collect table if it is a LazyFrame; this is required to get the row count
-    if _is_lazy_frame(tbl_filtered):
+    if is_narwhals_lazyframe(tbl_filtered):
         tbl_filtered = tbl_filtered.collect()
 
     return len(tbl_filtered)
@@ -377,7 +384,7 @@ def _count_null_values_in_column(
     tbl_filtered = tbl_nw.filter(nw.col(column).is_null())
 
     # Always collect table if it is a LazyFrame; this is required to get the row count
-    if _is_lazy_frame(tbl_filtered):
+    if is_narwhals_lazyframe(tbl_filtered):
         tbl_filtered = tbl_filtered.collect()
 
     return len(tbl_filtered)
