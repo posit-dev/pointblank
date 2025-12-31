@@ -2286,7 +2286,8 @@ def _generate_display_table(
         tbl_schema = Schema(tbl=data)
 
         # Get the row count for the table
-        ibis_rows = data.count()
+        # Note: ibis tables have count(), to_polars(), to_pandas() methods
+        ibis_rows = data.count()  # type: ignore[union-attr]
         n_rows = ibis_rows.to_polars() if df_lib_name_gt == "polars" else int(ibis_rows.to_pandas())
 
         # If n_head + n_tail is greater than the row count, display the entire table
@@ -2295,11 +2296,11 @@ def _generate_display_table(
             data_subset = data
 
             if row_number_list is None:
-                row_number_list = range(1, n_rows + 1)
+                row_number_list = list(range(1, n_rows + 1))
         else:
             # Get the first n and last n rows of the table
-            data_head = data.head(n_head)
-            data_tail = data.filter(
+            data_head = data.head(n_head)  # type: ignore[union-attr]
+            data_tail = data.filter(  # type: ignore[union-attr]
                 [ibis.row_number() >= (n_rows - n_tail), ibis.row_number() <= n_rows]
             )
             data_subset = data_head.union(data_tail)
@@ -2311,9 +2312,9 @@ def _generate_display_table(
 
         # Convert either to Polars or Pandas depending on the available library
         if df_lib_name_gt == "polars":
-            data = data_subset.to_polars()
+            data = data_subset.to_polars()  # type: ignore[union-attr]
         else:
-            data = data_subset.to_pandas()
+            data = data_subset.to_pandas()  # type: ignore[union-attr]
 
     # From a DataFrame:
     # - get the row count
@@ -2324,17 +2325,18 @@ def _generate_display_table(
         tbl_schema = Schema(tbl=data)
 
         if tbl_type == "polars":
-            n_rows = int(data.height)
+            # Note: polars DataFrames have height, head(), tail() attributes
+            n_rows = int(data.height)  # type: ignore[union-attr]
 
             # If n_head + n_tail is greater than the row count, display the entire table
             if n_head + n_tail >= n_rows:
                 full_dataset = True
 
                 if row_number_list is None:
-                    row_number_list = range(1, n_rows + 1)
+                    row_number_list = list(range(1, n_rows + 1))
 
             else:
-                data = pl.concat([data.head(n=n_head), data.tail(n=n_tail)])
+                data = pl.concat([data.head(n=n_head), data.tail(n=n_tail)])  # type: ignore[union-attr]
 
                 if row_number_list is None:
                     row_number_list = list(range(1, n_head + 1)) + list(
@@ -2342,40 +2344,42 @@ def _generate_display_table(
                     )
 
         if tbl_type == "pandas":
-            n_rows = data.shape[0]
+            # Note: pandas DataFrames have shape, head(), tail() attributes
+            n_rows = data.shape[0]  # type: ignore[union-attr]
 
             # If n_head + n_tail is greater than the row count, display the entire table
             if n_head + n_tail >= n_rows:
                 full_dataset = True
                 data_subset = data
 
-                row_number_list = range(1, n_rows + 1)
+                row_number_list = list(range(1, n_rows + 1))
             else:
-                data = pd.concat([data.head(n=n_head), data.tail(n=n_tail)])
+                data = pd.concat([data.head(n=n_head), data.tail(n=n_tail)])  # type: ignore[union-attr]
 
                 row_number_list = list(range(1, n_head + 1)) + list(
                     range(n_rows - n_tail + 1, n_rows + 1)
                 )
 
         if tbl_type == "pyspark":
-            n_rows = data.count()
+            # Note: pyspark DataFrames have count(), toPandas(), limit(), tail(), sparkSession
+            n_rows = data.count()  # type: ignore[union-attr]
 
             # If n_head + n_tail is greater than the row count, display the entire table
             if n_head + n_tail >= n_rows:
                 full_dataset = True
                 # Convert to pandas for Great Tables compatibility
-                data = data.toPandas()
+                data = data.toPandas()  # type: ignore[union-attr]
 
-                row_number_list = range(1, n_rows + 1)
+                row_number_list = list(range(1, n_rows + 1))
             else:
                 # Get head and tail samples, then convert to pandas
-                head_data = data.limit(n_head).toPandas()
+                head_data = data.limit(n_head).toPandas()  # type: ignore[union-attr]
 
                 # PySpark tail() returns a list of Row objects, need to convert to DataFrame
-                tail_rows = data.tail(n_tail)
+                tail_rows = data.tail(n_tail)  # type: ignore[union-attr]
                 if tail_rows:
                     # Convert list of Row objects back to DataFrame, then to pandas
-                    tail_df = data.sparkSession.createDataFrame(tail_rows, data.schema)
+                    tail_df = data.sparkSession.createDataFrame(tail_rows, data.schema)  # type: ignore[union-attr]
                     tail_data = tail_df.toPandas()
                 else:
                     # If no tail data, create empty DataFrame with same schema
@@ -2509,21 +2513,21 @@ def _generate_display_table(
     # Prepend a column that contains the row numbers if `show_row_numbers=True`
     if show_row_numbers or has_leading_row_num_col:
         if has_leading_row_num_col:
-            row_number_list = data["_row_num_"].to_list()
+            row_number_list = data["_row_num_"].to_list()  # type: ignore[union-attr]
 
         else:
             if df_lib_name_gt == "polars":
                 import polars as pl
 
                 row_number_series = pl.Series("_row_num_", row_number_list)
-                data = data.insert_column(0, row_number_series)
+                data = data.insert_column(0, row_number_series)  # type: ignore[union-attr]
 
             if df_lib_name_gt == "pandas":
-                data.insert(0, "_row_num_", row_number_list)
+                data.insert(0, "_row_num_", row_number_list)  # type: ignore[union-attr]
 
             if df_lib_name_gt == "pyspark":
                 # For PySpark converted to pandas, use pandas method
-                data.insert(0, "_row_num_", row_number_list)
+                data.insert(0, "_row_num_", row_number_list)  # type: ignore[union-attr]
 
         # Get the highest number in the `row_number_list` and calculate a width that will
         # safely fit a number of that magnitude
@@ -3257,7 +3261,7 @@ def _validate_columns_subset(
                 )
             return columns_subset
 
-    return columns_subset.resolve(columns=col_names)
+    return columns_subset.resolve(columns=col_names)  # type: ignore[union-attr]
 
 
 def _select_columns(
@@ -13908,12 +13912,14 @@ class Validate:
             )
 
         # Get the threshold status using the appropriate method
+        # Note: scalar=False (default) always returns a dict
+        status: dict[int, bool]
         if level == "warning":
-            status = self.warning(i=i)
+            status = self.warning(i=i)  # type: ignore[assignment]
         elif level == "error":
-            status = self.error(i=i)
-        elif level == "critical":
-            status = self.critical(i=i)
+            status = self.error(i=i)  # type: ignore[assignment]
+        else:  # level == "critical"
+            status = self.critical(i=i)  # type: ignore[assignment]
 
         # Find any steps that exceeded the threshold
         failures = []
@@ -14067,12 +14073,14 @@ class Validate:
             )
 
         # Get the threshold status using the appropriate method
+        # Note: scalar=False (default) always returns a dict
+        status: dict[int, bool]
         if level == "warning":
-            status = self.warning(i=i)
+            status = self.warning(i=i)  # type: ignore[assignment]
         elif level == "error":
-            status = self.error(i=i)
-        elif level == "critical":
-            status = self.critical(i=i)
+            status = self.error(i=i)  # type: ignore[assignment]
+        else:  # level == "critical"
+            status = self.critical(i=i)  # type: ignore[assignment]
 
         # Return True if any steps exceeded the threshold
         return any(status.values())
@@ -16825,7 +16833,7 @@ class Validate:
                     table = validation.pre(self.data)
 
                 # Get the columns from the table as a list
-                columns = list(table.columns)
+                columns = list(table.columns)  # type: ignore[union-attr]
 
                 # Evaluate the column expression
                 if isinstance(column_expr, ColumnSelectorNarwhals):
@@ -19782,7 +19790,7 @@ def _create_col_schema_match_note_html(schema_info: dict, locale: str = "en") ->
 """
 
     # Add the settings as an additional source note to the step report
-    step_report_gt = step_report_gt.tab_source_note(source_note=html(source_note_html))
+    step_report_gt = step_report_gt.tab_source_note(source_note=html(source_note_html))  # type: ignore[union-attr]
 
     # Extract the HTML from the GT object
     step_report_html = step_report_gt._repr_html_()
