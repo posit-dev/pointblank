@@ -2402,14 +2402,14 @@ def _generate_display_table(
             tbl_schema = Schema(tbl=data)
 
     # From the table schema, get a list of tuples containing column names and data types
-    col_dtype_dict = tbl_schema.columns
+    col_dtype_list = tbl_schema.columns or []
 
     # Extract the column names from the list of tuples (first element of each tuple)
-    col_names = [col[0] for col in col_dtype_dict]
+    col_names = [col[0] for col in col_dtype_list]
 
     # Iterate over the list of tuples and create a new dictionary with the
     # column names and data types
-    col_dtype_dict = {k: v for k, v in col_dtype_dict}
+    col_dtype_dict = {k: v for k, v in col_dtype_list}
 
     # Create short versions of the data types by omitting any text in parentheses
     col_dtype_dict_short = {

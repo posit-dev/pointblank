@@ -389,6 +389,8 @@ class Schema:
         bool
             True if the columns are the same, False otherwise.
         """
+        if self.columns is None or other.columns is None:
+            return self.columns is None and other.columns is None
 
         if not case_sensitive_colnames:
             this_column_list = [col.lower() for col in self.get_column_list()]
@@ -465,6 +467,8 @@ class Schema:
         bool
             True if the columns are the same, False otherwise.
         """
+        if self.columns is None or other.columns is None:
+            return self.columns is None and other.columns is None
 
         if not case_sensitive_colnames:
             this_column_list = [col.lower() for col in self.get_column_list()]
@@ -549,6 +553,8 @@ class Schema:
         bool
             True if the columns are the same, False otherwise.
         """
+        if self.columns is None or other.columns is None:
+            return self.columns is None and other.columns is None
 
         if not case_sensitive_colnames:
             this_column_list = [col.lower() for col in self.get_column_list()]
@@ -635,6 +641,8 @@ class Schema:
         bool
             True if the columns are the same, False otherwise.
         """
+        if self.columns is None or other.columns is None:
+            return self.columns is None and other.columns is None
 
         if not case_sensitive_colnames:
             this_column_list = [col.lower() for col in self.get_column_list()]
@@ -704,6 +712,8 @@ class Schema:
         list[str]
             A list of column names.
         """
+        if self.columns is None:
+            return []
         return [col[0] for col in self.columns]
 
     def get_dtype_list(self) -> list[str]:
@@ -715,9 +725,11 @@ class Schema:
         list[str]
             A list of data types.
         """
+        if self.columns is None:
+            return []
         return [col[1] for col in self.columns]
 
-    def get_schema_coerced(self, to: str | None = None) -> dict[str, str]:
+    def get_schema_coerced(self, to: str | None = None) -> Schema:
         # If a table isn't provided, we cannot use this method
         if self.tbl is None:
             raise ValueError(
@@ -757,8 +769,15 @@ class Schema:
                 new_schema = copy.deepcopy(Schema(tbl=(self.tbl.to_pandas())))
                 return new_schema
 
+        raise ValueError(
+            f"Cannot coerce schema from '{self.tbl_type}' to '{to}'. "
+            "Supported conversions: pandas->polars, polars->pandas."
+        )
+
     def __str__(self):
         formatted_columns = []
+        if self.columns is None:
+            return "Pointblank Schema (empty)"
         for col in self.columns:
             if len(col) == 1:  # Only column name provided (no data type)
                 formatted_columns.append(f"  {col[0]}: <ANY>")
