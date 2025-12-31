@@ -13228,6 +13228,7 @@ def test_get_row_count_parquet_list():
     assert result > 0  # Should return the row count from the combined Parquet files
 
 
+# TODO: This test takes a bizarrely long time to run and should be debugged
 @pytest.mark.parametrize("tbl_type", ["pandas", "polars"])
 def test_get_step_report_no_fail(tbl_type):
     small_table = load_dataset(dataset="small_table", tbl_type=tbl_type)
