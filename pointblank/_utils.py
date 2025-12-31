@@ -8,7 +8,6 @@ from typing import TYPE_CHECKING, Any
 import narwhals as nw
 from great_tables import GT
 from great_tables.gt import _get_column_of_values
-from narwhals.typing import FrameT
 
 from pointblank._constants import ASSERTION_TYPE_METHOD_MAP, GENERAL_COLUMN_TYPES, IBIS_BACKENDS
 from pointblank.column import Column, ColumnLiteral, ColumnSelector, ColumnSelectorNarwhals, col
@@ -16,7 +15,7 @@ from pointblank.column import Column, ColumnLiteral, ColumnSelector, ColumnSelec
 if TYPE_CHECKING:
     from collections.abc import Mapping
 
-    from narwhals.typing import IntoFrameT
+    from narwhals.typing import IntoFrame, IntoFrameT
 
     from pointblank._typing import AbsoluteBounds, Tolerance
 
@@ -58,7 +57,7 @@ def _derive_bounds(ref: int, tol: Tolerance) -> AbsoluteBounds:
     return bound, bound
 
 
-def _get_tbl_type(data: FrameT | Any) -> str:
+def _get_tbl_type(data: Any) -> str:
     type_str = str(type(data))
 
     ibis_tbl = "ibis.expr.types.relations.Table" in type_str
@@ -115,7 +114,7 @@ def _get_tbl_type(data: FrameT | Any) -> str:
     return "unknown"  # pragma: no cover
 
 
-def _process_ibis_through_narwhals(data: FrameT | Any, tbl_type: str) -> tuple[FrameT | Any, str]:
+def _process_ibis_through_narwhals(data: Any, tbl_type: str) -> tuple[Any, str]:
     """
     Process Ibis tables through Narwhals to unify the processing pathway.
 
@@ -125,14 +124,14 @@ def _process_ibis_through_narwhals(data: FrameT | Any, tbl_type: str) -> tuple[F
 
     Parameters
     ----------
-    data : FrameT | Any
+    data
         The data table, potentially an Ibis table
-    tbl_type : str
+    tbl_type
         The detected table type
 
     Returns
     -------
-    tuple[FrameT | Any, str]
+    tuple[Any, str]
         A tuple of (processed_data, updated_tbl_type) where:
         - processed_data is the Narwhals-wrapped table if it was Ibis, otherwise original data
         - updated_tbl_type is "narwhals" if it was Ibis, otherwise original tbl_type
@@ -245,6 +244,7 @@ def _select_df_lib(preference: str = "polars") -> Any:
     return pl if pl is not None else pd
 
 
+# TODO: Good argument exceptions should be handled by caller
 def _copy_dataframe(df: IntoFrameT) -> IntoFrameT:
     """
     Create a copy of a DataFrame, handling different DataFrame types.
@@ -285,19 +285,20 @@ def _copy_dataframe(df: IntoFrameT) -> IntoFrameT:
         return df  # pragma: no cover
 
 
-def _convert_to_narwhals(df: FrameT) -> nw.DataFrame:
+# TODO: Should straight up remove this
+def _convert_to_narwhals(df: IntoFrame) -> nw.DataFrame[Any] | nw.LazyFrame[Any]:
     # Convert the DataFrame to a format that narwhals can work with
-    return nw.from_native(df)  # type: ignore[return-value]
+    return nw.from_native(df)
 
 
-def _check_column_exists(dfn: nw.DataFrame, column: str) -> None:
+def _check_column_exists(dfn: nw.DataFrame[Any] | nw.LazyFrame[Any], column: str) -> None:
     """
     Check if a column exists in a DataFrame.
 
     Parameters
     ----------
     dfn
-        A Narwhals DataFrame.
+        A Narwhals DataFrame or LazyFrame.
     column
         The column to check for existence.
 
@@ -312,7 +313,7 @@ def _check_column_exists(dfn: nw.DataFrame, column: str) -> None:
 
 
 def _count_true_values_in_column(
-    tbl: FrameT,
+    tbl: IntoFrame,
     column: str,
     inverse: bool = False,
 ) -> int:
@@ -349,7 +350,7 @@ def _count_true_values_in_column(
 
 
 def _count_null_values_in_column(
-    tbl: FrameT,
+    tbl: IntoFrame,
     column: str,
 ) -> int:
     """
@@ -440,7 +441,10 @@ def _is_duration_dtype(dtype: str) -> bool:
 
 
 def _get_column_dtype(
-    dfn: nw.DataFrame, column: str, raw: bool = False, lowercased: bool = True
+    dfn: nw.DataFrame[Any] | nw.LazyFrame[Any],
+    column: str,
+    raw: bool = False,
+    lowercased: bool = True,
 ) -> str | nw.dtypes.DType | None:
     """
     Get the data type of a column in a DataFrame.
@@ -473,7 +477,9 @@ def _get_column_dtype(
     return column_dtype_str
 
 
-def _check_column_type(dfn: nw.DataFrame, column: str, allowed_types: list[str]) -> None:
+def _check_column_type(
+    dfn: nw.DataFrame[Any] | nw.LazyFrame[Any], column: str, allowed_types: list[str]
+) -> None:
     """
     Check if a column is of a certain data type.
 
@@ -525,8 +531,8 @@ def _check_column_type(dfn: nw.DataFrame, column: str, allowed_types: list[str])
 
 
 def _column_test_prep(
-    df: FrameT, column: str, allowed_types: list[str] | None, check_exists: bool = True
-) -> nw.DataFrame:
+    df: IntoFrame, column: str, allowed_types: list[str] | None, check_exists: bool = True
+) -> nw.DataFrame[Any] | nw.LazyFrame[Any]:
     # Convert the DataFrame to a format that narwhals can work with.
     dfn = _convert_to_narwhals(df=df)
 
@@ -542,8 +548,8 @@ def _column_test_prep(
 
 
 def _column_subset_test_prep(
-    df: FrameT, columns_subset: list[str] | None, check_exists: bool = True
-) -> nw.DataFrame:
+    df: IntoFrame, columns_subset: list[str] | None, check_exists: bool = True
+) -> nw.DataFrame[Any] | nw.LazyFrame[Any]:
     # Convert the DataFrame to a format that narwhals can work with.
     dfn = _convert_to_narwhals(df=df)
 

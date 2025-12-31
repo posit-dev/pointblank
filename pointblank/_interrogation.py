@@ -528,7 +528,7 @@ class NumberOfTestUnits:
     Count the number of test units in a column.
     """
 
-    df: FrameT
+    df: IntoFrame
     column: str
 
     def get_test_units(self, tbl_type: str) -> int:
@@ -566,7 +566,7 @@ def _get_compare_expr_nw(compare: Any) -> Any:
     return compare
 
 
-def _column_has_null_values(table: FrameT, column: str) -> bool:
+def _column_has_null_values(table: nw.DataFrame[Any] | nw.LazyFrame[Any], column: str) -> bool:
     try:
         # Try the standard null_count() method
         null_count = (table.select(column).null_count())[column][0]
@@ -651,7 +651,7 @@ def _modify_datetime_compare_val(tgt_column: Any, compare_val: Any) -> Any:
     return compare_expr
 
 
-def col_vals_expr(data_tbl: FrameT, expr, tbl_type: str = "local"):
+def col_vals_expr(data_tbl: IntoFrame, expr: Any, tbl_type: str = "local") -> Any:
     """Check if values in a column evaluate to True for a given predicate expression."""
     if tbl_type == "local":
         # Check the type of expression provided
@@ -681,7 +681,7 @@ def col_vals_expr(data_tbl: FrameT, expr, tbl_type: str = "local"):
     return data_tbl  # pragma: no cover
 
 
-def rows_complete(data_tbl: FrameT, columns_subset: list[str] | None):
+def rows_complete(data_tbl: IntoFrame, columns_subset: list[str] | None) -> Any:
     """
     Check if rows in a DataFrame are complete (no null values).
 
@@ -695,7 +695,7 @@ def rows_complete(data_tbl: FrameT, columns_subset: list[str] | None):
     )
 
 
-def col_exists(data_tbl: FrameT, column: str) -> bool:
+def col_exists(data_tbl: IntoFrame, column: str) -> bool:
     """
     Check if a column exists in a DataFrame.
 
@@ -716,8 +716,8 @@ def col_exists(data_tbl: FrameT, column: str) -> bool:
 
 
 def col_schema_match(
-    data_tbl: FrameT,
-    schema,
+    data_tbl: IntoFrame,
+    schema: Any,
     complete: bool,
     in_order: bool,
     case_sensitive_colnames: bool,
@@ -741,7 +741,9 @@ def col_schema_match(
     )
 
 
-def row_count_match(data_tbl: FrameT, count, inverse: bool, abs_tol_bounds) -> bool:
+def row_count_match(
+    data_tbl: IntoFrame, count: Any, inverse: bool, abs_tol_bounds: AbsoluteBounds
+) -> bool:
     """
     Check if DataFrame row count matches expected count.
     """
@@ -785,7 +787,7 @@ def col_pct_null(
     return n_null >= (abs_target - lower_bound) and n_null <= (abs_target + upper_bound)
 
 
-def col_count_match(data_tbl: FrameT, count, inverse: bool) -> bool:
+def col_count_match(data_tbl: IntoFrame, count: Any, inverse: bool) -> bool:
     """
     Check if DataFrame column count matches expected count.
     """
@@ -797,7 +799,7 @@ def col_count_match(data_tbl: FrameT, count, inverse: bool) -> bool:
         return get_column_count(data=data_tbl) != count
 
 
-def _coerce_to_common_backend(data_tbl: FrameT, tbl_compare: FrameT) -> tuple[FrameT, FrameT]:
+def _coerce_to_common_backend(data_tbl: Any, tbl_compare: Any) -> tuple[Any, Any]:
     """
     Coerce two tables to the same backend if they differ.
 
@@ -814,7 +816,7 @@ def _coerce_to_common_backend(data_tbl: FrameT, tbl_compare: FrameT) -> tuple[Fr
 
     Returns
     -------
-    tuple[FrameT, FrameT]
+    tuple[Any, Any]
         Both tables, with tbl_compare potentially converted to data_tbl's backend.
     """
     # Get backend types for both tables
@@ -900,7 +902,7 @@ def _coerce_to_common_backend(data_tbl: FrameT, tbl_compare: FrameT) -> tuple[Fr
     return data_tbl, tbl_compare
 
 
-def tbl_match(data_tbl: FrameT, tbl_compare: FrameT) -> bool:
+def tbl_match(data_tbl: IntoFrame, tbl_compare: IntoFrame) -> bool:
     """
     Check if two tables match exactly in schema, row count, and data.
 
@@ -1102,7 +1104,9 @@ def tbl_match(data_tbl: FrameT, tbl_compare: FrameT) -> bool:
     return True
 
 
-def conjointly_validation(data_tbl: FrameT, expressions, threshold: int, tbl_type: str = "local"):
+def conjointly_validation(
+    data_tbl: IntoFrame, expressions: Any, threshold: int, tbl_type: str = "local"
+) -> Any:
     """
     Perform conjoint validation using multiple expressions.
     """
@@ -1118,27 +1122,27 @@ def conjointly_validation(data_tbl: FrameT, expressions, threshold: int, tbl_typ
 
 
 # TODO: we can certainly simplify this
-def interrogate_gt(tbl: FrameT, column: str, compare: Any, na_pass: bool) -> FrameT:
+def interrogate_gt(tbl: IntoFrame, column: str, compare: Any, na_pass: bool) -> Any:
     """Greater than interrogation."""
     return _interrogate_comparison_base(tbl, column, compare, na_pass, "gt")
 
 
-def interrogate_lt(tbl: FrameT, column: str, compare: Any, na_pass: bool) -> FrameT:
+def interrogate_lt(tbl: IntoFrame, column: str, compare: Any, na_pass: bool) -> Any:
     """Less than interrogation."""
     return _interrogate_comparison_base(tbl, column, compare, na_pass, "lt")
 
 
-def interrogate_ge(tbl: FrameT, column: str, compare: Any, na_pass: bool) -> FrameT:
+def interrogate_ge(tbl: IntoFrame, column: str, compare: Any, na_pass: bool) -> Any:
     """Greater than or equal interrogation."""
     return _interrogate_comparison_base(tbl, column, compare, na_pass, "ge")
 
 
-def interrogate_le(tbl: FrameT, column: str, compare: Any, na_pass: bool) -> FrameT:
+def interrogate_le(tbl: IntoFrame, column: str, compare: Any, na_pass: bool) -> Any:
     """Less than or equal interrogation."""
     return _interrogate_comparison_base(tbl, column, compare, na_pass, "le")
 
 
-def interrogate_eq(tbl: IntoFrame, column: str, compare: Any, na_pass: bool) -> FrameT:
+def interrogate_eq(tbl: IntoFrame, column: str, compare: Any, na_pass: bool) -> Any:
     """Equal interrogation."""
 
     nw_tbl = nw.from_native(tbl)
@@ -1329,7 +1333,7 @@ def interrogate_eq(tbl: IntoFrame, column: str, compare: Any, na_pass: bool) -> 
         return result_tbl.drop("pb_is_good_1", "pb_is_good_2", "pb_is_good_3").to_native()
 
 
-def interrogate_ne(tbl: FrameT, column: str, compare: Any, na_pass: bool) -> FrameT:
+def interrogate_ne(tbl: IntoFrame, column: str, compare: Any, na_pass: bool) -> Any:
     """Not equal interrogation."""
 
     nw_tbl = nw.from_native(tbl)
@@ -1886,8 +1890,8 @@ def interrogate_ne(tbl: FrameT, column: str, compare: Any, na_pass: bool) -> Fra
 
 
 def interrogate_between(
-    tbl: FrameT, column: str, low: Any, high: Any, inclusive: tuple, na_pass: bool
-) -> FrameT:
+    tbl: IntoFrame, column: str, low: Any, high: Any, inclusive: tuple[bool, bool], na_pass: bool
+) -> Any:
     """Between interrogation."""
 
     low_val = _get_compare_expr_nw(compare=low)
@@ -2672,8 +2676,8 @@ def interrogate_decreasing(
 
 
 def _interrogate_comparison_base(
-    tbl: FrameT, column: str, compare: Any, na_pass: bool, operator: str
-) -> FrameT:
+    tbl: IntoFrame, column: str, compare: Any, na_pass: bool, operator: str
+) -> Any:
     """
     Unified base function for comparison operations (gt, ge, lt, le, eq, ne).
 
@@ -2692,7 +2696,7 @@ def _interrogate_comparison_base(
 
     Returns
     -------
-    FrameT
+    Any
         The result table with `pb_is_good_` column indicating the passing test units.
     """
 
