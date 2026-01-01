@@ -709,5 +709,313 @@ def test_auto_ref_column_list():
     v.assert_passing()
 
 
+# =====================================================
+# Parameterized Auto-Reference Tests (All Agg Methods)
+# =====================================================
+
+
+@pytest.fixture
+def auto_ref_equal_data() -> tuple[pl.DataFrame, pl.DataFrame]:
+    """Matching data and reference for equality tests."""
+    data = pl.DataFrame(
+        {
+            "val": [1.0, 2.0, 3.0, 4.0],  # sum=10, avg=2.5, sd≈1.29
+        }
+    )
+    reference = pl.DataFrame(
+        {
+            "val": [1.0, 2.0, 3.0, 4.0],  # same as data
+        }
+    )
+    return data, reference
+
+
+@pytest.fixture
+def auto_ref_greater_data() -> tuple[pl.DataFrame, pl.DataFrame]:
+    """Data with larger values than reference for gt/ge tests."""
+    data = pl.DataFrame(
+        {
+            "val": [10.0, 20.0, 30.0, 40.0],  # sum=100, avg=25, sd≈12.91
+        }
+    )
+    reference = pl.DataFrame(
+        {
+            "val": [1.0, 2.0, 3.0, 4.0],  # sum=10, avg=2.5, sd≈1.29
+        }
+    )
+    return data, reference
+
+
+@pytest.fixture
+def auto_ref_lesser_data() -> tuple[pl.DataFrame, pl.DataFrame]:
+    """Data with smaller values than reference for lt/le tests."""
+    data = pl.DataFrame(
+        {
+            "val": [1.0, 2.0, 3.0, 4.0],  # sum=10, avg=2.5, sd≈1.29
+        }
+    )
+    reference = pl.DataFrame(
+        {
+            "val": [10.0, 20.0, 30.0, 40.0],  # sum=100, avg=25, sd≈12.91
+        }
+    )
+    return data, reference
+
+
+# Test all equality methods (_eq) with automatic reference inference
+@pytest.mark.parametrize(
+    "method",
+    [
+        "col_sum_eq",
+        "col_avg_eq",
+        "col_sd_eq",
+    ],
+)
+def test_auto_ref_eq_methods_with_equal_data(method: str, auto_ref_equal_data):
+    """Test all _eq methods pass when data equals reference (auto-inference)."""
+    data, reference = auto_ref_equal_data
+    v = Validate(data=data, reference=reference)
+    v = getattr(v, method)("val")  # No value provided, should auto-infer ref("val")
+    v = v.interrogate()
+    v.assert_passing()
+
+
+# Test all greater-than methods (_gt) with auto-reference
+@pytest.mark.parametrize(
+    "method",
+    [
+        "col_sum_gt",
+        "col_avg_gt",
+        "col_sd_gt",
+    ],
+)
+def test_auto_ref_gt_methods(method: str, auto_ref_greater_data):
+    """Test all _gt methods pass when data > reference (auto-inference)."""
+    data, reference = auto_ref_greater_data
+    v = Validate(data=data, reference=reference)
+    v = getattr(v, method)("val")  # No value provided, should auto-infer ref("val")
+    v = v.interrogate()
+    v.assert_passing()
+
+
+# Test all greater-or-equal methods (_ge) with auto-reference
+@pytest.mark.parametrize(
+    "method",
+    [
+        "col_sum_ge",
+        "col_avg_ge",
+        "col_sd_ge",
+    ],
+)
+def test_auto_ref_ge_methods_with_equal_data(method: str, auto_ref_equal_data):
+    """Test all _ge methods pass when data == reference (auto-inference)."""
+    data, reference = auto_ref_equal_data
+    v = Validate(data=data, reference=reference)
+    v = getattr(v, method)("val")
+    v = v.interrogate()
+    v.assert_passing()
+
+
+@pytest.mark.parametrize(
+    "method",
+    [
+        "col_sum_ge",
+        "col_avg_ge",
+        "col_sd_ge",
+    ],
+)
+def test_auto_ref_ge_methods_with_greater_data(method: str, auto_ref_greater_data):
+    """Test all _ge methods pass when data > reference (auto-inference)."""
+    data, reference = auto_ref_greater_data
+    v = Validate(data=data, reference=reference)
+    v = getattr(v, method)("val")
+    v = v.interrogate()
+    v.assert_passing()
+
+
+# Test all less-than methods (_lt) with auto-reference
+@pytest.mark.parametrize(
+    "method",
+    [
+        "col_sum_lt",
+        "col_avg_lt",
+        "col_sd_lt",
+    ],
+)
+def test_auto_ref_lt_methods(method: str, auto_ref_lesser_data):
+    """Test all _lt methods pass when data < reference (auto-inference)."""
+    data, reference = auto_ref_lesser_data
+    v = Validate(data=data, reference=reference)
+    v = getattr(v, method)("val")
+    v = v.interrogate()
+    v.assert_passing()
+
+
+# Test all less-or-equal methods (_le) with auto-reference
+@pytest.mark.parametrize(
+    "method",
+    [
+        "col_sum_le",
+        "col_avg_le",
+        "col_sd_le",
+    ],
+)
+def test_auto_ref_le_methods_with_equal_data(method: str, auto_ref_equal_data):
+    """Test all _le methods pass when data == reference (auto-inference)."""
+    data, reference = auto_ref_equal_data
+    v = Validate(data=data, reference=reference)
+    v = getattr(v, method)("val")
+    v = v.interrogate()
+    v.assert_passing()
+
+
+@pytest.mark.parametrize(
+    "method",
+    [
+        "col_sum_le",
+        "col_avg_le",
+        "col_sd_le",
+    ],
+)
+def test_auto_ref_le_methods_with_lesser_data(method: str, auto_ref_lesser_data):
+    """Test all _le methods pass when data < reference (auto-inference)."""
+    data, reference = auto_ref_lesser_data
+    v = Validate(data=data, reference=reference)
+    v = getattr(v, method)("val")
+    v = v.interrogate()
+    v.assert_passing()
+
+
+# Test all methods raise error when no reference data
+@pytest.mark.parametrize("method", load_validation_method_grid())
+def test_auto_ref_all_methods_raise_without_reference(method: str):
+    """Test that all agg methods raise ValueError when value=None and no reference data."""
+    data = pl.DataFrame({"val": [1, 2, 3]})
+
+    with pytest.raises(ValueError, match="value.*required"):
+        v = Validate(data=data)
+        getattr(v, method)("val")  # No value and no reference
+
+
+# Test all methods work with explicit ref() even without auto-inference
+@pytest.mark.parametrize(
+    "method",
+    [
+        "col_sum_eq",
+        "col_avg_eq",
+        "col_sd_eq",
+    ],
+)
+def test_auto_ref_explicit_ref_still_works(method: str, auto_ref_equal_data):
+    """Test that explicit ref() still works alongside auto-inference."""
+    data, reference = auto_ref_equal_data
+    v = Validate(data=data, reference=reference)
+    # Explicit ref("val") should work the same as omitting value
+    v = getattr(v, method)("val", ref("val"))
+    v = v.interrogate()
+    v.assert_passing()
+
+
+# Test auto-reference with tolerance for all eq methods
+@pytest.mark.parametrize(
+    "method",
+    [
+        "col_sum_eq",
+        "col_avg_eq",
+        "col_sd_eq",
+    ],
+)
+def test_auto_ref_eq_methods_with_tolerance(method: str):
+    """Test all _eq methods with tolerance and auto-reference.
+
+    Note: Tolerance is calculated as int(tol * ref), so we need values large
+    enough that the tolerance doesn't truncate to 0. For ref=100 and tol=0.1,
+    we get int(0.1 * 100) = 10, allowing a tolerance of 10 units.
+    """
+    # Use larger values so tolerance calculation works (int(tol * ref) > 0)
+    # Data avg=110, sum=440, sd≈12.91
+    data = pl.DataFrame({"val": [100.0, 105.0, 115.0, 120.0]})
+    # Reference avg=100, sum=400, sd≈12.91
+    reference = pl.DataFrame({"val": [90.0, 95.0, 105.0, 110.0]})
+
+    v = Validate(data=data, reference=reference)
+    v = getattr(v, method)("val", tol=0.15)  # 15% tolerance
+    v = v.interrogate()
+    v.assert_passing()
+
+
+# Test auto-reference with multiple columns for all eq methods
+@pytest.mark.parametrize(
+    "method",
+    [
+        "col_sum_eq",
+        "col_avg_eq",
+        "col_sd_eq",
+    ],
+)
+def test_auto_ref_eq_methods_multiple_columns(method: str):
+    """Test auto-reference works when passing a list of columns."""
+    data = pl.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]})
+    reference = pl.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]})
+
+    v = Validate(data=data, reference=reference)
+    # Pass list of columns - should auto-infer ref(col) for each
+    v = getattr(v, method)(["a", "b", "c"])
+    v = v.interrogate()
+    v.assert_passing()
+
+
+# Test expected failures with auto-reference
+@pytest.mark.parametrize(
+    ("method", "data_vals", "ref_vals"),
+    [
+        # eq should fail when values differ
+        ("col_sum_eq", [1, 2, 3], [10, 20, 30]),
+        ("col_avg_eq", [1, 2, 3], [10, 20, 30]),
+        ("col_sd_eq", [1, 2, 3], [1, 1, 1]),  # Different variance
+        # gt should fail when data <= reference
+        ("col_sum_gt", [1, 2, 3], [10, 20, 30]),
+        ("col_avg_gt", [1, 2, 3], [10, 20, 30]),
+        # lt should fail when data >= reference
+        ("col_sum_lt", [10, 20, 30], [1, 2, 3]),
+        ("col_avg_lt", [10, 20, 30], [1, 2, 3]),
+    ],
+)
+def test_auto_ref_expected_failures(method: str, data_vals: list, ref_vals: list):
+    """Test that auto-reference correctly fails when conditions are not met."""
+    data = pl.DataFrame({"val": data_vals})
+    reference = pl.DataFrame({"val": ref_vals})
+
+    v = Validate(data=data, reference=reference)
+    v = getattr(v, method)("val")
+    v = v.interrogate()
+
+    with pytest.raises(AssertionError):
+        v.assert_passing()
+
+
+# Test mixing auto-reference and explicit values in same validation
+@pytest.mark.parametrize(
+    "method",
+    [
+        "col_sum_eq",
+        "col_avg_eq",
+        "col_sd_eq",
+    ],
+)
+def test_auto_ref_mixed_with_explicit_values(method: str, auto_ref_equal_data):
+    """Test mixing auto-reference (value=None) with explicit numeric values."""
+    data, reference = auto_ref_equal_data
+
+    v = Validate(data=data, reference=reference)
+    # First call with auto-reference
+    v = getattr(v, method)("val")
+    # Second call with explicit ref()
+    v = getattr(v, method)("val", ref("val"))
+
+    v = v.interrogate()
+    v.assert_passing()
+
+
 if __name__ == "__main__":
     pytest.main([__file__, "-sv"])
