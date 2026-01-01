@@ -4898,9 +4898,63 @@ class Validate:
         actions=None,
         active=True,
     ):
-        # For each column and assertion, create a validation info object and add it to
-        # the plan. This is used by all aggregation-based column validation methods and
-        # relies heavily on the `_ValidationInfo.from_agg_validator()` class method.
+        """
+        Add an aggregation-based validation step to the validation plan.
+
+        This internal method is used by all aggregation-based column validation methods
+        (e.g., `col_sum_eq`, `col_avg_gt`, `col_sd_le`) to create and register validation
+        steps. It relies heavily on the `_ValidationInfo.from_agg_validator()` class method.
+
+        Automatic Reference Inference
+        -----------------------------
+        When `value` is None and reference data has been set on the Validate object,
+        this method automatically creates a `ReferenceColumn` pointing to the same
+        column name in the reference data. This enables a convenient shorthand:
+
+        .. code-block:: python
+
+            # Instead of writing:
+            Validate(data=df, reference=ref_df).col_sum_eq("a", ref("a"))
+
+            # You can simply write:
+            Validate(data=df, reference=ref_df).col_sum_eq("a")
+
+        If `value` is None and no reference data is set, a `ValueError` is raised
+        immediately to provide clear feedback to the user.
+
+        Parameters
+        ----------
+        assertion_type
+            The type of assertion (e.g., "col_sum_eq", "col_avg_gt").
+        columns
+            Column name or collection of column names to validate.
+        value
+            The target value to compare against. Can be:
+            - A numeric literal (int or float)
+            - A `Column` object for cross-column comparison
+            - A `ReferenceColumn` object for reference data comparison
+            - None to automatically use `ref(column)` when reference data is set
+        tol
+            Tolerance for the comparison. Defaults to 0.
+        thresholds
+            Custom thresholds for the validation step.
+        brief
+            Brief description or auto-generate flag.
+        actions
+            Actions to take based on validation results.
+        active
+            Whether this validation step is active.
+
+        Returns
+        -------
+        Validate
+            The Validate instance for method chaining.
+
+        Raises
+        ------
+        ValueError
+            If `value` is None and no reference data is set on the Validate object.
+        """
         if isinstance(columns, str):
             columns = [columns]
         for column in columns:
