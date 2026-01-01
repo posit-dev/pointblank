@@ -3746,7 +3746,7 @@ class _ValidationInfo:
         cls,
         assertion_type: str,
         columns: _PBUnresolvedColumn,
-        value: float | Column,
+        value: float | Column | ReferenceColumn,
         tol: Tolerance = 0,
         thresholds: float | bool | tuple | dict | Thresholds | None = None,
         brief: str | bool = False,
@@ -4904,10 +4904,22 @@ class Validate:
         if isinstance(columns, str):
             columns = [columns]
         for column in columns:
+            # If value is None, default to referencing the same column from reference data
+            resolved_value = value
+            if value is None:
+                if self.reference is None:
+                    raise ValueError(
+                        f"The 'value' parameter is required for {assertion_type}() "
+                        "when no reference data is set. Either provide a value, or "
+                        "set reference data on the Validate object using "
+                        "Validate(data=..., reference=...)."
+                    )
+                resolved_value = ReferenceColumn(column_name=column)
+
             val_info = _ValidationInfo.from_agg_validator(
                 assertion_type=assertion_type,
                 columns=column,
-                value=value,
+                value=resolved_value,
                 tol=tol,
                 thresholds=self.thresholds if thresholds is None else thresholds,
                 actions=self.actions if actions is None else actions,
@@ -21136,7 +21148,7 @@ def make_agg_validator(name: str):
     def agg_validator(
         self: Validate,
         columns: str | Collection[str],
-        value,
+        value=None,
         tol=0,
         thresholds=None,
         brief=False,

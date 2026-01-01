@@ -17,7 +17,7 @@ VALIDATE_PYI_PATH = Path("pointblank/validate.pyi")
 SIGNATURE = """
         self,
         columns: _PBUnresolvedColumn,
-        value: float | Column,
+        value: float | Column | ReferenceColumn | None = None,
         tol: Tolerance = 0,
         thresholds: float | bool | tuple | dict | Thresholds | None = None,
         brief: str | bool = False,
@@ -28,7 +28,9 @@ SIGNATURE = """
 DOCSTRING = """
         Args:
             columns (_PBUnresolvedColumn): Column or collection of columns to validate.
-            value (float | Column): Target value to validate against.
+            value (float | Column | ReferenceColumn | None): Target value to validate against.
+                If None and reference data is set on the Validate object, defaults to
+                ref(column) to compare against the same column in the reference data.
             tol (Tolerance, optional): Tolerance for validation distance to target. Defaults to 0.
             thresholds (float | bool | tuple | dict | Thresholds | None, optional): Custom thresholds for
                 the bounds. See examples for usage. Defaults to None.
@@ -47,7 +49,7 @@ CLS = "Validate"
 IMPORT_HEADER = """
 from pointblank import Actions, Thresholds
 from pointblank._utils import _PBUnresolvedColumn
-from pointblank.column import Column
+from pointblank.column import Column, ReferenceColumn
 from pointblank._typing import Tolerance
 """
 

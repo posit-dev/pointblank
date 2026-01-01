@@ -1,16 +1,16 @@
 from pointblank import Actions, Thresholds
 from pointblank._utils import _PBUnresolvedColumn
-from pointblank.column import Column
+from pointblank.column import Column, ReferenceColumn
 from pointblank._typing import Tolerance
 
 from collections.abc import Collection
 from dataclasses import dataclass
 from great_tables import GT
-from narwhals.typing import FrameT
+from narwhals.typing import FrameT, IntoFrame
 from pathlib import Path
 from pointblank._typing import SegmentSpec, Tolerance
 from pointblank._utils import _PBUnresolvedColumn
-from pointblank.column import Column, ColumnSelector, ColumnSelectorNarwhals
+from pointblank.column import Column, ColumnSelector, ColumnSelectorNarwhals, ReferenceColumn
 from pointblank.schema import Schema
 from pointblank.thresholds import Actions, FinalActions, Thresholds
 from typing import Any, Callable, Literal, ParamSpec, TypeVar
@@ -91,7 +91,7 @@ class _ValidationInfo:
         cls,
         assertion_type: str,
         columns: _PBUnresolvedColumn,
-        value: float | Column,
+        value: float | Column | ReferenceColumn,
         tol: Tolerance = 0,
         thresholds: float | bool | tuple | dict | Thresholds | None = None,
         brief: str | bool = False,
@@ -103,12 +103,12 @@ class _ValidationInfo:
     step_id: str | None = ...
     sha1: str | None = ...
     assertion_type: str | None = ...
-    column: any | None = ...
-    values: any | list[any] | tuple | None = ...
+    column: Any | None = ...
+    values: Any | list[any] | tuple | None = ...
     inclusive: tuple[bool, bool] | None = ...
     na_pass: bool | None = ...
     pre: Callable | None = ...
-    segments: any | None = ...
+    segments: Any | None = ...
     thresholds: Thresholds | None = ...
     actions: Actions | None = ...
     label: str | None = ...
@@ -143,6 +143,7 @@ def print_database_tables(connection_string: str) -> list[str]: ...
 @dataclass
 class Validate:
     data: FrameT | Any
+    reference: IntoFrame | None = ...
     tbl_name: str | None = ...
     label: str | None = ...
     thresholds: int | float | bool | tuple | dict | Thresholds | None = ...
@@ -368,7 +369,7 @@ class Validate:
     ) -> Validate: ...
     def col_vals_expr(
         self,
-        expr: any,
+        expr: Any,
         pre: Callable | None = None,
         segments: SegmentSpec | None = None,
         thresholds: int | float | bool | tuple | dict | Thresholds = None,
@@ -380,6 +381,16 @@ class Validate:
         self,
         columns: str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals,
         thresholds: int | float | bool | tuple | dict | Thresholds = None,
+        actions: Actions | None = None,
+        brief: str | bool | None = None,
+        active: bool = True,
+    ) -> Validate: ...
+    def col_pct_null(
+        self,
+        columns: str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals,
+        p: float,
+        tol: Tolerance = 0,
+        thresholds: int | float | None | bool | tuple | dict | Thresholds = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool = True,
@@ -553,7 +564,7 @@ class Validate:
     def col_sum_eq(
         self,
         columns: _PBUnresolvedColumn,
-        value: float | Column,
+        value: float | Column | ReferenceColumn | None = None,
         tol: Tolerance = 0,
         thresholds: float | bool | tuple | dict | Thresholds | None = None,
         brief: str | bool = False,
@@ -564,7 +575,9 @@ class Validate:
 
         Args:
             columns (_PBUnresolvedColumn): Column or collection of columns to validate.
-            value (float | Column): Target value to validate against.
+            value (float | Column | ReferenceColumn | None): Target value to validate against.
+                If None and reference data is set on the Validate object, defaults to
+                ref(column) to compare against the same column in the reference data.
             tol (Tolerance, optional): Tolerance for validation distance to target. Defaults to 0.
             thresholds (float | bool | tuple | dict | Thresholds | None, optional): Custom thresholds for
                 the bounds. See examples for usage. Defaults to None.
@@ -587,7 +600,7 @@ class Validate:
     def col_sum_gt(
         self,
         columns: _PBUnresolvedColumn,
-        value: float | Column,
+        value: float | Column | ReferenceColumn | None = None,
         tol: Tolerance = 0,
         thresholds: float | bool | tuple | dict | Thresholds | None = None,
         brief: str | bool = False,
@@ -598,7 +611,9 @@ class Validate:
 
         Args:
             columns (_PBUnresolvedColumn): Column or collection of columns to validate.
-            value (float | Column): Target value to validate against.
+            value (float | Column | ReferenceColumn | None): Target value to validate against.
+                If None and reference data is set on the Validate object, defaults to
+                ref(column) to compare against the same column in the reference data.
             tol (Tolerance, optional): Tolerance for validation distance to target. Defaults to 0.
             thresholds (float | bool | tuple | dict | Thresholds | None, optional): Custom thresholds for
                 the bounds. See examples for usage. Defaults to None.
@@ -621,7 +636,7 @@ class Validate:
     def col_sum_ge(
         self,
         columns: _PBUnresolvedColumn,
-        value: float | Column,
+        value: float | Column | ReferenceColumn | None = None,
         tol: Tolerance = 0,
         thresholds: float | bool | tuple | dict | Thresholds | None = None,
         brief: str | bool = False,
@@ -632,7 +647,9 @@ class Validate:
 
         Args:
             columns (_PBUnresolvedColumn): Column or collection of columns to validate.
-            value (float | Column): Target value to validate against.
+            value (float | Column | ReferenceColumn | None): Target value to validate against.
+                If None and reference data is set on the Validate object, defaults to
+                ref(column) to compare against the same column in the reference data.
             tol (Tolerance, optional): Tolerance for validation distance to target. Defaults to 0.
             thresholds (float | bool | tuple | dict | Thresholds | None, optional): Custom thresholds for
                 the bounds. See examples for usage. Defaults to None.
@@ -655,7 +672,7 @@ class Validate:
     def col_sum_lt(
         self,
         columns: _PBUnresolvedColumn,
-        value: float | Column,
+        value: float | Column | ReferenceColumn | None = None,
         tol: Tolerance = 0,
         thresholds: float | bool | tuple | dict | Thresholds | None = None,
         brief: str | bool = False,
@@ -666,7 +683,9 @@ class Validate:
 
         Args:
             columns (_PBUnresolvedColumn): Column or collection of columns to validate.
-            value (float | Column): Target value to validate against.
+            value (float | Column | ReferenceColumn | None): Target value to validate against.
+                If None and reference data is set on the Validate object, defaults to
+                ref(column) to compare against the same column in the reference data.
             tol (Tolerance, optional): Tolerance for validation distance to target. Defaults to 0.
             thresholds (float | bool | tuple | dict | Thresholds | None, optional): Custom thresholds for
                 the bounds. See examples for usage. Defaults to None.
@@ -689,7 +708,7 @@ class Validate:
     def col_sum_le(
         self,
         columns: _PBUnresolvedColumn,
-        value: float | Column,
+        value: float | Column | ReferenceColumn | None = None,
         tol: Tolerance = 0,
         thresholds: float | bool | tuple | dict | Thresholds | None = None,
         brief: str | bool = False,
@@ -700,7 +719,9 @@ class Validate:
 
         Args:
             columns (_PBUnresolvedColumn): Column or collection of columns to validate.
-            value (float | Column): Target value to validate against.
+            value (float | Column | ReferenceColumn | None): Target value to validate against.
+                If None and reference data is set on the Validate object, defaults to
+                ref(column) to compare against the same column in the reference data.
             tol (Tolerance, optional): Tolerance for validation distance to target. Defaults to 0.
             thresholds (float | bool | tuple | dict | Thresholds | None, optional): Custom thresholds for
                 the bounds. See examples for usage. Defaults to None.
@@ -723,7 +744,7 @@ class Validate:
     def col_avg_eq(
         self,
         columns: _PBUnresolvedColumn,
-        value: float | Column,
+        value: float | Column | ReferenceColumn | None = None,
         tol: Tolerance = 0,
         thresholds: float | bool | tuple | dict | Thresholds | None = None,
         brief: str | bool = False,
@@ -734,7 +755,9 @@ class Validate:
 
         Args:
             columns (_PBUnresolvedColumn): Column or collection of columns to validate.
-            value (float | Column): Target value to validate against.
+            value (float | Column | ReferenceColumn | None): Target value to validate against.
+                If None and reference data is set on the Validate object, defaults to
+                ref(column) to compare against the same column in the reference data.
             tol (Tolerance, optional): Tolerance for validation distance to target. Defaults to 0.
             thresholds (float | bool | tuple | dict | Thresholds | None, optional): Custom thresholds for
                 the bounds. See examples for usage. Defaults to None.
@@ -757,7 +780,7 @@ class Validate:
     def col_avg_gt(
         self,
         columns: _PBUnresolvedColumn,
-        value: float | Column,
+        value: float | Column | ReferenceColumn | None = None,
         tol: Tolerance = 0,
         thresholds: float | bool | tuple | dict | Thresholds | None = None,
         brief: str | bool = False,
@@ -768,7 +791,9 @@ class Validate:
 
         Args:
             columns (_PBUnresolvedColumn): Column or collection of columns to validate.
-            value (float | Column): Target value to validate against.
+            value (float | Column | ReferenceColumn | None): Target value to validate against.
+                If None and reference data is set on the Validate object, defaults to
+                ref(column) to compare against the same column in the reference data.
             tol (Tolerance, optional): Tolerance for validation distance to target. Defaults to 0.
             thresholds (float | bool | tuple | dict | Thresholds | None, optional): Custom thresholds for
                 the bounds. See examples for usage. Defaults to None.
@@ -791,7 +816,7 @@ class Validate:
     def col_avg_ge(
         self,
         columns: _PBUnresolvedColumn,
-        value: float | Column,
+        value: float | Column | ReferenceColumn | None = None,
         tol: Tolerance = 0,
         thresholds: float | bool | tuple | dict | Thresholds | None = None,
         brief: str | bool = False,
@@ -802,7 +827,9 @@ class Validate:
 
         Args:
             columns (_PBUnresolvedColumn): Column or collection of columns to validate.
-            value (float | Column): Target value to validate against.
+            value (float | Column | ReferenceColumn | None): Target value to validate against.
+                If None and reference data is set on the Validate object, defaults to
+                ref(column) to compare against the same column in the reference data.
             tol (Tolerance, optional): Tolerance for validation distance to target. Defaults to 0.
             thresholds (float | bool | tuple | dict | Thresholds | None, optional): Custom thresholds for
                 the bounds. See examples for usage. Defaults to None.
@@ -825,7 +852,7 @@ class Validate:
     def col_avg_lt(
         self,
         columns: _PBUnresolvedColumn,
-        value: float | Column,
+        value: float | Column | ReferenceColumn | None = None,
         tol: Tolerance = 0,
         thresholds: float | bool | tuple | dict | Thresholds | None = None,
         brief: str | bool = False,
@@ -836,7 +863,9 @@ class Validate:
 
         Args:
             columns (_PBUnresolvedColumn): Column or collection of columns to validate.
-            value (float | Column): Target value to validate against.
+            value (float | Column | ReferenceColumn | None): Target value to validate against.
+                If None and reference data is set on the Validate object, defaults to
+                ref(column) to compare against the same column in the reference data.
             tol (Tolerance, optional): Tolerance for validation distance to target. Defaults to 0.
             thresholds (float | bool | tuple | dict | Thresholds | None, optional): Custom thresholds for
                 the bounds. See examples for usage. Defaults to None.
@@ -859,7 +888,7 @@ class Validate:
     def col_avg_le(
         self,
         columns: _PBUnresolvedColumn,
-        value: float | Column,
+        value: float | Column | ReferenceColumn | None = None,
         tol: Tolerance = 0,
         thresholds: float | bool | tuple | dict | Thresholds | None = None,
         brief: str | bool = False,
@@ -870,7 +899,9 @@ class Validate:
 
         Args:
             columns (_PBUnresolvedColumn): Column or collection of columns to validate.
-            value (float | Column): Target value to validate against.
+            value (float | Column | ReferenceColumn | None): Target value to validate against.
+                If None and reference data is set on the Validate object, defaults to
+                ref(column) to compare against the same column in the reference data.
             tol (Tolerance, optional): Tolerance for validation distance to target. Defaults to 0.
             thresholds (float | bool | tuple | dict | Thresholds | None, optional): Custom thresholds for
                 the bounds. See examples for usage. Defaults to None.
@@ -893,7 +924,7 @@ class Validate:
     def col_sd_eq(
         self,
         columns: _PBUnresolvedColumn,
-        value: float | Column,
+        value: float | Column | ReferenceColumn | None = None,
         tol: Tolerance = 0,
         thresholds: float | bool | tuple | dict | Thresholds | None = None,
         brief: str | bool = False,
@@ -904,7 +935,9 @@ class Validate:
 
         Args:
             columns (_PBUnresolvedColumn): Column or collection of columns to validate.
-            value (float | Column): Target value to validate against.
+            value (float | Column | ReferenceColumn | None): Target value to validate against.
+                If None and reference data is set on the Validate object, defaults to
+                ref(column) to compare against the same column in the reference data.
             tol (Tolerance, optional): Tolerance for validation distance to target. Defaults to 0.
             thresholds (float | bool | tuple | dict | Thresholds | None, optional): Custom thresholds for
                 the bounds. See examples for usage. Defaults to None.
@@ -927,7 +960,7 @@ class Validate:
     def col_sd_gt(
         self,
         columns: _PBUnresolvedColumn,
-        value: float | Column,
+        value: float | Column | ReferenceColumn | None = None,
         tol: Tolerance = 0,
         thresholds: float | bool | tuple | dict | Thresholds | None = None,
         brief: str | bool = False,
@@ -938,7 +971,9 @@ class Validate:
 
         Args:
             columns (_PBUnresolvedColumn): Column or collection of columns to validate.
-            value (float | Column): Target value to validate against.
+            value (float | Column | ReferenceColumn | None): Target value to validate against.
+                If None and reference data is set on the Validate object, defaults to
+                ref(column) to compare against the same column in the reference data.
             tol (Tolerance, optional): Tolerance for validation distance to target. Defaults to 0.
             thresholds (float | bool | tuple | dict | Thresholds | None, optional): Custom thresholds for
                 the bounds. See examples for usage. Defaults to None.
@@ -961,7 +996,7 @@ class Validate:
     def col_sd_ge(
         self,
         columns: _PBUnresolvedColumn,
-        value: float | Column,
+        value: float | Column | ReferenceColumn | None = None,
         tol: Tolerance = 0,
         thresholds: float | bool | tuple | dict | Thresholds | None = None,
         brief: str | bool = False,
@@ -972,7 +1007,9 @@ class Validate:
 
         Args:
             columns (_PBUnresolvedColumn): Column or collection of columns to validate.
-            value (float | Column): Target value to validate against.
+            value (float | Column | ReferenceColumn | None): Target value to validate against.
+                If None and reference data is set on the Validate object, defaults to
+                ref(column) to compare against the same column in the reference data.
             tol (Tolerance, optional): Tolerance for validation distance to target. Defaults to 0.
             thresholds (float | bool | tuple | dict | Thresholds | None, optional): Custom thresholds for
                 the bounds. See examples for usage. Defaults to None.
@@ -995,7 +1032,7 @@ class Validate:
     def col_sd_lt(
         self,
         columns: _PBUnresolvedColumn,
-        value: float | Column,
+        value: float | Column | ReferenceColumn | None = None,
         tol: Tolerance = 0,
         thresholds: float | bool | tuple | dict | Thresholds | None = None,
         brief: str | bool = False,
@@ -1006,7 +1043,9 @@ class Validate:
 
         Args:
             columns (_PBUnresolvedColumn): Column or collection of columns to validate.
-            value (float | Column): Target value to validate against.
+            value (float | Column | ReferenceColumn | None): Target value to validate against.
+                If None and reference data is set on the Validate object, defaults to
+                ref(column) to compare against the same column in the reference data.
             tol (Tolerance, optional): Tolerance for validation distance to target. Defaults to 0.
             thresholds (float | bool | tuple | dict | Thresholds | None, optional): Custom thresholds for
                 the bounds. See examples for usage. Defaults to None.
@@ -1029,7 +1068,7 @@ class Validate:
     def col_sd_le(
         self,
         columns: _PBUnresolvedColumn,
-        value: float | Column,
+        value: float | Column | ReferenceColumn | None = None,
         tol: Tolerance = 0,
         thresholds: float | bool | tuple | dict | Thresholds | None = None,
         brief: str | bool = False,
@@ -1040,7 +1079,9 @@ class Validate:
 
         Args:
             columns (_PBUnresolvedColumn): Column or collection of columns to validate.
-            value (float | Column): Target value to validate against.
+            value (float | Column | ReferenceColumn | None): Target value to validate against.
+                If None and reference data is set on the Validate object, defaults to
+                ref(column) to compare against the same column in the reference data.
             tol (Tolerance, optional): Tolerance for validation distance to target. Defaults to 0.
             thresholds (float | bool | tuple | dict | Thresholds | None, optional): Custom thresholds for
                 the bounds. See examples for usage. Defaults to None.

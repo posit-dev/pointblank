@@ -593,5 +593,121 @@ def test_ref_mixed_validation():
     v.assert_passing()
 
 
+# Tests for automatic reference column inference (when value is None)
+def test_auto_ref_sum_eq():
+    """Test automatic reference inference when value is not provided."""
+    data = pl.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]})  # sum: a=6, b=15
+    reference = pl.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]})  # sum: a=6, b=15
+
+    # When value is None, it should default to ref("a") and ref("b")
+    v = (
+        Validate(data=data, reference=reference)
+        .col_sum_eq("a")  # No value provided, should use ref("a")
+        .col_sum_eq("b")  # No value provided, should use ref("b")
+        .interrogate()
+    )
+    v.assert_passing()
+
+
+def test_auto_ref_avg_eq():
+    """Test automatic reference inference for avg comparison."""
+    data = pl.DataFrame({"x": [10, 20, 30]})  # avg=20
+    reference = pl.DataFrame({"x": [10, 20, 30]})  # avg=20
+
+    v = Validate(data=data, reference=reference).col_avg_eq("x").interrogate()
+    v.assert_passing()
+
+
+def test_auto_ref_sd_eq():
+    """Test automatic reference inference for sd comparison."""
+    data = pl.DataFrame({"val": [2, 4, 4, 4, 6]})
+    reference = pl.DataFrame({"val": [2, 4, 4, 4, 6]})
+
+    v = Validate(data=data, reference=reference).col_sd_eq("val").interrogate()
+    v.assert_passing()
+
+
+def test_auto_ref_gt():
+    """Test automatic reference with greater than comparison."""
+    data = pl.DataFrame({"a": [10, 20, 30]})  # sum=60
+    reference = pl.DataFrame({"a": [1, 2, 3]})  # sum=6
+
+    # data.a sum (60) > reference.a sum (6)
+    v = Validate(data=data, reference=reference).col_sum_gt("a").interrogate()
+    v.assert_passing()
+
+
+def test_auto_ref_lt():
+    """Test automatic reference with less than comparison."""
+    data = pl.DataFrame({"a": [1, 2, 3]})  # sum=6
+    reference = pl.DataFrame({"a": [10, 20, 30]})  # sum=60
+
+    # data.a sum (6) < reference.a sum (60)
+    v = Validate(data=data, reference=reference).col_sum_lt("a").interrogate()
+    v.assert_passing()
+
+
+def test_auto_ref_with_tolerance():
+    """Test automatic reference with tolerance."""
+    data = pl.DataFrame({"a": [11, 22, 33]})  # sum=66
+    reference = pl.DataFrame({"a": [10, 20, 30]})  # sum=60
+
+    # sum difference is 6, which is 10% of 60
+    v = Validate(data=data, reference=reference).col_sum_eq("a", tol=0.11).interrogate()
+    v.assert_passing()
+
+
+def test_auto_ref_multiple_columns():
+    """Test automatic reference with multiple columns."""
+    data = pl.DataFrame({"a": [1, 2], "b": [3, 4], "c": [5, 6]})
+    reference = pl.DataFrame({"a": [1, 2], "b": [3, 4], "c": [5, 6]})
+
+    v = (
+        Validate(data=data, reference=reference)
+        .col_sum_eq("a")
+        .col_sum_eq("b")
+        .col_sum_eq("c")
+        .col_avg_eq("a")
+        .col_avg_eq("b")
+        .col_avg_eq("c")
+        .interrogate()
+    )
+    v.assert_passing()
+
+
+def test_auto_ref_no_reference_data_raises():
+    """Test that using no value without reference data raises an error."""
+    data = pl.DataFrame({"a": [1, 2, 3]})
+
+    # Error is raised when calling the method, not at interrogate time
+    with pytest.raises(ValueError, match="value.*required"):
+        Validate(data=data).col_sum_eq("a")  # No value and no reference
+
+
+def test_auto_ref_mixed_explicit_and_auto():
+    """Test mixing explicit ref() and automatic inference."""
+    data = pl.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]})
+    reference = pl.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]})
+
+    v = (
+        Validate(data=data, reference=reference)
+        .col_sum_eq("a")  # Auto: ref("a")
+        .col_sum_eq("b", ref("b"))  # Explicit ref
+        .col_sum_eq("a", 6)  # Literal value
+        .interrogate()
+    )
+    v.assert_passing()
+
+
+def test_auto_ref_column_list():
+    """Test automatic reference with a list of columns."""
+    data = pl.DataFrame({"a": [1, 2, 3], "b": [1, 2, 3], "c": [1, 2, 3]})
+    reference = pl.DataFrame({"a": [1, 2, 3], "b": [1, 2, 3], "c": [1, 2, 3]})
+
+    # Passing a list of columns should use ref(col) for each
+    v = Validate(data=data, reference=reference).col_sum_eq(["a", "b", "c"]).interrogate()
+    v.assert_passing()
+
+
 if __name__ == "__main__":
     pytest.main([__file__, "-sv"])
