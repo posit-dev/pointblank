@@ -1,6 +1,6 @@
 import pytest
 
-from pointblank import Validate
+from pointblank import Validate, ref
 import polars as pl
 from pointblank._agg import load_validation_method_grid, is_valid_agg
 
@@ -387,6 +387,634 @@ def test_all_methods_can_be_accessed():
 def test_invalid_agg():
     assert not is_valid_agg("not_a_real_method")
     assert is_valid_agg("col_sum_eq")
+
+
+# =====================
+# Reference Data Tests
+# =====================
+
+
+@pytest.fixture
+def reference_data() -> pl.DataFrame:
+    """Reference data for comparison tests."""
+    return pl.DataFrame(
+        {
+            "a": [1, 1, 1],  # sum=3, avg=1, sd=0
+            "b": [2, 2, 2],  # sum=6, avg=2, sd=0
+            "c": [3, 3, 3],  # sum=9, avg=3, sd=0
+        }
+    )
+
+
+@pytest.fixture
+def matching_data() -> pl.DataFrame:
+    """Data that matches the reference data."""
+    return pl.DataFrame(
+        {
+            "a": [1, 1, 1],  # sum=3, avg=1, sd=0
+            "b": [2, 2, 2],  # sum=6, avg=2, sd=0
+            "c": [3, 3, 3],  # sum=9, avg=3, sd=0
+        }
+    )
+
+
+@pytest.fixture
+def different_data() -> pl.DataFrame:
+    """Data with different values than reference."""
+    return pl.DataFrame(
+        {
+            "a": [2, 2, 2],  # sum=6, avg=2, sd=0
+            "b": [3, 3, 3],  # sum=9, avg=3, sd=0
+            "c": [4, 4, 4],  # sum=12, avg=4, sd=0
+        }
+    )
+
+
+def test_ref_sum_eq_matching(matching_data, reference_data):
+    """Test that sum matches between identical data and reference."""
+    v = (
+        Validate(data=matching_data, reference=reference_data)
+        .col_sum_eq("a", ref("a"))
+        .col_sum_eq("b", ref("b"))
+        .col_sum_eq("c", ref("c"))
+        .interrogate()
+    )
+    v.assert_passing()
+
+
+def test_ref_avg_eq_matching(matching_data, reference_data):
+    """Test that avg matches between identical data and reference."""
+    v = (
+        Validate(data=matching_data, reference=reference_data)
+        .col_avg_eq("a", ref("a"))
+        .col_avg_eq("b", ref("b"))
+        .col_avg_eq("c", ref("c"))
+        .interrogate()
+    )
+    v.assert_passing()
+
+
+def test_ref_sd_eq_matching(matching_data, reference_data):
+    """Test that sd matches between identical data and reference."""
+    v = (
+        Validate(data=matching_data, reference=reference_data)
+        .col_sd_eq("a", ref("a"))
+        .col_sd_eq("b", ref("b"))
+        .col_sd_eq("c", ref("c"))
+        .interrogate()
+    )
+    v.assert_passing()
+
+
+def test_ref_sum_gt(different_data, reference_data):
+    """Test that sum of different data is greater than reference."""
+    # different_data.a sum=6 > reference_data.a sum=3
+    v = (
+        Validate(data=different_data, reference=reference_data)
+        .col_sum_gt("a", ref("a"))
+        .interrogate()
+    )
+    v.assert_passing()
+
+
+def test_ref_sum_lt(reference_data, different_data):
+    """Test that sum is less than reference."""
+    # reference_data.a sum=3 < different_data.a sum=6 (using different as reference)
+    v = (
+        Validate(data=reference_data, reference=different_data)
+        .col_sum_lt("a", ref("a"))
+        .interrogate()
+    )
+    v.assert_passing()
+
+
+def test_ref_different_columns():
+    """Test comparing different columns between data and reference."""
+    data = pl.DataFrame({"x": [1, 2, 3]})  # sum=6
+    reference = pl.DataFrame({"y": [2, 2, 2]})  # sum=6
+
+    v = Validate(data=data, reference=reference).col_sum_eq("x", ref("y")).interrogate()
+    v.assert_passing()
+
+
+def test_ref_with_tolerance():
+    """Test reference data comparison with tolerance."""
+    data = pl.DataFrame({"a": [10, 11, 12]})  # sum=33
+    reference = pl.DataFrame({"a": [10, 10, 10]})  # sum=30
+
+    # Without tolerance, this should fail
+    v_fail = Validate(data=data, reference=reference).col_sum_eq("a", ref("a")).interrogate()
+    with pytest.raises(AssertionError):
+        v_fail.assert_passing()
+
+    # With 10% tolerance, this should pass (30 +/- 3 includes 33)
+    v_pass = (
+        Validate(data=data, reference=reference).col_sum_eq("a", ref("a"), tol=0.1).interrogate()
+    )
+    v_pass.assert_passing()
+
+
+def test_ref_without_reference_data_raises():
+    """Test that using ref() without reference data raises an error."""
+    data = pl.DataFrame({"a": [1, 2, 3]})
+
+    v = Validate(data=data).col_sum_eq("a", ref("a"))
+
+    with pytest.raises(ValueError, match="Cannot use ref"):
+        v.interrogate()
+
+
+def test_ref_avg_comparisons():
+    """Test all avg comparison operators with reference data."""
+    data = pl.DataFrame({"value": [5, 5, 5]})  # avg=5
+    ref_equal = pl.DataFrame({"value": [5, 5, 5]})  # avg=5
+    ref_lower = pl.DataFrame({"value": [3, 3, 3]})  # avg=3
+    ref_higher = pl.DataFrame({"value": [7, 7, 7]})  # avg=7
+
+    # Test eq
+    Validate(data=data, reference=ref_equal).col_avg_eq(
+        "value", ref("value")
+    ).interrogate().assert_passing()
+
+    # Test gt (5 > 3)
+    Validate(data=data, reference=ref_lower).col_avg_gt(
+        "value", ref("value")
+    ).interrogate().assert_passing()
+
+    # Test ge (5 >= 5)
+    Validate(data=data, reference=ref_equal).col_avg_ge(
+        "value", ref("value")
+    ).interrogate().assert_passing()
+
+    # Test lt (5 < 7)
+    Validate(data=data, reference=ref_higher).col_avg_lt(
+        "value", ref("value")
+    ).interrogate().assert_passing()
+
+    # Test le (5 <= 5)
+    Validate(data=data, reference=ref_equal).col_avg_le(
+        "value", ref("value")
+    ).interrogate().assert_passing()
+
+
+def test_ref_multiple_columns_single_reference():
+    """Test validating multiple columns against a single reference column."""
+    data = pl.DataFrame(
+        {
+            "col_a": [10, 10, 10],  # sum=30
+            "col_b": [10, 10, 10],  # sum=30
+            "col_c": [10, 10, 10],  # sum=30
+        }
+    )
+    reference = pl.DataFrame({"baseline": [10, 10, 10]})  # sum=30
+
+    v = (
+        Validate(data=data, reference=reference)
+        .col_sum_eq("col_a", ref("baseline"))
+        .col_sum_eq("col_b", ref("baseline"))
+        .col_sum_eq("col_c", ref("baseline"))
+        .interrogate()
+    )
+    v.assert_passing()
+
+
+def test_ref_mixed_validation():
+    """Test mixing reference-based and literal-value validations."""
+    data = pl.DataFrame({"a": [1, 2, 3]})  # sum=6, avg=2
+    reference = pl.DataFrame({"a": [1, 2, 3]})  # sum=6
+
+    v = (
+        Validate(data=data, reference=reference)
+        .col_sum_eq("a", ref("a"))  # Reference-based
+        .col_sum_eq("a", 6)  # Literal value
+        .col_avg_eq("a", 2)  # Literal value
+        .interrogate()
+    )
+    v.assert_passing()
+
+
+# Tests for automatic reference column inference (when value is None)
+def test_auto_ref_sum_eq():
+    """Test automatic reference inference when value is not provided."""
+    data = pl.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]})  # sum: a=6, b=15
+    reference = pl.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]})  # sum: a=6, b=15
+
+    # When value is None, it should default to ref("a") and ref("b")
+    v = (
+        Validate(data=data, reference=reference)
+        .col_sum_eq("a")  # No value provided, should use ref("a")
+        .col_sum_eq("b")  # No value provided, should use ref("b")
+        .interrogate()
+    )
+    v.assert_passing()
+
+
+def test_auto_ref_avg_eq():
+    """Test automatic reference inference for avg comparison."""
+    data = pl.DataFrame({"x": [10, 20, 30]})  # avg=20
+    reference = pl.DataFrame({"x": [10, 20, 30]})  # avg=20
+
+    v = Validate(data=data, reference=reference).col_avg_eq("x").interrogate()
+    v.assert_passing()
+
+
+def test_auto_ref_sd_eq():
+    """Test automatic reference inference for sd comparison."""
+    data = pl.DataFrame({"val": [2, 4, 4, 4, 6]})
+    reference = pl.DataFrame({"val": [2, 4, 4, 4, 6]})
+
+    v = Validate(data=data, reference=reference).col_sd_eq("val").interrogate()
+    v.assert_passing()
+
+
+def test_auto_ref_gt():
+    """Test automatic reference with greater than comparison."""
+    data = pl.DataFrame({"a": [10, 20, 30]})  # sum=60
+    reference = pl.DataFrame({"a": [1, 2, 3]})  # sum=6
+
+    # data.a sum (60) > reference.a sum (6)
+    v = Validate(data=data, reference=reference).col_sum_gt("a").interrogate()
+    v.assert_passing()
+
+
+def test_auto_ref_lt():
+    """Test automatic reference with less than comparison."""
+    data = pl.DataFrame({"a": [1, 2, 3]})  # sum=6
+    reference = pl.DataFrame({"a": [10, 20, 30]})  # sum=60
+
+    # data.a sum (6) < reference.a sum (60)
+    v = Validate(data=data, reference=reference).col_sum_lt("a").interrogate()
+    v.assert_passing()
+
+
+def test_auto_ref_with_tolerance():
+    """Test automatic reference with tolerance."""
+    data = pl.DataFrame({"a": [11, 22, 33]})  # sum=66
+    reference = pl.DataFrame({"a": [10, 20, 30]})  # sum=60
+
+    # sum difference is 6, which is 10% of 60
+    v = Validate(data=data, reference=reference).col_sum_eq("a", tol=0.11).interrogate()
+    v.assert_passing()
+
+
+def test_auto_ref_multiple_columns():
+    """Test automatic reference with multiple columns."""
+    data = pl.DataFrame({"a": [1, 2], "b": [3, 4], "c": [5, 6]})
+    reference = pl.DataFrame({"a": [1, 2], "b": [3, 4], "c": [5, 6]})
+
+    v = (
+        Validate(data=data, reference=reference)
+        .col_sum_eq("a")
+        .col_sum_eq("b")
+        .col_sum_eq("c")
+        .col_avg_eq("a")
+        .col_avg_eq("b")
+        .col_avg_eq("c")
+        .interrogate()
+    )
+    v.assert_passing()
+
+
+def test_auto_ref_no_reference_data_raises():
+    """Test that using no value without reference data raises an error."""
+    data = pl.DataFrame({"a": [1, 2, 3]})
+
+    # Error is raised when calling the method, not at interrogate time
+    with pytest.raises(ValueError, match="value.*required"):
+        Validate(data=data).col_sum_eq("a")  # No value and no reference
+
+
+def test_auto_ref_mixed_explicit_and_auto():
+    """Test mixing explicit ref() and automatic inference."""
+    data = pl.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]})
+    reference = pl.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]})
+
+    v = (
+        Validate(data=data, reference=reference)
+        .col_sum_eq("a")  # Auto: ref("a")
+        .col_sum_eq("b", ref("b"))  # Explicit ref
+        .col_sum_eq("a", 6)  # Literal value
+        .interrogate()
+    )
+    v.assert_passing()
+
+
+def test_auto_ref_column_list():
+    """Test automatic reference with a list of columns."""
+    data = pl.DataFrame({"a": [1, 2, 3], "b": [1, 2, 3], "c": [1, 2, 3]})
+    reference = pl.DataFrame({"a": [1, 2, 3], "b": [1, 2, 3], "c": [1, 2, 3]})
+
+    # Passing a list of columns should use ref(col) for each
+    v = Validate(data=data, reference=reference).col_sum_eq(["a", "b", "c"]).interrogate()
+    v.assert_passing()
+
+
+# =====================================================
+# Parameterized Auto-Reference Tests (All Agg Methods)
+# =====================================================
+
+
+@pytest.fixture
+def auto_ref_equal_data() -> tuple[pl.DataFrame, pl.DataFrame]:
+    """Matching data and reference for equality tests."""
+    data = pl.DataFrame(
+        {
+            "val": [1.0, 2.0, 3.0, 4.0],  # sum=10, avg=2.5, sd≈1.29
+        }
+    )
+    reference = pl.DataFrame(
+        {
+            "val": [1.0, 2.0, 3.0, 4.0],  # same as data
+        }
+    )
+    return data, reference
+
+
+@pytest.fixture
+def auto_ref_greater_data() -> tuple[pl.DataFrame, pl.DataFrame]:
+    """Data with larger values than reference for gt/ge tests."""
+    data = pl.DataFrame(
+        {
+            "val": [10.0, 20.0, 30.0, 40.0],  # sum=100, avg=25, sd≈12.91
+        }
+    )
+    reference = pl.DataFrame(
+        {
+            "val": [1.0, 2.0, 3.0, 4.0],  # sum=10, avg=2.5, sd≈1.29
+        }
+    )
+    return data, reference
+
+
+@pytest.fixture
+def auto_ref_lesser_data() -> tuple[pl.DataFrame, pl.DataFrame]:
+    """Data with smaller values than reference for lt/le tests."""
+    data = pl.DataFrame(
+        {
+            "val": [1.0, 2.0, 3.0, 4.0],  # sum=10, avg=2.5, sd≈1.29
+        }
+    )
+    reference = pl.DataFrame(
+        {
+            "val": [10.0, 20.0, 30.0, 40.0],  # sum=100, avg=25, sd≈12.91
+        }
+    )
+    return data, reference
+
+
+# Test all equality methods (_eq) with automatic reference inference
+@pytest.mark.parametrize(
+    "method",
+    [
+        "col_sum_eq",
+        "col_avg_eq",
+        "col_sd_eq",
+    ],
+)
+def test_auto_ref_eq_methods_with_equal_data(method: str, auto_ref_equal_data):
+    """Test all _eq methods pass when data equals reference (auto-inference)."""
+    data, reference = auto_ref_equal_data
+    v = Validate(data=data, reference=reference)
+    v = getattr(v, method)("val")  # No value provided, should auto-infer ref("val")
+    v = v.interrogate()
+    v.assert_passing()
+
+
+# Test all greater-than methods (_gt) with auto-reference
+@pytest.mark.parametrize(
+    "method",
+    [
+        "col_sum_gt",
+        "col_avg_gt",
+        "col_sd_gt",
+    ],
+)
+def test_auto_ref_gt_methods(method: str, auto_ref_greater_data):
+    """Test all _gt methods pass when data > reference (auto-inference)."""
+    data, reference = auto_ref_greater_data
+    v = Validate(data=data, reference=reference)
+    v = getattr(v, method)("val")  # No value provided, should auto-infer ref("val")
+    v = v.interrogate()
+    v.assert_passing()
+
+
+# Test all greater-or-equal methods (_ge) with auto-reference
+@pytest.mark.parametrize(
+    "method",
+    [
+        "col_sum_ge",
+        "col_avg_ge",
+        "col_sd_ge",
+    ],
+)
+def test_auto_ref_ge_methods_with_equal_data(method: str, auto_ref_equal_data):
+    """Test all _ge methods pass when data == reference (auto-inference)."""
+    data, reference = auto_ref_equal_data
+    v = Validate(data=data, reference=reference)
+    v = getattr(v, method)("val")
+    v = v.interrogate()
+    v.assert_passing()
+
+
+@pytest.mark.parametrize(
+    "method",
+    [
+        "col_sum_ge",
+        "col_avg_ge",
+        "col_sd_ge",
+    ],
+)
+def test_auto_ref_ge_methods_with_greater_data(method: str, auto_ref_greater_data):
+    """Test all _ge methods pass when data > reference (auto-inference)."""
+    data, reference = auto_ref_greater_data
+    v = Validate(data=data, reference=reference)
+    v = getattr(v, method)("val")
+    v = v.interrogate()
+    v.assert_passing()
+
+
+# Test all less-than methods (_lt) with auto-reference
+@pytest.mark.parametrize(
+    "method",
+    [
+        "col_sum_lt",
+        "col_avg_lt",
+        "col_sd_lt",
+    ],
+)
+def test_auto_ref_lt_methods(method: str, auto_ref_lesser_data):
+    """Test all _lt methods pass when data < reference (auto-inference)."""
+    data, reference = auto_ref_lesser_data
+    v = Validate(data=data, reference=reference)
+    v = getattr(v, method)("val")
+    v = v.interrogate()
+    v.assert_passing()
+
+
+# Test all less-or-equal methods (_le) with auto-reference
+@pytest.mark.parametrize(
+    "method",
+    [
+        "col_sum_le",
+        "col_avg_le",
+        "col_sd_le",
+    ],
+)
+def test_auto_ref_le_methods_with_equal_data(method: str, auto_ref_equal_data):
+    """Test all _le methods pass when data == reference (auto-inference)."""
+    data, reference = auto_ref_equal_data
+    v = Validate(data=data, reference=reference)
+    v = getattr(v, method)("val")
+    v = v.interrogate()
+    v.assert_passing()
+
+
+@pytest.mark.parametrize(
+    "method",
+    [
+        "col_sum_le",
+        "col_avg_le",
+        "col_sd_le",
+    ],
+)
+def test_auto_ref_le_methods_with_lesser_data(method: str, auto_ref_lesser_data):
+    """Test all _le methods pass when data < reference (auto-inference)."""
+    data, reference = auto_ref_lesser_data
+    v = Validate(data=data, reference=reference)
+    v = getattr(v, method)("val")
+    v = v.interrogate()
+    v.assert_passing()
+
+
+# Test all methods raise error when no reference data
+@pytest.mark.parametrize("method", load_validation_method_grid())
+def test_auto_ref_all_methods_raise_without_reference(method: str):
+    """Test that all agg methods raise ValueError when value=None and no reference data."""
+    data = pl.DataFrame({"val": [1, 2, 3]})
+
+    with pytest.raises(ValueError, match="value.*required"):
+        v = Validate(data=data)
+        getattr(v, method)("val")  # No value and no reference
+
+
+# Test all methods work with explicit ref() even without auto-inference
+@pytest.mark.parametrize(
+    "method",
+    [
+        "col_sum_eq",
+        "col_avg_eq",
+        "col_sd_eq",
+    ],
+)
+def test_auto_ref_explicit_ref_still_works(method: str, auto_ref_equal_data):
+    """Test that explicit ref() still works alongside auto-inference."""
+    data, reference = auto_ref_equal_data
+    v = Validate(data=data, reference=reference)
+    # Explicit ref("val") should work the same as omitting value
+    v = getattr(v, method)("val", ref("val"))
+    v = v.interrogate()
+    v.assert_passing()
+
+
+# Test auto-reference with tolerance for all eq methods
+@pytest.mark.parametrize(
+    "method",
+    [
+        "col_sum_eq",
+        "col_avg_eq",
+        "col_sd_eq",
+    ],
+)
+def test_auto_ref_eq_methods_with_tolerance(method: str):
+    """Test all _eq methods with tolerance and auto-reference.
+
+    Note: Tolerance is calculated as int(tol * ref), so we need values large
+    enough that the tolerance doesn't truncate to 0. For ref=100 and tol=0.1,
+    we get int(0.1 * 100) = 10, allowing a tolerance of 10 units.
+    """
+    # Use larger values so tolerance calculation works (int(tol * ref) > 0)
+    # Data avg=110, sum=440, sd≈12.91
+    data = pl.DataFrame({"val": [100.0, 105.0, 115.0, 120.0]})
+    # Reference avg=100, sum=400, sd≈12.91
+    reference = pl.DataFrame({"val": [90.0, 95.0, 105.0, 110.0]})
+
+    v = Validate(data=data, reference=reference)
+    v = getattr(v, method)("val", tol=0.15)  # 15% tolerance
+    v = v.interrogate()
+    v.assert_passing()
+
+
+# Test auto-reference with multiple columns for all eq methods
+@pytest.mark.parametrize(
+    "method",
+    [
+        "col_sum_eq",
+        "col_avg_eq",
+        "col_sd_eq",
+    ],
+)
+def test_auto_ref_eq_methods_multiple_columns(method: str):
+    """Test auto-reference works when passing a list of columns."""
+    data = pl.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]})
+    reference = pl.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]})
+
+    v = Validate(data=data, reference=reference)
+    # Pass list of columns - should auto-infer ref(col) for each
+    v = getattr(v, method)(["a", "b", "c"])
+    v = v.interrogate()
+    v.assert_passing()
+
+
+# Test expected failures with auto-reference
+@pytest.mark.parametrize(
+    ("method", "data_vals", "ref_vals"),
+    [
+        # eq should fail when values differ
+        ("col_sum_eq", [1, 2, 3], [10, 20, 30]),
+        ("col_avg_eq", [1, 2, 3], [10, 20, 30]),
+        ("col_sd_eq", [1, 2, 3], [1, 1, 1]),  # Different variance
+        # gt should fail when data <= reference
+        ("col_sum_gt", [1, 2, 3], [10, 20, 30]),
+        ("col_avg_gt", [1, 2, 3], [10, 20, 30]),
+        # lt should fail when data >= reference
+        ("col_sum_lt", [10, 20, 30], [1, 2, 3]),
+        ("col_avg_lt", [10, 20, 30], [1, 2, 3]),
+    ],
+)
+def test_auto_ref_expected_failures(method: str, data_vals: list, ref_vals: list):
+    """Test that auto-reference correctly fails when conditions are not met."""
+    data = pl.DataFrame({"val": data_vals})
+    reference = pl.DataFrame({"val": ref_vals})
+
+    v = Validate(data=data, reference=reference)
+    v = getattr(v, method)("val")
+    v = v.interrogate()
+
+    with pytest.raises(AssertionError):
+        v.assert_passing()
+
+
+# Test mixing auto-reference and explicit values in same validation
+@pytest.mark.parametrize(
+    "method",
+    [
+        "col_sum_eq",
+        "col_avg_eq",
+        "col_sd_eq",
+    ],
+)
+def test_auto_ref_mixed_with_explicit_values(method: str, auto_ref_equal_data):
+    """Test mixing auto-reference (value=None) with explicit numeric values."""
+    data, reference = auto_ref_equal_data
+
+    v = Validate(data=data, reference=reference)
+    # First call with auto-reference
+    v = getattr(v, method)("val")
+    # Second call with explicit ref()
+    v = getattr(v, method)("val", ref("val"))
+
+    v = v.interrogate()
+    v.assert_passing()
 
 
 if __name__ == "__main__":

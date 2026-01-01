@@ -105,7 +105,14 @@ from pointblank._utils_check_args import (
     _check_thresholds,
 )
 from pointblank._utils_html import _create_table_dims_html, _create_table_type_html
-from pointblank.column import Column, ColumnLiteral, ColumnSelector, ColumnSelectorNarwhals, col
+from pointblank.column import (
+    Column,
+    ColumnLiteral,
+    ColumnSelector,
+    ColumnSelectorNarwhals,
+    ReferenceColumn,
+    col,
+)
 from pointblank.schema import Schema, _get_schema_validation_info
 from pointblank.segments import Segment
 from pointblank.thresholds import (
@@ -122,6 +129,8 @@ R = TypeVar("R")
 if TYPE_CHECKING:
     from collections.abc import Collection
     from typing import Any
+
+    from narwhals.typing import IntoFrame
 
     from pointblank._typing import AbsoluteBounds, Tolerance, _CompliantValue, _CompliantValues
 
@@ -3737,7 +3746,7 @@ class _ValidationInfo:
         cls,
         assertion_type: str,
         columns: _PBUnresolvedColumn,
-        value: float | Column,
+        value: float | Column | ReferenceColumn,
         tol: Tolerance = 0,
         thresholds: float | bool | tuple | dict | Thresholds | None = None,
         brief: str | bool = False,
@@ -4815,6 +4824,7 @@ class Validate:
     """
 
     data: FrameT | Any
+    reference: IntoFrame | None = None
     tbl_name: str | None = None
     label: str | None = None
     thresholds: int | float | bool | tuple | dict | Thresholds | None = None
@@ -4827,6 +4837,10 @@ class Validate:
     def __post_init__(self):
         # Process data through the centralized data processing pipeline
         self.data = _process_data(self.data)
+
+        # Process reference data if provided
+        if self.reference is not None:
+            self.reference = _process_data(self.reference)
 
         # Check input of the `thresholds=` argument
         _check_thresholds(thresholds=self.thresholds)
@@ -4884,16 +4898,82 @@ class Validate:
         actions=None,
         active=True,
     ):
-        # For each column and assertion, create a validation info object and add it to
-        # the plan. This is used by all aggregation-based column validation methods and
-        # relies heavily on the `_ValidationInfo.from_agg_validator()` class method.
+        """
+        Add an aggregation-based validation step to the validation plan.
+
+        This internal method is used by all aggregation-based column validation methods
+        (e.g., `col_sum_eq`, `col_avg_gt`, `col_sd_le`) to create and register validation
+        steps. It relies heavily on the `_ValidationInfo.from_agg_validator()` class method.
+
+        Automatic Reference Inference
+        -----------------------------
+        When `value` is None and reference data has been set on the Validate object,
+        this method automatically creates a `ReferenceColumn` pointing to the same
+        column name in the reference data. This enables a convenient shorthand:
+
+        .. code-block:: python
+
+            # Instead of writing:
+            Validate(data=df, reference=ref_df).col_sum_eq("a", ref("a"))
+
+            # You can simply write:
+            Validate(data=df, reference=ref_df).col_sum_eq("a")
+
+        If `value` is None and no reference data is set, a `ValueError` is raised
+        immediately to provide clear feedback to the user.
+
+        Parameters
+        ----------
+        assertion_type
+            The type of assertion (e.g., "col_sum_eq", "col_avg_gt").
+        columns
+            Column name or collection of column names to validate.
+        value
+            The target value to compare against. Can be:
+            - A numeric literal (int or float)
+            - A `Column` object for cross-column comparison
+            - A `ReferenceColumn` object for reference data comparison
+            - None to automatically use `ref(column)` when reference data is set
+        tol
+            Tolerance for the comparison. Defaults to 0.
+        thresholds
+            Custom thresholds for the validation step.
+        brief
+            Brief description or auto-generate flag.
+        actions
+            Actions to take based on validation results.
+        active
+            Whether this validation step is active.
+
+        Returns
+        -------
+        Validate
+            The Validate instance for method chaining.
+
+        Raises
+        ------
+        ValueError
+            If `value` is None and no reference data is set on the Validate object.
+        """
         if isinstance(columns, str):
             columns = [columns]
         for column in columns:
+            # If value is None, default to referencing the same column from reference data
+            resolved_value = value
+            if value is None:
+                if self.reference is None:
+                    raise ValueError(
+                        f"The 'value' parameter is required for {assertion_type}() "
+                        "when no reference data is set. Either provide a value, or "
+                        "set reference data on the Validate object using "
+                        "Validate(data=..., reference=...)."
+                    )
+                resolved_value = ReferenceColumn(column_name=column)
+
             val_info = _ValidationInfo.from_agg_validator(
                 assertion_type=assertion_type,
                 columns=column,
-                value=value,
+                value=resolved_value,
                 tol=tol,
                 thresholds=self.thresholds if thresholds is None else thresholds,
                 actions=self.actions if actions is None else actions,
@@ -13149,8 +13229,24 @@ class Validate:
                         vec: nw.DataFrame = nw.from_native(data_tbl_step).select(column)
                         real = agg(vec)
 
-                        target: float | int = value["value"]
+                        raw_value = value["value"]
                         tol = value["tol"]
+
+                        # Handle ReferenceColumn: compute target from reference data
+                        if isinstance(raw_value, ReferenceColumn):
+                            if self.reference is None:
+                                raise ValueError(
+                                    f"Cannot use ref('{raw_value.column_name}') without "
+                                    "setting reference data on the Validate object. "
+                                    "Use Validate(data=..., reference=...) to set reference data."
+                                )
+                            ref_vec: nw.DataFrame = nw.from_native(self.reference).select(
+                                raw_value.column_name
+                            )
+                            target: float | int = agg(ref_vec)
+                        else:
+                            target = raw_value
+
                         lower_diff, upper_diff = _derive_bounds(target, tol)
 
                         lower_bound = target - lower_diff
@@ -21106,7 +21202,7 @@ def make_agg_validator(name: str):
     def agg_validator(
         self: Validate,
         columns: str | Collection[str],
-        value,
+        value=None,
         tol=0,
         thresholds=None,
         brief=False,
