@@ -20,6 +20,7 @@ from pointblank.column import (
     first_n,
     last_n,
     matches,
+    ref,
     starts_with,
 )
 from pointblank.datascan import DataScan, col_summary_tbl
@@ -59,6 +60,7 @@ __all__ = [
     "DataScan",
     "DraftValidation",
     "col",
+    "ref",
     "expr_col",
     "col_summary_tbl",
     "starts_with",

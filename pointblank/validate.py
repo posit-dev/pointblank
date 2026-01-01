@@ -105,7 +105,14 @@ from pointblank._utils_check_args import (
     _check_thresholds,
 )
 from pointblank._utils_html import _create_table_dims_html, _create_table_type_html
-from pointblank.column import Column, ColumnLiteral, ColumnSelector, ColumnSelectorNarwhals, col
+from pointblank.column import (
+    Column,
+    ColumnLiteral,
+    ColumnSelector,
+    ColumnSelectorNarwhals,
+    ReferenceColumn,
+    col,
+)
 from pointblank.schema import Schema, _get_schema_validation_info
 from pointblank.segments import Segment
 from pointblank.thresholds import (
@@ -122,6 +129,8 @@ R = TypeVar("R")
 if TYPE_CHECKING:
     from collections.abc import Collection
     from typing import Any
+
+    from narwhals.typing import IntoFrame
 
     from pointblank._typing import AbsoluteBounds, Tolerance, _CompliantValue, _CompliantValues
 
@@ -4815,6 +4824,7 @@ class Validate:
     """
 
     data: FrameT | Any
+    reference: IntoFrame | None = None
     tbl_name: str | None = None
     label: str | None = None
     thresholds: int | float | bool | tuple | dict | Thresholds | None = None
@@ -4827,6 +4837,10 @@ class Validate:
     def __post_init__(self):
         # Process data through the centralized data processing pipeline
         self.data = _process_data(self.data)
+
+        # Process reference data if provided
+        if self.reference is not None:
+            self.reference = _process_data(self.reference)
 
         # Check input of the `thresholds=` argument
         _check_thresholds(thresholds=self.thresholds)
@@ -13149,8 +13163,24 @@ class Validate:
                         vec: nw.DataFrame = nw.from_native(data_tbl_step).select(column)
                         real = agg(vec)
 
-                        target: float | int = value["value"]
+                        raw_value = value["value"]
                         tol = value["tol"]
+
+                        # Handle ReferenceColumn: compute target from reference data
+                        if isinstance(raw_value, ReferenceColumn):
+                            if self.reference is None:
+                                raise ValueError(
+                                    f"Cannot use ref('{raw_value.column_name}') without "
+                                    "setting reference data on the Validate object. "
+                                    "Use Validate(data=..., reference=...) to set reference data."
+                                )
+                            ref_vec: nw.DataFrame = nw.from_native(self.reference).select(
+                                raw_value.column_name
+                            )
+                            target: float | int = agg(ref_vec)
+                        else:
+                            target = raw_value
+
                         lower_diff, upper_diff = _derive_bounds(target, tol)
 
                         lower_bound = target - lower_diff

@@ -1,6 +1,6 @@
 import pytest
 
-from pointblank import Validate
+from pointblank import Validate, ref
 import polars as pl
 from pointblank._agg import load_validation_method_grid, is_valid_agg
 
@@ -387,6 +387,210 @@ def test_all_methods_can_be_accessed():
 def test_invalid_agg():
     assert not is_valid_agg("not_a_real_method")
     assert is_valid_agg("col_sum_eq")
+
+
+# =====================
+# Reference Data Tests
+# =====================
+
+
+@pytest.fixture
+def reference_data() -> pl.DataFrame:
+    """Reference data for comparison tests."""
+    return pl.DataFrame(
+        {
+            "a": [1, 1, 1],  # sum=3, avg=1, sd=0
+            "b": [2, 2, 2],  # sum=6, avg=2, sd=0
+            "c": [3, 3, 3],  # sum=9, avg=3, sd=0
+        }
+    )
+
+
+@pytest.fixture
+def matching_data() -> pl.DataFrame:
+    """Data that matches the reference data."""
+    return pl.DataFrame(
+        {
+            "a": [1, 1, 1],  # sum=3, avg=1, sd=0
+            "b": [2, 2, 2],  # sum=6, avg=2, sd=0
+            "c": [3, 3, 3],  # sum=9, avg=3, sd=0
+        }
+    )
+
+
+@pytest.fixture
+def different_data() -> pl.DataFrame:
+    """Data with different values than reference."""
+    return pl.DataFrame(
+        {
+            "a": [2, 2, 2],  # sum=6, avg=2, sd=0
+            "b": [3, 3, 3],  # sum=9, avg=3, sd=0
+            "c": [4, 4, 4],  # sum=12, avg=4, sd=0
+        }
+    )
+
+
+def test_ref_sum_eq_matching(matching_data, reference_data):
+    """Test that sum matches between identical data and reference."""
+    v = (
+        Validate(data=matching_data, reference=reference_data)
+        .col_sum_eq("a", ref("a"))
+        .col_sum_eq("b", ref("b"))
+        .col_sum_eq("c", ref("c"))
+        .interrogate()
+    )
+    v.assert_passing()
+
+
+def test_ref_avg_eq_matching(matching_data, reference_data):
+    """Test that avg matches between identical data and reference."""
+    v = (
+        Validate(data=matching_data, reference=reference_data)
+        .col_avg_eq("a", ref("a"))
+        .col_avg_eq("b", ref("b"))
+        .col_avg_eq("c", ref("c"))
+        .interrogate()
+    )
+    v.assert_passing()
+
+
+def test_ref_sd_eq_matching(matching_data, reference_data):
+    """Test that sd matches between identical data and reference."""
+    v = (
+        Validate(data=matching_data, reference=reference_data)
+        .col_sd_eq("a", ref("a"))
+        .col_sd_eq("b", ref("b"))
+        .col_sd_eq("c", ref("c"))
+        .interrogate()
+    )
+    v.assert_passing()
+
+
+def test_ref_sum_gt(different_data, reference_data):
+    """Test that sum of different data is greater than reference."""
+    # different_data.a sum=6 > reference_data.a sum=3
+    v = (
+        Validate(data=different_data, reference=reference_data)
+        .col_sum_gt("a", ref("a"))
+        .interrogate()
+    )
+    v.assert_passing()
+
+
+def test_ref_sum_lt(reference_data, different_data):
+    """Test that sum is less than reference."""
+    # reference_data.a sum=3 < different_data.a sum=6 (using different as reference)
+    v = (
+        Validate(data=reference_data, reference=different_data)
+        .col_sum_lt("a", ref("a"))
+        .interrogate()
+    )
+    v.assert_passing()
+
+
+def test_ref_different_columns():
+    """Test comparing different columns between data and reference."""
+    data = pl.DataFrame({"x": [1, 2, 3]})  # sum=6
+    reference = pl.DataFrame({"y": [2, 2, 2]})  # sum=6
+
+    v = Validate(data=data, reference=reference).col_sum_eq("x", ref("y")).interrogate()
+    v.assert_passing()
+
+
+def test_ref_with_tolerance():
+    """Test reference data comparison with tolerance."""
+    data = pl.DataFrame({"a": [10, 11, 12]})  # sum=33
+    reference = pl.DataFrame({"a": [10, 10, 10]})  # sum=30
+
+    # Without tolerance, this should fail
+    v_fail = Validate(data=data, reference=reference).col_sum_eq("a", ref("a")).interrogate()
+    with pytest.raises(AssertionError):
+        v_fail.assert_passing()
+
+    # With 10% tolerance, this should pass (30 +/- 3 includes 33)
+    v_pass = (
+        Validate(data=data, reference=reference).col_sum_eq("a", ref("a"), tol=0.1).interrogate()
+    )
+    v_pass.assert_passing()
+
+
+def test_ref_without_reference_data_raises():
+    """Test that using ref() without reference data raises an error."""
+    data = pl.DataFrame({"a": [1, 2, 3]})
+
+    v = Validate(data=data).col_sum_eq("a", ref("a"))
+
+    with pytest.raises(ValueError, match="Cannot use ref"):
+        v.interrogate()
+
+
+def test_ref_avg_comparisons():
+    """Test all avg comparison operators with reference data."""
+    data = pl.DataFrame({"value": [5, 5, 5]})  # avg=5
+    ref_equal = pl.DataFrame({"value": [5, 5, 5]})  # avg=5
+    ref_lower = pl.DataFrame({"value": [3, 3, 3]})  # avg=3
+    ref_higher = pl.DataFrame({"value": [7, 7, 7]})  # avg=7
+
+    # Test eq
+    Validate(data=data, reference=ref_equal).col_avg_eq(
+        "value", ref("value")
+    ).interrogate().assert_passing()
+
+    # Test gt (5 > 3)
+    Validate(data=data, reference=ref_lower).col_avg_gt(
+        "value", ref("value")
+    ).interrogate().assert_passing()
+
+    # Test ge (5 >= 5)
+    Validate(data=data, reference=ref_equal).col_avg_ge(
+        "value", ref("value")
+    ).interrogate().assert_passing()
+
+    # Test lt (5 < 7)
+    Validate(data=data, reference=ref_higher).col_avg_lt(
+        "value", ref("value")
+    ).interrogate().assert_passing()
+
+    # Test le (5 <= 5)
+    Validate(data=data, reference=ref_equal).col_avg_le(
+        "value", ref("value")
+    ).interrogate().assert_passing()
+
+
+def test_ref_multiple_columns_single_reference():
+    """Test validating multiple columns against a single reference column."""
+    data = pl.DataFrame(
+        {
+            "col_a": [10, 10, 10],  # sum=30
+            "col_b": [10, 10, 10],  # sum=30
+            "col_c": [10, 10, 10],  # sum=30
+        }
+    )
+    reference = pl.DataFrame({"baseline": [10, 10, 10]})  # sum=30
+
+    v = (
+        Validate(data=data, reference=reference)
+        .col_sum_eq("col_a", ref("baseline"))
+        .col_sum_eq("col_b", ref("baseline"))
+        .col_sum_eq("col_c", ref("baseline"))
+        .interrogate()
+    )
+    v.assert_passing()
+
+
+def test_ref_mixed_validation():
+    """Test mixing reference-based and literal-value validations."""
+    data = pl.DataFrame({"a": [1, 2, 3]})  # sum=6, avg=2
+    reference = pl.DataFrame({"a": [1, 2, 3]})  # sum=6
+
+    v = (
+        Validate(data=data, reference=reference)
+        .col_sum_eq("a", ref("a"))  # Reference-based
+        .col_sum_eq("a", 6)  # Literal value
+        .col_avg_eq("a", 2)  # Literal value
+        .interrogate()
+    )
+    v.assert_passing()
 
 
 if __name__ == "__main__":
