@@ -5,7 +5,7 @@ from collections import defaultdict
 from collections.abc import Sequence
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, ClassVar
 
 import narwhals as nw
 from narwhals.dataframe import DataFrame
@@ -96,6 +96,7 @@ class ColumnProfile(_ColumnProfileABC):
     colname: str
     coltype: str
     statistics: MutableSequence[Stat] = field(default_factory=lambda: [])
+    _type: ClassVar[_TypeMap]  # Defined by subclasses
 
     @property
     def sample_data(self) -> Sequence[Any]:

@@ -15,7 +15,7 @@ from enum import Enum
 from functools import partial
 from importlib.metadata import version
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Callable, Literal, ParamSpec, TypeVar
+from typing import TYPE_CHECKING, Any, Callable, Literal, NoReturn, ParamSpec, TypeVar
 from zipfile import ZipFile
 
 import commonmark
@@ -24,7 +24,6 @@ from great_tables import GT, from_column, google_font, html, loc, md, style, val
 from great_tables.gt import _get_column_of_values
 from great_tables.vals import fmt_integer, fmt_number
 from importlib_resources import files
-from narwhals.typing import FrameT
 
 from pointblank._agg import is_valid_agg, load_validation_method_grid, resolve_agg_registries
 from pointblank._constants import (
@@ -130,7 +129,8 @@ if TYPE_CHECKING:
     from collections.abc import Collection
     from typing import Any
 
-    from narwhals.typing import IntoFrame
+    import polars as pl
+    from narwhals.typing import IntoDataFrame, IntoFrame
 
     from pointblank._typing import AbsoluteBounds, Tolerance, _CompliantValue, _CompliantValues
 
@@ -442,12 +442,13 @@ def config(
     global_config.report_incl_footer_timings = report_incl_footer_timings  # pragma: no cover
     global_config.report_incl_footer_notes = report_incl_footer_notes  # pragma: no cover
     global_config.preview_incl_header = preview_incl_header  # pragma: no cover
+    return global_config  # pragma: no cover
 
 
 def load_dataset(
     dataset: Literal["small_table", "game_revenue", "nycflights", "global_sales"] = "small_table",
     tbl_type: Literal["polars", "pandas", "duckdb"] = "polars",
-) -> FrameT | Any:
+) -> Any:
     """
     Load a dataset hosted in the library as specified table type.
 
@@ -468,7 +469,7 @@ def load_dataset(
 
     Returns
     -------
-    FrameT | Any
+    Any
         The dataset for the `Validate` object. This could be a Polars DataFrame, a Pandas DataFrame,
         or a DuckDB table as an Ibis table.
 
@@ -1541,7 +1542,7 @@ def get_data_path(
                 return tmp_file.name
 
 
-def _process_data(data: FrameT | Any) -> FrameT | Any:
+def _process_data(data: Any) -> Any:
     """
     Centralized data processing pipeline that handles all supported input types.
 
@@ -1558,7 +1559,7 @@ def _process_data(data: FrameT | Any) -> FrameT | Any:
 
     Parameters
     ----------
-    data : FrameT | Any
+    data
         The input data which could be:
         - a DataFrame object (Polars, Pandas, Ibis, etc.)
         - a GitHub URL pointing to a CSV or Parquet file
@@ -1569,7 +1570,7 @@ def _process_data(data: FrameT | Any) -> FrameT | Any:
 
     Returns
     -------
-    FrameT | Any
+    Any
         Processed data as a DataFrame if input was a supported data source type,
         otherwise the original data unchanged.
     """
@@ -1588,7 +1589,7 @@ def _process_data(data: FrameT | Any) -> FrameT | Any:
     return data
 
 
-def _process_github_url(data: FrameT | Any) -> FrameT | Any:
+def _process_github_url(data: Any) -> Any:
     """
     Process data parameter to handle GitHub URLs pointing to CSV or Parquet files.
 
@@ -1603,12 +1604,12 @@ def _process_github_url(data: FrameT | Any) -> FrameT | Any:
 
     Parameters
     ----------
-    data : FrameT | Any
+    data
         The data parameter which may be a GitHub URL string or any other data type.
 
     Returns
     -------
-    FrameT | Any
+    Any
         If the input is a supported GitHub URL, returns a DataFrame loaded from the downloaded file.
         Otherwise, returns the original data unchanged.
 
@@ -1693,7 +1694,7 @@ def _process_github_url(data: FrameT | Any) -> FrameT | Any:
         return data
 
 
-def _process_connection_string(data: FrameT | Any) -> FrameT | Any:
+def _process_connection_string(data: Any) -> Any:
     """
     Process data parameter to handle database connection strings.
 
@@ -1720,7 +1721,7 @@ def _process_connection_string(data: FrameT | Any) -> FrameT | Any:
     return connect_to_table(data)
 
 
-def _process_csv_input(data: FrameT | Any) -> FrameT | Any:
+def _process_csv_input(data: Any) -> Any:
     """
     Process data parameter to handle CSV file inputs.
 
@@ -1778,7 +1779,7 @@ def _process_csv_input(data: FrameT | Any) -> FrameT | Any:
         )
 
 
-def _process_parquet_input(data: FrameT | Any) -> FrameT | Any:
+def _process_parquet_input(data: Any) -> Any:
     """
     Process data parameter to handle Parquet file inputs.
 
@@ -1921,7 +1922,7 @@ def _process_parquet_input(data: FrameT | Any) -> FrameT | Any:
 
 
 def preview(
-    data: FrameT | Any,
+    data: Any,
     columns_subset: str | list[str] | Column | None = None,
     n_head: int = 5,
     n_tail: int = 5,
@@ -1929,7 +1930,7 @@ def preview(
     show_row_numbers: bool = True,
     max_col_width: int = 250,
     min_tbl_width: int = 500,
-    incl_header: bool = None,
+    incl_header: bool | None = None,
 ) -> GT:
     """
     Display a table preview that shows some rows from the top, some from the bottom.
@@ -2187,7 +2188,7 @@ def preview(
 
 
 def _generate_display_table(
-    data: FrameT | Any,
+    data: Any,
     columns_subset: str | list[str] | Column | None = None,
     n_head: int = 5,
     n_tail: int = 5,
@@ -2195,7 +2196,7 @@ def _generate_display_table(
     show_row_numbers: bool = True,
     max_col_width: int = 250,
     min_tbl_width: int = 500,
-    incl_header: bool = None,
+    incl_header: bool | None = None,
     mark_missing_values: bool = True,
     row_number_list: list[int] | None = None,
 ) -> GT:
@@ -2292,7 +2293,8 @@ def _generate_display_table(
         tbl_schema = Schema(tbl=data)
 
         # Get the row count for the table
-        ibis_rows = data.count()
+        # Note: ibis tables have count(), to_polars(), to_pandas() methods
+        ibis_rows = data.count()  # type: ignore[union-attr]
         n_rows = ibis_rows.to_polars() if df_lib_name_gt == "polars" else int(ibis_rows.to_pandas())
 
         # If n_head + n_tail is greater than the row count, display the entire table
@@ -2301,11 +2303,11 @@ def _generate_display_table(
             data_subset = data
 
             if row_number_list is None:
-                row_number_list = range(1, n_rows + 1)
+                row_number_list = list(range(1, n_rows + 1))
         else:
             # Get the first n and last n rows of the table
-            data_head = data.head(n_head)
-            data_tail = data.filter(
+            data_head = data.head(n_head)  # type: ignore[union-attr]
+            data_tail = data.filter(  # type: ignore[union-attr]
                 [ibis.row_number() >= (n_rows - n_tail), ibis.row_number() <= n_rows]
             )
             data_subset = data_head.union(data_tail)
@@ -2317,9 +2319,9 @@ def _generate_display_table(
 
         # Convert either to Polars or Pandas depending on the available library
         if df_lib_name_gt == "polars":
-            data = data_subset.to_polars()
+            data = data_subset.to_polars()  # type: ignore[union-attr]
         else:
-            data = data_subset.to_pandas()
+            data = data_subset.to_pandas()  # type: ignore[union-attr]
 
     # From a DataFrame:
     # - get the row count
@@ -2330,17 +2332,18 @@ def _generate_display_table(
         tbl_schema = Schema(tbl=data)
 
         if tbl_type == "polars":
-            n_rows = int(data.height)
+            # Note: polars DataFrames have height, head(), tail() attributes
+            n_rows = int(data.height)  # type: ignore[union-attr]
 
             # If n_head + n_tail is greater than the row count, display the entire table
             if n_head + n_tail >= n_rows:
                 full_dataset = True
 
                 if row_number_list is None:
-                    row_number_list = range(1, n_rows + 1)
+                    row_number_list = list(range(1, n_rows + 1))
 
             else:
-                data = pl.concat([data.head(n=n_head), data.tail(n=n_tail)])
+                data = pl.concat([data.head(n=n_head), data.tail(n=n_tail)])  # type: ignore[union-attr]
 
                 if row_number_list is None:
                     row_number_list = list(range(1, n_head + 1)) + list(
@@ -2348,40 +2351,42 @@ def _generate_display_table(
                     )
 
         if tbl_type == "pandas":
-            n_rows = data.shape[0]
+            # Note: pandas DataFrames have shape, head(), tail() attributes
+            n_rows = data.shape[0]  # type: ignore[union-attr]
 
             # If n_head + n_tail is greater than the row count, display the entire table
             if n_head + n_tail >= n_rows:
                 full_dataset = True
                 data_subset = data
 
-                row_number_list = range(1, n_rows + 1)
+                row_number_list = list(range(1, n_rows + 1))
             else:
-                data = pd.concat([data.head(n=n_head), data.tail(n=n_tail)])
+                data = pd.concat([data.head(n=n_head), data.tail(n=n_tail)])  # type: ignore[union-attr]
 
                 row_number_list = list(range(1, n_head + 1)) + list(
                     range(n_rows - n_tail + 1, n_rows + 1)
                 )
 
         if tbl_type == "pyspark":
-            n_rows = data.count()
+            # Note: pyspark DataFrames have count(), toPandas(), limit(), tail(), sparkSession
+            n_rows = data.count()  # type: ignore[union-attr]
 
             # If n_head + n_tail is greater than the row count, display the entire table
             if n_head + n_tail >= n_rows:
                 full_dataset = True
                 # Convert to pandas for Great Tables compatibility
-                data = data.toPandas()
+                data = data.toPandas()  # type: ignore[union-attr]
 
-                row_number_list = range(1, n_rows + 1)
+                row_number_list = list(range(1, n_rows + 1))
             else:
                 # Get head and tail samples, then convert to pandas
-                head_data = data.limit(n_head).toPandas()
+                head_data = data.limit(n_head).toPandas()  # type: ignore[union-attr]
 
                 # PySpark tail() returns a list of Row objects, need to convert to DataFrame
-                tail_rows = data.tail(n_tail)
+                tail_rows = data.tail(n_tail)  # type: ignore[union-attr]
                 if tail_rows:
                     # Convert list of Row objects back to DataFrame, then to pandas
-                    tail_df = data.sparkSession.createDataFrame(tail_rows, data.schema)
+                    tail_df = data.sparkSession.createDataFrame(tail_rows, data.schema)  # type: ignore[union-attr]
                     tail_data = tail_df.toPandas()
                 else:
                     # If no tail data, create empty DataFrame with same schema
@@ -2409,14 +2414,14 @@ def _generate_display_table(
             tbl_schema = Schema(tbl=data)
 
     # From the table schema, get a list of tuples containing column names and data types
-    col_dtype_dict = tbl_schema.columns
+    col_dtype_list = tbl_schema.columns or []
 
     # Extract the column names from the list of tuples (first element of each tuple)
-    col_names = [col[0] for col in col_dtype_dict]
+    col_names = [col[0] for col in col_dtype_list]
 
     # Iterate over the list of tuples and create a new dictionary with the
     # column names and data types
-    col_dtype_dict = {k: v for k, v in col_dtype_dict}
+    col_dtype_dict = {k: v for k, v in col_dtype_list}
 
     # Create short versions of the data types by omitting any text in parentheses
     col_dtype_dict_short = {
@@ -2515,21 +2520,21 @@ def _generate_display_table(
     # Prepend a column that contains the row numbers if `show_row_numbers=True`
     if show_row_numbers or has_leading_row_num_col:
         if has_leading_row_num_col:
-            row_number_list = data["_row_num_"].to_list()
+            row_number_list = data["_row_num_"].to_list()  # type: ignore[union-attr]
 
         else:
             if df_lib_name_gt == "polars":
                 import polars as pl
 
                 row_number_series = pl.Series("_row_num_", row_number_list)
-                data = data.insert_column(0, row_number_series)
+                data = data.insert_column(0, row_number_series)  # type: ignore[union-attr]
 
             if df_lib_name_gt == "pandas":
-                data.insert(0, "_row_num_", row_number_list)
+                data.insert(0, "_row_num_", row_number_list)  # type: ignore[union-attr]
 
             if df_lib_name_gt == "pyspark":
                 # For PySpark converted to pandas, use pandas method
-                data.insert(0, "_row_num_", row_number_list)
+                data.insert(0, "_row_num_", row_number_list)  # type: ignore[union-attr]
 
         # Get the highest number in the `row_number_list` and calculate a width that will
         # safely fit a number of that magnitude
@@ -2638,7 +2643,7 @@ def _generate_display_table(
     return gt_tbl
 
 
-def missing_vals_tbl(data: FrameT | Any) -> GT:
+def missing_vals_tbl(data: Any) -> GT:
     """
     Display a table that shows the missing values in the input table.
 
@@ -3239,7 +3244,7 @@ def _get_column_names_safe(data: Any) -> list[str]:
         return list(data.columns)  # pragma: no cover
 
 
-def _get_column_names(data: FrameT | Any, ibis_tbl: bool, df_lib_name_gt: str) -> list[str]:
+def _get_column_names(data: Any, ibis_tbl: bool, df_lib_name_gt: str) -> list[str]:
     if ibis_tbl:
         return data.columns if df_lib_name_gt == "polars" else list(data.columns)
 
@@ -3263,12 +3268,10 @@ def _validate_columns_subset(
                 )
             return columns_subset
 
-    return columns_subset.resolve(columns=col_names)
+    return columns_subset.resolve(columns=col_names)  # type: ignore[union-attr]
 
 
-def _select_columns(
-    data: FrameT | Any, resolved_columns: list[str], ibis_tbl: bool, tbl_type: str
-) -> FrameT | Any:
+def _select_columns(data: Any, resolved_columns: list[str], ibis_tbl: bool, tbl_type: str) -> Any:
     if ibis_tbl:
         return data[resolved_columns]
     if tbl_type == "polars":
@@ -3276,7 +3279,7 @@ def _select_columns(
     return data[resolved_columns]
 
 
-def get_column_count(data: FrameT | Any) -> int:
+def get_column_count(data: Any) -> int:
     """
     Get the number of columns in a table.
 
@@ -3488,7 +3491,7 @@ def _extract_enum_values(set_values: Any) -> list[Any]:
     return [set_values]
 
 
-def get_row_count(data: FrameT | Any) -> int:
+def get_row_count(data: Any) -> int:
     """
     Get the number of rows in a table.
 
@@ -3776,7 +3779,7 @@ class _ValidationInfo:
     sha1: str | None = None
     assertion_type: str | None = None
     column: Any | None = None
-    values: Any | list[any] | tuple | None = None
+    values: Any | list[Any] | tuple | None = None
     inclusive: tuple[bool, bool] | None = None
     na_pass: bool | None = None
     pre: Callable | None = None
@@ -3799,14 +3802,14 @@ class _ValidationInfo:
     error: bool | None = None
     critical: bool | None = None
     failure_text: str | None = None
-    tbl_checked: FrameT | None = None
-    extract: FrameT | None = None
-    val_info: dict[str, any] | None = None
+    tbl_checked: Any = None
+    extract: Any = None
+    val_info: dict[str, Any] | None = None
     time_processed: str | None = None
     proc_duration_s: float | None = None
     notes: dict[str, dict[str, str]] | None = None
 
-    def get_val_info(self) -> dict[str, any]:
+    def get_val_info(self) -> dict[str, Any] | None:
         return self.val_info
 
     def _add_note(self, key: str, markdown: str, text: str | None = None) -> None:
@@ -3982,7 +3985,7 @@ class _ValidationInfo:
         return self.notes is not None and len(self.notes) > 0
 
 
-def _handle_connection_errors(e: Exception, connection_string: str) -> None:
+def _handle_connection_errors(e: Exception, connection_string: str) -> NoReturn:
     """
     Shared error handling for database connection failures.
 
@@ -4823,7 +4826,7 @@ class Validate:
     when table specifications are missing or backend dependencies are not installed.
     """
 
-    data: FrameT | Any
+    data: IntoDataFrame
     reference: IntoFrame | None = None
     tbl_name: str | None = None
     label: str | None = None
@@ -4986,7 +4989,7 @@ class Validate:
 
     def set_tbl(
         self,
-        tbl: FrameT | Any,
+        tbl: Any,
         tbl_name: str | None = None,
         label: str | None = None,
     ) -> Validate:
@@ -5129,7 +5132,7 @@ class Validate:
         na_pass: bool = False,
         pre: Callable | None = None,
         segments: SegmentSpec | None = None,
-        thresholds: int | float | bool | tuple | dict | Thresholds = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool = True,
@@ -5413,7 +5416,7 @@ class Validate:
         na_pass: bool = False,
         pre: Callable | None = None,
         segments: SegmentSpec | None = None,
-        thresholds: int | float | bool | tuple | dict | Thresholds = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool = True,
@@ -5704,7 +5707,7 @@ class Validate:
         na_pass: bool = False,
         pre: Callable | None = None,
         segments: SegmentSpec | None = None,
-        thresholds: int | float | bool | tuple | dict | Thresholds = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool = True,
@@ -5995,7 +5998,7 @@ class Validate:
         na_pass: bool = False,
         pre: Callable | None = None,
         segments: SegmentSpec | None = None,
-        thresholds: int | float | bool | tuple | dict | Thresholds = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool = True,
@@ -6284,7 +6287,7 @@ class Validate:
         na_pass: bool = False,
         pre: Callable | None = None,
         segments: SegmentSpec | None = None,
-        thresholds: int | float | bool | tuple | dict | Thresholds = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool = True,
@@ -6576,7 +6579,7 @@ class Validate:
         na_pass: bool = False,
         pre: Callable | None = None,
         segments: SegmentSpec | None = None,
-        thresholds: int | float | bool | tuple | dict | Thresholds = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool = True,
@@ -6870,7 +6873,7 @@ class Validate:
         na_pass: bool = False,
         pre: Callable | None = None,
         segments: SegmentSpec | None = None,
-        thresholds: int | float | bool | tuple | dict | Thresholds = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool = True,
@@ -7190,7 +7193,7 @@ class Validate:
         na_pass: bool = False,
         pre: Callable | None = None,
         segments: SegmentSpec | None = None,
-        thresholds: int | float | bool | tuple | dict | Thresholds = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool = True,
@@ -7507,7 +7510,7 @@ class Validate:
         set: Collection[Any],
         pre: Callable | None = None,
         segments: SegmentSpec | None = None,
-        thresholds: int | float | bool | tuple | dict | Thresholds = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool = True,
@@ -7824,7 +7827,7 @@ class Validate:
         set: Collection[Any],
         pre: Callable | None = None,
         segments: SegmentSpec | None = None,
-        thresholds: int | float | bool | tuple | dict | Thresholds = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool = True,
@@ -8115,7 +8118,7 @@ class Validate:
         na_pass: bool = False,
         pre: Callable | None = None,
         segments: SegmentSpec | None = None,
-        thresholds: int | float | bool | tuple | dict | Thresholds = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool = True,
@@ -8303,7 +8306,7 @@ class Validate:
         na_pass: bool = False,
         pre: Callable | None = None,
         segments: SegmentSpec | None = None,
-        thresholds: int | float | bool | tuple | dict | Thresholds = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool = True,
@@ -8488,7 +8491,7 @@ class Validate:
         columns: str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals,
         pre: Callable | None = None,
         segments: SegmentSpec | None = None,
-        thresholds: int | float | bool | tuple | dict | Thresholds = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool = True,
@@ -8731,7 +8734,7 @@ class Validate:
         columns: str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals,
         pre: Callable | None = None,
         segments: SegmentSpec | None = None,
-        thresholds: int | float | bool | tuple | dict | Thresholds = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool = True,
@@ -8977,7 +8980,7 @@ class Validate:
         inverse: bool = False,
         pre: Callable | None = None,
         segments: SegmentSpec | None = None,
-        thresholds: int | float | bool | tuple | dict | Thresholds = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool = True,
@@ -9240,7 +9243,7 @@ class Validate:
         na_pass: bool = False,
         pre: Callable | None = None,
         segments: SegmentSpec | None = None,
-        thresholds: int | float | bool | tuple | dict | Thresholds = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool = True,
@@ -9523,7 +9526,7 @@ class Validate:
         expr: Any,
         pre: Callable | None = None,
         segments: SegmentSpec | None = None,
-        thresholds: int | float | bool | tuple | dict | Thresholds = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool = True,
@@ -9741,7 +9744,7 @@ class Validate:
     def col_exists(
         self,
         columns: str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals,
-        thresholds: int | float | bool | tuple | dict | Thresholds = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool = True,
@@ -10213,7 +10216,7 @@ class Validate:
         columns_subset: str | list[str] | None = None,
         pre: Callable | None = None,
         segments: SegmentSpec | None = None,
-        thresholds: int | float | bool | tuple | dict | Thresholds = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool = True,
@@ -10454,7 +10457,7 @@ class Validate:
         columns_subset: str | list[str] | None = None,
         pre: Callable | None = None,
         segments: SegmentSpec | None = None,
-        thresholds: int | float | bool | tuple | dict | Thresholds = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool = True,
@@ -10699,7 +10702,7 @@ class Validate:
         max_concurrent: int = 3,
         pre: Callable | None = None,
         segments: SegmentSpec | None = None,
-        thresholds: int | float | bool | tuple | dict | Thresholds = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool = True,
@@ -11094,7 +11097,7 @@ class Validate:
         case_sensitive_dtypes: bool = True,
         full_match_dtypes: bool = True,
         pre: Callable | None = None,
-        thresholds: int | float | bool | tuple | dict | Thresholds = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool = True,
@@ -11310,11 +11313,11 @@ class Validate:
 
     def row_count_match(
         self,
-        count: int | FrameT | Any,
+        count: int | Any,
         tol: Tolerance = 0,
         inverse: bool = False,
         pre: Callable | None = None,
-        thresholds: int | float | bool | tuple | dict | Thresholds = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool = True,
@@ -11529,10 +11532,10 @@ class Validate:
 
     def col_count_match(
         self,
-        count: int | FrameT | Any,
+        count: int | Any,
         inverse: bool = False,
         pre: Callable | None = None,
-        thresholds: int | float | bool | tuple | dict | Thresholds = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool = True,
@@ -11705,9 +11708,9 @@ class Validate:
 
     def tbl_match(
         self,
-        tbl_compare: FrameT | Any,
+        tbl_compare: Any,
         pre: Callable | None = None,
-        thresholds: int | float | bool | tuple | dict | Thresholds = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool = True,
@@ -11976,7 +11979,7 @@ class Validate:
         self,
         *exprs: Callable,
         pre: Callable | None = None,
-        thresholds: int | float | bool | tuple | dict | Thresholds = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool = True,
@@ -12224,7 +12227,7 @@ class Validate:
         self,
         expr: Callable,
         pre: Callable | None = None,
-        thresholds: int | float | bool | tuple | dict | Thresholds = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
         active: bool = True,
@@ -12773,7 +12776,11 @@ class Validate:
 
             # Make a deep copy of the table for this step to ensure proper isolation
             # This prevents modifications from one validation step affecting others
-            data_tbl_step = _copy_dataframe(data_tbl)
+            try:
+                # TODO: This copying should be scrutinized further
+                data_tbl_step: IntoDataFrame = _copy_dataframe(data_tbl)
+            except Exception as e:  # try not to crash the whole validation
+                data_tbl_step: IntoDataFrame = data_tbl
 
             # Capture original table dimensions and columns before preprocessing
             # (only if preprocessing is present - we'll set these inside the preprocessing block)
@@ -14001,12 +14008,14 @@ class Validate:
             )
 
         # Get the threshold status using the appropriate method
+        # Note: scalar=False (default) always returns a dict
+        status: dict[int, bool]
         if level == "warning":
-            status = self.warning(i=i)
+            status = self.warning(i=i)  # type: ignore[assignment]
         elif level == "error":
-            status = self.error(i=i)
-        elif level == "critical":
-            status = self.critical(i=i)
+            status = self.error(i=i)  # type: ignore[assignment]
+        else:  # level == "critical"
+            status = self.critical(i=i)  # type: ignore[assignment]
 
         # Find any steps that exceeded the threshold
         failures = []
@@ -14160,12 +14169,14 @@ class Validate:
             )
 
         # Get the threshold status using the appropriate method
+        # Note: scalar=False (default) always returns a dict
+        status: dict[int, bool]
         if level == "warning":
-            status = self.warning(i=i)
+            status = self.warning(i=i)  # type: ignore[assignment]
         elif level == "error":
-            status = self.error(i=i)
-        elif level == "critical":
-            status = self.critical(i=i)
+            status = self.error(i=i)  # type: ignore[assignment]
+        else:  # level == "critical"
+            status = self.critical(i=i)  # type: ignore[assignment]
 
         # Return True if any steps exceeded the threshold
         return any(status.values())
@@ -14938,7 +14949,7 @@ class Validate:
 
     def get_data_extracts(
         self, i: int | list[int] | None = None, frame: bool = False
-    ) -> dict[int, FrameT | None] | FrameT | None:
+    ) -> dict[int, Any] | Any:
         """
         Get the rows that failed for each validation step.
 
@@ -14961,7 +14972,7 @@ class Validate:
 
         Returns
         -------
-        dict[int, FrameT | None] | FrameT | None
+        dict[int, Any] | Any
             A dictionary of tables containing the rows that failed in every compatible validation
             step. Alternatively, it can be a DataFrame if `frame=True` and `i=` is a scalar.
 
@@ -15251,7 +15262,7 @@ class Validate:
 
         return json.dumps(report, indent=4, default=str)
 
-    def get_sundered_data(self, type="pass") -> FrameT:
+    def get_sundered_data(self, type="pass") -> Any:
         """
         Get the data that passed or failed the validation steps.
 
@@ -15287,7 +15298,7 @@ class Validate:
 
         Returns
         -------
-        FrameT
+        Any
             A table containing the data that passed or failed the validation steps.
 
         Examples
@@ -15379,6 +15390,7 @@ class Validate:
         # Get all validation step result tables and join together the `pb_is_good_` columns
         # ensuring that the columns are named uniquely (e.g., `pb_is_good_1`, `pb_is_good_2`, ...)
         # and that the index is reset
+        labeled_tbl_nw: nw.DataFrame | nw.LazyFrame | None = None
         for i, validation in enumerate(validation_info):
             results_tbl = nw.from_native(validation.tbl_checked)
 
@@ -15399,7 +15411,7 @@ class Validate:
             )
 
             # Add the results table to the list of tables
-            if i == 0:
+            if labeled_tbl_nw is None:
                 labeled_tbl_nw = results_tbl
             else:
                 labeled_tbl_nw = labeled_tbl_nw.join(results_tbl, on=index_name, how="left")
@@ -16917,7 +16929,7 @@ class Validate:
                     table = validation.pre(self.data)
 
                 # Get the columns from the table as a list
-                columns = list(table.columns)
+                columns = list(table.columns)  # type: ignore[union-attr]
 
                 # Evaluate the column expression
                 if isinstance(column_expr, ColumnSelectorNarwhals):
@@ -17330,8 +17342,8 @@ def _string_date_dttm_conversion(value: Any) -> Any:
 
 
 def _conditional_string_date_dttm_conversion(
-    value: any, allow_regular_strings: bool = False
-) -> any:
+    value: Any, allow_regular_strings: bool = False
+) -> Any:
     """
     Conditionally convert a string to a date or datetime object if it is in the correct format. If
     `allow_regular_strings=` is `True`, regular strings are allowed to pass through unchanged. If
@@ -17517,7 +17529,7 @@ def _create_autobrief_or_failure_text(
     assertion_type: str,
     lang: str,
     column: str,
-    values: str | None,
+    values: Any,
     for_failure: bool,
     locale: str | None = None,
     n_rows: int | None = None,
@@ -18391,8 +18403,7 @@ def _validation_info_as_dict(validation_info: _ValidationInfo) -> dict:
 
 def _get_assertion_icon(icon: list[str], length_val: int = 30) -> list[str]:
     # For each icon, get the assertion icon SVG test from SVG_ICONS_FOR_ASSERTION_TYPES dictionary
-    # TODO: No point in using `get` if we can't handle missing keys anyways
-    icon_svg = [SVG_ICONS_FOR_ASSERTION_TYPES.get(icon) for icon in icon]
+    icon_svg: list[str] = [SVG_ICONS_FOR_ASSERTION_TYPES[icon] for icon in icon]
 
     # Replace the width and height in the SVG string
     for i in range(len(icon_svg)):
@@ -18489,9 +18500,7 @@ def _transform_tbl_preprocessed(pre: Any, seg: Any, interrogation_performed: boo
 
 def _get_preprocessed_table_icon(icon: list[str]) -> list[str]:
     # For each icon, get the SVG icon from the SVG_ICONS_FOR_TBL_STATUS dictionary
-    icon_svg = [SVG_ICONS_FOR_TBL_STATUS.get(icon) for icon in icon]
-
-    return icon_svg
+    return [SVG_ICONS_FOR_TBL_STATUS[icon] for icon in icon]
 
 
 def _transform_eval(
@@ -18569,9 +18578,9 @@ def _transform_test_units(
             return _format_single_number_with_gt(
                 value, n_sigfig=3, compact=True, locale=locale, df_lib=df_lib
             )
-        else:
-            # Fallback to the original behavior
-            return str(vals.fmt_number(value, n_sigfig=3, compact=True, locale=locale)[0])
+        formatted = vals.fmt_number(value, n_sigfig=3, compact=True, locale=locale)
+        assert isinstance(formatted, list)
+        return formatted[0]
 
     return [
         (
@@ -18789,7 +18798,7 @@ def _get_callable_source(fn: Callable) -> str:
         pre_arg = _extract_pre_argument(source)
         return pre_arg
     except (OSError, TypeError):  # pragma: no cover
-        return fn.__name__
+        return fn.__name__  # ty: ignore
 
 
 def _extract_pre_argument(source: str) -> str:
@@ -19030,11 +19039,11 @@ def _format_number_safe(
             locale=locale,
             df_lib=df_lib,
         )
-    else:
-        # Fallback to the original behavior
-        return fmt_number(
-            value, decimals=decimals, drop_trailing_zeros=drop_trailing_zeros, locale=locale
-        )[0]  # pragma: no cover
+    ints = fmt_number(
+        value, decimals=decimals, drop_trailing_zeros=drop_trailing_zeros, locale=locale
+    )
+    assert isinstance(ints, list)
+    return ints[0]
 
 
 def _format_integer_safe(value: int, locale: str = "en", df_lib=None) -> str:
@@ -19047,9 +19056,10 @@ def _format_integer_safe(value: int, locale: str = "en", df_lib=None) -> str:
     if df_lib is not None and value is not None:
         # Use GT-based formatting to avoid Pandas dependency completely
         return _format_single_integer_with_gt(value, locale=locale, df_lib=df_lib)
-    else:
-        # Fallback to the original behavior
-        return fmt_integer(value, locale=locale)[0]
+
+    ints = fmt_integer(value, locale=locale)
+    assert isinstance(ints, list)
+    return ints[0]
 
 
 def _create_thresholds_html(thresholds: Thresholds, locale: str, df_lib=None) -> str:
@@ -19876,7 +19886,7 @@ def _create_col_schema_match_note_html(schema_info: dict, locale: str = "en") ->
 """
 
     # Add the settings as an additional source note to the step report
-    step_report_gt = step_report_gt.tab_source_note(source_note=html(source_note_html))
+    step_report_gt = step_report_gt.tab_source_note(source_note=html(source_note_html))  # type: ignore[union-attr]
 
     # Extract the HTML from the GT object
     step_report_html = step_report_gt._repr_html_()
@@ -20313,7 +20323,7 @@ def _step_report_rows_distinct(
 
 
 def _step_report_schema_in_order(
-    step: int, schema_info: dict, header: str, lang: str, debug_return_df: bool = False
+    step: int, schema_info: dict, header: str | None, lang: str, debug_return_df: bool = False
 ) -> GT | Any:
     """
     This is the case for schema validation where the schema is supposed to have the same column
@@ -20620,7 +20630,9 @@ def _step_report_schema_in_order(
         # Add a border below the row that terminates the target table schema
         step_report = step_report.tab_style(
             style=style.borders(sides="bottom", color="#6699CC80", style="solid", weight="1px"),
-            locations=loc.body(rows=len(colnames_tgt) - 1),
+            locations=loc.body(
+                rows=len(colnames_tgt) - 1  # ty: ignore (bug in GT, should allow an int)
+            ),
         )
 
     # If the version of `great_tables` is `>=0.17.0` then disable Quarto table processing
@@ -20669,8 +20681,8 @@ def _step_report_schema_in_order(
 
 
 def _step_report_schema_any_order(
-    step: int, schema_info: dict, header: str, lang: str, debug_return_df: bool = False
-) -> GT | Any:
+    step: int, schema_info: dict, header: str | None, lang: str, debug_return_df: bool = False
+) -> GT | pl.DataFrame:
     """
     This is the case for schema validation where the schema is permitted to not have to be in the
     same column order as the target table.
@@ -21089,9 +21101,7 @@ def _step_report_schema_any_order(
     header = header.format(title=title, details=details)
 
     # Create the header with `header` string
-    step_report = step_report.tab_header(title=md(header))
-
-    return step_report
+    return step_report.tab_header(title=md(header))
 
 
 def _create_label_text_html(

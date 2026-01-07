@@ -221,7 +221,7 @@ LOG_LEVELS_MAP = {"warning": 30, "error": 40, "critical": 50}
 CHECK_MARK_SPAN = "<span style='color: #4CA64C;'>&check;</span>"
 CROSS_MARK_SPAN = "<span style='color: #CF142B;'>&cross;</span>"
 
-SVG_ICONS_FOR_ASSERTION_TYPES = {
+SVG_ICONS_FOR_ASSERTION_TYPES: dict[str, str] = {
     ## EQ Icons
     "col_vals_eq": """<?xml version="1.0" encoding="UTF-8"?>
 <svg width="67px" height="67px" viewBox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">

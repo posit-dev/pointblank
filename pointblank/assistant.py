@@ -3,7 +3,6 @@ from __future__ import annotations
 from typing import Any
 
 from importlib_resources import files
-from narwhals.typing import FrameT
 
 from pointblank._constants import MODEL_PROVIDERS
 from pointblank.datascan import DataScan
@@ -15,7 +14,7 @@ __all__ = [
 
 def assistant(
     model: str,
-    data: FrameT | Any | None = None,
+    data: Any = None,
     tbl_name: str | None = None,
     api_key: str | None = None,
     display: str | None = None,
@@ -295,7 +294,7 @@ def assistant(
     if provider == "anthropic":  # pragma: no cover
         # Check that the anthropic package is installed
         try:
-            import anthropic  # noqa
+            import anthropic  # noqa  # type: ignore[import-not-found]
         except ImportError:  # pragma: no cover
             raise ImportError(  # pragma: no cover
                 "The `anthropic` package is required to use the `DraftValidation` class with "

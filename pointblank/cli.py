@@ -2411,7 +2411,7 @@ def requirements():
 
 
 def _rich_print_missing_table_enhanced(
-    gt_table: Any, original_data: Any = None, missing_info: dict = None
+    gt_table: Any, original_data: Any = None, missing_info: dict | None = None
 ) -> None:
     """Convert a missing values GT table to Rich table with enhanced formatting and metadata.
 

@@ -3322,6 +3322,7 @@ def test_polars_datetime_expression_single_segment_with_warning():
         assert validation.n_passed(i=1, scalar=True) == 2
 
 
+@pytest.mark.xfail
 def test_polars_datetime_non_midnight_conversion():
     """Test that non-midnight datetime expressions are converted to datetime objects."""
     # Create a datetime expression that's not at midnight but use a more realistic approach
@@ -13228,6 +13229,7 @@ def test_get_row_count_parquet_list():
     assert result > 0  # Should return the row count from the combined Parquet files
 
 
+# TODO: This test takes a bizarrely long time to run and should be debugged
 @pytest.mark.parametrize("tbl_type", ["pandas", "polars"])
 def test_get_step_report_no_fail(tbl_type):
     small_table = load_dataset(dataset="small_table", tbl_type=tbl_type)

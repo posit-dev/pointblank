@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass
+from typing import Any
 
 import narwhals as nw
 from narwhals.typing import IntoDataFrame
@@ -228,11 +229,16 @@ class ColumnSelectorNarwhals(Column):
 
     exprs: nw.selectors.Selector
 
-    def resolve(self, table) -> list[str]:
+    def resolve(
+        self, columns: list[str] | None = None, table: IntoDataFrame | None = None
+    ) -> list[str]:
+        # Note: columns parameter is unused - Narwhals selectors need the actual table
+        if table is None:
+            raise ValueError("ColumnSelectorNarwhals requires a table for resolution")
         # Convert the native table to a Narwhals DataFrame
         dfn = nw.from_native(table)
         # Use the selector to select columns and return their names
-        selected_df = dfn.select(self.exprs.exprs)
+        selected_df = dfn.select(self.exprs.exprs)  # type: ignore[attr-defined]
         # Use `collect_schema()` for LazyFrame to avoid performance warnings
         if hasattr(selected_df, "collect_schema"):
             return list(selected_df.collect_schema().keys())
@@ -241,7 +247,7 @@ class ColumnSelectorNarwhals(Column):
 
 
 def col(
-    exprs: str | ColumnSelector | ColumnSelectorNarwhals,
+    exprs: str | ColumnSelector | ColumnSelectorNarwhals | nw.selectors.Selector,
 ) -> Column | ColumnLiteral | ColumnSelectorNarwhals:
     """
     Helper function for referencing a column in the input table.
@@ -1728,13 +1734,25 @@ class ColumnExpression:
     Supports operations like >, <, +, etc. for creating backend-agnostic validation expressions.
     """
 
-    def __init__(self, column_name=None, operation=None, left=None, right=None):
+    column_name: str | None
+    operation: str | None
+    left: ColumnExpression | None
+    right: ColumnExpression | str | int | float | None
+
+    def __init__(
+        self,
+        column_name: str | None = None,
+        operation: str | None = None,
+        left: ColumnExpression | None = None,
+        right: ColumnExpression | str | int | float | None = None,
+    ):
         self.column_name = column_name  # Name of the column (for leaf nodes)
         self.operation = operation  # Operation type (gt, lt, add, etc.)
         self.left = left  # Left operand (ColumnExpression or None for column reference)
         self.right = right  # Right operand (ColumnExpression, value, or None)
 
-    def to_polars_expr(self):
+    # TODO: This method would benefit from stronger typing
+    def to_polars_expr(self) -> Any:
         """Convert this expression to a Polars expression."""
         import polars as pl
 
@@ -1744,16 +1762,16 @@ class ColumnExpression:
 
         # Handle unary operations like is_null
         if self.operation == "is_null":
-            left_expr = self.left
+            left_expr: Any = self.left
             if isinstance(left_expr, ColumnExpression):
                 left_expr = left_expr.to_polars_expr()
-            return left_expr.is_null()
+            return left_expr.is_null()  # type: ignore[union-attr]
 
         if self.operation == "is_not_null":
             left_expr = self.left
             if isinstance(left_expr, ColumnExpression):
                 left_expr = left_expr.to_polars_expr()
-            return left_expr.is_not_null()
+            return left_expr.is_not_null()  # type: ignore[union-attr]
 
         # Handle nested expressions through recursive evaluation
         if self.operation is None:
@@ -1761,6 +1779,7 @@ class ColumnExpression:
             raise ValueError("Invalid expression state: No operation or column name")
 
         # Get the left operand
+        left_expr: Any
         if self.left is None and self.column_name is not None:
             # Column name as left operand
             left_expr = pl.col(self.column_name)  # pragma: no cover
@@ -1772,6 +1791,7 @@ class ColumnExpression:
             left_expr = self.left  # pragma: no cover
 
         # Get the right operand
+        right_expr: Any
         if isinstance(self.right, ColumnExpression):
             # Nested expression as right operand
             right_expr = self.right.to_polars_expr()  # pragma: no cover
@@ -1782,35 +1802,35 @@ class ColumnExpression:
             # Literal value as right operand
             right_expr = self.right  # pragma: no cover
 
-        # Apply the operation
+        # Apply the operation (type ignore needed due to dynamic expression types)
         if self.operation == "gt":
-            return left_expr > right_expr
+            return left_expr > right_expr  # type: ignore[operator]
         elif self.operation == "lt":
-            return left_expr < right_expr
+            return left_expr < right_expr  # type: ignore[operator]
         elif self.operation == "eq":
             return left_expr == right_expr
         elif self.operation == "ne":
             return left_expr != right_expr
         elif self.operation == "ge":
-            return left_expr >= right_expr
+            return left_expr >= right_expr  # type: ignore[operator]
         elif self.operation == "le":
-            return left_expr <= right_expr
+            return left_expr <= right_expr  # type: ignore[operator]
         elif self.operation == "add":
-            return left_expr + right_expr
+            return left_expr + right_expr  # type: ignore[operator]
         elif self.operation == "sub":
-            return left_expr - right_expr
+            return left_expr - right_expr  # type: ignore[operator]
         elif self.operation == "mul":
-            return left_expr * right_expr
+            return left_expr * right_expr  # type: ignore[operator]
         elif self.operation == "div":
-            return left_expr / right_expr
+            return left_expr / right_expr  # type: ignore[operator]
         elif self.operation == "and":
-            return left_expr & right_expr
+            return left_expr & right_expr  # type: ignore[operator]
         elif self.operation == "or":
-            return left_expr | right_expr
+            return left_expr | right_expr  # type: ignore[operator]
         else:
             raise ValueError(f"Unsupported operation: {self.operation}")
 
-    def to_pandas_expr(self, df):
+    def to_pandas_expr(self, df: Any) -> Any:
         """Convert this expression to a Pandas Series of booleans."""
 
         # Handle is_null as a special case - but raise an error
@@ -1833,43 +1853,43 @@ class ColumnExpression:
             return df[self.column_name]
 
         # For other operations, recursively process operands
-        left_expr = self.left
+        left_expr: Any = self.left
         if isinstance(left_expr, ColumnExpression):
             left_expr = left_expr.to_pandas_expr(df)
         elif isinstance(left_expr, str) and left_expr in df.columns:  # pragma: no cover
             left_expr = df[left_expr]
 
-        right_expr = self.right
+        right_expr: Any = self.right
         if isinstance(right_expr, ColumnExpression):
             right_expr = right_expr.to_pandas_expr(df)
         elif isinstance(right_expr, str) and right_expr in df.columns:  # pragma: no cover
             right_expr = df[right_expr]
 
-        # Apply the operation
+        # Apply the operation (type ignore needed due to dynamic expression types)
         if self.operation == "gt":
-            return left_expr > right_expr
+            return left_expr > right_expr  # type: ignore[operator]
         elif self.operation == "lt":
-            return left_expr < right_expr
+            return left_expr < right_expr  # type: ignore[operator]
         elif self.operation == "eq":
             return left_expr == right_expr
         elif self.operation == "ne":
             return left_expr != right_expr
         elif self.operation == "ge":
-            return left_expr >= right_expr
+            return left_expr >= right_expr  # type: ignore[operator]
         elif self.operation == "le":
-            return left_expr <= right_expr
+            return left_expr <= right_expr  # type: ignore[operator]
         elif self.operation == "add":
-            return left_expr + right_expr
+            return left_expr + right_expr  # type: ignore[operator]
         elif self.operation == "sub":
-            return left_expr - right_expr
+            return left_expr - right_expr  # type: ignore[operator]
         elif self.operation == "mul":
-            return left_expr * right_expr
+            return left_expr * right_expr  # type: ignore[operator]
         elif self.operation == "div":
-            return left_expr / right_expr
+            return left_expr / right_expr  # type: ignore[operator]
         else:
             raise ValueError(f"Unsupported operation: {self.operation}")
 
-    def to_ibis_expr(self, table):
+    def to_ibis_expr(self, table: Any) -> Any:
         """Convert this expression to an Ibis expression."""
 
         # Base case: simple column reference
@@ -1878,16 +1898,16 @@ class ColumnExpression:
 
         # Handle unary operations
         if self.operation == "is_null":
-            left_expr = self.left
+            left_expr: Any = self.left
             if isinstance(left_expr, ColumnExpression):
                 left_expr = left_expr.to_ibis_expr(table)
-            return left_expr.isnull()
+            return left_expr.isnull()  # type: ignore[union-attr]
 
         if self.operation == "is_not_null":
             left_expr = self.left
             if isinstance(left_expr, ColumnExpression):
                 left_expr = left_expr.to_ibis_expr(table)
-            return ~left_expr.isnull()
+            return ~left_expr.isnull()  # type: ignore[union-attr,operator]
 
         # Handle nested expressions through recursive evaluation
         if self.operation is None:
@@ -1895,6 +1915,7 @@ class ColumnExpression:
             raise ValueError("Invalid expression state: No operation or column name")
 
         # Get the left operand
+        left_expr: Any
         if self.left is None and self.column_name is not None:
             # Column name as left operand
             left_expr = table[self.column_name]  # pragma: no cover
@@ -1906,6 +1927,7 @@ class ColumnExpression:
             left_expr = self.left  # pragma: no cover
 
         # Get the right operand
+        right_expr: Any
         if isinstance(self.right, ColumnExpression):
             # Nested expression as right operand
             right_expr = self.right.to_ibis_expr(table)  # pragma: no cover
@@ -1916,31 +1938,31 @@ class ColumnExpression:
             # Literal value as right operand
             right_expr = self.right  # pragma: no cover
 
-        # Apply the operation
+        # Apply the operation (type ignore needed due to dynamic expression types)
         if self.operation == "gt":
-            return left_expr > right_expr
+            return left_expr > right_expr  # type: ignore[operator]
         elif self.operation == "lt":
-            return left_expr < right_expr
+            return left_expr < right_expr  # type: ignore[operator]
         elif self.operation == "eq":
             return left_expr == right_expr
         elif self.operation == "ne":
             return left_expr != right_expr
         elif self.operation == "ge":
-            return left_expr >= right_expr
+            return left_expr >= right_expr  # type: ignore[operator]
         elif self.operation == "le":
-            return left_expr <= right_expr
+            return left_expr <= right_expr  # type: ignore[operator]
         elif self.operation == "add":
-            return left_expr + right_expr
+            return left_expr + right_expr  # type: ignore[operator]
         elif self.operation == "sub":
-            return left_expr - right_expr
+            return left_expr - right_expr  # type: ignore[operator]
         elif self.operation == "mul":
-            return left_expr * right_expr
+            return left_expr * right_expr  # type: ignore[operator]
         elif self.operation == "div":
-            return left_expr / right_expr
+            return left_expr / right_expr  # type: ignore[operator]
         elif self.operation == "and":
-            return left_expr & right_expr
+            return left_expr & right_expr  # type: ignore[operator]
         elif self.operation == "or":
-            return left_expr | right_expr
+            return left_expr | right_expr  # type: ignore[operator]
         else:
             raise ValueError(f"Unsupported operation: {self.operation}")
 
