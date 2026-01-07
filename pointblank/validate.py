@@ -21467,13 +21467,13 @@ def make_agg_validator(name: str):
     def agg_validator(
         self: Validate,
         columns: str | Collection[str],
-        value=None,
-        tol=0,
-        thresholds=None,
-        brief=False,
-        actions=None,
-        active=True,
-    ):
+        value: float | int | Column | ReferenceColumn | None = None,
+        tol: float = 0,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
+        brief: str | bool | None = None,
+        actions: Actions | None = None,
+        active: bool = True,
+    ) -> Validate:
         # Dynamically generated aggregate validator.
         # This method is generated per assertion type and forwards all arguments
         # to the shared aggregate validation implementation.
