@@ -11,7 +11,7 @@ failure thresholds (using the `Thresholds` class or through shorthands for this 
 `Validate` class has numerous methods for defining validation steps and for obtaining
 post-interrogation metrics and data.
 
-Validate(data: 'FrameT | Any', tbl_name: 'str | None' = None, label: 'str | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, final_actions: 'FinalActions | None' = None, brief: 'str | bool | None' = None, lang: 'str | None' = None, locale: 'str | None' = None) -> None
+Validate(data: 'IntoDataFrame', reference: 'IntoFrame | None' = None, tbl_name: 'str | None' = None, label: 'str | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, final_actions: 'FinalActions | None' = None, brief: 'str | bool | None' = None, lang: 'str | None' = None, locale: 'str | None' = None) -> None
 
     Workflow for defining a set of validations on a table and interrogating for results.
 
@@ -916,7 +916,7 @@ FinalActions(*args)
     used to retrieve the summary of the validation results.
     
 
-Schema(columns: 'str | list[str] | list[tuple[str, str]] | list[tuple[str]] | dict[str, str] | None' = None, tbl: 'any | None' = None, **kwargs)
+Schema(columns: 'str | list[str] | list[tuple[str, str]] | list[tuple[str]] | dict[str, str] | None' = None, tbl: 'Any | None' = None, **kwargs)
 Definition of a schema object.
 
     The schema object defines the structure of a table. Once it is defined, the object can be used
@@ -1167,7 +1167,7 @@ Definition of a schema object.
     `Schema` object is used in a validation workflow.
     
 
-DraftValidation(data: 'FrameT | Any', model: 'str', api_key: 'str | None' = None, verify_ssl: 'bool' = True) -> None
+DraftValidation(data: 'Any', model: 'str', api_key: 'str | None' = None, verify_ssl: 'bool' = True) -> None
 
     Draft a validation plan for a given table using an LLM.
 
@@ -1382,7 +1382,7 @@ Validation steps can be thought of as sequential validations on the target
 data. We call `Validate`'s validation methods to build up a validation plan: a collection of steps
 that, in the aggregate, provides good validation coverage.
 
-col_vals_gt(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', value: 'float | int | Column', na_pass: 'bool' = False, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
+col_vals_gt(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', value: 'float | int | Column', na_pass: 'bool' = False, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
 
         Are column data greater than a fixed value or data in another column?
 
@@ -1607,7 +1607,7 @@ col_vals_gt(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSe
         - Row 3: `c` is `2` and `b` is `2`.
         
 
-col_vals_lt(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', value: 'float | int | Column', na_pass: 'bool' = False, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
+col_vals_lt(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', value: 'float | int | Column', na_pass: 'bool' = False, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
 
         Are column data less than a fixed value or data in another column?
 
@@ -1832,7 +1832,7 @@ col_vals_lt(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSe
         - Row 2: `b` is `1` and `c` is `1`.
         
 
-col_vals_ge(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', value: 'float | int | Column', na_pass: 'bool' = False, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
+col_vals_ge(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', value: 'float | int | Column', na_pass: 'bool' = False, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
 
         Are column data greater than or equal to a fixed value or data in another column?
 
@@ -2057,7 +2057,7 @@ col_vals_ge(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSe
         - Row 4: `b` is `3` and `c` is `4`.
         
 
-col_vals_le(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', value: 'float | int | Column', na_pass: 'bool' = False, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
+col_vals_le(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', value: 'float | int | Column', na_pass: 'bool' = False, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
 
         Are column data less than or equal to a fixed value or data in another column?
 
@@ -2282,7 +2282,7 @@ col_vals_le(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSe
         - Row 4: `c` is `3` and `b` is `2`.
         
 
-col_vals_eq(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', value: 'float | int | Column', na_pass: 'bool' = False, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
+col_vals_eq(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', value: 'float | int | Column', na_pass: 'bool' = False, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
 
         Are column data equal to a fixed value or data in another column?
 
@@ -2505,7 +2505,7 @@ col_vals_eq(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSe
         - Row 5: `a` is `5` and `b` is `4`.
         
 
-col_vals_ne(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', value: 'float | int | Column', na_pass: 'bool' = False, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
+col_vals_ne(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', value: 'float | int | Column', na_pass: 'bool' = False, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
 
         Are column data not equal to a fixed value or data in another column?
 
@@ -2726,7 +2726,7 @@ col_vals_ne(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSe
         0 and 4, where `a` is `5` and `b` is `5` in both cases (i.e., they are equal to each other).
         
 
-col_vals_between(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', left: 'float | int | Column', right: 'float | int | Column', inclusive: 'tuple[bool, bool]' = (True, True), na_pass: 'bool' = False, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
+col_vals_between(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', left: 'float | int | Column', right: 'float | int | Column', inclusive: 'tuple[bool, bool]' = (True, True), na_pass: 'bool' = False, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
 
         Do column data lie between two specified values or data in other columns?
 
@@ -2971,7 +2971,7 @@ col_vals_between(self, columns: 'str | list[str] | Column | ColumnSelector | Col
         - Row 4: `b` is `8` but the bounds are `3` (`a`) and `7` (`c`).
         
 
-col_vals_outside(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', left: 'float | int | Column', right: 'float | int | Column', inclusive: 'tuple[bool, bool]' = (True, True), na_pass: 'bool' = False, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
+col_vals_outside(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', left: 'float | int | Column', right: 'float | int | Column', inclusive: 'tuple[bool, bool]' = (True, True), na_pass: 'bool' = False, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
 
         Do column data lie outside of two specified values or data in other columns?
 
@@ -3216,7 +3216,7 @@ col_vals_outside(self, columns: 'str | list[str] | Column | ColumnSelector | Col
         - Row 5: `b` is `6` and the bounds are `5` (`a`) and `7` (`c`).
         
 
-col_vals_in_set(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', set: 'Collection[Any]', pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
+col_vals_in_set(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', set: 'Collection[Any]', pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
 
         Validate whether column values are in a set of values.
 
@@ -3463,7 +3463,7 @@ col_vals_in_set(self, columns: 'str | list[str] | Column | ColumnSelector | Colu
         specified set.
         
 
-col_vals_not_in_set(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', set: 'Collection[Any]', pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
+col_vals_not_in_set(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', set: 'Collection[Any]', pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
 
         Validate whether column values are not in a set of values.
 
@@ -3687,7 +3687,7 @@ col_vals_not_in_set(self, columns: 'str | list[str] | Column | ColumnSelector | 
         statuses in the `InvalidStatus` enum.
         
 
-col_vals_increasing(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', allow_stationary: 'bool' = False, decreasing_tol: 'float | None' = None, na_pass: 'bool' = False, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
+col_vals_increasing(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', allow_stationary: 'bool' = False, decreasing_tol: 'float | None' = None, na_pass: 'bool' = False, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
 
         Are column data increasing by row?
 
@@ -3815,7 +3815,7 @@ col_vals_increasing(self, columns: 'str | list[str] | Column | ColumnSelector | 
         ```
         
 
-col_vals_decreasing(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', allow_stationary: 'bool' = False, increasing_tol: 'float | None' = None, na_pass: 'bool' = False, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
+col_vals_decreasing(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', allow_stationary: 'bool' = False, increasing_tol: 'float | None' = None, na_pass: 'bool' = False, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
 
         Are column data decreasing by row?
 
@@ -3943,7 +3943,7 @@ col_vals_decreasing(self, columns: 'str | list[str] | Column | ColumnSelector | 
         ```
         
 
-col_vals_null(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
+col_vals_null(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
 
         Validate whether values in a column are Null.
 
@@ -4129,7 +4129,7 @@ col_vals_null(self, columns: 'str | list[str] | Column | ColumnSelector | Column
         two non-Null values in column `b`.
         
 
-col_vals_not_null(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
+col_vals_not_null(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
 
         Validate whether values in a column are not Null.
 
@@ -4315,7 +4315,7 @@ col_vals_not_null(self, columns: 'str | list[str] | Column | ColumnSelector | Co
         two Null values in column `b`.
         
 
-col_vals_regex(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', pattern: 'str', na_pass: 'bool' = False, inverse: 'bool' = False, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
+col_vals_regex(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', pattern: 'str', na_pass: 'bool' = False, inverse: 'bool' = False, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
 
         Validate whether column values match a regular expression pattern.
 
@@ -4511,7 +4511,7 @@ col_vals_regex(self, columns: 'str | list[str] | Column | ColumnSelector | Colum
         string values of rows 1 and 2 in column `b`.
         
 
-col_vals_within_spec(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', spec: 'str', na_pass: 'bool' = False, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
+col_vals_within_spec(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', spec: 'str', na_pass: 'bool' = False, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
 
         Validate whether column values fit within a specification.
 
@@ -4729,7 +4729,7 @@ col_vals_within_spec(self, columns: 'str | list[str] | Column | ColumnSelector |
         The validation table shows that one test unit failed (the invalid email address in row 3).
         
 
-col_vals_expr(self, expr: 'any', pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
+col_vals_expr(self, expr: 'Any', pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
 
         Validate column values using a custom expression.
 
@@ -4900,7 +4900,2653 @@ col_vals_expr(self, expr: 'any', pre: 'Callable | None' = None, segments: 'Segme
         by using `col_vals_expr()`. All test units passed, with no failing test units.
         
 
-rows_distinct(self, columns_subset: 'str | list[str] | None' = None, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
+col_sum_gt(self: 'Validate', columns: 'str | Collection[str]', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool' = True) -> 'Validate'
+Does the column sum satisfy a greater than comparison?
+
+    The `col_sum_gt()` validation method checks whether the sum of values in a column
+    is greater than a specified `value=`. This is an aggregation-based validation where the entire
+    column is reduced to a single sum value that is then compared against the target. The
+    comparison used in this function is `sum(column) > value`.
+
+    Unlike row-level validations (e.g., `col_vals_gt()`), this method treats the entire column as
+    a single test unit. The validation either passes completely (if the aggregated value satisfies
+    the comparison) or fails completely.
+
+    Parameters
+    ----------
+    columns
+        A single column or a list of columns to validate. If multiple columns are supplied,
+        there will be a separate validation step generated for each column. The columns must
+        contain numeric data for the sum to be computed.
+    value
+        The value to compare the column sum against. This can be: (1) a numeric literal
+        (`int` or `float`), (2) a [`col()`](`pointblank.col`) object referencing another column
+        whose sum will be used for comparison, (3) a [`ref()`](`pointblank.ref`) object
+        referencing a column in reference data (when `Validate(reference=)` has been set), or (4)
+        `None` to automatically compare against the same column in reference data (shorthand for
+        `ref(column_name)` when reference data is set).
+    tol
+        A tolerance value for the comparison. The default is `0`, meaning exact comparison. When
+        set to a positive value, the comparison becomes more lenient. For example, with `tol=0.5`,
+        a sum that differs from the target by up to `0.5` will still pass. The `tol=` parameter expands the acceptable range for the comparison. For
+        `col_sum_gt()`, a tolerance of `tol=0.5` would mean the sum can be within `0.5` of the
+        target value and still pass validation.
+    thresholds
+        Failure threshold levels so that the validation step can react accordingly when
+        failing test units are level. Since this is an aggregation-based validation with only
+        one test unit, threshold values typically should be set as absolute counts (e.g., `1`) to
+        indicate pass/fail, or as proportions where any value less than `1.0` means failure is
+        acceptable.
+    brief
+        An optional brief description of the validation step that will be displayed in the
+        reporting table. You can use the templating elements like `"{step}"` to insert
+        the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+        the entire brief will be automatically generated. If `None` (the default) then there
+        won't be a brief.
+    actions
+        Optional actions to take when the validation step meets or exceeds any set threshold
+        levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
+        define the actions.
+    active
+        A boolean value indicating whether the validation step should be active. Using `False`
+        will make the validation step inactive (still reporting its presence and keeping indexes
+        for the steps unchanged).
+
+    Returns
+    -------
+    Validate
+        The `Validate` object with the added validation step.
+
+    Using Reference Data
+    --------------------
+    The `col_sum_gt()` method supports comparing column aggregations against reference data. This
+    is useful for validating that statistical properties remain consistent across different
+    versions of a dataset, or for comparing current data against historical baselines.
+
+    To use reference data, set the `reference=` parameter when creating the `Validate` object:
+
+    ```python
+    validation = (
+        pb.Validate(data=current_data, reference=baseline_data)
+        .col_sum_gt(columns="revenue")  # Compares sum(current.revenue) vs sum(baseline.revenue)
+        .interrogate()
+    )
+    ```
+
+    When `value=None` and reference data is set, the method automatically compares against the
+    same column in the reference data. You can also explicitly specify reference columns using
+    the `ref()` helper:
+
+    ```python
+    .col_sum_gt(columns="revenue", value=pb.ref("baseline_revenue"))
+    ```
+
+    Understanding Tolerance
+    -----------------------
+    The `tol=` parameter allows for fuzzy comparisons, which is especially important for
+    floating-point aggregations where exact equality is often unreliable.
+
+    The `tol=` parameter expands the acceptable range for the comparison. For
+        `col_sum_gt()`, a tolerance of `tol=0.5` would mean the sum can be within `0.5` of the
+        target value and still pass validation.
+
+    For equality comparisons (`col_*_eq`), the tolerance creates a range `[value - tol, value + tol]`
+    within which the aggregation is considered valid. For inequality comparisons, the tolerance
+    shifts the comparison boundary.
+
+    Thresholds
+    ----------
+    The `thresholds=` parameter is used to set the failure-condition levels for the validation
+    step. If they are set here at the step level, these thresholds will override any thresholds
+    set at the global level in `Validate(thresholds=...)`.
+
+    There are three threshold levels: 'warning', 'error', and 'critical'. Since aggregation
+    validations operate on a single test unit (the aggregated value), threshold values are
+    typically set as absolute counts:
+
+    - `thresholds=1` means any failure triggers a 'warning'
+    - `thresholds=(1, 1, 1)` means any failure triggers all three levels
+
+    Thresholds can be defined using one of these input schemes:
+
+    1. use the [`Thresholds`](`pointblank.Thresholds`) class (the most direct way to create
+    thresholds)
+    2. provide a tuple of 1-3 values, where position `0` is the 'warning' level, position `1` is
+    the 'error' level, and position `2` is the 'critical' level
+    3. create a dictionary of 1-3 value entries; the valid keys: are 'warning', 'error', and
+    'critical'
+    4. a single integer/float value denoting absolute number or fraction of failing test units
+    for the 'warning' level only
+
+    Examples
+    --------
+    For the examples, we'll use a simple Polars DataFrame with numeric columns. The table is
+    shown below:
+
+    ```python
+    import pointblank as pb
+    import polars as pl
+
+    tbl = pl.DataFrame(
+        {
+            "a": [1, 2, 3, 4, 5],
+            "b": [2, 2, 2, 2, 2],
+        }
+    )
+
+    pb.preview(tbl)
+    ```
+
+    Let's validate that the sum of column `a` is greater than `15`:
+
+    ```python
+    validation = (
+        pb.Validate(data=tbl)
+        .col_sum_gt(columns="a", value=15)
+        .interrogate()
+    )
+
+    validation
+    ```
+
+    The validation result shows whether the sum comparison passed or failed. Since this
+    is an aggregation-based validation, there is exactly one test unit per column.
+
+    When validating multiple columns, each column gets its own validation step:
+
+    ```python
+    validation = (
+        pb.Validate(data=tbl)
+        .col_sum_gt(columns=["a", "b"], value=15)
+        .interrogate()
+    )
+
+    validation
+    ```
+
+    Using tolerance for flexible comparisons:
+
+    ```python
+    validation = (
+        pb.Validate(data=tbl)
+        .col_sum_gt(columns="a", value=15, tol=1.0)
+        .interrogate()
+    )
+
+    validation
+    ```
+
+col_sum_lt(self: 'Validate', columns: 'str | Collection[str]', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool' = True) -> 'Validate'
+Does the column sum satisfy a less than comparison?
+
+    The `col_sum_lt()` validation method checks whether the sum of values in a column
+    is less than a specified `value=`. This is an aggregation-based validation where the entire
+    column is reduced to a single sum value that is then compared against the target. The
+    comparison used in this function is `sum(column) < value`.
+
+    Unlike row-level validations (e.g., `col_vals_gt()`), this method treats the entire column as
+    a single test unit. The validation either passes completely (if the aggregated value satisfies
+    the comparison) or fails completely.
+
+    Parameters
+    ----------
+    columns
+        A single column or a list of columns to validate. If multiple columns are supplied,
+        there will be a separate validation step generated for each column. The columns must
+        contain numeric data for the sum to be computed.
+    value
+        The value to compare the column sum against. This can be: (1) a numeric literal
+        (`int` or `float`), (2) a [`col()`](`pointblank.col`) object referencing another column
+        whose sum will be used for comparison, (3) a [`ref()`](`pointblank.ref`) object
+        referencing a column in reference data (when `Validate(reference=)` has been set), or (4)
+        `None` to automatically compare against the same column in reference data (shorthand for
+        `ref(column_name)` when reference data is set).
+    tol
+        A tolerance value for the comparison. The default is `0`, meaning exact comparison. When
+        set to a positive value, the comparison becomes more lenient. For example, with `tol=0.5`,
+        a sum that differs from the target by up to `0.5` will still pass. The `tol=` parameter expands the acceptable range for the comparison. For
+        `col_sum_lt()`, a tolerance of `tol=0.5` would mean the sum can be within `0.5` of the
+        target value and still pass validation.
+    thresholds
+        Failure threshold levels so that the validation step can react accordingly when
+        failing test units are level. Since this is an aggregation-based validation with only
+        one test unit, threshold values typically should be set as absolute counts (e.g., `1`) to
+        indicate pass/fail, or as proportions where any value less than `1.0` means failure is
+        acceptable.
+    brief
+        An optional brief description of the validation step that will be displayed in the
+        reporting table. You can use the templating elements like `"{step}"` to insert
+        the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+        the entire brief will be automatically generated. If `None` (the default) then there
+        won't be a brief.
+    actions
+        Optional actions to take when the validation step meets or exceeds any set threshold
+        levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
+        define the actions.
+    active
+        A boolean value indicating whether the validation step should be active. Using `False`
+        will make the validation step inactive (still reporting its presence and keeping indexes
+        for the steps unchanged).
+
+    Returns
+    -------
+    Validate
+        The `Validate` object with the added validation step.
+
+    Using Reference Data
+    --------------------
+    The `col_sum_lt()` method supports comparing column aggregations against reference data. This
+    is useful for validating that statistical properties remain consistent across different
+    versions of a dataset, or for comparing current data against historical baselines.
+
+    To use reference data, set the `reference=` parameter when creating the `Validate` object:
+
+    ```python
+    validation = (
+        pb.Validate(data=current_data, reference=baseline_data)
+        .col_sum_lt(columns="revenue")  # Compares sum(current.revenue) vs sum(baseline.revenue)
+        .interrogate()
+    )
+    ```
+
+    When `value=None` and reference data is set, the method automatically compares against the
+    same column in the reference data. You can also explicitly specify reference columns using
+    the `ref()` helper:
+
+    ```python
+    .col_sum_lt(columns="revenue", value=pb.ref("baseline_revenue"))
+    ```
+
+    Understanding Tolerance
+    -----------------------
+    The `tol=` parameter allows for fuzzy comparisons, which is especially important for
+    floating-point aggregations where exact equality is often unreliable.
+
+    The `tol=` parameter expands the acceptable range for the comparison. For
+        `col_sum_lt()`, a tolerance of `tol=0.5` would mean the sum can be within `0.5` of the
+        target value and still pass validation.
+
+    For equality comparisons (`col_*_eq`), the tolerance creates a range `[value - tol, value + tol]`
+    within which the aggregation is considered valid. For inequality comparisons, the tolerance
+    shifts the comparison boundary.
+
+    Thresholds
+    ----------
+    The `thresholds=` parameter is used to set the failure-condition levels for the validation
+    step. If they are set here at the step level, these thresholds will override any thresholds
+    set at the global level in `Validate(thresholds=...)`.
+
+    There are three threshold levels: 'warning', 'error', and 'critical'. Since aggregation
+    validations operate on a single test unit (the aggregated value), threshold values are
+    typically set as absolute counts:
+
+    - `thresholds=1` means any failure triggers a 'warning'
+    - `thresholds=(1, 1, 1)` means any failure triggers all three levels
+
+    Thresholds can be defined using one of these input schemes:
+
+    1. use the [`Thresholds`](`pointblank.Thresholds`) class (the most direct way to create
+    thresholds)
+    2. provide a tuple of 1-3 values, where position `0` is the 'warning' level, position `1` is
+    the 'error' level, and position `2` is the 'critical' level
+    3. create a dictionary of 1-3 value entries; the valid keys: are 'warning', 'error', and
+    'critical'
+    4. a single integer/float value denoting absolute number or fraction of failing test units
+    for the 'warning' level only
+
+    Examples
+    --------
+    For the examples, we'll use a simple Polars DataFrame with numeric columns. The table is
+    shown below:
+
+    ```python
+    import pointblank as pb
+    import polars as pl
+
+    tbl = pl.DataFrame(
+        {
+            "a": [1, 2, 3, 4, 5],
+            "b": [2, 2, 2, 2, 2],
+        }
+    )
+
+    pb.preview(tbl)
+    ```
+
+    Let's validate that the sum of column `a` is less than `15`:
+
+    ```python
+    validation = (
+        pb.Validate(data=tbl)
+        .col_sum_lt(columns="a", value=15)
+        .interrogate()
+    )
+
+    validation
+    ```
+
+    The validation result shows whether the sum comparison passed or failed. Since this
+    is an aggregation-based validation, there is exactly one test unit per column.
+
+    When validating multiple columns, each column gets its own validation step:
+
+    ```python
+    validation = (
+        pb.Validate(data=tbl)
+        .col_sum_lt(columns=["a", "b"], value=15)
+        .interrogate()
+    )
+
+    validation
+    ```
+
+    Using tolerance for flexible comparisons:
+
+    ```python
+    validation = (
+        pb.Validate(data=tbl)
+        .col_sum_lt(columns="a", value=15, tol=1.0)
+        .interrogate()
+    )
+
+    validation
+    ```
+
+col_sum_ge(self: 'Validate', columns: 'str | Collection[str]', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool' = True) -> 'Validate'
+Does the column sum satisfy a greater than or equal to comparison?
+
+    The `col_sum_ge()` validation method checks whether the sum of values in a column
+    is at least a specified `value=`. This is an aggregation-based validation where the entire
+    column is reduced to a single sum value that is then compared against the target. The
+    comparison used in this function is `sum(column) >= value`.
+
+    Unlike row-level validations (e.g., `col_vals_gt()`), this method treats the entire column as
+    a single test unit. The validation either passes completely (if the aggregated value satisfies
+    the comparison) or fails completely.
+
+    Parameters
+    ----------
+    columns
+        A single column or a list of columns to validate. If multiple columns are supplied,
+        there will be a separate validation step generated for each column. The columns must
+        contain numeric data for the sum to be computed.
+    value
+        The value to compare the column sum against. This can be: (1) a numeric literal
+        (`int` or `float`), (2) a [`col()`](`pointblank.col`) object referencing another column
+        whose sum will be used for comparison, (3) a [`ref()`](`pointblank.ref`) object
+        referencing a column in reference data (when `Validate(reference=)` has been set), or (4)
+        `None` to automatically compare against the same column in reference data (shorthand for
+        `ref(column_name)` when reference data is set).
+    tol
+        A tolerance value for the comparison. The default is `0`, meaning exact comparison. When
+        set to a positive value, the comparison becomes more lenient. For example, with `tol=0.5`,
+        a sum that differs from the target by up to `0.5` will still pass. The `tol=` parameter expands the acceptable range for the comparison. For
+        `col_sum_ge()`, a tolerance of `tol=0.5` would mean the sum can be within `0.5` of the
+        target value and still pass validation.
+    thresholds
+        Failure threshold levels so that the validation step can react accordingly when
+        failing test units are level. Since this is an aggregation-based validation with only
+        one test unit, threshold values typically should be set as absolute counts (e.g., `1`) to
+        indicate pass/fail, or as proportions where any value less than `1.0` means failure is
+        acceptable.
+    brief
+        An optional brief description of the validation step that will be displayed in the
+        reporting table. You can use the templating elements like `"{step}"` to insert
+        the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+        the entire brief will be automatically generated. If `None` (the default) then there
+        won't be a brief.
+    actions
+        Optional actions to take when the validation step meets or exceeds any set threshold
+        levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
+        define the actions.
+    active
+        A boolean value indicating whether the validation step should be active. Using `False`
+        will make the validation step inactive (still reporting its presence and keeping indexes
+        for the steps unchanged).
+
+    Returns
+    -------
+    Validate
+        The `Validate` object with the added validation step.
+
+    Using Reference Data
+    --------------------
+    The `col_sum_ge()` method supports comparing column aggregations against reference data. This
+    is useful for validating that statistical properties remain consistent across different
+    versions of a dataset, or for comparing current data against historical baselines.
+
+    To use reference data, set the `reference=` parameter when creating the `Validate` object:
+
+    ```python
+    validation = (
+        pb.Validate(data=current_data, reference=baseline_data)
+        .col_sum_ge(columns="revenue")  # Compares sum(current.revenue) vs sum(baseline.revenue)
+        .interrogate()
+    )
+    ```
+
+    When `value=None` and reference data is set, the method automatically compares against the
+    same column in the reference data. You can also explicitly specify reference columns using
+    the `ref()` helper:
+
+    ```python
+    .col_sum_ge(columns="revenue", value=pb.ref("baseline_revenue"))
+    ```
+
+    Understanding Tolerance
+    -----------------------
+    The `tol=` parameter allows for fuzzy comparisons, which is especially important for
+    floating-point aggregations where exact equality is often unreliable.
+
+    The `tol=` parameter expands the acceptable range for the comparison. For
+        `col_sum_ge()`, a tolerance of `tol=0.5` would mean the sum can be within `0.5` of the
+        target value and still pass validation.
+
+    For equality comparisons (`col_*_eq`), the tolerance creates a range `[value - tol, value + tol]`
+    within which the aggregation is considered valid. For inequality comparisons, the tolerance
+    shifts the comparison boundary.
+
+    Thresholds
+    ----------
+    The `thresholds=` parameter is used to set the failure-condition levels for the validation
+    step. If they are set here at the step level, these thresholds will override any thresholds
+    set at the global level in `Validate(thresholds=...)`.
+
+    There are three threshold levels: 'warning', 'error', and 'critical'. Since aggregation
+    validations operate on a single test unit (the aggregated value), threshold values are
+    typically set as absolute counts:
+
+    - `thresholds=1` means any failure triggers a 'warning'
+    - `thresholds=(1, 1, 1)` means any failure triggers all three levels
+
+    Thresholds can be defined using one of these input schemes:
+
+    1. use the [`Thresholds`](`pointblank.Thresholds`) class (the most direct way to create
+    thresholds)
+    2. provide a tuple of 1-3 values, where position `0` is the 'warning' level, position `1` is
+    the 'error' level, and position `2` is the 'critical' level
+    3. create a dictionary of 1-3 value entries; the valid keys: are 'warning', 'error', and
+    'critical'
+    4. a single integer/float value denoting absolute number or fraction of failing test units
+    for the 'warning' level only
+
+    Examples
+    --------
+    For the examples, we'll use a simple Polars DataFrame with numeric columns. The table is
+    shown below:
+
+    ```python
+    import pointblank as pb
+    import polars as pl
+
+    tbl = pl.DataFrame(
+        {
+            "a": [1, 2, 3, 4, 5],
+            "b": [2, 2, 2, 2, 2],
+        }
+    )
+
+    pb.preview(tbl)
+    ```
+
+    Let's validate that the sum of column `a` is at least `15`:
+
+    ```python
+    validation = (
+        pb.Validate(data=tbl)
+        .col_sum_ge(columns="a", value=15)
+        .interrogate()
+    )
+
+    validation
+    ```
+
+    The validation result shows whether the sum comparison passed or failed. Since this
+    is an aggregation-based validation, there is exactly one test unit per column.
+
+    When validating multiple columns, each column gets its own validation step:
+
+    ```python
+    validation = (
+        pb.Validate(data=tbl)
+        .col_sum_ge(columns=["a", "b"], value=15)
+        .interrogate()
+    )
+
+    validation
+    ```
+
+    Using tolerance for flexible comparisons:
+
+    ```python
+    validation = (
+        pb.Validate(data=tbl)
+        .col_sum_ge(columns="a", value=15, tol=1.0)
+        .interrogate()
+    )
+
+    validation
+    ```
+
+col_sum_le(self: 'Validate', columns: 'str | Collection[str]', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool' = True) -> 'Validate'
+Does the column sum satisfy a less than or equal to comparison?
+
+    The `col_sum_le()` validation method checks whether the sum of values in a column
+    is at most a specified `value=`. This is an aggregation-based validation where the entire
+    column is reduced to a single sum value that is then compared against the target. The
+    comparison used in this function is `sum(column) <= value`.
+
+    Unlike row-level validations (e.g., `col_vals_gt()`), this method treats the entire column as
+    a single test unit. The validation either passes completely (if the aggregated value satisfies
+    the comparison) or fails completely.
+
+    Parameters
+    ----------
+    columns
+        A single column or a list of columns to validate. If multiple columns are supplied,
+        there will be a separate validation step generated for each column. The columns must
+        contain numeric data for the sum to be computed.
+    value
+        The value to compare the column sum against. This can be: (1) a numeric literal
+        (`int` or `float`), (2) a [`col()`](`pointblank.col`) object referencing another column
+        whose sum will be used for comparison, (3) a [`ref()`](`pointblank.ref`) object
+        referencing a column in reference data (when `Validate(reference=)` has been set), or (4)
+        `None` to automatically compare against the same column in reference data (shorthand for
+        `ref(column_name)` when reference data is set).
+    tol
+        A tolerance value for the comparison. The default is `0`, meaning exact comparison. When
+        set to a positive value, the comparison becomes more lenient. For example, with `tol=0.5`,
+        a sum that differs from the target by up to `0.5` will still pass. The `tol=` parameter expands the acceptable range for the comparison. For
+        `col_sum_le()`, a tolerance of `tol=0.5` would mean the sum can be within `0.5` of the
+        target value and still pass validation.
+    thresholds
+        Failure threshold levels so that the validation step can react accordingly when
+        failing test units are level. Since this is an aggregation-based validation with only
+        one test unit, threshold values typically should be set as absolute counts (e.g., `1`) to
+        indicate pass/fail, or as proportions where any value less than `1.0` means failure is
+        acceptable.
+    brief
+        An optional brief description of the validation step that will be displayed in the
+        reporting table. You can use the templating elements like `"{step}"` to insert
+        the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+        the entire brief will be automatically generated. If `None` (the default) then there
+        won't be a brief.
+    actions
+        Optional actions to take when the validation step meets or exceeds any set threshold
+        levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
+        define the actions.
+    active
+        A boolean value indicating whether the validation step should be active. Using `False`
+        will make the validation step inactive (still reporting its presence and keeping indexes
+        for the steps unchanged).
+
+    Returns
+    -------
+    Validate
+        The `Validate` object with the added validation step.
+
+    Using Reference Data
+    --------------------
+    The `col_sum_le()` method supports comparing column aggregations against reference data. This
+    is useful for validating that statistical properties remain consistent across different
+    versions of a dataset, or for comparing current data against historical baselines.
+
+    To use reference data, set the `reference=` parameter when creating the `Validate` object:
+
+    ```python
+    validation = (
+        pb.Validate(data=current_data, reference=baseline_data)
+        .col_sum_le(columns="revenue")  # Compares sum(current.revenue) vs sum(baseline.revenue)
+        .interrogate()
+    )
+    ```
+
+    When `value=None` and reference data is set, the method automatically compares against the
+    same column in the reference data. You can also explicitly specify reference columns using
+    the `ref()` helper:
+
+    ```python
+    .col_sum_le(columns="revenue", value=pb.ref("baseline_revenue"))
+    ```
+
+    Understanding Tolerance
+    -----------------------
+    The `tol=` parameter allows for fuzzy comparisons, which is especially important for
+    floating-point aggregations where exact equality is often unreliable.
+
+    The `tol=` parameter expands the acceptable range for the comparison. For
+        `col_sum_le()`, a tolerance of `tol=0.5` would mean the sum can be within `0.5` of the
+        target value and still pass validation.
+
+    For equality comparisons (`col_*_eq`), the tolerance creates a range `[value - tol, value + tol]`
+    within which the aggregation is considered valid. For inequality comparisons, the tolerance
+    shifts the comparison boundary.
+
+    Thresholds
+    ----------
+    The `thresholds=` parameter is used to set the failure-condition levels for the validation
+    step. If they are set here at the step level, these thresholds will override any thresholds
+    set at the global level in `Validate(thresholds=...)`.
+
+    There are three threshold levels: 'warning', 'error', and 'critical'. Since aggregation
+    validations operate on a single test unit (the aggregated value), threshold values are
+    typically set as absolute counts:
+
+    - `thresholds=1` means any failure triggers a 'warning'
+    - `thresholds=(1, 1, 1)` means any failure triggers all three levels
+
+    Thresholds can be defined using one of these input schemes:
+
+    1. use the [`Thresholds`](`pointblank.Thresholds`) class (the most direct way to create
+    thresholds)
+    2. provide a tuple of 1-3 values, where position `0` is the 'warning' level, position `1` is
+    the 'error' level, and position `2` is the 'critical' level
+    3. create a dictionary of 1-3 value entries; the valid keys: are 'warning', 'error', and
+    'critical'
+    4. a single integer/float value denoting absolute number or fraction of failing test units
+    for the 'warning' level only
+
+    Examples
+    --------
+    For the examples, we'll use a simple Polars DataFrame with numeric columns. The table is
+    shown below:
+
+    ```python
+    import pointblank as pb
+    import polars as pl
+
+    tbl = pl.DataFrame(
+        {
+            "a": [1, 2, 3, 4, 5],
+            "b": [2, 2, 2, 2, 2],
+        }
+    )
+
+    pb.preview(tbl)
+    ```
+
+    Let's validate that the sum of column `a` is at most `15`:
+
+    ```python
+    validation = (
+        pb.Validate(data=tbl)
+        .col_sum_le(columns="a", value=15)
+        .interrogate()
+    )
+
+    validation
+    ```
+
+    The validation result shows whether the sum comparison passed or failed. Since this
+    is an aggregation-based validation, there is exactly one test unit per column.
+
+    When validating multiple columns, each column gets its own validation step:
+
+    ```python
+    validation = (
+        pb.Validate(data=tbl)
+        .col_sum_le(columns=["a", "b"], value=15)
+        .interrogate()
+    )
+
+    validation
+    ```
+
+    Using tolerance for flexible comparisons:
+
+    ```python
+    validation = (
+        pb.Validate(data=tbl)
+        .col_sum_le(columns="a", value=15, tol=1.0)
+        .interrogate()
+    )
+
+    validation
+    ```
+
+col_sum_eq(self: 'Validate', columns: 'str | Collection[str]', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool' = True) -> 'Validate'
+Does the column sum satisfy an equal to comparison?
+
+    The `col_sum_eq()` validation method checks whether the sum of values in a column
+    equals a specified `value=`. This is an aggregation-based validation where the entire
+    column is reduced to a single sum value that is then compared against the target. The
+    comparison used in this function is `sum(column) == value`.
+
+    Unlike row-level validations (e.g., `col_vals_gt()`), this method treats the entire column as
+    a single test unit. The validation either passes completely (if the aggregated value satisfies
+    the comparison) or fails completely.
+
+    Parameters
+    ----------
+    columns
+        A single column or a list of columns to validate. If multiple columns are supplied,
+        there will be a separate validation step generated for each column. The columns must
+        contain numeric data for the sum to be computed.
+    value
+        The value to compare the column sum against. This can be: (1) a numeric literal
+        (`int` or `float`), (2) a [`col()`](`pointblank.col`) object referencing another column
+        whose sum will be used for comparison, (3) a [`ref()`](`pointblank.ref`) object
+        referencing a column in reference data (when `Validate(reference=)` has been set), or (4)
+        `None` to automatically compare against the same column in reference data (shorthand for
+        `ref(column_name)` when reference data is set).
+    tol
+        A tolerance value for the comparison. The default is `0`, meaning exact comparison. When
+        set to a positive value, the comparison becomes more lenient. For example, with `tol=0.5`,
+        a sum that differs from the target by up to `0.5` will still pass. The `tol=` parameter is particularly useful with `col_sum_eq()` since exact equality
+        comparisons on floating-point aggregations can be problematic due to numerical precision.
+        Setting a small tolerance (e.g., `tol=0.001`) allows for minor differences that arise from
+        floating-point arithmetic.
+    thresholds
+        Failure threshold levels so that the validation step can react accordingly when
+        failing test units are level. Since this is an aggregation-based validation with only
+        one test unit, threshold values typically should be set as absolute counts (e.g., `1`) to
+        indicate pass/fail, or as proportions where any value less than `1.0` means failure is
+        acceptable.
+    brief
+        An optional brief description of the validation step that will be displayed in the
+        reporting table. You can use the templating elements like `"{step}"` to insert
+        the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+        the entire brief will be automatically generated. If `None` (the default) then there
+        won't be a brief.
+    actions
+        Optional actions to take when the validation step meets or exceeds any set threshold
+        levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
+        define the actions.
+    active
+        A boolean value indicating whether the validation step should be active. Using `False`
+        will make the validation step inactive (still reporting its presence and keeping indexes
+        for the steps unchanged).
+
+    Returns
+    -------
+    Validate
+        The `Validate` object with the added validation step.
+
+    Using Reference Data
+    --------------------
+    The `col_sum_eq()` method supports comparing column aggregations against reference data. This
+    is useful for validating that statistical properties remain consistent across different
+    versions of a dataset, or for comparing current data against historical baselines.
+
+    To use reference data, set the `reference=` parameter when creating the `Validate` object:
+
+    ```python
+    validation = (
+        pb.Validate(data=current_data, reference=baseline_data)
+        .col_sum_eq(columns="revenue")  # Compares sum(current.revenue) vs sum(baseline.revenue)
+        .interrogate()
+    )
+    ```
+
+    When `value=None` and reference data is set, the method automatically compares against the
+    same column in the reference data. You can also explicitly specify reference columns using
+    the `ref()` helper:
+
+    ```python
+    .col_sum_eq(columns="revenue", value=pb.ref("baseline_revenue"))
+    ```
+
+    Understanding Tolerance
+    -----------------------
+    The `tol=` parameter allows for fuzzy comparisons, which is especially important for
+    floating-point aggregations where exact equality is often unreliable.
+
+    The `tol=` parameter is particularly useful with `col_sum_eq()` since exact equality
+        comparisons on floating-point aggregations can be problematic due to numerical precision.
+        Setting a small tolerance (e.g., `tol=0.001`) allows for minor differences that arise from
+        floating-point arithmetic.
+
+    For equality comparisons (`col_*_eq`), the tolerance creates a range `[value - tol, value + tol]`
+    within which the aggregation is considered valid. For inequality comparisons, the tolerance
+    shifts the comparison boundary.
+
+    Thresholds
+    ----------
+    The `thresholds=` parameter is used to set the failure-condition levels for the validation
+    step. If they are set here at the step level, these thresholds will override any thresholds
+    set at the global level in `Validate(thresholds=...)`.
+
+    There are three threshold levels: 'warning', 'error', and 'critical'. Since aggregation
+    validations operate on a single test unit (the aggregated value), threshold values are
+    typically set as absolute counts:
+
+    - `thresholds=1` means any failure triggers a 'warning'
+    - `thresholds=(1, 1, 1)` means any failure triggers all three levels
+
+    Thresholds can be defined using one of these input schemes:
+
+    1. use the [`Thresholds`](`pointblank.Thresholds`) class (the most direct way to create
+    thresholds)
+    2. provide a tuple of 1-3 values, where position `0` is the 'warning' level, position `1` is
+    the 'error' level, and position `2` is the 'critical' level
+    3. create a dictionary of 1-3 value entries; the valid keys: are 'warning', 'error', and
+    'critical'
+    4. a single integer/float value denoting absolute number or fraction of failing test units
+    for the 'warning' level only
+
+    Examples
+    --------
+    For the examples, we'll use a simple Polars DataFrame with numeric columns. The table is
+    shown below:
+
+    ```python
+    import pointblank as pb
+    import polars as pl
+
+    tbl = pl.DataFrame(
+        {
+            "a": [1, 2, 3, 4, 5],
+            "b": [2, 2, 2, 2, 2],
+        }
+    )
+
+    pb.preview(tbl)
+    ```
+
+    Let's validate that the sum of column `a` equals `15`:
+
+    ```python
+    validation = (
+        pb.Validate(data=tbl)
+        .col_sum_eq(columns="a", value=15)
+        .interrogate()
+    )
+
+    validation
+    ```
+
+    The validation result shows whether the sum comparison passed or failed. Since this
+    is an aggregation-based validation, there is exactly one test unit per column.
+
+    When validating multiple columns, each column gets its own validation step:
+
+    ```python
+    validation = (
+        pb.Validate(data=tbl)
+        .col_sum_eq(columns=["a", "b"], value=15)
+        .interrogate()
+    )
+
+    validation
+    ```
+
+    Using tolerance for flexible comparisons:
+
+    ```python
+    validation = (
+        pb.Validate(data=tbl)
+        .col_sum_eq(columns="a", value=15, tol=1.0)
+        .interrogate()
+    )
+
+    validation
+    ```
+
+col_avg_gt(self: 'Validate', columns: 'str | Collection[str]', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool' = True) -> 'Validate'
+Does the column average satisfy a greater than comparison?
+
+    The `col_avg_gt()` validation method checks whether the average of values in a column
+    is greater than a specified `value=`. This is an aggregation-based validation where the entire
+    column is reduced to a single average value that is then compared against the target. The
+    comparison used in this function is `average(column) > value`.
+
+    Unlike row-level validations (e.g., `col_vals_gt()`), this method treats the entire column as
+    a single test unit. The validation either passes completely (if the aggregated value satisfies
+    the comparison) or fails completely.
+
+    Parameters
+    ----------
+    columns
+        A single column or a list of columns to validate. If multiple columns are supplied,
+        there will be a separate validation step generated for each column. The columns must
+        contain numeric data for the average to be computed.
+    value
+        The value to compare the column average against. This can be: (1) a numeric literal
+        (`int` or `float`), (2) a [`col()`](`pointblank.col`) object referencing another column
+        whose average will be used for comparison, (3) a [`ref()`](`pointblank.ref`) object
+        referencing a column in reference data (when `Validate(reference=)` has been set), or (4)
+        `None` to automatically compare against the same column in reference data (shorthand for
+        `ref(column_name)` when reference data is set).
+    tol
+        A tolerance value for the comparison. The default is `0`, meaning exact comparison. When
+        set to a positive value, the comparison becomes more lenient. For example, with `tol=0.5`,
+        a average that differs from the target by up to `0.5` will still pass. The `tol=` parameter expands the acceptable range for the comparison. For
+        `col_avg_gt()`, a tolerance of `tol=0.5` would mean the average can be within `0.5` of the
+        target value and still pass validation.
+    thresholds
+        Failure threshold levels so that the validation step can react accordingly when
+        failing test units are level. Since this is an aggregation-based validation with only
+        one test unit, threshold values typically should be set as absolute counts (e.g., `1`) to
+        indicate pass/fail, or as proportions where any value less than `1.0` means failure is
+        acceptable.
+    brief
+        An optional brief description of the validation step that will be displayed in the
+        reporting table. You can use the templating elements like `"{step}"` to insert
+        the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+        the entire brief will be automatically generated. If `None` (the default) then there
+        won't be a brief.
+    actions
+        Optional actions to take when the validation step meets or exceeds any set threshold
+        levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
+        define the actions.
+    active
+        A boolean value indicating whether the validation step should be active. Using `False`
+        will make the validation step inactive (still reporting its presence and keeping indexes
+        for the steps unchanged).
+
+    Returns
+    -------
+    Validate
+        The `Validate` object with the added validation step.
+
+    Using Reference Data
+    --------------------
+    The `col_avg_gt()` method supports comparing column aggregations against reference data. This
+    is useful for validating that statistical properties remain consistent across different
+    versions of a dataset, or for comparing current data against historical baselines.
+
+    To use reference data, set the `reference=` parameter when creating the `Validate` object:
+
+    ```python
+    validation = (
+        pb.Validate(data=current_data, reference=baseline_data)
+        .col_avg_gt(columns="revenue")  # Compares sum(current.revenue) vs sum(baseline.revenue)
+        .interrogate()
+    )
+    ```
+
+    When `value=None` and reference data is set, the method automatically compares against the
+    same column in the reference data. You can also explicitly specify reference columns using
+    the `ref()` helper:
+
+    ```python
+    .col_avg_gt(columns="revenue", value=pb.ref("baseline_revenue"))
+    ```
+
+    Understanding Tolerance
+    -----------------------
+    The `tol=` parameter allows for fuzzy comparisons, which is especially important for
+    floating-point aggregations where exact equality is often unreliable.
+
+    The `tol=` parameter expands the acceptable range for the comparison. For
+        `col_avg_gt()`, a tolerance of `tol=0.5` would mean the average can be within `0.5` of the
+        target value and still pass validation.
+
+    For equality comparisons (`col_*_eq`), the tolerance creates a range `[value - tol, value + tol]`
+    within which the aggregation is considered valid. For inequality comparisons, the tolerance
+    shifts the comparison boundary.
+
+    Thresholds
+    ----------
+    The `thresholds=` parameter is used to set the failure-condition levels for the validation
+    step. If they are set here at the step level, these thresholds will override any thresholds
+    set at the global level in `Validate(thresholds=...)`.
+
+    There are three threshold levels: 'warning', 'error', and 'critical'. Since aggregation
+    validations operate on a single test unit (the aggregated value), threshold values are
+    typically set as absolute counts:
+
+    - `thresholds=1` means any failure triggers a 'warning'
+    - `thresholds=(1, 1, 1)` means any failure triggers all three levels
+
+    Thresholds can be defined using one of these input schemes:
+
+    1. use the [`Thresholds`](`pointblank.Thresholds`) class (the most direct way to create
+    thresholds)
+    2. provide a tuple of 1-3 values, where position `0` is the 'warning' level, position `1` is
+    the 'error' level, and position `2` is the 'critical' level
+    3. create a dictionary of 1-3 value entries; the valid keys: are 'warning', 'error', and
+    'critical'
+    4. a single integer/float value denoting absolute number or fraction of failing test units
+    for the 'warning' level only
+
+    Examples
+    --------
+    For the examples, we'll use a simple Polars DataFrame with numeric columns. The table is
+    shown below:
+
+    ```python
+    import pointblank as pb
+    import polars as pl
+
+    tbl = pl.DataFrame(
+        {
+            "a": [1, 2, 3, 4, 5],
+            "b": [2, 2, 2, 2, 2],
+        }
+    )
+
+    pb.preview(tbl)
+    ```
+
+    Let's validate that the average of column `a` is greater than `3`:
+
+    ```python
+    validation = (
+        pb.Validate(data=tbl)
+        .col_avg_gt(columns="a", value=3)
+        .interrogate()
+    )
+
+    validation
+    ```
+
+    The validation result shows whether the average comparison passed or failed. Since this
+    is an aggregation-based validation, there is exactly one test unit per column.
+
+    When validating multiple columns, each column gets its own validation step:
+
+    ```python
+    validation = (
+        pb.Validate(data=tbl)
+        .col_avg_gt(columns=["a", "b"], value=3)
+        .interrogate()
+    )
+
+    validation
+    ```
+
+    Using tolerance for flexible comparisons:
+
+    ```python
+    validation = (
+        pb.Validate(data=tbl)
+        .col_avg_gt(columns="a", value=3, tol=1.0)
+        .interrogate()
+    )
+
+    validation
+    ```
+
+col_avg_lt(self: 'Validate', columns: 'str | Collection[str]', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool' = True) -> 'Validate'
+Does the column average satisfy a less than comparison?
+
+    The `col_avg_lt()` validation method checks whether the average of values in a column
+    is less than a specified `value=`. This is an aggregation-based validation where the entire
+    column is reduced to a single average value that is then compared against the target. The
+    comparison used in this function is `average(column) < value`.
+
+    Unlike row-level validations (e.g., `col_vals_gt()`), this method treats the entire column as
+    a single test unit. The validation either passes completely (if the aggregated value satisfies
+    the comparison) or fails completely.
+
+    Parameters
+    ----------
+    columns
+        A single column or a list of columns to validate. If multiple columns are supplied,
+        there will be a separate validation step generated for each column. The columns must
+        contain numeric data for the average to be computed.
+    value
+        The value to compare the column average against. This can be: (1) a numeric literal
+        (`int` or `float`), (2) a [`col()`](`pointblank.col`) object referencing another column
+        whose average will be used for comparison, (3) a [`ref()`](`pointblank.ref`) object
+        referencing a column in reference data (when `Validate(reference=)` has been set), or (4)
+        `None` to automatically compare against the same column in reference data (shorthand for
+        `ref(column_name)` when reference data is set).
+    tol
+        A tolerance value for the comparison. The default is `0`, meaning exact comparison. When
+        set to a positive value, the comparison becomes more lenient. For example, with `tol=0.5`,
+        a average that differs from the target by up to `0.5` will still pass. The `tol=` parameter expands the acceptable range for the comparison. For
+        `col_avg_lt()`, a tolerance of `tol=0.5` would mean the average can be within `0.5` of the
+        target value and still pass validation.
+    thresholds
+        Failure threshold levels so that the validation step can react accordingly when
+        failing test units are level. Since this is an aggregation-based validation with only
+        one test unit, threshold values typically should be set as absolute counts (e.g., `1`) to
+        indicate pass/fail, or as proportions where any value less than `1.0` means failure is
+        acceptable.
+    brief
+        An optional brief description of the validation step that will be displayed in the
+        reporting table. You can use the templating elements like `"{step}"` to insert
+        the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+        the entire brief will be automatically generated. If `None` (the default) then there
+        won't be a brief.
+    actions
+        Optional actions to take when the validation step meets or exceeds any set threshold
+        levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
+        define the actions.
+    active
+        A boolean value indicating whether the validation step should be active. Using `False`
+        will make the validation step inactive (still reporting its presence and keeping indexes
+        for the steps unchanged).
+
+    Returns
+    -------
+    Validate
+        The `Validate` object with the added validation step.
+
+    Using Reference Data
+    --------------------
+    The `col_avg_lt()` method supports comparing column aggregations against reference data. This
+    is useful for validating that statistical properties remain consistent across different
+    versions of a dataset, or for comparing current data against historical baselines.
+
+    To use reference data, set the `reference=` parameter when creating the `Validate` object:
+
+    ```python
+    validation = (
+        pb.Validate(data=current_data, reference=baseline_data)
+        .col_avg_lt(columns="revenue")  # Compares sum(current.revenue) vs sum(baseline.revenue)
+        .interrogate()
+    )
+    ```
+
+    When `value=None` and reference data is set, the method automatically compares against the
+    same column in the reference data. You can also explicitly specify reference columns using
+    the `ref()` helper:
+
+    ```python
+    .col_avg_lt(columns="revenue", value=pb.ref("baseline_revenue"))
+    ```
+
+    Understanding Tolerance
+    -----------------------
+    The `tol=` parameter allows for fuzzy comparisons, which is especially important for
+    floating-point aggregations where exact equality is often unreliable.
+
+    The `tol=` parameter expands the acceptable range for the comparison. For
+        `col_avg_lt()`, a tolerance of `tol=0.5` would mean the average can be within `0.5` of the
+        target value and still pass validation.
+
+    For equality comparisons (`col_*_eq`), the tolerance creates a range `[value - tol, value + tol]`
+    within which the aggregation is considered valid. For inequality comparisons, the tolerance
+    shifts the comparison boundary.
+
+    Thresholds
+    ----------
+    The `thresholds=` parameter is used to set the failure-condition levels for the validation
+    step. If they are set here at the step level, these thresholds will override any thresholds
+    set at the global level in `Validate(thresholds=...)`.
+
+    There are three threshold levels: 'warning', 'error', and 'critical'. Since aggregation
+    validations operate on a single test unit (the aggregated value), threshold values are
+    typically set as absolute counts:
+
+    - `thresholds=1` means any failure triggers a 'warning'
+    - `thresholds=(1, 1, 1)` means any failure triggers all three levels
+
+    Thresholds can be defined using one of these input schemes:
+
+    1. use the [`Thresholds`](`pointblank.Thresholds`) class (the most direct way to create
+    thresholds)
+    2. provide a tuple of 1-3 values, where position `0` is the 'warning' level, position `1` is
+    the 'error' level, and position `2` is the 'critical' level
+    3. create a dictionary of 1-3 value entries; the valid keys: are 'warning', 'error', and
+    'critical'
+    4. a single integer/float value denoting absolute number or fraction of failing test units
+    for the 'warning' level only
+
+    Examples
+    --------
+    For the examples, we'll use a simple Polars DataFrame with numeric columns. The table is
+    shown below:
+
+    ```python
+    import pointblank as pb
+    import polars as pl
+
+    tbl = pl.DataFrame(
+        {
+            "a": [1, 2, 3, 4, 5],
+            "b": [2, 2, 2, 2, 2],
+        }
+    )
+
+    pb.preview(tbl)
+    ```
+
+    Let's validate that the average of column `a` is less than `3`:
+
+    ```python
+    validation = (
+        pb.Validate(data=tbl)
+        .col_avg_lt(columns="a", value=3)
+        .interrogate()
+    )
+
+    validation
+    ```
+
+    The validation result shows whether the average comparison passed or failed. Since this
+    is an aggregation-based validation, there is exactly one test unit per column.
+
+    When validating multiple columns, each column gets its own validation step:
+
+    ```python
+    validation = (
+        pb.Validate(data=tbl)
+        .col_avg_lt(columns=["a", "b"], value=3)
+        .interrogate()
+    )
+
+    validation
+    ```
+
+    Using tolerance for flexible comparisons:
+
+    ```python
+    validation = (
+        pb.Validate(data=tbl)
+        .col_avg_lt(columns="a", value=3, tol=1.0)
+        .interrogate()
+    )
+
+    validation
+    ```
+
+col_avg_ge(self: 'Validate', columns: 'str | Collection[str]', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool' = True) -> 'Validate'
+Does the column average satisfy a greater than or equal to comparison?
+
+    The `col_avg_ge()` validation method checks whether the average of values in a column
+    is at least a specified `value=`. This is an aggregation-based validation where the entire
+    column is reduced to a single average value that is then compared against the target. The
+    comparison used in this function is `average(column) >= value`.
+
+    Unlike row-level validations (e.g., `col_vals_gt()`), this method treats the entire column as
+    a single test unit. The validation either passes completely (if the aggregated value satisfies
+    the comparison) or fails completely.
+
+    Parameters
+    ----------
+    columns
+        A single column or a list of columns to validate. If multiple columns are supplied,
+        there will be a separate validation step generated for each column. The columns must
+        contain numeric data for the average to be computed.
+    value
+        The value to compare the column average against. This can be: (1) a numeric literal
+        (`int` or `float`), (2) a [`col()`](`pointblank.col`) object referencing another column
+        whose average will be used for comparison, (3) a [`ref()`](`pointblank.ref`) object
+        referencing a column in reference data (when `Validate(reference=)` has been set), or (4)
+        `None` to automatically compare against the same column in reference data (shorthand for
+        `ref(column_name)` when reference data is set).
+    tol
+        A tolerance value for the comparison. The default is `0`, meaning exact comparison. When
+        set to a positive value, the comparison becomes more lenient. For example, with `tol=0.5`,
+        a average that differs from the target by up to `0.5` will still pass. The `tol=` parameter expands the acceptable range for the comparison. For
+        `col_avg_ge()`, a tolerance of `tol=0.5` would mean the average can be within `0.5` of the
+        target value and still pass validation.
+    thresholds
+        Failure threshold levels so that the validation step can react accordingly when
+        failing test units are level. Since this is an aggregation-based validation with only
+        one test unit, threshold values typically should be set as absolute counts (e.g., `1`) to
+        indicate pass/fail, or as proportions where any value less than `1.0` means failure is
+        acceptable.
+    brief
+        An optional brief description of the validation step that will be displayed in the
+        reporting table. You can use the templating elements like `"{step}"` to insert
+        the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+        the entire brief will be automatically generated. If `None` (the default) then there
+        won't be a brief.
+    actions
+        Optional actions to take when the validation step meets or exceeds any set threshold
+        levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
+        define the actions.
+    active
+        A boolean value indicating whether the validation step should be active. Using `False`
+        will make the validation step inactive (still reporting its presence and keeping indexes
+        for the steps unchanged).
+
+    Returns
+    -------
+    Validate
+        The `Validate` object with the added validation step.
+
+    Using Reference Data
+    --------------------
+    The `col_avg_ge()` method supports comparing column aggregations against reference data. This
+    is useful for validating that statistical properties remain consistent across different
+    versions of a dataset, or for comparing current data against historical baselines.
+
+    To use reference data, set the `reference=` parameter when creating the `Validate` object:
+
+    ```python
+    validation = (
+        pb.Validate(data=current_data, reference=baseline_data)
+        .col_avg_ge(columns="revenue")  # Compares sum(current.revenue) vs sum(baseline.revenue)
+        .interrogate()
+    )
+    ```
+
+    When `value=None` and reference data is set, the method automatically compares against the
+    same column in the reference data. You can also explicitly specify reference columns using
+    the `ref()` helper:
+
+    ```python
+    .col_avg_ge(columns="revenue", value=pb.ref("baseline_revenue"))
+    ```
+
+    Understanding Tolerance
+    -----------------------
+    The `tol=` parameter allows for fuzzy comparisons, which is especially important for
+    floating-point aggregations where exact equality is often unreliable.
+
+    The `tol=` parameter expands the acceptable range for the comparison. For
+        `col_avg_ge()`, a tolerance of `tol=0.5` would mean the average can be within `0.5` of the
+        target value and still pass validation.
+
+    For equality comparisons (`col_*_eq`), the tolerance creates a range `[value - tol, value + tol]`
+    within which the aggregation is considered valid. For inequality comparisons, the tolerance
+    shifts the comparison boundary.
+
+    Thresholds
+    ----------
+    The `thresholds=` parameter is used to set the failure-condition levels for the validation
+    step. If they are set here at the step level, these thresholds will override any thresholds
+    set at the global level in `Validate(thresholds=...)`.
+
+    There are three threshold levels: 'warning', 'error', and 'critical'. Since aggregation
+    validations operate on a single test unit (the aggregated value), threshold values are
+    typically set as absolute counts:
+
+    - `thresholds=1` means any failure triggers a 'warning'
+    - `thresholds=(1, 1, 1)` means any failure triggers all three levels
+
+    Thresholds can be defined using one of these input schemes:
+
+    1. use the [`Thresholds`](`pointblank.Thresholds`) class (the most direct way to create
+    thresholds)
+    2. provide a tuple of 1-3 values, where position `0` is the 'warning' level, position `1` is
+    the 'error' level, and position `2` is the 'critical' level
+    3. create a dictionary of 1-3 value entries; the valid keys: are 'warning', 'error', and
+    'critical'
+    4. a single integer/float value denoting absolute number or fraction of failing test units
+    for the 'warning' level only
+
+    Examples
+    --------
+    For the examples, we'll use a simple Polars DataFrame with numeric columns. The table is
+    shown below:
+
+    ```python
+    import pointblank as pb
+    import polars as pl
+
+    tbl = pl.DataFrame(
+        {
+            "a": [1, 2, 3, 4, 5],
+            "b": [2, 2, 2, 2, 2],
+        }
+    )
+
+    pb.preview(tbl)
+    ```
+
+    Let's validate that the average of column `a` is at least `3`:
+
+    ```python
+    validation = (
+        pb.Validate(data=tbl)
+        .col_avg_ge(columns="a", value=3)
+        .interrogate()
+    )
+
+    validation
+    ```
+
+    The validation result shows whether the average comparison passed or failed. Since this
+    is an aggregation-based validation, there is exactly one test unit per column.
+
+    When validating multiple columns, each column gets its own validation step:
+
+    ```python
+    validation = (
+        pb.Validate(data=tbl)
+        .col_avg_ge(columns=["a", "b"], value=3)
+        .interrogate()
+    )
+
+    validation
+    ```
+
+    Using tolerance for flexible comparisons:
+
+    ```python
+    validation = (
+        pb.Validate(data=tbl)
+        .col_avg_ge(columns="a", value=3, tol=1.0)
+        .interrogate()
+    )
+
+    validation
+    ```
+
+col_avg_le(self: 'Validate', columns: 'str | Collection[str]', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool' = True) -> 'Validate'
+Does the column average satisfy a less than or equal to comparison?
+
+    The `col_avg_le()` validation method checks whether the average of values in a column
+    is at most a specified `value=`. This is an aggregation-based validation where the entire
+    column is reduced to a single average value that is then compared against the target. The
+    comparison used in this function is `average(column) <= value`.
+
+    Unlike row-level validations (e.g., `col_vals_gt()`), this method treats the entire column as
+    a single test unit. The validation either passes completely (if the aggregated value satisfies
+    the comparison) or fails completely.
+
+    Parameters
+    ----------
+    columns
+        A single column or a list of columns to validate. If multiple columns are supplied,
+        there will be a separate validation step generated for each column. The columns must
+        contain numeric data for the average to be computed.
+    value
+        The value to compare the column average against. This can be: (1) a numeric literal
+        (`int` or `float`), (2) a [`col()`](`pointblank.col`) object referencing another column
+        whose average will be used for comparison, (3) a [`ref()`](`pointblank.ref`) object
+        referencing a column in reference data (when `Validate(reference=)` has been set), or (4)
+        `None` to automatically compare against the same column in reference data (shorthand for
+        `ref(column_name)` when reference data is set).
+    tol
+        A tolerance value for the comparison. The default is `0`, meaning exact comparison. When
+        set to a positive value, the comparison becomes more lenient. For example, with `tol=0.5`,
+        a average that differs from the target by up to `0.5` will still pass. The `tol=` parameter expands the acceptable range for the comparison. For
+        `col_avg_le()`, a tolerance of `tol=0.5` would mean the average can be within `0.5` of the
+        target value and still pass validation.
+    thresholds
+        Failure threshold levels so that the validation step can react accordingly when
+        failing test units are level. Since this is an aggregation-based validation with only
+        one test unit, threshold values typically should be set as absolute counts (e.g., `1`) to
+        indicate pass/fail, or as proportions where any value less than `1.0` means failure is
+        acceptable.
+    brief
+        An optional brief description of the validation step that will be displayed in the
+        reporting table. You can use the templating elements like `"{step}"` to insert
+        the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+        the entire brief will be automatically generated. If `None` (the default) then there
+        won't be a brief.
+    actions
+        Optional actions to take when the validation step meets or exceeds any set threshold
+        levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
+        define the actions.
+    active
+        A boolean value indicating whether the validation step should be active. Using `False`
+        will make the validation step inactive (still reporting its presence and keeping indexes
+        for the steps unchanged).
+
+    Returns
+    -------
+    Validate
+        The `Validate` object with the added validation step.
+
+    Using Reference Data
+    --------------------
+    The `col_avg_le()` method supports comparing column aggregations against reference data. This
+    is useful for validating that statistical properties remain consistent across different
+    versions of a dataset, or for comparing current data against historical baselines.
+
+    To use reference data, set the `reference=` parameter when creating the `Validate` object:
+
+    ```python
+    validation = (
+        pb.Validate(data=current_data, reference=baseline_data)
+        .col_avg_le(columns="revenue")  # Compares sum(current.revenue) vs sum(baseline.revenue)
+        .interrogate()
+    )
+    ```
+
+    When `value=None` and reference data is set, the method automatically compares against the
+    same column in the reference data. You can also explicitly specify reference columns using
+    the `ref()` helper:
+
+    ```python
+    .col_avg_le(columns="revenue", value=pb.ref("baseline_revenue"))
+    ```
+
+    Understanding Tolerance
+    -----------------------
+    The `tol=` parameter allows for fuzzy comparisons, which is especially important for
+    floating-point aggregations where exact equality is often unreliable.
+
+    The `tol=` parameter expands the acceptable range for the comparison. For
+        `col_avg_le()`, a tolerance of `tol=0.5` would mean the average can be within `0.5` of the
+        target value and still pass validation.
+
+    For equality comparisons (`col_*_eq`), the tolerance creates a range `[value - tol, value + tol]`
+    within which the aggregation is considered valid. For inequality comparisons, the tolerance
+    shifts the comparison boundary.
+
+    Thresholds
+    ----------
+    The `thresholds=` parameter is used to set the failure-condition levels for the validation
+    step. If they are set here at the step level, these thresholds will override any thresholds
+    set at the global level in `Validate(thresholds=...)`.
+
+    There are three threshold levels: 'warning', 'error', and 'critical'. Since aggregation
+    validations operate on a single test unit (the aggregated value), threshold values are
+    typically set as absolute counts:
+
+    - `thresholds=1` means any failure triggers a 'warning'
+    - `thresholds=(1, 1, 1)` means any failure triggers all three levels
+
+    Thresholds can be defined using one of these input schemes:
+
+    1. use the [`Thresholds`](`pointblank.Thresholds`) class (the most direct way to create
+    thresholds)
+    2. provide a tuple of 1-3 values, where position `0` is the 'warning' level, position `1` is
+    the 'error' level, and position `2` is the 'critical' level
+    3. create a dictionary of 1-3 value entries; the valid keys: are 'warning', 'error', and
+    'critical'
+    4. a single integer/float value denoting absolute number or fraction of failing test units
+    for the 'warning' level only
+
+    Examples
+    --------
+    For the examples, we'll use a simple Polars DataFrame with numeric columns. The table is
+    shown below:
+
+    ```python
+    import pointblank as pb
+    import polars as pl
+
+    tbl = pl.DataFrame(
+        {
+            "a": [1, 2, 3, 4, 5],
+            "b": [2, 2, 2, 2, 2],
+        }
+    )
+
+    pb.preview(tbl)
+    ```
+
+    Let's validate that the average of column `a` is at most `3`:
+
+    ```python
+    validation = (
+        pb.Validate(data=tbl)
+        .col_avg_le(columns="a", value=3)
+        .interrogate()
+    )
+
+    validation
+    ```
+
+    The validation result shows whether the average comparison passed or failed. Since this
+    is an aggregation-based validation, there is exactly one test unit per column.
+
+    When validating multiple columns, each column gets its own validation step:
+
+    ```python
+    validation = (
+        pb.Validate(data=tbl)
+        .col_avg_le(columns=["a", "b"], value=3)
+        .interrogate()
+    )
+
+    validation
+    ```
+
+    Using tolerance for flexible comparisons:
+
+    ```python
+    validation = (
+        pb.Validate(data=tbl)
+        .col_avg_le(columns="a", value=3, tol=1.0)
+        .interrogate()
+    )
+
+    validation
+    ```
+
+col_avg_eq(self: 'Validate', columns: 'str | Collection[str]', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool' = True) -> 'Validate'
+Does the column average satisfy an equal to comparison?
+
+    The `col_avg_eq()` validation method checks whether the average of values in a column
+    equals a specified `value=`. This is an aggregation-based validation where the entire
+    column is reduced to a single average value that is then compared against the target. The
+    comparison used in this function is `average(column) == value`.
+
+    Unlike row-level validations (e.g., `col_vals_gt()`), this method treats the entire column as
+    a single test unit. The validation either passes completely (if the aggregated value satisfies
+    the comparison) or fails completely.
+
+    Parameters
+    ----------
+    columns
+        A single column or a list of columns to validate. If multiple columns are supplied,
+        there will be a separate validation step generated for each column. The columns must
+        contain numeric data for the average to be computed.
+    value
+        The value to compare the column average against. This can be: (1) a numeric literal
+        (`int` or `float`), (2) a [`col()`](`pointblank.col`) object referencing another column
+        whose average will be used for comparison, (3) a [`ref()`](`pointblank.ref`) object
+        referencing a column in reference data (when `Validate(reference=)` has been set), or (4)
+        `None` to automatically compare against the same column in reference data (shorthand for
+        `ref(column_name)` when reference data is set).
+    tol
+        A tolerance value for the comparison. The default is `0`, meaning exact comparison. When
+        set to a positive value, the comparison becomes more lenient. For example, with `tol=0.5`,
+        a average that differs from the target by up to `0.5` will still pass. The `tol=` parameter is particularly useful with `col_avg_eq()` since exact equality
+        comparisons on floating-point aggregations can be problematic due to numerical precision.
+        Setting a small tolerance (e.g., `tol=0.001`) allows for minor differences that arise from
+        floating-point arithmetic.
+    thresholds
+        Failure threshold levels so that the validation step can react accordingly when
+        failing test units are level. Since this is an aggregation-based validation with only
+        one test unit, threshold values typically should be set as absolute counts (e.g., `1`) to
+        indicate pass/fail, or as proportions where any value less than `1.0` means failure is
+        acceptable.
+    brief
+        An optional brief description of the validation step that will be displayed in the
+        reporting table. You can use the templating elements like `"{step}"` to insert
+        the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+        the entire brief will be automatically generated. If `None` (the default) then there
+        won't be a brief.
+    actions
+        Optional actions to take when the validation step meets or exceeds any set threshold
+        levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
+        define the actions.
+    active
+        A boolean value indicating whether the validation step should be active. Using `False`
+        will make the validation step inactive (still reporting its presence and keeping indexes
+        for the steps unchanged).
+
+    Returns
+    -------
+    Validate
+        The `Validate` object with the added validation step.
+
+    Using Reference Data
+    --------------------
+    The `col_avg_eq()` method supports comparing column aggregations against reference data. This
+    is useful for validating that statistical properties remain consistent across different
+    versions of a dataset, or for comparing current data against historical baselines.
+
+    To use reference data, set the `reference=` parameter when creating the `Validate` object:
+
+    ```python
+    validation = (
+        pb.Validate(data=current_data, reference=baseline_data)
+        .col_avg_eq(columns="revenue")  # Compares sum(current.revenue) vs sum(baseline.revenue)
+        .interrogate()
+    )
+    ```
+
+    When `value=None` and reference data is set, the method automatically compares against the
+    same column in the reference data. You can also explicitly specify reference columns using
+    the `ref()` helper:
+
+    ```python
+    .col_avg_eq(columns="revenue", value=pb.ref("baseline_revenue"))
+    ```
+
+    Understanding Tolerance
+    -----------------------
+    The `tol=` parameter allows for fuzzy comparisons, which is especially important for
+    floating-point aggregations where exact equality is often unreliable.
+
+    The `tol=` parameter is particularly useful with `col_avg_eq()` since exact equality
+        comparisons on floating-point aggregations can be problematic due to numerical precision.
+        Setting a small tolerance (e.g., `tol=0.001`) allows for minor differences that arise from
+        floating-point arithmetic.
+
+    For equality comparisons (`col_*_eq`), the tolerance creates a range `[value - tol, value + tol]`
+    within which the aggregation is considered valid. For inequality comparisons, the tolerance
+    shifts the comparison boundary.
+
+    Thresholds
+    ----------
+    The `thresholds=` parameter is used to set the failure-condition levels for the validation
+    step. If they are set here at the step level, these thresholds will override any thresholds
+    set at the global level in `Validate(thresholds=...)`.
+
+    There are three threshold levels: 'warning', 'error', and 'critical'. Since aggregation
+    validations operate on a single test unit (the aggregated value), threshold values are
+    typically set as absolute counts:
+
+    - `thresholds=1` means any failure triggers a 'warning'
+    - `thresholds=(1, 1, 1)` means any failure triggers all three levels
+
+    Thresholds can be defined using one of these input schemes:
+
+    1. use the [`Thresholds`](`pointblank.Thresholds`) class (the most direct way to create
+    thresholds)
+    2. provide a tuple of 1-3 values, where position `0` is the 'warning' level, position `1` is
+    the 'error' level, and position `2` is the 'critical' level
+    3. create a dictionary of 1-3 value entries; the valid keys: are 'warning', 'error', and
+    'critical'
+    4. a single integer/float value denoting absolute number or fraction of failing test units
+    for the 'warning' level only
+
+    Examples
+    --------
+    For the examples, we'll use a simple Polars DataFrame with numeric columns. The table is
+    shown below:
+
+    ```python
+    import pointblank as pb
+    import polars as pl
+
+    tbl = pl.DataFrame(
+        {
+            "a": [1, 2, 3, 4, 5],
+            "b": [2, 2, 2, 2, 2],
+        }
+    )
+
+    pb.preview(tbl)
+    ```
+
+    Let's validate that the average of column `a` equals `3`:
+
+    ```python
+    validation = (
+        pb.Validate(data=tbl)
+        .col_avg_eq(columns="a", value=3)
+        .interrogate()
+    )
+
+    validation
+    ```
+
+    The validation result shows whether the average comparison passed or failed. Since this
+    is an aggregation-based validation, there is exactly one test unit per column.
+
+    When validating multiple columns, each column gets its own validation step:
+
+    ```python
+    validation = (
+        pb.Validate(data=tbl)
+        .col_avg_eq(columns=["a", "b"], value=3)
+        .interrogate()
+    )
+
+    validation
+    ```
+
+    Using tolerance for flexible comparisons:
+
+    ```python
+    validation = (
+        pb.Validate(data=tbl)
+        .col_avg_eq(columns="a", value=3, tol=1.0)
+        .interrogate()
+    )
+
+    validation
+    ```
+
+col_sd_gt(self: 'Validate', columns: 'str | Collection[str]', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool' = True) -> 'Validate'
+Does the column standard deviation satisfy a greater than comparison?
+
+    The `col_sd_gt()` validation method checks whether the standard deviation of values in a column
+    is greater than a specified `value=`. This is an aggregation-based validation where the entire
+    column is reduced to a single standard deviation value that is then compared against the target. The
+    comparison used in this function is `standard deviation(column) > value`.
+
+    Unlike row-level validations (e.g., `col_vals_gt()`), this method treats the entire column as
+    a single test unit. The validation either passes completely (if the aggregated value satisfies
+    the comparison) or fails completely.
+
+    Parameters
+    ----------
+    columns
+        A single column or a list of columns to validate. If multiple columns are supplied,
+        there will be a separate validation step generated for each column. The columns must
+        contain numeric data for the standard deviation to be computed.
+    value
+        The value to compare the column standard deviation against. This can be: (1) a numeric literal
+        (`int` or `float`), (2) a [`col()`](`pointblank.col`) object referencing another column
+        whose standard deviation will be used for comparison, (3) a [`ref()`](`pointblank.ref`) object
+        referencing a column in reference data (when `Validate(reference=)` has been set), or (4)
+        `None` to automatically compare against the same column in reference data (shorthand for
+        `ref(column_name)` when reference data is set).
+    tol
+        A tolerance value for the comparison. The default is `0`, meaning exact comparison. When
+        set to a positive value, the comparison becomes more lenient. For example, with `tol=0.5`,
+        a standard deviation that differs from the target by up to `0.5` will still pass. The `tol=` parameter expands the acceptable range for the comparison. For
+        `col_sd_gt()`, a tolerance of `tol=0.5` would mean the standard deviation can be within `0.5` of the
+        target value and still pass validation.
+    thresholds
+        Failure threshold levels so that the validation step can react accordingly when
+        failing test units are level. Since this is an aggregation-based validation with only
+        one test unit, threshold values typically should be set as absolute counts (e.g., `1`) to
+        indicate pass/fail, or as proportions where any value less than `1.0` means failure is
+        acceptable.
+    brief
+        An optional brief description of the validation step that will be displayed in the
+        reporting table. You can use the templating elements like `"{step}"` to insert
+        the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+        the entire brief will be automatically generated. If `None` (the default) then there
+        won't be a brief.
+    actions
+        Optional actions to take when the validation step meets or exceeds any set threshold
+        levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
+        define the actions.
+    active
+        A boolean value indicating whether the validation step should be active. Using `False`
+        will make the validation step inactive (still reporting its presence and keeping indexes
+        for the steps unchanged).
+
+    Returns
+    -------
+    Validate
+        The `Validate` object with the added validation step.
+
+    Using Reference Data
+    --------------------
+    The `col_sd_gt()` method supports comparing column aggregations against reference data. This
+    is useful for validating that statistical properties remain consistent across different
+    versions of a dataset, or for comparing current data against historical baselines.
+
+    To use reference data, set the `reference=` parameter when creating the `Validate` object:
+
+    ```python
+    validation = (
+        pb.Validate(data=current_data, reference=baseline_data)
+        .col_sd_gt(columns="revenue")  # Compares sum(current.revenue) vs sum(baseline.revenue)
+        .interrogate()
+    )
+    ```
+
+    When `value=None` and reference data is set, the method automatically compares against the
+    same column in the reference data. You can also explicitly specify reference columns using
+    the `ref()` helper:
+
+    ```python
+    .col_sd_gt(columns="revenue", value=pb.ref("baseline_revenue"))
+    ```
+
+    Understanding Tolerance
+    -----------------------
+    The `tol=` parameter allows for fuzzy comparisons, which is especially important for
+    floating-point aggregations where exact equality is often unreliable.
+
+    The `tol=` parameter expands the acceptable range for the comparison. For
+        `col_sd_gt()`, a tolerance of `tol=0.5` would mean the standard deviation can be within `0.5` of the
+        target value and still pass validation.
+
+    For equality comparisons (`col_*_eq`), the tolerance creates a range `[value - tol, value + tol]`
+    within which the aggregation is considered valid. For inequality comparisons, the tolerance
+    shifts the comparison boundary.
+
+    Thresholds
+    ----------
+    The `thresholds=` parameter is used to set the failure-condition levels for the validation
+    step. If they are set here at the step level, these thresholds will override any thresholds
+    set at the global level in `Validate(thresholds=...)`.
+
+    There are three threshold levels: 'warning', 'error', and 'critical'. Since aggregation
+    validations operate on a single test unit (the aggregated value), threshold values are
+    typically set as absolute counts:
+
+    - `thresholds=1` means any failure triggers a 'warning'
+    - `thresholds=(1, 1, 1)` means any failure triggers all three levels
+
+    Thresholds can be defined using one of these input schemes:
+
+    1. use the [`Thresholds`](`pointblank.Thresholds`) class (the most direct way to create
+    thresholds)
+    2. provide a tuple of 1-3 values, where position `0` is the 'warning' level, position `1` is
+    the 'error' level, and position `2` is the 'critical' level
+    3. create a dictionary of 1-3 value entries; the valid keys: are 'warning', 'error', and
+    'critical'
+    4. a single integer/float value denoting absolute number or fraction of failing test units
+    for the 'warning' level only
+
+    Examples
+    --------
+    For the examples, we'll use a simple Polars DataFrame with numeric columns. The table is
+    shown below:
+
+    ```python
+    import pointblank as pb
+    import polars as pl
+
+    tbl = pl.DataFrame(
+        {
+            "a": [1, 2, 3, 4, 5],
+            "b": [2, 2, 2, 2, 2],
+        }
+    )
+
+    pb.preview(tbl)
+    ```
+
+    Let's validate that the standard deviation of column `a` is greater than `2`:
+
+    ```python
+    validation = (
+        pb.Validate(data=tbl)
+        .col_sd_gt(columns="a", value=2)
+        .interrogate()
+    )
+
+    validation
+    ```
+
+    The validation result shows whether the standard deviation comparison passed or failed. Since this
+    is an aggregation-based validation, there is exactly one test unit per column.
+
+    When validating multiple columns, each column gets its own validation step:
+
+    ```python
+    validation = (
+        pb.Validate(data=tbl)
+        .col_sd_gt(columns=["a", "b"], value=2)
+        .interrogate()
+    )
+
+    validation
+    ```
+
+    Using tolerance for flexible comparisons:
+
+    ```python
+    validation = (
+        pb.Validate(data=tbl)
+        .col_sd_gt(columns="a", value=2, tol=1.0)
+        .interrogate()
+    )
+
+    validation
+    ```
+
+col_sd_lt(self: 'Validate', columns: 'str | Collection[str]', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool' = True) -> 'Validate'
+Does the column standard deviation satisfy a less than comparison?
+
+    The `col_sd_lt()` validation method checks whether the standard deviation of values in a column
+    is less than a specified `value=`. This is an aggregation-based validation where the entire
+    column is reduced to a single standard deviation value that is then compared against the target. The
+    comparison used in this function is `standard deviation(column) < value`.
+
+    Unlike row-level validations (e.g., `col_vals_gt()`), this method treats the entire column as
+    a single test unit. The validation either passes completely (if the aggregated value satisfies
+    the comparison) or fails completely.
+
+    Parameters
+    ----------
+    columns
+        A single column or a list of columns to validate. If multiple columns are supplied,
+        there will be a separate validation step generated for each column. The columns must
+        contain numeric data for the standard deviation to be computed.
+    value
+        The value to compare the column standard deviation against. This can be: (1) a numeric literal
+        (`int` or `float`), (2) a [`col()`](`pointblank.col`) object referencing another column
+        whose standard deviation will be used for comparison, (3) a [`ref()`](`pointblank.ref`) object
+        referencing a column in reference data (when `Validate(reference=)` has been set), or (4)
+        `None` to automatically compare against the same column in reference data (shorthand for
+        `ref(column_name)` when reference data is set).
+    tol
+        A tolerance value for the comparison. The default is `0`, meaning exact comparison. When
+        set to a positive value, the comparison becomes more lenient. For example, with `tol=0.5`,
+        a standard deviation that differs from the target by up to `0.5` will still pass. The `tol=` parameter expands the acceptable range for the comparison. For
+        `col_sd_lt()`, a tolerance of `tol=0.5` would mean the standard deviation can be within `0.5` of the
+        target value and still pass validation.
+    thresholds
+        Failure threshold levels so that the validation step can react accordingly when
+        failing test units are level. Since this is an aggregation-based validation with only
+        one test unit, threshold values typically should be set as absolute counts (e.g., `1`) to
+        indicate pass/fail, or as proportions where any value less than `1.0` means failure is
+        acceptable.
+    brief
+        An optional brief description of the validation step that will be displayed in the
+        reporting table. You can use the templating elements like `"{step}"` to insert
+        the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+        the entire brief will be automatically generated. If `None` (the default) then there
+        won't be a brief.
+    actions
+        Optional actions to take when the validation step meets or exceeds any set threshold
+        levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
+        define the actions.
+    active
+        A boolean value indicating whether the validation step should be active. Using `False`
+        will make the validation step inactive (still reporting its presence and keeping indexes
+        for the steps unchanged).
+
+    Returns
+    -------
+    Validate
+        The `Validate` object with the added validation step.
+
+    Using Reference Data
+    --------------------
+    The `col_sd_lt()` method supports comparing column aggregations against reference data. This
+    is useful for validating that statistical properties remain consistent across different
+    versions of a dataset, or for comparing current data against historical baselines.
+
+    To use reference data, set the `reference=` parameter when creating the `Validate` object:
+
+    ```python
+    validation = (
+        pb.Validate(data=current_data, reference=baseline_data)
+        .col_sd_lt(columns="revenue")  # Compares sum(current.revenue) vs sum(baseline.revenue)
+        .interrogate()
+    )
+    ```
+
+    When `value=None` and reference data is set, the method automatically compares against the
+    same column in the reference data. You can also explicitly specify reference columns using
+    the `ref()` helper:
+
+    ```python
+    .col_sd_lt(columns="revenue", value=pb.ref("baseline_revenue"))
+    ```
+
+    Understanding Tolerance
+    -----------------------
+    The `tol=` parameter allows for fuzzy comparisons, which is especially important for
+    floating-point aggregations where exact equality is often unreliable.
+
+    The `tol=` parameter expands the acceptable range for the comparison. For
+        `col_sd_lt()`, a tolerance of `tol=0.5` would mean the standard deviation can be within `0.5` of the
+        target value and still pass validation.
+
+    For equality comparisons (`col_*_eq`), the tolerance creates a range `[value - tol, value + tol]`
+    within which the aggregation is considered valid. For inequality comparisons, the tolerance
+    shifts the comparison boundary.
+
+    Thresholds
+    ----------
+    The `thresholds=` parameter is used to set the failure-condition levels for the validation
+    step. If they are set here at the step level, these thresholds will override any thresholds
+    set at the global level in `Validate(thresholds=...)`.
+
+    There are three threshold levels: 'warning', 'error', and 'critical'. Since aggregation
+    validations operate on a single test unit (the aggregated value), threshold values are
+    typically set as absolute counts:
+
+    - `thresholds=1` means any failure triggers a 'warning'
+    - `thresholds=(1, 1, 1)` means any failure triggers all three levels
+
+    Thresholds can be defined using one of these input schemes:
+
+    1. use the [`Thresholds`](`pointblank.Thresholds`) class (the most direct way to create
+    thresholds)
+    2. provide a tuple of 1-3 values, where position `0` is the 'warning' level, position `1` is
+    the 'error' level, and position `2` is the 'critical' level
+    3. create a dictionary of 1-3 value entries; the valid keys: are 'warning', 'error', and
+    'critical'
+    4. a single integer/float value denoting absolute number or fraction of failing test units
+    for the 'warning' level only
+
+    Examples
+    --------
+    For the examples, we'll use a simple Polars DataFrame with numeric columns. The table is
+    shown below:
+
+    ```python
+    import pointblank as pb
+    import polars as pl
+
+    tbl = pl.DataFrame(
+        {
+            "a": [1, 2, 3, 4, 5],
+            "b": [2, 2, 2, 2, 2],
+        }
+    )
+
+    pb.preview(tbl)
+    ```
+
+    Let's validate that the standard deviation of column `a` is less than `2`:
+
+    ```python
+    validation = (
+        pb.Validate(data=tbl)
+        .col_sd_lt(columns="a", value=2)
+        .interrogate()
+    )
+
+    validation
+    ```
+
+    The validation result shows whether the standard deviation comparison passed or failed. Since this
+    is an aggregation-based validation, there is exactly one test unit per column.
+
+    When validating multiple columns, each column gets its own validation step:
+
+    ```python
+    validation = (
+        pb.Validate(data=tbl)
+        .col_sd_lt(columns=["a", "b"], value=2)
+        .interrogate()
+    )
+
+    validation
+    ```
+
+    Using tolerance for flexible comparisons:
+
+    ```python
+    validation = (
+        pb.Validate(data=tbl)
+        .col_sd_lt(columns="a", value=2, tol=1.0)
+        .interrogate()
+    )
+
+    validation
+    ```
+
+col_sd_ge(self: 'Validate', columns: 'str | Collection[str]', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool' = True) -> 'Validate'
+Does the column standard deviation satisfy a greater than or equal to comparison?
+
+    The `col_sd_ge()` validation method checks whether the standard deviation of values in a column
+    is at least a specified `value=`. This is an aggregation-based validation where the entire
+    column is reduced to a single standard deviation value that is then compared against the target. The
+    comparison used in this function is `standard deviation(column) >= value`.
+
+    Unlike row-level validations (e.g., `col_vals_gt()`), this method treats the entire column as
+    a single test unit. The validation either passes completely (if the aggregated value satisfies
+    the comparison) or fails completely.
+
+    Parameters
+    ----------
+    columns
+        A single column or a list of columns to validate. If multiple columns are supplied,
+        there will be a separate validation step generated for each column. The columns must
+        contain numeric data for the standard deviation to be computed.
+    value
+        The value to compare the column standard deviation against. This can be: (1) a numeric literal
+        (`int` or `float`), (2) a [`col()`](`pointblank.col`) object referencing another column
+        whose standard deviation will be used for comparison, (3) a [`ref()`](`pointblank.ref`) object
+        referencing a column in reference data (when `Validate(reference=)` has been set), or (4)
+        `None` to automatically compare against the same column in reference data (shorthand for
+        `ref(column_name)` when reference data is set).
+    tol
+        A tolerance value for the comparison. The default is `0`, meaning exact comparison. When
+        set to a positive value, the comparison becomes more lenient. For example, with `tol=0.5`,
+        a standard deviation that differs from the target by up to `0.5` will still pass. The `tol=` parameter expands the acceptable range for the comparison. For
+        `col_sd_ge()`, a tolerance of `tol=0.5` would mean the standard deviation can be within `0.5` of the
+        target value and still pass validation.
+    thresholds
+        Failure threshold levels so that the validation step can react accordingly when
+        failing test units are level. Since this is an aggregation-based validation with only
+        one test unit, threshold values typically should be set as absolute counts (e.g., `1`) to
+        indicate pass/fail, or as proportions where any value less than `1.0` means failure is
+        acceptable.
+    brief
+        An optional brief description of the validation step that will be displayed in the
+        reporting table. You can use the templating elements like `"{step}"` to insert
+        the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+        the entire brief will be automatically generated. If `None` (the default) then there
+        won't be a brief.
+    actions
+        Optional actions to take when the validation step meets or exceeds any set threshold
+        levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
+        define the actions.
+    active
+        A boolean value indicating whether the validation step should be active. Using `False`
+        will make the validation step inactive (still reporting its presence and keeping indexes
+        for the steps unchanged).
+
+    Returns
+    -------
+    Validate
+        The `Validate` object with the added validation step.
+
+    Using Reference Data
+    --------------------
+    The `col_sd_ge()` method supports comparing column aggregations against reference data. This
+    is useful for validating that statistical properties remain consistent across different
+    versions of a dataset, or for comparing current data against historical baselines.
+
+    To use reference data, set the `reference=` parameter when creating the `Validate` object:
+
+    ```python
+    validation = (
+        pb.Validate(data=current_data, reference=baseline_data)
+        .col_sd_ge(columns="revenue")  # Compares sum(current.revenue) vs sum(baseline.revenue)
+        .interrogate()
+    )
+    ```
+
+    When `value=None` and reference data is set, the method automatically compares against the
+    same column in the reference data. You can also explicitly specify reference columns using
+    the `ref()` helper:
+
+    ```python
+    .col_sd_ge(columns="revenue", value=pb.ref("baseline_revenue"))
+    ```
+
+    Understanding Tolerance
+    -----------------------
+    The `tol=` parameter allows for fuzzy comparisons, which is especially important for
+    floating-point aggregations where exact equality is often unreliable.
+
+    The `tol=` parameter expands the acceptable range for the comparison. For
+        `col_sd_ge()`, a tolerance of `tol=0.5` would mean the standard deviation can be within `0.5` of the
+        target value and still pass validation.
+
+    For equality comparisons (`col_*_eq`), the tolerance creates a range `[value - tol, value + tol]`
+    within which the aggregation is considered valid. For inequality comparisons, the tolerance
+    shifts the comparison boundary.
+
+    Thresholds
+    ----------
+    The `thresholds=` parameter is used to set the failure-condition levels for the validation
+    step. If they are set here at the step level, these thresholds will override any thresholds
+    set at the global level in `Validate(thresholds=...)`.
+
+    There are three threshold levels: 'warning', 'error', and 'critical'. Since aggregation
+    validations operate on a single test unit (the aggregated value), threshold values are
+    typically set as absolute counts:
+
+    - `thresholds=1` means any failure triggers a 'warning'
+    - `thresholds=(1, 1, 1)` means any failure triggers all three levels
+
+    Thresholds can be defined using one of these input schemes:
+
+    1. use the [`Thresholds`](`pointblank.Thresholds`) class (the most direct way to create
+    thresholds)
+    2. provide a tuple of 1-3 values, where position `0` is the 'warning' level, position `1` is
+    the 'error' level, and position `2` is the 'critical' level
+    3. create a dictionary of 1-3 value entries; the valid keys: are 'warning', 'error', and
+    'critical'
+    4. a single integer/float value denoting absolute number or fraction of failing test units
+    for the 'warning' level only
+
+    Examples
+    --------
+    For the examples, we'll use a simple Polars DataFrame with numeric columns. The table is
+    shown below:
+
+    ```python
+    import pointblank as pb
+    import polars as pl
+
+    tbl = pl.DataFrame(
+        {
+            "a": [1, 2, 3, 4, 5],
+            "b": [2, 2, 2, 2, 2],
+        }
+    )
+
+    pb.preview(tbl)
+    ```
+
+    Let's validate that the standard deviation of column `a` is at least `2`:
+
+    ```python
+    validation = (
+        pb.Validate(data=tbl)
+        .col_sd_ge(columns="a", value=2)
+        .interrogate()
+    )
+
+    validation
+    ```
+
+    The validation result shows whether the standard deviation comparison passed or failed. Since this
+    is an aggregation-based validation, there is exactly one test unit per column.
+
+    When validating multiple columns, each column gets its own validation step:
+
+    ```python
+    validation = (
+        pb.Validate(data=tbl)
+        .col_sd_ge(columns=["a", "b"], value=2)
+        .interrogate()
+    )
+
+    validation
+    ```
+
+    Using tolerance for flexible comparisons:
+
+    ```python
+    validation = (
+        pb.Validate(data=tbl)
+        .col_sd_ge(columns="a", value=2, tol=1.0)
+        .interrogate()
+    )
+
+    validation
+    ```
+
+col_sd_le(self: 'Validate', columns: 'str | Collection[str]', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool' = True) -> 'Validate'
+Does the column standard deviation satisfy a less than or equal to comparison?
+
+    The `col_sd_le()` validation method checks whether the standard deviation of values in a column
+    is at most a specified `value=`. This is an aggregation-based validation where the entire
+    column is reduced to a single standard deviation value that is then compared against the target. The
+    comparison used in this function is `standard deviation(column) <= value`.
+
+    Unlike row-level validations (e.g., `col_vals_gt()`), this method treats the entire column as
+    a single test unit. The validation either passes completely (if the aggregated value satisfies
+    the comparison) or fails completely.
+
+    Parameters
+    ----------
+    columns
+        A single column or a list of columns to validate. If multiple columns are supplied,
+        there will be a separate validation step generated for each column. The columns must
+        contain numeric data for the standard deviation to be computed.
+    value
+        The value to compare the column standard deviation against. This can be: (1) a numeric literal
+        (`int` or `float`), (2) a [`col()`](`pointblank.col`) object referencing another column
+        whose standard deviation will be used for comparison, (3) a [`ref()`](`pointblank.ref`) object
+        referencing a column in reference data (when `Validate(reference=)` has been set), or (4)
+        `None` to automatically compare against the same column in reference data (shorthand for
+        `ref(column_name)` when reference data is set).
+    tol
+        A tolerance value for the comparison. The default is `0`, meaning exact comparison. When
+        set to a positive value, the comparison becomes more lenient. For example, with `tol=0.5`,
+        a standard deviation that differs from the target by up to `0.5` will still pass. The `tol=` parameter expands the acceptable range for the comparison. For
+        `col_sd_le()`, a tolerance of `tol=0.5` would mean the standard deviation can be within `0.5` of the
+        target value and still pass validation.
+    thresholds
+        Failure threshold levels so that the validation step can react accordingly when
+        failing test units are level. Since this is an aggregation-based validation with only
+        one test unit, threshold values typically should be set as absolute counts (e.g., `1`) to
+        indicate pass/fail, or as proportions where any value less than `1.0` means failure is
+        acceptable.
+    brief
+        An optional brief description of the validation step that will be displayed in the
+        reporting table. You can use the templating elements like `"{step}"` to insert
+        the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+        the entire brief will be automatically generated. If `None` (the default) then there
+        won't be a brief.
+    actions
+        Optional actions to take when the validation step meets or exceeds any set threshold
+        levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
+        define the actions.
+    active
+        A boolean value indicating whether the validation step should be active. Using `False`
+        will make the validation step inactive (still reporting its presence and keeping indexes
+        for the steps unchanged).
+
+    Returns
+    -------
+    Validate
+        The `Validate` object with the added validation step.
+
+    Using Reference Data
+    --------------------
+    The `col_sd_le()` method supports comparing column aggregations against reference data. This
+    is useful for validating that statistical properties remain consistent across different
+    versions of a dataset, or for comparing current data against historical baselines.
+
+    To use reference data, set the `reference=` parameter when creating the `Validate` object:
+
+    ```python
+    validation = (
+        pb.Validate(data=current_data, reference=baseline_data)
+        .col_sd_le(columns="revenue")  # Compares sum(current.revenue) vs sum(baseline.revenue)
+        .interrogate()
+    )
+    ```
+
+    When `value=None` and reference data is set, the method automatically compares against the
+    same column in the reference data. You can also explicitly specify reference columns using
+    the `ref()` helper:
+
+    ```python
+    .col_sd_le(columns="revenue", value=pb.ref("baseline_revenue"))
+    ```
+
+    Understanding Tolerance
+    -----------------------
+    The `tol=` parameter allows for fuzzy comparisons, which is especially important for
+    floating-point aggregations where exact equality is often unreliable.
+
+    The `tol=` parameter expands the acceptable range for the comparison. For
+        `col_sd_le()`, a tolerance of `tol=0.5` would mean the standard deviation can be within `0.5` of the
+        target value and still pass validation.
+
+    For equality comparisons (`col_*_eq`), the tolerance creates a range `[value - tol, value + tol]`
+    within which the aggregation is considered valid. For inequality comparisons, the tolerance
+    shifts the comparison boundary.
+
+    Thresholds
+    ----------
+    The `thresholds=` parameter is used to set the failure-condition levels for the validation
+    step. If they are set here at the step level, these thresholds will override any thresholds
+    set at the global level in `Validate(thresholds=...)`.
+
+    There are three threshold levels: 'warning', 'error', and 'critical'. Since aggregation
+    validations operate on a single test unit (the aggregated value), threshold values are
+    typically set as absolute counts:
+
+    - `thresholds=1` means any failure triggers a 'warning'
+    - `thresholds=(1, 1, 1)` means any failure triggers all three levels
+
+    Thresholds can be defined using one of these input schemes:
+
+    1. use the [`Thresholds`](`pointblank.Thresholds`) class (the most direct way to create
+    thresholds)
+    2. provide a tuple of 1-3 values, where position `0` is the 'warning' level, position `1` is
+    the 'error' level, and position `2` is the 'critical' level
+    3. create a dictionary of 1-3 value entries; the valid keys: are 'warning', 'error', and
+    'critical'
+    4. a single integer/float value denoting absolute number or fraction of failing test units
+    for the 'warning' level only
+
+    Examples
+    --------
+    For the examples, we'll use a simple Polars DataFrame with numeric columns. The table is
+    shown below:
+
+    ```python
+    import pointblank as pb
+    import polars as pl
+
+    tbl = pl.DataFrame(
+        {
+            "a": [1, 2, 3, 4, 5],
+            "b": [2, 2, 2, 2, 2],
+        }
+    )
+
+    pb.preview(tbl)
+    ```
+
+    Let's validate that the standard deviation of column `a` is at most `2`:
+
+    ```python
+    validation = (
+        pb.Validate(data=tbl)
+        .col_sd_le(columns="a", value=2)
+        .interrogate()
+    )
+
+    validation
+    ```
+
+    The validation result shows whether the standard deviation comparison passed or failed. Since this
+    is an aggregation-based validation, there is exactly one test unit per column.
+
+    When validating multiple columns, each column gets its own validation step:
+
+    ```python
+    validation = (
+        pb.Validate(data=tbl)
+        .col_sd_le(columns=["a", "b"], value=2)
+        .interrogate()
+    )
+
+    validation
+    ```
+
+    Using tolerance for flexible comparisons:
+
+    ```python
+    validation = (
+        pb.Validate(data=tbl)
+        .col_sd_le(columns="a", value=2, tol=1.0)
+        .interrogate()
+    )
+
+    validation
+    ```
+
+col_sd_eq(self: 'Validate', columns: 'str | Collection[str]', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool' = True) -> 'Validate'
+Does the column standard deviation satisfy an equal to comparison?
+
+    The `col_sd_eq()` validation method checks whether the standard deviation of values in a column
+    equals a specified `value=`. This is an aggregation-based validation where the entire
+    column is reduced to a single standard deviation value that is then compared against the target. The
+    comparison used in this function is `standard deviation(column) == value`.
+
+    Unlike row-level validations (e.g., `col_vals_gt()`), this method treats the entire column as
+    a single test unit. The validation either passes completely (if the aggregated value satisfies
+    the comparison) or fails completely.
+
+    Parameters
+    ----------
+    columns
+        A single column or a list of columns to validate. If multiple columns are supplied,
+        there will be a separate validation step generated for each column. The columns must
+        contain numeric data for the standard deviation to be computed.
+    value
+        The value to compare the column standard deviation against. This can be: (1) a numeric literal
+        (`int` or `float`), (2) a [`col()`](`pointblank.col`) object referencing another column
+        whose standard deviation will be used for comparison, (3) a [`ref()`](`pointblank.ref`) object
+        referencing a column in reference data (when `Validate(reference=)` has been set), or (4)
+        `None` to automatically compare against the same column in reference data (shorthand for
+        `ref(column_name)` when reference data is set).
+    tol
+        A tolerance value for the comparison. The default is `0`, meaning exact comparison. When
+        set to a positive value, the comparison becomes more lenient. For example, with `tol=0.5`,
+        a standard deviation that differs from the target by up to `0.5` will still pass. The `tol=` parameter is particularly useful with `col_sd_eq()` since exact equality
+        comparisons on floating-point aggregations can be problematic due to numerical precision.
+        Setting a small tolerance (e.g., `tol=0.001`) allows for minor differences that arise from
+        floating-point arithmetic.
+    thresholds
+        Failure threshold levels so that the validation step can react accordingly when
+        failing test units are level. Since this is an aggregation-based validation with only
+        one test unit, threshold values typically should be set as absolute counts (e.g., `1`) to
+        indicate pass/fail, or as proportions where any value less than `1.0` means failure is
+        acceptable.
+    brief
+        An optional brief description of the validation step that will be displayed in the
+        reporting table. You can use the templating elements like `"{step}"` to insert
+        the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+        the entire brief will be automatically generated. If `None` (the default) then there
+        won't be a brief.
+    actions
+        Optional actions to take when the validation step meets or exceeds any set threshold
+        levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
+        define the actions.
+    active
+        A boolean value indicating whether the validation step should be active. Using `False`
+        will make the validation step inactive (still reporting its presence and keeping indexes
+        for the steps unchanged).
+
+    Returns
+    -------
+    Validate
+        The `Validate` object with the added validation step.
+
+    Using Reference Data
+    --------------------
+    The `col_sd_eq()` method supports comparing column aggregations against reference data. This
+    is useful for validating that statistical properties remain consistent across different
+    versions of a dataset, or for comparing current data against historical baselines.
+
+    To use reference data, set the `reference=` parameter when creating the `Validate` object:
+
+    ```python
+    validation = (
+        pb.Validate(data=current_data, reference=baseline_data)
+        .col_sd_eq(columns="revenue")  # Compares sum(current.revenue) vs sum(baseline.revenue)
+        .interrogate()
+    )
+    ```
+
+    When `value=None` and reference data is set, the method automatically compares against the
+    same column in the reference data. You can also explicitly specify reference columns using
+    the `ref()` helper:
+
+    ```python
+    .col_sd_eq(columns="revenue", value=pb.ref("baseline_revenue"))
+    ```
+
+    Understanding Tolerance
+    -----------------------
+    The `tol=` parameter allows for fuzzy comparisons, which is especially important for
+    floating-point aggregations where exact equality is often unreliable.
+
+    The `tol=` parameter is particularly useful with `col_sd_eq()` since exact equality
+        comparisons on floating-point aggregations can be problematic due to numerical precision.
+        Setting a small tolerance (e.g., `tol=0.001`) allows for minor differences that arise from
+        floating-point arithmetic.
+
+    For equality comparisons (`col_*_eq`), the tolerance creates a range `[value - tol, value + tol]`
+    within which the aggregation is considered valid. For inequality comparisons, the tolerance
+    shifts the comparison boundary.
+
+    Thresholds
+    ----------
+    The `thresholds=` parameter is used to set the failure-condition levels for the validation
+    step. If they are set here at the step level, these thresholds will override any thresholds
+    set at the global level in `Validate(thresholds=...)`.
+
+    There are three threshold levels: 'warning', 'error', and 'critical'. Since aggregation
+    validations operate on a single test unit (the aggregated value), threshold values are
+    typically set as absolute counts:
+
+    - `thresholds=1` means any failure triggers a 'warning'
+    - `thresholds=(1, 1, 1)` means any failure triggers all three levels
+
+    Thresholds can be defined using one of these input schemes:
+
+    1. use the [`Thresholds`](`pointblank.Thresholds`) class (the most direct way to create
+    thresholds)
+    2. provide a tuple of 1-3 values, where position `0` is the 'warning' level, position `1` is
+    the 'error' level, and position `2` is the 'critical' level
+    3. create a dictionary of 1-3 value entries; the valid keys: are 'warning', 'error', and
+    'critical'
+    4. a single integer/float value denoting absolute number or fraction of failing test units
+    for the 'warning' level only
+
+    Examples
+    --------
+    For the examples, we'll use a simple Polars DataFrame with numeric columns. The table is
+    shown below:
+
+    ```python
+    import pointblank as pb
+    import polars as pl
+
+    tbl = pl.DataFrame(
+        {
+            "a": [1, 2, 3, 4, 5],
+            "b": [2, 2, 2, 2, 2],
+        }
+    )
+
+    pb.preview(tbl)
+    ```
+
+    Let's validate that the standard deviation of column `a` equals `2`:
+
+    ```python
+    validation = (
+        pb.Validate(data=tbl)
+        .col_sd_eq(columns="a", value=2)
+        .interrogate()
+    )
+
+    validation
+    ```
+
+    The validation result shows whether the standard deviation comparison passed or failed. Since this
+    is an aggregation-based validation, there is exactly one test unit per column.
+
+    When validating multiple columns, each column gets its own validation step:
+
+    ```python
+    validation = (
+        pb.Validate(data=tbl)
+        .col_sd_eq(columns=["a", "b"], value=2)
+        .interrogate()
+    )
+
+    validation
+    ```
+
+    Using tolerance for flexible comparisons:
+
+    ```python
+    validation = (
+        pb.Validate(data=tbl)
+        .col_sd_eq(columns="a", value=2, tol=1.0)
+        .interrogate()
+    )
+
+    validation
+    ```
+
+rows_distinct(self, columns_subset: 'str | list[str] | None' = None, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
 
         Validate whether rows in the table are distinct.
 
@@ -5090,7 +7736,7 @@ rows_distinct(self, columns_subset: 'str | list[str] | None' = None, pre: 'Calla
         others.
         
 
-rows_complete(self, columns_subset: 'str | list[str] | None' = None, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
+rows_complete(self, columns_subset: 'str | list[str] | None' = None, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
 
         Validate whether row data are complete by having no missing values.
 
@@ -5280,7 +7926,7 @@ rows_complete(self, columns_subset: 'str | list[str] | None' = None, pre: 'Calla
         others.
         
 
-col_exists(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', thresholds: 'int | float | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
+col_exists(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
 
         Validate whether one or more columns exist in the table.
 
@@ -5632,7 +8278,7 @@ col_pct_null(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnS
         ```python
         validation = (
             pb.Validate(data=tbl)
-            .col_pct_null(columns="b", p=0.375, tol=(0.1, 0.3)  # Expect 3 Nulls, allow -10%/+30%
+            .col_pct_null(columns="b", p=0.375, tol=(0.1, 0.3))  # Expect 3 Nulls, allow -10%/+30%
             .interrogate()
         )
 
@@ -5643,7 +8289,7 @@ col_pct_null(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnS
         calculates to 2.7 to 3.9, which rounds down to 2 to 3 rows).
         
 
-col_schema_match(self, schema: 'Schema', complete: 'bool' = True, in_order: 'bool' = True, case_sensitive_colnames: 'bool' = True, case_sensitive_dtypes: 'bool' = True, full_match_dtypes: 'bool' = True, pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
+col_schema_match(self, schema: 'Schema', complete: 'bool' = True, in_order: 'bool' = True, case_sensitive_colnames: 'bool' = True, case_sensitive_dtypes: 'bool' = True, full_match_dtypes: 'bool' = True, pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
 
         Do columns in the table (and their types) match a predefined schema?
 
@@ -5803,7 +8449,7 @@ col_schema_match(self, schema: 'Schema', complete: 'bool' = True, in_order: 'boo
         since the table columns and their types match the schema.
         
 
-row_count_match(self, count: 'int | FrameT | Any', tol: 'Tolerance' = 0, inverse: 'bool' = False, pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
+row_count_match(self, count: 'int | Any', tol: 'Tolerance' = 0, inverse: 'bool' = False, pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
 
         Validate whether the row count of the table matches a specified count.
 
@@ -5957,7 +8603,7 @@ row_count_match(self, count: 'int | FrameT | Any', tol: 'Tolerance' = 0, inverse
 
         
 
-col_count_match(self, count: 'int | FrameT | Any', inverse: 'bool' = False, pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
+col_count_match(self, count: 'int | Any', inverse: 'bool' = False, pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
 
         Validate whether the column count of the table matches a specified count.
 
@@ -6072,7 +8718,7 @@ col_count_match(self, count: 'int | FrameT | Any', inverse: 'bool' = False, pre:
         columns in the target table. So, the single test unit passed.
         
 
-tbl_match(self, tbl_compare: 'FrameT | Any', pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
+tbl_match(self, tbl_compare: 'Any', pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
 
         Validate whether the target table matches a comparison table.
 
@@ -6295,7 +8941,7 @@ tbl_match(self, tbl_compare: 'FrameT | Any', pre: 'Callable | None' = None, thre
         (one value is different in column `c`).
         
 
-conjointly(self, *exprs: 'Callable', pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
+conjointly(self, *exprs: 'Callable', pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
 
         Perform multiple row-wise validations for joint validity.
 
@@ -6494,7 +9140,7 @@ conjointly(self, *exprs: 'Callable', pre: 'Callable | None' = None, thresholds: 
         information on how to use it with different table backends.
         
 
-specially(self, expr: 'Callable', pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
+specially(self, expr: 'Callable', pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
 
         Perform a specialized validation with customized logic.
 
@@ -6794,7 +9440,7 @@ specially(self, expr: 'Callable', pre: 'Callable | None' = None, thresholds: 'in
         virtually any data quality requirement in your organization.
         
 
-prompt(self, prompt: 'str', model: 'str', columns_subset: 'str | list[str] | None' = None, batch_size: 'int' = 1000, max_concurrent: 'int' = 3, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
+prompt(self, prompt: 'str', model: 'str', columns_subset: 'str | list[str] | None' = None, batch_size: 'int' = 1000, max_concurrent: 'int' = 3, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
 
         Validate rows using AI/LLM-powered analysis.
 
@@ -7115,7 +9761,7 @@ many steps). Furthermore, the `col()` function can be used to declare a comparis
 for the `value=` argument in many `col_vals_*()` methods) when you can't use a fixed value
 for comparison.
 
-col(exprs: 'str | ColumnSelector | ColumnSelectorNarwhals') -> 'Column | ColumnLiteral | ColumnSelectorNarwhals'
+col(exprs: 'str | ColumnSelector | ColumnSelectorNarwhals | nw.selectors.Selector') -> 'Column | ColumnLiteral | ColumnSelectorNarwhals'
 
     Helper function for referencing a column in the input table.
 
@@ -8735,7 +11381,7 @@ interrogate(self, collect_extracts: 'bool' = True, collect_tbl_checked: 'bool' =
         `get_first_n=10`.
         
 
-set_tbl(self, tbl: 'FrameT | Any', tbl_name: 'str | None' = None, label: 'str | None' = None) -> 'Validate'
+set_tbl(self, tbl: 'Any', tbl_name: 'str | None' = None, label: 'str | None' = None) -> 'Validate'
 
         Set or replace the table associated with the Validate object.
 
@@ -8837,7 +11483,7 @@ set_tbl(self, tbl: 'FrameT | Any', tbl_name: 'str | None' = None, label: 'str | 
         ```
         
 
-get_tabular_report(self, title: 'str | None' = ':default:', incl_header: 'bool' = None, incl_footer: 'bool' = None, incl_footer_timings: 'bool' = None, incl_footer_notes: 'bool' = None) -> 'GT'
+get_tabular_report(self, title: 'str | None' = ':default:', incl_header: 'bool | None' = None, incl_footer: 'bool | None' = None, incl_footer_timings: 'bool | None' = None, incl_footer_notes: 'bool | None' = None) -> 'GT'
 
         Validation report as a GT table.
 
@@ -9210,7 +11856,7 @@ get_json_report(self, use_fields: 'list[str] | None' = None, exclude_fields: 'li
         failed validation
         
 
-get_sundered_data(self, type='pass') -> 'FrameT'
+get_sundered_data(self, type='pass') -> 'Any'
 
         Get the data that passed or failed the validation steps.
 
@@ -9246,7 +11892,7 @@ get_sundered_data(self, type='pass') -> 'FrameT'
 
         Returns
         -------
-        FrameT
+        Any
             A table containing the data that passed or failed the validation steps.
 
         Examples
@@ -9291,7 +11937,7 @@ get_sundered_data(self, type='pass') -> 'FrameT'
         that's what we see in the returned DataFrame.
         
 
-get_data_extracts(self, i: 'int | list[int] | None' = None, frame: 'bool' = False) -> 'dict[int, FrameT | None] | FrameT | None'
+get_data_extracts(self, i: 'int | list[int] | None' = None, frame: 'bool' = False) -> 'dict[int, Any] | Any'
 
         Get the rows that failed for each validation step.
 
@@ -9314,7 +11960,7 @@ get_data_extracts(self, i: 'int | list[int] | None' = None, frame: 'bool' = Fals
 
         Returns
         -------
-        dict[int, FrameT | None] | FrameT | None
+        dict[int, Any] | Any
             A dictionary of tables containing the rows that failed in every compatible validation
             step. Alternatively, it can be a DataFrame if `frame=True` and `i=` is a scalar.
 
@@ -10471,7 +13117,7 @@ datasets included in the package can be accessed via the `load_dataset()` functi
 `config()` utility lets us set global configuration parameters. Want to chat with an assistant? Use
 the `assistant()` function to get help with Pointblank.
 
-DataScan(data: 'IntoFrameT', tbl_name: 'str | None' = None) -> 'None'
+DataScan(data: 'Any', tbl_name: 'str | None' = None) -> 'None'
 
     Get a summary of a dataset.
 
@@ -10567,7 +13213,7 @@ DataScan(data: 'IntoFrameT', tbl_name: 'str | None' = None) -> 'None'
         A DataScan object.
     
 
-preview(data: 'FrameT | Any', columns_subset: 'str | list[str] | Column | None' = None, n_head: 'int' = 5, n_tail: 'int' = 5, limit: 'int' = 50, show_row_numbers: 'bool' = True, max_col_width: 'int' = 250, min_tbl_width: 'int' = 500, incl_header: 'bool' = None) -> 'GT'
+preview(data: 'Any', columns_subset: 'str | list[str] | Column | None' = None, n_head: 'int' = 5, n_tail: 'int' = 5, limit: 'int' = 50, show_row_numbers: 'bool' = True, max_col_width: 'int' = 250, min_tbl_width: 'int' = 500, incl_header: 'bool | None' = None) -> 'GT'
 
     Display a table preview that shows some rows from the top, some from the bottom.
 
@@ -10766,7 +13412,7 @@ preview(data: 'FrameT | Any', columns_subset: 'str | list[str] | Column | None' 
     function.
     
 
-col_summary_tbl(data: 'FrameT | Any', tbl_name: 'str | None' = None) -> 'GT'
+col_summary_tbl(data: 'Any', tbl_name: 'str | None' = None) -> 'GT'
 
     Generate a column-level summary table of a dataset.
 
@@ -10843,7 +13489,7 @@ col_summary_tbl(data: 'FrameT | Any', tbl_name: 'str | None' = None) -> 'GT'
     ```
     
 
-missing_vals_tbl(data: 'FrameT | Any') -> 'GT'
+missing_vals_tbl(data: 'Any') -> 'GT'
 
     Display a table that shows the missing values in the input table.
 
@@ -10917,7 +13563,7 @@ missing_vals_tbl(data: 'FrameT | Any') -> 'GT'
     sector. Many columns have no missing values at all, and those sectors are colored light blue.
     
 
-assistant(model: 'str', data: 'FrameT | Any | None' = None, tbl_name: 'str | None' = None, api_key: 'str | None' = None, display: 'str | None' = None) -> 'None'
+assistant(model: 'str', data: 'Any' = None, tbl_name: 'str | None' = None, api_key: 'str | None' = None, display: 'str | None' = None) -> 'None'
 
     Chat with the PbA (Pointblank Assistant) about your data validation needs.
 
@@ -11061,7 +13707,7 @@ assistant(model: 'str', data: 'FrameT | Any | None' = None, tbl_name: 'str | Non
     library. The loading preference is Polars first, then Pandas as a fallback.
     
 
-load_dataset(dataset: "Literal['small_table', 'game_revenue', 'nycflights', 'global_sales']" = 'small_table', tbl_type: "Literal['polars', 'pandas', 'duckdb']" = 'polars') -> 'FrameT | Any'
+load_dataset(dataset: "Literal['small_table', 'game_revenue', 'nycflights', 'global_sales']" = 'small_table', tbl_type: "Literal['polars', 'pandas', 'duckdb']" = 'polars') -> 'Any'
 
     Load a dataset hosted in the library as specified table type.
 
@@ -11082,7 +13728,7 @@ load_dataset(dataset: "Literal['small_table', 'game_revenue', 'nycflights', 'glo
 
     Returns
     -------
-    FrameT | Any
+    Any
         The dataset for the `Validate` object. This could be a Polars DataFrame, a Pandas DataFrame,
         or a DuckDB table as an Ibis table.
 
@@ -11374,7 +14020,7 @@ from YAML strings or files. The `validate_yaml()` function checks if the YAML co
 its own validity checks. The `yaml_to_python()` function converts YAML configuration to equivalent
 Python code.
 
-yaml_interrogate(yaml: 'Union[str, Path]', set_tbl: 'Union[FrameT, Any, None]' = None, namespaces: 'Optional[Union[Iterable[str], Mapping[str, str]]]' = None) -> 'Validate'
+yaml_interrogate(yaml: 'Union[str, Path]', set_tbl: 'Any' = None, namespaces: 'Optional[Union[Iterable[str], Mapping[str, str]]]' = None) -> 'Validate'
 Execute a YAML-based validation workflow.
 
     This is the main entry point for YAML-based validation workflows. It takes YAML configuration
@@ -11863,7 +14509,7 @@ columns or rows in a table. The `get_action_metadata()` function is useful when 
 actions since it returns metadata about the validation step that's triggering the action. Lastly,
 the `config()` utility lets us set global configuration parameters.
 
-get_column_count(data: 'FrameT | Any') -> 'int'
+get_column_count(data: 'Any') -> 'int'
 
     Get the number of columns in a table.
 
@@ -11978,7 +14624,7 @@ get_column_count(data: 'FrameT | Any') -> 'int'
     `8` for the `small_table` dataset.
     
 
-get_row_count(data: 'FrameT | Any') -> 'int'
+get_row_count(data: 'Any') -> 'int'
 
     Get the number of rows in a table.
 
@@ -12602,7 +15248,7 @@ send a Slack notification when validation steps exceed failure threshold levels 
 summary of the validation results, including the status, number of steps, passing and failing steps,
 table information, and timing details.
 
-send_slack_notification(webhook_url: 'str | None' = None, step_msg: 'str | None' = None, summary_msg: 'str | None' = None, debug: 'bool' = False) -> 'Callable'
+send_slack_notification(webhook_url: 'str | None' = None, step_msg: 'str | None' = None, summary_msg: 'str | None' = None, debug: 'bool' = False) -> 'Callable | None'
 
     Create a Slack notification function using a webhook URL.
 
