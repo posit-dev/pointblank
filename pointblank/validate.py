@@ -21291,15 +21291,12 @@ def _generate_agg_docstring(name: str) -> str:
         there will be a separate validation step generated for each column. The columns must
         contain numeric data for the {agg_name} to be computed.
     value
-        The value to compare the column {agg_name} against. This can be:
-
-        - A numeric literal (int or float)
-        - A [`col()`](`pointblank.col`) object referencing another column whose {agg_name} will
-          be used for comparison
-        - A [`ref()`](`pointblank.ref`) object referencing a column in reference data (when
-          `reference=` is set on `Validate`)
-        - `None` to automatically compare against the same column in reference data (shorthand
-          for `ref(column_name)` when reference data is set)
+        The value to compare the column {agg_name} against. This can be: (1) a numeric literal
+        (`int` or `float`), (2) a [`col()`](`pointblank.col`) object referencing another column
+        whose {agg_name} will be used for comparison, (3) a [`ref()`](`pointblank.ref`) object
+        referencing a column in reference data (when `Validate(reference=)` has been set), or (4)
+        `None` to automatically compare against the same column in reference data (shorthand for
+        `ref(column_name)` when reference data is set).
     tol
         A tolerance value for the comparison. The default is `0`, meaning exact comparison. When
         set to a positive value, the comparison becomes more lenient. For example, with `tol=0.5`,
