@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Callable
+from typing import Any, Callable
 
 import narwhals as nw
 
@@ -28,7 +28,7 @@ def _check_boolean_input(param: bool, param_name: str):
         raise ValueError(f"`{param_name}=` must be a boolean value.")
 
 
-def _check_column(column: str | list[str]):
+def _check_column(column: str | list[str] | Column | ColumnSelector | nw.selectors.Selector):
     """
     Check the input value of the `column=` parameter.
 
@@ -59,7 +59,7 @@ def _check_column(column: str | list[str]):
 
 
 # TODO: allow for checking of dates/datetimes
-def _check_value_float_int(value: float | int | any):
+def _check_value_float_int(value: float | int | Any):
     """
     Check that input value of the `value=` parameter is a float or integer.
 

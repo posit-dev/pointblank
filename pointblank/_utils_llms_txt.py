@@ -332,10 +332,14 @@ def _get_examples_text() -> str:
             example_text = "\n".join(example_text.split("\n")[8:])
 
             # Extract the title of the example (the line beginning with `###`)
-            title = re.search(r"### (.*)", example_text).group(1)
+            title_match = re.search(r"### (.*)", example_text)
+            assert title_match is not None
+            title = title_match.group(1)
 
             # The next line with text is the short description of the example
-            desc = re.search(r"(.*)\.", example_text).group(1)
+            desc_match = re.search(r"(.*)\.", example_text)
+            assert desc_match is not None
+            desc = desc_match.group(1)
 
             # Get all of the Python code blocks in the example
             # these can be identified as starting with ```python and ending with ```

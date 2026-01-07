@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Callable
+from typing import Callable, cast
 
 __all__ = ["Thresholds", "Actions", "FinalActions"]
 
@@ -180,14 +180,15 @@ class Thresholds:
         # The threshold value might be an absolute count, but we need to convert
         # it to a fractional value
         if isinstance(threshold_value, int):
-            threshold_value = _convert_abs_count_to_fraction(
-                value=threshold_value, test_units=test_units
-            )
+            converted = _convert_abs_count_to_fraction(value=threshold_value, test_units=test_units)
+            if converted is None:
+                return None
+            threshold_value = converted
 
         return fraction_failing >= threshold_value
 
 
-def _convert_abs_count_to_fraction(value: int | None, test_units: int) -> float:
+def _convert_abs_count_to_fraction(value: int | None, test_units: int) -> float | None:
     # Using a integer value signifying the total number of 'test units' (in the
     # context of a validation), we convert an integer count (absolute) threshold
     # value to a fractional threshold value
@@ -251,12 +252,12 @@ def _normalize_thresholds_creation(
         # any of these keys
 
         # Check keys for invalid entries and raise a ValueError if any are found
-        invalid_keys = set(thresholds.keys()) - {"warning", "error", "critical"}
+        invalid_keys: set = set(thresholds.keys()) - {"warning", "error", "critical"}
 
         if invalid_keys:
             raise ValueError(f"Invalid keys in the thresholds dictionary: {invalid_keys}")
 
-        thresholds = Thresholds(**thresholds)
+        thresholds = Thresholds(**cast(dict[str, int | float | None], thresholds))
 
     elif isinstance(thresholds, Thresholds):
         pass
@@ -483,12 +484,12 @@ class Actions:
 
     def _ensure_list(
         self, value: str | Callable | list[str | Callable] | None
-    ) -> list[str | Callable]:
+    ) -> list[str | Callable] | None:
         if value is None:
             return None
-        if not isinstance(value, list):
-            return [value]
-        return value
+        if isinstance(value, list):
+            return cast(list[str | Callable], value)
+        return [value]
 
     def __repr__(self) -> str:
         return f"Actions(warning={self.warning}, error={self.error}, critical={self.critical})"
@@ -627,13 +628,14 @@ class FinalActions:
     def __repr__(self) -> str:
         if isinstance(self.actions, list):
             action_reprs = ", ".join(
-                f"'{a}'" if isinstance(a, str) else a.__name__ for a in self.actions
+                f"'{a}'" if isinstance(a, str) else getattr(a, "__name__", repr(a))
+                for a in self.actions
             )
             return f"FinalActions([{action_reprs}])"
         elif isinstance(self.actions, str):
             return f"FinalActions('{self.actions}')"
         elif callable(self.actions):
-            return f"FinalActions({self.actions.__name__})"
+            return f"FinalActions({getattr(self.actions, '__name__', repr(self.actions))})"
         else:
             return f"FinalActions({self.actions})"  # pragma: no cover
 
