@@ -37,6 +37,7 @@
 - [Validate](https://posit-dev.github.io/pointblank/reference/Validate.html): Workflow for defining a set of validations on a table and interrogating for results.
 - [Thresholds](https://posit-dev.github.io/pointblank/reference/Thresholds.html): Definition of threshold values.
 - [Actions](https://posit-dev.github.io/pointblank/reference/Actions.html): Definition of action values.
+- [FinalActions](https://posit-dev.github.io/pointblank/reference/FinalActions.html): Define actions to be taken after validation is complete.
 - [Schema](https://posit-dev.github.io/pointblank/reference/Schema.html): Definition of a schema object.
 - [DraftValidation](https://posit-dev.github.io/pointblank/reference/DraftValidation.html): Draft a validation plan for a given table using an LLM.
 - [Validate.col_vals_gt](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_gt.html): Are column data greater than a fixed value or data in another column?
@@ -49,16 +50,39 @@
 - [Validate.col_vals_outside](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_outside.html): Do column data lie outside of two specified values or data in other columns?
 - [Validate.col_vals_in_set](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_in_set.html): Validate whether column values are in a set of values.
 - [Validate.col_vals_not_in_set](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_not_in_set.html): Validate whether column values are not in a set of values.
-- [Validate.col_vals_null](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_null.html): Validate whether values in a column are NULL.
-- [Validate.col_vals_not_null](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_not_null.html): Validate whether values in a column are not NULL.
+- [Validate.col_vals_increasing](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_increasing.html): Are column data increasing by row?
+- [Validate.col_vals_decreasing](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_decreasing.html): Are column data decreasing by row?
+- [Validate.col_vals_null](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_null.html): Validate whether values in a column are Null.
+- [Validate.col_vals_not_null](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_not_null.html): Validate whether values in a column are not Null.
 - [Validate.col_vals_regex](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_regex.html): Validate whether column values match a regular expression pattern.
+- [Validate.col_vals_within_spec](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_within_spec.html): Validate whether column values fit within a specification.
 - [Validate.col_vals_expr](https://posit-dev.github.io/pointblank/reference/Validate.col_vals_expr.html): Validate column values using a custom expression.
+- [Validate.rows_distinct](https://posit-dev.github.io/pointblank/reference/Validate.rows_distinct.html): Validate whether rows in the table are distinct.
+- [Validate.rows_complete](https://posit-dev.github.io/pointblank/reference/Validate.rows_complete.html): Validate whether row data are complete by having no missing values.
 - [Validate.col_exists](https://posit-dev.github.io/pointblank/reference/Validate.col_exists.html): Validate whether one or more columns exist in the table.
 - [Validate.col_pct_null](https://posit-dev.github.io/pointblank/reference/Validate.col_pct_null.html): Validate whether a column has a specific percentage of Null values.
-- [Validate.rows_distinct](https://posit-dev.github.io/pointblank/reference/Validate.rows_distinct.html): Validate whether rows in the table are distinct.
 - [Validate.col_schema_match](https://posit-dev.github.io/pointblank/reference/Validate.col_schema_match.html): Do columns in the table (and their types) match a predefined schema?
 - [Validate.row_count_match](https://posit-dev.github.io/pointblank/reference/Validate.row_count_match.html): Validate whether the row count of the table matches a specified count.
 - [Validate.col_count_match](https://posit-dev.github.io/pointblank/reference/Validate.col_count_match.html): Validate whether the column count of the table matches a specified count.
+- [Validate.tbl_match](https://posit-dev.github.io/pointblank/reference/Validate.tbl_match.html): Validate whether the target table matches a comparison table.
+- [Validate.conjointly](https://posit-dev.github.io/pointblank/reference/Validate.conjointly.html): Perform multiple row-wise validations for joint validity.
+- [Validate.specially](https://posit-dev.github.io/pointblank/reference/Validate.specially.html): Perform a specialized validation with customized logic.
+- [Validate.prompt](https://posit-dev.github.io/pointblank/reference/Validate.prompt.html): Validate rows using AI/LLM-powered analysis.
+- [Validate.col_sum_eq](https://posit-dev.github.io/pointblank/reference/Validate.col_sum_eq.html): Does the column sum satisfy an equal to comparison?
+- [Validate.col_sum_gt](https://posit-dev.github.io/pointblank/reference/Validate.col_sum_gt.html): Does the column sum satisfy a greater than comparison?
+- [Validate.col_sum_ge](https://posit-dev.github.io/pointblank/reference/Validate.col_sum_ge.html): Does the column sum satisfy a greater than or equal to comparison?
+- [Validate.col_sum_lt](https://posit-dev.github.io/pointblank/reference/Validate.col_sum_lt.html): Does the column sum satisfy a less than comparison?
+- [Validate.col_sum_le](https://posit-dev.github.io/pointblank/reference/Validate.col_sum_le.html): Does the column sum satisfy a less than or equal to comparison?
+- [Validate.col_avg_eq](https://posit-dev.github.io/pointblank/reference/Validate.col_avg_eq.html): Does the column average satisfy an equal to comparison?
+- [Validate.col_avg_gt](https://posit-dev.github.io/pointblank/reference/Validate.col_avg_gt.html): Does the column average satisfy a greater than comparison?
+- [Validate.col_avg_ge](https://posit-dev.github.io/pointblank/reference/Validate.col_avg_ge.html): Does the column average satisfy a greater than or equal to comparison?
+- [Validate.col_avg_lt](https://posit-dev.github.io/pointblank/reference/Validate.col_avg_lt.html): Does the column average satisfy a less than comparison?
+- [Validate.col_avg_le](https://posit-dev.github.io/pointblank/reference/Validate.col_avg_le.html): Does the column average satisfy a less than or equal to comparison?
+- [Validate.col_sd_eq](https://posit-dev.github.io/pointblank/reference/Validate.col_sd_eq.html): Does the column standard deviation satisfy an equal to comparison?
+- [Validate.col_sd_gt](https://posit-dev.github.io/pointblank/reference/Validate.col_sd_gt.html): Does the column standard deviation satisfy a greater than comparison?
+- [Validate.col_sd_ge](https://posit-dev.github.io/pointblank/reference/Validate.col_sd_ge.html): Does the column standard deviation satisfy a greater than or equal to comparison?
+- [Validate.col_sd_lt](https://posit-dev.github.io/pointblank/reference/Validate.col_sd_lt.html): Does the column standard deviation satisfy a less than comparison?
+- [Validate.col_sd_le](https://posit-dev.github.io/pointblank/reference/Validate.col_sd_le.html): Does the column standard deviation satisfy a less than or equal to comparison?
 - [col](https://posit-dev.github.io/pointblank/reference/col.html): Helper function for referencing a column in the input table.
 - [starts_with](https://posit-dev.github.io/pointblank/reference/starts_with.html): Select columns that start with specified text.
 - [ends_with](https://posit-dev.github.io/pointblank/reference/ends_with.html): Select columns that end with specified text.
@@ -67,7 +91,10 @@
 - [everything](https://posit-dev.github.io/pointblank/reference/everything.html): Select all columns.
 - [first_n](https://posit-dev.github.io/pointblank/reference/first_n.html): Select the first `n` columns in the column list.
 - [last_n](https://posit-dev.github.io/pointblank/reference/last_n.html): Select the last `n` columns in the column list.
+- [expr_col](https://posit-dev.github.io/pointblank/reference/expr_col.html): Create a column expression for use in `conjointly()` validation.
+- [seg_group](https://posit-dev.github.io/pointblank/reference/seg_group.html): Group together values for segmentation.
 - [Validate.interrogate](https://posit-dev.github.io/pointblank/reference/Validate.interrogate.html): Execute each validation step against the table and store the results.
+- [Validate.set_tbl](https://posit-dev.github.io/pointblank/reference/Validate.set_tbl.html): Set or replace the table associated with the Validate object.
 - [Validate.get_tabular_report](https://posit-dev.github.io/pointblank/reference/Validate.get_tabular_report.html): Validation report as a GT table.
 - [Validate.get_step_report](https://posit-dev.github.io/pointblank/reference/Validate.get_step_report.html): Get a detailed report for a single validation step.
 - [Validate.get_json_report](https://posit-dev.github.io/pointblank/reference/Validate.get_json_report.html): Get a report of the validation results as a JSON-formatted string.
@@ -75,6 +102,8 @@
 - [Validate.get_data_extracts](https://posit-dev.github.io/pointblank/reference/Validate.get_data_extracts.html): Get the rows that failed for each validation step.
 - [Validate.all_passed](https://posit-dev.github.io/pointblank/reference/Validate.all_passed.html): Determine if every validation step passed perfectly, with no failing test units.
 - [Validate.assert_passing](https://posit-dev.github.io/pointblank/reference/Validate.assert_passing.html): Raise an `AssertionError` if all tests are not passing.
+- [Validate.assert_below_threshold](https://posit-dev.github.io/pointblank/reference/Validate.assert_below_threshold.html): Raise an `AssertionError` if validation steps exceed a specified threshold level.
+- [Validate.above_threshold](https://posit-dev.github.io/pointblank/reference/Validate.above_threshold.html): Check if any validation steps exceed a specified threshold level.
 - [Validate.n](https://posit-dev.github.io/pointblank/reference/Validate.n.html): Provides a dictionary of the number of test units for each validation step.
 - [Validate.n_passed](https://posit-dev.github.io/pointblank/reference/Validate.n_passed.html): Provides a dictionary of the number of test units that passed for each validation step.
 - [Validate.n_failed](https://posit-dev.github.io/pointblank/reference/Validate.n_failed.html): Provides a dictionary of the number of test units that failed for each validation step.
@@ -85,11 +114,24 @@
 - [Validate.critical](https://posit-dev.github.io/pointblank/reference/Validate.critical.html): Get the 'critical' level status for each validation step.
 - [DataScan](https://posit-dev.github.io/pointblank/reference/DataScan.html): Get a summary of a dataset.
 - [preview](https://posit-dev.github.io/pointblank/reference/preview.html): Display a table preview that shows some rows from the top, some from the bottom.
+- [col_summary_tbl](https://posit-dev.github.io/pointblank/reference/col_summary_tbl.html): Generate a column-level summary table of a dataset.
 - [missing_vals_tbl](https://posit-dev.github.io/pointblank/reference/missing_vals_tbl.html): Display a table that shows the missing values in the input table.
+- [assistant](https://posit-dev.github.io/pointblank/reference/assistant.html): Chat with the PbA (Pointblank Assistant) about your data validation needs.
+- [load_dataset](https://posit-dev.github.io/pointblank/reference/load_dataset.html): Load a dataset hosted in the library as specified table type.
+- [get_data_path](https://posit-dev.github.io/pointblank/reference/get_data_path.html): Get the file path to a dataset included with the Pointblank package.
+- [connect_to_table](https://posit-dev.github.io/pointblank/reference/connect_to_table.html): Connect to a database table using a connection string.
+- [print_database_tables](https://posit-dev.github.io/pointblank/reference/print_database_tables.html): List all tables in a database from a connection string.
+- [yaml_interrogate](https://posit-dev.github.io/pointblank/reference/yaml_interrogate.html): Execute a YAML-based validation workflow.
+- [validate_yaml](https://posit-dev.github.io/pointblank/reference/validate_yaml.html): Validate YAML configuration against the expected structure.
+- [yaml_to_python](https://posit-dev.github.io/pointblank/reference/yaml_to_python.html): Convert YAML validation configuration to equivalent Python code.
 - [get_column_count](https://posit-dev.github.io/pointblank/reference/get_column_count.html): Get the number of columns in a table.
 - [get_row_count](https://posit-dev.github.io/pointblank/reference/get_row_count.html): Get the number of rows in a table.
-- [load_dataset](https://posit-dev.github.io/pointblank/reference/load_dataset.html): Load a dataset hosted in the library as specified table type.
-- [config](https://posit-dev.github.io/pointblank/reference/config.html): Configuration settings for the pointblank library.
+- [get_action_metadata](https://posit-dev.github.io/pointblank/reference/get_action_metadata.html): Access step-level metadata when authoring custom actions.
+- [get_validation_summary](https://posit-dev.github.io/pointblank/reference/get_validation_summary.html): Access validation summary information when authoring final actions.
+- [write_file](https://posit-dev.github.io/pointblank/reference/write_file.html): Write a Validate object to disk as a serialized file.
+- [read_file](https://posit-dev.github.io/pointblank/reference/read_file.html): Read a Validate object from disk that was previously saved with `write_file()`.
+- [config](https://posit-dev.github.io/pointblank/reference/config.html): Configuration settings for the Pointblank library.
+- [send_slack_notification](https://posit-dev.github.io/pointblank/reference/send_slack_notification.html): Create a Slack notification function using a webhook URL.
 
 ### User Guide
 
