@@ -21182,6 +21182,271 @@ def _create_col_schema_match_params_html(
     )
 
 
+def _generate_agg_docstring(name: str) -> str:
+    """Generate a comprehensive docstring for an aggregation validation method.
+
+    This function creates detailed documentation for dynamically generated methods like
+    `col_sum_eq()`, `col_avg_gt()`, `col_sd_le()`, etc. The docstrings follow the same
+    structure and quality as manually written validation methods like `col_vals_gt()`.
+
+    Parameters
+    ----------
+    name
+        The method name (e.g., "col_sum_eq", "col_avg_gt", "col_sd_le").
+
+    Returns
+    -------
+    str
+        A complete docstring for the method.
+    """
+    # Parse the method name to extract aggregation type and comparison operator
+    # Format: col_{agg}_{comp} (e.g., col_sum_eq, col_avg_gt, col_sd_le)
+    parts = name.split("_")
+    agg_type = parts[1]  # sum, avg, sd
+    comp_type = parts[2]  # eq, gt, ge, lt, le
+
+    # Human-readable names for aggregation types
+    agg_names = {
+        "sum": ("sum", "summed"),
+        "avg": ("average", "averaged"),
+        "sd": ("standard deviation", "computed for standard deviation"),
+    }
+
+    # Human-readable descriptions for comparison operators (with article for title)
+    comp_descriptions = {
+        "eq": ("equal to", "equals", "an"),
+        "gt": ("greater than", "is greater than", "a"),
+        "ge": ("greater than or equal to", "is at least", "a"),
+        "lt": ("less than", "is less than", "a"),
+        "le": ("less than or equal to", "is at most", "a"),
+    }
+
+    # Mathematical symbols for comparison operators
+    comp_symbols = {
+        "eq": "==",
+        "gt": ">",
+        "ge": ">=",
+        "lt": "<",
+        "le": "<=",
+    }
+
+    agg_name, agg_verb = agg_names[agg_type]
+    comp_desc, comp_phrase, comp_article = comp_descriptions[comp_type]
+    comp_symbol = comp_symbols[comp_type]
+
+    # Determine the appropriate example values based on the aggregation and comparison
+    if agg_type == "sum":
+        example_value = "15"
+        example_data = '{"a": [1, 2, 3, 4, 5], "b": [2, 2, 2, 2, 2]}'
+        example_sum = "15"  # sum of a
+        example_ref_sum = "10"  # sum of b
+    elif agg_type == "avg":
+        example_value = "3"
+        example_data = '{"a": [1, 2, 3, 4, 5], "b": [2, 2, 2, 2, 2]}'
+        example_sum = "3.0"  # avg of a
+        example_ref_sum = "2.0"  # avg of b
+    else:  # sd
+        example_value = "2"
+        example_data = '{"a": [1, 2, 3, 4, 5], "b": [2, 2, 2, 2, 2]}'
+        example_sum = "~1.58"  # sd of a
+        example_ref_sum = "0.0"  # sd of b
+
+    # Build appropriate tolerance explanation based on comparison type
+    if comp_type == "eq":
+        tol_explanation = f"""The `tol=` parameter is particularly useful with `{name}()` since exact equality
+        comparisons on floating-point aggregations can be problematic due to numerical precision.
+        Setting a small tolerance (e.g., `tol=0.001`) allows for minor differences that arise from
+        floating-point arithmetic."""
+    else:
+        tol_explanation = f"""The `tol=` parameter expands the acceptable range for the comparison. For
+        `{name}()`, a tolerance of `tol=0.5` would mean the {agg_name} can be within `0.5` of the
+        target value and still pass validation."""
+
+    docstring = f"""
+    Does the column {agg_name} satisfy {comp_article} {comp_desc} comparison?
+
+    The `{name}()` validation method checks whether the {agg_name} of values in a column
+    {comp_phrase} a specified `value=`. This is an aggregation-based validation where the entire
+    column is reduced to a single {agg_name} value that is then compared against the target. The
+    comparison used in this function is `{agg_name}(column) {comp_symbol} value`.
+
+    Unlike row-level validations (e.g., `col_vals_gt()`), this method treats the entire column as
+    a single test unit. The validation either passes completely (if the aggregated value satisfies
+    the comparison) or fails completely.
+
+    Parameters
+    ----------
+    columns
+        A single column or a list of columns to validate. If multiple columns are supplied,
+        there will be a separate validation step generated for each column. The columns must
+        contain numeric data for the {agg_name} to be computed.
+    value
+        The value to compare the column {agg_name} against. This can be:
+
+        - A numeric literal (int or float)
+        - A [`col()`](`pointblank.col`) object referencing another column whose {agg_name} will
+          be used for comparison
+        - A [`ref()`](`pointblank.ref`) object referencing a column in reference data (when
+          `reference=` is set on `Validate`)
+        - `None` to automatically compare against the same column in reference data (shorthand
+          for `ref(column_name)` when reference data is set)
+    tol
+        A tolerance value for the comparison. The default is `0`, meaning exact comparison. When
+        set to a positive value, the comparison becomes more lenient. For example, with `tol=0.5`,
+        a {agg_name} that differs from the target by up to `0.5` will still pass. {tol_explanation}
+    thresholds
+        Failure threshold levels so that the validation step can react accordingly when
+        failing test units are level. Since this is an aggregation-based validation with only
+        one test unit, threshold values typically should be set as absolute counts (e.g., `1`) to
+        indicate pass/fail, or as proportions where any value less than `1.0` means failure is
+        acceptable.
+    brief
+        An optional brief description of the validation step that will be displayed in the
+        reporting table. You can use the templating elements like `"{{step}}"` to insert
+        the step number, or `"{{auto}}"` to include an automatically generated brief. If `True`
+        the entire brief will be automatically generated. If `None` (the default) then there
+        won't be a brief.
+    actions
+        Optional actions to take when the validation step meets or exceeds any set threshold
+        levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
+        define the actions.
+    active
+        A boolean value indicating whether the validation step should be active. Using `False`
+        will make the validation step inactive (still reporting its presence and keeping indexes
+        for the steps unchanged).
+
+    Returns
+    -------
+    Validate
+        The `Validate` object with the added validation step.
+
+    Using Reference Data
+    --------------------
+    The `{name}()` method supports comparing column aggregations against reference data. This
+    is useful for validating that statistical properties remain consistent across different
+    versions of a dataset, or for comparing current data against historical baselines.
+
+    To use reference data, set the `reference=` parameter when creating the `Validate` object:
+
+    ```python
+    validation = (
+        pb.Validate(data=current_data, reference=baseline_data)
+        .{name}(columns="revenue")  # Compares sum(current.revenue) vs sum(baseline.revenue)
+        .interrogate()
+    )
+    ```
+
+    When `value=None` and reference data is set, the method automatically compares against the
+    same column in the reference data. You can also explicitly specify reference columns using
+    the `ref()` helper:
+
+    ```python
+    .{name}(columns="revenue", value=pb.ref("baseline_revenue"))
+    ```
+
+    Understanding Tolerance
+    -----------------------
+    The `tol=` parameter allows for fuzzy comparisons, which is especially important for
+    floating-point aggregations where exact equality is often unreliable.
+
+    {tol_explanation}
+
+    For equality comparisons (`col_*_eq`), the tolerance creates a range `[value - tol, value + tol]`
+    within which the aggregation is considered valid. For inequality comparisons, the tolerance
+    shifts the comparison boundary.
+
+    Thresholds
+    ----------
+    The `thresholds=` parameter is used to set the failure-condition levels for the validation
+    step. If they are set here at the step level, these thresholds will override any thresholds
+    set at the global level in `Validate(thresholds=...)`.
+
+    There are three threshold levels: 'warning', 'error', and 'critical'. Since aggregation
+    validations operate on a single test unit (the aggregated value), threshold values are
+    typically set as absolute counts:
+
+    - `thresholds=1` means any failure triggers a 'warning'
+    - `thresholds=(1, 1, 1)` means any failure triggers all three levels
+
+    Thresholds can be defined using one of these input schemes:
+
+    1. use the [`Thresholds`](`pointblank.Thresholds`) class (the most direct way to create
+    thresholds)
+    2. provide a tuple of 1-3 values, where position `0` is the 'warning' level, position `1` is
+    the 'error' level, and position `2` is the 'critical' level
+    3. create a dictionary of 1-3 value entries; the valid keys: are 'warning', 'error', and
+    'critical'
+    4. a single integer/float value denoting absolute number or fraction of failing test units
+    for the 'warning' level only
+
+    Examples
+    --------
+    ```{{python}}
+    #| echo: false
+    #| output: false
+    import pointblank as pb
+    pb.config(report_incl_header=False, report_incl_footer=False, preview_incl_header=False)
+    ```
+    For the examples, we'll use a simple Polars DataFrame with numeric columns. The table is
+    shown below:
+
+    ```{{python}}
+    import pointblank as pb
+    import polars as pl
+
+    tbl = pl.DataFrame(
+        {{
+            "a": [1, 2, 3, 4, 5],
+            "b": [2, 2, 2, 2, 2],
+        }}
+    )
+
+    pb.preview(tbl)
+    ```
+
+    Let's validate that the {agg_name} of column `a` {comp_phrase} `{example_value}`:
+
+    ```{{python}}
+    validation = (
+        pb.Validate(data=tbl)
+        .{name}(columns="a", value={example_value})
+        .interrogate()
+    )
+
+    validation
+    ```
+
+    The validation result shows whether the {agg_name} comparison passed or failed. Since this
+    is an aggregation-based validation, there is exactly one test unit per column.
+
+    When validating multiple columns, each column gets its own validation step:
+
+    ```{{python}}
+    validation = (
+        pb.Validate(data=tbl)
+        .{name}(columns=["a", "b"], value={example_value})
+        .interrogate()
+    )
+
+    validation
+    ```
+
+    Using tolerance for flexible comparisons:
+
+    ```{{python}}
+    validation = (
+        pb.Validate(data=tbl)
+        .{name}(columns="a", value={example_value}, tol=1.0)
+        .interrogate()
+    )
+
+    validation
+    ```
+    """
+
+    return docstring.strip()
+
+
 def make_agg_validator(name: str):
     """Factory for dynamically generated aggregate validation methods.
 
