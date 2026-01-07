@@ -170,6 +170,21 @@ quartodoc:
         - name: Validate.col_vals_regex
         - name: Validate.col_vals_within_spec
         - name: Validate.col_vals_expr
+        - name: Validate.col_sum_gt
+        - name: Validate.col_sum_lt
+        - name: Validate.col_sum_ge
+        - name: Validate.col_sum_le
+        - name: Validate.col_sum_eq
+        - name: Validate.col_avg_gt
+        - name: Validate.col_avg_lt
+        - name: Validate.col_avg_ge
+        - name: Validate.col_avg_le
+        - name: Validate.col_avg_eq
+        - name: Validate.col_sd_gt
+        - name: Validate.col_sd_lt
+        - name: Validate.col_sd_ge
+        - name: Validate.col_sd_le
+        - name: Validate.col_sd_eq
         - name: Validate.rows_distinct
         - name: Validate.rows_complete
         - name: Validate.col_exists
