@@ -46,6 +46,25 @@ def get_api_details(module, exported_list):
         # Get the docstring
         doc = obj.__doc__
 
+        # Fallback for dynamically generated aggregation methods that might not have
+        # their docstrings properly attached yet
+        if not doc and obj_name.startswith("col_") and "_" in obj_name:
+            # Check if this looks like a dynamically generated aggregation method
+            # (e.g., col_sum_gt, col_avg_eq, col_sd_le)
+            parts_name = obj_name.split("_")
+            if (
+                len(parts_name) == 3
+                and parts_name[1] in ["sum", "avg", "sd"]
+                and parts_name[2] in ["gt", "ge", "lt", "le", "eq"]
+            ):
+                try:
+                    from pointblank.validate import _generate_agg_docstring
+
+                    doc = _generate_agg_docstring(obj_name)
+                except Exception:
+                    # If we can't generate the docstring, just use what we have
+                    pass
+
         # Combine the class name, signature, and docstring
         api_text += f"{obj_name}{sig}\n{doc}\n\n"
 
@@ -101,6 +120,21 @@ def _get_api_text() -> str:
         "Validate.col_vals_regex",
         "Validate.col_vals_within_spec",
         "Validate.col_vals_expr",
+        "Validate.col_sum_gt",
+        "Validate.col_sum_lt",
+        "Validate.col_sum_ge",
+        "Validate.col_sum_le",
+        "Validate.col_sum_eq",
+        "Validate.col_avg_gt",
+        "Validate.col_avg_lt",
+        "Validate.col_avg_ge",
+        "Validate.col_avg_le",
+        "Validate.col_avg_eq",
+        "Validate.col_sd_gt",
+        "Validate.col_sd_lt",
+        "Validate.col_sd_ge",
+        "Validate.col_sd_le",
+        "Validate.col_sd_eq",
         "Validate.rows_distinct",
         "Validate.rows_complete",
         "Validate.col_exists",
