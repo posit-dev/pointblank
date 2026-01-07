@@ -21492,6 +21492,7 @@ def make_agg_validator(name: str):
     # These must be set before attaching the function to the class.
     agg_validator.__name__ = name
     agg_validator.__qualname__ = f"Validate.{name}"
+    agg_validator.__doc__ = _generate_agg_docstring(name)
 
     return agg_validator
 
