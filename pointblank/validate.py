@@ -16369,6 +16369,7 @@ class Validate:
         # (it is either Polars or Pandas)
         df = df_lib.DataFrame(validation_info_dict)
 
+        # !!!!!!!! Meghan: NTS this may be the breakpoint here to extract out to df, investigate
         # Return the DataFrame as a Great Tables table
         gt_tbl = (
             GT(df, id="pb_tbl")
