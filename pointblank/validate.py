@@ -15958,7 +15958,13 @@ class Validate:
             elif assertion_type[i] in ["conjointly", "specially"]:
                 column_text = ""
             else:
-                column_text = str(column)
+                # Handle both string columns and list columns
+                # For single-element lists like ['a'], display as 'a'
+                # For multi-element lists, display as comma-separated values
+                if isinstance(column, list):
+                    column_text = ", ".join(str(c) for c in column)
+                else:
+                    column_text = str(column)
 
             # Apply underline styling for synthetic columns; only apply styling if column_text is
             # not empty and not a special marker
