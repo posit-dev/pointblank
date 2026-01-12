@@ -15960,8 +15960,8 @@ class Validate:
             else:
                 column_text = str(column)
 
-            # Apply underline styling for synthetic columns (using the purple color from the icon)
-            # Only apply styling if column_text is not empty and not a special marker
+            # Apply underline styling for synthetic columns; only apply styling if column_text is
+            # not empty and not a special marker
             if (
                 has_synthetic_column
                 and column_text
