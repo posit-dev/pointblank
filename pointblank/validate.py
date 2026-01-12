@@ -15958,10 +15958,16 @@ class Validate:
             elif assertion_type[i] in ["conjointly", "specially"]:
                 column_text = ""
             else:
-                column_text = str(column)
+                # Handle both string columns and list columns
+                # For single-element lists like ['a'], display as 'a'
+                # For multi-element lists, display as comma-separated values
+                if isinstance(column, list):
+                    column_text = ", ".join(str(c) for c in column)
+                else:
+                    column_text = str(column)
 
-            # Apply underline styling for synthetic columns (using the purple color from the icon)
-            # Only apply styling if column_text is not empty and not a special marker
+            # Apply underline styling for synthetic columns; only apply styling if column_text is
+            # not empty and not a special marker
             if (
                 has_synthetic_column
                 and column_text
@@ -16079,6 +16085,32 @@ class Validate:
                     values_upd.append(value["prompt"])  # pragma: no cover
                 else:  # pragma: no cover
                     values_upd.append(str(value))  # pragma: no cover
+
+            # Handle aggregation methods (col_sum_gt, col_avg_eq, etc.)
+            elif is_valid_agg(assertion_type[i]):
+                # Extract the value and tolerance from the values dict
+                agg_value = value.get("value")
+                tol_value = value.get("tol", 0)
+
+                # Format the value (could be a number, Column, or ReferenceColumn)
+                if hasattr(agg_value, "__repr__"):
+                    # For Column or ReferenceColumn objects, use their repr
+                    value_str = repr(agg_value)
+                else:
+                    value_str = str(agg_value)
+
+                # Format tolerance - only show on second line if non-zero
+                if tol_value != 0:
+                    # Format tolerance based on its type
+                    if isinstance(tol_value, tuple):
+                        # Asymmetric bounds: (lower, upper)
+                        tol_str = f"tol=({tol_value[0]}, {tol_value[1]})"
+                    else:
+                        # Symmetric tolerance
+                        tol_str = f"tol={tol_value}"
+                    values_upd.append(f"{value_str}<br/>{tol_str}")
+                else:
+                    values_upd.append(value_str)
 
             # If the assertion type is not recognized, add the value as a string
             else:  # pragma: no cover
