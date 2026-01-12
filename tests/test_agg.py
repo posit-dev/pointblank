@@ -910,6 +910,7 @@ def test_auto_ref_explicit_ref_still_works(method: str, auto_ref_equal_data):
     """Test that explicit ref() still works alongside auto-inference."""
     data, reference = auto_ref_equal_data
     v = Validate(data=data, reference=reference)
+
     # Explicit ref("val") should work the same as omitting value
     v = getattr(v, method)("val", ref("val"))
     v = v.interrogate()
@@ -935,6 +936,7 @@ def test_auto_ref_eq_methods_with_tolerance(method: str):
     # Use larger values so tolerance calculation works (int(tol * ref) > 0)
     # Data avg=110, sum=440, sd≈12.91
     data = pl.DataFrame({"val": [100.0, 105.0, 115.0, 120.0]})
+
     # Reference avg=100, sum=400, sd≈12.91
     reference = pl.DataFrame({"val": [90.0, 95.0, 105.0, 110.0]})
 
@@ -959,7 +961,8 @@ def test_auto_ref_eq_methods_multiple_columns(method: str):
     reference = pl.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]})
 
     v = Validate(data=data, reference=reference)
-    # Pass list of columns - should auto-infer ref(col) for each
+
+    # Pass list of columns; should auto-infer ref(col) for each
     v = getattr(v, method)(["a", "b", "c"])
     v = v.interrogate()
     v.assert_passing()
@@ -1008,8 +1011,10 @@ def test_auto_ref_mixed_with_explicit_values(method: str, auto_ref_equal_data):
     data, reference = auto_ref_equal_data
 
     v = Validate(data=data, reference=reference)
+
     # First call with auto-reference
     v = getattr(v, method)("val")
+
     # Second call with explicit ref()
     v = getattr(v, method)("val", ref("val"))
 
@@ -1017,5 +1022,120 @@ def test_auto_ref_mixed_with_explicit_values(method: str, auto_ref_equal_data):
     v.assert_passing()
 
 
-if __name__ == "__main__":
-    pytest.main([__file__, "-sv"])
+# =============================================================================
+# Tests for validation report display formatting
+# =============================================================================
+
+
+def test_agg_report_columns_display():
+    """Test that the COLUMNS column displays column names without list brackets."""
+    data = pl.DataFrame({"a": [1, 2, 3, 4, 5]})
+
+    validation = Validate(data).col_sum_gt(columns="a", value=10).interrogate()
+
+    report = validation.get_tabular_report()
+    html = report.as_raw_html()
+
+    # Should display 'a' not '['a']'
+    assert "['a']" not in html
+
+    # The column name should be present in the HTML
+    assert ">a<" in html
+
+
+def test_agg_report_values_no_tolerance():
+    """Test that VALUES column shows just the value when tolerance is 0."""
+    data = pl.DataFrame({"a": [1, 2, 3, 4, 5]})
+
+    validation = Validate(data).col_sum_gt(columns="a", value=10).interrogate()
+
+    report = validation.get_tabular_report()
+    html = report.as_raw_html()
+
+    # Should display just '10' and no tolerance info
+    assert ">10<" in html
+
+    # Should NOT contain 'tol=' since tolerance is 0
+    assert "tol=0" not in html
+
+
+def test_agg_report_values_with_symmetric_tolerance():
+    """Test that VALUES column shows value and tolerance on separate lines."""
+    data = pl.DataFrame({"a": [1, 2, 3, 4, 5]})
+
+    validation = Validate(data).col_avg_eq(columns="a", value=3, tol=0.5).interrogate()
+
+    report = validation.get_tabular_report()
+    html = report.as_raw_html()
+
+    # Should display value and tolerance separated by <br/>
+    assert "3<br/>tol=0.5" in html
+
+
+def test_agg_report_values_with_asymmetric_tolerance():
+    """Test that VALUES column shows value and asymmetric tolerance tuple."""
+    data = pl.DataFrame({"a": [1, 2, 3, 4, 5]})
+
+    validation = Validate(data).col_sd_le(columns="a", value=2.0, tol=(0.1, 0.2)).interrogate()
+
+    report = validation.get_tabular_report()
+    html = report.as_raw_html()
+
+    # Should display value and asymmetric tolerance separated by <br/>
+    assert "2.0<br/>tol=(0.1, 0.2)" in html
+
+
+def test_agg_report_values_with_reference_column():
+    """Test that VALUES column shows ref('column') for reference columns."""
+    data = pl.DataFrame({"a": [1, 2, 3, 4, 5]})
+    ref_data = pl.DataFrame({"a": [1, 2, 3, 4, 5]})
+
+    validation = (
+        Validate(data, reference=ref_data).col_sum_eq(columns="a", value=ref("a")).interrogate()
+    )
+
+    report = validation.get_tabular_report()
+    html = report.as_raw_html()
+
+    # Should display ref('a') for the reference column
+    assert "ref('a')" in html or "ref(&#x27;a&#x27;)" in html  # HTML may escape quotes
+
+
+def test_agg_report_values_implicit_reference():
+    """Test that VALUES column shows ref('column') for implicit reference."""
+    data = pl.DataFrame({"a": [1, 2, 3, 4, 5]})
+    ref_data = pl.DataFrame({"a": [1, 2, 3, 4, 5]})
+
+    # When value is omitted with reference data, it should default to ref('a')
+    validation = Validate(data, reference=ref_data).col_sum_eq(columns="a").interrogate()
+
+    report = validation.get_tabular_report()
+    html = report.as_raw_html()
+
+    # Should display ref('a') for the implicit reference column
+    assert "ref('a')" in html or "ref(&#x27;a&#x27;)" in html  # HTML may escape quotes
+
+
+def test_agg_report_multiple_steps_formatting():
+    """Test that multiple aggregation steps all display correctly."""
+    data = pl.DataFrame({"a": [1, 2, 3, 4, 5], "b": [10, 20, 30, 40, 50]})
+
+    validation = (
+        Validate(data)
+        .col_sum_gt(columns="a", value=10)  # No tolerance
+        .col_avg_eq(columns="b", value=30, tol=0.1)  # Symmetric tolerance
+        .col_sd_le(columns="a", value=2.0, tol=(0.1, 0.2))  # Asymmetric tolerance
+        .interrogate()
+    )
+
+    report = validation.get_tabular_report()
+    html = report.as_raw_html()
+
+    # Step 1: Just the value (no tolerance)
+    assert ">10<" in html
+
+    # Step 2: Value with symmetric tolerance
+    assert "30<br/>tol=0.1" in html
+
+    # Step 3: Value with asymmetric tolerance
+    assert "2.0<br/>tol=(0.1, 0.2)" in html
