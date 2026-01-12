@@ -16080,6 +16080,32 @@ class Validate:
                 else:  # pragma: no cover
                     values_upd.append(str(value))  # pragma: no cover
 
+            # Handle aggregation methods (col_sum_gt, col_avg_eq, etc.)
+            elif is_valid_agg(assertion_type[i]):
+                # Extract the value and tolerance from the values dict
+                agg_value = value.get("value")
+                tol_value = value.get("tol", 0)
+
+                # Format the value (could be a number, Column, or ReferenceColumn)
+                if hasattr(agg_value, "__repr__"):
+                    # For Column or ReferenceColumn objects, use their repr
+                    value_str = repr(agg_value)
+                else:
+                    value_str = str(agg_value)
+
+                # Format tolerance - only show on second line if non-zero
+                if tol_value != 0:
+                    # Format tolerance based on its type
+                    if isinstance(tol_value, tuple):
+                        # Asymmetric bounds: (lower, upper)
+                        tol_str = f"tol=({tol_value[0]}, {tol_value[1]})"
+                    else:
+                        # Symmetric tolerance
+                        tol_str = f"tol={tol_value}"
+                    values_upd.append(f"{value_str}<br/>{tol_str}")
+                else:
+                    values_upd.append(value_str)
+
             # If the assertion type is not recognized, add the value as a string
             else:  # pragma: no cover
                 values_upd.append(str(value))  # pragma: no cover
