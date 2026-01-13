@@ -20,13 +20,14 @@ These validation methods cover everything from checking column values against th
 validating the table structure and detecting duplicates. Combined into validation steps, they form
 the foundation of your data quality workflow.
 
-Pointblank provides [over 25 validation methods](https://posit-dev.github.io/pointblank/reference/#validation-steps)
-to handle diverse data quality requirements. These are grouped into three main categories:
+Pointblank provides [over 40 validation methods](https://posit-dev.github.io/pointblank/reference/#validation-steps)
+to handle diverse data quality requirements. These are grouped into five main categories:
 
 1. Column Value Validations
 2. Row-based Validations
 3. Table Structure Validations
 4. AI-Powered Validations
+5. Aggregate Validations
 
 Within each of these categories, we'll walk through several examples showing how each validation
 method creates steps in your validation plan.
@@ -547,11 +548,138 @@ improving performance and reducing API costs by only sending relevant data to th
 **Note:** To use `~~Validate.prompt()`, you need to have the appropriate API credentials configured
 for your chosen LLM provider (Anthropic, OpenAI, Ollama, or AWS Bedrock).
 
+## 5. Aggregate Validations
+
+Aggregate validations operate on column-level statistics rather than individual row values. These
+methods compute an aggregate value (such as sum, average, or standard deviation) from a column and
+compare it against an expected value. Unlike row-level validations where each row is a test unit,
+aggregate validations treat the entire column as a single test unit that either passes or fails.
+
+Pointblank provides three families of aggregate validation methods:
+
+- **Sum validations** (`~~Validate.col_sum_eq()`, `~~Validate.col_sum_gt()`, `~~Validate.col_sum_lt()`,
+  `~~Validate.col_sum_ge()`, `~~Validate.col_sum_le()`) for validating the sum of column values
+
+- **Average validations** (`~~Validate.col_avg_eq()`, `~~Validate.col_avg_gt()`, `~~Validate.col_avg_lt()`,
+  `~~Validate.col_avg_ge()`, `~~Validate.col_avg_le()`) for validating the mean of column values
+
+- **Standard deviation validations** (`~~Validate.col_sd_eq()`, `~~Validate.col_sd_gt()`,
+  `~~Validate.col_sd_lt()`, `~~Validate.col_sd_ge()`, `~~Validate.col_sd_le()`) for validating the
+  standard deviation of column values
+
+Each family supports the five comparison operators: equal to (`_eq`), greater than (`_gt`), less
+than (`_lt`), greater than or equal to (`_ge`), and less than or equal to (`_le`).
+
+### Validating Column Sums
+
+Here's an example validating that the sum of column `a` equals 55:
+
+```{python}
+import polars as pl
+
+agg_data = pl.DataFrame({
+    "a": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+    "b": [10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
+})
+
+(
+    pb.Validate(data=agg_data)
+    .col_sum_eq(columns="a", value=55)
+    .col_sum_gt(columns="b", value=500)
+    .interrogate()
+)
+```
+
+### Validating Column Averages
+
+Average validations are useful for ensuring that typical values remain within expected bounds:
+
+```{python}
+(
+    pb.Validate(data=agg_data)
+    .col_avg_eq(columns="a", value=5.5)
+    .col_avg_ge(columns="b", value=50)
+    .interrogate()
+)
+```
+
+### Validating Standard Deviations
+
+Standard deviation validations help ensure data variability is within expected ranges:
+
+```{python}
+(
+    pb.Validate(data=agg_data)
+    .col_sd_gt(columns="a", value=2)
+    .col_sd_lt(columns="b", value=35)
+    .interrogate()
+)
+```
+
+### Using Tolerance for Fuzzy Comparisons
+
+Floating-point arithmetic can introduce small precision errors, making exact equality comparisons
+unreliable. The `tol=` parameter allows for fuzzy comparisons by specifying an acceptable tolerance:
+
+```{python}
+(
+    pb.Validate(data=agg_data)
+    .col_avg_eq(columns="a", value=5.5, tol=0.01)  # Pass if average is within ±0.01 of 5.5
+    .col_sum_eq(columns="b", value=550, tol=1)    # Pass if sum is within ±1 of 550
+    .interrogate()
+)
+```
+
+For equality comparisons, the tolerance creates a range `[value - tol, value + tol]` within which
+the aggregate is considered valid.
+
+### Comparing Against Reference Data
+
+Aggregate validations shine when comparing current data against a baseline or reference dataset.
+This is invaluable for detecting drift in data properties over time:
+
+```{python}
+# Current data
+current_data = pl.DataFrame({"revenue": [100, 200, 150, 175, 125]})
+
+# Historical baseline
+baseline_data = pl.DataFrame({"revenue": [95, 205, 145, 180, 130]})
+
+(
+    pb.Validate(data=current_data, reference=baseline_data)
+    .col_sum_eq(columns="revenue", tol=50)   # Compare sums with tolerance
+    .col_avg_eq(columns="revenue", tol=5)    # Compare averages with tolerance
+    .interrogate()
+)
+```
+
+When `value=None` (the default) and reference data is set, aggregate methods automatically compare
+against the same column in the reference data.
+
+### Comparing Against Other Columns
+
+You can also compare aggregates against other columns in the same table using the `col()` helper:
+
+```{python}
+comparison_data = pl.DataFrame({
+    "sales_q1": [100, 150, 200, 175],
+    "sales_q2": [120, 140, 180, 160],
+})
+
+(
+    pb.Validate(data=comparison_data)
+    .col_sum_ge(columns="sales_q2", value=pb.col("sales_q1"))  # Q2 sum >= Q1 sum
+    .interrogate()
+)
+```
+
+This validates that the total sales in Q2 is at least as much as Q1.
+
 ## Conclusion
 
 In this article, we've explored the various types of validation methods that Pointblank offers for
 ensuring data quality. These methods provide a framework for validating column values, checking row
-properties, verifying table structures, and even using AI for complex semantic validations. By
-combining these validation methods into comprehensive plans, you can systematically test your data
-against business rules and quality expectations. And this all helps to ensure your data remains
-reliable and trustworthy.
+properties, verifying table structures, using AI for complex semantic validations, and validating
+aggregate statistics across columns. By combining these validation methods into comprehensive plans,
+you can systematically test your data against business rules and quality expectations. And this all
+helps to ensure your data remains reliable and trustworthy.
