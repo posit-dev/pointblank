@@ -656,25 +656,6 @@ baseline_data = pl.DataFrame({"revenue": [95, 205, 145, 180, 130]})
 When `value=None` (the default) and reference data is set, aggregate methods automatically compare
 against the same column in the reference data.
 
-### Comparing Against Other Columns
-
-You can also compare aggregates against other columns in the same table using the `col()` helper:
-
-```{python}
-comparison_data = pl.DataFrame({
-    "sales_q1": [100, 150, 200, 175],
-    "sales_q2": [120, 140, 180, 160],
-})
-
-(
-    pb.Validate(data=comparison_data)
-    .col_sum_ge(columns="sales_q2", value=pb.col("sales_q1"))  # Q2 sum >= Q1 sum
-    .interrogate()
-)
-```
-
-This validates that the total sales in Q2 is at least as much as Q1.
-
 ## Conclusion
 
 In this article, we've explored the various types of validation methods that Pointblank offers for
