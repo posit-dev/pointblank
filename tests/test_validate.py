@@ -20630,6 +20630,7 @@ def test_pct_null_exact_match_with_tol() -> None:
 def test_pct_null_within_tol_pass() -> None:
     """Should pass if pct null is within tolerance margin."""
     data = pl.DataFrame({"a": [None, None, 1, 2]})  # 50% nulls
+
     # Allow tolerance of 0.1 around 0.4 -> [0.3, 0.5]
     validation = Validate(data).col_pct_null(columns=["a"], p=0.4, tol=0.1).interrogate()
     validation.assert_passing()
@@ -20639,6 +20640,7 @@ def test_pct_null_outside_tol_fail(half_null_ser: pl.Series) -> None:
     """Should fail if pct null is outside tolerance margin."""
     data = pl.DataFrame({"a": half_null_ser})  # 50% nulls
     validation = Validate(data).col_pct_null(columns=["a"], p=0.4, tol=0.05).interrogate()
+
     with pytest.raises(AssertionError):
         validation.assert_passing()
 
@@ -20646,6 +20648,7 @@ def test_pct_null_outside_tol_fail(half_null_ser: pl.Series) -> None:
 def test_pct_null_lower_bound_edge() -> None:
     """Should pass exactly at lower bound of tolerance range."""
     data = pl.DataFrame({"a": [None, None, 1, 2]})  # 50% nulls
+
     # Expect 0.55 ± 0.05 => [0.5, 0.6]
     validation = Validate(data).col_pct_null(columns=["a"], p=0.55, tol=0.0).interrogate()
     validation.assert_passing()
@@ -20654,6 +20657,7 @@ def test_pct_null_lower_bound_edge() -> None:
 def test_pct_null_upper_bound_edge() -> None:
     """Should pass exactly at upper bound of tolerance range."""
     data = pl.DataFrame({"a": [None, 1, 2, 3]})  # 25% nulls
+
     # Expect 0.2 ± 0.05 => [0.15, 0.25]
     validation = Validate(data).col_pct_null(columns=["a"], p=0.2, tol=0.05).interrogate()
     validation.assert_passing()
@@ -20669,6 +20673,7 @@ def test_pct_null_multiple_columns_with_tol() -> None:
         }
     )
     validation = Validate(data).col_pct_null(columns=["a", "b", "c"], p=0.5, tol=0.01).interrogate()
+
     # "a" and "b" should pass, "c" should fail
     with pytest.raises(AssertionError):
         validation.assert_passing()
@@ -20701,8 +20706,10 @@ def test_col_pct_null_with_tuple_tolerance():
             "b": [None, None, None, None, None, 6, 7, 8, 9, 10],  # 50% null
         }
     )
-    validation = Validate(data=data).col_pct_null(columns="a", p=0.2, tol=(0.05, 0.1)).interrogate()
+
     # 20% null, expecting 20% with -5%/+10% tolerance (range: 15%-30%)
+    validation = Validate(data=data).col_pct_null(columns="a", p=0.2, tol=(0.05, 0.1)).interrogate()
+
     assert validation.n_passed(i=1, scalar=True) == 1
 
 
@@ -20718,6 +20725,7 @@ def test_col_pct_null_with_absolute_tuple_tolerance():
         .col_pct_null(columns="a", p=0.1, tol=(0, 2))  # Expect 1, allow +0/-2
         .interrogate()
     )
+
     # 2 nulls actual, expecting 1, allowed range is 1-3
     assert validation.n_passed(i=1, scalar=True) == 1
 
@@ -20733,6 +20741,7 @@ def test_col_pct_null_with_narwhals_selector():
     validation = (
         Validate(data=data).col_pct_null(columns=ncs.numeric(), p=0.4, tol=0.1).interrogate()
     )
+
     # Should create steps for columns a and b
     assert len(validation.validation_info) == 2
 
@@ -20747,6 +20756,7 @@ def test_col_pct_null_text_generation():
     text = _create_text_col_pct_null(
         lang="en", column="test_col", value=value, for_failure=False, n_rows=10
     )
+
     assert isinstance(text, str)
     assert len(text) > 0
 
@@ -20756,6 +20766,7 @@ def test_col_pct_null_text_generation():
         "bound_finder": type("BoundFinder", (), {"keywords": {"tol": (0.1, 0.2)}})(),
     }
     text = _create_text_col_pct_null(lang="en", column="test_col", value=value, for_failure=False)
+
     assert isinstance(text, str)
 
     # Symmetric absolute tolerance with n_rows
@@ -20766,6 +20777,7 @@ def test_col_pct_null_text_generation():
     text = _create_text_col_pct_null(
         lang="en", column="test_col", value=value, for_failure=False, n_rows=20
     )
+
     assert isinstance(text, str)
 
     # Asymmetric absolute tolerance without n_rows (fallback path)
@@ -20776,6 +20788,7 @@ def test_col_pct_null_text_generation():
     text = _create_text_col_pct_null(
         lang="en", column="test_col", value=value, for_failure=False, n_rows=None
     )
+
     assert isinstance(text, str)
 
     # Single value absolute tolerance without n_rows
@@ -20786,4 +20799,187 @@ def test_col_pct_null_text_generation():
     text = _create_text_col_pct_null(
         lang="en", column="test_col", value=value, for_failure=False, n_rows=None
     )
+
     assert isinstance(text, str)
+
+
+# =============================================================================
+# Tests for aggregate validation step reports (col_sum_*, col_avg_*, col_sd_*)
+# =============================================================================
+
+
+@pytest.mark.parametrize("tbl_type", ["polars", "pandas"])
+def test_aggregate_step_report_col_sum(tbl_type):
+    """Test that `get_step_report()` works for col_sum_* validations."""
+
+    small_table = load_dataset(dataset="small_table", tbl_type=tbl_type)
+
+    # Test col_sum_gt(): passing case
+    validation_pass = Validate(small_table).col_sum_gt(columns="a", value=10).interrogate()
+    report_pass = validation_pass.get_step_report(i=1)
+
+    assert report_pass is not None
+    assert isinstance(report_pass, GT.GT)
+
+    html_pass = report_pass.as_raw_html()
+
+    assert "ACTUAL" in html_pass
+    assert "EXPECTED" in html_pass
+    assert "satisfies the condition" in html_pass
+
+    # Test col_sum_lt - failing case
+    validation_fail = Validate(small_table).col_sum_lt(columns="a", value=1).interrogate()
+    report_fail = validation_fail.get_step_report(i=1)
+
+    assert report_fail is not None
+    assert isinstance(report_fail, GT.GT)
+
+    html_fail = report_fail.as_raw_html()
+
+    assert "does not satisfy the condition" in html_fail
+
+
+@pytest.mark.parametrize("tbl_type", ["polars", "pandas"])
+def test_aggregate_step_report_col_avg(tbl_type):
+    """Test that `get_step_report()` works for col_avg_* validations."""
+
+    small_table = load_dataset(dataset="small_table", tbl_type=tbl_type)
+
+    # Test col_avg_gt(): passing case (average of 'a' is ~3.14)
+    validation_pass = Validate(small_table).col_avg_gt(columns="a", value=1).interrogate()
+    report_pass = validation_pass.get_step_report(i=1)
+
+    assert report_pass is not None
+    assert isinstance(report_pass, GT.GT)
+
+    html_pass = report_pass.as_raw_html()
+
+    assert "ACTUAL" in html_pass
+    assert "satisfies the condition" in html_pass
+
+    # Test col_avg_eq with tolerance - passing case
+    validation_tol = Validate(small_table).col_avg_eq(columns="a", value=3.1, tol=0.5).interrogate()
+    report_tol = validation_tol.get_step_report(i=1)
+
+    assert report_tol is not None
+    assert isinstance(report_tol, GT.GT)
+
+    html_tol = report_tol.as_raw_html()
+
+    assert "TOL" in html_tol
+
+
+@pytest.mark.parametrize("tbl_type", ["polars", "pandas"])
+def test_aggregate_step_report_col_sd(tbl_type):
+    """Test that `get_step_report()` works for col_sd_* validations."""
+
+    small_table = load_dataset(dataset="small_table", tbl_type=tbl_type)
+
+    # Test col_sd_gt(): passing case
+    validation_pass = Validate(small_table).col_sd_gt(columns="a", value=0.1).interrogate()
+    report_pass = validation_pass.get_step_report(i=1)
+
+    assert report_pass is not None
+    assert isinstance(report_pass, GT.GT)
+
+    html_pass = report_pass.as_raw_html()
+
+    assert "ACTUAL" in html_pass
+    assert "satisfies the condition" in html_pass
+
+
+@pytest.mark.parametrize("tbl_type", ["polars", "pandas"])
+def test_aggregate_step_report_all_operators(tbl_type):
+    """Test that all aggregate operators (eq, gt, ge, lt, le) produce valid step reports."""
+
+    small_table = load_dataset(dataset="small_table", tbl_type=tbl_type)
+
+    # Build validation with all operator types
+    validation = (
+        Validate(small_table)
+        .col_sum_eq(columns="a", value=22)
+        .col_sum_gt(columns="a", value=10)
+        .col_sum_ge(columns="a", value=22)
+        .col_sum_lt(columns="a", value=100)
+        .col_sum_le(columns="a", value=22)
+        .col_avg_eq(columns="a", value=3.14, tol=0.1)
+        .col_avg_gt(columns="a", value=1)
+        .col_avg_ge(columns="a", value=3)
+        .col_avg_lt(columns="a", value=10)
+        .col_avg_le(columns="a", value=5)
+        .col_sd_eq(columns="a", value=1.5, tol=0.5)
+        .col_sd_gt(columns="a", value=0.1)
+        .col_sd_ge(columns="a", value=1)
+        .col_sd_lt(columns="a", value=10)
+        .col_sd_le(columns="a", value=5)
+        .interrogate()
+    )
+
+    # Verify all 15 steps produce valid GT reports
+    for i in range(1, 16):
+        report = validation.get_step_report(i=i)
+
+        assert report is not None
+        assert isinstance(report, GT.GT)
+
+
+def test_aggregate_step_report_difference_column():
+    """Test that the DIFFERENCE column shows correct values in aggregate step reports."""
+
+    df = pl.DataFrame({"value": [10, 20, 30]})  # sum=60, avg=20, sd~=10
+
+    # Test with tolerance - should show difference
+    validation = Validate(df).col_sum_eq(columns="value", value=50, tol=15).interrogate()
+    report = validation.get_step_report(i=1)
+    html = report.as_raw_html()
+
+    assert "DIFFERENCE" in html
+
+    # Test without tolerance - difference should be blank or N/A
+    validation_no_tol = Validate(df).col_sum_gt(columns="value", value=50).interrogate()
+    report_no_tol = validation_no_tol.get_step_report(i=1)
+    html_no_tol = report_no_tol.as_raw_html()
+
+    assert "ACTUAL" in html_no_tol
+
+
+def test_aggregate_step_report_status_indicators():
+    """Test that status indicators (checkmark/cross) appear correctly in aggregate step reports."""
+
+    df = pl.DataFrame({"value": [10, 20, 30]})  # sum=60
+
+    # Passing case: should have checkmark
+    validation_pass = Validate(df).col_sum_gt(columns="value", value=50).interrogate()
+    html_pass = validation_pass.get_step_report(i=1).as_raw_html()
+
+    # Check for success indicator (checkmark character)
+    assert "✓" in html_pass
+
+    # Failing case: should have cross mark
+    validation_fail = Validate(df).col_sum_lt(columns="value", value=50).interrogate()
+    html_fail = validation_fail.get_step_report(i=1).as_raw_html()
+
+    # Check for failure indicator (cross character)
+    assert "✗" in html_fail
+
+
+def test_aggregate_step_report_custom_header():
+    """Test that custom headers work with aggregate step reports."""
+
+    df = pl.DataFrame({"value": [10, 20, 30]})
+
+    validation = Validate(df).col_sum_gt(columns="value", value=50).interrogate()
+
+    # Test with custom header text
+    report_custom = validation.get_step_report(i=1, header="Custom Aggregate Report")
+
+    assert isinstance(report_custom, GT.GT)
+
+    html_custom = report_custom.as_raw_html()
+
+    assert "Custom Aggregate Report" in html_custom
+
+    # Test with header=None (no header)
+    report_no_header = validation.get_step_report(i=1, header=None)
+
+    assert isinstance(report_no_header, GT.GT)
