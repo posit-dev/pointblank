@@ -20356,6 +20356,296 @@ def _step_report_rows_distinct(
     return step_report
 
 
+def _step_report_aggregate(
+    assertion_type: str,
+    i: int,
+    column: str,
+    values: dict,
+    all_passed: bool,
+    val_info: dict | None,
+    header: str,
+    lang: str,
+) -> GT:
+    """
+    Generate a step report for aggregate validation methods (col_sum_*, col_avg_*, col_sd_*).
+
+    This creates a 1-row table showing the computed aggregate value vs. the target value,
+    along with tolerance and pass/fail status.
+    """
+
+    # Determine whether the `lang` value represents a right-to-left language
+    is_rtl_lang = lang in RTL_LANGUAGES
+    direction_rtl = " direction: rtl;" if is_rtl_lang else ""
+
+    # Parse assertion type to get aggregate function and comparison operator
+    # Format: col_{agg}_{comp} (e.g., col_sum_eq, col_avg_gt, col_sd_le)
+    parts = assertion_type.split("_")
+    agg_type = parts[1]  # sum, avg, sd
+    comp_type = parts[2]  # eq, gt, ge, lt, le
+
+    # Map aggregate type to display name
+    agg_display = {"sum": "SUM", "avg": "AVG", "sd": "SD"}.get(agg_type, agg_type.upper())
+
+    # Map comparison type to symbol
+    comp_symbols = {
+        "eq": "=",
+        "gt": "&gt;",
+        "ge": "&ge;",
+        "lt": "&lt;",
+        "le": "&le;",
+    }
+    comp_symbol = comp_symbols.get(comp_type, comp_type)
+
+    # Get computed values from val_info (stored during interrogation)
+    if val_info is not None:
+        actual = val_info.get("actual", None)
+        target = val_info.get("target", None)
+        tol = val_info.get("tol", 0)
+        lower_bound = val_info.get("lower_bound", target)
+        upper_bound = val_info.get("upper_bound", target)
+    else:
+        # Fallback if val_info is not available
+        actual = None
+        target = values.get("value", None)
+        tol = values.get("tol", 0)
+        lower_bound = target
+        upper_bound = target
+
+    # Format column name for display (handle list vs string)
+    if isinstance(column, list):
+        column_display = column[0] if len(column) == 1 else ", ".join(column)
+    else:
+        column_display = str(column)
+
+    # Generate assertion text for header
+    if target is not None:
+        target_display = f"{target:,.6g}" if isinstance(target, float) else f"{target:,}"
+        assertion_text = f"{agg_display}({column_display}) {comp_symbol} {target_display}"
+    else:
+        assertion_text = f"{agg_display}({column_display}) {comp_symbol} ?"
+
+    # Calculate difference from boundary
+    if actual is not None and target is not None:
+        if comp_type == "eq":
+            # For equality, show distance from target (considering tolerance)
+            if lower_bound == upper_bound:
+                difference = actual - target
+            else:
+                # With tolerance, show distance from nearest bound
+                if actual < lower_bound:
+                    difference = actual - lower_bound
+                elif actual > upper_bound:
+                    difference = actual - upper_bound
+                else:
+                    difference = 0  # Within bounds
+        elif comp_type in ["gt", "ge"]:
+            # Distance from lower bound (positive if passing)
+            difference = actual - lower_bound
+        elif comp_type in ["lt", "le"]:
+            # Distance from upper bound (negative if passing)
+            difference = actual - upper_bound
+        else:
+            difference = actual - target
+    else:
+        difference = None
+
+    # Format values for display
+    def format_value(v):
+        if v is None:
+            return "&mdash;"
+        if isinstance(v, float):
+            return f"{v:,.6g}"
+        return f"{v:,}"
+
+    # Format tolerance for display
+    if tol == 0:
+        tol_display = "&mdash;"
+    elif isinstance(tol, tuple):
+        tol_display = f"(-{tol[0]}, +{tol[1]})"
+    else:
+        tol_display = f"&plusmn;{tol}"
+
+    # Format difference with sign
+    if difference is not None:
+        if difference == 0:
+            diff_display = "0"
+        elif difference > 0:
+            diff_display = (
+                f"+{difference:,.6g}" if isinstance(difference, float) else f"+{difference:,}"
+            )
+        else:
+            diff_display = (
+                f"{difference:,.6g}" if isinstance(difference, float) else f"{difference:,}"
+            )
+    else:
+        diff_display = "&mdash;"
+
+    # Create pass/fail indicator
+    if all_passed:
+        status_html = CHECK_MARK_SPAN
+        status_color = "#4CA64C"
+    else:
+        status_html = CROSS_MARK_SPAN
+        status_color = "#CF142B"
+
+    # Select DataFrame library (prefer Polars, fall back to Pandas)
+    if _is_lib_present("polars"):
+        import polars as pl
+
+        df_lib = pl
+    elif _is_lib_present("pandas"):  # pragma: no cover
+        import pandas as pd  # pragma: no cover
+
+        df_lib = pd  # pragma: no cover
+    else:  # pragma: no cover
+        raise ImportError(
+            "Neither Polars nor Pandas is available for step report generation"
+        )  # pragma: no cover
+
+    # Create the data for the 1-row table
+    report_data = df_lib.DataFrame(
+        {
+            "actual": [format_value(actual)],
+            "target": [format_value(target)],
+            "tolerance": [tol_display],
+            "difference": [diff_display],
+            "status": [status_html],
+        }
+    )
+
+    # Create GT table with styling matching preview() and other step reports
+    step_report = (
+        GT(report_data, id="pb_step_tbl")
+        .opt_table_font(font=google_font(name="IBM Plex Sans"))
+        .opt_align_table_header(align="left")
+        .cols_label(
+            actual="ACTUAL",
+            target="EXPECTED",
+            tolerance="TOL",
+            difference="DIFFERENCE",
+            status="",
+        )
+        .cols_align(align="center")
+        .fmt_markdown(columns=["actual", "target", "tolerance", "difference", "status"])
+        .tab_style(
+            style=style.text(color="black", font=google_font(name="IBM Plex Mono"), size="13px"),
+            locations=loc.body(columns=["actual", "target", "tolerance", "difference"]),
+        )
+        .tab_style(
+            style=style.text(size="13px"),
+            locations=loc.body(columns="status"),
+        )
+        .tab_style(
+            style=style.text(color="gray20", font=google_font(name="IBM Plex Mono"), size="12px"),
+            locations=loc.column_labels(),
+        )
+        .tab_style(
+            style=style.borders(
+                sides=["top", "bottom"], color="#E9E9E9", style="solid", weight="1px"
+            ),
+            locations=loc.body(),
+        )
+        .tab_options(
+            table_body_vlines_style="solid",
+            table_body_vlines_width="1px",
+            table_body_vlines_color="#E9E9E9",
+            column_labels_vlines_style="solid",
+            column_labels_vlines_width="1px",
+            column_labels_vlines_color="#F2F2F2",
+        )
+        .cols_width(
+            cases={
+                "actual": "200px",
+                "target": "200px",
+                "tolerance": "150px",
+                "difference": "200px",
+                "status": "50px",
+            }
+        )
+    )
+
+    # Apply styling based on pass/fail
+    if all_passed:
+        step_report = step_report.tab_style(
+            style=[
+                style.text(color="#006400"),
+                style.fill(color="#4CA64C33"),
+            ],
+            locations=loc.body(columns="status"),
+        )
+    else:
+        step_report = step_report.tab_style(
+            style=[
+                style.text(color="#B22222"),
+                style.fill(color="#FFC1C159"),
+            ],
+            locations=loc.body(columns="status"),
+        )
+
+    # If the version of `great_tables` is `>=0.17.0` then disable Quarto table processing
+    if version("great_tables") >= "0.17.0":
+        step_report = step_report.tab_options(quarto_disable_processing=True)
+
+    # If no header requested, return the table as-is
+    if header is None:
+        return step_report
+
+    # Create header content
+    assertion_header_text = STEP_REPORT_TEXT["assertion_header_text"][lang]
+
+    # Wrap assertion text in styled code tag
+    assertion_code = (
+        f"<code style='color: #303030; font-family: monospace; font-size: smaller;'>"
+        f"{assertion_text}</code>"
+    )
+
+    if all_passed:
+        title = STEP_REPORT_TEXT["report_for_step_i"][lang].format(i=i) + " " + CHECK_MARK_SPAN
+        result_stmt = STEP_REPORT_TEXT.get("agg_success_statement", {}).get(
+            lang,
+            f"The aggregate value for column <code>{column_display}</code> satisfies the condition.",
+        )
+        if isinstance(result_stmt, str) and "{column}" in result_stmt:
+            result_stmt = result_stmt.format(column=column_display)
+    else:
+        title = STEP_REPORT_TEXT["report_for_step_i"][lang].format(i=i) + " " + CROSS_MARK_SPAN
+        result_stmt = STEP_REPORT_TEXT.get("agg_failure_statement", {}).get(
+            lang,
+            f"The aggregate value for column <code>{column_display}</code> does not satisfy the condition.",
+        )
+        if isinstance(result_stmt, str) and "{column}" in result_stmt:
+            result_stmt = result_stmt.format(column=column_display)
+
+    details = (
+        f"<div style='font-size: 13.6px; {direction_rtl}'>"
+        "<div style='padding-top: 7px;'>"
+        f"{assertion_header_text} <span style='border-style: solid; border-width: thin; "
+        "border-color: lightblue; padding-left: 2px; padding-right: 2px;'>"
+        "<code style='color: #303030; background-color: transparent; "
+        f"position: relative; bottom: 1px;'>{assertion_code}</code></span>"
+        "</div>"
+        "<div style='padding-top: 7px;'>"
+        f"{result_stmt}"
+        "</div>"
+        "</div>"
+    )
+
+    # Generate the default template text for the header when `":default:"` is used
+    if header == ":default:":
+        header = "{title}{details}"
+
+    # Use commonmark to convert the header text to HTML
+    header = commonmark.commonmark(header)
+
+    # Place any templated text in the header
+    header = header.format(title=title, details=details)
+
+    # Create the header with `header` string
+    step_report = step_report.tab_header(title=md(header))
+
+    return step_report
+
+
 def _step_report_schema_in_order(
     step: int, schema_info: dict, header: str | None, lang: str, debug_return_df: bool = False
 ) -> GT | Any:
