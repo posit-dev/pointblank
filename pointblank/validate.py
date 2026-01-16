@@ -13265,6 +13265,15 @@ class Validate:
                         validation.n_passed = int(result_bool)
                         validation.n_failed = 1 - result_bool
 
+                        # Store computed values for step reports
+                        validation.val_info = {
+                            "actual": real,
+                            "target": target,
+                            "tol": tol,
+                            "lower_bound": lower_bound,
+                            "upper_bound": upper_bound,
+                        }
+
                         results_tbl = None
                     else:
                         raise ValueError(
@@ -16897,6 +16906,18 @@ class Validate:
                     lang=lang,
                     debug_return_df=debug_return_df,
                 )
+
+        elif is_valid_agg(assertion_type):
+            step_report = _step_report_aggregate(
+                assertion_type=assertion_type,
+                i=i,
+                column=column,
+                values=values,
+                all_passed=all_passed,
+                val_info=val_info,
+                header=header,
+                lang=lang,
+            )
 
         else:
             step_report = None  # pragma: no cover
