@@ -562,6 +562,50 @@ def test_validate_class_lang_locale():
         Validate(tbl_pd, lang="invalid")
 
 
+def test_validate_class_governance_params():
+    """Test the governance parameters: owner, consumers, version."""
+    # Test with all governance parameters
+    validate = Validate(
+        tbl_pd,
+        owner="data-platform-team",
+        consumers=["ml-team", "analytics"],
+        version="2.1.0",
+    )
+
+    assert validate.owner == "data-platform-team"
+    assert validate.consumers == ["ml-team", "analytics"]
+    assert validate.version == "2.1.0"
+
+    # Test with single consumer string (should be converted to list)
+    validate_single_consumer = Validate(
+        tbl_pd,
+        consumers="ml-team",
+    )
+    assert validate_single_consumer.consumers == ["ml-team"]
+
+    # Test with None values (defaults)
+    validate_defaults = Validate(tbl_pd)
+    assert validate_defaults.owner is None
+    assert validate_defaults.consumers is None
+    assert validate_defaults.version is None
+
+    # Test invalid owner type
+    with pytest.raises(TypeError, match="owner="):
+        Validate(tbl_pd, owner=123)
+
+    # Test invalid consumers type
+    with pytest.raises(TypeError, match="consumers="):
+        Validate(tbl_pd, consumers=123)
+
+    # Test invalid consumers list with non-string elements
+    with pytest.raises(TypeError, match="consumers="):
+        Validate(tbl_pd, consumers=["ml-team", 123])
+
+    # Test invalid version type
+    with pytest.raises(TypeError, match="version="):
+        Validate(tbl_pd, version=1.0)
+
+
 @pytest.mark.parametrize(
     "data",
     (
