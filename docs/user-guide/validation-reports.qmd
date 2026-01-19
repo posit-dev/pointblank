@@ -82,9 +82,48 @@ especially when sharing reports with stakeholders or reviewing historical valida
 
 #### Report Footer
 
-The report footer contains a timestamp showing when the interrogation was performed. This timestamp
-helps track when data quality checks were executed, which is especially useful when archiving
-reports or monitoring data quality over time.
+The report footer contains several pieces of information that provide context and traceability:
+
+**Timestamps**: The footer shows when the interrogation was performed, including the start time,
+duration, and end time. This helps track when data quality checks were executed, which is especially
+useful when archiving reports or monitoring data quality over time.
+
+**Governance Metadata**: When you provide governance parameters to `Validate`, they are displayed
+in the footer as well. This metadata helps document data ownership and dependencies:
+
+- **Owner**: who is responsible for the data quality (e.g., `"data-platform-team"`)
+- **Consumers**: who depends on this data (e.g., `["ml-team", "analytics"]`)
+- **Version**: the version of the validation plan or data contract (e.g., `"2.1.0"`)
+
+Here's an example showing governance metadata in a validation report:
+
+```{python}
+# Example with governance metadata
+governance_validation = (
+    pb.Validate(
+        data=data,
+        tbl_name="sales_data",
+        label="Sales data validation",
+        owner="data-platform-team",
+        consumers=["ml-team", "analytics", "finance"],
+        version="1.2.0",
+    )
+    .col_vals_gt(columns="value", value=0)
+    .col_vals_in_set(columns="category", set=["A", "B", "C", "D", "E"])
+    .interrogate()
+)
+
+governance_validation
+```
+
+The governance metadata appears below the timestamps in the footer, making it easy to identify who
+owns the data, who depends on it, and which version of the validation rules are being applied.
+
+::: {.callout-tip}
+Governance metadata is particularly useful in enterprise environments where data lineage and
+accountability are important. By including `owner`, `consumers`, and `version` in your validations,
+you create self-documenting reports that can be easily understood by anyone reviewing them.
+:::
 
 ::: {.callout-note}
 Throughout this documentation, the footer is hidden in example reports for brevity. This is
@@ -486,7 +525,25 @@ validation = pb.Validate(
 )
 ```
 
-#### 2. Add Brief Messages for Stakeholder Reports
+#### 2. Include Governance Metadata for Accountability
+
+Add ownership and dependency information for enterprise data governance:
+
+```python
+validation = pb.Validate(
+    data=sales_df,
+    tbl_name="Q3_2025_sales",
+    label="Quarterly sales data validation",
+    owner="data-platform-team",
+    consumers=["ml-team", "analytics", "finance"],
+    version="2.1.0"
+)
+```
+
+This creates a clear record of who is responsible for the data, who depends on it, and which version
+of the validation rules are being applied.
+
+#### 3. Add Brief Messages for Stakeholder Reports
 
 When sharing reports with non-technical stakeholders, always include briefs:
 
@@ -498,7 +555,7 @@ When sharing reports with non-technical stakeholders, always include briefs:
 )
 ```
 
-#### 3. Set Appropriate Thresholds
+#### 4. Set Appropriate Thresholds
 
 Configure thresholds that align with your data quality requirements:
 
@@ -514,7 +571,7 @@ validation = pb.Validate(
 )
 ```
 
-#### 4. Customize for Your Audience
+#### 5. Customize for Your Audience
 
 Tailor the report presentation to your audience:
 
@@ -522,7 +579,7 @@ Tailor the report presentation to your audience:
 - **Management**: hide technical columns, emphasize status indicators
 - **Data stewards**: include extract download buttons, detailed briefs
 
-#### 5. Combine with Other Reporting Tools
+#### 6. Combine with Other Reporting Tools
 
 Use validation reports alongside other Pointblank features:
 
@@ -530,7 +587,7 @@ Use validation reports alongside other Pointblank features:
 - **Extracts**: use `get_data_extracts()` to get all failing data for analysis
 - **Sundered data**: use `get_sundered_data()` to split data into passing/failing sets
 
-#### 6. Archive Reports for Trend Analysis
+#### 7. Archive Reports for Trend Analysis
 
 Save validation reports over time to track data quality trends:
 
