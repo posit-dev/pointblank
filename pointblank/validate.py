@@ -4350,6 +4350,18 @@ class Validate:
         locale's rules. Examples include `"en-US"` for English (United States) and `"fr-FR"` for
         French (France). More simply, this can be a language identifier without a designation of
         territory, like `"es"` for Spanish.
+    owner
+        An optional string identifying the owner of the data being validated. This is useful for
+        governance purposes, indicating who is responsible for the quality and maintenance of the
+        data. For example, `"data-platform-team"` or `"analytics-engineering"`.
+    consumers
+        An optional string or list of strings identifying who depends on or consumes this data.
+        This helps document data dependencies and can be useful for impact analysis when data
+        quality issues are detected. For example, `"ml-team"` or `["ml-team", "analytics"]`.
+    version
+        An optional string representing the version of the validation plan or data contract. This
+        supports semantic versioning (e.g., `"1.0.0"`, `"2.1.0"`) and is useful for tracking changes
+        to validation rules over time and for organizational governance.
 
     Returns
     -------
@@ -4836,6 +4848,9 @@ class Validate:
     brief: str | bool | None = None
     lang: str | None = None
     locale: str | None = None
+    owner: str | None = None
+    consumers: str | list[str] | None = None
+    version: str | None = None
 
     def __post_init__(self):
         # Process data through the centralized data processing pipeline
@@ -4879,6 +4894,36 @@ class Validate:
 
         # Transform any shorthands of `brief` to string representations
         self.brief = _transform_auto_brief(brief=self.brief)
+
+        # Validate and normalize the `owner` parameter
+        if self.owner is not None and not isinstance(self.owner, str):
+            raise TypeError(
+                "The `owner=` parameter must be a string representing the owner of the data. "
+                f"Received type: {type(self.owner).__name__}"
+            )
+
+        # Validate and normalize the `consumers` parameter
+        if self.consumers is not None:
+            if isinstance(self.consumers, str):
+                self.consumers = [self.consumers]
+            elif isinstance(self.consumers, list):
+                if not all(isinstance(c, str) for c in self.consumers):
+                    raise TypeError(
+                        "The `consumers=` parameter must be a string or a list of strings. "
+                        "All elements in the list must be strings."
+                    )
+            else:
+                raise TypeError(
+                    "The `consumers=` parameter must be a string or a list of strings. "
+                    f"Received type: {type(self.consumers).__name__}"
+                )
+
+        # Validate the `version` parameter
+        if self.version is not None and not isinstance(self.version, str):
+            raise TypeError(
+                "The `version=` parameter must be a string representing the version. "
+                f"Received type: {type(self.version).__name__}"
+            )
 
         # TODO: Add functionality to obtain the column names and types from the table
         self.col_names = None
