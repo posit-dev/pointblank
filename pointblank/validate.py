@@ -16604,6 +16604,15 @@ class Validate:
             if incl_footer_timings:
                 gt_tbl = gt_tbl.tab_source_note(source_note=html(table_time))
 
+            # Add governance metadata as source note if any metadata is present
+            governance_html = _create_governance_metadata_html(
+                owner=self.owner,
+                consumers=self.consumers,
+                version=self.version,
+            )
+            if governance_html:
+                gt_tbl = gt_tbl.tab_source_note(source_note=html(governance_html))
+
             # Create notes markdown from validation steps and add as separate source note if enabled
             if incl_footer_notes:
                 notes_markdown = _create_notes_html(self.validation_info)
@@ -18914,6 +18923,71 @@ def _extract_pre_argument(source: str) -> str:
     pre_arg = source[pre_start + len("pre=") : pre_end].strip()
 
     return pre_arg
+
+
+def _create_governance_metadata_html(
+    owner: str | None,
+    consumers: list[str] | None,
+    version: str | None,
+) -> str:
+    """
+    Create HTML for governance metadata display in the report footer.
+
+    Parameters
+    ----------
+    owner
+        The owner of the data being validated.
+    consumers
+        List of consumers who depend on the data.
+    version
+        The version of the validation plan.
+
+    Returns
+    -------
+    str
+        HTML string containing formatted governance metadata, or empty string if no metadata.
+    """
+    if owner is None and consumers is None and version is None:
+        return ""
+
+    metadata_parts = []
+
+    # Common style for the metadata badges (similar to timing style but slightly smaller font)
+    badge_style = (
+        "background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; "
+        "margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; "
+        "border-radius: 0; padding: 2px 10px 2px 10px; font-size: 11px;"
+    )
+    label_style = (
+        "color: #777; font-weight: bold; font-size: 9px; text-transform: uppercase; "
+        "margin-right: 3px;"
+    )
+
+    if owner is not None:
+        metadata_parts.append(
+            f"<span style='{badge_style}'><span style='{label_style}'>Owner:</span> {owner}</span>"
+        )
+
+    if consumers is not None and len(consumers) > 0:
+        consumers_str = ", ".join(consumers)
+        metadata_parts.append(
+            f"<span style='{badge_style}'>"
+            f"<span style='{label_style}'>Consumers:</span> {consumers_str}"
+            f"</span>"
+        )
+
+    if version is not None:
+        metadata_parts.append(
+            f"<span style='{badge_style}'>"
+            f"<span style='{label_style}'>Version:</span> {version}"
+            f"</span>"
+        )
+
+    return (
+        f"<div style='margin-top: 5px; margin-bottom: 5px; margin-left: 10px;'>"
+        f"{''.join(metadata_parts)}"
+        f"</div>"
+    )
 
 
 def _create_table_time_html(
