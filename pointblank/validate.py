@@ -4350,6 +4350,18 @@ class Validate:
         locale's rules. Examples include `"en-US"` for English (United States) and `"fr-FR"` for
         French (France). More simply, this can be a language identifier without a designation of
         territory, like `"es"` for Spanish.
+    owner
+        An optional string identifying the owner of the data being validated. This is useful for
+        governance purposes, indicating who is responsible for the quality and maintenance of the
+        data. For example, `"data-platform-team"` or `"analytics-engineering"`.
+    consumers
+        An optional string or list of strings identifying who depends on or consumes this data.
+        This helps document data dependencies and can be useful for impact analysis when data
+        quality issues are detected. For example, `"ml-team"` or `["ml-team", "analytics"]`.
+    version
+        An optional string representing the version of the validation plan or data contract. This
+        supports semantic versioning (e.g., `"1.0.0"`, `"2.1.0"`) and is useful for tracking changes
+        to validation rules over time and for organizational governance.
 
     Returns
     -------
@@ -4836,6 +4848,9 @@ class Validate:
     brief: str | bool | None = None
     lang: str | None = None
     locale: str | None = None
+    owner: str | None = None
+    consumers: str | list[str] | None = None
+    version: str | None = None
 
     def __post_init__(self):
         # Process data through the centralized data processing pipeline
@@ -4879,6 +4894,36 @@ class Validate:
 
         # Transform any shorthands of `brief` to string representations
         self.brief = _transform_auto_brief(brief=self.brief)
+
+        # Validate and normalize the `owner` parameter
+        if self.owner is not None and not isinstance(self.owner, str):
+            raise TypeError(
+                "The `owner=` parameter must be a string representing the owner of the data. "
+                f"Received type: {type(self.owner).__name__}"
+            )
+
+        # Validate and normalize the `consumers` parameter
+        if self.consumers is not None:
+            if isinstance(self.consumers, str):
+                self.consumers = [self.consumers]
+            elif isinstance(self.consumers, list):
+                if not all(isinstance(c, str) for c in self.consumers):
+                    raise TypeError(
+                        "The `consumers=` parameter must be a string or a list of strings. "
+                        "All elements in the list must be strings."
+                    )
+            else:
+                raise TypeError(
+                    "The `consumers=` parameter must be a string or a list of strings. "
+                    f"Received type: {type(self.consumers).__name__}"
+                )
+
+        # Validate the `version` parameter
+        if self.version is not None and not isinstance(self.version, str):
+            raise TypeError(
+                "The `version=` parameter must be a string representing the version. "
+                f"Received type: {type(self.version).__name__}"
+            )
 
         # TODO: Add functionality to obtain the column names and types from the table
         self.col_names = None
@@ -16559,6 +16604,15 @@ class Validate:
             if incl_footer_timings:
                 gt_tbl = gt_tbl.tab_source_note(source_note=html(table_time))
 
+            # Add governance metadata as source note if any metadata is present
+            governance_html = _create_governance_metadata_html(
+                owner=self.owner,
+                consumers=self.consumers,
+                version=self.version,
+            )
+            if governance_html:
+                gt_tbl = gt_tbl.tab_source_note(source_note=html(governance_html))
+
             # Create notes markdown from validation steps and add as separate source note if enabled
             if incl_footer_notes:
                 notes_markdown = _create_notes_html(self.validation_info)
@@ -18869,6 +18923,71 @@ def _extract_pre_argument(source: str) -> str:
     pre_arg = source[pre_start + len("pre=") : pre_end].strip()
 
     return pre_arg
+
+
+def _create_governance_metadata_html(
+    owner: str | None,
+    consumers: list[str] | None,
+    version: str | None,
+) -> str:
+    """
+    Create HTML for governance metadata display in the report footer.
+
+    Parameters
+    ----------
+    owner
+        The owner of the data being validated.
+    consumers
+        List of consumers who depend on the data.
+    version
+        The version of the validation plan.
+
+    Returns
+    -------
+    str
+        HTML string containing formatted governance metadata, or empty string if no metadata.
+    """
+    if owner is None and consumers is None and version is None:
+        return ""
+
+    metadata_parts = []
+
+    # Common style for the metadata badges (similar to timing style but slightly smaller font)
+    badge_style = (
+        "background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; "
+        "margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; "
+        "border-radius: 0; padding: 2px 10px 2px 10px; font-size: 11px;"
+    )
+    label_style = (
+        "color: #777; font-weight: bold; font-size: 9px; text-transform: uppercase; "
+        "margin-right: 3px;"
+    )
+
+    if owner is not None:
+        metadata_parts.append(
+            f"<span style='{badge_style}'><span style='{label_style}'>Owner:</span> {owner}</span>"
+        )
+
+    if consumers is not None and len(consumers) > 0:
+        consumers_str = ", ".join(consumers)
+        metadata_parts.append(
+            f"<span style='{badge_style}'>"
+            f"<span style='{label_style}'>Consumers:</span> {consumers_str}"
+            f"</span>"
+        )
+
+    if version is not None:
+        metadata_parts.append(
+            f"<span style='{badge_style}'>"
+            f"<span style='{label_style}'>Version:</span> {version}"
+            f"</span>"
+        )
+
+    return (
+        f"<div style='margin-top: 5px; margin-bottom: 5px; margin-left: 10px;'>"
+        f"{''.join(metadata_parts)}"
+        f"</div>"
+    )
 
 
 def _create_table_time_html(

@@ -562,6 +562,91 @@ def test_validate_class_lang_locale():
         Validate(tbl_pd, lang="invalid")
 
 
+def test_validate_class_governance_params():
+    """Test the governance parameters: owner, consumers, version."""
+    # Test with all governance parameters
+    validate = Validate(
+        tbl_pd,
+        owner="data-platform-team",
+        consumers=["ml-team", "analytics"],
+        version="2.1.0",
+    )
+
+    assert validate.owner == "data-platform-team"
+    assert validate.consumers == ["ml-team", "analytics"]
+    assert validate.version == "2.1.0"
+
+    # Test with single consumer string (should be converted to list)
+    validate_single_consumer = Validate(
+        tbl_pd,
+        consumers="ml-team",
+    )
+    assert validate_single_consumer.consumers == ["ml-team"]
+
+    # Test with None values (defaults)
+    validate_defaults = Validate(tbl_pd)
+    assert validate_defaults.owner is None
+    assert validate_defaults.consumers is None
+    assert validate_defaults.version is None
+
+    # Test invalid owner type
+    with pytest.raises(TypeError, match="owner="):
+        Validate(tbl_pd, owner=123)
+
+    # Test invalid consumers type
+    with pytest.raises(TypeError, match="consumers="):
+        Validate(tbl_pd, consumers=123)
+
+    # Test invalid consumers list with non-string elements
+    with pytest.raises(TypeError, match="consumers="):
+        Validate(tbl_pd, consumers=["ml-team", 123])
+
+    # Test invalid version type
+    with pytest.raises(TypeError, match="version="):
+        Validate(tbl_pd, version=1.0)
+
+
+def test_validate_governance_params_in_report(tbl_pd):
+    """Test that governance metadata is displayed in the validation report."""
+    validate = (
+        Validate(
+            tbl_pd,
+            owner="data-platform-team",
+            consumers=["ml-team", "analytics"],
+            version="2.1.0",
+        )
+        .col_vals_gt(columns="x", value=0)
+        .interrogate()
+    )
+
+    # Get the tabular report HTML
+    report = validate.get_tabular_report()
+    report_html = report.as_raw_html()
+
+    # Check that governance metadata appears in the report
+    assert "data-platform-team" in report_html
+    assert "ml-team" in report_html
+    assert "analytics" in report_html
+    assert "2.1.0" in report_html
+    assert "Owner:" in report_html
+    assert "Consumers:" in report_html
+    assert "Version:" in report_html
+
+
+def test_validate_governance_params_not_in_report_when_none(tbl_pd):
+    """Test that governance metadata is not displayed when all values are None."""
+    validate = Validate(tbl_pd).col_vals_gt(columns="x", value=0).interrogate()
+
+    # Get the tabular report HTML
+    report = validate.get_tabular_report()
+    report_html = report.as_raw_html()
+
+    # Check that governance labels don't appear when no metadata is set
+    assert "Owner:" not in report_html
+    assert "Consumers:" not in report_html
+    assert "Version:" not in report_html
+
+
 @pytest.mark.parametrize(
     "data",
     (
