@@ -18777,6 +18777,33 @@ def _create_text_col_count_match(lang: str, value: dict, for_failure: bool = Fal
     return EXPECT_FAIL_TEXT[f"col_count_match_n_{type_}_text"][lang].format(values_text=values_text)
 
 
+def _create_text_data_freshness(
+    lang: str,
+    column: str | None,
+    value: dict,
+    for_failure: bool = False,
+) -> str:
+    """Create text for data_freshness validation."""
+    type_ = _expect_failure_type(for_failure=for_failure)
+
+    column_text = _prep_column_text(column=column)
+    max_age_text = _format_timedelta(value.get("max_age"))
+
+    if for_failure:
+        age = value.get("age")
+        age_text = _format_timedelta(age) if age else "unknown"
+        return EXPECT_FAIL_TEXT[f"data_freshness_{type_}_text"][lang].format(
+            column_text=column_text,
+            max_age_text=max_age_text,
+            age_text=age_text,
+        )
+    else:
+        return EXPECT_FAIL_TEXT[f"data_freshness_{type_}_text"][lang].format(
+            column_text=column_text,
+            max_age_text=max_age_text,
+        )
+
+
 def _create_text_col_pct_null(
     lang: str,
     column: str | None,
