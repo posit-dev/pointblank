@@ -526,7 +526,7 @@ recent_data = pl.DataFrame({
 
 (
     pb.Validate(data=recent_data)
-    .data_freshness(columns="event_time", max_age="2d")
+    .data_freshness(column="event_time", max_age="2d")
     .interrogate()
 )
 ```
