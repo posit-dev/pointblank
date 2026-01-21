@@ -18549,6 +18549,14 @@ def _create_autobrief_or_failure_text(
             for_failure=for_failure,
         )
 
+    if assertion_type == "data_freshness":
+        return _create_text_data_freshness(
+            lang=lang,
+            column=column,
+            value=values,
+            for_failure=for_failure,
+        )
+
     if assertion_type == "col_pct_null":
         return _create_text_col_pct_null(
             lang=lang,
