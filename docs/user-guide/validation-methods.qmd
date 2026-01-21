@@ -357,6 +357,7 @@ These structural checks form a foundation for more detailed data quality assessm
 - `~~Validate.col_count_match()`: confirms the table has the expected number of columns
 - `~~Validate.row_count_match()`: verifies the table has the expected number of rows
 - `~~Validate.tbl_match()`: validates that the target table matches a comparison table
+- `~~Validate.data_freshness()`: checks that data is recent and not stale
 
 These structural validations provide essential checks on the fundamental organization of your data
 tables, ensuring they have the expected dimensions and components needed for reliable data analysis.
@@ -493,6 +494,70 @@ matches a specified count.
 
 Expectations on column and row counts can be useful in certain situations and they align nicely with
 schema checks.
+
+### Validating Data Freshness
+
+Late or missing data is one of the most common (and costly) data quality issues in production
+systems. When data pipelines fail silently or experience delays, downstream analytics and ML models
+can produce stale or misleading results. The `~~Validate.data_freshness()` validation method helps
+catch these issues early by verifying that your data contains recent records.
+
+Data freshness validation works by checking a datetime column against a maximum allowed age. If the
+most recent timestamp in that column is older than the specified threshold, the validation fails.
+This simple check can prevent major downstream problems caused by stale data.
+
+Here's an example that validates data is no older than 2 days:
+
+```{python}
+import polars as pl
+from datetime import datetime, timedelta
+
+# Simulate a data feed that should be updated daily
+recent_data = pl.DataFrame({
+    "event": ["login", "purchase", "logout", "signup"],
+    "event_time": [
+        datetime.now() - timedelta(hours=1),
+        datetime.now() - timedelta(hours=6),
+        datetime.now() - timedelta(hours=12),
+        datetime.now() - timedelta(hours=18),
+    ],
+    "user_id": [101, 102, 103, 104]
+})
+
+(
+    pb.Validate(data=recent_data)
+    .data_freshness(column="event_time", max_age="2d")
+    .interrogate()
+)
+```
+
+The `max_age=` parameter accepts a flexible string format: `"30m"` for 30 minutes, `"6h"` for 6
+hours, `"2d"` for 2 days, or `"1w"` for 1 week. You can also combine units: `"1d 12h"` for 1.5 days.
+
+When validation succeeds, the report includes details about the data's age in the footer. When it
+fails, you'll see exactly how old the most recent data is and what threshold was exceeded. This
+context helps quickly diagnose whether you're dealing with a minor delay or a major pipeline
+failure.
+
+Data freshness validation is particularly valuable for:
+
+- monitoring ETL pipelines to catch failures before they cascade to reports and dashboards
+- validating data feeds to ensure third-party data sources are delivering as expected
+- including freshness checks in automated data quality tests as part of continuous integration
+- building alerting systems that trigger notifications when critical data becomes stale
+
+You might wonder why not just use `~~Validate.col_vals_gt()` with a datetime threshold. While that
+approach works, `~~Validate.data_freshness()` offers several advantages: the method name clearly
+communicates your intent, the `max_age=` string format (e.g., `"2d"`) is more readable than datetime
+arithmetic, it auto-generates meaningful validation briefs, the report footer shows helpful context
+about actual data age and thresholds, and timezone mismatches between your data and comparison time
+are handled gracefully with informative warnings.
+
+::: {.callout-note}
+When comparing timezone-aware and timezone-naive datetimes, Pointblank will include a warning in the
+validation report. For consistent results, ensure your data and comparison times use compatible
+timezone settings.
+:::
 
 ## 4. AI-Powered Validations
 

@@ -21068,3 +21068,999 @@ def test_aggregate_step_report_custom_header():
     report_no_header = validation.get_step_report(i=1, header=None)
 
     assert isinstance(report_no_header, GT.GT)
+
+
+# =============================================================================
+# data_freshness() tests
+# =============================================================================
+
+
+def test_data_freshness_recent_data():
+    """Test that data_freshness() passes when data is within max_age."""
+    df = pl.DataFrame(
+        {
+            "id": [1, 2, 3],
+            "updated_at": [
+                datetime.datetime.now() - datetime.timedelta(hours=1),
+                datetime.datetime.now() - datetime.timedelta(hours=12),
+                datetime.datetime.now() - datetime.timedelta(hours=20),
+            ],
+        }
+    )
+
+    validation = Validate(df).data_freshness(column="updated_at", max_age="24 hours").interrogate()
+
+    assert validation.n_passed(i=1, scalar=True) == 1
+    assert validation.n_failed(i=1, scalar=True) == 0
+
+
+def test_data_freshness_stale_data():
+    """Test that data_freshness() fails when data exceeds max_age."""
+    df = pl.DataFrame(
+        {
+            "id": [1, 2, 3],
+            "updated_at": [
+                datetime.datetime.now() - datetime.timedelta(hours=48),
+                datetime.datetime.now() - datetime.timedelta(hours=50),
+                datetime.datetime.now() - datetime.timedelta(hours=72),
+            ],
+        }
+    )
+
+    validation = Validate(df).data_freshness(column="updated_at", max_age="24 hours").interrogate()
+
+    assert validation.n_passed(i=1, scalar=True) == 0
+    assert validation.n_failed(i=1, scalar=True) == 1
+
+
+def test_data_freshness_various_time_units():
+    """Test data_freshness() with various time unit formats."""
+    df = pl.DataFrame({"updated_at": [datetime.datetime.now() - datetime.timedelta(hours=1)]})
+
+    # Test different time units
+    time_specs = [
+        ("30 minutes", False),  # 1 hour old > 30 mins -> fail
+        ("2 hours", True),  # 1 hour old < 2 hours -> pass
+        ("1 day", True),  # 1 hour old < 1 day -> pass
+        ("1 week", True),  # 1 hour old < 1 week -> pass
+        ("90 seconds", False),  # 1 hour old > 90 seconds -> fail
+    ]
+
+    for max_age, should_pass in time_specs:
+        validation = Validate(df).data_freshness(column="updated_at", max_age=max_age).interrogate()
+        expected_passed = 1 if should_pass else 0
+
+        assert validation.n_passed(i=1, scalar=True) == expected_passed, (
+            f"Failed for max_age='{max_age}', expected pass={should_pass}"
+        )
+
+
+def test_data_freshness_timedelta_input():
+    """Test that data_freshness() accepts timedelta objects for max_age."""
+    df = pl.DataFrame({"updated_at": [datetime.datetime.now() - datetime.timedelta(hours=5)]})
+
+    validation = (
+        Validate(df)
+        .data_freshness(column="updated_at", max_age=datetime.timedelta(hours=12))
+        .interrogate()
+    )
+
+    assert validation.n_passed(i=1, scalar=True) == 1
+
+
+def test_data_freshness_invalid_max_age():
+    """Test that data_freshness() raises an error with an invalid max_age format."""
+    df = pl.DataFrame({"updated_at": [datetime.datetime.now()]})
+
+    with pytest.raises(ValueError, match="Invalid max_age format"):
+        Validate(df).data_freshness(column="updated_at", max_age="invalid")
+
+
+def test_data_freshness_invalid_time_unit():
+    """Test that data_freshness() raises an error with unknown time units."""
+    df = pl.DataFrame({"updated_at": [datetime.datetime.now()]})
+
+    with pytest.raises(ValueError, match="Unknown time unit"):
+        Validate(df).data_freshness(column="updated_at", max_age="5 fortnights")
+
+
+def test_data_freshness_with_reference_time():
+    """Test data_freshness() with explicit reference_time."""
+    # Create data with a known timestamp
+    data_time = datetime.datetime(2024, 1, 15, 10, 0, 0)
+    df = pl.DataFrame({"updated_at": [data_time]})
+
+    # Reference time 2 hours after data time -> data is 2 hours old
+    ref_time = datetime.datetime(2024, 1, 15, 12, 0, 0)
+
+    # Should pass: data is 2 hours old, max_age is 3 hours
+    validation_pass = (
+        Validate(df)
+        .data_freshness(column="updated_at", max_age="3 hours", reference_time=ref_time)
+        .interrogate()
+    )
+
+    assert validation_pass.n_passed(i=1, scalar=True) == 1
+
+    # Should fail: data is 2 hours old, max_age is 1 hour
+    validation_fail = (
+        Validate(df)
+        .data_freshness(column="updated_at", max_age="1 hour", reference_time=ref_time)
+        .interrogate()
+    )
+
+    assert validation_fail.n_passed(i=1, scalar=True) == 0
+
+
+def test_data_freshness_reference_time_string():
+    """Test data_freshness() with reference_time as ISO string."""
+    data_time = datetime.datetime(2024, 1, 15, 10, 0, 0)
+    df = pl.DataFrame({"updated_at": [data_time]})
+
+    validation = (
+        Validate(df)
+        .data_freshness(
+            column="updated_at", max_age="5 hours", reference_time="2024-01-15T12:00:00"
+        )
+        .interrogate()
+    )
+
+    assert validation.n_passed(i=1, scalar=True) == 1
+
+
+def test_data_freshness_pandas():
+    """Test that data_freshness() works with pandas DataFrames."""
+
+    df = pd.DataFrame(
+        {
+            "id": [1, 2, 3],
+            "updated_at": [
+                datetime.datetime.now() - datetime.timedelta(hours=1),
+                datetime.datetime.now() - datetime.timedelta(hours=12),
+                datetime.datetime.now() - datetime.timedelta(hours=20),
+            ],
+        }
+    )
+
+    validation = Validate(df).data_freshness(column="updated_at", max_age="24 hours").interrogate()
+
+    assert validation.n_passed(i=1, scalar=True) == 1
+
+
+def test_data_freshness_multiple_steps():
+    """Test multiple data_freshness() validations in same Validate object."""
+    df = pl.DataFrame(
+        {
+            "created_at": [datetime.datetime.now() - datetime.timedelta(hours=5)],
+            "updated_at": [datetime.datetime.now() - datetime.timedelta(hours=1)],
+        }
+    )
+
+    validation = (
+        Validate(df)
+        .data_freshness(column="created_at", max_age="12 hours")
+        .data_freshness(column="updated_at", max_age="30 minutes")
+        .data_freshness(column="updated_at", max_age="2 hours")
+        .interrogate()
+    )
+
+    assert validation.n_passed(i=1, scalar=True) == 1  # created_at: 5h < 12h
+    assert validation.n_passed(i=2, scalar=True) == 0  # updated_at: 1h > 30min
+    assert validation.n_passed(i=3, scalar=True) == 1  # updated_at: 1h < 2h
+
+
+def test_data_freshness_time_unit_abbreviations():
+    """Test that time unit abbreviations work correctly."""
+    df = pl.DataFrame({"updated_at": [datetime.datetime.now() - datetime.timedelta(minutes=30)]})
+
+    # Test various abbreviations
+    abbreviations = ["1h", "1 hr", "1 hrs", "60 min", "60 mins", "60 m", "3600 sec", "3600 s"]
+
+    for abbrev in abbreviations:
+        validation = Validate(df).data_freshness(column="updated_at", max_age=abbrev).interrogate()
+
+        assert validation.n_passed(i=1, scalar=True) == 1, f"Failed for abbreviation: {abbrev}"
+
+
+def test_data_freshness_column_type_error():
+    """Test that data_freshness() raises error for non-string column parameter."""
+    df = pl.DataFrame({"updated_at": [datetime.datetime.now()]})
+
+    with pytest.raises(TypeError, match="must be a string"):
+        Validate(df).data_freshness(column=123, max_age="1 hour")
+
+
+# =============================================================================
+# data_freshness() edge cases - timezone and time input combinations
+# =============================================================================
+
+
+def test_data_freshness_naive_data_naive_reference():
+    """Test naive data with naive reference time (both local)."""
+    # Both naive - straightforward comparison
+    data_time = datetime.datetime(2024, 6, 15, 10, 0, 0)
+    ref_time = datetime.datetime(2024, 6, 15, 12, 0, 0)  # 2 hours later
+
+    df = pl.DataFrame({"updated_at": [data_time]})
+
+    # Data is 2 hours old, max_age is 3 hours -> pass
+    validation = (
+        Validate(df)
+        .data_freshness(column="updated_at", max_age="3 hours", reference_time=ref_time)
+        .interrogate()
+    )
+
+    assert validation.n_passed(i=1, scalar=True) == 1
+
+    # Data is 2 hours old, max_age is 1 hour -> fail
+    validation_2 = (
+        Validate(df)
+        .data_freshness(column="updated_at", max_age="1 hour", reference_time=ref_time)
+        .interrogate()
+    )
+
+    assert validation_2.n_passed(i=1, scalar=True) == 0
+
+
+def test_data_freshness_aware_data_aware_reference_same_tz():
+    """Test timezone-aware data with timezone-aware reference in same timezone."""
+    utc = datetime.timezone.utc
+
+    data_time = datetime.datetime(2024, 6, 15, 10, 0, 0, tzinfo=utc)
+    ref_time = datetime.datetime(2024, 6, 15, 12, 0, 0, tzinfo=utc)  # 2 hours later
+
+    df = pl.DataFrame({"updated_at": [data_time]})
+
+    validation = (
+        Validate(df)
+        .data_freshness(column="updated_at", max_age="3 hours", reference_time=ref_time)
+        .interrogate()
+    )
+
+    assert validation.n_passed(i=1, scalar=True) == 1
+
+
+def test_data_freshness_aware_data_aware_reference_different_tz():
+    """Test timezone-aware data with timezone-aware reference in different timezones."""
+    utc = datetime.timezone.utc
+    est = datetime.timezone(datetime.timedelta(hours=-5))
+
+    # Both represent the same moment in time
+    data_time = datetime.datetime(2024, 6, 15, 10, 0, 0, tzinfo=utc)  # 10:00 UTC
+    ref_time = datetime.datetime(2024, 6, 15, 7, 0, 0, tzinfo=est)  # 07:00 EST = 12:00 UTC
+
+    df = pl.DataFrame({"updated_at": [data_time]})
+
+    # Data is 2 hours old (10:00 UTC to 12:00 UTC)
+    validation = (
+        Validate(df)
+        .data_freshness(column="updated_at", max_age="3 hours", reference_time=ref_time)
+        .interrogate()
+    )
+
+    assert validation.n_passed(i=1, scalar=True) == 1
+
+
+def test_data_freshness_naive_data_aware_reference():
+    """Test naive data with timezone-aware reference time."""
+    utc = datetime.timezone.utc
+
+    # Naive data
+    data_time = datetime.datetime(2024, 6, 15, 10, 0, 0)
+
+    # Aware reference
+    ref_time = datetime.datetime(2024, 6, 15, 12, 0, 0, tzinfo=utc)
+
+    df = pl.DataFrame({"updated_at": [data_time]})
+
+    # With allow_tz_mismatch=True, this should work
+    # The naive datetime will be interpreted as UTC timezone
+    validation = (
+        Validate(df)
+        .data_freshness(
+            column="updated_at",
+            max_age="3 hours",
+            reference_time=ref_time,
+            allow_tz_mismatch=True,
+        )
+        .interrogate()
+    )
+
+    assert validation.n_passed(i=1, scalar=True) == 1
+
+
+def test_data_freshness_aware_data_naive_reference():
+    """Test timezone-aware data with naive reference time."""
+    utc = datetime.timezone.utc
+
+    # Aware data
+    data_time = datetime.datetime(2024, 6, 15, 10, 0, 0, tzinfo=utc)
+
+    # Naive reference
+    ref_time = datetime.datetime(2024, 6, 15, 12, 0, 0)
+
+    df = pl.DataFrame({"updated_at": [data_time]})
+
+    # With allow_tz_mismatch=True, this should work
+    validation = (
+        Validate(df)
+        .data_freshness(
+            column="updated_at",
+            max_age="3 hours",
+            reference_time=ref_time,
+            allow_tz_mismatch=True,
+        )
+        .interrogate()
+    )
+
+    assert validation.n_passed(i=1, scalar=True) == 1
+
+
+def test_data_freshness_with_timezone_parameter():
+    """Test data_freshness() with explicit timezone parameter."""
+    # Naive data: will be interpreted in the specified timezone
+    data_time = datetime.datetime(2024, 6, 15, 10, 0, 0)
+    ref_time = datetime.datetime(2024, 6, 15, 12, 0, 0)
+
+    df = pl.DataFrame({"updated_at": [data_time]})
+
+    validation = (
+        Validate(df)
+        .data_freshness(
+            column="updated_at",
+            max_age="3 hours",
+            reference_time=ref_time,
+            timezone="America/New_York",
+        )
+        .interrogate()
+    )
+
+    # Should still pass (both interpreted in same timezone)
+    assert validation.n_passed(i=1, scalar=True) == 1
+
+
+def test_data_freshness_timezone_offset_formats():
+    """Test data_freshness() with timezone offsets like '-7', '-07:00', '+5', '+05:30'."""
+    # Naive data
+    data_time = datetime.datetime(2024, 6, 15, 10, 0, 0)
+    ref_time = datetime.datetime(2024, 6, 15, 12, 0, 0)
+
+    df = pl.DataFrame({"updated_at": [data_time]})
+
+    # Test simple offset format: "-7"
+    validation_1 = (
+        Validate(df)
+        .data_freshness(
+            column="updated_at",
+            max_age="3 hours",
+            reference_time=ref_time,
+            timezone="-7",
+        )
+        .interrogate()
+    )
+
+    assert validation_1.n_passed(i=1, scalar=True) == 1
+
+    # Test full offset format: "-07:00"
+    validation_2 = (
+        Validate(df)
+        .data_freshness(
+            column="updated_at",
+            max_age="3 hours",
+            reference_time=ref_time,
+            timezone="-07:00",
+        )
+        .interrogate()
+    )
+
+    assert validation_2.n_passed(i=1, scalar=True) == 1
+
+    # Test positive offset: "+5"
+    validation_3 = (
+        Validate(df)
+        .data_freshness(
+            column="updated_at",
+            max_age="3 hours",
+            reference_time=ref_time,
+            timezone="+5",
+        )
+        .interrogate()
+    )
+
+    assert validation_3.n_passed(i=1, scalar=True) == 1
+
+    # Test offset with minutes: "+05:30"
+    validation_4 = (
+        Validate(df)
+        .data_freshness(
+            column="updated_at",
+            max_age="3 hours",
+            reference_time=ref_time,
+            timezone="+05:30",
+        )
+        .interrogate()
+    )
+
+    assert validation_4.n_passed(i=1, scalar=True) == 1
+
+
+def test_data_freshness_reference_time_iso_string_with_tz():
+    """Test reference_time as ISO string with timezone offset."""
+    utc = datetime.timezone.utc
+    data_time = datetime.datetime(2024, 6, 15, 10, 0, 0, tzinfo=utc)
+
+    df = pl.DataFrame({"updated_at": [data_time]})
+
+    # Reference time as ISO string with timezone
+    validation = (
+        Validate(df)
+        .data_freshness(
+            column="updated_at", max_age="3 hours", reference_time="2024-06-15T12:00:00+00:00"
+        )
+        .interrogate()
+    )
+
+    assert validation.n_passed(i=1, scalar=True) == 1
+
+
+def test_data_freshness_reference_time_iso_string_different_tz():
+    """Test reference_time as ISO string with different timezone offset."""
+    utc = datetime.timezone.utc
+
+    # Data at 10:00 UTC
+    data_time = datetime.datetime(2024, 6, 15, 10, 0, 0, tzinfo=utc)
+
+    df = pl.DataFrame({"updated_at": [data_time]})
+
+    # Reference time: 07:00-05:00 = 12:00 UTC (2 hours after data)
+    validation = (
+        Validate(df)
+        .data_freshness(
+            column="updated_at", max_age="3 hours", reference_time="2024-06-15T07:00:00-05:00"
+        )
+        .interrogate()
+    )
+
+    assert validation.n_passed(i=1, scalar=True) == 1
+
+
+def test_data_freshness_exact_boundary():
+    """Test data_freshness() at exact max_age boundary."""
+    ref_time = datetime.datetime(2024, 6, 15, 12, 0, 0)
+    data_time = ref_time - datetime.timedelta(hours=2)  # Exactly 2 hours old
+
+    df = pl.DataFrame({"updated_at": [data_time]})
+
+    # Exactly at boundary: should pass (age <= max_age)
+    validation = (
+        Validate(df)
+        .data_freshness(column="updated_at", max_age="2 hours", reference_time=ref_time)
+        .interrogate()
+    )
+
+    assert validation.n_passed(i=1, scalar=True) == 1
+
+    # Just under boundary: should fail (use timedelta for precise control)
+    validation_2 = (
+        Validate(df)
+        .data_freshness(
+            column="updated_at",
+            max_age=datetime.timedelta(hours=1, minutes=59),
+            reference_time=ref_time,
+        )
+        .interrogate()
+    )
+
+    assert validation_2.n_passed(i=1, scalar=True) == 0
+
+
+def test_data_freshness_zero_age():
+    """Test data_freshness() when data time equals reference time."""
+    same_time = datetime.datetime(2024, 6, 15, 12, 0, 0)
+
+    df = pl.DataFrame({"updated_at": [same_time]})
+
+    # Age is 0: should always pass any positive max_age
+    validation = (
+        Validate(df)
+        .data_freshness(column="updated_at", max_age="1 second", reference_time=same_time)
+        .interrogate()
+    )
+
+    assert validation.n_passed(i=1, scalar=True) == 1
+
+
+def test_data_freshness_future_data():
+    """Test data_freshness() when data is in the future relative to reference."""
+    ref_time = datetime.datetime(2024, 6, 15, 12, 0, 0)
+    future_data = ref_time + datetime.timedelta(hours=1)  # 1 hour in the future
+
+    df = pl.DataFrame({"updated_at": [future_data]})
+
+    # Negative age (future data) - should pass since it's "fresh"
+    validation = (
+        Validate(df)
+        .data_freshness(column="updated_at", max_age="1 hour", reference_time=ref_time)
+        .interrogate()
+    )
+
+    # Future data has negative age, which is <= max_age
+    assert validation.n_passed(i=1, scalar=True) == 1
+
+
+def test_data_freshness_empty_dataframe():
+    """Test data_freshness() with empty DataFrame."""
+    df = pl.DataFrame({"updated_at": pl.Series([], dtype=pl.Datetime)})
+
+    validation = Validate(df).data_freshness(column="updated_at", max_age="1 hour").interrogate()
+
+    # Empty column has no max value so validation fails (no data to verify freshness)
+    # This is a table-level assertion so n=1 (one check performed)
+    assert validation.n_passed(i=1, scalar=True) == 0
+    assert validation.n_failed(i=1, scalar=True) == 1
+
+    # The step should be marked as failed overall
+    assert validation.all_passed() is False
+
+
+def test_data_freshness_null_values():
+    """Test data_freshness() with null values in column."""
+    df = pl.DataFrame(
+        {
+            "updated_at": [
+                datetime.datetime.now() - datetime.timedelta(hours=1),
+                None,
+                datetime.datetime.now() - datetime.timedelta(hours=2),
+            ]
+        }
+    )
+
+    # Max should ignore nulls and find the most recent non-null value
+    validation = Validate(df).data_freshness(column="updated_at", max_age="3 hours").interrogate()
+
+    assert validation.n_passed(i=1, scalar=True) == 1
+
+
+def test_data_freshness_all_nulls():
+    """Test data_freshness() when all values are null."""
+    df = pl.DataFrame({"updated_at": pl.Series([None, None, None], dtype=pl.Datetime)})
+
+    validation = Validate(df).data_freshness(column="updated_at", max_age="1 hour").interrogate()
+
+    # All nulls (no max value): should fail
+    assert validation.n_passed(i=1, scalar=True) == 0
+
+
+def test_data_freshness_mixed_time_string_formats():
+    """Test various string formats for max_age."""
+    df = pl.DataFrame({"updated_at": [datetime.datetime.now() - datetime.timedelta(minutes=90)]})
+
+    valid_formats = [
+        "2 hours",
+        "2 hour",
+        "2h",
+        "2 hr",
+        "2 hrs",
+        "120 minutes",
+        "120 minute",
+        "120 min",
+        "120 mins",
+        "120 m",
+        "7200 seconds",
+        "7200 second",
+        "7200 sec",
+        "7200 secs",
+        "7200 s",
+    ]
+
+    for fmt in valid_formats:
+        validation = Validate(df).data_freshness(column="updated_at", max_age=fmt).interrogate()
+
+        assert validation.n_passed(i=1, scalar=True) == 1, f"Failed for format: {fmt}"
+
+
+def test_data_freshness_large_time_values():
+    """Test data_freshness() with large time values (weeks, months-equivalent)."""
+    df = pl.DataFrame({"updated_at": [datetime.datetime.now() - datetime.timedelta(days=10)]})
+
+    # Test week units
+    validation = Validate(df).data_freshness(column="updated_at", max_age="2 weeks").interrogate()
+
+    assert validation.n_passed(i=1, scalar=True) == 1
+
+    validation_2 = Validate(df).data_freshness(column="updated_at", max_age="1 week").interrogate()
+
+    assert validation_2.n_passed(i=1, scalar=True) == 0
+
+
+def test_data_freshness_fractional_time_values():
+    """Test data_freshness() with fractional time values."""
+    df = pl.DataFrame({"updated_at": [datetime.datetime.now() - datetime.timedelta(minutes=45)]})
+
+    # 1.5 hours = 90 minutes, should pass for 45 min old data
+    validation = Validate(df).data_freshness(column="updated_at", max_age="1.5 hours").interrogate()
+
+    assert validation.n_passed(i=1, scalar=True) == 1
+
+    # 0.5 hours = 30 minutes, should fail for 45 min old data
+    validation_2 = (
+        Validate(df).data_freshness(column="updated_at", max_age="0.5 hours").interrogate()
+    )
+
+    assert validation_2.n_passed(i=1, scalar=True) == 0
+
+
+def test_data_freshness_compound_time_expression():
+    """Test data_freshness() with compound time string expressions like '2 hours 15 minutes'."""
+    df = pl.DataFrame({"updated_at": [datetime.datetime.now() - datetime.timedelta(hours=2)]})
+
+    # Test compound string expression "2 hours 15 minutes"
+    validation = (
+        Validate(df).data_freshness(column="updated_at", max_age="2 hours 15 minutes").interrogate()
+    )
+
+    # 2h old data should pass with 2h 15m max_age
+    assert validation.n_passed(i=1, scalar=True) == 1
+
+    # Test compound string expression "1 hour 45 minutes" (should fail for 2h old data)
+    validation_2 = (
+        Validate(df).data_freshness(column="updated_at", max_age="1 hour 45 minutes").interrogate()
+    )
+
+    assert validation_2.n_passed(i=1, scalar=True) == 0
+
+    # Test compact format "1h30m"
+    df2 = pl.DataFrame(
+        {"updated_at": [datetime.datetime.now() - datetime.timedelta(hours=1, minutes=15)]}
+    )
+    validation_3 = Validate(df2).data_freshness(column="updated_at", max_age="1h30m").interrogate()
+
+    assert validation_3.n_passed(i=1, scalar=True) == 1
+
+    # Test "1 day 6 hours"
+    df3 = pl.DataFrame(
+        {"updated_at": [datetime.datetime.now() - datetime.timedelta(days=1, hours=5)]}
+    )
+    validation_4 = (
+        Validate(df3).data_freshness(column="updated_at", max_age="1 day 6 hours").interrogate()
+    )
+
+    assert validation_4.n_passed(i=1, scalar=True) == 1
+
+
+def test_data_freshness_multi_unit_compound_expression():
+    """Test data_freshness() with multi-unit compound expressions like '1 week 2 days 3 hours'."""
+    # Data is 1 week, 2 days, and 2 hours old (should pass with 1w 2d 3h max_age)
+    df = pl.DataFrame(
+        {"updated_at": [datetime.datetime.now() - datetime.timedelta(weeks=1, days=2, hours=2)]}
+    )
+
+    # 1 week 2 days 3 hours = 9 days 3 hours; data is 9 days 2 hours old -> should pass
+    validation = (
+        Validate(df)
+        .data_freshness(column="updated_at", max_age="1 week 2 days 3 hours")
+        .interrogate()
+    )
+
+    assert validation.n_passed(i=1, scalar=True) == 1
+
+    # Data is 1 week, 2 days, and 4 hours old (should fail with 1w 2d 3h max_age)
+    df2 = pl.DataFrame(
+        {"updated_at": [datetime.datetime.now() - datetime.timedelta(weeks=1, days=2, hours=4)]}
+    )
+    validation_2 = (
+        Validate(df2)
+        .data_freshness(column="updated_at", max_age="1 week 2 days 3 hours")
+        .interrogate()
+    )
+
+    assert validation_2.n_passed(i=1, scalar=True) == 0
+
+
+def test_data_freshness_multiple_rows_finds_max():
+    """Test that data_freshness() correctly finds the maximum (most recent) datetime."""
+    # Most recent is 30 minutes ago
+    df = pl.DataFrame(
+        {
+            "updated_at": [
+                datetime.datetime.now() - datetime.timedelta(days=10),
+                datetime.datetime.now() - datetime.timedelta(hours=5),
+                datetime.datetime.now() - datetime.timedelta(minutes=30),  # Most recent
+                datetime.datetime.now() - datetime.timedelta(days=2),
+            ]
+        }
+    )
+
+    # 1 hour max_age should pass (30 min < 1 hour)
+    validation = Validate(df).data_freshness(column="updated_at", max_age="1 hour").interrogate()
+
+    assert validation.n_passed(i=1, scalar=True) == 1
+
+    # 15 minute max_age should fail (30 min > 15 min)
+    validation_2 = (
+        Validate(df).data_freshness(column="updated_at", max_age="15 minutes").interrogate()
+    )
+
+    assert validation_2.n_passed(i=1, scalar=True) == 0
+
+
+def test_data_freshness_with_date_only():
+    """Test data_freshness() with date-only column converted to datetime."""
+    # Date column needs to be converted to datetime for comparison
+    today = datetime.datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+    yesterday = today - datetime.timedelta(days=1)
+
+    df = pl.DataFrame({"last_date": [yesterday, today]})
+
+    # Create reference time that makes 'today' (midnight) recent enough
+    ref_time = today + datetime.timedelta(hours=12)  # Noon today
+
+    # Most recent data is midnight today, ref is noon today, age = 12 hours
+    validation = (
+        Validate(df)
+        .data_freshness(column="last_date", max_age="2 days", reference_time=ref_time)
+        .interrogate()
+    )
+
+    assert validation.n_passed(i=1, scalar=True) == 1
+
+
+def test_data_freshness_pandas_timezone_aware():
+    """Test that data_freshness() works with pandas timezone-aware data."""
+
+    utc = datetime.timezone.utc
+    now = datetime.datetime.now(utc)
+
+    # Create timezone-aware timestamps directly (don't use tz_localize on aware data)
+    df = pd.DataFrame(
+        {"updated_at": pd.to_datetime([now - pd.Timedelta(hours=1), now - pd.Timedelta(hours=2)])}
+    )
+
+    validation = Validate(df).data_freshness(column="updated_at", max_age="3 hours").interrogate()
+
+    assert validation.n_passed(i=1, scalar=True) == 1
+
+
+def test_data_freshness_no_current_time_reference():
+    """Test that data_freshness() uses current time when no reference_time provided."""
+    # Create data that's definitely recent (1 minute ago)
+    df = pl.DataFrame({"updated_at": [datetime.datetime.now() - datetime.timedelta(minutes=1)]})
+
+    # Should pass with generous max_age
+    validation = Validate(df).data_freshness(column="updated_at", max_age="1 hour").interrogate()
+
+    assert validation.n_passed(i=1, scalar=True) == 1
+
+
+def test_data_freshness_daylight_saving_time():
+    """Test that data_freshness() handles DST transitions correctly."""
+    # Create times around a DST transition (March 2024 in US)
+    # Before DST: 2024-03-10 01:00:00 EST (UTC-5)
+    # After DST: 2024-03-10 03:00:00 EDT (UTC-4)
+    # There's a 1-hour jump
+
+    utc = datetime.timezone.utc
+
+    # Use UTC times to avoid DST ambiguity in test
+    data_time = datetime.datetime(2024, 3, 10, 6, 0, 0, tzinfo=utc)  # 1:00 AM EST
+    ref_time = datetime.datetime(2024, 3, 10, 8, 0, 0, tzinfo=utc)  # 4:00 AM EDT (2 hours later)
+
+    df = pl.DataFrame({"updated_at": [data_time]})
+
+    validation = (
+        Validate(df)
+        .data_freshness(column="updated_at", max_age="3 hours", reference_time=ref_time)
+        .interrogate()
+    )
+
+    assert validation.n_passed(i=1, scalar=True) == 1
+
+
+def test_data_freshness_very_small_max_age():
+    """Test data_freshness() with very small max_age values."""
+    ref_time = datetime.datetime(2024, 6, 15, 12, 0, 0)
+    data_time = ref_time - datetime.timedelta(seconds=30)
+
+    df = pl.DataFrame({"updated_at": [data_time]})
+
+    # 30 seconds old, max_age is 1 minute -> pass
+    validation = (
+        Validate(df)
+        .data_freshness(column="updated_at", max_age="1 minute", reference_time=ref_time)
+        .interrogate()
+    )
+
+    assert validation.n_passed(i=1, scalar=True) == 1
+
+    # 30 seconds old, max_age is 20 seconds -> fail
+    validation_2 = (
+        Validate(df)
+        .data_freshness(column="updated_at", max_age="20 seconds", reference_time=ref_time)
+        .interrogate()
+    )
+
+    assert validation_2.n_passed(i=1, scalar=True) == 0
+
+
+def test_data_freshness_very_large_max_age():
+    """Test data_freshness() with very large max_age values."""
+    # Data from 50 weeks ago (350 days)
+    df = pl.DataFrame({"updated_at": [datetime.datetime.now() - datetime.timedelta(days=350)]})
+
+    # 52 weeks (364 days) should pass
+    validation = Validate(df).data_freshness(column="updated_at", max_age="52 weeks").interrogate()
+
+    assert validation.n_passed(i=1, scalar=True) == 1
+
+    # Data from a year ago
+    df2 = pl.DataFrame({"updated_at": [datetime.datetime.now() - datetime.timedelta(days=365)]})
+
+    # 366 days should pass for leap year safety
+    validation_2 = (
+        Validate(df2).data_freshness(column="updated_at", max_age="366 days").interrogate()
+    )
+
+    assert validation_2.n_passed(i=1, scalar=True) == 1
+
+
+def test_data_freshness_timedelta_zero():
+    """Test data_freshness() with a zero timedelta."""
+    same_time = datetime.datetime(2024, 6, 15, 12, 0, 0)
+    df = pl.DataFrame({"updated_at": [same_time]})
+
+    # Zero max_age (only passes if data time equals reference time)
+    validation = (
+        Validate(df)
+        .data_freshness(
+            column="updated_at", max_age=datetime.timedelta(0), reference_time=same_time
+        )
+        .interrogate()
+    )
+
+    assert validation.n_passed(i=1, scalar=True) == 1
+
+
+def test_data_freshness_case_insensitive_units():
+    """Test that time units are case-insensitive."""
+    df = pl.DataFrame({"updated_at": [datetime.datetime.now() - datetime.timedelta(minutes=30)]})
+
+    units = ["1 HOUR", "1 Hour", "1 hOuR", "60 MINUTES", "60 Minutes", "3600 SECONDS"]
+
+    for unit in units:
+        validation = Validate(df).data_freshness(column="updated_at", max_age=unit).interrogate()
+
+        assert validation.n_passed(i=1, scalar=True) == 1, f"Failed for unit: {unit}"
+
+
+def test_data_freshness_whitespace_handling():
+    """Test that extra whitespace in max_age is handled correctly."""
+    df = pl.DataFrame({"updated_at": [datetime.datetime.now() - datetime.timedelta(minutes=30)]})
+
+    # Various whitespace scenarios
+    formats = ["1 hour", "1  hour", " 1 hour ", "1 hour "]
+
+    for fmt in formats:
+        validation = Validate(df).data_freshness(column="updated_at", max_age=fmt).interrogate()
+
+        assert validation.n_passed(i=1, scalar=True) == 1, f"Failed for format: '{fmt}'"
+
+
+def test_data_freshness_pre_hook():
+    """Test that data_freshness() works with a pre-processing hook."""
+    # Data with string dates
+    df = pl.DataFrame({"date_str": ["2024-06-15 10:00:00", "2024-06-15 11:00:00"]})
+
+    ref_time = datetime.datetime(2024, 6, 15, 12, 0, 0)
+
+    validation = (
+        Validate(df)
+        .data_freshness(
+            column="updated_at",
+            max_age="3 hours",
+            reference_time=ref_time,
+            pre=lambda d: d.with_columns(pl.col("date_str").str.to_datetime().alias("updated_at")),
+        )
+        .interrogate()
+    )
+
+    # Most recent is 11:00, ref is 12:00, so 1 hour old < 3 hours
+    assert validation.n_passed(i=1, scalar=True) == 1
+
+
+def test_data_freshness_with_active_inactive():
+    """Test data_freshness() with the active parameter."""
+    df = pl.DataFrame({"updated_at": [datetime.datetime.now() - datetime.timedelta(days=10)]})
+
+    validation = (
+        Validate(df)
+        .data_freshness(column="updated_at", max_age="1 day", active=False)
+        .interrogate()
+    )
+
+    # Step is inactive, so it should not be evaluated (i.e., returns None)
+    assert validation.n_passed(i=1, scalar=True) is None
+    assert validation.n_failed(i=1, scalar=True) is None
+
+
+def test_data_freshness_with_brief():
+    """Test data_freshness() with the brief parameter."""
+    df = pl.DataFrame({"updated_at": [datetime.datetime.now() - datetime.timedelta(hours=1)]})
+
+    validation = (
+        Validate(df)
+        .data_freshness(column="updated_at", max_age="2 hours", brief="Check data freshness")
+        .interrogate()
+    )
+
+    assert validation.n_passed(i=1, scalar=True) == 1
+
+
+def test_data_freshness_polars_date_column():
+    """Test data_freshness() with a Polars Date type column cast to datetime."""
+    # Create a datetime column for consistency
+    now = datetime.datetime.now()
+    week_ago = now - datetime.timedelta(days=7)
+
+    df = pl.DataFrame(
+        {
+            "last_update": [
+                week_ago,
+                now - datetime.timedelta(days=3),
+                now - datetime.timedelta(hours=12),
+            ]
+        }
+    )
+
+    # Most recent is 12 hours ago, should pass with 2 days max_age
+    validation = Validate(df).data_freshness(column="last_update", max_age="2 days").interrogate()
+
+    assert validation.n_passed(i=1, scalar=True) == 1
+
+    # 12 hours should also pass
+    validation_2 = (
+        Validate(df).data_freshness(column="last_update", max_age="13 hours").interrogate()
+    )
+
+    assert validation_2.n_passed(i=1, scalar=True) == 1
+
+
+def test_data_freshness_reference_time_datetime_object():
+    """Test that reference_time accepts datetime object directly."""
+    data_time = datetime.datetime(2024, 6, 15, 10, 0, 0)
+    ref_time = datetime.datetime(2024, 6, 15, 12, 0, 0)
+
+    df = pl.DataFrame({"updated_at": [data_time]})
+
+    # Pass datetime object directly
+    validation = (
+        Validate(df)
+        .data_freshness(column="updated_at", max_age="3 hours", reference_time=ref_time)
+        .interrogate()
+    )
+
+    assert validation.n_passed(i=1, scalar=True) == 1
+
+
+def test_data_freshness_multiple_columns_same_validation():
+    """Test data_freshness() on multiple columns in the same validation."""
+    now = datetime.datetime.now()
+
+    df = pl.DataFrame(
+        {
+            "created_at": [now - datetime.timedelta(hours=48)],
+            "updated_at": [now - datetime.timedelta(hours=2)],
+            "last_login": [now - datetime.timedelta(minutes=30)],
+        }
+    )
+
+    validation = (
+        Validate(df)
+        .data_freshness(column="created_at", max_age="3 days")
+        .data_freshness(column="updated_at", max_age="24 hours")
+        .data_freshness(column="last_login", max_age="1 hour")
+        .interrogate()
+    )
+
+    assert validation.n_passed(i=1, scalar=True) == 1  # 48h < 3 days
+    assert validation.n_passed(i=2, scalar=True) == 1  # 2h < 24h
+    assert validation.n_passed(i=3, scalar=True) == 1  # 30m < 1h

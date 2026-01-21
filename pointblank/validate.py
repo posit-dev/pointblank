@@ -17,6 +17,7 @@ from importlib.metadata import version
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Callable, Literal, NoReturn, ParamSpec, TypeVar
 from zipfile import ZipFile
+from zoneinfo import ZoneInfo
 
 import commonmark
 import narwhals as nw
@@ -11575,6 +11576,369 @@ class Validate:
 
         return self
 
+    def data_freshness(
+        self,
+        column: str,
+        max_age: str | datetime.timedelta,
+        reference_time: datetime.datetime | str | None = None,
+        timezone: str | None = None,
+        allow_tz_mismatch: bool = False,
+        pre: Callable | None = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
+        actions: Actions | None = None,
+        brief: str | bool | None = None,
+        active: bool = True,
+    ) -> Validate:
+        """
+        Validate that data in a datetime column is not older than a specified maximum age.
+
+        The `data_freshness()` validation method checks whether the most recent timestamp in the
+        specified datetime column is within the allowed `max_age=` from the `reference_time=` (which
+        defaults to the current time). This is useful for ensuring data pipelines are delivering
+        fresh data and for enforcing data SLAs.
+
+        This method helps detect stale data by comparing the maximum (most recent) value in a
+        datetime column against an expected freshness threshold.
+
+        Parameters
+        ----------
+        column
+            The name of the datetime column to check for freshness. This column should contain
+            date or datetime values.
+        max_age
+            The maximum allowed age of the data. Can be specified as: (1) a string with a
+            human-readable duration like `"24 hours"`, `"1 day"`, `"30 minutes"`, `"2 weeks"`, etc.
+            (supported units: `seconds`, `minutes`, `hours`, `days`, `weeks`), or (2) a
+            `datetime.timedelta` object for precise control.
+        reference_time
+            The reference point in time to compare against. Defaults to `None`, which uses the
+            current time (UTC if `timezone=` is not specified). Can be: (1) a `datetime.datetime`
+            object (timezone-aware recommended), (2) a string in ISO 8601 format (e.g.,
+            `"2024-01-15T10:30:00"` or `"2024-01-15T10:30:00+05:30"`), or (3) `None` to use the
+            current time.
+        timezone
+            The timezone to use for interpreting the data and reference time. Accepts IANA
+            timezone names (e.g., `"America/New_York"`), hour offsets (e.g., `"-7"`), or ISO 8601
+            offsets (e.g., `"-07:00"`). When `None` (default), naive datetimes are treated as UTC.
+            See the *The `timezone=` Parameter* section for details.
+        allow_tz_mismatch
+            Whether to allow timezone mismatches between the column data and reference time.
+            By default (`False`), a warning note is added when comparing timezone-naive with
+            timezone-aware datetimes. Set to `True` to suppress these warnings.
+        pre
+            An optional preprocessing function or lambda to apply to the data table during
+            interrogation. This function should take a table as input and return a modified table.
+        thresholds
+            Set threshold failure levels for reporting and reacting to exceedences of the levels.
+            The thresholds are set at the step level and will override any global thresholds set in
+            `Validate(thresholds=...)`. The default is `None`, which means that no thresholds will
+            be set locally and global thresholds (if any) will take effect.
+        actions
+            Optional actions to take when the validation step meets or exceeds any set threshold
+            levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
+            define the actions.
+        brief
+            An optional brief description of the validation step that will be displayed in the
+            reporting table. You can use the templating elements like `"{step}"` to insert
+            the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+            the entire brief will be automatically generated. If `None` (the default) then there
+            won't be a brief.
+        active
+            A boolean value indicating whether the validation step should be active. Using `False`
+            will make the validation step inactive (still reporting its presence and keeping indexes
+            for the steps unchanged).
+
+        Returns
+        -------
+        Validate
+            The `Validate` object with the added validation step.
+
+        How Timezones Affect Freshness Checks
+        -------------------------------------
+        Freshness validation involves comparing two times: the **data time** (the most recent
+        timestamp in your column) and the **execution time** (when and where the validation runs).
+        Timezone confusion typically arises because these two times may originate from different
+        contexts.
+
+        Consider these common scenarios:
+
+        - your data timestamps are stored in UTC (common for databases), but you're running
+          validation on your laptop in New York (Eastern Time)
+        - you develop and test validation locally, then deploy it to a cloud workflow that runs
+          in UTC—suddenly your 'same' validation behaves differently
+        - your data comes from servers in multiple regions, each recording timestamps in their
+          local timezone
+
+        The `timezone=` parameter exists to solve this problem by establishing a single, explicit
+        timezone context for the freshness comparison. When you specify a timezone, Pointblank
+        interprets both the data timestamps (if naive) and the execution time in that timezone,
+        ensuring consistent behavior whether you run validation on your laptop or in a cloud
+        workflow.
+
+        **Scenario 1: Data has timezone-aware datetimes**
+
+        ```python
+        # Your data column has values like: 2024-01-15 10:30:00+00:00 (UTC)
+        # Comparison is straightforward as both sides have explicit timezones
+        .data_freshness(column="updated_at", max_age="24 hours")
+        ```
+
+        **Scenario 2: Data has naive datetimes (no timezone)**
+
+        ```python
+        # Your data column has values like: 2024-01-15 10:30:00 (no timezone)
+        # Specify the timezone the data was recorded in:
+        .data_freshness(column="updated_at", max_age="24 hours", timezone="America/New_York")
+        ```
+
+        **Scenario 3: Ensuring consistent behavior across environments**
+
+        ```python
+        # Pin the timezone to ensure identical results whether running locally or in the cloud
+        .data_freshness(
+            column="updated_at",
+            max_age="24 hours",
+            timezone="UTC",  # Explicit timezone removes environment dependence
+        )
+        ```
+
+        The `timezone=` Parameter
+        ---------------------------
+        The `timezone=` parameter accepts several convenient formats, making it easy to specify
+        timezones in whatever way is most natural for your use case. The following examples
+        illustrate the three supported input styles.
+
+        **IANA Timezone Names** (recommended for regions with daylight saving time):
+
+        ```python
+        timezone="America/New_York"   # Eastern Time (handles DST automatically)
+        timezone="Europe/London"      # UK time
+        timezone="Asia/Tokyo"         # Japan Standard Time
+        timezone="Australia/Sydney"   # Australian Eastern Time
+        timezone="UTC"                # Coordinated Universal Time
+        ```
+
+        **Simple Hour Offsets** (quick and easy):
+
+        ```python
+        timezone="-7"    # UTC-7 (e.g., Mountain Standard Time)
+        timezone="+5"    # UTC+5 (e.g., Pakistan Standard Time)
+        timezone="0"     # UTC
+        timezone="-12"   # UTC-12
+        ```
+
+        **ISO 8601 Offset Format** (precise, including fractional hours):
+
+        ```python
+        timezone="-07:00"   # UTC-7
+        timezone="+05:30"   # UTC+5:30 (e.g., India Standard Time)
+        timezone="+00:00"   # UTC
+        timezone="-09:30"   # UTC-9:30
+        ```
+
+        When a timezone is specified:
+
+        - naive datetime values in the column are assumed to be in this timezone.
+        - the reference time (if naive) is assumed to be in this timezone.
+        - the validation report will show times in this timezone.
+
+        When `None` (default):
+
+        - if your column has timezone-aware datetimes, those timezones are used
+        - if your column has naive datetimes, they're treated as UTC
+        - the current time reference uses UTC
+
+        Note that IANA timezone names are preferred when daylight saving time transitions matter, as
+        they automatically handle the offset changes. Fixed offsets like `"-7"` or `"-07:00"` do not
+        account for DST.
+
+        Recommendations for Working with Timestamps
+        -------------------------------------------
+        When working with datetime data, storing timestamps in UTC in your databases is strongly
+        recommended since it provides a consistent reference point regardless of where your data
+        originates or where it's consumed. Using timezone-aware datetimes whenever possible helps
+        avoid ambiguity—when a datetime has an explicit timezone, there's no guessing about what
+        time it actually represents.
+
+        If you're working with naive datetimes (which lack timezone information), always specify the
+        `timezone=` parameter so Pointblank knows how to interpret those values. When providing
+        `reference_time=` as a string, use ISO 8601 format with the timezone offset included (e.g.,
+        `"2024-01-15T10:30:00+00:00"`) to ensure unambiguous parsing. Finally, prefer IANA timezone
+        names (like `"America/New_York"`) over fixed offsets (like `"-05:00"`) when daylight saving
+        time transitions matter, since IANA names automatically handle the twice-yearly offset
+        changes. To see all available IANA timezone names in Python, use
+        `zoneinfo.available_timezones()` from the standard library's `zoneinfo` module.
+
+        Examples
+        --------
+        ```{python}
+        #| echo: false
+        #| output: false
+        import pointblank as pb
+        pb.config(report_incl_header=False, report_incl_footer=False)
+        ```
+
+        The simplest use of `data_freshness()` requires just two arguments: the `column=` containing
+        your timestamps and `max_age=` specifying how old the data can be. In this first example,
+        we create sample data with an `"updated_at"` column containing timestamps from 1, 12, and
+        20 hours ago. By setting `max_age="24 hours"`, we're asserting that the most recent
+        timestamp should be within 24 hours of the current time. Since the newest record is only
+        1 hour old, this validation passes.
+
+        ```{python}
+        import pointblank as pb
+        import polars as pl
+        from datetime import datetime, timedelta
+
+        # Create sample data with recent timestamps
+        recent_data = pl.DataFrame({
+            "id": [1, 2, 3],
+            "updated_at": [
+                datetime.now() - timedelta(hours=1),
+                datetime.now() - timedelta(hours=12),
+                datetime.now() - timedelta(hours=20),
+            ]
+        })
+
+        validation = (
+            pb.Validate(data=recent_data)
+            .data_freshness(column="updated_at", max_age="24 hours")
+            .interrogate()
+        )
+
+        validation
+        ```
+
+        The `max_age=` parameter accepts human-readable strings with various time units. You can
+        chain multiple `data_freshness()` calls to check different freshness thresholds
+        simultaneously—useful for tiered SLAs where you might want warnings at 30 minutes but
+        errors at 2 days.
+
+        ```{python}
+        # Check data is fresh within different time windows
+        validation = (
+            pb.Validate(data=recent_data)
+            .data_freshness(column="updated_at", max_age="30 minutes")  # Very fresh
+            .data_freshness(column="updated_at", max_age="2 days")      # Reasonably fresh
+            .data_freshness(column="updated_at", max_age="1 week")      # Within a week
+            .interrogate()
+        )
+
+        validation
+        ```
+
+        When your data contains naive datetimes (timestamps without timezone information), use the
+        `timezone=` parameter to specify what timezone those values represent. Here we have event
+        data recorded in Eastern Time, so we set `timezone="America/New_York"` to ensure the
+        freshness comparison is done correctly.
+
+        ```{python}
+        # Data with naive datetimes (assume they're in Eastern Time)
+        eastern_data = pl.DataFrame({
+            "event_time": [
+                datetime.now() - timedelta(hours=2),
+                datetime.now() - timedelta(hours=5),
+            ]
+        })
+
+        validation = (
+            pb.Validate(data=eastern_data)
+            .data_freshness(
+                column="event_time",
+                max_age="12 hours",
+                timezone="America/New_York"  # Interpret times as Eastern
+            )
+            .interrogate()
+        )
+
+        validation
+        ```
+
+        For reproducible validations or historical checks, you can use `reference_time=` to compare
+        against a specific point in time instead of the current time. This is particularly useful
+        for testing or when validating data snapshots. The reference time should include a timezone
+        offset (like `+00:00` for UTC) to avoid ambiguity.
+
+        ```{python}
+        validation = (
+            pb.Validate(data=recent_data)
+            .data_freshness(
+                column="updated_at",
+                max_age="24 hours",
+                reference_time="2024-01-15T12:00:00+00:00"
+            )
+            .interrogate()
+        )
+
+        validation
+        ```
+        """
+
+        assertion_type = _get_fn_name()
+
+        _check_pre(pre=pre)
+        _check_thresholds(thresholds=thresholds)
+        _check_boolean_input(param=active, param_name="active")
+        _check_boolean_input(param=allow_tz_mismatch, param_name="allow_tz_mismatch")
+
+        # Validate and parse the max_age parameter
+        max_age_td = _parse_max_age(max_age)
+
+        # Validate the column parameter
+        if not isinstance(column, str):
+            raise TypeError(
+                f"The `column` parameter must be a string, got {type(column).__name__}."
+            )
+
+        # Validate the timezone parameter if provided
+        if timezone is not None:
+            _validate_timezone(timezone)
+
+        # Parse reference_time if it's a string
+        parsed_reference_time = None
+        if reference_time is not None:
+            if isinstance(reference_time, str):
+                parsed_reference_time = _parse_reference_time(reference_time)
+            elif isinstance(reference_time, datetime.datetime):
+                parsed_reference_time = reference_time
+            else:
+                raise TypeError(
+                    f"The `reference_time` parameter must be a string or datetime object, "
+                    f"got {type(reference_time).__name__}."
+                )
+
+        # Determine threshold to use (global or local) and normalize a local `thresholds=` value
+        thresholds = (
+            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+        )
+
+        # Package up the parameters for later interrogation
+        values = {
+            "max_age": max_age_td,
+            "max_age_str": max_age if isinstance(max_age, str) else str(max_age),
+            "reference_time": parsed_reference_time,
+            "timezone": timezone,
+            "allow_tz_mismatch": allow_tz_mismatch,
+        }
+
+        # Determine brief to use (global or local) and transform any shorthands of `brief=`
+        brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
+
+        val_info = _ValidationInfo(
+            assertion_type=assertion_type,
+            column=column,
+            values=values,
+            pre=pre,
+            thresholds=thresholds,
+            actions=actions,
+            brief=brief,
+            active=active,
+        )
+
+        self._add_validation(validation_info=val_info)
+
+        return self
+
     def col_count_match(
         self,
         count: int | Any,
@@ -12986,6 +13350,8 @@ class Validate:
                 "col_schema_match",
                 "row_count_match",
                 "col_count_match",
+                "data_freshness",
+                "tbl_match",
             ]
 
             if validation.n == 0 and assertion_type not in table_level_assertions:
@@ -13243,6 +13609,105 @@ class Validate:
                         validation.n = 1
                         validation.n_passed = int(result_bool)
                         validation.n_failed = 1 - int(result_bool)
+
+                        results_tbl = None
+
+                    elif assertion_type == "data_freshness":
+                        from pointblank._interrogation import data_freshness as data_freshness_check
+
+                        freshness_result = data_freshness_check(
+                            data_tbl=data_tbl_step,
+                            column=column,
+                            max_age=value["max_age"],
+                            reference_time=value["reference_time"],
+                            timezone=value["timezone"],
+                            allow_tz_mismatch=value["allow_tz_mismatch"],
+                        )
+
+                        result_bool = freshness_result["passed"]
+                        validation.all_passed = result_bool
+                        validation.n = 1
+                        validation.n_passed = int(result_bool)
+                        validation.n_failed = 1 - int(result_bool)
+
+                        # Store the freshness check details for reporting
+                        validation.val_info = freshness_result
+
+                        # Update the values dict with actual computed values for failure text
+                        if freshness_result.get("age") is not None:
+                            value["age"] = freshness_result["age"]
+
+                        # Add timezone warning note if applicable
+                        if freshness_result.get("tz_warning_key"):
+                            tz_key = freshness_result["tz_warning_key"]
+                            tz_warning_text = NOTES_TEXT.get(tz_key, {}).get(
+                                self.locale, NOTES_TEXT.get(tz_key, {}).get("en", "")
+                            )
+                            validation._add_note(
+                                key="tz_warning",
+                                markdown=f"⚠️ {tz_warning_text}",
+                                text=tz_warning_text,
+                            )
+
+                        # Add note about column being empty if applicable
+                        if freshness_result.get("column_empty"):
+                            column_empty_text = NOTES_TEXT.get(
+                                "data_freshness_column_empty", {}
+                            ).get(
+                                self.locale,
+                                NOTES_TEXT.get("data_freshness_column_empty", {}).get(
+                                    "en", "The datetime column is empty (no values to check)."
+                                ),
+                            )
+                            validation._add_note(
+                                key="column_empty",
+                                markdown=f"⚠️ {column_empty_text}",
+                                text=column_empty_text,
+                            )
+
+                        # Add informational note about the freshness check
+                        if freshness_result.get("max_datetime") and freshness_result.get("age"):
+                            max_dt = freshness_result["max_datetime"]
+                            # Format datetime without microseconds for cleaner display
+                            if hasattr(max_dt, "replace"):
+                                max_dt_display = max_dt.replace(microsecond=0)
+                            else:
+                                max_dt_display = max_dt
+                            age = freshness_result["age"]
+                            age_str = _format_timedelta(age)
+                            max_age_str = _format_timedelta(value["max_age"])
+
+                            # Get translated template for pass/fail
+                            if result_bool:
+                                details_key = "data_freshness_details_pass"
+                                prefix = "✓"
+                            else:
+                                details_key = "data_freshness_details_fail"
+                                prefix = "✗"
+
+                            details_template = NOTES_TEXT.get(details_key, {}).get(
+                                self.locale,
+                                NOTES_TEXT.get(details_key, {}).get(
+                                    "en",
+                                    "Most recent data: `{max_dt}` (age: {age}, max allowed: {max_age})",
+                                ),
+                            )
+
+                            # Format the template with values
+                            note_text = details_template.format(
+                                max_dt=max_dt_display, age=age_str, max_age=max_age_str
+                            )
+                            # For markdown, make the age bold
+                            note_md_template = details_template.replace(
+                                "(age: {age}", "(age: **{age}**"
+                            )
+                            note_md = f"{prefix} {note_md_template.format(max_dt=max_dt_display, age=age_str, max_age=max_age_str)}"
+
+                            validation._add_note(
+                                key="freshness_details",
+                                markdown=note_md,
+                                text=note_text,
+                            )
 
                         results_tbl = None
 
@@ -16099,6 +16564,69 @@ class Validate:
                 tol_value = bound_finder.keywords.get("tol", 0) if bound_finder else 0
                 values_upd.append(f"p = {p_value}<br/>tol = {tol_value}")
 
+            elif assertion_type[i] in ["data_freshness"]:
+                # Format max_age nicely for display
+                max_age = value.get("max_age")
+                max_age_str = _format_timedelta(max_age) if max_age else "&mdash;"
+
+                # Build additional lines with non-default parameters
+                extra_lines = []
+
+                if value.get("reference_time") is not None:
+                    ref_time = value["reference_time"]
+
+                    # Format datetime across two lines: date and time+tz
+                    if hasattr(ref_time, "strftime"):
+                        date_str = ref_time.strftime("@%Y-%m-%d")
+                        time_str = " " + ref_time.strftime("%H:%M:%S")
+
+                        # Add timezone offset if present
+                        if hasattr(ref_time, "tzinfo") and ref_time.tzinfo is not None:
+                            tz_offset = ref_time.strftime("%z")
+                            if tz_offset:
+                                time_str += tz_offset
+                        extra_lines.append(date_str)
+                        extra_lines.append(time_str)
+                    else:
+                        extra_lines.append(f"@{ref_time}")
+
+                # Timezone and allow_tz_mismatch on same line
+                tz_line_parts = []
+                if value.get("timezone") is not None:
+                    # Convert timezone name to ISO 8601 offset format
+                    tz_name = value["timezone"]
+
+                    try:
+                        tz_obj = ZoneInfo(tz_name)
+
+                        # Get the current offset for this timezone
+                        now = datetime.datetime.now(tz_obj)
+                        offset = now.strftime("%z")
+
+                        # Format as ISO 8601 extended: -07:00 (insert colon)
+                        if len(offset) == 5:
+                            tz_display = f"{offset[:3]}:{offset[3:]}"
+                        else:
+                            tz_display = offset
+
+                    except Exception:
+                        tz_display = tz_name
+                    tz_line_parts.append(tz_display)
+
+                if value.get("allow_tz_mismatch"):
+                    tz_line_parts.append("~tz")
+
+                if tz_line_parts:
+                    extra_lines.append(" ".join(tz_line_parts))
+
+                if extra_lines:
+                    extra_html = "<br/>".join(extra_lines)
+                    values_upd.append(
+                        f'{max_age_str}<br/><span style="font-size: 9px;">{extra_html}</span>'
+                    )
+                else:
+                    values_upd.append(max_age_str)
+
             elif assertion_type[i] in ["col_schema_match"]:
                 values_upd.append("SCHEMA")
 
@@ -17569,6 +18097,265 @@ def _process_brief(
     return brief
 
 
+def _parse_max_age(max_age: str | datetime.timedelta) -> datetime.timedelta:
+    """
+    Parse a max_age specification into a timedelta.
+
+    Parameters
+    ----------
+    max_age
+        Either a timedelta object or a string like "24 hours", "1 day", "30 minutes",
+        or compound expressions like "2 hours 15 minutes", "1 day 6 hours", etc.
+
+    Returns
+    -------
+    datetime.timedelta
+        The parsed timedelta.
+
+    Raises
+    ------
+    ValueError
+        If the string format is invalid or the unit is not recognized.
+    """
+    if isinstance(max_age, datetime.timedelta):
+        return max_age
+
+    if not isinstance(max_age, str):
+        raise TypeError(
+            f"The `max_age` parameter must be a string or timedelta, got {type(max_age).__name__}."
+        )
+
+    # Parse string format like "24 hours", "1 day", "30 minutes", etc.
+    max_age_str = max_age.strip().lower()
+
+    # Define unit mappings (singular and plural forms)
+    unit_mappings = {
+        "second": "seconds",
+        "seconds": "seconds",
+        "sec": "seconds",
+        "secs": "seconds",
+        "s": "seconds",
+        "minute": "minutes",
+        "minutes": "minutes",
+        "min": "minutes",
+        "mins": "minutes",
+        "m": "minutes",
+        "hour": "hours",
+        "hours": "hours",
+        "hr": "hours",
+        "hrs": "hours",
+        "h": "hours",
+        "day": "days",
+        "days": "days",
+        "d": "days",
+        "week": "weeks",
+        "weeks": "weeks",
+        "wk": "weeks",
+        "wks": "weeks",
+        "w": "weeks",
+    }
+
+    import re
+
+    # Pattern to find all number+unit pairs (supports compound expressions)
+    # Matches: "2 hours 15 minutes", "1day6h", "30 min", etc.
+    compound_pattern = r"(\d+(?:\.\d+)?)\s*([a-zA-Z]+)"
+    matches = re.findall(compound_pattern, max_age_str)
+
+    if not matches:
+        raise ValueError(
+            f"Invalid max_age format: '{max_age}'. Expected format like '24 hours', "
+            f"'1 day', '30 minutes', '2 hours 15 minutes', etc."
+        )
+
+    # Accumulate timedelta from all matched components
+    total_td = datetime.timedelta()
+    valid_units = ["seconds", "minutes", "hours", "days", "weeks"]
+
+    for value_str, unit in matches:
+        value = float(value_str)
+
+        # Normalize the unit
+        unit_lower = unit.lower()
+        if unit_lower not in unit_mappings:
+            raise ValueError(
+                f"Unknown time unit '{unit}' in max_age '{max_age}'. "
+                f"Valid units are: {', '.join(valid_units)} (or their abbreviations)."
+            )
+
+        normalized_unit = unit_mappings[unit_lower]
+
+        # Add to total timedelta
+        if normalized_unit == "seconds":
+            total_td += datetime.timedelta(seconds=value)
+        elif normalized_unit == "minutes":
+            total_td += datetime.timedelta(minutes=value)
+        elif normalized_unit == "hours":
+            total_td += datetime.timedelta(hours=value)
+        elif normalized_unit == "days":
+            total_td += datetime.timedelta(days=value)
+        elif normalized_unit == "weeks":
+            total_td += datetime.timedelta(weeks=value)
+
+    return total_td
+
+
+def _parse_timezone(timezone: str) -> datetime.tzinfo:
+    """
+    Parse a timezone string into a tzinfo object.
+
+    Supports:
+    - IANA timezone names: "America/New_York", "Europe/London", "UTC"
+    - Offset strings: "-7", "+5", "-07:00", "+05:30"
+
+    Parameters
+    ----------
+    timezone
+        The timezone string to parse.
+
+    Returns
+    -------
+    datetime.tzinfo
+        The parsed timezone object.
+
+    Raises
+    ------
+    ValueError
+        If the timezone is not valid.
+    """
+    import re
+
+    # Check for offset formats: "-7", "+5", "-07:00", "+05:30", etc.
+    # Match: optional sign, 1-2 digits, optional colon and 2 more digits
+    offset_pattern = r"^([+-]?)(\d{1,2})(?::(\d{2}))?$"
+    match = re.match(offset_pattern, timezone.strip())
+
+    if match:
+        sign_str, hours_str, minutes_str = match.groups()
+        hours = int(hours_str)
+        minutes = int(minutes_str) if minutes_str else 0
+
+        # Apply sign (default positive if not specified)
+        total_minutes = hours * 60 + minutes
+        if sign_str == "-":
+            total_minutes = -total_minutes
+
+        return datetime.timezone(datetime.timedelta(minutes=total_minutes))
+
+    # Try IANA timezone names (zoneinfo is standard in Python 3.9+)
+    try:
+        return ZoneInfo(timezone)
+    except KeyError:
+        pass
+
+    raise ValueError(
+        f"Invalid timezone: '{timezone}'. Use an IANA timezone name "
+        f"(e.g., 'America/New_York', 'UTC') or an offset (e.g., '-7', '+05:30')."
+    )
+
+
+def _validate_timezone(timezone: str) -> None:
+    """
+    Validate that a timezone string is valid.
+
+    Parameters
+    ----------
+    timezone
+        The timezone string to validate.
+
+    Raises
+    ------
+    ValueError
+        If the timezone is not valid.
+    """
+    # Use _parse_timezone to validate - it will raise ValueError if invalid
+    _parse_timezone(timezone)
+
+
+def _parse_reference_time(reference_time: str) -> datetime.datetime:
+    """
+    Parse a reference time string into a datetime object.
+
+    Parameters
+    ----------
+    reference_time
+        An ISO 8601 formatted datetime string.
+
+    Returns
+    -------
+    datetime.datetime
+        The parsed datetime object.
+
+    Raises
+    ------
+    ValueError
+        If the string cannot be parsed.
+    """
+    # Try parsing with fromisoformat (handles most ISO 8601 formats)
+    try:
+        return datetime.datetime.fromisoformat(reference_time)
+    except ValueError:
+        pass
+
+    # Try parsing common formats
+    formats = [
+        "%Y-%m-%d %H:%M:%S",
+        "%Y-%m-%d %H:%M:%S%z",
+        "%Y-%m-%dT%H:%M:%S",
+        "%Y-%m-%dT%H:%M:%S%z",
+        "%Y-%m-%d",
+    ]
+
+    for fmt in formats:
+        try:
+            return datetime.datetime.strptime(reference_time, fmt)
+        except ValueError:
+            continue
+
+    raise ValueError(
+        f"Could not parse reference_time '{reference_time}'. "
+        f"Please use ISO 8601 format like '2024-01-15T10:30:00' or '2024-01-15T10:30:00+00:00'."
+    )
+
+
+def _format_timedelta(td: datetime.timedelta) -> str:
+    """
+    Format a timedelta into a human-readable string.
+
+    Parameters
+    ----------
+    td
+        The timedelta to format.
+
+    Returns
+    -------
+    str
+        A human-readable string like "24 hours", "2 days 5 hours", etc.
+    """
+    total_seconds = td.total_seconds()
+
+    if total_seconds < 60:
+        val = round(total_seconds, 1)
+        return f"{val}s"
+    elif total_seconds < 3600:
+        val = round(total_seconds / 60, 1)
+        return f"{val}m"
+    elif total_seconds < 86400:
+        val = round(total_seconds / 3600, 1)
+        return f"{val}h"
+    elif total_seconds < 604800:
+        # For days, show "xd yh" format for better readability
+        days = int(total_seconds // 86400)
+        remaining_hours = round((total_seconds % 86400) / 3600, 1)
+        if remaining_hours == 0:
+            return f"{days}d"
+        else:
+            return f"{days}d {remaining_hours}h"
+    else:
+        val = round(total_seconds / 604800)
+        return f"{val}w"
+
+
 def _transform_auto_brief(brief: str | bool | None) -> str | None:
     if isinstance(brief, bool):
         if brief:
@@ -17759,6 +18546,14 @@ def _create_autobrief_or_failure_text(
     if assertion_type == "col_count_match":
         return _create_text_col_count_match(
             lang=lang,
+            value=values,
+            for_failure=for_failure,
+        )
+
+    if assertion_type == "data_freshness":
+        return _create_text_data_freshness(
+            lang=lang,
+            column=column,
             value=values,
             for_failure=for_failure,
         )
@@ -17989,6 +18784,33 @@ def _create_text_col_count_match(lang: str, value: dict, for_failure: bool = Fal
     values_text = _prep_values_text(value["count"], lang=lang)
 
     return EXPECT_FAIL_TEXT[f"col_count_match_n_{type_}_text"][lang].format(values_text=values_text)
+
+
+def _create_text_data_freshness(
+    lang: str,
+    column: str | None,
+    value: dict,
+    for_failure: bool = False,
+) -> str:
+    """Create text for data_freshness validation."""
+    type_ = _expect_failure_type(for_failure=for_failure)
+
+    column_text = _prep_column_text(column=column)
+    max_age_text = _format_timedelta(value.get("max_age"))
+
+    if for_failure:
+        age = value.get("age")
+        age_text = _format_timedelta(age) if age else "unknown"
+        return EXPECT_FAIL_TEXT[f"data_freshness_{type_}_text"][lang].format(
+            column_text=column_text,
+            max_age_text=max_age_text,
+            age_text=age_text,
+        )
+    else:
+        return EXPECT_FAIL_TEXT[f"data_freshness_{type_}_text"][lang].format(
+            column_text=column_text,
+            max_age_text=max_age_text,
+        )
 
 
 def _create_text_col_pct_null(

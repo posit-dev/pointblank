@@ -49,6 +49,7 @@ ASSERTION_TYPE_METHOD_MAP: dict[str, str] = {
     "col_schema_match": "col_schema_match",
     "row_count_match": "row_count_match",
     "col_count_match": "col_count_match",
+    "data_freshness": "data_freshness",
     "tbl_match": "tbl_match",
     "conjointly": "conjointly",
     "specially": "specially",
@@ -723,6 +724,19 @@ SVG_ICONS_FOR_ASSERTION_TYPES: dict[str, str] = {
                 <line x1="5.21223397" y1="0.514669353" x2="5.21223397" y2="7.58573716" id="Line"></line>
             </g>
             <path d="M11.5931863,12.5146694 C11.3836625,12.5146694 10.212234,12.5646694 10.212234,13.8480027 L10.212234,53.181336 C10.212234,54.4646694 11.3836625,54.5146694 11.5931863,54.5146694 L14.1646149,54.5146694 L14.1646149,12.5146694 L11.5931863,12.5146694 Z M20.1721771,12.5146694 L20.1721771,54.5146694 L16.2522908,54.5146694 L16.2522908,54.5146694 L16.2522908,12.5146694 L16.2522908,12.5146694 L20.1721771,12.5146694 Z M24.8656149,12.5150904 C25.1448786,12.521763 26.212234,12.6230027 26.212234,13.8480027 L26.212234,13.8480027 L26.212234,53.181336 C26.212234,54.4646694 25.0408054,54.5146694 24.8312816,54.5146694 L24.8312816,54.5146694 L22.259853,54.5146694 L22.259853,12.5146694 Z" id="rows_one" fill="#000000" fill-rule="nonzero" transform="translate(18.212234, 33.514669) rotate(-180.000000) translate(-18.212234, -33.514669) "></path>
+        </g>
+    </g>
+</svg>""",
+    "data_freshness": """<?xml version="1.0" encoding="UTF-8"?>
+<svg width="67px" height="67px" viewBox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>data_freshness</title>
+    <g id="All-Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="data_freshness" transform="translate(0.000000, 0.275862)">
+            <path d="M56.712234,1 C59.1975153,1 61.4475153,2.00735931 63.076195,3.63603897 C64.7048747,5.26471863 65.712234,7.51471863 65.712234,10 L65.712234,10 L65.712234,65 L10.712234,65 C8.22695259,65 5.97695259,63.9926407 4.34827294,62.363961 C2.71959328,60.7352814 1.71223397,58.4852814 1.71223397,56 L1.71223397,56 L1.71223397,10 C1.71223397,7.51471863 2.71959328,5.26471863 4.34827294,3.63603897 C5.97695259,2.00735931 8.22695259,1 10.712234,1 L10.712234,1 Z" id="rectangle" stroke="#000000" stroke-width="2" fill="#FFFFFF"></path>
+            <circle id="clock-face" stroke="#000000" stroke-width="2" cx="33.5" cy="33" r="20"></circle>
+            <line x1="33.5" y1="33" x2="33.5" y2="20" id="hour-hand" stroke="#000000" stroke-width="2.5" stroke-linecap="round"></line>
+            <line x1="33.5" y1="33" x2="44" y2="33" id="minute-hand" stroke="#000000" stroke-width="2" stroke-linecap="round"></line>
+            <circle id="center-dot" fill="#000000" cx="33.5" cy="33" r="2"></circle>
         </g>
     </g>
 </svg>""",
