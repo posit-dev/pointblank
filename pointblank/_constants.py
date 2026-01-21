@@ -728,15 +728,15 @@ SVG_ICONS_FOR_ASSERTION_TYPES: dict[str, str] = {
     </g>
 </svg>""",
     "data_freshness": """<?xml version="1.0" encoding="UTF-8"?>
-<svg width="67px" height="67px" viewBox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg width="67px" height="67px" viewBox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF;">
     <title>data_freshness</title>
-    <g id="All-Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="data_freshness" transform="translate(0.000000, 0.275862)">
-            <path d="M56.712234,1 C59.1975153,1 61.4475153,2.00735931 63.076195,3.63603897 C64.7048747,5.26471863 65.712234,7.51471863 65.712234,10 L65.712234,10 L65.712234,65 L10.712234,65 C8.22695259,65 5.97695259,63.9926407 4.34827294,62.363961 C2.71959328,60.7352814 1.71223397,58.4852814 1.71223397,56 L1.71223397,56 L1.71223397,10 C1.71223397,7.51471863 2.71959328,5.26471863 4.34827294,3.63603897 C5.97695259,2.00735931 8.22695259,1 10.712234,1 L10.712234,1 Z" id="rectangle" stroke="#000000" stroke-width="2" fill="#FFFFFF"></path>
-            <circle id="clock-face" stroke="#000000" stroke-width="2" cx="33.5" cy="33" r="20"></circle>
-            <line x1="33.5" y1="33" x2="33.5" y2="20" id="hour-hand" stroke="#000000" stroke-width="2.5" stroke-linecap="round"></line>
-            <line x1="33.5" y1="33" x2="44" y2="33" id="minute-hand" stroke="#000000" stroke-width="2" stroke-linecap="round"></line>
-            <circle id="center-dot" fill="#000000" cx="33.5" cy="33" r="2"></circle>
+    <g id="Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="data_freshness" transform="translate(1.500000, 1.500000)">
+            <path d="M55,0 C57.4852813,0 59.7352813,1.00735931 61.363961,2.63603897 C62.9926407,4.26471863 64,6.51471863 64,9 L64,9 L64,64 L9,64 C6.51471862,64 4.26471862,62.9926407 2.63603897,61.363961 C1.00735931,59.7352814 0,57.4852814 0,55 L0,55 L0,9 C0,6.51471863 1.00735931,4.26471863 2.63603897,2.63603897 C4.26471862,1.00735931 6.51471862,0 9,0 L9,0 L55,0 Z" id="rectangle" stroke="#000000" stroke-width="2" fill="#FFFFFF" fill-rule="nonzero"></path>
+            <circle id="clock-face" stroke="#000000" stroke-width="2" cx="32" cy="32" r="20"></circle>
+            <line x1="32" y1="32" x2="32" y2="17.2394543" id="hour-hand" stroke="#000000" stroke-width="2" stroke-linecap="round"></line>
+            <line x1="32" y1="32" x2="42.5" y2="32" id="minute-hand" stroke="#000000" stroke-width="2" stroke-linecap="round"></line>
+            <circle id="center-dot" fill="#000000" fill-rule="nonzero" cx="32" cy="32" r="2"></circle>
         </g>
     </g>
 </svg>""",
