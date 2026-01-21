@@ -378,7 +378,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
         border-radius: 2px;
     ">
 <p>The simplest use of <code>data_freshness()</code> requires just two arguments: the <code>column=</code> containing your timestamps and <code>max_age=</code> specifying how old the data can be. In this first example, we create sample data with an <code>"updated_at"</code> column containing timestamps from 1, 12, and 20 hours ago. By setting <code>max_age="24 hours"</code>, we’re asserting that the most recent timestamp should be within 24 hours of the current time. Since the newest record is only 1 hour old, this validation passes.</p>
-<div id="e63a5a2d" class="cell" data-execution_count="2">
+<div id="61c2da97" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> datetime <span class="im">import</span> datetime, timedelta</span>
@@ -546,7 +546,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 </div>
 <p>The <code>max_age=</code> parameter accepts human-readable strings with various time units. You can chain multiple <code>data_freshness()</code> calls to check different freshness thresholds simultaneously—useful for tiered SLAs where you might want warnings at 30 minutes but errors at 2 days.</p>
-<div id="a65a995c" class="cell" data-execution_count="3">
+<div id="4458c969" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check data is fresh within different time windows</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>recent_data)</span>
@@ -791,7 +791,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 </div>
 <p>When your data contains naive datetimes (timestamps without timezone information), use the <code>timezone=</code> parameter to specify what timezone those values represent. Here we have event data recorded in Eastern Time, so we set <code>timezone="America/New_York"</code> to ensure the freshness comparison is done correctly.</p>
-<div id="a2226a5b" class="cell" data-execution_count="4">
+<div id="fe1cfac7" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Data with naive datetimes (assume they're in Eastern Time)</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>eastern_data <span class="op">=</span> pl.DataFrame({</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"event_time"</span>: [</span>
@@ -957,7 +957,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 </div>
 <p>For reproducible validations or historical checks, you can use <code>reference_time=</code> to compare against a specific point in time instead of the current time. This is particularly useful for testing or when validating data snapshots. The reference time should include a timezone offset (like <code>+00:00</code> for UTC) to avoid ambiguity.</p>
-<div id="186a94d3" class="cell" data-execution_count="5">
+<div id="c897195e" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>recent_data)</span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    .data_freshness(</span>

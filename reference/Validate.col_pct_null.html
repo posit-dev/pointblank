@@ -322,7 +322,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
         border-radius: 2px;
     ">
 <p>For the examples here, we’ll use a simple Polars DataFrame with three columns (<code>a</code>, <code>b</code>, and <code>c</code>) that have different percentages of Null values. The table is shown below:</p>
-<div id="4f9ff3a3" class="cell" data-execution_count="2">
+<div id="cb82175a" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -465,7 +465,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 </div>
 <p>Let’s validate that column <code>a</code> has 0% Null values (i.e., no Null values at all).</p>
-<div id="6445cd31" class="cell" data-execution_count="3">
+<div id="648a489e" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    .col_pct_null(columns<span class="op">=</span><span class="st">"a"</span>, p<span class="op">=</span><span class="fl">0.0</span>)</span>
@@ -573,7 +573,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
             <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
 <svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF;">
     <title>pct_null</title>
-    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+    <g id="Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="col_vals_null" transform="translate(1.000000, 1.581717)" fill-rule="nonzero">
             <path d="M55,0 C57.4852813,0 59.7352813,1.00735931 61.363961,2.63603897 C62.9926407,4.26471863 64,6.51471863 64,9 L64,9 L64,64 L9,64 C6.51471862,64 4.26471862,62.9926407 2.63603897,61.363961 C1.00735931,59.7352814 0,57.4852814 0,55 L0,55 L0,9 C0,6.51471863 1.00735931,4.26471863 2.63603897,2.63603897 C4.26471862,1.00735931 6.51471862,0 9,0 L9,0 L55,0 Z" id="rectangle" stroke="#000000" stroke-width="2" fill="#FFFFFF"></path>
             <path d="M45.4146228,41.5 C43.2877254,41.5 41.6252254,40.7535715 40.745203,39.4536832 C39.8651805,40.7535715 38.2026805,41.5 36.0757835,41.5 C33.2639529,41.5 28.8023458,39.0677454 28.8023458,32.5428572 C28.8023458,29.5232143 29.7544662,22.5 38.5737744,22.5 C38.8727698,22.5 39.1166315,22.7438617 39.1166315,23.0428571 L39.1166315,24.1285714 C39.1166315,24.4275668 38.8727698,24.6714286 38.5737744,24.6714286 C35.9591539,24.6714286 33.1452029,27.1354913 33.1452029,32.5428572 C33.1452029,35.051451 34.0125019,38.7857143 36.4023458,38.7857143 C38.0945336,38.7857143 39.0614978,37.023549 39.6531269,35.5773439 C38.5758948,33.7664061 38.0309172,32.0699775 38.0309172,30.5347097 C38.0309172,27.0082592 39.4919662,25.7571429 40.745203,25.7571429 C41.9984397,25.7571429 43.4594886,27.0082592 43.4594886,30.5347097 C43.4594886,32.0911832 42.929355,33.745201 41.8393994,35.5773439 C42.7194218,37.7063617 43.8114979,38.7857143 45.0880601,38.7857143 C47.477904,38.7857143 48.345203,35.051451 48.345203,32.5428572 C48.345203,27.1354913 45.5312519,24.6714286 42.9166315,24.6714286 C42.6155157,24.6714286 42.3737744,24.4275668 42.3737744,24.1285714 L42.3737744,23.0428571 C42.3737744,22.7438617 42.6155157,22.5 42.9166315,22.5 C51.7359397,22.5 52.6880601,29.5232143 52.6880601,32.5428572 C52.6880601,39.0677454 48.2264529,41.5 45.4146228,41.5 Z" id="omega" fill="#000000"></path>
@@ -620,7 +620,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 <p>Printing the <code>validation</code> object shows the validation table in an HTML viewing environment. The validation table shows the single entry that corresponds to the validation step created by using <code>col_pct_null()</code>. The validation passed since column <code>a</code> has no Null values.</p>
 <p>Now, let’s check that column <code>b</code> has exactly 50% Null values.</p>
-<div id="354d6271" class="cell" data-execution_count="4">
+<div id="84b6cd22" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    .col_pct_null(columns<span class="op">=</span><span class="st">"b"</span>, p<span class="op">=</span><span class="fl">0.5</span>)</span>
@@ -728,7 +728,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
             <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
 <svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF;">
     <title>pct_null</title>
-    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+    <g id="Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="col_vals_null" transform="translate(1.000000, 1.581717)" fill-rule="nonzero">
             <path d="M55,0 C57.4852813,0 59.7352813,1.00735931 61.363961,2.63603897 C62.9926407,4.26471863 64,6.51471863 64,9 L64,9 L64,64 L9,64 C6.51471862,64 4.26471862,62.9926407 2.63603897,61.363961 C1.00735931,59.7352814 0,57.4852814 0,55 L0,55 L0,9 C0,6.51471863 1.00735931,4.26471863 2.63603897,2.63603897 C4.26471862,1.00735931 6.51471862,0 9,0 L9,0 L55,0 Z" id="rectangle" stroke="#000000" stroke-width="2" fill="#FFFFFF"></path>
             <path d="M45.4146228,41.5 C43.2877254,41.5 41.6252254,40.7535715 40.745203,39.4536832 C39.8651805,40.7535715 38.2026805,41.5 36.0757835,41.5 C33.2639529,41.5 28.8023458,39.0677454 28.8023458,32.5428572 C28.8023458,29.5232143 29.7544662,22.5 38.5737744,22.5 C38.8727698,22.5 39.1166315,22.7438617 39.1166315,23.0428571 L39.1166315,24.1285714 C39.1166315,24.4275668 38.8727698,24.6714286 38.5737744,24.6714286 C35.9591539,24.6714286 33.1452029,27.1354913 33.1452029,32.5428572 C33.1452029,35.051451 34.0125019,38.7857143 36.4023458,38.7857143 C38.0945336,38.7857143 39.0614978,37.023549 39.6531269,35.5773439 C38.5758948,33.7664061 38.0309172,32.0699775 38.0309172,30.5347097 C38.0309172,27.0082592 39.4919662,25.7571429 40.745203,25.7571429 C41.9984397,25.7571429 43.4594886,27.0082592 43.4594886,30.5347097 C43.4594886,32.0911832 42.929355,33.745201 41.8393994,35.5773439 C42.7194218,37.7063617 43.8114979,38.7857143 45.0880601,38.7857143 C47.477904,38.7857143 48.345203,35.051451 48.345203,32.5428572 C48.345203,27.1354913 45.5312519,24.6714286 42.9166315,24.6714286 C42.6155157,24.6714286 42.3737744,24.4275668 42.3737744,24.1285714 L42.3737744,23.0428571 C42.3737744,22.7438617 42.6155157,22.5 42.9166315,22.5 C51.7359397,22.5 52.6880601,29.5232143 52.6880601,32.5428572 C52.6880601,39.0677454 48.2264529,41.5 45.4146228,41.5 Z" id="omega" fill="#000000"></path>
@@ -775,7 +775,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 <p>This validation also passes, as column <code>b</code> has exactly 4 out of 8 values as Null (50%).</p>
 <p>Finally, let’s validate column <code>c</code> with a tolerance. Column <code>c</code> has 75% Null values, so we’ll check if it’s approximately 70% Null with a tolerance of 10%.</p>
-<div id="9c56644c" class="cell" data-execution_count="5">
+<div id="7d38c415" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    .col_pct_null(columns<span class="op">=</span><span class="st">"c"</span>, p<span class="op">=</span><span class="fl">0.70</span>, tol<span class="op">=</span><span class="fl">0.10</span>)</span>
@@ -883,7 +883,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
             <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
 <svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF;">
     <title>pct_null</title>
-    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+    <g id="Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="col_vals_null" transform="translate(1.000000, 1.581717)" fill-rule="nonzero">
             <path d="M55,0 C57.4852813,0 59.7352813,1.00735931 61.363961,2.63603897 C62.9926407,4.26471863 64,6.51471863 64,9 L64,9 L64,64 L9,64 C6.51471862,64 4.26471862,62.9926407 2.63603897,61.363961 C1.00735931,59.7352814 0,57.4852814 0,55 L0,55 L0,9 C0,6.51471863 1.00735931,4.26471863 2.63603897,2.63603897 C4.26471862,1.00735931 6.51471862,0 9,0 L9,0 L55,0 Z" id="rectangle" stroke="#000000" stroke-width="2" fill="#FFFFFF"></path>
             <path d="M45.4146228,41.5 C43.2877254,41.5 41.6252254,40.7535715 40.745203,39.4536832 C39.8651805,40.7535715 38.2026805,41.5 36.0757835,41.5 C33.2639529,41.5 28.8023458,39.0677454 28.8023458,32.5428572 C28.8023458,29.5232143 29.7544662,22.5 38.5737744,22.5 C38.8727698,22.5 39.1166315,22.7438617 39.1166315,23.0428571 L39.1166315,24.1285714 C39.1166315,24.4275668 38.8727698,24.6714286 38.5737744,24.6714286 C35.9591539,24.6714286 33.1452029,27.1354913 33.1452029,32.5428572 C33.1452029,35.051451 34.0125019,38.7857143 36.4023458,38.7857143 C38.0945336,38.7857143 39.0614978,37.023549 39.6531269,35.5773439 C38.5758948,33.7664061 38.0309172,32.0699775 38.0309172,30.5347097 C38.0309172,27.0082592 39.4919662,25.7571429 40.745203,25.7571429 C41.9984397,25.7571429 43.4594886,27.0082592 43.4594886,30.5347097 C43.4594886,32.0911832 42.929355,33.745201 41.8393994,35.5773439 C42.7194218,37.7063617 43.8114979,38.7857143 45.0880601,38.7857143 C47.477904,38.7857143 48.345203,35.051451 48.345203,32.5428572 C48.345203,27.1354913 45.5312519,24.6714286 42.9166315,24.6714286 C42.6155157,24.6714286 42.3737744,24.4275668 42.3737744,24.1285714 L42.3737744,23.0428571 C42.3737744,22.7438617 42.6155157,22.5 42.9166315,22.5 C51.7359397,22.5 52.6880601,29.5232143 52.6880601,32.5428572 C52.6880601,39.0677454 48.2264529,41.5 45.4146228,41.5 Z" id="omega" fill="#000000"></path>
@@ -931,7 +931,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <p>This validation passes because the actual percentage (75%) falls within the acceptable range of 60% to 80% (70% ± 10%).</p>
 <p>The <code>tol=</code> parameter supports multiple formats to express tolerance. Let’s explore all the different ways to specify tolerance using column <code>b</code>, which has exactly 50% Null values (4 out of 8 values).</p>
 <p><em>Using an absolute tolerance (integer)</em>: Specify the exact number of rows that can deviate. With <code>tol=1</code>, we allow the count to differ by 1 row in either direction.</p>
-<div id="a1d422e0" class="cell" data-execution_count="6">
+<div id="518212e6" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    .col_pct_null(columns<span class="op">=</span><span class="st">"b"</span>, p<span class="op">=</span><span class="fl">0.375</span>, tol<span class="op">=</span><span class="dv">1</span>)  <span class="co"># Expect 3 nulls, allow ±1 (range: 2-4)</span></span>
@@ -1039,7 +1039,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
             <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
 <svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF;">
     <title>pct_null</title>
-    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+    <g id="Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="col_vals_null" transform="translate(1.000000, 1.581717)" fill-rule="nonzero">
             <path d="M55,0 C57.4852813,0 59.7352813,1.00735931 61.363961,2.63603897 C62.9926407,4.26471863 64,6.51471863 64,9 L64,9 L64,64 L9,64 C6.51471862,64 4.26471862,62.9926407 2.63603897,61.363961 C1.00735931,59.7352814 0,57.4852814 0,55 L0,55 L0,9 C0,6.51471863 1.00735931,4.26471863 2.63603897,2.63603897 C4.26471862,1.00735931 6.51471862,0 9,0 L9,0 L55,0 Z" id="rectangle" stroke="#000000" stroke-width="2" fill="#FFFFFF"></path>
             <path d="M45.4146228,41.5 C43.2877254,41.5 41.6252254,40.7535715 40.745203,39.4536832 C39.8651805,40.7535715 38.2026805,41.5 36.0757835,41.5 C33.2639529,41.5 28.8023458,39.0677454 28.8023458,32.5428572 C28.8023458,29.5232143 29.7544662,22.5 38.5737744,22.5 C38.8727698,22.5 39.1166315,22.7438617 39.1166315,23.0428571 L39.1166315,24.1285714 C39.1166315,24.4275668 38.8727698,24.6714286 38.5737744,24.6714286 C35.9591539,24.6714286 33.1452029,27.1354913 33.1452029,32.5428572 C33.1452029,35.051451 34.0125019,38.7857143 36.4023458,38.7857143 C38.0945336,38.7857143 39.0614978,37.023549 39.6531269,35.5773439 C38.5758948,33.7664061 38.0309172,32.0699775 38.0309172,30.5347097 C38.0309172,27.0082592 39.4919662,25.7571429 40.745203,25.7571429 C41.9984397,25.7571429 43.4594886,27.0082592 43.4594886,30.5347097 C43.4594886,32.0911832 42.929355,33.745201 41.8393994,35.5773439 C42.7194218,37.7063617 43.8114979,38.7857143 45.0880601,38.7857143 C47.477904,38.7857143 48.345203,35.051451 48.345203,32.5428572 C48.345203,27.1354913 45.5312519,24.6714286 42.9166315,24.6714286 C42.6155157,24.6714286 42.3737744,24.4275668 42.3737744,24.1285714 L42.3737744,23.0428571 C42.3737744,22.7438617 42.6155157,22.5 42.9166315,22.5 C51.7359397,22.5 52.6880601,29.5232143 52.6880601,32.5428572 C52.6880601,39.0677454 48.2264529,41.5 45.4146228,41.5 Z" id="omega" fill="#000000"></path>
@@ -1086,7 +1086,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 <p>This passes because column <code>b</code> has 4 Null values, which falls within the acceptable range of 2 to 4 (3 ± 1).</p>
 <p><em>Using a relative tolerance (float)</em>: Specify the tolerance as a proportion of the expected count. With <code>tol=0.25</code>, we allow a 25% deviation from the expected count.</p>
-<div id="35e70338" class="cell" data-execution_count="7">
+<div id="dac01da4" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    .col_pct_null(columns<span class="op">=</span><span class="st">"b"</span>, p<span class="op">=</span><span class="fl">0.375</span>, tol<span class="op">=</span><span class="fl">0.25</span>)  <span class="co"># Expect 3 nulls, allow ±25% (range: 2.25-3.75)</span></span>
@@ -1194,7 +1194,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
             <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
 <svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF;">
     <title>pct_null</title>
-    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+    <g id="Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="col_vals_null" transform="translate(1.000000, 1.581717)" fill-rule="nonzero">
             <path d="M55,0 C57.4852813,0 59.7352813,1.00735931 61.363961,2.63603897 C62.9926407,4.26471863 64,6.51471863 64,9 L64,9 L64,64 L9,64 C6.51471862,64 4.26471862,62.9926407 2.63603897,61.363961 C1.00735931,59.7352814 0,57.4852814 0,55 L0,55 L0,9 C0,6.51471863 1.00735931,4.26471863 2.63603897,2.63603897 C4.26471862,1.00735931 6.51471862,0 9,0 L9,0 L55,0 Z" id="rectangle" stroke="#000000" stroke-width="2" fill="#FFFFFF"></path>
             <path d="M45.4146228,41.5 C43.2877254,41.5 41.6252254,40.7535715 40.745203,39.4536832 C39.8651805,40.7535715 38.2026805,41.5 36.0757835,41.5 C33.2639529,41.5 28.8023458,39.0677454 28.8023458,32.5428572 C28.8023458,29.5232143 29.7544662,22.5 38.5737744,22.5 C38.8727698,22.5 39.1166315,22.7438617 39.1166315,23.0428571 L39.1166315,24.1285714 C39.1166315,24.4275668 38.8727698,24.6714286 38.5737744,24.6714286 C35.9591539,24.6714286 33.1452029,27.1354913 33.1452029,32.5428572 C33.1452029,35.051451 34.0125019,38.7857143 36.4023458,38.7857143 C38.0945336,38.7857143 39.0614978,37.023549 39.6531269,35.5773439 C38.5758948,33.7664061 38.0309172,32.0699775 38.0309172,30.5347097 C38.0309172,27.0082592 39.4919662,25.7571429 40.745203,25.7571429 C41.9984397,25.7571429 43.4594886,27.0082592 43.4594886,30.5347097 C43.4594886,32.0911832 42.929355,33.745201 41.8393994,35.5773439 C42.7194218,37.7063617 43.8114979,38.7857143 45.0880601,38.7857143 C47.477904,38.7857143 48.345203,35.051451 48.345203,32.5428572 C48.345203,27.1354913 45.5312519,24.6714286 42.9166315,24.6714286 C42.6155157,24.6714286 42.3737744,24.4275668 42.3737744,24.1285714 L42.3737744,23.0428571 C42.3737744,22.7438617 42.6155157,22.5 42.9166315,22.5 C51.7359397,22.5 52.6880601,29.5232143 52.6880601,32.5428572 C52.6880601,39.0677454 48.2264529,41.5 45.4146228,41.5 Z" id="omega" fill="#000000"></path>
@@ -1241,7 +1241,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 <p>This passes because 4 Null values falls within the acceptable range (3 ± 0.75 calculates to 2.25 to 3.75, which rounds down to 2 to 3 rows).</p>
 <p><em>Using asymmetric absolute bounds (tuple of integers)</em>: Specify different lower and upper bounds as absolute values. With <code>tol=(0, 2)</code>, we allow no deviation below but up to 2 rows above the expected count.</p>
-<div id="318880a0" class="cell" data-execution_count="8">
+<div id="d1eca2cf" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    .col_pct_null(columns<span class="op">=</span><span class="st">"b"</span>, p<span class="op">=</span><span class="fl">0.25</span>, tol<span class="op">=</span>(<span class="dv">0</span>, <span class="dv">2</span>))  <span class="co"># Expect 2 Nulls, allow +0/-2 (range: 2-4)</span></span>
@@ -1349,7 +1349,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
             <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
 <svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF;">
     <title>pct_null</title>
-    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+    <g id="Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="col_vals_null" transform="translate(1.000000, 1.581717)" fill-rule="nonzero">
             <path d="M55,0 C57.4852813,0 59.7352813,1.00735931 61.363961,2.63603897 C62.9926407,4.26471863 64,6.51471863 64,9 L64,9 L64,64 L9,64 C6.51471862,64 4.26471862,62.9926407 2.63603897,61.363961 C1.00735931,59.7352814 0,57.4852814 0,55 L0,55 L0,9 C0,6.51471863 1.00735931,4.26471863 2.63603897,2.63603897 C4.26471862,1.00735931 6.51471862,0 9,0 L9,0 L55,0 Z" id="rectangle" stroke="#000000" stroke-width="2" fill="#FFFFFF"></path>
             <path d="M45.4146228,41.5 C43.2877254,41.5 41.6252254,40.7535715 40.745203,39.4536832 C39.8651805,40.7535715 38.2026805,41.5 36.0757835,41.5 C33.2639529,41.5 28.8023458,39.0677454 28.8023458,32.5428572 C28.8023458,29.5232143 29.7544662,22.5 38.5737744,22.5 C38.8727698,22.5 39.1166315,22.7438617 39.1166315,23.0428571 L39.1166315,24.1285714 C39.1166315,24.4275668 38.8727698,24.6714286 38.5737744,24.6714286 C35.9591539,24.6714286 33.1452029,27.1354913 33.1452029,32.5428572 C33.1452029,35.051451 34.0125019,38.7857143 36.4023458,38.7857143 C38.0945336,38.7857143 39.0614978,37.023549 39.6531269,35.5773439 C38.5758948,33.7664061 38.0309172,32.0699775 38.0309172,30.5347097 C38.0309172,27.0082592 39.4919662,25.7571429 40.745203,25.7571429 C41.9984397,25.7571429 43.4594886,27.0082592 43.4594886,30.5347097 C43.4594886,32.0911832 42.929355,33.745201 41.8393994,35.5773439 C42.7194218,37.7063617 43.8114979,38.7857143 45.0880601,38.7857143 C47.477904,38.7857143 48.345203,35.051451 48.345203,32.5428572 C48.345203,27.1354913 45.5312519,24.6714286 42.9166315,24.6714286 C42.6155157,24.6714286 42.3737744,24.4275668 42.3737744,24.1285714 L42.3737744,23.0428571 C42.3737744,22.7438617 42.6155157,22.5 42.9166315,22.5 C51.7359397,22.5 52.6880601,29.5232143 52.6880601,32.5428572 C52.6880601,39.0677454 48.2264529,41.5 45.4146228,41.5 Z" id="omega" fill="#000000"></path>
@@ -1396,7 +1396,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 <p>This passes because 4 Null values falls within the acceptable range of 2 to 4.</p>
 <p><em>Using asymmetric relative bounds (tuple of floats)</em>: Specify different lower and upper bounds as proportions. With <code>tol=(0.1, 0.3)</code>, we allow 10% below and 30% above the expected count.</p>
-<div id="c6e1d022" class="cell" data-execution_count="9">
+<div id="79d3e365" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    .col_pct_null(columns<span class="op">=</span><span class="st">"b"</span>, p<span class="op">=</span><span class="fl">0.375</span>, tol<span class="op">=</span>(<span class="fl">0.1</span>, <span class="fl">0.3</span>))  <span class="co"># Expect 3 Nulls, allow -10%/+30%</span></span>
@@ -1504,7 +1504,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
             <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
 <svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF;">
     <title>pct_null</title>
-    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+    <g id="Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="col_vals_null" transform="translate(1.000000, 1.581717)" fill-rule="nonzero">
             <path d="M55,0 C57.4852813,0 59.7352813,1.00735931 61.363961,2.63603897 C62.9926407,4.26471863 64,6.51471863 64,9 L64,9 L64,64 L9,64 C6.51471862,64 4.26471862,62.9926407 2.63603897,61.363961 C1.00735931,59.7352814 0,57.4852814 0,55 L0,55 L0,9 C0,6.51471863 1.00735931,4.26471863 2.63603897,2.63603897 C4.26471862,1.00735931 6.51471862,0 9,0 L9,0 L55,0 Z" id="rectangle" stroke="#000000" stroke-width="2" fill="#FFFFFF"></path>
             <path d="M45.4146228,41.5 C43.2877254,41.5 41.6252254,40.7535715 40.745203,39.4536832 C39.8651805,40.7535715 38.2026805,41.5 36.0757835,41.5 C33.2639529,41.5 28.8023458,39.0677454 28.8023458,32.5428572 C28.8023458,29.5232143 29.7544662,22.5 38.5737744,22.5 C38.8727698,22.5 39.1166315,22.7438617 39.1166315,23.0428571 L39.1166315,24.1285714 C39.1166315,24.4275668 38.8727698,24.6714286 38.5737744,24.6714286 C35.9591539,24.6714286 33.1452029,27.1354913 33.1452029,32.5428572 C33.1452029,35.051451 34.0125019,38.7857143 36.4023458,38.7857143 C38.0945336,38.7857143 39.0614978,37.023549 39.6531269,35.5773439 C38.5758948,33.7664061 38.0309172,32.0699775 38.0309172,30.5347097 C38.0309172,27.0082592 39.4919662,25.7571429 40.745203,25.7571429 C41.9984397,25.7571429 43.4594886,27.0082592 43.4594886,30.5347097 C43.4594886,32.0911832 42.929355,33.745201 41.8393994,35.5773439 C42.7194218,37.7063617 43.8114979,38.7857143 45.0880601,38.7857143 C47.477904,38.7857143 48.345203,35.051451 48.345203,32.5428572 C48.345203,27.1354913 45.5312519,24.6714286 42.9166315,24.6714286 C42.6155157,24.6714286 42.3737744,24.4275668 42.3737744,24.1285714 L42.3737744,23.0428571 C42.3737744,22.7438617 42.6155157,22.5 42.9166315,22.5 C51.7359397,22.5 52.6880601,29.5232143 52.6880601,32.5428572 C52.6880601,39.0677454 48.2264529,41.5 45.4146228,41.5 Z" id="omega" fill="#000000"></path>
