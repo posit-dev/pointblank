@@ -13611,6 +13611,105 @@ class Validate:
 
                         results_tbl = None
 
+                    elif assertion_type == "data_freshness":
+                        from pointblank._interrogation import data_freshness as data_freshness_check
+
+                        freshness_result = data_freshness_check(
+                            data_tbl=data_tbl_step,
+                            column=column,
+                            max_age=value["max_age"],
+                            reference_time=value["reference_time"],
+                            timezone=value["timezone"],
+                            allow_tz_mismatch=value["allow_tz_mismatch"],
+                        )
+
+                        result_bool = freshness_result["passed"]
+                        validation.all_passed = result_bool
+                        validation.n = 1
+                        validation.n_passed = int(result_bool)
+                        validation.n_failed = 1 - int(result_bool)
+
+                        # Store the freshness check details for reporting
+                        validation.val_info = freshness_result
+
+                        # Update the values dict with actual computed values for failure text
+                        if freshness_result.get("age") is not None:
+                            value["age"] = freshness_result["age"]
+
+                        # Add timezone warning note if applicable
+                        if freshness_result.get("tz_warning_key"):
+                            tz_key = freshness_result["tz_warning_key"]
+                            tz_warning_text = NOTES_TEXT.get(tz_key, {}).get(
+                                self.locale, NOTES_TEXT.get(tz_key, {}).get("en", "")
+                            )
+                            validation._add_note(
+                                key="tz_warning",
+                                markdown=f"⚠️ {tz_warning_text}",
+                                text=tz_warning_text,
+                            )
+
+                        # Add note about column being empty if applicable
+                        if freshness_result.get("column_empty"):
+                            column_empty_text = NOTES_TEXT.get(
+                                "data_freshness_column_empty", {}
+                            ).get(
+                                self.locale,
+                                NOTES_TEXT.get("data_freshness_column_empty", {}).get(
+                                    "en", "The datetime column is empty (no values to check)."
+                                ),
+                            )
+                            validation._add_note(
+                                key="column_empty",
+                                markdown=f"⚠️ {column_empty_text}",
+                                text=column_empty_text,
+                            )
+
+                        # Add informational note about the freshness check
+                        if freshness_result.get("max_datetime") and freshness_result.get("age"):
+                            max_dt = freshness_result["max_datetime"]
+                            # Format datetime without microseconds for cleaner display
+                            if hasattr(max_dt, "replace"):
+                                max_dt_display = max_dt.replace(microsecond=0)
+                            else:
+                                max_dt_display = max_dt
+                            age = freshness_result["age"]
+                            age_str = _format_timedelta(age)
+                            max_age_str = _format_timedelta(value["max_age"])
+
+                            # Get translated template for pass/fail
+                            if result_bool:
+                                details_key = "data_freshness_details_pass"
+                                prefix = "✓"
+                            else:
+                                details_key = "data_freshness_details_fail"
+                                prefix = "✗"
+
+                            details_template = NOTES_TEXT.get(details_key, {}).get(
+                                self.locale,
+                                NOTES_TEXT.get(details_key, {}).get(
+                                    "en",
+                                    "Most recent data: `{max_dt}` (age: {age}, max allowed: {max_age})",
+                                ),
+                            )
+
+                            # Format the template with values
+                            note_text = details_template.format(
+                                max_dt=max_dt_display, age=age_str, max_age=max_age_str
+                            )
+                            # For markdown, make the age bold
+                            note_md_template = details_template.replace(
+                                "(age: {age}", "(age: **{age}**"
+                            )
+                            note_md = f"{prefix} {note_md_template.format(max_dt=max_dt_display, age=age_str, max_age=max_age_str)}"
+
+                            validation._add_note(
+                                key="freshness_details",
+                                markdown=note_md,
+                                text=note_text,
+                            )
+
+                        results_tbl = None
+
                     elif assertion_type == "tbl_match":
                         from pointblank._interrogation import tbl_match
 
