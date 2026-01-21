@@ -13349,6 +13349,8 @@ class Validate:
                 "col_schema_match",
                 "row_count_match",
                 "col_count_match",
+                "data_freshness",
+                "tbl_match",
             ]
 
             if validation.n == 0 and assertion_type not in table_level_assertions:
