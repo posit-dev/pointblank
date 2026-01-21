@@ -266,7 +266,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
         border-radius: 2px;
     ">
 <p>Different types of validation steps can have different numbers of test units. In the example below, we’ll use a simple Polars DataFrame with three columns (<code>a</code>, <code>b</code>, and <code>c</code>). There will be three validation steps, and the number of test units for each step will be a little bit different.</p>
-<div id="657d89aa" class="cell" data-execution_count="1">
+<div id="021a00a8" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -291,7 +291,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>The first validation step checks that all values in column <code>a</code> are greater than <code>0</code>. Let’s use the <code>n()</code> method to determine the number of test units this validation step.</p>
-<div id="86a34f91" class="cell" data-execution_count="2">
+<div id="472bd59d" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>validation.n(i<span class="op">=</span><span class="dv">1</span>, scalar<span class="op">=</span><span class="va">True</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="2">
 <pre><code>4</code></pre>
@@ -299,7 +299,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 <p>The returned value of <code>4</code> is the number of test units for the first validation step. This value is the same as the number of rows in the table.</p>
 <p>The second validation step checks for the existence of column <code>b</code>. Using the <code>n()</code> method we can get the number of test units for this the second step.</p>
-<div id="d7e5d405" class="cell" data-execution_count="3">
+<div id="c6130970" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>validation.n(i<span class="op">=</span><span class="dv">2</span>, scalar<span class="op">=</span><span class="va">True</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="3">
 <pre><code>1</code></pre>
@@ -307,7 +307,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 <p>There’s a single test unit here because the validation step is checking for the presence of a single column.</p>
 <p>The third validation step checks that all values in column <code>b</code> are less than <code>9</code> after filtering the table to only include rows where the value in column <code>a</code> is greater than <code>1</code>. Because the table is filtered, the number of test units will be less than the total number of rows in the input table. Let’s prove this by using the <code>n()</code> method.</p>
-<div id="31bb2389" class="cell" data-execution_count="4">
+<div id="76dddbf1" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>validation.n(i<span class="op">=</span><span class="dv">3</span>, scalar<span class="op">=</span><span class="va">True</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="4">
 <pre><code>3</code></pre>
@@ -315,7 +315,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 <p>The returned value of <code>3</code> is the number of test units for the third validation step. When using the <code>pre=</code> argument, the input table can be mutated before performing the validation. The <code>n()</code> method is a good way to determine whether the mutation performed as expected.</p>
 <p>In all of these examples, the <code>scalar=True</code> argument was used to return the value as a scalar integer value. If <code>scalar=False</code>, the method will return a dictionary with an entry for the validation step number (from the <code>i=</code> argument) and the number of test units. Futhermore, leaving out the <code>i=</code> argument altogether will return a dictionary with filled with the number of test units for each validation step. Here’s what that looks like:</p>
-<div id="1ef77ac1" class="cell" data-execution_count="5">
+<div id="17234c9e" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>validation.n()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="5">
 <pre><code>{1: 4, 2: 1, 3: 3}</code></pre>

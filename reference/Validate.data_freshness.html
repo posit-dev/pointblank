@@ -378,7 +378,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
         border-radius: 2px;
     ">
 <p>The simplest use of <code>data_freshness()</code> requires just two arguments: the <code>column=</code> containing your timestamps and <code>max_age=</code> specifying how old the data can be. In this first example, we create sample data with an <code>"updated_at"</code> column containing timestamps from 1, 12, and 20 hours ago. By setting <code>max_age="24 hours"</code>, we’re asserting that the most recent timestamp should be within 24 hours of the current time. Since the newest record is only 1 hour old, this validation passes.</p>
-<div id="dcdcd6c8" class="cell" data-execution_count="2">
+<div id="e63a5a2d" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> datetime <span class="im">import</span> datetime, timedelta</span>
@@ -498,15 +498,15 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left">
         <div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
             <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
-<svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink">
+<svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF;">
     <title>data_freshness</title>
-    <g id="All-Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="data_freshness" transform="translate(0.000000, 0.275862)">
-            <path d="M56.712234,1 C59.1975153,1 61.4475153,2.00735931 63.076195,3.63603897 C64.7048747,5.26471863 65.712234,7.51471863 65.712234,10 L65.712234,10 L65.712234,65 L10.712234,65 C8.22695259,65 5.97695259,63.9926407 4.34827294,62.363961 C2.71959328,60.7352814 1.71223397,58.4852814 1.71223397,56 L1.71223397,56 L1.71223397,10 C1.71223397,7.51471863 2.71959328,5.26471863 4.34827294,3.63603897 C5.97695259,2.00735931 8.22695259,1 10.712234,1 L10.712234,1 Z" id="rectangle" stroke="#000000" stroke-width="2" fill="#FFFFFF"></path>
-            <circle id="clock-face" stroke="#000000" stroke-width="2" cx="33.5" cy="33" r="20"></circle>
-            <line x1="33.5" y1="33" x2="33.5" y2="20" id="hour-hand" stroke="#000000" stroke-width="2.5" stroke-linecap="round"></line>
-            <line x1="33.5" y1="33" x2="44" y2="33" id="minute-hand" stroke="#000000" stroke-width="2" stroke-linecap="round"></line>
-            <circle id="center-dot" fill="#000000" cx="33.5" cy="33" r="2"></circle>
+    <g id="Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="data_freshness" transform="translate(1.500000, 1.500000)">
+            <path d="M55,0 C57.4852813,0 59.7352813,1.00735931 61.363961,2.63603897 C62.9926407,4.26471863 64,6.51471863 64,9 L64,9 L64,64 L9,64 C6.51471862,64 4.26471862,62.9926407 2.63603897,61.363961 C1.00735931,59.7352814 0,57.4852814 0,55 L0,55 L0,9 C0,6.51471863 1.00735931,4.26471863 2.63603897,2.63603897 C4.26471862,1.00735931 6.51471862,0 9,0 L9,0 L55,0 Z" id="rectangle" stroke="#000000" stroke-width="2" fill="#FFFFFF" fill-rule="nonzero"></path>
+            <circle id="clock-face" stroke="#000000" stroke-width="2" cx="32" cy="32" r="20"></circle>
+            <line x1="32" y1="32" x2="32" y2="17.2394543" id="hour-hand" stroke="#000000" stroke-width="2" stroke-linecap="round"></line>
+            <line x1="32" y1="32" x2="42.5" y2="32" id="minute-hand" stroke="#000000" stroke-width="2" stroke-linecap="round"></line>
+            <circle id="center-dot" fill="#000000" fill-rule="nonzero" cx="32" cy="32" r="2"></circle>
         </g>
     </g>
 </svg>
@@ -546,7 +546,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 </div>
 <p>The <code>max_age=</code> parameter accepts human-readable strings with various time units. You can chain multiple <code>data_freshness()</code> calls to check different freshness thresholds simultaneously—useful for tiered SLAs where you might want warnings at 30 minutes but errors at 2 days.</p>
-<div id="51246d71" class="cell" data-execution_count="3">
+<div id="a65a995c" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check data is fresh within different time windows</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>recent_data)</span>
@@ -655,15 +655,15 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left">
         <div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
             <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
-<svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink">
+<svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF;">
     <title>data_freshness</title>
-    <g id="All-Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="data_freshness" transform="translate(0.000000, 0.275862)">
-            <path d="M56.712234,1 C59.1975153,1 61.4475153,2.00735931 63.076195,3.63603897 C64.7048747,5.26471863 65.712234,7.51471863 65.712234,10 L65.712234,10 L65.712234,65 L10.712234,65 C8.22695259,65 5.97695259,63.9926407 4.34827294,62.363961 C2.71959328,60.7352814 1.71223397,58.4852814 1.71223397,56 L1.71223397,56 L1.71223397,10 C1.71223397,7.51471863 2.71959328,5.26471863 4.34827294,3.63603897 C5.97695259,2.00735931 8.22695259,1 10.712234,1 L10.712234,1 Z" id="rectangle" stroke="#000000" stroke-width="2" fill="#FFFFFF"></path>
-            <circle id="clock-face" stroke="#000000" stroke-width="2" cx="33.5" cy="33" r="20"></circle>
-            <line x1="33.5" y1="33" x2="33.5" y2="20" id="hour-hand" stroke="#000000" stroke-width="2.5" stroke-linecap="round"></line>
-            <line x1="33.5" y1="33" x2="44" y2="33" id="minute-hand" stroke="#000000" stroke-width="2" stroke-linecap="round"></line>
-            <circle id="center-dot" fill="#000000" cx="33.5" cy="33" r="2"></circle>
+    <g id="Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="data_freshness" transform="translate(1.500000, 1.500000)">
+            <path d="M55,0 C57.4852813,0 59.7352813,1.00735931 61.363961,2.63603897 C62.9926407,4.26471863 64,6.51471863 64,9 L64,9 L64,64 L9,64 C6.51471862,64 4.26471862,62.9926407 2.63603897,61.363961 C1.00735931,59.7352814 0,57.4852814 0,55 L0,55 L0,9 C0,6.51471863 1.00735931,4.26471863 2.63603897,2.63603897 C4.26471862,1.00735931 6.51471862,0 9,0 L9,0 L55,0 Z" id="rectangle" stroke="#000000" stroke-width="2" fill="#FFFFFF" fill-rule="nonzero"></path>
+            <circle id="clock-face" stroke="#000000" stroke-width="2" cx="32" cy="32" r="20"></circle>
+            <line x1="32" y1="32" x2="32" y2="17.2394543" id="hour-hand" stroke="#000000" stroke-width="2" stroke-linecap="round"></line>
+            <line x1="32" y1="32" x2="42.5" y2="32" id="minute-hand" stroke="#000000" stroke-width="2" stroke-linecap="round"></line>
+            <circle id="center-dot" fill="#000000" fill-rule="nonzero" cx="32" cy="32" r="2"></circle>
         </g>
     </g>
 </svg>
@@ -699,15 +699,15 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left">
         <div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
             <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
-<svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink">
+<svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF;">
     <title>data_freshness</title>
-    <g id="All-Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="data_freshness" transform="translate(0.000000, 0.275862)">
-            <path d="M56.712234,1 C59.1975153,1 61.4475153,2.00735931 63.076195,3.63603897 C64.7048747,5.26471863 65.712234,7.51471863 65.712234,10 L65.712234,10 L65.712234,65 L10.712234,65 C8.22695259,65 5.97695259,63.9926407 4.34827294,62.363961 C2.71959328,60.7352814 1.71223397,58.4852814 1.71223397,56 L1.71223397,56 L1.71223397,10 C1.71223397,7.51471863 2.71959328,5.26471863 4.34827294,3.63603897 C5.97695259,2.00735931 8.22695259,1 10.712234,1 L10.712234,1 Z" id="rectangle" stroke="#000000" stroke-width="2" fill="#FFFFFF"></path>
-            <circle id="clock-face" stroke="#000000" stroke-width="2" cx="33.5" cy="33" r="20"></circle>
-            <line x1="33.5" y1="33" x2="33.5" y2="20" id="hour-hand" stroke="#000000" stroke-width="2.5" stroke-linecap="round"></line>
-            <line x1="33.5" y1="33" x2="44" y2="33" id="minute-hand" stroke="#000000" stroke-width="2" stroke-linecap="round"></line>
-            <circle id="center-dot" fill="#000000" cx="33.5" cy="33" r="2"></circle>
+    <g id="Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="data_freshness" transform="translate(1.500000, 1.500000)">
+            <path d="M55,0 C57.4852813,0 59.7352813,1.00735931 61.363961,2.63603897 C62.9926407,4.26471863 64,6.51471863 64,9 L64,9 L64,64 L9,64 C6.51471862,64 4.26471862,62.9926407 2.63603897,61.363961 C1.00735931,59.7352814 0,57.4852814 0,55 L0,55 L0,9 C0,6.51471863 1.00735931,4.26471863 2.63603897,2.63603897 C4.26471862,1.00735931 6.51471862,0 9,0 L9,0 L55,0 Z" id="rectangle" stroke="#000000" stroke-width="2" fill="#FFFFFF" fill-rule="nonzero"></path>
+            <circle id="clock-face" stroke="#000000" stroke-width="2" cx="32" cy="32" r="20"></circle>
+            <line x1="32" y1="32" x2="32" y2="17.2394543" id="hour-hand" stroke="#000000" stroke-width="2" stroke-linecap="round"></line>
+            <line x1="32" y1="32" x2="42.5" y2="32" id="minute-hand" stroke="#000000" stroke-width="2" stroke-linecap="round"></line>
+            <circle id="center-dot" fill="#000000" fill-rule="nonzero" cx="32" cy="32" r="2"></circle>
         </g>
     </g>
 </svg>
@@ -743,15 +743,15 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left">
         <div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
             <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
-<svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink">
+<svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF;">
     <title>data_freshness</title>
-    <g id="All-Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="data_freshness" transform="translate(0.000000, 0.275862)">
-            <path d="M56.712234,1 C59.1975153,1 61.4475153,2.00735931 63.076195,3.63603897 C64.7048747,5.26471863 65.712234,7.51471863 65.712234,10 L65.712234,10 L65.712234,65 L10.712234,65 C8.22695259,65 5.97695259,63.9926407 4.34827294,62.363961 C2.71959328,60.7352814 1.71223397,58.4852814 1.71223397,56 L1.71223397,56 L1.71223397,10 C1.71223397,7.51471863 2.71959328,5.26471863 4.34827294,3.63603897 C5.97695259,2.00735931 8.22695259,1 10.712234,1 L10.712234,1 Z" id="rectangle" stroke="#000000" stroke-width="2" fill="#FFFFFF"></path>
-            <circle id="clock-face" stroke="#000000" stroke-width="2" cx="33.5" cy="33" r="20"></circle>
-            <line x1="33.5" y1="33" x2="33.5" y2="20" id="hour-hand" stroke="#000000" stroke-width="2.5" stroke-linecap="round"></line>
-            <line x1="33.5" y1="33" x2="44" y2="33" id="minute-hand" stroke="#000000" stroke-width="2" stroke-linecap="round"></line>
-            <circle id="center-dot" fill="#000000" cx="33.5" cy="33" r="2"></circle>
+    <g id="Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="data_freshness" transform="translate(1.500000, 1.500000)">
+            <path d="M55,0 C57.4852813,0 59.7352813,1.00735931 61.363961,2.63603897 C62.9926407,4.26471863 64,6.51471863 64,9 L64,9 L64,64 L9,64 C6.51471862,64 4.26471862,62.9926407 2.63603897,61.363961 C1.00735931,59.7352814 0,57.4852814 0,55 L0,55 L0,9 C0,6.51471863 1.00735931,4.26471863 2.63603897,2.63603897 C4.26471862,1.00735931 6.51471862,0 9,0 L9,0 L55,0 Z" id="rectangle" stroke="#000000" stroke-width="2" fill="#FFFFFF" fill-rule="nonzero"></path>
+            <circle id="clock-face" stroke="#000000" stroke-width="2" cx="32" cy="32" r="20"></circle>
+            <line x1="32" y1="32" x2="32" y2="17.2394543" id="hour-hand" stroke="#000000" stroke-width="2" stroke-linecap="round"></line>
+            <line x1="32" y1="32" x2="42.5" y2="32" id="minute-hand" stroke="#000000" stroke-width="2" stroke-linecap="round"></line>
+            <circle id="center-dot" fill="#000000" fill-rule="nonzero" cx="32" cy="32" r="2"></circle>
         </g>
     </g>
 </svg>
@@ -791,7 +791,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 </div>
 <p>When your data contains naive datetimes (timestamps without timezone information), use the <code>timezone=</code> parameter to specify what timezone those values represent. Here we have event data recorded in Eastern Time, so we set <code>timezone="America/New_York"</code> to ensure the freshness comparison is done correctly.</p>
-<div id="c80acf9b" class="cell" data-execution_count="4">
+<div id="a2226a5b" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Data with naive datetimes (assume they're in Eastern Time)</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>eastern_data <span class="op">=</span> pl.DataFrame({</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"event_time"</span>: [</span>
@@ -909,15 +909,15 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left">
         <div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
             <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
-<svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink">
+<svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF;">
     <title>data_freshness</title>
-    <g id="All-Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="data_freshness" transform="translate(0.000000, 0.275862)">
-            <path d="M56.712234,1 C59.1975153,1 61.4475153,2.00735931 63.076195,3.63603897 C64.7048747,5.26471863 65.712234,7.51471863 65.712234,10 L65.712234,10 L65.712234,65 L10.712234,65 C8.22695259,65 5.97695259,63.9926407 4.34827294,62.363961 C2.71959328,60.7352814 1.71223397,58.4852814 1.71223397,56 L1.71223397,56 L1.71223397,10 C1.71223397,7.51471863 2.71959328,5.26471863 4.34827294,3.63603897 C5.97695259,2.00735931 8.22695259,1 10.712234,1 L10.712234,1 Z" id="rectangle" stroke="#000000" stroke-width="2" fill="#FFFFFF"></path>
-            <circle id="clock-face" stroke="#000000" stroke-width="2" cx="33.5" cy="33" r="20"></circle>
-            <line x1="33.5" y1="33" x2="33.5" y2="20" id="hour-hand" stroke="#000000" stroke-width="2.5" stroke-linecap="round"></line>
-            <line x1="33.5" y1="33" x2="44" y2="33" id="minute-hand" stroke="#000000" stroke-width="2" stroke-linecap="round"></line>
-            <circle id="center-dot" fill="#000000" cx="33.5" cy="33" r="2"></circle>
+    <g id="Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="data_freshness" transform="translate(1.500000, 1.500000)">
+            <path d="M55,0 C57.4852813,0 59.7352813,1.00735931 61.363961,2.63603897 C62.9926407,4.26471863 64,6.51471863 64,9 L64,9 L64,64 L9,64 C6.51471862,64 4.26471862,62.9926407 2.63603897,61.363961 C1.00735931,59.7352814 0,57.4852814 0,55 L0,55 L0,9 C0,6.51471863 1.00735931,4.26471863 2.63603897,2.63603897 C4.26471862,1.00735931 6.51471862,0 9,0 L9,0 L55,0 Z" id="rectangle" stroke="#000000" stroke-width="2" fill="#FFFFFF" fill-rule="nonzero"></path>
+            <circle id="clock-face" stroke="#000000" stroke-width="2" cx="32" cy="32" r="20"></circle>
+            <line x1="32" y1="32" x2="32" y2="17.2394543" id="hour-hand" stroke="#000000" stroke-width="2" stroke-linecap="round"></line>
+            <line x1="32" y1="32" x2="42.5" y2="32" id="minute-hand" stroke="#000000" stroke-width="2" stroke-linecap="round"></line>
+            <circle id="center-dot" fill="#000000" fill-rule="nonzero" cx="32" cy="32" r="2"></circle>
         </g>
     </g>
 </svg>
@@ -957,7 +957,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 </div>
 <p>For reproducible validations or historical checks, you can use <code>reference_time=</code> to compare against a specific point in time instead of the current time. This is particularly useful for testing or when validating data snapshots. The reference time should include a timezone offset (like <code>+00:00</code> for UTC) to avoid ambiguity.</p>
-<div id="e6bce981" class="cell" data-execution_count="5">
+<div id="186a94d3" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>recent_data)</span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    .data_freshness(</span>
@@ -1067,15 +1067,15 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left">
         <div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
             <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
-<svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink">
+<svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF;">
     <title>data_freshness</title>
-    <g id="All-Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="data_freshness" transform="translate(0.000000, 0.275862)">
-            <path d="M56.712234,1 C59.1975153,1 61.4475153,2.00735931 63.076195,3.63603897 C64.7048747,5.26471863 65.712234,7.51471863 65.712234,10 L65.712234,10 L65.712234,65 L10.712234,65 C8.22695259,65 5.97695259,63.9926407 4.34827294,62.363961 C2.71959328,60.7352814 1.71223397,58.4852814 1.71223397,56 L1.71223397,56 L1.71223397,10 C1.71223397,7.51471863 2.71959328,5.26471863 4.34827294,3.63603897 C5.97695259,2.00735931 8.22695259,1 10.712234,1 L10.712234,1 Z" id="rectangle" stroke="#000000" stroke-width="2" fill="#FFFFFF"></path>
-            <circle id="clock-face" stroke="#000000" stroke-width="2" cx="33.5" cy="33" r="20"></circle>
-            <line x1="33.5" y1="33" x2="33.5" y2="20" id="hour-hand" stroke="#000000" stroke-width="2.5" stroke-linecap="round"></line>
-            <line x1="33.5" y1="33" x2="44" y2="33" id="minute-hand" stroke="#000000" stroke-width="2" stroke-linecap="round"></line>
-            <circle id="center-dot" fill="#000000" cx="33.5" cy="33" r="2"></circle>
+    <g id="Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="data_freshness" transform="translate(1.500000, 1.500000)">
+            <path d="M55,0 C57.4852813,0 59.7352813,1.00735931 61.363961,2.63603897 C62.9926407,4.26471863 64,6.51471863 64,9 L64,9 L64,64 L9,64 C6.51471862,64 4.26471862,62.9926407 2.63603897,61.363961 C1.00735931,59.7352814 0,57.4852814 0,55 L0,55 L0,9 C0,6.51471863 1.00735931,4.26471863 2.63603897,2.63603897 C4.26471862,1.00735931 6.51471862,0 9,0 L9,0 L55,0 Z" id="rectangle" stroke="#000000" stroke-width="2" fill="#FFFFFF" fill-rule="nonzero"></path>
+            <circle id="clock-face" stroke="#000000" stroke-width="2" cx="32" cy="32" r="20"></circle>
+            <line x1="32" y1="32" x2="32" y2="17.2394543" id="hour-hand" stroke="#000000" stroke-width="2" stroke-linecap="round"></line>
+            <line x1="32" y1="32" x2="42.5" y2="32" id="minute-hand" stroke="#000000" stroke-width="2" stroke-linecap="round"></line>
+            <circle id="center-dot" fill="#000000" fill-rule="nonzero" cx="32" cy="32" r="2"></circle>
         </g>
     </g>
 </svg>
