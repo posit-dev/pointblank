@@ -16563,6 +16563,69 @@ class Validate:
                 tol_value = bound_finder.keywords.get("tol", 0) if bound_finder else 0
                 values_upd.append(f"p = {p_value}<br/>tol = {tol_value}")
 
+            elif assertion_type[i] in ["data_freshness"]:
+                # Format max_age nicely for display
+                max_age = value.get("max_age")
+                max_age_str = _format_timedelta(max_age) if max_age else "&mdash;"
+
+                # Build additional lines with non-default parameters
+                extra_lines = []
+
+                if value.get("reference_time") is not None:
+                    ref_time = value["reference_time"]
+
+                    # Format datetime across two lines: date and time+tz
+                    if hasattr(ref_time, "strftime"):
+                        date_str = ref_time.strftime("@%Y-%m-%d")
+                        time_str = " " + ref_time.strftime("%H:%M:%S")
+
+                        # Add timezone offset if present
+                        if hasattr(ref_time, "tzinfo") and ref_time.tzinfo is not None:
+                            tz_offset = ref_time.strftime("%z")
+                            if tz_offset:
+                                time_str += tz_offset
+                        extra_lines.append(date_str)
+                        extra_lines.append(time_str)
+                    else:
+                        extra_lines.append(f"@{ref_time}")
+
+                # Timezone and allow_tz_mismatch on same line
+                tz_line_parts = []
+                if value.get("timezone") is not None:
+                    # Convert timezone name to ISO 8601 offset format
+                    tz_name = value["timezone"]
+
+                    try:
+                        tz_obj = ZoneInfo(tz_name)
+
+                        # Get the current offset for this timezone
+                        now = datetime.datetime.now(tz_obj)
+                        offset = now.strftime("%z")
+
+                        # Format as ISO 8601 extended: -07:00 (insert colon)
+                        if len(offset) == 5:
+                            tz_display = f"{offset[:3]}:{offset[3:]}"
+                        else:
+                            tz_display = offset
+
+                    except Exception:
+                        tz_display = tz_name
+                    tz_line_parts.append(tz_display)
+
+                if value.get("allow_tz_mismatch"):
+                    tz_line_parts.append("~tz")
+
+                if tz_line_parts:
+                    extra_lines.append(" ".join(tz_line_parts))
+
+                if extra_lines:
+                    extra_html = "<br/>".join(extra_lines)
+                    values_upd.append(
+                        f'{max_age_str}<br/><span style="font-size: 9px;">{extra_html}</span>'
+                    )
+                else:
+                    values_upd.append(max_age_str)
+
             elif assertion_type[i] in ["col_schema_match"]:
                 values_upd.append("SCHEMA")
 
