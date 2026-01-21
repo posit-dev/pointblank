@@ -2992,3 +2992,206 @@ def interrogate_prompt(
             result_tbl["pb_is_good_"] = validation_results
 
         return result_tbl
+
+
+def data_freshness(
+    data_tbl: IntoFrame,
+    column: str,
+    max_age: Any,  # datetime.timedelta
+    reference_time: Any | None,  # datetime.datetime | None
+    timezone: str | None,
+    allow_tz_mismatch: bool,
+) -> dict:
+    """
+    Check if the most recent datetime value in a column is within the allowed max_age.
+
+    Parameters
+    ----------
+    data_tbl
+        The data table to check.
+    column
+        The datetime column to check.
+    max_age
+        The maximum allowed age as a timedelta.
+    reference_time
+        The reference time to compare against (None = use current time).
+    timezone
+        The timezone to use for interpretation.
+    allow_tz_mismatch
+        Whether to suppress timezone mismatch warnings.
+
+    Returns
+    -------
+    dict
+        A dictionary containing:
+        - 'passed': bool, whether the validation passed
+        - 'max_datetime': the maximum datetime found in the column
+        - 'reference_time': the reference time used
+        - 'age': the calculated age (timedelta)
+        - 'max_age': the maximum allowed age
+        - 'tz_warning': any timezone warning message
+    """
+    import datetime
+
+    nw_frame = nw.from_native(data_tbl)
+
+    # Handle LazyFrames by collecting them first
+    if is_narwhals_lazyframe(nw_frame):
+        nw_frame = nw_frame.collect()
+
+    assert is_narwhals_dataframe(nw_frame)
+
+    result = {
+        "passed": False,
+        "max_datetime": None,
+        "reference_time": None,
+        "age": None,
+        "max_age": max_age,
+        "tz_warning": None,
+        "column_empty": False,
+    }
+
+    # Get the maximum datetime value from the column
+    try:
+        # Use narwhals to get max value
+        max_val_result = nw_frame.select(nw.col(column).max())
+        max_datetime_raw = max_val_result.item()
+
+        if max_datetime_raw is None:
+            result["column_empty"] = True
+            result["passed"] = False
+            return result
+
+        # Convert to Python datetime if needed
+        if hasattr(max_datetime_raw, "to_pydatetime"):
+            # Pandas Timestamp
+            max_datetime = max_datetime_raw.to_pydatetime()
+        elif hasattr(max_datetime_raw, "isoformat"):
+            # Already a datetime-like object
+            max_datetime = max_datetime_raw
+        else:
+            # Try to parse as string or handle other types
+            max_datetime = datetime.datetime.fromisoformat(str(max_datetime_raw))
+
+        result["max_datetime"] = max_datetime
+
+    except Exception as e:
+        result["error"] = str(e)
+        result["passed"] = False
+        return result
+
+    # Determine the reference time
+    # We'll set the reference time after we know the timezone awareness of the data
+    if reference_time is None:
+        ref_time = None  # Will be set below based on data timezone awareness
+    else:
+        ref_time = reference_time
+
+    # Handle timezone awareness/naivete
+    max_dt_aware = _is_datetime_aware(max_datetime)
+
+    # Helper to parse timezone string (supports IANA names and offsets like "-7", "-07:00")
+    def _get_tz_from_string(tz_str: str) -> datetime.tzinfo:
+        import re
+
+        # Check for offset formats: "-7", "+5", "-07:00", "+05:30", etc.
+        offset_pattern = r"^([+-]?)(\d{1,2})(?::(\d{2}))?$"
+        match = re.match(offset_pattern, tz_str.strip())
+
+        if match:
+            sign_str, hours_str, minutes_str = match.groups()
+            hours = int(hours_str)
+            minutes = int(minutes_str) if minutes_str else 0
+
+            total_minutes = hours * 60 + minutes
+            if sign_str == "-":
+                total_minutes = -total_minutes
+
+            return datetime.timezone(datetime.timedelta(minutes=total_minutes))
+
+        # Try IANA timezone names (zoneinfo is standard in Python 3.9+)
+        try:
+            return ZoneInfo(tz_str)
+        except KeyError:
+            # Invalid timezone name, fall back to UTC
+            return datetime.timezone.utc
+
+    # If ref_time is None (no reference_time provided), set it based on data awareness
+    if ref_time is None:
+        if max_dt_aware:
+            # Data is timezone-aware, use timezone-aware now
+            if timezone:
+                ref_time = datetime.datetime.now(_get_tz_from_string(timezone))
+            else:
+                # Default to UTC when data is aware but no timezone specified
+                ref_time = datetime.datetime.now(datetime.timezone.utc)
+        else:
+            # Data is naive, use naive local time for comparison
+            if timezone:
+                # If user specified timezone, use it for reference
+                ref_time = datetime.datetime.now(_get_tz_from_string(timezone))
+            else:
+                # No timezone specified and data is naive -> use naive local time
+                ref_time = datetime.datetime.now()
+
+    result["reference_time"] = ref_time
+    ref_dt_aware = _is_datetime_aware(ref_time)
+
+    # Track timezone warnings - use keys for translation lookup
+    tz_warning_key = None
+
+    if max_dt_aware != ref_dt_aware:
+        if not allow_tz_mismatch:
+            if max_dt_aware and not ref_dt_aware:
+                tz_warning_key = "data_freshness_tz_warning_aware_naive"
+            else:
+                tz_warning_key = "data_freshness_tz_warning_naive_aware"
+        result["tz_warning_key"] = tz_warning_key
+
+    # Make both comparable
+    try:
+        if max_dt_aware and not ref_dt_aware:
+            # Add timezone to reference time
+            if timezone:
+                try:
+                    ref_time = ref_time.replace(tzinfo=ZoneInfo(timezone))
+                except KeyError:
+                    ref_time = ref_time.replace(tzinfo=datetime.timezone.utc)
+            else:
+                # Assume UTC
+                ref_time = ref_time.replace(tzinfo=datetime.timezone.utc)
+
+        elif not max_dt_aware and ref_dt_aware:
+            # Localize the max_datetime if we have a timezone
+            if timezone:
+                try:
+                    max_datetime = max_datetime.replace(tzinfo=ZoneInfo(timezone))
+                except KeyError:
+                    # Remove timezone from reference for comparison
+                    ref_time = ref_time.replace(tzinfo=None)
+            else:
+                # Remove timezone from reference for comparison
+                ref_time = ref_time.replace(tzinfo=None)
+
+        # Calculate the age
+        age = ref_time - max_datetime
+        result["age"] = age
+        result["reference_time"] = ref_time
+
+        # Check if within max_age
+        result["passed"] = age <= max_age
+
+    except Exception as e:
+        result["error"] = str(e)
+        result["passed"] = False
+
+    return result
+
+
+def _is_datetime_aware(dt: Any) -> bool:
+    """Check if a datetime object is timezone-aware."""
+    if dt is None:
+        return False
+    if hasattr(dt, "tzinfo"):
+        return dt.tzinfo is not None and dt.tzinfo.utcoffset(dt) is not None
+    return False
