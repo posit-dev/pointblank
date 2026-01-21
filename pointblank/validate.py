@@ -18096,6 +18096,265 @@ def _process_brief(
     return brief
 
 
+def _parse_max_age(max_age: str | datetime.timedelta) -> datetime.timedelta:
+    """
+    Parse a max_age specification into a timedelta.
+
+    Parameters
+    ----------
+    max_age
+        Either a timedelta object or a string like "24 hours", "1 day", "30 minutes",
+        or compound expressions like "2 hours 15 minutes", "1 day 6 hours", etc.
+
+    Returns
+    -------
+    datetime.timedelta
+        The parsed timedelta.
+
+    Raises
+    ------
+    ValueError
+        If the string format is invalid or the unit is not recognized.
+    """
+    if isinstance(max_age, datetime.timedelta):
+        return max_age
+
+    if not isinstance(max_age, str):
+        raise TypeError(
+            f"The `max_age` parameter must be a string or timedelta, got {type(max_age).__name__}."
+        )
+
+    # Parse string format like "24 hours", "1 day", "30 minutes", etc.
+    max_age_str = max_age.strip().lower()
+
+    # Define unit mappings (singular and plural forms)
+    unit_mappings = {
+        "second": "seconds",
+        "seconds": "seconds",
+        "sec": "seconds",
+        "secs": "seconds",
+        "s": "seconds",
+        "minute": "minutes",
+        "minutes": "minutes",
+        "min": "minutes",
+        "mins": "minutes",
+        "m": "minutes",
+        "hour": "hours",
+        "hours": "hours",
+        "hr": "hours",
+        "hrs": "hours",
+        "h": "hours",
+        "day": "days",
+        "days": "days",
+        "d": "days",
+        "week": "weeks",
+        "weeks": "weeks",
+        "wk": "weeks",
+        "wks": "weeks",
+        "w": "weeks",
+    }
+
+    import re
+
+    # Pattern to find all number+unit pairs (supports compound expressions)
+    # Matches: "2 hours 15 minutes", "1day6h", "30 min", etc.
+    compound_pattern = r"(\d+(?:\.\d+)?)\s*([a-zA-Z]+)"
+    matches = re.findall(compound_pattern, max_age_str)
+
+    if not matches:
+        raise ValueError(
+            f"Invalid max_age format: '{max_age}'. Expected format like '24 hours', "
+            f"'1 day', '30 minutes', '2 hours 15 minutes', etc."
+        )
+
+    # Accumulate timedelta from all matched components
+    total_td = datetime.timedelta()
+    valid_units = ["seconds", "minutes", "hours", "days", "weeks"]
+
+    for value_str, unit in matches:
+        value = float(value_str)
+
+        # Normalize the unit
+        unit_lower = unit.lower()
+        if unit_lower not in unit_mappings:
+            raise ValueError(
+                f"Unknown time unit '{unit}' in max_age '{max_age}'. "
+                f"Valid units are: {', '.join(valid_units)} (or their abbreviations)."
+            )
+
+        normalized_unit = unit_mappings[unit_lower]
+
+        # Add to total timedelta
+        if normalized_unit == "seconds":
+            total_td += datetime.timedelta(seconds=value)
+        elif normalized_unit == "minutes":
+            total_td += datetime.timedelta(minutes=value)
+        elif normalized_unit == "hours":
+            total_td += datetime.timedelta(hours=value)
+        elif normalized_unit == "days":
+            total_td += datetime.timedelta(days=value)
+        elif normalized_unit == "weeks":
+            total_td += datetime.timedelta(weeks=value)
+
+    return total_td
+
+
+def _parse_timezone(timezone: str) -> datetime.tzinfo:
+    """
+    Parse a timezone string into a tzinfo object.
+
+    Supports:
+    - IANA timezone names: "America/New_York", "Europe/London", "UTC"
+    - Offset strings: "-7", "+5", "-07:00", "+05:30"
+
+    Parameters
+    ----------
+    timezone
+        The timezone string to parse.
+
+    Returns
+    -------
+    datetime.tzinfo
+        The parsed timezone object.
+
+    Raises
+    ------
+    ValueError
+        If the timezone is not valid.
+    """
+    import re
+
+    # Check for offset formats: "-7", "+5", "-07:00", "+05:30", etc.
+    # Match: optional sign, 1-2 digits, optional colon and 2 more digits
+    offset_pattern = r"^([+-]?)(\d{1,2})(?::(\d{2}))?$"
+    match = re.match(offset_pattern, timezone.strip())
+
+    if match:
+        sign_str, hours_str, minutes_str = match.groups()
+        hours = int(hours_str)
+        minutes = int(minutes_str) if minutes_str else 0
+
+        # Apply sign (default positive if not specified)
+        total_minutes = hours * 60 + minutes
+        if sign_str == "-":
+            total_minutes = -total_minutes
+
+        return datetime.timezone(datetime.timedelta(minutes=total_minutes))
+
+    # Try IANA timezone names (zoneinfo is standard in Python 3.9+)
+    try:
+        return ZoneInfo(timezone)
+    except KeyError:
+        pass
+
+    raise ValueError(
+        f"Invalid timezone: '{timezone}'. Use an IANA timezone name "
+        f"(e.g., 'America/New_York', 'UTC') or an offset (e.g., '-7', '+05:30')."
+    )
+
+
+def _validate_timezone(timezone: str) -> None:
+    """
+    Validate that a timezone string is valid.
+
+    Parameters
+    ----------
+    timezone
+        The timezone string to validate.
+
+    Raises
+    ------
+    ValueError
+        If the timezone is not valid.
+    """
+    # Use _parse_timezone to validate - it will raise ValueError if invalid
+    _parse_timezone(timezone)
+
+
+def _parse_reference_time(reference_time: str) -> datetime.datetime:
+    """
+    Parse a reference time string into a datetime object.
+
+    Parameters
+    ----------
+    reference_time
+        An ISO 8601 formatted datetime string.
+
+    Returns
+    -------
+    datetime.datetime
+        The parsed datetime object.
+
+    Raises
+    ------
+    ValueError
+        If the string cannot be parsed.
+    """
+    # Try parsing with fromisoformat (handles most ISO 8601 formats)
+    try:
+        return datetime.datetime.fromisoformat(reference_time)
+    except ValueError:
+        pass
+
+    # Try parsing common formats
+    formats = [
+        "%Y-%m-%d %H:%M:%S",
+        "%Y-%m-%d %H:%M:%S%z",
+        "%Y-%m-%dT%H:%M:%S",
+        "%Y-%m-%dT%H:%M:%S%z",
+        "%Y-%m-%d",
+    ]
+
+    for fmt in formats:
+        try:
+            return datetime.datetime.strptime(reference_time, fmt)
+        except ValueError:
+            continue
+
+    raise ValueError(
+        f"Could not parse reference_time '{reference_time}'. "
+        f"Please use ISO 8601 format like '2024-01-15T10:30:00' or '2024-01-15T10:30:00+00:00'."
+    )
+
+
+def _format_timedelta(td: datetime.timedelta) -> str:
+    """
+    Format a timedelta into a human-readable string.
+
+    Parameters
+    ----------
+    td
+        The timedelta to format.
+
+    Returns
+    -------
+    str
+        A human-readable string like "24 hours", "2 days 5 hours", etc.
+    """
+    total_seconds = td.total_seconds()
+
+    if total_seconds < 60:
+        val = round(total_seconds, 1)
+        return f"{val}s"
+    elif total_seconds < 3600:
+        val = round(total_seconds / 60, 1)
+        return f"{val}m"
+    elif total_seconds < 86400:
+        val = round(total_seconds / 3600, 1)
+        return f"{val}h"
+    elif total_seconds < 604800:
+        # For days, show "xd yh" format for better readability
+        days = int(total_seconds // 86400)
+        remaining_hours = round((total_seconds % 86400) / 3600, 1)
+        if remaining_hours == 0:
+            return f"{days}d"
+        else:
+            return f"{days}d {remaining_hours}h"
+    else:
+        val = round(total_seconds / 604800)
+        return f"{val}w"
+
+
 def _transform_auto_brief(brief: str | bool | None) -> str | None:
     if isinstance(brief, bool):
         if brief:
