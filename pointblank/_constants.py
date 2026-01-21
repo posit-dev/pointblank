@@ -49,6 +49,7 @@ ASSERTION_TYPE_METHOD_MAP: dict[str, str] = {
     "col_schema_match": "col_schema_match",
     "row_count_match": "row_count_match",
     "col_count_match": "col_count_match",
+    "data_freshness": "data_freshness",
     "tbl_match": "tbl_match",
     "conjointly": "conjointly",
     "specially": "specially",
