@@ -16369,7 +16369,6 @@ class Validate:
         # (it is either Polars or Pandas)
         df = df_lib.DataFrame(validation_info_dict)
 
-        # !!!!!!!! Meghan: NTS this may be the breakpoint here to extract out to df, investigate
         # Return the DataFrame as a Great Tables table
         gt_tbl = (
             GT(df, id="pb_tbl")
@@ -16871,6 +16870,94 @@ class Validate:
             step_report = None  # pragma: no cover
 
         return step_report
+
+    def get_dataframe(
+        self,
+        tbl_type: Literal["polars", "pandas", "duckdb"] = "polars",
+        keep_extracts: bool = False,
+    ):
+        """
+        Validation results as a dataframe
+
+        The `get_dataframe()` method returns a dataframe that represents the validation
+        report. This dataframe provides a summary of the validation results, including the
+        validation steps, the number of test units, the number of failing test units, and the
+        fraction of failing test units. This can be particularly helpful for logging purposes
+        and enables write validation summaries to CSVs and other on-disk formats.
+
+        Parameters
+        ----------
+        tbl_type :
+            The output backend for the dataframe. The named options are `"polars"`,
+        `"pandas"`, and `"duckdb"`. Default is 'polars'.
+
+        keep_extracts:
+            An option to keep any collected extract data for failing rows from validation steps. By
+        default, this is `False` (i.e., extract data is removed to save space).
+
+        Supported DataFrame Types
+        -------------------------
+        The `tbl_type=` parameter can be set to one of the following:
+
+        - `"polars"`: A Polars DataFrame.
+        - `"pandas"`: A Pandas DataFrame.
+        - `"duckdb"`: An Ibis table for a DuckDB database.
+
+        Examples
+        --------
+        In a
+        ```{python}
+        import pointblank as pb
+
+        # Create a validation
+        validation = (
+            pb.Validate(data=pb.load_dataset("small_table", tbl_type = "duckdb"), label="My validation")
+            .col_vals_gt(columns="d", value=100)
+            .col_vals_regex(columns="b", pattern=r"[0-9]-[a-z]{3}-[0-9]{3}")
+            .interrogate()
+            )
+
+        # Get a dataframe of the validation summary results
+        df_validation = validation.get_dataframe()
+
+        ```
+
+        """
+
+        # Raise an error if tbl_type is not one of the supported types
+        if tbl_type not in ["polars", "pandas", "duckdb"]:
+            raise ValueError(
+                f"The DataFrame type `{tbl_type}` is not valid. Choose one of the following:\n"
+                "- `polars`\n"
+                "- `pandas`\n"
+                "- `duckdb`"
+            )
+
+        # Grab the summary data from validation info helper function
+        report = _validation_info_as_dict(self.validation_info)
+
+        # Pop the extracts off unless specified to keep
+        if keep_extracts is False and "extract" in report:
+            report.pop("extract")
+
+        # Remove keys to be dropped
+        # MEGHAN pick up Here!!!
+        # I need to
+        # 1) assess which keys should be turned innto columns
+        # 2) Determine which keys are used for conditionals (active = data from step shows, inactive replace with "-")
+        # 3) Create a schema
+        # 4) return the df
+
+        # Check for polars, raise if not installed
+        if tbl_type == "polars":
+            if not _is_lib_present(lib_name="polars"):
+                raise ImportError(
+                    "The Polars library is not installed but is required when specifying "
+                    '`tbl_type="polars".'
+                )
+
+            # Create the schema for the df
+            schema = pl.Schema({})
 
     def _add_validation(self, validation_info):
         """
