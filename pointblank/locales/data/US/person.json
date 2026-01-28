@@ -1,0 +1,68 @@
+{
+  "first_names": {
+    "male": [
+      "James", "John", "Robert", "Michael", "William", "David", "Joseph", "Charles",
+      "Thomas", "Christopher", "Daniel", "Matthew", "Anthony", "Mark", "Donald",
+      "Steven", "Paul", "Andrew", "Joshua", "Kenneth", "Kevin", "Brian", "George",
+      "Timothy", "Ronald", "Edward", "Jason", "Jeffrey", "Ryan", "Jacob", "Gary",
+      "Nicholas", "Eric", "Jonathan", "Stephen", "Larry", "Justin", "Scott", "Brandon",
+      "Benjamin", "Samuel", "Raymond", "Gregory", "Frank", "Alexander", "Patrick",
+      "Jack", "Dennis", "Jerry", "Tyler", "Aaron", "Jose", "Adam", "Nathan", "Henry",
+      "Douglas", "Zachary", "Peter", "Kyle", "Noah", "Ethan", "Jeremy", "Walter",
+      "Christian", "Keith", "Roger", "Terry", "Austin", "Sean", "Gerald", "Carl",
+      "Harold", "Dylan", "Arthur", "Lawrence", "Jordan", "Jesse", "Bryan", "Billy",
+      "Bruce", "Gabriel", "Joe", "Logan", "Albert", "Willie", "Alan", "Eugene",
+      "Russell", "Vincent", "Philip", "Bobby", "Johnny", "Bradley", "Roy", "Ralph",
+      "Eugene", "Randy", "Howard", "Vincent", "Russell"
+    ],
+    "female": [
+      "Mary", "Patricia", "Jennifer", "Linda", "Barbara", "Elizabeth", "Susan",
+      "Jessica", "Sarah", "Karen", "Lisa", "Nancy", "Betty", "Margaret", "Sandra",
+      "Ashley", "Kimberly", "Emily", "Donna", "Michelle", "Dorothy", "Carol",
+      "Amanda", "Melissa", "Deborah", "Stephanie", "Rebecca", "Sharon", "Laura",
+      "Cynthia", "Kathleen", "Amy", "Angela", "Shirley", "Anna", "Brenda", "Pamela",
+      "Emma", "Nicole", "Helen", "Samantha", "Katherine", "Christine", "Debra",
+      "Rachel", "Carolyn", "Janet", "Catherine", "Maria", "Heather", "Diane", "Ruth",
+      "Julie", "Olivia", "Joyce", "Virginia", "Victoria", "Kelly", "Lauren", "Christina",
+      "Joan", "Evelyn", "Judith", "Megan", "Andrea", "Cheryl", "Hannah", "Jacqueline",
+      "Martha", "Gloria", "Teresa", "Ann", "Sara", "Madison", "Frances", "Kathryn",
+      "Janice", "Jean", "Abigail", "Alice", "Judy", "Sophia", "Grace", "Denise",
+      "Amber", "Doris", "Marilyn", "Danielle", "Beverly", "Isabella", "Theresa",
+      "Diana", "Natalie", "Brittany", "Charlotte", "Marie", "Kayla", "Alexis", "Lori"
+    ],
+    "neutral": [
+      "Alex", "Jordan", "Taylor", "Morgan", "Casey", "Riley", "Jamie", "Avery",
+      "Quinn", "Peyton", "Cameron", "Skyler", "Dakota", "Reese", "Parker", "Finley",
+      "Hayden", "Emery", "Rowan", "Charlie", "Sage", "River", "Phoenix", "Blake",
+      "Drew", "Kendall", "Bailey", "Harley", "Jessie", "Kerry", "Lane", "Lee",
+      "Logan", "Micah", "Pat", "Robin", "Sam", "Shannon", "Terry", "Tracy"
+    ]
+  },
+  "last_names": [
+    "Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller", "Davis",
+    "Rodriguez", "Martinez", "Hernandez", "Lopez", "Gonzalez", "Wilson", "Anderson",
+    "Thomas", "Taylor", "Moore", "Jackson", "Martin", "Lee", "Perez", "Thompson",
+    "White", "Harris", "Sanchez", "Clark", "Ramirez", "Lewis", "Robinson", "Walker",
+    "Young", "Allen", "King", "Wright", "Scott", "Torres", "Nguyen", "Hill", "Flores",
+    "Green", "Adams", "Nelson", "Baker", "Hall", "Rivera", "Campbell", "Mitchell",
+    "Carter", "Roberts", "Gomez", "Phillips", "Evans", "Turner", "Diaz", "Parker",
+    "Cruz", "Edwards", "Collins", "Reyes", "Stewart", "Morris", "Morales", "Murphy",
+    "Cook", "Rogers", "Gutierrez", "Ortiz", "Morgan", "Cooper", "Peterson", "Bailey",
+    "Reed", "Kelly", "Howard", "Ramos", "Kim", "Cox", "Ward", "Richardson", "Watson",
+    "Brooks", "Chavez", "Wood", "James", "Bennett", "Gray", "Mendoza", "Ruiz", "Hughes",
+    "Price", "Alvarez", "Castillo", "Sanders", "Patel", "Myers", "Long", "Ross", "Foster",
+    "Jimenez", "Powell", "Jenkins", "Perry", "Russell", "Sullivan", "Bell", "Coleman",
+    "Butler", "Henderson", "Barnes", "Gonzales", "Fisher", "Vasquez", "Simmons", "Graham",
+    "Hamilton", "Stone", "Montgomery", "Wagner", "Franklin", "Stevens", "Spencer", "Griffin"
+  ],
+  "name_formats": [
+    "{first_name} {last_name}",
+    "{first_name} {middle_initial}. {last_name}"
+  ],
+  "prefixes": {
+    "male": ["Mr.", "Dr."],
+    "female": ["Ms.", "Mrs.", "Dr."],
+    "neutral": ["Dr."]
+  },
+  "suffixes": ["Jr.", "Sr.", "II", "III", "IV", "PhD", "MD", "DDS", "Esq."]
+}
