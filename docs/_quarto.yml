@@ -297,6 +297,21 @@ quartodoc:
         - name: write_file
         - name: read_file
         - name: config
+    - title: Test Data Generation
+      desc: >
+        Generate synthetic test data based on schema definitions. Use `generate_dataset()` to
+        create data from a `Schema` object. The helper functions define typed fields with
+        constraints for realistic test data generation.
+      contents:
+        - name: generate_dataset
+        - name: int_field
+        - name: float_field
+        - name: string_field
+        - name: bool_field
+        - name: date_field
+        - name: datetime_field
+        - name: time_field
+        - name: duration_field
     - title: Prebuilt Actions
       desc: >
         The *Prebuilt Actions* group contains a function that can be used to send a Slack
