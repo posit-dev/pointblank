@@ -1,0 +1,36 @@
+{
+  "first_names": {
+    "male": [
+      "Gabriel", "Louis", "Raphaël", "Jules", "Adam", "Lucas", "Léo", "Hugo", "Arthur", "Nathan",
+      "Ethan", "Paul", "Tom", "Noah", "Théo", "Mathis", "Sacha", "Maxime", "Antoine", "Alexandre",
+      "Pierre", "Jean", "Michel", "François", "André", "Philippe", "Alain", "Bernard", "Jacques", "Patrick",
+      "Nicolas", "Christophe", "Julien", "Olivier", "Laurent", "Thierry", "Marc", "Éric", "David", "Vincent"
+    ],
+    "female": [
+      "Emma", "Louise", "Jade", "Alice", "Chloé", "Léa", "Manon", "Inès", "Camille", "Sarah",
+      "Lina", "Anna", "Rose", "Zoé", "Juliette", "Clara", "Eva", "Charlotte", "Léonie", "Marie",
+      "Nathalie", "Isabelle", "Sylvie", "Catherine", "Françoise", "Christine", "Valérie", "Sophie", "Sandrine", "Laura",
+      "Céline", "Aurélie", "Caroline", "Stéphanie", "Véronique", "Laure", "Anne", "Delphine", "Hélène", "Pauline"
+    ],
+    "neutral": [
+      "Camille", "Dominique", "Claude", "Alix", "Lou", "Sacha", "Charlie", "Morgan", "Maxime", "Andrea"
+    ]
+  },
+  "last_names": [
+    "Martin", "Bernard", "Thomas", "Petit", "Robert", "Richard", "Durand", "Dubois", "Moreau", "Laurent",
+    "Simon", "Michel", "Lefebvre", "Leroy", "Roux", "David", "Bertrand", "Morel", "Fournier", "Girard",
+    "Bonnet", "Dupont", "Lambert", "Fontaine", "Rousseau", "Vincent", "Muller", "Lefevre", "Faure", "Andre",
+    "Mercier", "Blanc", "Guerin", "Boyer", "Garnier", "Chevalier", "François", "Legrand", "Gauthier", "Garcia",
+    "Perrin", "Robin", "Clement", "Morin", "Nicolas", "Henry", "Roussel", "Mathieu", "Gautier", "Masson"
+  ],
+  "name_formats": [
+    "{first_name} {last_name}",
+    "{first_name} {middle_initial}. {last_name}"
+  ],
+  "prefixes": {
+    "male": ["M.", "Dr"],
+    "female": ["Mme", "Mlle", "Dr"],
+    "neutral": ["Dr", "Pr"]
+  },
+  "suffixes": []
+}
