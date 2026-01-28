@@ -1,0 +1,39 @@
+{
+  "first_names": {
+    "male": [
+      "Lukas", "Leon", "Luca", "Finn", "Elias", "Jonas", "Noah", "Paul", "Felix", "Maximilian",
+      "Ben", "Tim", "Julian", "Luis", "Niklas", "David", "Moritz", "Tom", "Jan", "Alexander",
+      "Max", "Erik", "Tobias", "Sebastian", "Michael", "Thomas", "Andreas", "Christian", "Daniel", "Markus",
+      "Stefan", "Martin", "Peter", "Frank", "Jens", "Matthias", "Florian", "Patrick", "Dennis", "Marco",
+      "Philipp", "Simon", "Dominik", "Johannes", "Fabian", "Marcel", "Benjamin", "Kevin", "Christopher", "Oliver"
+    ],
+    "female": [
+      "Emma", "Mia", "Hannah", "Sofia", "Anna", "Emilia", "Lena", "Marie", "Lea", "Lina",
+      "Laura", "Johanna", "Amelie", "Leonie", "Clara", "Sarah", "Julia", "Lisa", "Katharina", "Sophie",
+      "Nina", "Sandra", "Sabrina", "Melanie", "Nicole", "Stefanie", "Christina", "Nadine", "Jennifer", "Vanessa",
+      "Maria", "Eva", "Monika", "Petra", "Susanne", "Claudia", "Andrea", "Martina", "Birgit", "Karin"
+    ],
+    "neutral": [
+      "Alex", "Kim", "Robin", "Sascha", "Nikita", "Andrea", "Toni", "Chris", "Sam", "Jo"
+    ]
+  },
+  "last_names": [
+    "Müller", "Schmidt", "Schneider", "Fischer", "Weber", "Meyer", "Wagner", "Becker", "Schulz", "Hoffmann",
+    "Schäfer", "Koch", "Bauer", "Richter", "Klein", "Wolf", "Schröder", "Neumann", "Schwarz", "Zimmermann",
+    "Braun", "Krüger", "Hofmann", "Hartmann", "Lange", "Schmitt", "Werner", "Schmitz", "Krause", "Meier",
+    "Lehmann", "Schmid", "Schulze", "Maier", "Köhler", "Herrmann", "König", "Walter", "Mayer", "Huber",
+    "Kaiser", "Fuchs", "Peters", "Lang", "Scholz", "Möller", "Weiß", "Jung", "Hahn", "Schubert",
+    "Vogel", "Friedrich", "Keller", "Günther", "Frank", "Berger", "Winkler", "Roth", "Beck", "Lorenz",
+    "Baumann", "Franke", "Albrecht", "Schuster", "Simon", "Ludwig", "Böhm", "Winter", "Kraus", "Martin"
+  ],
+  "name_formats": [
+    "{first_name} {last_name}",
+    "{first_name} {middle_initial}. {last_name}"
+  ],
+  "prefixes": {
+    "male": ["Herr", "Dr."],
+    "female": ["Frau", "Dr."],
+    "neutral": ["Dr.", "Prof."]
+  },
+  "suffixes": []
+}
