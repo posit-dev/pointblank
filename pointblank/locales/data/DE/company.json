@@ -1,0 +1,55 @@
+{
+  "suffixes": [
+    "GmbH", "AG", "KG", "OHG", "e.V.", "SE", "GmbH & Co. KG", "UG", "mbH", "eG"
+  ],
+  "formats": [
+    "{last_name} {suffix}",
+    "{last_name} und {last_name}",
+    "{adjective} {noun} {suffix}",
+    "{adjective} {noun}",
+    "{last_name} {noun}"
+  ],
+  "adjectives": [
+    "Deutsche", "Berliner", "Münchner", "Hamburger", "Kölner", "Frankfurter",
+    "Bayerische", "Norddeutsche", "Süddeutsche", "Europäische", "Internationale",
+    "Moderne", "Neue", "Erste", "Zentrale", "Vereinigte", "Allgemeine",
+    "Technische", "Industrielle", "Digitale", "Innovative", "Strategische",
+    "Premium", "Elite", "Global", "Universal", "National", "Regional"
+  ],
+  "nouns": [
+    "Lösungen", "Systeme", "Technologien", "Industrie", "Dienstleistungen", "Beratung",
+    "Verwaltung", "Entwicklung", "Management", "Marketing", "Software", "Hardware",
+    "Netzwerke", "Sicherheit", "Analytik", "Daten", "Forschung", "Technik",
+    "Fertigung", "Bau", "Immobilien", "Versicherung", "Gesundheit", "Logistik",
+    "Transport", "Energie", "Ressourcen", "Materialien", "Produkte", "Handel",
+    "Vertrieb", "Kommunikation", "Medien", "Finanzen", "Investitionen", "Werke"
+  ],
+  "jobs": [
+    "Softwareentwickler", "Produktmanager", "Datenanalyst", "Marketing-Manager",
+    "Vertriebsmitarbeiter", "Personalleiter", "Finanzanalyst", "Projektmanager",
+    "Business Analyst", "Betriebsleiter", "Kundenberater", "Buchhalter",
+    "Verwaltungsassistent", "Grafikdesigner", "Webentwickler", "Netzwerkadministrator",
+    "Datenbankadministrator", "Systemadministrator", "Qualitätsingenieur",
+    "Technischer Redakteur", "UX-Designer", "DevOps-Ingenieur", "Cloud-Architekt",
+    "Sicherheitsanalyst", "Data Scientist", "Berater", "Rechtsanwalt", "Arzt",
+    "Apotheker", "Lehrer", "Professor", "Sozialarbeiter", "Koch", "Hotelmanager",
+    "Immobilienmakler", "Bankangestellter", "Finanzberater", "Maschinenbauingenieur",
+    "Elektroingenieur", "Bauingenieur", "Architekt", "Bauleiter", "Geschäftsführer"
+  ],
+  "catch_phrase_adjectives": [
+    "Innovativ", "Dynamisch", "Führend", "Erstklassig", "Revolutionär",
+    "Transformativ", "Skalierbar", "Robust", "Agil", "Strategisch",
+    "Kundenorientiert", "Datengetrieben", "Cloudbasiert", "KI-gestützt",
+    "Nachhaltig", "Zukunftsorientiert", "Effizient", "Flexibel", "Zuverlässig"
+  ],
+  "catch_phrase_nouns": [
+    "Lösungen", "Plattformen", "Ökosysteme", "Strategien", "Technologien",
+    "Innovationen", "Erfahrungen", "Transformationen", "Optimierungen",
+    "Integrationen", "Dienstleistungen", "Konzepte", "Systeme", "Prozesse"
+  ],
+  "catch_phrase_verbs": [
+    "liefern", "optimieren", "transformieren", "revolutionieren", "ermöglichen",
+    "beschleunigen", "rationalisieren", "maximieren", "verbessern", "antreiben",
+    "erschließen", "skalieren", "modernisieren", "digitalisieren", "entwickeln"
+  ]
+}
