@@ -98,17 +98,636 @@
     {"city": "Homburg", "state": "Saarland", "state_abbr": "SL", "postcode_prefix": "66", "lat_min": 49.30, "lat_max": 49.35, "lon_min": 7.32, "lon_max": 7.40},
     {"city": "Völklingen", "state": "Saarland", "state_abbr": "SL", "postcode_prefix": "66", "lat_min": 49.23, "lat_max": 49.28, "lon_min": 6.82, "lon_max": 6.90}
   ],
-  "street_names": [
-    "Haupt", "Bahnhof", "Schiller", "Goethe", "Linden", "Berg", "Kirch", "Schloss", "Markt", "Wald",
-    "Wiesen", "Garten", "Rosen", "Sonnen", "Fried", "Mozart", "Beethoven", "Bach", "Kant", "Hegel",
-    "Bismarck", "Kaiser", "König", "Fürst", "Graf", "Ritter", "Burg", "Turm", "Mühlen", "Brunnen",
-    "Eichen", "Buchen", "Birken", "Tannen", "Erlen", "Weiden", "Ahorn", "Kastanien", "Lärchen", "Ulmen",
-    "Rathaus", "Post", "Schul", "Krankenhaus", "Polizei", "Feuer", "Amt", "Gerichts", "Bank", "Industrie"
-  ],
-  "street_suffixes": [
-    "straße", "weg", "platz", "allee", "gasse", "ring", "damm", "ufer", "promenade", "passage",
-    "park", "hof", "tor", "brücke", "steig", "pfad", "anger", "aue", "feld", "grund"
-  ],
+  "streets_by_city": {
+    "Berlin": [
+      "Unter den Linden", "Friedrichstraße", "Kurfürstendamm", "Potsdamer Platz", "Alexanderplatz",
+      "Karl-Marx-Allee", "Prenzlauer Allee", "Schönhauser Allee", "Kastanienallee", "Oranienburger Straße",
+      "Torstraße", "Invalidenstraße", "Chausseestraße", "Brunnenstraße", "Rosenthaler Straße",
+      "Hackescher Markt", "Auguststraße", "Tucholskystraße", "Große Hamburger Straße", "Sophienstraße",
+      "Linienstraße", "Alte Schönhauser Straße", "Neue Schönhauser Straße", "Mulackstraße", "Gormannstraße",
+      "Weinmeisterstraße", "Münzstraße", "Dircksenstraße", "Rochstraße", "Rosa-Luxemburg-Straße",
+      "Mollstraße", "Prenzlauer Berg", "Danziger Straße", "Eberswalder Straße", "Pappelallee",
+      "Stargarder Straße", "Lychener Straße", "Helmholtzplatz", "Raumerstraße", "Schliemannstraße",
+      "Wörther Straße", "Kollwitzstraße", "Knaackstraße", "Husemannstraße", "Sredzkistraße",
+      "Rykestraße", "Choriner Straße", "Zionskirchstraße", "Fehrbelliner Straße", "Veteranenstraße",
+      "Bergstraße", "Ackerstraße", "Bernauer Straße", "Schwedter Straße", "Kopenhagener Straße",
+      "Bornholmer Straße", "Osloer Straße", "Prinzenallee", "Badstraße", "Pankstraße",
+      "Müllerstraße", "Seestraße", "Reinickendorfer Straße", "Residenzstraße", "Aroser Allee",
+      "Holländerstraße", "Markstraße", "Scharnweberstraße", "Triftstraße", "Turiner Straße",
+      "Kreuzbergstraße", "Oranienstraße", "Kottbusser Damm", "Skalitzer Straße", "Wrangelstraße",
+      "Schlesische Straße", "Falckensteinstraße", "Mariannenstraße", "Naunynstraße", "Adalbertstraße",
+      "Dresdener Straße", "Manteuffelstraße", "Oppelner Straße", "Reichenberger Straße", "Forster Straße",
+      "Urbanstraße", "Graefestraße", "Dieffenbachstraße", "Planufer", "Maybachufer",
+      "Sonnenallee", "Karl-Marx-Straße", "Hermannstraße", "Boddinstraße", "Weserstraße",
+      "Flughafenstraße", "Hermannplatz", "Kottbusser Tor", "Moritzplatz", "Heinrich-Heine-Straße",
+      "Kantstraße", "Savignyplatz", "Fasanenstraße", "Uhlandstraße", "Lietzenburger Straße",
+      "Hardenbergstraße", "Joachimstaler Straße", "Tauentzienstraße", "Rankestraße", "Augsburger Straße",
+      "Nürnberger Straße", "Spichernstraße", "Pariser Straße", "Güntzelstraße", "Hohenzollerndamm",
+      "Bundesallee", "Berliner Straße", "Fehrbelliner Platz", "Rüdesheimer Platz", "Breitenbachplatz",
+      "Rathaus Schöneberg", "Martin-Luther-Straße", "Motzstraße", "Winterfeldtplatz", "Goltzstraße",
+      "Akazienstraße", "Belziger Straße", "Hauptstraße", "Grunewaldstraße", "Eisenacher Straße",
+      "Pallasstraße", "Potsdamer Straße", "Bülowstraße", "Dennewitzstraße", "Kurfürstenstraße",
+      "Genthiner Straße", "Lützowstraße", "Derfflingerstraße", "Einemstraße", "Wichmannstraße"
+    ],
+    "Mitte": [
+      "Unter den Linden", "Friedrichstraße", "Wilhelmstraße", "Leipziger Straße", "Behrenstraße",
+      "Französische Straße", "Jägerstraße", "Taubenstraße", "Mohrenstraße", "Kronenstraße",
+      "Glinkastraße", "Mauerstraße", "Markgrafenstraße", "Charlottenstraße", "Niederwallstraße",
+      "Oberwallstraße", "Hausvogteiplatz", "Werderstraße", "Dorotheenstraße", "Mittelstraße"
+    ],
+    "Kreuzberg": [
+      "Oranienstraße", "Kottbusser Damm", "Skalitzer Straße", "Wrangelstraße", "Schlesische Straße",
+      "Falckensteinstraße", "Mariannenstraße", "Naunynstraße", "Adalbertstraße", "Dresdener Straße",
+      "Manteuffelstraße", "Oppelner Straße", "Reichenberger Straße", "Forster Straße", "Urbanstraße",
+      "Graefestraße", "Dieffenbachstraße", "Planufer", "Maybachufer", "Bergmannstraße"
+    ],
+    "Prenzlauer Berg": [
+      "Prenzlauer Allee", "Schönhauser Allee", "Kastanienallee", "Danziger Straße", "Eberswalder Straße",
+      "Pappelallee", "Stargarder Straße", "Lychener Straße", "Helmholtzplatz", "Raumerstraße",
+      "Schliemannstraße", "Wörther Straße", "Kollwitzstraße", "Knaackstraße", "Husemannstraße",
+      "Sredzkistraße", "Rykestraße", "Choriner Straße", "Zionskirchstraße", "Fehrbelliner Straße"
+    ],
+    "Charlottenburg": [
+      "Kurfürstendamm", "Kantstraße", "Savignyplatz", "Fasanenstraße", "Uhlandstraße",
+      "Lietzenburger Straße", "Hardenbergstraße", "Joachimstaler Straße", "Tauentzienstraße", "Rankestraße",
+      "Augsburger Straße", "Nürnberger Straße", "Spichernstraße", "Pariser Straße", "Güntzelstraße",
+      "Wilmersdorfer Straße", "Bismarckstraße", "Sophie-Charlotte-Straße", "Schloßstraße", "Kaiserdamm"
+    ],
+    "Neukölln": [
+      "Sonnenallee", "Karl-Marx-Straße", "Hermannstraße", "Boddinstraße", "Weserstraße",
+      "Flughafenstraße", "Hermannplatz", "Richardstraße", "Reuterstraße", "Pannierstraße",
+      "Maybachufer", "Sanderstraße", "Friedelstraße", "Schierker Straße", "Erkstraße",
+      "Wildenbruchstraße", "Elbestraße", "Donaustraße", "Fuldastraße", "Neckarstraße"
+    ],
+    "Friedrichshain": [
+      "Karl-Marx-Allee", "Frankfurter Allee", "Warschauer Straße", "Simon-Dach-Straße", "Boxhagener Straße",
+      "Grünberger Straße", "Gabriel-Max-Straße", "Revaler Straße", "Wühlischstraße", "Kopernikusstraße",
+      "Niederbarnimstraße", "Samariterstraße", "Petersburger Straße", "Bänschstraße", "Voigtstraße",
+      "Schreinerstraße", "Jessnerstraße", "Gärtnerstraße", "Dolziger Straße", "Mainzer Straße"
+    ],
+    "Schöneberg": [
+      "Hauptstraße", "Grunewaldstraße", "Eisenacher Straße", "Martin-Luther-Straße", "Motzstraße",
+      "Winterfeldtplatz", "Goltzstraße", "Akazienstraße", "Belziger Straße", "Pallasstraße",
+      "Potsdamer Straße", "Bülowstraße", "Dennewitzstraße", "Kurfürstenstraße", "Nollendorfplatz",
+      "Maaßenstraße", "Nollendorfstraße", "Kleiststraße", "Yorckstraße", "Großgörschenstraße"
+    ],
+    "Hamburg": [
+      "Mönckebergstraße", "Spitalerstraße", "Jungfernstieg", "Neuer Wall", "Große Bleichen",
+      "Poststraße", "Gerhofstraße", "Colonnaden", "Dammtorstraße", "Gänsemarkt",
+      "ABC-Straße", "Caffamacherreihe", "Valentinskamp", "Gorch-Fock-Wall", "Esplanade",
+      "Lombardsbrücke", "Kennedybrücke", "Glockengießerwall", "Steindamm", "Kirchenallee",
+      "Lange Reihe", "Danziger Straße", "Brennerstraße", "Lübecker Straße", "Wandsbeker Chaussee",
+      "Grindelallee", "Rothenbaumchaussee", "Mittelweg", "Hallerstraße", "Isestraße",
+      "Eppendorfer Baum", "Eppendorfer Landstraße", "Eppendorfer Weg", "Hoheluftchaussee", "Lokstedter Weg",
+      "Alsterdorfer Straße", "Winterhuder Weg", "Hudtwalckerstraße", "Barmbeker Straße", "Bramfelder Straße",
+      "Fuhlsbüttler Straße", "Langenhorner Chaussee", "Hamburger Straße", "Mundsburger Damm", "Uhlenhorster Weg",
+      "Harvestehuder Weg", "Heilwigstraße", "Oberstraße", "Klosterstern", "Innocentiastraße",
+      "Reeperbahn", "Große Freiheit", "Davidstraße", "Hamburger Berg", "Spielbudenplatz",
+      "Simon-von-Utrecht-Straße", "Clemens-Schultz-Straße", "Hein-Hoyer-Straße", "Talstraße", "Detlev-Bremer-Straße",
+      "Bernstorffstraße", "Sternstraße", "Wohlwillstraße", "Schulterblatt", "Schanzenstraße",
+      "Bartelsstraße", "Susannenstraße", "Weidenallee", "Eifflerstraße", "Stresemannstraße",
+      "Max-Brauer-Allee", "Holstenstraße", "Königstraße", "Ottenser Hauptstraße", "Bahrenfelder Straße"
+    ],
+    "Altona": [
+      "Ottenser Hauptstraße", "Bahrenfelder Straße", "Max-Brauer-Allee", "Große Bergstraße", "Königstraße",
+      "Holstenstraße", "Museumstraße", "Palmaille", "Elbchaussee", "Klopstockstraße",
+      "Reventlowstraße", "Bleickenallee", "Hohenzollernring", "Schomburgstraße", "Bernadottestraße",
+      "Goßlerstraße", "Eulenstraße", "Barnerstraße", "Arnoldstraße", "Friedensallee"
+    ],
+    "St. Pauli": [
+      "Reeperbahn", "Große Freiheit", "Davidstraße", "Hamburger Berg", "Spielbudenplatz",
+      "Simon-von-Utrecht-Straße", "Clemens-Schultz-Straße", "Hein-Hoyer-Straße", "Talstraße", "Detlev-Bremer-Straße",
+      "Bernstorffstraße", "Sternstraße", "Wohlwillstraße", "Silbersackstraße", "Seilerstraße",
+      "Friedrichstraße", "Kastanienallee", "Thadenstraße", "Lincolnstraße", "Brigittenstraße"
+    ],
+    "Eimsbüttel": [
+      "Osterstraße", "Heußweg", "Fruchtallee", "Eimsbütteler Chaussee", "Doormannsweg",
+      "Lappenbergsallee", "Methfesselstraße", "Stellinger Weg", "Kieler Straße", "Lutterothstraße",
+      "Sillemstraße", "Margaretenstraße", "Wrangelstraße", "Ottersbekallee", "Bundesstraße",
+      "Beim Schlump", "Grindelberg", "Grindelhof", "Rentzelstraße", "Schäferkampsallee"
+    ],
+    "Harburg": [
+      "Lüneburger Straße", "Harburger Rathausstraße", "Harburger Ring", "Schloßmühlendamm", "Knoopstraße",
+      "Moorstraße", "Sand", "Neue Straße", "Bremer Straße", "Schwarzenbergstraße",
+      "Eißendorfer Straße", "Heimfelder Straße", "Denickestraße", "Reeseberg", "Wilstorfer Straße"
+    ],
+    "Wandsbek": [
+      "Wandsbeker Marktstraße", "Wandsbeker Zollstraße", "Wandsbeker Chaussee", "Schloßstraße", "Hinterm Stern",
+      "Ahrensburger Straße", "Walddörferstraße", "Farmsen", "Berner Chaussee", "Steilshooper Straße",
+      "Bramfelder Chaussee", "Poppenbütteler Weg", "Saseler Damm", "Wellingsbüttler Weg", "Höltigbaum"
+    ],
+    "München": [
+      "Marienplatz", "Kaufingerstraße", "Neuhauser Straße", "Maximilianstraße", "Theatinerstraße",
+      "Residenzstraße", "Weinstraße", "Dienerstraße", "Hofgraben", "Perusastraße",
+      "Maffeistraße", "Salvatorstraße", "Kardinal-Faulhaber-Straße", "Promenadeplatz", "Pacellistraße",
+      "Lenbachplatz", "Karlsplatz", "Sonnenstraße", "Bayerstraße", "Schillerstraße",
+      "Schwanthalerstraße", "Landwehrstraße", "Goethestraße", "Nußbaumstraße", "Pettenkoferstraße",
+      "Lindwurmstraße", "Kapuzinerstraße", "Reichenbachstraße", "Fraunhoferstraße", "Müllerstraße",
+      "Rumfordstraße", "Klenzestraße", "Hans-Sachs-Straße", "Baaderstraße", "Ickstattstraße",
+      "Corneliusstraße", "Gärtnerplatz", "Buttermelcherstraße", "Blumenstraße", "Auenstraße",
+      "Isartalstraße", "Widenmayerstraße", "Prinzregentenstraße", "Lerchenfeldstraße", "Sternstraße",
+      "Thierschstraße", "Steinsdorfstraße", "Liebigstraße", "Unsöldstraße", "Tattenbachstraße",
+      "Leopoldstraße", "Ludwigstraße", "Odeonsplatz", "Brienner Straße", "Königinstraße",
+      "Franz-Joseph-Straße", "Ainmillerstraße", "Georgenstraße", "Theresienstraße", "Türkenstraße",
+      "Schellingstraße", "Amalienstraße", "Gabelsbergerstraße", "Arcisstraße", "Barer Straße",
+      "Augustenstraße", "Dachauerstraße", "Nymphenburger Straße", "Lothstraße", "Marsstraße",
+      "Seidlstraße", "Arnulfstraße", "Hirtenstraße", "Hackerbrücke", "Grasserstraße",
+      "Landsberger Straße", "Donnersbergerstraße", "Trappentreustraße", "Westendstraße", "Kazmairstraße",
+      "Ridlerstraße", "Ligsalzstraße", "Ganghoferstraße", "Theresienhöhe", "Bavariaring"
+    ],
+    "Schwabing": [
+      "Leopoldstraße", "Hohenzollernstraße", "Franz-Joseph-Straße", "Ainmillerstraße", "Georgenstraße",
+      "Kaiserstraße", "Viktoriastraße", "Römerstraße", "Belgradstraße", "Herzogstraße",
+      "Martiusstraße", "Ohmstraße", "Nordendstraße", "Clemensstraße", "Winzererstraße",
+      "Kurfürstenstraße", "Potsdamer Straße", "Wilhelmstraße", "Friedrichstraße", "Occamstraße"
+    ],
+    "Maxvorstadt": [
+      "Ludwigstraße", "Theresienstraße", "Türkenstraße", "Schellingstraße", "Amalienstraße",
+      "Gabelsbergerstraße", "Arcisstraße", "Barer Straße", "Augustenstraße", "Heßstraße",
+      "Dachauerstraße", "Sandstraße", "Zieblandstraße", "Adalbertstraße", "Nordendstraße",
+      "Giselastraße", "Veterinärstraße", "Königinstraße", "Von-der-Tann-Straße", "Brienner Straße"
+    ],
+    "Nürnberg": [
+      "Königstraße", "Karolinenstraße", "Breite Gasse", "Kaiserstraße", "Vordere Ledergasse",
+      "Hintere Ledergasse", "Weinmarkt", "Hauptmarkt", "Obstmarkt", "Fleischbrücke",
+      "Albrecht-Dürer-Straße", "Bergstraße", "Burgstraße", "Obere Schmiedgasse", "Untere Schmiedgasse",
+      "Adlerstraße", "Tucherstraße", "Tetzelgasse", "Pirckheimerstraße", "Johannesgasse",
+      "Laufertorgasse", "Innere Laufer Gasse", "Äußere Laufer Gasse", "Wöhrder Hauptstraße", "Sulzbacher Straße",
+      "Rathenauplatz", "Prinzregentenufer", "Maximilianstraße", "Pillenreuther Straße", "Gibitzenhofstraße"
+    ],
+    "Augsburg": [
+      "Maximilianstraße", "Bürgermeister-Fischer-Straße", "Annastraße", "Karlstraße", "Philippine-Welser-Straße",
+      "Karolinenstraße", "Fuggerstraße", "Schaezlerstraße", "Halderstraße", "Bahnhofstraße",
+      "Viktoriastraße", "Prinzregentenstraße", "Konrad-Adenauer-Allee", "Gögginger Straße", "Haunstetter Straße",
+      "Hochfeldstraße", "Ulmer Straße", "Donauwörther Straße", "Neuburger Straße", "Lechhausen"
+    ],
+    "Regensburg": [
+      "Gesandtenstraße", "Goliathstraße", "Wahlenstraße", "Kramgasse", "Residenzstraße",
+      "Obermünsterstraße", "Untere Bachgasse", "Obere Bachgasse", "Am Ölberg", "Schwarze-Bären-Straße",
+      "Ludwigstraße", "Maximilianstraße", "Fröhliche-Türken-Straße", "Keplerstraße", "Haidplatz",
+      "Neupfarrplatz", "Kohlenmarkt", "Fischmarkt", "Brückstraße", "Weißgerbergraben"
+    ],
+    "Würzburg": [
+      "Kaiserstraße", "Domstraße", "Schönbornstraße", "Augustinerstraße", "Karmelitenstraße",
+      "Theaterstraße", "Eichhornstraße", "Juliuspromenade", "Marktplatz", "Hofstraße",
+      "Semmelstraße", "Neubaustraße", "Sanderstraße", "Grombühlstraße", "Berliner Platz",
+      "Frankfurter Straße", "Schweinfurter Straße", "Nürnberger Straße", "Mergentheimer Straße", "Zellerau"
+    ],
+    "Ingolstadt": [
+      "Ludwigstraße", "Theresienstraße", "Donaustraße", "Schrannenstraße", "Harderstraße",
+      "Milchstraße", "Kreuzstraße", "Münzbergstraße", "Hallstraße", "Am Stein",
+      "Paradeplatz", "Rathausplatz", "Mauthstraße", "Schliffelmarkt", "Kupferstraße"
+    ],
+    "Fürth": [
+      "Schwabacher Straße", "Nürnberger Straße", "Rudolf-Breitscheid-Straße", "Königstraße", "Maxstraße",
+      "Friedrichstraße", "Hirschenstraße", "Moststraße", "Gustavstraße", "Waagstraße",
+      "Marktplatz", "Hallstraße", "Theaterstraße", "Blumenstraße", "Rosenstraße"
+    ],
+    "Köln": [
+      "Hohe Straße", "Schildergasse", "Neumarkt", "Breite Straße", "Ehrenstraße",
+      "Mittelstraße", "Pfeilstraße", "Brüsseler Straße", "Maastrichter Straße", "Aachener Straße",
+      "Venloer Straße", "Subbelrather Straße", "Amsterdamer Straße", "Neusser Straße", "Riehler Straße",
+      "Zülpicher Straße", "Luxemburger Straße", "Bonner Straße", "Severinstraße", "Chlodwigplatz",
+      "Deutzer Freiheit", "Deutzer Brücke", "Mindener Straße", "Mülheimer Freiheit", "Keupstraße",
+      "Dellbrücker Hauptstraße", "Bergisch Gladbacher Straße", "Frankfurter Straße", "Kalker Hauptstraße", "Gremberger Straße",
+      "Hahnenstraße", "Apostelnstraße", "Gertrudenstraße", "Friesenstraße", "Hohenzollernring",
+      "Habsburgerring", "Hansaring", "Ebertplatz", "Friesenplatz", "Rudolfplatz",
+      "Barbarossaplatz", "Ringe", "Agilolfstraße", "Bayenthalgürtel", "Militärring",
+      "Innere Kanalstraße", "Äußere Kanalstraße", "Gürtel", "Rodenkirchener Straße", "Rheinuferstraße",
+      "Konrad-Adenauer-Ufer", "Deutzer Werft", "Rheinauhafen", "Ubierring", "Alteburger Straße"
+    ],
+    "Düsseldorf": [
+      "Königsallee", "Schadowstraße", "Flinger Straße", "Bolkerstraße", "Ratinger Straße",
+      "Altstadt", "Carlsplatz", "Marktplatz", "Burgplatz", "Rheinuferpromenade",
+      "Friedrichstraße", "Graf-Adolf-Straße", "Berliner Allee", "Heinrich-Heine-Allee", "Kasernenstraße",
+      "Steinstraße", "Oststraße", "Bismarckstraße", "Immermannstraße", "Klosterstraße",
+      "Bilker Straße", "Lorettostraße", "Suitbertusstraße", "Aachener Straße", "Gladbacher Straße",
+      "Oberkassel", "Belsenstraße", "Luegallee", "Kaiser-Wilhelm-Ring", "Barbarossaplatz",
+      "Rethelstraße", "Brehmstraße", "Grafenberger Allee", "Wehrhahn", "Corneliusstraße",
+      "Karolingerstraße", "Merowingerstraße", "Völklinger Straße", "Lierenfelder Straße", "Erkrather Straße"
+    ],
+    "Dortmund": [
+      "Westenhellweg", "Ostenhellweg", "Hansastraße", "Kampstraße", "Betenstraße",
+      "Brückstraße", "Kleppingstraße", "Silberstraße", "Markt", "Alter Markt",
+      "Friedensplatz", "Reinoldistraße", "Wißstraße", "Schwanenwall", "Hoher Wall",
+      "Freistuhl", "Berswordtstraße", "Königswall", "Burgwall", "Südwall",
+      "Rheinische Straße", "Lindemannstraße", "Möllerstraße", "Mallinckrodtstraße", "Bornstraße",
+      "Münsterstraße", "Schützenstraße", "Nordmarkt", "Steinstraße", "Leopoldstraße",
+      "Brackeler Hellweg", "Körner Hellweg", "Märkische Straße", "Hohe Straße", "Kaiserstraße"
+    ],
+    "Essen": [
+      "Kettwiger Straße", "Limbecker Straße", "Viehofer Straße", "Rathenaustraße", "Hindenburgstraße",
+      "I. Weberstraße", "II. Hagen", "Huyssenallee", "Bismarckstraße", "Gildehofstraße",
+      "Rellinghauser Straße", "Rüttenscheider Straße", "Alfredstraße", "Martinstraße", "Bredeneyer Straße",
+      "Meisenburgstraße", "Frankenstraße", "Wittekindstraße", "Borbecker Straße", "Altendorfer Straße",
+      "Altenessener Straße", "Gladbecker Straße", "Bottroper Straße", "Katernberger Straße", "Steeler Straße"
+    ],
+    "Duisburg": [
+      "Königstraße", "Düsseldorfer Straße", "Oststraße", "Kuhstraße", "Schwanenstraße",
+      "Salvatorweg", "Obermauerstraße", "Untermauerstraße", "Beekstraße", "Sonnenwall",
+      "Friedrich-Wilhelm-Straße", "Münzstraße", "Poststraße", "Claubergstraße", "Steinsche Gasse",
+      "Meidericher Straße", "Ruhrorter Straße", "Mülheimer Straße", "Hochfeldstraße", "Wanheimer Straße"
+    ],
+    "Bochum": [
+      "Kortumstraße", "Huestraße", "Viktoriastraße", "Bongardstraße", "Hellweg",
+      "Massenbergstraße", "Dr.-Ruer-Platz", "Boulevard", "Rathausplatz", "Willy-Brandt-Platz",
+      "Castroper Straße", "Herner Straße", "Dorstener Straße", "Universitätsstraße", "Königsallee",
+      "Alleestraße", "Wittener Straße", "Hattinger Straße", "Wasserstraße", "Alte Hattinger Straße"
+    ],
+    "Wuppertal": [
+      "Friedrich-Ebert-Straße", "Poststraße", "Herzogstraße", "Neumarkt", "Wall",
+      "Alte Freiheit", "Kasinostraße", "Hofkamp", "Berliner Straße", "Morianstraße",
+      "Barmer Straße", "Werth", "Geschwister-Scholl-Platz", "Alter Markt", "Johannes-Rau-Platz",
+      "Elberfelder Straße", "Steinweg", "Talsperrenstraße", "Briller Straße", "Arrenberger Straße"
+    ],
+    "Bielefeld": [
+      "Bahnhofstraße", "Niederwall", "Obernstraße", "Jahnplatz", "Alter Markt",
+      "Rathausstraße", "Altstädter Kirchplatz", "Neustädter Straße", "Breite Straße", "Hagenbruchstraße",
+      "Detmolder Straße", "Artur-Ladebeck-Straße", "Herforder Straße", "Jöllenbecker Straße", "Stapenhorststraße",
+      "Schildescher Straße", "Wertherstraße", "Potsdamer Straße", "Ravensberger Straße", "Eckendorfer Straße"
+    ],
+    "Bonn": [
+      "Münsterplatz", "Poststraße", "Sternstraße", "Remigiusstraße", "Bonngasse",
+      "Friedensplatz", "Markt", "Bottlerplatz", "Am Hof", "Franziskanerstraße",
+      "Adenauerallee", "Koblenzer Straße", "Poppelsdorfer Allee", "Meckenheimer Allee", "Reuterstraße",
+      "Kaiserstraße", "Maxstraße", "Oxfordstraße", "Endenicher Straße", "Bornheimer Straße"
+    ],
+    "Münster": [
+      "Prinzipalmarkt", "Salzstraße", "Ludgeristraße", "Rothenburg", "Roggenmarkt",
+      "Alter Fischmarkt", "Spiekerhof", "Drubbel", "Königsstraße", "Aegidiistraße",
+      "Windthorststraße", "Hammer Straße", "Warendorfer Straße", "Wolbecker Straße", "Mauritzstraße",
+      "Steinfurter Straße", "Grevener Straße", "Weseler Straße", "Moltkestraße", "Hüfferstraße"
+    ],
+    "Gelsenkirchen": [
+      "Bahnhofstraße", "Hauptstraße", "Ahstraße", "Neumarkt", "Heinrich-König-Platz",
+      "Arminstraße", "Ebertstraße", "Husemannstraße", "Florastraße", "Ringstraße",
+      "Bochumer Straße", "Bismarckstraße", "Kurt-Schumacher-Straße", "Cranger Straße", "Feldmarkstraße"
+    ],
+    "Mönchengladbach": [
+      "Hindenburgstraße", "Waldhausener Straße", "Bismarckstraße", "Fliethstraße", "Stepgesstraße",
+      "Regentenstraße", "Abteistraße", "Limitenstraße", "Kapuzinerstraße", "Viersener Straße",
+      "Rheydter Straße", "Odenkirchener Straße", "Gladbacher Straße", "Korschenbroicher Straße", "Wickrather Straße"
+    ],
+    "Aachen": [
+      "Krämerstraße", "Großkölnstraße", "Dahmengraben", "Ursulinerstraße", "Annastraße",
+      "Pontstraße", "Markt", "Katschhof", "Münsterplatz", "Büchel",
+      "Peterstraße", "Jakobstraße", "Hartmannstraße", "Theaterstraße", "Friedrich-Wilhelm-Platz",
+      "Wilhelmstraße", "Monheimsallee", "Jülicher Straße", "Krefelder Straße", "Eupener Straße"
+    ],
+    "Frankfurt am Main": [
+      "Zeil", "Goethestraße", "Freßgass", "Kaiserstraße", "Taunusstraße",
+      "Mainzer Landstraße", "Bockenheimer Landstraße", "Senckenberganlage", "Kettenhofweg", "Westendstraße",
+      "Große Bockenheimer Straße", "Neue Mainzer Straße", "Taunusanlage", "Gallusanlage", "Untermainanlage",
+      "Schaumainkai", "Museumsufer", "Brückenstraße", "Fahrgasse", "Berliner Straße",
+      "Konstabler Wache", "Allerheiligenstraße", "Lange Straße", "Battonnstraße", "Münchener Straße",
+      "Schweizer Straße", "Textorstraße", "Dreieichstraße", "Gartenstraße", "Kennedyallee",
+      "Berger Straße", "Höhenstraße", "Glauburgstraße", "Friedberger Landstraße", "Wittelsbacherallee",
+      "Habsburgerallee", "Oeder Weg", "Eckenheimer Landstraße", "Eschersheimer Landstraße", "Leipziger Straße"
+    ],
+    "Sachsenhausen": [
+      "Schweizer Straße", "Textorstraße", "Dreieichstraße", "Brückenstraße", "Kleine Rittergasse",
+      "Große Rittergasse", "Paradiesgasse", "Elisabethenstraße", "Frankensteiner Straße", "Darmstädter Landstraße",
+      "Mörfelder Landstraße", "Stresemannallee", "Gartenstraße", "Oppenheimer Landstraße", "Kennedyallee"
+    ],
+    "Bornheim": [
+      "Berger Straße", "Saalburgstraße", "Mainkurstraße", "Gronauer Straße", "Rotlintstraße",
+      "Egenolffstraße", "Bürgelerstraße", "Bornheimer Landwehr", "Sandweg", "Rhönstraße",
+      "Wittelsbacherallee", "Habsburgerallee", "Turmstraße", "Löwengasse", "Kettelerallee"
+    ],
+    "Wiesbaden": [
+      "Wilhelmstraße", "Langgasse", "Kirchgasse", "Marktstraße", "Friedrichstraße",
+      "Taunusstraße", "Rheinstraße", "Luisenstraße", "Schillerplatz", "Kranzplatz",
+      "Kochbrunnenplatz", "Sonnenberger Straße", "Frankfurter Straße", "Mainzer Straße", "Bierstadter Straße",
+      "Schiersteiner Straße", "Dotzheimer Straße", "Biebricher Allee", "Kaiser-Friedrich-Ring", "Schwalbacher Straße"
+    ],
+    "Kassel": [
+      "Obere Königstraße", "Untere Königstraße", "Treppenstraße", "Wilhelmsstraße", "Ständeplatz",
+      "Friedrichsplatz", "Opernplatz", "Königsplatz", "Brüder-Grimm-Platz", "Am Rathaus",
+      "Friedrich-Ebert-Straße", "Frankfurter Straße", "Leipziger Straße", "Schöne Aussicht", "Weinbergstraße",
+      "Wilhelmshöher Allee", "Kirchweg", "Landgraf-Karl-Straße", "Philosophenweg", "Kölnische Straße"
+    ],
+    "Darmstadt": [
+      "Luisenplatz", "Rheinstraße", "Kasinostraße", "Elisabethenstraße", "Grafenstraße",
+      "Schulstraße", "Marktplatz", "Ernst-Ludwig-Straße", "Wilhelminenstraße", "Schleiermacherstraße",
+      "Heidelberger Straße", "Frankfurter Straße", "Pallaswiesenstraße", "Bismarckstraße", "Landgraf-Georg-Straße",
+      "Heinrichstraße", "Alexanderstraße", "Nieder-Ramstädter Straße", "Soderstraße", "Kranichsteiner Straße"
+    ],
+    "Offenbach am Main": [
+      "Frankfurter Straße", "Kaiserstraße", "Marktplatz", "Domstraße", "Bieberer Straße",
+      "Luisenstraße", "Waldstraße", "Berliner Straße", "Mathildenstraße", "Ludwigstraße",
+      "Senefelderstraße", "Bismarckstraße", "Mainstraße", "Rathenaustraße", "Arthur-Zitscher-Straße"
+    ],
+    "Stuttgart": [
+      "Königstraße", "Schulstraße", "Kirchstraße", "Marktplatz", "Schillerplatz",
+      "Stiftstraße", "Calwer Straße", "Büchsenstraße", "Steinstraße", "Kronenstraße",
+      "Bolzstraße", "Lautenschlagerstraße", "Rotebühlplatz", "Theodor-Heuss-Straße", "Friedrichstraße",
+      "Tübinger Straße", "Hauptstätter Straße", "Eberhardstraße", "Charlottenplatz", "Neckarstraße",
+      "Heilbronner Straße", "Löwentorstraße", "Stresemannstraße", "Pragstraße", "Rosensteinstraße",
+      "Cannstatter Straße", "Wilhelmsplatz", "Marienstraße", "Bad Cannstatt", "Schwabenstraße",
+      "Möhringer Straße", "Vaihinger Straße", "Böblinger Straße", "Filderstraße", "Degerloch"
+    ],
+    "Karlsruhe": [
+      "Kaiserstraße", "Karlstraße", "Herrenstraße", "Waldstraße", "Kreuzstraße",
+      "Ritterstraße", "Zähringerstraße", "Erbprinzenstraße", "Akademiestraße", "Sophienstraße",
+      "Stephanienstraße", "Amalienstraße", "Douglasstraße", "Durlacher Allee", "Kriegsstraße",
+      "Ettlinger Straße", "Rüppurrer Straße", "Südendstraße", "Brauerstraße", "Yorckstraße"
+    ],
+    "Mannheim": [
+      "Planken", "Breite Straße", "Kunststraße", "Fressgasse", "Marktplatz",
+      "Paradeplatz", "Kurpfalzstraße", "Augustaanlage", "Friedrichsring", "Bismarckstraße",
+      "Luisenring", "Jungbuschstraße", "Hafenstraße", "Neckarauer Straße", "Schwetzinger Straße",
+      "Seckenheimer Straße", "Käfertaler Straße", "Waldhofstraße", "Rheinau", "Lindenhof"
+    ],
+    "Freiburg im Breisgau": [
+      "Kaiser-Joseph-Straße", "Bertoldstraße", "Salzstraße", "Rathausgasse", "Münsterplatz",
+      "Herrenstraße", "Schusterstraße", "Gerberau", "Fischerau", "Oberlinden",
+      "Unterlinden", "Eisenbahnstraße", "Friedrichstraße", "Habsburgerstraße", "Dreikönigstraße",
+      "Schwabentorplatz", "Schwabentor", "Kartäuserstraße", "Schwarzwaldstraße", "Basler Straße"
+    ],
+    "Heidelberg": [
+      "Hauptstraße", "Plöck", "Sofienstraße", "Friedrichstraße", "Brückenstraße",
+      "Universitätsplatz", "Marktplatz", "Kornmarkt", "Karlsplatz", "Bismarckplatz",
+      "Bergheimer Straße", "Rohrbacher Straße", "Kirchheimer Weg", "Eppelheimer Straße", "Kurfürstenanlage",
+      "Neuenheimer Landstraße", "Handschuhsheimer Landstraße", "Schröderstraße", "Bunsenstraße", "Philosophenweg"
+    ],
+    "Ulm": [
+      "Hirschstraße", "Bahnhofstraße", "Neue Straße", "Münsterplatz", "Marktplatz",
+      "Platzgasse", "Sattlergasse", "Fischergasse", "Gerbergasse", "Schwörhausgasse",
+      "Frauenstraße", "Kronengasse", "Hafengasse", "Weinhofberg", "Herrenkellergasse",
+      "Olgastraße", "Karlstraße", "Schillerstraße", "Friedrichsau", "Blaubeurer Straße"
+    ],
+    "Heilbronn": [
+      "Fleiner Straße", "Sülmerstraße", "Kaiserstraße", "Lohtorstraße", "Allee",
+      "Marktplatz", "Kiliansplatz", "Hafenstraße", "Wollhausstraße", "Paulinenstraße",
+      "Gymnasiumstraße", "Schillerstraße", "Urbanstraße", "Weinsberger Straße", "Neckarsulmer Straße"
+    ],
+    "Pforzheim": [
+      "Leopoldstraße", "Bahnhofstraße", "Zerrennerstraße", "Westliche Karl-Friedrich-Straße", "Östliche Karl-Friedrich-Straße",
+      "Bleichstraße", "Jörg-Ratgeb-Straße", "Schloßberg", "Enzstraße", "Auer Straße",
+      "Calwer Straße", "Durlacher Straße", "Brötzinger Straße", "Hirsauer Straße", "Ispringer Straße"
+    ],
+    "Reutlingen": [
+      "Wilhelmstraße", "Marktplatz", "Metzgerstraße", "Weingärtnerstraße", "Kanzleistraße",
+      "Katharinenstraße", "Gartenstraße", "Albstraße", "Burgplatz", "Oberamteistraße",
+      "Karlstraße", "Kaiserstraße", "Lederstraße", "Planie", "Tübinger Straße"
+    ],
+    "Tübingen": [
+      "Mühlstraße", "Am Markt", "Holzmarkt", "Lange Gasse", "Kirchgasse",
+      "Neue Straße", "Neckargasse", "Ammergasse", "Froschgasse", "Bursagasse",
+      "Münzgasse", "Collegiumsgasse", "Wilhelmstraße", "Uhlandstraße", "Hölderlinstraße",
+      "Keplerstraße", "Schimpfstraße", "Corrensstraße", "Europastraße", "Rümelinstraße"
+    ],
+    "Konstanz": [
+      "Hussenstraße", "Marktstätte", "Kanzleistraße", "Rosgartenstraße", "Wessenbergstraße",
+      "Münsterplatz", "Salmannsweilergasse", "Kreuzlinger Straße", "Mainaustraße", "Reichenaustraße",
+      "Bodanstraße", "Laube", "Sigismundstraße", "Obere Laube", "Untere Laube"
+    ],
+    "Hannover": [
+      "Georgstraße", "Bahnhofstraße", "Ernst-August-Platz", "Kröpcke", "Karmarschstraße",
+      "Schillerstraße", "Osterstraße", "Große Packhofstraße", "Prinzenstraße", "Marktstraße",
+      "Leinstraße", "Schmiedestraße", "Knochenhauer Straße", "Ständehausstraße", "Friedrichswall",
+      "Aegidientorplatz", "Lavesallee", "Waterlooplatz", "Königsworther Platz", "Calenberger Straße",
+      "Hildesheimer Straße", "Podbielskistraße", "Vahrenwalder Straße", "Lister Meile", "Walderseestraße",
+      "Bödekerstraße", "Wedekindstraße", "Sedanstraße", "Lindener Marktplatz", "Limmerstraße"
+    ],
+    "Braunschweig": [
+      "Bohlweg", "Damm", "Schild", "Hutfiltern", "Sack",
+      "Kohlmarkt", "Altstadtmarkt", "Burgplatz", "Ölschlägern", "Poststraße",
+      "Steinweg", "Friedrich-Wilhelm-Straße", "Münzstraße", "Kattreppeln", "Schützenstraße",
+      "Jasperallee", "Berliner Straße", "Hamburger Straße", "Celler Straße", "Wolfenbütteler Straße"
+    ],
+    "Oldenburg": [
+      "Lange Straße", "Achternstraße", "Kurwickstraße", "Schlossplatz", "Markt",
+      "Heiligengeiststraße", "Kirchenstraße", "Wallstraße", "Theaterwall", "Peterstraße",
+      "Staulinie", "Mottenstraße", "Bergstraße", "Schüttingstraße", "Haarenstraße",
+      "Alexanderstraße", "Donnerschweer Straße", "Nadorster Straße", "Ofener Straße", "Ammerländer Heerstraße"
+    ],
+    "Osnabrück": [
+      "Große Straße", "Johannisstraße", "Krahnstraße", "Bierstraße", "Domhof",
+      "Markt", "Nikolaiort", "Heger Straße", "Lohstraße", "Marienstraße",
+      "Kommenderiestraße", "Neumarkt", "Wittekindstraße", "Natruper Straße", "Martinistraße",
+      "Möserstraße", "Schillerstraße", "Goethering", "Jahnplatz", "Rheiner Landstraße"
+    ],
+    "Wolfsburg": [
+      "Porschestraße", "Poststraße", "Schillerstraße", "Goethestraße", "Lessingstraße",
+      "Kaufhof", "Rothenfelder Straße", "Kleiststraße", "Heßlinger Straße", "Heinrich-Nordhoff-Straße",
+      "Dieselstraße", "Siegfried-Ehlers-Straße", "Schulenburgallee", "Berliner Ring", "Braunschweiger Straße"
+    ],
+    "Göttingen": [
+      "Weender Straße", "Groner Straße", "Rote Straße", "Barfüßerstraße", "Kurze Straße",
+      "Prinzenstraße", "Jüdenstraße", "Paulinerstraße", "Nikolaistraße", "Kornmarkt",
+      "Markt", "Johannisstraße", "Theaterstraße", "Berliner Straße", "Friedländer Weg",
+      "Geismar Landstraße", "Reinhäuser Landstraße", "Bürgerstraße", "Robert-Koch-Straße", "Goßlerstraße"
+    ],
+    "Salzgitter": [
+      "Berliner Straße", "Marktplatz", "Am Schölkegraben", "Braunschweiger Straße", "Peiner Straße",
+      "Watenstedter Straße", "Neißestraße", "Elbestraße", "Saarstraße", "Konrad-Adenauer-Straße",
+      "In den Blumentriften", "Theodor-Heuss-Straße", "Albert-Schweitzer-Straße", "Friedrich-Ebert-Straße", "Kattowitzer Straße"
+    ],
+    "Hildesheim": [
+      "Hoher Weg", "Almsstraße", "Schuhstraße", "Osterstraße", "Rathausstraße",
+      "Andreasplatz", "Markt", "Alter Markt", "Domhof", "Burgstraße",
+      "Hückedahler Straße", "Sedanstraße", "Bismarckplatz", "Kaiserstraße", "Bahnhofsallee"
+    ],
+    "Leipzig": [
+      "Nikolaistraße", "Grimmaische Straße", "Petersstraße", "Hainstraße", "Brühl",
+      "Katharinenstraße", "Reichsstraße", "Markt", "Augustusplatz", "Goethestraße",
+      "Schillerstraße", "Dittrichring", "Thomasgasse", "Burgstraße", "Ritterstraße",
+      "Barfußgässchen", "Mädlerpassage", "Specks Hof", "Städtisches Kaufhaus", "Strohsackpassage",
+      "Karl-Liebknecht-Straße", "Südplatz", "Arthur-Hoffmann-Straße", "Könneritzstraße", "Käthe-Kollwitz-Straße",
+      "Waldstraße", "Ferdinand-Rhode-Straße", "Merseburger Straße", "Georg-Schumann-Straße", "Lindenauer Markt",
+      "Jahnallee", "Ranstädter Steinweg", "Plagwitzer Straße", "Karl-Heine-Straße", "Industriestraße"
+    ],
+    "Dresden": [
+      "Prager Straße", "Wilsdruffer Straße", "Altmarkt", "Neumarkt", "Taschenbergpalais",
+      "Brühlsche Terrasse", "Münzgasse", "Frauenstraße", "Galeriestraße", "Theaterplatz",
+      "Sophienstraße", "Schlossstraße", "Augustusstraße", "Rampische Straße", "Kreuzstraße",
+      "Seestraße", "Ringstraße", "Fetscherstraße", "Blasewitzer Straße", "Bautzner Straße",
+      "Königsbrücker Straße", "Albertplatz", "Bischofsweg", "Rothenburger Straße", "Görlitzer Straße",
+      "Louisenstraße", "Martin-Luther-Straße", "Kamenzer Straße", "Alaunstraße", "Böhmische Straße",
+      "Großenhainer Straße", "Leipziger Straße", "Friedrichstraße", "Maxstraße", "Annenstraße"
+    ],
+    "Chemnitz": [
+      "Straße der Nationen", "Zentralhaltestelle", "Markt", "Neumarkt", "Brückenstraße",
+      "Innere Klosterstraße", "Am Rathaus", "Theaterstraße", "Bahnhofstraße", "Hartmannstraße",
+      "Mühlenstraße", "Annaberger Straße", "Leipziger Straße", "Zwickauer Straße", "Blankenauer Straße",
+      "Bernsdorfer Straße", "Reichsstraße", "Heinrich-Zille-Straße", "Parkstraße", "Sonnenberger Straße"
+    ],
+    "Zwickau": [
+      "Hauptstraße", "Marienplatz", "Innere Plauensche Straße", "Äußere Plauensche Straße", "Peter-Breuer-Straße",
+      "Bahnhofstraße", "Schumannstraße", "Werdauer Straße", "Crimmitschauer Straße", "Reichenbacher Straße",
+      "Leipziger Straße", "Kopernikusstraße", "Scheffelstraße", "Humboldtstraße", "Lessingstraße"
+    ],
+    "Plauen": [
+      "Bahnhofstraße", "Postplatz", "Altmarkt", "Nobelstraße", "Reichsstraße",
+      "Straßberger Straße", "Oelsnitzer Straße", "Pausaer Straße", "Chrieschwitzer Straße", "Elsterstraße",
+      "Hammerstraße", "Neundorfer Straße", "Dobenaustraße", "Friedrich-Ebert-Straße", "Reißiger Straße"
+    ],
+    "Bremen": [
+      "Obernstraße", "Sögestraße", "Lloydpassage", "Domshof", "Am Markt",
+      "Schüsselkorb", "Böttcherstraße", "Martinistraße", "Langenstraße", "Hutfilterstraße",
+      "Am Wall", "Contrescarpe", "Herdentor", "Bürgermeister-Smidt-Straße", "Bahnhofsplatz",
+      "Findorffstraße", "Schwachhauser Heerstraße", "Ostertorsteinweg", "Sielwall", "Vor dem Steintor",
+      "Westerstraße", "Pappelstraße", "Friedrich-Karl-Straße", "Neuenlander Straße", "Hemmstraße"
+    ],
+    "Bremerhaven": [
+      "Bürgermeister-Smidt-Straße", "Hafenstraße", "Lloydstraße", "Georgstraße", "Deichstraße",
+      "Columbusstraße", "Rickmersstraße", "Friedrich-Ebert-Straße", "Grashoffstraße", "Barkhausenstraße",
+      "Schillerstraße", "Goethestraße", "Lessingstraße", "Körnerstraße", "Am Längengrad"
+    ],
+    "Kiel": [
+      "Holstenstraße", "Holtenauer Straße", "Bergstraße", "Dänische Straße", "Fleethörn",
+      "Alter Markt", "Holstenplatz", "Sophienblatt", "Kaistraße", "Wall",
+      "Exerzierplatz", "Wilhelminenstraße", "Schloßgarten", "Knooper Weg", "Kronshagener Weg",
+      "Schwedendamm", "Elisabethstraße", "Feldstraße", "Gutenbergstraße", "Schauenburgerstraße"
+    ],
+    "Lübeck": [
+      "Breite Straße", "Königstraße", "Holstenstraße", "Hüxstraße", "Mengstraße",
+      "Sandstraße", "Mühlenstraße", "Fleischhauerstraße", "Aegidienstraße", "Wahmstraße",
+      "Beckergrube", "Kolk", "Untertrave", "An der Obertrave", "Mühlendamm",
+      "Koberg", "Große Burgstraße", "Kleine Burgstraße", "Dr.-Julius-Leber-Straße", "Moislinger Allee"
+    ],
+    "Flensburg": [
+      "Holm", "Große Straße", "Norderstraße", "Südermarkt", "Rathausstraße",
+      "Angelburger Straße", "Schiffbrücke", "Hafendamm", "Neustadt", "Norderhofenden",
+      "Süderhofenden", "Kompagniestraße", "Toosbüystraße", "Friesische Straße", "Apenrader Straße"
+    ],
+    "Neumünster": [
+      "Großflecken", "Lütjenstraße", "Kuhberg", "Holstenstraße", "Plöner Straße",
+      "Kieler Straße", "Rendsburger Straße", "Christianstraße", "Bahnhofstraße", "Färberstraße",
+      "Wippendorfstraße", "Haart", "Am Teich", "Gartenstraße", "Christianstraße"
+    ],
+    "Magdeburg": [
+      "Breiter Weg", "Ernst-Reuter-Allee", "Otto-von-Guericke-Straße", "Hasselbachplatz", "Halberstädter Straße",
+      "Große Diesdorfer Straße", "Olvenstedter Straße", "Leipziger Straße", "Wiener Straße", "Lübecker Straße",
+      "Alter Markt", "Domplatz", "Jakobstraße", "Fürstenwallstraße", "Hegelstraße",
+      "Schönebecker Straße", "Berliner Chaussee", "Magdeburger Ring", "Sternstraße", "Große Steinernetischstraße"
+    ],
+    "Halle (Saale)": [
+      "Große Ulrichstraße", "Kleine Ulrichstraße", "Leipziger Straße", "Marktplatz", "Große Steinstraße",
+      "Kleine Steinstraße", "Geiststraße", "Rannische Straße", "Große Klausstraße", "Kleine Klausstraße",
+      "Oleariusstraße", "Taubenstraße", "Hansering", "Robert-Franz-Ring", "Joliot-Curie-Platz",
+      "Delitzscher Straße", "Merseburger Straße", "Magdeburger Straße", "Bernburger Straße", "Reilstraße"
+    ],
+    "Dessau-Roßlau": [
+      "Kavalierstraße", "Zerbster Straße", "Askanische Straße", "Franz-Mehrings-Straße", "Antoinettenstraße",
+      "Friedensplatz", "Ratsgasse", "Schloßstraße", "Am Georgium", "Ebertallee",
+      "Gropiusallee", "Bauhausstraße", "Friedrichstraße", "Heidestraße", "Wolfgangstraße"
+    ],
+    "Erfurt": [
+      "Anger", "Bahnhofstraße", "Schlösserstraße", "Marktstraße", "Fischmarkt",
+      "Domplatz", "Wenigemarkt", "Krämerbrücke", "Michaelisstraße", "Allerheiligenstraße",
+      "Johannesstraße", "Regierungsstraße", "Schillerstraße", "Juri-Gagarin-Ring", "Stauffenbergallee",
+      "Magdeburger Allee", "Weimarische Straße", "Nordhäuser Straße", "Leipziger Straße", "Arnstädter Straße"
+    ],
+    "Jena": [
+      "Holzmarkt", "Markt", "Leutragraben", "Teichgraben", "Saalbahnhofstraße",
+      "Löbdergraben", "Johannisstraße", "Wagnergasse", "Schillergasse", "Saalstraße",
+      "Ernst-Abbe-Platz", "Carl-Zeiss-Platz", "Bachstraße", "Grietgasse", "Fürstengraben",
+      "Schillerstraße", "Goethestraße", "Philosophenweg", "Grünewaldstraße", "Camsdorfer Brücke"
+    ],
+    "Gera": [
+      "Sorge", "Schloßstraße", "Zschochernstraße", "Heinrichstraße", "Johannisplatz",
+      "Markt", "Kornmarkt", "Florian-Geyer-Straße", "Am Küchengarten", "Reichsstraße",
+      "Gagarinstraße", "Vogtlandstraße", "Ronneburger Straße", "De-Smit-Straße", "Wiesestraße"
+    ],
+    "Weimar": [
+      "Schillerstraße", "Markt", "Theaterplatz", "Frauenplan", "Jakobstraße",
+      "Marktstraße", "Kaufstraße", "Geleitstraße", "Scherfgasse", "Burgplatz",
+      "Am Palais", "Herderplatz", "Steubenstraße", "Amalienstraße", "Trierer Straße",
+      "Berkaer Straße", "Ernst-Thälmann-Straße", "Erfurter Straße", "Buttelstedter Straße", "Schwanseestraße"
+    ],
+    "Potsdam": [
+      "Brandenburger Straße", "Lindenstraße", "Charlottenstraße", "Dortustraße", "Gutenbergstraße",
+      "Friedrich-Ebert-Straße", "Hegelallee", "Am Neuen Palais", "Luisenplatz", "Am Kanal",
+      "Yorckstraße", "Jägerallee", "Berliner Straße", "Rudolf-Breitscheid-Straße", "Am Bassinplatz",
+      "Nauener Tor", "Jägertor", "Französische Straße", "Kurfürstenstraße", "Schopenhauerstraße"
+    ],
+    "Cottbus": [
+      "Spremberger Straße", "Berliner Straße", "Bahnhofstraße", "Marktplatz", "Schloßkirchplatz",
+      "Sandower Straße", "Am Turm", "Burgstraße", "Karl-Marx-Straße", "Breitscheidstraße",
+      "Franz-Mehring-Straße", "Stadtpromenade", "Puschkinpromenade", "Mühlenstraße", "Parzellenstraße"
+    ],
+    "Brandenburg an der Havel": [
+      "Steinstraße", "Hauptstraße", "Neustädtischer Markt", "Altstädtischer Markt", "Sankt-Annen-Straße",
+      "Ritterstraße", "Mühlendamm", "Bauhofstraße", "Potsdamer Straße", "Magdeburger Straße",
+      "Plauer Straße", "Neuendorfer Straße", "Wilhelmsdorfer Straße", "Wredowstraße", "Große Gartenstraße"
+    ],
+    "Frankfurt (Oder)": [
+      "Karl-Marx-Straße", "Heilbronner Straße", "Bahnhofstraße", "Große Oderstraße", "Kleine Oderstraße",
+      "Collegienstraße", "Marktplatz", "Am Kleistpark", "Leipziger Straße", "Berliner Straße",
+      "Fürstenwalder Straße", "Müllroser Chaussee", "Gubener Straße", "Rosa-Luxemburg-Straße", "Heinrich-Hildebrand-Straße"
+    ],
+    "Rostock": [
+      "Kröpeliner Straße", "Lange Straße", "Universitätsplatz", "Neuer Markt", "Breite Straße",
+      "Am Strande", "Wokrenterstraße", "Am Ziegenmarkt", "Schnickmannstraße", "Steinstraße",
+      "Doberaner Straße", "Blücherstraße", "Richard-Wagner-Straße", "August-Bebel-Straße", "Parkstraße",
+      "Warnemünder Straße", "Warnowufer", "Hafenstraße", "Lübecker Straße", "Hamburger Straße"
+    ],
+    "Schwerin": [
+      "Mecklenburgstraße", "Wismarsche Straße", "Schloßstraße", "Marienplatz", "Am Markt",
+      "Puschkinstraße", "Goethestraße", "Schillerstraße", "Grevesmühlener Straße", "Lübecker Straße",
+      "Plater Straße", "Wittenburger Straße", "Am Packhof", "Arsenalstraße", "Wallstraße"
+    ],
+    "Stralsund": [
+      "Ossenreyerstraße", "Mönchstraße", "Tribseer Straße", "Badenstraße", "Neuer Markt",
+      "Alter Markt", "Fährstraße", "Frankenstraße", "Langenstraße", "Heilgeiststraße",
+      "Knieper Damm", "Greifswalder Chaussee", "Prohner Straße", "Am Kütertor", "Schillstraße"
+    ],
+    "Greifswald": [
+      "Lange Straße", "Markt", "Domstraße", "Fischstraße", "Brüggstraße",
+      "Steinbecker Straße", "Gützkower Straße", "Loitzer Straße", "Anklamer Straße", "Wolgaster Straße",
+      "Bahnhofstraße", "Karl-Marx-Platz", "Robert-Blum-Straße", "Hans-Beimler-Straße", "Schützenstraße"
+    ],
+    "Mainz": [
+      "Ludwigstraße", "Schillerstraße", "Große Bleiche", "Boppstraße", "Klarastraße",
+      "Markt", "Augustinerstraße", "Schöfferstraße", "Gutenbergplatz", "Kirschgarten",
+      "Emmerich-Josef-Straße", "Adam-Karrillon-Straße", "Kaiser-Wilhelm-Ring", "Rheinallee", "Dagobertstraße",
+      "Bahnhofstraße", "Parcusstraße", "Kaiserstraße", "Münsterstraße", "Fischergasse"
+    ],
+    "Ludwigshafen am Rhein": [
+      "Bismarckstraße", "Ludwigstraße", "Kaiser-Wilhelm-Straße", "Berliner Platz", "Rathausplatz",
+      "Bahnhofstraße", "Wredestraße", "Heinigstraße", "Mundenheimer Straße", "Oggersheimer Straße",
+      "Frankenthaler Straße", "Bruchwiesenstraße", "Rheinallee", "Luitpoldstraße", "Prinzregentenstraße"
+    ],
+    "Koblenz": [
+      "Löhrstraße", "Marktstraße", "Firmungstraße", "Am Plan", "Görgenstraße",
+      "Schloßstraße", "Münzplatz", "Florinsmarkt", "Altengraben", "Burgstraße",
+      "Gemüsegasse", "Pfuhlgasse", "Kornpfortstraße", "Am Wöllershof", "Clemensstraße",
+      "Friedrich-Ebert-Ring", "Hohenzollernstraße", "Mainzer Straße", "Schlachthofstraße", "Rizzastraße"
+    ],
+    "Trier": [
+      "Simeonstraße", "Brotstraße", "Fleischstraße", "Dietrichstraße", "Hauptmarkt",
+      "Kornmarkt", "Viehmarkt", "Neustraße", "Palaststraße", "Domfreihof",
+      "Liebfrauenstraße", "Windstraße", "Stockplatz", "Fahrstraße", "Nordallee",
+      "Südallee", "Ostallee", "Kaiserstraße", "Paulinstraße", "Christophstraße"
+    ],
+    "Kaiserslautern": [
+      "Fackelstraße", "Eisenbahnstraße", "Marktstraße", "Fruchthallstraße", "Steinstraße",
+      "Schneiderstraße", "Pirmasenser Straße", "Fischerstraße", "Mainzer Straße", "Mannheimer Straße",
+      "Richard-Wagner-Straße", "Pariser Straße", "Königstraße", "Mühlstraße", "Lauterstraße"
+    ],
+    "Saarbrücken": [
+      "Bahnhofstraße", "Reichsstraße", "Mainzer Straße", "Kaiserstraße", "Eisenbahnstraße",
+      "Dudweilerstraße", "Großherzog-Friedrich-Straße", "Talstraße", "Nauwieser Straße", "Trierer Straße",
+      "Sankt-Johanner Straße", "Betzenstraße", "Feldmannstraße", "Heuduckstraße", "Saargemünder Straße"
+    ],
+    "Neunkirchen": [
+      "Hüttenbergstraße", "Bahnhofstraße", "Oberer Markt", "Stummstraße", "Saarbrücker Straße",
+      "Bliesstraße", "Wellesweilerstraße", "Wiebelskircher Straße", "Kuchenbergstraße", "Fernstraße",
+      "Lindenallee", "Parkstraße", "Heinitzstraße", "Schlossstraße", "Limbacher Straße"
+    ],
+    "Homburg": [
+      "Eisenbahnstraße", "Talstraße", "Kaiserstraße", "Bahnhofstraße", "Saarbrücker Straße",
+      "Berliner Straße", "Am Forum", "Beeder Straße", "Zweibrücker Straße", "Kirrberger Straße",
+      "Schlossberg-Höhenstraße", "Robert-Bosch-Straße", "Bexbacher Straße", "Am Römermuseum", "Universitätsstraße"
+    ],
+    "Völklingen": [
+      "Rathausstraße", "Bismarckstraße", "Poststraße", "Moltkestraße", "Karl-Janssen-Straße",
+      "Saarbrücker Straße", "Hohenzollernstraße", "Marktstraße", "Gatterstraße", "Wehrdenstraße",
+      "Heinestraße", "Parkstraße", "Schillerstraße", "Goethestraße", "Am Staden"
+    ]
+  },
   "postcode_format": "#####",
   "address_formats": [
     "{street_name} {building_number}, {postcode} {city}",
