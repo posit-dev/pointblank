@@ -696,8 +696,11 @@ class LocaleGenerator:
         adjectives = self._data.company.get("adjectives", ["Global", "Advanced"])
         nouns = self._data.company.get("nouns", ["Solutions", "Systems"])
 
+        # Use a fresh random last name for company (not the current person's name)
+        company_last_name = self._generate_last_name()
+
         return fmt.format(
-            last_name=self.last_name(),
+            last_name=company_last_name,
             suffix=self.rng.choice(suffixes),
             adjective=self.rng.choice(adjectives),
             noun=self.rng.choice(nouns),
