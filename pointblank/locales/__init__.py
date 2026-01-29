@@ -221,6 +221,11 @@ class LocaleRegistry:
         """Load country data, falling back through the chain."""
         merged_data = LocaleData(locale=fallback_chain[0])
 
+        # Load shared/universal data first (e.g., file extensions, MIME types)
+        shared_data = self._load_country_files("_shared")
+        if shared_data:
+            self._merge_data(merged_data, shared_data)
+
         # Load in reverse order so more specific countries override
         for country in reversed(fallback_chain):
             data = self._load_country_files(country)
