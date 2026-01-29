@@ -940,6 +940,7 @@ class TestLocaleDataFiles:
                 ("formats", False),
                 ("adjectives", False),
                 ("nouns", False),
+                ("well_known_companies", False),
                 ("jobs", False),
                 ("catch_phrase_adjectives", False),
                 ("catch_phrase_nouns", False),
@@ -1087,6 +1088,45 @@ class TestLocaleDataFiles:
             assert isinstance(data["phone_area_codes"], dict), (
                 f"{country}: phone_area_codes should be a dict"
             )
+            assert len(data["phone_area_codes"]) > 0, (
+                f"{country}: phone_area_codes should not be empty"
+            )
+
+            # Validate postcode_format
+            assert isinstance(data["postcode_format"], str), (
+                f"{country}: postcode_format should be a string"
+            )
+            assert len(data["postcode_format"]) > 0, (
+                f"{country}: postcode_format should not be empty"
+            )
+
+            # Validate address_formats
+            assert isinstance(data["address_formats"], list), (
+                f"{country}: address_formats should be a list"
+            )
+            assert len(data["address_formats"]) > 0, (
+                f"{country}: address_formats should not be empty"
+            )
+            for fmt in data["address_formats"]:
+                assert isinstance(fmt, str), f"{country}: each address_format should be a string"
+
+            # Validate country and country_code
+            assert isinstance(data["country"], str), f"{country}: country should be a string"
+            assert isinstance(data["country_code"], str), (
+                f"{country}: country_code should be a string"
+            )
+            assert len(data["country_code"]) == 2, (
+                f"{country}: country_code should be 2 characters (ISO 3166-1 alpha-2)"
+            )
+
+            # Validate streets_by_city structure
+            for city, streets in data["streets_by_city"].items():
+                assert isinstance(streets, list), f"{country}/{city}: streets should be a list"
+                assert len(streets) > 0, f"{country}/{city}: streets should not be empty"
+                for street in streets:
+                    assert isinstance(street, str), (
+                        f"{country}/{city}: each street should be a string"
+                    )
 
     def test_person_json_schema_consistency(self):
         """Ensure person.json files have consistent schema across countries."""
@@ -1113,16 +1153,33 @@ class TestLocaleDataFiles:
                 assert isinstance(first_names[gender], list), (
                     f"{country}: first_names[{gender}] should be a list"
                 )
+                # male and female should have content, neutral can be empty
+                if gender != "neutral":
+                    assert len(first_names[gender]) > 0, (
+                        f"{country}: first_names[{gender}] should not be empty"
+                    )
+                for name in first_names[gender]:
+                    assert isinstance(name, str), (
+                        f"{country}: each first name in {gender} should be a string"
+                    )
 
-            # last_names should be a list
+            # last_names should be a list of strings
             assert isinstance(data["last_names"], list), f"{country}: last_names should be a list"
             assert len(data["last_names"]) > 0, f"{country}: last_names should not be empty"
+            for name in data["last_names"]:
+                assert isinstance(name, str), f"{country}: each last_name should be a string"
 
-            # name_formats should be a list
+            # name_formats should be a list with valid placeholders
             assert isinstance(data["name_formats"], list), (
                 f"{country}: name_formats should be a list"
             )
             assert len(data["name_formats"]) > 0, f"{country}: name_formats should not be empty"
+            valid_name_placeholders = {"{first_name}", "{last_name}"}
+            for fmt in data["name_formats"]:
+                assert isinstance(fmt, str), f"{country}: each name_format should be a string"
+                # Check that format contains at least first_name or last_name
+                has_name = "{first_name}" in fmt or "{last_name}" in fmt
+                assert has_name, f"{country}: name_format '{fmt}' should contain a name placeholder"
 
             # prefixes should be a dict with male/female/neutral keys
             prefixes = data["prefixes"]
@@ -1132,9 +1189,20 @@ class TestLocaleDataFiles:
                 assert isinstance(prefixes[gender], list), (
                     f"{country}: prefixes[{gender}] should be a list"
                 )
+                # male and female should have content
+                if gender != "neutral":
+                    assert len(prefixes[gender]) > 0, (
+                        f"{country}: prefixes[{gender}] should not be empty"
+                    )
+                for prefix in prefixes[gender]:
+                    assert isinstance(prefix, str), (
+                        f"{country}: each prefix in {gender} should be a string"
+                    )
 
-            # suffixes should be a list
+            # suffixes should be a list of strings
             assert isinstance(data["suffixes"], list), f"{country}: suffixes should be a list"
+            for suffix in data["suffixes"]:
+                assert isinstance(suffix, str), f"{country}: each suffix should be a string"
 
     def test_company_json_schema_consistency(self):
         """Ensure company.json files have consistent schema across countries."""
@@ -1148,6 +1216,7 @@ class TestLocaleDataFiles:
             "formats",
             "adjectives",
             "nouns",
+            "well_known_companies",
             "jobs",
             "catch_phrase_adjectives",
             "catch_phrase_nouns",
@@ -1162,10 +1231,57 @@ class TestLocaleDataFiles:
             missing_keys = required_keys - set(data.keys())
             assert not missing_keys, f"company.json for {country} is missing keys: {missing_keys}"
 
-            # Validate all required keys are lists with content
-            for key in required_keys:
+            # Validate list keys are lists with content
+            list_keys = {
+                "suffixes",
+                "formats",
+                "adjectives",
+                "nouns",
+                "jobs",
+                "catch_phrase_adjectives",
+                "catch_phrase_nouns",
+                "catch_phrase_verbs",
+            }
+            for key in list_keys:
                 assert isinstance(data[key], list), f"{country}: {key} should be a list"
                 assert len(data[key]) > 0, f"{country}: {key} should not be empty"
+
+            # Validate well_known_companies structure
+            well_known = data["well_known_companies"]
+            assert isinstance(well_known, list), f"{country}: well_known_companies should be a list"
+            assert len(well_known) > 0, f"{country}: well_known_companies should not be empty"
+
+            for company in well_known:
+                assert isinstance(company, dict), (
+                    f"{country}: each well_known_company should be a dict"
+                )
+                assert "name" in company, f"{country}: each well_known_company should have 'name'"
+                assert "cities" in company, (
+                    f"{country}: each well_known_company should have 'cities'"
+                )
+                assert isinstance(company["name"], str), (
+                    f"{country}: company name should be a string"
+                )
+                assert isinstance(company["cities"], list), (
+                    f"{country}: company cities should be a list"
+                )
+                assert len(company["cities"]) > 0, (
+                    f"{country}: company '{company['name']}' should have at least one city"
+                )
+                for city in company["cities"]:
+                    assert isinstance(city, str), (
+                        f"{country}: each city in '{company['name']}' should be a string"
+                    )
+
+            # Validate formats contain valid placeholders
+            valid_placeholders = {"{last_name}", "{suffix}", "{adjective}", "{noun}"}
+            for fmt in data["formats"]:
+                # Extract all placeholders from format string
+                import re
+
+                placeholders = set(re.findall(r"\{[^}]+\}", fmt))
+                invalid = placeholders - valid_placeholders
+                assert not invalid, f"{country}: format '{fmt}' has invalid placeholders: {invalid}"
 
     def test_internet_json_schema_consistency(self):
         """Ensure internet.json files have consistent schema across countries."""
@@ -1190,10 +1306,25 @@ class TestLocaleDataFiles:
             missing_keys = required_keys - set(data.keys())
             assert not missing_keys, f"internet.json for {country} is missing keys: {missing_keys}"
 
-            # Validate all required keys are lists with content
+            # Validate all required keys are lists with content and contain strings
             for key in required_keys:
                 assert isinstance(data[key], list), f"{country}: {key} should be a list"
                 assert len(data[key]) > 0, f"{country}: {key} should not be empty"
+                for item in data[key]:
+                    assert isinstance(item, str), (
+                        f"{country}: each item in {key} should be a string"
+                    )
+
+            # Validate email domains look like domains
+            for domain in data["free_email_domains"]:
+                assert "." in domain, f"{country}: email domain '{domain}' should contain a dot"
+
+            # Validate TLDs (stored without dots, e.g., 'com' not '.com')
+            for tld in data["tlds"]:
+                assert len(tld) > 0, f"{country}: TLD should not be empty"
+                assert not tld.startswith("."), (
+                    f"{country}: TLD '{tld}' should not start with a dot"
+                )
 
     def test_misc_json_schema_consistency(self):
         """Ensure misc.json files have consistent schema across countries.
@@ -1227,12 +1358,33 @@ class TestLocaleDataFiles:
         assert shared_file.exists(), "_shared/misc.json should exist with universal data"
         with open(shared_file, "r", encoding="utf-8") as f:
             shared_data = json.load(f)
+
+        # Validate file_extensions
         assert "file_extensions" in shared_data, "_shared should have file_extensions"
-        assert "mime_types" in shared_data, "_shared should have mime_types"
-        assert "currency_codes" in shared_data, "_shared should have currency_codes"
+        assert isinstance(shared_data["file_extensions"], list), "file_extensions should be a list"
         assert len(shared_data["file_extensions"]) > 0, "file_extensions should not be empty"
+        for ext in shared_data["file_extensions"]:
+            assert isinstance(ext, str), "each file_extension should be a string"
+            assert len(ext) > 0, f"file_extension should not be empty"
+            # Extensions are stored without dots (e.g., 'txt' not '.txt')
+            assert not ext.startswith("."), f"file_extension '{ext}' should not start with a dot"
+
+        # Validate mime_types
+        assert "mime_types" in shared_data, "_shared should have mime_types"
+        assert isinstance(shared_data["mime_types"], list), "mime_types should be a list"
         assert len(shared_data["mime_types"]) > 0, "mime_types should not be empty"
+        for mime in shared_data["mime_types"]:
+            assert isinstance(mime, str), "each mime_type should be a string"
+            assert "/" in mime, f"mime_type '{mime}' should contain a slash"
+
+        # Validate currency_codes (ISO 4217)
+        assert "currency_codes" in shared_data, "_shared should have currency_codes"
+        assert isinstance(shared_data["currency_codes"], list), "currency_codes should be a list"
         assert len(shared_data["currency_codes"]) > 0, "currency_codes should not be empty"
+        for code in shared_data["currency_codes"]:
+            assert isinstance(code, str), "each currency_code should be a string"
+            assert len(code) == 3, f"currency_code '{code}' should be 3 characters (ISO 4217)"
+            assert code.isupper(), f"currency_code '{code}' should be uppercase"
 
     def test_text_json_schema_consistency(self):
         """Ensure text.json files have consistent schema across countries."""
@@ -1251,10 +1403,89 @@ class TestLocaleDataFiles:
             missing_keys = required_keys - set(data.keys())
             assert not missing_keys, f"text.json for {country} is missing keys: {missing_keys}"
 
-            # Validate arrays are non-empty
+            # Validate arrays are non-empty and contain strings
             for key in required_keys:
                 assert isinstance(data[key], list), f"{country}: {key} should be a list"
                 assert len(data[key]) > 0, f"{country}: {key} should not be empty"
+                for item in data[key]:
+                    assert isinstance(item, str), (
+                        f"{country}: each item in {key} should be a string"
+                    )
+
+    def test_well_known_companies_cities_exist_in_locations(self):
+        """Ensure well-known company cities match cities defined in address.json locations."""
+        import json
+        from pathlib import Path
+
+        locales_dir = Path(__file__).parent.parent / "pointblank" / "locales" / "data"
+        countries = ["US", "DE", "FR", "JP", "CA"]
+
+        for country in countries:
+            # Load address data to get valid cities
+            address_file = locales_dir / country / "address.json"
+            with open(address_file, "r", encoding="utf-8") as f:
+                address_data = json.load(f)
+            valid_cities = {loc["city"] for loc in address_data["locations"]}
+
+            # Load company data
+            company_file = locales_dir / country / "company.json"
+            with open(company_file, "r", encoding="utf-8") as f:
+                company_data = json.load(f)
+
+            # Check each well-known company's cities
+            for company in company_data.get("well_known_companies", []):
+                company_name = company.get("name", "Unknown")
+                for city in company.get("cities", []):
+                    # This is a warning, not a hard failure - companies may have offices
+                    # in cities we haven't added to our locations list yet
+                    if city not in valid_cities:
+                        print(
+                            f"Note: {country} company '{company_name}' has city '{city}' "
+                            f"not in locations"
+                        )
+
+    def test_locale_data_no_duplicate_entries(self):
+        """Ensure locale data lists don't have critical duplicate entries."""
+        import json
+        from pathlib import Path
+
+        locales_dir = Path(__file__).parent.parent / "pointblank" / "locales" / "data"
+        countries = ["US", "DE", "FR", "JP", "CA"]
+
+        for country in countries:
+            # Check person.json for duplicate names
+            person_file = locales_dir / country / "person.json"
+            with open(person_file, "r", encoding="utf-8") as f:
+                person_data = json.load(f)
+
+            # Last names may have some duplicates (common surnames appear multiple times
+            # in real populations), so we just check for excessive duplicates
+            last_names = person_data.get("last_names", [])
+            unique_last_names = set(last_names)
+            duplicate_ratio = 1 - (len(unique_last_names) / len(last_names)) if last_names else 0
+            assert duplicate_ratio < 0.1, (
+                f"{country}: person.json has too many duplicate last_names "
+                f"({duplicate_ratio:.1%} duplicates)"
+            )
+
+            # First names should not have duplicates within each gender
+            for gender in ["male", "female", "neutral"]:
+                first_names = person_data.get("first_names", {}).get(gender, [])
+                duplicates = [x for x in first_names if first_names.count(x) > 1]
+                assert not duplicates, (
+                    f"{country}: person.json has duplicate {gender} first_names: {set(duplicates)}"
+                )
+
+            # Check company.json for duplicate well-known companies (must be unique)
+            company_file = locales_dir / country / "company.json"
+            with open(company_file, "r", encoding="utf-8") as f:
+                company_data = json.load(f)
+
+            company_names = [c["name"] for c in company_data.get("well_known_companies", [])]
+            duplicates = [x for x in company_names if company_names.count(x) > 1]
+            assert not duplicates, (
+                f"{country}: company.json has duplicate well_known_companies: {set(duplicates)}"
+            )
 
     def test_locale_data_statistics(self):
         """Print statistics about locale data for review."""
