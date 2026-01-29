@@ -696,41 +696,27 @@ class LocaleGenerator:
         """
         # 15% chance to use a well-known company
         if self.rng.random() < 0.15:
-            well_known = self._data.company.get("well_known_companies", {})
+            well_known = self._data.company.get("well_known_companies", [])
             if well_known:
-                # Get current city and country if location context is active
+                # Get current city if location context is active
                 current_city = None
-                current_country = self.country
                 if self._row_locations is not None and self._current_row is not None:
                     current_city = self._row_locations[self._current_row].get("city")
 
-                # Collect all companies, preferring those in the current city/country
+                # Collect all companies, preferring those in the current city
                 city_companies = []
-                country_companies = []
                 all_companies = []
 
-                for sector_companies in well_known.values():
-                    for company in sector_companies:
-                        name = company.get("name") if isinstance(company, dict) else company
-                        cities_by_country = (
-                            company.get("cities", {}) if isinstance(company, dict) else {}
-                        )
-                        all_companies.append(name)
-
-                        # Check if company has presence in current country
-                        country_cities = cities_by_country.get(current_country, [])
-                        if country_cities:
-                            country_companies.append(name)
-                            # Check if company is in current city
-                            if current_city and current_city in country_cities:
-                                city_companies.append(name)
+                for company in well_known:
+                    name = company.get("name") if isinstance(company, dict) else company
+                    cities = company.get("cities", []) if isinstance(company, dict) else []
+                    all_companies.append(name)
+                    if current_city and current_city in cities:
+                        city_companies.append(name)
 
                 # 70% chance to use city-relevant company if available
                 if city_companies and self.rng.random() < 0.7:
                     return self.rng.choice(city_companies)
-                # Otherwise prefer companies with presence in the country
-                elif country_companies and self.rng.random() < 0.8:
-                    return self.rng.choice(country_companies)
                 elif all_companies:
                     return self.rng.choice(all_companies)
 
