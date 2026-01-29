@@ -495,6 +495,7 @@ class TestCountrySupport:
     # Common countries to test (ISO alpha-2 codes)
     COUNTRIES = [
         "US",
+        "CA",
         "GB",
         "DE",
         "FR",
