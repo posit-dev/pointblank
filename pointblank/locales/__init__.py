@@ -562,18 +562,13 @@ class LocaleGenerator:
 
         formats = self._data.address.get(
             "address_formats",
-            ["{building_number} {street_name}, {city}, {state} {postcode}"],
+            ["{building_number} {street}, {city}, {state} {postcode}"],
         )
         fmt = self.rng.choice(formats)
 
-        # Generate street name once and provide both 'street' and 'street_name' keys
-        # to support format strings using either placeholder
-        street = self.street_name()
-
         result = fmt.format(
             building_number=self.building_number(),
-            street=street,
-            street_name=street,
+            street=self.street_name(),
             city=self.city(),
             state=self.state(abbr=True),
             postcode=self.postcode(),
