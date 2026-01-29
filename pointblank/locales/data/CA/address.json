@@ -81,14 +81,27 @@
     "Place", "Terrace", "Circle", "Crescent", "Trail", "Path", "Gardens",
     "Heights", "Park", "Square", "Close", "Grove", "Mews", "Row", "Gate"
   ],
+  "postcode_format": "?#? #?#",
   "address_formats": [
     "{building_number} {street_name} {street_suffix}",
     "{building_number} {street_name} {street_suffix}, Unit {unit_number}",
     "{building_number} {street_name} {street_suffix}, Apt {unit_number}"
   ],
-  "full_address_format": "{street_address}, {city}, {state_abbr} {postcode}",
-  "postcode_format": "?#? #?#",
-  "phone_format": "(###) ###-####",
-  "building_number_range": [1, 9999],
-  "unit_number_range": [1, 999]
+  "country": "Canada",
+  "country_code": "CA",
+  "phone_area_codes": {
+    "Ontario": ["416", "647", "437", "905", "289", "365", "613", "343", "519", "226", "548", "705", "249", "807"],
+    "Quebec": ["514", "438", "450", "579", "819", "873", "418", "581", "367"],
+    "British Columbia": ["604", "778", "236", "672", "250"],
+    "Alberta": ["403", "587", "825", "780", "368"],
+    "Manitoba": ["204", "431"],
+    "Saskatchewan": ["306", "639"],
+    "Nova Scotia": ["902", "782"],
+    "New Brunswick": ["506"],
+    "Newfoundland and Labrador": ["709"],
+    "Prince Edward Island": ["902", "782"],
+    "Yukon": ["867"],
+    "Northwest Territories": ["867"],
+    "Nunavut": ["867"]
+  }
 }
