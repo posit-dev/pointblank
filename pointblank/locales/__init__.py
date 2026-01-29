@@ -565,12 +565,18 @@ class LocaleGenerator:
         return f"({area_code}) {exchange}-{subscriber}"
 
     def latitude(self) -> str:
-        """Generate a random latitude."""
-        return f"{self.rng.uniform(-90, 90):.6f}"
+        """Generate a random latitude (bounded by current location if available)."""
+        location = self._get_current_location()
+        lat_min = location.get("lat_min", -90)
+        lat_max = location.get("lat_max", 90)
+        return f"{self.rng.uniform(lat_min, lat_max):.6f}"
 
     def longitude(self) -> str:
-        """Generate a random longitude."""
-        return f"{self.rng.uniform(-180, 180):.6f}"
+        """Generate a random longitude (bounded by current location if available)."""
+        location = self._get_current_location()
+        lon_min = location.get("lon_min", -180)
+        lon_max = location.get("lon_max", 180)
+        return f"{self.rng.uniform(lon_min, lon_max):.6f}"
 
     # =========================================================================
     # Company
