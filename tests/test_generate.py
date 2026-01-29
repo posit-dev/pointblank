@@ -880,6 +880,39 @@ class TestLocaleDataFiles:
                 assert "postcode_prefix" in loc, (
                     f"{country}: each location should have 'postcode_prefix'"
                 )
+                # Validate lat/lon bounding box fields
+                assert "lat_min" in loc, f"{country}: each location should have 'lat_min'"
+                assert "lat_max" in loc, f"{country}: each location should have 'lat_max'"
+                assert "lon_min" in loc, f"{country}: each location should have 'lon_min'"
+                assert "lon_max" in loc, f"{country}: each location should have 'lon_max'"
+                # Validate lat/lon bounds are numeric and valid
+                assert isinstance(loc["lat_min"], (int, float)), (
+                    f"{country}: lat_min should be numeric"
+                )
+                assert isinstance(loc["lat_max"], (int, float)), (
+                    f"{country}: lat_max should be numeric"
+                )
+                assert isinstance(loc["lon_min"], (int, float)), (
+                    f"{country}: lon_min should be numeric"
+                )
+                assert isinstance(loc["lon_max"], (int, float)), (
+                    f"{country}: lon_max should be numeric"
+                )
+                assert loc["lat_min"] < loc["lat_max"], (
+                    f"{country}/{loc['city']}: lat_min should be less than lat_max"
+                )
+                assert loc["lon_min"] < loc["lon_max"], (
+                    f"{country}/{loc['city']}: lon_min should be less than lon_max"
+                )
+                # Validate latitude range (-90 to 90) and longitude range (-180 to 180)
+                assert -90 <= loc["lat_min"] <= 90, f"{country}/{loc['city']}: lat_min out of range"
+                assert -90 <= loc["lat_max"] <= 90, f"{country}/{loc['city']}: lat_max out of range"
+                assert -180 <= loc["lon_min"] <= 180, (
+                    f"{country}/{loc['city']}: lon_min out of range"
+                )
+                assert -180 <= loc["lon_max"] <= 180, (
+                    f"{country}/{loc['city']}: lon_max out of range"
+                )
 
             # Validate other required fields
             assert isinstance(data["street_names"], list), (
