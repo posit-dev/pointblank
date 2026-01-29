@@ -398,10 +398,27 @@ class LocaleGenerator:
         fmt = self.rng.choice(formats)
 
         person = self._get_current_person()
+
+        # Get gender for prefix selection (from person context or parameter)
+        person_gender = person.get("gender", "neutral")
+        if gender:
+            person_gender = gender
+
+        # Get prefix based on gender
+        prefixes = self._data.person.get("prefixes", {})
+        prefix_list = prefixes.get(person_gender, prefixes.get("neutral", [""]))
+        prefix = self.rng.choice(prefix_list) if prefix_list else ""
+
+        # Get suffix
+        suffixes = self._data.person.get("suffixes", [""])
+        suffix = self.rng.choice(suffixes) if suffixes else ""
+
         return fmt.format(
             first_name=person.get("first_name", "Alex"),
             last_name=person.get("last_name", "Smith"),
             middle_initial=self.rng.choice("ABCDEFGHIJKLMNOPQRSTUVWXYZ"),
+            prefix=prefix,
+            suffix=suffix,
         )
 
     # =========================================================================
