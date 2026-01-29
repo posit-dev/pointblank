@@ -7,6 +7,13 @@
     "naka", "ue", "shita", "mae", "ushiro", "soto",
     "hai", "iie", "arigatou", "sumimasen", "onegai", "douzo"
   ],
+  "sentence_patterns": [
+    "{noun} wa {adjective} desu.",
+    "{noun} ga {verb}.",
+    "{adverb} {verb} shimasu.",
+    "{adjective} {noun} desu.",
+    "{noun} to {noun} ga arimasu."
+  ],
   "adjectives": [
     "big", "small", "new", "old", "good", "bad",
     "fast", "slow", "hot", "cold", "high", "low",
@@ -40,12 +47,5 @@
     "together", "alone", "directly", "especially", "probably", "certainly",
     "also", "only", "just", "even", "almost", "quite",
     "more", "most", "less", "least", "rather", "fairly"
-  ],
-  "sentence_patterns": [
-    "{noun} wa {adjective} desu.",
-    "{noun} ga {verb}.",
-    "{adverb} {verb} shimasu.",
-    "{adjective} {noun} desu.",
-    "{noun} to {noun} ga arimasu."
   ]
 }
