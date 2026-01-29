@@ -864,7 +864,7 @@ class TestLocaleDataFiles:
         from pathlib import Path
 
         locales_dir = Path(__file__).parent.parent / "pointblank" / "locales" / "data"
-        countries = ["US", "DE", "FR", "JP"]
+        countries = ["US", "DE", "FR", "JP", "CA"]
         required_files = {
             "address.json",
             "company.json",
@@ -893,7 +893,7 @@ class TestLocaleDataFiles:
         from pathlib import Path
 
         locales_dir = Path(__file__).parent.parent / "pointblank" / "locales" / "data"
-        countries = ["US", "DE", "FR", "JP"]
+        countries = ["US", "DE", "FR", "JP", "CA"]
 
         for country in countries:
             country_dir = locales_dir / country
@@ -905,13 +905,107 @@ class TestLocaleDataFiles:
                 except json.JSONDecodeError as e:
                     pytest.fail(f"Invalid JSON in {json_file}: {e}")
 
+    def test_json_key_order_consistency(self):
+        """Ensure JSON files have consistent key ordering across all countries."""
+        import json
+        from pathlib import Path
+
+        locales_dir = Path(__file__).parent.parent / "pointblank" / "locales" / "data"
+        countries = ["US", "DE", "FR", "JP", "CA"]
+        json_files = [
+            "address.json",
+            "company.json",
+            "internet.json",
+            "misc.json",
+            "person.json",
+            "text.json",
+        ]
+
+        # Expected key orders for each file type
+        # Keys marked as optional may not exist in all countries (e.g., street_suffixes for JP)
+        # The tuple format is: (key_name, is_optional)
+        expected_key_orders = {
+            "address.json": [
+                ("locations", False),
+                ("street_names", False),
+                ("street_suffixes", True),  # JP doesn't have Western-style street suffixes
+                ("postcode_format", False),
+                ("address_formats", False),
+                ("country", False),
+                ("country_code", False),
+                ("phone_area_codes", False),
+            ],
+            "company.json": [
+                ("suffixes", False),
+                ("formats", False),
+                ("adjectives", False),
+                ("nouns", False),
+                ("jobs", False),
+                ("catch_phrase_adjectives", False),
+                ("catch_phrase_nouns", False),
+                ("catch_phrase_verbs", False),
+            ],
+            "internet.json": [
+                ("free_email_domains", False),
+                ("tlds", False),
+                ("domain_words", False),
+                ("user_agent_browsers", False),
+                ("user_agent_os", False),
+            ],
+            "misc.json": [
+                ("colors", False),
+                ("file_extensions", False),
+                ("mime_types", False),
+                ("currency_codes", False),
+            ],
+            "person.json": [
+                ("first_names", False),
+                ("last_names", False),
+                ("name_formats", False),
+                ("prefixes", False),
+                ("suffixes", False),
+            ],
+            "text.json": [
+                ("words", False),
+                ("sentence_patterns", False),
+                ("adjectives", False),
+                ("nouns", False),
+                ("verbs", False),
+                ("adverbs", False),
+            ],
+        }
+
+        for json_file in json_files:
+            key_specs = expected_key_orders[json_file]
+
+            for country in countries:
+                file_path = locales_dir / country / json_file
+                with open(file_path, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+
+                actual_keys = list(data.keys())
+
+                # Build expected order for this country (exclude optional keys not present)
+                expected_order = [
+                    key for key, is_optional in key_specs if not is_optional or key in actual_keys
+                ]
+
+                # Filter actual keys to only those in our expected order
+                filtered_keys = [k for k in actual_keys if k in expected_order]
+
+                # Verify the order matches
+                assert filtered_keys == expected_order, (
+                    f"{country}/{json_file}: Key order mismatch. "
+                    f"Expected {expected_order}, got {filtered_keys}"
+                )
+
     def test_address_json_schema_consistency(self):
         """Ensure address.json files have consistent schema across countries."""
         import json
         from pathlib import Path
 
         locales_dir = Path(__file__).parent.parent / "pointblank" / "locales" / "data"
-        countries = ["US", "DE", "FR", "JP"]
+        countries = ["US", "DE", "FR", "JP", "CA"]
         required_keys = {
             "locations",
             "street_names",
@@ -990,7 +1084,7 @@ class TestLocaleDataFiles:
         from pathlib import Path
 
         locales_dir = Path(__file__).parent.parent / "pointblank" / "locales" / "data"
-        countries = ["US", "DE", "FR", "JP"]
+        countries = ["US", "DE", "FR", "JP", "CA"]
         required_keys = {"first_names", "last_names", "name_formats", "prefixes", "suffixes"}
 
         for country in countries:
@@ -1038,7 +1132,7 @@ class TestLocaleDataFiles:
         from pathlib import Path
 
         locales_dir = Path(__file__).parent.parent / "pointblank" / "locales" / "data"
-        countries = ["US", "DE", "FR", "JP"]
+        countries = ["US", "DE", "FR", "JP", "CA"]
         required_keys = {
             "suffixes",
             "formats",
@@ -1069,7 +1163,7 @@ class TestLocaleDataFiles:
         from pathlib import Path
 
         locales_dir = Path(__file__).parent.parent / "pointblank" / "locales" / "data"
-        countries = ["US", "DE", "FR", "JP"]
+        countries = ["US", "DE", "FR", "JP", "CA"]
         required_keys = {
             "free_email_domains",
             "tlds",
@@ -1097,7 +1191,7 @@ class TestLocaleDataFiles:
         from pathlib import Path
 
         locales_dir = Path(__file__).parent.parent / "pointblank" / "locales" / "data"
-        countries = ["US", "DE", "FR", "JP"]
+        countries = ["US", "DE", "FR", "JP", "CA"]
         required_keys = {"colors", "file_extensions", "mime_types", "currency_codes"}
 
         for country in countries:
@@ -1119,7 +1213,7 @@ class TestLocaleDataFiles:
         from pathlib import Path
 
         locales_dir = Path(__file__).parent.parent / "pointblank" / "locales" / "data"
-        countries = ["US", "DE", "FR", "JP"]
+        countries = ["US", "DE", "FR", "JP", "CA"]
         required_keys = {"words", "adjectives", "nouns", "verbs", "adverbs"}
 
         for country in countries:
@@ -1141,7 +1235,7 @@ class TestLocaleDataFiles:
         from pathlib import Path
 
         locales_dir = Path(__file__).parent.parent / "pointblank" / "locales" / "data"
-        countries = ["US", "DE", "FR", "JP"]
+        countries = ["US", "DE", "FR", "JP", "CA"]
 
         print("\n=== Locale Data Statistics ===")
         for country in countries:
