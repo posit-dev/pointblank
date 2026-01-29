@@ -1,49 +1,51 @@
 {
   "words": [
-    "私", "あなた", "彼", "彼女", "これ", "それ", "あれ", "ここ", "そこ", "あそこ",
-    "何", "誰", "どこ", "いつ", "なぜ", "どう", "今", "昨日", "今日", "明日",
-    "年", "月", "日", "時", "分", "秒", "人", "物", "事", "所",
-    "言う", "行く", "来る", "見る", "聞く", "食べる", "飲む", "読む", "書く", "話す",
-    "思う", "知る", "分かる", "考える", "作る", "使う", "持つ", "出る", "入る", "始める",
-    "大きい", "小さい", "長い", "短い", "高い", "低い", "新しい", "古い", "良い", "悪い",
-    "速い", "遅い", "強い", "弱い", "明るい", "暗い", "熱い", "冷たい", "美しい", "醜い",
-    "家", "学校", "会社", "店", "駅", "病院", "公園", "道", "山", "川",
-    "海", "空", "木", "花", "鳥", "魚", "犬", "猫", "車", "電車",
-    "本", "紙", "水", "火", "風", "雨", "雪", "雲", "星", "月",
-    "朝", "昼", "夜", "春", "夏", "秋", "冬", "東", "西", "南", "北"
-  ],
-  "sentence_patterns": [
-    "{adjective}{noun}が{adjective}{noun}を{verb}。",
-    "{noun}が{noun}で{adverb}{verb}。",
-    "{proper_noun}は{adjective}{noun}を{adverb}{verb}。"
+    "watashi", "anata", "kare", "kanojo", "watashitachi", "karera",
+    "kore", "sore", "are", "koko", "soko", "asoko",
+    "ima", "kyou", "ashita", "kinou", "mainichi", "maitsuki",
+    "hito", "mono", "koto", "tokoro", "toki", "hou",
+    "naka", "ue", "shita", "mae", "ushiro", "soto",
+    "hai", "iie", "arigatou", "sumimasen", "onegai", "douzo"
   ],
   "adjectives": [
-    "大きい", "小さい", "長い", "短い", "高い", "低い", "新しい", "古い", "若い",
-    "明るい", "暗い", "うるさい", "静かな", "熱い", "冷たい", "暖かい", "涼しい", "柔らかい", "硬い",
-    "滑らかな", "粗い", "きれいな", "汚い", "幸せな", "悲しい", "怒った", "穏やかな", "勇敢な",
-    "恥ずかしい", "賢い", "愚かな", "親切な", "意地悪な", "金持ちの", "貧しい", "強い", "弱い",
-    "広い", "狭い", "深い", "浅い", "厚い", "薄い", "重い",
-    "軽い", "いっぱいの", "空の", "開いた", "閉じた", "濡れた", "乾いた", "新鮮な", "古い"
+    "big", "small", "new", "old", "good", "bad",
+    "fast", "slow", "hot", "cold", "high", "low",
+    "long", "short", "wide", "narrow", "deep", "shallow",
+    "bright", "dark", "heavy", "light", "hard", "soft",
+    "beautiful", "clean", "quiet", "busy", "easy", "difficult",
+    "interesting", "fun", "delicious", "important", "necessary", "convenient",
+    "kind", "strict", "famous", "popular", "expensive", "cheap"
   ],
   "nouns": [
-    "犬", "猫", "鳥", "魚", "木", "家", "車", "本", "テーブル", "椅子",
-    "ドア", "窓", "道", "川", "山", "海", "空", "太陽", "月",
-    "星", "雲", "雨", "雪", "風", "火", "水", "土", "空気",
-    "石", "木材", "金属", "ガラス", "紙", "布", "食べ物", "飲み物", "お金",
-    "時間", "場所", "人", "子供", "男", "女", "少年", "少女", "友達",
-    "家族", "学校", "仕事", "都市", "国", "世界", "人生", "日", "夜",
-    "朝", "夕方", "週", "月", "年", "物語", "歌", "ゲーム", "スポーツ"
+    "dog", "cat", "bird", "fish", "flower", "tree",
+    "mountain", "river", "sea", "sky", "sun", "moon",
+    "house", "car", "train", "airplane", "ship", "bicycle",
+    "book", "pen", "paper", "computer", "phone", "camera",
+    "food", "water", "tea", "coffee", "rice", "bread",
+    "school", "company", "hospital", "station", "airport", "hotel",
+    "family", "friend", "teacher", "student", "doctor", "customer"
   ],
   "verbs": [
-    "走る", "跳ぶ", "歩く", "話す", "見る", "聞く", "感じる", "思う", "知る",
-    "欲しい", "必要とする", "好む", "愛する", "嫌う", "見つける", "与える", "取る", "作る",
-    "言う", "伝える", "尋ねる", "答える", "助ける", "働く", "遊ぶ", "読む", "書く",
-    "描く", "歌う", "踊る", "料理する", "食べる", "飲む", "眠る", "起きる", "開ける",
-    "閉める", "始める", "終える", "止まる", "終わる", "動く", "留まる", "来る", "行く"
+    "run", "walk", "eat", "drink", "sleep", "wake",
+    "read", "write", "speak", "listen", "see", "watch",
+    "buy", "sell", "give", "receive", "make", "use",
+    "go", "come", "return", "enter", "exit", "arrive",
+    "begin", "end", "continue", "stop", "wait", "hurry",
+    "think", "believe", "know", "understand", "remember", "forget",
+    "work", "rest", "play", "study", "teach", "learn"
   ],
   "adverbs": [
-    "速く", "ゆっくり", "注意深く", "幸せに", "悲しく", "大声で", "静かに",
-    "簡単に", "ほとんど", "いつも", "決して", "しばしば", "時々", "普通に",
-    "本当に", "とても", "かなり", "ほぼ", "すでに", "まだ", "ちょうど", "だけ"
+    "quickly", "slowly", "well", "very", "really", "truly",
+    "already", "still", "soon", "finally", "always", "sometimes",
+    "together", "alone", "directly", "especially", "probably", "certainly",
+    "also", "only", "just", "even", "almost", "quite",
+    "more", "most", "less", "least", "rather", "fairly"
+  ],
+  "sentence_patterns": [
+    "{noun} wa {adjective} desu.",
+    "{noun} ga {verb}.",
+    "{adverb} {verb} shimasu.",
+    "{adjective} {noun} desu.",
+    "{noun} to {noun} ga arimasu."
   ]
 }
