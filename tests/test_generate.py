@@ -472,8 +472,8 @@ class TestGenerateDatasetFunction:
 
         schema = Schema(value="Int64", name="String")
 
-        df1 = generate_dataset(schema, n=10, seed=42)
-        df2 = generate_dataset(schema, n=10, seed=42)
+        df1 = generate_dataset(schema, n=10, seed=23)
+        df2 = generate_dataset(schema, n=10, seed=23)
 
         assert df1.equals(df2)
 
@@ -638,8 +638,8 @@ class TestCountrySupport:
         schema = Schema(name=string_field(preset="name"))
 
         # Same seed should produce same results regardless of code format
-        df_alpha2 = generate_dataset(schema, n=10, seed=42, country="US")
-        df_alpha3 = generate_dataset(schema, n=10, seed=42, country="USA")
+        df_alpha2 = generate_dataset(schema, n=10, seed=23, country="US")
+        df_alpha3 = generate_dataset(schema, n=10, seed=23, country="USA")
 
         assert df_alpha2.equals(df_alpha3)
 
@@ -651,9 +651,9 @@ class TestCountrySupport:
         schema = Schema(name=string_field(preset="name"))
 
         # Legacy locale formats should work
-        df_legacy1 = generate_dataset(schema, n=10, seed=42, country="en-US")
-        df_legacy2 = generate_dataset(schema, n=10, seed=42, country="en_US")
-        df_iso = generate_dataset(schema, n=10, seed=42, country="US")
+        df_legacy1 = generate_dataset(schema, n=10, seed=23, country="en-US")
+        df_legacy2 = generate_dataset(schema, n=10, seed=23, country="en_US")
+        df_iso = generate_dataset(schema, n=10, seed=23, country="US")
 
         # All should produce the same results
         assert df_legacy1.equals(df_iso)
@@ -792,6 +792,66 @@ class TestCountrySupport:
         )
 
         assert validation.all_passed(), "Combined schema validation failed"
+
+
+class TestGeneratorValidation:
+    """Tests that generated data passes pointblank validation."""
+
+    def test_credit_card_numbers_pass_luhn_validation(self):
+        """Ensure generated credit card numbers pass Luhn checksum validation."""
+        from pointblank.locales import LocaleGenerator
+        from pointblank._spec_utils import is_credit_card
+
+        # Test across multiple locales
+        for locale in ["en_US", "de_DE", "fr_FR", "ja_JP"]:
+            gen = LocaleGenerator(locale, seed=23)
+
+            # Generate multiple credit cards and verify all pass validation
+            for i in range(50):
+                cc = gen.credit_card_number()
+
+                # Check it passes the full credit card validation (regex + Luhn)
+                assert is_credit_card(cc), (
+                    f"Credit card '{cc}' generated for {locale} failed validation"
+                )
+
+                # Also verify length is correct for card type
+                if cc.startswith("37"):  # Amex
+                    assert len(cc) == 15, f"Amex card should be 15 digits: {cc}"
+                else:  # Visa (4), MC (5), Discover (6011)
+                    assert len(cc) == 16, f"Non-Amex card should be 16 digits: {cc}"
+
+    def test_credit_cards_with_col_vals_within_spec(self):
+        """Ensure generated credit cards pass col_vals_within_spec validation."""
+        import pointblank as pb
+
+        # Generate data with credit card column using Schema
+        schema = pb.Schema(columns=[("credit_card", "str")])
+        df = pb.generate_dataset(
+            schema,
+            n=100,
+            seed=23,
+        )
+
+        # The Schema.generate() doesn't use presets directly, so use LocaleGenerator
+        from pointblank.locales import LocaleGenerator
+
+        gen = LocaleGenerator("en_US", seed=23)
+        credit_cards = [gen.credit_card_number() for _ in range(100)]
+
+        # Create a dataframe with the generated credit cards
+        import polars as pl
+
+        df = pl.DataFrame({"credit_card": credit_cards})
+
+        # Validate using col_vals_within_spec
+        validation = (
+            pb.Validate(df)
+            .col_vals_within_spec(columns="credit_card", spec="credit_card")
+            .interrogate()
+        )
+
+        assert validation.all_passed(), "Generated credit cards failed col_vals_within_spec"
 
 
 class TestLocaleDataFiles:
