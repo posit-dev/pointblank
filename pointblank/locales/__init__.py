@@ -759,11 +759,22 @@ class LocaleGenerator:
         return "".join(digits)
 
     def _luhn_checksum(self, digits: list[str]) -> int:
-        """Calculate Luhn checksum digit."""
+        """Calculate Luhn check digit for a partial card number.
+
+        The check digit is appended to make the full number pass the Luhn algorithm.
+        We process from right to left, doubling every second digit starting from
+        the rightmost digit of the partial number (since the check digit will be
+        at position 0 and won't be doubled).
+        """
         nums = [int(d) for d in digits]
-        odd_sum = sum(nums[-1::-2])
-        even_sum = sum(sum(divmod(2 * d, 10)) for d in nums[-2::-2])
-        return (10 - (odd_sum + even_sum) % 10) % 10
+        total = 0
+        for i, d in enumerate(reversed(nums)):
+            if i % 2 == 0:  # These positions get doubled (check digit at pos 0 won't be)
+                d = d * 2
+                if d > 9:
+                    d -= 9
+            total += d
+        return (10 - (total % 10)) % 10
 
     def iban(self) -> str:
         """Generate a random IBAN."""
