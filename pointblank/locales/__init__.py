@@ -306,10 +306,15 @@ class LocaleGenerator:
     _row_persons: list[dict[str, str]] | None = None
 
     def _get_person(self, gender: str | None = None) -> dict[str, str]:
-        """Get a coherent person (first_name, last_name) from the data."""
+        """Get a coherent person (first_name, last_name, gender) from the data."""
+        # If no gender specified, randomly select one (weighted toward male/female)
+        if gender is None:
+            gender = self.rng.choice(["male", "female"])
+
         return {
             "first_name": self._generate_first_name(gender),
             "last_name": self._generate_last_name(),
+            "gender": gender,
         }
 
     def _generate_first_name(self, gender: str | None = None) -> str:
