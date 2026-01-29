@@ -954,9 +954,6 @@ class TestLocaleDataFiles:
             ],
             "misc.json": [
                 ("colors", False),
-                ("file_extensions", False),
-                ("mime_types", False),
-                ("currency_codes", False),
             ],
             "person.json": [
                 ("first_names", False),
@@ -1199,13 +1196,18 @@ class TestLocaleDataFiles:
                 assert len(data[key]) > 0, f"{country}: {key} should not be empty"
 
     def test_misc_json_schema_consistency(self):
-        """Ensure misc.json files have consistent schema across countries."""
+        """Ensure misc.json files have consistent schema across countries.
+
+        Note: file_extensions, mime_types, and currency_codes are universal and stored in
+        _shared/misc.json, so they are not required in country-specific misc.json files.
+        """
         import json
         from pathlib import Path
 
         locales_dir = Path(__file__).parent.parent / "pointblank" / "locales" / "data"
         countries = ["US", "DE", "FR", "JP", "CA"]
-        required_keys = {"colors", "file_extensions", "mime_types", "currency_codes"}
+        # Country-specific required keys (file_extensions/mime_types/currency_codes are universal)
+        required_keys = {"colors"}
 
         for country in countries:
             misc_file = locales_dir / country / "misc.json"
@@ -1219,6 +1221,18 @@ class TestLocaleDataFiles:
             for key in required_keys:
                 assert isinstance(data[key], list), f"{country}: {key} should be a list"
                 assert len(data[key]) > 0, f"{country}: {key} should not be empty"
+
+        # Also verify that shared/universal data exists
+        shared_file = locales_dir / "_shared" / "misc.json"
+        assert shared_file.exists(), "_shared/misc.json should exist with universal data"
+        with open(shared_file, "r", encoding="utf-8") as f:
+            shared_data = json.load(f)
+        assert "file_extensions" in shared_data, "_shared should have file_extensions"
+        assert "mime_types" in shared_data, "_shared should have mime_types"
+        assert "currency_codes" in shared_data, "_shared should have currency_codes"
+        assert len(shared_data["file_extensions"]) > 0, "file_extensions should not be empty"
+        assert len(shared_data["mime_types"]) > 0, "mime_types should not be empty"
+        assert len(shared_data["currency_codes"]) > 0, "currency_codes should not be empty"
 
     def test_text_json_schema_consistency(self):
         """Ensure text.json files have consistent schema across countries."""
