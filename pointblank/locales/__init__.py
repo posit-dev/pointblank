@@ -531,7 +531,22 @@ class LocaleGenerator:
         return prefix + suffix
 
     def street_name(self) -> str:
-        """Generate a random street name."""
+        """Generate a random street name.
+
+        If the locale has `streets_by_city`, use city-specific streets.
+        Otherwise, fall back to combining `street_names` and `street_suffixes`.
+        """
+        # Check if locale uses city-specific streets
+        streets_by_city = self._data.address.get("streets_by_city")
+        if streets_by_city:
+            # Get current city from location
+            location = self._get_current_location()
+            city = location.get("city", "")
+            city_streets = streets_by_city.get(city)
+            if city_streets:
+                return self.rng.choice(city_streets)
+
+        # Fall back to old street_names + street_suffixes approach
         names = self._data.address.get("street_names", ["Main"])
         suffixes = self._data.address.get("street_suffixes", ["St"])
         return f"{self.rng.choice(names)} {self.rng.choice(suffixes)}"
@@ -551,9 +566,14 @@ class LocaleGenerator:
         )
         fmt = self.rng.choice(formats)
 
+        # Generate street name once and provide both 'street' and 'street_name' keys
+        # to support format strings using either placeholder
+        street = self.street_name()
+
         result = fmt.format(
             building_number=self.building_number(),
-            street_name=self.street_name(),
+            street=street,
+            street_name=street,
             city=self.city(),
             state=self.state(abbr=True),
             postcode=self.postcode(),
