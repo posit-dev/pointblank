@@ -147,16 +147,15 @@
     "Knight", "Lambert", "Lancaster", "Lane", "Langley", "Lawrence", "Lawson", "Leach",
     "Leonard", "Lewis", "Lloyd"
   ],
-  "prefixes": {
-    "male": ["Mr.", "Dr.", "Prof.", "Rev."],
-    "female": ["Ms.", "Mrs.", "Dr.", "Prof.", "Rev."],
-    "neutral": ["Dr.", "Prof.", "Rev.", "Mx."]
-  },
-  "suffixes": ["Jr.", "Sr.", "II", "III", "IV", "PhD", "MD", "QC", "CM", "OC"],
   "name_formats": [
     "{first_name} {last_name}",
     "{prefix} {first_name} {last_name}",
     "{first_name} {last_name} {suffix}"
   ],
-  "blood_types": ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"]
+  "prefixes": {
+    "male": ["Mr.", "Dr.", "Prof.", "Rev."],
+    "female": ["Ms.", "Mrs.", "Dr.", "Prof.", "Rev."],
+    "neutral": ["Dr.", "Prof.", "Rev.", "Mx."]
+  },
+  "suffixes": ["Jr.", "Sr.", "II", "III", "IV", "PhD", "MD", "QC", "CM", "OC"]
 }
