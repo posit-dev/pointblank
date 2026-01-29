@@ -1,35 +1,30 @@
 {
   "colors": [
-    "赤", "青", "緑", "黄", "オレンジ", "紫", "ピンク", "茶",
-    "黒", "白", "灰", "シアン", "マゼンタ", "栗色", "紺", "オリーブ",
-    "ティール", "アクア", "ライム", "フクシア", "銀", "金", "サンゴ", "サーモン",
-    "ターコイズ", "インディゴ", "スミレ", "クリムゾン", "スカーレット", "バーガンディ", "ラベンダー",
-    "ベージュ", "アイボリー", "タン", "カーキ", "ピーチ", "ミント", "アズール", "ペリウィンクル"
+    "Red", "Blue", "Green", "Yellow", "Orange", "Purple", "Pink", "Brown",
+    "Black", "White", "Gray", "Gold", "Silver", "Navy", "Crimson", "Indigo",
+    "Cyan", "Magenta", "Lime", "Teal", "Maroon", "Olive", "Coral", "Salmon",
+    "Turquoise", "Violet", "Beige", "Ivory", "Khaki", "Lavender", "Pearl", "Rose"
   ],
   "file_extensions": [
-    "txt", "pdf", "doc", "docx", "xls", "xlsx", "ppt", "pptx", "csv", "json",
-    "xml", "html", "css", "js", "py", "java", "cpp", "h", "md", "rst",
-    "png", "jpg", "jpeg", "gif", "svg", "bmp", "ico", "webp", "tiff",
-    "mp3", "wav", "ogg", "flac", "aac", "wma",
-    "mp4", "avi", "mkv", "mov", "wmv", "flv", "webm",
-    "zip", "tar", "gz", "rar", "7z", "bz2"
+    ".txt", ".pdf", ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx",
+    ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".svg", ".ico", ".webp",
+    ".mp3", ".wav", ".flac", ".aac", ".ogg", ".wma", ".m4a",
+    ".mp4", ".avi", ".mkv", ".mov", ".wmv", ".flv", ".webm",
+    ".zip", ".rar", ".7z", ".tar", ".gz", ".bz2",
+    ".html", ".css", ".js", ".json", ".xml", ".yaml", ".yml",
+    ".py", ".java", ".cpp", ".c", ".h", ".cs", ".rb", ".php", ".go", ".rs",
+    ".sql", ".db", ".sqlite", ".csv", ".tsv"
   ],
   "mime_types": [
-    "text/plain", "text/html", "text/css", "text/javascript", "text/csv",
+    "text/plain", "text/html", "text/css", "text/javascript",
     "application/json", "application/xml", "application/pdf",
-    "application/zip", "application/gzip", "application/x-tar",
-    "application/msword", "application/vnd.ms-excel", "application/vnd.ms-powerpoint",
-    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-    "application/vnd.openxmlformats-officedocument.presentationml.presentation",
-    "image/png", "image/jpeg", "image/gif", "image/svg+xml", "image/webp",
+    "application/zip", "application/gzip",
+    "image/jpeg", "image/png", "image/gif", "image/svg+xml", "image/webp",
     "audio/mpeg", "audio/wav", "audio/ogg", "audio/flac",
-    "video/mp4", "video/webm", "video/x-msvideo", "video/quicktime"
+    "video/mp4", "video/webm", "video/ogg", "video/quicktime",
+    "application/octet-stream", "multipart/form-data"
   ],
-  "currency_codes": [
-    "JPY", "USD", "EUR", "GBP", "CNY", "KRW", "TWD", "HKD", "SGD", "AUD",
-    "CAD", "CHF", "THB", "MYR", "IDR", "PHP", "VND", "INR", "NZD", "RUB"
-  ],
-  "id_format": "####-####-####",
-  "license_plate_format": "?###?###"
+  "currency_codes": ["JPY"],
+  "currency_symbols": ["¥"],
+  "currency_formats": ["¥{amount}", "{amount}円"]
 }
