@@ -922,13 +922,13 @@ class TestLocaleDataFiles:
         ]
 
         # Expected key orders for each file type
-        # Keys marked as optional may not exist in all countries (e.g., street_suffixes for JP)
+        # Keys marked as optional may not exist in all countries
+        # All countries use streets_by_city for city-specific full street names
         # The tuple format is: (key_name, is_optional)
         expected_key_orders = {
             "address.json": [
                 ("locations", False),
-                ("street_names", False),
-                ("street_suffixes", True),  # JP doesn't have Western-style street suffixes
+                ("streets_by_city", False),  # All countries use city-specific full street names
                 ("postcode_format", False),
                 ("address_formats", False),
                 ("country", False),
@@ -1006,9 +1006,10 @@ class TestLocaleDataFiles:
 
         locales_dir = Path(__file__).parent.parent / "pointblank" / "locales" / "data"
         countries = ["US", "DE", "FR", "JP", "CA"]
-        required_keys = {
+
+        # Common required keys for all countries
+        common_required_keys = {
             "locations",
-            "street_names",
             "postcode_format",
             "address_formats",
             "country",
@@ -1016,13 +1017,29 @@ class TestLocaleDataFiles:
             "phone_area_codes",
         }
 
+        # All countries use streets_by_city (city-specific full street names)
+        countries = ["US", "DE", "FR", "JP", "CA"]
+
         for country in countries:
             address_file = locales_dir / country / "address.json"
             with open(address_file, "r", encoding="utf-8") as f:
                 data = json.load(f)
 
-            missing_keys = required_keys - set(data.keys())
+            missing_keys = common_required_keys - set(data.keys())
             assert not missing_keys, f"address.json for {country} is missing keys: {missing_keys}"
+
+            # Check streets_by_city structure (all countries use this)
+            assert "streets_by_city" in data, f"{country}: should have 'streets_by_city'"
+            assert isinstance(data["streets_by_city"], dict), (
+                f"{country}: streets_by_city should be a dict"
+            )
+            # Validate that each city in locations has streets
+            city_names = {loc["city"] for loc in data["locations"]}
+            streets_cities = set(data["streets_by_city"].keys())
+            assert city_names == streets_cities, (
+                f"{country}: streets_by_city cities should match location cities. "
+                f"Missing: {city_names - streets_cities}, Extra: {streets_cities - city_names}"
+            )
 
             # Validate locations structure
             assert isinstance(data["locations"], list), f"{country}: locations should be a list"
@@ -1070,10 +1087,6 @@ class TestLocaleDataFiles:
                 )
 
             # Validate other required fields
-            assert isinstance(data["street_names"], list), (
-                f"{country}: street_names should be a list"
-            )
-            assert len(data["street_names"]) > 0, f"{country}: street_names should not be empty"
             assert isinstance(data["phone_area_codes"], dict), (
                 f"{country}: phone_area_codes should be a dict"
             )
@@ -1245,7 +1258,9 @@ class TestLocaleDataFiles:
             with open(country_dir / "address.json", "r", encoding="utf-8") as f:
                 addr = json.load(f)
             locations = len(addr.get("locations", []))
-            streets = len(addr.get("street_names", []))
+            # Count streets from streets_by_city (sum of all city street lists)
+            streets_by_city = addr.get("streets_by_city", {})
+            streets = sum(len(v) for v in streets_by_city.values()) if streets_by_city else 0
             states = len(addr.get("phone_area_codes", {}))
 
             # Person stats
