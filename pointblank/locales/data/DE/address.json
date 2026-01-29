@@ -730,8 +730,8 @@
   },
   "postcode_format": "#####",
   "address_formats": [
-    "{street_name} {building_number}, {postcode} {city}",
-    "{street_name} {building_number}, Wohnung {unit}, {postcode} {city}"
+    "{street} {building_number}, {postcode} {city}",
+    "{street} {building_number}, Wohnung {unit}, {postcode} {city}"
   ],
   "country": "Deutschland",
   "country_code": "DE",
