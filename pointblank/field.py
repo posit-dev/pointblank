@@ -35,6 +35,7 @@ AVAILABLE_PRESETS = frozenset(
     {
         # Personal
         "name",
+        "name_full",
         "first_name",
         "last_name",
         "email",

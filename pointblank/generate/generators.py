@@ -100,6 +100,7 @@ def _generate_from_preset(preset: str, generator: LocaleGenerator) -> str:
     preset_mapping = {
         # Personal
         "name": generator.name,
+        "name_full": generator.name_full,
         "first_name": generator.first_name,
         "last_name": generator.last_name,
         "email": generator.email,
@@ -367,7 +368,7 @@ def generate_column(
 
 # Presets that should share coherent context across columns
 ADDRESS_RELATED_PRESETS = {"city", "state", "postcode", "phone_number", "latitude", "longitude"}
-PERSON_RELATED_PRESETS = {"name", "first_name", "last_name", "email", "user_name"}
+PERSON_RELATED_PRESETS = {"name", "name_full", "first_name", "last_name", "email", "user_name"}
 
 
 def _get_coherence_needs(fields: dict[str, Field]) -> tuple[bool, bool]:
