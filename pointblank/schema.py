@@ -892,7 +892,7 @@ class Schema:
             name=pb.string_field(preset="name"),
             city=pb.string_field(preset="city"),
         )
-        german_data = schema.generate(n=20, seed=42, country="DE")
+        german_data = schema.generate(n=20, seed=23, country="DE")
         ```
         """
         from pointblank.field import Field
