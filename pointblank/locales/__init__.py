@@ -403,33 +403,96 @@ class LocaleGenerator:
         return person.get("last_name", "Smith")
 
     def name(self, gender: str | None = None) -> str:
-        """Generate a full name (first + last, coherent with current person context)."""
-        formats = self._data.person.get("name_formats", ["{first_name} {last_name}"])
-        fmt = self.rng.choice(formats)
+        """Generate a simple full name (first + last, coherent with current person context).
 
+        For names with prefixes (Mr., Ms., Dr., etc.) and occasional suffixes (Jr., III),
+        use name_full() instead.
+        """
         person = self._get_current_person()
+        first = person.get("first_name", "Alex")
+        last = person.get("last_name", "Smith")
+
+        # Check if locale uses "last first" order (e.g., Japanese)
+        formats = self._data.person.get("name_formats", ["{first_name} {last_name}"])
+        # Use the simplest format (usually first one, which is typically "first last" or "last first")
+        if formats and "{last_name} {first_name}" in formats[0]:
+            return f"{last} {first}"
+        return f"{first} {last}"
+
+    def name_full(self, gender: str | None = None) -> str:
+        """Generate a full name with optional prefix and rare suffix.
+
+        Includes honorific prefixes with realistic frequencies:
+        - Common honorifics (Mr., Ms., Mrs., etc.): ~95% of names
+        - Professional titles (Dr., Prof., Rev., etc.): ~5% of names
+
+        Suffixes (Jr., II, III) appear very rarely (~1 in 2000).
+        """
+        person = self._get_current_person()
+        first = person.get("first_name", "Alex")
+        last = person.get("last_name", "Smith")
 
         # Get gender for prefix selection (from person context or parameter)
         person_gender = person.get("gender", "neutral")
         if gender:
             person_gender = gender
 
-        # Get prefix based on gender
+        # Professional titles are rare (~2-3% of population for Dr., ~0.5% for Prof.)
+        # These should appear infrequently
+        professional_titles = {
+            "Dr.",
+            "Prof.",
+            "Professor",
+            "Rev.",
+            "Pr.",
+            "Prof. Dr.",
+            "Rabbi",
+            "Father",
+            "Sister",
+            "Pastor",
+            "Elder",
+        }
+
+        # Get prefix based on gender from locale data
         prefixes = self._data.person.get("prefixes", {})
-        prefix_list = prefixes.get(person_gender, prefixes.get("neutral", [""]))
-        prefix = self.rng.choice(prefix_list) if prefix_list else ""
+        prefix_list = prefixes.get(person_gender, prefixes.get("neutral", []))
 
-        # Get suffix
-        suffixes = self._data.person.get("suffixes", [""])
-        suffix = self.rng.choice(suffixes) if suffixes else ""
+        # Separate common honorifics and professional titles from locale data
+        locale_common = [p for p in prefix_list if p not in professional_titles]
+        locale_professional = [p for p in prefix_list if p in professional_titles]
 
-        return fmt.format(
-            first_name=person.get("first_name", "Alex"),
-            last_name=person.get("last_name", "Smith"),
-            middle_initial=self.rng.choice("ABCDEFGHIJKLMNOPQRSTUVWXYZ"),
-            prefix=prefix,
-            suffix=suffix,
-        )
+        # Select prefix with realistic probabilities
+        # ~95% common honorific, ~5% professional title
+        if locale_professional and self.rng.random() < 0.05:
+            prefix = self.rng.choice(locale_professional)
+        elif locale_common:
+            prefix = self.rng.choice(locale_common)
+        else:
+            # Fallback defaults if no common prefixes in locale
+            fallback = {"male": "Mr.", "female": "Ms.", "neutral": "Mr."}
+            prefix = fallback.get(person_gender, "")
+
+        # Get suffix - very rare (approximately 1/2000 chance)
+        suffix = ""
+        if self.rng.random() < 0.0005:  # 1 in 2000
+            suffixes = self._data.person.get("suffixes", [])
+            # Filter out empty strings
+            suffixes = [s for s in suffixes if s]
+            if suffixes:
+                suffix = self.rng.choice(suffixes)
+
+        # Check if locale uses "last first" order (e.g., Japanese)
+        formats = self._data.person.get("name_formats", ["{first_name} {last_name}"])
+        if formats and "{last_name} {first_name}" in formats[0]:
+            # For "last first" cultures, prefix typically comes before everything
+            parts = [prefix, last, first] if prefix else [last, first]
+        else:
+            parts = [prefix, first, last] if prefix else [first, last]
+
+        if suffix:
+            parts.append(suffix)
+
+        return " ".join(parts)
 
     # =========================================================================
     # Address
