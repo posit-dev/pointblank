@@ -76,6 +76,9 @@ COUNTRY_CODE_MAP: dict[str, str] = {
     # Netherlands
     "NL": "NL",
     "NLD": "NL",
+    # Belgium
+    "BE": "BE",
+    "BEL": "BE",
     # Poland
     "PL": "PL",
     "POL": "PL",
@@ -101,6 +104,7 @@ COUNTRY_CODE_MAP: dict[str, str] = {
 # internet, misc, person, and text JSON files in the data directory
 COUNTRIES_WITH_FULL_DATA: list[str] = [
     "US",  # United States
+    "BE",  # Belgium
     "CA",  # Canada
     "CH",  # Switzerland
     "DE",  # Germany
@@ -126,6 +130,8 @@ COUNTRY_FALLBACKS: dict[str, list[str]] = {
     "CH": ["CH", "DE", "US"],
     # French-speaking
     "FR": ["FR", "US"],
+    # Belgian (Dutch/French bilingual)
+    "BE": ["BE", "NL", "FR", "US"],
     # Spanish-speaking
     "ES": ["ES", "US"],
     "MX": ["MX", "ES", "US"],
@@ -752,7 +758,20 @@ class LocaleGenerator:
         self._current_location = None
 
     def city(self) -> str:
-        """Generate a random city name (coherent with current location context)."""
+        """Generate a random city name (coherent with current location context).
+
+        Returns the exonym (English name) if available, otherwise the native city name.
+        This allows addresses to use native names while city presets use international names.
+        """
+        location = self._get_current_location()
+        # Prefer exonym (English name) for standalone city preset
+        return location.get("exonym", location.get("city", "Springfield"))
+
+    def _city_native(self) -> str:
+        """Get the native city name (used internally for addresses).
+
+        Always returns the native name, ignoring any exonym.
+        """
         location = self._get_current_location()
         return location.get("city", "Springfield")
 
@@ -846,7 +865,7 @@ class LocaleGenerator:
         result = fmt.format(
             building_number=self.building_number(),
             street=self.street_name(),
-            city=self.city(),
+            city=self._city_native(),  # Use native name in addresses
             state=self.state(abbr=True),
             postcode=self.postcode(),
             country=self.country(),
