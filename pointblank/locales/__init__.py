@@ -17,7 +17,13 @@ from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     pass
 
-__all__ = ["LocaleRegistry", "LocaleGenerator", "get_generator"]
+__all__ = [
+    "LocaleRegistry",
+    "LocaleGenerator",
+    "get_generator",
+    "COUNTRY_CODE_MAP",
+    "COUNTRIES_WITH_FULL_DATA",
+]
 
 
 # ISO 3166-1 country code mappings
@@ -85,6 +91,18 @@ COUNTRY_CODE_MAP: dict[str, str] = {
     "TW": "TW",
     "TWN": "TW",
 }
+
+# Countries that have complete locale data files
+# These are the ISO alpha-2 codes for countries with full address, company,
+# internet, misc, person, and text JSON files in the data directory
+COUNTRIES_WITH_FULL_DATA: list[str] = [
+    "US",  # United States
+    "CA",  # Canada
+    "DE",  # Germany
+    "FR",  # France
+    "GB",  # United Kingdom
+    "JP",  # Japan
+]
 
 # Fallback chains for countries (when a country's data is incomplete)
 COUNTRY_FALLBACKS: dict[str, list[str]] = {
