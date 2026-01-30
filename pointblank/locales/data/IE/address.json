@@ -606,8 +606,10 @@
   "postcode_format": "?## ?#?#",
   "address_formats": [
     "{building_number} {street}, {city}, Co. {state}",
-    "{street}, {city}, {postcode}",
-    "{building_number} {street}, {city}, {state}, {postcode}"
+    "{building_number} {street}, {city}, {postcode}",
+    "{building_number} {street}, {city}, {state}, {postcode}",
+    "Apt {unit}, {building_number} {street}, {city}, {postcode}",
+    "Unit {unit}, {building_number} {street}, {city}, {postcode}"
   ],
   "country": "Ireland",
   "country_code": "IE",
