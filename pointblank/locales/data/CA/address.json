@@ -723,9 +723,9 @@
   },
   "postcode_format": "?#? #?#",
   "address_formats": [
-    "{building_number} {street}",
-    "{building_number} {street}, Unit {unit}",
-    "{building_number} {street}, Apt {unit}"
+    "{building_number} {street}, {city}, {state} {postcode}",
+    "{building_number} {street}, Unit {unit}, {city}, {state} {postcode}",
+    "{building_number} {street}, Apt {unit}, {city}, {state} {postcode}"
   ],
   "country": "Canada",
   "country_code": "CA",
