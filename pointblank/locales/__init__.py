@@ -37,6 +37,9 @@ COUNTRY_CODE_MAP: dict[str, str] = {
     "GB": "GB",
     "GBR": "GB",
     "UK": "GB",  # Common alias
+    # Ireland
+    "IE": "IE",
+    "IRL": "IE",
     # Australia
     "AU": "AU",
     "AUS": "AU",
@@ -104,6 +107,7 @@ COUNTRIES_WITH_FULL_DATA: list[str] = [
     "ES",  # Spain
     "FR",  # France
     "GB",  # United Kingdom
+    "IE",  # Ireland
     "IT",  # Italy
     "JP",  # Japan
     "NL",  # Netherlands
@@ -113,6 +117,7 @@ COUNTRIES_WITH_FULL_DATA: list[str] = [
 COUNTRY_FALLBACKS: dict[str, list[str]] = {
     # English-speaking countries fall back to US
     "GB": ["GB", "US"],
+    "IE": ["IE", "GB", "US"],
     "AU": ["AU", "GB", "US"],
     "CA": ["CA", "US"],
     # German-speaking countries
