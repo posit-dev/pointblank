@@ -977,10 +977,20 @@ class TestCountrySupport:
         Test that address, city, and state columns are coherent (match) when
         generated together. The city embedded in the address should match the
         city column, and similarly for state.
+
+        Note: Some cities have exonyms (e.g., "Brussels" for "Bruxelles"). In these
+        cases, the city column shows the English exonym while the address uses the
+        native name. This is intentional for international usability.
         """
         pytest.importorskip("polars")
 
         from pointblank import Schema, generate_dataset, string_field
+
+        # Known exonym mappings: exonym -> native name
+        # Cities where the city() preset returns English name but address uses native
+        EXONYM_TO_NATIVE = {
+            "Brussels": "Bruxelles",
+        }
 
         schema = Schema(
             columns=[
@@ -1000,8 +1010,11 @@ class TestCountrySupport:
 
                 # The city should appear somewhere in the address
                 # (addresses contain the city name in the format string)
-                assert city in address, (
-                    f"[{country}] Row {i}: City '{city}' not found in address '{address}'"
+                # For cities with exonyms, check the native name instead
+                native_name = EXONYM_TO_NATIVE.get(city, city)
+                assert native_name in address, (
+                    f"[{country}] Row {i}: City '{native_name}' (exonym: '{city}') "
+                    f"not found in address '{address}'"
                 )
 
     def test_address_city_coherence_with_abbreviations(self):
