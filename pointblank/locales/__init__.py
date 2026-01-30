@@ -108,6 +108,7 @@ COUNTRIES_WITH_FULL_DATA: list[str] = [
     "CA",  # Canada
     "CH",  # Switzerland
     "DE",  # Germany
+    "DK",  # Denmark
     "ES",  # Spain
     "FR",  # France
     "GB",  # United Kingdom
@@ -132,6 +133,11 @@ COUNTRY_FALLBACKS: dict[str, list[str]] = {
     "FR": ["FR", "US"],
     # Belgian (Dutch/French bilingual)
     "BE": ["BE", "NL", "FR", "US"],
+    # Scandinavian
+    "DK": ["DK", "DE", "US"],
+    "NO": ["NO", "DK", "DE", "US"],
+    "SE": ["SE", "DK", "DE", "US"],
+    "FI": ["FI", "SE", "US"],
     # Spanish-speaking
     "ES": ["ES", "US"],
     "MX": ["MX", "ES", "US"],
@@ -866,7 +872,8 @@ class LocaleGenerator:
             building_number=self.building_number(),
             street=self.street_name(),
             city=self._city_native(),  # Use native name in addresses
-            state=self.state(abbr=True),
+            state=self.state(abbr=False),
+            state_abbr=self.state(abbr=True),
             postcode=self.postcode(),
             country=self.country(),
             unit=str(self.rng.randint(1, 999)),
