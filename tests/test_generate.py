@@ -795,6 +795,183 @@ class TestCountrySupport:
 
         assert validation.all_passed(), "Combined schema validation failed"
 
+    def test_comprehensive_schema_all_countries_with_full_data(self):
+        """
+        Comprehensive test that exercises ALL field types and presets across ALL countries
+        with full data. This catches regressions early and ensures locale data is complete.
+        """
+        pytest.importorskip("polars")
+        from datetime import date, datetime, time
+
+        from pointblank import (
+            Schema,
+            generate_dataset,
+            int_field,
+            float_field,
+            string_field,
+            bool_field,
+            date_field,
+            datetime_field,
+            time_field,
+        )
+
+        # Create a comprehensive schema with many field types
+        schema = Schema(
+            columns=[
+                # =====================================================================
+                # Personal Information (using presets)
+                # =====================================================================
+                ("name", string_field(preset="name")),
+                ("full_name", string_field(preset="name_full")),
+                ("first_name", string_field(preset="first_name")),
+                ("last_name", string_field(preset="last_name")),
+                ("email", string_field(preset="email")),
+                ("phone", string_field(preset="phone_number")),
+                ("username", string_field(preset="user_name")),
+                # =====================================================================
+                # Address Information (using presets)
+                # =====================================================================
+                ("address", string_field(preset="address")),
+                ("city", string_field(preset="city")),
+                ("state", string_field(preset="state")),
+                ("postcode", string_field(preset="postcode")),
+                ("country", string_field(preset="country")),
+                ("latitude", string_field(preset="latitude")),
+                ("longitude", string_field(preset="longitude")),
+                # =====================================================================
+                # Business Information (using presets)
+                # =====================================================================
+                ("company", string_field(preset="company")),
+                ("job_title", string_field(preset="job")),
+                ("catch_phrase", string_field(preset="catch_phrase")),
+                # =====================================================================
+                # Internet & Technical (using presets)
+                # =====================================================================
+                ("website", string_field(preset="url")),
+                ("domain", string_field(preset="domain_name")),
+                ("ipv4_address", string_field(preset="ipv4")),
+                ("ipv6_address", string_field(preset="ipv6")),
+                ("password", string_field(preset="password")),
+                # =====================================================================
+                # Financial (using presets)
+                # =====================================================================
+                ("credit_card", string_field(preset="credit_card_number")),
+                ("iban", string_field(preset="iban")),
+                ("currency", string_field(preset="currency_code")),
+                # =====================================================================
+                # Identifiers (using presets)
+                # =====================================================================
+                ("uuid", string_field(preset="uuid4")),
+                ("ssn", string_field(preset="ssn")),
+                ("license_plate", string_field(preset="license_plate")),
+                # =====================================================================
+                # Text Content (using presets)
+                # =====================================================================
+                ("word", string_field(preset="word")),
+                ("sentence", string_field(preset="sentence")),
+                ("paragraph", string_field(preset="paragraph")),
+                # =====================================================================
+                # Miscellaneous (using presets)
+                # =====================================================================
+                ("color", string_field(preset="color_name")),
+                ("file_name", string_field(preset="file_name")),
+                ("file_ext", string_field(preset="file_extension")),
+                ("mime_type", string_field(preset="mime_type")),
+                # =====================================================================
+                # Integer Fields (with constraints)
+                # =====================================================================
+                ("id", int_field(unique=True)),
+                ("age", int_field(min_val=18, max_val=80)),
+                ("rating", int_field(allowed=[1, 2, 3, 4, 5])),
+                ("quantity", int_field(min_val=0, max_val=1000)),
+                (
+                    "priority",
+                    int_field(allowed=[1, 2, 3], nullable=True, null_probability=0.1),
+                ),
+                # =====================================================================
+                # Float Fields (with constraints)
+                # =====================================================================
+                ("price", float_field(min_val=0.01, max_val=9999.99)),
+                ("discount_pct", float_field(min_val=0.0, max_val=0.5)),
+                ("temperature", float_field(min_val=-40.0, max_val=50.0)),
+                (
+                    "score",
+                    float_field(min_val=0.0, max_val=100.0, nullable=True, null_probability=0.05),
+                ),
+                # =====================================================================
+                # String Fields (with constraints)
+                # =====================================================================
+                ("product_code", string_field(pattern=r"[A-Z]{3}-\d{4}")),
+                (
+                    "status",
+                    string_field(allowed=["pending", "active", "completed", "cancelled"]),
+                ),
+                ("description", string_field(min_length=10, max_length=100)),
+                (
+                    "category",
+                    string_field(allowed=["Electronics", "Clothing", "Food", "Books", "Other"]),
+                ),
+                # =====================================================================
+                # Boolean Fields
+                # =====================================================================
+                ("is_active", bool_field()),
+                ("is_verified", bool_field()),
+                ("has_subscription", bool_field(nullable=True, null_probability=0.1)),
+                # =====================================================================
+                # Date Fields
+                # =====================================================================
+                (
+                    "birth_date",
+                    date_field(min_date=date(1940, 1, 1), max_date=date(2005, 12, 31)),
+                ),
+                (
+                    "order_date",
+                    date_field(min_date=date(2024, 1, 1), max_date=date(2024, 12, 31)),
+                ),
+                # =====================================================================
+                # Datetime Fields
+                # =====================================================================
+                (
+                    "created_at",
+                    datetime_field(
+                        min_date=datetime(2024, 1, 1, 0, 0, 0),
+                        max_date=datetime(2024, 12, 31, 23, 59, 59),
+                    ),
+                ),
+                (
+                    "updated_at",
+                    datetime_field(
+                        min_date=datetime(2024, 6, 1, 0, 0, 0),
+                        max_date=datetime(2024, 12, 31, 23, 59, 59),
+                        nullable=True,
+                        null_probability=0.2,
+                    ),
+                ),
+                # =====================================================================
+                # Time Fields
+                # =====================================================================
+                ("start_time", time_field(min_time=time(8, 0, 0), max_time=time(18, 0, 0))),
+                ("end_time", time_field(min_time=time(9, 0, 0), max_time=time(22, 0, 0))),
+            ]
+        )
+
+        # Test all countries with full data
+        for country in COUNTRIES_WITH_FULL_DATA:
+            df = generate_dataset(schema, n=10, seed=23, country=country)
+
+            # Verify basic structure
+            assert df.shape[0] == 10
+            assert df.shape[1] == 57
+
+            # Verify no unexpected errors occurred (all values generated successfully)
+            # Check a few key columns are not empty strings
+            for col in ["name", "email", "city", "company", "address"]:
+                values = df[col].to_list()
+
+                assert all(v is not None and len(str(v)) > 0 for v in values), (
+                    f"Column {col} has empty values for {country}"
+                )
+
 
 class TestGeneratorValidation:
     """Tests that generated data passes pointblank validation."""
