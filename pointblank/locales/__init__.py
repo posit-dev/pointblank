@@ -803,8 +803,11 @@ class LocaleGenerator:
 
     def address(self) -> str:
         """Generate a full coherent address (city, state, postcode are consistent)."""
-        # Select a new location for this address
-        self.new_location()
+        # Only select a new location if row locations are not active
+        # This ensures coherence with other address-related columns (city, state, etc.)
+        using_row_context = self._row_locations is not None and self._current_row is not None
+        if not using_row_context:
+            self.new_location()
 
         formats = self._data.address.get(
             "address_formats",
@@ -822,8 +825,9 @@ class LocaleGenerator:
             unit=str(self.rng.randint(1, 999)),
         )
 
-        # Clear location after generating full address
-        self.clear_location()
+        # Clear location after generating full address (only if we set it)
+        if not using_row_context:
+            self.clear_location()
         return result
 
     def phone_number(self) -> str:
