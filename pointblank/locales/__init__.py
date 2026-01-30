@@ -106,6 +106,7 @@ COUNTRIES_WITH_FULL_DATA: list[str] = [
     "GB",  # United Kingdom
     "IT",  # Italy
     "JP",  # Japan
+    "NL",  # Netherlands
 ]
 
 # Fallback chains for countries (when a country's data is incomplete)
