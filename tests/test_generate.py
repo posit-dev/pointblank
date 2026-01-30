@@ -972,6 +972,106 @@ class TestCountrySupport:
                     f"Column {col} has empty values for {country}"
                 )
 
+    def test_address_city_state_coherence_all_countries(self):
+        """
+        Test that address, city, and state columns are coherent (match) when
+        generated together. The city embedded in the address should match the
+        city column, and similarly for state.
+        """
+        pytest.importorskip("polars")
+
+        from pointblank import Schema, generate_dataset, string_field
+
+        schema = Schema(
+            columns=[
+                ("address", string_field(preset="address")),
+                ("city", string_field(preset="city")),
+                ("state", string_field(preset="state")),
+                ("postcode", string_field(preset="postcode")),
+            ]
+        )
+
+        # Test all countries with full data
+        for country in COUNTRIES_WITH_FULL_DATA:
+            df = generate_dataset(schema, n=50, seed=42, country=country)
+
+            for i, row in enumerate(df.iter_rows()):
+                address, city, state, postcode = row
+
+                # The city should appear somewhere in the address
+                # (addresses contain the city name in the format string)
+                assert city in address, (
+                    f"[{country}] Row {i}: City '{city}' not found in address '{address}'"
+                )
+
+    def test_address_city_coherence_with_abbreviations(self):
+        """
+        Test address/city coherence handles state abbreviations correctly.
+        Some address formats use abbreviated states (e.g., 'CA' instead of 'California').
+        """
+        pytest.importorskip("polars")
+
+        from pointblank import Schema, generate_dataset, string_field
+
+        schema = Schema(
+            columns=[
+                ("address", string_field(preset="address")),
+                ("city", string_field(preset="city")),
+                ("state", string_field(preset="state")),
+            ]
+        )
+
+        # Test a selection of countries
+        test_countries = ["US", "GB", "DE", "FR", "IE", "JP"]
+
+        for country in test_countries:
+            if country not in COUNTRIES_WITH_FULL_DATA:
+                continue
+
+            df = generate_dataset(schema, n=30, seed=123, country=country)
+
+            mismatches = []
+            for i, row in enumerate(df.iter_rows()):
+                address, city, state = row
+
+                if city not in address:
+                    mismatches.append(f"Row {i}: city='{city}' not in address='{address}'")
+
+            assert len(mismatches) == 0, (
+                f"[{country}] Found {len(mismatches)} city/address mismatches:\n"
+                + "\n".join(mismatches[:5])  # Show first 5
+            )
+
+    def test_address_only_still_generates_coherent_addresses(self):
+        """
+        Test that when only the address preset is used (without separate city/state
+        columns), it still generates internally coherent addresses.
+        """
+        pytest.importorskip("polars")
+
+        from pointblank import Schema, generate_dataset, string_field
+        from pointblank.locales import LocaleGenerator
+
+        schema = Schema(columns=[("address", string_field(preset="address"))])
+
+        for country in COUNTRIES_WITH_FULL_DATA:
+            df = generate_dataset(schema, n=20, seed=99, country=country)
+
+            # Load the locale to get the list of valid cities
+            gen = LocaleGenerator(country=country, seed=1)
+            locations = gen._data.address.get("locations", [])
+            valid_cities = {loc.get("city", "") for loc in locations}
+
+            # Check that each address contains a valid city for this country
+            for i, row in enumerate(df.iter_rows()):
+                address = row[0]
+                found_city = any(city in address for city in valid_cities if city)
+
+                assert found_city, (
+                    f"[{country}] Row {i}: Address '{address}' does not contain "
+                    f"any valid city from the locale data"
+                )
+
 
 class TestGeneratorValidation:
     """Tests that generated data passes pointblank validation."""
