@@ -1,6 +1,7 @@
 import pytest
 from datetime import date, datetime
 
+from pointblank.locales import COUNTRIES_WITH_FULL_DATA
 from pointblank.field import (
     int_field,
     float_field,
@@ -864,7 +865,7 @@ class TestLocaleDataFiles:
         from pathlib import Path
 
         locales_dir = Path(__file__).parent.parent / "pointblank" / "locales" / "data"
-        countries = ["US", "DE", "FR", "JP", "CA"]
+        countries = COUNTRIES_WITH_FULL_DATA
         required_files = {
             "address.json",
             "company.json",
@@ -893,7 +894,7 @@ class TestLocaleDataFiles:
         from pathlib import Path
 
         locales_dir = Path(__file__).parent.parent / "pointblank" / "locales" / "data"
-        countries = ["US", "DE", "FR", "JP", "CA"]
+        countries = COUNTRIES_WITH_FULL_DATA
 
         for country in countries:
             country_dir = locales_dir / country
@@ -911,7 +912,7 @@ class TestLocaleDataFiles:
         from pathlib import Path
 
         locales_dir = Path(__file__).parent.parent / "pointblank" / "locales" / "data"
-        countries = ["US", "DE", "FR", "JP", "CA"]
+        countries = COUNTRIES_WITH_FULL_DATA
         json_files = [
             "address.json",
             "company.json",
@@ -1003,7 +1004,7 @@ class TestLocaleDataFiles:
         from pathlib import Path
 
         locales_dir = Path(__file__).parent.parent / "pointblank" / "locales" / "data"
-        countries = ["US", "DE", "FR", "JP", "CA"]
+        countries = COUNTRIES_WITH_FULL_DATA
 
         # Common required keys for all countries
         common_required_keys = {
@@ -1016,7 +1017,7 @@ class TestLocaleDataFiles:
         }
 
         # All countries use streets_by_city (city-specific full street names)
-        countries = ["US", "DE", "FR", "JP", "CA"]
+        countries = COUNTRIES_WITH_FULL_DATA
 
         for country in countries:
             address_file = locales_dir / country / "address.json"
@@ -1134,7 +1135,7 @@ class TestLocaleDataFiles:
         from pathlib import Path
 
         locales_dir = Path(__file__).parent.parent / "pointblank" / "locales" / "data"
-        countries = ["US", "DE", "FR", "JP", "CA"]
+        countries = COUNTRIES_WITH_FULL_DATA
         required_keys = {"first_names", "last_names", "name_formats", "prefixes", "suffixes"}
 
         for country in countries:
@@ -1210,7 +1211,7 @@ class TestLocaleDataFiles:
         from pathlib import Path
 
         locales_dir = Path(__file__).parent.parent / "pointblank" / "locales" / "data"
-        countries = ["US", "DE", "FR", "JP", "CA"]
+        countries = COUNTRIES_WITH_FULL_DATA
         required_keys = {
             "suffixes",
             "formats",
@@ -1289,7 +1290,7 @@ class TestLocaleDataFiles:
         from pathlib import Path
 
         locales_dir = Path(__file__).parent.parent / "pointblank" / "locales" / "data"
-        countries = ["US", "DE", "FR", "JP", "CA"]
+        countries = COUNTRIES_WITH_FULL_DATA
         required_keys = {
             "free_email_domains",
             "tlds",
@@ -1336,7 +1337,7 @@ class TestLocaleDataFiles:
         from pathlib import Path
 
         locales_dir = Path(__file__).parent.parent / "pointblank" / "locales" / "data"
-        countries = ["US", "DE", "FR", "JP", "CA"]
+        countries = COUNTRIES_WITH_FULL_DATA
         # Country-specific required keys (file_extensions/mime_types/currency_codes are universal)
         required_keys = {"colors"}
 
@@ -1392,7 +1393,7 @@ class TestLocaleDataFiles:
         from pathlib import Path
 
         locales_dir = Path(__file__).parent.parent / "pointblank" / "locales" / "data"
-        countries = ["US", "DE", "FR", "JP", "CA"]
+        countries = COUNTRIES_WITH_FULL_DATA
         required_keys = {"words", "adjectives", "nouns", "verbs", "adverbs"}
 
         for country in countries:
@@ -1418,7 +1419,7 @@ class TestLocaleDataFiles:
         from pathlib import Path
 
         locales_dir = Path(__file__).parent.parent / "pointblank" / "locales" / "data"
-        countries = ["US", "DE", "FR", "JP", "CA"]
+        countries = COUNTRIES_WITH_FULL_DATA
 
         for country in countries:
             # Load address data to get valid cities
@@ -1450,7 +1451,7 @@ class TestLocaleDataFiles:
         from pathlib import Path
 
         locales_dir = Path(__file__).parent.parent / "pointblank" / "locales" / "data"
-        countries = ["US", "DE", "FR", "JP", "CA"]
+        countries = COUNTRIES_WITH_FULL_DATA
 
         for country in countries:
             # Check person.json for duplicate names
@@ -1493,7 +1494,7 @@ class TestLocaleDataFiles:
         from pathlib import Path
 
         locales_dir = Path(__file__).parent.parent / "pointblank" / "locales" / "data"
-        countries = ["US", "DE", "FR", "JP", "CA"]
+        countries = COUNTRIES_WITH_FULL_DATA
 
         print("\n=== Locale Data Statistics ===")
         for country in countries:
