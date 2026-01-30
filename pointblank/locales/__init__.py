@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import json
 import random
+import unicodedata
 from dataclasses import dataclass, field
 from importlib.resources import files
 from typing import TYPE_CHECKING, Any
@@ -98,6 +99,7 @@ COUNTRY_CODE_MAP: dict[str, str] = {
 COUNTRIES_WITH_FULL_DATA: list[str] = [
     "US",  # United States
     "CA",  # Canada
+    "CH",  # Switzerland
     "DE",  # Germany
     "ES",  # Spain
     "FR",  # France
@@ -148,6 +150,151 @@ class LocaleData:
     internet: dict[str, Any] = field(default_factory=dict)
     text: dict[str, Any] = field(default_factory=dict)
     misc: dict[str, Any] = field(default_factory=dict)
+
+
+# Transliteration map for special characters (umlauts add 'e', others simplified)
+_TRANSLITERATION_MAP: dict[str, str] = {
+    # German umlauts -> add 'e'
+    "ä": "ae",
+    "ö": "oe",
+    "ü": "ue",
+    "Ä": "Ae",
+    "Ö": "Oe",
+    "Ü": "Ue",
+    "ß": "ss",
+    # Scandinavian
+    "å": "aa",
+    "Å": "Aa",
+    "ø": "oe",
+    "Ø": "Oe",
+    "æ": "ae",
+    "Æ": "Ae",
+    # French/Spanish/Portuguese/Italian accents
+    "à": "a",
+    "á": "a",
+    "â": "a",
+    "ã": "a",
+    "À": "A",
+    "Á": "A",
+    "Â": "A",
+    "Ã": "A",
+    "è": "e",
+    "é": "e",
+    "ê": "e",
+    "ë": "e",
+    "È": "E",
+    "É": "E",
+    "Ê": "E",
+    "Ë": "E",
+    "ì": "i",
+    "í": "i",
+    "î": "i",
+    "ï": "i",
+    "Ì": "I",
+    "Í": "I",
+    "Î": "I",
+    "Ï": "I",
+    "ò": "o",
+    "ó": "o",
+    "ô": "o",
+    "õ": "o",
+    "Ò": "O",
+    "Ó": "O",
+    "Ô": "O",
+    "Õ": "O",
+    "ù": "u",
+    "ú": "u",
+    "û": "u",
+    "Ù": "U",
+    "Ú": "U",
+    "Û": "U",
+    "ñ": "n",
+    "Ñ": "N",
+    "ç": "c",
+    "Ç": "C",
+    "ý": "y",
+    "ÿ": "y",
+    "Ý": "Y",
+    # Eastern European
+    "ł": "l",
+    "Ł": "L",
+    "ń": "n",
+    "Ń": "N",
+    "ś": "s",
+    "Ś": "S",
+    "ź": "z",
+    "Ź": "Z",
+    "ż": "z",
+    "Ż": "Z",
+    "ć": "c",
+    "Ć": "C",
+    "ě": "e",
+    "Ě": "E",
+    "š": "s",
+    "Š": "S",
+    "č": "c",
+    "Č": "C",
+    "ř": "r",
+    "Ř": "R",
+    "ž": "z",
+    "Ž": "Z",
+    "ů": "u",
+    "Ů": "U",
+    "ď": "d",
+    "Ď": "D",
+    "ť": "t",
+    "Ť": "T",
+    "ň": "n",
+    "Ň": "N",
+    # Other
+    "đ": "d",
+    "Đ": "D",
+    "ğ": "g",
+    "Ğ": "G",
+    "ı": "i",
+    "İ": "I",
+    "ş": "s",
+    "Ş": "S",
+    "ț": "t",
+    "Ț": "T",
+    "ă": "a",
+    "Ă": "A",
+}
+
+
+def _transliterate_to_ascii(text: str) -> str:
+    """
+    Transliterate text to ASCII-safe characters for email addresses and usernames.
+
+    Handles German umlauts specially (ü -> ue, ö -> oe, ä -> ae) and converts
+    other accented characters to their base ASCII equivalents.
+
+    Parameters
+    ----------
+    text
+        The text to transliterate.
+
+    Returns
+    -------
+    str
+        ASCII-safe version of the text.
+    """
+    # First apply our custom transliteration map
+    result = []
+    for char in text:
+        if char in _TRANSLITERATION_MAP:
+            result.append(_TRANSLITERATION_MAP[char])
+        else:
+            result.append(char)
+    text = "".join(result)
+
+    # Then use unicodedata to handle any remaining non-ASCII characters
+    # NFD decomposes characters (e.g., é -> e + combining accent)
+    # We then filter to keep only ASCII characters
+    normalized = unicodedata.normalize("NFD", text)
+    ascii_text = "".join(c for c in normalized if unicodedata.category(c) != "Mn")
+
+    return ascii_text
 
 
 def _normalize_country(country: str) -> str:
@@ -808,6 +955,10 @@ class LocaleGenerator:
         last = person.get("last_name", "name").lower()
         domains = self._data.internet.get("free_email_domains", ["gmail.com", "outlook.com"])
 
+        # Transliterate to ASCII for valid email addresses
+        first = _transliterate_to_ascii(first)
+        last = _transliterate_to_ascii(last)
+
         # Clean names for email (remove non-alphanumeric)
         first = "".join(c for c in first if c.isalnum())
         last = "".join(c for c in last if c.isalnum())
@@ -832,6 +983,10 @@ class LocaleGenerator:
         person = self._get_current_person()
         first = person.get("first_name", "user").lower()
         last = person.get("last_name", "name").lower()
+
+        # Transliterate to ASCII for valid usernames
+        first = _transliterate_to_ascii(first)
+        last = _transliterate_to_ascii(last)
 
         # Clean names
         first = "".join(c for c in first if c.isalnum())
