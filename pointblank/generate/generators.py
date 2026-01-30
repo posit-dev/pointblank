@@ -367,7 +367,15 @@ def generate_column(
 
 
 # Presets that should share coherent context across columns
-ADDRESS_RELATED_PRESETS = {"city", "state", "postcode", "phone_number", "latitude", "longitude"}
+ADDRESS_RELATED_PRESETS = {
+    "address",
+    "city",
+    "state",
+    "postcode",
+    "phone_number",
+    "latitude",
+    "longitude",
+}
 PERSON_RELATED_PRESETS = {"name", "name_full", "first_name", "last_name", "email", "user_name"}
 
 
