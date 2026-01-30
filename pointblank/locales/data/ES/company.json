@@ -1,0 +1,644 @@
+{
+  "suffixes": [
+    "S.A.",
+    "S.L.",
+    "S.L.U.",
+    "S.A.U.",
+    "S.Coop.",
+    "S.C.",
+    "S.Com.",
+    "S.L.L."
+  ],
+  "formats": [
+    "{adjective} {noun} {suffix}",
+    "{noun} {adjective} {suffix}",
+    "{last_name} {suffix}",
+    "{last_name} y {last_name}",
+    "{adjective} {noun}",
+    "Grupo {noun} {suffix}",
+    "{noun} Ibérica {suffix}",
+    "{last_name} {noun} {suffix}"
+  ],
+  "adjectives": [
+    "Global",
+    "Nacional",
+    "Internacional",
+    "Ibérica",
+    "Española",
+    "Peninsular",
+    "Mediterránea",
+    "Atlántica",
+    "Continental",
+    "Digital",
+    "Técnica",
+    "Industrial",
+    "Comercial",
+    "Financiera",
+    "Agrícola",
+    "Alimentaria",
+    "Inmobiliaria",
+    "Energética",
+    "Moderna",
+    "Nueva",
+    "Primera",
+    "Central",
+    "Principal",
+    "Superior",
+    "General",
+    "Universal",
+    "Integral",
+    "Total",
+    "Completa",
+    "Avanzada",
+    "Innovadora",
+    "Dinámica",
+    "Excelente",
+    "Óptima",
+    "Premium",
+    "Selecta",
+    "Auténtica",
+    "Tradicional",
+    "Clásica"
+  ],
+  "nouns": [
+    "Soluciones",
+    "Servicios",
+    "Tecnología",
+    "Sistemas",
+    "Comunicaciones",
+    "Industrias",
+    "Construcciones",
+    "Inmuebles",
+    "Inversiones",
+    "Consultores",
+    "Asesores",
+    "Gestión",
+    "Logística",
+    "Transportes",
+    "Distribución",
+    "Comercio",
+    "Alimentación",
+    "Energía",
+    "Medio Ambiente",
+    "Recursos",
+    "Capital",
+    "Finanzas",
+    "Seguros",
+    "Banca",
+    "Turismo",
+    "Hostelería",
+    "Restauración",
+    "Diseño",
+    "Marketing",
+    "Publicidad",
+    "Media",
+    "Comunicación",
+    "Software",
+    "Hardware",
+    "Electrónica",
+    "Mecánica",
+    "Química",
+    "Farmacia",
+    "Biotecnología",
+    "Ingeniería",
+    "Arquitectura",
+    "Educación",
+    "Formación"
+  ],
+  "well_known_companies": [
+    {
+      "name": "Telefónica",
+      "cities": [
+        "Madrid"
+      ]
+    },
+    {
+      "name": "Banco Santander",
+      "cities": [
+        "Madrid"
+      ]
+    },
+    {
+      "name": "BBVA",
+      "cities": [
+        "Bilbao"
+      ]
+    },
+    {
+      "name": "Inditex",
+      "cities": [
+        "A Coruña"
+      ]
+    },
+    {
+      "name": "Iberdrola",
+      "cities": [
+        "Bilbao"
+      ]
+    },
+    {
+      "name": "Repsol",
+      "cities": [
+        "Madrid"
+      ]
+    },
+    {
+      "name": "Endesa",
+      "cities": [
+        "Madrid"
+      ]
+    },
+    {
+      "name": "Naturgy",
+      "cities": [
+        "Barcelona"
+      ]
+    },
+    {
+      "name": "CaixaBank",
+      "cities": [
+        "Valencia"
+      ]
+    },
+    {
+      "name": "Mapfre",
+      "cities": [
+        "Madrid"
+      ]
+    },
+    {
+      "name": "Ferrovial",
+      "cities": [
+        "Madrid"
+      ]
+    },
+    {
+      "name": "ACS",
+      "cities": [
+        "Madrid"
+      ]
+    },
+    {
+      "name": "Acciona",
+      "cities": [
+        "Madrid"
+      ]
+    },
+    {
+      "name": "Grifols",
+      "cities": [
+        "Barcelona"
+      ]
+    },
+    {
+      "name": "Amadeus IT",
+      "cities": [
+        "Madrid"
+      ]
+    },
+    {
+      "name": "Aena",
+      "cities": [
+        "Madrid"
+      ]
+    },
+    {
+      "name": "Red Eléctrica",
+      "cities": [
+        "Madrid"
+      ]
+    },
+    {
+      "name": "Siemens Gamesa",
+      "cities": [
+        "Bilbao"
+      ]
+    },
+    {
+      "name": "Meliá Hotels",
+      "cities": [
+        "Palma"
+      ]
+    },
+    {
+      "name": "NH Hotel Group",
+      "cities": [
+        "Madrid"
+      ]
+    },
+    {
+      "name": "Sacyr",
+      "cities": [
+        "Madrid"
+      ]
+    },
+    {
+      "name": "FCC",
+      "cities": [
+        "Madrid"
+      ]
+    },
+    {
+      "name": "OHL",
+      "cities": [
+        "Madrid"
+      ]
+    },
+    {
+      "name": "Abertis",
+      "cities": [
+        "Barcelona"
+      ]
+    },
+    {
+      "name": "Cellnex",
+      "cities": [
+        "Barcelona"
+      ]
+    },
+    {
+      "name": "Puig",
+      "cities": [
+        "Barcelona"
+      ]
+    },
+    {
+      "name": "Mango",
+      "cities": [
+        "Barcelona"
+      ]
+    },
+    {
+      "name": "Desigual",
+      "cities": [
+        "Barcelona"
+      ]
+    },
+    {
+      "name": "Seat",
+      "cities": [
+        "Barcelona"
+      ]
+    },
+    {
+      "name": "Cepsa",
+      "cities": [
+        "Madrid"
+      ]
+    },
+    {
+      "name": "Mercadona",
+      "cities": [
+        "Valencia"
+      ]
+    },
+    {
+      "name": "El Corte Inglés",
+      "cities": [
+        "Madrid"
+      ]
+    },
+    {
+      "name": "Dia",
+      "cities": [
+        "Madrid"
+      ]
+    },
+    {
+      "name": "Carrefour España",
+      "cities": [
+        "Madrid"
+      ]
+    },
+    {
+      "name": "Eroski",
+      "cities": [
+        "Bilbao"
+      ]
+    },
+    {
+      "name": "Prosegur",
+      "cities": [
+        "Madrid"
+      ]
+    },
+    {
+      "name": "Indra",
+      "cities": [
+        "Madrid"
+      ]
+    },
+    {
+      "name": "Técnicas Reunidas",
+      "cities": [
+        "Madrid"
+      ]
+    },
+    {
+      "name": "Acerinox",
+      "cities": [
+        "Madrid"
+      ]
+    },
+    {
+      "name": "ArcelorMittal España",
+      "cities": [
+        "Madrid"
+      ]
+    },
+    {
+      "name": "Navantia",
+      "cities": [
+        "Cartagena"
+      ]
+    },
+    {
+      "name": "Airbus España",
+      "cities": [
+        "Madrid"
+      ]
+    },
+    {
+      "name": "Iberia",
+      "cities": [
+        "Madrid"
+      ]
+    },
+    {
+      "name": "Vueling",
+      "cities": [
+        "Barcelona"
+      ]
+    },
+    {
+      "name": "Renfe",
+      "cities": [
+        "Madrid"
+      ]
+    },
+    {
+      "name": "Correos",
+      "cities": [
+        "Madrid"
+      ]
+    },
+    {
+      "name": "RTVE",
+      "cities": [
+        "Madrid"
+      ]
+    },
+    {
+      "name": "Mediaset España",
+      "cities": [
+        "Madrid"
+      ]
+    },
+    {
+      "name": "Atresmedia",
+      "cities": [
+        "Madrid"
+      ]
+    },
+    {
+      "name": "Prisa",
+      "cities": [
+        "Madrid"
+      ]
+    },
+    {
+      "name": "Vocento",
+      "cities": [
+        "Madrid"
+      ]
+    },
+    {
+      "name": "Henneo",
+      "cities": [
+        "Zaragoza"
+      ]
+    },
+    {
+      "name": "La Vanguardia",
+      "cities": [
+        "Barcelona"
+      ]
+    },
+    {
+      "name": "Grupo Planeta",
+      "cities": [
+        "Barcelona"
+      ]
+    },
+    {
+      "name": "Random House Mondadori",
+      "cities": [
+        "Barcelona"
+      ]
+    },
+    {
+      "name": "Almirall",
+      "cities": [
+        "Barcelona"
+      ]
+    },
+    {
+      "name": "PharmaMar",
+      "cities": [
+        "Madrid"
+      ]
+    },
+    {
+      "name": "Viscofan",
+      "cities": [
+        "Pamplona"
+      ]
+    },
+    {
+      "name": "Ebro Foods",
+      "cities": [
+        "Madrid"
+      ]
+    },
+    {
+      "name": "Pescanova",
+      "cities": [
+        "Vigo"
+      ]
+    },
+    {
+      "name": "Campofrío",
+      "cities": [
+        "Burgos"
+      ]
+    },
+    {
+      "name": "Mahou San Miguel",
+      "cities": [
+        "Madrid"
+      ]
+    },
+    {
+      "name": "Estrella Damm",
+      "cities": [
+        "Barcelona"
+      ]
+    },
+    {
+      "name": "Osborne",
+      "cities": [
+        "Cádiz"
+      ]
+    },
+    {
+      "name": "González Byass",
+      "cities": [
+        "Jerez de la Frontera"
+      ]
+    }
+  ],
+  "jobs": [
+    "Abogado",
+    "Administrador",
+    "Agente comercial",
+    "Analista",
+    "Arquitecto",
+    "Asesor fiscal",
+    "Auditor",
+    "Cajero",
+    "Chef",
+    "Científico",
+    "Comercial",
+    "Conductor",
+    "Consultor",
+    "Contable",
+    "Coordinador",
+    "Desarrollador",
+    "Diseñador",
+    "Director",
+    "Economista",
+    "Editor",
+    "Electricista",
+    "Enfermero",
+    "Farmacéutico",
+    "Fontanero",
+    "Gerente",
+    "Ingeniero",
+    "Investigador",
+    "Jardinero",
+    "Jefe de proyecto",
+    "Locutor",
+    "Maestro",
+    "Mecánico",
+    "Médico",
+    "Periodista",
+    "Piloto",
+    "Pintor",
+    "Policía",
+    "Profesor",
+    "Programador",
+    "Psicólogo",
+    "Publicista",
+    "Recepcionista",
+    "Secretario",
+    "Soldador",
+    "Técnico",
+    "Traductor",
+    "Veterinario",
+    "Abogada",
+    "Administradora",
+    "Analista",
+    "Arquitecta",
+    "Asesora fiscal",
+    "Auditora",
+    "Científica",
+    "Consultora",
+    "Contable",
+    "Coordinadora",
+    "Desarrolladora",
+    "Diseñadora",
+    "Directora",
+    "Economista",
+    "Editora",
+    "Enfermera",
+    "Farmacéutica",
+    "Gerente",
+    "Ingeniera",
+    "Investigadora",
+    "Jefa de proyecto",
+    "Maestra",
+    "Médica",
+    "Periodista",
+    "Profesora",
+    "Programadora",
+    "Psicóloga",
+    "Publicista",
+    "Recepcionista",
+    "Secretaria",
+    "Técnica",
+    "Traductora",
+    "Veterinaria"
+  ],
+  "catch_phrase_adjectives": [
+    "innovadora",
+    "dinámica",
+    "eficiente",
+    "profesional",
+    "sostenible",
+    "integral",
+    "excelente",
+    "líder",
+    "global",
+    "moderna",
+    "avanzada",
+    "fiable",
+    "segura",
+    "competitiva",
+    "estratégica",
+    "optimizada",
+    "personalizada",
+    "transparente",
+    "ágil"
+  ],
+  "catch_phrase_nouns": [
+    "soluciones",
+    "servicios",
+    "tecnología",
+    "resultados",
+    "experiencia",
+    "calidad",
+    "innovación",
+    "compromiso",
+    "excelencia",
+    "profesionalidad",
+    "confianza",
+    "éxito",
+    "rendimiento",
+    "valor",
+    "gestión",
+    "estrategia",
+    "desarrollo",
+    "crecimiento",
+    "futuro"
+  ],
+  "catch_phrase_verbs": [
+    "ofrecemos",
+    "garantizamos",
+    "proporcionamos",
+    "creamos",
+    "desarrollamos",
+    "implementamos",
+    "optimizamos",
+    "transformamos",
+    "impulsamos",
+    "lideramos",
+    "innovamos",
+    "construimos",
+    "potenciamos",
+    "facilitamos",
+    "aseguramos",
+    "mejoramos",
+    "diseñamos",
+    "gestionamos"
+  ]
+}
