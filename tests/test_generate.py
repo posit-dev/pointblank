@@ -990,6 +990,7 @@ class TestCountrySupport:
         # Cities where the city() preset returns English name but address uses native
         EXONYM_TO_NATIVE = {
             "Brussels": "Bruxelles",
+            "Copenhagen": "København",
         }
 
         schema = Schema(
