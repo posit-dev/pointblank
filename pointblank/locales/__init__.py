@@ -771,7 +771,35 @@ class LocaleGenerator:
         """Generate a random postal code (coherent with current location context)."""
         location = self._get_current_location()
         prefix = location.get("postcode_prefix", "")
-        # Generate remaining digits to complete the postal code
+        postcode_format = self._data.address.get("postcode_format", "")
+
+        # If format uses pattern characters (? for letter, # for digit), generate accordingly
+        if "?" in postcode_format or "#" in postcode_format:
+            # Generate the full postcode from the format pattern
+            # Replace ? with random uppercase letter, # with random digit
+            result = []
+            prefix_idx = 0
+            for char in postcode_format:
+                if char == "?":
+                    # Use prefix character if available, otherwise random letter
+                    if prefix_idx < len(prefix) and prefix[prefix_idx].isalpha():
+                        result.append(prefix[prefix_idx])
+                        prefix_idx += 1
+                    else:
+                        result.append(self.rng.choice("ABCDEFGHIJKLMNOPQRSTUVWXYZ"))
+                elif char == "#":
+                    # Use prefix character if available, otherwise random digit
+                    if prefix_idx < len(prefix) and prefix[prefix_idx].isdigit():
+                        result.append(prefix[prefix_idx])
+                        prefix_idx += 1
+                    else:
+                        result.append(str(self.rng.randint(0, 9)))
+                else:
+                    # Keep literal characters (spaces, dashes, etc.)
+                    result.append(char)
+            return "".join(result)
+
+        # Default: append digits to complete the postal code
         remaining = 5 - len(prefix)
         suffix = "".join(str(self.rng.randint(0, 9)) for _ in range(remaining))
         return prefix + suffix
