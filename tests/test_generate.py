@@ -992,6 +992,8 @@ class TestCountrySupport:
             "Brussels": "Bruxelles",
             "Copenhagen": "København",
             "Gothenburg": "Göteborg",
+            "Istanbul": "İstanbul",
+            "Izmir": "İzmir",
             "Krakow": "Kraków",
             "Lisbon": "Lisboa",
             "Vienna": "Wien",
