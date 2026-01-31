@@ -993,6 +993,7 @@ class TestCountrySupport:
             "Copenhagen": "København",
             "Gothenburg": "Göteborg",
             "Krakow": "Kraków",
+            "Lisbon": "Lisboa",
             "Vienna": "Wien",
             "Warsaw": "Warszawa",
         }
