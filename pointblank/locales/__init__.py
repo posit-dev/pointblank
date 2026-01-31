@@ -120,6 +120,7 @@ COUNTRIES_WITH_FULL_DATA: list[str] = [
     "NL",  # Netherlands
     "NO",  # Norway
     "PL",  # Poland
+    "PT",  # Portugal
     "SE",  # Sweden
 ]
 
