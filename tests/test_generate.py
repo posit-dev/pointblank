@@ -991,6 +991,7 @@ class TestCountrySupport:
         EXONYM_TO_NATIVE = {
             "Brussels": "Bruxelles",
             "Copenhagen": "København",
+            "Gothenburg": "Göteborg",
         }
 
         schema = Schema(
