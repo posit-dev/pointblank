@@ -111,6 +111,7 @@ COUNTRIES_WITH_FULL_DATA: list[str] = [
     "DE",  # Germany
     "DK",  # Denmark
     "ES",  # Spain
+    "FI",  # Finland
     "FR",  # France
     "GB",  # United Kingdom
     "IE",  # Ireland
