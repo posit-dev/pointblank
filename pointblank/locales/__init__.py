@@ -104,6 +104,7 @@ COUNTRY_CODE_MAP: dict[str, str] = {
 # internet, misc, person, and text JSON files in the data directory
 COUNTRIES_WITH_FULL_DATA: list[str] = [
     "US",  # United States
+    "AT",  # Austria
     "BE",  # Belgium
     "CA",  # Canada
     "CH",  # Switzerland
