@@ -97,6 +97,9 @@ COUNTRY_CODE_MAP: dict[str, str] = {
     # Taiwan
     "TW": "TW",
     "TWN": "TW",
+    # Turkey
+    "TR": "TR",
+    "TUR": "TR",
 }
 
 # Countries that have complete locale data files
@@ -122,6 +125,7 @@ COUNTRIES_WITH_FULL_DATA: list[str] = [
     "PL",  # Poland
     "PT",  # Portugal
     "SE",  # Sweden
+    "TR",  # Turkey
 ]
 
 # Fallback chains for countries (when a country's data is incomplete)
@@ -160,6 +164,8 @@ COUNTRY_FALLBACKS: dict[str, list[str]] = {
     "KR": ["KR", "US"],
     "CN": ["CN", "US"],
     "TW": ["TW", "CN", "US"],
+    # Turkey
+    "TR": ["TR", "US"],
 }
 
 
