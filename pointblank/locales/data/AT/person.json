@@ -1,0 +1,17 @@
+{
+  "first_names": {
+    "male": ["Lukas", "Florian", "Tobias", "David", "Alexander", "Maximilian", "Sebastian", "Paul", "Felix", "Julian", "Dominik", "Michael", "Daniel", "Thomas", "Stefan", "Markus", "Andreas", "Christian", "Patrick", "Manuel", "Christoph", "Matthias", "Martin", "Bernhard", "Wolfgang", "Peter", "Franz", "Johann", "Josef", "Helmut", "Karl", "Walter", "Herbert", "Friedrich", "Leopold", "Anton", "Gerhard", "Rudolf", "Manfred", "Robert"],
+    "female": ["Anna", "Sarah", "Laura", "Julia", "Lena", "Lisa", "Katharina", "Sophie", "Maria", "Hannah", "Leonie", "Emma", "Johanna", "Nina", "Christina", "Stefanie", "Sandra", "Claudia", "Sabine", "Petra", "Andrea", "Martina", "Monika", "Elisabeth", "Michaela", "Birgit", "Silvia", "Barbara", "Karin", "Ingrid", "Renate", "Christine", "Eva", "Helga", "Brigitte", "Theresia", "Margarete", "Rosa", "Gertrude", "Edeltraud"],
+    "neutral": ["Kim", "Sascha", "Alex", "Robin", "Andrea", "Toni", "Dominique", "Charlie", "Jo", "Michi"]
+  },
+  "last_names": ["Gruber", "Huber", "Bauer", "Wagner", "Müller", "Pichler", "Steiner", "Moser", "Mayer", "Hofer", "Leitner", "Berger", "Fuchs", "Eder", "Fischer", "Schmid", "Winkler", "Weber", "Schwarz", "Maier", "Schneider", "Reiter", "Mayr", "Schmidt", "Wimmer", "Egger", "Brunner", "Lang", "Baumgartner", "Auer", "Binder", "Wolf", "Wallner", "Aigner", "Ebner", "Koller", "Lehner", "Haas", "Schuster", "Hackl"],
+  "name_formats": [
+    "{first_name} {last_name}"
+  ],
+  "prefixes": {
+    "male": ["Herr", "Dr.", "Mag.", "Ing.", "DI"],
+    "female": ["Frau", "Dr.", "Mag.", "Ing.", "DI"],
+    "neutral": ["Dr.", "Mag.", "Ing.", "DI"]
+  },
+  "suffixes": ["BSc", "MSc", "MBA", "PhD", "jun.", "sen."]
+}
