@@ -1,0 +1,65 @@
+{
+  "suffixes": ["AB", "HB", "KB", "Aktiebolag", "Handelsbolag", "Kommanditbolag", "Holding", "Group", "Sverige"],
+  "formats": [
+    "{last_name} {suffix}",
+    "{adjective} {noun} {suffix}",
+    "{noun} {suffix}",
+    "{adjective} {suffix}"
+  ],
+  "adjectives": [
+    "Nordisk", "Svensk", "Skandinavisk", "Global", "Digital",
+    "Grön", "Smart", "Modern", "Kreativ", "Dynamisk",
+    "Innovativ", "Professionell", "Internationell", "Central", "Premier",
+    "Elite", "Royal", "National", "Nordic", "Baltic"
+  ],
+  "nouns": [
+    "Teknik", "Handel", "Service", "Energi", "Industri",
+    "Finans", "Invest", "Partner", "Konsult", "Solutions",
+    "Systems", "Design", "Media", "Transport", "Logistik",
+    "IT", "Data", "Tech", "Food", "Pharma"
+  ],
+  "well_known_companies": [
+    {"name": "Volvo", "cities": ["Göteborg"]},
+    {"name": "IKEA", "cities": ["Älmhult", "Malmö"]},
+    {"name": "Ericsson", "cities": ["Stockholm"]},
+    {"name": "H&M", "cities": ["Stockholm"]},
+    {"name": "Spotify", "cities": ["Stockholm"]},
+    {"name": "Klarna", "cities": ["Stockholm"]},
+    {"name": "Atlas Copco", "cities": ["Stockholm", "Nacka"]},
+    {"name": "Nordea", "cities": ["Stockholm"]},
+    {"name": "SEB", "cities": ["Stockholm"]},
+    {"name": "Handelsbanken", "cities": ["Stockholm"]},
+    {"name": "Swedbank", "cities": ["Stockholm"]},
+    {"name": "Scania", "cities": ["Södertälje"]},
+    {"name": "Electrolux", "cities": ["Stockholm"]},
+    {"name": "SKF", "cities": ["Göteborg"]},
+    {"name": "Sandvik", "cities": ["Sandviken", "Stockholm"]},
+    {"name": "Telia", "cities": ["Stockholm"]},
+    {"name": "Vattenfall", "cities": ["Stockholm", "Solna"]},
+    {"name": "Saab", "cities": ["Linköping", "Trollhättan"]},
+    {"name": "Husqvarna", "cities": ["Huskvarna", "Jönköping"]},
+    {"name": "Securitas", "cities": ["Stockholm"]}
+  ],
+  "jobs": [
+    "Mjukvaruutvecklare", "Ingenjör", "Lärare", "Sjuksköterska", "Läkare",
+    "Advokat", "Arkitekt", "Designer", "Journalist", "Konsult",
+    "Revisor", "Säljare", "Projektledare", "VD", "Fastighetsmäklare",
+    "Elektriker", "Snickare", "Mekaniker", "Kock", "Servitör",
+    "Polis", "Brandman", "Frisör", "Tandläkare", "Fysioterapeut"
+  ],
+  "catch_phrase_adjectives": [
+    "innovativ", "hållbar", "professionell", "dynamisk", "kreativ",
+    "effektiv", "pålitlig", "modern", "nordisk", "grön",
+    "kvalitets", "global", "lokal", "smart", "digital"
+  ],
+  "catch_phrase_nouns": [
+    "lösningar", "service", "kvalitet", "innovation", "tillväxt",
+    "samarbete", "resultat", "värden", "partnerskap", "framtid",
+    "teknologi", "design", "strategi", "utveckling", "framgång"
+  ],
+  "catch_phrase_verbs": [
+    "skapar", "levererar", "utvecklar", "driver", "bygger",
+    "formar", "inspirerar", "förbinder", "stärker", "transformerar",
+    "optimerar", "realiserar", "möjliggör", "säkerställer", "främjar"
+  ]
+}
