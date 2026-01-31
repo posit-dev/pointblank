@@ -992,6 +992,7 @@ class TestCountrySupport:
             "Brussels": "Bruxelles",
             "Copenhagen": "København",
             "Gothenburg": "Göteborg",
+            "Vienna": "Wien",
         }
 
         schema = Schema(
