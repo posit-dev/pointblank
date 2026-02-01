@@ -100,6 +100,9 @@ COUNTRY_CODE_MAP: dict[str, str] = {
     # Turkey
     "TR": "TR",
     "TUR": "TR",
+    # New Zealand
+    "NZ": "NZ",
+    "NZL": "NZ",
 }
 
 # Countries that have complete locale data files
@@ -124,6 +127,7 @@ COUNTRIES_WITH_FULL_DATA: list[str] = [
     "JP",  # Japan
     "NL",  # Netherlands
     "NO",  # Norway
+    "NZ",  # New Zealand
     "PL",  # Poland
     "PT",  # Portugal
     "SE",  # Sweden
