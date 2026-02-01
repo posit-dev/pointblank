@@ -40,6 +40,9 @@ COUNTRY_CODE_MAP: dict[str, str] = {
     # Ireland
     "IE": "IE",
     "IRL": "IE",
+    # Iceland
+    "IS": "IS",
+    "ISL": "IS",
     # Australia
     "AU": "AU",
     "AUS": "AU",
@@ -132,6 +135,7 @@ COUNTRIES_WITH_FULL_DATA: list[str] = [
     "HK",  # Hong Kong
     "IE",  # Ireland
     "IN",  # India
+    "IS",  # Iceland
     "IT",  # Italy
     "JP",  # Japan
     "MX",  # Mexico
