@@ -1,0 +1,18 @@
+{
+  "first_names": {
+    "male": ["José", "Juan", "Luis", "Carlos", "Miguel", "Francisco", "Antonio", "Jesús", "Pedro", "Alejandro", "Jorge", "Daniel", "Manuel", "Ricardo", "Eduardo", "Fernando", "Roberto", "Rafael", "David", "Sergio", "Mario", "Javier", "Raúl", "Arturo", "Enrique", "Diego", "Andrés", "Héctor", "Óscar", "Pablo"],
+    "female": ["María", "Guadalupe", "Ana", "Rosa", "Patricia", "Laura", "Verónica", "Carmen", "Leticia", "Adriana", "Sandra", "Martha", "Claudia", "Gabriela", "Silvia", "Elizabeth", "Teresa", "Mónica", "Alejandra", "Fernanda", "Sofía", "Valeria", "Daniela", "Camila", "Regina", "Mariana", "Ximena", "Valentina", "Isabella", "Natalia"],
+    "neutral": ["Guadalupe", "Cruz", "Ángel", "Jesús", "Ariel", "René", "Andrea"]
+  },
+  "last_names": ["García", "Hernández", "López", "Martínez", "González", "Rodríguez", "Pérez", "Sánchez", "Ramírez", "Torres", "Flores", "Rivera", "Gómez", "Díaz", "Cruz", "Morales", "Reyes", "Gutiérrez", "Ortiz", "Ramos", "Castillo", "Vázquez", "Mendoza", "Ruiz", "Aguilar", "Jiménez", "Moreno", "Muñoz", "Álvarez", "Romero", "Medina", "Vargas", "Castro", "Chávez", "Salazar"],
+  "name_formats": [
+    "{first_name} {last_name}",
+    "{first_name} {last_name} {last_name}"
+  ],
+  "prefixes": {
+    "male": ["Sr.", "Don", "Lic.", "Ing.", "Dr."],
+    "female": ["Sra.", "Srta.", "Doña", "Lic.", "Ing.", "Dra."],
+    "neutral": ["Lic.", "Ing.", "Dr."]
+  },
+  "suffixes": ["Jr.", "II", "III"]
+}
