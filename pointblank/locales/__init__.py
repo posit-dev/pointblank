@@ -109,6 +109,9 @@ COUNTRY_CODE_MAP: dict[str, str] = {
     # Hungary
     "HU": "HU",
     "HUN": "HU",
+    # Indonesia
+    "ID": "ID",
+    "IDN": "ID",
     # Taiwan
     "TW": "TW",
     "TWN": "TW",
@@ -140,6 +143,7 @@ COUNTRIES_WITH_FULL_DATA: list[str] = [
     "GB",  # United Kingdom
     "HK",  # Hong Kong
     "HU",  # Hungary
+    "ID",  # Indonesia
     "IE",  # Ireland
     "IN",  # India
     "IS",  # Iceland
