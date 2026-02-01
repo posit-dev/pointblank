@@ -88,6 +88,9 @@ COUNTRY_CODE_MAP: dict[str, str] = {
     # Poland
     "PL": "PL",
     "POL": "PL",
+    # Romania
+    "RO": "RO",
+    "ROU": "RO",
     # Russia
     "RU": "RU",
     "RUS": "RU",
@@ -145,6 +148,7 @@ COUNTRIES_WITH_FULL_DATA: list[str] = [
     "NZ",  # New Zealand
     "PL",  # Poland
     "PT",  # Portugal
+    "RO",  # Romania
     "SE",  # Sweden
     "TR",  # Turkey
     "TW",  # Taiwan
