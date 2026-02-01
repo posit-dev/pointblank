@@ -70,6 +70,9 @@ COUNTRY_CODE_MAP: dict[str, str] = {
     # Brazil
     "BR": "BR",
     "BRA": "BR",
+    # India
+    "IN": "IN",
+    "IND": "IN",
     # Italy
     "IT": "IT",
     "ITA": "IT",
@@ -123,6 +126,7 @@ COUNTRIES_WITH_FULL_DATA: list[str] = [
     "FR",  # France
     "GB",  # United Kingdom
     "IE",  # Ireland
+    "IN",  # India
     "IT",  # Italy
     "JP",  # Japan
     "MX",  # Mexico
