@@ -106,6 +106,9 @@ COUNTRY_CODE_MAP: dict[str, str] = {
     # China
     "CN": "CN",
     "CHN": "CN",
+    # Czech Republic
+    "CZ": "CZ",
+    "CZE": "CZ",
     # Hong Kong
     "HK": "HK",
     "HKG": "HK",
@@ -141,6 +144,7 @@ COUNTRIES_WITH_FULL_DATA: list[str] = [
     "CA",  # Canada
     "CH",  # Switzerland
     "CN",  # China
+    "CZ",  # Czech Republic
     "DE",  # Germany
     "DK",  # Denmark
     "ES",  # Spain
