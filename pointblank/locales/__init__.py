@@ -142,6 +142,7 @@ COUNTRIES_WITH_FULL_DATA: list[str] = [
     "PT",  # Portugal
     "SE",  # Sweden
     "TR",  # Turkey
+    "TW",  # Taiwan
 ]
 
 # Fallback chains for countries (when a country's data is incomplete)
