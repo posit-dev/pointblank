@@ -138,6 +138,7 @@ COUNTRIES_WITH_FULL_DATA: list[str] = [
     "IS",  # Iceland
     "IT",  # Italy
     "JP",  # Japan
+    "KR",  # South Korea
     "MX",  # Mexico
     "NL",  # Netherlands
     "NO",  # Norway
