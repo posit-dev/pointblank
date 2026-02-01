@@ -121,6 +121,9 @@ COUNTRY_CODE_MAP: dict[str, str] = {
     # New Zealand
     "NZ": "NZ",
     "NZL": "NZ",
+    # Philippines
+    "PH": "PH",
+    "PHL": "PH",
 }
 
 # Countries that have complete locale data files
@@ -155,6 +158,7 @@ COUNTRIES_WITH_FULL_DATA: list[str] = [
     "NO",  # Norway
     "NZ",  # New Zealand
     "PL",  # Poland
+    "PH",  # Philippines
     "PT",  # Portugal
     "RO",  # Romania
     "SE",  # Sweden
