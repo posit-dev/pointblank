@@ -52,6 +52,9 @@ COUNTRY_CODE_MAP: dict[str, str] = {
     # Germany
     "DE": "DE",
     "DEU": "DE",
+    # Greece
+    "GR": "GR",
+    "GRC": "GR",
     # Austria
     "AT": "AT",
     "AUT": "AT",
@@ -144,6 +147,7 @@ COUNTRIES_WITH_FULL_DATA: list[str] = [
     "FI",  # Finland
     "FR",  # France
     "GB",  # United Kingdom
+    "GR",  # Greece
     "HK",  # Hong Kong
     "HU",  # Hungary
     "ID",  # Indonesia
