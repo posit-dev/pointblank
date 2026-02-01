@@ -1,0 +1,65 @@
+{
+  "suffixes": ["Pvt Ltd", "Ltd", "LLP", "India Pvt Ltd", "Solutions"],
+  "formats": [
+    "{last_name} {suffix}",
+    "{adjective} {noun} {suffix}",
+    "{noun} {suffix}",
+    "{last_name} & {last_name} {suffix}"
+  ],
+  "adjectives": [
+    "Indian", "National", "Bharat", "Digital", "Tech",
+    "Modern", "International", "Global", "Smart", "Advanced",
+    "Innovative", "Premier", "Elite", "Professional", "New",
+    "Integrated", "United", "Dynamic", "Strategic", "Progressive"
+  ],
+  "nouns": [
+    "Technologies", "Industries", "Trading", "Infra", "Realty",
+    "Energy", "Finance", "Insurance", "Consulting", "Logistics",
+    "Pharma", "Media", "Communications", "Services", "Solutions",
+    "Systems", "Investments", "Developers", "Enterprises", "Ventures"
+  ],
+  "well_known_companies": [
+    {"name": "Reliance Industries", "cities": ["Mumbai"]},
+    {"name": "Tata Consultancy Services", "cities": ["Mumbai"]},
+    {"name": "HDFC Bank", "cities": ["Mumbai"]},
+    {"name": "Infosys", "cities": ["Bengaluru"]},
+    {"name": "ICICI Bank", "cities": ["Mumbai"]},
+    {"name": "Hindustan Unilever", "cities": ["Mumbai"]},
+    {"name": "State Bank of India", "cities": ["Mumbai"]},
+    {"name": "Bharti Airtel", "cities": ["Delhi"]},
+    {"name": "ITC Limited", "cities": ["Kolkata"]},
+    {"name": "Wipro", "cities": ["Bengaluru"]},
+    {"name": "HCL Technologies", "cities": ["Noida"]},
+    {"name": "Axis Bank", "cities": ["Mumbai"]},
+    {"name": "Kotak Mahindra Bank", "cities": ["Mumbai"]},
+    {"name": "Larsen & Toubro", "cities": ["Mumbai"]},
+    {"name": "Asian Paints", "cities": ["Mumbai"]},
+    {"name": "Maruti Suzuki", "cities": ["Delhi", "Gurgaon"]},
+    {"name": "Sun Pharma", "cities": ["Mumbai"]},
+    {"name": "Bajaj Finance", "cities": ["Pune"]},
+    {"name": "Tech Mahindra", "cities": ["Pune"]},
+    {"name": "Titan Company", "cities": ["Bengaluru"]}
+  ],
+  "jobs": [
+    "Software Engineer", "IT Consultant", "Doctor", "Teacher", "Accountant",
+    "Lawyer", "Architect", "Designer", "Journalist", "Business Analyst",
+    "Data Scientist", "Sales Executive", "Manager", "Director", "Civil Engineer",
+    "Electrician", "Mechanic", "Chef", "Bank Officer", "Government Officer",
+    "Police Officer", "Professor", "Dentist", "Pharmacist", "CA"
+  ],
+  "catch_phrase_adjectives": [
+    "innovative", "sustainable", "professional", "dynamic", "creative",
+    "efficient", "reliable", "modern", "trusted", "committed",
+    "quality", "global", "local", "smart", "digital"
+  ],
+  "catch_phrase_nouns": [
+    "solutions", "services", "quality", "innovation", "growth",
+    "partnership", "results", "values", "collaboration", "future",
+    "technology", "design", "strategy", "development", "success"
+  ],
+  "catch_phrase_verbs": [
+    "creates", "delivers", "develops", "drives", "builds",
+    "shapes", "inspires", "connects", "strengthens", "transforms",
+    "optimizes", "achieves", "enables", "ensures", "promotes"
+  ]
+}
