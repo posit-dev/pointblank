@@ -1,0 +1,17 @@
+{
+  "first_names": {
+    "male": ["James", "John", "William", "David", "Michael", "Daniel", "Matthew", "Joshua", "Thomas", "Andrew", "Christopher", "Jack", "Oliver", "Noah", "Liam", "Ethan", "Lucas", "Mason", "Logan", "Alexander", "Benjamin", "Jacob", "Henry", "Sebastian", "Ryan", "Nathan", "Samuel", "Harrison", "Lachlan", "Cooper", "Charlie", "Max", "Oscar", "Archie", "Leo", "Hunter", "Riley", "Isaac", "Finn", "Harry"],
+    "female": ["Emma", "Olivia", "Charlotte", "Mia", "Amelia", "Ava", "Sophia", "Grace", "Lily", "Chloe", "Emily", "Isabella", "Sophie", "Ella", "Zoe", "Harper", "Ruby", "Willow", "Ivy", "Sienna", "Evelyn", "Isla", "Scarlett", "Matilda", "Aria", "Georgia", "Layla", "Hannah", "Lucy", "Maddison", "Audrey", "Violet", "Hazel", "Ellie", "Piper", "Mackenzie", "Alice", "Eva", "Savannah", "Penelope"],
+    "neutral": ["Alex", "Jordan", "Taylor", "Riley", "Casey", "Jamie", "Morgan", "Quinn", "Avery", "Hayden"]
+  },
+  "last_names": ["Smith", "Jones", "Williams", "Brown", "Wilson", "Taylor", "Johnson", "White", "Martin", "Anderson", "Thompson", "Nguyen", "Thomas", "Walker", "Harris", "Lee", "Ryan", "Robinson", "Kelly", "King", "Davis", "Wright", "Evans", "Roberts", "Green", "Hall", "Wood", "Jackson", "Clarke", "Baker", "Mitchell", "Campbell", "Turner", "Scott", "Collins", "Morris", "Hill", "Ward", "Murphy", "Cooper"],
+  "name_formats": [
+    "{first_name} {last_name}"
+  ],
+  "prefixes": {
+    "male": ["Mr", "Dr"],
+    "female": ["Ms", "Mrs", "Dr"],
+    "neutral": ["Dr"]
+  },
+  "suffixes": ["Jr", "Sr", "OAM", "AM", "AO", "AC"]
+}
