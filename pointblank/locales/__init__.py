@@ -109,6 +109,7 @@ COUNTRIES_WITH_FULL_DATA: list[str] = [
     "US",  # United States
     "AT",  # Austria
     "BE",  # Belgium
+    "BR",  # Brazil
     "CA",  # Canada
     "CH",  # Switzerland
     "DE",  # Germany
