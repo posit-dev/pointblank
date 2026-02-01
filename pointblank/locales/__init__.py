@@ -108,6 +108,7 @@ COUNTRY_CODE_MAP: dict[str, str] = {
 COUNTRIES_WITH_FULL_DATA: list[str] = [
     "US",  # United States
     "AT",  # Austria
+    "AU",  # Australia
     "BE",  # Belgium
     "BR",  # Brazil
     "CA",  # Canada
