@@ -16905,7 +16905,7 @@ class Validate:
 
         Examples
         --------
-        In a
+
         ```{python}
         import pointblank as pb
 
@@ -16943,9 +16943,9 @@ class Validate:
         # Remove keys to be dropped
         # MEGHAN pick up Here!!!
         # I need to
-        # 1) assess which keys should be turned innto columns
+        # 1) assess which keys should be turned innto columns - DONE
         # 2) Determine which keys are used for conditionals (active = data from step shows, inactive replace with "-")
-        # 3) Create a schema
+        # 3) Create a schema - DONE
         # 4) return the df
 
         # Check for polars, raise if not installed
@@ -16956,8 +16956,24 @@ class Validate:
                     '`tbl_type="polars".'
                 )
 
-            # Create the schema for the df
-            schema = pl.Schema({})
+        # Create the schema for the df
+        schema = pl.Schema(
+            {
+                "step": pl.String,  # assertion_type
+                "columns": pl.String,  # column
+                "values": pl.String,  # values
+                "tbl": pl.String,  # pre
+                "eval": pl.String,  # active
+                "units": pl.Int64,  # n
+                "pass_n": pl.Int64,  # n_passed
+                "pass_pct": pl.Float64,  # f_passed
+                "fail_n": pl.Int64,  # n_failed
+                "fail_pct": pl.Float64,  # f_failed
+                "warning": pl.Boolean,  # warning
+                "error": pl.Boolean,  # error
+                "critical": pl.Boolean,  # critical
+            }
+        )
 
     def _add_validation(self, validation_info):
         """
