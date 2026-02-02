@@ -64,6 +64,9 @@ COUNTRY_CODE_MAP: dict[str, str] = {
     # Switzerland
     "CH": "CH",
     "CHE": "CH",
+    # Chile
+    "CL": "CL",
+    "CHL": "CL",
     # France
     "FR": "FR",
     "FRA": "FR",
@@ -163,6 +166,7 @@ COUNTRIES_WITH_FULL_DATA: list[str] = [
     "BR",  # Brazil
     "CA",  # Canada
     "CH",  # Switzerland
+    "CL",  # Chile
     "CN",  # China
     "CO",  # Colombia
     "CZ",  # Czech Republic
