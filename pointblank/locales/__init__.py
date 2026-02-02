@@ -103,6 +103,9 @@ COUNTRY_CODE_MAP: dict[str, str] = {
     # South Korea
     "KR": "KR",
     "KOR": "KR",
+    # Latvia
+    "LV": "LV",
+    "LVA": "LV",
     # China
     "CN": "CN",
     "CHN": "CN",
@@ -161,6 +164,7 @@ COUNTRIES_WITH_FULL_DATA: list[str] = [
     "IT",  # Italy
     "JP",  # Japan
     "KR",  # South Korea
+    "LV",  # Latvia
     "MX",  # Mexico
     "NL",  # Netherlands
     "NO",  # Norway
