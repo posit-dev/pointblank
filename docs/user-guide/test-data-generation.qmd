@@ -158,12 +158,12 @@ from datetime import date, datetime
 
 schema = pb.Schema(
     birth_date=pb.date_field(
-        min_val=date(1960, 1, 1),
-        max_val=date(2005, 12, 31)
+        min_date=date(1960, 1, 1),
+        max_date=date(2005, 12, 31)
     ),
     created_at=pb.datetime_field(
-        min_val=datetime(2024, 1, 1),
-        max_val=datetime(2024, 12, 31)
+        min_date=datetime(2024, 1, 1),
+        max_date=datetime(2024, 12, 31)
     ),
 )
 
