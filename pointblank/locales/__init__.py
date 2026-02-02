@@ -1315,8 +1315,6 @@ class LocaleGenerator:
 
     def uuid4(self) -> str:
         """Generate a random UUID4."""
-        import uuid
-
         # Use our RNG to generate deterministic UUIDs
         hex_chars = "0123456789abcdef"
         parts = [
