@@ -1,0 +1,38 @@
+{
+  "first_names": {
+    "male": [
+      "José", "Juan", "Luis", "Carlos", "Jorge", "Manuel", "Francisco", "Pedro", "Miguel", "Sergio",
+      "Rodrigo", "Sebastián", "Andrés", "Pablo", "Diego", "Felipe", "Cristián", "Alejandro", "Nicolás", "Matías",
+      "Gonzalo", "Daniel", "Ricardo", "Eduardo", "Fernando", "Jaime", "Claudio", "Mauricio", "Marcelo", "Patricio",
+      "Héctor", "Raúl", "Oscar", "Víctor", "Alberto", "Roberto", "Alfredo", "Enrique", "Guillermo", "Arturo",
+      "Gabriel", "Ignacio", "Tomás", "Benjamín", "Vicente", "Martín", "Agustín", "Maximiliano", "Joaquín", "Emilio",
+      "Hugo", "Álvaro", "Iván", "César", "Julio", "Ramón", "Rafael", "Antonio", "Germán", "Leonardo"
+    ],
+    "female": [
+      "María", "Ana", "Carmen", "Rosa", "Patricia", "Claudia", "Sandra", "Andrea", "Carolina", "Paola",
+      "Francisca", "Valentina", "Catalina", "Javiera", "Camila", "Daniela", "Constanza", "Fernanda", "Isidora", "Antonia",
+      "Sofía", "Martina", "Florencia", "Josefa", "Macarena", "Paula", "Natalia", "Lorena", "Verónica", "Mónica",
+      "Cecilia", "Silvia", "Teresa", "Gloria", "Marta", "Susana", "Beatriz", "Isabel", "Marcela", "Alejandra",
+      "Gabriela", "Victoria", "Bárbara", "Ximena", "Carla", "Nicole", "Pamela", "Karina", "Marisol", "Soledad",
+      "Pilar", "Luz", "Elena", "Margarita", "Alicia", "Adriana", "Angélica", "Viviana", "Roxana", "Elizabeth"
+    ],
+    "neutral": ["Alex", "Ariel", "Andrea", "René", "Jesús", "Cruz", "Dominique", "Noel", "Ángel", "Guadalupe"]
+  },
+  "last_names": [
+    "González", "Muñoz", "Rojas", "Díaz", "Pérez", "Soto", "Contreras", "Silva", "Martínez", "Sepúlveda",
+    "Morales", "Rodríguez", "López", "Fuentes", "Hernández", "García", "Garrido", "Bravo", "Reyes", "Núñez",
+    "Jara", "Vera", "Torres", "Araya", "Espinoza", "Valenzuela", "Tapia", "Figueroa", "Flores", "Sánchez",
+    "Fernández", "Ramírez", "Carrasco", "Gómez", "Cortés", "Herrera", "Aravena", "Castillo", "Gutiérrez", "Vargas",
+    "Vásquez", "Riquelme", "Castro", "Pizarro", "Álvarez", "Olivares", "Aguilera", "Orellana", "Cárdenas", "Vergara",
+    "Campos", "Navarro", "Vega", "Sandoval", "Poblete", "Leiva", "Méndez", "Parra", "Ibáñez", "Zúñiga"
+  ],
+  "name_formats": [
+    "{first_name} {last_name}"
+  ],
+  "prefixes": {
+    "male": ["Sr.", "Don", "Dr.", "Lic.", "Ing.", "Prof."],
+    "female": ["Sra.", "Srta.", "Doña", "Dra.", "Lic.", "Ing.", "Prof."],
+    "neutral": ["Dr.", "Lic.", "Ing.", "Prof."]
+  },
+  "suffixes": ["Jr.", "PhD", "MBA"]
+}
