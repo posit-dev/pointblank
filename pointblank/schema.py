@@ -837,34 +837,32 @@ class Schema:
         -------------------
         The `country=` parameter controls the country used for generating realistic data with
         presets (e.g., `preset="email"`, `preset="address"`). This affects location-specific
-        formats like addresses, phone numbers, and postal codes. Supported ISO country codes:
+        formats like addresses, phone numbers, and postal codes. Currently, **50 countries** are
+        supported with full locale data:
 
-        - United States: `"US"` or `"USA"`
-        - United Kingdom: `"GB"`, `"GBR"`, or `"UK"`
-        - Australia: `"AU"` or `"AUS"`
-        - Canada: `"CA"` or `"CAN"`
-        - Germany: `"DE"` or `"DEU"`
-        - Austria: `"AT"` or `"AUT"`
-        - Switzerland: `"CH"` or `"CHE"`
-        - France: `"FR"` or `"FRA"`
-        - Spain: `"ES"` or `"ESP"`
-        - Mexico: `"MX"` or `"MEX"`
-        - Portugal: `"PT"` or `"PRT"`
-        - Brazil: `"BR"` or `"BRA"`
-        - Italy: `"IT"` or `"ITA"`
-        - Netherlands: `"NL"` or `"NLD"`
-        - Poland: `"PL"` or `"POL"`
-        - Russia: `"RU"` or `"RUS"`
-        - Japan: `"JP"` or `"JPN"`
-        - South Korea: `"KR"` or `"KOR"`
-        - China: `"CN"` or `"CHN"`
-        - Taiwan: `"TW"` or `"TWN"`
+        **Europe (32 countries):** Austria (`"AT"`), Belgium (`"BE"`), Bulgaria (`"BG"`),
+        Croatia (`"HR"`), Cyprus (`"CY"`), Czech Republic (`"CZ"`), Denmark (`"DK"`),
+        Estonia (`"EE"`), Finland (`"FI"`), France (`"FR"`), Germany (`"DE"`), Greece (`"GR"`),
+        Hungary (`"HU"`), Iceland (`"IS"`), Ireland (`"IE"`), Italy (`"IT"`), Latvia (`"LV"`),
+        Lithuania (`"LT"`), Luxembourg (`"LU"`), Malta (`"MT"`), Netherlands (`"NL"`),
+        Norway (`"NO"`), Poland (`"PL"`), Portugal (`"PT"`), Romania (`"RO"`), Russia (`"RU"`),
+        Slovakia (`"SK"`), Slovenia (`"SI"`), Spain (`"ES"`), Sweden (`"SE"`),
+        Switzerland (`"CH"`), United Kingdom (`"GB"`)
+
+        **Americas (7 countries):** Argentina (`"AR"`), Brazil (`"BR"`), Canada (`"CA"`),
+        Chile (`"CL"`), Colombia (`"CO"`), Mexico (`"MX"`), United States (`"US"`)
+
+        **Asia-Pacific (10 countries):** Australia (`"AU"`), China (`"CN"`), Hong Kong (`"HK"`),
+        India (`"IN"`), Indonesia (`"ID"`), Japan (`"JP"`), New Zealand (`"NZ"`),
+        Philippines (`"PH"`), South Korea (`"KR"`), Taiwan (`"TW"`)
+
+        **Middle East (1 country):** Turkey (`"TR"`)
 
         Examples
         --------
-        Generate data from a schema with Field constraints:
+        Using `pb.Schema` we first put together a schema with field constraints:
 
-        ```python
+        ```{python}
         import pointblank as pb
 
         schema = pb.Schema(
@@ -873,26 +871,31 @@ class Schema:
             age=pb.int_field(min_val=18, max_val=100),
             status=pb.string_field(allowed=["active", "pending", "inactive"]),
         )
+        ```
 
+        With the `generate()` method, we can obtain a set number of rows of generated data:
+
+        ```{python}
         # Generate 100 rows of test data
-        test_data = schema.generate(n=100, seed=23)
+        pb.preview(schema.generate(n=100, seed=23))
         ```
 
-        Generate data from a simple dtype-only schema:
+        It's possible to generate data from a simple dtype-only schema:
 
-        ```python
+        ```{python}
         schema = pb.Schema(name="String", age="Int64", active="Boolean")
-        test_data = schema.generate(n=50, seed=123, output="pandas")
+        pb.preview(schema.generate(n=50, seed=123, output="pandas"))
         ```
 
-        Generate data with German addresses:
+        We can obtain synthetic data with German addresses using presets for person name and city of
+        residence. Note the use of `country="DE"` in the `generate()` call:
 
-        ```python
+        ```{python}
         schema = pb.Schema(
             name=pb.string_field(preset="name"),
             city=pb.string_field(preset="city"),
         )
-        german_data = schema.generate(n=20, seed=23, country="DE")
+        pb.preview(schema.generate(n=20, seed=23, country="DE"))
         ```
         """
         from pointblank.field import Field
@@ -1578,34 +1581,32 @@ def generate_dataset(
     -------------------
     The `country=` parameter controls the country used for generating realistic data with
     presets (e.g., `preset="email"`, `preset="address"`). This affects location-specific
-    formats like addresses, phone numbers, and postal codes. Supported ISO country codes:
+    formats like addresses, phone numbers, and postal codes. Currently, **50 countries** are
+    supported with full locale data:
 
-    - United States: `"US"` or `"USA"`
-    - United Kingdom: `"GB"`, `"GBR"`, or `"UK"`
-    - Australia: `"AU"` or `"AUS"`
-    - Canada: `"CA"` or `"CAN"`
-    - Germany: `"DE"` or `"DEU"`
-    - Austria: `"AT"` or `"AUT"`
-    - Switzerland: `"CH"` or `"CHE"`
-    - France: `"FR"` or `"FRA"`
-    - Spain: `"ES"` or `"ESP"`
-    - Mexico: `"MX"` or `"MEX"`
-    - Portugal: `"PT"` or `"PRT"`
-    - Brazil: `"BR"` or `"BRA"`
-    - Italy: `"IT"` or `"ITA"`
-    - Netherlands: `"NL"` or `"NLD"`
-    - Poland: `"PL"` or `"POL"`
-    - Russia: `"RU"` or `"RUS"`
-    - Japan: `"JP"` or `"JPN"`
-    - South Korea: `"KR"` or `"KOR"`
-    - China: `"CN"` or `"CHN"`
-    - Taiwan: `"TW"` or `"TWN"`
+    **Europe (32 countries):** Austria (`"AT"`), Belgium (`"BE"`), Bulgaria (`"BG"`),
+    Croatia (`"HR"`), Cyprus (`"CY"`), Czech Republic (`"CZ"`), Denmark (`"DK"`),
+    Estonia (`"EE"`), Finland (`"FI"`), France (`"FR"`), Germany (`"DE"`), Greece (`"GR"`),
+    Hungary (`"HU"`), Iceland (`"IS"`), Ireland (`"IE"`), Italy (`"IT"`), Latvia (`"LV"`),
+    Lithuania (`"LT"`), Luxembourg (`"LU"`), Malta (`"MT"`), Netherlands (`"NL"`),
+    Norway (`"NO"`), Poland (`"PL"`), Portugal (`"PT"`), Romania (`"RO"`), Russia (`"RU"`),
+    Slovakia (`"SK"`), Slovenia (`"SI"`), Spain (`"ES"`), Sweden (`"SE"`),
+    Switzerland (`"CH"`), United Kingdom (`"GB"`)
+
+    **Americas (7 countries):** Argentina (`"AR"`), Brazil (`"BR"`), Canada (`"CA"`),
+    Chile (`"CL"`), Colombia (`"CO"`), Mexico (`"MX"`), United States (`"US"`)
+
+    **Asia-Pacific (10 countries):** Australia (`"AU"`), China (`"CN"`), Hong Kong (`"HK"`),
+    India (`"IN"`), Indonesia (`"ID"`), Japan (`"JP"`), New Zealand (`"NZ"`),
+    Philippines (`"PH"`), South Korea (`"KR"`), Taiwan (`"TW"`)
+
+    **Middle East (1 country):** Turkey (`"TR"`)
 
     Examples
     --------
-    Generate test data from a schema with Field constraints:
+    Generate test data from a schema with field constraints:
 
-    ```python
+    ```{python}
     import pointblank as pb
 
     schema = pb.Schema(
@@ -1616,25 +1617,25 @@ def generate_dataset(
     )
 
     # Generate 100 rows of test data
-    test_data = pb.generate_dataset(schema, n=100, seed=23)
+    pb.preview(pb.generate_dataset(schema, n=100, seed=23))
     ```
 
     Generate data from a simple dtype-only schema as a Pandas DataFrame:
 
-    ```python
+    ```{python}
     schema = pb.Schema(name="String", age="Int64", active="Boolean")
-    test_data = pb.generate_dataset(schema, n=50, seed=123, output="pandas")
+    pb.preview(pb.generate_dataset(schema, n=50, seed=23, output="pandas"))
     ```
 
-    Generate data for German addresses:
+    Generate data with German addresses by using `country="DE"`:
 
-    ```python
+    ```{python}
     schema = pb.Schema(
         name=pb.string_field(preset="name"),
         address=pb.string_field(preset="address"),
         city=pb.string_field(preset="city"),
     )
-    german_data = pb.generate_dataset(schema, n=20, seed=42, country="DE")
+    pb.preview(pb.generate_dataset(schema, n=20, seed=23, country="DE"))
     ```
     """
     return schema.generate(n=n, seed=seed, output=output, country=country)
