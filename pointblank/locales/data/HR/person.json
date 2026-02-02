@@ -1,0 +1,38 @@
+{
+  "first_names": {
+    "male": [
+      "Ivan", "Marko", "Josip", "Tomislav", "Ante", "Stjepan", "Nikola", "Luka", "Davor", "Zdravko",
+      "Mario", "Darko", "Željko", "Branko", "Hrvoje", "Goran", "Dragan", "Mladen", "Boris", "Zoran",
+      "Petar", "Marin", "Matej", "Filip", "Antonio", "Karlo", "Fran", "David", "Jakov", "Lovro",
+      "Dino", "Robert", "Vedran", "Kristijan", "Siniša", "Miroslav", "Vladimir", "Ivica", "Damir", "Nenad",
+      "Dubravko", "Krešimir", "Tihomir", "Zlatko", "Emil", "Igor", "Miljenko", "Bruno", "Leon", "Adrian",
+      "Domagoj", "Dominik", "Patrik", "Viktor", "Matija", "Tin", "Roko", "Borna", "Niko", "Jan"
+    ],
+    "female": [
+      "Ana", "Marija", "Ivana", "Petra", "Marina", "Lucija", "Katarina", "Maja", "Martina", "Nikolina",
+      "Jelena", "Kristina", "Andrea", "Sara", "Iva", "Tea", "Lana", "Mia", "Karla", "Ena",
+      "Valentina", "Lidija", "Mirjana", "Snježana", "Dragica", "Jasmina", "Gordana", "Branka", "Nataša", "Tatjana",
+      "Sanja", "Vesna", "Renata", "Dijana", "Danijela", "Sandra", "Irena", "Helena", "Antonia", "Paula",
+      "Gabrijela", "Monika", "Barbara", "Lorena", "Dora", "Eva", "Marta", "Nina", "Tina", "Klara",
+      "Adriana", "Lara", "Ivona", "Margareta", "Stella", "Ema", "Hana", "Matea", "Lea", "Laura"
+    ],
+    "neutral": ["Saša", "Andrea", "Nikola", "Dominik", "Vanja", "Jura", "Nika", "Ines", "Renato", "Darijo"]
+  },
+  "last_names": [
+    "Horvat", "Kovačević", "Babić", "Marić", "Novak", "Jurić", "Knežević", "Vuković", "Matić", "Tomić",
+    "Pavlović", "Kovač", "Perić", "Blažević", "Radić", "Filipović", "Šimić", "Gregorić", "Rožić", "Šarić",
+    "Pavić", "Bogdanović", "Vidović", "Petrović", "Grgić", "Bosanac", "Antić", "Mandić", "Barić", "Lončar",
+    "Tadić", "Herceg", "Mikić", "Lovrić", "Škvorc", "Bilić", "Bošnjak", "Brkić", "Čavić", "Domjanović",
+    "Galić", "Ilić", "Jakšić", "Jerković", "Karlović", "Kos", "Kranjčević", "Krstić", "Lukić", "Mađar",
+    "Milić", "Nikić", "Orešković", "Pejić", "Rajić", "Salopek", "Starčević", "Štimac", "Tomašević", "Zorić"
+  ],
+  "name_formats": [
+    "{first_name} {last_name}"
+  ],
+  "prefixes": {
+    "male": ["g.", "dr.", "prof.", "ing.", "mr.", "mag."],
+    "female": ["gđa.", "gđica.", "dr.", "prof.", "ing.", "mr.", "mag."],
+    "neutral": ["dr.", "prof.", "ing.", "mr.", "mag."]
+  },
+  "suffixes": ["ml.", "st.", "PhD", "MBA"]
+}
