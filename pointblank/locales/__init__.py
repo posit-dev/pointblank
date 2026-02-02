@@ -118,6 +118,9 @@ COUNTRY_CODE_MAP: dict[str, str] = {
     # Lithuania
     "LT": "LT",
     "LTU": "LT",
+    # Luxembourg
+    "LU": "LU",
+    "LUX": "LU",
     # China
     "CN": "CN",
     "CHN": "CN",
@@ -197,6 +200,7 @@ COUNTRIES_WITH_FULL_DATA: list[str] = [
     "KR",  # South Korea
     "LV",  # Latvia
     "LT",  # Lithuania
+    "LU",  # Luxembourg
     "MX",  # Mexico
     "NL",  # Netherlands
     "NO",  # Norway
