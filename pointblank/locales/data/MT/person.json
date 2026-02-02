@@ -1,0 +1,38 @@
+{
+  "first_names": {
+    "male": [
+      "Joseph", "John", "Paul", "George", "Mario", "Anthony", "Michael", "David", "Mark", "Charles",
+      "Robert", "Raymond", "Carmel", "Francis", "Emanuel", "Louis", "Alfred", "Victor", "Albert", "Edward",
+      "Lawrence", "Vincent", "Martin", "Stephen", "Andrew", "Peter", "James", "Christopher", "Matthew", "Daniel",
+      "Saviour", "Carmelo", "Salvatore", "Jesmond", "Noel", "Ivan", "Adrian", "Christian", "Clive", "Keith",
+      "Kurt", "Luca", "Matteo", "Gabriel", "Ethan", "Jake", "Luke", "Nathan", "Sean", "Owen",
+      "Karl", "Jean", "Claude", "Pierre", "Andre", "Reuben", "Isaac", "Samuel", "Benjamin", "Nicholas"
+    ],
+    "female": [
+      "Maria", "Carmen", "Anna", "Rose", "Josephine", "Grace", "Mary", "Rita", "Catherine", "Teresa",
+      "Angela", "Margaret", "Elizabeth", "Patricia", "Doris", "Joan", "Helen", "Louise", "Victoria", "Christine",
+      "Michelle", "Sandra", "Diane", "Caroline", "Stephanie", "Amanda", "Nicole", "Sarah", "Emma", "Laura",
+      "Francesca", "Giulia", "Sofia", "Martina", "Chiara", "Lucia", "Elena", "Giorgia", "Valentina", "Alessia",
+      "Mia", "Ella", "Amy", "Chloe", "Hannah", "Leah", "Rachel", "Rebecca", "Jessica", "Natalie",
+      "Antoinette", "Bernadette", "Pauline", "Rosemarie", "Mariella", "Graziella", "Connie", "Doreen", "Marlene", "Josette"
+    ],
+    "neutral": ["Alex", "Chris", "Jean", "Claude", "Andrea", "Dominique", "Noel", "Francis", "Ashley", "Jordan"]
+  },
+  "last_names": [
+    "Borg", "Camilleri", "Vella", "Farrugia", "Zammit", "Galea", "Spiteri", "Micallef", "Grech", "Attard",
+    "Sammut", "Fenech", "Muscat", "Caruana", "Mifsud", "Pace", "Azzopardi", "Cassar", "Brincat", "Calleja",
+    "Scicluna", "Bonnici", "Schembri", "Bugeja", "Agius", "Chetcuti", "Debono", "Buttigieg", "Portelli", "Xerri",
+    "Formosa", "Baldacchino", "Cutajar", "Sultana", "Abela", "Mangion", "Gatt", "Tonna", "Cauchi", "Cremona",
+    "Sant", "Mallia", "Psaila", "Zahra", "Gauci", "Vassallo", "Ellul", "Falzon", "Magro", "Barbara",
+    "Bonello", "Buhagiar", "Delia", "Dimech", "Busuttil", "Cardona", "Darmanin", "Falcone", "Pullicino", "Scerri"
+  ],
+  "name_formats": [
+    "{first_name} {last_name}"
+  ],
+  "prefixes": {
+    "male": ["Mr", "Dr", "Prof", "Ing", "Rev", "Hon"],
+    "female": ["Mrs", "Ms", "Miss", "Dr", "Prof", "Ing", "Rev", "Hon"],
+    "neutral": ["Dr", "Prof", "Ing", "Rev", "Hon"]
+  },
+  "suffixes": ["PhD", "MBA", "OBE", "MBE", "KM", "MOM"]
+}
