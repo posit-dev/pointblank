@@ -1,0 +1,38 @@
+{
+  "first_names": {
+    "male": [
+      "Luka", "Janez", "Marko", "Andrej", "Matej", "Matic", "Žan", "Nejc", "Rok", "Anže",
+      "Tilen", "Miha", "Jure", "Primož", "Bojan", "Gregor", "Dejan", "Aleš", "Tomaž", "Igor",
+      "Franc", "Ivan", "Anton", "Jožef", "Peter", "Milan", "Boris", "Mitja", "Blaž", "Gašper",
+      "Simon", "David", "Jan", "Nik", "Žiga", "Tadej", "Urban", "Aljaž", "Vid", "Klemen",
+      "Leon", "Domen", "Lovro", "Jakob", "Filip", "Matjaž", "Boštjan", "Samo", "Jernej", "Damjan",
+      "Robert", "Sašo", "Danijel", "Vladimir", "Srečko", "Drago", "Slavko", "Branko", "Zdravko", "Stanko"
+    ],
+    "female": [
+      "Ana", "Maja", "Nina", "Eva", "Anja", "Sara", "Tina", "Petra", "Katja", "Monika",
+      "Urška", "Špela", "Tjaša", "Nika", "Lara", "Zala", "Neža", "Klara", "Ema", "Hana",
+      "Marija", "Nataša", "Alenka", "Irena", "Mateja", "Vesna", "Suzana", "Mojca", "Barbara", "Simona",
+      "Lidija", "Polona", "Janja", "Andreja", "Metka", "Martina", "Lucija", "Valentina", "Laura", "Ines",
+      "Manca", "Ajda", "Ela", "Živa", "Julija", "Rebeka", "Lea", "Teja", "Maša", "Karmen",
+      "Sonja", "Branka", "Dragica", "Marjeta", "Ivana", "Milena", "Olga", "Vera", "Darinka", "Tatjana"
+    ],
+    "neutral": ["Saša", "Nika", "Dominik", "Andrea", "Nikola", "Jure", "Tilen", "Simona", "Matej", "Luka"]
+  },
+  "last_names": [
+    "Novak", "Horvat", "Krajnc", "Kovačič", "Zupančič", "Potočnik", "Kovač", "Mlakar", "Kos", "Vidmar",
+    "Golob", "Turk", "Božič", "Kotnik", "Korošec", "Bizjak", "Hribar", "Černigoj", "Logar", "Rozman",
+    "Petek", "Zajc", "Hočevar", "Gorenc", "Žagar", "Kavčič", "Kranjc", "Jamnik", "Primožič", "Breznik",
+    "Kuhar", "Dolenc", "Štrukelj", "Erjavec", "Jereb", "Kastelic", "Zupan", "Kocijančič", "Lah", "Pečnik",
+    "Starič", "Tomc", "Tratnik", "Udovič", "Vodopivec", "Žnidaršič", "Černe", "Babič", "Marinko", "Medved",
+    "Pirnat", "Ribič", "Sever", "Škof", "Tekavec", "Urbanc", "Vesel", "Zakrajšek", "Arh", "Bogataj"
+  ],
+  "name_formats": [
+    "{first_name} {last_name}"
+  ],
+  "prefixes": {
+    "male": ["gospod", "g.", "dr.", "mag.", "prof.", "dipl. ing."],
+    "female": ["gospa", "ga.", "dr.", "mag.", "prof.", "dipl. ing."],
+    "neutral": ["dr.", "mag.", "prof.", "dipl. ing."]
+  },
+  "suffixes": ["ml.", "st.", "dr.", "mag.", "dipl. ing.", "univ. dipl."]
+}
