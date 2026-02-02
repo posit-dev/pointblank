@@ -1,0 +1,389 @@
+---
+title: Test Data Generation
+jupyter: python3
+toc-expand: 2
+html-table-processing: none
+---
+
+```{python}
+# | echo: false
+
+import pointblank as pb
+pb.config(report_incl_footer=False)
+```
+
+Pointblank provides a built-in test data generation system that creates realistic, locale-aware
+synthetic data based on schema definitions. This is useful for testing validation rules, creating
+sample datasets, and generating fixture data for development.
+
+::: {.callout-note}
+Throughout this guide, we use `pb.preview()` to display generated datasets with nice HTML
+formatting. This is optional: `pb.generate_dataset()` returns a standard DataFrame that you can
+display or manipulate however you prefer.
+:::
+
+## Quick Start
+
+Generate test data using a schema with field constraints:
+
+```{python}
+import pointblank as pb
+
+# Define a schema with typed field specifications
+schema = pb.Schema(
+    user_id=pb.int_field(min_val=1, unique=True),
+    name=pb.string_field(preset="name"),
+    email=pb.string_field(preset="email"),
+    age=pb.int_field(min_val=18, max_val=80),
+    status=pb.string_field(allowed=["active", "pending", "inactive"]),
+)
+
+# Generate 10 rows of test data (seed ensures reproducibility)
+test_data = pb.generate_dataset(schema, n=100, seed=23)
+test_data
+```
+
+## Field Types
+
+Pointblank provides helper functions for defining typed columns with constraints:
+
+| Function | Description | Key Parameters |
+|----------|-------------|----------------|
+| `int_field()` | Integer columns | `min_val`, `max_val`, `allowed`, `unique` |
+| `float_field()` | Float columns | `min_val`, `max_val`, `allowed` |
+| `string_field()` | String columns | `preset`, `pattern`, `allowed`, `unique` |
+| `bool_field()` | Boolean columns | `p_true` (probability of True) |
+| `date_field()` | Date columns | `min_val`, `max_val` |
+| `datetime_field()` | Datetime columns | `min_val`, `max_val` |
+| `time_field()` | Time columns | `min_val`, `max_val` |
+| `duration_field()` | Duration columns | `min_val`, `max_val` |
+
+### Integer Fields
+
+Integer fields support range constraints with `min_val` and `max_val`, discrete allowed values with
+`allowed`, and uniqueness enforcement with `unique=True`:
+
+```{python}
+schema = pb.Schema(
+    id=pb.int_field(min_val=1000, max_val=9999, unique=True),
+    quantity=pb.int_field(min_val=1, max_val=100),
+    rating=pb.int_field(allowed=[1, 2, 3, 4, 5]),
+)
+
+pb.preview(pb.generate_dataset(schema, n=100, seed=23))
+```
+
+The `unique=True` constraint ensures no duplicate values appear in that column, which is useful for
+generating primary keys or identifiers.
+
+### Float Fields
+
+Float fields work similarly to integers, with `min_val` and `max_val` defining the range of
+generated values:
+
+```{python}
+schema = pb.Schema(
+    price=pb.float_field(min_val=0.0, max_val=1000.0),
+    discount=pb.float_field(min_val=0.0, max_val=0.5),
+    temperature=pb.float_field(min_val=-40.0, max_val=50.0),
+)
+
+pb.preview(pb.generate_dataset(schema, n=100, seed=23))
+```
+
+Values are uniformly distributed across the specified range, making this useful for simulating
+measurements, prices, or any continuous numeric data.
+
+### String Fields with Presets
+
+Presets generate realistic data like names, emails, and addresses. When you include related
+fields like `name` and `email` in the same schema, Pointblank ensures **coherence** (e.g., the email
+address will be derived from the person's name), making the generated data more realistic:
+
+```{python}
+schema = pb.Schema(
+    full_name=pb.string_field(preset="name"),
+    email=pb.string_field(preset="email"),
+    company=pb.string_field(preset="company"),
+    city=pb.string_field(preset="city"),
+)
+
+pb.preview(pb.generate_dataset(schema, n=100, seed=23))
+```
+
+This coherence extends to other related fields like `user_name`, which will also reflect the
+person's name when included alongside name and email fields.
+
+### String Fields with Patterns
+
+Use regex patterns to generate strings matching specific formats:
+
+```{python}
+schema = pb.Schema(
+    product_code=pb.string_field(pattern=r"[A-Z]{3}-[0-9]{4}"),
+    phone=pb.string_field(pattern=r"\([0-9]{3}\) [0-9]{3}-[0-9]{4}"),
+    license_plate=pb.string_field(pattern=r"[A-Z]{2}[0-9]{2} [A-Z]{3}"),
+)
+
+pb.preview(pb.generate_dataset(schema, n=100, seed=23))
+```
+
+Patterns support standard regex character classes and quantifiers, giving you flexibility to
+generate data matching virtually any format specification.
+
+### Boolean Fields
+
+Control the probability of `True` values:
+
+```{python}
+schema = pb.Schema(
+    is_active=pb.bool_field(p_true=0.8),      # 80% True
+    is_premium=pb.bool_field(p_true=0.2),     # 20% True
+    is_verified=pb.bool_field(),              # 50% True (default)
+)
+
+pb.preview(pb.generate_dataset(schema, n=100, seed=23))
+```
+
+This probabilistic control is helpful when you need to simulate real-world distributions where
+certain states are more common than others.
+
+### Date and Datetime Fields
+
+Temporal fields accept Python `date` and `datetime` objects for their range boundaries, generating
+values uniformly distributed within the specified period:
+
+```{python}
+from datetime import date, datetime
+
+schema = pb.Schema(
+    birth_date=pb.date_field(
+        min_val=date(1960, 1, 1),
+        max_val=date(2005, 12, 31)
+    ),
+    created_at=pb.datetime_field(
+        min_val=datetime(2024, 1, 1),
+        max_val=datetime(2024, 12, 31)
+    ),
+)
+
+pb.preview(pb.generate_dataset(schema, n=100, seed=23))
+```
+
+The same pattern applies to `time_field()` and `duration_field()`, allowing you to generate
+realistic temporal data for any use case.
+
+## Available Presets
+
+The `preset=` parameter in `string_field()` supports many data types:
+
+**Personal Data:**
+
+- `name`: full name (first + last)
+- `name_full`: full name with potential prefix/suffix
+- `first_name`: first name only
+- `last_name`: last name only
+- `email`: email address
+
+**Location Data:**
+
+- `address`: full street address
+- `city`: city name
+- `state`: state/province name
+- `country`: country name
+- `postcode`: postal/ZIP code
+- `latitude`: latitude coordinate
+- `longitude`: longitude coordinate
+
+**Business Data:**
+
+- `company`: company name
+- `job`: job title
+- `catch_phrase`: business catch phrase
+
+**Internet Data:**
+
+- `url`: website URL
+- `domain_name`: domain name
+- `ipv4`: IPv4 address
+- `ipv6`: IPv6 address
+- `user_name`: username
+- `password`: password
+
+**Financial Data:**
+
+- `credit_card_number`: credit card number
+- `iban`: International Bank Account Number
+- `currency_code`: currency code (USD, EUR, etc.)
+
+**Identifiers:**
+
+- `uuid4`: UUID version 4
+- `ssn`: Social Security Number (US format)
+- `license_plate`: vehicle license plate
+
+**Text:**
+
+- `word`: single word
+- `sentence`: full sentence
+- `paragraph`: paragraph of text
+- `text`: multiple paragraphs
+
+**Miscellaneous:**
+
+- `color_name`: color name
+- `file_name`: file name
+- `file_extension`: file extension
+- `mime_type`: MIME type
+
+## Country-Specific Data
+
+One of the most powerful features is generating locale-aware data. Use the `country=` parameter
+to generate data specific to a country. This affects names, cities, addresses, and other
+locale-sensitive presets.
+
+Let's create a schema that includes several location-related fields. When generating data for a
+specific country, Pointblank ensures *consistency across related fields*. The city, address,
+postcode, and coordinates will all correspond to the same location:
+
+```{python}
+# Schema with linked location fields
+schema = pb.Schema(
+    name=pb.string_field(preset="name"),
+    city=pb.string_field(preset="city"),
+    address=pb.string_field(preset="address"),
+    postcode=pb.string_field(preset="postcode"),
+    latitude=pb.string_field(preset="latitude"),
+    longitude=pb.string_field(preset="longitude"),
+)
+```
+
+Here's German data with authentic names and addresses from cities like Berlin, Munich, and Hamburg.
+Notice how the latitude/longitude coordinates match real locations in Germany:
+
+```{python}
+pb.preview(pb.generate_dataset(schema, n=200, seed=23, country="DE"))
+```
+
+Japanese data includes names in romanized form and addresses from cities like Tokyo, Osaka, and
+Kyoto. The coordinates fall within Japan's geographic boundaries:
+
+```{python}
+pb.preview(pb.generate_dataset(schema, n=200, seed=23, country="JP"))
+```
+
+Brazilian data features Portuguese names and addresses from cities like São Paulo, Rio de Janeiro,
+and Brasília. The postal codes follow Brazil's CEP format:
+
+```{python}
+pb.preview(pb.generate_dataset(schema, n=200, seed=23, country="BR"))
+```
+
+This location coherence is valuable when testing geospatial applications, address validation
+systems, or any scenario where realistic, internally-consistent location data matters.
+
+### Supported Countries
+
+Pointblank currently supports 50 countries with full locale data for realistic test data generation.
+You can use either ISO 3166-1 alpha-2 codes (e.g., `"US"`) or alpha-3 codes (e.g., `"USA"`).
+
+**Europe (32 countries):**
+
+- Austria (`AT`), Belgium (`BE`), Bulgaria (`BG`), Croatia (`HR`), Cyprus (`CY`), Czech Republic (`CZ`), Denmark (`DK`), Estonia (`EE`), Finland (`FI`), France (`FR`), Germany (`DE`), Greece (`GR`), Hungary (`HU`), Iceland (`IS`), Ireland (`IE`), Italy (`IT`), Latvia (`LV`), Lithuania (`LT`), Luxembourg (`LU`), Malta (`MT`), Netherlands (`NL`), Norway (`NO`), Poland (`PL`), Portugal (`PT`), Romania (`RO`), Russia (`RU`), Slovakia (`SK`), Slovenia (`SI`), Spain (`ES`), Sweden (`SE`), Switzerland (`CH`), United Kingdom (`GB`)
+
+**Americas (7 countries):**
+
+- Argentina (`AR`), Brazil (`BR`), Canada (`CA`), Chile (`CL`), Colombia (`CO`), Mexico (`MX`), United States (`US`)
+
+**Asia-Pacific (10 countries):**
+
+- Australia (`AU`), China (`CN`), Hong Kong (`HK`), India (`IN`), Indonesia (`ID`), Japan (`JP`), New Zealand (`NZ`), Philippines (`PH`), South Korea (`KR`), Taiwan (`TW`)
+
+**Middle East (1 country):**
+
+- Turkey (`TR`)
+
+Additional countries and expanded coverage are planned for future releases.
+
+## Output Formats
+
+The `generate_dataset()` function supports multiple output formats via the `output=` parameter,
+making it easy to integrate with your preferred data processing library.
+
+```{python}
+schema = pb.Schema(
+    id=pb.int_field(min_val=1),
+    name=pb.string_field(preset="name"),
+)
+```
+
+The default output is a **Polars DataFrame**, which offers excellent performance and a modern API
+for data manipulation:
+
+```{python}
+# Polars DataFrame (default)
+polars_df = pb.generate_dataset(schema, n=100, seed=23, output="polars")
+pb.preview(polars_df)
+```
+
+If your workflow uses Pandas, simply specify `output="pandas"` to get a **Pandas DataFrame**:
+
+```{python}
+# Pandas DataFrame
+pandas_df = pb.generate_dataset(schema, n=100, seed=23, output="pandas")
+pb.preview(pandas_df)
+```
+
+Both formats work seamlessly with Pointblank's validation functions, so you can choose whichever
+fits best with your existing data pipeline.
+
+## Using Generated Data for Validation Testing
+
+A common use case is generating test data to validate your validation rules:
+
+```{python}
+# Define a schema with constraints
+schema = pb.Schema(
+    user_id=pb.int_field(min_val=1, unique=True),
+    email=pb.string_field(preset="email"),
+    age=pb.int_field(min_val=18, max_val=100),
+    status=pb.string_field(allowed=["active", "pending", "inactive"]),
+)
+
+# Generate test data
+test_data = pb.generate_dataset(schema, n=100, seed=23)
+
+# Validate the generated data (it should pass all checks)
+validation = (
+    pb.Validate(test_data)
+    .col_vals_gt("user_id", 0)
+    .col_vals_regex("email", r".+@.+\..+")
+    .col_vals_between("age", 18, 100)
+    .col_vals_in_set("status", ["active", "pending", "inactive"])
+    .interrogate()
+)
+
+validation
+```
+
+Since the generated data respects the constraints defined in the schema, it should pass all
+validation checks. This workflow is particularly useful for testing validation logic before
+applying it to production data, or for creating reproducible test fixtures in your CI/CD pipeline.
+
+## Conclusion
+
+Test data generation provides a convenient way to create realistic synthetic datasets directly from
+schema definitions. While the concept is straightforward (defining field types and constraints, then
+generating matching data), the feature can be invaluable in many development and testing workflows.
+By incorporating test data generation into your process, you can:
+
+- quickly prototype validation rules before working with production data
+- create reproducible test fixtures for automated testing and CI/CD pipelines
+- generate locale-specific data for internationalization testing across many countries
+- ensure coherent relationships between related fields like names, emails, and addresses
+- produce datasets of any size with consistent, realistic values
+
+Whether you're building validation logic, testing data pipelines, or simply need sample data for
+development, the schema-based generation approach gives you precise control over data
+characteristics while maintaining the realism needed to uncover edge cases and validate your
+assumptions about data quality.
