@@ -46,6 +46,9 @@ COUNTRY_CODE_MAP: dict[str, str] = {
     # Australia
     "AU": "AU",
     "AUS": "AU",
+    # Argentina
+    "AR": "AR",
+    "ARG": "AR",
     # Canada
     "CA": "CA",
     "CAN": "CA",
@@ -149,6 +152,7 @@ COUNTRY_CODE_MAP: dict[str, str] = {
 # internet, misc, person, and text JSON files in the data directory
 COUNTRIES_WITH_FULL_DATA: list[str] = [
     "US",  # United States
+    "AR",  # Argentina
     "AT",  # Austria
     "AU",  # Australia
     "BE",  # Belgium
