@@ -88,6 +88,9 @@ COUNTRY_CODE_MAP: dict[str, str] = {
     # Belgium
     "BE": "BE",
     "BEL": "BE",
+    # Bulgaria
+    "BG": "BG",
+    "BGR": "BG",
     # Poland
     "PL": "PL",
     "POL": "PL",
@@ -143,6 +146,7 @@ COUNTRIES_WITH_FULL_DATA: list[str] = [
     "AT",  # Austria
     "AU",  # Australia
     "BE",  # Belgium
+    "BG",  # Bulgaria
     "BR",  # Brazil
     "CA",  # Canada
     "CH",  # Switzerland
