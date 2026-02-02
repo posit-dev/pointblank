@@ -219,6 +219,7 @@ COUNTRIES_WITH_FULL_DATA: list[str] = [
     "PH",  # Philippines
     "PT",  # Portugal
     "RO",  # Romania
+    "RU",  # Russia
     "SE",  # Sweden
     "SK",  # Slovakia
     "SI",  # Slovenia
