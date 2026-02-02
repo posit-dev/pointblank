@@ -701,6 +701,9 @@ class BoolField(Field):
 
     Parameters
     ----------
+    p_true
+        Probability of generating `True`. Default is `0.5` (equal probability).
+        Must be between 0.0 and 1.0.
     nullable
         Whether the column can contain null values. Default is `False`.
     null_probability
@@ -718,13 +721,19 @@ class BoolField(Field):
     ```python
     import pointblank as pb
 
-    # Basic boolean field
+    # Basic boolean field (50% True)
     is_active = pb.bool_field()
+
+    # Boolean with 80% probability of True
+    is_verified = pb.bool_field(p_true=0.8)
 
     # Nullable boolean
     has_subscription = pb.bool_field(nullable=True, null_probability=0.1)
     ```
     """
+
+    # Boolean-specific parameter
+    p_true: float = 0.5
 
     # Override dtype with fixed value
     dtype: str = "Boolean"
@@ -737,8 +746,13 @@ class BoolField(Field):
         if self.dtype != "Boolean":
             raise ValueError(f"BoolField dtype must be 'Boolean', got '{self.dtype}'")
 
+        # Validate p_true
+        if not 0.0 <= self.p_true <= 1.0:
+            raise ValueError(f"p_true must be between 0.0 and 1.0, got {self.p_true}")
+
 
 def bool_field(
+    p_true: float = 0.5,
     nullable: bool = False,
     null_probability: float = 0.0,
     unique: bool = False,
@@ -749,6 +763,9 @@ def bool_field(
 
     Parameters
     ----------
+    p_true
+        Probability of generating `True`. Default is `0.5` (equal probability).
+        Must be between 0.0 and 1.0.
     nullable
         Whether the column can contain null values. Default is `False`.
     null_probability
@@ -770,14 +787,16 @@ def bool_field(
     import pointblank as pb
 
     schema = pb.Schema(
-        is_active=pb.bool_field(),
-        is_verified=pb.bool_field(nullable=True, null_probability=0.05),
+        is_active=pb.bool_field(p_true=0.8),      # 80% True
+        is_premium=pb.bool_field(p_true=0.2),     # 20% True
+        is_verified=pb.bool_field(),              # 50% True (default)
     )
 
     data = schema.generate(n=100, seed=23)
     ```
     """
     return BoolField(
+        p_true=p_true,
         nullable=nullable,
         null_probability=null_probability,
         unique=unique,

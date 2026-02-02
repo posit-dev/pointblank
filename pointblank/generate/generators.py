@@ -161,7 +161,8 @@ def _generate_from_pattern(pattern: str, rng: random.Random) -> str:
 
 def _generate_boolean(field: Field, rng: random.Random, generator: Any | None = None) -> bool:
     """Generate a random boolean value."""
-    return rng.choice([True, False])
+    p_true = getattr(field, "p_true", 0.5)
+    return rng.random() < p_true
 
 
 def _generate_date(field: Field, rng: random.Random, generator: Any | None = None) -> date:
