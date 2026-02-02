@@ -76,6 +76,9 @@ COUNTRY_CODE_MAP: dict[str, str] = {
     # Mexico
     "MX": "MX",
     "MEX": "MX",
+    # Malta
+    "MT": "MT",
+    "MLT": "MT",
     # Portugal
     "PT": "PT",
     "PRT": "PT",
@@ -106,6 +109,9 @@ COUNTRY_CODE_MAP: dict[str, str] = {
     # Russia
     "RU": "RU",
     "RUS": "RU",
+    # Slovakia
+    "SK": "SK",
+    "SVK": "SK",
     # Japan
     "JP": "JP",
     "JPN": "JP",
@@ -201,6 +207,7 @@ COUNTRIES_WITH_FULL_DATA: list[str] = [
     "LV",  # Latvia
     "LT",  # Lithuania
     "LU",  # Luxembourg
+    "MT",  # Malta
     "MX",  # Mexico
     "NL",  # Netherlands
     "NO",  # Norway
@@ -210,6 +217,7 @@ COUNTRIES_WITH_FULL_DATA: list[str] = [
     "PT",  # Portugal
     "RO",  # Romania
     "SE",  # Sweden
+    "SK",  # Slovakia
     "TR",  # Turkey
     "TW",  # Taiwan
 ]
