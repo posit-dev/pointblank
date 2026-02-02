@@ -1,0 +1,38 @@
+{
+  "first_names": {
+    "male": [
+      "Ján", "Peter", "Martin", "Jozef", "Štefan", "Michal", "Tomáš", "Miroslav", "Pavol", "Ladislav",
+      "František", "Jaroslav", "Milan", "Ondrej", "Marek", "Lukáš", "Matej", "Jakub", "Adam", "Samuel",
+      "Dávid", "Filip", "Dominik", "Šimon", "Patrik", "Richard", "Róbert", "Eduard", "Branislav", "Rastislav",
+      "Vladimír", "Igor", "Boris", "Ivan", "Juraj", "Karol", "Anton", "Andrej", "Daniel", "Erik",
+      "Alexander", "Viktor", "Roman", "Stanislav", "Ľuboš", "Marián", "Dušan", "Radoslav", "Tibor", "Zdenko",
+      "Kamil", "Leonard", "Marcel", "Norbert", "Oliver", "Adrián", "René", "Silvester", "Teodor", "Viliam"
+    ],
+    "female": [
+      "Mária", "Anna", "Eva", "Katarína", "Jana", "Zuzana", "Monika", "Martina", "Helena", "Lucia",
+      "Veronika", "Petra", "Silvia", "Andrea", "Michaela", "Barbora", "Lenka", "Ivana", "Tatiana", "Simona",
+      "Soňa", "Dana", "Daniela", "Natália", "Kristína", "Alena", "Beáta", "Denisa", "Erika", "Gabriela",
+      "Henrieta", "Iveta", "Jarmila", "Klára", "Laura", "Magdaléna", "Nina", "Oľga", "Patrícia", "Radka",
+      "Renáta", "Sabína", "Terézia", "Viktória", "Žofia", "Alexandra", "Bianka", "Dominika", "Emma", "Hana",
+      "Ema", "Sofia", "Nela", "Ela", "Lia", "Mia", "Romana", "Tamara", "Linda", "Diana"
+    ],
+    "neutral": ["Alex", "Saša", "Nikola", "Andrea", "Dominik", "René", "Patrik", "Jozef", "Milan", "Roman"]
+  },
+  "last_names": [
+    "Horváth", "Kováč", "Varga", "Tóth", "Nagy", "Baláž", "Szabó", "Molnár", "Balog", "Lukáč",
+    "Novák", "Kučera", "Černý", "Polák", "Kollár", "Kováčová", "Horváthová", "Vargová", "Tóthová", "Nagyová",
+    "Valent", "Mikuš", "Hudák", "Šimko", "Čech", "Lacko", "Mészáros", "Záborský", "Kočiš", "Lakatoš",
+    "Ondruš", "Krajčí", "Bednár", "Gajdoš", "Hruška", "Janíček", "Kováčik", "Lauko", "Macko", "Oravec",
+    "Pápay", "Révész", "Sládek", "Štefan", "Turčan", "Uličný", "Vančo", "Zeman", "Adamec", "Bača",
+    "Čierny", "Dubovský", "Ferencz", "Gábriš", "Haluška", "Ivanič", "Jánošík", "Kmeť", "Labuda", "Majer"
+  ],
+  "name_formats": [
+    "{first_name} {last_name}"
+  ],
+  "prefixes": {
+    "male": ["pán", "Ing.", "Mgr.", "Dr.", "PhDr.", "MUDr.", "JUDr.", "Prof."],
+    "female": ["pani", "Ing.", "Mgr.", "Dr.", "PhDr.", "MUDr.", "JUDr.", "Prof."],
+    "neutral": ["Ing.", "Mgr.", "Dr.", "PhDr.", "MUDr.", "JUDr.", "Prof."]
+  },
+  "suffixes": ["PhD.", "CSc.", "MBA", "ml.", "st."]
+}
