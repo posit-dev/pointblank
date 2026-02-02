@@ -133,6 +133,9 @@ COUNTRY_CODE_MAP: dict[str, str] = {
     # Hong Kong
     "HK": "HK",
     "HKG": "HK",
+    # Croatia
+    "HR": "HR",
+    "HRV": "HR",
     # Hungary
     "HU": "HU",
     "HUN": "HU",
@@ -179,6 +182,7 @@ COUNTRIES_WITH_FULL_DATA: list[str] = [
     "GB",  # United Kingdom
     "GR",  # Greece
     "HK",  # Hong Kong
+    "HR",  # Croatia
     "HU",  # Hungary
     "ID",  # Indonesia
     "IE",  # Ireland
