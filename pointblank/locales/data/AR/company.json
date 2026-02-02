@@ -1,0 +1,60 @@
+{
+  "suffixes": [
+    "S.A.", "S.R.L.", "S.A.S.", "S.C.A.", "Coop.", "Ltda.", "Group", "Argentina", "AR", "Holdings"
+  ],
+  "formats": [
+    "{last_name} {suffix}",
+    "{adjective} {noun} {suffix}",
+    "{adjective} {noun}",
+    "{noun} {suffix}"
+  ],
+  "adjectives": [
+    "Argentina", "Austral", "Pampa", "Río", "Sur", "Norte", "Nacional", "Federal", "United", "Global",
+    "Premier", "First", "Modern", "Digital", "Smart", "Dynamic", "Latin", "Advanced", "New", "Gran"
+  ],
+  "nouns": [
+    "Bank", "Telecom", "Energy", "Power", "Gas", "Pharma", "Agro", "Electronics", "Engineering",
+    "Manufacturing", "Logistics", "Transport", "Trading", "Insurance", "Finance", "Construction", "Foods", "Retail", "Steel", "Shipping"
+  ],
+  "well_known_companies": [
+    {"name": "YPF", "cities": ["Buenos Aires"]},
+    {"name": "Mercado Libre", "cities": ["Buenos Aires"]},
+    {"name": "Techint Group", "cities": ["Buenos Aires"]},
+    {"name": "Banco Galicia", "cities": ["Buenos Aires", "Córdoba", "Rosario"]},
+    {"name": "Banco Santander Río", "cities": ["Buenos Aires", "Mendoza"]},
+    {"name": "Banco Macro", "cities": ["Buenos Aires", "Salta"]},
+    {"name": "Telecom Argentina", "cities": ["Buenos Aires"]},
+    {"name": "Claro Argentina", "cities": ["Buenos Aires", "Córdoba"]},
+    {"name": "Movistar Argentina", "cities": ["Buenos Aires", "Rosario"]},
+    {"name": "Aerolíneas Argentinas", "cities": ["Buenos Aires"]},
+    {"name": "Arcor", "cities": ["Córdoba", "Buenos Aires"]},
+    {"name": "Molinos Río de la Plata", "cities": ["Buenos Aires"]},
+    {"name": "Quilmes", "cities": ["Buenos Aires"]},
+    {"name": "Tenaris", "cities": ["Buenos Aires"]},
+    {"name": "Ternium Argentina", "cities": ["Buenos Aires", "Rosario"]},
+    {"name": "Pan American Energy", "cities": ["Buenos Aires", "Neuquén"]},
+    {"name": "Pampa Energía", "cities": ["Buenos Aires"]},
+    {"name": "Globant", "cities": ["Buenos Aires", "Rosario", "Córdoba"]},
+    {"name": "Despegar", "cities": ["Buenos Aires"]},
+    {"name": "Grupo Clarín", "cities": ["Buenos Aires"]}
+  ],
+  "jobs": [
+    "Software Engineer", "Product Manager", "Data Analyst", "Marketing Manager", "Sales Representative",
+    "HR Manager", "Financial Analyst", "Project Manager", "Operations Manager", "UI/UX Designer",
+    "Frontend Developer", "Backend Developer", "DevOps Engineer", "QA Engineer", "Data Scientist",
+    "Accountant", "Business Analyst", "Customer Service Representative", "Logistics Coordinator", "Procurement Specialist",
+    "Agronomist", "Industrial Engineer", "Production Manager", "Quality Manager", "IT Administrator"
+  ],
+  "catch_phrase_adjectives": [
+    "Innovative", "Reliable", "Professional", "Dynamic", "Trusted", "Leading", "Modern", "Sustainable",
+    "Customer-focused", "Quality-driven", "Latin American", "Regional"
+  ],
+  "catch_phrase_nouns": [
+    "solutions", "services", "quality", "excellence", "innovation", "value", "partnership", "growth",
+    "performance", "reliability", "integrity", "success"
+  ],
+  "catch_phrase_verbs": [
+    "deliver", "create", "build", "provide", "enable", "achieve", "drive", "transform", "empower",
+    "connect", "innovate", "lead"
+  ]
+}
