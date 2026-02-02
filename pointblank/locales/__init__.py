@@ -124,6 +124,9 @@ COUNTRY_CODE_MAP: dict[str, str] = {
     # Colombia
     "CO": "CO",
     "COL": "CO",
+    # Cyprus
+    "CY": "CY",
+    "CYP": "CY",
     # Czech Republic
     "CZ": "CZ",
     "CZE": "CZ",
@@ -172,6 +175,7 @@ COUNTRIES_WITH_FULL_DATA: list[str] = [
     "CL",  # Chile
     "CN",  # China
     "CO",  # Colombia
+    "CY",  # Cyprus
     "CZ",  # Czech Republic
     "DE",  # Germany
     "DK",  # Denmark
