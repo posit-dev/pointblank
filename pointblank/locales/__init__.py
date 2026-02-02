@@ -112,6 +112,9 @@ COUNTRY_CODE_MAP: dict[str, str] = {
     # Slovakia
     "SK": "SK",
     "SVK": "SK",
+    # Slovenia
+    "SI": "SI",
+    "SVN": "SI",
     # Japan
     "JP": "JP",
     "JPN": "JP",
@@ -218,6 +221,7 @@ COUNTRIES_WITH_FULL_DATA: list[str] = [
     "RO",  # Romania
     "SE",  # Sweden
     "SK",  # Slovakia
+    "SI",  # Slovenia
     "TR",  # Turkey
     "TW",  # Taiwan
 ]
