@@ -38,9 +38,8 @@ schema = pb.Schema(
     status=pb.string_field(allowed=["active", "pending", "inactive"]),
 )
 
-# Generate 10 rows of test data (seed ensures reproducibility)
-test_data = pb.generate_dataset(schema, n=100, seed=23)
-test_data
+# Generate 100 rows of test data (seed ensures reproducibility)
+pb.preview(pb.generate_dataset(schema, n=100, seed=23))
 ```
 
 ## Field Types
