@@ -6,7 +6,7 @@ from __future__ import annotations
 
 import random
 import string
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, time, timedelta
 from typing import TYPE_CHECKING, Any, Callable
 
 from pointblank._utils import _is_lib_present
@@ -220,17 +220,85 @@ def _generate_datetime(field: Field, rng: random.Random, generator: Any | None =
 
 
 def _generate_duration(field: Field, rng: random.Random, generator: Any | None = None) -> timedelta:
-    """Generate a random duration value."""
-    # Generate duration between 0 and 30 days by default
-    seconds = rng.randint(0, 30 * 24 * 60 * 60)
-    return timedelta(seconds=seconds)
+    """Generate a random duration value, respecting field constraints."""
+    min_duration = getattr(field, "min_duration", None)
+    max_duration = getattr(field, "max_duration", None)
+
+    # Parse min_duration
+    if min_duration is None:
+        min_d = timedelta(seconds=0)
+    elif isinstance(min_duration, str):
+        # Parse "HH:MM:SS" format
+        parts = min_duration.split(":")
+        if len(parts) == 3:
+            hours, minutes, seconds = map(float, parts)
+            min_d = timedelta(hours=hours, minutes=minutes, seconds=seconds)
+        elif len(parts) == 2:
+            minutes, seconds = map(float, parts)
+            min_d = timedelta(minutes=minutes, seconds=seconds)
+        else:
+            min_d = timedelta(seconds=0)
+    else:
+        min_d = min_duration
+
+    # Parse max_duration
+    if max_duration is None:
+        max_d = timedelta(days=30)  # Default: 30 days
+    elif isinstance(max_duration, str):
+        # Parse "HH:MM:SS" format
+        parts = max_duration.split(":")
+        if len(parts) == 3:
+            hours, minutes, seconds = map(float, parts)
+            max_d = timedelta(hours=hours, minutes=minutes, seconds=seconds)
+        elif len(parts) == 2:
+            minutes, seconds = map(float, parts)
+            max_d = timedelta(minutes=minutes, seconds=seconds)
+        else:
+            max_d = timedelta(days=30)
+    else:
+        max_d = max_duration
+
+    # Generate random duration within range
+    min_seconds = int(min_d.total_seconds())
+    max_seconds = int(max_d.total_seconds())
+    random_seconds = rng.randint(min_seconds, max(min_seconds, max_seconds))
+
+    return timedelta(seconds=random_seconds)
 
 
 def _generate_time(field: Field, rng: random.Random, generator: Any | None = None) -> str:
-    """Generate a random time value as string."""
-    hour = rng.randint(0, 23)
-    minute = rng.randint(0, 59)
-    second = rng.randint(0, 59)
+    """Generate a random time value as string, respecting field constraints."""
+    min_time = getattr(field, "min_time", None)
+    max_time = getattr(field, "max_time", None)
+
+    # Parse min_time
+    if min_time is None:
+        min_t = time(0, 0, 0)
+    elif isinstance(min_time, str):
+        min_t = time.fromisoformat(min_time)
+    else:
+        min_t = min_time
+
+    # Parse max_time
+    if max_time is None:
+        max_t = time(23, 59, 59)
+    elif isinstance(max_time, str):
+        max_t = time.fromisoformat(max_time)
+    else:
+        max_t = max_time
+
+    # Convert to seconds since midnight for random generation
+    min_seconds = min_t.hour * 3600 + min_t.minute * 60 + min_t.second
+    max_seconds = max_t.hour * 3600 + max_t.minute * 60 + max_t.second
+
+    # Generate random seconds within range
+    random_seconds = rng.randint(min_seconds, max(min_seconds, max_seconds))
+
+    # Convert back to time components
+    hour = random_seconds // 3600
+    minute = (random_seconds % 3600) // 60
+    second = random_seconds % 60
+
     return f"{hour:02d}:{minute:02d}:{second:02d}"
 
 
