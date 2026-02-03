@@ -1,5 +1,5 @@
 import pytest
-from datetime import date, datetime
+from datetime import date, datetime, time, timedelta
 
 from pointblank.locales import COUNTRIES_WITH_FULL_DATA
 from pointblank.field import (
@@ -9,6 +9,8 @@ from pointblank.field import (
     bool_field,
     date_field,
     datetime_field,
+    time_field,
+    duration_field,
     IntField,
     FloatField,
     StringField,
@@ -182,6 +184,158 @@ class TestGenerateColumnDatetime:
 
         assert len(values) == 10
         assert all(isinstance(v, datetime) for v in values)
+
+
+class TestGenerateColumnTime:
+    """Tests for time column generation."""
+
+    def test_generate_time_column(self):
+        """Test generating a Time column."""
+        field = time_field()
+        config = GeneratorConfig(n=10, seed=23)
+        values = generate_column(field, config)
+
+        assert len(values) == 10
+        assert all(isinstance(v, str) for v in values)
+        # Verify time format HH:MM:SS
+        for v in values:
+            parts = v.split(":")
+            assert len(parts) == 3
+            assert 0 <= int(parts[0]) <= 23
+            assert 0 <= int(parts[1]) <= 59
+            assert 0 <= int(parts[2]) <= 59
+
+    def test_generate_time_with_constraints(self):
+        """Test generating a Time column with min/max constraints."""
+        field = time_field(min_time=time(9, 0, 0), max_time=time(12, 0, 0))
+        config = GeneratorConfig(n=100, seed=23)
+        values = generate_column(field, config)
+
+        assert len(values) == 100
+        # Verify all times are within the 9:00-12:00 range
+        for v in values:
+            parts = v.split(":")
+            hour = int(parts[0])
+            minute = int(parts[1])
+            second = int(parts[2])
+            time_seconds = hour * 3600 + minute * 60 + second
+            min_seconds = 9 * 3600  # 09:00:00
+            max_seconds = 12 * 3600  # 12:00:00
+            assert min_seconds <= time_seconds <= max_seconds, f"Time {v} not in range 09:00-12:00"
+
+    def test_generate_time_different_fields_have_different_values(self):
+        """Test that different time fields generate different values (not the same row values)."""
+        # This tests the fix where time fields were all getting identical values per row
+        from pointblank import Schema, generate_dataset
+
+        schema = Schema(
+            start_time=time_field(min_time=time(9, 0, 0), max_time=time(12, 0, 0)),
+            end_time=time_field(min_time=time(13, 0, 0), max_time=time(17, 0, 0)),
+        )
+
+        df = generate_dataset(schema, n=50, seed=23)
+
+        # Get all values
+        start_times = df["start_time"].to_list()
+        end_times = df["end_time"].to_list()
+
+        # Verify the values are different (start_time should be 9-12, end_time should be 13-17)
+        for st, et in zip(start_times, end_times):
+            assert st != et, f"start_time {st} should not equal end_time {et}"
+
+            # Verify start_time is in 9-12 range
+            st_hour = int(st.split(":")[0])
+            assert 9 <= st_hour <= 12, f"start_time hour {st_hour} not in range 9-12"
+
+            # Verify end_time is in 13-17 range
+            et_hour = int(et.split(":")[0])
+            assert 13 <= et_hour <= 17, f"end_time hour {et_hour} not in range 13-17"
+
+    def test_generate_time_with_string_constraints(self):
+        """Test generating a Time column with string min/max constraints."""
+        field = time_field(min_time="14:00:00", max_time="18:30:00")
+        config = GeneratorConfig(n=100, seed=23)
+        values = generate_column(field, config)
+
+        assert len(values) == 100
+        for v in values:
+            parts = v.split(":")
+            hour = int(parts[0])
+            minute = int(parts[1])
+            second = int(parts[2])
+            time_seconds = hour * 3600 + minute * 60 + second
+            min_seconds = 14 * 3600  # 14:00:00
+            max_seconds = 18 * 3600 + 30 * 60  # 18:30:00
+            assert min_seconds <= time_seconds <= max_seconds, f"Time {v} not in range"
+
+
+class TestGenerateColumnDuration:
+    """Tests for duration column generation."""
+
+    def test_generate_duration_column(self):
+        """Test generating a Duration column."""
+        field = duration_field()
+        config = GeneratorConfig(n=10, seed=23)
+        values = generate_column(field, config)
+
+        assert len(values) == 10
+        assert all(isinstance(v, timedelta) for v in values)
+
+    def test_generate_duration_with_constraints(self):
+        """Test generating a Duration column with min/max constraints."""
+        min_dur = timedelta(minutes=5)
+        max_dur = timedelta(hours=2)
+        field = duration_field(min_duration=min_dur, max_duration=max_dur)
+        config = GeneratorConfig(n=100, seed=23)
+        values = generate_column(field, config)
+
+        assert len(values) == 100
+        for v in values:
+            assert min_dur <= v <= max_dur, f"Duration {v} not in range {min_dur}-{max_dur}"
+
+    def test_generate_duration_different_fields_have_different_values(self):
+        """Test that different duration fields generate different values."""
+        from pointblank import Schema, generate_dataset
+
+        schema = Schema(
+            session_length=duration_field(
+                min_duration=timedelta(hours=1), max_duration=timedelta(hours=3)
+            ),
+            wait_time=duration_field(
+                min_duration=timedelta(seconds=10), max_duration=timedelta(minutes=5)
+            ),
+        )
+
+        df = generate_dataset(schema, n=50, seed=23)
+
+        # Convert to Python objects for comparison
+        import polars as pl
+
+        session_lengths = df["session_length"].to_list()
+        wait_times = df["wait_time"].to_list()
+
+        # Verify values are in their respective ranges
+        for sl in session_lengths:
+            assert timedelta(hours=1) <= sl <= timedelta(hours=3), (
+                f"session_length {sl} not in 1-3 hour range"
+            )
+
+        for wt in wait_times:
+            assert timedelta(seconds=10) <= wt <= timedelta(minutes=5), (
+                f"wait_time {wt} not in 10sec-5min range"
+            )
+
+    def test_generate_duration_with_small_range(self):
+        """Test generating durations with a very small range."""
+        min_dur = timedelta(seconds=100)
+        max_dur = timedelta(seconds=110)
+        field = duration_field(min_duration=min_dur, max_duration=max_dur)
+        config = GeneratorConfig(n=50, seed=23)
+        values = generate_column(field, config)
+
+        assert len(values) == 50
+        for v in values:
+            assert min_dur <= v <= max_dur, f"Duration {v} not in narrow range"
 
 
 class TestGenerateColumnUnique:
