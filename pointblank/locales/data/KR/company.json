@@ -1,0 +1,68 @@
+{
+  "suffixes": [
+    "Corporation", "Corp", "Co Ltd", "Inc", "Group", "Holdings", "Electronics", "Industries",
+    "Engineering", "Construction", "Chemicals", "Life", "Insurance", "Securities", "Bank"
+  ],
+  "formats": [
+    "{last_name} {suffix}",
+    "{adjective} {noun} {suffix}",
+    "{adjective} {noun}",
+    "{noun} {suffix}"
+  ],
+  "adjectives": [
+    "Samsung", "Hyundai", "LG", "SK", "Lotte", "Hanwha", "Doosan", "Kumho", "Hanjin", "CJ",
+    "Korean", "Korea", "Global", "Asia", "Pacific", "United", "Premier", "Dynamic", "Smart", "Digital"
+  ],
+  "nouns": [
+    "Electronics", "Motors", "Heavy Industries", "Engineering", "Construction", "Chemicals", "Life",
+    "Insurance", "Securities", "Shipping", "Airlines", "Telecom", "Energy", "Petrochemical", "Steel",
+    "Semiconductor", "Display", "Battery", "Automotive", "Entertainment"
+  ],
+  "well_known_companies": [
+    {"name": "Samsung Electronics", "cities": ["Seoul", "Suwon", "Yongin", "Seongnam"]},
+    {"name": "Hyundai Motor", "cities": ["Seoul", "Ulsan", "Namyang"]},
+    {"name": "SK Hynix", "cities": ["Seoul", "Icheon", "Cheongju"]},
+    {"name": "LG Electronics", "cities": ["Seoul", "Pyeongtaek", "Gumi"]},
+    {"name": "POSCO", "cities": ["Seoul", "Pohang", "Gwangyang"]},
+    {"name": "Kia Motors", "cities": ["Seoul", "Hwaseong", "Gwangju"]},
+    {"name": "KB Financial Group", "cities": ["Seoul", "Yeouido"]},
+    {"name": "Shinhan Financial Group", "cities": ["Seoul", "Jung-gu"]},
+    {"name": "Hyundai Mobis", "cities": ["Seoul", "Ulsan", "Changwon"]},
+    {"name": "Samsung SDI", "cities": ["Yongin", "Cheonan", "Ulsan"]},
+    {"name": "LG Chem", "cities": ["Seoul", "Daesan", "Ochang"]},
+    {"name": "Samsung Display", "cities": ["Asan", "Cheonan"]},
+    {"name": "Naver", "cities": ["Seongnam", "Seoul"]},
+    {"name": "Kakao", "cities": ["Seongnam", "Jeju"]},
+    {"name": "Coupang", "cities": ["Seoul", "Bucheon"]},
+    {"name": "Krafton", "cities": ["Seongnam", "Seoul"]},
+    {"name": "NC Soft", "cities": ["Seongnam", "Seoul"]},
+    {"name": "Netmarble", "cities": ["Seoul", "Guro"]},
+    {"name": "Korean Air", "cities": ["Seoul", "Incheon"]},
+    {"name": "Asiana Airlines", "cities": ["Seoul", "Incheon"]},
+    {"name": "Lotte Corporation", "cities": ["Seoul", "Songpa-gu"]},
+    {"name": "CJ Corporation", "cities": ["Seoul", "Mapo-gu"]},
+    {"name": "Hanwha Group", "cities": ["Seoul", "Jung-gu"]},
+    {"name": "Doosan Group", "cities": ["Seoul", "Changwon"]},
+    {"name": "Hana Financial Group", "cities": ["Seoul", "Jung-gu"]}
+  ],
+  "jobs": [
+    "Software Engineer", "Product Manager", "Data Scientist", "Marketing Manager", "Sales Representative",
+    "HR Manager", "Financial Analyst", "Project Manager", "Operations Manager", "UI/UX Designer",
+    "Frontend Developer", "Backend Developer", "DevOps Engineer", "Mobile Developer", "AI Engineer",
+    "Semiconductor Engineer", "Display Engineer", "Battery Engineer", "Automotive Engineer", "Chemical Engineer",
+    "Investment Banker", "Fund Manager", "Accountant", "Management Consultant", "Business Analyst",
+    "Content Creator", "K-pop Manager", "Game Developer", "Esports Manager", "Entertainment Producer"
+  ],
+  "catch_phrase_adjectives": [
+    "Innovative", "Leading", "Global", "Dynamic", "Smart", "Digital", "Advanced", "Sustainable",
+    "Future-oriented", "Customer-focused", "Technology-driven", "World-class", "Premium", "Trusted"
+  ],
+  "catch_phrase_nouns": [
+    "innovation", "technology", "solutions", "excellence", "quality", "service", "value", "growth",
+    "partnership", "future", "leadership", "performance", "sustainability", "success"
+  ],
+  "catch_phrase_verbs": [
+    "inspire", "innovate", "create", "lead", "deliver", "transform", "empower", "enable", "connect",
+    "build", "drive", "achieve", "advance", "pioneer", "shape"
+  ]
+}

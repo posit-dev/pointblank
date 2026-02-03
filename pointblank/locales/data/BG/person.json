@@ -1,0 +1,40 @@
+{
+  "first_names": {
+    "male": [
+      "Ivan", "Georgi", "Dimitar", "Nikolay", "Petar", "Stefan", "Hristo", "Todor", "Yordan", "Vasil",
+      "Angel", "Aleksandar", "Martin", "Plamen", "Krasimir", "Stoyan", "Atanas", "Emil", "Boris", "Viktor",
+      "Kiril", "Mihail", "Valentin", "Daniel", "Rumen", "Boyko", "Deyan", "Ivo", "Lyubomir", "Stanislav",
+      "Bozhidar", "Svetoslav", "Radoslav", "Miroslav", "Dragomir", "Vladislav", "Zdravko", "Zlatan", "Bogdan", "Yavor",
+      "Tihomir", "Borislav", "Kaloyan", "Simeon", "Dobromir", "Milen", "Zhivko", "Kristian", "Anton", "Pavel",
+      "Vladimir", "Spas", "Asen", "Kostadin", "Nikola", "Ognyan", "Ventsislav", "Zahari", "Lyuben", "Svetlin"
+    ],
+    "female": [
+      "Maria", "Ivanka", "Elena", "Daniela", "Desislava", "Petya", "Silvia", "Galina", "Stefka", "Tsvetana",
+      "Nadezhda", "Ekaterina", "Yordanka", "Rumyana", "Gergana", "Teodora", "Antoaneta", "Boryana", "Violeta", "Vesela",
+      "Kalina", "Zdravka", "Radka", "Milena", "Stoyanka", "Penka", "Rositsa", "Liliya", "Mariya", "Viktoria",
+      "Zlatka", "Nikolina", "Albena", "Bilyana", "Darina", "Eva", "Fani", "Gabriela", "Hristina", "Irina",
+      "Yoana", "Kristina", "Lyudmila", "Magdalena", "Nataliya", "Olga", "Pavlina", "Ralitsa", "Snejana", "Tanya",
+      "Valentina", "Yana", "Zornitsa", "Anelia", "Blagovesta", "Diana", "Emiliya", "Iglika", "Kamelia", "Lora"
+    ],
+    "neutral": ["Aleksi", "Niki", "Sasha", "Vali", "Dani", "Mimi", "Bobi", "Toni", "Gabi", "Rumi"]
+  },
+  "last_names": [
+    "Ivanov", "Ivanova", "Georgiev", "Georgieva", "Dimitrov", "Dimitrova", "Petrov", "Petrova", "Nikolov", "Nikolova",
+    "Hristov", "Hristova", "Todorov", "Todorova", "Yordanov", "Yordanova", "Stefanov", "Stefanova", "Atanasov", "Atanasova",
+    "Angelov", "Angelova", "Vasilev", "Vasileva", "Kolev", "Koleva", "Stoyanov", "Stoyanova", "Marinov", "Marinova",
+    "Popov", "Popova", "Iliev", "Ilieva", "Stoimenov", "Stoimenova", "Metodiev", "Metodieva", "Mihaylov", "Mihaylova",
+    "Borisov", "Borisova", "Kostov", "Kostova", "Kovachev", "Kovacheva", "Krastev", "Krasteva", "Mladenov", "Mladenova",
+    "Radev", "Radeva", "Simeonov", "Simeonova", "Tonev", "Toneva", "Valchev", "Valcheva", "Yankov", "Yankova",
+    "Zahariev", "Zaharieva", "Aleksandrov", "Aleksandrova", "Bonev", "Boneva", "Cholakov", "Cholakova", "Danchev", "Dancheva",
+    "Enchev", "Encheva", "Filipov", "Filipova", "Genov", "Genova", "Haralampiev", "Haralampieva", "Ignatov", "Ignatova"
+  ],
+  "name_formats": [
+    "{first_name} {last_name}"
+  ],
+  "prefixes": {
+    "male": ["Gospodin", "Dr.", "Prof.", "Ing.", "Mag."],
+    "female": ["Gospozha", "Dr.", "Prof.", "Ing.", "Mag."],
+    "neutral": ["Dr.", "Prof.", "Ing.", "Mag."]
+  },
+  "suffixes": ["Ph.D.", "Dr.", "MBA"]
+}

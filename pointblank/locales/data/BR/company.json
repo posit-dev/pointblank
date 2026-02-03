@@ -1,0 +1,65 @@
+{
+  "suffixes": ["Ltda.", "S.A.", "S/A", "Eireli", "ME", "EPP"],
+  "formats": [
+    "{last_name} {suffix}",
+    "{adjective} {noun} {suffix}",
+    "{noun} {suffix}",
+    "{last_name} & {last_name} {suffix}"
+  ],
+  "adjectives": [
+    "Brasileira", "Nacional", "Central", "Sul", "Nova",
+    "Moderna", "Internacional", "Regional", "Global", "Digital",
+    "Inovadora", "Verde", "Premium", "Elite", "Profissional",
+    "Inteligente", "Criativa", "Dinâmica", "Estratégica", "Tropical"
+  ],
+  "nouns": [
+    "Tecnologia", "Indústria", "Comércio", "Construção", "Imobiliária",
+    "Energia", "Finanças", "Seguros", "Consultoria", "Logística",
+    "Farmácia", "Mídia", "Informática", "Serviços", "Soluções",
+    "Sistemas", "Investimentos", "Holding", "Parceiros", "Grupo"
+  ],
+  "well_known_companies": [
+    {"name": "Petrobras", "cities": ["Rio de Janeiro"]},
+    {"name": "Vale", "cities": ["Rio de Janeiro"]},
+    {"name": "Itaú Unibanco", "cities": ["São Paulo"]},
+    {"name": "Bradesco", "cities": ["São Paulo"]},
+    {"name": "Banco do Brasil", "cities": ["Brasília"]},
+    {"name": "Ambev", "cities": ["São Paulo"]},
+    {"name": "JBS", "cities": ["São Paulo"]},
+    {"name": "Magazine Luiza", "cities": ["São Paulo"]},
+    {"name": "Natura", "cities": ["São Paulo"]},
+    {"name": "Embraer", "cities": ["São Paulo"]},
+    {"name": "Gerdau", "cities": ["Porto Alegre"]},
+    {"name": "BRF", "cities": ["São Paulo"]},
+    {"name": "Localiza", "cities": ["Belo Horizonte"]},
+    {"name": "Weg", "cities": ["Joinville"]},
+    {"name": "B3", "cities": ["São Paulo"]},
+    {"name": "Cielo", "cities": ["São Paulo"]},
+    {"name": "Suzano", "cities": ["São Paulo"]},
+    {"name": "Klabin", "cities": ["São Paulo"]},
+    {"name": "Nubank", "cities": ["São Paulo"]},
+    {"name": "iFood", "cities": ["São Paulo"]}
+  ],
+  "jobs": [
+    "Programador", "Engenheiro", "Professor", "Enfermeiro", "Médico",
+    "Advogado", "Arquiteto", "Designer", "Jornalista", "Consultor",
+    "Contador", "Vendedor", "Gerente de Projeto", "Diretor", "Corretor de Imóveis",
+    "Eletricista", "Carpinteiro", "Mecânico", "Cozinheiro", "Garçom",
+    "Policial", "Bombeiro", "Cabeleireiro", "Dentista", "Fisioterapeuta"
+  ],
+  "catch_phrase_adjectives": [
+    "inovador", "sustentável", "profissional", "dinâmico", "criativo",
+    "eficiente", "confiável", "moderno", "brasileiro", "verde",
+    "qualificado", "global", "local", "inteligente", "digital"
+  ],
+  "catch_phrase_nouns": [
+    "soluções", "serviços", "qualidade", "inovação", "crescimento",
+    "parceria", "resultados", "valores", "colaboração", "futuro",
+    "tecnologia", "design", "estratégia", "desenvolvimento", "sucesso"
+  ],
+  "catch_phrase_verbs": [
+    "cria", "entrega", "desenvolve", "impulsiona", "constrói",
+    "molda", "inspira", "conecta", "fortalece", "transforma",
+    "otimiza", "realiza", "possibilita", "garante", "promove"
+  ]
+}

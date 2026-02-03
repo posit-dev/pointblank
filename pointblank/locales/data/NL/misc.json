@@ -1,0 +1,55 @@
+{
+  "colors": [
+    "Rood", "Blauw", "Groen", "Geel", "Oranje", "Paars", "Roze", "Bruin",
+    "Zwart", "Wit", "Grijs", "Cyaan", "Magenta", "Kastanjebruin", "Marineblauw", "Olijfgroen",
+    "Turkoois", "Aquamarijn", "Limoen", "Fuchsia", "Zilver", "Goud", "Koraal", "Zalm",
+    "Turkooisblauw", "Indigo", "Violet", "Karmijn", "Scharlaken", "Bordeauxrood", "Lavendel",
+    "Beige", "Ivoor", "Lichtbruin", "Kaki", "Perzik", "Mint", "Azuurblauw", "Altijdgroen"
+  ],
+  "currency": {
+    "code": "EUR",
+    "symbol": "€",
+    "name": "Euro",
+    "decimal_separator": ",",
+    "thousands_separator": ".",
+    "format": "€ {amount}"
+  },
+  "phone_formats": [
+    "06-{8}",
+    "06 {8}",
+    "+31 6 {8}",
+    "+31 (0)6 {8}",
+    "0{2}-{7}",
+    "0{3}-{6}",
+    "+31 {2} {7}",
+    "+31 {3} {6}"
+  ],
+  "date_formats": {
+    "short": "dd-MM-yyyy",
+    "medium": "d MMM yyyy",
+    "long": "d MMMM yyyy",
+    "full": "EEEE d MMMM yyyy"
+  },
+  "time_formats": {
+    "short": "HH:mm",
+    "medium": "HH:mm:ss",
+    "long": "HH:mm:ss z"
+  },
+  "national_id_formats": [
+    "{9}"
+  ],
+  "license_plate_formats": [
+    "{letter}{letter}-{letter}{letter}-{2}",
+    "{2}-{letter}{letter}{letter}-{number}",
+    "{2}-{letter}{letter}-{letter}{letter}",
+    "{letter}-{3}-{letter}{letter}",
+    "{letter}{letter}-{3}-{letter}",
+    "{letter}{letter}{letter}-{2}-{letter}"
+  ],
+  "bank_formats": {
+    "iban": "NL{2}{letter}{letter}{10}",
+    "bic_codes": ["ABNANL2A", "INGBNL2A", "RABONL2U", "TRIONL2U", "BUNQNL2A", "SNSBNL2A", "ASNBNL21", "RABORABO"]
+  },
+  "measurement_system": "metric",
+  "driving_side": "right"
+}

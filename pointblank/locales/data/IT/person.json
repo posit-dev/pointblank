@@ -1,0 +1,70 @@
+{
+  "first_names": {
+    "male": [
+      "Alessandro", "Andrea", "Antonio", "Bruno", "Carlo", "Claudio", "Daniele", "Davide",
+      "Edoardo", "Emanuele", "Enrico", "Fabio", "Federico", "Filippo", "Francesco", "Gabriele",
+      "Giacomo", "Gianluca", "Gianni", "Giorgio", "Giovanni", "Giuseppe", "Giulio", "Luca",
+      "Luigi", "Manuel", "Marco", "Mario", "Massimo", "Matteo", "Mattia", "Maurizio",
+      "Michele", "Nicola", "Paolo", "Pietro", "Raffaele", "Riccardo", "Roberto", "Salvatore",
+      "Simone", "Stefano", "Tommaso", "Valentino", "Vincenzo", "Vittorio", "Alberto", "Alessio",
+      "Alfredo", "Aldo", "Angelo", "Armando", "Arturo", "Augusto", "Benedetto", "Bernardo",
+      "Cesare", "Christian", "Corrado", "Cosimo", "Cristiano", "Diego", "Domenico", "Dario",
+      "Elia", "Emilio", "Enzo", "Ernesto", "Ettore", "Eugenio", "Fabrizio", "Fernando",
+      "Flavio", "Franco", "Gaetano", "Gennaro", "Gerardo", "Gianfranco", "Gianluigi", "Gianmarco",
+      "Gino", "Giuliano", "Gregorio", "Guido", "Ignazio", "Ivan", "Jacopo", "Leonardo",
+      "Lorenzo", "Luciano", "Lucio", "Marcello", "Marino", "Martino", "Massimiliano", "Mauro",
+      "Mirko", "Niccolò", "Nunzio", "Omar", "Orazio", "Oscar", "Osvaldo", "Pasquale",
+      "Patrizio", "Piero", "Renato", "Renzo", "Rocco", "Romano", "Romeo", "Ruggero",
+      "Sandro", "Samuele", "Sebastiano", "Sergio", "Silvano", "Silvio", "Tiziano", "Ugo",
+      "Umberto", "Valerio", "Vito", "Walter"
+    ],
+    "female": [
+      "Alessandra", "Alessia", "Alice", "Angela", "Anna", "Arianna", "Aurora", "Beatrice",
+      "Bianca", "Camilla", "Carla", "Carlotta", "Caterina", "Cecilia", "Chiara", "Claudia",
+      "Cristina", "Daniela", "Debora", "Diana", "Elena", "Eleonora", "Elisa", "Elisabetta",
+      "Emanuela", "Emma", "Erica", "Federica", "Francesca", "Gabriella", "Giada", "Ginevra",
+      "Giorgia", "Giovanna", "Giulia", "Gloria", "Ilaria", "Irene", "Isabella", "Jessica",
+      "Laura", "Letizia", "Linda", "Lucia", "Ludovica", "Luisa", "Maddalena", "Manuela",
+      "Margherita", "Maria", "Marta", "Martina", "Matilde", "Melissa", "Michela", "Monica",
+      "Nadia", "Nicoletta", "Noemi", "Paola", "Patrizia", "Raffaella", "Rebecca", "Rita",
+      "Roberta", "Rosa", "Rosanna", "Rossella", "Sabrina", "Sara", "Serena", "Silvia",
+      "Simona", "Sofia", "Sonia", "Stefania", "Teresa", "Valentina", "Valeria", "Vanessa",
+      "Veronica", "Virginia", "Vittoria", "Ada", "Adele", "Adriana", "Agnese", "Alberta",
+      "Ambra", "Amelia", "Anita", "Annalisa", "Annamaria", "Antonella", "Assunta", "Barbara",
+      "Benedetta", "Bruna", "Clara", "Cinzia", "Concetta", "Costanza", "Dalila", "Donatella",
+      "Dora", "Edda", "Elsa", "Eva", "Fabiana", "Fabiola", "Filomena", "Fiorella",
+      "Flavia", "Flora", "Franca", "Gaia", "Gemma", "Gilda", "Gina", "Gioia",
+      "Giuseppina", "Grazia", "Graziella", "Ida", "Ines", "Ivana", "Lara", "Lidia"
+    ],
+    "neutral": [
+      "Andrea", "Celeste", "Gabriele", "Luca", "Michele", "Nicola", "Simone"
+    ]
+  },
+  "last_names": [
+    "Rossi", "Russo", "Ferrari", "Esposito", "Bianchi", "Romano", "Colombo", "Ricci",
+    "Marino", "Greco", "Bruno", "Gallo", "Conti", "De Luca", "Mancini", "Costa",
+    "Giordano", "Rizzo", "Lombardi", "Moretti", "Barbieri", "Fontana", "Santoro", "Mariani",
+    "Rinaldi", "Caruso", "Ferrara", "Galli", "Martini", "Leone", "Longo", "Gentile",
+    "Martinelli", "Vitale", "Lombardo", "Serra", "Coppola", "De Santis", "D'Angelo", "Marchetti",
+    "Parisi", "Villa", "Conte", "Ferraro", "Ferri", "Fabbri", "Bianco", "Marini",
+    "Grasso", "Valentini", "Messina", "Sala", "De Angelis", "Gatti", "Pellegrini", "Palumbo",
+    "Sanna", "Farina", "Rizzi", "Monti", "Cattaneo", "Morandi", "Amato", "Silvestri",
+    "Mazza", "Testa", "Grassi", "Pellegrino", "Carbone", "Giuliani", "Benedetti", "Barone",
+    "Basile", "Neri", "Caputo", "Pagano", "Montanari", "Guerra", "Santini", "Vitali",
+    "Bernardi", "Orlando", "Donati", "Piras", "Martino", "Rossetti", "Marchese", "Riva",
+    "Ruggiero", "Sorrentino", "Piazza", "Ferrante", "D'Amico", "Toscano", "Fiore", "Palmieri",
+    "Giannini", "Palermo", "Castelli", "Colucci", "Battaglia", "Poli", "Costantini", "Giuliani"
+  ],
+  "name_formats": [
+    "{first_name} {last_name}",
+    "{prefix} {first_name} {last_name}",
+    "{first_name} {last_name} {suffix}",
+    "{prefix} {first_name} {last_name} {suffix}"
+  ],
+  "prefixes": {
+    "male": ["Sig.", "Dott.", "Prof.", "Ing.", "Avv.", "Arch."],
+    "female": ["Sig.ra", "Dott.ssa", "Prof.ssa", "Ing.", "Avv.", "Arch."],
+    "neutral": ["Dott.", "Prof.", "Ing.", "Avv.", "Arch."]
+  },
+  "suffixes": ["Jr.", "Sr.", "I", "II", "III"]
+}

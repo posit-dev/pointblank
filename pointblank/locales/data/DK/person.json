@@ -1,0 +1,45 @@
+{
+  "first_names": {
+    "male": [
+      "William", "Noah", "Oscar", "Lucas", "Oliver",
+      "Victor", "Malthe", "Emil", "Alfred", "Carl",
+      "Valdemar", "Anton", "Elias", "August", "Frederik",
+      "Magnus", "Theodor", "Aksel", "Christian", "Mikkel",
+      "Sebastian", "Alexander", "Benjamin", "Jonas", "Mathias",
+      "Nikolaj", "Rasmus", "Simon", "Tobias", "Marcus",
+      "Daniel", "Jakob", "Mads", "Peter", "Thomas",
+      "Anders", "Henrik", "Lars", "Jens", "Søren"
+    ],
+    "female": [
+      "Emma", "Ida", "Clara", "Freja", "Alma",
+      "Josefine", "Ella", "Sofia", "Anna", "Karla",
+      "Laura", "Isabella", "Nora", "Alberte", "Agnes",
+      "Olivia", "Maja", "Lærke", "Victoria", "Mathilde",
+      "Caroline", "Sofie", "Marie", "Sara", "Louise",
+      "Julie", "Katrine", "Camilla", "Line", "Mette",
+      "Anne", "Kirsten", "Karen", "Hanne", "Inge",
+      "Lise", "Marianne", "Birgitte", "Charlotte", "Trine"
+    ],
+    "neutral": []
+  },
+  "last_names": [
+    "Nielsen", "Jensen", "Hansen", "Pedersen", "Andersen",
+    "Christensen", "Larsen", "Sørensen", "Rasmussen", "Petersen",
+    "Jørgensen", "Madsen", "Kristensen", "Olsen", "Thomsen",
+    "Poulsen", "Johansen", "Knudsen", "Mortensen", "Møller",
+    "Jakobsen", "Eriksen", "Frederiksen", "Henriksen", "Laursen",
+    "Holm", "Schmidt", "Lund", "Dahl", "Bruun",
+    "Nissen", "Mogensen", "Vestergaard", "Østergaard", "Bach",
+    "Frandsen", "Lassen", "Lindberg", "Bak", "Clausen"
+  ],
+  "name_formats": [
+    "{first_name} {last_name}",
+    "{prefix} {first_name} {last_name}"
+  ],
+  "prefixes": {
+    "male": ["Hr."],
+    "female": ["Fru", "Frk."],
+    "neutral": []
+  },
+  "suffixes": []
+}

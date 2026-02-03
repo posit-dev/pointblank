@@ -1,0 +1,40 @@
+{
+  "first_names": {
+    "male": [
+      "Jose", "Juan", "Pedro", "Antonio", "Manuel", "Francisco", "Rafael", "Miguel", "Carlos", "Fernando",
+      "Ricardo", "Eduardo", "Roberto", "Alfredo", "Ernesto", "Reynaldo", "Rolando", "Rodolfo", "Romeo", "Ramon",
+      "Mark", "John", "Michael", "Christian", "James", "Joshua", "Daniel", "David", "Kevin", "Ryan",
+      "Jayson", "Jomar", "Jonel", "Jhon", "Jerome", "Jeffrey", "Joel", "Jonathan", "Joseph", "Jericho",
+      "Angelo", "Ariel", "Bryan", "Carlo", "Dennis", "Emmanuel", "Francis", "Gerald", "Harold", "Ian",
+      "Kenneth", "Lester", "Neil", "Oliver", "Patrick", "Renz", "Sherwin", "Vincent", "William", "Zach"
+    ],
+    "female": [
+      "Maria", "Ana", "Rosa", "Carmen", "Teresa", "Josefa", "Luz", "Gloria", "Elena", "Isabel",
+      "Patricia", "Elizabeth", "Catherine", "Christine", "Michelle", "Jennifer", "Nicole", "Angela", "Jessica", "Stephanie",
+      "Grace", "Faith", "Joy", "Hope", "Charity", "Precious", "Princess", "Angel", "Divine", "Lovely",
+      "Kristine", "Kathleen", "Karen", "Kim", "Kimberly", "Kristen", "Kelly", "Karla", "Kate", "Katherine",
+      "Mary Jane", "Mae", "Maricel", "Maricris", "Marilou", "Marissa", "Marian", "Marianne", "Marjorie", "Marlene",
+      "Cherry", "Daisy", "Jasmine", "Rose", "Lily", "Iris", "Violet", "Ruby", "Pearl", "Jade"
+    ],
+    "neutral": ["Alex", "Sam", "Jordan", "Angel", "Pat", "Chris", "Jamie", "Jess", "Casey", "Riley"]
+  },
+  "last_names": [
+    "Santos", "Reyes", "Cruz", "Bautista", "Ocampo", "Garcia", "Mendoza", "Torres", "Tomas", "Andrade",
+    "Castillo", "Rivera", "Flores", "Gonzales", "Ramos", "Aquino", "Fernandez", "Lopez", "Martinez", "Perez",
+    "Rodriguez", "Hernandez", "Villanueva", "De Leon", "Del Rosario", "De Guzman", "De La Cruz", "De Los Santos", "Dela Cruz", "Delos Reyes",
+    "Soriano", "Salazar", "Santiago", "Pascual", "Navarro", "Morales", "Miranda", "Mercado", "Marquez", "Manalang",
+    "Luna", "Lim", "Liwanag", "Lagman", "Lacson", "Jimenez", "Ignacio", "Ilagan", "Hidalgo", "Gutierrez",
+    "Gomez", "Francisco", "Estrada", "Enriquez", "Espiritu", "Diaz", "David", "Corpuz", "Concepcion", "Chua",
+    "Castro", "Cabrera", "Bonifacio", "Bernardino", "Bello", "Baluyot", "Aguilar", "Abalos", "Tan", "Sy",
+    "Co", "Ong", "Go", "Yu", "Lee", "Dy", "Ang", "Lao", "Yap", "Uy"
+  ],
+  "name_formats": [
+    "{first_name} {last_name}"
+  ],
+  "prefixes": {
+    "male": ["Mr.", "Dr.", "Atty.", "Engr.", "Prof.", "Hon."],
+    "female": ["Ms.", "Mrs.", "Dr.", "Atty.", "Engr.", "Prof.", "Hon."],
+    "neutral": ["Dr.", "Atty.", "Engr.", "Prof.", "Hon."]
+  },
+  "suffixes": ["Jr.", "Sr.", "III", "IV", "M.D.", "Ph.D.", "CPA", "MBA"]
+}

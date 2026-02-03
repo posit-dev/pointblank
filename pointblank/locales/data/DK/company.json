@@ -1,0 +1,65 @@
+{
+  "suffixes": ["A/S", "ApS", "K/S", "I/S", "P/S", "Holding", "Group", "Danmark"],
+  "formats": [
+    "{last_name} {suffix}",
+    "{adjective} {noun} {suffix}",
+    "{noun} {suffix}",
+    "{adjective} {suffix}"
+  ],
+  "adjectives": [
+    "Nordisk", "Dansk", "Skandinavisk", "Global", "Digital",
+    "Grøn", "Smart", "Moderne", "Kreativ", "Dynamisk",
+    "Innovativ", "Professionel", "International", "Central", "Premier",
+    "Elite", "Royal", "National", "Nordic", "Baltic"
+  ],
+  "nouns": [
+    "Teknik", "Handel", "Service", "Energi", "Industri",
+    "Finans", "Invest", "Partner", "Consult", "Solutions",
+    "Systems", "Design", "Media", "Transport", "Logistik",
+    "IT", "Data", "Tech", "Food", "Pharma"
+  ],
+  "well_known_companies": [
+    {"name": "Mærsk", "cities": ["København"]},
+    {"name": "Novo Nordisk", "cities": ["København", "Hillerød"]},
+    {"name": "Carlsberg", "cities": ["København"]},
+    {"name": "Vestas", "cities": ["Aarhus", "København"]},
+    {"name": "Danske Bank", "cities": ["København"]},
+    {"name": "LEGO", "cities": ["Billund"]},
+    {"name": "Ørsted", "cities": ["København"]},
+    {"name": "DSV", "cities": ["Hedehusene", "København"]},
+    {"name": "Coloplast", "cities": ["Humlebæk"]},
+    {"name": "Pandora", "cities": ["København"]},
+    {"name": "ISS", "cities": ["København"]},
+    {"name": "Danfoss", "cities": ["Nordborg", "Sønderborg"]},
+    {"name": "Grundfos", "cities": ["Bjerringbro"]},
+    {"name": "Arla", "cities": ["Aarhus", "Viby"]},
+    {"name": "Rockwool", "cities": ["Hedehusene"]},
+    {"name": "Jysk", "cities": ["Aarhus", "Brabrand"]},
+    {"name": "Ecco", "cities": ["Bredebro"]},
+    {"name": "Bang & Olufsen", "cities": ["Struer"]},
+    {"name": "Coop Danmark", "cities": ["Albertslund"]},
+    {"name": "TDC", "cities": ["København"]}
+  ],
+  "jobs": [
+    "Softwareudvikler", "Ingeniør", "Lærer", "Sygeplejerske", "Læge",
+    "Advokat", "Arkitekt", "Designer", "Journalist", "Konsulent",
+    "Revisor", "Sælger", "Projektleder", "Direktør", "Ejendomsmægler",
+    "Elektriker", "Tømrer", "Mekaniker", "Kok", "Tjener",
+    "Politibetjent", "Brandmand", "Frisør", "Tandlæge", "Fysioterapeut"
+  ],
+  "catch_phrase_adjectives": [
+    "innovativ", "bæredygtig", "professionel", "dynamisk", "kreativ",
+    "effektiv", "pålidelig", "moderne", "nordisk", "grøn",
+    "kvalitets", "global", "lokal", "smart", "digital"
+  ],
+  "catch_phrase_nouns": [
+    "løsninger", "service", "kvalitet", "innovation", "vækst",
+    "samarbejde", "resultater", "værdier", "partnerskab", "fremtid",
+    "teknologi", "design", "strategi", "udvikling", "succes"
+  ],
+  "catch_phrase_verbs": [
+    "skaber", "leverer", "udvikler", "driver", "bygger",
+    "former", "inspirerer", "forbinder", "styrker", "transformerer",
+    "optimerer", "realiserer", "muliggør", "sikrer", "fremmer"
+  ]
+}

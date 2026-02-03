@@ -1,0 +1,60 @@
+{
+  "suffixes": [
+    "S.A.", "Ltda.", "SpA", "S.C.", "E.I.R.L.", "Group", "Chile", "Holdings", "Corp.", "CL"
+  ],
+  "formats": [
+    "{last_name} {suffix}",
+    "{adjective} {noun} {suffix}",
+    "{adjective} {noun}",
+    "{noun} {suffix}"
+  ],
+  "adjectives": [
+    "Chilean", "Chilena", "Andina", "Pacífico", "Nacional", "United", "Global", "Premier", "First", "Southern",
+    "Digital", "Smart", "Dynamic", "Latin", "Advanced", "New", "Gran", "Sur", "Norte", "Central"
+  ],
+  "nouns": [
+    "Mining", "Copper", "Energy", "Power", "Forestry", "Salmon", "Wine", "Agro", "Engineering",
+    "Manufacturing", "Logistics", "Transport", "Trading", "Finance", "Retail", "Construction", "Foods", "Steel", "Fishing", "Telecom"
+  ],
+  "well_known_companies": [
+    {"name": "Codelco", "cities": ["Santiago"]},
+    {"name": "LATAM Airlines", "cities": ["Santiago"]},
+    {"name": "Falabella", "cities": ["Santiago"]},
+    {"name": "Cencosud", "cities": ["Santiago"]},
+    {"name": "ENAP", "cities": ["Santiago", "Concepción"]},
+    {"name": "Banco de Chile", "cities": ["Santiago"]},
+    {"name": "BancoEstado", "cities": ["Santiago"]},
+    {"name": "CMPC", "cities": ["Santiago"]},
+    {"name": "SQM", "cities": ["Santiago", "Antofagasta"]},
+    {"name": "Concha y Toro", "cities": ["Santiago"]},
+    {"name": "Enel Chile", "cities": ["Santiago"]},
+    {"name": "Entel Chile", "cities": ["Santiago"]},
+    {"name": "VTR", "cities": ["Santiago"]},
+    {"name": "Movistar Chile", "cities": ["Santiago", "Valparaíso"]},
+    {"name": "CCU", "cities": ["Santiago"]},
+    {"name": "Copec", "cities": ["Santiago"]},
+    {"name": "Arauco", "cities": ["Santiago", "Concepción"]},
+    {"name": "Sonda", "cities": ["Santiago"]},
+    {"name": "NotCo", "cities": ["Santiago"]},
+    {"name": "Cornershop", "cities": ["Santiago"]}
+  ],
+  "jobs": [
+    "Software Engineer", "Product Manager", "Data Analyst", "Marketing Manager", "Sales Representative",
+    "HR Manager", "Financial Analyst", "Project Manager", "Operations Manager", "UI/UX Designer",
+    "Frontend Developer", "Backend Developer", "DevOps Engineer", "QA Engineer", "Data Scientist",
+    "Accountant", "Business Analyst", "Customer Service Representative", "Logistics Coordinator", "Mining Engineer",
+    "Agronomist", "Winemaker", "Industrial Engineer", "Production Manager", "Geologist"
+  ],
+  "catch_phrase_adjectives": [
+    "Innovative", "Reliable", "Professional", "Dynamic", "Trusted", "Leading", "Modern", "Sustainable",
+    "Customer-focused", "Quality-driven", "Latin American", "Chilean"
+  ],
+  "catch_phrase_nouns": [
+    "solutions", "services", "quality", "excellence", "innovation", "value", "partnership", "growth",
+    "performance", "reliability", "integrity", "success"
+  ],
+  "catch_phrase_verbs": [
+    "deliver", "create", "build", "provide", "enable", "achieve", "drive", "transform", "empower",
+    "connect", "innovate", "lead"
+  ]
+}

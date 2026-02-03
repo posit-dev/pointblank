@@ -1,0 +1,17 @@
+{
+  "first_names": {
+    "male": ["Juhani", "Mikko", "Matti", "Antti", "Juha", "Timo", "Kari", "Pekka", "Jari", "Markku", "Heikki", "Ville", "Petri", "Sami", "Tuomas", "Lauri", "Aleksi", "Eero", "Oskari", "Valtteri", "Elias", "Oliver", "Onni", "Leo", "Väinö", "Eetu", "Veikko", "Ilmari", "Johannes", "Niklas", "Emil", "Joel", "Jesse", "Rasmus", "Henri", "Joni", "Teemu", "Olli", "Arto", "Tapani"],
+    "female": ["Maria", "Helena", "Johanna", "Kaarina", "Marjatta", "Anna", "Liisa", "Anneli", "Hannele", "Leena", "Tuula", "Päivi", "Pirjo", "Sari", "Minna", "Tiina", "Laura", "Emilia", "Sofia", "Aino", "Emma", "Olivia", "Venla", "Aurora", "Helmi", "Iida", "Ella", "Sara", "Siiri", "Elsa", "Eevi", "Veera", "Noora", "Julia", "Eveliina", "Riikka", "Katri", "Maija", "Sanna", "Jenni"],
+    "neutral": ["Kim", "Kaino", "Vieno", "Ilo", "Tuuli", "Lumi", "Toivo", "Onni", "Aamu", "Sulo"]
+  },
+  "last_names": ["Korhonen", "Virtanen", "Mäkinen", "Nieminen", "Mäkelä", "Hämäläinen", "Laine", "Heikkinen", "Koskinen", "Järvinen", "Lehtonen", "Lehtinen", "Saarinen", "Salminen", "Heinonen", "Niemi", "Heikkilä", "Kinnunen", "Salonen", "Turunen", "Salo", "Laitinen", "Tuominen", "Rantanen", "Karjalainen", "Jokinen", "Mattila", "Savolainen", "Lahtinen", "Ahonen", "Ojala", "Leppänen", "Kallio", "Hiltunen", "Miettinen", "Nurminen", "Aaltonen", "Karvonen", "Pitkänen", "Mustonen"],
+  "name_formats": [
+    "{first_name} {last_name}"
+  ],
+  "prefixes": {
+    "male": ["Herra"],
+    "female": ["Rouva", "Neiti"],
+    "neutral": ["Herra", "Rouva"]
+  },
+  "suffixes": ["nuor.", "vanh."]
+}

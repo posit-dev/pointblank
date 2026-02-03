@@ -1,0 +1,17 @@
+{
+  "first_names": {
+    "male": ["João", "António", "José", "Manuel", "Francisco", "Carlos", "Paulo", "Pedro", "Luís", "Rui", "Miguel", "Fernando", "Jorge", "Ricardo", "André", "Bruno", "Nuno", "Tiago", "Diogo", "Hugo", "Marco", "Sérgio", "Vítor", "Daniel", "Rafael", "Gonçalo", "David", "Filipe", "Alexandre", "Henrique", "Rodrigo", "Tomás", "Bernardo", "Gustavo", "Leonardo", "Martim", "Gabriel", "Duarte", "Salvador", "Afonso"],
+    "female": ["Maria", "Ana", "Isabel", "Joana", "Teresa", "Margarida", "Sofia", "Catarina", "Helena", "Inês", "Rita", "Marta", "Beatriz", "Carla", "Sara", "Patrícia", "Raquel", "Cláudia", "Susana", "Paula", "Filipa", "Lúcia", "Mónica", "Cristina", "Vera", "Diana", "Daniela", "Sandra", "Andreia", "Carolina", "Leonor", "Matilde", "Mariana", "Francisca", "Madalena", "Alice", "Laura", "Constança", "Clara", "Eva"],
+    "neutral": ["Alex", "Noa", "Sasha", "Charlie", "Andrea", "Robin", "Kim", "Dominique", "Sam", "Jordan"]
+  },
+  "last_names": ["Silva", "Santos", "Ferreira", "Pereira", "Oliveira", "Costa", "Rodrigues", "Martins", "Jesus", "Sousa", "Fernandes", "Gonçalves", "Gomes", "Lopes", "Marques", "Alves", "Almeida", "Ribeiro", "Pinto", "Carvalho", "Teixeira", "Moreira", "Correia", "Mendes", "Nunes", "Soares", "Vieira", "Monteiro", "Cardoso", "Rocha", "Raposo", "Neves", "Coelho", "Cruz", "Cunha", "Pires", "Ramos", "Reis", "Simões", "Henriques"],
+  "name_formats": [
+    "{first_name} {last_name}"
+  ],
+  "prefixes": {
+    "male": ["Sr.", "Dr."],
+    "female": ["Sra.", "Dra."],
+    "neutral": ["Dr."]
+  },
+  "suffixes": ["Jr.", "Filho"]
+}

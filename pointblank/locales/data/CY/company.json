@@ -1,0 +1,60 @@
+{
+  "suffixes": [
+    "Ltd", "Limited", "PLC", "LLC", "Co.", "Group", "Cyprus", "CY", "Holdings", "Corp."
+  ],
+  "formats": [
+    "{last_name} {suffix}",
+    "{adjective} {noun} {suffix}",
+    "{adjective} {noun}",
+    "{noun} {suffix}"
+  ],
+  "adjectives": [
+    "Cyprus", "Cypriot", "Mediterranean", "Hellenic", "European", "Global", "Premier", "First", "Island",
+    "Digital", "Smart", "Dynamic", "United", "Advanced", "New", "Eastern", "Modern", "Golden", "International"
+  ],
+  "nouns": [
+    "Bank", "Shipping", "Energy", "Tourism", "Finance", "Telecom", "Property", "Insurance",
+    "Trading", "Maritime", "Investment", "Consulting", "Development", "Holdings", "Construction", "Services", "Tech", "Logistics", "Marine", "Airways"
+  ],
+  "well_known_companies": [
+    {"name": "Bank of Cyprus", "cities": ["Nicosia"]},
+    {"name": "Hellenic Bank", "cities": ["Nicosia"]},
+    {"name": "Cyprus Airways", "cities": ["Larnaca"]},
+    {"name": "CYTA", "cities": ["Nicosia"]},
+    {"name": "EAC", "cities": ["Nicosia"]},
+    {"name": "Hermes Airports", "cities": ["Larnaca", "Paphos"]},
+    {"name": "Petrolina", "cities": ["Limassol"]},
+    {"name": "KEAN Soft Drinks", "cities": ["Limassol"]},
+    {"name": "Laiki Sporting", "cities": ["Nicosia"]},
+    {"name": "Cyprus Cement", "cities": ["Limassol"]},
+    {"name": "Vassiliko Cement Works", "cities": ["Limassol"]},
+    {"name": "Columbia Shipmanagement", "cities": ["Limassol"]},
+    {"name": "Interorient Navigation", "cities": ["Limassol"]},
+    {"name": "Forthnet", "cities": ["Nicosia"]},
+    {"name": "Leptos Estates", "cities": ["Paphos"]},
+    {"name": "Aristo Developers", "cities": ["Paphos"]},
+    {"name": "Lordos Hotels", "cities": ["Larnaca"]},
+    {"name": "Louis Hotels", "cities": ["Limassol"]},
+    {"name": "Photos Photiades Group", "cities": ["Nicosia"]},
+    {"name": "KEO", "cities": ["Limassol"]}
+  ],
+  "jobs": [
+    "Software Engineer", "Product Manager", "Data Analyst", "Marketing Manager", "Sales Representative",
+    "HR Manager", "Financial Analyst", "Project Manager", "Operations Manager", "UI/UX Designer",
+    "Accountant", "Business Analyst", "Customer Service Representative", "Shipping Coordinator", "Tourism Manager",
+    "Hotel Manager", "Maritime Officer", "Investment Analyst", "Tax Consultant", "Real Estate Agent",
+    "Bank Manager", "Insurance Agent", "Ship Captain", "Pilot", "Property Developer"
+  ],
+  "catch_phrase_adjectives": [
+    "Innovative", "Reliable", "Professional", "Dynamic", "Trusted", "Leading", "Modern", "Sustainable",
+    "Customer-focused", "Quality-driven", "European", "Mediterranean"
+  ],
+  "catch_phrase_nouns": [
+    "solutions", "services", "quality", "excellence", "innovation", "value", "partnership", "growth",
+    "performance", "reliability", "integrity", "success"
+  ],
+  "catch_phrase_verbs": [
+    "deliver", "create", "build", "provide", "enable", "achieve", "drive", "transform", "empower",
+    "connect", "innovate", "lead"
+  ]
+}

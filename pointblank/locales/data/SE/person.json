@@ -1,0 +1,45 @@
+{
+  "first_names": {
+    "male": [
+      "Lars", "Erik", "Anders", "Johan", "Karl",
+      "Per", "Nils", "Mikael", "Jan", "Olof",
+      "Sven", "Hans", "Bengt", "Bo", "Göran",
+      "Mats", "Leif", "Peter", "Thomas", "Ulf",
+      "Oscar", "William", "Lucas", "Liam", "Elias",
+      "Hugo", "Oliver", "Theo", "Noah", "Adam",
+      "Alexander", "Filip", "Viktor", "Emil", "Axel",
+      "Leo", "Vincent", "Isak", "Arvid", "Gustav"
+    ],
+    "female": [
+      "Anna", "Eva", "Maria", "Karin", "Kristina",
+      "Sara", "Lena", "Emma", "Ingrid", "Birgitta",
+      "Elisabeth", "Inger", "Christina", "Margareta", "Marie",
+      "Annika", "Helena", "Susanne", "Monica", "Ulla",
+      "Alice", "Maja", "Elsa", "Ella", "Wilma",
+      "Ebba", "Alma", "Olivia", "Julia", "Agnes",
+      "Freja", "Astrid", "Saga", "Lilly", "Selma",
+      "Ester", "Sigrid", "Vera", "Nellie", "Alicia"
+    ],
+    "neutral": []
+  },
+  "last_names": [
+    "Andersson", "Johansson", "Karlsson", "Nilsson", "Eriksson",
+    "Larsson", "Olsson", "Persson", "Svensson", "Gustafsson",
+    "Pettersson", "Jonsson", "Jansson", "Hansson", "Bengtsson",
+    "Jönsson", "Lindberg", "Jakobsson", "Magnusson", "Lindström",
+    "Olofsson", "Lindqvist", "Lindgren", "Axelsson", "Berg",
+    "Bergström", "Lundberg", "Lund", "Lundgren", "Mattsson",
+    "Berglund", "Fredriksson", "Sandberg", "Henriksson", "Forsberg",
+    "Sjöberg", "Wallin", "Engström", "Danielsson", "Håkansson"
+  ],
+  "name_formats": [
+    "{first_name} {last_name}",
+    "{prefix} {first_name} {last_name}"
+  ],
+  "prefixes": {
+    "male": ["Herr"],
+    "female": ["Fru", "Fröken"],
+    "neutral": []
+  },
+  "suffixes": []
+}

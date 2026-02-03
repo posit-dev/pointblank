@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import copy
 from dataclasses import dataclass
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Literal
 
 import narwhals as nw
 
@@ -12,7 +12,9 @@ from pointblank._utils import _get_tbl_type, _is_lazy_frame, _is_lib_present, _i
 if TYPE_CHECKING:
     from typing import Any
 
-__all__ = ["Schema", "_check_schema_match"]
+    from pointblank.field import Field
+
+__all__ = ["Schema", "generate_dataset", "_check_schema_match"]
 
 
 @dataclass
@@ -789,6 +791,230 @@ class Schema:
     def __repr__(self):
         return f"Schema(columns={self.columns})"
 
+    def generate(
+        self,
+        n: int = 100,
+        seed: int | None = None,
+        output: Literal["polars", "pandas", "dict"] = "polars",
+        country: str = "US",
+    ) -> Any:
+        """
+        Generate synthetic test data conforming to this schema.
+
+        This method generates random data that matches the schema's column definitions. When the
+        schema is defined using `Field` objects with constraints (e.g., `min_val`, `max_val`,
+        `pattern`, `preset`), the generated data will respect those constraints.
+
+        Parameters
+        ----------
+        n
+            Number of rows to generate. Default is `100`.
+        seed
+            Random seed for reproducibility. If provided, the same seed will produce
+            the same data. Default is `None` (non-deterministic).
+        output
+            Output format for the generated data. Options are: (1) `"polars"` (default) returns a
+            Polars DataFrame, (2) `"pandas"` returns a Pandas DataFrame, and (3) `"dict"` returns
+            a dictionary of lists.
+        country
+            Country code for realistic data generation when using presets (e.g., `preset="email"`,
+            `preset="address"`). Accepts ISO 3166-1 alpha-2 codes (e.g., `"US"`, `"DE"`, `"FR"`)
+            or alpha-3 codes (e.g., `"USA"`, `"DEU"`, `"FRA"`). Default is `"US"`.
+
+        Returns
+        -------
+        DataFrame or dict
+            Generated data in the requested format.
+
+        Raises
+        ------
+        ValueError
+            If the schema has no columns or if constraints cannot be satisfied.
+        ImportError
+            If required optional dependencies are not installed.
+
+        Supported Countries
+        -------------------
+        The `country=` parameter controls the country used for generating realistic data with
+        presets (e.g., `preset="email"`, `preset="address"`). This affects location-specific
+        formats like addresses, phone numbers, and postal codes. Currently, **50 countries** are
+        supported with full locale data:
+
+        **Europe (32 countries):** Austria (`"AT"`), Belgium (`"BE"`), Bulgaria (`"BG"`),
+        Croatia (`"HR"`), Cyprus (`"CY"`), Czech Republic (`"CZ"`), Denmark (`"DK"`),
+        Estonia (`"EE"`), Finland (`"FI"`), France (`"FR"`), Germany (`"DE"`), Greece (`"GR"`),
+        Hungary (`"HU"`), Iceland (`"IS"`), Ireland (`"IE"`), Italy (`"IT"`), Latvia (`"LV"`),
+        Lithuania (`"LT"`), Luxembourg (`"LU"`), Malta (`"MT"`), Netherlands (`"NL"`),
+        Norway (`"NO"`), Poland (`"PL"`), Portugal (`"PT"`), Romania (`"RO"`), Russia (`"RU"`),
+        Slovakia (`"SK"`), Slovenia (`"SI"`), Spain (`"ES"`), Sweden (`"SE"`),
+        Switzerland (`"CH"`), United Kingdom (`"GB"`)
+
+        **Americas (7 countries):** Argentina (`"AR"`), Brazil (`"BR"`), Canada (`"CA"`),
+        Chile (`"CL"`), Colombia (`"CO"`), Mexico (`"MX"`), United States (`"US"`)
+
+        **Asia-Pacific (10 countries):** Australia (`"AU"`), China (`"CN"`), Hong Kong (`"HK"`),
+        India (`"IN"`), Indonesia (`"ID"`), Japan (`"JP"`), New Zealand (`"NZ"`),
+        Philippines (`"PH"`), South Korea (`"KR"`), Taiwan (`"TW"`)
+
+        **Middle East (1 country):** Turkey (`"TR"`)
+
+        Examples
+        --------
+        Using `pb.Schema` we first put together a schema with field constraints:
+
+        ```{python}
+        import pointblank as pb
+
+        schema = pb.Schema(
+            user_id=pb.int_field(min_val=1, unique=True),
+            email=pb.string_field(preset="email"),
+            age=pb.int_field(min_val=18, max_val=100),
+            status=pb.string_field(allowed=["active", "pending", "inactive"]),
+        )
+        ```
+
+        With the `generate()` method, we can obtain a set number of rows of generated data:
+
+        ```{python}
+        # Generate 100 rows of test data
+        pb.preview(schema.generate(n=100, seed=23))
+        ```
+
+        It's possible to generate data from a simple dtype-only schema:
+
+        ```{python}
+        schema = pb.Schema(name="String", age="Int64", active="Boolean")
+        pb.preview(schema.generate(n=50, seed=123, output="pandas"))
+        ```
+
+        We can obtain synthetic data with German addresses using presets for person name and city of
+        residence. Note the use of `country="DE"` in the `generate()` call:
+
+        ```{python}
+        schema = pb.Schema(
+            name=pb.string_field(preset="name"),
+            city=pb.string_field(preset="city"),
+        )
+        pb.preview(schema.generate(n=20, seed=23, country="DE"))
+        ```
+        """
+        from pointblank.field import Field
+        from pointblank.generate import GeneratorConfig, generate_dataframe
+
+        if self.columns is None or len(self.columns) == 0:
+            raise ValueError("Cannot generate data from an empty schema.")
+
+        # Convert schema columns to Field objects
+        fields: dict[str, Field] = {}
+
+        for col_tuple in self.columns:
+            col_name = col_tuple[0]
+
+            # Check if the value is already a Field object
+            if len(col_tuple) > 1 and isinstance(col_tuple[1], Field):
+                fields[col_name] = col_tuple[1]
+            elif len(col_tuple) > 1:
+                # Simple dtype string - convert to basic Field
+                dtype_str = col_tuple[1]
+                fields[col_name] = _dtype_string_to_field(dtype_str)
+            else:
+                # No dtype specified - default to String
+                fields[col_name] = Field(dtype="String")
+
+        # Create generator config
+        config = GeneratorConfig(
+            n=n,
+            seed=seed,
+            output=output,
+            country=country,
+        )
+
+        return generate_dataframe(fields, config)
+
+
+def _dtype_string_to_field(dtype_str: str) -> "Field":
+    """
+    Convert a dtype string to a basic Field object.
+
+    This handles the mapping from various dtype string formats to
+    standardized Field dtypes.
+    """
+    from pointblank.field import (
+        BoolField,
+        DateField,
+        DatetimeField,
+        DurationField,
+        FloatField,
+        IntField,
+        StringField,
+        TimeField,
+    )
+
+    # Normalize dtype string
+    dtype_lower = dtype_str.lower()
+
+    # Map common dtype strings to Field classes and dtypes
+    dtype_mapping = {
+        # Integer types
+        "int8": ("int", "Int8"),
+        "int16": ("int", "Int16"),
+        "int32": ("int", "Int32"),
+        "int64": ("int", "Int64"),
+        "int": ("int", "Int64"),
+        "integer": ("int", "Int64"),
+        "uint8": ("int", "UInt8"),
+        "uint16": ("int", "UInt16"),
+        "uint32": ("int", "UInt32"),
+        "uint64": ("int", "UInt64"),
+        # Float types
+        "float32": ("float", "Float32"),
+        "float64": ("float", "Float64"),
+        "float": ("float", "Float64"),
+        "double": ("float", "Float64"),
+        # String types
+        "string": ("string", "String"),
+        "str": ("string", "String"),
+        "utf8": ("string", "String"),
+        "object": ("string", "String"),
+        # Boolean
+        "bool": ("bool", "Boolean"),
+        "boolean": ("bool", "Boolean"),
+        # Date/time types
+        "date": ("date", "Date"),
+        "datetime": ("datetime", "Datetime"),
+        "timestamp": ("datetime", "Datetime"),
+        "time": ("time", "Time"),
+        "duration": ("duration", "Duration"),
+        "timedelta": ("duration", "Duration"),
+    }
+
+    # Field class mapping
+    field_classes = {
+        "int": IntField,
+        "float": FloatField,
+        "string": StringField,
+        "bool": BoolField,
+        "date": DateField,
+        "datetime": DatetimeField,
+        "time": TimeField,
+        "duration": DurationField,
+    }
+
+    # Try direct mapping first
+    if dtype_lower in dtype_mapping:
+        field_type, dtype = dtype_mapping[dtype_lower]
+        field_class = field_classes[field_type]
+        return field_class(dtype=dtype)
+
+    # Try to match partial strings (e.g., "datetime64[ns]" -> "Datetime")
+    for key, (field_type, dtype) in dtype_mapping.items():
+        if key in dtype_lower:
+            field_class = field_classes[field_type]
+            return field_class(dtype=dtype)
+
+    # Default to StringField for unknown types
+    return StringField()
+
 
 def _process_columns(
     *,
@@ -1302,3 +1528,114 @@ def _check_schema_match(
         )
 
     return res
+
+
+def generate_dataset(
+    schema: Schema,
+    n: int = 100,
+    seed: int | None = None,
+    output: Literal["polars", "pandas", "dict"] = "polars",
+    country: str = "US",
+) -> Any:
+    """
+    Generate synthetic test data from a schema.
+
+    This function generates random data that conforms to a schema's column definitions. When the
+    schema is defined using `Field` objects with constraints (e.g., `min_val`, `max_val`,
+    `pattern`, `preset`), the generated data will respect those constraints.
+
+    This is a convenience function that wraps `Schema.generate()` for a more functional style
+    of usage, similar to how `load_dataset()` loads built-in datasets.
+
+    Parameters
+    ----------
+    schema
+        The schema object defining the structure and constraints of the data to generate.
+    n
+        Number of rows to generate. Default is `100`.
+    seed
+        Random seed for reproducibility. If provided, the same seed will produce
+        the same data. Default is `None` (non-deterministic).
+    output
+        Output format for the generated data. Options are: (1) `"polars"` (default) returns a
+        Polars DataFrame, (2) `"pandas"` returns a Pandas DataFrame, and (3) `"dict"` returns
+        a dictionary of lists.
+    country
+        Country code for realistic data generation when using presets (e.g., `preset="email"`,
+        `preset="address"`). Accepts ISO 3166-1 alpha-2 codes (e.g., `"US"`, `"DE"`, `"FR"`)
+        or alpha-3 codes (e.g., `"USA"`, `"DEU"`, `"FRA"`). Default is `"US"`.
+
+    Returns
+    -------
+    DataFrame or dict
+        Generated data in the requested format.
+
+    Raises
+    ------
+    ValueError
+        If the schema has no columns or if constraints cannot be satisfied.
+    ImportError
+        If required optional dependencies are not installed.
+
+    Supported Countries
+    -------------------
+    The `country=` parameter controls the country used for generating realistic data with
+    presets (e.g., `preset="email"`, `preset="address"`). This affects location-specific
+    formats like addresses, phone numbers, and postal codes. Currently, **50 countries** are
+    supported with full locale data:
+
+    **Europe (32 countries):** Austria (`"AT"`), Belgium (`"BE"`), Bulgaria (`"BG"`),
+    Croatia (`"HR"`), Cyprus (`"CY"`), Czech Republic (`"CZ"`), Denmark (`"DK"`),
+    Estonia (`"EE"`), Finland (`"FI"`), France (`"FR"`), Germany (`"DE"`), Greece (`"GR"`),
+    Hungary (`"HU"`), Iceland (`"IS"`), Ireland (`"IE"`), Italy (`"IT"`), Latvia (`"LV"`),
+    Lithuania (`"LT"`), Luxembourg (`"LU"`), Malta (`"MT"`), Netherlands (`"NL"`),
+    Norway (`"NO"`), Poland (`"PL"`), Portugal (`"PT"`), Romania (`"RO"`), Russia (`"RU"`),
+    Slovakia (`"SK"`), Slovenia (`"SI"`), Spain (`"ES"`), Sweden (`"SE"`),
+    Switzerland (`"CH"`), United Kingdom (`"GB"`)
+
+    **Americas (7 countries):** Argentina (`"AR"`), Brazil (`"BR"`), Canada (`"CA"`),
+    Chile (`"CL"`), Colombia (`"CO"`), Mexico (`"MX"`), United States (`"US"`)
+
+    **Asia-Pacific (10 countries):** Australia (`"AU"`), China (`"CN"`), Hong Kong (`"HK"`),
+    India (`"IN"`), Indonesia (`"ID"`), Japan (`"JP"`), New Zealand (`"NZ"`),
+    Philippines (`"PH"`), South Korea (`"KR"`), Taiwan (`"TW"`)
+
+    **Middle East (1 country):** Turkey (`"TR"`)
+
+    Examples
+    --------
+    Generate test data from a schema with field constraints:
+
+    ```{python}
+    import pointblank as pb
+
+    schema = pb.Schema(
+        user_id=pb.int_field(min_val=1, unique=True),
+        email=pb.string_field(preset="email"),
+        age=pb.int_field(min_val=18, max_val=100),
+        status=pb.string_field(allowed=["active", "pending", "inactive"]),
+    )
+
+    # Generate 100 rows of test data
+    pb.preview(pb.generate_dataset(schema, n=100, seed=23))
+    ```
+
+    Generate data from a simple dtype-only schema as a Pandas DataFrame:
+
+    ```{python}
+    schema = pb.Schema(name="String", age="Int64", active="Boolean")
+    pb.preview(pb.generate_dataset(schema, n=50, seed=23, output="pandas"))
+    ```
+
+    Generate data with German addresses by using `country="DE"`:
+
+    ```{python}
+    schema = pb.Schema(
+        name=pb.string_field(preset="name"),
+        address=pb.string_field(preset="address"),
+        city=pb.string_field(preset="city"),
+    )
+    pb.preview(pb.generate_dataset(schema, n=20, seed=23, country="DE"))
+    ```
+    """
+    return schema.generate(n=n, seed=seed, output=output, country=country)

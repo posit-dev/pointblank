@@ -1,0 +1,62 @@
+{
+  "first_names": {
+    "male": [
+      "Lucas", "Noah", "Liam", "Louis", "Adam", "Victor", "Arthur", "Julien", "Nathan", "Hugo",
+      "Maxime", "Thomas", "Mathis", "Théo", "Alexandre", "Antoine", "Nicolas", "Simon", "Romain",
+      "Mathieu", "Jef", "Wout", "Jasper", "Robbe", "Senne", "Tibo", "Bram", "Pieter", "Dries",
+      "Stan", "Lars", "Ruben", "Stijn", "Jens", "Ward", "Bert", "Jan", "Koen", "Filip", "Marc",
+      "Michaël", "Guillaume", "Pierre", "Jean", "François", "Charles", "Benoît", "Olivier",
+      "Philippe", "Christophe", "Luca", "Matteo", "Elias", "Finn", "Milan", "Emile", "Léon",
+      "Jules", "Gabriel", "Raphaël"
+    ],
+    "female": [
+      "Emma", "Louise", "Olivia", "Charlotte", "Mila", "Alice", "Léa", "Chloé", "Camille", "Marie",
+      "Julie", "Laura", "Sarah", "Manon", "Lotte", "Amber", "Luna", "Noor", "Elena", "Anna",
+      "Hannah", "Lisa", "Axelle", "Jana", "Elien", "Sofie", "Lien", "Leen", "Silke", "Eline",
+      "Fien", "Nathalie", "Isabelle", "Sophie", "Caroline", "Céline", "Amélie", "Margot",
+      "Claire", "Valentine", "Juliette", "Pauline", "Anaïs", "Zoé", "Mathilde", "Elise",
+      "Aurélie", "Laure", "Marion", "Hélène"
+    ],
+    "neutral": [
+      "Alex", "Charlie", "Dominique", "Maxime", "Camille", "Sacha", "Lou", "Noa", "Eden", "Robin",
+      "Sam", "Andrea", "Yannick", "Claude", "Morgan", "René", "Alix", "Leslie", "Laurence", "Ange"
+    ]
+  },
+  "last_names": [
+    "Peeters", "Janssen", "Maes", "Jacobs", "Willems", "Mertens", "Claes", "Goossens", "Wouters",
+    "De Smedt", "Hermans", "Dubois", "Lambert", "Dupont", "Martin", "Simon", "Laurent", "Lejeune",
+    "Renard", "Lemaire", "Peters", "Michiels", "Claessens", "Van den Berg", "Desmet", "Smeets",
+    "Cools", "Pauwels", "De Backer", "Van Damme", "De Cock", "Vandenberghe", "Leclercq", "Dumont",
+    "Leroy", "Henrard", "Fontaine", "Lefebvre", "Bernard", "Thomas", "Delcourt", "Pirard",
+    "Charlier", "Collin", "Gerard", "Adam", "Fournier", "Michel", "Legrand", "Denis",
+    "Van de Velde", "De Wolf", "Van Hees", "Verschueren", "Aerts", "Stevens", "Verhoeven",
+    "De Graef", "Van Acker", "Bogaert", "Van den Broeck", "Janssens", "Vermeersch", "Van Dyck",
+    "Declercq", "Lenaerts", "Gielen", "Van Hoeck", "Nijs", "Verstraete", "De Meyer", "Van Loon",
+    "Vandenbulcke", "Moens", "Hendrickx", "Thijs", "Martens", "De Pauw", "Van der Linden",
+    "Dumoulin", "Henrotte", "Bodart", "Schmitz", "Collignon", "Toussaint", "Gilles", "Louis",
+    "Henry", "Noël", "Guillaume", "Libert", "Lacroix", "Remy", "Poncelet", "Georges"
+  ],
+  "name_formats": [
+    "{first_name} {last_name}",
+    "{first_name} {middle_initial}. {last_name}",
+    "{prefix} {first_name} {last_name}",
+    "{first_name} {last_name} {suffix}"
+  ],
+  "prefixes": {
+    "male": ["M.", "Dr.", "Prof.", "Ir."],
+    "female": ["Mme", "Mlle", "Dr.", "Prof.", "Ir."],
+    "neutral": ["Dr.", "Prof.", "Ir."]
+  },
+  "suffixes": ["Jr.", "Sr."],
+  "job_titles": [
+    "Ingénieur", "Médecin", "Avocat", "Architecte", "Professeur", "Directeur", "Manager",
+    "Comptable", "Infirmier", "Pharmacien", "Journaliste", "Consultant", "Analyste",
+    "Développeur", "Designer", "Chercheur", "Économiste", "Psychologue", "Kinésithérapeute",
+    "Chef de projet", "Commercial", "Responsable RH", "Technicien", "Électricien", "Mécanicien",
+    "Plombier", "Boulanger", "Cuisinier", "Serveur", "Vendeur", "Secrétaire", "Assistant",
+    "Directeur général", "Directeur financier", "Directeur commercial", "Chef d'entreprise",
+    "Fonctionnaire", "Policier", "Pompier", "Militaire", "Enseignant", "Instituteur",
+    "Software Engineer", "Data Analyst", "Business Analyst", "Project Manager", "Sales Manager",
+    "Marketing Manager", "HR Manager", "Financial Controller", "Quality Manager", "IT Manager"
+  ]
+}
