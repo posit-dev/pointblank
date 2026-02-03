@@ -161,6 +161,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
   <li><a href="#inspection-and-assistance" id="toc-inspection-and-assistance" class="nav-link" data-scroll-target="#inspection-and-assistance">Inspection and Assistance</a></li>
   <li><a href="#yaml" id="toc-yaml" class="nav-link" data-scroll-target="#yaml">YAML</a></li>
   <li><a href="#utility-functions" id="toc-utility-functions" class="nav-link" data-scroll-target="#utility-functions">Utility Functions</a></li>
+  <li><a href="#test-data-generation" id="toc-test-data-generation" class="nav-link" data-scroll-target="#test-data-generation">Test Data Generation</a></li>
   <li><a href="#prebuilt-actions" id="toc-prebuilt-actions" class="nav-link" data-scroll-target="#prebuilt-actions">Prebuilt Actions</a></li>
   </ul>
 </nav>
@@ -535,6 +536,42 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 
 <dt><a href="../reference/config.html#pointblank.config">config()</a></dt>
 <dd style="text-indent: 20px; margin-top: -3px;">Configuration settings for the Pointblank library.</dd>
+
+</dl>
+</div>
+</section>
+<section id="test-data-generation" class="level2">
+<h2 class="anchored" data-anchor-id="test-data-generation">Test Data Generation</h2>
+<p>Generate synthetic test data based on schema definitions. Use <a href="../reference/generate_dataset.html#pointblank.generate_dataset" title="0"><code>generate_dataset()</code></a> to create data from a <a href="../reference/Schema.html#pointblank.Schema" title="0"><code>Schema</code></a> object. The helper functions define typed fields with constraints for realistic test data generation.</p>
+<div class="caption-top table" style="border-top-style: dashed; border-bottom-style: dashed;">
+<dl style="margin-top: 10px;">
+
+<dt><a href="../reference/generate_dataset.html#pointblank.generate_dataset">generate_dataset()</a></dt>
+<dd style="text-indent: 20px; margin-top: -3px;">Generate synthetic test data from a schema.</dd>
+
+<dt><a href="../reference/int_field.html#pointblank.int_field">int_field()</a></dt>
+<dd style="text-indent: 20px; margin-top: -3px;">Create an integer column specification.</dd>
+
+<dt><a href="../reference/float_field.html#pointblank.float_field">float_field()</a></dt>
+<dd style="text-indent: 20px; margin-top: -3px;">Create a floating-point column specification.</dd>
+
+<dt><a href="../reference/string_field.html#pointblank.string_field">string_field()</a></dt>
+<dd style="text-indent: 20px; margin-top: -3px;">Create a string column specification.</dd>
+
+<dt><a href="../reference/bool_field.html#pointblank.bool_field">bool_field()</a></dt>
+<dd style="text-indent: 20px; margin-top: -3px;">Create a boolean column specification.</dd>
+
+<dt><a href="../reference/date_field.html#pointblank.date_field">date_field()</a></dt>
+<dd style="text-indent: 20px; margin-top: -3px;">Create a date column specification.</dd>
+
+<dt><a href="../reference/datetime_field.html#pointblank.datetime_field">datetime_field()</a></dt>
+<dd style="text-indent: 20px; margin-top: -3px;">Create a datetime column specification.</dd>
+
+<dt><a href="../reference/time_field.html#pointblank.time_field">time_field()</a></dt>
+<dd style="text-indent: 20px; margin-top: -3px;">Create a time column specification.</dd>
+
+<dt><a href="../reference/duration_field.html#pointblank.duration_field">duration_field()</a></dt>
+<dd style="text-indent: 20px; margin-top: -3px;">Create a duration column specification.</dd>
 
 </dl>
 </div>
