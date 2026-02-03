@@ -224,21 +224,24 @@ class IntField(Field):
 
     Examples
     --------
+    Define a schema with integer fields and generate test data:
+
     ```python
     import pointblank as pb
 
-    # Basic integer field
-    user_id = pb.int_field()
+    # Define a schema with integer field specifications
+    schema = pb.Schema(
+        user_id=pb.int_field(min_val=1, unique=True),
+        age=pb.int_field(min_val=0, max_val=120),
+        rating=pb.int_field(allowed=[1, 2, 3, 4, 5]),
+    )
 
-    # With constraints
-    age = pb.int_field(min_val=0, max_val=120)
-
-    # Categorical integers
-    rating = pb.int_field(allowed=[1, 2, 3, 4, 5])
-
-    # Unsigned 8-bit integer
-    byte_val = pb.int_field(min_val=0, max_val=255, dtype="UInt8")
+    # Generate 100 rows of test data
+    pb.preview(pb.generate_dataset(schema, n=100, seed=23))
     ```
+
+    The generated data will have unique user IDs starting from `1`, ages between `0`-`120`,
+    and ratings sampled from the allowed values.
     """
 
     # Integer-specific constraints
@@ -317,17 +320,24 @@ def int_field(
 
     Examples
     --------
-    ```python
+    Define a schema with integer fields and generate test data:
+
+    ```{python}
     import pointblank as pb
 
+    # Define a schema with integer field specifications
     schema = pb.Schema(
-        user_id=pb.int_field(min_val=1),
+        user_id=pb.int_field(min_val=1, unique=True),
         age=pb.int_field(min_val=0, max_val=120),
         rating=pb.int_field(allowed=[1, 2, 3, 4, 5]),
     )
 
-    data = schema.generate(n=100, seed=23)
+    # Generate 100 rows of test data
+    pb.preview(pb.generate_dataset(schema, n=100, seed=23))
     ```
+
+    The generated data will have unique user IDs starting from `1`, ages between `0`-`120`,
+    and ratings sampled from the allowed values.
     """
     return IntField(
         min_val=min_val,
@@ -380,18 +390,23 @@ class FloatField(Field):
 
     Examples
     --------
+    Define a schema with float fields and generate test data:
+
     ```python
     import pointblank as pb
 
-    # Basic float field
-    price = pb.float_field(min_val=0.0)
+    # Define a schema with float field specifications
+    schema = pb.Schema(
+        price=pb.float_field(min_val=0.01, max_val=9999.99),
+        probability=pb.float_field(min_val=0.0, max_val=1.0),
+        temperature=pb.float_field(min_val=-40.0, max_val=50.0),
+    )
 
-    # With range
-    probability = pb.float_field(min_val=0.0, max_val=1.0)
-
-    # Single precision
-    sensor_reading = pb.float_field(dtype="Float32")
+    # Generate 100 rows of test data
+    pb.preview(pb.generate_dataset(schema, n=100, seed=23))
     ```
+
+    Values are uniformly distributed across the specified ranges.
     """
 
     # Float-specific constraints
@@ -470,16 +485,23 @@ def float_field(
 
     Examples
     --------
-    ```python
+    Define a schema with float fields and generate test data:
+
+    ```{python}
     import pointblank as pb
 
+    # Define a schema with float field specifications
     schema = pb.Schema(
         price=pb.float_field(min_val=0.01, max_val=9999.99),
         probability=pb.float_field(min_val=0.0, max_val=1.0),
+        temperature=pb.float_field(min_val=-40.0, max_val=50.0),
     )
 
-    data = schema.generate(n=100, seed=23)
+    # Generate 100 rows of test data
+    pb.preview(pb.generate_dataset(schema, n=100, seed=23))
     ```
+
+    Values are uniformly distributed across the specified ranges.
     """
     return FloatField(
         min_val=min_val,
@@ -533,21 +555,25 @@ class StringField(Field):
 
     Examples
     --------
+    Define a schema with string fields and generate test data:
+
     ```python
     import pointblank as pb
 
-    # Basic string field
-    name = pb.string_field(min_length=1, max_length=100)
+    # Define a schema with string field specifications
+    schema = pb.Schema(
+        name=pb.string_field(preset="name"),
+        email=pb.string_field(preset="email", unique=True),
+        status=pb.string_field(allowed=["active", "pending", "inactive"]),
+        code=pb.string_field(pattern=r"[A-Z]{3}-[0-9]{4}"),
+    )
 
-    # With regex pattern
-    code = pb.string_field(pattern=r"[A-Z]{3}-\\d{4}")
-
-    # Realistic data preset
-    email = pb.string_field(preset="email", unique=True)
-
-    # Categorical
-    status = pb.string_field(allowed=["active", "pending", "inactive"])
+    # Generate 100 rows of test data
+    pb.preview(pb.generate_dataset(schema, n=100, seed=23))
     ```
+
+    The generated data will have coherent names and emails (derived from the name),
+    statuses sampled from the allowed values, and codes matching the regex pattern.
     """
 
     # String-specific constraints
@@ -663,18 +689,25 @@ def string_field(
 
     Examples
     --------
-    ```python
+    Define a schema with string fields and generate test data:
+
+    ```{python}
     import pointblank as pb
 
+    # Define a schema with string field specifications
     schema = pb.Schema(
         name=pb.string_field(preset="name"),
         email=pb.string_field(preset="email", unique=True),
         status=pb.string_field(allowed=["active", "pending", "inactive"]),
-        code=pb.string_field(pattern=r"[A-Z]{3}-\\d{4}"),
+        code=pb.string_field(pattern=r"[A-Z]{3}-[0-9]{4}"),
     )
 
-    data = schema.generate(n=100, seed=23)
+    # Generate 100 rows of test data
+    pb.preview(pb.generate_dataset(schema, n=100, seed=23))
     ```
+
+    The generated data will have coherent names and emails (derived from the name),
+    statuses sampled from the allowed values, and codes matching the regex pattern.
     """
     return StringField(
         min_length=min_length,
@@ -718,18 +751,24 @@ class BoolField(Field):
 
     Examples
     --------
+    Define a schema with boolean fields and generate test data:
+
     ```python
     import pointblank as pb
 
-    # Basic boolean field (50% True)
-    is_active = pb.bool_field()
+    # Define a schema with boolean field specifications
+    schema = pb.Schema(
+        is_active=pb.bool_field(p_true=0.8),      # 80% True
+        is_premium=pb.bool_field(p_true=0.2),     # 20% True
+        is_verified=pb.bool_field(),              # 50% True (default)
+    )
 
-    # Boolean with 80% probability of True
-    is_verified = pb.bool_field(p_true=0.8)
-
-    # Nullable boolean
-    has_subscription = pb.bool_field(nullable=True, null_probability=0.1)
+    # Generate 100 rows of test data
+    pb.preview(pb.generate_dataset(schema, n=100, seed=23))
     ```
+
+    The `p_true` parameter controls the probability of generating `True` values,
+    which is helpful for simulating real-world distributions.
     """
 
     # Boolean-specific parameter
@@ -783,17 +822,24 @@ def bool_field(
 
     Examples
     --------
-    ```python
+    Define a schema with boolean fields and generate test data:
+
+    ```{python}
     import pointblank as pb
 
+    # Define a schema with boolean field specifications
     schema = pb.Schema(
         is_active=pb.bool_field(p_true=0.8),      # 80% True
         is_premium=pb.bool_field(p_true=0.2),     # 20% True
         is_verified=pb.bool_field(),              # 50% True (default)
     )
 
-    data = schema.generate(n=100, seed=23)
+    # Generate 100 rows of test data
+    pb.preview(pb.generate_dataset(schema, n=100, seed=23))
     ```
+
+    The `p_true=` parameter controls the probability of generating `True` values,
+    which is helpful for simulating real-world distributions.
     """
     return BoolField(
         p_true=p_true,
@@ -833,15 +879,29 @@ class DateField(Field):
 
     Examples
     --------
+    Define a schema with date fields and generate test data:
+
     ```python
     import pointblank as pb
+    from datetime import date
 
-    # Basic date field
-    created_at = pb.date_field()
+    # Define a schema with date field specifications
+    schema = pb.Schema(
+        birth_date=pb.date_field(
+            min_date=date(1960, 1, 1),
+            max_date=date(2005, 12, 31)
+        ),
+        hire_date=pb.date_field(
+            min_date=date(2020, 1, 1),
+            max_date=date(2024, 12, 31)
+        ),
+    )
 
-    # With range
-    birth_date = pb.date_field(min_date="1950-01-01", max_date="2005-12-31")
+    # Generate 100 rows of test data
+    pb.preview(pb.generate_dataset(schema, n=100, seed=23))
     ```
+
+    Date values are uniformly distributed within the specified range.
     """
 
     # Date-specific constraints
@@ -918,16 +978,29 @@ def date_field(
 
     Examples
     --------
-    ```python
-    import pointblank as pb
+    Define a schema with date fields and generate test data:
 
+    ```{python}
+    import pointblank as pb
+    from datetime import date
+
+    # Define a schema with date field specifications
     schema = pb.Schema(
-        created_at=pb.date_field(),
-        birth_date=pb.date_field(min_date="1950-01-01", max_date="2005-12-31"),
+        birth_date=pb.date_field(
+            min_date=date(1960, 1, 1),
+            max_date=date(2005, 12, 31)
+        ),
+        hire_date=pb.date_field(
+            min_date=date(2020, 1, 1),
+            max_date=date(2024, 12, 31)
+        ),
     )
 
-    data = schema.generate(n=100, seed=23)
+    # Generate 100 rows of test data
+    pb.preview(pb.generate_dataset(schema, n=100, seed=23))
     ```
+
+    Date values are uniformly distributed within the specified range.
     """
     return DateField(
         min_date=min_date,
@@ -968,18 +1041,29 @@ class DatetimeField(Field):
 
     Examples
     --------
+    Define a schema with datetime fields and generate test data:
+
     ```python
     import pointblank as pb
+    from datetime import datetime
 
-    # Basic datetime field
-    timestamp = pb.datetime_field()
-
-    # With range
-    event_time = pb.datetime_field(
-        min_date="2024-01-01T00:00:00",
-        max_date="2024-12-31T23:59:59"
+    # Define a schema with datetime field specifications
+    schema = pb.Schema(
+        created_at=pb.datetime_field(
+            min_date=datetime(2024, 1, 1),
+            max_date=datetime(2024, 12, 31)
+        ),
+        updated_at=pb.datetime_field(
+            min_date=datetime(2024, 6, 1),
+            max_date=datetime(2024, 12, 31)
+        ),
     )
+
+    # Generate 100 rows of test data
+    pb.preview(pb.generate_dataset(schema, n=100, seed=23))
     ```
+
+    Datetime values are uniformly distributed within the specified range.
     """
 
     # Datetime-specific constraints
@@ -1057,19 +1141,29 @@ def datetime_field(
 
     Examples
     --------
-    ```python
-    import pointblank as pb
+    Define a schema with datetime fields and generate test data:
 
+    ```{python}
+    import pointblank as pb
+    from datetime import datetime
+
+    # Define a schema with datetime field specifications
     schema = pb.Schema(
-        created_at=pb.datetime_field(),
-        event_time=pb.datetime_field(
-            min_date="2024-01-01T00:00:00",
-            max_date="2024-12-31T23:59:59"
+        created_at=pb.datetime_field(
+            min_date=datetime(2024, 1, 1),
+            max_date=datetime(2024, 12, 31)
+        ),
+        updated_at=pb.datetime_field(
+            min_date=datetime(2024, 6, 1),
+            max_date=datetime(2024, 12, 31)
         ),
     )
 
-    data = schema.generate(n=100, seed=23)
+    # Generate 100 rows of test data
+    pb.preview(pb.generate_dataset(schema, n=100, seed=23))
     ```
+
+    Datetime values are uniformly distributed within the specified range.
     """
     return DatetimeField(
         min_date=min_date,
@@ -1110,15 +1204,29 @@ class TimeField(Field):
 
     Examples
     --------
+    Define a schema with time fields and generate test data:
+
     ```python
     import pointblank as pb
+    from datetime import time
 
-    # Basic time field
-    start_time = pb.time_field()
+    # Define a schema with time field specifications
+    schema = pb.Schema(
+        start_time=pb.time_field(
+            min_time=time(9, 0, 0),
+            max_time=time(12, 0, 0)
+        ),
+        end_time=pb.time_field(
+            min_time=time(13, 0, 0),
+            max_time=time(17, 0, 0)
+        ),
+    )
 
-    # Business hours only
-    meeting_time = pb.time_field(min_time="09:00:00", max_time="17:00:00")
+    # Generate 100 rows of test data
+    pb.preview(pb.generate_dataset(schema, n=100, seed=23))
     ```
+
+    Time values are uniformly distributed within the specified range.
     """
 
     # Time-specific constraints
@@ -1193,16 +1301,29 @@ def time_field(
 
     Examples
     --------
-    ```python
-    import pointblank as pb
+    Define a schema with time fields and generate test data:
 
+    ```{python}
+    import pointblank as pb
+    from datetime import time
+
+    # Define a schema with time field specifications
     schema = pb.Schema(
-        start_time=pb.time_field(),
-        meeting_time=pb.time_field(min_time="09:00:00", max_time="17:00:00"),
+        start_time=pb.time_field(
+            min_time=time(9, 0, 0),
+            max_time=time(12, 0, 0)
+        ),
+        end_time=pb.time_field(
+            min_time=time(13, 0, 0),
+            max_time=time(17, 0, 0)
+        ),
     )
 
-    data = schema.generate(n=100, seed=23)
+    # Generate 100 rows of test data
+    pb.preview(pb.generate_dataset(schema, n=100, seed=23))
     ```
+
+    Time values are uniformly distributed within the specified range.
     """
     return TimeField(
         min_time=min_time,
@@ -1243,19 +1364,29 @@ class DurationField(Field):
 
     Examples
     --------
+    Define a schema with duration fields and generate test data:
+
     ```python
     import pointblank as pb
     from datetime import timedelta
 
-    # Basic duration field
-    elapsed = pb.duration_field()
-
-    # With range
-    session_length = pb.duration_field(
-        min_duration=timedelta(minutes=1),
-        max_duration=timedelta(hours=2)
+    # Define a schema with duration field specifications
+    schema = pb.Schema(
+        session_length=pb.duration_field(
+            min_duration=timedelta(minutes=5),
+            max_duration=timedelta(hours=2)
+        ),
+        wait_time=pb.duration_field(
+            min_duration=timedelta(seconds=30),
+            max_duration=timedelta(minutes=15)
+        ),
     )
+
+    # Generate 100 rows of test data
+    pb.preview(pb.generate_dataset(schema, n=100, seed=23))
     ```
+
+    Duration values are uniformly distributed within the specified range.
     """
 
     # Duration-specific constraints
@@ -1342,20 +1473,29 @@ def duration_field(
 
     Examples
     --------
-    ```python
+    Define a schema with duration fields and generate test data:
+
+    ```{python}
     import pointblank as pb
     from datetime import timedelta
 
+    # Define a schema with duration field specifications
     schema = pb.Schema(
-        elapsed=pb.duration_field(),
         session_length=pb.duration_field(
-            min_duration=timedelta(minutes=1),
+            min_duration=timedelta(minutes=5),
             max_duration=timedelta(hours=2)
+        ),
+        wait_time=pb.duration_field(
+            min_duration=timedelta(seconds=30),
+            max_duration=timedelta(minutes=15)
         ),
     )
 
-    data = schema.generate(n=100, seed=23)
+    # Generate 100 rows of test data
+    pb.generate_dataset(schema, n=100, seed=23)
     ```
+
+    Duration values are uniformly distributed within the specified range.
     """
     return DurationField(
         min_duration=min_duration,
