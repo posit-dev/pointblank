@@ -721,6 +721,260 @@ baseline_data = pl.DataFrame({"revenue": [95, 205, 145, 180, 130]})
 When `value=None` (the default) and reference data is set, aggregate methods automatically compare
 against the same column in the reference data.
 
+## 6. Custom Validations with `specially()`
+
+While Pointblank provides over 40 built-in validation methods, there are times when you need to
+implement custom validation logic that goes beyond these standard checks. The `~~Validate.specially()`
+method gives you complete flexibility to create bespoke validations for domain-specific business
+rules, complex multi-column checks, or cross-dataset referential integrity constraints.
+
+### Basic Custom Validations
+
+The `specially()` method accepts a callable function that performs your custom validation logic. The
+function should return boolean values indicating whether each test unit passes:
+
+```{python}
+import polars as pl
+
+simple_tbl = pl.DataFrame({
+    "a": [5, 7, 1, 3, 9, 4],
+    "b": [6, 3, 0, 5, 8, 2]
+})
+
+# Custom validation: sum of two columns must be positive
+def validate_sum_positive(data):
+    return data.select(pl.col("a") + pl.col("b") > 0)
+
+(
+    pb.Validate(data=simple_tbl)
+    .specially(
+        expr=validate_sum_positive,
+        brief="Sum of columns 'a' and 'b' must be positive"
+    )
+    .interrogate()
+)
+```
+
+This validation passes because all rows have a positive sum for columns `a` and `b`. The
+`specially()` method provides the flexibility to implement any validation logic you can express in
+Python, making it a powerful tool for custom data quality checks.
+
+### Cross-Dataset Referential Integrity
+
+One powerful use case for `specially()` is validating relationships between multiple datasets. This
+is particularly valuable for checking foreign key constraints, conditional existence rules, and
+cardinality relationships that span multiple tables.
+
+#### Foreign Key Validation
+
+Verify that all keys in one dataset exist in another:
+
+```{python}
+# Create related datasets: Orders and OrderDetails
+orders = pl.DataFrame({
+    "order_id": [1, 2, 3, 4, 5],
+    "customer_id": ["A", "B", "A", "C", "B"],
+    "status": ["completed", "pending", "completed", "cancelled", "completed"]
+})
+
+order_details = pl.DataFrame({
+    "detail_id": [101, 102, 103, 104, 105, 106, 107, 108, 109],
+    "order_id": [1, 1, 1, 2, 3, 3, 4, 5, 5],
+    "product_id": ["P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9"],
+    "quantity": [2, 1, 3, 1, 2, 1, 1, 2, 1]
+})
+
+# Validate foreign key constraint
+def check_foreign_key(df):
+    """Check if all order_ids in order_details exist in orders table"""
+    valid_order_ids = orders.select("order_id")
+    # Semi join returns only rows with matching keys
+    return df.join(valid_order_ids, on="order_id", how="semi").height == df.height
+
+(
+    pb.Validate(data=order_details, tbl_name="order_details")
+    .specially(
+        expr=check_foreign_key,
+        brief="All order_ids must exist in orders table"
+    )
+    .interrogate()
+)
+```
+
+This validation ensures referential integrity by confirming that every `order_id` in the
+`order_details` table has a corresponding record in the `orders` table. The use of a semi-join makes
+this check efficient, as it only verifies the existence of matching keys without returning full
+joined data.
+
+#### Conditional Existence Checks
+
+Implement "if X then Y must exist" logic across datasets:
+
+```{python}
+def check_completed_orders_have_details(df):
+    """Completed orders must have at least one detail record"""
+    completed_orders = df.filter(pl.col("status") == "completed")
+    order_ids_with_details = order_details.select("order_id").unique()
+
+    # Check each completed order has matching details
+    return completed_orders.join(
+        order_ids_with_details,
+        on="order_id",
+        how="left"
+    ).with_columns(
+        pl.col("order_id").is_not_null().alias("has_details")
+    ).select("has_details")
+
+(
+    pb.Validate(data=orders, tbl_name="orders")
+    .specially(
+        expr=check_completed_orders_have_details,
+        brief="Completed orders must have detail records"
+    )
+    .interrogate()
+)
+```
+
+This validation implements conditional business logic: only orders with a `completed` status are
+required to have detail records. This pattern is common in real-world scenarios where certain
+records trigger mandatory relationships while others don't. The validation returns a boolean for
+each completed order, allowing you to see exactly which records pass or fail.
+
+#### Cardinality Constraints
+
+Validate that relationships between datasets follow specific cardinality rules:
+
+```{python}
+def check_quantity_ratio(df):
+    """Each order should have exactly 3x quantity units in details"""
+    order_counts = orders.group_by("order_id").agg(pl.lit(1).alias("order_count"))
+
+    detail_quantities = order_details.group_by("order_id").agg(
+        pl.col("quantity").sum().alias("total_quantity")
+    )
+
+    joined = order_counts.join(detail_quantities, on="order_id", how="left")
+
+    return joined.with_columns(
+        (pl.col("total_quantity") == pl.col("order_count") * 3).alias("valid_ratio")
+    ).select("valid_ratio")
+
+
+(
+    pb.Validate(data=orders, tbl_name="orders")
+    .specially(
+        expr=check_quantity_ratio,
+        brief="Each order should have 3x quantity units in details",
+        thresholds=(0.4, 0.7),  # Allow some flexibility
+    )
+    .interrogate()
+)
+```
+
+Cardinality constraints like this validate that the relationship between datasets follows expected
+patterns. In this example, we expect each order to have a specific quantity ratio in the detail
+records. Note the use of `thresholds=` to allow some flexibility (not every order needs to meet this
+requirement perfectly, but too many violations would indicate a data quality issue).
+
+#### Composite Keys with Business Logic
+
+Validate complex relationships involving multiple columns and conditional logic:
+
+```{python}
+# More complex scenario with composite keys
+employees = pl.DataFrame({
+    "dept_id": ["D1", "D1", "D2", "D2", "D3"],
+    "emp_id": ["E001", "E002", "E003", "E004", "E005"],
+    "emp_name": ["Alice", "Bob", "Charlie", "Diana", "Eve"],
+    "is_manager": [True, False, True, False, False]
+})
+
+projects = pl.DataFrame({
+    "project_id": ["P1", "P2", "P3", "P4"],
+    "dept_id": ["D1", "D2", "D1", "D3"],
+    "manager_emp_id": ["E001", "E003", "E001", "E005"]
+})
+
+def check_project_manager_validity(df):
+    """Project managers must be valid managers in their department"""
+    validation_result = df.join(
+        employees,
+        left_on=["dept_id", "manager_emp_id"],
+        right_on=["dept_id", "emp_id"],
+        how="left"
+    ).with_columns(
+        # Manager must exist in dept AND have manager status
+        ((pl.col("emp_name").is_not_null()) & (pl.col("is_manager") == True)).alias("valid_manager")
+    ).select("valid_manager")
+
+    return validation_result
+
+(
+    pb.Validate(data=projects, tbl_name="projects")
+    .specially(
+        expr=check_project_manager_validity,
+        brief="Project managers must be valid managers in their department"
+    )
+    .interrogate()
+)
+```
+
+This example demonstrates validation using composite keys (both `dept_id` and `emp_id`) combined
+with conditional business logic (checking the `is_manager` flag). Such validations are common in
+enterprise systems where relationships must satisfy multiple constraints simultaneously. The
+validation reveals that one project (`P4`) fails because employee `E005` is not a manager, even
+though they exist in the same department.
+
+### Reusable Validation Factories
+
+For validations you'll use repeatedly, create factory functions that generate customized validators:
+
+```{python}
+def make_foreign_key_validator(reference_table, key_columns):
+    """Factory function to create reusable foreign key validators"""
+    def validate_fk(df):
+        if isinstance(key_columns, str):
+            keys = [key_columns]
+        else:
+            keys = key_columns
+
+        ref_keys = reference_table.select(keys).unique()
+        matched = df.join(ref_keys, on=keys, how="semi")
+        return matched.height == df.height
+
+    return validate_fk
+
+# Use the factory across multiple validations
+(
+    pb.Validate(data=order_details, tbl_name="order_details")
+    .specially(
+        expr=make_foreign_key_validator(orders, "order_id"),
+        brief="FK constraint: order_id → orders"
+    )
+    .interrogate()
+)
+```
+
+Factory functions like `make_foreign_key_validator()` make your validation code more maintainable
+and reusable. Once defined, you can use the same factory to validate different foreign key
+relationships across your entire data pipeline, ensuring consistency in how these constraints are
+checked. This pattern is particularly valuable in production environments where you validate
+multiple related tables.
+
+### When to Use `specially()`
+
+The `specially()` method is ideal for:
+
+- cross-dataset validations: foreign keys, referential integrity, conditional existence
+- complex business rules: multi-column checks, conditional logic, domain-specific constraints
+- custom statistical tests: validations requiring calculations not covered by built-in methods
+- SQL-style checks: converting complex SQL queries into validation steps
+- prototype validations: testing new validation patterns before implementing them as dedicated methods
+
+By combining `specially()` with Pointblank's built-in validation methods, you can create
+comprehensive data quality checks that address both standard and highly specific validation
+requirements.
+
 ## Conclusion
 
 In this article, we've explored the various types of validation methods that Pointblank offers for
