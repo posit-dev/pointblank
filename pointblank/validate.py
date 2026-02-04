@@ -16934,11 +16934,11 @@ class Validate:
             )
 
         # Grab the summary data from validation info helper function
-        report = _validation_info_as_dict(self.validation_info)
+        report_original = _validation_info_as_dict(self.validation_info)
 
         # Pop the extracts off unless specified to keep
-        if keep_extracts is False and "extract" in report:
-            report.pop("extract")
+        if keep_extracts is False and "extract" in report_original:
+            report_original.pop("extract")
 
         # Remove keys to be dropped
         # MEGHAN pick up Here!!!
@@ -16955,24 +16955,47 @@ class Validate:
                     "The Polars library is not installed but is required when specifying "
                     '`tbl_type="polars".'
                 )
+            import polars as pl
 
         # Create the schema for the df
         schema = pl.Schema(
             {
-                "step": pl.String,  # assertion_type
-                "columns": pl.String,  # column
-                "values": pl.String,  # values
-                "tbl": pl.String,  # pre
-                "eval": pl.String,  # active
-                "units": pl.Int64,  # n
-                "pass_n": pl.Int64,  # n_passed
-                "pass_pct": pl.Float64,  # f_passed
-                "fail_n": pl.Int64,  # n_failed
-                "fail_pct": pl.Float64,  # f_failed
+                "assertion_type": pl.String,  # assertion_type
+                "column": pl.String,  # column
+                "values": pl.Unknown,  # values
+                "pre": pl.Unknown,  # pre
+                "active": pl.String,  # active
+                "n": pl.Int64,  # n
+                "n_passed": pl.Int64,  # n_passed
+                "f_passed": pl.Float64,  # f_passed
+                "n_failed": pl.Int64,  # n_failed
+                "f_failed": pl.Float64,  # f_failed
                 "warning": pl.Boolean,  # warning
                 "error": pl.Boolean,  # error
                 "critical": pl.Boolean,  # critical
             }
+        )
+
+        names_dict = {
+            "assertion_type": "step",
+            "column": "columns",
+            "values": "values",
+            "pre": "tbl",
+            "active": "eval",
+            "n": "units",
+            "n_passed": "pass_n",
+            "f_passed": "pass_pct",
+            "n_failed": "failed_n",
+            "f_failed": "failed_pct",
+            "warning": "warning",
+            "error": "error",
+            "critical": "critical",
+        }
+
+        report = {key: report_original[key] for key in names_dict.keys() if key in report_original}
+
+        df_validation_results = pl.DataFrame(data=report, schema=schema, strict=False).rename(
+            names_dict
         )
 
     def _add_validation(self, validation_info):
