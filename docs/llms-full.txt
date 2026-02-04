@@ -11,7 +11,7 @@ failure thresholds (using the `Thresholds` class or through shorthands for this 
 `Validate` class has numerous methods for defining validation steps and for obtaining
 post-interrogation metrics and data.
 
-Validate(data: 'IntoDataFrame', reference: 'IntoFrame | None' = None, tbl_name: 'str | None' = None, label: 'str | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, final_actions: 'FinalActions | None' = None, brief: 'str | bool | None' = None, lang: 'str | None' = None, locale: 'str | None' = None) -> None
+Validate(data: 'IntoDataFrame', reference: 'IntoFrame | None' = None, tbl_name: 'str | None' = None, label: 'str | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, final_actions: 'FinalActions | None' = None, brief: 'str | bool | None' = None, lang: 'str | None' = None, locale: 'str | None' = None, owner: 'str | None' = None, consumers: 'str | list[str] | None' = None, version: 'str | None' = None) -> None
 
     Workflow for defining a set of validations on a table and interrogating for results.
 
@@ -99,6 +99,18 @@ Validate(data: 'IntoDataFrame', reference: 'IntoFrame | None' = None, tbl_name: 
         locale's rules. Examples include `"en-US"` for English (United States) and `"fr-FR"` for
         French (France). More simply, this can be a language identifier without a designation of
         territory, like `"es"` for Spanish.
+    owner
+        An optional string identifying the owner of the data being validated. This is useful for
+        governance purposes, indicating who is responsible for the quality and maintenance of the
+        data. For example, `"data-platform-team"` or `"analytics-engineering"`.
+    consumers
+        An optional string or list of strings identifying who depends on or consumes this data.
+        This helps document data dependencies and can be useful for impact analysis when data
+        quality issues are detected. For example, `"ml-team"` or `["ml-team", "analytics"]`.
+    version
+        An optional string representing the version of the validation plan or data contract. This
+        supports semantic versioning (e.g., `"1.0.0"`, `"2.1.0"`) and is useful for tracking changes
+        to validation rules over time and for organizational governance.
 
     Returns
     -------
@@ -8289,6 +8301,271 @@ col_pct_null(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnS
         calculates to 2.7 to 3.9, which rounds down to 2 to 3 rows).
         
 
+data_freshness(self, column: 'str', max_age: 'str | datetime.timedelta', reference_time: 'datetime.datetime | str | None' = None, timezone: 'str | None' = None, allow_tz_mismatch: 'bool' = False, pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
+
+        Validate that data in a datetime column is not older than a specified maximum age.
+
+        The `data_freshness()` validation method checks whether the most recent timestamp in the
+        specified datetime column is within the allowed `max_age=` from the `reference_time=` (which
+        defaults to the current time). This is useful for ensuring data pipelines are delivering
+        fresh data and for enforcing data SLAs.
+
+        This method helps detect stale data by comparing the maximum (most recent) value in a
+        datetime column against an expected freshness threshold.
+
+        Parameters
+        ----------
+        column
+            The name of the datetime column to check for freshness. This column should contain
+            date or datetime values.
+        max_age
+            The maximum allowed age of the data. Can be specified as: (1) a string with a
+            human-readable duration like `"24 hours"`, `"1 day"`, `"30 minutes"`, `"2 weeks"`, etc.
+            (supported units: `seconds`, `minutes`, `hours`, `days`, `weeks`), or (2) a
+            `datetime.timedelta` object for precise control.
+        reference_time
+            The reference point in time to compare against. Defaults to `None`, which uses the
+            current time (UTC if `timezone=` is not specified). Can be: (1) a `datetime.datetime`
+            object (timezone-aware recommended), (2) a string in ISO 8601 format (e.g.,
+            `"2024-01-15T10:30:00"` or `"2024-01-15T10:30:00+05:30"`), or (3) `None` to use the
+            current time.
+        timezone
+            The timezone to use for interpreting the data and reference time. Accepts IANA
+            timezone names (e.g., `"America/New_York"`), hour offsets (e.g., `"-7"`), or ISO 8601
+            offsets (e.g., `"-07:00"`). When `None` (default), naive datetimes are treated as UTC.
+            See the *The `timezone=` Parameter* section for details.
+        allow_tz_mismatch
+            Whether to allow timezone mismatches between the column data and reference time.
+            By default (`False`), a warning note is added when comparing timezone-naive with
+            timezone-aware datetimes. Set to `True` to suppress these warnings.
+        pre
+            An optional preprocessing function or lambda to apply to the data table during
+            interrogation. This function should take a table as input and return a modified table.
+        thresholds
+            Set threshold failure levels for reporting and reacting to exceedences of the levels.
+            The thresholds are set at the step level and will override any global thresholds set in
+            `Validate(thresholds=...)`. The default is `None`, which means that no thresholds will
+            be set locally and global thresholds (if any) will take effect.
+        actions
+            Optional actions to take when the validation step meets or exceeds any set threshold
+            levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
+            define the actions.
+        brief
+            An optional brief description of the validation step that will be displayed in the
+            reporting table. You can use the templating elements like `"{step}"` to insert
+            the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+            the entire brief will be automatically generated. If `None` (the default) then there
+            won't be a brief.
+        active
+            A boolean value indicating whether the validation step should be active. Using `False`
+            will make the validation step inactive (still reporting its presence and keeping indexes
+            for the steps unchanged).
+
+        Returns
+        -------
+        Validate
+            The `Validate` object with the added validation step.
+
+        How Timezones Affect Freshness Checks
+        -------------------------------------
+        Freshness validation involves comparing two times: the **data time** (the most recent
+        timestamp in your column) and the **execution time** (when and where the validation runs).
+        Timezone confusion typically arises because these two times may originate from different
+        contexts.
+
+        Consider these common scenarios:
+
+        - your data timestamps are stored in UTC (common for databases), but you're running
+          validation on your laptop in New York (Eastern Time)
+        - you develop and test validation locally, then deploy it to a cloud workflow that runs
+          in UTC—suddenly your 'same' validation behaves differently
+        - your data comes from servers in multiple regions, each recording timestamps in their
+          local timezone
+
+        The `timezone=` parameter exists to solve this problem by establishing a single, explicit
+        timezone context for the freshness comparison. When you specify a timezone, Pointblank
+        interprets both the data timestamps (if naive) and the execution time in that timezone,
+        ensuring consistent behavior whether you run validation on your laptop or in a cloud
+        workflow.
+
+        **Scenario 1: Data has timezone-aware datetimes**
+
+        ```python
+        # Your data column has values like: 2024-01-15 10:30:00+00:00 (UTC)
+        # Comparison is straightforward as both sides have explicit timezones
+        .data_freshness(column="updated_at", max_age="24 hours")
+        ```
+
+        **Scenario 2: Data has naive datetimes (no timezone)**
+
+        ```python
+        # Your data column has values like: 2024-01-15 10:30:00 (no timezone)
+        # Specify the timezone the data was recorded in:
+        .data_freshness(column="updated_at", max_age="24 hours", timezone="America/New_York")
+        ```
+
+        **Scenario 3: Ensuring consistent behavior across environments**
+
+        ```python
+        # Pin the timezone to ensure identical results whether running locally or in the cloud
+        .data_freshness(
+            column="updated_at",
+            max_age="24 hours",
+            timezone="UTC",  # Explicit timezone removes environment dependence
+        )
+        ```
+
+        The `timezone=` Parameter
+        ---------------------------
+        The `timezone=` parameter accepts several convenient formats, making it easy to specify
+        timezones in whatever way is most natural for your use case. The following examples
+        illustrate the three supported input styles.
+
+        **IANA Timezone Names** (recommended for regions with daylight saving time):
+
+        ```python
+        timezone="America/New_York"   # Eastern Time (handles DST automatically)
+        timezone="Europe/London"      # UK time
+        timezone="Asia/Tokyo"         # Japan Standard Time
+        timezone="Australia/Sydney"   # Australian Eastern Time
+        timezone="UTC"                # Coordinated Universal Time
+        ```
+
+        **Simple Hour Offsets** (quick and easy):
+
+        **ISO 8601 Offset Format** (precise, including fractional hours):
+
+        When a timezone is specified:
+
+        - naive datetime values in the column are assumed to be in this timezone.
+        - the reference time (if naive) is assumed to be in this timezone.
+        - the validation report will show times in this timezone.
+
+        When `None` (default):
+
+        - if your column has timezone-aware datetimes, those timezones are used
+        - if your column has naive datetimes, they're treated as UTC
+        - the current time reference uses UTC
+
+        Note that IANA timezone names are preferred when daylight saving time transitions matter, as
+        they automatically handle the offset changes. Fixed offsets like `"-7"` or `"-07:00"` do not
+        account for DST.
+
+        Recommendations for Working with Timestamps
+        -------------------------------------------
+        When working with datetime data, storing timestamps in UTC in your databases is strongly
+        recommended since it provides a consistent reference point regardless of where your data
+        originates or where it's consumed. Using timezone-aware datetimes whenever possible helps
+        avoid ambiguity—when a datetime has an explicit timezone, there's no guessing about what
+        time it actually represents.
+
+        If you're working with naive datetimes (which lack timezone information), always specify the
+        `timezone=` parameter so Pointblank knows how to interpret those values. When providing
+        `reference_time=` as a string, use ISO 8601 format with the timezone offset included (e.g.,
+        `"2024-01-15T10:30:00+00:00"`) to ensure unambiguous parsing. Finally, prefer IANA timezone
+        names (like `"America/New_York"`) over fixed offsets (like `"-05:00"`) when daylight saving
+        time transitions matter, since IANA names automatically handle the twice-yearly offset
+        changes. To see all available IANA timezone names in Python, use
+        `zoneinfo.available_timezones()` from the standard library's `zoneinfo` module.
+
+        Examples
+        --------
+        The simplest use of `data_freshness()` requires just two arguments: the `column=` containing
+        your timestamps and `max_age=` specifying how old the data can be. In this first example,
+        we create sample data with an `"updated_at"` column containing timestamps from 1, 12, and
+        20 hours ago. By setting `max_age="24 hours"`, we're asserting that the most recent
+        timestamp should be within 24 hours of the current time. Since the newest record is only
+        1 hour old, this validation passes.
+
+        ```python
+        import pointblank as pb
+        import polars as pl
+        from datetime import datetime, timedelta
+
+        # Create sample data with recent timestamps
+        recent_data = pl.DataFrame({
+            "id": [1, 2, 3],
+            "updated_at": [
+                datetime.now() - timedelta(hours=1),
+                datetime.now() - timedelta(hours=12),
+                datetime.now() - timedelta(hours=20),
+            ]
+        })
+
+        validation = (
+            pb.Validate(data=recent_data)
+            .data_freshness(column="updated_at", max_age="24 hours")
+            .interrogate()
+        )
+
+        validation
+        ```
+
+        The `max_age=` parameter accepts human-readable strings with various time units. You can
+        chain multiple `data_freshness()` calls to check different freshness thresholds
+        simultaneously—useful for tiered SLAs where you might want warnings at 30 minutes but
+        errors at 2 days.
+
+        ```python
+        # Check data is fresh within different time windows
+        validation = (
+            pb.Validate(data=recent_data)
+            .data_freshness(column="updated_at", max_age="30 minutes")  # Very fresh
+            .data_freshness(column="updated_at", max_age="2 days")      # Reasonably fresh
+            .data_freshness(column="updated_at", max_age="1 week")      # Within a week
+            .interrogate()
+        )
+
+        validation
+        ```
+
+        When your data contains naive datetimes (timestamps without timezone information), use the
+        `timezone=` parameter to specify what timezone those values represent. Here we have event
+        data recorded in Eastern Time, so we set `timezone="America/New_York"` to ensure the
+        freshness comparison is done correctly.
+
+        ```python
+        # Data with naive datetimes (assume they're in Eastern Time)
+        eastern_data = pl.DataFrame({
+            "event_time": [
+                datetime.now() - timedelta(hours=2),
+                datetime.now() - timedelta(hours=5),
+            ]
+        })
+
+        validation = (
+            pb.Validate(data=eastern_data)
+            .data_freshness(
+                column="event_time",
+                max_age="12 hours",
+                timezone="America/New_York"  # Interpret times as Eastern
+            )
+            .interrogate()
+        )
+
+        validation
+        ```
+
+        For reproducible validations or historical checks, you can use `reference_time=` to compare
+        against a specific point in time instead of the current time. This is particularly useful
+        for testing or when validating data snapshots. The reference time should include a timezone
+        offset (like `+00:00` for UTC) to avoid ambiguity.
+
+        ```python
+        validation = (
+            pb.Validate(data=recent_data)
+            .data_freshness(
+                column="updated_at",
+                max_age="24 hours",
+                reference_time="2024-01-15T12:00:00+00:00"
+            )
+            .interrogate()
+        )
+
+        validation
+        ```
+        
+
 col_schema_match(self, schema: 'Schema', complete: 'bool' = True, in_order: 'bool' = True, case_sensitive_colnames: 'bool' = True, case_sensitive_dtypes: 'bool' = True, full_match_dtypes: 'bool' = True, pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
 
         Do columns in the table (and their types) match a predefined schema?
@@ -15238,6 +15515,521 @@ config(report_incl_header: 'bool' = True, report_incl_footer: 'bool' = True, rep
     -------
     PointblankConfig
         A `PointblankConfig` object with the specified configuration settings.
+    
+
+
+## The Test Data Generation family
+
+Generate synthetic test data based on schema definitions. Use
+`generate_dataset()` to create data from a `Schema` object. The helper functions define typed fields
+with constraints for realistic test data generation.
+
+generate_dataset(schema: 'Schema', n: 'int' = 100, seed: 'int | None' = None, output: "Literal['polars', 'pandas', 'dict']" = 'polars', country: 'str' = 'US') -> 'Any'
+
+    Generate synthetic test data from a schema.
+
+    This function generates random data that conforms to a schema's column definitions. When the
+    schema is defined using `Field` objects with constraints (e.g., `min_val`, `max_val`,
+    `pattern`, `preset`), the generated data will respect those constraints.
+
+    This is a convenience function that wraps `Schema.generate()` for a more functional style
+    of usage, similar to how `load_dataset()` loads built-in datasets.
+
+    Parameters
+    ----------
+    schema
+        The schema object defining the structure and constraints of the data to generate.
+    n
+        Number of rows to generate. Default is `100`.
+    seed
+        Random seed for reproducibility. If provided, the same seed will produce
+        the same data. Default is `None` (non-deterministic).
+    output
+        Output format for the generated data. Options are: (1) `"polars"` (default) returns a
+        Polars DataFrame, (2) `"pandas"` returns a Pandas DataFrame, and (3) `"dict"` returns
+        a dictionary of lists.
+    country
+        Country code for realistic data generation when using presets (e.g., `preset="email"`,
+        `preset="address"`). Accepts ISO 3166-1 alpha-2 codes (e.g., `"US"`, `"DE"`, `"FR"`)
+        or alpha-3 codes (e.g., `"USA"`, `"DEU"`, `"FRA"`). Default is `"US"`.
+
+    Returns
+    -------
+    DataFrame or dict
+        Generated data in the requested format.
+
+    Raises
+    ------
+    ValueError
+        If the schema has no columns or if constraints cannot be satisfied.
+    ImportError
+        If required optional dependencies are not installed.
+
+    Supported Countries
+    -------------------
+    The `country=` parameter controls the country used for generating realistic data with
+    presets (e.g., `preset="email"`, `preset="address"`). This affects location-specific
+    formats like addresses, phone numbers, and postal codes. Currently, **50 countries** are
+    supported with full locale data:
+
+    **Europe (32 countries):** Austria (`"AT"`), Belgium (`"BE"`), Bulgaria (`"BG"`),
+    Croatia (`"HR"`), Cyprus (`"CY"`), Czech Republic (`"CZ"`), Denmark (`"DK"`),
+    Estonia (`"EE"`), Finland (`"FI"`), France (`"FR"`), Germany (`"DE"`), Greece (`"GR"`),
+    Hungary (`"HU"`), Iceland (`"IS"`), Ireland (`"IE"`), Italy (`"IT"`), Latvia (`"LV"`),
+    Lithuania (`"LT"`), Luxembourg (`"LU"`), Malta (`"MT"`), Netherlands (`"NL"`),
+    Norway (`"NO"`), Poland (`"PL"`), Portugal (`"PT"`), Romania (`"RO"`), Russia (`"RU"`),
+    Slovakia (`"SK"`), Slovenia (`"SI"`), Spain (`"ES"`), Sweden (`"SE"`),
+    Switzerland (`"CH"`), United Kingdom (`"GB"`)
+
+    **Americas (7 countries):** Argentina (`"AR"`), Brazil (`"BR"`), Canada (`"CA"`),
+    Chile (`"CL"`), Colombia (`"CO"`), Mexico (`"MX"`), United States (`"US"`)
+
+    **Asia-Pacific (10 countries):** Australia (`"AU"`), China (`"CN"`), Hong Kong (`"HK"`),
+    India (`"IN"`), Indonesia (`"ID"`), Japan (`"JP"`), New Zealand (`"NZ"`),
+    Philippines (`"PH"`), South Korea (`"KR"`), Taiwan (`"TW"`)
+
+    **Middle East (1 country):** Turkey (`"TR"`)
+
+    Examples
+    --------
+    Generate test data from a schema with field constraints:
+
+    ```python
+    import pointblank as pb
+
+    schema = pb.Schema(
+        user_id=pb.int_field(min_val=1, unique=True),
+        email=pb.string_field(preset="email"),
+        age=pb.int_field(min_val=18, max_val=100),
+        status=pb.string_field(allowed=["active", "pending", "inactive"]),
+    )
+
+    # Generate 100 rows of test data
+    pb.preview(pb.generate_dataset(schema, n=100, seed=23))
+    ```
+
+    Generate data from a simple dtype-only schema as a Pandas DataFrame:
+
+    ```python
+    schema = pb.Schema(name="String", age="Int64", active="Boolean")
+    pb.preview(pb.generate_dataset(schema, n=50, seed=23, output="pandas"))
+    ```
+
+    Generate data with German addresses by using `country="DE"`:
+
+    ```python
+    schema = pb.Schema(
+        name=pb.string_field(preset="name"),
+        address=pb.string_field(preset="address"),
+        city=pb.string_field(preset="city"),
+    )
+    pb.preview(pb.generate_dataset(schema, n=20, seed=23, country="DE"))
+    ```
+    
+
+int_field(min_val: 'int | None' = None, max_val: 'int | None' = None, allowed: 'list[int] | None' = None, nullable: 'bool' = False, null_probability: 'float' = 0.0, unique: 'bool' = False, generator: 'Callable[[], Any] | None' = None, dtype: 'str' = 'Int64') -> 'IntField'
+
+    Create an integer column specification.
+
+    Parameters
+    ----------
+    min_val
+        Minimum value (inclusive). Default is `None` (no minimum).
+    max_val
+        Maximum value (inclusive). Default is `None` (no maximum).
+    allowed
+        List of allowed values (categorical constraint). When provided,
+        values are sampled from this list.
+    nullable
+        Whether the column can contain null values. Default is `False`.
+    null_probability
+        Probability of generating null when `nullable=True`. Default is `0.0`.
+    unique
+        Whether all values must be unique. Default is `False`.
+    generator
+        Custom callable that generates values. Overrides other settings.
+    dtype
+        Integer dtype. Default is `"Int64"`. Options: `"Int8"`, `"Int16"`,
+        `"Int32"`, `"Int64"`, `"UInt8"`, `"UInt16"`, `"UInt32"`, `"UInt64"`.
+
+    Returns
+    -------
+    IntField
+        An integer field specification.
+
+    Examples
+    --------
+    Define a schema with integer fields and generate test data:
+
+    ```python
+    import pointblank as pb
+
+    # Define a schema with integer field specifications
+    schema = pb.Schema(
+        user_id=pb.int_field(min_val=1, unique=True),
+        age=pb.int_field(min_val=0, max_val=120),
+        rating=pb.int_field(allowed=[1, 2, 3, 4, 5]),
+    )
+
+    # Generate 100 rows of test data
+    pb.preview(pb.generate_dataset(schema, n=100, seed=23))
+    ```
+
+    The generated data will have unique user IDs starting from `1`, ages between `0`-`120`,
+    and ratings sampled from the allowed values.
+    
+
+float_field(min_val: 'float | None' = None, max_val: 'float | None' = None, allowed: 'list[float] | None' = None, nullable: 'bool' = False, null_probability: 'float' = 0.0, unique: 'bool' = False, generator: 'Callable[[], Any] | None' = None, dtype: 'str' = 'Float64') -> 'FloatField'
+
+    Create a floating-point column specification.
+
+    Parameters
+    ----------
+    min_val
+        Minimum value (inclusive). Default is `None` (no minimum).
+    max_val
+        Maximum value (inclusive). Default is `None` (no maximum).
+    allowed
+        List of allowed values (categorical constraint). When provided,
+        values are sampled from this list.
+    nullable
+        Whether the column can contain null values. Default is `False`.
+    null_probability
+        Probability of generating null when `nullable=True`. Default is `0.0`.
+    unique
+        Whether all values must be unique. Default is `False`.
+    generator
+        Custom callable that generates values. Overrides other settings.
+    dtype
+        Float dtype. Default is `"Float64"`. Options: `"Float32"`, `"Float64"`.
+
+    Returns
+    -------
+    FloatField
+        A float field specification.
+
+    Examples
+    --------
+    Define a schema with float fields and generate test data:
+
+    ```python
+    import pointblank as pb
+
+    # Define a schema with float field specifications
+    schema = pb.Schema(
+        price=pb.float_field(min_val=0.01, max_val=9999.99),
+        probability=pb.float_field(min_val=0.0, max_val=1.0),
+        temperature=pb.float_field(min_val=-40.0, max_val=50.0),
+    )
+
+    # Generate 100 rows of test data
+    pb.preview(pb.generate_dataset(schema, n=100, seed=23))
+    ```
+
+    Values are uniformly distributed across the specified ranges.
+    
+
+string_field(min_length: 'int | None' = None, max_length: 'int | None' = None, pattern: 'str | None' = None, preset: 'str | None' = None, allowed: 'list[str] | None' = None, nullable: 'bool' = False, null_probability: 'float' = 0.0, unique: 'bool' = False, generator: 'Callable[[], Any] | None' = None) -> 'StringField'
+
+    Create a string column specification.
+
+    Parameters
+    ----------
+    min_length
+        Minimum string length. Default is `None` (no minimum).
+    max_length
+        Maximum string length. Default is `None` (no maximum).
+    pattern
+        Regular expression pattern for generated strings.
+    preset
+        Preset for realistic data (e.g., `"email"`, `"name"`, `"phone_number"`).
+    allowed
+        List of allowed values (categorical constraint).
+    nullable
+        Whether the column can contain null values. Default is `False`.
+    null_probability
+        Probability of generating null when `nullable=True`. Default is `0.0`.
+    unique
+        Whether all values must be unique. Default is `False`.
+    generator
+        Custom callable that generates values. Overrides other settings.
+
+    Returns
+    -------
+    StringField
+        A string field specification.
+
+    Examples
+    --------
+    Define a schema with string fields and generate test data:
+
+    ```python
+    import pointblank as pb
+
+    # Define a schema with string field specifications
+    schema = pb.Schema(
+        name=pb.string_field(preset="name"),
+        email=pb.string_field(preset="email", unique=True),
+        status=pb.string_field(allowed=["active", "pending", "inactive"]),
+        code=pb.string_field(pattern=r"[A-Z]{3}-[0-9]{4}"),
+    )
+
+    # Generate 100 rows of test data
+    pb.preview(pb.generate_dataset(schema, n=100, seed=23))
+    ```
+
+    The generated data will have coherent names and emails (derived from the name),
+    statuses sampled from the allowed values, and codes matching the regex pattern.
+    
+
+bool_field(p_true: 'float' = 0.5, nullable: 'bool' = False, null_probability: 'float' = 0.0, unique: 'bool' = False, generator: 'Callable[[], Any] | None' = None) -> 'BoolField'
+
+    Create a boolean column specification.
+
+    Parameters
+    ----------
+    p_true
+        Probability of generating `True`. Default is `0.5` (equal probability).
+        Must be between 0.0 and 1.0.
+    nullable
+        Whether the column can contain null values. Default is `False`.
+    null_probability
+        Probability of generating null when `nullable=True`. Default is `0.0`.
+    unique
+        Whether all values must be unique. Default is `False`.
+        Note: Boolean can only have 2 unique non-null values.
+    generator
+        Custom callable that generates values. Overrides other settings.
+
+    Returns
+    -------
+    BoolField
+        A boolean field specification.
+
+    Examples
+    --------
+    Define a schema with boolean fields and generate test data:
+
+    ```python
+    import pointblank as pb
+
+    # Define a schema with boolean field specifications
+    schema = pb.Schema(
+        is_active=pb.bool_field(p_true=0.8),      # 80% True
+        is_premium=pb.bool_field(p_true=0.2),     # 20% True
+        is_verified=pb.bool_field(),              # 50% True (default)
+    )
+
+    # Generate 100 rows of test data
+    pb.preview(pb.generate_dataset(schema, n=100, seed=23))
+    ```
+
+    The `p_true=` parameter controls the probability of generating `True` values,
+    which is helpful for simulating real-world distributions.
+    
+
+date_field(min_date: 'str | date | None' = None, max_date: 'str | date | None' = None, nullable: 'bool' = False, null_probability: 'float' = 0.0, unique: 'bool' = False, generator: 'Callable[[], Any] | None' = None) -> 'DateField'
+
+    Create a date column specification.
+
+    Parameters
+    ----------
+    min_date
+        Minimum date (inclusive). Can be ISO string or `date` object.
+    max_date
+        Maximum date (inclusive). Can be ISO string or `date` object.
+    nullable
+        Whether the column can contain null values. Default is `False`.
+    null_probability
+        Probability of generating null when `nullable=True`. Default is `0.0`.
+    unique
+        Whether all values must be unique. Default is `False`.
+    generator
+        Custom callable that generates values. Overrides other settings.
+
+    Returns
+    -------
+    DateField
+        A date field specification.
+
+    Examples
+    --------
+    Define a schema with date fields and generate test data:
+
+    ```python
+    import pointblank as pb
+    from datetime import date
+
+    # Define a schema with date field specifications
+    schema = pb.Schema(
+        birth_date=pb.date_field(
+            min_date=date(1960, 1, 1),
+            max_date=date(2005, 12, 31)
+        ),
+        hire_date=pb.date_field(
+            min_date=date(2020, 1, 1),
+            max_date=date(2024, 12, 31)
+        ),
+    )
+
+    # Generate 100 rows of test data
+    pb.preview(pb.generate_dataset(schema, n=100, seed=23))
+    ```
+
+    Date values are uniformly distributed within the specified range.
+    
+
+datetime_field(min_date: 'str | datetime | None' = None, max_date: 'str | datetime | None' = None, nullable: 'bool' = False, null_probability: 'float' = 0.0, unique: 'bool' = False, generator: 'Callable[[], Any] | None' = None) -> 'DatetimeField'
+
+    Create a datetime column specification.
+
+    Parameters
+    ----------
+    min_date
+        Minimum datetime (inclusive). Can be ISO string or `datetime` object.
+    max_date
+        Maximum datetime (inclusive). Can be ISO string or `datetime` object.
+    nullable
+        Whether the column can contain null values. Default is `False`.
+    null_probability
+        Probability of generating null when `nullable=True`. Default is `0.0`.
+    unique
+        Whether all values must be unique. Default is `False`.
+    generator
+        Custom callable that generates values. Overrides other settings.
+
+    Returns
+    -------
+    DatetimeField
+        A datetime field specification.
+
+    Examples
+    --------
+    Define a schema with datetime fields and generate test data:
+
+    ```python
+    import pointblank as pb
+    from datetime import datetime
+
+    # Define a schema with datetime field specifications
+    schema = pb.Schema(
+        created_at=pb.datetime_field(
+            min_date=datetime(2024, 1, 1),
+            max_date=datetime(2024, 12, 31)
+        ),
+        updated_at=pb.datetime_field(
+            min_date=datetime(2024, 6, 1),
+            max_date=datetime(2024, 12, 31)
+        ),
+    )
+
+    # Generate 100 rows of test data
+    pb.preview(pb.generate_dataset(schema, n=100, seed=23))
+    ```
+
+    Datetime values are uniformly distributed within the specified range.
+    
+
+time_field(min_time: 'str | time | None' = None, max_time: 'str | time | None' = None, nullable: 'bool' = False, null_probability: 'float' = 0.0, unique: 'bool' = False, generator: 'Callable[[], Any] | None' = None) -> 'TimeField'
+
+    Create a time column specification.
+
+    Parameters
+    ----------
+    min_time
+        Minimum time (inclusive). Can be ISO string or `time` object.
+    max_time
+        Maximum time (inclusive). Can be ISO string or `time` object.
+    nullable
+        Whether the column can contain null values. Default is `False`.
+    null_probability
+        Probability of generating null when `nullable=True`. Default is `0.0`.
+    unique
+        Whether all values must be unique. Default is `False`.
+    generator
+        Custom callable that generates values. Overrides other settings.
+
+    Returns
+    -------
+    TimeField
+        A time field specification.
+
+    Examples
+    --------
+    Define a schema with time fields and generate test data:
+
+    ```python
+    import pointblank as pb
+    from datetime import time
+
+    # Define a schema with time field specifications
+    schema = pb.Schema(
+        start_time=pb.time_field(
+            min_time=time(9, 0, 0),
+            max_time=time(12, 0, 0)
+        ),
+        end_time=pb.time_field(
+            min_time=time(13, 0, 0),
+            max_time=time(17, 0, 0)
+        ),
+    )
+
+    # Generate 100 rows of test data
+    pb.preview(pb.generate_dataset(schema, n=100, seed=23))
+    ```
+
+    Time values are uniformly distributed within the specified range.
+    
+
+duration_field(min_duration: 'str | timedelta | None' = None, max_duration: 'str | timedelta | None' = None, nullable: 'bool' = False, null_probability: 'float' = 0.0, unique: 'bool' = False, generator: 'Callable[[], Any] | None' = None) -> 'DurationField'
+
+    Create a duration column specification.
+
+    Parameters
+    ----------
+    min_duration
+        Minimum duration (inclusive). Can be string or `timedelta` object.
+    max_duration
+        Maximum duration (inclusive). Can be string or `timedelta` object.
+    nullable
+        Whether the column can contain null values. Default is `False`.
+    null_probability
+        Probability of generating null when `nullable=True`. Default is `0.0`.
+    unique
+        Whether all values must be unique. Default is `False`.
+    generator
+        Custom callable that generates values. Overrides other settings.
+
+    Returns
+    -------
+    DurationField
+        A duration field specification.
+
+    Examples
+    --------
+    Define a schema with duration fields and generate test data:
+
+    ```python
+    import pointblank as pb
+    from datetime import timedelta
+
+    # Define a schema with duration field specifications
+    schema = pb.Schema(
+        session_length=pb.duration_field(
+            min_duration=timedelta(minutes=5),
+            max_duration=timedelta(hours=2)
+        ),
+        wait_time=pb.duration_field(
+            min_duration=timedelta(seconds=30),
+            max_duration=timedelta(minutes=15)
+        ),
+    )
+
+    # Generate 100 rows of test data
+    pb.generate_dataset(schema, n=100, seed=23)
+    ```
+
+    Duration values are uniformly distributed within the specified range.
     
 
 
