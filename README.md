@@ -354,6 +354,50 @@ Click the following headings to see some video demonstrations of the CLI:
 
 </details>
 
+## Generate Realistic Test Data
+
+Need test data for your validation workflows? The `generate_dataset()` function creates realistic, locale-aware synthetic data based on schema definitions. It's very useful for developing pipelines without production data, running CI/CD tests with reproducible scenarios, or prototyping workflows before production data is available.
+
+```python
+import pointblank as pb
+
+# Define a schema with field constraints
+schema = pb.Schema(
+    user_id=pb.int_field(min_val=1, unique=True),
+    name=pb.string_field(preset="name"),
+    email=pb.string_field(preset="email"),
+    age=pb.int_field(min_val=18, max_val=100),
+    status=pb.string_field(allowed=["active", "pending", "inactive"]),
+)
+
+# Generate 10 rows of realistic test data
+data = pb.generate_dataset(schema, n=10, seed=23)
+
+data
+```
+
+| user_id             | name             | email                      | age | status   |
+|---------------------|------------------|----------------------------|-----|----------|
+| 7188536481533917197 | Vivienne Rios    | vrios27@hotmail.com        | 55  | pending  |
+| 2674009078779859984 | William Schaefer | wschaefer28@yandex.com     | 28  | active   |
+| 7652102777077138151 | Lily Hansen      | lily779@aol.com            | 20  | active   |
+| 157503859921753049  | Shirley Mays     | shirley_mays@protonmail.com| 93  | inactive |
+| 2829213282471975080 | Sean Dawson      | sean_dawson@hotmail.com    | 57  | pending  |
+| 3497364383162086858 | Zachary Marsh    | zmarsh23@zoho.com          | 72  | pending  |
+| 3302703640991750415 | Gemma Gonzalez   | gemmagonzalez@yahoo.com    | 66  | pending  |
+| 6695746877064448147 | Brian Haley      | brian437@yandex.com        | 85  | inactive |
+| 2466163118311913924 | Nora Hernandez   | norahernandez@aol.com      | 63  | pending  |
+| 129827878195925732  | Diana Novak      | diana922@protonmail.com    | 34  | active   |
+
+The generator supports sophisticated data generation with these capabilities:
+
+- **Realistic data with presets**: Use built-in presets like `"name"`, `"email"`, `"address"`, `"phone"`, etc.
+- **50+ country support**: Generate locale-specific data (e.g., `country="DE"` for German addresses)
+- **Field constraints**: Control ranges, patterns, uniqueness, and allowed values
+- **Multiple output formats**: Returns Polars DataFrames by default, but also supports Pandas (`output="pandas"`) or dictionaries (`output="dict"`)
+
+This makes it easy to generate test data that matches your validation rules, helping you develop and test data quality workflows without relying on real data.
+
 ## Features That Set Pointblank Apart
 
 - **Complete validation workflow**: From data access to validation to reporting in a single pipeline
