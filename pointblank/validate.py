@@ -17506,6 +17506,133 @@ class Validate:
 
         return step_report
 
+    def get_dataframe(
+        self,
+        tbl_type: Literal["polars", "pandas", "duckdb"] = "polars",
+        keep_extracts: bool = False,
+    ):
+        """
+        Validation results as a dataframe
+
+        The `get_dataframe()` method returns a dataframe that represents the validation
+        report. This dataframe provides a summary of the validation results, including the
+        validation steps, the number of test units, the number of failing test units, and the
+        fraction of failing test units. This can be particularly helpful for logging purposes
+        and enables write validation summaries to CSVs and other on-disk formats.
+
+        Parameters
+        ----------
+        tbl_type :
+            The output backend for the dataframe. The named options are `"polars"`,
+        `"pandas"`, and `"duckdb"`. Default is 'polars'.
+
+        keep_extracts:
+            An option to keep any collected extract data for failing rows from validation steps. By
+        default, this is `False` (i.e., extract data is removed to save space).
+
+        Supported DataFrame Types
+        -------------------------
+        The `tbl_type=` parameter can be set to one of the following:
+
+        - `"polars"`: A Polars DataFrame.
+        - `"pandas"`: A Pandas DataFrame.
+        - `"duckdb"`: An Ibis table for a DuckDB database.
+
+        Examples
+        --------
+
+        ```{python}
+        import pointblank as pb
+
+        # Create a validation
+        validation = (
+            pb.Validate(data=pb.load_dataset("small_table", tbl_type = "duckdb"), label="My validation")
+            .col_vals_gt(columns="d", value=100)
+            .col_vals_regex(columns="b", pattern=r"[0-9]-[a-z]{3}-[0-9]{3}")
+            .interrogate()
+            )
+
+        # Get a dataframe of the validation summary results
+        df_validation = validation.get_dataframe()
+
+        ```
+
+        """
+
+        # Raise an error if tbl_type is not one of the supported types
+        if tbl_type not in ["polars", "pandas", "duckdb"]:
+            raise ValueError(
+                f"The DataFrame type `{tbl_type}` is not valid. Choose one of the following:\n"
+                "- `polars`\n"
+                "- `pandas`\n"
+                "- `duckdb`"
+            )
+
+        # Grab the summary data from validation info helper function
+        report_original = _validation_info_as_dict(self.validation_info)
+
+        # Pop the extracts off unless specified to keep
+        if keep_extracts is False and "extract" in report_original:
+            report_original.pop("extract")
+
+        # Remove keys to be dropped
+        # MEGHAN pick up Here!!!
+        # I need to
+        # 1) assess which keys should be turned innto columns - DONE
+        # 2) Determine which keys are used for conditionals (active = data from step shows, inactive replace with "-")
+        # 3) Create a schema - DONE
+        # 4) return the df
+
+        # Check for polars, raise if not installed
+        if tbl_type == "polars":
+            if not _is_lib_present(lib_name="polars"):
+                raise ImportError(
+                    "The Polars library is not installed but is required when specifying "
+                    '`tbl_type="polars".'
+                )
+            import polars as pl
+
+        # Create the schema for the df
+        schema = pl.Schema(
+            {
+                "assertion_type": pl.String,  # assertion_type
+                "column": pl.String,  # column
+                "values": pl.Unknown,  # values
+                "pre": pl.Unknown,  # pre
+                "active": pl.String,  # active
+                "n": pl.Int64,  # n
+                "n_passed": pl.Int64,  # n_passed
+                "f_passed": pl.Float64,  # f_passed
+                "n_failed": pl.Int64,  # n_failed
+                "f_failed": pl.Float64,  # f_failed
+                "warning": pl.Boolean,  # warning
+                "error": pl.Boolean,  # error
+                "critical": pl.Boolean,  # critical
+            }
+        )
+
+        names_dict = {
+            "assertion_type": "step",
+            "column": "columns",
+            "values": "values",
+            "pre": "tbl",
+            "active": "eval",
+            "n": "units",
+            "n_passed": "pass_n",
+            "f_passed": "pass_pct",
+            "n_failed": "failed_n",
+            "f_failed": "failed_pct",
+            "warning": "warning",
+            "error": "error",
+            "critical": "critical",
+        }
+
+        report = {key: report_original[key] for key in names_dict.keys() if key in report_original}
+
+        df_validation_results = pl.DataFrame(data=report, schema=schema, strict=False).rename(
+            names_dict
+        )
+
     def _add_validation(self, validation_info):
         """
         Add a validation to the list of validations.
