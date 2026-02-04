@@ -11,19 +11,39 @@ from pathlib import Path
 # Add the parent directory to the path so we can import from pointblank
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from pointblank._utils_llms_txt import generate_llms_full_txt, generate_llms_txt
+from pointblank._utils_llms_txt import (
+    _get_api_and_examples_text,
+    generate_llms_full_txt,
+    generate_llms_txt,
+)
 
 
 def main():
     """Generate both llms.txt and llms-full.txt files."""
     base_dir = Path(__file__).parent.parent
     docs_dir = base_dir / "docs"
+    data_dir = base_dir / "pointblank" / "data"
 
-    # Ensure docs directory exists
+    # Ensure directories exist
     docs_dir.mkdir(exist_ok=True)
+    data_dir.mkdir(exist_ok=True)
+
+    # First, regenerate the api-docs.txt file (used by assistant() and as cache for llms-full.txt)
+    print("Regenerating api-docs.txt...")
+    try:
+        api_docs_content = _get_api_and_examples_text()
+        api_docs_path = data_dir / "api-docs.txt"
+        with open(api_docs_path, "w") as f:
+            f.write(api_docs_content)
+        print(f"✓ Generated {api_docs_path}")
+    except Exception as e:
+        print(f"✗ Failed to generate api-docs.txt: {e}")
+        import traceback
+
+        traceback.print_exc()
 
     # Generate llms.txt
-    print("Generating llms.txt...")
+    print("\nGenerating llms.txt...")
     try:
         llms_content = generate_llms_txt()
         llms_path = docs_dir / "llms.txt"
