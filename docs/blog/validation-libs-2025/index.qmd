@@ -537,6 +537,7 @@ for the modern data ecosystem with first-class support for complex validation sc
 ### Example
 
 ```{python}
+#| eval: false
 import polars as pl
 import dataframely as dy
 
@@ -573,6 +574,7 @@ features, it brings a fairly sophisticated approach to validation failures. Rath
 exceptions, it provides detailed failure analysis:
 
 ```{python}
+#| eval: false
 # Soft validation: separate valid and invalid rows
 good_data, failure_info = UserSchema.filter(user_data, cast=True)
 
