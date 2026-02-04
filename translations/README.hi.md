@@ -301,6 +301,41 @@ pb run validation.yaml --exit-code
 pb run validation.py --exit-code
 ```
 
+## यथार्थवादी टेस्ट डेटा जनरेट करें
+
+अपने वैलिडेशन वर्कफ़्लो के लिए टेस्ट डेटा चाहिए? `generate_dataset()` फ़ंक्शन स्कीमा परिभाषाओं के आधार पर यथार्थवादी, लोकेल-अवेयर सिंथेटिक डेटा बनाता है। प्रोडक्शन डेटा के बिना पाइपलाइन विकसित करने, पुन: प्रस्तुत करने योग्य परिदृश्यों के साथ CI/CD टेस्ट चलाने, या प्रोडक्शन डेटा उपलब्ध होने से पहले वर्कफ़्लो का प्रोटोटाइप बनाने के लिए बहुत उपयोगी।
+
+```python
+import pointblank as pb
+
+# फ़ील्ड बाधाओं के साथ स्कीमा परिभाषित करें
+schema = pb.Schema(
+    user_id=pb.int_field(min_val=1, unique=True),
+    name=pb.string_field(preset="name"),
+    email=pb.string_field(preset="email"),
+    age=pb.int_field(min_val=18, max_val=100),
+    status=pb.string_field(allowed=["active", "pending", "inactive"]),
+)
+
+# 100 पंक्तियों का यथार्थवादी टेस्ट डेटा जनरेट करें
+data = pb.generate_dataset(schema, n=100, seed=23)
+```
+
+| user_id             | name             | email                       | age | status   |
+|---------------------|------------------|-----------------------------|-----|----------|
+| 7188536481533917197 | Vivienne Rios    | vrios27@hotmail.com         | 55  | pending  |
+| 2674009078779859984 | William Schaefer | wschaefer28@yandex.com      | 28  | active   |
+| 7652102777077138151 | Lily Hansen      | lily779@aol.com             | 20  | active   |
+| 157503859921753049  | Shirley Mays     | shirley_mays@protonmail.com | 93  | inactive |
+| 2829213282471975080 | Sean Dawson      | sean_dawson@hotmail.com     | 57  | pending  |
+
+जनरेटर इन क्षमताओं के साथ परिष्कृत डेटा जनरेशन का समर्थन करता है:
+
+- **प्रीसेट के साथ यथार्थवादी डेटा**: `"name"`, `"email"`, `"address"`, `"phone"` आदि जैसे बिल्ट-इन प्रीसेट का उपयोग करें
+- **50+ देशों का समर्थन**: लोकेल-विशिष्ट डेटा जनरेट करें (उदा., जर्मन पतों के लिए `country="DE"`)
+- **फ़ील्ड बाधाएं**: रेंज, पैटर्न, विशिष्टता और अनुमत मानों को नियंत्रित करें
+- **एकाधिक आउटपुट प्रारूप**: डिफ़ॉल्ट रूप से Polars DataFrame लौटाता है, लेकिन Pandas (`output="pandas"`) या शब्दकोश (`output="dict"`) का भी समर्थन करता है
+
 ## विशेषताएं जो पॉइन्टब्लैंक को अलग बनाती हैं
 
 - **पूर्ण वैलिडेशन वर्कफ्लो**: डेटा एक्सेस से वैलिडेशन से रिपोर्टिंग तक एक ही पाइपलाइन में
