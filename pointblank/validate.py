@@ -13412,6 +13412,28 @@ class Validate:
 
             # Skip the validation step if it is not active but still record the time of processing
             if not validation.active:
+                # If no note was already set by callable resolution above, this is a
+                # plain `active=False` — attach a note explaining the explicit deactivation
+                if not validation.notes or "active_check" not in validation.notes:
+                    step_skipped = NOTES_TEXT.get("active_check_step_skipped", {}).get(
+                        self.locale, "Step skipped"
+                    )
+                    body_template = NOTES_TEXT.get("step_set_inactive", {}).get(
+                        self.locale,
+                        NOTES_TEXT.get("step_set_inactive", {}).get("en", ""),
+                    )
+                    body_text = body_template.format(param="`active=`", value="`False`")
+                    body_html = body_template.format(
+                        param="<code>active=</code>", value="<code>False</code>"
+                    )
+                    note_text = f"{step_skipped} \u2014 {body_text}"
+                    note_html = f"{html_module.escape(step_skipped)} &mdash; {body_html}"
+                    validation._add_note(
+                        key="active_check",
+                        markdown=note_html,
+                        text=note_text,
+                    )
+
                 end_time = datetime.datetime.now(datetime.timezone.utc)
                 validation.proc_duration_s = (end_time - start_time).total_seconds()
                 validation.time_processed = end_time.isoformat(timespec="milliseconds")
