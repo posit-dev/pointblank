@@ -10,7 +10,7 @@ bread-crumbs: true
 #| echo: false
 #| output: false
 import pointblank as pb
-pb.config(report_incl_footer=False)
+pb.config(report_incl_footer_timings=False)
 ```
 
 Actions transform data validation from passive reporting to active response by automatically

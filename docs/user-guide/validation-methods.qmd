@@ -10,7 +10,7 @@ bread-crumbs: true
 #| echo: false
 #| output: false
 import pointblank as pb
-pb.config(report_incl_header=False, report_incl_footer=False)
+pb.config(report_incl_header=False, report_incl_footer_timings=False)
 ```
 
 Pointblank provides a comprehensive suite of validation methods to verify different aspects of your

@@ -10,7 +10,7 @@ bread-crumbs: true
 #| echo: false
 #| output: false
 import pointblank as pb
-pb.config(report_incl_footer=False)
+pb.config(report_incl_footer_timings=False)
 ```
 
 The Pointblank library is all about assessing the state of data quality for a table. You provide the

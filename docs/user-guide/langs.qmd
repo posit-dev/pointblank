@@ -8,7 +8,7 @@ html-table-processing: none
 #| echo: false
 #| output: false
 import pointblank as pb
-pb.config(report_incl_header=False, report_incl_footer=False)
+pb.config(report_incl_header=False, report_incl_footer_timings=False)
 ```
 
 It's possible to generate reporting in various spoken languages. We do this via the `lang=`

@@ -10,7 +10,7 @@ bread-crumbs: true
 #| echo: false
 #| output: false
 import pointblank as pb
-pb.config(report_incl_footer=False)
+pb.config(report_incl_footer_timings=False)
 ```
 
 Thresholds are a key concept in Pointblank that allow you to define acceptable limits for failing

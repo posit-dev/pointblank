@@ -9,7 +9,7 @@ html-table-processing: none
 #| echo: false
 #| output: false
 import pointblank as pb
-pb.config(report_incl_footer=False)
+pb.config(report_incl_footer_timings=False)
 ```
 
 Pointblank provides a built-in test data generation system that creates realistic, locale-aware

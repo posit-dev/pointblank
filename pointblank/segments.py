@@ -76,7 +76,7 @@ def seg_group(values: list[Any]) -> Segment:
     #| echo: false
     #| output: false
     import pointblank as pb
-    pb.config(report_incl_header=False, report_incl_footer=False, preview_incl_header=False)
+    pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
     ```
 
     Let's say we're analyzing sales from our local bookstore, and want to check the number of books
