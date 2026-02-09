@@ -274,6 +274,16 @@ quartodoc:
         - name: get_data_path
         - name: connect_to_table
         - name: print_database_tables
+    - title: Table Pre-checks
+      desc: >
+        The *Table Pre-checks* group contains helper functions that are designed for use with the
+        `active=` parameter of validation methods. These callables inspect the target table before
+        a validation step runs and conditionally skip the step when a precondition is not met
+        (e.g., a required column is missing or the table does not have enough rows). A descriptive,
+        locale-aware note is automatically attached to any step that is skipped.
+      contents:
+        - name: has_columns
+        - name: has_rows
     - title: YAML
       desc: >
         The *YAML* group contains functions that allow for the use of YAML to orchestrate validation
