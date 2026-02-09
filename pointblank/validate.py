@@ -13315,6 +13315,101 @@ class Validate:
             # Bypassing the validation step if conditions met
             # ------------------------------------------------
 
+            # Resolve callable `active` values by evaluating them against the original table;
+            # this evaluation occurs *before* any `pre` processing so that inspection functions
+            # like `has_columns()` see the raw input data
+            if callable(validation.active):
+                active_fn = validation.active
+                active_exc: Exception | None = None
+                try:
+                    validation.active = bool(active_fn(data_tbl))
+                except Exception as exc:
+                    validation.active = False
+                    active_exc = exc
+
+                # If the callable deactivated the step, attach a note so the validation
+                # report explains *why* the step was skipped. Inspection helpers like
+                # `has_columns()` set a `_reason` dict with a translation key and params;
+                # for arbitrary callables we fall back to a generic translated message.
+                if not validation.active:
+                    reason_info = getattr(active_fn, "_reason", None)
+
+                    # --- "Step skipped" prefix (translated) ---
+                    step_skipped = NOTES_TEXT.get("active_check_step_skipped", {}).get(
+                        self.locale, "Step skipped"
+                    )
+
+                    if isinstance(reason_info, dict):
+                        # Structured reason from an inspection helper
+                        reason_key = reason_info.get("key", "")
+                        reason_params = reason_info.get("params", {})
+
+                        # Format numeric params with comma separator for display
+                        fmt_params = {}
+                        for k, v in reason_params.items():
+                            if k == "columns" and isinstance(v, list):
+                                fmt_params[k] = ", ".join(f"`{c}`" for c in v)
+                            elif isinstance(v, int):
+                                fmt_params[k] = f"`{v:,}`"
+                            else:
+                                fmt_params[k] = str(v)
+
+                        template = NOTES_TEXT.get(reason_key, {}).get(
+                            self.locale,
+                            NOTES_TEXT.get(reason_key, {}).get("en", ""),
+                        )
+                        reason_text_body = template.format(**fmt_params)
+                        reason_text = f"{step_skipped} \u2014 {reason_text_body}"
+
+                        reason_escaped = html_module.escape(reason_text_body)
+                        step_skipped_esc = html_module.escape(step_skipped)
+                        reason_html = f"{step_skipped_esc} &mdash; {reason_escaped}"
+
+                    elif active_exc is not None:
+                        fn_name = getattr(active_fn, "__name__", None) or getattr(
+                            active_fn, "__qualname__", "callable"
+                        )
+                        exc_msg = str(active_exc)
+                        template = NOTES_TEXT.get("active_check_callable_raised_error", {}).get(
+                            self.locale,
+                            NOTES_TEXT.get("active_check_callable_raised_error", {}).get("en", ""),
+                        )
+                        reason_text_body = template.format(fn_name=f"`{fn_name}`", exc_msg=exc_msg)
+                        reason_text = f"{step_skipped} \u2014 {reason_text_body}"
+
+                        reason_text_body_html = template.format(
+                            fn_name=f"<code>{html_module.escape(fn_name)}</code>",
+                            exc_msg=html_module.escape(exc_msg),
+                        )
+                        step_skipped_esc = html_module.escape(step_skipped)
+                        reason_html = f"{step_skipped_esc} &mdash; {reason_text_body_html}"
+
+                    else:
+                        fn_name = getattr(active_fn, "__name__", None) or getattr(
+                            active_fn, "__qualname__", "callable"
+                        )
+                        template = NOTES_TEXT.get("active_check_callable_returned_false", {}).get(
+                            self.locale,
+                            NOTES_TEXT.get("active_check_callable_returned_false", {}).get(
+                                "en", ""
+                            ),
+                        )
+                        reason_text_body = template.format(fn_name=f"`{fn_name}`", value="`False`")
+                        reason_text = f"{step_skipped} \u2014 {reason_text_body}"
+
+                        reason_text_body_html = template.format(
+                            fn_name=f"<code>{html_module.escape(fn_name)}</code>",
+                            value="<code>False</code>",
+                        )
+                        step_skipped_esc = html_module.escape(step_skipped)
+                        reason_html = f"{step_skipped_esc} &mdash; {reason_text_body_html}"
+
+                    validation._add_note(
+                        key="active_check",
+                        markdown=reason_html,
+                        text=reason_text,
+                    )
+
             # Skip the validation step if it is not active but still record the time of processing
             if not validation.active:
                 end_time = datetime.datetime.now(datetime.timezone.utc)
