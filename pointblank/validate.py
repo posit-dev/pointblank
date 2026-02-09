@@ -4,6 +4,7 @@ import base64
 import contextlib
 import copy
 import datetime
+import html as html_module
 import inspect
 import json
 import pickle
@@ -98,6 +99,7 @@ from pointblank._utils import (
     _select_df_lib,
 )
 from pointblank._utils_check_args import (
+    _check_active_input,
     _check_boolean_input,
     _check_column,
     _check_pre,
@@ -3755,7 +3757,7 @@ class _ValidationInfo:
         thresholds: float | bool | tuple | dict | Thresholds | None = None,
         brief: str | bool = False,
         actions: Actions | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
     ) -> _ValidationInfo:
         # This factory method creates a `_ValidationInfo` instance for aggregate
         # methods. The reason this is created, is because all agg methods share the same
@@ -3790,7 +3792,7 @@ class _ValidationInfo:
     label: str | None = None
     brief: str | None = None
     autobrief: str | None = None
-    active: bool | None = None
+    active: bool | Callable | None = None
     # Interrogation results
     eval_error: bool | None = None
     all_passed: bool | None = None
@@ -5181,7 +5183,7 @@ class Validate:
         thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
     ) -> Validate:
         """
         Are column data greater than a fixed value or data in another column?
@@ -5235,9 +5237,14 @@ class Validate:
             the entire brief will be automatically generated. If `None` (the default) then there
             won't be a brief.
         active
-            A boolean value indicating whether the validation step should be active. Using `False`
-            will make the validation step inactive (still reporting its presence and keeping indexes
-            for the steps unchanged).
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing. Inspection
+            functions like [`has_columns()`](`pointblank.has_columns`) and
+            [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
+            based on properties of the target table.
 
         Returns
         -------
@@ -5421,7 +5428,7 @@ class Validate:
         # _check_segments(segments=segments)
         _check_thresholds(thresholds=thresholds)
         _check_boolean_input(param=na_pass, param_name="na_pass")
-        _check_boolean_input(param=active, param_name="active")
+        _check_active_input(param=active, param_name="active")
 
         # If value is a string-based date or datetime, convert it to the appropriate type
         value = _string_date_dttm_conversion(value=value)
@@ -5465,7 +5472,7 @@ class Validate:
         thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
     ) -> Validate:
         """
         Are column data less than a fixed value or data in another column?
@@ -5519,9 +5526,14 @@ class Validate:
             the entire brief will be automatically generated. If `None` (the default) then there
             won't be a brief.
         active
-            A boolean value indicating whether the validation step should be active. Using `False`
-            will make the validation step inactive (still reporting its presence and keeping indexes
-            for the steps unchanged).
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing. Inspection
+            functions like [`has_columns()`](`pointblank.has_columns`) and
+            [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
+            based on properties of the target table.
 
         Returns
         -------
@@ -5705,7 +5717,7 @@ class Validate:
         # _check_segments(segments=segments)
         _check_thresholds(thresholds=thresholds)
         _check_boolean_input(param=na_pass, param_name="na_pass")
-        _check_boolean_input(param=active, param_name="active")
+        _check_active_input(param=active, param_name="active")
 
         # If value is a string-based date or datetime, convert it to the appropriate type
         value = _string_date_dttm_conversion(value=value)
@@ -5756,7 +5768,7 @@ class Validate:
         thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
     ) -> Validate:
         """
         Are column data equal to a fixed value or data in another column?
@@ -5810,9 +5822,14 @@ class Validate:
             the entire brief will be automatically generated. If `None` (the default) then there
             won't be a brief.
         active
-            A boolean value indicating whether the validation step should be active. Using `False`
-            will make the validation step inactive (still reporting its presence and keeping indexes
-            for the steps unchanged).
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing. Inspection
+            functions like [`has_columns()`](`pointblank.has_columns`) and
+            [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
+            based on properties of the target table.
 
         Returns
         -------
@@ -5995,7 +6012,7 @@ class Validate:
         # _check_segments(segments=segments)
         _check_thresholds(thresholds=thresholds)
         _check_boolean_input(param=na_pass, param_name="na_pass")
-        _check_boolean_input(param=active, param_name="active")
+        _check_active_input(param=active, param_name="active")
 
         # If value is a string-based date or datetime, convert it to the appropriate type
         # Allow regular strings to pass through for string comparisons
@@ -6047,7 +6064,7 @@ class Validate:
         thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
     ) -> Validate:
         """
         Are column data not equal to a fixed value or data in another column?
@@ -6101,9 +6118,14 @@ class Validate:
             the entire brief will be automatically generated. If `None` (the default) then there
             won't be a brief.
         active
-            A boolean value indicating whether the validation step should be active. Using `False`
-            will make the validation step inactive (still reporting its presence and keeping indexes
-            for the steps unchanged).
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing. Inspection
+            functions like [`has_columns()`](`pointblank.has_columns`) and
+            [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
+            based on properties of the target table.
 
         Returns
         -------
@@ -6284,7 +6306,7 @@ class Validate:
         # _check_segments(segments=segments)
         _check_thresholds(thresholds=thresholds)
         _check_boolean_input(param=na_pass, param_name="na_pass")
-        _check_boolean_input(param=active, param_name="active")
+        _check_active_input(param=active, param_name="active")
 
         # If value is a string-based date or datetime, convert it to the appropriate type
         # Allow regular strings to pass through for string comparisons
@@ -6336,7 +6358,7 @@ class Validate:
         thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
     ) -> Validate:
         """
         Are column data greater than or equal to a fixed value or data in another column?
@@ -6390,9 +6412,14 @@ class Validate:
             the entire brief will be automatically generated. If `None` (the default) then there
             won't be a brief.
         active
-            A boolean value indicating whether the validation step should be active. Using `False`
-            will make the validation step inactive (still reporting its presence and keeping indexes
-            for the steps unchanged).
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing. Inspection
+            functions like [`has_columns()`](`pointblank.has_columns`) and
+            [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
+            based on properties of the target table.
 
         Returns
         -------
@@ -6577,7 +6604,7 @@ class Validate:
         # _check_segments(segments=segments)
         _check_thresholds(thresholds=thresholds)
         _check_boolean_input(param=na_pass, param_name="na_pass")
-        _check_boolean_input(param=active, param_name="active")
+        _check_active_input(param=active, param_name="active")
 
         # If value is a string-based date or datetime, convert it to the appropriate type
         value = _string_date_dttm_conversion(value=value)
@@ -6628,7 +6655,7 @@ class Validate:
         thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
     ) -> Validate:
         """
         Are column data less than or equal to a fixed value or data in another column?
@@ -6682,9 +6709,14 @@ class Validate:
             the entire brief will be automatically generated. If `None` (the default) then there
             won't be a brief.
         active
-            A boolean value indicating whether the validation step should be active. Using `False`
-            will make the validation step inactive (still reporting its presence and keeping indexes
-            for the steps unchanged).
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing. Inspection
+            functions like [`has_columns()`](`pointblank.has_columns`) and
+            [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
+            based on properties of the target table.
 
         Returns
         -------
@@ -6869,7 +6901,7 @@ class Validate:
         # _check_segments(segments=segments)
         _check_thresholds(thresholds=thresholds)
         _check_boolean_input(param=na_pass, param_name="na_pass")
-        _check_boolean_input(param=active, param_name="active")
+        _check_active_input(param=active, param_name="active")
 
         # If value is a string-based date or datetime, convert it to the appropriate type
         value = _string_date_dttm_conversion(value=value)
@@ -6922,7 +6954,7 @@ class Validate:
         thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
     ) -> Validate:
         """
         Do column data lie between two specified values or data in other columns?
@@ -6986,9 +7018,14 @@ class Validate:
             the entire brief will be automatically generated. If `None` (the default) then there
             won't be a brief.
         active
-            A boolean value indicating whether the validation step should be active. Using `False`
-            will make the validation step inactive (still reporting its presence and keeping indexes
-            for the steps unchanged).
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing. Inspection
+            functions like [`has_columns()`](`pointblank.has_columns`) and
+            [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
+            based on properties of the target table.
 
         Returns
         -------
@@ -7184,7 +7221,7 @@ class Validate:
         # _check_segments(segments=segments)
         _check_thresholds(thresholds=thresholds)
         _check_boolean_input(param=na_pass, param_name="na_pass")
-        _check_boolean_input(param=active, param_name="active")
+        _check_active_input(param=active, param_name="active")
 
         # If `left=` or `right=` is a string-based date or datetime, convert to the appropriate type
         left = _string_date_dttm_conversion(value=left)
@@ -7242,7 +7279,7 @@ class Validate:
         thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
     ) -> Validate:
         """
         Do column data lie outside of two specified values or data in other columns?
@@ -7306,9 +7343,14 @@ class Validate:
             the entire brief will be automatically generated. If `None` (the default) then there
             won't be a brief.
         active
-            A boolean value indicating whether the validation step should be active. Using `False`
-            will make the validation step inactive (still reporting its presence and keeping indexes
-            for the steps unchanged).
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing. Inspection
+            functions like [`has_columns()`](`pointblank.has_columns`) and
+            [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
+            based on properties of the target table.
 
         Returns
         -------
@@ -7504,7 +7546,7 @@ class Validate:
         # _check_segments(segments=segments)
         _check_thresholds(thresholds=thresholds)
         _check_boolean_input(param=na_pass, param_name="na_pass")
-        _check_boolean_input(param=active, param_name="active")
+        _check_active_input(param=active, param_name="active")
 
         # If `left=` or `right=` is a string-based date or datetime, convert to the appropriate type
         left = _string_date_dttm_conversion(value=left)
@@ -7559,7 +7601,7 @@ class Validate:
         thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
     ) -> Validate:
         """
         Validate whether column values are in a set of values.
@@ -7608,9 +7650,14 @@ class Validate:
             the entire brief will be automatically generated. If `None` (the default) then there
             won't be a brief.
         active
-            A boolean value indicating whether the validation step should be active. Using `False`
-            will make the validation step inactive (still reporting its presence and keeping indexes
-            for the steps unchanged).
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing. Inspection
+            functions like [`has_columns()`](`pointblank.has_columns`) and
+            [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
+            based on properties of the target table.
 
         Returns
         -------
@@ -7830,7 +7877,7 @@ class Validate:
         # TODO: add check for segments
         # _check_segments(segments=segments)
         _check_thresholds(thresholds=thresholds)
-        _check_boolean_input(param=active, param_name="active")
+        _check_active_input(param=active, param_name="active")
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
@@ -7876,7 +7923,7 @@ class Validate:
         thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
     ) -> Validate:
         """
         Validate whether column values are not in a set of values.
@@ -7925,9 +7972,14 @@ class Validate:
             the entire brief will be automatically generated. If `None` (the default) then there
             won't be a brief.
         active
-            A boolean value indicating whether the validation step should be active. Using `False`
-            will make the validation step inactive (still reporting its presence and keeping indexes
-            for the steps unchanged).
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing. Inspection
+            functions like [`has_columns()`](`pointblank.has_columns`) and
+            [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
+            based on properties of the target table.
 
         Returns
         -------
@@ -8119,7 +8171,7 @@ class Validate:
         # TODO: add check for segments
         # _check_segments(segments=segments)
         _check_thresholds(thresholds=thresholds)
-        _check_boolean_input(param=active, param_name="active")
+        _check_active_input(param=active, param_name="active")
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
@@ -8167,7 +8219,7 @@ class Validate:
         thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
     ) -> Validate:
         """
         Are column data increasing by row?
@@ -8227,9 +8279,14 @@ class Validate:
             the entire brief will be automatically generated. If `None` (the default) then there
             won't be a brief.
         active
-            A boolean value indicating whether the validation step should be active. Using `False`
-            will make the validation step inactive (still reporting its presence and keeping indexes
-            for the steps unchanged).
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing. Inspection
+            functions like [`has_columns()`](`pointblank.has_columns`) and
+            [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
+            based on properties of the target table.
 
         Returns
         -------
@@ -8355,7 +8412,7 @@ class Validate:
         thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
     ) -> Validate:
         """
         Are column data decreasing by row?
@@ -8415,9 +8472,14 @@ class Validate:
             the entire brief will be automatically generated. If `None` (the default) then there
             won't be a brief.
         active
-            A boolean value indicating whether the validation step should be active. Using `False`
-            will make the validation step inactive (still reporting its presence and keeping indexes
-            for the steps unchanged).
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing. Inspection
+            functions like [`has_columns()`](`pointblank.has_columns`) and
+            [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
+            based on properties of the target table.
 
         Returns
         -------
@@ -8540,7 +8602,7 @@ class Validate:
         thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
     ) -> Validate:
         """
         Validate whether values in a column are Null.
@@ -8583,9 +8645,14 @@ class Validate:
             the entire brief will be automatically generated. If `None` (the default) then there
             won't be a brief.
         active
-            A boolean value indicating whether the validation step should be active. Using `False`
-            will make the validation step inactive (still reporting its presence and keeping indexes
-            for the steps unchanged).
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing. Inspection
+            functions like [`has_columns()`](`pointblank.has_columns`) and
+            [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
+            based on properties of the target table.
 
         Returns
         -------
@@ -8739,7 +8806,7 @@ class Validate:
         # TODO: add check for segments
         # _check_segments(segments=segments)
         _check_thresholds(thresholds=thresholds)
-        _check_boolean_input(param=active, param_name="active")
+        _check_active_input(param=active, param_name="active")
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
@@ -8783,7 +8850,7 @@ class Validate:
         thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
     ) -> Validate:
         """
         Validate whether values in a column are not Null.
@@ -8826,9 +8893,14 @@ class Validate:
             the entire brief will be automatically generated. If `None` (the default) then there
             won't be a brief.
         active
-            A boolean value indicating whether the validation step should be active. Using `False`
-            will make the validation step inactive (still reporting its presence and keeping indexes
-            for the steps unchanged).
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing. Inspection
+            functions like [`has_columns()`](`pointblank.has_columns`) and
+            [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
+            based on properties of the target table.
 
         Returns
         -------
@@ -8982,7 +9054,7 @@ class Validate:
         # TODO: add check for segments
         # _check_segments(segments=segments)
         _check_thresholds(thresholds=thresholds)
-        _check_boolean_input(param=active, param_name="active")
+        _check_active_input(param=active, param_name="active")
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
@@ -9029,7 +9101,7 @@ class Validate:
         thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
     ) -> Validate:
         """
         Validate whether column values match a regular expression pattern.
@@ -9081,9 +9153,14 @@ class Validate:
             the entire brief will be automatically generated. If `None` (the default) then there
             won't be a brief.
         active
-            A boolean value indicating whether the validation step should be active. Using `False`
-            will make the validation step inactive (still reporting its presence and keeping indexes
-            for the steps unchanged).
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing. Inspection
+            functions like [`has_columns()`](`pointblank.has_columns`) and
+            [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
+            based on properties of the target table.
 
         Returns
         -------
@@ -9241,7 +9318,7 @@ class Validate:
         _check_thresholds(thresholds=thresholds)
         _check_boolean_input(param=na_pass, param_name="na_pass")
         _check_boolean_input(param=inverse, param_name="inverse")
-        _check_boolean_input(param=active, param_name="active")
+        _check_active_input(param=active, param_name="active")
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
@@ -9292,7 +9369,7 @@ class Validate:
         thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
     ) -> Validate:
         """
         Validate whether column values fit within a specification.
@@ -9345,9 +9422,14 @@ class Validate:
             the entire brief will be automatically generated. If `None` (the default) then there
             won't be a brief.
         active
-            A boolean value indicating whether the validation step should be active. Using `False`
-            will make the validation step inactive (still reporting its presence and keeping indexes
-            for the steps unchanged).
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing. Inspection
+            functions like [`has_columns()`](`pointblank.has_columns`) and
+            [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
+            based on properties of the target table.
 
         Returns
         -------
@@ -9526,7 +9608,7 @@ class Validate:
         # _check_segments(segments=segments)
         _check_thresholds(thresholds=thresholds)
         _check_boolean_input(param=na_pass, param_name="na_pass")
-        _check_boolean_input(param=active, param_name="active")
+        _check_active_input(param=active, param_name="active")
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
@@ -9575,7 +9657,7 @@ class Validate:
         thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
     ) -> Validate:
         """
         Validate column values using a custom expression.
@@ -9619,9 +9701,14 @@ class Validate:
             the entire brief will be automatically generated. If `None` (the default) then there
             won't be a brief.
         active
-            A boolean value indicating whether the validation step should be active. Using `False`
-            will make the validation step inactive (still reporting its presence and keeping indexes
-            for the steps unchanged).
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing. Inspection
+            functions like [`has_columns()`](`pointblank.has_columns`) and
+            [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
+            based on properties of the target table.
 
         Returns
         -------
@@ -9761,7 +9848,7 @@ class Validate:
         # TODO: add check for segments
         # _check_segments(segments=segments)
         _check_thresholds(thresholds=thresholds)
-        _check_boolean_input(param=active, param_name="active")
+        _check_active_input(param=active, param_name="active")
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
@@ -9793,7 +9880,7 @@ class Validate:
         thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
     ) -> Validate:
         """
         Validate whether one or more columns exist in the table.
@@ -9826,9 +9913,14 @@ class Validate:
             the entire brief will be automatically generated. If `None` (the default) then there
             won't be a brief.
         active
-            A boolean value indicating whether the validation step should be active. Using `False`
-            will make the validation step inactive (still reporting its presence and keeping indexes
-            for the steps unchanged).
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing. Inspection
+            functions like [`has_columns()`](`pointblank.has_columns`) and
+            [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
+            based on properties of the target table.
 
         Returns
         -------
@@ -9926,7 +10018,7 @@ class Validate:
 
         _check_column(column=columns)
         _check_thresholds(thresholds=thresholds)
-        _check_boolean_input(param=active, param_name="active")
+        _check_active_input(param=active, param_name="active")
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
@@ -9969,7 +10061,7 @@ class Validate:
         thresholds: int | float | None | bool | tuple | dict | Thresholds = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
     ) -> Validate:
         """
         Validate whether a column has a specific percentage of Null values.
@@ -10013,9 +10105,14 @@ class Validate:
             the entire brief will be automatically generated. If `None` (the default) then there
             won't be a brief.
         active
-            A boolean value indicating whether the validation step should be active. Using `False`
-            will make the validation step inactive (still reporting its presence and keeping indexes
-            for the steps unchanged).
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing. Inspection
+            functions like [`has_columns()`](`pointblank.has_columns`) and
+            [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
+            based on properties of the target table.
 
         Returns
         -------
@@ -10220,7 +10317,7 @@ class Validate:
 
         _check_column(column=columns)
         _check_thresholds(thresholds=thresholds)
-        _check_boolean_input(param=active, param_name="active")
+        _check_active_input(param=active, param_name="active")
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
@@ -10265,7 +10362,7 @@ class Validate:
         thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
     ) -> Validate:
         """
         Validate whether rows in the table are distinct.
@@ -10308,9 +10405,14 @@ class Validate:
             the entire brief will be automatically generated. If `None` (the default) then there
             won't be a brief.
         active
-            A boolean value indicating whether the validation step should be active. Using `False`
-            will make the validation step inactive (still reporting its presence and keeping indexes
-            for the steps unchanged).
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing. Inspection
+            functions like [`has_columns()`](`pointblank.has_columns`) and
+            [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
+            based on properties of the target table.
 
         Returns
         -------
@@ -10468,7 +10570,7 @@ class Validate:
         # TODO: add check for segments
         # _check_segments(segments=segments)
         _check_thresholds(thresholds=thresholds)
-        _check_boolean_input(param=active, param_name="active")
+        _check_active_input(param=active, param_name="active")
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
@@ -10506,7 +10608,7 @@ class Validate:
         thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
     ) -> Validate:
         """
         Validate whether row data are complete by having no missing values.
@@ -10549,9 +10651,14 @@ class Validate:
             the entire brief will be automatically generated. If `None` (the default) then there
             won't be a brief.
         active
-            A boolean value indicating whether the validation step should be active. Using `False`
-            will make the validation step inactive (still reporting its presence and keeping indexes
-            for the steps unchanged).
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing. Inspection
+            functions like [`has_columns()`](`pointblank.has_columns`) and
+            [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
+            based on properties of the target table.
 
         Returns
         -------
@@ -10709,7 +10816,7 @@ class Validate:
         # TODO: add check for segments
         # _check_segments(segments=segments)
         _check_thresholds(thresholds=thresholds)
-        _check_boolean_input(param=active, param_name="active")
+        _check_active_input(param=active, param_name="active")
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
@@ -10751,7 +10858,7 @@ class Validate:
         thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
     ) -> Validate:
         """
         Validate rows using AI/LLM-powered analysis.
@@ -10825,9 +10932,14 @@ class Validate:
             the entire brief will be automatically generated. If `None` (the default) then there
             won't be a brief.
         active
-            A boolean value indicating whether the validation step should be active. Using `False`
-            will make the validation step inactive (still reporting its presence and keeping indexes
-            for the steps unchanged).
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing. Inspection
+            functions like [`has_columns()`](`pointblank.has_columns`) and
+            [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
+            based on properties of the target table.
 
         Returns
         -------
@@ -11095,7 +11207,7 @@ class Validate:
 
         _check_pre(pre=pre)
         _check_thresholds(thresholds=thresholds)
-        _check_boolean_input(param=active, param_name="active")
+        _check_active_input(param=active, param_name="active")
 
         # Promote a single column given as a string to a list
         if columns_subset is not None and isinstance(columns_subset, str):
@@ -11146,7 +11258,7 @@ class Validate:
         thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
     ) -> Validate:
         """
         Do columns in the table (and their types) match a predefined schema?
@@ -11205,9 +11317,14 @@ class Validate:
             the entire brief will be automatically generated. If `None` (the default) then there
             won't be a brief.
         active
-            A boolean value indicating whether the validation step should be active. Using `False`
-            will make the validation step inactive (still reporting its presence and keeping indexes
-            for the steps unchanged).
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing. Inspection
+            functions like [`has_columns()`](`pointblank.has_columns`) and
+            [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
+            based on properties of the target table.
 
         Returns
         -------
@@ -11318,7 +11435,7 @@ class Validate:
 
         _check_pre(pre=pre)
         _check_thresholds(thresholds=thresholds)
-        _check_boolean_input(param=active, param_name="active")
+        _check_active_input(param=active, param_name="active")
         _check_boolean_input(param=complete, param_name="complete")
         _check_boolean_input(param=in_order, param_name="in_order")
         _check_boolean_input(param=case_sensitive_colnames, param_name="case_sensitive_colnames")
@@ -11366,7 +11483,7 @@ class Validate:
         thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
     ) -> Validate:
         """
         Validate whether the row count of the table matches a specified count.
@@ -11418,9 +11535,14 @@ class Validate:
             the entire brief will be automatically generated. If `None` (the default) then there
             won't be a brief.
         active
-            A boolean value indicating whether the validation step should be active. Using `False`
-            will make the validation step inactive (still reporting its presence and keeping indexes
-            for the steps unchanged).
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing. Inspection
+            functions like [`has_columns()`](`pointblank.has_columns`) and
+            [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
+            based on properties of the target table.
 
         Returns
         -------
@@ -11540,7 +11662,7 @@ class Validate:
 
         _check_pre(pre=pre)
         _check_thresholds(thresholds=thresholds)
-        _check_boolean_input(param=active, param_name="active")
+        _check_active_input(param=active, param_name="active")
         _check_boolean_input(param=inverse, param_name="inverse")
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
@@ -11587,7 +11709,7 @@ class Validate:
         thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
     ) -> Validate:
         """
         Validate that data in a datetime column is not older than a specified maximum age.
@@ -11644,9 +11766,14 @@ class Validate:
             the entire brief will be automatically generated. If `None` (the default) then there
             won't be a brief.
         active
-            A boolean value indicating whether the validation step should be active. Using `False`
-            will make the validation step inactive (still reporting its presence and keeping indexes
-            for the steps unchanged).
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing. Inspection
+            functions like [`has_columns()`](`pointblank.has_columns`) and
+            [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
+            based on properties of the target table.
 
         Returns
         -------
@@ -11878,7 +12005,7 @@ class Validate:
 
         _check_pre(pre=pre)
         _check_thresholds(thresholds=thresholds)
-        _check_boolean_input(param=active, param_name="active")
+        _check_active_input(param=active, param_name="active")
         _check_boolean_input(param=allow_tz_mismatch, param_name="allow_tz_mismatch")
 
         # Validate and parse the max_age parameter
@@ -11947,7 +12074,7 @@ class Validate:
         thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
     ) -> Validate:
         """
         Validate whether the column count of the table matches a specified count.
@@ -11991,9 +12118,14 @@ class Validate:
             the entire brief will be automatically generated. If `None` (the default) then there
             won't be a brief.
         active
-            A boolean value indicating whether the validation step should be active. Using `False`
-            will make the validation step inactive (still reporting its presence and keeping indexes
-            for the steps unchanged).
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing. Inspection
+            functions like [`has_columns()`](`pointblank.has_columns`) and
+            [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
+            based on properties of the target table.
 
         Returns
         -------
@@ -12082,7 +12214,7 @@ class Validate:
 
         _check_pre(pre=pre)
         _check_thresholds(thresholds=thresholds)
-        _check_boolean_input(param=active, param_name="active")
+        _check_active_input(param=active, param_name="active")
         _check_boolean_input(param=inverse, param_name="inverse")
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
@@ -12122,7 +12254,7 @@ class Validate:
         thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
     ) -> Validate:
         """
         Validate whether the target table matches a comparison table.
@@ -12170,9 +12302,14 @@ class Validate:
             the entire brief will be automatically generated. If `None` (the default) then there
             won't be a brief.
         active
-            A boolean value indicating whether the validation step should be active. Using `False`
-            will make the validation step inactive (still reporting its presence and keeping indexes
-            for the steps unchanged).
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing. Inspection
+            functions like [`has_columns()`](`pointblank.has_columns`) and
+            [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
+            based on properties of the target table.
 
         Returns
         -------
@@ -12357,7 +12494,7 @@ class Validate:
 
         _check_pre(pre=pre)
         _check_thresholds(thresholds=thresholds)
-        _check_boolean_input(param=active, param_name="active")
+        _check_active_input(param=active, param_name="active")
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
@@ -12391,7 +12528,7 @@ class Validate:
         thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
     ) -> Validate:
         """
         Perform multiple row-wise validations for joint validity.
@@ -12435,9 +12572,14 @@ class Validate:
             the entire brief will be automatically generated. If `None` (the default) then there
             won't be a brief.
         active
-            A boolean value indicating whether the validation step should be active. Using `False`
-            will make the validation step inactive (still reporting its presence and keeping indexes
-            for the steps unchanged).
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing. Inspection
+            functions like [`has_columns()`](`pointblank.has_columns`) and
+            [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
+            based on properties of the target table.
 
         Returns
         -------
@@ -12604,7 +12746,7 @@ class Validate:
 
         _check_pre(pre=pre)
         _check_thresholds(thresholds=thresholds)
-        _check_boolean_input(param=active, param_name="active")
+        _check_active_input(param=active, param_name="active")
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
@@ -12639,7 +12781,7 @@ class Validate:
         thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
     ) -> Validate:
         """
         Perform a specialized validation with customized logic.
@@ -12698,9 +12840,14 @@ class Validate:
             the entire brief will be automatically generated. If `None` (the default) then there
             won't be a brief.
         active
-            A boolean value indicating whether the validation step should be active. Using `False`
-            will make the validation step inactive (still reporting its presence and keeping indexes
-            for the steps unchanged).
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing. Inspection
+            functions like [`has_columns()`](`pointblank.has_columns`) and
+            [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
+            based on properties of the target table.
 
         Returns
         -------
@@ -12952,7 +13099,7 @@ class Validate:
         # _check_expr_specially(expr=expr)
         _check_pre(pre=pre)
         _check_thresholds(thresholds=thresholds)
-        _check_boolean_input(param=active, param_name="active")
+        _check_active_input(param=active, param_name="active")
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
@@ -13168,8 +13315,125 @@ class Validate:
             # Bypassing the validation step if conditions met
             # ------------------------------------------------
 
+            # Resolve callable `active` values by evaluating them against the original table;
+            # this evaluation occurs *before* any `pre` processing so that inspection functions
+            # like `has_columns()` see the raw input data
+            if callable(validation.active):
+                active_fn = validation.active
+                active_exc: Exception | None = None
+                try:
+                    validation.active = bool(active_fn(data_tbl))
+                except Exception as exc:
+                    validation.active = False
+                    active_exc = exc
+
+                # If the callable deactivated the step, attach a note so the validation
+                # report explains *why* the step was skipped. Inspection helpers like
+                # `has_columns()` set a `_reason` dict with a translation key and params;
+                # for arbitrary callables we fall back to a generic translated message.
+                if not validation.active:
+                    reason_info = getattr(active_fn, "_reason", None)
+
+                    # --- "Step skipped" prefix (translated) ---
+                    step_skipped = NOTES_TEXT.get("active_check_step_skipped", {}).get(
+                        self.locale, "Step skipped"
+                    )
+
+                    if isinstance(reason_info, dict):
+                        # Structured reason from an inspection helper
+                        reason_key = reason_info.get("key", "")
+                        reason_params = reason_info.get("params", {})
+
+                        # Format numeric params with comma separator for display
+                        fmt_params = {}
+                        for k, v in reason_params.items():
+                            if k == "columns" and isinstance(v, list):
+                                fmt_params[k] = ", ".join(f"`{c}`" for c in v)
+                            elif isinstance(v, int):
+                                fmt_params[k] = f"`{v:,}`"
+                            else:
+                                fmt_params[k] = str(v)
+
+                        template = NOTES_TEXT.get(reason_key, {}).get(
+                            self.locale,
+                            NOTES_TEXT.get(reason_key, {}).get("en", ""),
+                        )
+                        reason_text_body = template.format(**fmt_params)
+                        reason_text = f"{step_skipped} \u2014 {reason_text_body}"
+
+                        reason_escaped = html_module.escape(reason_text_body)
+                        step_skipped_esc = html_module.escape(step_skipped)
+                        reason_html = f"{step_skipped_esc} &mdash; {reason_escaped}"
+
+                    elif active_exc is not None:
+                        fn_name = getattr(active_fn, "__name__", None) or getattr(
+                            active_fn, "__qualname__", "callable"
+                        )
+                        exc_msg = str(active_exc)
+                        template = NOTES_TEXT.get("active_check_callable_raised_error", {}).get(
+                            self.locale,
+                            NOTES_TEXT.get("active_check_callable_raised_error", {}).get("en", ""),
+                        )
+                        reason_text_body = template.format(fn_name=f"`{fn_name}`", exc_msg=exc_msg)
+                        reason_text = f"{step_skipped} \u2014 {reason_text_body}"
+
+                        reason_text_body_html = template.format(
+                            fn_name=f"<code>{html_module.escape(fn_name)}</code>",
+                            exc_msg=html_module.escape(exc_msg),
+                        )
+                        step_skipped_esc = html_module.escape(step_skipped)
+                        reason_html = f"{step_skipped_esc} &mdash; {reason_text_body_html}"
+
+                    else:
+                        fn_name = getattr(active_fn, "__name__", None) or getattr(
+                            active_fn, "__qualname__", "callable"
+                        )
+                        template = NOTES_TEXT.get("active_check_callable_returned_false", {}).get(
+                            self.locale,
+                            NOTES_TEXT.get("active_check_callable_returned_false", {}).get(
+                                "en", ""
+                            ),
+                        )
+                        reason_text_body = template.format(fn_name=f"`{fn_name}`", value="`False`")
+                        reason_text = f"{step_skipped} \u2014 {reason_text_body}"
+
+                        reason_text_body_html = template.format(
+                            fn_name=f"<code>{html_module.escape(fn_name)}</code>",
+                            value="<code>False</code>",
+                        )
+                        step_skipped_esc = html_module.escape(step_skipped)
+                        reason_html = f"{step_skipped_esc} &mdash; {reason_text_body_html}"
+
+                    validation._add_note(
+                        key="active_check",
+                        markdown=reason_html,
+                        text=reason_text,
+                    )
+
             # Skip the validation step if it is not active but still record the time of processing
             if not validation.active:
+                # If no note was already set by callable resolution above, this is a
+                # plain `active=False` — attach a note explaining the explicit deactivation
+                if not validation.notes or "active_check" not in validation.notes:
+                    step_skipped = NOTES_TEXT.get("active_check_step_skipped", {}).get(
+                        self.locale, "Step skipped"
+                    )
+                    body_template = NOTES_TEXT.get("step_set_inactive", {}).get(
+                        self.locale,
+                        NOTES_TEXT.get("step_set_inactive", {}).get("en", ""),
+                    )
+                    body_text = body_template.format(param="`active=`", value="`False`")
+                    body_html = body_template.format(
+                        param="<code>active=</code>", value="<code>False</code>"
+                    )
+                    note_text = f"{step_skipped} \u2014 {body_text}"
+                    note_html = f"{html_module.escape(step_skipped)} &mdash; {body_html}"
+                    validation._add_note(
+                        key="active_check",
+                        markdown=note_html,
+                        text=note_text,
+                    )
+
                 end_time = datetime.datetime.now(datetime.timezone.utc)
                 validation.proc_duration_s = (end_time - start_time).total_seconds()
                 validation.time_processed = end_time.isoformat(timespec="milliseconds")
@@ -13205,7 +13469,6 @@ class Validate:
             if validation.pre is not None:
                 try:
                     # Capture original table dimensions before preprocessing
-                    # Use get_row_count() instead of len() for compatibility with PySpark, etc.
                     original_rows = get_row_count(data_tbl_step)
                     original_cols = get_column_count(data_tbl_step)
                     original_column_names = set(
@@ -13267,6 +13530,7 @@ class Validate:
                             processed_rows=processed_rows,
                             processed_cols=processed_cols,
                         )
+
                     else:
                         # No dimension change - just indicate preprocessing was applied
                         note_html = _create_preprocessing_no_change_note_html(locale=self.locale)
@@ -22604,9 +22868,14 @@ def _generate_agg_docstring(name: str) -> str:
         levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
         define the actions.
     active
-        A boolean value indicating whether the validation step should be active. Using `False`
-        will make the validation step inactive (still reporting its presence and keeping indexes
-        for the steps unchanged).
+        A boolean value or callable that determines whether the validation step should be
+        active. Using `False` will make the validation step inactive (still reporting its
+        presence and keeping indexes for the steps unchanged). A callable can also be
+        provided; it will receive the data table as its single argument and must return a
+        boolean value. The callable is evaluated *before* any `pre=` processing.
+        Inspection functions like [`has_columns()`](`pointblank.has_columns`) and
+        [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate
+        a step based on properties of the target table.
 
     Returns
     -------
@@ -22765,7 +23034,7 @@ def make_agg_validator(name: str):
         thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
         brief: str | bool | None = None,
         actions: Actions | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
     ) -> Validate:
         # Dynamically generated aggregate validator.
         # This method is generated per assertion type and forwards all arguments
