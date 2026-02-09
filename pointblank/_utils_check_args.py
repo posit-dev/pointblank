@@ -28,6 +28,33 @@ def _check_boolean_input(param: bool, param_name: str):
         raise ValueError(f"`{param_name}=` must be a boolean value.")
 
 
+def _check_active_input(param: bool | Callable, param_name: str):
+    """
+    Check that the `active=` parameter is a boolean or a callable.
+
+    The callable form allows `active=` to accept an expression that will be evaluated at
+    interrogation time. The callable should accept a single argument (the table) and return a
+    boolean value.
+
+    Parameters
+    ----------
+    param
+        The input value to check. Must be a boolean or a callable.
+    param_name
+        The name of the parameter being checked. This is used in the error message.
+
+    Raises
+    ------
+    ValueError
+        When `param` is not a boolean value or a callable.
+    """
+    if isinstance(param, bool):
+        return
+    if callable(param):
+        return
+    raise ValueError(f"`{param_name}=` must be a boolean value or a callable.")
+
+
 def _check_column(column: str | list[str] | Column | ColumnSelector | nw.selectors.Selector):
     """
     Check the input value of the `column=` parameter.
