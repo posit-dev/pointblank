@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>validate.col_sd_lt – Pointblank</title>
+<title>has_columns – Pointblank</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -192,9 +192,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
   <ul>
   <li><a href="#parameters" id="toc-parameters" class="nav-link active" data-scroll-target="#parameters">Parameters</a></li>
   <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
-  <li><a href="#using-reference-data" id="toc-using-reference-data" class="nav-link" data-scroll-target="#using-reference-data">Using Reference Data</a></li>
-  <li><a href="#understanding-tolerance" id="toc-understanding-tolerance" class="nav-link" data-scroll-target="#understanding-tolerance">Understanding Tolerance</a></li>
-  <li><a href="#thresholds" id="toc-thresholds" class="nav-link" data-scroll-target="#thresholds">Thresholds</a></li>
+  <li><a href="#raises" id="toc-raises" class="nav-link" data-scroll-target="#raises">Raises</a></li>
   <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
   </ul>
 </nav>
@@ -204,7 +202,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title" style="font-family: SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace; font-size: 1.25rem;">col_sd_lt()<span style="font-size: 0.75rem; border-style: solid; border-width: 1px; border-color: steelblue; background-color: #E3F2FF; margin-left: 12px; vertical-align: 3.5px;"><code style="background-color: transparent; color: steelblue;">method</code></span></h1>
+<h1 class="title" style="font-family: SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace; font-size: 1.25rem;">has_columns()<span style="font-size: 0.75rem; border-style: solid; border-width: 1px; border-color: darkorange; background-color: #FFF1E0; margin-left: 12px; vertical-align: 3.5px;"><code style="background-color: transparent; color: darkorange;">function</code></span></h1>
 </div>
 
 
@@ -220,97 +218,45 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 
 </header>
 
-<p style="font-size: 1rem; font-style: italic; margin-top: -10px; line-height: 1;">Does the column standard deviation satisfy a less than comparison?</p>
+<p style="font-size: 1rem; font-style: italic; margin-top: -10px; line-height: 1;">Check whether one or more columns exist in a table.</p>
 
 
 
 <p style="font-size: 12px; color: rgb(170, 170, 170); margin-bottom: -14px;">USAGE</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>Validate.col_sd_lt(</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    columns,</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    value<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    tol<span class="op">=</span><span class="dv">0</span>,</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    thresholds<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    brief<span class="op">=</span><span class="va">False</span>,</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    actions<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    active<span class="op">=</span><span class="va">True</span>,</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>The <code>col_sd_lt()</code> validation method checks whether the standard deviation of values in a column is less than a specified <code>value=</code>. This is an aggregation-based validation where the entire column is reduced to a single standard deviation value that is then compared against the target. The comparison used in this function is <code>standard deviation(column) &lt; value</code>.</p>
-<p>Unlike row-level validations (e.g., <code>col_vals_gt()</code>), this method treats the entire column as a single test unit. The validation either passes completely (if the aggregated value satisfies the comparison) or fails completely.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>has_columns(<span class="op">*</span>columns)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>This function returns a callable that, when given a table, checks whether all specified columns are present. It is primarily designed for use with the <code>active=</code> parameter of validation methods. When a validation step has <code>active=has_columns("col_a", "col_b")</code>, the step will be skipped (made inactive) if either <code>col_a</code> or <code>col_b</code> is missing from the target table.</p>
+<p>The callable is evaluated against the original table <em>before</em> any <code>pre=</code> processing is applied. This means the column check is performed on the raw input data, not on a pre-processed version of it.</p>
+<p>A note is attached to any skipped step in the validation report explaining which columns were not found.</p>
 <section id="parameters" class="level2 doc-section doc-section-parameters">
 <h3 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters">Parameters</h3>
 <dl style="border-style: solid; border-width: 2px; border-color: #00AC1480; padding: 1rem; padding-bottom: 0.25rem;">
-<dt><code><span class="parameter-name"><strong>columns</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><code>_PBUnresolvedColumn</code></span></code></dt>
+<dt><code><span class="parameter-name">*<strong>columns</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><code>str</code> | <code>list</code>[<code>str</code>]</span> <span class="parameter-default-sep">=</span> <span class="parameter-default">()</span></code></dt>
 <dd>
-<p>A single column or a list of columns to validate. If multiple columns are supplied, there will be a separate validation step generated for each column. The columns must contain numeric data for the standard deviation to be computed.</p>
-</dd>
-<dt><code><span class="parameter-name"><strong>value</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><code>float</code> | <code>Column</code> | <code>ReferenceColumn</code> | None</span> <span class="parameter-default-sep">=</span> <span class="parameter-default">None</span></code></dt>
-<dd>
-<p>The value to compare the column standard deviation against. This can be: (1) a numeric literal (<code>int</code> or <code>float</code>), (2) a <a href="../reference/col.html#pointblank.col"><span><code>col()</code></span></a> object referencing another column whose standard deviation will be used for comparison, (3) a <code>ref()</code> object referencing a column in reference data (when <code>Validate(reference=)</code> has been set), or (4) <code>None</code> to automatically compare against the same column in reference data (shorthand for <code>ref(column_name)</code> when reference data is set).</p>
-</dd>
-<dt><code><span class="parameter-name"><strong>tol</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><code>Tolerance</code></span> <span class="parameter-default-sep">=</span> <span class="parameter-default">0</span></code></dt>
-<dd>
-<p>A tolerance value for the comparison. The default is <code>0</code>, meaning exact comparison. When set to a positive value, the comparison becomes more lenient. For example, with <code>tol=0.5</code>, a standard deviation that differs from the target by up to <code>0.5</code> will still pass. The <code>tol=</code> parameter expands the acceptable range for the comparison. For <code>col_sd_lt()</code>, a tolerance of <code>tol=0.5</code> would mean the standard deviation can be within <code>0.5</code> of the target value and still pass validation.</p>
-</dd>
-<dt><code><span class="parameter-name"><strong>thresholds</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><code>float</code> | <code>bool</code> | <code>tuple</code> | <code>dict</code> | <a href="../reference/Thresholds.html#pointblank.Thresholds">Thresholds</a> | None</span> <span class="parameter-default-sep">=</span> <span class="parameter-default">None</span></code></dt>
-<dd>
-<p>Failure threshold levels so that the validation step can react accordingly when failing test units are level. Since this is an aggregation-based validation with only one test unit, threshold values typically should be set as absolute counts (e.g., <code>1</code>) to indicate pass/fail, or as proportions where any value less than <code>1.0</code> means failure is acceptable.</p>
-</dd>
-<dt><code><span class="parameter-name"><strong>brief</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><code>str</code> | <code>bool</code></span> <span class="parameter-default-sep">=</span> <span class="parameter-default">False</span></code></dt>
-<dd>
-<p>An optional brief description of the validation step that will be displayed in the reporting table. You can use the templating elements like <code>"{step}"</code> to insert the step number, or <code>"{auto}"</code> to include an automatically generated brief. If <code>True</code> the entire brief will be automatically generated. If <code>None</code> (the default) then there won’t be a brief.</p>
-</dd>
-<dt><code><span class="parameter-name"><strong>actions</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><a href="../reference/Actions.html#pointblank.Actions">Actions</a> | None</span> <span class="parameter-default-sep">=</span> <span class="parameter-default">None</span></code></dt>
-<dd>
-<p>Optional actions to take when the validation step meets or exceeds any set threshold levels. If provided, the <a href="../reference/Actions.html#pointblank.Actions"><span><code>Actions</code></span></a> class should be used to define the actions.</p>
-</dd>
-<dt><code><span class="parameter-name"><strong>active</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><code>bool</code> | <code>Callable</code></span> <span class="parameter-default-sep">=</span> <span class="parameter-default">True</span></code></dt>
-<dd>
-<p>A boolean value or callable that determines whether the validation step should be active. Using <code>False</code> will make the validation step inactive (still reporting its presence and keeping indexes for the steps unchanged). A callable can also be provided; it will receive the data table as its single argument and must return a boolean value. The callable is evaluated <em>before</em> any <code>pre=</code> processing. Inspection functions like <a href="../reference/has_columns.html#pointblank.has_columns"><span><code>has_columns()</code></span></a> and <a href="../reference/has_rows.html#pointblank.has_rows"><span><code>has_rows()</code></span></a> can be used here to conditionally activate a step based on properties of the target table.</p>
+<p>One or more column names to check for in the table. Each argument can be a string or a list of strings. All specified columns must be present for the callable to return <code>True</code>.</p>
 </dd>
 </dl>
 </section>
 <section id="returns" class="level2 doc-section doc-section-returns">
 <h3 class="doc-section doc-section-returns anchored" data-anchor-id="returns">Returns</h3>
 <dl style="border-style: solid; border-width: 2px; border-color: #0059AC80; padding: 1rem; padding-bottom: 0.25rem;">
-<dt><code><span class="parameter-name"></span> <span class="parameter-annotation-sep" style="margin-left: -8px;"></span> <span class="parameter-annotation"><a href="../reference/Validate.html#pointblank.Validate">Validate</a></span></code></dt>
+<dt><code><span class="parameter-name"></span> <span class="parameter-annotation-sep" style="margin-left: -8px;"></span> <span class="parameter-annotation"><code>Callable</code>[[<code>Any</code>], <code>bool</code>]</span></code></dt>
 <dd>
-<p>The <a href="../reference/Validate.html#pointblank.Validate" title="0"><code>Validate</code></a> object with the added validation step.</p>
+<p>A callable that accepts a table and returns <code>True</code> if every column in <code>columns</code> exists in the table, <code>False</code> otherwise.</p>
 </dd>
 </dl>
 </section>
-<section id="using-reference-data" class="level2 doc-section doc-section-using-reference-data">
-<h3 class="doc-section doc-section-using-reference-data anchored" data-anchor-id="using-reference-data">Using Reference Data</h3>
-<p>The <code>col_sd_lt()</code> method supports comparing column aggregations against reference data. This is useful for validating that statistical properties remain consistent across different versions of a dataset, or for comparing current data against historical baselines.</p>
-<p>To use reference data, set the <code>reference=</code> parameter when creating the <a href="../reference/Validate.html#pointblank.Validate" title="0"><code>Validate</code></a> object:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>current_data, reference<span class="op">=</span>baseline_data)</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    .col_sd_lt(columns<span class="op">=</span><span class="st">"revenue"</span>)  <span class="co"># Compares sum(current.revenue) vs sum(baseline.revenue)</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>When <code>value=None</code> and reference data is set, the method automatically compares against the same column in the reference data. You can also explicitly specify reference columns using the <code>ref()</code> helper:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>.col_sd_lt(columns<span class="op">=</span><span class="st">"revenue"</span>, value<span class="op">=</span>pb.ref(<span class="st">"baseline_revenue"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</section>
-<section id="understanding-tolerance" class="level2 doc-section doc-section-understanding-tolerance">
-<h3 class="doc-section doc-section-understanding-tolerance anchored" data-anchor-id="understanding-tolerance">Understanding Tolerance</h3>
-<p>The <code>tol=</code> parameter allows for fuzzy comparisons, which is especially important for floating-point aggregations where exact equality is often unreliable.</p>
-<p>The <code>tol=</code> parameter expands the acceptable range for the comparison. For <code>col_sd_lt()</code>, a tolerance of <code>tol=0.5</code> would mean the standard deviation can be within <code>0.5</code> of the target value and still pass validation.</p>
-<p>For equality comparisons (<code>col_*_eq</code>), the tolerance creates a range <code>[value - tol, value + tol]</code> within which the aggregation is considered valid. For inequality comparisons, the tolerance shifts the comparison boundary.</p>
-</section>
-<section id="thresholds" class="level2 doc-section doc-section-thresholds">
-<h3 class="doc-section doc-section-thresholds anchored" data-anchor-id="thresholds">Thresholds</h3>
-<p>The <code>thresholds=</code> parameter is used to set the failure-condition levels for the validation step. If they are set here at the step level, these thresholds will override any thresholds set at the global level in <code>Validate(thresholds=...)</code>.</p>
-<p>There are three threshold levels: ‘warning’, ‘error’, and ‘critical’. Since aggregation validations operate on a single test unit (the aggregated value), threshold values are typically set as absolute counts:</p>
-<ul>
-<li><code>thresholds=1</code> means any failure triggers a ‘warning’</li>
-<li><code>thresholds=(1, 1, 1)</code> means any failure triggers all three levels</li>
-</ul>
-<p>Thresholds can be defined using one of these input schemes:</p>
-<ol type="1">
-<li>use the <a href="../reference/Thresholds.html#pointblank.Thresholds"><span><code>Thresholds</code></span></a> class (the most direct way to create thresholds)</li>
-<li>provide a tuple of 1-3 values, where position <code>0</code> is the ‘warning’ level, position <code>1</code> is the ‘error’ level, and position <code>2</code> is the ‘critical’ level</li>
-<li>create a dictionary of 1-3 value entries; the valid keys: are ‘warning’, ‘error’, and ‘critical’</li>
-<li>a single integer/float value denoting absolute number or fraction of failing test units for the ‘warning’ level only</li>
-</ol>
+<section id="raises" class="level2 doc-section doc-section-raises">
+<h3 class="doc-section doc-section-raises anchored" data-anchor-id="raises">Raises</h3>
+<dl>
+<dt><code><span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><code>ValueError</code></span></code></dt>
+<dd>
+<p>If no column names are provided.</p>
+</dd>
+<dt><code><span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><code>TypeError</code></span></code></dt>
+<dd>
+<p>If any of the provided column names is not a string or list of strings.</p>
+</dd>
+</dl>
 </section>
 <section id="examples" class="level2 doc-section doc-section-examples">
 <h3 class="doc-section doc-section-examples anchored" data-anchor-id="examples"><span style="
@@ -332,113 +278,194 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
         margin: 10px 0;
         border-radius: 2px;
     ">
-<p>For the examples, we’ll use a simple Polars DataFrame with numeric columns. The table is shown below:</p>
-<div id="4814362b" class="cell" data-execution_count="2">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>tbl <span class="op">=</span> pl.DataFrame(</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    {</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>        <span class="st">"a"</span>: [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>],</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>        <span class="st">"b"</span>: [<span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">2</span>],</span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    }</span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>pb.preview(tbl)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Using <a href="../reference/has_columns.html#pointblank.has_columns" title="0"><code>has_columns()</code></a> with the <code>active=</code> parameter to conditionally run a validation step:</p>
+<div id="5f787561" class="cell" data-execution_count="2">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>tbl <span class="op">=</span> pl.DataFrame({<span class="st">"a"</span>: [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>], <span class="st">"b"</span>: [<span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">6</span>]})</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    .col_vals_gt(columns<span class="op">=</span><span class="st">"a"</span>, value<span class="op">=</span><span class="dv">0</span>, active<span class="op">=</span>pb.has_columns(<span class="st">"a"</span>))</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    .col_vals_gt(columns<span class="op">=</span><span class="st">"a"</span>, value<span class="op">=</span><span class="dv">0</span>, active<span class="op">=</span>pb.has_columns(<span class="st">"z"</span>))</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>validation</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="2">
-<div id="pb_preview_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="pb_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans&display=swap');
-#pb_preview_tbl table {
+#pb_tbl table {
           font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
           -webkit-font-smoothing: antialiased;
           -moz-osx-font-smoothing: grayscale;
         }
 
-#pb_preview_tbl thead, tbody, tfoot, tr, td, th { border-style: none; }
+#pb_tbl thead, tbody, tfoot, tr, td, th { border-style: none; }
  tr { background-color: transparent; }
-#pb_preview_tbl p { margin: 0; padding: 0; }
- #pb_preview_tbl .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 16px; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: auto; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
- #pb_preview_tbl .gt_caption { padding-top: 4px; padding-bottom: 4px; }
- #pb_preview_tbl .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
- #pb_preview_tbl .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
- #pb_preview_tbl .gt_heading { background-color: #FFFFFF; text-align: left; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
- #pb_preview_tbl .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
- #pb_preview_tbl .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
- #pb_preview_tbl .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: solid; border-left-width: 1px; border-left-color: #F2F2F2; border-right-style: solid; border-right-width: 1px; border-right-color: #F2F2F2; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
- #pb_preview_tbl .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
- #pb_preview_tbl .gt_column_spanner_outer:first-child { padding-left: 0; }
- #pb_preview_tbl .gt_column_spanner_outer:last-child { padding-right: 0; }
- #pb_preview_tbl .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
- #pb_preview_tbl .gt_spanner_row { border-bottom-style: hidden; }
- #pb_preview_tbl .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
- #pb_preview_tbl .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
- #pb_preview_tbl .gt_from_md> :first-child { margin-top: 0; }
- #pb_preview_tbl .gt_from_md> :last-child { margin-bottom: 0; }
- #pb_preview_tbl .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: solid; border-left-width: 1px; border-left-color: #E9E9E9; border-right-style: solid; border-right-width: 1px; border-right-color: #E9E9E9; vertical-align: middle; overflow-x: hidden; }
- #pb_preview_tbl .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
- #pb_preview_tbl .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
- #pb_preview_tbl .gt_row_group_first td { border-top-width: 2px; }
- #pb_preview_tbl .gt_row_group_first th { border-top-width: 2px; }
- #pb_preview_tbl .gt_striped { color: #333333; background-color: #F4F4F4; }
- #pb_preview_tbl .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
- #pb_preview_tbl .gt_grand_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
- #pb_preview_tbl .gt_first_grand_summary_row_bottom { border-top-style: double; border-top-width: 6px; border-top-color: #D3D3D3; }
- #pb_preview_tbl .gt_last_grand_summary_row_top { border-bottom-style: double; border-bottom-width: 6px; border-bottom-color: #D3D3D3; }
- #pb_preview_tbl .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
- #pb_preview_tbl .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
- #pb_preview_tbl .gt_left { text-align: left; }
- #pb_preview_tbl .gt_center { text-align: center; }
- #pb_preview_tbl .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
- #pb_preview_tbl .gt_font_normal { font-weight: normal; }
- #pb_preview_tbl .gt_font_bold { font-weight: bold; }
- #pb_preview_tbl .gt_font_italic { font-style: italic; }
- #pb_preview_tbl .gt_super { font-size: 65%; }
- #pb_preview_tbl .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
- #pb_preview_tbl .gt_asterisk { font-size: 100%; vertical-align: 0; }
+#pb_tbl p { margin: 0; padding: 0; }
+ #pb_tbl .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 90%; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: auto; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
+ #pb_tbl .gt_caption { padding-top: 4px; padding-bottom: 4px; }
+ #pb_tbl .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
+ #pb_tbl .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
+ #pb_tbl .gt_heading { background-color: #FFFFFF; text-align: left; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #pb_tbl .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #pb_tbl .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #pb_tbl .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
+ #pb_tbl .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
+ #pb_tbl .gt_column_spanner_outer:first-child { padding-left: 0; }
+ #pb_tbl .gt_column_spanner_outer:last-child { padding-right: 0; }
+ #pb_tbl .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
+ #pb_tbl .gt_spanner_row { border-bottom-style: hidden; }
+ #pb_tbl .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
+ #pb_tbl .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
+ #pb_tbl .gt_from_md> :first-child { margin-top: 0; }
+ #pb_tbl .gt_from_md> :last-child { margin-bottom: 0; }
+ #pb_tbl .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
+ #pb_tbl .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
+ #pb_tbl .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
+ #pb_tbl .gt_row_group_first td { border-top-width: 2px; }
+ #pb_tbl .gt_row_group_first th { border-top-width: 2px; }
+ #pb_tbl .gt_striped { color: #333333; background-color: #F4F4F4; }
+ #pb_tbl .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #pb_tbl .gt_grand_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #pb_tbl .gt_first_grand_summary_row_bottom { border-top-style: double; border-top-width: 6px; border-top-color: #D3D3D3; }
+ #pb_tbl .gt_last_grand_summary_row_top { border-bottom-style: double; border-bottom-width: 6px; border-bottom-color: #D3D3D3; }
+ #pb_tbl .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #pb_tbl .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #pb_tbl .gt_left { text-align: left; }
+ #pb_tbl .gt_center { text-align: center; }
+ #pb_tbl .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
+ #pb_tbl .gt_font_normal { font-weight: normal; }
+ #pb_tbl .gt_font_bold { font-weight: bold; }
+ #pb_tbl .gt_font_italic { font-style: italic; }
+ #pb_tbl .gt_super { font-size: 65%; }
+ #pb_tbl .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
+ #pb_tbl .gt_asterisk { font-size: 100%; vertical-align: 0; }
  
 </style>
 <table style="table-layout: fixed;; width: 0px" class="gt_table" data-quarto-disable-processing="true" data-quarto-bootstrap="false">
 <colgroup>
-  <col style="width:17.8px;">
-  <col style="width:250px;">
-  <col style="width:250px;">
+  <col style="width:4px;">
+  <col style="width:35px;">
+  <col style="width:190px;">
+  <col style="width:120px;">
+  <col style="width:120px;">
+  <col style="width:50px;">
+  <col style="width:50px;">
+  <col style="width:60px;">
+  <col style="width:60px;">
+  <col style="width:60px;">
+  <col style="width:30px;">
+  <col style="width:30px;">
+  <col style="width:30px;">
+  <col style="width:65px;">
 </colgroup>
 
 <thead>
 
 <tr class="gt_col_headings">
-  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="color: gray20;font-family: IBM Plex Mono;font-size: 12px;" scope="col" id="pb_preview_tbl-_row_num_"></th>
-  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="color: gray20;font-family: IBM Plex Mono;font-size: 12px;" scope="col" id="pb_preview_tbl-a"><div><div style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-bottom: 2px; margin-bottom: 2px;">a</div><div style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-top: 2px; margin-top: 2px;"><em>Int64</em></div></div></th>
-  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="color: gray20;font-family: IBM Plex Mono;font-size: 12px;" scope="col" id="pb_preview_tbl-b"><div><div style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-bottom: 2px; margin-bottom: 2px;">b</div><div style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding-top: 2px; margin-top: 2px;"><em>Int64</em></div></div></th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-status_color"></th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-i"></th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-type_upd">STEP</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-columns_upd">COLUMNS</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-values_upd">VALUES</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-tbl">TBL</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-eval">EVAL</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-test_units">UNITS</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-pass">PASS</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-fail">FAIL</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-w_upd">W</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-e_upd">E</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-c_upd">C</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-extract_upd">EXT</th>
 </tr>
 </thead>
 <tbody class="gt_table_body">
   <tr>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; color: gray;font-family: IBM Plex Mono;font-size: 10px; border-right: 2px solid #6699CC80;" class="gt_row gt_right">1</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">1</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">2</td>
+    <td style="height: 40px; background-color: #4CA64C; color: transparent;font-size: 0px;" class="gt_row gt_left">#4CA64C</td>
+    <td style="height: 40px; color: #666666;font-size: 13px;font-weight: bold;" class="gt_row gt_right">1</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left">
+        <div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
+            <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
+<svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF;">
+    <title>col_vals_gt</title>
+    <g id="Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="col_vals_gt" transform="translate(1.500000, 1.500000)" fill-rule="nonzero">
+            <path d="M55,0 C57.4852813,0 59.7352813,1.00735931 61.363961,2.63603897 C62.9926407,4.26471863 64,6.51471863 64,9 L64,9 L64,64 L9,64 C6.51471862,64 4.26471862,62.9926407 2.63603897,61.363961 C1.00735931,59.7352814 0,57.4852814 0,55 L0,55 L0,9 C0,6.51471863 1.00735931,4.26471863 2.63603897,2.63603897 C4.26471862,1.00735931 6.51471862,0 9,0 L9,0 L55,0 Z" id="rectangle" stroke="#000000" stroke-width="2" fill="#FFFFFF"></path>
+            <path d="M48.7619048,10 L15.2380953,10 C12.3466667,10 10,12.3466667 10,15.2380952 L10,48.7619048 C10,51.6533333 12.3466667,54 15.2380953,54 L48.7619048,54 C51.6533333,54 54,51.6533333 54,48.7619048 L54,15.2380952 C54,12.3466667 51.6533333,10 48.7619048,10 Z M25.2638095,44.3828571 L24.0695238,42.6647619 L39.5847619,32 L24.0695238,21.3352381 L25.2638095,19.6171429 L43.2828572,32 L25.2638095,44.3828571 Z" id="greater_than" fill="#000000"></path>
+        </g>
+    </g>
+</svg>
+        </div>
+        <div style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size: 11px; display: inline-block; vertical-align: middle;">
+            <div>col_vals_gt()</div>
+        </div>
+        
+        </td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">a</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">0</td>
+    <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" class="gt_row gt_center"><svg width="25px" height="25px" viewbox="0 0 25 25" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="vertical-align: middle;">
+    <g id="unchanged" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="unchanged" transform="translate(0.500000, 0.570147)">
+            <rect id="Rectangle" x="0.125132506" y="0" width="23.749735" height="23.7894737"></rect>
+            <path d="M5.80375046,8.18194736 C3.77191832,8.18194736 2.11875046,9.83495328 2.11875046,11.8669474 C2.11875046,13.8989414 3.77191832,15.5519474 5.80375046,15.5519474 C7.8355826,15.5519474 9.48875046,13.8989414 9.48875046,11.8669474 C9.48875046,9.83495328 7.83552863,8.18194736 5.80375046,8.18194736 Z M5.80375046,14.814915 C4.17821997,14.814915 2.85578285,13.4924778 2.85578285,11.8669474 C2.85578285,10.2414169 4.17821997,8.91897975 5.80375046,8.91897975 C7.42928095,8.91897975 8.75171807,10.2414169 8.75171807,11.8669474 C8.75171807,13.4924778 7.42928095,14.814915 5.80375046,14.814915 Z" id="Shape" fill="#000000" fill-rule="nonzero"></path>
+            <path d="M13.9638189,8.699335 C13.9364621,8.70430925 13.9091059,8.71176968 13.8842359,8.71923074 C13.7822704,8.73663967 13.6877654,8.77643115 13.6056956,8.83860518 L10.2433156,11.3852598 C10.0766886,11.5046343 9.97720993,11.6986181 9.97720993,11.9025491 C9.97720993,12.1064807 10.0766886,12.3004639 10.2433156,12.4198383 L13.6056956,14.966493 C13.891697,15.1803725 14.2970729,15.1231721 14.5109517,14.8371707 C14.7248313,14.5511692 14.6676309,14.145794 14.3816294,13.9319145 L12.5313257,12.5392127 L21.8812495,12.5392127 L21.8812495,11.2658854 L12.5313257,11.2658854 L14.3816294,9.87318364 C14.6377872,9.71650453 14.7497006,9.40066014 14.6477351,9.11714553 C14.5482564,8.83363156 14.262255,8.65954352 13.9638189,8.699335 Z" id="arrow" fill="#000000" transform="translate(15.929230, 11.894737) rotate(-180.000000) translate(-15.929230, -11.894737) "></path>
+        </g>
+    </g>
+</svg></td>
+    <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" class="gt_row gt_center"><span style="color:#4CA64C;">✓</span></td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_right">3</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">3<br>1.00</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">0<br>0.00</td>
+    <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" class="gt_row gt_center">—</td>
+    <td style="height: 40px; background-color: #FCFCFC;" class="gt_row gt_center">—</td>
+    <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" class="gt_row gt_center">—</td>
+    <td style="height: 40px;" class="gt_row gt_center">—</td>
   </tr>
   <tr>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; color: gray;font-family: IBM Plex Mono;font-size: 10px; border-right: 2px solid #6699CC80;" class="gt_row gt_right">2</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">2</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">2</td>
-  </tr>
-  <tr>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; color: gray;font-family: IBM Plex Mono;font-size: 10px; border-right: 2px solid #6699CC80;" class="gt_row gt_right">3</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">3</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">2</td>
-  </tr>
-  <tr>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; color: gray;font-family: IBM Plex Mono;font-size: 10px; border-right: 2px solid #6699CC80;" class="gt_row gt_right">4</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">4</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">2</td>
-  </tr>
-  <tr>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; color: gray;font-family: IBM Plex Mono;font-size: 10px; border-right: 2px solid #6699CC80;" class="gt_row gt_right">5</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">5</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_right">2</td>
+    <td style="height: 40px; background-color: #4CA64C66; color: transparent;font-size: 0px; background-color: #F2F2F2;" class="gt_row gt_left">#4CA64C66</td>
+    <td style="height: 40px; color: #666666;font-size: 13px;font-weight: bold; background-color: #F2F2F2;" class="gt_row gt_right">2</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; background-color: #F2F2F2;" class="gt_row gt_left">
+        <div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
+            <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
+<svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF;">
+    <title>col_vals_gt</title>
+    <g id="Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="col_vals_gt" transform="translate(1.500000, 1.500000)" fill-rule="nonzero">
+            <path d="M55,0 C57.4852813,0 59.7352813,1.00735931 61.363961,2.63603897 C62.9926407,4.26471863 64,6.51471863 64,9 L64,9 L64,64 L9,64 C6.51471862,64 4.26471862,62.9926407 2.63603897,61.363961 C1.00735931,59.7352814 0,57.4852814 0,55 L0,55 L0,9 C0,6.51471863 1.00735931,4.26471863 2.63603897,2.63603897 C4.26471862,1.00735931 6.51471862,0 9,0 L9,0 L55,0 Z" id="rectangle" stroke="#000000" stroke-width="2" fill="#FFFFFF"></path>
+            <path d="M48.7619048,10 L15.2380953,10 C12.3466667,10 10,12.3466667 10,15.2380952 L10,48.7619048 C10,51.6533333 12.3466667,54 15.2380953,54 L48.7619048,54 C51.6533333,54 54,51.6533333 54,48.7619048 L54,15.2380952 C54,12.3466667 51.6533333,10 48.7619048,10 Z M25.2638095,44.3828571 L24.0695238,42.6647619 L39.5847619,32 L24.0695238,21.3352381 L25.2638095,19.6171429 L43.2828572,32 L25.2638095,44.3828571 Z" id="greater_than" fill="#000000"></path>
+        </g>
+    </g>
+</svg>
+        </div>
+        <div style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size: 11px; display: inline-block; vertical-align: middle;">
+            <div>col_vals_gt()</div>
+        </div>
+        
+        </td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; background-color: #F2F2F2;" class="gt_row gt_left">a</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; background-color: #F2F2F2;" class="gt_row gt_left">0</td>
+    <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3; background-color: #F2F2F2;" class="gt_row gt_center"><svg width="25px" height="25px" viewbox="0 0 25 25" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="vertical-align: middle;">
+    <g id="unchanged" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="unchanged" transform="translate(0.500000, 0.570147)">
+            <rect id="Rectangle" x="0.125132506" y="0" width="23.749735" height="23.7894737"></rect>
+            <path d="M5.80375046,8.18194736 C3.77191832,8.18194736 2.11875046,9.83495328 2.11875046,11.8669474 C2.11875046,13.8989414 3.77191832,15.5519474 5.80375046,15.5519474 C7.8355826,15.5519474 9.48875046,13.8989414 9.48875046,11.8669474 C9.48875046,9.83495328 7.83552863,8.18194736 5.80375046,8.18194736 Z M5.80375046,14.814915 C4.17821997,14.814915 2.85578285,13.4924778 2.85578285,11.8669474 C2.85578285,10.2414169 4.17821997,8.91897975 5.80375046,8.91897975 C7.42928095,8.91897975 8.75171807,10.2414169 8.75171807,11.8669474 C8.75171807,13.4924778 7.42928095,14.814915 5.80375046,14.814915 Z" id="Shape" fill="#000000" fill-rule="nonzero"></path>
+            <path d="M13.9638189,8.699335 C13.9364621,8.70430925 13.9091059,8.71176968 13.8842359,8.71923074 C13.7822704,8.73663967 13.6877654,8.77643115 13.6056956,8.83860518 L10.2433156,11.3852598 C10.0766886,11.5046343 9.97720993,11.6986181 9.97720993,11.9025491 C9.97720993,12.1064807 10.0766886,12.3004639 10.2433156,12.4198383 L13.6056956,14.966493 C13.891697,15.1803725 14.2970729,15.1231721 14.5109517,14.8371707 C14.7248313,14.5511692 14.6676309,14.145794 14.3816294,13.9319145 L12.5313257,12.5392127 L21.8812495,12.5392127 L21.8812495,11.2658854 L12.5313257,11.2658854 L14.3816294,9.87318364 C14.6377872,9.71650453 14.7497006,9.40066014 14.6477351,9.11714553 C14.5482564,8.83363156 14.262255,8.65954352 13.9638189,8.699335 Z" id="arrow" fill="#000000" transform="translate(15.929230, 11.894737) rotate(-180.000000) translate(-15.929230, -11.894737) "></path>
+        </g>
+    </g>
+</svg></td>
+    <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3; background-color: #F2F2F2;" class="gt_row gt_center">—</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; background-color: #F2F2F2;" class="gt_row gt_right">—</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; background-color: #F2F2F2;" class="gt_row gt_right">—</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; background-color: #F2F2F2;" class="gt_row gt_right">—</td>
+    <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3; background-color: #F2F2F2;" class="gt_row gt_center">—</td>
+    <td style="height: 40px; background-color: #FCFCFC; background-color: #F2F2F2;" class="gt_row gt_center">—</td>
+    <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3; background-color: #F2F2F2;" class="gt_row gt_center">—</td>
+    <td style="height: 40px; background-color: #F2F2F2;" class="gt_row gt_center">—</td>
   </tr>
 </tbody>
 
@@ -449,15 +476,17 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
         
 </div>
 </div>
-<p>Let’s validate that the standard deviation of column <code>a</code> is less than <code>2</code>:</p>
-<div id="3fe9753d" class="cell" data-execution_count="3">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    .col_sd_lt(columns<span class="op">=</span><span class="st">"a"</span>, value<span class="op">=</span><span class="dv">2</span>)</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>validation</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The first step ran because column <code>a</code> exists. The second step was skipped because column <code>z</code> is missing, and the report note explains which column was not found.</p>
+<p>When checking for multiple columns, the step is only active when <em>all</em> columns are present:</p>
+<div id="3167650f" class="cell" data-execution_count="3">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_gt(columns<span class="op">=</span><span class="st">"a"</span>, value<span class="op">=</span><span class="dv">0</span>, active<span class="op">=</span>pb.has_columns(<span class="st">"a"</span>, <span class="st">"b"</span>))</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    .col_vals_gt(columns<span class="op">=</span><span class="st">"a"</span>, value<span class="op">=</span><span class="dv">0</span>, active<span class="op">=</span>pb.has_columns(<span class="st">"a"</span>, <span class="st">"x"</span>, <span class="st">"y"</span>))</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>validation</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="3">
 <div id="pb_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>
@@ -557,26 +586,22 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
         <div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
             <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
 <svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF;">
-    <title>col_sd_lt</title>
+    <title>col_vals_gt</title>
     <g id="Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="col_sd_lt" transform="translate(1.500000, 1.500000)" fill-rule="nonzero">
+        <g id="col_vals_gt" transform="translate(1.500000, 1.500000)" fill-rule="nonzero">
             <path d="M55,0 C57.4852813,0 59.7352813,1.00735931 61.363961,2.63603897 C62.9926407,4.26471863 64,6.51471863 64,9 L64,9 L64,64 L9,64 C6.51471862,64 4.26471862,62.9926407 2.63603897,61.363961 C1.00735931,59.7352814 0,57.4852814 0,55 L0,55 L0,9 C0,6.51471863 1.00735931,4.26471863 2.63603897,2.63603897 C4.26471862,1.00735931 6.51471862,0 9,0 L9,0 L55,0 Z" id="rectangle" stroke="#000000" stroke-width="2" fill="#FFFFFF"></path>
-            <g id="sd" transform="translate(24.244000, 46.374000)" fill="#000000">
-                <path d="M3.388,10.766 C2.66933333,10.766 2.03,10.6423333 1.47,10.395 C0.91,10.1476667 0.466666667,9.814 0.14,9.394 C0.0466666667,9.27266667 0,9.15133333 0,9.03 C0,8.82466667 0.098,8.67066667 0.294,8.568 C0.378,8.52133333 0.466666667,8.498 0.56,8.498 C0.718666667,8.498 0.882,8.582 1.05,8.75 C1.358,9.07666667 1.69866667,9.31466667 2.072,9.464 C2.44533333,9.61333333 2.87466667,9.688 3.36,9.688 C3.808,9.688 4.17433333,9.61566667 4.459,9.471 C4.74366667,9.32633333 4.886,9.128 4.886,8.876 C4.886,8.68933333 4.83233333,8.53533333 4.725,8.414 C4.61766667,8.29266667 4.43333333,8.176 4.172,8.064 C3.91066667,7.952 3.5,7.80266667 2.94,7.616 C1.99733333,7.31733333 1.33233333,7.00933333 0.945,6.692 C0.557666667,6.37466667 0.364,5.95933333 0.364,5.446 C0.364,4.89533333 0.604333333,4.45433333 1.085,4.123 C1.56566667,3.79166667 2.21666667,3.626 3.038,3.626 C3.64466667,3.626 4.207,3.72633333 4.725,3.927 C5.243,4.12766667 5.628,4.40066667 5.88,4.746 C5.964,4.858 6.006,4.97466667 6.006,5.096 C6.006,5.25466667 5.922,5.39 5.754,5.502 C5.63266667,5.57666667 5.51133333,5.614 5.39,5.614 C5.20333333,5.614 5.026,5.53 4.858,5.362 C4.634,5.138 4.375,4.97233333 4.081,4.865 C3.787,4.75766667 3.43466667,4.704 3.024,4.704 C2.58533333,4.704 2.25166667,4.76933333 2.023,4.9 C1.79433333,5.03066667 1.68,5.21733333 1.68,5.46 C1.68,5.64666667 1.73133333,5.796 1.834,5.908 C1.93666667,6.02 2.114,6.12733333 2.366,6.23 C2.618,6.33266667 3.038,6.47733333 3.626,6.664 C4.27933333,6.86933333 4.79033333,7.07466667 5.159,7.28 C5.52766667,7.48533333 5.79133333,7.714 5.95,7.966 C6.10866667,8.218 6.188,8.52133333 6.188,8.876 C6.188,9.44533333 5.93366667,9.90266667 5.425,10.248 C4.91633333,10.5933333 4.23733333,10.766 3.388,10.766 Z" id="s"></path>
-                <path d="M11.088,10.766 C10.332,10.766 9.674,10.6236667 9.114,10.339 C8.554,10.0543333 8.12,9.646 7.812,9.114 C7.504,8.582 7.35,7.952 7.35,7.224 C7.35,6.524 7.497,5.901 7.791,5.355 C8.085,4.809 8.51666667,4.38433333 9.086,4.081 C9.65533333,3.77766667 10.332,3.626 11.116,3.626 C11.7506667,3.626 12.2896667,3.74033333 12.733,3.969 C13.1763333,4.19766667 13.58,4.522 13.944,4.942 L13.958,0.658 C13.958,0.452666667 14.0163333,0.291666667 14.133,0.175 C14.2496667,0.0583333333 14.4106667,0 14.616,0 C14.812,0 14.966,0.0583333333 15.078,0.175 C15.19,0.291666667 15.246,0.452666667 15.246,0.658 L15.246,10.108 C15.246,10.3133333 15.19,10.4743333 15.078,10.591 C14.966,10.7076667 14.812,10.766 14.616,10.766 C14.4106667,10.766 14.2496667,10.7076667 14.133,10.591 C14.0163333,10.4743333 13.958,10.3133333 13.958,10.108 L13.958,9.422 C13.3046667,10.318 12.348,10.766 11.088,10.766 Z M11.228,9.688 C12.0773333,9.688 12.7446667,9.46633333 13.23,9.023 C13.7153333,8.57966667 13.958,7.97066667 13.958,7.196 C13.958,6.43066667 13.7013333,5.824 13.188,5.376 C12.6746667,4.928 12.026,4.704 11.242,4.704 C10.43,4.704 9.79533333,4.93266667 9.338,5.39 C8.88066667,5.84733333 8.652,6.45866667 8.652,7.224 C8.652,8.02666667 8.87833333,8.638 9.331,9.058 C9.78366667,9.478 10.416,9.688 11.228,9.688 Z" id="d"></path>
-            </g>
-            <path d="M46.6818182,10 L17.3181818,10 C16.0413706,10 15,11.0413705 15,12.3181818 L15,41.6818182 C15,42.9586295 16.0413706,44 17.3181818,44 L46.6818182,44 C47.9586295,44 49,42.9586295 49,41.6818182 L49,12.3181818 C49,11.0413705 47.9586295,10 46.6818182,10 Z M37.1827058,37.2718397 L36.0900215,38.364524 L24.7254976,27 L36.0900215,15.635476 L37.1827058,16.7281603 L26.9108669,27 L37.1827058,37.2718397 Z" id="less_than" fill="#000000"></path>
+            <path d="M48.7619048,10 L15.2380953,10 C12.3466667,10 10,12.3466667 10,15.2380952 L10,48.7619048 C10,51.6533333 12.3466667,54 15.2380953,54 L48.7619048,54 C51.6533333,54 54,51.6533333 54,48.7619048 L54,15.2380952 C54,12.3466667 51.6533333,10 48.7619048,10 Z M25.2638095,44.3828571 L24.0695238,42.6647619 L39.5847619,32 L24.0695238,21.3352381 L25.2638095,19.6171429 L43.2828572,32 L25.2638095,44.3828571 Z" id="greater_than" fill="#000000"></path>
         </g>
     </g>
 </svg>
         </div>
         <div style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size: 11px; display: inline-block; vertical-align: middle;">
-            <div>col_sd_lt()</div>
+            <div>col_vals_gt()</div>
         </div>
         
         </td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">a</td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">2</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">0</td>
     <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" class="gt_row gt_center"><svg width="25px" height="25px" viewbox="0 0 25 25" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="vertical-align: middle;">
     <g id="unchanged" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="unchanged" transform="translate(0.500000, 0.570147)">
@@ -587,13 +612,54 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     </g>
 </svg></td>
     <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" class="gt_row gt_center"><span style="color:#4CA64C;">✓</span></td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_right">1</td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">1<br>1.00</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_right">3</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">3<br>1.00</td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">0<br>0.00</td>
     <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" class="gt_row gt_center">—</td>
     <td style="height: 40px; background-color: #FCFCFC;" class="gt_row gt_center">—</td>
     <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" class="gt_row gt_center">—</td>
     <td style="height: 40px;" class="gt_row gt_center">—</td>
+  </tr>
+  <tr>
+    <td style="height: 40px; background-color: #4CA64C66; color: transparent;font-size: 0px; background-color: #F2F2F2;" class="gt_row gt_left">#4CA64C66</td>
+    <td style="height: 40px; color: #666666;font-size: 13px;font-weight: bold; background-color: #F2F2F2;" class="gt_row gt_right">2</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; background-color: #F2F2F2;" class="gt_row gt_left">
+        <div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
+            <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
+<svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF;">
+    <title>col_vals_gt</title>
+    <g id="Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="col_vals_gt" transform="translate(1.500000, 1.500000)" fill-rule="nonzero">
+            <path d="M55,0 C57.4852813,0 59.7352813,1.00735931 61.363961,2.63603897 C62.9926407,4.26471863 64,6.51471863 64,9 L64,9 L64,64 L9,64 C6.51471862,64 4.26471862,62.9926407 2.63603897,61.363961 C1.00735931,59.7352814 0,57.4852814 0,55 L0,55 L0,9 C0,6.51471863 1.00735931,4.26471863 2.63603897,2.63603897 C4.26471862,1.00735931 6.51471862,0 9,0 L9,0 L55,0 Z" id="rectangle" stroke="#000000" stroke-width="2" fill="#FFFFFF"></path>
+            <path d="M48.7619048,10 L15.2380953,10 C12.3466667,10 10,12.3466667 10,15.2380952 L10,48.7619048 C10,51.6533333 12.3466667,54 15.2380953,54 L48.7619048,54 C51.6533333,54 54,51.6533333 54,48.7619048 L54,15.2380952 C54,12.3466667 51.6533333,10 48.7619048,10 Z M25.2638095,44.3828571 L24.0695238,42.6647619 L39.5847619,32 L24.0695238,21.3352381 L25.2638095,19.6171429 L43.2828572,32 L25.2638095,44.3828571 Z" id="greater_than" fill="#000000"></path>
+        </g>
+    </g>
+</svg>
+        </div>
+        <div style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size: 11px; display: inline-block; vertical-align: middle;">
+            <div>col_vals_gt()</div>
+        </div>
+        
+        </td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; background-color: #F2F2F2;" class="gt_row gt_left">a</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; background-color: #F2F2F2;" class="gt_row gt_left">0</td>
+    <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3; background-color: #F2F2F2;" class="gt_row gt_center"><svg width="25px" height="25px" viewbox="0 0 25 25" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="vertical-align: middle;">
+    <g id="unchanged" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="unchanged" transform="translate(0.500000, 0.570147)">
+            <rect id="Rectangle" x="0.125132506" y="0" width="23.749735" height="23.7894737"></rect>
+            <path d="M5.80375046,8.18194736 C3.77191832,8.18194736 2.11875046,9.83495328 2.11875046,11.8669474 C2.11875046,13.8989414 3.77191832,15.5519474 5.80375046,15.5519474 C7.8355826,15.5519474 9.48875046,13.8989414 9.48875046,11.8669474 C9.48875046,9.83495328 7.83552863,8.18194736 5.80375046,8.18194736 Z M5.80375046,14.814915 C4.17821997,14.814915 2.85578285,13.4924778 2.85578285,11.8669474 C2.85578285,10.2414169 4.17821997,8.91897975 5.80375046,8.91897975 C7.42928095,8.91897975 8.75171807,10.2414169 8.75171807,11.8669474 C8.75171807,13.4924778 7.42928095,14.814915 5.80375046,14.814915 Z" id="Shape" fill="#000000" fill-rule="nonzero"></path>
+            <path d="M13.9638189,8.699335 C13.9364621,8.70430925 13.9091059,8.71176968 13.8842359,8.71923074 C13.7822704,8.73663967 13.6877654,8.77643115 13.6056956,8.83860518 L10.2433156,11.3852598 C10.0766886,11.5046343 9.97720993,11.6986181 9.97720993,11.9025491 C9.97720993,12.1064807 10.0766886,12.3004639 10.2433156,12.4198383 L13.6056956,14.966493 C13.891697,15.1803725 14.2970729,15.1231721 14.5109517,14.8371707 C14.7248313,14.5511692 14.6676309,14.145794 14.3816294,13.9319145 L12.5313257,12.5392127 L21.8812495,12.5392127 L21.8812495,11.2658854 L12.5313257,11.2658854 L14.3816294,9.87318364 C14.6377872,9.71650453 14.7497006,9.40066014 14.6477351,9.11714553 C14.5482564,8.83363156 14.262255,8.65954352 13.9638189,8.699335 Z" id="arrow" fill="#000000" transform="translate(15.929230, 11.894737) rotate(-180.000000) translate(-15.929230, -11.894737) "></path>
+        </g>
+    </g>
+</svg></td>
+    <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3; background-color: #F2F2F2;" class="gt_row gt_center">—</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; background-color: #F2F2F2;" class="gt_row gt_right">—</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; background-color: #F2F2F2;" class="gt_row gt_right">—</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; background-color: #F2F2F2;" class="gt_row gt_right">—</td>
+    <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3; background-color: #F2F2F2;" class="gt_row gt_center">—</td>
+    <td style="height: 40px; background-color: #FCFCFC; background-color: #F2F2F2;" class="gt_row gt_center">—</td>
+    <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3; background-color: #F2F2F2;" class="gt_row gt_center">—</td>
+    <td style="height: 40px; background-color: #F2F2F2;" class="gt_row gt_center">—</td>
   </tr>
 </tbody>
 
@@ -604,16 +670,16 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
         
 </div>
 </div>
-<p>The validation result shows whether the standard deviation comparison passed or failed. Since this is an aggregation-based validation, there is exactly one test unit per column.</p>
-<p>When validating multiple columns, each column gets its own validation step:</p>
-<div id="edc63b23" class="cell" data-execution_count="4">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    .col_sd_lt(columns<span class="op">=</span>[<span class="st">"a"</span>, <span class="st">"b"</span>], value<span class="op">=</span><span class="dv">2</span>)</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>validation</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The first step is active because both <code>a</code> and <code>b</code> exist. The second step is skipped because <code>x</code> and <code>y</code> are missing.</p>
+<p>Column names can also be provided as a list:</p>
+<div id="241e0ecb" class="cell" data-execution_count="4">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_gt(columns<span class="op">=</span><span class="st">"a"</span>, value<span class="op">=</span><span class="dv">0</span>, active<span class="op">=</span>pb.has_columns([<span class="st">"a"</span>, <span class="st">"b"</span>]))</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>validation</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="4">
 <div id="pb_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>
@@ -713,26 +779,22 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
         <div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
             <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
 <svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF;">
-    <title>col_sd_lt</title>
+    <title>col_vals_gt</title>
     <g id="Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="col_sd_lt" transform="translate(1.500000, 1.500000)" fill-rule="nonzero">
+        <g id="col_vals_gt" transform="translate(1.500000, 1.500000)" fill-rule="nonzero">
             <path d="M55,0 C57.4852813,0 59.7352813,1.00735931 61.363961,2.63603897 C62.9926407,4.26471863 64,6.51471863 64,9 L64,9 L64,64 L9,64 C6.51471862,64 4.26471862,62.9926407 2.63603897,61.363961 C1.00735931,59.7352814 0,57.4852814 0,55 L0,55 L0,9 C0,6.51471863 1.00735931,4.26471863 2.63603897,2.63603897 C4.26471862,1.00735931 6.51471862,0 9,0 L9,0 L55,0 Z" id="rectangle" stroke="#000000" stroke-width="2" fill="#FFFFFF"></path>
-            <g id="sd" transform="translate(24.244000, 46.374000)" fill="#000000">
-                <path d="M3.388,10.766 C2.66933333,10.766 2.03,10.6423333 1.47,10.395 C0.91,10.1476667 0.466666667,9.814 0.14,9.394 C0.0466666667,9.27266667 0,9.15133333 0,9.03 C0,8.82466667 0.098,8.67066667 0.294,8.568 C0.378,8.52133333 0.466666667,8.498 0.56,8.498 C0.718666667,8.498 0.882,8.582 1.05,8.75 C1.358,9.07666667 1.69866667,9.31466667 2.072,9.464 C2.44533333,9.61333333 2.87466667,9.688 3.36,9.688 C3.808,9.688 4.17433333,9.61566667 4.459,9.471 C4.74366667,9.32633333 4.886,9.128 4.886,8.876 C4.886,8.68933333 4.83233333,8.53533333 4.725,8.414 C4.61766667,8.29266667 4.43333333,8.176 4.172,8.064 C3.91066667,7.952 3.5,7.80266667 2.94,7.616 C1.99733333,7.31733333 1.33233333,7.00933333 0.945,6.692 C0.557666667,6.37466667 0.364,5.95933333 0.364,5.446 C0.364,4.89533333 0.604333333,4.45433333 1.085,4.123 C1.56566667,3.79166667 2.21666667,3.626 3.038,3.626 C3.64466667,3.626 4.207,3.72633333 4.725,3.927 C5.243,4.12766667 5.628,4.40066667 5.88,4.746 C5.964,4.858 6.006,4.97466667 6.006,5.096 C6.006,5.25466667 5.922,5.39 5.754,5.502 C5.63266667,5.57666667 5.51133333,5.614 5.39,5.614 C5.20333333,5.614 5.026,5.53 4.858,5.362 C4.634,5.138 4.375,4.97233333 4.081,4.865 C3.787,4.75766667 3.43466667,4.704 3.024,4.704 C2.58533333,4.704 2.25166667,4.76933333 2.023,4.9 C1.79433333,5.03066667 1.68,5.21733333 1.68,5.46 C1.68,5.64666667 1.73133333,5.796 1.834,5.908 C1.93666667,6.02 2.114,6.12733333 2.366,6.23 C2.618,6.33266667 3.038,6.47733333 3.626,6.664 C4.27933333,6.86933333 4.79033333,7.07466667 5.159,7.28 C5.52766667,7.48533333 5.79133333,7.714 5.95,7.966 C6.10866667,8.218 6.188,8.52133333 6.188,8.876 C6.188,9.44533333 5.93366667,9.90266667 5.425,10.248 C4.91633333,10.5933333 4.23733333,10.766 3.388,10.766 Z" id="s"></path>
-                <path d="M11.088,10.766 C10.332,10.766 9.674,10.6236667 9.114,10.339 C8.554,10.0543333 8.12,9.646 7.812,9.114 C7.504,8.582 7.35,7.952 7.35,7.224 C7.35,6.524 7.497,5.901 7.791,5.355 C8.085,4.809 8.51666667,4.38433333 9.086,4.081 C9.65533333,3.77766667 10.332,3.626 11.116,3.626 C11.7506667,3.626 12.2896667,3.74033333 12.733,3.969 C13.1763333,4.19766667 13.58,4.522 13.944,4.942 L13.958,0.658 C13.958,0.452666667 14.0163333,0.291666667 14.133,0.175 C14.2496667,0.0583333333 14.4106667,0 14.616,0 C14.812,0 14.966,0.0583333333 15.078,0.175 C15.19,0.291666667 15.246,0.452666667 15.246,0.658 L15.246,10.108 C15.246,10.3133333 15.19,10.4743333 15.078,10.591 C14.966,10.7076667 14.812,10.766 14.616,10.766 C14.4106667,10.766 14.2496667,10.7076667 14.133,10.591 C14.0163333,10.4743333 13.958,10.3133333 13.958,10.108 L13.958,9.422 C13.3046667,10.318 12.348,10.766 11.088,10.766 Z M11.228,9.688 C12.0773333,9.688 12.7446667,9.46633333 13.23,9.023 C13.7153333,8.57966667 13.958,7.97066667 13.958,7.196 C13.958,6.43066667 13.7013333,5.824 13.188,5.376 C12.6746667,4.928 12.026,4.704 11.242,4.704 C10.43,4.704 9.79533333,4.93266667 9.338,5.39 C8.88066667,5.84733333 8.652,6.45866667 8.652,7.224 C8.652,8.02666667 8.87833333,8.638 9.331,9.058 C9.78366667,9.478 10.416,9.688 11.228,9.688 Z" id="d"></path>
-            </g>
-            <path d="M46.6818182,10 L17.3181818,10 C16.0413706,10 15,11.0413705 15,12.3181818 L15,41.6818182 C15,42.9586295 16.0413706,44 17.3181818,44 L46.6818182,44 C47.9586295,44 49,42.9586295 49,41.6818182 L49,12.3181818 C49,11.0413705 47.9586295,10 46.6818182,10 Z M37.1827058,37.2718397 L36.0900215,38.364524 L24.7254976,27 L36.0900215,15.635476 L37.1827058,16.7281603 L26.9108669,27 L37.1827058,37.2718397 Z" id="less_than" fill="#000000"></path>
+            <path d="M48.7619048,10 L15.2380953,10 C12.3466667,10 10,12.3466667 10,15.2380952 L10,48.7619048 C10,51.6533333 12.3466667,54 15.2380953,54 L48.7619048,54 C51.6533333,54 54,51.6533333 54,48.7619048 L54,15.2380952 C54,12.3466667 51.6533333,10 48.7619048,10 Z M25.2638095,44.3828571 L24.0695238,42.6647619 L39.5847619,32 L24.0695238,21.3352381 L25.2638095,19.6171429 L43.2828572,32 L25.2638095,44.3828571 Z" id="greater_than" fill="#000000"></path>
         </g>
     </g>
 </svg>
         </div>
         <div style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size: 11px; display: inline-block; vertical-align: middle;">
-            <div>col_sd_lt()</div>
+            <div>col_vals_gt()</div>
         </div>
         
         </td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">a</td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">2</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">0</td>
     <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" class="gt_row gt_center"><svg width="25px" height="25px" viewbox="0 0 25 25" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="vertical-align: middle;">
     <g id="unchanged" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="unchanged" transform="translate(0.500000, 0.570147)">
@@ -743,208 +805,8 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     </g>
 </svg></td>
     <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" class="gt_row gt_center"><span style="color:#4CA64C;">✓</span></td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_right">1</td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">1<br>1.00</td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">0<br>0.00</td>
-    <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" class="gt_row gt_center">—</td>
-    <td style="height: 40px; background-color: #FCFCFC;" class="gt_row gt_center">—</td>
-    <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" class="gt_row gt_center">—</td>
-    <td style="height: 40px;" class="gt_row gt_center">—</td>
-  </tr>
-  <tr>
-    <td style="height: 40px; background-color: #4CA64C; color: transparent;font-size: 0px;" class="gt_row gt_left">#4CA64C</td>
-    <td style="height: 40px; color: #666666;font-size: 13px;font-weight: bold;" class="gt_row gt_right">2</td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left">
-        <div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
-            <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
-<svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF;">
-    <title>col_sd_lt</title>
-    <g id="Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="col_sd_lt" transform="translate(1.500000, 1.500000)" fill-rule="nonzero">
-            <path d="M55,0 C57.4852813,0 59.7352813,1.00735931 61.363961,2.63603897 C62.9926407,4.26471863 64,6.51471863 64,9 L64,9 L64,64 L9,64 C6.51471862,64 4.26471862,62.9926407 2.63603897,61.363961 C1.00735931,59.7352814 0,57.4852814 0,55 L0,55 L0,9 C0,6.51471863 1.00735931,4.26471863 2.63603897,2.63603897 C4.26471862,1.00735931 6.51471862,0 9,0 L9,0 L55,0 Z" id="rectangle" stroke="#000000" stroke-width="2" fill="#FFFFFF"></path>
-            <g id="sd" transform="translate(24.244000, 46.374000)" fill="#000000">
-                <path d="M3.388,10.766 C2.66933333,10.766 2.03,10.6423333 1.47,10.395 C0.91,10.1476667 0.466666667,9.814 0.14,9.394 C0.0466666667,9.27266667 0,9.15133333 0,9.03 C0,8.82466667 0.098,8.67066667 0.294,8.568 C0.378,8.52133333 0.466666667,8.498 0.56,8.498 C0.718666667,8.498 0.882,8.582 1.05,8.75 C1.358,9.07666667 1.69866667,9.31466667 2.072,9.464 C2.44533333,9.61333333 2.87466667,9.688 3.36,9.688 C3.808,9.688 4.17433333,9.61566667 4.459,9.471 C4.74366667,9.32633333 4.886,9.128 4.886,8.876 C4.886,8.68933333 4.83233333,8.53533333 4.725,8.414 C4.61766667,8.29266667 4.43333333,8.176 4.172,8.064 C3.91066667,7.952 3.5,7.80266667 2.94,7.616 C1.99733333,7.31733333 1.33233333,7.00933333 0.945,6.692 C0.557666667,6.37466667 0.364,5.95933333 0.364,5.446 C0.364,4.89533333 0.604333333,4.45433333 1.085,4.123 C1.56566667,3.79166667 2.21666667,3.626 3.038,3.626 C3.64466667,3.626 4.207,3.72633333 4.725,3.927 C5.243,4.12766667 5.628,4.40066667 5.88,4.746 C5.964,4.858 6.006,4.97466667 6.006,5.096 C6.006,5.25466667 5.922,5.39 5.754,5.502 C5.63266667,5.57666667 5.51133333,5.614 5.39,5.614 C5.20333333,5.614 5.026,5.53 4.858,5.362 C4.634,5.138 4.375,4.97233333 4.081,4.865 C3.787,4.75766667 3.43466667,4.704 3.024,4.704 C2.58533333,4.704 2.25166667,4.76933333 2.023,4.9 C1.79433333,5.03066667 1.68,5.21733333 1.68,5.46 C1.68,5.64666667 1.73133333,5.796 1.834,5.908 C1.93666667,6.02 2.114,6.12733333 2.366,6.23 C2.618,6.33266667 3.038,6.47733333 3.626,6.664 C4.27933333,6.86933333 4.79033333,7.07466667 5.159,7.28 C5.52766667,7.48533333 5.79133333,7.714 5.95,7.966 C6.10866667,8.218 6.188,8.52133333 6.188,8.876 C6.188,9.44533333 5.93366667,9.90266667 5.425,10.248 C4.91633333,10.5933333 4.23733333,10.766 3.388,10.766 Z" id="s"></path>
-                <path d="M11.088,10.766 C10.332,10.766 9.674,10.6236667 9.114,10.339 C8.554,10.0543333 8.12,9.646 7.812,9.114 C7.504,8.582 7.35,7.952 7.35,7.224 C7.35,6.524 7.497,5.901 7.791,5.355 C8.085,4.809 8.51666667,4.38433333 9.086,4.081 C9.65533333,3.77766667 10.332,3.626 11.116,3.626 C11.7506667,3.626 12.2896667,3.74033333 12.733,3.969 C13.1763333,4.19766667 13.58,4.522 13.944,4.942 L13.958,0.658 C13.958,0.452666667 14.0163333,0.291666667 14.133,0.175 C14.2496667,0.0583333333 14.4106667,0 14.616,0 C14.812,0 14.966,0.0583333333 15.078,0.175 C15.19,0.291666667 15.246,0.452666667 15.246,0.658 L15.246,10.108 C15.246,10.3133333 15.19,10.4743333 15.078,10.591 C14.966,10.7076667 14.812,10.766 14.616,10.766 C14.4106667,10.766 14.2496667,10.7076667 14.133,10.591 C14.0163333,10.4743333 13.958,10.3133333 13.958,10.108 L13.958,9.422 C13.3046667,10.318 12.348,10.766 11.088,10.766 Z M11.228,9.688 C12.0773333,9.688 12.7446667,9.46633333 13.23,9.023 C13.7153333,8.57966667 13.958,7.97066667 13.958,7.196 C13.958,6.43066667 13.7013333,5.824 13.188,5.376 C12.6746667,4.928 12.026,4.704 11.242,4.704 C10.43,4.704 9.79533333,4.93266667 9.338,5.39 C8.88066667,5.84733333 8.652,6.45866667 8.652,7.224 C8.652,8.02666667 8.87833333,8.638 9.331,9.058 C9.78366667,9.478 10.416,9.688 11.228,9.688 Z" id="d"></path>
-            </g>
-            <path d="M46.6818182,10 L17.3181818,10 C16.0413706,10 15,11.0413705 15,12.3181818 L15,41.6818182 C15,42.9586295 16.0413706,44 17.3181818,44 L46.6818182,44 C47.9586295,44 49,42.9586295 49,41.6818182 L49,12.3181818 C49,11.0413705 47.9586295,10 46.6818182,10 Z M37.1827058,37.2718397 L36.0900215,38.364524 L24.7254976,27 L36.0900215,15.635476 L37.1827058,16.7281603 L26.9108669,27 L37.1827058,37.2718397 Z" id="less_than" fill="#000000"></path>
-        </g>
-    </g>
-</svg>
-        </div>
-        <div style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size: 11px; display: inline-block; vertical-align: middle;">
-            <div>col_sd_lt()</div>
-        </div>
-        
-        </td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">b</td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">2</td>
-    <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" class="gt_row gt_center"><svg width="25px" height="25px" viewbox="0 0 25 25" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="vertical-align: middle;">
-    <g id="unchanged" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="unchanged" transform="translate(0.500000, 0.570147)">
-            <rect id="Rectangle" x="0.125132506" y="0" width="23.749735" height="23.7894737"></rect>
-            <path d="M5.80375046,8.18194736 C3.77191832,8.18194736 2.11875046,9.83495328 2.11875046,11.8669474 C2.11875046,13.8989414 3.77191832,15.5519474 5.80375046,15.5519474 C7.8355826,15.5519474 9.48875046,13.8989414 9.48875046,11.8669474 C9.48875046,9.83495328 7.83552863,8.18194736 5.80375046,8.18194736 Z M5.80375046,14.814915 C4.17821997,14.814915 2.85578285,13.4924778 2.85578285,11.8669474 C2.85578285,10.2414169 4.17821997,8.91897975 5.80375046,8.91897975 C7.42928095,8.91897975 8.75171807,10.2414169 8.75171807,11.8669474 C8.75171807,13.4924778 7.42928095,14.814915 5.80375046,14.814915 Z" id="Shape" fill="#000000" fill-rule="nonzero"></path>
-            <path d="M13.9638189,8.699335 C13.9364621,8.70430925 13.9091059,8.71176968 13.8842359,8.71923074 C13.7822704,8.73663967 13.6877654,8.77643115 13.6056956,8.83860518 L10.2433156,11.3852598 C10.0766886,11.5046343 9.97720993,11.6986181 9.97720993,11.9025491 C9.97720993,12.1064807 10.0766886,12.3004639 10.2433156,12.4198383 L13.6056956,14.966493 C13.891697,15.1803725 14.2970729,15.1231721 14.5109517,14.8371707 C14.7248313,14.5511692 14.6676309,14.145794 14.3816294,13.9319145 L12.5313257,12.5392127 L21.8812495,12.5392127 L21.8812495,11.2658854 L12.5313257,11.2658854 L14.3816294,9.87318364 C14.6377872,9.71650453 14.7497006,9.40066014 14.6477351,9.11714553 C14.5482564,8.83363156 14.262255,8.65954352 13.9638189,8.699335 Z" id="arrow" fill="#000000" transform="translate(15.929230, 11.894737) rotate(-180.000000) translate(-15.929230, -11.894737) "></path>
-        </g>
-    </g>
-</svg></td>
-    <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" class="gt_row gt_center"><span style="color:#4CA64C;">✓</span></td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_right">1</td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">1<br>1.00</td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">0<br>0.00</td>
-    <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" class="gt_row gt_center">—</td>
-    <td style="height: 40px; background-color: #FCFCFC;" class="gt_row gt_center">—</td>
-    <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" class="gt_row gt_center">—</td>
-    <td style="height: 40px;" class="gt_row gt_center">—</td>
-  </tr>
-</tbody>
-
-
-</table>
-
-</div>
-        
-</div>
-</div>
-<p>Using tolerance for flexible comparisons:</p>
-<div id="5f43057a" class="cell" data-execution_count="5">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    .col_sd_lt(columns<span class="op">=</span><span class="st">"a"</span>, value<span class="op">=</span><span class="dv">2</span>, tol<span class="op">=</span><span class="fl">1.0</span>)</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    .interrogate()</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>validation</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-display" data-execution_count="5">
-<div id="pb_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans&display=swap');
-#pb_tbl table {
-          font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
-          -webkit-font-smoothing: antialiased;
-          -moz-osx-font-smoothing: grayscale;
-        }
-
-#pb_tbl thead, tbody, tfoot, tr, td, th { border-style: none; }
- tr { background-color: transparent; }
-#pb_tbl p { margin: 0; padding: 0; }
- #pb_tbl .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 90%; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: auto; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
- #pb_tbl .gt_caption { padding-top: 4px; padding-bottom: 4px; }
- #pb_tbl .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
- #pb_tbl .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
- #pb_tbl .gt_heading { background-color: #FFFFFF; text-align: left; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
- #pb_tbl .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
- #pb_tbl .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
- #pb_tbl .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
- #pb_tbl .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
- #pb_tbl .gt_column_spanner_outer:first-child { padding-left: 0; }
- #pb_tbl .gt_column_spanner_outer:last-child { padding-right: 0; }
- #pb_tbl .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
- #pb_tbl .gt_spanner_row { border-bottom-style: hidden; }
- #pb_tbl .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
- #pb_tbl .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
- #pb_tbl .gt_from_md> :first-child { margin-top: 0; }
- #pb_tbl .gt_from_md> :last-child { margin-bottom: 0; }
- #pb_tbl .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
- #pb_tbl .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
- #pb_tbl .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
- #pb_tbl .gt_row_group_first td { border-top-width: 2px; }
- #pb_tbl .gt_row_group_first th { border-top-width: 2px; }
- #pb_tbl .gt_striped { color: #333333; background-color: #F4F4F4; }
- #pb_tbl .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
- #pb_tbl .gt_grand_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
- #pb_tbl .gt_first_grand_summary_row_bottom { border-top-style: double; border-top-width: 6px; border-top-color: #D3D3D3; }
- #pb_tbl .gt_last_grand_summary_row_top { border-bottom-style: double; border-bottom-width: 6px; border-bottom-color: #D3D3D3; }
- #pb_tbl .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
- #pb_tbl .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
- #pb_tbl .gt_left { text-align: left; }
- #pb_tbl .gt_center { text-align: center; }
- #pb_tbl .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
- #pb_tbl .gt_font_normal { font-weight: normal; }
- #pb_tbl .gt_font_bold { font-weight: bold; }
- #pb_tbl .gt_font_italic { font-style: italic; }
- #pb_tbl .gt_super { font-size: 65%; }
- #pb_tbl .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
- #pb_tbl .gt_asterisk { font-size: 100%; vertical-align: 0; }
- 
-</style>
-<table style="table-layout: fixed;; width: 0px" class="gt_table" data-quarto-disable-processing="true" data-quarto-bootstrap="false">
-<colgroup>
-  <col style="width:4px;">
-  <col style="width:35px;">
-  <col style="width:190px;">
-  <col style="width:120px;">
-  <col style="width:120px;">
-  <col style="width:50px;">
-  <col style="width:50px;">
-  <col style="width:60px;">
-  <col style="width:60px;">
-  <col style="width:60px;">
-  <col style="width:30px;">
-  <col style="width:30px;">
-  <col style="width:30px;">
-  <col style="width:65px;">
-</colgroup>
-
-<thead>
-
-<tr class="gt_col_headings">
-  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-status_color"></th>
-  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-i"></th>
-  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-type_upd">STEP</th>
-  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-columns_upd">COLUMNS</th>
-  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-values_upd">VALUES</th>
-  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-tbl">TBL</th>
-  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-eval">EVAL</th>
-  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-test_units">UNITS</th>
-  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-pass">PASS</th>
-  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-fail">FAIL</th>
-  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-w_upd">W</th>
-  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-e_upd">E</th>
-  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-c_upd">C</th>
-  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-extract_upd">EXT</th>
-</tr>
-</thead>
-<tbody class="gt_table_body">
-  <tr>
-    <td style="height: 40px; background-color: #4CA64C; color: transparent;font-size: 0px;" class="gt_row gt_left">#4CA64C</td>
-    <td style="height: 40px; color: #666666;font-size: 13px;font-weight: bold;" class="gt_row gt_right">1</td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left">
-        <div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
-            <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
-<svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF;">
-    <title>col_sd_lt</title>
-    <g id="Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="col_sd_lt" transform="translate(1.500000, 1.500000)" fill-rule="nonzero">
-            <path d="M55,0 C57.4852813,0 59.7352813,1.00735931 61.363961,2.63603897 C62.9926407,4.26471863 64,6.51471863 64,9 L64,9 L64,64 L9,64 C6.51471862,64 4.26471862,62.9926407 2.63603897,61.363961 C1.00735931,59.7352814 0,57.4852814 0,55 L0,55 L0,9 C0,6.51471863 1.00735931,4.26471863 2.63603897,2.63603897 C4.26471862,1.00735931 6.51471862,0 9,0 L9,0 L55,0 Z" id="rectangle" stroke="#000000" stroke-width="2" fill="#FFFFFF"></path>
-            <g id="sd" transform="translate(24.244000, 46.374000)" fill="#000000">
-                <path d="M3.388,10.766 C2.66933333,10.766 2.03,10.6423333 1.47,10.395 C0.91,10.1476667 0.466666667,9.814 0.14,9.394 C0.0466666667,9.27266667 0,9.15133333 0,9.03 C0,8.82466667 0.098,8.67066667 0.294,8.568 C0.378,8.52133333 0.466666667,8.498 0.56,8.498 C0.718666667,8.498 0.882,8.582 1.05,8.75 C1.358,9.07666667 1.69866667,9.31466667 2.072,9.464 C2.44533333,9.61333333 2.87466667,9.688 3.36,9.688 C3.808,9.688 4.17433333,9.61566667 4.459,9.471 C4.74366667,9.32633333 4.886,9.128 4.886,8.876 C4.886,8.68933333 4.83233333,8.53533333 4.725,8.414 C4.61766667,8.29266667 4.43333333,8.176 4.172,8.064 C3.91066667,7.952 3.5,7.80266667 2.94,7.616 C1.99733333,7.31733333 1.33233333,7.00933333 0.945,6.692 C0.557666667,6.37466667 0.364,5.95933333 0.364,5.446 C0.364,4.89533333 0.604333333,4.45433333 1.085,4.123 C1.56566667,3.79166667 2.21666667,3.626 3.038,3.626 C3.64466667,3.626 4.207,3.72633333 4.725,3.927 C5.243,4.12766667 5.628,4.40066667 5.88,4.746 C5.964,4.858 6.006,4.97466667 6.006,5.096 C6.006,5.25466667 5.922,5.39 5.754,5.502 C5.63266667,5.57666667 5.51133333,5.614 5.39,5.614 C5.20333333,5.614 5.026,5.53 4.858,5.362 C4.634,5.138 4.375,4.97233333 4.081,4.865 C3.787,4.75766667 3.43466667,4.704 3.024,4.704 C2.58533333,4.704 2.25166667,4.76933333 2.023,4.9 C1.79433333,5.03066667 1.68,5.21733333 1.68,5.46 C1.68,5.64666667 1.73133333,5.796 1.834,5.908 C1.93666667,6.02 2.114,6.12733333 2.366,6.23 C2.618,6.33266667 3.038,6.47733333 3.626,6.664 C4.27933333,6.86933333 4.79033333,7.07466667 5.159,7.28 C5.52766667,7.48533333 5.79133333,7.714 5.95,7.966 C6.10866667,8.218 6.188,8.52133333 6.188,8.876 C6.188,9.44533333 5.93366667,9.90266667 5.425,10.248 C4.91633333,10.5933333 4.23733333,10.766 3.388,10.766 Z" id="s"></path>
-                <path d="M11.088,10.766 C10.332,10.766 9.674,10.6236667 9.114,10.339 C8.554,10.0543333 8.12,9.646 7.812,9.114 C7.504,8.582 7.35,7.952 7.35,7.224 C7.35,6.524 7.497,5.901 7.791,5.355 C8.085,4.809 8.51666667,4.38433333 9.086,4.081 C9.65533333,3.77766667 10.332,3.626 11.116,3.626 C11.7506667,3.626 12.2896667,3.74033333 12.733,3.969 C13.1763333,4.19766667 13.58,4.522 13.944,4.942 L13.958,0.658 C13.958,0.452666667 14.0163333,0.291666667 14.133,0.175 C14.2496667,0.0583333333 14.4106667,0 14.616,0 C14.812,0 14.966,0.0583333333 15.078,0.175 C15.19,0.291666667 15.246,0.452666667 15.246,0.658 L15.246,10.108 C15.246,10.3133333 15.19,10.4743333 15.078,10.591 C14.966,10.7076667 14.812,10.766 14.616,10.766 C14.4106667,10.766 14.2496667,10.7076667 14.133,10.591 C14.0163333,10.4743333 13.958,10.3133333 13.958,10.108 L13.958,9.422 C13.3046667,10.318 12.348,10.766 11.088,10.766 Z M11.228,9.688 C12.0773333,9.688 12.7446667,9.46633333 13.23,9.023 C13.7153333,8.57966667 13.958,7.97066667 13.958,7.196 C13.958,6.43066667 13.7013333,5.824 13.188,5.376 C12.6746667,4.928 12.026,4.704 11.242,4.704 C10.43,4.704 9.79533333,4.93266667 9.338,5.39 C8.88066667,5.84733333 8.652,6.45866667 8.652,7.224 C8.652,8.02666667 8.87833333,8.638 9.331,9.058 C9.78366667,9.478 10.416,9.688 11.228,9.688 Z" id="d"></path>
-            </g>
-            <path d="M46.6818182,10 L17.3181818,10 C16.0413706,10 15,11.0413705 15,12.3181818 L15,41.6818182 C15,42.9586295 16.0413706,44 17.3181818,44 L46.6818182,44 C47.9586295,44 49,42.9586295 49,41.6818182 L49,12.3181818 C49,11.0413705 47.9586295,10 46.6818182,10 Z M37.1827058,37.2718397 L36.0900215,38.364524 L24.7254976,27 L36.0900215,15.635476 L37.1827058,16.7281603 L26.9108669,27 L37.1827058,37.2718397 Z" id="less_than" fill="#000000"></path>
-        </g>
-    </g>
-</svg>
-        </div>
-        <div style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size: 11px; display: inline-block; vertical-align: middle;">
-            <div>col_sd_lt()</div>
-        </div>
-        
-        </td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">a</td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">2<br>tol=1.0</td>
-    <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" class="gt_row gt_center"><svg width="25px" height="25px" viewbox="0 0 25 25" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="vertical-align: middle;">
-    <g id="unchanged" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="unchanged" transform="translate(0.500000, 0.570147)">
-            <rect id="Rectangle" x="0.125132506" y="0" width="23.749735" height="23.7894737"></rect>
-            <path d="M5.80375046,8.18194736 C3.77191832,8.18194736 2.11875046,9.83495328 2.11875046,11.8669474 C2.11875046,13.8989414 3.77191832,15.5519474 5.80375046,15.5519474 C7.8355826,15.5519474 9.48875046,13.8989414 9.48875046,11.8669474 C9.48875046,9.83495328 7.83552863,8.18194736 5.80375046,8.18194736 Z M5.80375046,14.814915 C4.17821997,14.814915 2.85578285,13.4924778 2.85578285,11.8669474 C2.85578285,10.2414169 4.17821997,8.91897975 5.80375046,8.91897975 C7.42928095,8.91897975 8.75171807,10.2414169 8.75171807,11.8669474 C8.75171807,13.4924778 7.42928095,14.814915 5.80375046,14.814915 Z" id="Shape" fill="#000000" fill-rule="nonzero"></path>
-            <path d="M13.9638189,8.699335 C13.9364621,8.70430925 13.9091059,8.71176968 13.8842359,8.71923074 C13.7822704,8.73663967 13.6877654,8.77643115 13.6056956,8.83860518 L10.2433156,11.3852598 C10.0766886,11.5046343 9.97720993,11.6986181 9.97720993,11.9025491 C9.97720993,12.1064807 10.0766886,12.3004639 10.2433156,12.4198383 L13.6056956,14.966493 C13.891697,15.1803725 14.2970729,15.1231721 14.5109517,14.8371707 C14.7248313,14.5511692 14.6676309,14.145794 14.3816294,13.9319145 L12.5313257,12.5392127 L21.8812495,12.5392127 L21.8812495,11.2658854 L12.5313257,11.2658854 L14.3816294,9.87318364 C14.6377872,9.71650453 14.7497006,9.40066014 14.6477351,9.11714553 C14.5482564,8.83363156 14.262255,8.65954352 13.9638189,8.699335 Z" id="arrow" fill="#000000" transform="translate(15.929230, 11.894737) rotate(-180.000000) translate(-15.929230, -11.894737) "></path>
-        </g>
-    </g>
-</svg></td>
-    <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" class="gt_row gt_center"><span style="color:#4CA64C;">✓</span></td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_right">1</td>
-    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">1<br>1.00</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_right">3</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">3<br>1.00</td>
     <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">0<br>0.00</td>
     <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" class="gt_row gt_center">—</td>
     <td style="height: 40px; background-color: #FCFCFC;" class="gt_row gt_center">—</td>
