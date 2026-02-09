@@ -44,7 +44,7 @@ def has_columns(*columns: str | list[str]) -> Callable[[Any], bool]:
     #| echo: false
     #| output: false
     import pointblank as pb
-    pb.config(report_incl_header=False, report_incl_footer=False, preview_incl_header=False)
+    pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
     ```
 
     Using `has_columns()` with the `active=` parameter to conditionally run a validation step:
@@ -203,7 +203,7 @@ def has_rows(
     #| echo: false
     #| output: false
     import pointblank as pb
-    pb.config(report_incl_header=False, report_incl_footer=False, preview_incl_header=False)
+    pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
     ```
 
     Skip a validation step if the table is empty:

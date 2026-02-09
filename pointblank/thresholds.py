@@ -44,7 +44,7 @@ class Thresholds:
     #| echo: false
     #| output: false
     import pointblank as pb
-    pb.config(report_incl_footer=False)
+    pb.config(report_incl_footer_timings=False)
     ```
     In a data validation workflow, you can set thresholds for the number of failing test units at
     different levels. For example, you can set a threshold for the 'warning' level when the number
@@ -389,7 +389,7 @@ class Actions:
     #| echo: false
     #| output: false
     import pointblank as pb
-    pb.config(report_incl_footer=False)
+    pb.config(report_incl_footer_timings=False)
     ```
 
     Let's define both threshold values and actions for a data validation workflow. We'll set these

@@ -133,7 +133,7 @@ class Schema:
     #| echo: false
     #| output: false
     import pointblank as pb
-    pb.config(report_incl_header=False, report_incl_footer=False, preview_incl_header=False)
+    pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
     ```
     A schema can be constructed via the `Schema` class in multiple ways. Let's use the following
     Polars DataFrame as a basis for constructing a schema:
