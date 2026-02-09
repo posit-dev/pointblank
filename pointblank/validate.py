@@ -98,6 +98,7 @@ from pointblank._utils import (
     _select_df_lib,
 )
 from pointblank._utils_check_args import (
+    _check_active_input,
     _check_boolean_input,
     _check_column,
     _check_pre,
