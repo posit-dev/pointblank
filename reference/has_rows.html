@@ -286,7 +286,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
         border-radius: 2px;
     ">
 <p>Skip a validation step if the table is empty:</p>
-<div id="2088099e" class="cell" data-execution_count="2">
+<div id="cfcc7efd" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -434,7 +434,15 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     <td style="height: 40px; background-color: #F2F2F2;" class="gt_row gt_center">—</td>
   </tr>
 </tbody>
+  <tfoot class="gt_sourcenotes">
+  
+  <tr>
+    <td class="gt_sourcenote" colspan="14" style="text-align: left;"><hr style="border: none; border-top-width: 1px; border-top-style: dotted; border-top-color: #B5B5B5; margin-top: -3px; margin-bottom: 3px;">
+<strong>Notes</strong>
+<p><span style="font-variant: small-caps; font-weight: bold; font-size: smaller; text-transform: uppercase; color: #333333;">Step 1</span> <span style="font-family: &quot;IBM Plex Mono&quot;, monospace; font-size: smaller;">(active_check)</span> Step skipped — Row count check failed: table is empty.</p></td>
+  </tr>
 
+</tfoot>
 
 </table>
 
@@ -444,7 +452,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 <p>The step was skipped because the table has no rows.</p>
 <p>Only run a step when the table has at least a minimum number of rows:</p>
-<div id="f2790dad" class="cell" data-execution_count="3">
+<div id="826a2755" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_gt(columns<span class="op">=</span><span class="st">"x"</span>, value<span class="op">=</span><span class="dv">0</span>, active<span class="op">=</span>pb.has_rows(<span class="bu">min</span><span class="op">=</span><span class="dv">100</span>))</span>
@@ -586,7 +594,15 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     <td style="height: 40px; background-color: #F2F2F2;" class="gt_row gt_center">—</td>
   </tr>
 </tbody>
+  <tfoot class="gt_sourcenotes">
+  
+  <tr>
+    <td class="gt_sourcenote" colspan="14" style="text-align: left;"><hr style="border: none; border-top-width: 1px; border-top-style: dotted; border-top-color: #B5B5B5; margin-top: -3px; margin-bottom: 3px;">
+<strong>Notes</strong>
+<p><span style="font-variant: small-caps; font-weight: bold; font-size: smaller; text-transform: uppercase; color: #333333;">Step 1</span> <span style="font-family: &quot;IBM Plex Mono&quot;, monospace; font-size: smaller;">(active_check)</span> Step skipped — Row count check failed: expected at least <code>100</code> row(s), found <code>3</code>.</p></td>
+  </tr>
 
+</tfoot>
 
 </table>
 
@@ -596,7 +612,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 <p>The step was skipped because the table has only 3 rows, which is fewer than the required minimum of <code>100</code>.</p>
 <p>You can also check for an exact count or a range:</p>
-<div id="51d7bb58" class="cell" data-execution_count="4">
+<div id="6481c398" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_gt(columns<span class="op">=</span><span class="st">"x"</span>, value<span class="op">=</span><span class="dv">0</span>, active<span class="op">=</span>pb.has_rows(count<span class="op">=</span><span class="dv">3</span>))</span>
@@ -822,7 +838,15 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     <td style="height: 40px; background-color: #F2F2F2;" class="gt_row gt_center">—</td>
   </tr>
 </tbody>
+  <tfoot class="gt_sourcenotes">
+  
+  <tr>
+    <td class="gt_sourcenote" colspan="14" style="text-align: left;"><hr style="border: none; border-top-width: 1px; border-top-style: dotted; border-top-color: #B5B5B5; margin-top: -3px; margin-bottom: 3px;">
+<strong>Notes</strong>
+<p><span style="font-variant: small-caps; font-weight: bold; font-size: smaller; text-transform: uppercase; color: #333333;">Step 3</span> <span style="font-family: &quot;IBM Plex Mono&quot;, monospace; font-size: smaller;">(active_check)</span> Step skipped — Row count check failed: expected exactly <code>100</code> row(s), found <code>3</code>.</p></td>
+  </tr>
 
+</tfoot>
 
 </table>
 

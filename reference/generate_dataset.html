@@ -303,7 +303,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
         border-radius: 2px;
     ">
 <p>Generate test data from a schema with field constraints:</p>
-<div id="fcaaf371" class="cell" data-execution_count="1">
+<div id="e3cd4355" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
@@ -472,7 +472,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 </div>
 <p>Generate data from a simple dtype-only schema as a Pandas DataFrame:</p>
-<div id="7593a4cf" class="cell" data-execution_count="2">
+<div id="e549bc8a" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(name<span class="op">=</span><span class="st">"String"</span>, age<span class="op">=</span><span class="st">"Int64"</span>, active<span class="op">=</span><span class="st">"Boolean"</span>)</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>pb.preview(pb.generate_dataset(schema, n<span class="op">=</span><span class="dv">50</span>, seed<span class="op">=</span><span class="dv">23</span>, output<span class="op">=</span><span class="st">"pandas"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="2">
@@ -620,7 +620,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 </div>
 <p>Generate data with German addresses by using <code>country="DE"</code>:</p>
-<div id="92de6e12" class="cell" data-execution_count="3">
+<div id="e8700741" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    name<span class="op">=</span>pb.string_field(preset<span class="op">=</span><span class="st">"name"</span>),</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    address<span class="op">=</span>pb.string_field(preset<span class="op">=</span><span class="st">"address"</span>),</span>

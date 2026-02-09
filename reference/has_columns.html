@@ -279,7 +279,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
         border-radius: 2px;
     ">
 <p>Using <a href="../reference/has_columns.html#pointblank.has_columns" title="0"><code>has_columns()</code></a> with the <code>active=</code> parameter to conditionally run a validation step:</p>
-<div id="5f787561" class="cell" data-execution_count="2">
+<div id="d298e5b7" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -468,7 +468,15 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     <td style="height: 40px; background-color: #F2F2F2;" class="gt_row gt_center">—</td>
   </tr>
 </tbody>
+  <tfoot class="gt_sourcenotes">
+  
+  <tr>
+    <td class="gt_sourcenote" colspan="14" style="text-align: left;"><hr style="border: none; border-top-width: 1px; border-top-style: dotted; border-top-color: #B5B5B5; margin-top: -3px; margin-bottom: 3px;">
+<strong>Notes</strong>
+<p><span style="font-variant: small-caps; font-weight: bold; font-size: smaller; text-transform: uppercase; color: #333333;">Step 2</span> <span style="font-family: &quot;IBM Plex Mono&quot;, monospace; font-size: smaller;">(active_check)</span> Step skipped — Column check failed: missing column(s) <code>z</code>.</p></td>
+  </tr>
 
+</tfoot>
 
 </table>
 
@@ -478,7 +486,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 <p>The first step ran because column <code>a</code> exists. The second step was skipped because column <code>z</code> is missing, and the report note explains which column was not found.</p>
 <p>When checking for multiple columns, the step is only active when <em>all</em> columns are present:</p>
-<div id="3167650f" class="cell" data-execution_count="3">
+<div id="fc13a818" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_gt(columns<span class="op">=</span><span class="st">"a"</span>, value<span class="op">=</span><span class="dv">0</span>, active<span class="op">=</span>pb.has_columns(<span class="st">"a"</span>, <span class="st">"b"</span>))</span>
@@ -662,7 +670,15 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     <td style="height: 40px; background-color: #F2F2F2;" class="gt_row gt_center">—</td>
   </tr>
 </tbody>
+  <tfoot class="gt_sourcenotes">
+  
+  <tr>
+    <td class="gt_sourcenote" colspan="14" style="text-align: left;"><hr style="border: none; border-top-width: 1px; border-top-style: dotted; border-top-color: #B5B5B5; margin-top: -3px; margin-bottom: 3px;">
+<strong>Notes</strong>
+<p><span style="font-variant: small-caps; font-weight: bold; font-size: smaller; text-transform: uppercase; color: #333333;">Step 2</span> <span style="font-family: &quot;IBM Plex Mono&quot;, monospace; font-size: smaller;">(active_check)</span> Step skipped — Column check failed: missing column(s) <code>x</code>, <code>y</code>.</p></td>
+  </tr>
 
+</tfoot>
 
 </table>
 
@@ -672,7 +688,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 <p>The first step is active because both <code>a</code> and <code>b</code> exist. The second step is skipped because <code>x</code> and <code>y</code> are missing.</p>
 <p>Column names can also be provided as a list:</p>
-<div id="241e0ecb" class="cell" data-execution_count="4">
+<div id="19a7272d" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_gt(columns<span class="op">=</span><span class="st">"a"</span>, value<span class="op">=</span><span class="dv">0</span>, active<span class="op">=</span>pb.has_columns([<span class="st">"a"</span>, <span class="st">"b"</span>]))</span>

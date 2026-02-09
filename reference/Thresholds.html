@@ -271,19 +271,19 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
         border-radius: 2px;
     ">
 <p>In a data validation workflow, you can set thresholds for the number of failing test units at different levels. For example, you can set a threshold for the ‘warning’ level when the number of failing test units exceeds 10% of the total number of test units:</p>
-<div id="fdb0b2ea" class="cell" data-execution_count="2">
+<div id="648acddb" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>thresholds_1 <span class="op">=</span> pb.Thresholds(warning<span class="op">=</span><span class="fl">0.1</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>You can also set thresholds for the ‘error’ and ‘critical’ levels:</p>
-<div id="045c0902" class="cell" data-execution_count="3">
+<div id="d2bbcde4" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>thresholds_2 <span class="op">=</span> pb.Thresholds(warning<span class="op">=</span><span class="fl">0.1</span>, error<span class="op">=</span><span class="fl">0.2</span>, critical<span class="op">=</span><span class="fl">0.05</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Thresholds can also be set as absolute counts. Here’s an example where the ‘warning’ level is set to <code>5</code> failing test units:</p>
-<div id="d8a1bbaf" class="cell" data-execution_count="4">
+<div id="75218105" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>thresholds_3 <span class="op">=</span> pb.Thresholds(warning<span class="op">=</span><span class="dv">5</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>The <code>thresholds</code> object can be used to set global thresholds for all validation steps. Or, you can set thresholds for individual validation steps, which will override the global thresholds. Here’s a data validation workflow example where we set global thresholds and then override with different thresholds at the <a href="../reference/Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt"><code>col_vals_gt()</code></a> step:</p>
-<div id="cd90977c" class="cell" data-execution_count="5">
+<div id="d99b416c" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>        data<span class="op">=</span>pb.load_dataset(dataset<span class="op">=</span><span class="st">"small_table"</span>),</span>
@@ -522,7 +522,15 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     <td style="height: 40px;" class="gt_row gt_center"><a href="data:text/csv;base64,X3Jvd19udW1fLGRhdGVfdGltZSxkYXRlLGEsYixjLGQsZSxmCjEsMjAxNi0wMS0wNFQxMTowMDowMC4wMDAwMDAsMjAxNi0wMS0wNCwyLDEtYmNkLTM0NSwzLDM0MjMuMjksdHJ1ZSxoaWdoCjIsMjAxNi0wMS0wNFQwMDozMjowMC4wMDAwMDAsMjAxNi0wMS0wNCwzLDUtZWdoLTE2Myw4LDk5OTkuOTksdHJ1ZSxsb3cKNCwyMDE2LTAxLTA2VDE3OjIzOjAwLjAwMDAwMCwyMDE2LTAxLTA2LDIsNS1qZG8tOTAzLCwzODkyLjQsZmFsc2UsbWlkCjksMjAxNi0wMS0yMFQwNDozMDowMC4wMDAwMDAsMjAxNi0wMS0yMCwzLDUtYmNlLTY0Miw5LDgzNy45MyxmYWxzZSxoaWdoCjEwLDIwMTYtMDEtMjBUMDQ6MzA6MDAuMDAwMDAwLDIwMTYtMDEtMjAsMyw1LWJjZS02NDIsOSw4MzcuOTMsZmFsc2UsaGlnaAoxMiwyMDE2LTAxLTI4VDAyOjUxOjAwLjAwMDAwMCwyMDE2LTAxLTI4LDIsNy1kbXgtMDEwLDgsMTA4LjM0LGZhbHNlLGxvdwoxMywyMDE2LTAxLTMwVDExOjIzOjAwLjAwMDAwMCwyMDE2LTAxLTMwLDEsMy1ka2EtMzAzLCwyMjMwLjA5LHRydWUsaGlnaAo=" download="extract_0003.csv"><button style="background-color: #67C2DC; color: #FFFFFF; border: none; padding: 5px; font-weight: bold; cursor: pointer; border-radius: 4px;">CSV</button></a></td>
   </tr>
 </tbody>
+  <tfoot class="gt_sourcenotes">
+  
+  <tr>
+    <td class="gt_sourcenote" colspan="14" style="text-align: left;"><hr style="border: none; border-top-width: 1px; border-top-style: dotted; border-top-color: #B5B5B5; margin-top: -3px; margin-bottom: 3px;">
+<strong>Notes</strong>
+<p><span style="font-variant: small-caps; font-weight: bold; font-size: smaller; text-transform: uppercase; color: #333333;">Step 3</span> <span style="font-family: &quot;IBM Plex Mono&quot;, monospace; font-size: smaller;">(local_thresholds)</span> Step-specific thresholds set with <span style="font-family: monospace;"><span style="color: #AAAAAA; font-weight: bold;">W</span>:5</span>.</p></td>
+  </tr>
 
+</tfoot>
 
 </table>
 
