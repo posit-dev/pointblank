@@ -45,6 +45,7 @@ from pointblank.field import (
     time_field,
 )
 from pointblank.generate.base import GeneratorConfig
+from pointblank.inspect import has_columns, has_rows
 from pointblank.schema import Schema, generate_dataset
 from pointblank.segments import seg_group
 from pointblank.thresholds import Actions, FinalActions, Thresholds
@@ -128,6 +129,9 @@ __all__ = [
     "GeneratorConfig",
     # Data generation - convenience function
     "generate_dataset",
+    # Table inspection functions (for use with `active=`)
+    "has_columns",
+    "has_rows",
     # YAML functionality
     "yaml_interrogate",
     "validate_yaml",
