@@ -97,3 +97,49 @@ def has_columns(*columns: str | list[str]) -> Callable[[Any], bool]:
     ```
     """
 
+    # Flatten: accept a mix of individual strings and lists of strings
+    flat_columns: list[str] = []
+    for c in columns:
+        if isinstance(c, str):
+            flat_columns.append(c)
+        elif isinstance(c, list):
+            for item in c:
+                if not isinstance(item, str):
+                    raise TypeError(
+                        "Column names provided to `has_columns()` must be strings, "
+                        f"got {type(item).__name__} inside a list."
+                    )
+                flat_columns.append(item)
+        else:
+            raise TypeError(
+                f"Column names provided to `has_columns()` must be strings or lists of strings, "
+                f"got {type(c).__name__}."
+            )
+
+    if len(flat_columns) == 0:
+        raise ValueError("At least one column name must be provided to `has_columns()`.")
+
+    columns = tuple(flat_columns)
+
+    def _check(tbl: Any) -> bool:
+        import narwhals as nw
+
+        tbl_nw = nw.from_native(tbl)
+        tbl_columns = set(tbl_nw.columns)
+        result = all(col in tbl_columns for col in columns)
+
+        if not result:
+            missing = sorted(col for col in columns if col not in tbl_columns)
+            _check._reason = {
+                "key": "active_check_missing_columns",
+                "params": {"columns": missing},
+            }
+        else:
+            _check._reason = None
+
+        return result
+
+    _check._reason = None
+    return _check
+
+
