@@ -13469,7 +13469,6 @@ class Validate:
             if validation.pre is not None:
                 try:
                     # Capture original table dimensions before preprocessing
-                    # Use get_row_count() instead of len() for compatibility with PySpark, etc.
                     original_rows = get_row_count(data_tbl_step)
                     original_cols = get_column_count(data_tbl_step)
                     original_column_names = set(
@@ -13531,6 +13530,7 @@ class Validate:
                             processed_rows=processed_rows,
                             processed_cols=processed_cols,
                         )
+
                     else:
                         # No dimension change - just indicate preprocessing was applied
                         note_html = _create_preprocessing_no_change_note_html(locale=self.locale)
@@ -22868,9 +22868,14 @@ def _generate_agg_docstring(name: str) -> str:
         levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
         define the actions.
     active
-        A boolean value indicating whether the validation step should be active. Using `False`
-        will make the validation step inactive (still reporting its presence and keeping indexes
-        for the steps unchanged).
+        A boolean value or callable that determines whether the validation step should be
+        active. Using `False` will make the validation step inactive (still reporting its
+        presence and keeping indexes for the steps unchanged). A callable can also be
+        provided; it will receive the data table as its single argument and must return a
+        boolean value. The callable is evaluated *before* any `pre=` processing.
+        Inspection functions like [`has_columns()`](`pointblank.has_columns`) and
+        [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate
+        a step based on properties of the target table.
 
     Returns
     -------
