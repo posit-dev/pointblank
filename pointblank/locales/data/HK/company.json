@@ -1,0 +1,69 @@
+{
+  "suffixes": [
+    "Limited", "Ltd", "Holdings", "Group", "International", "Corporation", "Corp", "Enterprises",
+    "Company", "Co", "Trading", "Investment", "Development", "Services", "Solutions", "Technology"
+  ],
+  "formats": [
+    "{last_name} {suffix}",
+    "{adjective} {noun} {suffix}",
+    "{adjective} {noun}",
+    "{noun} {suffix}"
+  ],
+  "adjectives": [
+    "Global", "International", "Pacific", "Asian", "Oriental", "Eastern", "Golden", "Silver", "Royal", "Premier",
+    "United", "Allied", "Crown", "Dragon", "Phoenix", "Star", "Fortune", "Prosperity", "Victory", "Harmony",
+    "Dynamic", "Innovative", "Strategic", "Leading", "Elite", "Prime", "Superior", "Advanced", "Modern", "Smart"
+  ],
+  "nouns": [
+    "Trading", "Investment", "Finance", "Capital", "Properties", "Development", "Construction", "Engineering",
+    "Manufacturing", "Electronics", "Technology", "Solutions", "Services", "Logistics", "Shipping", "Transport",
+    "Import Export", "Retail", "Wholesale", "Food", "Textile", "Jewelry", "Securities", "Insurance", "Consulting"
+  ],
+  "well_known_companies": [
+    {"name": "HSBC", "cities": ["Central", "Admiralty", "Tsim Sha Tsui", "Mong Kok", "Sha Tin"]},
+    {"name": "Hang Seng Bank", "cities": ["Central", "Wan Chai", "Tsim Sha Tsui", "Mong Kok", "Kwun Tong"]},
+    {"name": "Bank of China Hong Kong", "cities": ["Central", "Admiralty", "Tsim Sha Tsui", "Mong Kok"]},
+    {"name": "Standard Chartered", "cities": ["Central", "Admiralty", "Tsim Sha Tsui"]},
+    {"name": "CK Hutchison", "cities": ["Central", "Tsim Sha Tsui", "Quarry Bay"]},
+    {"name": "Sun Hung Kai Properties", "cities": ["Central", "Wan Chai", "Tsim Sha Tsui", "Sha Tin"]},
+    {"name": "New World Development", "cities": ["Central", "Tsim Sha Tsui", "Kwun Tong"]},
+    {"name": "Henderson Land", "cities": ["Central", "Wan Chai", "Mong Kok"]},
+    {"name": "Swire Properties", "cities": ["Central", "Admiralty", "Quarry Bay", "Tai Koo"]},
+    {"name": "Cathay Pacific", "cities": ["Central", "Admiralty", "Tung Chung"]},
+    {"name": "MTR Corporation", "cities": ["Central", "Admiralty", "Kowloon City", "Sha Tin"]},
+    {"name": "Hong Kong Exchanges", "cities": ["Central", "Admiralty"]},
+    {"name": "AIA Group", "cities": ["Central", "Wan Chai", "Tsim Sha Tsui"]},
+    {"name": "Link REIT", "cities": ["Central", "Wan Chai", "Kwun Tong", "Sha Tin"]},
+    {"name": "CLP Holdings", "cities": ["Kowloon City", "Hung Hom"]},
+    {"name": "HK Electric", "cities": ["Central", "Wan Chai"]},
+    {"name": "Jardine Matheson", "cities": ["Central", "Quarry Bay"]},
+    {"name": "Wharf Holdings", "cities": ["Central", "Tsim Sha Tsui", "Hung Hom"]},
+    {"name": "Galaxy Entertainment", "cities": ["Central", "Wan Chai"]},
+    {"name": "Techtronic Industries", "cities": ["Kwai Chung", "Kwun Tong"]},
+    {"name": "Lenovo", "cities": ["Quarry Bay", "Kwun Tong"]},
+    {"name": "Li & Fung", "cities": ["Central", "Kwun Tong"]},
+    {"name": "Dairy Farm", "cities": ["Central", "Quarry Bay"]},
+    {"name": "Mandarin Oriental", "cities": ["Central", "Admiralty"]},
+    {"name": "Shangri-La Hotels", "cities": ["Central", "Admiralty", "Tsim Sha Tsui"]}
+  ],
+  "jobs": [
+    "Software Engineer", "Product Manager", "Data Analyst", "Marketing Manager", "Sales Representative",
+    "HR Manager", "Financial Analyst", "Project Manager", "Operations Manager", "UI/UX Designer",
+    "Frontend Developer", "Backend Developer", "QA Engineer", "DevOps Engineer", "Data Scientist",
+    "Investment Banker", "Fund Manager", "Risk Analyst", "Compliance Officer", "Auditor",
+    "Account Manager", "Business Development Manager", "Trade Finance Specialist", "Logistics Coordinator",
+    "Property Agent", "Interior Designer", "Architect", "Quantity Surveyor", "Legal Counsel", "Paralegal"
+  ],
+  "catch_phrase_adjectives": [
+    "Innovative", "Leading", "Dynamic", "Professional", "Reliable", "Trusted", "Premier", "Excellence",
+    "World-class", "Customer-focused", "Results-driven", "Forward-thinking", "Strategic", "Agile"
+  ],
+  "catch_phrase_nouns": [
+    "solutions", "services", "partnerships", "excellence", "growth", "success", "value", "innovation",
+    "opportunities", "results", "performance", "quality", "integrity", "commitment"
+  ],
+  "catch_phrase_verbs": [
+    "deliver", "create", "drive", "build", "enable", "empower", "transform", "achieve", "maximize",
+    "optimize", "accelerate", "enhance", "unlock", "connect", "lead"
+  ]
+}

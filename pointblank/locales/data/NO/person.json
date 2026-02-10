@@ -1,0 +1,17 @@
+{
+  "first_names": {
+    "male": ["Ole", "Lars", "Erik", "Per", "Knut", "Hans", "Jan", "Bjørn", "Anders", "Magnus", "Olav", "Tor", "Arne", "Geir", "Svein", "Harald", "Odd", "Leif", "Gunnar", "Trond", "Nils", "Rune", "Morten", "Espen", "Stian", "Thomas", "Martin", "Kristoffer", "Jonas", "Sindre", "Håkon", "Øyvind", "Petter", "Vegard", "Eirik", "Henrik", "Emil", "Sondre", "Fredrik", "Marius"],
+    "female": ["Anne", "Maria", "Ingrid", "Kari", "Liv", "Astrid", "Marit", "Hilde", "Silje", "Kristin", "Berit", "Grete", "Randi", "Solveig", "Sigrid", "Inger", "Turid", "Bente", "Tove", "Helene", "Nina", "Camilla", "Hege", "Marianne", "Elisabeth", "Eva", "Ida", "Thea", "Nora", "Emma", "Sofie", "Sara", "Julie", "Emilie", "Martine", "Maren", "Vilde", "Andrea", "Frida", "Lene"],
+    "neutral": ["Kim", "Robin", "Inge", "Tonny", "Janne", "Sandy", "Alex", "Charlie", "Jo", "Vidar"]
+  },
+  "last_names": ["Hansen", "Johansen", "Olsen", "Larsen", "Andersen", "Pedersen", "Nilsen", "Kristiansen", "Jensen", "Karlsen", "Johnsen", "Pettersen", "Eriksen", "Berg", "Haugen", "Hagen", "Johannessen", "Andreassen", "Jacobsen", "Dahl", "Halvorsen", "Henriksen", "Lund", "Sørensen", "Lie", "Moe", "Gundersen", "Iversen", "Strand", "Solberg", "Bakken", "Holm", "Martinsen", "Eide", "Christensen", "Amundsen", "Hauge", "Brekke", "Moen", "Aas"],
+  "name_formats": [
+    "{first_name} {last_name}"
+  ],
+  "prefixes": {
+    "male": ["Hr."],
+    "female": ["Fru", "Frøken"],
+    "neutral": ["Hr.", "Fru"]
+  },
+  "suffixes": ["jr.", "sr."]
+}

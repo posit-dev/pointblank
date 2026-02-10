@@ -1,0 +1,55 @@
+{
+  "first_names": {
+    "male": [
+      "Jack", "James", "Noah", "Daniel", "Conor", "Adam", "Liam", "Charlie", "Luke", "Harry",
+      "Michael", "Sean", "Patrick", "Cian", "Oisín", "Darragh", "Fionn", "Tadhg", "Cillian", "Ryan",
+      "Aaron", "Dylan", "Evan", "Jamie", "Alex", "Finn", "Ben", "Thomas", "Matthew", "Ethan",
+      "David", "John", "Rory", "Callum", "Shane", "Kevin", "Brian", "Cathal", "Eoin", "Niall",
+      "Seán", "Pádraic", "Dara", "Declan", "Cormac", "Aidan", "Brendan", "Colm", "Diarmuid", "Donnacha",
+      "Éamonn", "Fergal", "Fergus", "Gerard", "Killian", "Lorcan", "Malachy", "Micheál", "Odhrán", "Pearse",
+      "Proinsias", "Ronan", "Ruairí", "Seamus", "Tomás", "Ultan", "Ciarán", "Domhnall", "Éanna", "Fearghal",
+      "Gearóid", "Lorcán", "Naoise", "Odhran", "Pádraig", "Peadar", "Rían", "Tiernan", "Barry", "Denis",
+      "Donal", "Eoghan", "Fintan", "Gavin", "Hugh", "Joseph", "Kenneth", "Martin", "Neil", "Oliver",
+      "Paul", "Peter", "Raymond", "Robert", "Stephen", "Timothy", "Vincent", "William"
+    ],
+    "female": [
+      "Emily", "Emma", "Sophie", "Amelia", "Grace", "Mia", "Ella", "Hannah", "Lucy", "Chloe",
+      "Aoife", "Saoirse", "Caoimhe", "Niamh", "Ciara", "Róisín", "Áine", "Siobhán", "Clodagh", "Aisling",
+      "Sarah", "Anna", "Katie", "Jessica", "Rachel", "Ava", "Lily", "Lauren", "Leah", "Holly",
+      "Molly", "Fiona", "Sinéad", "Maeve", "Orla", "Eimear", "Gráinne", "Sorcha", "Méabh", "Ailbhe",
+      "Bridget", "Catherine", "Deirdre", "Eileen", "Geraldine", "Kathleen", "Margaret", "Mary", "Maureen", "Patricia",
+      "Tara", "Nuala", "Bríd", "Una", "Emer", "Neasa", "Muireann", "Laoise", "Sadhbh", "Alannah",
+      "Aoibhín", "Bláithín", "Catriona", "Dáiríne", "Eithne", "Fionnuala", "Gormlaith", "Íde", "Líadan", "Meadhbh",
+      "Naomh", "Oonagh", "Peig", "Riona", "Saorla", "Siún", "Treasa", "Úna", "Yvonne", "Zara",
+      "Alice", "Brenda", "Caroline", "Deborah", "Eleanor", "Frances", "Helen", "Jennifer", "Karen", "Linda",
+      "Michelle", "Nicola", "Olivia", "Paula", "Rebecca", "Sandra", "Teresa", "Valerie", "Wendy", "Zoe"
+    ],
+    "neutral": [
+      "Alex", "Jamie", "Jordan", "Casey", "Morgan", "Riley", "Taylor", "Quinn", "Rowan", "Avery",
+      "Kerry", "Shannon", "Pat", "Chris", "Sam", "Finley", "Reese", "Sage", "Sky", "Phoenix"
+    ]
+  },
+  "last_names": [
+    "Murphy", "Kelly", "O'Sullivan", "Walsh", "Smith", "O'Brien", "Byrne", "Ryan", "O'Connor", "O'Neill",
+    "Doyle", "McCarthy", "Gallagher", "O'Reilly", "Doherty", "Kennedy", "Lynch", "Murray", "Quinn", "Moore",
+    "McLoughlin", "Carroll", "Connolly", "Daly", "O'Connell", "Wilson", "Dunne", "Brennan", "Burke", "Collins",
+    "Campbell", "Clarke", "Johnston", "Hughes", "O'Farrell", "Fitzgerald", "Brown", "Martin", "Maguire", "Nolan",
+    "Flynn", "Thompson", "O'Callaghan", "O'Donnell", "Duffy", "O'Mahony", "Boyle", "Healy", "O'Shea", "White",
+    "Sweeney", "Hayes", "Kavanagh", "Power", "O'Hara", "McGrath", "Moran", "Brady", "Stewart", "Casey", "Foley",
+    "Fitzpatrick", "O'Leary", "McDonnell", "MacMahon", "Donnelly", "Regan", "Donovan", "Burns", "Flanagan", "Mullan",
+    "Barry", "Kane", "Robinson", "Cunningham", "Griffin", "Kenny", "Sheehan", "Ward", "Whelan", "Lyons",
+    "Reid", "Graham", "Higgins", "Cullen", "Keane", "King", "Maher", "MacKenna", "Bell", "Scott", "Ó Cíosóig",
+    "Hogan", "O'Keeffe", "Magee", "MacNamara", "MacCarthy", "Buckley", "O'Dwyer", "Crowley", "O'Rourke", "Long"
+  ],
+  "name_formats": [
+    "{first_name} {last_name}",
+    "{prefix} {first_name} {last_name}",
+    "{first_name} {last_name} {suffix}"
+  ],
+  "prefixes": {
+    "male": ["Mr", "Dr", "Fr", "Rev", "Prof"],
+    "female": ["Ms", "Mrs", "Miss", "Dr", "Sr", "Prof"],
+    "neutral": ["Dr", "Prof"]
+  },
+  "suffixes": ["Jr", "Sr", "TD", "SC", "BL", "PhD", "MD"]
+}

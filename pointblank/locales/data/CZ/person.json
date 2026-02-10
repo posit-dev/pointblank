@@ -1,0 +1,40 @@
+{
+  "first_names": {
+    "male": [
+      "Jan", "Petr", "Jiri", "Josef", "Pavel", "Martin", "Tomas", "Jaroslav", "Miroslav", "Zdenek",
+      "Frantisek", "Vaclav", "Karel", "Milan", "Michal", "Lukas", "Ondrej", "Jakub", "David", "Filip",
+      "Adam", "Vojtech", "Matej", "Daniel", "Marek", "Radek", "Stanislav", "Roman", "Ladislav", "Vladimir",
+      "Ivan", "Libor", "Ales", "Jozef", "Patrik", "Robert", "Richard", "Viktor", "Dominik", "Stepan",
+      "Antonin", "Bohumil", "Vlastimil", "Jindrich", "Dusan", "Oldrich", "Radim", "Kamil", "Igor", "Rostislav",
+      "Lubomir", "Dalibor", "Bretislav", "Premysl", "Svatopluk", "Vilem", "Emanuel", "Rudolf", "Bedrich", "Leopold"
+    ],
+    "female": [
+      "Marie", "Jana", "Eva", "Hana", "Anna", "Lenka", "Katerina", "Lucie", "Vera", "Alena",
+      "Petra", "Veronika", "Jitka", "Martina", "Michaela", "Tereza", "Jaroslava", "Ivana", "Zuzana", "Monika",
+      "Barbora", "Marketa", "Klara", "Simona", "Gabriela", "Nikola", "Karolina", "Kristyna", "Pavla", "Denisa",
+      "Romana", "Helena", "Irena", "Ludmila", "Dagmar", "Blanka", "Renata", "Daniela", "Sarka", "Andrea",
+      "Jarmila", "Bozena", "Milada", "Stanislava", "Drahomira", "Vlasta", "Radka", "Vendula", "Adela", "Natalie",
+      "Olga", "Erika", "Kamila", "Silvie", "Zdenka", "Marta", "Jirina", "Emilie", "Libuse", "Kveta"
+    ],
+    "neutral": ["Alex", "Nikola", "Sasa", "Dominik", "Patrik", "Robin", "Kim", "Dana", "Milan", "Jirka"]
+  },
+  "last_names": [
+    "Novak", "Novakova", "Svoboda", "Svobodova", "Novotny", "Novotna", "Dvorak", "Dvorakova", "Cerny", "Cerna",
+    "Prochazka", "Prochazkova", "Kucera", "Kucerova", "Vesely", "Vesela", "Horak", "Horakova", "Nemec", "Nemcova",
+    "Marek", "Markova", "Pospisil", "Pospisilova", "Hajek", "Hajkova", "Jelinek", "Jelinkova", "Kral", "Kralova",
+    "Ruzicka", "Ruzickova", "Benes", "Benesova", "Fiala", "Fialova", "Sedlacek", "Sedlackova", "Zeman", "Zemanova",
+    "Pokorny", "Pokorna", "Kolar", "Kolarova", "Urban", "Urbanova", "Holub", "Holubova", "Vanek", "Vankova",
+    "Blaha", "Blahova", "Kopecky", "Kopecka", "Vlcek", "Vlckova", "Maly", "Mala", "Kratky", "Kratka",
+    "Kadlec", "Kadlecova", "Bartos", "Bartosova", "Dolezal", "Dolezalova", "Sykora", "Sykorova", "Pavlik", "Pavlikova",
+    "Havlicek", "Havlickova", "Hruska", "Hruskova", "Kovar", "Kovarova", "Soukup", "Soukupova", "Polak", "Polakova"
+  ],
+  "name_formats": [
+    "{first_name} {last_name}"
+  ],
+  "prefixes": {
+    "male": ["Pan", "Dr.", "Ing.", "Prof.", "Mgr.", "Bc."],
+    "female": ["Pani", "Dr.", "Ing.", "Prof.", "Mgr.", "Bc."],
+    "neutral": ["Dr.", "Ing.", "Prof.", "Mgr.", "Bc."]
+  },
+  "suffixes": ["Ph.D.", "CSc.", "MBA", "DiS."]
+}

@@ -302,6 +302,41 @@ pb run validation.yaml --exit-code
 pb run validation.py --exit-code
 ```
 
+## Genereer Realistische Testdata
+
+Testdata nodig voor je validatieworkflows? De functie `generate_dataset()` creëert realistische, locale-bewuste synthetische data op basis van schemadefinities. Zeer nuttig voor het ontwikkelen van pipelines zonder productiedata, het uitvoeren van CI/CD-tests met reproduceerbare scenario's, of het prototypen van workflows voordat productiedata beschikbaar is.
+
+```python
+import pointblank as pb
+
+# Definieer een schema met veldbeperkingen
+schema = pb.Schema(
+    user_id=pb.int_field(min_val=1, unique=True),
+    name=pb.string_field(preset="name"),
+    email=pb.string_field(preset="email"),
+    age=pb.int_field(min_val=18, max_val=100),
+    status=pb.string_field(allowed=["active", "pending", "inactive"]),
+)
+
+# Genereer 100 rijen realistische testdata
+data = pb.generate_dataset(schema, n=100, seed=23)
+```
+
+| user_id             | name             | email                       | age | status   |
+|---------------------|------------------|-----------------------------|-----|----------|
+| 7188536481533917197 | Vivienne Rios    | vrios27@hotmail.com         | 55  | pending  |
+| 2674009078779859984 | William Schaefer | wschaefer28@yandex.com      | 28  | active   |
+| 7652102777077138151 | Lily Hansen      | lily779@aol.com             | 20  | active   |
+| 157503859921753049  | Shirley Mays     | shirley_mays@protonmail.com | 93  | inactive |
+| 2829213282471975080 | Sean Dawson      | sean_dawson@hotmail.com     | 57  | pending  |
+
+De generator ondersteunt geavanceerde datageneratie met deze mogelijkheden:
+
+- **Realistische data met presets**: Gebruik ingebouwde presets zoals `"name"`, `"email"`, `"address"`, `"phone"`, enz.
+- **Ondersteuning voor 50+ landen**: Genereer locale-specifieke data (bijv. `country="DE"` voor Duitse adressen)
+- **Veldbeperkingen**: Beheer bereiken, patronen, uniciteit en toegestane waarden
+- **Meerdere uitvoerformaten**: Retourneert standaard Polars DataFrames, maar ondersteunt ook Pandas (`output="pandas"`) of dictionaries (`output="dict"`)
+
 ## Kenmerken die Pointblank onderscheiden
 
 - **Complete validatieworkflow**: Van datatoegang tot validatie tot rapportage in één pipeline

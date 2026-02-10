@@ -299,6 +299,41 @@ pb run validation.yaml --exit-code
 pb run validation.py --exit-code
 ```
 
+## 生成真实的测试数据
+
+需要测试数据来验证您的工作流程？`generate_dataset()` 函数基于模式定义创建真实的、支持本地化的合成数据。对于在没有生产数据的情况下开发管道、使用可重现的场景运行 CI/CD 测试，或在生产数据可用之前进行工作流原型设计非常有用。
+
+```python
+import pointblank as pb
+
+# 定义带有字段约束的模式
+schema = pb.Schema(
+    user_id=pb.int_field(min_val=1, unique=True),
+    name=pb.string_field(preset="name"),
+    email=pb.string_field(preset="email"),
+    age=pb.int_field(min_val=18, max_val=100),
+    status=pb.string_field(allowed=["active", "pending", "inactive"]),
+)
+
+# 生成 100 行真实的测试数据
+data = pb.generate_dataset(schema, n=100, seed=23)
+```
+
+| user_id             | name             | email                       | age | status   |
+|---------------------|------------------|-----------------------------|-----|----------|
+| 7188536481533917197 | Vivienne Rios    | vrios27@hotmail.com         | 55  | pending  |
+| 2674009078779859984 | William Schaefer | wschaefer28@yandex.com      | 28  | active   |
+| 7652102777077138151 | Lily Hansen      | lily779@aol.com             | 20  | active   |
+| 157503859921753049  | Shirley Mays     | shirley_mays@protonmail.com | 93  | inactive |
+| 2829213282471975080 | Sean Dawson      | sean_dawson@hotmail.com     | 57  | pending  |
+
+该生成器支持具有以下功能的复杂数据生成：
+
+- **使用预设的真实数据**：使用内置预设，如 `"name"`、`"email"`、`"address"`、`"phone"` 等
+- **支持 50+ 个国家/地区**：生成特定区域的数据（例如，`country="DE"` 用于德国地址）
+- **字段约束**：控制范围、模式、唯一性和允许的值
+- **多种输出格式**：默认返回 Polars DataFrame，也支持 Pandas（`output="pandas"`）或字典（`output="dict"`）
+
 ## Pointblank 的突出特点
 
 - **完整的验证工作流**: 在单个管道中从数据访问到验证再到报告

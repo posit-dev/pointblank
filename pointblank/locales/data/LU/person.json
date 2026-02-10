@@ -1,0 +1,38 @@
+{
+  "first_names": {
+    "male": [
+      "Jean", "Marc", "Pierre", "Michel", "Paul", "Claude", "François", "Patrick", "Luc", "Tom",
+      "Max", "Ben", "Léon", "Louis", "Felix", "Arthur", "Hugo", "Noah", "Luca", "David",
+      "Nicolas", "Julien", "Christophe", "Laurent", "Thierry", "Philippe", "Eric", "Alain", "André", "Robert",
+      "Georges", "Henri", "Jacques", "René", "Roger", "Fernand", "Lucien", "Émile", "Gilles", "Serge",
+      "Yves", "Daniel", "Guy", "Raymond", "Bernard", "Charles", "Léo", "Gabriel", "Raphaël", "Lucas",
+      "Mathis", "Maxime", "Alexandre", "Antoine", "Vincent", "Olivier", "Stéphane", "Pascal", "Christian", "Joël"
+    ],
+    "female": [
+      "Marie", "Anne", "Françoise", "Monique", "Nicole", "Catherine", "Isabelle", "Christine", "Sophie", "Nathalie",
+      "Martine", "Sylvie", "Chantal", "Jeanne", "Claire", "Emma", "Léa", "Chloé", "Manon", "Camille",
+      "Julie", "Laura", "Sarah", "Léonie", "Lina", "Mia", "Zoé", "Charlotte", "Alice", "Louise",
+      "Élise", "Margaux", "Céline", "Valérie", "Patricia", "Brigitte", "Jacqueline", "Denise", "Yvonne", "Madeleine",
+      "Thérèse", "Josette", "Simone", "Paulette", "Germaine", "Lucie", "Hélène", "Virginie", "Aurélie", "Émilie",
+      "Stéphanie", "Caroline", "Sandrine", "Véronique", "Florence", "Laurence", "Delphine", "Corinne", "Alexandra", "Élodie"
+    ],
+    "neutral": ["Alex", "Dominique", "Claude", "Camille", "Maxime", "Andrea", "Lou", "Charlie", "Sacha", "Morgan"]
+  },
+  "last_names": [
+    "Muller", "Weber", "Schmit", "Hoffmann", "Wagner", "Klein", "Becker", "Meyer", "Schneider", "Schmitz",
+    "Simon", "Majerus", "Welter", "Kieffer", "Reuter", "Peters", "Hansen", "Thill", "Mersch", "Diederich",
+    "Steffen", "Schroeder", "Braun", "Friedrich", "Kremer", "Reding", "Flammang", "Kirsch", "Jacoby", "Kayser",
+    "Lux", "Reckinger", "Faber", "Wolff", "Hess", "Scholtes", "Schiltz", "Weydert", "Franck", "Adam",
+    "Bernard", "Bertrand", "Clement", "Conter", "Dahm", "Dupont", "Engel", "Even", "Ferreira", "Fischer",
+    "Frieden", "Goergen", "Gonçalves", "Hamus", "Jung", "Kemp", "Lentz", "Mangen", "Meyers", "Pauly"
+  ],
+  "name_formats": [
+    "{first_name} {last_name}"
+  ],
+  "prefixes": {
+    "male": ["M.", "Dr.", "Prof.", "Maître", "Ing."],
+    "female": ["Mme", "Mlle", "Dr.", "Prof.", "Maître", "Ing."],
+    "neutral": ["Dr.", "Prof.", "Maître", "Ing."]
+  },
+  "suffixes": ["Jr.", "PhD", "MBA"]
+}

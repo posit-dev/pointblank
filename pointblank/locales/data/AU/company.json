@@ -1,0 +1,65 @@
+{
+  "suffixes": ["Pty Ltd", "Ltd", "Group", "Holdings", "Australia"],
+  "formats": [
+    "{last_name} {suffix}",
+    "{adjective} {noun} {suffix}",
+    "{noun} {suffix}",
+    "{last_name} & {last_name} {suffix}"
+  ],
+  "adjectives": [
+    "Australian", "National", "Central", "Pacific", "New",
+    "Modern", "International", "Regional", "Global", "Digital",
+    "Innovative", "Green", "Premium", "Elite", "Professional",
+    "Smart", "Creative", "Dynamic", "Strategic", "Southern"
+  ],
+  "nouns": [
+    "Technology", "Industries", "Trading", "Construction", "Property",
+    "Energy", "Finance", "Insurance", "Consulting", "Logistics",
+    "Pharmaceuticals", "Media", "IT", "Services", "Solutions",
+    "Systems", "Investments", "Holdings", "Partners", "Group"
+  ],
+  "well_known_companies": [
+    {"name": "BHP", "cities": ["Melbourne"]},
+    {"name": "Commonwealth Bank", "cities": ["Sydney"]},
+    {"name": "CSL", "cities": ["Melbourne"]},
+    {"name": "Westpac", "cities": ["Sydney"]},
+    {"name": "NAB", "cities": ["Melbourne"]},
+    {"name": "ANZ", "cities": ["Melbourne"]},
+    {"name": "Woolworths", "cities": ["Sydney"]},
+    {"name": "Wesfarmers", "cities": ["Perth"]},
+    {"name": "Macquarie Group", "cities": ["Sydney"]},
+    {"name": "Telstra", "cities": ["Melbourne"]},
+    {"name": "Rio Tinto", "cities": ["Melbourne"]},
+    {"name": "Fortescue Metals", "cities": ["Perth"]},
+    {"name": "Woodside", "cities": ["Perth"]},
+    {"name": "Transurban", "cities": ["Melbourne"]},
+    {"name": "Coles", "cities": ["Melbourne"]},
+    {"name": "Qantas", "cities": ["Sydney"]},
+    {"name": "Atlassian", "cities": ["Sydney"]},
+    {"name": "Canva", "cities": ["Sydney"]},
+    {"name": "Afterpay", "cities": ["Melbourne"]},
+    {"name": "Bluescope Steel", "cities": ["Wollongong"]}
+  ],
+  "jobs": [
+    "Software Developer", "Engineer", "Teacher", "Nurse", "Doctor",
+    "Lawyer", "Architect", "Designer", "Journalist", "Consultant",
+    "Accountant", "Sales Representative", "Project Manager", "Director", "Real Estate Agent",
+    "Electrician", "Carpenter", "Mechanic", "Chef", "Waiter",
+    "Police Officer", "Firefighter", "Hairdresser", "Dentist", "Physiotherapist"
+  ],
+  "catch_phrase_adjectives": [
+    "innovative", "sustainable", "professional", "dynamic", "creative",
+    "efficient", "reliable", "modern", "Australian", "green",
+    "quality", "global", "local", "smart", "digital"
+  ],
+  "catch_phrase_nouns": [
+    "solutions", "services", "quality", "innovation", "growth",
+    "partnership", "results", "values", "collaboration", "future",
+    "technology", "design", "strategy", "development", "success"
+  ],
+  "catch_phrase_verbs": [
+    "creates", "delivers", "develops", "drives", "builds",
+    "shapes", "inspires", "connects", "strengthens", "transforms",
+    "optimises", "achieves", "enables", "ensures", "promotes"
+  ]
+}

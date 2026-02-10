@@ -1,0 +1,713 @@
+{
+  "locations": [
+    {"city": "Tokyo", "state": "Tokyo", "state_abbr": "Tokyo", "postcode_prefix": "100", "lat_min": 35.52, "lat_max": 35.82, "lon_min": 139.56, "lon_max": 139.92},
+    {"city": "Shinjuku", "state": "Tokyo", "state_abbr": "Tokyo", "postcode_prefix": "160", "lat_min": 35.68, "lat_max": 35.72, "lon_min": 139.68, "lon_max": 139.72},
+    {"city": "Shibuya", "state": "Tokyo", "state_abbr": "Tokyo", "postcode_prefix": "150", "lat_min": 35.64, "lat_max": 35.68, "lon_min": 139.68, "lon_max": 139.72},
+    {"city": "Shinagawa", "state": "Tokyo", "state_abbr": "Tokyo", "postcode_prefix": "140", "lat_min": 35.60, "lat_max": 35.64, "lon_min": 139.72, "lon_max": 139.76},
+    {"city": "Ikebukuro", "state": "Tokyo", "state_abbr": "Tokyo", "postcode_prefix": "171", "lat_min": 35.72, "lat_max": 35.75, "lon_min": 139.70, "lon_max": 139.73},
+    {"city": "Ueno", "state": "Tokyo", "state_abbr": "Tokyo", "postcode_prefix": "110", "lat_min": 35.70, "lat_max": 35.73, "lon_min": 139.77, "lon_max": 139.80},
+    {"city": "Ginza", "state": "Tokyo", "state_abbr": "Tokyo", "postcode_prefix": "104", "lat_min": 35.66, "lat_max": 35.68, "lon_min": 139.76, "lon_max": 139.78},
+    {"city": "Akihabara", "state": "Tokyo", "state_abbr": "Tokyo", "postcode_prefix": "101", "lat_min": 35.69, "lat_max": 35.71, "lon_min": 139.77, "lon_max": 139.79},
+    {"city": "Roppongi", "state": "Tokyo", "state_abbr": "Tokyo", "postcode_prefix": "106", "lat_min": 35.65, "lat_max": 35.67, "lon_min": 139.72, "lon_max": 139.74},
+    {"city": "Nakano", "state": "Tokyo", "state_abbr": "Tokyo", "postcode_prefix": "164", "lat_min": 35.70, "lat_max": 35.72, "lon_min": 139.66, "lon_max": 139.68},
+    {"city": "Kichijoji", "state": "Tokyo", "state_abbr": "Tokyo", "postcode_prefix": "180", "lat_min": 35.70, "lat_max": 35.72, "lon_min": 139.57, "lon_max": 139.60},
+    {"city": "Hachioji", "state": "Tokyo", "state_abbr": "Tokyo", "postcode_prefix": "192", "lat_min": 35.63, "lat_max": 35.68, "lon_min": 139.30, "lon_max": 139.38},
+    {"city": "Machida", "state": "Tokyo", "state_abbr": "Tokyo", "postcode_prefix": "194", "lat_min": 35.53, "lat_max": 35.58, "lon_min": 139.43, "lon_max": 139.48},
+    {"city": "Tachikawa", "state": "Tokyo", "state_abbr": "Tokyo", "postcode_prefix": "190", "lat_min": 35.68, "lat_max": 35.72, "lon_min": 139.40, "lon_max": 139.44},
+    {"city": "Yokohama", "state": "Kanagawa", "state_abbr": "Kanagawa", "postcode_prefix": "220", "lat_min": 35.38, "lat_max": 35.52, "lon_min": 139.58, "lon_max": 139.75},
+    {"city": "Kawasaki", "state": "Kanagawa", "state_abbr": "Kanagawa", "postcode_prefix": "210", "lat_min": 35.50, "lat_max": 35.58, "lon_min": 139.68, "lon_max": 139.78},
+    {"city": "Sagamihara", "state": "Kanagawa", "state_abbr": "Kanagawa", "postcode_prefix": "252", "lat_min": 35.53, "lat_max": 35.60, "lon_min": 139.33, "lon_max": 139.43},
+    {"city": "Fujisawa", "state": "Kanagawa", "state_abbr": "Kanagawa", "postcode_prefix": "251", "lat_min": 35.33, "lat_max": 35.38, "lon_min": 139.45, "lon_max": 139.52},
+    {"city": "Yokosuka", "state": "Kanagawa", "state_abbr": "Kanagawa", "postcode_prefix": "238", "lat_min": 35.25, "lat_max": 35.32, "lon_min": 139.65, "lon_max": 139.72},
+    {"city": "Hiratsuka", "state": "Kanagawa", "state_abbr": "Kanagawa", "postcode_prefix": "254", "lat_min": 35.32, "lat_max": 35.37, "lon_min": 139.33, "lon_max": 139.38},
+    {"city": "Chigasaki", "state": "Kanagawa", "state_abbr": "Kanagawa", "postcode_prefix": "253", "lat_min": 35.32, "lat_max": 35.35, "lon_min": 139.40, "lon_max": 139.43},
+    {"city": "Kamakura", "state": "Kanagawa", "state_abbr": "Kanagawa", "postcode_prefix": "248", "lat_min": 35.30, "lat_max": 35.35, "lon_min": 139.52, "lon_max": 139.58},
+    {"city": "Osaka", "state": "Osaka", "state_abbr": "Osaka", "postcode_prefix": "530", "lat_min": 34.58, "lat_max": 34.78, "lon_min": 135.40, "lon_max": 135.58},
+    {"city": "Umeda", "state": "Osaka", "state_abbr": "Osaka", "postcode_prefix": "530", "lat_min": 34.70, "lat_max": 34.72, "lon_min": 135.48, "lon_max": 135.50},
+    {"city": "Namba", "state": "Osaka", "state_abbr": "Osaka", "postcode_prefix": "542", "lat_min": 34.66, "lat_max": 34.68, "lon_min": 135.50, "lon_max": 135.52},
+    {"city": "Shinsaibashi", "state": "Osaka", "state_abbr": "Osaka", "postcode_prefix": "542", "lat_min": 34.67, "lat_max": 34.69, "lon_min": 135.49, "lon_max": 135.51},
+    {"city": "Tennoji", "state": "Osaka", "state_abbr": "Osaka", "postcode_prefix": "543", "lat_min": 34.64, "lat_max": 34.66, "lon_min": 135.51, "lon_max": 135.53},
+    {"city": "Sakai", "state": "Osaka", "state_abbr": "Osaka", "postcode_prefix": "590", "lat_min": 34.53, "lat_max": 34.60, "lon_min": 135.45, "lon_max": 135.52},
+    {"city": "Higashiosaka", "state": "Osaka", "state_abbr": "Osaka", "postcode_prefix": "577", "lat_min": 34.65, "lat_max": 34.70, "lon_min": 135.57, "lon_max": 135.63},
+    {"city": "Hirakata", "state": "Osaka", "state_abbr": "Osaka", "postcode_prefix": "573", "lat_min": 34.80, "lat_max": 34.85, "lon_min": 135.63, "lon_max": 135.68},
+    {"city": "Toyonaka", "state": "Osaka", "state_abbr": "Osaka", "postcode_prefix": "560", "lat_min": 34.77, "lat_max": 34.82, "lon_min": 135.45, "lon_max": 135.50},
+    {"city": "Suita", "state": "Osaka", "state_abbr": "Osaka", "postcode_prefix": "564", "lat_min": 34.75, "lat_max": 34.80, "lon_min": 135.50, "lon_max": 135.55},
+    {"city": "Takatsuki", "state": "Osaka", "state_abbr": "Osaka", "postcode_prefix": "569", "lat_min": 34.83, "lat_max": 34.87, "lon_min": 135.60, "lon_max": 135.65},
+    {"city": "Nagoya", "state": "Aichi", "state_abbr": "Aichi", "postcode_prefix": "450", "lat_min": 35.10, "lat_max": 35.25, "lon_min": 136.85, "lon_max": 137.02},
+    {"city": "Sakae", "state": "Aichi", "state_abbr": "Aichi", "postcode_prefix": "460", "lat_min": 35.16, "lat_max": 35.18, "lon_min": 136.90, "lon_max": 136.92},
+    {"city": "Toyota", "state": "Aichi", "state_abbr": "Aichi", "postcode_prefix": "471", "lat_min": 35.05, "lat_max": 35.12, "lon_min": 137.13, "lon_max": 137.20},
+    {"city": "Okazaki", "state": "Aichi", "state_abbr": "Aichi", "postcode_prefix": "444", "lat_min": 34.93, "lat_max": 35.00, "lon_min": 137.15, "lon_max": 137.22},
+    {"city": "Ichinomiya", "state": "Aichi", "state_abbr": "Aichi", "postcode_prefix": "491", "lat_min": 35.28, "lat_max": 35.33, "lon_min": 136.78, "lon_max": 136.83},
+    {"city": "Toyohashi", "state": "Aichi", "state_abbr": "Aichi", "postcode_prefix": "440", "lat_min": 34.75, "lat_max": 34.82, "lon_min": 137.37, "lon_max": 137.45},
+    {"city": "Kasugai", "state": "Aichi", "state_abbr": "Aichi", "postcode_prefix": "486", "lat_min": 35.23, "lat_max": 35.28, "lon_min": 136.95, "lon_max": 137.00},
+    {"city": "Anjo", "state": "Aichi", "state_abbr": "Aichi", "postcode_prefix": "446", "lat_min": 34.95, "lat_max": 35.00, "lon_min": 137.07, "lon_max": 137.12},
+    {"city": "Sapporo", "state": "Hokkaido", "state_abbr": "Hokkaido", "postcode_prefix": "060", "lat_min": 42.97, "lat_max": 43.15, "lon_min": 141.22, "lon_max": 141.48},
+    {"city": "Susukino", "state": "Hokkaido", "state_abbr": "Hokkaido", "postcode_prefix": "064", "lat_min": 43.05, "lat_max": 43.07, "lon_min": 141.35, "lon_max": 141.37},
+    {"city": "Hakodate", "state": "Hokkaido", "state_abbr": "Hokkaido", "postcode_prefix": "040", "lat_min": 41.75, "lat_max": 41.82, "lon_min": 140.72, "lon_max": 140.78},
+    {"city": "Asahikawa", "state": "Hokkaido", "state_abbr": "Hokkaido", "postcode_prefix": "070", "lat_min": 43.75, "lat_max": 43.82, "lon_min": 142.35, "lon_max": 142.42},
+    {"city": "Obihiro", "state": "Hokkaido", "state_abbr": "Hokkaido", "postcode_prefix": "080", "lat_min": 42.90, "lat_max": 42.95, "lon_min": 143.18, "lon_max": 143.23},
+    {"city": "Kushiro", "state": "Hokkaido", "state_abbr": "Hokkaido", "postcode_prefix": "085", "lat_min": 42.97, "lat_max": 43.02, "lon_min": 144.37, "lon_max": 144.42},
+    {"city": "Otaru", "state": "Hokkaido", "state_abbr": "Hokkaido", "postcode_prefix": "047", "lat_min": 43.18, "lat_max": 43.22, "lon_min": 140.98, "lon_max": 141.02},
+    {"city": "Kitami", "state": "Hokkaido", "state_abbr": "Hokkaido", "postcode_prefix": "090", "lat_min": 43.80, "lat_max": 43.85, "lon_min": 143.88, "lon_max": 143.93},
+    {"city": "Tomakomai", "state": "Hokkaido", "state_abbr": "Hokkaido", "postcode_prefix": "053", "lat_min": 42.62, "lat_max": 42.67, "lon_min": 141.58, "lon_max": 141.63},
+    {"city": "Fukuoka", "state": "Fukuoka", "state_abbr": "Fukuoka", "postcode_prefix": "810", "lat_min": 33.55, "lat_max": 33.70, "lon_min": 130.32, "lon_max": 130.48},
+    {"city": "Tenjin", "state": "Fukuoka", "state_abbr": "Fukuoka", "postcode_prefix": "810", "lat_min": 33.58, "lat_max": 33.60, "lon_min": 130.38, "lon_max": 130.40},
+    {"city": "Hakata", "state": "Fukuoka", "state_abbr": "Fukuoka", "postcode_prefix": "812", "lat_min": 33.58, "lat_max": 33.62, "lon_min": 130.40, "lon_max": 130.44},
+    {"city": "Kitakyushu", "state": "Fukuoka", "state_abbr": "Fukuoka", "postcode_prefix": "802", "lat_min": 33.85, "lat_max": 33.95, "lon_min": 130.82, "lon_max": 130.92},
+    {"city": "Kurume", "state": "Fukuoka", "state_abbr": "Fukuoka", "postcode_prefix": "830", "lat_min": 33.30, "lat_max": 33.35, "lon_min": 130.50, "lon_max": 130.55},
+    {"city": "Iizuka", "state": "Fukuoka", "state_abbr": "Fukuoka", "postcode_prefix": "820", "lat_min": 33.63, "lat_max": 33.67, "lon_min": 130.68, "lon_max": 130.72},
+    {"city": "Omuta", "state": "Fukuoka", "state_abbr": "Fukuoka", "postcode_prefix": "836", "lat_min": 33.02, "lat_max": 33.07, "lon_min": 130.43, "lon_max": 130.47},
+    {"city": "Kasuga", "state": "Fukuoka", "state_abbr": "Fukuoka", "postcode_prefix": "816", "lat_min": 33.52, "lat_max": 33.55, "lon_min": 130.47, "lon_max": 130.50},
+    {"city": "Kyoto", "state": "Kyoto", "state_abbr": "Kyoto", "postcode_prefix": "600", "lat_min": 34.93, "lat_max": 35.08, "lon_min": 135.70, "lon_max": 135.82},
+    {"city": "Gion", "state": "Kyoto", "state_abbr": "Kyoto", "postcode_prefix": "605", "lat_min": 35.00, "lat_max": 35.02, "lon_min": 135.77, "lon_max": 135.79},
+    {"city": "Arashiyama", "state": "Kyoto", "state_abbr": "Kyoto", "postcode_prefix": "616", "lat_min": 35.01, "lat_max": 35.03, "lon_min": 135.67, "lon_max": 135.69},
+    {"city": "Uji", "state": "Kyoto", "state_abbr": "Kyoto", "postcode_prefix": "611", "lat_min": 34.88, "lat_max": 34.92, "lon_min": 135.78, "lon_max": 135.82},
+    {"city": "Kameoka", "state": "Kyoto", "state_abbr": "Kyoto", "postcode_prefix": "621", "lat_min": 35.00, "lat_max": 35.05, "lon_min": 135.57, "lon_max": 135.62},
+    {"city": "Maizuru", "state": "Kyoto", "state_abbr": "Kyoto", "postcode_prefix": "625", "lat_min": 35.45, "lat_max": 35.50, "lon_min": 135.35, "lon_max": 135.40},
+    {"city": "Fukuchiyama", "state": "Kyoto", "state_abbr": "Kyoto", "postcode_prefix": "620", "lat_min": 35.28, "lat_max": 35.32, "lon_min": 135.10, "lon_max": 135.15},
+    {"city": "Kobe", "state": "Hyogo", "state_abbr": "Hyogo", "postcode_prefix": "650", "lat_min": 34.65, "lat_max": 34.75, "lon_min": 135.10, "lon_max": 135.25},
+    {"city": "Sannomiya", "state": "Hyogo", "state_abbr": "Hyogo", "postcode_prefix": "651", "lat_min": 34.68, "lat_max": 34.70, "lon_min": 135.18, "lon_max": 135.20},
+    {"city": "Himeji", "state": "Hyogo", "state_abbr": "Hyogo", "postcode_prefix": "670", "lat_min": 34.82, "lat_max": 34.87, "lon_min": 134.68, "lon_max": 134.73},
+    {"city": "Nishinomiya", "state": "Hyogo", "state_abbr": "Hyogo", "postcode_prefix": "662", "lat_min": 34.72, "lat_max": 34.77, "lon_min": 135.32, "lon_max": 135.37},
+    {"city": "Amagasaki", "state": "Hyogo", "state_abbr": "Hyogo", "postcode_prefix": "660", "lat_min": 34.70, "lat_max": 34.75, "lon_min": 135.40, "lon_max": 135.45},
+    {"city": "Akashi", "state": "Hyogo", "state_abbr": "Hyogo", "postcode_prefix": "673", "lat_min": 34.63, "lat_max": 34.68, "lon_min": 134.97, "lon_max": 135.02},
+    {"city": "Kakogawa", "state": "Hyogo", "state_abbr": "Hyogo", "postcode_prefix": "675", "lat_min": 34.75, "lat_max": 34.80, "lon_min": 134.83, "lon_max": 134.88},
+    {"city": "Takarazuka", "state": "Hyogo", "state_abbr": "Hyogo", "postcode_prefix": "665", "lat_min": 34.78, "lat_max": 34.82, "lon_min": 135.33, "lon_max": 135.38},
+    {"city": "Hiroshima", "state": "Hiroshima", "state_abbr": "Hiroshima", "postcode_prefix": "730", "lat_min": 34.35, "lat_max": 34.48, "lon_min": 132.40, "lon_max": 132.52},
+    {"city": "Fukuyama", "state": "Hiroshima", "state_abbr": "Hiroshima", "postcode_prefix": "720", "lat_min": 34.47, "lat_max": 34.52, "lon_min": 133.35, "lon_max": 133.40},
+    {"city": "Kure", "state": "Hiroshima", "state_abbr": "Hiroshima", "postcode_prefix": "737", "lat_min": 34.23, "lat_max": 34.27, "lon_min": 132.55, "lon_max": 132.60},
+    {"city": "Higashihiroshima", "state": "Hiroshima", "state_abbr": "Hiroshima", "postcode_prefix": "739", "lat_min": 34.40, "lat_max": 34.45, "lon_min": 132.72, "lon_max": 132.77},
+    {"city": "Onomichi", "state": "Hiroshima", "state_abbr": "Hiroshima", "postcode_prefix": "722", "lat_min": 34.40, "lat_max": 34.43, "lon_min": 133.18, "lon_max": 133.22},
+    {"city": "Mihara", "state": "Hiroshima", "state_abbr": "Hiroshima", "postcode_prefix": "723", "lat_min": 34.38, "lat_max": 34.42, "lon_min": 133.07, "lon_max": 133.12},
+    {"city": "Sendai", "state": "Miyagi", "state_abbr": "Miyagi", "postcode_prefix": "980", "lat_min": 38.22, "lat_max": 38.32, "lon_min": 140.83, "lon_max": 140.95},
+    {"city": "Ishinomaki", "state": "Miyagi", "state_abbr": "Miyagi", "postcode_prefix": "986", "lat_min": 38.42, "lat_max": 38.47, "lon_min": 141.28, "lon_max": 141.33},
+    {"city": "Osaki", "state": "Miyagi", "state_abbr": "Miyagi", "postcode_prefix": "989", "lat_min": 38.57, "lat_max": 38.62, "lon_min": 140.95, "lon_max": 141.00},
+    {"city": "Natori", "state": "Miyagi", "state_abbr": "Miyagi", "postcode_prefix": "981", "lat_min": 38.17, "lat_max": 38.20, "lon_min": 140.88, "lon_max": 140.92},
+    {"city": "Kesennuma", "state": "Miyagi", "state_abbr": "Miyagi", "postcode_prefix": "988", "lat_min": 38.90, "lat_max": 38.95, "lon_min": 141.55, "lon_max": 141.60},
+    {"city": "Saitama", "state": "Saitama", "state_abbr": "Saitama", "postcode_prefix": "330", "lat_min": 35.85, "lat_max": 35.95, "lon_min": 139.60, "lon_max": 139.72},
+    {"city": "Kawagoe", "state": "Saitama", "state_abbr": "Saitama", "postcode_prefix": "350", "lat_min": 35.90, "lat_max": 35.95, "lon_min": 139.47, "lon_max": 139.52},
+    {"city": "Kawaguchi", "state": "Saitama", "state_abbr": "Saitama", "postcode_prefix": "332", "lat_min": 35.80, "lat_max": 35.85, "lon_min": 139.72, "lon_max": 139.77},
+    {"city": "Koshigaya", "state": "Saitama", "state_abbr": "Saitama", "postcode_prefix": "343", "lat_min": 35.88, "lat_max": 35.92, "lon_min": 139.78, "lon_max": 139.82},
+    {"city": "Tokorozawa", "state": "Saitama", "state_abbr": "Saitama", "postcode_prefix": "359", "lat_min": 35.78, "lat_max": 35.82, "lon_min": 139.45, "lon_max": 139.50},
+    {"city": "Kasukabe", "state": "Saitama", "state_abbr": "Saitama", "postcode_prefix": "344", "lat_min": 35.97, "lat_max": 36.00, "lon_min": 139.75, "lon_max": 139.80},
+    {"city": "Soka", "state": "Saitama", "state_abbr": "Saitama", "postcode_prefix": "340", "lat_min": 35.82, "lat_max": 35.85, "lon_min": 139.80, "lon_max": 139.83},
+    {"city": "Kumagaya", "state": "Saitama", "state_abbr": "Saitama", "postcode_prefix": "360", "lat_min": 36.13, "lat_max": 36.17, "lon_min": 139.37, "lon_max": 139.42},
+    {"city": "Chiba", "state": "Chiba", "state_abbr": "Chiba", "postcode_prefix": "260", "lat_min": 35.58, "lat_max": 35.68, "lon_min": 140.08, "lon_max": 140.18},
+    {"city": "Funabashi", "state": "Chiba", "state_abbr": "Chiba", "postcode_prefix": "273", "lat_min": 35.68, "lat_max": 35.72, "lon_min": 139.98, "lon_max": 140.03},
+    {"city": "Matsudo", "state": "Chiba", "state_abbr": "Chiba", "postcode_prefix": "271", "lat_min": 35.78, "lat_max": 35.82, "lon_min": 139.88, "lon_max": 139.93},
+    {"city": "Ichikawa", "state": "Chiba", "state_abbr": "Chiba", "postcode_prefix": "272", "lat_min": 35.72, "lat_max": 35.77, "lon_min": 139.90, "lon_max": 139.95},
+    {"city": "Kashiwa", "state": "Chiba", "state_abbr": "Chiba", "postcode_prefix": "277", "lat_min": 35.85, "lat_max": 35.90, "lon_min": 139.97, "lon_max": 140.02},
+    {"city": "Ichihara", "state": "Chiba", "state_abbr": "Chiba", "postcode_prefix": "290", "lat_min": 35.48, "lat_max": 35.53, "lon_min": 140.10, "lon_max": 140.15},
+    {"city": "Urayasu", "state": "Chiba", "state_abbr": "Chiba", "postcode_prefix": "279", "lat_min": 35.65, "lat_max": 35.68, "lon_min": 139.90, "lon_max": 139.93},
+    {"city": "Narashino", "state": "Chiba", "state_abbr": "Chiba", "postcode_prefix": "275", "lat_min": 35.67, "lat_max": 35.70, "lon_min": 140.02, "lon_max": 140.05},
+    {"city": "Niigata", "state": "Niigata", "state_abbr": "Niigata", "postcode_prefix": "950", "lat_min": 37.88, "lat_max": 37.97, "lon_min": 139.00, "lon_max": 139.12},
+    {"city": "Nagaoka", "state": "Niigata", "state_abbr": "Niigata", "postcode_prefix": "940", "lat_min": 37.43, "lat_max": 37.48, "lon_min": 138.83, "lon_max": 138.88},
+    {"city": "Joetsu", "state": "Niigata", "state_abbr": "Niigata", "postcode_prefix": "943", "lat_min": 37.13, "lat_max": 37.18, "lon_min": 138.23, "lon_max": 138.28},
+    {"city": "Sanjo", "state": "Niigata", "state_abbr": "Niigata", "postcode_prefix": "955", "lat_min": 37.62, "lat_max": 37.67, "lon_min": 138.95, "lon_max": 139.00},
+    {"city": "Shibata", "state": "Niigata", "state_abbr": "Niigata", "postcode_prefix": "957", "lat_min": 37.93, "lat_max": 37.97, "lon_min": 139.32, "lon_max": 139.37},
+    {"city": "Shizuoka", "state": "Shizuoka", "state_abbr": "Shizuoka", "postcode_prefix": "420", "lat_min": 34.95, "lat_max": 35.03, "lon_min": 138.35, "lon_max": 138.45},
+    {"city": "Hamamatsu", "state": "Shizuoka", "state_abbr": "Shizuoka", "postcode_prefix": "430", "lat_min": 34.70, "lat_max": 34.80, "lon_min": 137.70, "lon_max": 137.82},
+    {"city": "Numazu", "state": "Shizuoka", "state_abbr": "Shizuoka", "postcode_prefix": "410", "lat_min": 35.08, "lat_max": 35.12, "lon_min": 138.85, "lon_max": 138.90},
+    {"city": "Fuji", "state": "Shizuoka", "state_abbr": "Shizuoka", "postcode_prefix": "416", "lat_min": 35.15, "lat_max": 35.20, "lon_min": 138.67, "lon_max": 138.72},
+    {"city": "Iwata", "state": "Shizuoka", "state_abbr": "Shizuoka", "postcode_prefix": "438", "lat_min": 34.72, "lat_max": 34.77, "lon_min": 137.85, "lon_max": 137.90},
+    {"city": "Yaizu", "state": "Shizuoka", "state_abbr": "Shizuoka", "postcode_prefix": "425", "lat_min": 34.86, "lat_max": 34.90, "lon_min": 138.30, "lon_max": 138.35},
+    {"city": "Okayama", "state": "Okayama", "state_abbr": "Okayama", "postcode_prefix": "700", "lat_min": 34.63, "lat_max": 34.72, "lon_min": 133.88, "lon_max": 133.98},
+    {"city": "Kurashiki", "state": "Okayama", "state_abbr": "Okayama", "postcode_prefix": "710", "lat_min": 34.58, "lat_max": 34.63, "lon_min": 133.75, "lon_max": 133.82},
+    {"city": "Tsuyama", "state": "Okayama", "state_abbr": "Okayama", "postcode_prefix": "708", "lat_min": 35.05, "lat_max": 35.10, "lon_min": 134.00, "lon_max": 134.05},
+    {"city": "Soja", "state": "Okayama", "state_abbr": "Okayama", "postcode_prefix": "719", "lat_min": 34.67, "lat_max": 34.70, "lon_min": 133.75, "lon_max": 133.78},
+    {"city": "Naha", "state": "Okinawa", "state_abbr": "Okinawa", "postcode_prefix": "900", "lat_min": 26.18, "lat_max": 26.25, "lon_min": 127.65, "lon_max": 127.72},
+    {"city": "Okinawa", "state": "Okinawa", "state_abbr": "Okinawa", "postcode_prefix": "904", "lat_min": 26.32, "lat_max": 26.38, "lon_min": 127.78, "lon_max": 127.83},
+    {"city": "Uruma", "state": "Okinawa", "state_abbr": "Okinawa", "postcode_prefix": "904", "lat_min": 26.35, "lat_max": 26.42, "lon_min": 127.85, "lon_max": 127.92},
+    {"city": "Urasoe", "state": "Okinawa", "state_abbr": "Okinawa", "postcode_prefix": "901", "lat_min": 26.23, "lat_max": 26.28, "lon_min": 127.70, "lon_max": 127.75},
+    {"city": "Ginowan", "state": "Okinawa", "state_abbr": "Okinawa", "postcode_prefix": "901", "lat_min": 26.27, "lat_max": 26.30, "lon_min": 127.77, "lon_max": 127.80},
+    {"city": "Kanazawa", "state": "Ishikawa", "state_abbr": "Ishikawa", "postcode_prefix": "920", "lat_min": 36.53, "lat_max": 36.60, "lon_min": 136.62, "lon_max": 136.70},
+    {"city": "Komatsu", "state": "Ishikawa", "state_abbr": "Ishikawa", "postcode_prefix": "923", "lat_min": 36.40, "lat_max": 36.43, "lon_min": 136.43, "lon_max": 136.47},
+    {"city": "Hakusan", "state": "Ishikawa", "state_abbr": "Ishikawa", "postcode_prefix": "924", "lat_min": 36.50, "lat_max": 36.55, "lon_min": 136.55, "lon_max": 136.60},
+    {"city": "Nagano", "state": "Nagano", "state_abbr": "Nagano", "postcode_prefix": "380", "lat_min": 36.62, "lat_max": 36.68, "lon_min": 138.17, "lon_max": 138.23},
+    {"city": "Matsumoto", "state": "Nagano", "state_abbr": "Nagano", "postcode_prefix": "390", "lat_min": 36.22, "lat_max": 36.28, "lon_min": 137.95, "lon_max": 138.02},
+    {"city": "Ueda", "state": "Nagano", "state_abbr": "Nagano", "postcode_prefix": "386", "lat_min": 36.38, "lat_max": 36.43, "lon_min": 138.25, "lon_max": 138.30},
+    {"city": "Iida", "state": "Nagano", "state_abbr": "Nagano", "postcode_prefix": "395", "lat_min": 35.50, "lat_max": 35.55, "lon_min": 137.82, "lon_max": 137.87},
+    {"city": "Suwa", "state": "Nagano", "state_abbr": "Nagano", "postcode_prefix": "392", "lat_min": 36.03, "lat_max": 36.07, "lon_min": 138.10, "lon_max": 138.15}
+  ],
+  "streets_by_city": {
+    "Tokyo": [
+      "Marunouchi", "Otemachi", "Chiyoda", "Nagatacho", "Kasumigaseki", "Hibiya", "Yurakucho",
+      "Nihonbashi", "Kyobashi", "Hatchobori", "Kanda", "Akihabara", "Jimbocho", "Suidobashi",
+      "Honjo", "Ryogoku", "Kinshicho", "Oshiage", "Mukojima", "Hikifune", "Kameido", "Ojima",
+      "Monzen-nakacho", "Kiba", "Toyosu", "Shinonome", "Ariake", "Odaiba", "Harumi", "Tsukishima",
+      "Kachidoki", "Minami-senju", "Senju", "Arakawa", "Nishi-nippori", "Yanaka", "Ueno",
+      "Okachimachi", "Asakusa", "Kuramae", "Iriya", "Mikawashima", "Machiya", "Tabata",
+      "Komagome", "Sugamo", "Otsuka", "Ikebukuro", "Mejiro", "Takadanobaba", "Waseda",
+      "Shimoochiai", "Nakai", "Higashinakano", "Nakano", "Koenji", "Asagaya", "Ogikubo",
+      "Nishiogikubo", "Kichijoji", "Inokashira", "Mitaka", "Musashisakai", "Higashikoganei"
+    ],
+    "Shinjuku": [
+      "Nishi-Shinjuku", "Kabukicho", "Shinjuku-sanchome", "Hyakunincho", "Okubo", "Takadanobaba",
+      "Toyama", "Naitomachi", "Yotsuya", "Ichigaya", "Kagurazaka", "Wakamatsucho", "Akebonobashi",
+      "Haramachi", "Enokicho", "Shomyoji", "Daimachi", "Kitashinjuku", "Totsuka-machi", "Ochiai"
+    ],
+    "Shibuya": [
+      "Shibuya", "Dogenzaka", "Maruyamacho", "Udagawacho", "Jinnan", "Kamiyamacho", "Tomigaya",
+      "Harajuku", "Jingumae", "Sendagaya", "Yoyogi", "Sasazuka", "Hatagaya", "Hatsudai",
+      "Honmachi", "Shoto", "Nanpeidai", "Sakuragaokacho", "Hiroo", "Ebisu", "Ebisunishi",
+      "Daikanyama", "Aobadai", "Kamimeguro", "Higashiyama", "Komaba", "Uehara", "Nishihara"
+    ],
+    "Shinagawa": [
+      "Konan", "Higashishinagawa", "Minamishinagawa", "Kitashinagawa", "Nishishinagawa",
+      "Osaki", "Higashioi", "Nishioi", "Hiromachi", "Futaba", "Togoshi", "Nakanobu",
+      "Nishimagome", "Higashinakanobu", "Ebara", "Hatanodai", "Koyama", "Yashio"
+    ],
+    "Ikebukuro": [
+      "Nishi-Ikebukuro", "Higashi-Ikebukuro", "Minami-Ikebukuro", "Ikebukuro", "Mejiro",
+      "Zoshigaya", "Takada", "Otsuka", "Komagome", "Sugamo", "Nishisugamo", "Kamiikebukuro",
+      "Ikebukurohoncho", "Kamitoshima", "Nagasaki", "Chihaya", "Minamisena", "Senkawa"
+    ],
+    "Ueno": [
+      "Ueno", "Uenokoen", "Higashiueno", "Kitaueno", "Ikenohata", "Nezu", "Yanaka",
+      "Sendagi", "Yushima", "Hongo", "Koishikawa", "Hakusan", "Sengoku", "Nishikata",
+      "Mukougaoka", "Yayoi", "Bunkyo", "Mejirodai", "Sekiguchi", "Edogawabashi"
+    ],
+    "Ginza": [
+      "Ginza", "Yurakucho", "Higashiginza", "Shinbashi", "Tsukiji", "Hamamatsucho",
+      "Shiodome", "Takeshiba", "Shiba", "Azabudai", "Toranomon", "Akasaka", "Nagatacho",
+      "Kokkai-gijidomae", "Tameike-sanno", "Roppongi-itchome", "Kamiyacho"
+    ],
+    "Akihabara": [
+      "Sotokanda", "Kanda", "Awajicho", "Sudacho", "Tachikawa", "Iwamotocho",
+      "Higashikanda", "Kajicho", "Kanda-nishikicho", "Kanda-sakumacho", "Misaki-cho",
+      "Ogawamachi", "Jimbocho", "Surugadai", "Hitotsubashi", "Kitanomaru"
+    ],
+    "Roppongi": [
+      "Roppongi", "Azabujuban", "Nishiazabu", "Motoazabu", "Minamiazabu", "Higashiazabu",
+      "Azabudai", "Azabunagasakacho", "Minami-Aoyama", "Kita-Aoyama", "Nishimachida",
+      "Akasaka", "Motomachi", "Roppongi-Hills", "Midtown", "Roppongi-itchome"
+    ],
+    "Nakano": [
+      "Nakano", "Araiyakushimae", "Numabukuro", "Nogata", "Saginomiya", "Fujimicho",
+      "Arai", "Egota", "Kamitakada", "Wakamiya", "Yamato-cho", "Chuo", "Honcho"
+    ],
+    "Kichijoji": [
+      "Kichijoji-honcho", "Kichijoji-minamicho", "Kichijoji-kitamachi", "Kichijoji-higashicho",
+      "Gotenyama", "Midoricho", "Sakuracho", "Nakacho", "Nishikubo", "Kyonancho",
+      "Sekimae", "Musashino", "Sakai", "Inokashira"
+    ],
+    "Hachioji": [
+      "Yokoyamacho", "Myojincho", "Asahicho", "Higashicho", "Honcho", "Nishi-Hachioji",
+      "Katakura", "Minamino", "Horinouchi", "Takao", "Nagabusa", "Utsukushigaoka",
+      "Minamiosawa", "Yuigaoka", "Matsugicho", "Nishihachioji", "Motohongocho"
+    ],
+    "Machida": [
+      "Haramachida", "Nakamachi", "Morino", "Tsukushino", "Narusegaoka", "Tamagawa-gakuen",
+      "Machida", "Asahi-cho", "Tsuruma", "Minamimachida", "Naruse", "Kanamori"
+    ],
+    "Tachikawa": [
+      "Akebonocho", "Nishikicho", "Takamatsucho", "Shiokawacho", "Midoricho",
+      "Shibasaki", "Nishisuna", "Sakae-cho", "Izumi-cho", "Fujimi-cho"
+    ],
+    "Yokohama": [
+      "Minato-Mirai", "Sakuragicho", "Kannai", "Bashamichi", "Yamashitacho", "Chinatown",
+      "Motomachi", "Ishikawacho", "Yamate", "Nogecho", "Isezakicho", "Yokohamabashi",
+      "Hinodecho", "Koganecho", "Tsurumi", "Kawasaki-cho", "Naka-ku", "Nishi-ku",
+      "Kanagawa-ku", "Hodogaya", "Totsuka", "Kohoku", "Midori-ku", "Aoba-ku",
+      "Tsuzuki-ku", "Izumi-ku", "Sakae-ku", "Seya", "Asahi-ku", "Konan-ku"
+    ],
+    "Kawasaki": [
+      "Kawasakieki-mae", "Ogawacho", "Sakuramoto", "Miyamachi", "Shukugawara", "Noborito",
+      "Tama-ku", "Takatsu-ku", "Nakahara-ku", "Miyamae-ku", "Asao-ku", "Saiwai-ku"
+    ],
+    "Sagamihara": [
+      "Sagamiono", "Hashimoto", "Haramachida", "Fuchinobe", "Kamimizo", "Chuo-ku",
+      "Midori-ku", "Minami-ku", "Sobudai", "Aihara", "Sagamidai"
+    ],
+    "Fujisawa": [
+      "Fujisawa", "Kugenuma", "Tsujido", "Katase", "Enoshima", "Shonan", "Honkugenuma",
+      "Katasekaigan", "Kugenuma-kaigan", "Tsujido-nishikaigan", "Shonan-Fujisawa"
+    ],
+    "Yokosuka": [
+      "Honcho", "Odakicho", "Wakamatsucho", "Ogawacho", "Kurihama", "Uraga",
+      "Shioiri", "Kinugasa", "Nishi-Uraga", "Otsu-cho", "Funakoshi"
+    ],
+    "Hiratsuka": [
+      "Meijimachi", "Akashi-cho", "Takaracho", "Miyamaecho", "Beniya-cho", "Nakaharakami",
+      "Nakaharanaka", "Nakaharashimo", "Oiwake", "Kaigan"
+    ],
+    "Chigasaki": [
+      "Chigasaki", "Higashikaigan", "Minami-koide", "Shonan", "Hamasuka", "Nakakaigan",
+      "Tsurugamine", "Enzo", "Higashicho", "Nishicho"
+    ],
+    "Kamakura": [
+      "Komachi", "Yuigahama", "Hase", "Inamuragasaki", "Shichirigahama", "Koshigoe",
+      "Zaimokuza", "Onarimachi", "Yamanouchi", "Nishi-Kamakura", "Ofuna"
+    ],
+    "Osaka": [
+      "Namba", "Shinsaibashi", "Dotonbori", "Americamura", "Hozenji", "Sennichimae",
+      "Nipponbashi", "Denden-town", "Tennoji", "Shinsekai", "Tsutenkaku", "Abeno",
+      "Umeda", "Kitashinchi", "Sonezaki", "Nakatsu", "Fukushima", "Nodahanshin",
+      "Yodoyabashi", "Hommachi", "Shinsaibashi", "Nagahoribashi", "Tanimachi", "Sakaisuji",
+      "Temma", "Ogimachi", "Nakanoshima", "Temmabashi", "Kyobashi", "Miyakojima",
+      "Tsuruhashi", "Imazato", "Momodani", "Tennoji", "Uehommachi"
+    ],
+    "Umeda": [
+      "Umeda", "Sonezaki", "Doyamacho", "Shibata", "Chayamachi", "Kakudacho",
+      "Nakazakinishi", "Nakazaki", "Komatsubara-cho", "Tsurunocho", "Kitashinchi"
+    ],
+    "Namba": [
+      "Namba", "Nanba-naka", "Shinsaibashisuji", "Sennichimae", "Dotonbori",
+      "Soemoncho", "Nipponbashi", "Shimanouchi", "Higashishinsaibashi"
+    ],
+    "Shinsaibashi": [
+      "Shinsaibashi", "Shinsaibashisuji", "Minamisenba", "Bakuro-cho", "Kyutaro-machi",
+      "Kawaramachi", "Higashishinsaibashi", "Nishishinsaibashi", "Americamura"
+    ],
+    "Tennoji": [
+      "Tennoji", "Uehommachi", "Shitennoji", "Tamatsukirimae", "Momodani",
+      "Ikutamachuo", "Hoshinogaoka", "Yuhigaoka", "Chausuyama"
+    ],
+    "Sakai": [
+      "Sakai-higashi", "Sakai-nishi", "Sakai-kita", "Sakai-minami", "Sakai-mihara",
+      "Naka-ku", "Higashi-ku", "Nishi-ku", "Minami-ku", "Kita-ku"
+    ],
+    "Higashiosaka": [
+      "Fuse", "Nagata", "Yao", "Kawachi-Hanazono", "Wakae", "Kintetsu-Yao",
+      "Shin-Ishikiri", "Nunose", "Yoshida", "Mitsujima"
+    ],
+    "Hirakata": [
+      "Hirakatashi", "Kuzuhaekimae", "Okamotocho", "Okacho", "Hirakata-koen",
+      "Makino", "Nagao", "Tsuda", "Fujisaka"
+    ],
+    "Toyonaka": [
+      "Shibahara", "Okamachi", "Minami-Sakurazuka", "Toyonaka-ekimae", "Shonai",
+      "Hattori", "Midorigaoka", "Shin-Senri"
+    ],
+    "Suita": [
+      "Esaka", "Suita-shi", "Senrioka", "Senri-Chuo", "Momoyamadai", "Yamadanishi",
+      "Konoike", "Kishibe", "Toyotsu"
+    ],
+    "Takatsuki": [
+      "Takatsuki-shi", "Tondabayashi", "Toneyama", "Hiyoshidai", "Nishinomiya",
+      "Nishimachi", "Akutagawa-cho", "Imashiro-cho"
+    ],
+    "Nagoya": [
+      "Sakae", "Fushimi", "Marunouchi", "Osu", "Kanayama", "Nagoya-eki", "Meieki",
+      "Nishiki", "Tsurumai", "Chikusa", "Higashiyama", "Motoyama", "Kakuozan",
+      "Imaike", "Ikeshita", "Fujigaoka", "Hoshigaoka", "Nagakute", "Meito",
+      "Tempaku", "Naka-ku", "Higashi-ku", "Kita-ku", "Nishi-ku", "Nakamura-ku",
+      "Showa-ku", "Mizuho-ku", "Atsuta-ku", "Minami-ku", "Moriyama-ku"
+    ],
+    "Sakae": [
+      "Sakae", "Nishiki", "Marunouchi", "Izumi", "Osu", "Kamimaezu", "Yabacho",
+      "Higashisakura", "Shin-Sakae", "Shirakawa-koen"
+    ],
+    "Toyota": [
+      "Toyota-shi", "Shin-Toyota", "Toyota-shiyakusho-mae", "Matsuzakamachi",
+      "Inocho", "Koromo-cho", "Honmachi", "Nishimachi"
+    ],
+    "Okazaki": [
+      "Okazaki-koen-mae", "Higashiokazaki", "Okazaki", "Honcho", "Aoi-cho",
+      "Sakura-cho", "Myodaiji-cho", "Yahagi-cho"
+    ],
+    "Ichinomiya": [
+      "Ichinomiya", "Shin-Ichinomiya", "Owari-Ichinomiya", "Bisai", "Kisogawa-cho",
+      "Asahi-cho", "Midori-cho", "Imaise-cho"
+    ],
+    "Toyohashi": [
+      "Toyohashi-eki", "Ekimae-odori", "Hirokoji", "Matsuba-cho", "Hana-cho",
+      "Ekimae-dori", "Nishi-Shinmachi", "Shimoji-cho"
+    ],
+    "Kasugai": [
+      "Kasugai", "Kachigawa", "Ajiyoshi-cho", "Kozoji-cho", "Sakashita-cho",
+      "Tashiro-cho", "Matsukawado-cho", "Nishiyama-cho"
+    ],
+    "Anjo": [
+      "Anjo", "Shin-Anjo", "Kitaanjo", "Minamianjo", "Furuikawa-cho",
+      "Sakurai-cho", "Akematsu-cho", "Higashisakai-cho"
+    ],
+    "Sapporo": [
+      "Odori", "Susukino", "Tanukikoji", "Sapporo-eki", "Kita-ku", "Higashi-ku",
+      "Shiroishi-ku", "Toyohira-ku", "Minami-ku", "Nishi-ku", "Atsubetsu-ku",
+      "Teine-ku", "Kiyota-ku", "Chuo-ku", "Maruyama", "Kotoni", "Hassamu",
+      "Sumikawa", "Makomanai", "Miyanosawa", "Nijuyonken", "Nango"
+    ],
+    "Susukino": [
+      "Susukino", "Minami-4-jo", "Minami-5-jo", "Minami-6-jo", "Minami-7-jo",
+      "Nakajima-koen", "Horohira-bashi", "Gakuen-mae"
+    ],
+    "Hakodate": [
+      "Motomachi", "Suehirocho", "Goryokaku", "Yunokawa", "Hakodate-eki", "Matsukaze-cho",
+      "Wakamatsu-cho", "Omoricho", "Kaigan-cho", "Tokura-cho"
+    ],
+    "Asahikawa": [
+      "Asahikawa-eki", "Kaimono-koen", "Miyashita-dori", "San-jo-dori", "Shunkodai",
+      "Nagayama", "Midorigaoka", "Kamisorachidai", "Suehiro"
+    ],
+    "Obihiro": [
+      "Obihiro-eki", "Nishi-2-jo", "Nishi-3-jo", "Odori", "Higashiobihiro",
+      "Inada-cho", "Nishi-Obihiro", "Otofuke"
+    ],
+    "Kushiro": [
+      "Kushiro-eki", "Kitaodori", "Saiwai-cho", "Sakae-machi", "Nusamai",
+      "Shunkodai", "Aikokunishi", "Toridori"
+    ],
+    "Otaru": [
+      "Otaru-eki", "Ironai", "Sakaimachi", "Irifune", "Inaho", "Hanazono",
+      "Shiomidai", "Sumiyoshi", "Chuo-dori"
+    ],
+    "Kitami": [
+      "Kitami-eki", "Kita-2-jo", "Kita-3-jo", "Nishi-3-chome", "Nishi-4-chome",
+      "Minami-cho", "Koryodai", "Tokoro"
+    ],
+    "Tomakomai": [
+      "Tomakomai-eki", "Omotemachi", "Nishimachi", "Wakakusa-cho", "Sumiyoshi-cho",
+      "Kogane-cho", "Futaba-cho", "Shiraoi"
+    ],
+    "Fukuoka": [
+      "Tenjin", "Nakasu", "Hakata", "Daimyo", "Imaizumi", "Yakuin", "Ropponmatsu",
+      "Nishijin", "Momochi", "Hakozaki", "Kashii", "Chihaya", "Meinohama",
+      "Nishishin", "Watanabe-dori", "Gofuku-machi", "Kawabata", "Canal-City"
+    ],
+    "Tenjin": [
+      "Tenjin", "Tenjin-minami", "Watanabe-dori", "Yakuin-odori", "Kego",
+      "Daimyo", "Imaizumi", "Akasaka", "Ohoribata"
+    ],
+    "Hakata": [
+      "Hakata-eki", "Hakata-ekimae", "Gion-machi", "Sumiyoshi", "Okada",
+      "Hakatakuko", "Chiyo", "Yoshizuka", "Hakataekihigashi"
+    ],
+    "Kitakyushu": [
+      "Kokura", "Kokura-kita", "Kokura-minami", "Moji", "Tobata", "Wakamatsu",
+      "Yahata-nishi", "Yahata-higashi", "Tanga", "Uomachi", "Kyomachi"
+    ],
+    "Kurume": [
+      "Kurume-eki", "Higashi-machi", "Rokkaku-do", "Hisamitsu", "Nishi-machi",
+      "Chuo-machi", "Tenjin-cho", "Meiji-dori"
+    ],
+    "Iizuka": [
+      "Iizuka-eki", "Yoshio-machi", "Shin-iizuka", "Honmachi", "Kawashima",
+      "Yokota", "Shimaizumi", "Nagai"
+    ],
+    "Omuta": [
+      "Omuta-eki", "Asahi-machi", "Takaramachi", "Fuji-machi", "Shiratsuru-cho",
+      "Shin-Omuta", "Nagato-machi", "Temmangu"
+    ],
+    "Kasuga": [
+      "Kasuga", "Kasugabaru", "Harumachieki", "Onojo", "Shirane", "Suwara",
+      "Hikarigaoka", "Hakataeki-minami"
+    ],
+    "Kyoto": [
+      "Kawaramachi", "Shijo", "Gion", "Higashiyama", "Pontocho", "Sanjo",
+      "Teramachi", "Nishiki", "Shinkyogoku", "Karasuma", "Oike", "Marutamachi",
+      "Kitaoji", "Kinkakuji", "Arashiyama", "Fushimi", "Yamashina", "Daigo",
+      "Kiyomizu", "Maruyama", "Nanzenji", "Heian", "Okazaki", "Shimogamo",
+      "Kamigamo", "Kinkaku", "Ryoanji", "Nijo", "Uzumasa", "Saga"
+    ],
+    "Gion": [
+      "Gion", "Hanamikoji", "Shijo-dori", "Yasaka", "Shinbashi-dori", "Nawate-dori",
+      "Higashioji-dori", "Kiyomizu", "Sannen-zaka", "Ninen-zaka"
+    ],
+    "Arashiyama": [
+      "Arashiyama", "Saga", "Tenryuji", "Togetsukyo", "Okochi-sanso", "Nonomiya",
+      "Sagano", "Daikakuji", "Adashino", "Otagi"
+    ],
+    "Uji": [
+      "Uji", "Byodoin", "Ise-cho", "Obaku", "Momoyama", "Kohata", "Mimurodo",
+      "Ogura", "Iseda", "Yawata"
+    ],
+    "Kameoka": [
+      "Kameoka-eki", "Nantan", "Umemachi", "Chitose-cho", "Hozu", "Shinmachi",
+      "Ekimae-cho", "Miya-machi"
+    ],
+    "Maizuru": [
+      "Maizuru-eki", "Higashimaizuru", "Nishimaizuru", "Kitamaizuru", "Minamikojo-machi",
+      "Kamaya", "Asahi", "Hamacho"
+    ],
+    "Fukuchiyama": [
+      "Fukuchiyama-eki", "Nishi-machi", "Nakanotsucho", "Ekimae-cho", "Hirono",
+      "Nagata", "Miyuki-cho", "Kawakita"
+    ],
+    "Kobe": [
+      "Sannomiya", "Motomachi", "Meriken-Park", "Harborland", "Kobe-eki", "Nankinmachi",
+      "Kitano", "Ijinkan", "Tor-Road", "Ikuta", "Shin-Kobe", "Nunobiki", "Maya",
+      "Rokko", "Mikage", "Okamoto", "Sumiyoshi", "Ashiya", "Nishinomiya",
+      "Higashinada", "Nada", "Chuo-ku", "Hyogo-ku", "Nagata-ku", "Suma-ku"
+    ],
+    "Sannomiya": [
+      "Sannomiya", "Center-gai", "Kanocho", "Kitanagasa-dori", "Ikuta-cho",
+      "Nishimachi", "Nankinmachi", "Sakaemachi-dori", "Shimoyamate-dori"
+    ],
+    "Himeji": [
+      "Himeji-eki", "Ekimae-cho", "Juninmachi", "Honmachi", "Oteji", "Miyuki-dori",
+      "Nishiekimae-cho", "Shiromoto-cho", "Naka-ku"
+    ],
+    "Nishinomiya": [
+      "Nishinomiya-kitaguchi", "Shukugawa", "Kotoen", "Kurakuenguchi", "Naruo",
+      "Koshien", "Konan", "Uegahara", "Mefu"
+    ],
+    "Amagasaki": [
+      "Amagasaki-eki", "Tsukaguchi", "Sonoda", "Mukonoso", "Taisho-cho",
+      "Shinmeidai", "Minamimukonoso", "Higashisonoda"
+    ],
+    "Akashi": [
+      "Akashi-eki", "Honmachi", "Higashiakashi", "Nishiakashi", "Uozumimachi",
+      "Okuba-cho", "Okubo", "Hayashizaki"
+    ],
+    "Kakogawa": [
+      "Kakogawa-eki", "Kako-cho", "Hioka-cho", "Higashikobe-cho", "Beppu-cho",
+      "Noguchi-cho", "Hiraoka-cho", "Shikama-cho"
+    ],
+    "Takarazuka": [
+      "Takarazuka-eki", "Sakasegawa", "Obayashi", "Ojoin", "Shin-Takarazuka",
+      "Nigawa", "Kohama", "Nakayamadera"
+    ],
+    "Hiroshima": [
+      "Hiroshima-eki", "Kamiyacho", "Hondori", "Hatchobori", "Funairi", "Yokogawa",
+      "Hakushima", "Ushita", "Danbaracho", "Asaminami", "Asakita", "Aki-ku",
+      "Naka-ku", "Higashi-ku", "Minami-ku", "Nishi-ku", "Saeki-ku"
+    ],
+    "Fukuyama": [
+      "Fukuyama-eki", "Higashisakura-cho", "Nishi-cho", "Honmachi", "Sanno-machi",
+      "Motomachi", "Kasuga-cho", "Akebono-cho"
+    ],
+    "Kure": [
+      "Kure-eki", "Honmachi", "Chuo", "Takaramachi", "Nishimachi", "Naka-dori",
+      "Hiro", "Yoshiuracho", "Kawaramachi"
+    ],
+    "Higashihiroshima": [
+      "Saijo", "Hachihonmatsucho", "Shiraichi", "Kurose", "Aki-Takada",
+      "Takaya-cho", "Gion", "Kouchi-cho"
+    ],
+    "Onomichi": [
+      "Onomichi-eki", "Tsuchidocho", "Kubocho", "Nagatocho", "Higashigosho-cho",
+      "Senkoji", "Mukaishima", "Innoshima"
+    ],
+    "Mihara": [
+      "Mihara-eki", "Honmachi", "Shiroyama", "Miyauracho", "Itosaki-cho",
+      "Tokiwa-cho", "Minato-cho", "Nukushinacho"
+    ],
+    "Sendai": [
+      "Sendai-eki", "Ichibancho", "Kokubuncho", "Aoba-dori", "Jozenji-dori",
+      "Hirose-dori", "Chuo-dori", "Aoba-ku", "Miyagino-ku", "Wakabayashi-ku",
+      "Taihaku-ku", "Izumi-ku", "Nagamachi", "Kawauchi", "Yagiyama"
+    ],
+    "Ishinomaki": [
+      "Ishinomaki-eki", "Chuo", "Kadonowaki", "Hebita", "Minato-cho",
+      "Honcho", "Yamashita-cho", "Watanoha"
+    ],
+    "Osaki": [
+      "Furukawa", "Sanbongi", "Matsuyama", "Kashimadai", "Iwadeyama",
+      "Naruko-onsen", "Nakayama-daira", "Tajiri"
+    ],
+    "Natori": [
+      "Natori-eki", "Masuda", "Yuriage", "Nagamachi-minami", "Ainosato",
+      "Takadatechuo", "Tomizawa"
+    ],
+    "Kesennuma": [
+      "Kesennuma-eki", "Minami-machi", "Yaemi", "Shishiori", "Hashikami",
+      "Karakuwa", "Motoyoshi", "Tsuyama"
+    ],
+    "Saitama": [
+      "Omiya", "Urawa", "Yono", "Iwatsuki", "Nishi-ku", "Kita-ku", "Omiya-ku",
+      "Minuma-ku", "Chuo-ku", "Sakura-ku", "Urawa-ku", "Minami-ku", "Midori-ku"
+    ],
+    "Kawagoe": [
+      "Kawagoe-eki", "Hon-Kawagoe", "Kurazukuri", "Kashiya-yokocho", "Renkei-ji",
+      "Saiwaicho", "Wakitamachi", "Shintomicho", "Naka-cho"
+    ],
+    "Kawaguchi": [
+      "Kawaguchi-eki", "Nishikawaguchi", "Warabi", "Aoki", "Maekawa", "Shiiba",
+      "Higashikawaguchi", "Namiki", "Shiba"
+    ],
+    "Koshigaya": [
+      "Koshigaya-eki", "Minami-Koshigaya", "Kita-Koshigaya", "Shin-Koshigaya",
+      "Lake-Town", "Sengendai", "Oosawa", "Hanada"
+    ],
+    "Tokorozawa": [
+      "Tokorozawa-eki", "Shin-Tokorozawa", "Nishi-Tokorozawa", "Kotesashi",
+      "Higashi-Tokorozawa", "Prope", "Yamaguchi", "Sayama-ga-oka"
+    ],
+    "Kasukabe": [
+      "Kasukabe-eki", "Kita-Kasukabe", "Takesato", "Bunen", "Fujinomiya",
+      "Midori-cho", "Chuo", "Kasukabe-Eki-Higashi"
+    ],
+    "Soka": [
+      "Soka-eki", "Takasago", "Matsubara", "Shin-Soka", "Yatsuka", "Aoi",
+      "Yashio", "Sakae-cho"
+    ],
+    "Kumagaya": [
+      "Kumagaya-eki", "Ginza", "Hoshikawa", "Chikuwa-cho", "Sakura-cho",
+      "Honcho", "Miyamachi", "Tsukuba"
+    ],
+    "Chiba": [
+      "Chiba-eki", "Chiba-Chuo", "Soga", "Inage", "Makuhari", "Kaihin-makuhari",
+      "Sakusabe", "Tsuga", "Chiba-Minato", "Nishi-Chiba", "Chiba-ko"
+    ],
+    "Funabashi": [
+      "Funabashi-eki", "Kita-Funabashi", "Tsudanuma", "Shin-Funabashi",
+      "Nishi-Funabashi", "Minami-Funabashi", "Futawa-mukodai", "Misaki"
+    ],
+    "Matsudo": [
+      "Matsudo-eki", "Shin-Matsudo", "Kita-Matsudo", "Yahashira", "Kogane",
+      "Tokiwa-daira", "Mabashi", "Minami-Nagareyama"
+    ],
+    "Ichikawa": [
+      "Ichikawa-eki", "Motoyawata", "Gyotoku", "Minami-Gyotoku", "Nishi-Funabashi",
+      "Ichikawa-Shiohama", "Ichikawa-ono", "Konodai"
+    ],
+    "Kashiwa": [
+      "Kashiwa-eki", "Kashiwanoha", "Minami-Kashiwa", "Shin-Kashiwa", "Kitakashiwa",
+      "Kami-nagarekawa", "Masuo", "Sakasai"
+    ],
+    "Ichihara": [
+      "Goi", "Goishikaigan", "Kimitsu", "Anegasaki", "Tatsumidai",
+      "Chiharadai", "Kokubunjidai", "Yawata"
+    ],
+    "Urayasu": [
+      "Urayasu-eki", "Shin-Urayasu", "Maihama", "Minami-Urayasu", "Takasu",
+      "Mihama", "Irifune", "Akemi"
+    ],
+    "Narashino": [
+      "Tsudanuma", "Shin-Narashino", "Narashino", "Yatsu", "Mimomi",
+      "Fujisaki", "Makuhari-Hongou", "Kagenoura"
+    ],
+    "Niigata": [
+      "Niigata-eki", "Bandai", "Furumachi", "Nukata", "Hakusan", "Sekiya",
+      "Higashibori-dori", "Nishihori-dori", "Nishi-ku", "Chuo-ku", "Higashi-ku",
+      "Konan-ku", "Akiha-ku", "Minami-ku", "Nishi-kan-ku", "Kita-ku"
+    ],
+    "Nagaoka": [
+      "Nagaoka-eki", "Otedori", "Omachi", "Jonai-cho", "Higashisakaemachi",
+      "Kitanagaoka", "Miyauchi", "Kawasaki"
+    ],
+    "Joetsu": [
+      "Joetsu-Myoko", "Naoetsu", "Takada", "Kasugayama", "Arai", "Kubiki",
+      "Gochi", "Maki"
+    ],
+    "Sanjo": [
+      "Sanjo-eki", "Kitasanjo", "Higashisanjo", "Tsubame-Sanjo", "Honmachi",
+      "Shimada", "Ikarashi", "Arai"
+    ],
+    "Shibata": [
+      "Shibata-eki", "Shimomachi", "Okicho", "Nishimachi", "Nakamachi",
+      "Kawaramachi", "Suwamachi", "Jonouchi"
+    ],
+    "Shizuoka": [
+      "Shizuoka-eki", "Aoi-ku", "Suruga-ku", "Shimizu-ku", "Miyuki-cho",
+      "Takajomachi", "Sumpu", "Takajo", "Ote", "Gofuku-cho"
+    ],
+    "Hamamatsu": [
+      "Hamamatsu-eki", "Naka-ku", "Higashi-ku", "Nishi-ku", "Minami-ku",
+      "Kita-ku", "Hamakita-ku", "Tenryu-ku", "Kamaji", "Tamachi"
+    ],
+    "Numazu": [
+      "Numazu-eki", "Shimamoto-cho", "Chuo-cho", "Honmachi", "Ohoka",
+      "Kanukiyama", "Shimo-Kanuki", "Mishima-Tanaka"
+    ],
+    "Fuji": [
+      "Fuji-eki", "Shin-Fuji", "Yoshiwara", "Fuji-Yoshiwara", "Higashi-Tanaka",
+      "Dembomachi", "Imagawa", "Hiracho"
+    ],
+    "Iwata": [
+      "Iwata-eki", "Higashimachi", "Nishimachi", "Jyutaku-cho", "Nakamura-cho",
+      "Arai-cho", "Toyoda-cho", "Fukuda"
+    ],
+    "Yaizu": [
+      "Yaizu-eki", "Honmachi", "Sakana-cho", "Sakaemachi", "Horacho",
+      "Nishikoyama", "Daito-cho", "Ryuyo"
+    ],
+    "Okayama": [
+      "Okayama-eki", "Omotecho", "Korakuen", "Okayama-jo", "Naka-ku",
+      "Kita-ku", "Minami-ku", "Higashi-ku", "Daiku", "Hokan-cho"
+    ],
+    "Kurashiki": [
+      "Kurashiki-eki", "Bikan", "Achi", "Honmachi", "Tamashima", "Mizushima",
+      "Chayamachi", "Kojima", "Tsurugata"
+    ],
+    "Tsuyama": [
+      "Tsuyama-eki", "Sange", "Otemachi", "Higashiichiba", "Tanaka-machi",
+      "Kawasaki", "Yokoyama", "Kozuki"
+    ],
+    "Soja": [
+      "Soja-eki", "Ekimae", "Chuo", "Mitsuikedai", "Yamate", "Toide-cho",
+      "Mita-cho", "Kiyoto"
+    ],
+    "Naha": [
+      "Kokusai-dori", "Makishi", "Matsuo", "Tsuboya", "Naha-eki", "Miebashi",
+      "Maejima", "Asato", "Tomari", "Shuri", "Omoromachi", "Naminoue"
+    ],
+    "Okinawa": [
+      "Okinawa-shi", "Goya", "Misato", "Nakanomachi", "Awase", "Chibana",
+      "Yogi", "Ikehara", "Nakagusuku"
+    ],
+    "Uruma": [
+      "Uruma", "Ishikawa", "Gushikawa", "Katsuren", "Yonashiro", "Miyagi",
+      "Heshikiya", "Henza", "Hama-Higa"
+    ],
+    "Urasoe": [
+      "Urasoe-eki", "Isa", "Makiminato", "Asato", "Maeda", "Kyozuka",
+      "Jima", "Tedako", "Iso"
+    ],
+    "Ginowan": [
+      "Ginowan", "Futenma", "Mashiki", "Nodake", "Aragusuku", "Oyama",
+      "Uchidomari", "Isa"
+    ],
+    "Kanazawa": [
+      "Kanazawa-eki", "Katamachi", "Korinbo", "Kenrokuen", "Higashiyama",
+      "Nagamachi", "Kazue-machi", "Omicho", "Teramachi", "Nishi-chaya",
+      "Oyama", "Nomachi", "Musashi-ga-tsuji"
+    ],
+    "Komatsu": [
+      "Komatsu-eki", "Hinode-machi", "Tosho-cho", "Shioyama-cho", "Ekimae-cho",
+      "Sonota-machi", "Awazu-onsen", "Hakusan"
+    ],
+    "Hakusan": [
+      "Hakusan-eki", "Tsurugi", "Matto", "Mikawa", "Torigoe", "Kawachi",
+      "Yoshinodani", "Shiramine"
+    ],
+    "Nagano": [
+      "Nagano-eki", "Zenkoji", "Gondo-machi", "Chuo-dori", "Agata-machi",
+      "Midori-cho", "Okada", "Kawanakajima", "Matsushiro"
+    ],
+    "Matsumoto": [
+      "Matsumoto-eki", "Matsumoto-jo", "Chuo", "Fukashi", "Ote", "Agata-machi",
+      "Nakamachi", "Nawate", "Shimauchi"
+    ],
+    "Ueda": [
+      "Ueda-eki", "Ueda-jo", "Tenjin", "Chuo", "Matsuo", "Kokubunji",
+      "Shioda", "Bessho-onsen"
+    ],
+    "Iida": [
+      "Iida-eki", "Honmachi", "Chuo-dori", "Tonomachi", "Chuo", "Matsuo",
+      "Tokimata", "Kamigo"
+    ],
+    "Suwa": [
+      "Kami-Suwa-eki", "Suwa-ko", "Suwa-Taisha", "Shimogamo", "Toyoda",
+      "Nakasu", "Okaya", "Shimosuwa"
+    ]
+  },
+  "postcode_format": "###-####",
+  "address_formats": [
+    "{postcode} {state} {city} {street} {building_number}-{unit}",
+    "{postcode} {state} {city} {street} {building_number}"
+  ],
+  "country": "Japan",
+  "country_code": "JP",
+  "phone_area_codes": {
+    "Tokyo": ["03"],
+    "Kanagawa": ["045", "044", "042"],
+    "Osaka": ["06"],
+    "Aichi": ["052"],
+    "Hokkaido": ["011"],
+    "Fukuoka": ["092"],
+    "Kyoto": ["075"],
+    "Hyogo": ["078"],
+    "Hiroshima": ["082"],
+    "Miyagi": ["022"],
+    "Saitama": ["048"],
+    "Chiba": ["043"],
+    "Niigata": ["025"],
+    "Shizuoka": ["054", "053"],
+    "Okayama": ["086"],
+    "Okinawa": ["098"],
+    "Ishikawa": ["076"],
+    "Nagano": ["026"]
+  }
+}

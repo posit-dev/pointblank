@@ -302,6 +302,41 @@ pb run validation.yaml --exit-code
 pb run validation.py --exit-code
 ```
 
+## 현실적인 테스트 데이터 생성
+
+검증 워크플로우를 위한 테스트 데이터가 필요하신가요? `generate_dataset()` 함수는 스키마 정의를 기반으로 현실적이고 로케일 인식 합성 데이터를 생성합니다. 프로덕션 데이터 없이 파이프라인을 개발하거나, 재현 가능한 시나리오로 CI/CD 테스트를 실행하거나, 프로덕션 데이터가 준비되기 전에 워크플로우를 프로토타입하는 데 매우 유용합니다.
+
+```python
+import pointblank as pb
+
+# 필드 제약 조건이 있는 스키마 정의
+schema = pb.Schema(
+    user_id=pb.int_field(min_val=1, unique=True),
+    name=pb.string_field(preset="name"),
+    email=pb.string_field(preset="email"),
+    age=pb.int_field(min_val=18, max_val=100),
+    status=pb.string_field(allowed=["active", "pending", "inactive"]),
+)
+
+# 100개의 현실적인 테스트 데이터 행 생성
+data = pb.generate_dataset(schema, n=100, seed=23)
+```
+
+| user_id             | name             | email                       | age | status   |
+|---------------------|------------------|-----------------------------|-----|----------|
+| 7188536481533917197 | Vivienne Rios    | vrios27@hotmail.com         | 55  | pending  |
+| 2674009078779859984 | William Schaefer | wschaefer28@yandex.com      | 28  | active   |
+| 7652102777077138151 | Lily Hansen      | lily779@aol.com             | 20  | active   |
+| 157503859921753049  | Shirley Mays     | shirley_mays@protonmail.com | 93  | inactive |
+| 2829213282471975080 | Sean Dawson      | sean_dawson@hotmail.com     | 57  | pending  |
+
+생성기는 다음 기능으로 정교한 데이터 생성을 지원합니다:
+
+- **프리셋을 사용한 현실적인 데이터**: `"name"`, `"email"`, `"address"`, `"phone"` 등의 내장 프리셋 사용
+- **50개국 이상 지원**: 로케일별 데이터 생성 (예: `country="DE"`로 독일 주소)
+- **필드 제약 조건**: 범위, 패턴, 고유성 및 허용 값 제어
+- **다중 출력 형식**: 기본적으로 Polars DataFrame을 반환하지만, Pandas (`output="pandas"`) 또는 딕셔너리 (`output="dict"`)도 지원
+
 ## Pointblank을 차별화하는 기능
 
 - **완전한 검증 워크플로우**: 단일 파이프라인에서 데이터 액세스부터 검증, 보고까지

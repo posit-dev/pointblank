@@ -1,0 +1,996 @@
+{
+  "locations": [
+    {"city": "New York", "state": "New York", "state_abbr": "NY", "postcode_prefix": "100", "lat_min": 40.48, "lat_max": 40.92, "lon_min": -74.26, "lon_max": -73.70},
+    {"city": "Brooklyn", "state": "New York", "state_abbr": "NY", "postcode_prefix": "112", "lat_min": 40.57, "lat_max": 40.74, "lon_min": -74.04, "lon_max": -73.83},
+    {"city": "Buffalo", "state": "New York", "state_abbr": "NY", "postcode_prefix": "142", "lat_min": 42.83, "lat_max": 42.97, "lon_min": -78.93, "lon_max": -78.78},
+    {"city": "Albany", "state": "New York", "state_abbr": "NY", "postcode_prefix": "122", "lat_min": 42.61, "lat_max": 42.72, "lon_min": -73.82, "lon_max": -73.70},
+    {"city": "Rochester", "state": "New York", "state_abbr": "NY", "postcode_prefix": "146", "lat_min": 43.10, "lat_max": 43.23, "lon_min": -77.70, "lon_max": -77.50},
+    {"city": "Syracuse", "state": "New York", "state_abbr": "NY", "postcode_prefix": "132", "lat_min": 42.98, "lat_max": 43.10, "lon_min": -76.22, "lon_max": -76.08},
+    {"city": "Yonkers", "state": "New York", "state_abbr": "NY", "postcode_prefix": "107", "lat_min": 40.91, "lat_max": 41.00, "lon_min": -73.90, "lon_max": -73.82},
+    {"city": "Los Angeles", "state": "California", "state_abbr": "CA", "postcode_prefix": "900", "lat_min": 33.70, "lat_max": 34.34, "lon_min": -118.67, "lon_max": -118.15},
+    {"city": "San Francisco", "state": "California", "state_abbr": "CA", "postcode_prefix": "941", "lat_min": 37.70, "lat_max": 37.83, "lon_min": -122.52, "lon_max": -122.35},
+    {"city": "San Diego", "state": "California", "state_abbr": "CA", "postcode_prefix": "921", "lat_min": 32.53, "lat_max": 33.11, "lon_min": -117.28, "lon_max": -116.90},
+    {"city": "San Jose", "state": "California", "state_abbr": "CA", "postcode_prefix": "951", "lat_min": 37.20, "lat_max": 37.47, "lon_min": -122.05, "lon_max": -121.73},
+    {"city": "Sacramento", "state": "California", "state_abbr": "CA", "postcode_prefix": "958", "lat_min": 38.44, "lat_max": 38.69, "lon_min": -121.56, "lon_max": -121.36},
+    {"city": "Oakland", "state": "California", "state_abbr": "CA", "postcode_prefix": "946", "lat_min": 37.73, "lat_max": 37.88, "lon_min": -122.33, "lon_max": -122.11},
+    {"city": "Fresno", "state": "California", "state_abbr": "CA", "postcode_prefix": "937", "lat_min": 36.66, "lat_max": 36.91, "lon_min": -119.93, "lon_max": -119.68},
+    {"city": "Long Beach", "state": "California", "state_abbr": "CA", "postcode_prefix": "908", "lat_min": 33.73, "lat_max": 33.88, "lon_min": -118.25, "lon_max": -118.06},
+    {"city": "Anaheim", "state": "California", "state_abbr": "CA", "postcode_prefix": "928", "lat_min": 33.78, "lat_max": 33.87, "lon_min": -118.00, "lon_max": -117.84},
+    {"city": "Irvine", "state": "California", "state_abbr": "CA", "postcode_prefix": "926", "lat_min": 33.62, "lat_max": 33.76, "lon_min": -117.87, "lon_max": -117.68},
+    {"city": "Bakersfield", "state": "California", "state_abbr": "CA", "postcode_prefix": "933", "lat_min": 35.30, "lat_max": 35.45, "lon_min": -119.15, "lon_max": -118.90},
+    {"city": "Riverside", "state": "California", "state_abbr": "CA", "postcode_prefix": "925", "lat_min": 33.87, "lat_max": 34.02, "lon_min": -117.50, "lon_max": -117.30},
+    {"city": "Stockton", "state": "California", "state_abbr": "CA", "postcode_prefix": "952", "lat_min": 37.90, "lat_max": 38.05, "lon_min": -121.35, "lon_max": -121.18},
+    {"city": "Fremont", "state": "California", "state_abbr": "CA", "postcode_prefix": "945", "lat_min": 37.47, "lat_max": 37.59, "lon_min": -122.08, "lon_max": -121.88},
+    {"city": "Santa Ana", "state": "California", "state_abbr": "CA", "postcode_prefix": "927", "lat_min": 33.69, "lat_max": 33.78, "lon_min": -117.93, "lon_max": -117.82},
+    {"city": "Modesto", "state": "California", "state_abbr": "CA", "postcode_prefix": "953", "lat_min": 37.60, "lat_max": 37.73, "lon_min": -121.05, "lon_max": -120.93},
+    {"city": "Fontana", "state": "California", "state_abbr": "CA", "postcode_prefix": "923", "lat_min": 34.05, "lat_max": 34.17, "lon_min": -117.50, "lon_max": -117.40},
+    {"city": "Santa Clarita", "state": "California", "state_abbr": "CA", "postcode_prefix": "913", "lat_min": 34.35, "lat_max": 34.47, "lon_min": -118.58, "lon_max": -118.40},
+    {"city": "San Bernardino", "state": "California", "state_abbr": "CA", "postcode_prefix": "924", "lat_min": 34.05, "lat_max": 34.18, "lon_min": -117.35, "lon_max": -117.20},
+    {"city": "Chicago", "state": "Illinois", "state_abbr": "IL", "postcode_prefix": "606", "lat_min": 41.64, "lat_max": 42.02, "lon_min": -87.94, "lon_max": -87.52},
+    {"city": "Aurora", "state": "Illinois", "state_abbr": "IL", "postcode_prefix": "605", "lat_min": 41.72, "lat_max": 41.82, "lon_min": -88.40, "lon_max": -88.24},
+    {"city": "Naperville", "state": "Illinois", "state_abbr": "IL", "postcode_prefix": "605", "lat_min": 41.70, "lat_max": 41.82, "lon_min": -88.23, "lon_max": -88.07},
+    {"city": "Joliet", "state": "Illinois", "state_abbr": "IL", "postcode_prefix": "604", "lat_min": 41.48, "lat_max": 41.58, "lon_min": -88.15, "lon_max": -88.00},
+    {"city": "Rockford", "state": "Illinois", "state_abbr": "IL", "postcode_prefix": "611", "lat_min": 42.20, "lat_max": 42.35, "lon_min": -89.15, "lon_max": -88.95},
+    {"city": "Springfield", "state": "Illinois", "state_abbr": "IL", "postcode_prefix": "627", "lat_min": 39.72, "lat_max": 39.87, "lon_min": -89.72, "lon_max": -89.58},
+    {"city": "Peoria", "state": "Illinois", "state_abbr": "IL", "postcode_prefix": "616", "lat_min": 40.65, "lat_max": 40.78, "lon_min": -89.68, "lon_max": -89.55},
+    {"city": "Houston", "state": "Texas", "state_abbr": "TX", "postcode_prefix": "770", "lat_min": 29.52, "lat_max": 30.11, "lon_min": -95.79, "lon_max": -95.01},
+    {"city": "San Antonio", "state": "Texas", "state_abbr": "TX", "postcode_prefix": "782", "lat_min": 29.26, "lat_max": 29.65, "lon_min": -98.73, "lon_max": -98.29},
+    {"city": "Dallas", "state": "Texas", "state_abbr": "TX", "postcode_prefix": "752", "lat_min": 32.62, "lat_max": 33.02, "lon_min": -96.99, "lon_max": -96.55},
+    {"city": "Austin", "state": "Texas", "state_abbr": "TX", "postcode_prefix": "787", "lat_min": 30.10, "lat_max": 30.52, "lon_min": -97.94, "lon_max": -97.56},
+    {"city": "Fort Worth", "state": "Texas", "state_abbr": "TX", "postcode_prefix": "761", "lat_min": 32.61, "lat_max": 32.97, "lon_min": -97.53, "lon_max": -97.19},
+    {"city": "El Paso", "state": "Texas", "state_abbr": "TX", "postcode_prefix": "799", "lat_min": 31.65, "lat_max": 31.97, "lon_min": -106.63, "lon_max": -106.28},
+    {"city": "Arlington", "state": "Texas", "state_abbr": "TX", "postcode_prefix": "760", "lat_min": 32.63, "lat_max": 32.80, "lon_min": -97.20, "lon_max": -97.03},
+    {"city": "Corpus Christi", "state": "Texas", "state_abbr": "TX", "postcode_prefix": "784", "lat_min": 27.65, "lat_max": 27.87, "lon_min": -97.52, "lon_max": -97.28},
+    {"city": "Plano", "state": "Texas", "state_abbr": "TX", "postcode_prefix": "750", "lat_min": 33.00, "lat_max": 33.13, "lon_min": -96.77, "lon_max": -96.61},
+    {"city": "Laredo", "state": "Texas", "state_abbr": "TX", "postcode_prefix": "780", "lat_min": 27.45, "lat_max": 27.63, "lon_min": -99.58, "lon_max": -99.42},
+    {"city": "Lubbock", "state": "Texas", "state_abbr": "TX", "postcode_prefix": "794", "lat_min": 33.47, "lat_max": 33.65, "lon_min": -101.95, "lon_max": -101.77},
+    {"city": "Irving", "state": "Texas", "state_abbr": "TX", "postcode_prefix": "750", "lat_min": 32.79, "lat_max": 32.94, "lon_min": -97.03, "lon_max": -96.87},
+    {"city": "Garland", "state": "Texas", "state_abbr": "TX", "postcode_prefix": "750", "lat_min": 32.87, "lat_max": 32.98, "lon_min": -96.68, "lon_max": -96.56},
+    {"city": "Phoenix", "state": "Arizona", "state_abbr": "AZ", "postcode_prefix": "850", "lat_min": 33.29, "lat_max": 33.92, "lon_min": -112.33, "lon_max": -111.93},
+    {"city": "Tucson", "state": "Arizona", "state_abbr": "AZ", "postcode_prefix": "857", "lat_min": 32.07, "lat_max": 32.33, "lon_min": -111.07, "lon_max": -110.75},
+    {"city": "Mesa", "state": "Arizona", "state_abbr": "AZ", "postcode_prefix": "852", "lat_min": 33.30, "lat_max": 33.50, "lon_min": -111.88, "lon_max": -111.58},
+    {"city": "Chandler", "state": "Arizona", "state_abbr": "AZ", "postcode_prefix": "852", "lat_min": 33.22, "lat_max": 33.37, "lon_min": -111.90, "lon_max": -111.78},
+    {"city": "Scottsdale", "state": "Arizona", "state_abbr": "AZ", "postcode_prefix": "852", "lat_min": 33.45, "lat_max": 33.78, "lon_min": -111.95, "lon_max": -111.73},
+    {"city": "Gilbert", "state": "Arizona", "state_abbr": "AZ", "postcode_prefix": "852", "lat_min": 33.26, "lat_max": 33.40, "lon_min": -111.82, "lon_max": -111.68},
+    {"city": "Glendale", "state": "Arizona", "state_abbr": "AZ", "postcode_prefix": "853", "lat_min": 33.48, "lat_max": 33.72, "lon_min": -112.23, "lon_max": -112.10},
+    {"city": "Tempe", "state": "Arizona", "state_abbr": "AZ", "postcode_prefix": "852", "lat_min": 33.35, "lat_max": 33.46, "lon_min": -111.98, "lon_max": -111.88},
+    {"city": "Peoria", "state": "Arizona", "state_abbr": "AZ", "postcode_prefix": "853", "lat_min": 33.55, "lat_max": 33.83, "lon_min": -112.30, "lon_max": -112.18},
+    {"city": "Surprise", "state": "Arizona", "state_abbr": "AZ", "postcode_prefix": "853", "lat_min": 33.60, "lat_max": 33.72, "lon_min": -112.45, "lon_max": -112.33},
+    {"city": "Philadelphia", "state": "Pennsylvania", "state_abbr": "PA", "postcode_prefix": "191", "lat_min": 39.87, "lat_max": 40.14, "lon_min": -75.28, "lon_max": -74.95},
+    {"city": "Pittsburgh", "state": "Pennsylvania", "state_abbr": "PA", "postcode_prefix": "152", "lat_min": 40.36, "lat_max": 40.50, "lon_min": -80.10, "lon_max": -79.87},
+    {"city": "Allentown", "state": "Pennsylvania", "state_abbr": "PA", "postcode_prefix": "181", "lat_min": 40.57, "lat_max": 40.65, "lon_min": -75.53, "lon_max": -75.43},
+    {"city": "Erie", "state": "Pennsylvania", "state_abbr": "PA", "postcode_prefix": "165", "lat_min": 42.05, "lat_max": 42.18, "lon_min": -80.15, "lon_max": -79.95},
+    {"city": "Reading", "state": "Pennsylvania", "state_abbr": "PA", "postcode_prefix": "196", "lat_min": 40.30, "lat_max": 40.38, "lon_min": -75.97, "lon_max": -75.88},
+    {"city": "Scranton", "state": "Pennsylvania", "state_abbr": "PA", "postcode_prefix": "185", "lat_min": 41.38, "lat_max": 41.47, "lon_min": -75.72, "lon_max": -75.60},
+    {"city": "Bethlehem", "state": "Pennsylvania", "state_abbr": "PA", "postcode_prefix": "180", "lat_min": 40.58, "lat_max": 40.67, "lon_min": -75.43, "lon_max": -75.33},
+    {"city": "Jacksonville", "state": "Florida", "state_abbr": "FL", "postcode_prefix": "322", "lat_min": 30.10, "lat_max": 30.59, "lon_min": -81.88, "lon_max": -81.38},
+    {"city": "Miami", "state": "Florida", "state_abbr": "FL", "postcode_prefix": "331", "lat_min": 25.71, "lat_max": 25.86, "lon_min": -80.33, "lon_max": -80.13},
+    {"city": "Tampa", "state": "Florida", "state_abbr": "FL", "postcode_prefix": "336", "lat_min": 27.82, "lat_max": 28.08, "lon_min": -82.56, "lon_max": -82.34},
+    {"city": "Orlando", "state": "Florida", "state_abbr": "FL", "postcode_prefix": "328", "lat_min": 28.40, "lat_max": 28.62, "lon_min": -81.51, "lon_max": -81.23},
+    {"city": "St. Petersburg", "state": "Florida", "state_abbr": "FL", "postcode_prefix": "337", "lat_min": 27.70, "lat_max": 27.85, "lon_min": -82.75, "lon_max": -82.60},
+    {"city": "Hialeah", "state": "Florida", "state_abbr": "FL", "postcode_prefix": "330", "lat_min": 25.83, "lat_max": 25.92, "lon_min": -80.33, "lon_max": -80.23},
+    {"city": "Port St. Lucie", "state": "Florida", "state_abbr": "FL", "postcode_prefix": "349", "lat_min": 27.23, "lat_max": 27.38, "lon_min": -80.43, "lon_max": -80.30},
+    {"city": "Cape Coral", "state": "Florida", "state_abbr": "FL", "postcode_prefix": "339", "lat_min": 26.55, "lat_max": 26.72, "lon_min": -82.05, "lon_max": -81.87},
+    {"city": "Tallahassee", "state": "Florida", "state_abbr": "FL", "postcode_prefix": "323", "lat_min": 30.38, "lat_max": 30.52, "lon_min": -84.35, "lon_max": -84.18},
+    {"city": "Fort Lauderdale", "state": "Florida", "state_abbr": "FL", "postcode_prefix": "333", "lat_min": 26.09, "lat_max": 26.22, "lon_min": -80.20, "lon_max": -80.08},
+    {"city": "Pembroke Pines", "state": "Florida", "state_abbr": "FL", "postcode_prefix": "330", "lat_min": 25.98, "lat_max": 26.05, "lon_min": -80.38, "lon_max": -80.22},
+    {"city": "Hollywood", "state": "Florida", "state_abbr": "FL", "postcode_prefix": "330", "lat_min": 26.00, "lat_max": 26.07, "lon_min": -80.20, "lon_max": -80.10},
+    {"city": "Columbus", "state": "Ohio", "state_abbr": "OH", "postcode_prefix": "432", "lat_min": 39.81, "lat_max": 40.16, "lon_min": -83.20, "lon_max": -82.77},
+    {"city": "Cleveland", "state": "Ohio", "state_abbr": "OH", "postcode_prefix": "441", "lat_min": 41.39, "lat_max": 41.60, "lon_min": -81.88, "lon_max": -81.53},
+    {"city": "Cincinnati", "state": "Ohio", "state_abbr": "OH", "postcode_prefix": "452", "lat_min": 39.07, "lat_max": 39.22, "lon_min": -84.62, "lon_max": -84.40},
+    {"city": "Toledo", "state": "Ohio", "state_abbr": "OH", "postcode_prefix": "436", "lat_min": 41.60, "lat_max": 41.73, "lon_min": -83.68, "lon_max": -83.45},
+    {"city": "Akron", "state": "Ohio", "state_abbr": "OH", "postcode_prefix": "443", "lat_min": 41.00, "lat_max": 41.15, "lon_min": -81.58, "lon_max": -81.42},
+    {"city": "Dayton", "state": "Ohio", "state_abbr": "OH", "postcode_prefix": "454", "lat_min": 39.70, "lat_max": 39.83, "lon_min": -84.28, "lon_max": -84.10},
+    {"city": "Parma", "state": "Ohio", "state_abbr": "OH", "postcode_prefix": "441", "lat_min": 41.37, "lat_max": 41.42, "lon_min": -81.78, "lon_max": -81.70},
+    {"city": "Canton", "state": "Ohio", "state_abbr": "OH", "postcode_prefix": "447", "lat_min": 40.78, "lat_max": 40.87, "lon_min": -81.43, "lon_max": -81.33},
+    {"city": "Indianapolis", "state": "Indiana", "state_abbr": "IN", "postcode_prefix": "462", "lat_min": 39.63, "lat_max": 39.93, "lon_min": -86.33, "lon_max": -85.93},
+    {"city": "Fort Wayne", "state": "Indiana", "state_abbr": "IN", "postcode_prefix": "468", "lat_min": 40.98, "lat_max": 41.17, "lon_min": -85.25, "lon_max": -85.03},
+    {"city": "Evansville", "state": "Indiana", "state_abbr": "IN", "postcode_prefix": "477", "lat_min": 37.93, "lat_max": 38.05, "lon_min": -87.65, "lon_max": -87.48},
+    {"city": "South Bend", "state": "Indiana", "state_abbr": "IN", "postcode_prefix": "466", "lat_min": 41.62, "lat_max": 41.73, "lon_min": -86.35, "lon_max": -86.18},
+    {"city": "Carmel", "state": "Indiana", "state_abbr": "IN", "postcode_prefix": "460", "lat_min": 39.95, "lat_max": 40.03, "lon_min": -86.18, "lon_max": -86.05},
+    {"city": "Bloomington", "state": "Indiana", "state_abbr": "IN", "postcode_prefix": "474", "lat_min": 39.12, "lat_max": 39.22, "lon_min": -86.58, "lon_max": -86.47},
+    {"city": "Charlotte", "state": "North Carolina", "state_abbr": "NC", "postcode_prefix": "282", "lat_min": 35.05, "lat_max": 35.39, "lon_min": -81.01, "lon_max": -80.68},
+    {"city": "Raleigh", "state": "North Carolina", "state_abbr": "NC", "postcode_prefix": "276", "lat_min": 35.71, "lat_max": 35.95, "lon_min": -78.78, "lon_max": -78.53},
+    {"city": "Greensboro", "state": "North Carolina", "state_abbr": "NC", "postcode_prefix": "274", "lat_min": 35.98, "lat_max": 36.15, "lon_min": -80.02, "lon_max": -79.75},
+    {"city": "Durham", "state": "North Carolina", "state_abbr": "NC", "postcode_prefix": "277", "lat_min": 35.90, "lat_max": 36.10, "lon_min": -79.02, "lon_max": -78.82},
+    {"city": "Winston-Salem", "state": "North Carolina", "state_abbr": "NC", "postcode_prefix": "271", "lat_min": 36.03, "lat_max": 36.18, "lon_min": -80.35, "lon_max": -80.18},
+    {"city": "Fayetteville", "state": "North Carolina", "state_abbr": "NC", "postcode_prefix": "283", "lat_min": 35.00, "lat_max": 35.15, "lon_min": -79.02, "lon_max": -78.85},
+    {"city": "Cary", "state": "North Carolina", "state_abbr": "NC", "postcode_prefix": "275", "lat_min": 35.72, "lat_max": 35.85, "lon_min": -78.87, "lon_max": -78.73},
+    {"city": "Wilmington", "state": "North Carolina", "state_abbr": "NC", "postcode_prefix": "284", "lat_min": 34.18, "lat_max": 34.28, "lon_min": -77.95, "lon_max": -77.85},
+    {"city": "Seattle", "state": "Washington", "state_abbr": "WA", "postcode_prefix": "981", "lat_min": 47.49, "lat_max": 47.73, "lon_min": -122.44, "lon_max": -122.24},
+    {"city": "Spokane", "state": "Washington", "state_abbr": "WA", "postcode_prefix": "992", "lat_min": 47.60, "lat_max": 47.75, "lon_min": -117.50, "lon_max": -117.33},
+    {"city": "Tacoma", "state": "Washington", "state_abbr": "WA", "postcode_prefix": "984", "lat_min": 47.17, "lat_max": 47.32, "lon_min": -122.52, "lon_max": -122.38},
+    {"city": "Vancouver", "state": "Washington", "state_abbr": "WA", "postcode_prefix": "986", "lat_min": 45.60, "lat_max": 45.72, "lon_min": -122.73, "lon_max": -122.55},
+    {"city": "Bellevue", "state": "Washington", "state_abbr": "WA", "postcode_prefix": "980", "lat_min": 47.55, "lat_max": 47.65, "lon_min": -122.22, "lon_max": -122.10},
+    {"city": "Kent", "state": "Washington", "state_abbr": "WA", "postcode_prefix": "980", "lat_min": 47.35, "lat_max": 47.45, "lon_min": -122.28, "lon_max": -122.17},
+    {"city": "Everett", "state": "Washington", "state_abbr": "WA", "postcode_prefix": "982", "lat_min": 47.93, "lat_max": 48.02, "lon_min": -122.27, "lon_max": -122.15},
+    {"city": "Denver", "state": "Colorado", "state_abbr": "CO", "postcode_prefix": "802", "lat_min": 39.61, "lat_max": 39.91, "lon_min": -105.11, "lon_max": -104.60},
+    {"city": "Colorado Springs", "state": "Colorado", "state_abbr": "CO", "postcode_prefix": "809", "lat_min": 38.75, "lat_max": 38.95, "lon_min": -104.90, "lon_max": -104.70},
+    {"city": "Aurora", "state": "Colorado", "state_abbr": "CO", "postcode_prefix": "800", "lat_min": 39.62, "lat_max": 39.77, "lon_min": -104.88, "lon_max": -104.65},
+    {"city": "Fort Collins", "state": "Colorado", "state_abbr": "CO", "postcode_prefix": "805", "lat_min": 40.50, "lat_max": 40.63, "lon_min": -105.15, "lon_max": -105.00},
+    {"city": "Lakewood", "state": "Colorado", "state_abbr": "CO", "postcode_prefix": "802", "lat_min": 39.62, "lat_max": 39.75, "lon_min": -105.18, "lon_max": -105.03},
+    {"city": "Thornton", "state": "Colorado", "state_abbr": "CO", "postcode_prefix": "802", "lat_min": 39.85, "lat_max": 39.97, "lon_min": -104.98, "lon_max": -104.87},
+    {"city": "Arvada", "state": "Colorado", "state_abbr": "CO", "postcode_prefix": "800", "lat_min": 39.77, "lat_max": 39.87, "lon_min": -105.15, "lon_max": -105.00},
+    {"city": "Westminster", "state": "Colorado", "state_abbr": "CO", "postcode_prefix": "800", "lat_min": 39.83, "lat_max": 39.93, "lon_min": -105.10, "lon_max": -104.97},
+    {"city": "Boston", "state": "Massachusetts", "state_abbr": "MA", "postcode_prefix": "021", "lat_min": 42.23, "lat_max": 42.40, "lon_min": -71.19, "lon_max": -70.92},
+    {"city": "Worcester", "state": "Massachusetts", "state_abbr": "MA", "postcode_prefix": "016", "lat_min": 42.23, "lat_max": 42.33, "lon_min": -71.85, "lon_max": -71.73},
+    {"city": "Springfield", "state": "Massachusetts", "state_abbr": "MA", "postcode_prefix": "011", "lat_min": 42.08, "lat_max": 42.16, "lon_min": -72.62, "lon_max": -72.52},
+    {"city": "Lowell", "state": "Massachusetts", "state_abbr": "MA", "postcode_prefix": "018", "lat_min": 42.62, "lat_max": 42.68, "lon_min": -71.35, "lon_max": -71.28},
+    {"city": "Cambridge", "state": "Massachusetts", "state_abbr": "MA", "postcode_prefix": "021", "lat_min": 42.35, "lat_max": 42.40, "lon_min": -71.15, "lon_max": -71.07},
+    {"city": "New Bedford", "state": "Massachusetts", "state_abbr": "MA", "postcode_prefix": "027", "lat_min": 41.60, "lat_max": 41.68, "lon_min": -70.95, "lon_max": -70.90},
+    {"city": "Nashville", "state": "Tennessee", "state_abbr": "TN", "postcode_prefix": "372", "lat_min": 36.00, "lat_max": 36.30, "lon_min": -87.03, "lon_max": -86.58},
+    {"city": "Memphis", "state": "Tennessee", "state_abbr": "TN", "postcode_prefix": "381", "lat_min": 34.99, "lat_max": 35.23, "lon_min": -90.12, "lon_max": -89.85},
+    {"city": "Knoxville", "state": "Tennessee", "state_abbr": "TN", "postcode_prefix": "379", "lat_min": 35.90, "lat_max": 36.05, "lon_min": -84.05, "lon_max": -83.82},
+    {"city": "Chattanooga", "state": "Tennessee", "state_abbr": "TN", "postcode_prefix": "374", "lat_min": 34.98, "lat_max": 35.12, "lon_min": -85.38, "lon_max": -85.17},
+    {"city": "Clarksville", "state": "Tennessee", "state_abbr": "TN", "postcode_prefix": "370", "lat_min": 36.48, "lat_max": 36.62, "lon_min": -87.43, "lon_max": -87.27},
+    {"city": "Murfreesboro", "state": "Tennessee", "state_abbr": "TN", "postcode_prefix": "371", "lat_min": 35.80, "lat_max": 35.92, "lon_min": -86.45, "lon_max": -86.35},
+    {"city": "Detroit", "state": "Michigan", "state_abbr": "MI", "postcode_prefix": "482", "lat_min": 42.28, "lat_max": 42.45, "lon_min": -83.29, "lon_max": -82.91},
+    {"city": "Grand Rapids", "state": "Michigan", "state_abbr": "MI", "postcode_prefix": "495", "lat_min": 42.88, "lat_max": 43.05, "lon_min": -85.75, "lon_max": -85.55},
+    {"city": "Warren", "state": "Michigan", "state_abbr": "MI", "postcode_prefix": "480", "lat_min": 42.47, "lat_max": 42.53, "lon_min": -83.07, "lon_max": -82.95},
+    {"city": "Sterling Heights", "state": "Michigan", "state_abbr": "MI", "postcode_prefix": "483", "lat_min": 42.55, "lat_max": 42.62, "lon_min": -83.07, "lon_max": -82.92},
+    {"city": "Ann Arbor", "state": "Michigan", "state_abbr": "MI", "postcode_prefix": "481", "lat_min": 42.23, "lat_max": 42.33, "lon_min": -83.80, "lon_max": -83.68},
+    {"city": "Lansing", "state": "Michigan", "state_abbr": "MI", "postcode_prefix": "489", "lat_min": 42.68, "lat_max": 42.78, "lon_min": -84.60, "lon_max": -84.48},
+    {"city": "Dearborn", "state": "Michigan", "state_abbr": "MI", "postcode_prefix": "481", "lat_min": 42.28, "lat_max": 42.35, "lon_min": -83.27, "lon_max": -83.15},
+    {"city": "Livonia", "state": "Michigan", "state_abbr": "MI", "postcode_prefix": "481", "lat_min": 42.38, "lat_max": 42.45, "lon_min": -83.42, "lon_max": -83.32},
+    {"city": "Atlanta", "state": "Georgia", "state_abbr": "GA", "postcode_prefix": "303", "lat_min": 33.65, "lat_max": 33.89, "lon_min": -84.55, "lon_max": -84.28},
+    {"city": "Augusta", "state": "Georgia", "state_abbr": "GA", "postcode_prefix": "309", "lat_min": 33.38, "lat_max": 33.55, "lon_min": -82.10, "lon_max": -81.90},
+    {"city": "Columbus", "state": "Georgia", "state_abbr": "GA", "postcode_prefix": "319", "lat_min": 32.40, "lat_max": 32.55, "lon_min": -84.98, "lon_max": -84.87},
+    {"city": "Macon", "state": "Georgia", "state_abbr": "GA", "postcode_prefix": "312", "lat_min": 32.80, "lat_max": 32.90, "lon_min": -83.70, "lon_max": -83.58},
+    {"city": "Savannah", "state": "Georgia", "state_abbr": "GA", "postcode_prefix": "314", "lat_min": 31.97, "lat_max": 32.12, "lon_min": -81.20, "lon_max": -81.05},
+    {"city": "Athens", "state": "Georgia", "state_abbr": "GA", "postcode_prefix": "306", "lat_min": 33.90, "lat_max": 34.02, "lon_min": -83.43, "lon_max": -83.30},
+    {"city": "Sandy Springs", "state": "Georgia", "state_abbr": "GA", "postcode_prefix": "303", "lat_min": 33.90, "lat_max": 33.98, "lon_min": -84.40, "lon_max": -84.32},
+    {"city": "Roswell", "state": "Georgia", "state_abbr": "GA", "postcode_prefix": "300", "lat_min": 34.00, "lat_max": 34.10, "lon_min": -84.40, "lon_max": -84.28},
+    {"city": "Baltimore", "state": "Maryland", "state_abbr": "MD", "postcode_prefix": "212", "lat_min": 39.20, "lat_max": 39.37, "lon_min": -76.72, "lon_max": -76.52},
+    {"city": "Frederick", "state": "Maryland", "state_abbr": "MD", "postcode_prefix": "217", "lat_min": 39.38, "lat_max": 39.48, "lon_min": -77.45, "lon_max": -77.38},
+    {"city": "Rockville", "state": "Maryland", "state_abbr": "MD", "postcode_prefix": "208", "lat_min": 39.05, "lat_max": 39.12, "lon_min": -77.17, "lon_max": -77.10},
+    {"city": "Gaithersburg", "state": "Maryland", "state_abbr": "MD", "postcode_prefix": "208", "lat_min": 39.12, "lat_max": 39.18, "lon_min": -77.25, "lon_max": -77.17},
+    {"city": "Bowie", "state": "Maryland", "state_abbr": "MD", "postcode_prefix": "207", "lat_min": 38.93, "lat_max": 39.02, "lon_min": -76.78, "lon_max": -76.70},
+    {"city": "Hagerstown", "state": "Maryland", "state_abbr": "MD", "postcode_prefix": "217", "lat_min": 39.62, "lat_max": 39.68, "lon_min": -77.75, "lon_max": -77.68},
+    {"city": "Annapolis", "state": "Maryland", "state_abbr": "MD", "postcode_prefix": "214", "lat_min": 38.95, "lat_max": 39.00, "lon_min": -76.52, "lon_max": -76.47},
+    {"city": "Minneapolis", "state": "Minnesota", "state_abbr": "MN", "postcode_prefix": "554", "lat_min": 44.89, "lat_max": 45.05, "lon_min": -93.35, "lon_max": -93.20},
+    {"city": "St. Paul", "state": "Minnesota", "state_abbr": "MN", "postcode_prefix": "551", "lat_min": 44.88, "lat_max": 45.02, "lon_min": -93.17, "lon_max": -93.00},
+    {"city": "Rochester", "state": "Minnesota", "state_abbr": "MN", "postcode_prefix": "559", "lat_min": 43.95, "lat_max": 44.08, "lon_min": -92.52, "lon_max": -92.42},
+    {"city": "Duluth", "state": "Minnesota", "state_abbr": "MN", "postcode_prefix": "558", "lat_min": 46.72, "lat_max": 46.83, "lon_min": -92.18, "lon_max": -92.05},
+    {"city": "Bloomington", "state": "Minnesota", "state_abbr": "MN", "postcode_prefix": "554", "lat_min": 44.80, "lat_max": 44.87, "lon_min": -93.35, "lon_max": -93.23},
+    {"city": "Plymouth", "state": "Minnesota", "state_abbr": "MN", "postcode_prefix": "554", "lat_min": 44.97, "lat_max": 45.05, "lon_min": -93.50, "lon_max": -93.40},
+    {"city": "Portland", "state": "Oregon", "state_abbr": "OR", "postcode_prefix": "972", "lat_min": 45.43, "lat_max": 45.65, "lon_min": -122.84, "lon_max": -122.47},
+    {"city": "Salem", "state": "Oregon", "state_abbr": "OR", "postcode_prefix": "973", "lat_min": 44.88, "lat_max": 45.00, "lon_min": -123.10, "lon_max": -122.92},
+    {"city": "Eugene", "state": "Oregon", "state_abbr": "OR", "postcode_prefix": "974", "lat_min": 43.98, "lat_max": 44.10, "lon_min": -123.20, "lon_max": -123.03},
+    {"city": "Gresham", "state": "Oregon", "state_abbr": "OR", "postcode_prefix": "970", "lat_min": 45.48, "lat_max": 45.55, "lon_min": -122.48, "lon_max": -122.38},
+    {"city": "Hillsboro", "state": "Oregon", "state_abbr": "OR", "postcode_prefix": "971", "lat_min": 45.50, "lat_max": 45.58, "lon_min": -123.00, "lon_max": -122.87},
+    {"city": "Beaverton", "state": "Oregon", "state_abbr": "OR", "postcode_prefix": "970", "lat_min": 45.45, "lat_max": 45.52, "lon_min": -122.85, "lon_max": -122.77},
+    {"city": "Bend", "state": "Oregon", "state_abbr": "OR", "postcode_prefix": "977", "lat_min": 43.98, "lat_max": 44.10, "lon_min": -121.35, "lon_max": -121.25},
+    {"city": "Las Vegas", "state": "Nevada", "state_abbr": "NV", "postcode_prefix": "891", "lat_min": 36.04, "lat_max": 36.33, "lon_min": -115.35, "lon_max": -115.03},
+    {"city": "Henderson", "state": "Nevada", "state_abbr": "NV", "postcode_prefix": "890", "lat_min": 35.93, "lat_max": 36.10, "lon_min": -115.15, "lon_max": -114.90},
+    {"city": "Reno", "state": "Nevada", "state_abbr": "NV", "postcode_prefix": "895", "lat_min": 39.47, "lat_max": 39.60, "lon_min": -119.90, "lon_max": -119.72},
+    {"city": "North Las Vegas", "state": "Nevada", "state_abbr": "NV", "postcode_prefix": "890", "lat_min": 36.18, "lat_max": 36.33, "lon_min": -115.20, "lon_max": -115.05},
+    {"city": "Sparks", "state": "Nevada", "state_abbr": "NV", "postcode_prefix": "894", "lat_min": 39.52, "lat_max": 39.58, "lon_min": -119.78, "lon_max": -119.70},
+    {"city": "Carson City", "state": "Nevada", "state_abbr": "NV", "postcode_prefix": "897", "lat_min": 39.13, "lat_max": 39.22, "lon_min": -119.82, "lon_max": -119.72},
+    {"city": "New Orleans", "state": "Louisiana", "state_abbr": "LA", "postcode_prefix": "701", "lat_min": 29.87, "lat_max": 30.05, "lon_min": -90.14, "lon_max": -89.87},
+    {"city": "Baton Rouge", "state": "Louisiana", "state_abbr": "LA", "postcode_prefix": "708", "lat_min": 30.35, "lat_max": 30.55, "lon_min": -91.20, "lon_max": -91.03},
+    {"city": "Shreveport", "state": "Louisiana", "state_abbr": "LA", "postcode_prefix": "711", "lat_min": 32.42, "lat_max": 32.58, "lon_min": -93.82, "lon_max": -93.65},
+    {"city": "Lafayette", "state": "Louisiana", "state_abbr": "LA", "postcode_prefix": "705", "lat_min": 30.15, "lat_max": 30.28, "lon_min": -92.10, "lon_max": -91.95},
+    {"city": "Lake Charles", "state": "Louisiana", "state_abbr": "LA", "postcode_prefix": "706", "lat_min": 30.15, "lat_max": 30.28, "lon_min": -93.28, "lon_max": -93.15},
+    {"city": "Kenner", "state": "Louisiana", "state_abbr": "LA", "postcode_prefix": "700", "lat_min": 29.98, "lat_max": 30.03, "lon_min": -90.28, "lon_max": -90.22}
+  ],
+  "streets_by_city": {
+    "New York": [
+      "Broadway", "Fifth Avenue", "Park Avenue", "Madison Avenue", "Lexington Avenue",
+      "Wall Street", "Canal Street", "Houston Street", "Bleecker Street", "Christopher Street",
+      "West 42nd Street", "East 57th Street", "Amsterdam Avenue", "Columbus Avenue", "Central Park West",
+      "West End Avenue", "Riverside Drive", "St. Nicholas Avenue", "Lenox Avenue", "Frederick Douglass Boulevard",
+      "125th Street", "116th Street", "96th Street", "86th Street", "72nd Street",
+      "34th Street", "23rd Street", "14th Street", "8th Street", "Delancey Street",
+      "Orchard Street", "Allen Street", "Bowery", "Mulberry Street", "Mott Street",
+      "Elizabeth Street", "Spring Street", "Prince Street", "Mercer Street", "Greene Street",
+      "Wooster Street", "West Broadway", "Varick Street", "Hudson Street", "Greenwich Street",
+      "Washington Street", "West Street", "Water Street", "Front Street", "Pearl Street"
+    ],
+    "Brooklyn": [
+      "Atlantic Avenue", "Flatbush Avenue", "Bedford Avenue", "Nostrand Avenue", "Eastern Parkway",
+      "Ocean Parkway", "Kings Highway", "Church Avenue", "Coney Island Avenue", "Bay Parkway",
+      "86th Street", "4th Avenue", "5th Avenue", "7th Avenue", "Smith Street",
+      "Court Street", "Henry Street", "Montague Street", "Remsen Street", "Joralemon Street",
+      "Fulton Street", "DeKalb Avenue", "Myrtle Avenue", "Flushing Avenue", "Kent Avenue",
+      "Wythe Avenue", "Berry Street", "North 6th Street", "Metropolitan Avenue", "Grand Street",
+      "Graham Avenue", "Manhattan Avenue", "Greenpoint Avenue", "McGuinness Boulevard", "Franklin Street"
+    ],
+    "Buffalo": [
+      "Main Street", "Delaware Avenue", "Elmwood Avenue", "Hertel Avenue", "Seneca Street",
+      "Broadway", "Genesee Street", "Bailey Avenue", "Kenmore Avenue", "Niagara Street",
+      "Allen Street", "Chippewa Street", "Pearl Street", "Franklin Street", "Court Street",
+      "Washington Street", "Exchange Street", "Church Street", "Oak Street", "Maple Street"
+    ],
+    "Albany": [
+      "State Street", "Washington Avenue", "Central Avenue", "Western Avenue", "Madison Avenue",
+      "Lark Street", "Pearl Street", "Broadway", "Clinton Avenue", "Delaware Avenue",
+      "New Scotland Avenue", "Manning Boulevard", "Quail Street", "Ontario Street", "Dove Street"
+    ],
+    "Rochester": [
+      "East Avenue", "Monroe Avenue", "Park Avenue", "South Avenue", "Main Street",
+      "Clinton Avenue", "State Street", "Exchange Boulevard", "Plymouth Avenue", "Genesee Street",
+      "Lake Avenue", "Ridge Road", "Culver Road", "Winton Road", "University Avenue"
+    ],
+    "Syracuse": [
+      "Erie Boulevard", "James Street", "Salina Street", "Genesee Street", "Clinton Street",
+      "Warren Street", "Fayette Street", "Montgomery Street", "State Street", "Water Street",
+      "University Avenue", "Westcott Street", "Euclid Avenue", "Madison Street", "Onondaga Street"
+    ],
+    "Yonkers": [
+      "South Broadway", "North Broadway", "Central Park Avenue", "McLean Avenue", "Riverdale Avenue",
+      "Nepperhan Avenue", "Ashburton Avenue", "Warburton Avenue", "Palisade Avenue", "Main Street"
+    ],
+    "Los Angeles": [
+      "Wilshire Boulevard", "Sunset Boulevard", "Hollywood Boulevard", "Santa Monica Boulevard", "Melrose Avenue",
+      "La Brea Avenue", "Fairfax Avenue", "La Cienega Boulevard", "Beverly Boulevard", "Third Street",
+      "Olympic Boulevard", "Pico Boulevard", "Venice Boulevard", "Washington Boulevard", "Jefferson Boulevard",
+      "Crenshaw Boulevard", "Western Avenue", "Vermont Avenue", "Figueroa Street", "Broadway",
+      "Spring Street", "Main Street", "Los Angeles Street", "Alameda Street", "Central Avenue",
+      "Rodeo Drive", "Camden Drive", "Bedford Drive", "Robertson Boulevard", "Doheny Drive",
+      "Laurel Canyon Boulevard", "Coldwater Canyon Avenue", "Beverly Glen Boulevard", "Sepulveda Boulevard", "Highland Avenue",
+      "Vine Street", "Cahuenga Boulevard", "Ventura Boulevard", "Lankershim Boulevard", "Victory Boulevard"
+    ],
+    "San Francisco": [
+      "Market Street", "Mission Street", "Van Ness Avenue", "Geary Boulevard", "Divisadero Street",
+      "Fillmore Street", "Haight Street", "Castro Street", "Valencia Street", "24th Street",
+      "Polk Street", "Lombard Street", "Union Street", "Chestnut Street", "Columbus Avenue",
+      "Grant Avenue", "Stockton Street", "Kearny Street", "Montgomery Street", "Sansome Street",
+      "Battery Street", "Embarcadero", "Third Street", "Fourth Street", "Fifth Street",
+      "Folsom Street", "Howard Street", "Harrison Street", "Bryant Street", "Brannan Street",
+      "Irving Street", "Judah Street", "Noriega Street", "Taraval Street", "Ocean Avenue"
+    ],
+    "San Diego": [
+      "Broadway", "Harbor Drive", "Pacific Highway", "India Street", "Kettner Boulevard",
+      "Fifth Avenue", "Sixth Avenue", "Park Boulevard", "University Avenue", "El Cajon Boulevard",
+      "Adams Avenue", "Normal Street", "30th Street", "Texas Street", "Morena Boulevard",
+      "Sports Arena Boulevard", "Rosecrans Street", "Midway Drive", "Clairemont Mesa Boulevard", "Convoy Street",
+      "Mira Mesa Boulevard", "Poway Road", "Rancho Bernardo Road", "Carmel Mountain Road", "Scripps Poway Parkway"
+    ],
+    "San Jose": [
+      "Santa Clara Street", "San Fernando Street", "First Street", "Second Street", "Market Street",
+      "San Carlos Street", "San Salvador Street", "Julian Street", "Taylor Street", "Hedding Street",
+      "The Alameda", "Stevens Creek Boulevard", "Winchester Boulevard", "Saratoga Avenue", "Campbell Avenue",
+      "Bascom Avenue", "Meridian Avenue", "Lincoln Avenue", "Almaden Expressway", "Blossom Hill Road"
+    ],
+    "Sacramento": [
+      "K Street", "J Street", "L Street", "Capitol Avenue", "N Street",
+      "16th Street", "21st Street", "Broadway", "Freeport Boulevard", "Franklin Boulevard",
+      "Stockton Boulevard", "Folsom Boulevard", "Fair Oaks Boulevard", "Howe Avenue", "Arden Way",
+      "Fulton Avenue", "Watt Avenue", "El Camino Avenue", "Marconi Avenue", "Madison Avenue"
+    ],
+    "Oakland": [
+      "Broadway", "Telegraph Avenue", "College Avenue", "Piedmont Avenue", "Grand Avenue",
+      "Lakeshore Avenue", "MacArthur Boulevard", "International Boulevard", "Fruitvale Avenue", "High Street",
+      "Park Boulevard", "14th Street", "19th Street", "40th Street", "51st Street",
+      "Shattuck Avenue", "Claremont Avenue", "Ashby Avenue", "Alcatraz Avenue", "Martin Luther King Jr. Way"
+    ],
+    "Fresno": [
+      "Blackstone Avenue", "Shaw Avenue", "Herndon Avenue", "Shields Avenue", "Ashlan Avenue",
+      "Bullard Avenue", "Nees Avenue", "Barstow Avenue", "Gettysburg Avenue", "Olive Avenue",
+      "First Street", "Fulton Street", "Van Ness Avenue", "Fresno Street", "Tulare Street",
+      "Clovis Avenue", "Cedar Avenue", "Chestnut Avenue", "Maple Avenue", "Palm Avenue"
+    ],
+    "Long Beach": [
+      "Ocean Boulevard", "Pacific Coast Highway", "Long Beach Boulevard", "Atlantic Avenue", "Cherry Avenue",
+      "Lakewood Boulevard", "Bellflower Boulevard", "7th Street", "Broadway", "Anaheim Street",
+      "Pacific Avenue", "Pine Avenue", "Locust Avenue", "Linden Avenue", "Cedar Avenue",
+      "Redondo Avenue", "Temple Avenue", "Ximeno Avenue", "Belmont Shore Drive", "2nd Street"
+    ],
+    "Anaheim": [
+      "Harbor Boulevard", "Katella Avenue", "Ball Road", "Lincoln Avenue", "La Palma Avenue",
+      "Euclid Street", "Brookhurst Street", "Beach Boulevard", "Magnolia Avenue", "State College Boulevard",
+      "Orangewood Avenue", "Gene Autry Way", "Disneyland Drive", "Convention Way", "West Street"
+    ],
+    "Irvine": [
+      "Irvine Center Drive", "Culver Drive", "Jeffrey Road", "Alton Parkway", "Barranca Parkway",
+      "Jamboree Road", "MacArthur Boulevard", "Von Karman Avenue", "Michelson Drive", "Main Street",
+      "University Drive", "Campus Drive", "California Avenue", "Harvard Avenue", "Yale Avenue"
+    ],
+    "Bakersfield": [
+      "California Avenue", "Chester Avenue", "Truxtun Avenue", "24th Street", "Golden State Avenue",
+      "Union Avenue", "H Street", "Oak Street", "19th Street", "Brundage Lane",
+      "Ming Avenue", "White Lane", "Stockdale Highway", "Rosedale Highway", "Olive Drive"
+    ],
+    "Riverside": [
+      "University Avenue", "Magnolia Avenue", "Market Street", "Main Street", "Mission Inn Avenue",
+      "14th Street", "Arlington Avenue", "Van Buren Boulevard", "Indiana Avenue", "Central Avenue",
+      "Brockton Avenue", "Canyon Crest Drive", "Columbia Avenue", "Iowa Avenue", "Chicago Avenue"
+    ],
+    "Stockton": [
+      "Pacific Avenue", "March Lane", "Hammer Lane", "Benjamin Holt Drive", "Robinhood Drive",
+      "El Dorado Street", "Main Street", "Weber Avenue", "Charter Way", "Miner Avenue",
+      "California Street", "Center Street", "San Joaquin Street", "Lindsay Street", "Aurora Street"
+    ],
+    "Fremont": [
+      "Fremont Boulevard", "Mowry Avenue", "Stevenson Boulevard", "Auto Mall Parkway", "Grimmer Boulevard",
+      "Paseo Padre Parkway", "Niles Boulevard", "Mission Boulevard", "Warm Springs Boulevard", "Thornton Avenue"
+    ],
+    "Santa Ana": [
+      "Main Street", "17th Street", "1st Street", "4th Street", "Civic Center Drive",
+      "Bristol Street", "MacArthur Boulevard", "Tustin Avenue", "Grand Avenue", "Fairview Street",
+      "Harbor Boulevard", "Warner Avenue", "Edinger Avenue", "McFadden Avenue", "Westminster Avenue"
+    ],
+    "Modesto": [
+      "McHenry Avenue", "Oakdale Road", "Briggsmore Avenue", "Tully Road", "Standiford Avenue",
+      "Coffee Road", "Dale Road", "Scenic Drive", "Prescott Road", "Sylvan Avenue",
+      "9th Street", "10th Street", "J Street", "K Street", "H Street"
+    ],
+    "Fontana": [
+      "Sierra Avenue", "Foothill Boulevard", "Baseline Road", "San Bernardino Avenue", "Valley Boulevard",
+      "Cherry Avenue", "Citrus Avenue", "Cedar Avenue", "Alder Avenue", "Mango Avenue"
+    ],
+    "Santa Clarita": [
+      "Bouquet Canyon Road", "Soledad Canyon Road", "McBean Parkway", "Valencia Boulevard", "Magic Mountain Parkway",
+      "Newhall Avenue", "Lyons Avenue", "San Fernando Road", "Sierra Highway", "The Old Road"
+    ],
+    "San Bernardino": [
+      "E Street", "D Street", "Baseline Street", "Highland Avenue", "Hospitality Lane",
+      "Waterman Avenue", "Mt. Vernon Avenue", "Tippecanoe Avenue", "Meridian Avenue", "Kendall Drive"
+    ],
+    "Chicago": [
+      "Michigan Avenue", "State Street", "Clark Street", "LaSalle Street", "Wacker Drive",
+      "Lake Shore Drive", "Ashland Avenue", "Western Avenue", "Halsted Street", "Milwaukee Avenue",
+      "Lincoln Avenue", "Diversey Parkway", "Fullerton Avenue", "Belmont Avenue", "Irving Park Road",
+      "Lawrence Avenue", "Foster Avenue", "Devon Avenue", "Touhy Avenue", "Howard Street",
+      "Madison Street", "Washington Boulevard", "Jackson Boulevard", "Congress Parkway", "Roosevelt Road",
+      "Cermak Road", "31st Street", "35th Street", "47th Street", "55th Street",
+      "63rd Street", "71st Street", "79th Street", "87th Street", "95th Street",
+      "Armitage Avenue", "North Avenue", "Division Street", "Chicago Avenue", "Grand Avenue"
+    ],
+    "Aurora": [
+      "New York Street", "Galena Boulevard", "Illinois Avenue", "Lake Street", "Downer Place",
+      "Stolp Avenue", "Broadway", "LaSalle Street", "River Street", "Fox Valley Center Drive"
+    ],
+    "Naperville": [
+      "Washington Street", "Main Street", "Ogden Avenue", "Aurora Avenue", "Jefferson Avenue",
+      "Naper Boulevard", "Iroquois Avenue", "Benton Avenue", "Columbia Street", "Eagle Street"
+    ],
+    "Joliet": [
+      "Jefferson Street", "Collins Street", "Chicago Street", "Ottawa Street", "Cass Street",
+      "Scott Street", "Western Avenue", "Broadway", "Plainfield Road", "Larkin Avenue"
+    ],
+    "Rockford": [
+      "State Street", "Main Street", "East State Street", "Charles Street", "Auburn Street",
+      "Broadway", "Seventh Street", "Kishwaukee Street", "Rural Street", "Alpine Road"
+    ],
+    "Springfield": [
+      "Capitol Avenue", "Monroe Street", "Adams Street", "Jefferson Street", "Washington Street",
+      "Cook Street", "Edwards Street", "Lawrence Avenue", "Clear Lake Avenue", "Sangamon Avenue"
+    ],
+    "Peoria": [
+      "Main Street", "Adams Street", "Jefferson Avenue", "Hamilton Boulevard", "University Street",
+      "Western Avenue", "Sheridan Road", "Knoxville Avenue", "War Memorial Drive", "Sterling Avenue"
+    ],
+    "Houston": [
+      "Main Street", "Westheimer Road", "Richmond Avenue", "Montrose Boulevard", "Kirby Drive",
+      "Shepherd Drive", "Washington Avenue", "Memorial Drive", "Allen Parkway", "Buffalo Bayou",
+      "Fannin Street", "San Jacinto Street", "Travis Street", "Milam Street", "Smith Street",
+      "Louisiana Street", "McKinney Street", "Dallas Street", "Lamar Street", "Capitol Street",
+      "Bellaire Boulevard", "Bissonnet Street", "University Boulevard", "Rice Boulevard", "Holcombe Boulevard",
+      "Post Oak Boulevard", "Galleria Drive", "Sage Road", "Voss Road", "Fondren Road"
+    ],
+    "San Antonio": [
+      "Commerce Street", "Houston Street", "St. Mary's Street", "Navarro Street", "Soledad Street",
+      "Market Street", "Nueva Street", "Dolorosa Street", "Main Avenue", "Broadway",
+      "Alamo Plaza", "River Walk", "Villita Street", "King William Street", "Durango Boulevard",
+      "Military Drive", "Fredericksburg Road", "Bandera Road", "Culebra Road", "Marbach Road",
+      "Blanco Road", "San Pedro Avenue", "McCullough Avenue", "Hildebrand Avenue", "Olmos Drive"
+    ],
+    "Dallas": [
+      "Main Street", "Elm Street", "Commerce Street", "Pacific Avenue", "Ross Avenue",
+      "Akard Street", "Ervay Street", "St. Paul Street", "Harwood Street", "Pearl Street",
+      "McKinney Avenue", "Oak Lawn Avenue", "Cedar Springs Road", "Lemmon Avenue", "Turtle Creek Boulevard",
+      "Knox Street", "Henderson Avenue", "Greenville Avenue", "Skillman Street", "Abrams Road",
+      "Mockingbird Lane", "Lovers Lane", "Northwest Highway", "Preston Road", "Hillcrest Avenue",
+      "Inwood Road", "Harry Hines Boulevard", "Stemmons Freeway", "Industrial Boulevard", "Riverfront Boulevard"
+    ],
+    "Austin": [
+      "Congress Avenue", "6th Street", "Guadalupe Street", "Lamar Boulevard", "South First Street",
+      "Red River Street", "Brazos Street", "Colorado Street", "Lavaca Street", "San Jacinto Boulevard",
+      "Martin Luther King Jr. Boulevard", "12th Street", "15th Street", "24th Street", "35th Street",
+      "Barton Springs Road", "South Congress Avenue", "East Riverside Drive", "Pleasant Valley Road", "Airport Boulevard",
+      "Burnet Road", "Research Boulevard", "Parmer Lane", "Mopac Expressway", "Anderson Lane"
+    ],
+    "Fort Worth": [
+      "Main Street", "Houston Street", "Commerce Street", "Throckmorton Street", "Taylor Street",
+      "Sundance Square", "7th Street", "Lancaster Avenue", "Magnolia Avenue", "South Main Street",
+      "Camp Bowie Boulevard", "University Drive", "Berry Street", "Seminary Drive", "Rosedale Street",
+      "Hemphill Street", "Park Place Avenue", "Forest Park Boulevard", "Trinity Park Drive", "Harley Avenue"
+    ],
+    "El Paso": [
+      "Mesa Street", "Montana Avenue", "Alameda Avenue", "Paisano Drive", "Texas Avenue",
+      "El Paso Street", "Oregon Street", "Kansas Street", "Stanton Street", "Santa Fe Street",
+      "San Antonio Avenue", "Mills Avenue", "Main Drive", "Murchison Drive", "Yandell Drive"
+    ],
+    "Arlington": [
+      "Cooper Street", "Collins Street", "Division Street", "Abram Street", "Pioneer Parkway",
+      "Park Row Drive", "Green Oaks Boulevard", "Lamar Boulevard", "Matlock Road", "New York Avenue"
+    ],
+    "Corpus Christi": [
+      "Shoreline Boulevard", "Ocean Drive", "Staples Street", "Leopard Street", "Ayers Street",
+      "Airline Road", "South Padre Island Drive", "Saratoga Boulevard", "Port Avenue", "Water Street"
+    ],
+    "Plano": [
+      "Park Boulevard", "Preston Road", "Coit Road", "Independence Parkway", "Legacy Drive",
+      "Spring Creek Parkway", "Parker Road", "Plano Parkway", "15th Street", "Avenue K"
+    ],
+    "Laredo": [
+      "San Bernardo Avenue", "Zaragoza Street", "McPherson Road", "Calton Road", "Hillside Road",
+      "Saunders Street", "Bustamante Street", "Victoria Street", "Farragut Street", "Lincoln Street"
+    ],
+    "Lubbock": [
+      "Broadway", "University Avenue", "19th Street", "50th Street", "82nd Street",
+      "Quaker Avenue", "Indiana Avenue", "Slide Road", "Milwaukee Avenue", "Avenue Q"
+    ],
+    "Irving": [
+      "MacArthur Boulevard", "Las Colinas Boulevard", "O'Connor Road", "Beltline Road", "Northgate Drive",
+      "Royal Lane", "Story Road", "Pioneer Drive", "Rochelle Boulevard", "Walnut Hill Lane"
+    ],
+    "Garland": [
+      "Garland Avenue", "Main Street", "First Street", "State Street", "Walnut Street",
+      "Jupiter Road", "Shiloh Road", "Buckingham Road", "Miller Road", "Brand Road"
+    ],
+    "Phoenix": [
+      "Central Avenue", "Camelback Road", "Indian School Road", "Thomas Road", "McDowell Road",
+      "Van Buren Street", "Washington Street", "Jefferson Street", "Roosevelt Street", "Fillmore Street",
+      "7th Street", "7th Avenue", "16th Street", "24th Street", "32nd Street",
+      "44th Street", "Cave Creek Road", "Scottsdale Road", "Tatum Boulevard", "Paradise Valley Parkway",
+      "Bell Road", "Greenway Road", "Thunderbird Road", "Cactus Road", "Peoria Avenue"
+    ],
+    "Tucson": [
+      "Broadway Boulevard", "Speedway Boulevard", "Grant Road", "22nd Street", "Congress Street",
+      "Stone Avenue", "6th Avenue", "Campbell Avenue", "Swan Road", "Wilmot Road",
+      "Kolb Road", "Pantano Road", "Tanque Verde Road", "Sabino Canyon Road", "Oracle Road",
+      "Flowing Wells Road", "Miracle Mile", "Drachman Street", "Ajo Way", "Irvington Road"
+    ],
+    "Mesa": [
+      "Main Street", "Center Street", "Country Club Drive", "Alma School Road", "Dobson Road",
+      "Lindsay Road", "Greenfield Road", "Gilbert Road", "Power Road", "Sossaman Road",
+      "Southern Avenue", "Broadway Road", "University Drive", "Brown Road", "McKellips Road"
+    ],
+    "Chandler": [
+      "Chandler Boulevard", "Arizona Avenue", "Alma School Road", "Dobson Road", "McClintock Drive",
+      "Price Road", "Gilbert Road", "Cooper Road", "McQueen Road", "Riggs Road"
+    ],
+    "Scottsdale": [
+      "Scottsdale Road", "Hayden Road", "Pima Road", "Frank Lloyd Wright Boulevard", "Shea Boulevard",
+      "Indian Bend Road", "McDonald Drive", "Camelback Road", "Lincoln Drive", "Chaparral Road",
+      "Main Street", "Marshall Way", "Brown Avenue", "Drinkwater Boulevard", "Goldwater Boulevard"
+    ],
+    "Gilbert": [
+      "Gilbert Road", "Val Vista Drive", "Greenfield Road", "Higley Road", "Power Road",
+      "Williams Field Road", "Baseline Road", "Guadalupe Road", "Warner Road", "Ray Road"
+    ],
+    "Glendale": [
+      "Glendale Avenue", "Northern Avenue", "Olive Avenue", "Peoria Avenue", "Thunderbird Road",
+      "59th Avenue", "67th Avenue", "75th Avenue", "83rd Avenue", "91st Avenue"
+    ],
+    "Tempe": [
+      "Mill Avenue", "University Drive", "Apache Boulevard", "Rural Road", "McClintock Drive",
+      "Priest Drive", "Scottsdale Road", "Baseline Road", "Southern Avenue", "Broadway Road"
+    ],
+    "Surprise": [
+      "Bell Road", "Grand Avenue", "Dysart Road", "Litchfield Road", "Greenway Road",
+      "Waddell Road", "Cactus Road", "Peoria Avenue", "Reems Road", "Bullard Avenue"
+    ],
+    "Philadelphia": [
+      "Broad Street", "Market Street", "Chestnut Street", "Walnut Street", "Spruce Street",
+      "Pine Street", "Locust Street", "Arch Street", "Race Street", "Vine Street",
+      "Front Street", "2nd Street", "3rd Street", "4th Street", "5th Street",
+      "6th Street", "7th Street", "8th Street", "9th Street", "10th Street",
+      "11th Street", "12th Street", "13th Street", "South Street", "Washington Avenue",
+      "Passyunk Avenue", "Oregon Avenue", "Snyder Avenue", "Girard Avenue", "Frankford Avenue"
+    ],
+    "Pittsburgh": [
+      "Forbes Avenue", "Fifth Avenue", "Liberty Avenue", "Penn Avenue", "Smithfield Street",
+      "Grant Street", "Wood Street", "Market Street", "Stanwix Street", "Point Street",
+      "Butler Street", "Centre Avenue", "Craig Street", "Bigelow Boulevard", "Baum Boulevard",
+      "East Carson Street", "South Side Works Drive", "Station Square Drive", "Mount Washington Avenue", "Grandview Avenue"
+    ],
+    "Allentown": [
+      "Hamilton Street", "7th Street", "Allen Street", "Linden Street", "Turner Street",
+      "Tilghman Street", "Liberty Street", "Union Street", "Walnut Street", "Chew Street"
+    ],
+    "Erie": [
+      "State Street", "Peach Street", "French Street", "Parade Street", "6th Street",
+      "8th Street", "12th Street", "26th Street", "38th Street", "West Lake Road"
+    ],
+    "Reading": [
+      "Penn Street", "Court Street", "Washington Street", "5th Street", "6th Street",
+      "9th Street", "13th Street", "Spring Street", "Walnut Street", "Chestnut Street"
+    ],
+    "Scranton": [
+      "Lackawanna Avenue", "Wyoming Avenue", "Adams Avenue", "Jefferson Avenue", "Washington Avenue",
+      "Linden Street", "Penn Avenue", "Spruce Street", "Mulberry Street", "Vine Street"
+    ],
+    "Bethlehem": [
+      "Main Street", "Broad Street", "New Street", "Walnut Street", "Church Street",
+      "3rd Street", "4th Street", "Center Street", "Wyandotte Street", "Cherokee Street"
+    ],
+    "Jacksonville": [
+      "Bay Street", "Main Street", "Laura Street", "Ocean Street", "Forsyth Street",
+      "Adams Street", "Duval Street", "Monroe Street", "Ashley Street", "Church Street",
+      "Riverside Avenue", "Park Street", "Margaret Street", "King Street", "St. Johns Avenue"
+    ],
+    "Miami": [
+      "Brickell Avenue", "Biscayne Boulevard", "Collins Avenue", "Ocean Drive", "Washington Avenue",
+      "Lincoln Road", "Espanola Way", "Alton Road", "West Avenue", "Meridian Avenue",
+      "Calle Ocho", "Flagler Street", "Miami Avenue", "SW 8th Street", "Coral Way",
+      "South Dixie Highway", "Miracle Mile", "Ponce de Leon Boulevard", "LeJeune Road", "Bird Road"
+    ],
+    "Tampa": [
+      "Tampa Street", "Florida Avenue", "Franklin Street", "Kennedy Boulevard", "Bayshore Boulevard",
+      "Dale Mabry Highway", "Westshore Boulevard", "Armenia Avenue", "Howard Avenue", "MacDill Avenue",
+      "Gandy Boulevard", "Henderson Boulevard", "Swann Avenue", "Bay to Bay Boulevard", "Azeele Street"
+    ],
+    "Orlando": [
+      "Orange Avenue", "Church Street", "Central Boulevard", "Pine Street", "Robinson Street",
+      "Magnolia Avenue", "Rosalind Avenue", "Lake Eola Drive", "Thornton Park Drive", "Summerlin Avenue",
+      "Mills Avenue", "Colonial Drive", "Edgewater Drive", "Fairbanks Avenue", "Park Avenue"
+    ],
+    "St. Petersburg": [
+      "Central Avenue", "1st Street", "2nd Street", "4th Street", "Beach Drive",
+      "MLK Street", "34th Street", "Tyrone Boulevard", "Park Street", "Bayshore Drive"
+    ],
+    "Hialeah": [
+      "Palm Avenue", "East 4th Avenue", "West 49th Street", "East 8th Avenue", "West 8th Avenue",
+      "Okeechobee Road", "East 25th Street", "West 12th Avenue", "East 9th Street", "West 20th Street"
+    ],
+    "Port St. Lucie": [
+      "Port St. Lucie Boulevard", "Bayshore Boulevard", "California Boulevard", "Floresta Drive", "Prima Vista Boulevard",
+      "Walton Road", "Gatlin Boulevard", "St. Lucie West Boulevard", "Airoso Boulevard", "Becker Road"
+    ],
+    "Cape Coral": [
+      "Cape Coral Parkway", "Del Prado Boulevard", "Santa Barbara Boulevard", "Chiquita Boulevard", "Skyline Boulevard",
+      "Country Club Boulevard", "Pine Island Road", "Veterans Parkway", "Coronado Parkway", "Hancock Bridge Parkway"
+    ],
+    "Tallahassee": [
+      "Monroe Street", "Adams Street", "Apalachee Parkway", "Tennessee Street", "College Avenue",
+      "Call Street", "Pensacola Street", "Gaines Street", "Park Avenue", "Capital Circle"
+    ],
+    "Fort Lauderdale": [
+      "Las Olas Boulevard", "Sunrise Boulevard", "Broward Boulevard", "Oakland Park Boulevard", "Commercial Boulevard",
+      "Federal Highway", "Andrews Avenue", "SE 17th Street", "A1A", "Bayview Drive"
+    ],
+    "Pembroke Pines": [
+      "Pines Boulevard", "Sheridan Street", "Pembroke Road", "University Drive", "Flamingo Road",
+      "Douglas Road", "Palm Avenue", "Hiatus Road", "SW 145th Avenue", "NW 172nd Avenue"
+    ],
+    "Hollywood": [
+      "Hollywood Boulevard", "Young Circle", "Harrison Street", "Tyler Street", "Federal Highway",
+      "Dixie Highway", "21st Avenue", "Johnson Street", "Sheridan Street", "Stirling Road"
+    ],
+    "Columbus": [
+      "High Street", "Broad Street", "Long Street", "Main Street", "State Street",
+      "Gay Street", "Town Street", "Spring Street", "Rich Street", "Mound Street",
+      "Third Street", "Fourth Street", "Front Street", "Neil Avenue", "Indianola Avenue"
+    ],
+    "Cleveland": [
+      "Euclid Avenue", "Superior Avenue", "St. Clair Avenue", "Prospect Avenue", "Carnegie Avenue",
+      "Chester Avenue", "Cedar Avenue", "Central Avenue", "Kinsman Road", "Woodland Avenue",
+      "Detroit Avenue", "Lorain Avenue", "West 25th Street", "East 9th Street", "Public Square"
+    ],
+    "Cincinnati": [
+      "Vine Street", "Main Street", "Walnut Street", "Race Street", "Elm Street",
+      "Central Parkway", "Reading Road", "Gilbert Avenue", "Madison Road", "Columbia Parkway",
+      "4th Street", "5th Street", "6th Street", "7th Street", "8th Street"
+    ],
+    "Toledo": [
+      "Summit Street", "Adams Street", "Madison Avenue", "Monroe Street", "Jefferson Avenue",
+      "St. Clair Street", "Huron Street", "Erie Street", "Spielbusch Avenue", "Michigan Street"
+    ],
+    "Akron": [
+      "Main Street", "Market Street", "High Street", "South Main Street", "Exchange Street",
+      "Mill Street", "Forge Street", "Perkins Street", "Grant Street", "Maple Street"
+    ],
+    "Dayton": [
+      "Main Street", "Ludlow Street", "Jefferson Street", "Third Street", "Fifth Street",
+      "Monument Avenue", "Wayne Avenue", "Salem Avenue", "Germantown Street", "Xenia Avenue"
+    ],
+    "Parma": [
+      "Ridge Road", "Pearl Road", "Broadview Road", "State Road", "Pleasant Valley Road",
+      "Snow Road", "Chevrolet Boulevard", "Stumph Road", "Day Drive", "West Ridgewood Drive"
+    ],
+    "Canton": [
+      "Market Avenue", "Cleveland Avenue", "Tuscarawas Street", "12th Street", "Fulton Road",
+      "Harrison Avenue", "Navarre Road", "Lincoln Way", "West Tusc Street", "Dueber Avenue"
+    ],
+    "Indianapolis": [
+      "Meridian Street", "Pennsylvania Street", "Delaware Street", "Capitol Avenue", "Illinois Street",
+      "Market Street", "Washington Street", "Ohio Street", "New York Street", "Vermont Street",
+      "Michigan Street", "10th Street", "16th Street", "30th Street", "38th Street",
+      "Fall Creek Parkway", "Central Avenue", "College Avenue", "Keystone Avenue", "Allisonville Road"
+    ],
+    "Fort Wayne": [
+      "Calhoun Street", "Clinton Street", "Berry Street", "Washington Boulevard", "Jefferson Boulevard",
+      "Main Street", "Wayne Street", "Columbia Street", "Fairfield Avenue", "Broadway"
+    ],
+    "Evansville": [
+      "Main Street", "First Avenue", "Second Street", "Third Street", "Walnut Street",
+      "Sycamore Street", "Vine Street", "Cherry Street", "Locust Street", "Riverside Drive"
+    ],
+    "South Bend": [
+      "Michigan Street", "Main Street", "Washington Street", "Jefferson Boulevard", "Lincoln Way",
+      "Sample Street", "Western Avenue", "Portage Avenue", "Edison Road", "Ireland Road"
+    ],
+    "Carmel": [
+      "Main Street", "Rangeline Road", "Keystone Parkway", "Meridian Street", "Pennsylvania Street",
+      "96th Street", "106th Street", "116th Street", "126th Street", "136th Street"
+    ],
+    "Bloomington": [
+      "College Avenue", "Walnut Street", "Washington Street", "Kirkwood Avenue", "4th Street",
+      "7th Street", "10th Street", "3rd Street", "Indiana Avenue", "Jordan Avenue"
+    ],
+    "Charlotte": [
+      "Tryon Street", "Trade Street", "College Street", "Church Street", "Brevard Street",
+      "Morehead Street", "Stonewall Street", "4th Street", "7th Street", "9th Street",
+      "Independence Boulevard", "Central Avenue", "Sharon Road", "Providence Road", "Queens Road",
+      "Park Road", "South Boulevard", "Freedom Drive", "Wilkinson Boulevard", "Beatties Ford Road"
+    ],
+    "Raleigh": [
+      "Fayetteville Street", "Wilmington Street", "Salisbury Street", "McDowell Street", "Blount Street",
+      "Hargett Street", "Martin Street", "Morgan Street", "Davie Street", "Edenton Street",
+      "Hillsborough Street", "Glenwood Avenue", "Capital Boulevard", "New Bern Avenue", "Western Boulevard"
+    ],
+    "Greensboro": [
+      "Elm Street", "Market Street", "Eugene Street", "Davie Street", "Washington Street",
+      "Gate City Boulevard", "High Point Road", "Battleground Avenue", "Summit Avenue", "Friendly Avenue"
+    ],
+    "Durham": [
+      "Main Street", "Corcoran Street", "Chapel Hill Street", "Morgan Street", "Mangum Street",
+      "Roxboro Street", "Gregson Street", "Duke Street", "Ninth Street", "Broad Street"
+    ],
+    "Winston-Salem": [
+      "Trade Street", "4th Street", "5th Street", "Main Street", "Liberty Street",
+      "Cherry Street", "Marshall Street", "Brookstown Avenue", "First Street", "Stratford Road"
+    ],
+    "Fayetteville": [
+      "Hay Street", "Person Street", "Green Street", "Franklin Street", "Rowan Street",
+      "Gillespie Street", "Robeson Street", "Bragg Boulevard", "Raeford Road", "Skibo Road"
+    ],
+    "Cary": [
+      "Chatham Street", "Academy Street", "Walnut Street", "Harrison Avenue", "Kildaire Farm Road",
+      "Maynard Road", "Cary Parkway", "High House Road", "Tryon Road", "Buck Jones Road"
+    ],
+    "Wilmington": [
+      "Front Street", "Market Street", "Princess Street", "Dock Street", "Water Street",
+      "3rd Street", "4th Street", "5th Street", "Castle Street", "Orange Street"
+    ],
+    "Seattle": [
+      "Pike Street", "Pine Street", "Union Street", "University Street", "Seneca Street",
+      "Madison Street", "Marion Street", "Columbia Street", "Cherry Street", "James Street",
+      "1st Avenue", "2nd Avenue", "3rd Avenue", "4th Avenue", "5th Avenue",
+      "Broadway", "Capitol Hill", "Queen Anne Avenue", "Fremont Avenue", "Aurora Avenue",
+      "Westlake Avenue", "Eastlake Avenue", "Rainier Avenue", "MLK Jr. Way", "Jackson Street"
+    ],
+    "Spokane": [
+      "Division Street", "Monroe Street", "Howard Street", "Post Street", "Washington Street",
+      "Lincoln Street", "Riverside Avenue", "Sprague Avenue", "1st Avenue", "2nd Avenue",
+      "Main Avenue", "Boone Avenue", "Mission Avenue", "Indiana Avenue", "Francis Avenue"
+    ],
+    "Tacoma": [
+      "Pacific Avenue", "Broadway", "6th Avenue", "Stadium Way", "South Tacoma Way",
+      "Yakima Avenue", "Fawcett Avenue", "Commerce Street", "A Street", "St. Helens Avenue"
+    ],
+    "Vancouver": [
+      "Main Street", "Broadway", "Mill Plain Boulevard", "Fourth Plain Boulevard", "St. Johns Boulevard",
+      "Andresen Road", "Hazel Dell Avenue", "Highway 99", "MacArthur Boulevard", "Columbia Street"
+    ],
+    "Bellevue": [
+      "Bellevue Way", "108th Avenue NE", "NE 8th Street", "Main Street", "106th Avenue NE",
+      "NE 4th Street", "116th Avenue NE", "Bel-Red Road", "156th Avenue NE", "NE 24th Street"
+    ],
+    "Kent": [
+      "Central Avenue", "Meeker Street", "Willis Street", "Smith Street", "Railroad Avenue",
+      "Kennebeck Avenue", "4th Avenue", "Washington Avenue", "Naden Avenue", "Gowe Street"
+    ],
+    "Everett": [
+      "Broadway", "Colby Avenue", "Hewitt Avenue", "Pacific Avenue", "Rucker Avenue",
+      "Wetmore Avenue", "Hoyt Avenue", "Everett Avenue", "California Street", "Oakes Avenue"
+    ],
+    "Denver": [
+      "16th Street", "17th Street", "Colfax Avenue", "Broadway", "Speer Boulevard",
+      "Larimer Street", "Blake Street", "Market Street", "Champa Street", "Stout Street",
+      "Curtis Street", "Arapahoe Street", "Lawrence Street", "Welton Street", "California Street",
+      "Colorado Boulevard", "University Boulevard", "Monaco Parkway", "Leetsdale Drive", "Alameda Avenue"
+    ],
+    "Colorado Springs": [
+      "Tejon Street", "Nevada Avenue", "Cascade Avenue", "Weber Street", "Wahsatch Avenue",
+      "Platte Avenue", "Colorado Avenue", "Bijou Street", "Kiowa Street", "Pikes Peak Avenue",
+      "Academy Boulevard", "Powers Boulevard", "Austin Bluffs Parkway", "Garden of the Gods Road", "Woodmen Road"
+    ],
+    "Fort Collins": [
+      "College Avenue", "Mountain Avenue", "Mulberry Street", "Laurel Street", "Oak Street",
+      "Olive Street", "Riverside Avenue", "Remington Street", "Howes Street", "Mason Street"
+    ],
+    "Lakewood": [
+      "Colfax Avenue", "Wadsworth Boulevard", "Alameda Avenue", "Mississippi Avenue", "Jewell Avenue",
+      "6th Avenue", "Kipling Street", "Garrison Street", "Sheridan Boulevard", "Union Boulevard"
+    ],
+    "Thornton": [
+      "Washington Street", "Grant Street", "York Street", "Colorado Boulevard", "Holly Street",
+      "104th Avenue", "112th Avenue", "120th Avenue", "136th Avenue", "144th Avenue"
+    ],
+    "Arvada": [
+      "Ralston Road", "Wadsworth Boulevard", "Kipling Street", "Sheridan Boulevard", "52nd Avenue",
+      "58th Avenue", "64th Avenue", "72nd Avenue", "80th Avenue", "Grandview Avenue"
+    ],
+    "Westminster": [
+      "Federal Boulevard", "Sheridan Boulevard", "72nd Avenue", "88th Avenue", "92nd Avenue",
+      "104th Avenue", "112th Avenue", "120th Avenue", "Church Ranch Boulevard", "Westminster Boulevard"
+    ],
+    "Boston": [
+      "Boylston Street", "Newbury Street", "Commonwealth Avenue", "Beacon Street", "Charles Street",
+      "Tremont Street", "Washington Street", "State Street", "Congress Street", "Atlantic Avenue",
+      "Summer Street", "Federal Street", "Milk Street", "Franklin Street", "Devonshire Street",
+      "Cambridge Street", "Storrow Drive", "Memorial Drive", "Massachusetts Avenue", "Huntington Avenue"
+    ],
+    "Worcester": [
+      "Main Street", "Front Street", "Commercial Street", "Mechanic Street", "Foster Street",
+      "Highland Street", "Park Avenue", "Pleasant Street", "Franklin Street", "Chandler Street"
+    ],
+    "Cambridge": [
+      "Massachusetts Avenue", "Cambridge Street", "Main Street", "Broadway", "Harvard Street",
+      "Mt. Auburn Street", "Brattle Street", "JFK Street", "Memorial Drive", "Concord Avenue"
+    ],
+    "Lowell": [
+      "Merrimack Street", "Central Street", "Middle Street", "Market Street", "Dutton Street",
+      "Broadway", "Middlesex Street", "Gorham Street", "Bridge Street", "Pawtucket Street"
+    ],
+    "New Bedford": [
+      "Union Street", "Purchase Street", "Acushnet Avenue", "County Street", "Pleasant Street",
+      "William Street", "Elm Street", "Kempton Street", "Rockdale Avenue", "Ashley Boulevard"
+    ],
+    "Nashville": [
+      "Broadway", "Church Street", "Commerce Street", "Union Street", "Deaderick Street",
+      "Charlotte Avenue", "West End Avenue", "Music Row", "12th Avenue South", "21st Avenue South",
+      "Division Street", "Demonbreun Street", "Korean Veterans Boulevard", "McGavock Street", "Woodland Street"
+    ],
+    "Memphis": [
+      "Beale Street", "Main Street", "Front Street", "Second Street", "Third Street",
+      "Union Avenue", "Madison Avenue", "Monroe Avenue", "Poplar Avenue", "Summer Avenue",
+      "Highland Street", "Southern Avenue", "Park Avenue", "Elvis Presley Boulevard", "Airways Boulevard"
+    ],
+    "Knoxville": [
+      "Gay Street", "Market Square", "Clinch Avenue", "Church Avenue", "Union Avenue",
+      "Main Street", "Summit Hill Drive", "Cumberland Avenue", "Kingston Pike", "Chapman Highway"
+    ],
+    "Chattanooga": [
+      "Broad Street", "Market Street", "Chestnut Street", "Cherry Street", "Lindsay Street",
+      "Vine Street", "Main Street", "McCallie Avenue", "Brainerd Road", "Rossville Boulevard"
+    ],
+    "Clarksville": [
+      "Madison Street", "Franklin Street", "Commerce Street", "Public Square", "Main Street",
+      "Riverside Drive", "College Street", "Spring Street", "University Avenue", "Wilma Rudolph Boulevard"
+    ],
+    "Murfreesboro": [
+      "Main Street", "Broad Street", "Church Street", "College Street", "Maple Street",
+      "East Main Street", "Memorial Boulevard", "Medical Center Parkway", "Old Fort Parkway", "Thompson Lane"
+    ],
+    "Detroit": [
+      "Woodward Avenue", "Michigan Avenue", "Gratiot Avenue", "Grand River Avenue", "Jefferson Avenue",
+      "Fort Street", "Cass Avenue", "2nd Avenue", "3rd Avenue", "Brush Street",
+      "Livernois Avenue", "6 Mile Road", "7 Mile Road", "8 Mile Road", "McNichols Road"
+    ],
+    "Grand Rapids": [
+      "Division Avenue", "Monroe Avenue", "Fulton Street", "Wealthy Street", "Michigan Street",
+      "Pearl Street", "Lyon Street", "Ottawa Avenue", "Market Avenue", "Ionia Avenue"
+    ],
+    "Warren": [
+      "Van Dyke Avenue", "Hoover Road", "Mound Road", "Ryan Road", "Dequindre Road",
+      "12 Mile Road", "13 Mile Road", "14 Mile Road", "Chicago Road", "Schoenherr Road"
+    ],
+    "Sterling Heights": [
+      "Van Dyke Avenue", "Mound Road", "Schoenherr Road", "Utica Road", "15 Mile Road",
+      "16 Mile Road", "17 Mile Road", "18 Mile Road", "Hall Road", "Lakeside Boulevard"
+    ],
+    "Ann Arbor": [
+      "Main Street", "State Street", "Liberty Street", "Huron Street", "Washington Street",
+      "William Street", "Division Street", "Fifth Avenue", "Fourth Avenue", "South University Avenue"
+    ],
+    "Lansing": [
+      "Michigan Avenue", "Capitol Avenue", "Washington Avenue", "Grand Avenue", "Saginaw Street",
+      "Oakland Avenue", "Cedar Street", "Logan Street", "Kalamazoo Street", "Mount Hope Avenue"
+    ],
+    "Dearborn": [
+      "Michigan Avenue", "Ford Road", "Greenfield Road", "Oakwood Boulevard", "Schaefer Highway",
+      "Telegraph Road", "Monroe Street", "Mason Street", "Hubbard Drive", "Village Road"
+    ],
+    "Livonia": [
+      "Plymouth Road", "5 Mile Road", "6 Mile Road", "7 Mile Road", "8 Mile Road",
+      "Middlebelt Road", "Merriman Road", "Farmington Road", "Newburgh Road", "Levan Road"
+    ],
+    "Atlanta": [
+      "Peachtree Street", "Marietta Street", "Forsyth Street", "Spring Street", "West Peachtree Street",
+      "Piedmont Avenue", "Juniper Street", "Courtland Street", "Luckie Street", "Broad Street",
+      "Auburn Avenue", "Edgewood Avenue", "Decatur Street", "Memorial Drive", "DeKalb Avenue",
+      "Ponce de Leon Avenue", "North Avenue", "10th Street", "14th Street", "17th Street"
+    ],
+    "Augusta": [
+      "Broad Street", "Greene Street", "Reynolds Street", "Ellis Street", "Telfair Street",
+      "7th Street", "8th Street", "9th Street", "10th Street", "Walton Way"
+    ],
+    "Macon": [
+      "Cherry Street", "Mulberry Street", "Poplar Street", "Walnut Street", "Cotton Avenue",
+      "Broadway", "1st Street", "2nd Street", "3rd Street", "College Street"
+    ],
+    "Savannah": [
+      "Bull Street", "Broughton Street", "Bay Street", "Congress Street", "State Street",
+      "Drayton Street", "Abercorn Street", "Whitaker Street", "Barnard Street", "Liberty Street",
+      "Jones Street", "Oglethorpe Avenue", "Victory Drive", "DeRenne Avenue", "Abercorn Extension"
+    ],
+    "Athens": [
+      "Broad Street", "Clayton Street", "College Avenue", "Lumpkin Street", "Milledge Avenue",
+      "Prince Avenue", "Pulaski Street", "Washington Street", "Hancock Avenue", "Dougherty Street"
+    ],
+    "Sandy Springs": [
+      "Roswell Road", "Hammond Drive", "Peachtree Dunwoody Road", "Mount Vernon Highway", "Abernathy Road",
+      "Johnson Ferry Road", "Dunwoody Place", "Glenridge Drive", "Barfield Road", "Sandy Springs Circle"
+    ],
+    "Roswell": [
+      "Canton Street", "Atlanta Street", "Alpharetta Street", "Mimosa Boulevard", "Norcross Street",
+      "Mill Street", "Elizabeth Way", "Holcomb Bridge Road", "Crabapple Road", "Hardscrabble Road"
+    ],
+    "Baltimore": [
+      "Charles Street", "Pratt Street", "Lombard Street", "Baltimore Street", "Fayette Street",
+      "Calvert Street", "Light Street", "Howard Street", "Eutaw Street", "St. Paul Street",
+      "North Avenue", "Pennsylvania Avenue", "Orleans Street", "Eastern Avenue", "Broadway"
+    ],
+    "Frederick": [
+      "Market Street", "Patrick Street", "Church Street", "2nd Street", "3rd Street",
+      "East Street", "West Street", "Court Street", "Council Street", "Carroll Street"
+    ],
+    "Rockville": [
+      "Rockville Pike", "Hungerford Drive", "Maryland Avenue", "Viers Mill Road", "Veirs Mill Road",
+      "First Street", "Monroe Street", "Fleet Street", "Beall Avenue", "Montgomery Avenue"
+    ],
+    "Gaithersburg": [
+      "Frederick Avenue", "Diamond Avenue", "Russell Avenue", "Summit Avenue", "Walker Avenue",
+      "Quince Orchard Road", "Shady Grove Road", "Muddy Branch Road", "Great Seneca Highway", "Kentlands Boulevard"
+    ],
+    "Bowie": [
+      "Collington Road", "Annapolis Road", "Church Road", "Mitchellville Road", "Old Chapel Road",
+      "Belair Drive", "Northview Drive", "Pointer Ridge Drive", "Race Track Road", "Kenhill Drive"
+    ],
+    "Hagerstown": [
+      "Washington Street", "Potomac Street", "Franklin Street", "Jonathan Street", "Locust Street",
+      "Mulberry Street", "Church Street", "Antietam Street", "Summit Avenue", "Northern Avenue"
+    ],
+    "Annapolis": [
+      "Main Street", "Maryland Avenue", "Duke of Gloucester Street", "Prince George Street", "East Street",
+      "West Street", "Church Circle", "State Circle", "Compromise Street", "Dock Street"
+    ],
+    "Minneapolis": [
+      "Nicollet Mall", "Hennepin Avenue", "Washington Avenue", "1st Avenue", "2nd Avenue",
+      "3rd Street", "4th Street", "5th Street", "6th Street", "7th Street",
+      "Lake Street", "Franklin Avenue", "Lyndale Avenue", "Bryant Avenue", "Uptown"
+    ],
+    "St. Paul": [
+      "Wabasha Street", "St. Peter Street", "Cedar Street", "Minnesota Street", "Jackson Street",
+      "5th Street", "6th Street", "7th Street", "Kellogg Boulevard", "Summit Avenue",
+      "Grand Avenue", "Selby Avenue", "University Avenue", "Marshall Avenue", "Como Avenue"
+    ],
+    "Duluth": [
+      "Superior Street", "1st Avenue West", "Lake Avenue", "Canal Park Drive", "London Road",
+      "4th Street", "Central Entrance", "Mesaba Avenue", "Piedmont Avenue", "Grand Avenue"
+    ],
+    "Plymouth": [
+      "Highway 55", "County Road 6", "County Road 9", "Vicksburg Lane", "Rockford Road",
+      "36th Avenue North", "45th Avenue North", "Northwest Boulevard", "Fernbrook Lane", "Xenium Lane"
+    ],
+    "Portland": [
+      "Burnside Street", "Broadway", "Morrison Street", "Alder Street", "Washington Street",
+      "Stark Street", "Oak Street", "Yamhill Street", "Taylor Street", "Salmon Street",
+      "5th Avenue", "6th Avenue", "10th Avenue", "11th Avenue", "Park Avenue",
+      "Hawthorne Boulevard", "Belmont Street", "Division Street", "Powell Boulevard", "MLK Jr. Boulevard",
+      "Alberta Street", "Mississippi Avenue", "Williams Avenue", "Interstate Avenue", "Fremont Street"
+    ],
+    "Salem": [
+      "Commercial Street", "State Street", "Court Street", "Center Street", "High Street",
+      "Liberty Street", "Front Street", "Church Street", "Chemeketa Street", "Marion Street"
+    ],
+    "Eugene": [
+      "Willamette Street", "Broadway", "7th Avenue", "8th Avenue", "11th Avenue",
+      "13th Avenue", "Pearl Street", "High Street", "Olive Street", "Alder Street"
+    ],
+    "Gresham": [
+      "Powell Boulevard", "Burnside Street", "Stark Street", "Division Street", "Main Avenue",
+      "Cleveland Avenue", "Roberts Avenue", "Eastman Parkway", "Hogan Road", "182nd Avenue"
+    ],
+    "Hillsboro": [
+      "Main Street", "2nd Avenue", "3rd Avenue", "Washington Street", "Lincoln Street",
+      "Baseline Road", "Cornell Road", "185th Avenue", "Orenco Station Parkway", "Tanasbourne Drive"
+    ],
+    "Beaverton": [
+      "Beaverton-Hillsdale Highway", "Canyon Road", "Hall Boulevard", "Murray Boulevard", "Allen Boulevard",
+      "Farmington Road", "Walker Road", "Cedar Hills Boulevard", "Scholls Ferry Road", "Western Avenue"
+    ],
+    "Bend": [
+      "Wall Street", "Bond Street", "Minnesota Avenue", "Franklin Avenue", "Greenwood Avenue",
+      "Newport Avenue", "Colorado Avenue", "Arizona Avenue", "Galveston Avenue", "Portland Avenue"
+    ],
+    "Las Vegas": [
+      "Las Vegas Boulevard", "Fremont Street", "Main Street", "Stewart Avenue", "Charleston Boulevard",
+      "Sahara Avenue", "Desert Inn Road", "Flamingo Road", "Tropicana Avenue", "Sunset Road",
+      "Paradise Road", "Maryland Parkway", "Eastern Avenue", "Rancho Drive", "Decatur Boulevard",
+      "Rainbow Boulevard", "Jones Boulevard", "Buffalo Drive", "Durango Drive", "Fort Apache Road"
+    ],
+    "Henderson": [
+      "Water Street", "Lake Mead Parkway", "Boulder Highway", "Green Valley Parkway", "Stephanie Street",
+      "Sunset Road", "Warm Springs Road", "Wigwam Parkway", "St. Rose Parkway", "Horizon Ridge Parkway"
+    ],
+    "Reno": [
+      "Virginia Street", "Sierra Street", "Center Street", "1st Street", "2nd Street",
+      "4th Street", "Mill Street", "Commercial Row", "Lake Street", "Riverside Drive"
+    ],
+    "North Las Vegas": [
+      "Las Vegas Boulevard", "Main Street", "Civic Center Drive", "Lake Mead Boulevard", "Cheyenne Avenue",
+      "Craig Road", "Carey Avenue", "Owens Avenue", "Bruce Street", "McDaniel Street"
+    ],
+    "Sparks": [
+      "Victorian Avenue", "B Street", "C Street", "Prater Way", "Rock Boulevard",
+      "El Rancho Drive", "Pyramid Way", "McCarran Boulevard", "Baring Boulevard", "Sparks Boulevard"
+    ],
+    "Carson City": [
+      "Carson Street", "Stewart Street", "King Street", "Proctor Street", "Division Street",
+      "William Street", "Washington Street", "Musser Street", "Robinson Street", "Roop Street"
+    ],
+    "New Orleans": [
+      "Bourbon Street", "Royal Street", "Canal Street", "Decatur Street", "Chartres Street",
+      "Dauphine Street", "Burgundy Street", "Rampart Street", "St. Charles Avenue", "Magazine Street",
+      "Tchoupitoulas Street", "Carondelet Street", "Poydras Street", "Baronne Street", "Camp Street",
+      "Frenchmen Street", "Esplanade Avenue", "Basin Street", "St. Peter Street", "St. Ann Street"
+    ],
+    "Baton Rouge": [
+      "Third Street", "Main Street", "Florida Street", "Convention Street", "North Boulevard",
+      "Government Street", "Highland Road", "College Drive", "Airline Highway", "Plank Road"
+    ],
+    "Shreveport": [
+      "Texas Street", "Marshall Street", "Spring Street", "Milam Street", "Market Street",
+      "Commerce Street", "Edwards Street", "Fannin Street", "Travis Street", "Louisiana Avenue"
+    ],
+    "Lafayette": [
+      "Jefferson Street", "Vermilion Street", "Main Street", "Buchanan Street", "Congress Street",
+      "Johnston Street", "University Avenue", "Cameron Street", "Pinhook Road", "Evangeline Thruway"
+    ],
+    "Lake Charles": [
+      "Ryan Street", "Broad Street", "Kirby Street", "Division Street", "Prien Lake Road",
+      "Common Street", "Lakeshore Drive", "Shell Beach Drive", "Enterprise Boulevard", "Nelson Road"
+    ],
+    "Kenner": [
+      "Williams Boulevard", "Loyola Drive", "Veterans Memorial Boulevard", "Vintage Drive", "32nd Street",
+      "3rd Street", "Minor Street", "Short Street", "Compromise Street", "Airline Drive"
+    ]
+  },
+  "postcode_format": "#####",
+  "address_formats": [
+    "{building_number} {street}, {city}, {state} {postcode}",
+    "{building_number} {street}, Apt {unit}, {city}, {state} {postcode}",
+    "{building_number} {street}, Suite {unit}, {city}, {state} {postcode}"
+  ],
+  "country": "United States",
+  "country_code": "US",
+  "phone_area_codes": {
+    "New York": ["212", "718", "917", "347", "646", "929", "332"],
+    "California": ["213", "310", "323", "415", "510", "619", "714", "818", "858", "909", "949", "951", "626", "650", "707", "805", "925", "408"],
+    "Illinois": ["312", "773", "872", "630", "847", "708", "815", "331", "224"],
+    "Texas": ["214", "713", "281", "512", "210", "817", "469", "972", "832", "346", "682", "903", "915", "940", "956"],
+    "Arizona": ["602", "480", "623", "928", "520"],
+    "Pennsylvania": ["215", "412", "267", "484", "610", "570", "717", "724", "814"],
+    "Florida": ["305", "786", "954", "561", "407", "321", "352", "386", "727", "813", "850", "863", "904", "941"],
+    "Ohio": ["216", "614", "513", "419", "330", "440", "234", "567", "740", "937"],
+    "Indiana": ["317", "219", "260", "574", "765", "812", "930"],
+    "North Carolina": ["704", "919", "336", "252", "828", "910", "980", "984"],
+    "Washington": ["206", "253", "425", "360", "509", "564"],
+    "Colorado": ["303", "720", "719", "970", "970"],
+    "Massachusetts": ["617", "857", "508", "774", "413", "978", "351"],
+    "Tennessee": ["615", "901", "423", "865", "731", "931"],
+    "Michigan": ["313", "248", "586", "616", "734", "810", "517", "269", "231"],
+    "Georgia": ["404", "678", "770", "470", "706", "762", "912", "229", "478"],
+    "Maryland": ["410", "443", "301", "240", "667"],
+    "Minnesota": ["612", "651", "763", "952", "218", "320", "507"],
+    "Oregon": ["503", "971", "541", "458"],
+    "Nevada": ["702", "725", "775"],
+    "Louisiana": ["504", "225", "318", "337", "985"]
+  }
+}

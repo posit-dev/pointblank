@@ -1,0 +1,65 @@
+{
+  "suffixes": ["S.A. de C.V.", "S.A.", "S. de R.L.", "S.C.", "A.C."],
+  "formats": [
+    "{last_name} {suffix}",
+    "{adjective} {noun} {suffix}",
+    "Grupo {last_name} {suffix}",
+    "{noun} de México {suffix}"
+  ],
+  "adjectives": [
+    "Mexicana", "Nacional", "Central", "Norte", "Sur",
+    "Moderna", "Internacional", "Regional", "Global", "Digital",
+    "Innovadora", "Premier", "Elite", "Profesional", "Nueva",
+    "Alta", "Gran", "Primera", "Selecta", "Superior"
+  ],
+  "nouns": [
+    "Tecnología", "Industrias", "Comercio", "Construcción", "Inmobiliaria",
+    "Energía", "Finanzas", "Seguros", "Consultoría", "Logística",
+    "Alimentos", "Medios", "Comunicaciones", "Servicios", "Soluciones",
+    "Sistemas", "Inversiones", "Desarrollos", "Transporte", "Manufacturas"
+  ],
+  "well_known_companies": [
+    {"name": "América Móvil", "cities": ["Mexico City"]},
+    {"name": "FEMSA", "cities": ["Monterrey"]},
+    {"name": "Walmart de México", "cities": ["Mexico City"]},
+    {"name": "Grupo Bimbo", "cities": ["Mexico City"]},
+    {"name": "Cemex", "cities": ["Monterrey"]},
+    {"name": "Grupo Televisa", "cities": ["Mexico City"]},
+    {"name": "Grupo México", "cities": ["Mexico City"]},
+    {"name": "Banorte", "cities": ["Monterrey"]},
+    {"name": "BBVA México", "cities": ["Mexico City"]},
+    {"name": "Grupo Elektra", "cities": ["Mexico City"]},
+    {"name": "Liverpool", "cities": ["Mexico City"]},
+    {"name": "Grupo Modelo", "cities": ["Mexico City"]},
+    {"name": "Peñoles", "cities": ["Mexico City"]},
+    {"name": "Grupo Carso", "cities": ["Mexico City"]},
+    {"name": "Alfa", "cities": ["Monterrey"]},
+    {"name": "Arca Continental", "cities": ["Monterrey"]},
+    {"name": "Grupo Aeroportuario del Pacífico", "cities": ["Guadalajara"]},
+    {"name": "Nemak", "cities": ["Monterrey"]},
+    {"name": "Gruma", "cities": ["Monterrey"]},
+    {"name": "Grupo Lala", "cities": ["Torreón"]}
+  ],
+  "jobs": [
+    "Ingeniero", "Abogado", "Contador", "Médico", "Arquitecto",
+    "Maestro", "Enfermero", "Programador", "Diseñador", "Periodista",
+    "Administrador", "Vendedor", "Director", "Gerente", "Analista",
+    "Electricista", "Mecánico", "Chef", "Mesero", "Taxista",
+    "Policía", "Bombero", "Dentista", "Veterinario", "Psicólogo"
+  ],
+  "catch_phrase_adjectives": [
+    "innovador", "sustentable", "profesional", "dinámico", "creativo",
+    "eficiente", "confiable", "moderno", "mexicano", "comprometido",
+    "excelente", "global", "local", "inteligente", "digital"
+  ],
+  "catch_phrase_nouns": [
+    "soluciones", "servicios", "calidad", "innovación", "crecimiento",
+    "asociación", "resultados", "valores", "colaboración", "futuro",
+    "tecnología", "diseño", "estrategia", "desarrollo", "éxito"
+  ],
+  "catch_phrase_verbs": [
+    "crea", "entrega", "desarrolla", "impulsa", "construye",
+    "forma", "inspira", "conecta", "fortalece", "transforma",
+    "optimiza", "logra", "habilita", "asegura", "promueve"
+  ]
+}

@@ -139,6 +139,7 @@ def _get_api_text() -> str:
         "Validate.rows_complete",
         "Validate.col_exists",
         "Validate.col_pct_null",
+        "Validate.data_freshness",
         "Validate.col_schema_match",
         "Validate.row_count_match",
         "Validate.col_count_match",
@@ -214,6 +215,18 @@ def _get_api_text() -> str:
         "config",
     ]
 
+    test_data_generation_exported = [
+        "generate_dataset",
+        "int_field",
+        "float_field",
+        "string_field",
+        "bool_field",
+        "date_field",
+        "datetime_field",
+        "time_field",
+        "duration_field",
+    ]
+
     prebuilt_actions_exported = [
         "send_slack_notification",
     ]
@@ -266,6 +279,10 @@ columns or rows in a table. The `get_action_metadata()` function is useful when 
 actions since it returns metadata about the validation step that's triggering the action. Lastly,
 the `config()` utility lets us set global configuration parameters."""
 
+    test_data_generation_desc = """Generate synthetic test data based on schema definitions. Use
+`generate_dataset()` to create data from a `Schema` object. The helper functions define typed fields
+with constraints for realistic test data generation."""
+
     prebuilt_actions_desc = """The Prebuilt Actions group contains a function that can be used to
 send a Slack notification when validation steps exceed failure threshold levels or just to provide a
 summary of the validation results, including the status, number of steps, passing and failing steps,
@@ -298,6 +315,9 @@ table information, and timing details."""
 
     api_text += f"""\n## The Utility Functions family\n\n{utility_desc}\n\n"""
     api_text += get_api_details(module=pointblank, exported_list=utility_exported)
+
+    api_text += f"""\n## The Test Data Generation family\n\n{test_data_generation_desc}\n\n"""
+    api_text += get_api_details(module=pointblank, exported_list=test_data_generation_exported)
 
     api_text += f"""\n## The Prebuilt Actions family\n\n{prebuilt_actions_desc}\n\n"""
     api_text += get_api_details(module=pointblank, exported_list=prebuilt_actions_exported)

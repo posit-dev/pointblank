@@ -1,0 +1,17 @@
+{
+  "first_names": {
+    "male": ["João", "José", "Antônio", "Francisco", "Carlos", "Paulo", "Pedro", "Lucas", "Luiz", "Marcos", "Luis", "Gabriel", "Rafael", "Daniel", "Marcelo", "Bruno", "Eduardo", "Felipe", "Rodrigo", "Márcio", "Fernando", "Roberto", "Ricardo", "Matheus", "Gustavo", "André", "Diego", "Guilherme", "Leandro", "Thiago", "Leonardo", "Vinícius", "Caio", "Henrique", "Samuel", "Miguel", "Arthur", "Davi", "Bernardo", "Heitor"],
+    "female": ["Maria", "Ana", "Francisca", "Antônia", "Adriana", "Juliana", "Marcia", "Fernanda", "Patrícia", "Aline", "Sandra", "Camila", "Amanda", "Bruna", "Jéssica", "Letícia", "Júlia", "Luciana", "Vanessa", "Mariana", "Gabriela", "Rafaela", "Isabela", "Larissa", "Beatriz", "Carolina", "Renata", "Daniela", "Luana", "Natália", "Vitória", "Luísa", "Helena", "Lívia", "Sophia", "Alice", "Laura", "Manuela", "Valentina", "Heloísa"],
+    "neutral": ["Alex", "Ariel", "Dani", "Gabi", "Jô", "Lu", "Noel", "Sam", "Val", "Yuri"]
+  },
+  "last_names": ["Silva", "Santos", "Oliveira", "Souza", "Rodrigues", "Ferreira", "Alves", "Pereira", "Lima", "Gomes", "Costa", "Ribeiro", "Martins", "Carvalho", "Almeida", "Lopes", "Soares", "Fernandes", "Vieira", "Barbosa", "Rocha", "Dias", "Nascimento", "Andrade", "Moreira", "Nunes", "Marques", "Machado", "Mendes", "Freitas", "Cardoso", "Ramos", "Gonçalves", "Santana", "Teixeira", "Araújo", "Correia", "Pinto", "Monteiro", "Batista"],
+  "name_formats": [
+    "{first_name} {last_name}"
+  ],
+  "prefixes": {
+    "male": ["Sr.", "Dr."],
+    "female": ["Sra.", "Dra."],
+    "neutral": ["Dr."]
+  },
+  "suffixes": ["Filho", "Neto", "Júnior"]
+}

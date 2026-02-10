@@ -1,0 +1,61 @@
+{
+  "suffixes": [
+    "PT", "Tbk", "CV", "Group", "Indonesia", "Corporation", "Holdings", "Internasional",
+    "Persada", "Jaya", "Mandiri", "Sejahtera", "Abadi", "Makmur", "Sentosa"
+  ],
+  "formats": [
+    "PT {last_name} {suffix}",
+    "PT {adjective} {noun} {suffix}",
+    "PT {adjective} {noun}",
+    "CV {last_name} {noun}"
+  ],
+  "adjectives": [
+    "Global", "Prima", "Mega", "Multi", "Indo", "Nusa", "Bumi", "Surya", "Cipta", "Karya",
+    "Mitra", "Sumber", "Putra", "Bina", "Citra", "Eka", "Tri", "Panca", "Setia", "Jaya"
+  ],
+  "nouns": [
+    "Mandiri", "Sentosa", "Makmur", "Sejahtera", "Abadi", "Perkasa", "Utama", "Pratama", "Perdana", "Cemerlang",
+    "Lestari", "Mulia", "Sukses", "Karya", "Cipta", "Buana", "Nusantara", "Persada", "Sarana", "Daya"
+  ],
+  "well_known_companies": [
+    {"name": "Bank Central Asia (BCA)", "cities": ["Jakarta Pusat", "Jakarta Selatan", "Surabaya", "Bandung"]},
+    {"name": "Bank Rakyat Indonesia (BRI)", "cities": ["Jakarta Pusat", "Surabaya", "Medan", "Makassar"]},
+    {"name": "Bank Mandiri", "cities": ["Jakarta Pusat", "Jakarta Selatan", "Surabaya", "Bandung"]},
+    {"name": "Telkom Indonesia", "cities": ["Bandung", "Jakarta Pusat", "Surabaya", "Medan"]},
+    {"name": "Pertamina", "cities": ["Jakarta Pusat", "Balikpapan", "Surabaya", "Medan"]},
+    {"name": "Astra International", "cities": ["Jakarta Utara", "Jakarta Pusat", "Surabaya"]},
+    {"name": "Indofood", "cities": ["Jakarta Pusat", "Surabaya", "Semarang", "Medan"]},
+    {"name": "Unilever Indonesia", "cities": ["Jakarta Selatan", "Surabaya", "Bandung"]},
+    {"name": "Gojek", "cities": ["Jakarta Selatan", "Surabaya", "Bandung", "Yogyakarta"]},
+    {"name": "Tokopedia", "cities": ["Jakarta Selatan", "Surabaya", "Bandung"]},
+    {"name": "Shopee Indonesia", "cities": ["Jakarta Selatan", "Surabaya", "Bandung"]},
+    {"name": "Bukalapak", "cities": ["Jakarta Selatan", "Bandung", "Surabaya"]},
+    {"name": "Traveloka", "cities": ["Jakarta Selatan", "Surabaya", "Denpasar"]},
+    {"name": "Grab Indonesia", "cities": ["Jakarta Selatan", "Surabaya", "Bandung", "Medan"]},
+    {"name": "Garuda Indonesia", "cities": ["Jakarta Pusat", "Surabaya", "Denpasar", "Makassar"]},
+    {"name": "Lion Air", "cities": ["Jakarta Pusat", "Surabaya", "Medan", "Makassar"]},
+    {"name": "Semen Indonesia", "cities": ["Surabaya", "Jakarta Pusat", "Semarang"]},
+    {"name": "PLN (Perusahaan Listrik Negara)", "cities": ["Jakarta Selatan", "Surabaya", "Medan", "Makassar"]},
+    {"name": "XL Axiata", "cities": ["Jakarta Selatan", "Surabaya", "Bandung"]},
+    {"name": "Indosat Ooredoo", "cities": ["Jakarta Pusat", "Surabaya", "Medan"]}
+  ],
+  "jobs": [
+    "Software Engineer", "Product Manager", "Data Analyst", "Marketing Manager", "Sales Executive",
+    "HR Manager", "Financial Analyst", "Project Manager", "Operations Manager", "UI/UX Designer",
+    "Frontend Developer", "Backend Developer", "DevOps Engineer", "QA Engineer", "Data Scientist",
+    "Accountant", "Business Analyst", "Customer Service", "Logistics Coordinator", "Procurement Manager",
+    "Mechanical Engineer", "Civil Engineer", "Electrical Engineer", "Production Supervisor", "Quality Control"
+  ],
+  "catch_phrase_adjectives": [
+    "Innovative", "Reliable", "Professional", "Dynamic", "Trusted", "Leading", "Modern", "Sustainable",
+    "Customer-focused", "Quality-driven", "Excellent", "Advanced", "Strategic", "Premium"
+  ],
+  "catch_phrase_nouns": [
+    "solutions", "services", "quality", "excellence", "innovation", "value", "partnership", "growth",
+    "performance", "reliability", "integrity", "success", "results", "commitment"
+  ],
+  "catch_phrase_verbs": [
+    "deliver", "create", "build", "provide", "enable", "achieve", "drive", "transform", "empower",
+    "connect", "innovate", "lead", "develop", "optimize", "enhance"
+  ]
+}

@@ -1,0 +1,619 @@
+{
+  "locations": [
+    {"city": "Paris", "state": "Île-de-France", "state_abbr": "IDF", "postcode_prefix": "75", "lat_min": 48.81, "lat_max": 48.90, "lon_min": 2.22, "lon_max": 2.47},
+    {"city": "Le Marais", "state": "Île-de-France", "state_abbr": "IDF", "postcode_prefix": "750", "lat_min": 48.85, "lat_max": 48.87, "lon_min": 2.35, "lon_max": 2.37},
+    {"city": "Montmartre", "state": "Île-de-France", "state_abbr": "IDF", "postcode_prefix": "750", "lat_min": 48.88, "lat_max": 48.89, "lon_min": 2.33, "lon_max": 2.35},
+    {"city": "Saint-Germain-des-Prés", "state": "Île-de-France", "state_abbr": "IDF", "postcode_prefix": "750", "lat_min": 48.85, "lat_max": 48.86, "lon_min": 2.32, "lon_max": 2.34},
+    {"city": "Belleville", "state": "Île-de-France", "state_abbr": "IDF", "postcode_prefix": "750", "lat_min": 48.87, "lat_max": 48.88, "lon_min": 2.38, "lon_max": 2.40},
+    {"city": "La Défense", "state": "Île-de-France", "state_abbr": "IDF", "postcode_prefix": "920", "lat_min": 48.88, "lat_max": 48.90, "lon_min": 2.23, "lon_max": 2.26},
+    {"city": "Boulogne-Billancourt", "state": "Île-de-France", "state_abbr": "IDF", "postcode_prefix": "921", "lat_min": 48.82, "lat_max": 48.85, "lon_min": 2.22, "lon_max": 2.26},
+    {"city": "Saint-Denis", "state": "Île-de-France", "state_abbr": "IDF", "postcode_prefix": "930", "lat_min": 48.92, "lat_max": 48.95, "lon_min": 2.33, "lon_max": 2.38},
+    {"city": "Versailles", "state": "Île-de-France", "state_abbr": "IDF", "postcode_prefix": "781", "lat_min": 48.78, "lat_max": 48.82, "lon_min": 2.10, "lon_max": 2.16},
+    {"city": "Nanterre", "state": "Île-de-France", "state_abbr": "IDF", "postcode_prefix": "920", "lat_min": 48.88, "lat_max": 48.92, "lon_min": 2.18, "lon_max": 2.24},
+    {"city": "Créteil", "state": "Île-de-France", "state_abbr": "IDF", "postcode_prefix": "940", "lat_min": 48.77, "lat_max": 48.80, "lon_min": 2.44, "lon_max": 2.48},
+    {"city": "Marseille", "state": "Provence-Alpes-Côte d'Azur", "state_abbr": "PACA", "postcode_prefix": "130", "lat_min": 43.18, "lat_max": 43.38, "lon_min": 5.28, "lon_max": 5.53},
+    {"city": "Le Vieux-Port", "state": "Provence-Alpes-Côte d'Azur", "state_abbr": "PACA", "postcode_prefix": "130", "lat_min": 43.29, "lat_max": 43.30, "lon_min": 5.36, "lon_max": 5.38},
+    {"city": "Nice", "state": "Provence-Alpes-Côte d'Azur", "state_abbr": "PACA", "postcode_prefix": "060", "lat_min": 43.68, "lat_max": 43.74, "lon_min": 7.22, "lon_max": 7.32},
+    {"city": "Toulon", "state": "Provence-Alpes-Côte d'Azur", "state_abbr": "PACA", "postcode_prefix": "830", "lat_min": 43.10, "lat_max": 43.15, "lon_min": 5.90, "lon_max": 5.98},
+    {"city": "Aix-en-Provence", "state": "Provence-Alpes-Côte d'Azur", "state_abbr": "PACA", "postcode_prefix": "131", "lat_min": 43.50, "lat_max": 43.56, "lon_min": 5.40, "lon_max": 5.48},
+    {"city": "Cannes", "state": "Provence-Alpes-Côte d'Azur", "state_abbr": "PACA", "postcode_prefix": "060", "lat_min": 43.54, "lat_max": 43.58, "lon_min": 6.97, "lon_max": 7.03},
+    {"city": "Antibes", "state": "Provence-Alpes-Côte d'Azur", "state_abbr": "PACA", "postcode_prefix": "060", "lat_min": 43.56, "lat_max": 43.60, "lon_min": 7.10, "lon_max": 7.15},
+    {"city": "Avignon", "state": "Provence-Alpes-Côte d'Azur", "state_abbr": "PACA", "postcode_prefix": "840", "lat_min": 43.92, "lat_max": 43.97, "lon_min": 4.78, "lon_max": 4.85},
+    {"city": "Lyon", "state": "Auvergne-Rhône-Alpes", "state_abbr": "ARA", "postcode_prefix": "690", "lat_min": 45.70, "lat_max": 45.80, "lon_min": 4.78, "lon_max": 4.92},
+    {"city": "Vieux Lyon", "state": "Auvergne-Rhône-Alpes", "state_abbr": "ARA", "postcode_prefix": "690", "lat_min": 45.76, "lat_max": 45.77, "lon_min": 4.82, "lon_max": 4.83},
+    {"city": "La Part-Dieu", "state": "Auvergne-Rhône-Alpes", "state_abbr": "ARA", "postcode_prefix": "690", "lat_min": 45.76, "lat_max": 45.77, "lon_min": 4.85, "lon_max": 4.87},
+    {"city": "Villeurbanne", "state": "Auvergne-Rhône-Alpes", "state_abbr": "ARA", "postcode_prefix": "691", "lat_min": 45.76, "lat_max": 45.79, "lon_min": 4.87, "lon_max": 4.92},
+    {"city": "Saint-Étienne", "state": "Auvergne-Rhône-Alpes", "state_abbr": "ARA", "postcode_prefix": "420", "lat_min": 45.42, "lat_max": 45.47, "lon_min": 4.35, "lon_max": 4.42},
+    {"city": "Grenoble", "state": "Auvergne-Rhône-Alpes", "state_abbr": "ARA", "postcode_prefix": "380", "lat_min": 45.15, "lat_max": 45.22, "lon_min": 5.68, "lon_max": 5.77},
+    {"city": "Clermont-Ferrand", "state": "Auvergne-Rhône-Alpes", "state_abbr": "ARA", "postcode_prefix": "630", "lat_min": 45.75, "lat_max": 45.82, "lon_min": 3.05, "lon_max": 3.15},
+    {"city": "Annecy", "state": "Auvergne-Rhône-Alpes", "state_abbr": "ARA", "postcode_prefix": "740", "lat_min": 45.88, "lat_max": 45.92, "lon_min": 6.10, "lon_max": 6.15},
+    {"city": "Chambéry", "state": "Auvergne-Rhône-Alpes", "state_abbr": "ARA", "postcode_prefix": "730", "lat_min": 45.55, "lat_max": 45.60, "lon_min": 5.90, "lon_max": 5.95},
+    {"city": "Toulouse", "state": "Occitanie", "state_abbr": "OCC", "postcode_prefix": "310", "lat_min": 43.53, "lat_max": 43.68, "lon_min": 1.35, "lon_max": 1.52},
+    {"city": "Capitole", "state": "Occitanie", "state_abbr": "OCC", "postcode_prefix": "310", "lat_min": 43.60, "lat_max": 43.61, "lon_min": 1.43, "lon_max": 1.45},
+    {"city": "Montpellier", "state": "Occitanie", "state_abbr": "OCC", "postcode_prefix": "340", "lat_min": 43.58, "lat_max": 43.65, "lon_min": 3.82, "lon_max": 3.93},
+    {"city": "Nîmes", "state": "Occitanie", "state_abbr": "OCC", "postcode_prefix": "300", "lat_min": 43.82, "lat_max": 43.87, "lon_min": 4.33, "lon_max": 4.40},
+    {"city": "Perpignan", "state": "Occitanie", "state_abbr": "OCC", "postcode_prefix": "660", "lat_min": 42.68, "lat_max": 42.72, "lon_min": 2.87, "lon_max": 2.92},
+    {"city": "Béziers", "state": "Occitanie", "state_abbr": "OCC", "postcode_prefix": "345", "lat_min": 43.33, "lat_max": 43.37, "lon_min": 3.20, "lon_max": 3.25},
+    {"city": "Carcassonne", "state": "Occitanie", "state_abbr": "OCC", "postcode_prefix": "110", "lat_min": 43.20, "lat_max": 43.23, "lon_min": 2.33, "lon_max": 2.38},
+    {"city": "Bordeaux", "state": "Nouvelle-Aquitaine", "state_abbr": "NAQ", "postcode_prefix": "330", "lat_min": 44.80, "lat_max": 44.92, "lon_min": -0.65, "lon_max": -0.52},
+    {"city": "Saint-Pierre", "state": "Nouvelle-Aquitaine", "state_abbr": "NAQ", "postcode_prefix": "330", "lat_min": 44.83, "lat_max": 44.85, "lon_min": -0.58, "lon_max": -0.56},
+    {"city": "Chartrons", "state": "Nouvelle-Aquitaine", "state_abbr": "NAQ", "postcode_prefix": "330", "lat_min": 44.85, "lat_max": 44.87, "lon_min": -0.57, "lon_max": -0.55},
+    {"city": "Limoges", "state": "Nouvelle-Aquitaine", "state_abbr": "NAQ", "postcode_prefix": "870", "lat_min": 45.82, "lat_max": 45.87, "lon_min": 1.23, "lon_max": 1.30},
+    {"city": "Poitiers", "state": "Nouvelle-Aquitaine", "state_abbr": "NAQ", "postcode_prefix": "860", "lat_min": 46.57, "lat_max": 46.62, "lon_min": 0.32, "lon_max": 0.38},
+    {"city": "La Rochelle", "state": "Nouvelle-Aquitaine", "state_abbr": "NAQ", "postcode_prefix": "170", "lat_min": 46.15, "lat_max": 46.18, "lon_min": -1.18, "lon_max": -1.13},
+    {"city": "Pau", "state": "Nouvelle-Aquitaine", "state_abbr": "NAQ", "postcode_prefix": "640", "lat_min": 43.28, "lat_max": 43.33, "lon_min": -0.40, "lon_max": -0.35},
+    {"city": "Bayonne", "state": "Nouvelle-Aquitaine", "state_abbr": "NAQ", "postcode_prefix": "640", "lat_min": 43.48, "lat_max": 43.52, "lon_min": -1.48, "lon_max": -1.43},
+    {"city": "Biarritz", "state": "Nouvelle-Aquitaine", "state_abbr": "NAQ", "postcode_prefix": "640", "lat_min": 43.47, "lat_max": 43.50, "lon_min": -1.58, "lon_max": -1.53},
+    {"city": "Nantes", "state": "Pays de la Loire", "state_abbr": "PDL", "postcode_prefix": "440", "lat_min": 47.18, "lat_max": 47.28, "lon_min": -1.62, "lon_max": -1.48},
+    {"city": "Île Feydeau", "state": "Pays de la Loire", "state_abbr": "PDL", "postcode_prefix": "440", "lat_min": 47.21, "lat_max": 47.22, "lon_min": -1.56, "lon_max": -1.55},
+    {"city": "Le Mans", "state": "Pays de la Loire", "state_abbr": "PDL", "postcode_prefix": "720", "lat_min": 47.98, "lat_max": 48.03, "lon_min": 0.18, "lon_max": 0.23},
+    {"city": "Angers", "state": "Pays de la Loire", "state_abbr": "PDL", "postcode_prefix": "490", "lat_min": 47.45, "lat_max": 47.50, "lon_min": -0.58, "lon_max": -0.52},
+    {"city": "Saint-Nazaire", "state": "Pays de la Loire", "state_abbr": "PDL", "postcode_prefix": "446", "lat_min": 47.27, "lat_max": 47.30, "lon_min": -2.22, "lon_max": -2.18},
+    {"city": "La Roche-sur-Yon", "state": "Pays de la Loire", "state_abbr": "PDL", "postcode_prefix": "850", "lat_min": 46.65, "lat_max": 46.68, "lon_min": -1.45, "lon_max": -1.40},
+    {"city": "Lille", "state": "Hauts-de-France", "state_abbr": "HDF", "postcode_prefix": "590", "lat_min": 50.60, "lat_max": 50.68, "lon_min": 2.98, "lon_max": 3.10},
+    {"city": "Vieux-Lille", "state": "Hauts-de-France", "state_abbr": "HDF", "postcode_prefix": "590", "lat_min": 50.64, "lat_max": 50.65, "lon_min": 3.05, "lon_max": 3.07},
+    {"city": "Roubaix", "state": "Hauts-de-France", "state_abbr": "HDF", "postcode_prefix": "591", "lat_min": 50.68, "lat_max": 50.72, "lon_min": 3.15, "lon_max": 3.20},
+    {"city": "Tourcoing", "state": "Hauts-de-France", "state_abbr": "HDF", "postcode_prefix": "592", "lat_min": 50.72, "lat_max": 50.75, "lon_min": 3.15, "lon_max": 3.18},
+    {"city": "Amiens", "state": "Hauts-de-France", "state_abbr": "HDF", "postcode_prefix": "800", "lat_min": 49.87, "lat_max": 49.92, "lon_min": 2.27, "lon_max": 2.33},
+    {"city": "Dunkerque", "state": "Hauts-de-France", "state_abbr": "HDF", "postcode_prefix": "590", "lat_min": 51.02, "lat_max": 51.05, "lon_min": 2.35, "lon_max": 2.40},
+    {"city": "Calais", "state": "Hauts-de-France", "state_abbr": "HDF", "postcode_prefix": "620", "lat_min": 50.93, "lat_max": 50.97, "lon_min": 1.83, "lon_max": 1.88},
+    {"city": "Strasbourg", "state": "Grand Est", "state_abbr": "GES", "postcode_prefix": "670", "lat_min": 48.53, "lat_max": 48.62, "lon_min": 7.70, "lon_max": 7.82},
+    {"city": "Petite France", "state": "Grand Est", "state_abbr": "GES", "postcode_prefix": "670", "lat_min": 48.57, "lat_max": 48.58, "lon_min": 7.73, "lon_max": 7.75},
+    {"city": "Reims", "state": "Grand Est", "state_abbr": "GES", "postcode_prefix": "510", "lat_min": 49.23, "lat_max": 49.28, "lon_min": 3.98, "lon_max": 4.05},
+    {"city": "Metz", "state": "Grand Est", "state_abbr": "GES", "postcode_prefix": "570", "lat_min": 49.10, "lat_max": 49.15, "lon_min": 6.15, "lon_max": 6.22},
+    {"city": "Nancy", "state": "Grand Est", "state_abbr": "GES", "postcode_prefix": "540", "lat_min": 48.67, "lat_max": 48.72, "lon_min": 6.15, "lon_max": 6.22},
+    {"city": "Mulhouse", "state": "Grand Est", "state_abbr": "GES", "postcode_prefix": "680", "lat_min": 47.73, "lat_max": 47.78, "lon_min": 7.32, "lon_max": 7.38},
+    {"city": "Colmar", "state": "Grand Est", "state_abbr": "GES", "postcode_prefix": "680", "lat_min": 48.07, "lat_max": 48.10, "lon_min": 7.33, "lon_max": 7.38},
+    {"city": "Troyes", "state": "Grand Est", "state_abbr": "GES", "postcode_prefix": "100", "lat_min": 48.28, "lat_max": 48.32, "lon_min": 4.05, "lon_max": 4.10},
+    {"city": "Rennes", "state": "Bretagne", "state_abbr": "BRE", "postcode_prefix": "350", "lat_min": 48.08, "lat_max": 48.15, "lon_min": -1.72, "lon_max": -1.63},
+    {"city": "Brest", "state": "Bretagne", "state_abbr": "BRE", "postcode_prefix": "292", "lat_min": 48.38, "lat_max": 48.42, "lon_min": -4.52, "lon_max": -4.47},
+    {"city": "Quimper", "state": "Bretagne", "state_abbr": "BRE", "postcode_prefix": "290", "lat_min": 47.98, "lat_max": 48.00, "lon_min": -4.12, "lon_max": -4.08},
+    {"city": "Lorient", "state": "Bretagne", "state_abbr": "BRE", "postcode_prefix": "566", "lat_min": 47.73, "lat_max": 47.77, "lon_min": -3.40, "lon_max": -3.35},
+    {"city": "Vannes", "state": "Bretagne", "state_abbr": "BRE", "postcode_prefix": "560", "lat_min": 47.65, "lat_max": 47.68, "lon_min": -2.78, "lon_max": -2.73},
+    {"city": "Saint-Malo", "state": "Bretagne", "state_abbr": "BRE", "postcode_prefix": "354", "lat_min": 48.64, "lat_max": 48.66, "lon_min": -2.02, "lon_max": -1.98},
+    {"city": "Saint-Brieuc", "state": "Bretagne", "state_abbr": "BRE", "postcode_prefix": "220", "lat_min": 48.50, "lat_max": 48.53, "lon_min": -2.78, "lon_max": -2.73},
+    {"city": "Dijon", "state": "Bourgogne-Franche-Comté", "state_abbr": "BFC", "postcode_prefix": "210", "lat_min": 47.30, "lat_max": 47.35, "lon_min": 5.00, "lon_max": 5.08},
+    {"city": "Besançon", "state": "Bourgogne-Franche-Comté", "state_abbr": "BFC", "postcode_prefix": "250", "lat_min": 47.22, "lat_max": 47.27, "lon_min": 5.98, "lon_max": 6.05},
+    {"city": "Belfort", "state": "Bourgogne-Franche-Comté", "state_abbr": "BFC", "postcode_prefix": "900", "lat_min": 47.62, "lat_max": 47.65, "lon_min": 6.85, "lon_max": 6.88},
+    {"city": "Auxerre", "state": "Bourgogne-Franche-Comté", "state_abbr": "BFC", "postcode_prefix": "890", "lat_min": 47.78, "lat_max": 47.82, "lon_min": 3.55, "lon_max": 3.60},
+    {"city": "Chalon-sur-Saône", "state": "Bourgogne-Franche-Comté", "state_abbr": "BFC", "postcode_prefix": "710", "lat_min": 46.78, "lat_max": 46.82, "lon_min": 4.83, "lon_max": 4.88},
+    {"city": "Rouen", "state": "Normandie", "state_abbr": "NOR", "postcode_prefix": "760", "lat_min": 49.42, "lat_max": 49.47, "lon_min": 1.05, "lon_max": 1.12},
+    {"city": "Le Havre", "state": "Normandie", "state_abbr": "NOR", "postcode_prefix": "760", "lat_min": 49.48, "lat_max": 49.52, "lon_min": 0.10, "lon_max": 0.15},
+    {"city": "Caen", "state": "Normandie", "state_abbr": "NOR", "postcode_prefix": "140", "lat_min": 49.17, "lat_max": 49.20, "lon_min": -0.40, "lon_max": -0.35},
+    {"city": "Cherbourg-en-Cotentin", "state": "Normandie", "state_abbr": "NOR", "postcode_prefix": "500", "lat_min": 49.62, "lat_max": 49.65, "lon_min": -1.65, "lon_max": -1.60},
+    {"city": "Évreux", "state": "Normandie", "state_abbr": "NOR", "postcode_prefix": "270", "lat_min": 49.02, "lat_max": 49.05, "lon_min": 1.13, "lon_max": 1.18},
+    {"city": "Dieppe", "state": "Normandie", "state_abbr": "NOR", "postcode_prefix": "762", "lat_min": 49.92, "lat_max": 49.93, "lon_min": 1.07, "lon_max": 1.10},
+    {"city": "Orléans", "state": "Centre-Val de Loire", "state_abbr": "CVL", "postcode_prefix": "450", "lat_min": 47.87, "lat_max": 47.92, "lon_min": 1.88, "lon_max": 1.95},
+    {"city": "Tours", "state": "Centre-Val de Loire", "state_abbr": "CVL", "postcode_prefix": "370", "lat_min": 47.38, "lat_max": 47.42, "lon_min": 0.67, "lon_max": 0.72},
+    {"city": "Bourges", "state": "Centre-Val de Loire", "state_abbr": "CVL", "postcode_prefix": "180", "lat_min": 47.07, "lat_max": 47.10, "lon_min": 2.38, "lon_max": 2.42},
+    {"city": "Blois", "state": "Centre-Val de Loire", "state_abbr": "CVL", "postcode_prefix": "410", "lat_min": 47.58, "lat_max": 47.60, "lon_min": 1.32, "lon_max": 1.35},
+    {"city": "Chartres", "state": "Centre-Val de Loire", "state_abbr": "CVL", "postcode_prefix": "280", "lat_min": 48.43, "lat_max": 48.47, "lon_min": 1.48, "lon_max": 1.52},
+    {"city": "Châteauroux", "state": "Centre-Val de Loire", "state_abbr": "CVL", "postcode_prefix": "360", "lat_min": 46.80, "lat_max": 46.83, "lon_min": 1.68, "lon_max": 1.72},
+    {"city": "Ajaccio", "state": "Corse", "state_abbr": "COR", "postcode_prefix": "200", "lat_min": 41.92, "lat_max": 41.95, "lon_min": 8.72, "lon_max": 8.77},
+    {"city": "Bastia", "state": "Corse", "state_abbr": "COR", "postcode_prefix": "200", "lat_min": 42.68, "lat_max": 42.72, "lon_min": 9.45, "lon_max": 9.48},
+    {"city": "Porto-Vecchio", "state": "Corse", "state_abbr": "COR", "postcode_prefix": "201", "lat_min": 41.58, "lat_max": 41.60, "lon_min": 9.27, "lon_max": 9.30},
+    {"city": "Calvi", "state": "Corse", "state_abbr": "COR", "postcode_prefix": "202", "lat_min": 42.56, "lat_max": 42.58, "lon_min": 8.75, "lon_max": 8.77}
+  ],
+  "streets_by_city": {
+    "Paris": [
+      "Avenue des Champs-Élysées", "Rue de Rivoli", "Boulevard Saint-Germain", "Boulevard Haussmann", "Rue du Faubourg Saint-Honoré",
+      "Avenue de l'Opéra", "Rue de la Paix", "Place Vendôme", "Rue Saint-Honoré", "Boulevard des Capucines",
+      "Rue Lafayette", "Boulevard Voltaire", "Avenue de la République", "Rue de Rennes", "Boulevard Raspail",
+      "Rue de Vaugirard", "Avenue Montaigne", "Rue du Bac", "Quai d'Orsay", "Rue de Grenelle",
+      "Avenue Kléber", "Avenue Victor Hugo", "Avenue Foch", "Rue de Passy", "Avenue Mozart",
+      "Boulevard de Sébastopol", "Rue Réaumur", "Rue du Temple", "Rue de Turenne", "Rue Oberkampf",
+      "Rue de Belleville", "Avenue Gambetta", "Rue des Pyrénées", "Boulevard de Ménilmontant", "Rue de Bagnolet",
+      "Avenue de Clichy", "Rue de Rome", "Boulevard des Batignolles", "Rue Cardinet", "Avenue de Villiers",
+      "Boulevard de Magenta", "Rue du Faubourg Saint-Denis", "Rue du Faubourg Saint-Martin", "Boulevard de Strasbourg", "Rue de Paradis",
+      "Rue Mouffetard", "Rue Monge", "Boulevard Saint-Marcel", "Place d'Italie", "Avenue des Gobelins",
+      "Rue de Charonne", "Boulevard Diderot", "Avenue Daumesnil", "Rue de Lyon", "Place de la Bastille",
+      "Quai de la Tournelle", "Rue Saint-Jacques", "Boulevard Saint-Michel", "Rue Gay-Lussac", "Rue d'Ulm",
+      "Avenue du Maine", "Rue d'Alésia", "Rue Raymond Losserand", "Boulevard Brune", "Rue de la Convention",
+      "Avenue Émile Zola", "Rue de la Croix-Nivert", "Rue Lecourbe", "Rue de Sèvres", "Boulevard Garibaldi",
+      "Rue de Courcelles", "Boulevard Malesherbes", "Rue de Lisbonne", "Rue de Miromesnil", "Avenue Hoche",
+      "Rue de Bercy", "Quai de Bercy", "Avenue de Saint-Mandé", "Boulevard de Reuilly", "Rue de Picpus",
+      "Avenue de Wagram", "Avenue des Ternes", "Rue Bayen", "Boulevard Pereire", "Avenue de la Grande Armée",
+      "Rue de la Pompe", "Avenue Paul Doumer", "Rue de l'Alboni", "Quai Louis Blériot", "Avenue du Président Kennedy",
+      "Rue Caulaincourt", "Rue Lepic", "Rue des Abbesses", "Place du Tertre", "Rue Norvins",
+      "Rue de Lappe", "Rue de la Roquette", "Rue Keller", "Passage Thiéré", "Rue Sedaine"
+    ],
+    "Le Marais": [
+      "Rue des Francs-Bourgeois", "Rue des Rosiers", "Rue Vieille du Temple", "Rue de Bretagne", "Place des Vosges",
+      "Rue du Parc Royal", "Rue de Turenne", "Rue de Saintonge", "Rue Charlot", "Rue de Poitou",
+      "Rue des Archives", "Rue Rambuteau", "Rue Pastourelle", "Rue de Picardie", "Rue Debelleyme",
+      "Rue du Pont aux Choux", "Rue de Thorigny", "Rue de la Perle", "Rue du Roi de Sicile", "Rue des Écouffes",
+      "Rue Payenne", "Rue Elzévir", "Rue du Trésor", "Rue Sainte-Croix de la Bretonnerie", "Rue des Blancs Manteaux",
+      "Rue des Guillemites", "Rue Barbette", "Rue de Béarn", "Rue du Pas de la Mule", "Rue Saint-Gilles"
+    ],
+    "Montmartre": [
+      "Rue Lepic", "Rue des Abbesses", "Rue Caulaincourt", "Place du Tertre", "Rue Norvins",
+      "Rue Gabrielle", "Rue d'Orsel", "Rue des Martyrs", "Boulevard de Clichy", "Place Pigalle",
+      "Rue de Steinkerque", "Rue Tardieu", "Rue Foyatier", "Rue du Mont-Cenis", "Rue Cortot",
+      "Rue Saint-Vincent", "Rue de l'Abreuvoir", "Rue Girardon", "Rue Poulbot", "Rue Saint-Rustique",
+      "Rue Tholozé", "Rue Véron", "Rue Durantin", "Rue Houdon", "Rue André Antoine",
+      "Place Émile Goudeau", "Rue Ravignan", "Rue Berthe", "Rue La Vieuville", "Rue André del Sarte"
+    ],
+    "Saint-Germain-des-Prés": [
+      "Boulevard Saint-Germain", "Rue de Rennes", "Rue du Four", "Rue Bonaparte", "Rue de Seine",
+      "Rue Jacob", "Rue des Saints-Pères", "Rue de l'Université", "Rue du Bac", "Rue de Grenelle",
+      "Rue Mazarine", "Rue Guénégaud", "Rue Dauphine", "Rue de Buci", "Rue Saint-André des Arts",
+      "Rue de l'Ancienne Comédie", "Rue de l'Odéon", "Rue Monsieur le Prince", "Rue de Condé", "Rue de Vaugirard",
+      "Rue du Cherche-Midi", "Rue Madame", "Rue d'Assas", "Rue Vavin", "Rue Notre-Dame des Champs"
+    ],
+    "Belleville": [
+      "Rue de Belleville", "Rue des Pyrénées", "Rue de Ménilmontant", "Boulevard de Belleville", "Rue Julien Lacroix",
+      "Rue des Couronnes", "Rue Ramponeau", "Rue Dénoyez", "Rue Bisson", "Rue de Tourtille",
+      "Rue Piat", "Rue des Envierges", "Rue de la Mare", "Rue Vilin", "Rue Henri Chevreau",
+      "Rue de l'Ermitage", "Rue des Cascades", "Rue de Savies", "Rue Olivier Métra", "Rue du Télégraphe"
+    ],
+    "La Défense": [
+      "Esplanade du Général de Gaulle", "Parvis de La Défense", "Place de La Défense", "Cours Michelet", "Boulevard Circulaire",
+      "Avenue de la Division Leclerc", "Rue de l'Arche", "Place des Corolles", "Boulevard de La Défense", "Avenue Pablo Picasso",
+      "Place des Reflets", "Rue Carpeaux", "Avenue du Général de Gaulle", "Cours Valmy", "Place Carpeaux"
+    ],
+    "Boulogne-Billancourt": [
+      "Avenue Jean-Baptiste Clément", "Rue de Billancourt", "Avenue Victor Hugo", "Rue du Château", "Avenue Édouard Vaillant",
+      "Rue de Sèvres", "Avenue du Général Leclerc", "Rue de Paris", "Boulevard Jean Jaurès", "Rue Marcel Bontemps",
+      "Rue Escudier", "Rue du Point du Jour", "Avenue Pierre Grenier", "Rue de Silly", "Boulevard de la République",
+      "Rue Yves Kermen", "Avenue Robert Schuman", "Rue Gallieni", "Rue des Peupliers", "Rue de l'Ancienne Mairie"
+    ],
+    "Saint-Denis": [
+      "Rue de la République", "Avenue du Président Wilson", "Boulevard Marcel Sembat", "Rue Gabriel Péri", "Place du Caquet",
+      "Rue de la Légion d'Honneur", "Boulevard Jules Guesde", "Rue du Port", "Rue de Strasbourg", "Avenue Francis de Pressensé",
+      "Rue Danielle Casanova", "Rue du Landy", "Boulevard Anatole France", "Rue de Paris", "Rue Proudhon"
+    ],
+    "Versailles": [
+      "Avenue de Paris", "Rue de Satory", "Rue de la Paroisse", "Avenue de Saint-Cloud", "Rue des Réservoirs",
+      "Rue de l'Orangerie", "Avenue de l'Europe", "Rue du Général Leclerc", "Boulevard de la Reine", "Rue Carnot",
+      "Rue Royale", "Rue du Peintre Lebrun", "Place du Marché Notre-Dame", "Rue de la Chancellerie", "Avenue du Général de Gaulle",
+      "Rue des États-Généraux", "Rue de Montreuil", "Avenue de Sceaux", "Rue du Maréchal Foch", "Rue Hoche"
+    ],
+    "Nanterre": [
+      "Avenue de la République", "Rue du Marché", "Place de la Boule", "Avenue Pablo Picasso", "Rue Maurice Thorez",
+      "Boulevard des Provinces Françaises", "Rue des Trois Fontanot", "Avenue Georges Clémenceau", "Rue du 8 Mai 1945", "Rue de Courbevoie",
+      "Place Gabriel Péri", "Rue de Stalingrad", "Boulevard du Général Leclerc", "Rue Salvador Allende", "Avenue de la Folie"
+    ],
+    "Créteil": [
+      "Avenue du Général de Gaulle", "Rue du Général Leclerc", "Avenue du Maréchal de Lattre de Tassigny", "Rue Juliette Savar", "Boulevard Kennedy",
+      "Avenue de Verdun", "Rue Victor Hugo", "Place Salvador Allende", "Avenue Pierre Brossolette", "Boulevard Jean-Jacques Rousseau",
+      "Rue de la Préfecture", "Avenue du Mont-Mesly", "Rue de Brie", "Boulevard du Général Pierre Billotte", "Rue de la Lévrière"
+    ],
+    "Marseille": [
+      "La Canebière", "Rue Saint-Ferréol", "Rue Paradis", "Boulevard Longchamp", "Cours Julien",
+      "Quai des Belges", "Rue de la République", "Boulevard Baille", "Avenue du Prado", "Rue Breteuil",
+      "Rue Sainte", "Rue d'Aubagne", "Rue Grignan", "Boulevard Garibaldi", "Rue de Rome",
+      "Cours Lieutaud", "Rue Sylvabelle", "Avenue de Toulon", "Boulevard Notre-Dame", "Rue Jean Mermoz",
+      "Corniche Président John Fitzgerald Kennedy", "Promenade Georges Pompidou", "Avenue Cantini", "Boulevard Périer", "Rue Montgrand",
+      "Rue Vincent Scotto", "Rue Thubaneau", "Boulevard de la Libération", "Avenue de la Corse", "Rue de la Loge",
+      "Rue Caisserie", "Boulevard de Paris", "Rue d'Endoume", "Avenue de Mazargues", "Boulevard Michelet"
+    ],
+    "Le Vieux-Port": [
+      "Quai du Port", "Quai de Rive Neuve", "Quai des Belges", "Rue de la Loge", "Rue Caisserie",
+      "Rue Bonneterie", "Rue de la Guirlande", "Place Vivaux", "Rue Henri Fiocca", "Rue du Petit Puits",
+      "Rue de la Prison", "Montée des Accoules", "Place de Lenche", "Rue Fontaine de Caylus", "Rue des Moulins"
+    ],
+    "Nice": [
+      "Promenade des Anglais", "Avenue Jean Médecin", "Rue de France", "Boulevard Victor Hugo", "Rue Masséna",
+      "Place Garibaldi", "Cours Saleya", "Rue Pairolière", "Rue Droite", "Place Rossetti",
+      "Boulevard Gambetta", "Avenue de la Californie", "Boulevard de Cimiez", "Avenue des Fleurs", "Rue Gioffredo",
+      "Avenue Thiers", "Boulevard Carabacel", "Rue Pastorelli", "Rue Alphonse Karr", "Boulevard Dubouchage",
+      "Quai des États-Unis", "Rue Saint-François de Paule", "Rue de la Préfecture", "Rue Alexandre Mari", "Avenue Félix Faure",
+      "Rue Paradis", "Rue de Belgique", "Rue d'Italie", "Boulevard Stalingrad", "Rue Halevy"
+    ],
+    "Toulon": [
+      "Avenue de la République", "Rue Jean Jaurès", "Boulevard de Strasbourg", "Place de la Liberté", "Rue d'Alger",
+      "Cours Lafayette", "Rue Victor Clappier", "Boulevard du Maréchal Leclerc", "Rue Hoche", "Place Puget",
+      "Rue des Boucheries", "Quai Stalingrad", "Avenue de la Victoire", "Rue Gimelli", "Boulevard Cunéo",
+      "Rue Vincent Raspail", "Avenue du Maréchal Foch", "Rue Marius Michel", "Place d'Armes", "Rue de la Pomme"
+    ],
+    "Aix-en-Provence": [
+      "Cours Mirabeau", "Rue d'Italie", "Rue Espariat", "Place de l'Hôtel de Ville", "Rue Gaston de Saporta",
+      "Cours Sextius", "Rue des Cordeliers", "Rue Aude", "Rue Cardinale", "Place des Cardeurs",
+      "Rue Thiers", "Boulevard du Roi René", "Rue de la Mule Noire", "Rue du Maréchal Foch", "Avenue Victor Hugo",
+      "Boulevard Carnot", "Rue Manuel", "Place Richelme", "Rue Boulegon", "Passage Agard"
+    ],
+    "Cannes": [
+      "La Croisette", "Rue d'Antibes", "Boulevard de la République", "Rue Meynadier", "Rue Félix Faure",
+      "Boulevard Carnot", "Avenue du Maréchal Juin", "Rue des Serbes", "Rue Louis Blanc", "Boulevard Jean Hibert",
+      "Rue du Commandant André", "Square Mérimée", "Rue Buttura", "Avenue de Grasse", "Rue Georges Clémenceau"
+    ],
+    "Antibes": [
+      "Boulevard d'Aguillon", "Rue de la République", "Avenue du 24 Août", "Rue Georges Clémenceau", "Place Nationale",
+      "Cours Masséna", "Rue Sade", "Rue Aubernon", "Rue James Close", "Rue Thuret",
+      "Boulevard Albert 1er", "Avenue de Nice", "Rue de Fersen", "Rue Rostan", "Rue Wilson"
+    ],
+    "Avignon": [
+      "Place de l'Horloge", "Rue de la République", "Rue Joseph Vernet", "Cours Jean Jaurès", "Rue Carreterie",
+      "Place Pie", "Rue des Marchands", "Rue du Roi René", "Rue Petite Fusterie", "Rue Grande Fusterie",
+      "Rue des Teinturiers", "Rue de la Bonneterie", "Rue Saint-Agricol", "Rue du Vieux Sextier", "Boulevard Saint-Roch",
+      "Rue Guillaume Puy", "Rue Banasterie", "Place des Corps-Saints", "Rue Philonarde", "Rue Saint-Étienne"
+    ],
+    "Lyon": [
+      "Rue de la République", "Cours Vitton", "Avenue Jean Jaurès", "Boulevard des Belges", "Rue du Président Édouard Herriot",
+      "Rue de la Part-Dieu", "Avenue de Saxe", "Cours Lafayette", "Quai Saint-Antoine", "Rue Mercière",
+      "Rue Victor Hugo", "Place Bellecour", "Rue de Brest", "Rue Émile Zola", "Rue de la Charité",
+      "Cours Gambetta", "Avenue Félix Faure", "Rue Garibaldi", "Boulevard des Brotteaux", "Rue Moncey",
+      "Rue du Bât d'Argent", "Rue Grenette", "Rue Thomassin", "Rue Paul Bert", "Rue de Créqui",
+      "Quai Romain Rolland", "Quai Jules Courmont", "Rue de la Martinière", "Place des Terreaux", "Rue Constantine",
+      "Cours Albert Thomas", "Avenue Berthelot", "Boulevard Vivier-Merle", "Rue Servient", "Rue Vendôme"
+    ],
+    "Vieux Lyon": [
+      "Rue Saint-Jean", "Rue du Bœuf", "Rue Juiverie", "Montée du Gourguillon", "Place du Change",
+      "Rue de Gadagne", "Rue Lainerie", "Rue Tramassac", "Quai Romain Rolland", "Place Saint-Jean",
+      "Rue des Trois Maries", "Rue de la Bombarde", "Rue du Palais de Justice", "Rue de la Baleine", "Rue Mourguet",
+      "Rue François Vernay", "Rue de la Brèche", "Montée Saint-Barthélémy", "Place de la Trinité", "Rue Soufflot"
+    ],
+    "La Part-Dieu": [
+      "Boulevard Vivier-Merle", "Rue Servient", "Rue Garibaldi", "Rue de la Villette", "Cours Lafayette",
+      "Rue de la Part-Dieu", "Rue du Docteur Bouchut", "Avenue Georges Pompidou", "Rue Paul Bert", "Rue de Bonnel",
+      "Rue Maurice Flandin", "Rue du Lac", "Rue de la Madeleine", "Avenue Thiers", "Rue Desaix"
+    ],
+    "Villeurbanne": [
+      "Cours Émile Zola", "Avenue Henri Barbusse", "Rue du 4 Août 1789", "Rue Pierre Voyant", "Avenue Roger Salengro",
+      "Rue Anatole France", "Avenue des Frères Lumière", "Boulevard Eugène Réguillon", "Rue Francis de Pressensé", "Rue Michel Servet",
+      "Place Grandclément", "Rue du Tonkin", "Avenue Paul Krüger", "Boulevard du 11 Novembre 1918", "Rue Léon Blum"
+    ],
+    "Saint-Étienne": [
+      "Place Jean Jaurès", "Cours Fauriel", "Rue Gambetta", "Avenue de la Libération", "Rue de la République",
+      "Rue des Martyrs de Vingré", "Boulevard Valbenoîte", "Rue du Général Foy", "Rue du Onze Novembre", "Place du Peuple",
+      "Rue de la Ville", "Grand'Rue", "Rue Denis Escoffier", "Place de l'Hôtel de Ville", "Cours Victor Hugo",
+      "Rue du Treyve", "Avenue Denfert-Rochereau", "Rue Michelet", "Boulevard Karl Marx", "Rue Élise Gervais"
+    ],
+    "Grenoble": [
+      "Place Grenette", "Boulevard Gambetta", "Avenue Alsace-Lorraine", "Rue Félix Poulat", "Place Victor Hugo",
+      "Cours Jean Jaurès", "Quai Stéphane Jay", "Rue Lesdiguières", "Rue de Bonne", "Rue Bayard",
+      "Boulevard Maréchal Foch", "Avenue de Vizille", "Rue de la République", "Rue Lafayette", "Boulevard Maréchal Lyautey",
+      "Rue Thiers", "Place Notre-Dame", "Grande Rue", "Rue Saint-Laurent", "Quai Mounier"
+    ],
+    "Clermont-Ferrand": [
+      "Place de Jaude", "Avenue des États-Unis", "Rue Blatin", "Boulevard Gergovia", "Rue du 11 Novembre",
+      "Rue des Gras", "Rue du Port", "Place de la Victoire", "Rue Fontgiève", "Boulevard François Mitterrand",
+      "Avenue Julien", "Rue Saint-Dominique", "Rue Ballainvilliers", "Rue Bonnabaud", "Avenue Carnot",
+      "Rue Montlosier", "Avenue Léon Blum", "Rue Pascal", "Boulevard Jean Jaurès", "Rue Lagarlaye"
+    ],
+    "Annecy": [
+      "Rue Royale", "Rue Sainte-Claire", "Rue du Lac", "Avenue d'Albigny", "Quai Napoléon III",
+      "Rue Carnot", "Rue Sommeiller", "Rue de la Gare", "Avenue de Chambéry", "Rue du Paquier",
+      "Rue Jean-Jacques Rousseau", "Passage de l'Île", "Rue Perrière", "Rue Filaterie", "Rue de l'Île",
+      "Rue du Pâquier", "Avenue du Parmelan", "Rue Président Favre", "Rue des Glières", "Avenue de Genève"
+    ],
+    "Chambéry": [
+      "Place Saint-Léger", "Rue de Boigne", "Boulevard de la Colonne", "Rue Croix d'Or", "Rue Basse du Château",
+      "Avenue du Comte Vert", "Rue Favre", "Rue des Portiques", "Place du Château", "Rue de la République",
+      "Avenue Jean Jaurès", "Boulevard du Théâtre", "Rue Denfert-Rochereau", "Place Monge", "Rue Juiverie"
+    ],
+    "Toulouse": [
+      "Rue d'Alsace-Lorraine", "Place du Capitole", "Rue du Taur", "Rue Saint-Rome", "Rue de Metz",
+      "Boulevard de Strasbourg", "Allées Jean Jaurès", "Rue Lafayette", "Rue Bayard", "Rue de Rémusat",
+      "Rue des Filatiers", "Rue Pargaminières", "Rue de la Colombette", "Avenue de Lyon", "Rue Riquet",
+      "Rue Ozenne", "Rue des Arts", "Rue Croix-Baragnon", "Place Saint-Georges", "Rue du Languedoc",
+      "Rue Matabiau", "Boulevard Lazare Carnot", "Rue de la Pomme", "Avenue Honoré Serres", "Rue des Lois",
+      "Allées François Verdier", "Rue Gabriel Péri", "Boulevard Armand Duportal", "Rue Achille Viadieu", "Avenue Jean Rieux"
+    ],
+    "Capitole": [
+      "Place du Capitole", "Rue du Poids de l'Huile", "Rue Saint-Rome", "Rue des Changes", "Rue du Taur",
+      "Rue Cujas", "Rue Lafayette", "Rue de la Bourse", "Rue du May", "Rue de l'Écharpe",
+      "Rue Gambetta", "Rue des Tourneurs", "Rue Boulbonne", "Rue d'Astorg", "Rue de la Trinité"
+    ],
+    "Montpellier": [
+      "Place de la Comédie", "Rue de la Loge", "Rue Foch", "Boulevard du Jeu de Paume", "Rue de l'Aiguillerie",
+      "Esplanade Charles de Gaulle", "Rue de la Vieille", "Grand Rue Jean Moulin", "Rue Jacques Cœur", "Boulevard Henri IV",
+      "Rue de l'Ancien Courrier", "Rue Embouque d'Or", "Rue du Cannau", "Place de la Canourgue", "Rue de l'Université",
+      "Boulevard Bonne Nouvelle", "Rue de Verdun", "Avenue Georges Clémenceau", "Rue du Grand Saint-Jean", "Rue Sainte-Anne"
+    ],
+    "Nîmes": [
+      "Boulevard Victor Hugo", "Avenue Jean Jaurès", "Rue de la Madeleine", "Boulevard Amiral Courbet", "Rue Régale",
+      "Place de la Maison Carrée", "Rue Auguste", "Rue de l'Aspic", "Rue du Général Perrier", "Boulevard Gambetta",
+      "Rue de la République", "Place du Marché", "Rue du Château Fadaise", "Rue Fresque", "Rue Corconne"
+    ],
+    "Perpignan": [
+      "Place de la Loge", "Rue de l'Ange", "Quai Vauban", "Boulevard Jean Bourrat", "Rue Louis Blanc",
+      "Avenue du Général de Gaulle", "Rue de l'Argenterie", "Place de la République", "Rue des Fabriques Nabot", "Rue Petite la Réal",
+      "Place Arago", "Rue Maréchal Foch", "Boulevard des Pyrénées", "Rue Grande la Monnaie", "Avenue Gilbert Brutus"
+    ],
+    "Béziers": [
+      "Allées Paul Riquet", "Rue du 4 Septembre", "Boulevard de la Liberté", "Rue de la Citadelle", "Place Jean Jaurès",
+      "Rue Française", "Avenue du Maréchal Foch", "Boulevard du Président Wilson", "Rue du Capus", "Rue de la République"
+    ],
+    "Carcassonne": [
+      "Rue Georges Clémenceau", "Boulevard Jean Jaurès", "Rue de Verdun", "Place Gambetta", "Rue du Pont Vieux",
+      "Boulevard Omer Sarraut", "Rue Courtejaire", "Rue du Maréchal Foch", "Rue de la Liberté", "Avenue du Général Leclerc",
+      "Rue Voltaire", "Boulevard Barbès", "Lices Hautes", "Rue Trivalle", "Rue du Grand Puits"
+    ],
+    "Bordeaux": [
+      "Cours de l'Intendance", "Rue Sainte-Catherine", "Place de la Bourse", "Allées de Tourny", "Rue du Pas Saint-Georges",
+      "Cours Victor Hugo", "Rue Fondaudège", "Quai des Chartrons", "Cours Clémenceau", "Rue Judaïque",
+      "Place Gambetta", "Rue du Palais Gallien", "Rue de Cursol", "Cours d'Albret", "Rue Ferrère",
+      "Place de la Victoire", "Rue de la Devise", "Cours de la Marne", "Rue du Chai des Farines", "Rue Notre-Dame",
+      "Quai de la Douane", "Rue Esprit des Lois", "Rue Montesquieu", "Place Pey-Berland", "Rue des Trois Conils",
+      "Cours Portal", "Rue Camille Sauvageau", "Rue Duffour-Dubergier", "Rue de Cheverus", "Cours Georges Clémenceau"
+    ],
+    "Saint-Pierre": [
+      "Place Saint-Pierre", "Rue de la Rousselle", "Rue Saint-James", "Rue des Menuts", "Rue du Mirail",
+      "Rue du Loup", "Rue de Guienne", "Rue de la Vieille Tour", "Rue des Allamandiers", "Rue du Parlement Sainte-Catherine"
+    ],
+    "Chartrons": [
+      "Cours Portal", "Quai des Chartrons", "Rue Notre-Dame", "Rue Borie", "Cours de Verdun",
+      "Rue Ferrère", "Rue Poyenne", "Rue du Jardin Public", "Rue Sicard", "Rue Barreyre"
+    ],
+    "Limoges": [
+      "Boulevard Gambetta", "Avenue de la Libération", "Rue Jean Jaurès", "Place de la République", "Rue du Consulat",
+      "Boulevard Victor Hugo", "Rue de la Boucherie", "Rue du Temple", "Place Denis Dussoubs", "Avenue du Général de Gaulle",
+      "Rue Adrien Dubouché", "Rue des Coopérateurs", "Boulevard de Fleurus", "Rue Haute-Vienne", "Rue François Chénieux"
+    ],
+    "Poitiers": [
+      "Rue Carnot", "Place du Maréchal Leclerc", "Rue de la Regratterie", "Boulevard du Grand Cerf", "Rue des Cordeliers",
+      "Place Charles de Gaulle", "Rue Victor Hugo", "Boulevard Solférino", "Rue Gambetta", "Rue Arsène Orillard",
+      "Rue Jean Jaurès", "Boulevard du Pont Achard", "Rue de la Cathédrale", "Rue du Marché Notre-Dame", "Rue du Moulin à Vent"
+    ],
+    "La Rochelle": [
+      "Rue du Palais", "Rue Chaudrier", "Rue Saint-Nicolas", "Cours des Dames", "Rue des Merciers",
+      "Quai Duperré", "Rue du Temple", "Place de Verdun", "Rue de l'Escale", "Rue Gargoulleau",
+      "Avenue du Général de Gaulle", "Rue Chef de Ville", "Rue Saint-Sauveur", "Quai Valin", "Rue Albert 1er"
+    ],
+    "Pau": [
+      "Boulevard des Pyrénées", "Place Royale", "Rue du Maréchal Joffre", "Rue Henri IV", "Rue du Château",
+      "Avenue du Général de Gaulle", "Rue Carnot", "Rue Gachet", "Place Clémenceau", "Rue Louis Barthou",
+      "Rue Marca", "Boulevard Barbanègre", "Rue du 14 Juillet", "Rue Serviez", "Avenue Jean Mermoz"
+    ],
+    "Bayonne": [
+      "Rue Port Neuf", "Place de la Liberté", "Quai Amiral Jaureguiberry", "Rue d'Espagne", "Pont Saint-Esprit",
+      "Rue Victor Hugo", "Allées Boufflers", "Rue des Basques", "Quai Galuperie", "Rue Poissonnerie",
+      "Place Paul Bert", "Rue de la Monnaie", "Rue Thiers", "Avenue Capitaine Resplandy", "Rue Jacques Laffitte"
+    ],
+    "Biarritz": [
+      "Avenue Édouard VII", "Place Clémenceau", "Avenue de la Marne", "Rue Mazagran", "Avenue du Maréchal Foch",
+      "Boulevard du Général de Gaulle", "Rue Gambetta", "Avenue de Verdun", "Rue Gardères", "Place Sainte-Eugénie",
+      "Avenue de l'Impératrice", "Rue d'Espagne", "Avenue de la Reine Victoria", "Boulevard du Prince de Galles", "Rue Maison Suisse"
+    ],
+    "Nantes": [
+      "Rue Crébillon", "Place du Commerce", "Cours des 50 Otages", "Rue de la Marne", "Passage Pommeraye",
+      "Rue de Strasbourg", "Place Graslin", "Rue Voltaire", "Quai de la Fosse", "Rue de Budapest",
+      "Rue du Calvaire", "Cours Cambronne", "Allée Baco", "Rue Scribe", "Rue du Marchix",
+      "Boulevard de Stalingrad", "Avenue de la Flandre", "Rue Maréchal Joffre", "Quai de la Maison Rouge", "Rue de l'Héronnière",
+      "Rue Racine", "Rue Jean-Jacques Rousseau", "Boulevard Gabriel Guist'hau", "Rue Félibien", "Boulevard des Martyrs Nantais"
+    ],
+    "Île Feydeau": [
+      "Place de la Petite Hollande", "Allée Turenne", "Rue Kervégan", "Quai Turenne", "Rue de la Juiverie",
+      "Place du Sanitat", "Rue Bouchaud", "Rue des Trois Croissants", "Cour Cambronne", "Rue Bossuet"
+    ],
+    "Le Mans": [
+      "Place de la République", "Rue de la Barillerie", "Avenue du Général Leclerc", "Rue de l'Étoile", "Boulevard René Levasseur",
+      "Rue Gambetta", "Place des Jacobins", "Rue de Bolton", "Avenue Jean Jaurès", "Grande Rue",
+      "Rue du Port", "Rue de la Reine Bérengère", "Rue Wilbur Wright", "Rue de Tessé", "Boulevard Demorieux"
+    ],
+    "Angers": [
+      "Rue d'Alsace", "Place du Ralliement", "Boulevard Foch", "Rue Plantagenêt", "Rue Saint-Laud",
+      "Boulevard du Maréchal Foch", "Rue des Lices", "Place Sainte-Croix", "Rue Lenepveu", "Rue du Mail",
+      "Boulevard Carnot", "Rue de la Roë", "Rue Beaurepaire", "Place du Pilori", "Rue Saint-Aubin"
+    ],
+    "Saint-Nazaire": [
+      "Avenue de la République", "Rue Ville Martin", "Rue Henri Gautier", "Boulevard de Verdun", "Rue du Croisic",
+      "Avenue du Général de Gaulle", "Rue de Nantes", "Place du Commando", "Rue du Soleil Levant", "Boulevard Jean de Neyman"
+    ],
+    "La Roche-sur-Yon": [
+      "Place Napoléon", "Rue Georges Clémenceau", "Boulevard Aristide Briand", "Rue Paul Émile Victor", "Rue Maréchal Foch",
+      "Boulevard Louis Blanc", "Rue du Maréchal Joffre", "Avenue du Maréchal Leclerc", "Rue Travot", "Rue du Président de Gaulle"
+    ],
+    "Lille": [
+      "Rue Faidherbe", "Place du Général de Gaulle", "Rue de Béthune", "Rue Nationale", "Boulevard de la Liberté",
+      "Rue des Tanneurs", "Rue de la Monnaie", "Rue Esquermoise", "Boulevard Carnot", "Avenue du Peuple Belge",
+      "Rue de Paris", "Rue Gambetta", "Rue Solférino", "Place de la République", "Rue du Molinel",
+      "Rue Léon Gambetta", "Boulevard Louis XIV", "Rue Masséna", "Rue Inkermann", "Avenue Kennedy",
+      "Rue du Sec Arembault", "Rue de la Clef", "Place Louise de Bettignies", "Rue des Arts", "Rue Voltaire"
+    ],
+    "Vieux-Lille": [
+      "Rue de la Monnaie", "Place aux Oignons", "Rue Basse", "Rue des Chats Bossus", "Rue de la Grande Chaussée",
+      "Rue Pétérinck", "Rue d'Angleterre", "Rue de Gand", "Rue Royale", "Place du Lion d'Or",
+      "Rue Lepelletier", "Rue Saint-André", "Rue de la Barre", "Rue des Bouchers", "Rue Comtesse"
+    ],
+    "Roubaix": [
+      "Grande Rue", "Rue de Lannoy", "Rue Pierre de Roubaix", "Boulevard du Général Leclerc", "Rue du Maréchal Foch",
+      "Avenue Jean Lebas", "Place de la Liberté", "Rue de l'Épeule", "Rue de l'Alma", "Boulevard de Paris",
+      "Rue du Grand Chemin", "Rue de Tourcoing", "Rue Jules Guesde", "Rue de Barbieux", "Avenue Alfred Motte"
+    ],
+    "Tourcoing": [
+      "Rue de Paris", "Grand Place", "Rue du Clinquet", "Boulevard Gambetta", "Rue du Haze",
+      "Rue de la Croix Rouge", "Avenue Gustave Dron", "Rue de Lille", "Rue du Calvaire", "Rue Nationale",
+      "Rue de Roncq", "Rue de Gand", "Boulevard de l'Égalité", "Rue Saint-Jacques", "Rue de Mouvaux"
+    ],
+    "Amiens": [
+      "Rue des Trois Cailloux", "Place Gambetta", "Rue de Noyon", "Boulevard d'Alsace-Lorraine", "Rue du Don",
+      "Place René Goblet", "Rue Delambre", "Rue des Jacobins", "Rue Victor Hugo", "Boulevard de Belfort",
+      "Rue Dusevel", "Place du Fil", "Rue Saint-Leu", "Rue des Sergents", "Rue du Cloître de la Barge"
+    ],
+    "Dunkerque": [
+      "Place Jean Bart", "Rue Clémenceau", "Boulevard Alexandre III", "Rue de la Marine", "Quai des Hollandais",
+      "Rue Faidherbe", "Avenue de la Mer", "Rue du Président Poincaré", "Boulevard Sainte-Barbe", "Rue des Fusiliers Marins"
+    ],
+    "Calais": [
+      "Boulevard Jacquard", "Rue Royale", "Place d'Armes", "Rue du Duc de Guise", "Boulevard de la Résistance",
+      "Rue de la Mer", "Rue Jean de Vienne", "Place de Norvège", "Rue André Gerschel", "Boulevard Curie"
+    ],
+    "Strasbourg": [
+      "Place Kléber", "Rue des Grandes Arcades", "Place Gutenberg", "Rue du Vieux Marché aux Poissons", "Quai des Bateliers",
+      "Avenue des Vosges", "Rue de la Mésange", "Rue des Hallebardes", "Boulevard de la Victoire", "Rue du Fossé des Tanneurs",
+      "Rue de la Haute Montée", "Rue du Dôme", "Rue des Serruriers", "Place de l'Homme de Fer", "Rue du Jeu des Enfants",
+      "Rue des Juifs", "Quai Saint-Nicolas", "Grand'Rue", "Rue des Orfèvres", "Place du Château",
+      "Avenue de la Liberté", "Rue du 22 Novembre", "Boulevard de Metz", "Rue de la Division Leclerc", "Rue du Faubourg National"
+    ],
+    "Petite France": [
+      "Rue du Bain aux Plantes", "Quai de la Petite France", "Rue des Moulins", "Pont Couverts", "Rue des Dentelles",
+      "Place Benjamin Zix", "Rue du Fossé des Tanneurs", "Rue de la Douane", "Rue du Pigeon", "Rue des Écrivains"
+    ],
+    "Reims": [
+      "Place Drouet d'Erlon", "Rue de Vesle", "Rue Carnot", "Place du Forum", "Rue du Général Leclerc",
+      "Boulevard Lundy", "Rue de l'Université", "Cours Jean-Baptiste Langlet", "Rue Colbert", "Rue de Talleyrand",
+      "Avenue Jean Jaurès", "Rue du Temple", "Rue des Capucins", "Boulevard de la Paix", "Rue de Mars"
+    ],
+    "Metz": [
+      "Place Saint-Louis", "Rue Serpenoise", "Rue des Clercs", "Rue Fabert", "Avenue Foch",
+      "Rue du Palais", "Rue des Jardins", "Place de la République", "Rue Dupont des Loges", "Boulevard Poincaré",
+      "Rue du Petit Paris", "En Fournirue", "Rue de la Fontaine", "Rue du Pont des Morts", "Place d'Armes"
+    ],
+    "Nancy": [
+      "Place Stanislas", "Rue Saint-Dizier", "Rue Saint-Jean", "Rue Gambetta", "Rue des Dominicains",
+      "Place de la Carrière", "Rue Héré", "Cours Léopold", "Rue Mazagran", "Rue Raugraff",
+      "Rue Saint-Georges", "Rue du Grand Rabbin Haguenauer", "Boulevard du 21ème RA", "Rue du Manège", "Rue des Carmes"
+    ],
+    "Mulhouse": [
+      "Rue du Sauvage", "Place de la Réunion", "Rue de la Sinne", "Boulevard de l'Europe", "Rue Henriette",
+      "Avenue du Maréchal Foch", "Rue des Boulangers", "Rue Jacques Prévert", "Rue Mercière", "Rue Lambert",
+      "Avenue Aristide Briand", "Rue des Franciscains", "Rue de la Justice", "Boulevard Roosevelt", "Rue Guillaume Tell"
+    ],
+    "Colmar": [
+      "Rue des Clefs", "Place de la Cathédrale", "Rue des Marchands", "Grand'Rue", "Quai de la Poissonnerie",
+      "Rue des Têtes", "Place de l'Ancienne Douane", "Rue Turenne", "Rue Kléber", "Rue Berthe Molly",
+      "Rue Vauban", "Rue des Boulangers", "Rue des Augustins", "Rue Chauffour", "Rue de la Herse"
+    ],
+    "Troyes": [
+      "Rue Émile Zola", "Place Alexandre Israël", "Rue de la Cité", "Rue du Général de Gaulle", "Rue Champeaux",
+      "Place de la Libération", "Rue Urbain IV", "Rue Molé", "Rue du Palais de Justice", "Rue Paillot de Montabert"
+    ],
+    "Rennes": [
+      "Rue Le Bastard", "Place de la Mairie", "Rue de Nemours", "Rue d'Antrain", "Boulevard de la Liberté",
+      "Rue Saint-Georges", "Rue de la Visitation", "Place des Lices", "Rue du Chapitre", "Rue Saint-Michel",
+      "Quai Émile Zola", "Rue Maréchal Joffre", "Boulevard de Beaumont", "Avenue Janvier", "Rue de Fougères",
+      "Rue Jean Jaurès", "Rue de Paris", "Boulevard Solférino", "Rue de Brest", "Rue Hoche"
+    ],
+    "Brest": [
+      "Rue de Siam", "Rue Jean Jaurès", "Boulevard de la Marine", "Rue de Lyon", "Place de la Liberté",
+      "Rue Émile Zola", "Rue de la Porte", "Avenue Georges Clémenceau", "Rue Yves Collet", "Rue du Château",
+      "Rue Voltaire", "Rue Traverse", "Boulevard Gambetta", "Rue Louis Pasteur", "Rue de Kérinou"
+    ],
+    "Quimper": [
+      "Rue Kéréon", "Place Saint-Corentin", "Rue du Guéodet", "Rue du Chapeau Rouge", "Rue Saint-François",
+      "Quai du Steïr", "Rue des Gentilshommes", "Rue Élie Fréron", "Boulevard de l'Odet", "Rue du Parc"
+    ],
+    "Lorient": [
+      "Rue du Port", "Place Jules Ferry", "Cours de Chazelles", "Rue de la Bôve", "Rue du Maréchal Foch",
+      "Boulevard Cosmao Dumanoir", "Rue Paul Bert", "Quai des Indes", "Rue du Général de Gaulle", "Rue Victor Massé"
+    ],
+    "Vannes": [
+      "Place Henri IV", "Rue du Mené", "Rue des Halles", "Rue Saint-Vincent", "Rue de la Fontaine",
+      "Place des Lices", "Rue des Orfèvres", "Rue Émile Burgault", "Rue Saint-Guenhaël", "Rue du Port"
+    ],
+    "Saint-Malo": [
+      "Rue de la Corne de Cerf", "Rue Jacques Cartier", "Rue de Dinan", "Place Châteaubriand", "Rue Porcon de la Barbinais",
+      "Rue de l'Orme", "Quai Saint-Vincent", "Rue du Pélicot", "Grande Rue", "Rue Sainte-Barbe"
+    ],
+    "Saint-Brieuc": [
+      "Rue Saint-Guillaume", "Place du Général de Gaulle", "Rue de Gouédic", "Boulevard Charner", "Rue du Maréchal Foch",
+      "Rue du Parc", "Avenue de la Gare", "Rue Notre-Dame", "Place du Champ au Roy", "Rue des Trois Frères le Goff"
+    ],
+    "Dijon": [
+      "Rue de la Liberté", "Place François Rude", "Rue du Bourg", "Rue des Forges", "Place Darcy",
+      "Rue de la Chouette", "Rue Musette", "Rue Verrerie", "Place de la Libération", "Boulevard de la Trémouille",
+      "Rue Rameau", "Rue Charrue", "Rue du Château", "Rue Piron", "Rue Jean-Jacques Rousseau"
+    ],
+    "Besançon": [
+      "Grande Rue", "Rue des Granges", "Place du 8 Septembre", "Rue Battant", "Pont Battant",
+      "Quai Vauban", "Rue de la République", "Place de la Révolution", "Rue Mégevand", "Rue Pasteur",
+      "Avenue de Chardonnet", "Rue Charles Nodier", "Rue de la Préfecture", "Rue Bersot", "Rue d'Arènes"
+    ],
+    "Belfort": [
+      "Place d'Armes", "Rue du Général de Gaulle", "Faubourg de France", "Avenue Jean Jaurès", "Rue de la Grande Fontaine",
+      "Rue Thiers", "Boulevard Carnot", "Avenue du Maréchal Foch", "Rue du Quai", "Rue du Magasin"
+    ],
+    "Auxerre": [
+      "Rue du Temple", "Place Charles Surugue", "Rue de Paris", "Rue du Pont", "Rue de l'Horloge",
+      "Rue Fécauderie", "Rue Joubert", "Place des Cordeliers", "Rue du Général Leclerc", "Rue de la Draperie"
+    ],
+    "Chalon-sur-Saône": [
+      "Rue du Général Leclerc", "Place de l'Hôtel de Ville", "Rue du Châtelet", "Grande Rue", "Quai des Messageries",
+      "Boulevard de la République", "Rue de la Citadelle", "Rue aux Fèvres", "Rue Saint-Vincent", "Rue du Pont"
+    ],
+    "Rouen": [
+      "Rue du Gros Horloge", "Place du Vieux Marché", "Rue Jeanne d'Arc", "Rue des Carmes", "Rue Saint-Romain",
+      "Rue de la République", "Quai de la Bourse", "Rue Beauvoisine", "Boulevard des Belges", "Rue du Général Leclerc",
+      "Rue de la Pie", "Rue Damiette", "Rue Eau de Robec", "Rue Cauchoise", "Rue de l'Hôpital"
+    ],
+    "Le Havre": [
+      "Rue de Paris", "Avenue Foch", "Rue Victor Hugo", "Quai Southampton", "Boulevard de Strasbourg",
+      "Rue Louis Brindeau", "Rue Voltaire", "Rue du Maréchal Joffre", "Rue Bernardin de Saint-Pierre", "Place de l'Hôtel de Ville",
+      "Rue Gustave Flaubert", "Rue Georges Braque", "Boulevard François 1er", "Quai George V", "Rue Racine"
+    ],
+    "Caen": [
+      "Rue Saint-Pierre", "Place Saint-Pierre", "Rue Saint-Jean", "Boulevard des Alliés", "Avenue du 6 Juin",
+      "Rue de Strasbourg", "Rue Écuyère", "Rue Froide", "Quai Vendeuvre", "Rue de Geôle",
+      "Rue Guillaume le Conquérant", "Rue du Vaugueux", "Rue de Bras", "Boulevard Maréchal Leclerc", "Rue de Bernières"
+    ],
+    "Cherbourg-en-Cotentin": [
+      "Rue Grande Rue", "Place de Gaulle", "Rue du Château", "Quai Alexandre III", "Rue Christine",
+      "Rue Gambetta", "Rue au Blé", "Rue François La Vieille", "Rue de la Paix", "Avenue de Paris"
+    ],
+    "Évreux": [
+      "Rue de la Harpe", "Rue Chartraine", "Place du Général de Gaulle", "Rue Joséphine", "Boulevard Gambetta",
+      "Rue du Docteur Oursel", "Rue Saint-Sauveur", "Rue de Grenoble", "Rue de la Petite Cité", "Place Clemenceau"
+    ],
+    "Dieppe": [
+      "Grande Rue", "Quai Henri IV", "Rue de la Barre", "Place du Puits Salé", "Rue Saint-Jacques",
+      "Rue de Sygogne", "Rue du Haut Pas", "Arcade de la Poissonnerie", "Rue d'Écosse", "Rue du Petit Fort"
+    ],
+    "Orléans": [
+      "Rue Jeanne d'Arc", "Place du Martroi", "Rue de la République", "Rue Royale", "Rue de Bourgogne",
+      "Rue du Tabour", "Rue des Carmes", "Place du Châtelet", "Rue Sainte-Catherine", "Rue du Poirier",
+      "Boulevard Alexandre Martin", "Rue Bannier", "Quai du Châtelet", "Rue d'Illiers", "Rue de la Bretonnerie"
+    ],
+    "Tours": [
+      "Rue Nationale", "Place Jean Jaurès", "Rue du Commerce", "Rue Colbert", "Boulevard Heurteloup",
+      "Rue de la Scellerie", "Rue du Grand Marché", "Place Plumereau", "Rue du Petit Saint-Martin", "Rue de Châteauneuf",
+      "Rue Briçonnet", "Rue du Change", "Boulevard Béranger", "Rue Bernard Palissy", "Rue Victor Hugo"
+    ],
+    "Bourges": [
+      "Rue Moyenne", "Place Gordaine", "Rue Mirebeau", "Rue du Commerce", "Place Cujas",
+      "Rue d'Auron", "Rue Joyeuse", "Rue Bourbonnoux", "Rue des Arènes", "Rue Jacques Cœur"
+    ],
+    "Blois": [
+      "Rue du Commerce", "Rue Denis Papin", "Place Louis XII", "Rue Porte Chartraine", "Rue du Puits Châtel",
+      "Rue Pierre de Blois", "Rue Saint-Lubin", "Quai de la Saussaye", "Rue des Papegaults", "Rue du Lion Ferré"
+    ],
+    "Chartres": [
+      "Rue du Cygne", "Place des Épars", "Rue de la Pie", "Rue des Changes", "Place Billard",
+      "Rue du Soleil d'Or", "Rue au Lait", "Rue du Bois Merrain", "Rue Noël Ballay", "Rue du Cheval Blanc"
+    ],
+    "Châteauroux": [
+      "Rue Grande", "Place de la République", "Rue Victor Hugo", "Boulevard George Sand", "Rue de la Gare",
+      "Avenue de Verdun", "Rue Ledru-Rollin", "Rue du 14 Juillet", "Place Voltaire", "Rue des Marins"
+    ],
+    "Ajaccio": [
+      "Cours Napoléon", "Rue Cardinal Fesch", "Place de Gaulle", "Boulevard Pascal Rossini", "Rue du Roi de Rome",
+      "Quai Napoléon", "Rue Forcioli Conti", "Place Foch", "Rue Bonaparte", "Boulevard Lantivy",
+      "Avenue du 1er Consul", "Rue Sergent Casalonga", "Rue Letizia", "Rue Saint-Charles", "Rue Emmanuel Arène"
+    ],
+    "Bastia": [
+      "Boulevard Paoli", "Place Saint-Nicolas", "Rue César Campinchi", "Rue Napoléon", "Quai des Martyrs de la Libération",
+      "Rue Chanoine Leschi", "Rue du Colle", "Place du Marché", "Rue Salvatore Viale", "Rue du Cap"
+    ],
+    "Porto-Vecchio": [
+      "Rue du Général Leclerc", "Place de la République", "Cours Napoléon", "Rue du Général de Gaulle", "Rue Borgo",
+      "Rue Camille de Rocca Serra", "Place de l'Église", "Rue Jean Jaurès", "Rue de la Citadelle", "Quai Pascal Paoli"
+    ],
+    "Calvi": [
+      "Boulevard Wilson", "Rue Clemenceau", "Place Christophe Colomb", "Rue Joffre", "Quai Landry",
+      "Rue de l'Uruguay", "Avenue de la République", "Place de la Porteuse d'Eau", "Rue Adolphe Landry", "Boulevard du Front de Mer"
+    ]
+  },
+  "postcode_format": "#####",
+  "address_formats": [
+    "{building_number} {street}, {postcode} {city}",
+    "{building_number} {street}, Apt {unit}, {postcode} {city}"
+  ],
+  "country": "France",
+  "country_code": "FR",
+  "phone_area_codes": {
+    "Île-de-France": ["01"],
+    "Provence-Alpes-Côte d'Azur": ["04"],
+    "Auvergne-Rhône-Alpes": ["04"],
+    "Occitanie": ["04", "05"],
+    "Nouvelle-Aquitaine": ["05"],
+    "Pays de la Loire": ["02"],
+    "Hauts-de-France": ["03"],
+    "Grand Est": ["03"],
+    "Bretagne": ["02"],
+    "Bourgogne-Franche-Comté": ["03"],
+    "Normandie": ["02"],
+    "Centre-Val de Loire": ["02"],
+    "Corse": ["04"]
+  }
+}

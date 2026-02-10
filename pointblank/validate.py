@@ -18,6 +18,7 @@ from importlib.metadata import version
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Callable, Literal, NoReturn, ParamSpec, TypeVar
 from zipfile import ZipFile
+from zoneinfo import ZoneInfo
 
 import commonmark
 import narwhals as nw
@@ -449,20 +450,14 @@ def config(
     global global_config
     global_config.report_incl_header = report_incl_header  # pragma: no cover
     global_config.report_incl_footer = report_incl_footer  # pragma: no cover
-    global_config.report_incl_footer_timings = (
-        report_incl_footer_timings  # pragma: no cover
-    )
-    global_config.report_incl_footer_notes = (
-        report_incl_footer_notes  # pragma: no cover
-    )
+    global_config.report_incl_footer_timings = report_incl_footer_timings  # pragma: no cover
+    global_config.report_incl_footer_notes = report_incl_footer_notes  # pragma: no cover
     global_config.preview_incl_header = preview_incl_header  # pragma: no cover
     return global_config  # pragma: no cover
 
 
 def load_dataset(
-    dataset: Literal[
-        "small_table", "game_revenue", "nycflights", "global_sales"
-    ] = "small_table",
+    dataset: Literal["small_table", "game_revenue", "nycflights", "global_sales"] = "small_table",
     tbl_type: Literal["polars", "pandas", "duckdb"] = "polars",
 ) -> Any:
     """
@@ -597,9 +592,7 @@ def load_dataset(
 
         import polars as pl
 
-        dataset = pl.read_csv(
-            ZipFile(data_path).read(f"{dataset}.csv"), try_parse_dates=True
-        )
+        dataset = pl.read_csv(ZipFile(data_path).read(f"{dataset}.csv"), try_parse_dates=True)
 
     if tbl_type == "pandas":
         if not _is_lib_present(lib_name="pandas"):
@@ -757,9 +750,7 @@ def read_file(filepath: str | Path) -> Validate:
                         pass  # pragma: no cover
 
                     # Execute the function source code with the enhanced namespace
-                    exec(
-                        source_code, execution_namespace, execution_namespace
-                    )  # pragma: no cover
+                    exec(source_code, execution_namespace, execution_namespace)  # pragma: no cover
 
                     # The function should now be in the execution namespace
                     if func_name in execution_namespace:  # pragma: no cover
@@ -781,17 +772,13 @@ def read_file(filepath: str | Path) -> Validate:
                     and validation_info._pb_function_name in restored_functions
                 ):
                     func_name = validation_info._pb_function_name  # pragma: no cover
-                    validation_info.pre = restored_functions[
-                        func_name
-                    ]  # pragma: no cover
+                    validation_info.pre = restored_functions[func_name]  # pragma: no cover
                     # Clean up the temporary attribute
                     delattr(validation_info, "_pb_function_name")  # pragma: no cover
 
         # Verify that we loaded a Validate object
         if not isinstance(validation, Validate):  # pragma: no cover
-            raise RuntimeError(
-                f"File does not contain a valid Validate object: {file_path}"
-            )
+            raise RuntimeError(f"File does not contain a valid Validate object: {file_path}")
 
         return validation
 
@@ -854,9 +841,7 @@ def _check_for_unpicklable_objects(
             except (OSError, TypeError):  # pragma: no cover
                 # If we can't get source, check if it's at least picklable
                 try:  # pragma: no cover
-                    pickle.dumps(
-                        func, protocol=pickle.HIGHEST_PROTOCOL
-                    )  # pragma: no cover
+                    pickle.dumps(func, protocol=pickle.HIGHEST_PROTOCOL)  # pragma: no cover
                     # It's picklable but no source: this might cause issues across sessions
                     print(  # pragma: no cover
                         f"Warning: Function '{func_name}' is picklable but source code could not be captured. "
@@ -872,9 +857,7 @@ def _check_for_unpicklable_objects(
                         f"Warning: Function '{func_name}' is not picklable and source could not be captured. "
                         f"It will not be available after saving/loading."
                     )
-                    unpicklable_lambda_steps.append(
-                        (i, validation_info)
-                    )  # pragma: no cover
+                    unpicklable_lambda_steps.append((i, validation_info))  # pragma: no cover
 
     # Only raise error for lambda functions now
     if unpicklable_lambda_steps:
@@ -971,9 +954,7 @@ def _provide_serialization_guidance(validation: Validate) -> None:
 
             # Check if it's likely to work across sessions
             if (
-                func_module == "__main__"
-                or not func_module
-                or func_module == "<unknown>"
+                func_module == "__main__" or not func_module or func_module == "<unknown>"
             ):  # pragma: no cover
                 # Function defined interactively - risky for cross-session use
                 functions_analysis["interactive_functions"].append(
@@ -1378,9 +1359,7 @@ def write_file(
                 )
                 for func_name in function_sources.keys():
                     print(f"      • {func_name}")
-                print(
-                    "   📥 These functions will be automatically restored when loading"
-                )
+                print("   📥 These functions will be automatically restored when loading")
 
             # Provide loading instructions
             preprocessing_funcs = [
@@ -1398,9 +1377,7 @@ def write_file(
                     for info in preprocessing_funcs
                     if hasattr(info, "pre") and info.pre
                 ):
-                    print(
-                        "      # Import any preprocessing functions from their modules"
-                    )
+                    print("      # Import any preprocessing functions from their modules")
                     modules_mentioned = set()
                     for info in preprocessing_funcs:
                         if (
@@ -1415,11 +1392,7 @@ def write_file(
                                 modules_mentioned.add(info.pre.__module__)
                 print(f"      validation = pb.read_file('{file_path.name}')")
             else:
-                print(
-                    "   📖 To load: validation = pb.read_file('{}')".format(
-                        file_path.name
-                    )
-                )
+                print("   📖 To load: validation = pb.read_file('{}')".format(file_path.name))
 
     except Exception as e:  # pragma: no cover
         raise RuntimeError(
@@ -1428,9 +1401,7 @@ def write_file(
 
 
 def get_data_path(
-    dataset: Literal[
-        "small_table", "game_revenue", "nycflights", "global_sales"
-    ] = "small_table",
+    dataset: Literal["small_table", "game_revenue", "nycflights", "global_sales"] = "small_table",
     file_type: Literal["csv", "parquet", "duckdb"] = "csv",
 ) -> str:
     """
@@ -1554,9 +1525,7 @@ def get_data_path(
 
         # For CSV files, we need to extract from zip to a temporary location
         # since most libraries expect actual file paths, not zip contents
-        with tempfile.NamedTemporaryFile(
-            mode="wb", suffix=".csv", delete=False
-        ) as tmp_file:
+        with tempfile.NamedTemporaryFile(mode="wb", suffix=".csv", delete=False) as tmp_file:
             with ZipFile(data_path) as zip_file:
                 csv_content = zip_file.read(f"{dataset}.csv")
                 tmp_file.write(csv_content)
@@ -1567,16 +1536,12 @@ def get_data_path(
         data_path = files("pointblank.data") / f"{dataset}.zip"
 
         # We'll need to convert CSV to Parquet temporarily
-        with tempfile.NamedTemporaryFile(
-            mode="wb", suffix=".parquet", delete=False
-        ) as tmp_file:
+        with tempfile.NamedTemporaryFile(mode="wb", suffix=".parquet", delete=False) as tmp_file:
             # Load CSV data and save as Parquet
             if _is_lib_present(lib_name="polars"):
                 import polars as pl
 
-                df = pl.read_csv(
-                    ZipFile(data_path).read(f"{dataset}.csv"), try_parse_dates=True
-                )
+                df = pl.read_csv(ZipFile(data_path).read(f"{dataset}.csv"), try_parse_dates=True)
                 df.write_parquet(tmp_file.name)
             elif _is_lib_present(lib_name="pandas"):
                 import pandas as pd
@@ -1594,9 +1559,7 @@ def get_data_path(
         data_path = files("pointblank.data") / f"{dataset}-duckdb.zip"
 
         # Extract DuckDB file to temporary location
-        with tempfile.NamedTemporaryFile(
-            mode="wb", suffix=".ddb", delete=False
-        ) as tmp_file:
+        with tempfile.NamedTemporaryFile(mode="wb", suffix=".ddb", delete=False) as tmp_file:
             with ZipFile(data_path) as zip_file:
                 ddb_content = zip_file.read(f"{dataset}.ddb")
                 tmp_file.write(ddb_content)
@@ -1729,9 +1692,7 @@ def _process_github_url(data: Any) -> Any:
             return data
 
         user, repo, branch, file_path = match.groups()
-        raw_url = (
-            f"https://raw.githubusercontent.com/{user}/{repo}/{branch}/{file_path}"
-        )
+        raw_url = f"https://raw.githubusercontent.com/{user}/{repo}/{branch}/{file_path}"
 
     # Download the file content to a temporary file
     try:
@@ -1742,9 +1703,7 @@ def _process_github_url(data: Any) -> Any:
         file_ext = ".csv" if path_lower.endswith(".csv") else ".parquet"
 
         # Create a temporary file
-        with tempfile.NamedTemporaryFile(
-            mode="wb", suffix=file_ext, delete=False
-        ) as tmp_file:
+        with tempfile.NamedTemporaryFile(mode="wb", suffix=file_ext, delete=False) as tmp_file:
             tmp_file.write(content)
             tmp_file_path = tmp_file.name
 
@@ -1978,9 +1937,7 @@ def _process_parquet_input(data: Any) -> Any:
                 dfs = [pd.read_parquet(path) for path in parquet_paths]
                 return pd.concat(dfs, ignore_index=True)
         except Exception as e:
-            raise RuntimeError(
-                f"Failed to read Parquet file(s) with Pandas: {e}"
-            ) from e
+            raise RuntimeError(f"Failed to read Parquet file(s) with Pandas: {e}") from e
     else:
         raise ImportError(
             "Neither Polars nor Pandas is available for reading Parquet files. "
@@ -2284,9 +2241,7 @@ def _generate_display_table(
 
     # Check that the n_head and n_tail aren't greater than the limit
     if n_head + n_tail > limit:
-        raise ValueError(
-            f"The sum of `n_head=` and `n_tail=` cannot exceed the limit ({limit})."
-        )
+        raise ValueError(f"The sum of `n_head=` and `n_tail=` cannot exceed the limit ({limit}).")
 
     # Do we have a DataFrame library to work with? We need at least one to display
     # the table using Great Tables
@@ -2330,9 +2285,7 @@ def _generate_display_table(
 
     # If `columns_subset=` is not None, resolve the columns to display
     if columns_subset is not None:
-        col_names = _get_column_names(
-            data, ibis_tbl=ibis_tbl, df_lib_name_gt=df_lib_name_gt
-        )
+        col_names = _get_column_names(data, ibis_tbl=ibis_tbl, df_lib_name_gt=df_lib_name_gt)
 
         resolved_columns = _validate_columns_subset(
             columns_subset=columns_subset, col_names=col_names
@@ -2369,11 +2322,7 @@ def _generate_display_table(
         # Get the row count for the table
         # Note: ibis tables have count(), to_polars(), to_pandas() methods
         ibis_rows = data.count()  # type: ignore[union-attr]
-        n_rows = (
-            ibis_rows.to_polars()
-            if df_lib_name_gt == "polars"
-            else int(ibis_rows.to_pandas())
-        )
+        n_rows = ibis_rows.to_polars() if df_lib_name_gt == "polars" else int(ibis_rows.to_pandas())
 
         # If n_head + n_tail is greater than the row count, display the entire table
         if n_head + n_tail > n_rows:
@@ -2515,9 +2464,7 @@ def _generate_display_table(
         # method can be used
         none_values = {k: data[k].isnull() for k in col_names}
 
-    none_values = [
-        (k, i) for k, v in none_values.items() for i, val in enumerate(v) if val
-    ]
+    none_values = [(k, i) for k, v in none_values.items() for i, val in enumerate(v) if val]
 
     # Import Great Tables to get preliminary renders of the columns
     import great_tables as gt
@@ -2536,12 +2483,8 @@ def _generate_display_table(
             data_col = data.select([column])
 
         # Using Great Tables, render the columns and get the list of values as formatted strings
-        built_gt = (
-            GT(data=data_col).fmt_markdown(columns=column)._build_data(context="html")
-        )
-        column_values = gt.gt._get_column_of_values(
-            built_gt, column_name=column, context="html"
-        )
+        built_gt = GT(data=data_col).fmt_markdown(columns=column)._build_data(context="html")
+        column_values = gt.gt._get_column_of_values(built_gt, column_name=column, context="html")
 
         # Get the maximum number of characters in the column
         if column_values:  # Check if column_values is not empty
@@ -2577,9 +2520,7 @@ def _generate_display_table(
     if sum_col_widths < min_tbl_width:
         remaining_width = min_tbl_width - sum_col_widths
         n_remaining_cols = len(col_widths)
-        col_widths = [
-            width + remaining_width // n_remaining_cols for width in col_widths
-        ]
+        col_widths = [width + remaining_width // n_remaining_cols for width in col_widths]
 
     # Add the `px` suffix to each of the column widths, stringifying them
     col_widths = [f"{width}px" for width in col_widths]
@@ -2638,13 +2579,9 @@ def _generate_display_table(
         col_dtype_labels_dict = {"_row_num_": ""} | col_dtype_labels_dict
 
     # Create the label, table type, and thresholds HTML fragments
-    table_type_html = _create_table_type_html(
-        tbl_type=tbl_type, tbl_name=None, font_size="10px"
-    )
+    table_type_html = _create_table_type_html(tbl_type=tbl_type, tbl_name=None, font_size="10px")
 
-    tbl_dims_html = _create_table_dims_html(
-        columns=n_columns, rows=n_rows, font_size="10px"
-    )
+    tbl_dims_html = _create_table_dims_html(columns=n_columns, rows=n_rows, font_size="10px")
 
     # Compose the subtitle HTML fragment
     combined_subtitle = (
@@ -2669,15 +2606,11 @@ def _generate_display_table(
             locations=loc.body(),
         )
         .tab_style(
-            style=style.text(
-                color="black", font=google_font(name="IBM Plex Mono"), size="12px"
-            ),
+            style=style.text(color="black", font=google_font(name="IBM Plex Mono"), size="12px"),
             locations=loc.body(),
         )
         .tab_style(
-            style=style.text(
-                color="gray20", font=google_font(name="IBM Plex Mono"), size="12px"
-            ),
+            style=style.text(color="gray20", font=google_font(name="IBM Plex Mono"), size="12px"),
             locations=loc.column_labels(),
         )
         .tab_style(
@@ -2717,21 +2650,15 @@ def _generate_display_table(
 
     if not full_dataset:
         gt_tbl = gt_tbl.tab_style(
-            style=style.borders(
-                sides="bottom", color="#6699CC80", style="solid", weight="2px"
-            ),
+            style=style.borders(sides="bottom", color="#6699CC80", style="solid", weight="2px"),
             locations=loc.body(rows=n_head - 1),
         )
 
     if show_row_numbers:
         gt_tbl = gt_tbl.tab_style(
             style=[
-                style.text(
-                    color="gray", font=google_font(name="IBM Plex Mono"), size="10px"
-                ),
-                style.borders(
-                    sides="right", color="#6699CC80", style="solid", weight="2px"
-                ),
+                style.text(color="gray", font=google_font(name="IBM Plex Mono"), size="10px"),
+                style.borders(sides="right", color="#6699CC80", style="solid", weight="2px"),
             ],
             locations=loc.body(columns="_row_num_"),
         )
@@ -2907,13 +2834,9 @@ def missing_vals_tbl(data: Any) -> GT:
 
                         # Apply the appropriate conversion method
                         if use_polars_conversion:
-                            null_sum_converted = (
-                                null_sum.to_polars()
-                            )  # pragma: no cover
+                            null_sum_converted = null_sum.to_polars()  # pragma: no cover
                         else:
-                            null_sum_converted = (
-                                null_sum.to_pandas()
-                            )  # pragma: no cover
+                            null_sum_converted = null_sum.to_pandas()  # pragma: no cover
 
                         missing_prop = (null_sum_converted / sector_size) * 100
                         col_missing_props.append(missing_prop)
@@ -2984,9 +2907,7 @@ def missing_vals_tbl(data: Any) -> GT:
                 col: [
                     (
                         getattr(
-                            data[(cut_points[i - 1] if i > 0 else 0) : cut_points[i]][
-                                col
-                            ],
+                            data[(cut_points[i - 1] if i > 0 else 0) : cut_points[i]][col],
                             null_method,
                         )().sum()
                         / (cut_points[i] - (cut_points[i - 1] if i > 0 else 0))
@@ -3058,17 +2979,13 @@ def missing_vals_tbl(data: Any) -> GT:
                         window = Window.orderBy(
                             pyspark_col(data.columns[0])
                         )  # Order by first column
-                        sector_data = data.withColumn(
-                            "row_num", row_number().over(window)
-                        ).filter(
+                        sector_data = data.withColumn("row_num", row_number().over(window)).filter(
                             (pyspark_col("row_num") > start_row)
                             & (pyspark_col("row_num") <= end_row)
                         )
 
                         # Count nulls in this sector
-                        null_count = sector_data.filter(
-                            pyspark_col(col_name).isNull()
-                        ).count()
+                        null_count = sector_data.filter(pyspark_col(col_name).isNull()).count()
                         missing_prop = (null_count / sector_size) * 100
                         col_missing_props.append(missing_prop)
                     else:
@@ -3084,13 +3001,11 @@ def missing_vals_tbl(data: Any) -> GT:
                     from pyspark.sql.window import Window
 
                     window = Window.orderBy(pyspark_col(data.columns[0]))
-                    sector_data = data.withColumn(
-                        "row_num", row_number().over(window)
-                    ).filter(pyspark_col("row_num") > start_row)
+                    sector_data = data.withColumn("row_num", row_number().over(window)).filter(
+                        pyspark_col("row_num") > start_row
+                    )
 
-                    null_count = sector_data.filter(
-                        pyspark_col(col_name).isNull()
-                    ).count()
+                    null_count = sector_data.filter(pyspark_col(col_name).isNull()).count()
                     missing_prop = (null_count / sector_size) * 100
                     col_missing_props.append(missing_prop)
                 else:
@@ -3133,13 +3048,9 @@ def missing_vals_tbl(data: Any) -> GT:
     n_missing_total_fmt = _format_to_integer_value(n_missing_total)
 
     # Create the label, table type, and thresholds HTML fragments
-    table_type_html = _create_table_type_html(
-        tbl_type=tbl_type, tbl_name=None, font_size="10px"
-    )
+    table_type_html = _create_table_type_html(tbl_type=tbl_type, tbl_name=None, font_size="10px")
 
-    tbl_dims_html = _create_table_dims_html(
-        columns=len(col_names), rows=n_rows, font_size="10px"
-    )
+    tbl_dims_html = _create_table_dims_html(columns=len(col_names), rows=n_rows, font_size="10px")
 
     check_mark = '<span style="color:#4CA64C;">&check;</span>'
 
@@ -3168,10 +3079,7 @@ def missing_vals_tbl(data: Any) -> GT:
     row_ranges_html = (
         "<div style='font-size: 8px;'><ol style='margin-top: 2px; margin-left: -15px;'>"
         + "".join(
-            [
-                f"<li>{row_range[0]} &ndash; {row_range[1]}</li>"
-                for row_range in zip(*row_ranges)
-            ]
+            [f"<li>{row_range[0]} &ndash; {row_range[1]}</li>" for row_range in zip(*row_ranges)]
         )
         + "</ol></div>"
     )
@@ -3239,9 +3147,7 @@ def missing_vals_tbl(data: Any) -> GT:
             locations=loc.body(),
         )
         .tab_style(
-            style=style.text(
-                color="black", font=google_font(name="IBM Plex Mono"), size="12px"
-            ),
+            style=style.text(color="black", font=google_font(name="IBM Plex Mono"), size="12px"),
             locations=loc.body(),
         )
         .tab_style(
@@ -3379,9 +3285,7 @@ def _validate_columns_subset(
 ) -> list[str]:
     if isinstance(columns_subset, str):
         if columns_subset not in col_names:
-            raise ValueError(
-                "The `columns_subset=` value doesn't match any columns in the table."
-            )
+            raise ValueError("The `columns_subset=` value doesn't match any columns in the table.")
         return [columns_subset]
 
     if isinstance(columns_subset, list):
@@ -3395,9 +3299,7 @@ def _validate_columns_subset(
     return columns_subset.resolve(columns=col_names)  # type: ignore[union-attr]
 
 
-def _select_columns(
-    data: Any, resolved_columns: list[str], ibis_tbl: bool, tbl_type: str
-) -> Any:
+def _select_columns(data: Any, resolved_columns: list[str], ibis_tbl: bool, tbl_type: str) -> Any:
     if ibis_tbl:
         return data[resolved_columns]
     if tbl_type == "polars":
@@ -3572,9 +3474,7 @@ def get_column_count(data: Any) -> int:
         if "pandas" in str(type(data)):
             return data.shape[1]  # pragma: no cover
         else:
-            raise ValueError(
-                "The input table type supplied in `data=` is not supported."
-            )
+            raise ValueError("The input table type supplied in `data=` is not supported.")
 
 
 def _extract_enum_values(set_values: Any) -> list[Any]:
@@ -3794,9 +3694,7 @@ def get_row_count(data: Any) -> int:
         elif "pyspark" in str(type(data)):  # pragma: no cover
             return data.count()
         else:
-            raise ValueError(
-                "The input table type supplied in `data=` is not supported."
-            )
+            raise ValueError("The input table type supplied in `data=` is not supported.")
 
 
 @dataclass
@@ -3991,9 +3889,7 @@ class _ValidationInfo:
         # Add the note entry
         self.notes[key] = {"markdown": markdown, "text": text}
 
-    def _get_notes(
-        self, format: str = "dict"
-    ) -> dict[str, dict[str, str]] | list[str] | None:
+    def _get_notes(self, format: str = "dict") -> dict[str, dict[str, str]] | list[str] | None:
         """
         Get notes associated with this validation step.
 
@@ -4137,9 +4033,7 @@ def _handle_connection_errors(e: Exception, connection_string: str) -> NoReturn:
 
     # Check if this is a missing backend dependency
     for backend, install_cmd in backend_install_map.items():
-        if backend in error_str and (
-            "not found" in error_str or "no module" in error_str
-        ):
+        if backend in error_str and ("not found" in error_str or "no module" in error_str):
             raise ConnectionError(
                 f"Missing {backend.upper()} backend for Ibis. Install it with:\n"
                 f"  {install_cmd}\n\n"
@@ -4310,9 +4204,7 @@ def connect_to_table(connection_string: str) -> Any:
 
         # Check if this is a "table not found" error
         if "table" in error_str and (
-            "not found" in error_str
-            or "does not exist" in error_str
-            or "not exist" in error_str
+            "not found" in error_str or "does not exist" in error_str or "not exist" in error_str
         ):
             # Try to get available tables for a helpful error message
             try:  # pragma: no cover
@@ -4486,6 +4378,18 @@ class Validate:
         locale's rules. Examples include `"en-US"` for English (United States) and `"fr-FR"` for
         French (France). More simply, this can be a language identifier without a designation of
         territory, like `"es"` for Spanish.
+    owner
+        An optional string identifying the owner of the data being validated. This is useful for
+        governance purposes, indicating who is responsible for the quality and maintenance of the
+        data. For example, `"data-platform-team"` or `"analytics-engineering"`.
+    consumers
+        An optional string or list of strings identifying who depends on or consumes this data.
+        This helps document data dependencies and can be useful for impact analysis when data
+        quality issues are detected. For example, `"ml-team"` or `["ml-team", "analytics"]`.
+    version
+        An optional string representing the version of the validation plan or data contract. This
+        supports semantic versioning (e.g., `"1.0.0"`, `"2.1.0"`) and is useful for tracking changes
+        to validation rules over time and for organizational governance.
 
     Returns
     -------
@@ -4972,6 +4876,9 @@ class Validate:
     brief: str | bool | None = None
     lang: str | None = None
     locale: str | None = None
+    owner: str | None = None
+    consumers: str | list[str] | None = None
+    version: str | None = None
 
     def __post_init__(self):
         # Process data through the centralized data processing pipeline
@@ -4989,9 +4896,7 @@ class Validate:
 
         # Check that `actions` is an Actions object if provided
         # TODO: allow string, callable, of list of either and upgrade to Actions object
-        if self.actions is not None and not isinstance(
-            self.actions, Actions
-        ):  # pragma: no cover
+        if self.actions is not None and not isinstance(self.actions, Actions):  # pragma: no cover
             raise TypeError(
                 "The `actions=` parameter must be an `Actions` object. "
                 "Please use `Actions()` to wrap your actions."
@@ -5017,6 +4922,36 @@ class Validate:
 
         # Transform any shorthands of `brief` to string representations
         self.brief = _transform_auto_brief(brief=self.brief)
+
+        # Validate and normalize the `owner` parameter
+        if self.owner is not None and not isinstance(self.owner, str):
+            raise TypeError(
+                "The `owner=` parameter must be a string representing the owner of the data. "
+                f"Received type: {type(self.owner).__name__}"
+            )
+
+        # Validate and normalize the `consumers` parameter
+        if self.consumers is not None:
+            if isinstance(self.consumers, str):
+                self.consumers = [self.consumers]
+            elif isinstance(self.consumers, list):
+                if not all(isinstance(c, str) for c in self.consumers):
+                    raise TypeError(
+                        "The `consumers=` parameter must be a string or a list of strings. "
+                        "All elements in the list must be strings."
+                    )
+            else:
+                raise TypeError(
+                    "The `consumers=` parameter must be a string or a list of strings. "
+                    f"Received type: {type(self.consumers).__name__}"
+                )
+
+        # Validate the `version` parameter
+        if self.version is not None and not isinstance(self.version, str):
+            raise TypeError(
+                "The `version=` parameter must be a string representing the version. "
+                f"Received type: {type(self.version).__name__}"
+            )
 
         # TODO: Add functionality to obtain the column names and types from the table
         self.col_names = None
@@ -5520,9 +5455,7 @@ class Validate:
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
-            self.thresholds
-            if thresholds is None
-            else _normalize_thresholds_creation(thresholds)
+            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
         )
 
         columns = _resolve_columns(columns)
@@ -5806,9 +5739,7 @@ class Validate:
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
-            self.thresholds
-            if thresholds is None
-            else _normalize_thresholds_creation(thresholds)
+            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
         )
 
         # If `columns` is a ColumnSelector or Narwhals selector, call `col()` on it to later
@@ -6095,15 +6026,11 @@ class Validate:
 
         # If value is a string-based date or datetime, convert it to the appropriate type
         # Allow regular strings to pass through for string comparisons
-        value = _conditional_string_date_dttm_conversion(
-            value=value, allow_regular_strings=True
-        )
+        value = _conditional_string_date_dttm_conversion(value=value, allow_regular_strings=True)
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
-            self.thresholds
-            if thresholds is None
-            else _normalize_thresholds_creation(thresholds)
+            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
         )
 
         # If `columns` is a ColumnSelector or Narwhals selector, call `col()` on it to later
@@ -6388,15 +6315,11 @@ class Validate:
 
         # If value is a string-based date or datetime, convert it to the appropriate type
         # Allow regular strings to pass through for string comparisons
-        value = _conditional_string_date_dttm_conversion(
-            value=value, allow_regular_strings=True
-        )
+        value = _conditional_string_date_dttm_conversion(value=value, allow_regular_strings=True)
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
-            self.thresholds
-            if thresholds is None
-            else _normalize_thresholds_creation(thresholds)
+            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
         )
 
         # If `columns` is a ColumnSelector or Narwhals selector, call `col()` on it to later
@@ -6688,9 +6611,7 @@ class Validate:
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
-            self.thresholds
-            if thresholds is None
-            else _normalize_thresholds_creation(thresholds)
+            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
         )
 
         # If `columns` is a ColumnSelector or Narwhals selector, call `col()` on it to later
@@ -6982,9 +6903,7 @@ class Validate:
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
-            self.thresholds
-            if thresholds is None
-            else _normalize_thresholds_creation(thresholds)
+            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
         )
 
         # If `columns` is a ColumnSelector or Narwhals selector, call `col()` on it to later
@@ -7303,9 +7222,7 @@ class Validate:
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
-            self.thresholds
-            if thresholds is None
-            else _normalize_thresholds_creation(thresholds)
+            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
         )
 
         # If `columns` is a ColumnSelector or Narwhals selector, call `col()` on it to later
@@ -7625,9 +7542,7 @@ class Validate:
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
-            self.thresholds
-            if thresholds is None
-            else _normalize_thresholds_creation(thresholds)
+            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
         )
 
         # If `columns` is a ColumnSelector or Narwhals selector, call `col()` on it to later
@@ -7936,9 +7851,7 @@ class Validate:
             if val is None:
                 continue
             if not isinstance(val, (float, int, str)):
-                raise ValueError(
-                    "`set=` must be a list of floats, integers, or strings."
-                )
+                raise ValueError("`set=` must be a list of floats, integers, or strings.")
 
         _check_pre(pre=pre)
         # TODO: add check for segments
@@ -7948,9 +7861,7 @@ class Validate:
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
-            self.thresholds
-            if thresholds is None
-            else _normalize_thresholds_creation(thresholds)
+            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
         )
 
         # If `columns` is a ColumnSelector or Narwhals selector, call `col()` on it to later
@@ -8239,9 +8150,7 @@ class Validate:
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
-            self.thresholds
-            if thresholds is None
-            else _normalize_thresholds_creation(thresholds)
+            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
         )
 
         # If `columns` is a ColumnSelector or Narwhals selector, call `col()` on it to later
@@ -8424,9 +8333,7 @@ class Validate:
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
-            self.thresholds
-            if thresholds is None
-            else _normalize_thresholds_creation(thresholds)
+            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
         )
 
         # If `columns` is a ColumnSelector or Narwhals selector, call `col()` on it to later
@@ -8614,9 +8521,7 @@ class Validate:
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
-            self.thresholds
-            if thresholds is None
-            else _normalize_thresholds_creation(thresholds)
+            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
         )
 
         # If `columns` is a ColumnSelector or Narwhals selector, call `col()` on it to later
@@ -8865,9 +8770,7 @@ class Validate:
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
-            self.thresholds
-            if thresholds is None
-            else _normalize_thresholds_creation(thresholds)
+            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
         )
 
         # If `columns` is a ColumnSelector or Narwhals selector, call `col()` on it to later
@@ -9110,9 +9013,7 @@ class Validate:
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
-            self.thresholds
-            if thresholds is None
-            else _normalize_thresholds_creation(thresholds)
+            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
         )
 
         # If `columns` is a ColumnSelector or Narwhals selector, call `col()` on it to later
@@ -9371,9 +9272,7 @@ class Validate:
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
-            self.thresholds
-            if thresholds is None
-            else _normalize_thresholds_creation(thresholds)
+            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
         )
 
         # If `columns` is a ColumnSelector or Narwhals selector, call `col()` on it to later
@@ -9658,9 +9557,7 @@ class Validate:
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
-            self.thresholds
-            if thresholds is None
-            else _normalize_thresholds_creation(thresholds)
+            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
         )
 
         # If `columns` is a ColumnSelector or Narwhals selector, call `col()` on it to later
@@ -9895,9 +9792,7 @@ class Validate:
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
-            self.thresholds
-            if thresholds is None
-            else _normalize_thresholds_creation(thresholds)
+            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
         )
 
         # Determine brief to use (global or local) and transform any shorthands of `brief=`
@@ -10062,9 +9957,7 @@ class Validate:
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
-            self.thresholds
-            if thresholds is None
-            else _normalize_thresholds_creation(thresholds)
+            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
         )
 
         # If `columns` is a ColumnSelector or Narwhals selector, call `col()` on it to later
@@ -10358,9 +10251,7 @@ class Validate:
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
-            self.thresholds
-            if thresholds is None
-            else _normalize_thresholds_creation(thresholds)
+            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
         )
 
         # If `columns` is a ColumnSelector or Narwhals selector, call `col()` on it to later
@@ -10608,9 +10499,7 @@ class Validate:
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
-            self.thresholds
-            if thresholds is None
-            else _normalize_thresholds_creation(thresholds)
+            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
         )
 
         if columns_subset is not None and isinstance(columns_subset, str):
@@ -10851,14 +10740,10 @@ class Validate:
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
-            self.thresholds
-            if thresholds is None
-            else _normalize_thresholds_creation(thresholds)
+            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
         )
 
-        if columns_subset is not None and isinstance(
-            columns_subset, str
-        ):  # pragma: no cover
+        if columns_subset is not None and isinstance(columns_subset, str):  # pragma: no cover
             columns_subset = [columns_subset]  # pragma: no cover
 
         # TODO: incorporate Column object
@@ -11221,9 +11106,7 @@ class Validate:
         try:
             provider, model_name = model.split(sep=":", maxsplit=1)
         except ValueError:
-            raise ValueError(
-                f"Model must be in format 'provider:model_name', got: {model}"
-            )
+            raise ValueError(f"Model must be in format 'provider:model_name', got: {model}")
 
         # Error if an unsupported provider is used
         if provider not in MODEL_PROVIDERS:
@@ -11247,9 +11130,7 @@ class Validate:
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
-            self.thresholds
-            if thresholds is None
-            else _normalize_thresholds_creation(thresholds)
+            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
         )
 
         # Determine brief to use (global or local) and transform any shorthands of `brief=`
@@ -11467,19 +11348,13 @@ class Validate:
         _check_boolean_input(param=active, param_name="active")
         _check_boolean_input(param=complete, param_name="complete")
         _check_boolean_input(param=in_order, param_name="in_order")
-        _check_boolean_input(
-            param=case_sensitive_colnames, param_name="case_sensitive_colnames"
-        )
-        _check_boolean_input(
-            param=case_sensitive_dtypes, param_name="case_sensitive_dtypes"
-        )
+        _check_boolean_input(param=case_sensitive_colnames, param_name="case_sensitive_colnames")
+        _check_boolean_input(param=case_sensitive_dtypes, param_name="case_sensitive_dtypes")
         _check_boolean_input(param=full_match_dtypes, param_name="full_match_dtypes")
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
-            self.thresholds
-            if thresholds is None
-            else _normalize_thresholds_creation(thresholds)
+            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
         )
 
         # Package up the `schema=` and boolean params into a dictionary for later interrogation
@@ -11697,16 +11572,12 @@ class Validate:
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
-            self.thresholds
-            if thresholds is None
-            else _normalize_thresholds_creation(thresholds)
+            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
         )
 
         # If `count` is a DataFrame or table then use the row count of the DataFrame as
         # the expected count
-        if _is_value_a_df(count) or "ibis.expr.types.relations.Table" in str(
-            type(count)
-        ):
+        if _is_value_a_df(count) or "ibis.expr.types.relations.Table" in str(type(count)):
             count = get_row_count(count)
 
         # Check the integrity of tolerance
@@ -11720,6 +11591,369 @@ class Validate:
 
         val_info = _ValidationInfo(
             assertion_type=assertion_type,
+            values=values,
+            pre=pre,
+            thresholds=thresholds,
+            actions=actions,
+            brief=brief,
+            active=active,
+        )
+
+        self._add_validation(validation_info=val_info)
+
+        return self
+
+    def data_freshness(
+        self,
+        column: str,
+        max_age: str | datetime.timedelta,
+        reference_time: datetime.datetime | str | None = None,
+        timezone: str | None = None,
+        allow_tz_mismatch: bool = False,
+        pre: Callable | None = None,
+        thresholds: int | float | bool | tuple | dict | Thresholds | None = None,
+        actions: Actions | None = None,
+        brief: str | bool | None = None,
+        active: bool = True,
+    ) -> Validate:
+        """
+        Validate that data in a datetime column is not older than a specified maximum age.
+
+        The `data_freshness()` validation method checks whether the most recent timestamp in the
+        specified datetime column is within the allowed `max_age=` from the `reference_time=` (which
+        defaults to the current time). This is useful for ensuring data pipelines are delivering
+        fresh data and for enforcing data SLAs.
+
+        This method helps detect stale data by comparing the maximum (most recent) value in a
+        datetime column against an expected freshness threshold.
+
+        Parameters
+        ----------
+        column
+            The name of the datetime column to check for freshness. This column should contain
+            date or datetime values.
+        max_age
+            The maximum allowed age of the data. Can be specified as: (1) a string with a
+            human-readable duration like `"24 hours"`, `"1 day"`, `"30 minutes"`, `"2 weeks"`, etc.
+            (supported units: `seconds`, `minutes`, `hours`, `days`, `weeks`), or (2) a
+            `datetime.timedelta` object for precise control.
+        reference_time
+            The reference point in time to compare against. Defaults to `None`, which uses the
+            current time (UTC if `timezone=` is not specified). Can be: (1) a `datetime.datetime`
+            object (timezone-aware recommended), (2) a string in ISO 8601 format (e.g.,
+            `"2024-01-15T10:30:00"` or `"2024-01-15T10:30:00+05:30"`), or (3) `None` to use the
+            current time.
+        timezone
+            The timezone to use for interpreting the data and reference time. Accepts IANA
+            timezone names (e.g., `"America/New_York"`), hour offsets (e.g., `"-7"`), or ISO 8601
+            offsets (e.g., `"-07:00"`). When `None` (default), naive datetimes are treated as UTC.
+            See the *The `timezone=` Parameter* section for details.
+        allow_tz_mismatch
+            Whether to allow timezone mismatches between the column data and reference time.
+            By default (`False`), a warning note is added when comparing timezone-naive with
+            timezone-aware datetimes. Set to `True` to suppress these warnings.
+        pre
+            An optional preprocessing function or lambda to apply to the data table during
+            interrogation. This function should take a table as input and return a modified table.
+        thresholds
+            Set threshold failure levels for reporting and reacting to exceedences of the levels.
+            The thresholds are set at the step level and will override any global thresholds set in
+            `Validate(thresholds=...)`. The default is `None`, which means that no thresholds will
+            be set locally and global thresholds (if any) will take effect.
+        actions
+            Optional actions to take when the validation step meets or exceeds any set threshold
+            levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
+            define the actions.
+        brief
+            An optional brief description of the validation step that will be displayed in the
+            reporting table. You can use the templating elements like `"{step}"` to insert
+            the step number, or `"{auto}"` to include an automatically generated brief. If `True`
+            the entire brief will be automatically generated. If `None` (the default) then there
+            won't be a brief.
+        active
+            A boolean value indicating whether the validation step should be active. Using `False`
+            will make the validation step inactive (still reporting its presence and keeping indexes
+            for the steps unchanged).
+
+        Returns
+        -------
+        Validate
+            The `Validate` object with the added validation step.
+
+        How Timezones Affect Freshness Checks
+        -------------------------------------
+        Freshness validation involves comparing two times: the **data time** (the most recent
+        timestamp in your column) and the **execution time** (when and where the validation runs).
+        Timezone confusion typically arises because these two times may originate from different
+        contexts.
+
+        Consider these common scenarios:
+
+        - your data timestamps are stored in UTC (common for databases), but you're running
+          validation on your laptop in New York (Eastern Time)
+        - you develop and test validation locally, then deploy it to a cloud workflow that runs
+          in UTC—suddenly your 'same' validation behaves differently
+        - your data comes from servers in multiple regions, each recording timestamps in their
+          local timezone
+
+        The `timezone=` parameter exists to solve this problem by establishing a single, explicit
+        timezone context for the freshness comparison. When you specify a timezone, Pointblank
+        interprets both the data timestamps (if naive) and the execution time in that timezone,
+        ensuring consistent behavior whether you run validation on your laptop or in a cloud
+        workflow.
+
+        **Scenario 1: Data has timezone-aware datetimes**
+
+        ```python
+        # Your data column has values like: 2024-01-15 10:30:00+00:00 (UTC)
+        # Comparison is straightforward as both sides have explicit timezones
+        .data_freshness(column="updated_at", max_age="24 hours")
+        ```
+
+        **Scenario 2: Data has naive datetimes (no timezone)**
+
+        ```python
+        # Your data column has values like: 2024-01-15 10:30:00 (no timezone)
+        # Specify the timezone the data was recorded in:
+        .data_freshness(column="updated_at", max_age="24 hours", timezone="America/New_York")
+        ```
+
+        **Scenario 3: Ensuring consistent behavior across environments**
+
+        ```python
+        # Pin the timezone to ensure identical results whether running locally or in the cloud
+        .data_freshness(
+            column="updated_at",
+            max_age="24 hours",
+            timezone="UTC",  # Explicit timezone removes environment dependence
+        )
+        ```
+
+        The `timezone=` Parameter
+        ---------------------------
+        The `timezone=` parameter accepts several convenient formats, making it easy to specify
+        timezones in whatever way is most natural for your use case. The following examples
+        illustrate the three supported input styles.
+
+        **IANA Timezone Names** (recommended for regions with daylight saving time):
+
+        ```python
+        timezone="America/New_York"   # Eastern Time (handles DST automatically)
+        timezone="Europe/London"      # UK time
+        timezone="Asia/Tokyo"         # Japan Standard Time
+        timezone="Australia/Sydney"   # Australian Eastern Time
+        timezone="UTC"                # Coordinated Universal Time
+        ```
+
+        **Simple Hour Offsets** (quick and easy):
+
+        ```python
+        timezone="-7"    # UTC-7 (e.g., Mountain Standard Time)
+        timezone="+5"    # UTC+5 (e.g., Pakistan Standard Time)
+        timezone="0"     # UTC
+        timezone="-12"   # UTC-12
+        ```
+
+        **ISO 8601 Offset Format** (precise, including fractional hours):
+
+        ```python
+        timezone="-07:00"   # UTC-7
+        timezone="+05:30"   # UTC+5:30 (e.g., India Standard Time)
+        timezone="+00:00"   # UTC
+        timezone="-09:30"   # UTC-9:30
+        ```
+
+        When a timezone is specified:
+
+        - naive datetime values in the column are assumed to be in this timezone.
+        - the reference time (if naive) is assumed to be in this timezone.
+        - the validation report will show times in this timezone.
+
+        When `None` (default):
+
+        - if your column has timezone-aware datetimes, those timezones are used
+        - if your column has naive datetimes, they're treated as UTC
+        - the current time reference uses UTC
+
+        Note that IANA timezone names are preferred when daylight saving time transitions matter, as
+        they automatically handle the offset changes. Fixed offsets like `"-7"` or `"-07:00"` do not
+        account for DST.
+
+        Recommendations for Working with Timestamps
+        -------------------------------------------
+        When working with datetime data, storing timestamps in UTC in your databases is strongly
+        recommended since it provides a consistent reference point regardless of where your data
+        originates or where it's consumed. Using timezone-aware datetimes whenever possible helps
+        avoid ambiguity—when a datetime has an explicit timezone, there's no guessing about what
+        time it actually represents.
+
+        If you're working with naive datetimes (which lack timezone information), always specify the
+        `timezone=` parameter so Pointblank knows how to interpret those values. When providing
+        `reference_time=` as a string, use ISO 8601 format with the timezone offset included (e.g.,
+        `"2024-01-15T10:30:00+00:00"`) to ensure unambiguous parsing. Finally, prefer IANA timezone
+        names (like `"America/New_York"`) over fixed offsets (like `"-05:00"`) when daylight saving
+        time transitions matter, since IANA names automatically handle the twice-yearly offset
+        changes. To see all available IANA timezone names in Python, use
+        `zoneinfo.available_timezones()` from the standard library's `zoneinfo` module.
+
+        Examples
+        --------
+        ```{python}
+        #| echo: false
+        #| output: false
+        import pointblank as pb
+        pb.config(report_incl_header=False, report_incl_footer=False)
+        ```
+
+        The simplest use of `data_freshness()` requires just two arguments: the `column=` containing
+        your timestamps and `max_age=` specifying how old the data can be. In this first example,
+        we create sample data with an `"updated_at"` column containing timestamps from 1, 12, and
+        20 hours ago. By setting `max_age="24 hours"`, we're asserting that the most recent
+        timestamp should be within 24 hours of the current time. Since the newest record is only
+        1 hour old, this validation passes.
+
+        ```{python}
+        import pointblank as pb
+        import polars as pl
+        from datetime import datetime, timedelta
+
+        # Create sample data with recent timestamps
+        recent_data = pl.DataFrame({
+            "id": [1, 2, 3],
+            "updated_at": [
+                datetime.now() - timedelta(hours=1),
+                datetime.now() - timedelta(hours=12),
+                datetime.now() - timedelta(hours=20),
+            ]
+        })
+
+        validation = (
+            pb.Validate(data=recent_data)
+            .data_freshness(column="updated_at", max_age="24 hours")
+            .interrogate()
+        )
+
+        validation
+        ```
+
+        The `max_age=` parameter accepts human-readable strings with various time units. You can
+        chain multiple `data_freshness()` calls to check different freshness thresholds
+        simultaneously—useful for tiered SLAs where you might want warnings at 30 minutes but
+        errors at 2 days.
+
+        ```{python}
+        # Check data is fresh within different time windows
+        validation = (
+            pb.Validate(data=recent_data)
+            .data_freshness(column="updated_at", max_age="30 minutes")  # Very fresh
+            .data_freshness(column="updated_at", max_age="2 days")      # Reasonably fresh
+            .data_freshness(column="updated_at", max_age="1 week")      # Within a week
+            .interrogate()
+        )
+
+        validation
+        ```
+
+        When your data contains naive datetimes (timestamps without timezone information), use the
+        `timezone=` parameter to specify what timezone those values represent. Here we have event
+        data recorded in Eastern Time, so we set `timezone="America/New_York"` to ensure the
+        freshness comparison is done correctly.
+
+        ```{python}
+        # Data with naive datetimes (assume they're in Eastern Time)
+        eastern_data = pl.DataFrame({
+            "event_time": [
+                datetime.now() - timedelta(hours=2),
+                datetime.now() - timedelta(hours=5),
+            ]
+        })
+
+        validation = (
+            pb.Validate(data=eastern_data)
+            .data_freshness(
+                column="event_time",
+                max_age="12 hours",
+                timezone="America/New_York"  # Interpret times as Eastern
+            )
+            .interrogate()
+        )
+
+        validation
+        ```
+
+        For reproducible validations or historical checks, you can use `reference_time=` to compare
+        against a specific point in time instead of the current time. This is particularly useful
+        for testing or when validating data snapshots. The reference time should include a timezone
+        offset (like `+00:00` for UTC) to avoid ambiguity.
+
+        ```{python}
+        validation = (
+            pb.Validate(data=recent_data)
+            .data_freshness(
+                column="updated_at",
+                max_age="24 hours",
+                reference_time="2024-01-15T12:00:00+00:00"
+            )
+            .interrogate()
+        )
+
+        validation
+        ```
+        """
+
+        assertion_type = _get_fn_name()
+
+        _check_pre(pre=pre)
+        _check_thresholds(thresholds=thresholds)
+        _check_boolean_input(param=active, param_name="active")
+        _check_boolean_input(param=allow_tz_mismatch, param_name="allow_tz_mismatch")
+
+        # Validate and parse the max_age parameter
+        max_age_td = _parse_max_age(max_age)
+
+        # Validate the column parameter
+        if not isinstance(column, str):
+            raise TypeError(
+                f"The `column` parameter must be a string, got {type(column).__name__}."
+            )
+
+        # Validate the timezone parameter if provided
+        if timezone is not None:
+            _validate_timezone(timezone)
+
+        # Parse reference_time if it's a string
+        parsed_reference_time = None
+        if reference_time is not None:
+            if isinstance(reference_time, str):
+                parsed_reference_time = _parse_reference_time(reference_time)
+            elif isinstance(reference_time, datetime.datetime):
+                parsed_reference_time = reference_time
+            else:
+                raise TypeError(
+                    f"The `reference_time` parameter must be a string or datetime object, "
+                    f"got {type(reference_time).__name__}."
+                )
+
+        # Determine threshold to use (global or local) and normalize a local `thresholds=` value
+        thresholds = (
+            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
+        )
+
+        # Package up the parameters for later interrogation
+        values = {
+            "max_age": max_age_td,
+            "max_age_str": max_age if isinstance(max_age, str) else str(max_age),
+            "reference_time": parsed_reference_time,
+            "timezone": timezone,
+            "allow_tz_mismatch": allow_tz_mismatch,
+        }
+
+        # Determine brief to use (global or local) and transform any shorthands of `brief=`
+        brief = self.brief if brief is None else _transform_auto_brief(brief=brief)
+
+        val_info = _ValidationInfo(
+            assertion_type=assertion_type,
+            column=column,
             values=values,
             pre=pre,
             thresholds=thresholds,
@@ -11880,16 +12114,12 @@ class Validate:
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
-            self.thresholds
-            if thresholds is None
-            else _normalize_thresholds_creation(thresholds)
+            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
         )
 
         # If `count` is a DataFrame or table then use the column count of the DataFrame as
         # the expected count
-        if _is_value_a_df(count) or "ibis.expr.types.relations.Table" in str(
-            type(count)
-        ):
+        if _is_value_a_df(count) or "ibis.expr.types.relations.Table" in str(type(count)):
             count = get_column_count(count)
 
         # Package up the `count=` and boolean params into a dictionary for later interrogation
@@ -12158,9 +12388,7 @@ class Validate:
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
-            self.thresholds
-            if thresholds is None
-            else _normalize_thresholds_creation(thresholds)
+            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
         )
 
         # Package up the `tbl_compare` into a dictionary for later interrogation
@@ -12407,9 +12635,7 @@ class Validate:
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
-            self.thresholds
-            if thresholds is None
-            else _normalize_thresholds_creation(thresholds)
+            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
         )
 
         # Determine brief to use (global or local) and transform any shorthands of `brief=`
@@ -12757,9 +12983,7 @@ class Validate:
 
         # Determine threshold to use (global or local) and normalize a local `thresholds=` value
         thresholds = (
-            self.thresholds
-            if thresholds is None
-            else _normalize_thresholds_creation(thresholds)
+            self.thresholds if thresholds is None else _normalize_thresholds_creation(thresholds)
         )
 
         # Determine brief to use (global or local) and transform any shorthands of `brief=`
@@ -12890,9 +13114,7 @@ class Validate:
         """
 
         # Raise if `get_first_n` and either or `sample_n` or `sample_frac` arguments are provided
-        if get_first_n is not None and (
-            sample_n is not None or sample_frac is not None
-        ):
+        if get_first_n is not None and (sample_n is not None or sample_frac is not None):
             raise ValueError(
                 "The `get_first_n=` argument cannot be provided with the `sample_n=` or "
                 "`sample_frac=` arguments."
@@ -12935,9 +13157,7 @@ class Validate:
             segment = validation.segments
 
             # Get compatible data types for this assertion type
-            assertion_method = ASSERTION_TYPE_METHOD_MAP.get(
-                assertion_type, assertion_type
-            )
+            assertion_method = ASSERTION_TYPE_METHOD_MAP.get(assertion_type, assertion_type)
             compatible_dtypes = COMPATIBLE_DTYPES.get(assertion_method, [])
 
             # Process the `brief` text for the validation step by including template variables to
@@ -12995,8 +13215,8 @@ class Validate:
             try:
                 # TODO: This copying should be scrutinized further
                 data_tbl_step: IntoDataFrame = _copy_dataframe(data_tbl)
-            except Exception as e:  # try not to crash the whole validation
-                data_tbl_step: IntoDataFrame = data_tbl
+            except Exception as e:  # pragma: no cover
+                data_tbl_step: IntoDataFrame = data_tbl  # pragma: no cover
 
             # Capture original table dimensions and columns before preprocessing
             # (only if preprocessing is present - we'll set these inside the preprocessing block)
@@ -13059,10 +13279,7 @@ class Validate:
                     processed_cols = get_column_count(data_tbl_step)
 
                     # Always add a note when preprocessing is applied
-                    if (
-                        original_rows != processed_rows
-                        or original_cols != processed_cols
-                    ):
+                    if original_rows != processed_rows or original_cols != processed_cols:
                         # Dimensions changed - show the change
                         note_html = _create_preprocessing_note_html(
                             original_rows=original_rows,
@@ -13079,9 +13296,7 @@ class Validate:
                         )
                     else:
                         # No dimension change - just indicate preprocessing was applied
-                        note_html = _create_preprocessing_no_change_note_html(
-                            locale=self.locale
-                        )
+                        note_html = _create_preprocessing_no_change_note_html(locale=self.locale)
                         note_text = _create_preprocessing_no_change_note_text()
 
                     validation._add_note(
@@ -13100,10 +13315,7 @@ class Validate:
                         )
 
                         # Check if the target column is in the processed table but not in original
-                        if (
-                            column in processed_column_names
-                            and column not in original_column_names
-                        ):
+                        if column in processed_column_names and column not in original_column_names:
                             note_html = _create_synthetic_target_column_note_html(
                                 column_name=column,
                                 locale=self.locale,
@@ -13122,9 +13334,7 @@ class Validate:
                     validation.eval_error = True
                     end_time = datetime.datetime.now(datetime.timezone.utc)
                     validation.proc_duration_s = (end_time - start_time).total_seconds()
-                    validation.time_processed = end_time.isoformat(
-                        timespec="milliseconds"
-                    )
+                    validation.time_processed = end_time.isoformat(timespec="milliseconds")
                     validation.active = False
                     continue
 
@@ -13154,9 +13364,9 @@ class Validate:
             # Set the number of test units
             # ------------------------------------------------
 
-            validation.n = NumberOfTestUnits(
-                df=data_tbl_step, column=column
-            ).get_test_units(tbl_type=tbl_type)
+            validation.n = NumberOfTestUnits(df=data_tbl_step, column=column).get_test_units(
+                tbl_type=tbl_type
+            )
 
             # Check if preprocessing or segmentation resulted in zero rows
             # Only apply this check to row-based validations, not table-level validations
@@ -13167,6 +13377,8 @@ class Validate:
                 "col_schema_match",
                 "row_count_match",
                 "col_count_match",
+                "data_freshness",
+                "tbl_match",
             ]
 
             if validation.n == 0 and assertion_type not in table_level_assertions:
@@ -13244,12 +13456,8 @@ class Validate:
                             from pointblank._interrogation import interrogate_increasing
 
                             # Extract direction options from val_info
-                            allow_stationary = validation.val_info.get(
-                                "allow_stationary", False
-                            )
-                            decreasing_tol = validation.val_info.get(
-                                "decreasing_tol", 0.0
-                            )
+                            allow_stationary = validation.val_info.get("allow_stationary", False)
+                            decreasing_tol = validation.val_info.get("decreasing_tol", 0.0)
 
                             results_tbl = interrogate_increasing(
                                 tbl=tbl,
@@ -13263,12 +13471,8 @@ class Validate:
                             from pointblank._interrogation import interrogate_decreasing
 
                             # Extract direction options from val_info
-                            allow_stationary = validation.val_info.get(
-                                "allow_stationary", False
-                            )
-                            increasing_tol = validation.val_info.get(
-                                "increasing_tol", 0.0
-                            )
+                            allow_stationary = validation.val_info.get("allow_stationary", False)
+                            increasing_tol = validation.val_info.get("increasing_tol", 0.0)
 
                             results_tbl = interrogate_decreasing(
                                 tbl=tbl,
@@ -13299,9 +13503,7 @@ class Validate:
                             )
 
                         elif assertion_type == "col_vals_in_set":
-                            results_tbl = interrogate_isin(
-                                tbl=tbl, column=column, set_values=value
-                            )
+                            results_tbl = interrogate_isin(tbl=tbl, column=column, set_values=value)
 
                         elif assertion_type == "col_vals_not_in_set":
                             results_tbl = interrogate_notin(
@@ -13348,9 +13550,7 @@ class Validate:
                         )
 
                     elif assertion_type == "rows_complete":
-                        results_tbl = rows_complete(
-                            data_tbl=data_tbl_step, columns_subset=column
-                        )
+                        results_tbl = rows_complete(data_tbl=data_tbl_step, columns_subset=column)
 
                     elif assertion_type == "prompt":
                         from pointblank._interrogation import interrogate_prompt
@@ -13447,6 +13647,105 @@ class Validate:
 
                         results_tbl = None
 
+                    elif assertion_type == "data_freshness":
+                        from pointblank._interrogation import data_freshness as data_freshness_check
+
+                        freshness_result = data_freshness_check(
+                            data_tbl=data_tbl_step,
+                            column=column,
+                            max_age=value["max_age"],
+                            reference_time=value["reference_time"],
+                            timezone=value["timezone"],
+                            allow_tz_mismatch=value["allow_tz_mismatch"],
+                        )
+
+                        result_bool = freshness_result["passed"]
+                        validation.all_passed = result_bool
+                        validation.n = 1
+                        validation.n_passed = int(result_bool)
+                        validation.n_failed = 1 - int(result_bool)
+
+                        # Store the freshness check details for reporting
+                        validation.val_info = freshness_result
+
+                        # Update the values dict with actual computed values for failure text
+                        if freshness_result.get("age") is not None:
+                            value["age"] = freshness_result["age"]
+
+                        # Add timezone warning note if applicable
+                        if freshness_result.get("tz_warning_key"):
+                            tz_key = freshness_result["tz_warning_key"]
+                            tz_warning_text = NOTES_TEXT.get(tz_key, {}).get(
+                                self.locale, NOTES_TEXT.get(tz_key, {}).get("en", "")
+                            )
+                            validation._add_note(
+                                key="tz_warning",
+                                markdown=f"⚠️ {tz_warning_text}",
+                                text=tz_warning_text,
+                            )
+
+                        # Add note about column being empty if applicable
+                        if freshness_result.get("column_empty"):
+                            column_empty_text = NOTES_TEXT.get(
+                                "data_freshness_column_empty", {}
+                            ).get(
+                                self.locale,
+                                NOTES_TEXT.get("data_freshness_column_empty", {}).get(
+                                    "en", "The datetime column is empty (no values to check)."
+                                ),
+                            )
+                            validation._add_note(
+                                key="column_empty",
+                                markdown=f"⚠️ {column_empty_text}",
+                                text=column_empty_text,
+                            )
+
+                        # Add informational note about the freshness check
+                        if freshness_result.get("max_datetime") and freshness_result.get("age"):
+                            max_dt = freshness_result["max_datetime"]
+                            # Format datetime without microseconds for cleaner display
+                            if hasattr(max_dt, "replace"):
+                                max_dt_display = max_dt.replace(microsecond=0)
+                            else:
+                                max_dt_display = max_dt
+                            age = freshness_result["age"]
+                            age_str = _format_timedelta(age)
+                            max_age_str = _format_timedelta(value["max_age"])
+
+                            # Get translated template for pass/fail
+                            if result_bool:
+                                details_key = "data_freshness_details_pass"
+                                prefix = "✓"
+                            else:
+                                details_key = "data_freshness_details_fail"
+                                prefix = "✗"
+
+                            details_template = NOTES_TEXT.get(details_key, {}).get(
+                                self.locale,
+                                NOTES_TEXT.get(details_key, {}).get(
+                                    "en",
+                                    "Most recent data: `{max_dt}` (age: {age}, max allowed: {max_age})",
+                                ),
+                            )
+
+                            # Format the template with values
+                            note_text = details_template.format(
+                                max_dt=max_dt_display, age=age_str, max_age=max_age_str
+                            )
+                            # For markdown, make the age bold
+                            note_md_template = details_template.replace(
+                                "(age: {age}", "(age: **{age}**"
+                            )
+                            note_md = f"{prefix} {note_md_template.format(max_dt=max_dt_display, age=age_str, max_age=max_age_str)}"
+
+                            validation._add_note(
+                                key="freshness_details",
+                                markdown=note_md,
+                                text=note_text,
+                            )
+
+                        results_tbl = None
+
                     elif assertion_type == "tbl_match":
                         from pointblank._interrogation import tbl_match
 
@@ -13457,9 +13756,7 @@ class Validate:
                         if callable(tbl_compare):
                             tbl_compare = tbl_compare()
 
-                        result_bool = tbl_match(
-                            data_tbl=data_tbl_step, tbl_compare=tbl_compare
-                        )
+                        result_bool = tbl_match(data_tbl=data_tbl_step, tbl_compare=tbl_compare)
 
                         validation.all_passed = result_bool
                         validation.n = 1
@@ -13495,9 +13792,9 @@ class Validate:
                                     "setting reference data on the Validate object. "
                                     "Use Validate(data=..., reference=...) to set reference data."
                                 )
-                            ref_vec: nw.DataFrame = nw.from_native(
-                                self.reference
-                            ).select(raw_value.column_name)
+                            ref_vec: nw.DataFrame = nw.from_native(self.reference).select(
+                                raw_value.column_name
+                            )
                             target: float | int = agg(ref_vec)
                         else:
                             target = raw_value
@@ -13512,6 +13809,15 @@ class Validate:
                         validation.n = 1
                         validation.n_passed = int(result_bool)
                         validation.n_failed = 1 - result_bool
+
+                        # Store computed values for step reports
+                        validation.val_info = {
+                            "actual": real,
+                            "target": target,
+                            "tol": tol,
+                            "lower_bound": lower_bound,
+                            "upper_bound": upper_bound,
+                        }
 
                         results_tbl = None
                     else:
@@ -13533,19 +13839,14 @@ class Validate:
                         or ("dtype" in error_msg and "compare" in error_msg)
                     )
 
-                    is_column_not_found = (
-                        "column" in error_msg and "not found" in error_msg
-                    )
+                    is_column_not_found = "column" in error_msg and "not found" in error_msg
 
                     is_comparison_column_not_found = (
-                        "unable to find column" in error_msg
-                        and "valid columns" in error_msg
+                        "unable to find column" in error_msg and "valid columns" in error_msg
                     )
 
                     if (
-                        is_comparison_error
-                        or is_column_not_found
-                        or is_comparison_column_not_found
+                        is_comparison_error or is_column_not_found or is_comparison_column_not_found
                     ):  # pragma: no cover
                         # If data quality comparison fails or column not found, mark as eval_error
                         validation.eval_error = True  # pragma: no cover
@@ -13579,9 +13880,7 @@ class Validate:
                         elif is_comparison_column_not_found:
                             # Extract column name from error message
                             # Error format: 'unable to find column "col_name"; valid columns: ...'
-                            match = re.search(
-                                r'unable to find column "([^"]+)"', str(e)
-                            )
+                            match = re.search(r'unable to find column "([^"]+)"', str(e))
 
                             if match:
                                 missing_col_name = match.group(1)
@@ -13606,28 +13905,24 @@ class Validate:
                                     ):
                                         position = "right"
 
-                                note_html = (
-                                    _create_comparison_column_not_found_note_html(
-                                        column_name=missing_col_name,
-                                        position=position,
-                                        available_columns=(
-                                            list(data_tbl_step.columns)
-                                            if hasattr(data_tbl_step, "columns")
-                                            else []
-                                        ),
-                                        locale=self.locale,
-                                    )
+                                note_html = _create_comparison_column_not_found_note_html(
+                                    column_name=missing_col_name,
+                                    position=position,
+                                    available_columns=(
+                                        list(data_tbl_step.columns)
+                                        if hasattr(data_tbl_step, "columns")
+                                        else []
+                                    ),
+                                    locale=self.locale,
                                 )
-                                note_text = (
-                                    _create_comparison_column_not_found_note_text(
-                                        column_name=missing_col_name,
-                                        position=position,
-                                        available_columns=(
-                                            list(data_tbl_step.columns)
-                                            if hasattr(data_tbl_step, "columns")
-                                            else []
-                                        ),
-                                    )
+                                note_text = _create_comparison_column_not_found_note_text(
+                                    column_name=missing_col_name,
+                                    position=position,
+                                    available_columns=(
+                                        list(data_tbl_step.columns)
+                                        if hasattr(data_tbl_step, "columns")
+                                        else []
+                                    ),
                                 )
                                 validation._add_note(
                                     key="comparison_column_not_found",
@@ -13635,9 +13930,7 @@ class Validate:
                                     text=note_text,
                                 )
 
-                        end_time = datetime.datetime.now(
-                            datetime.timezone.utc
-                        )  # pragma: no cover
+                        end_time = datetime.datetime.now(datetime.timezone.utc)  # pragma: no cover
 
                         validation.proc_duration_s = (
                             end_time - start_time
@@ -13699,9 +13992,7 @@ class Validate:
                 # Solely for the col_vals_in_set assertion type, any Null values in the
                 # `pb_is_good_` column are counted as failing test units
                 if assertion_type == "col_vals_in_set":
-                    null_count = _count_null_values_in_column(
-                        tbl=results_tbl, column="pb_is_good_"
-                    )
+                    null_count = _count_null_values_in_column(tbl=results_tbl, column="pb_is_good_")
                     validation.n_failed += null_count
 
                 # For column-value validations, the number of test units is the number of rows
@@ -13745,9 +14036,7 @@ class Validate:
                     threshold_note_html = _create_local_threshold_note_html(
                         thresholds=threshold, locale=self.locale
                     )
-                    threshold_note_text = _create_local_threshold_note_text(
-                        thresholds=threshold
-                    )
+                    threshold_note_text = _create_local_threshold_note_text(thresholds=threshold)
 
                     # Add the note to the validation step
                     validation._add_note(
@@ -13758,9 +14047,7 @@ class Validate:
 
                 elif self.thresholds != Thresholds():
                     # Thresholds explicitly reset to empty when global thresholds exist
-                    reset_note_html = _create_threshold_reset_note_html(
-                        locale=self.locale
-                    )
+                    reset_note_html = _create_threshold_reset_note_html(locale=self.locale)
                     reset_note_text = _create_threshold_reset_note_text()
 
                     # Add the note to the validation step
@@ -13907,9 +14194,7 @@ class Validate:
                 # Handle LazyFrame row indexing which requires order_by parameter
                 try:
                     # Try without order_by first (for DataFrames)
-                    validation_extract_nw = validation_extract_nw.with_row_index(
-                        name="_row_num_"
-                    )
+                    validation_extract_nw = validation_extract_nw.with_row_index(name="_row_num_")
                 except TypeError:
                     # LazyFrames require order_by parameter: use first column for ordering
                     first_col = validation_extract_nw.columns[0]
@@ -13917,16 +14202,12 @@ class Validate:
                         name="_row_num_", order_by=first_col
                     )
 
-                validation_extract_nw = validation_extract_nw.filter(
-                    ~nw.col("pb_is_good_")
-                ).drop(
+                validation_extract_nw = validation_extract_nw.filter(~nw.col("pb_is_good_")).drop(
                     "pb_is_good_"
                 )  # noqa
 
                 # Add 1 to the row numbers to make them 1-indexed
-                validation_extract_nw = validation_extract_nw.with_columns(
-                    nw.col("_row_num_") + 1
-                )
+                validation_extract_nw = validation_extract_nw.with_columns(nw.col("_row_num_") + 1)
 
                 # Apply any sampling or limiting to the number of rows to extract
                 if get_first_n is not None:
@@ -13937,12 +14218,8 @@ class Validate:
                         validation_extract_nw = validation_extract_nw.sample(n=sample_n)
                     except AttributeError:
                         # For LazyFrames without sample method, collect first then sample
-                        validation_extract_native = (
-                            validation_extract_nw.collect().to_native()
-                        )
-                        if hasattr(
-                            validation_extract_native, "sample"
-                        ):  # pragma: no cover
+                        validation_extract_native = validation_extract_nw.collect().to_native()
+                        if hasattr(validation_extract_native, "sample"):  # pragma: no cover
                             # PySpark DataFrame has sample method
                             validation_extract_native = (
                                 validation_extract_native.sample(  # pragma: no cover
@@ -13957,40 +14234,32 @@ class Validate:
                             )  # pragma: no cover
                         else:
                             # Fallback: just take first n rows after collecting
-                            validation_extract_nw = (
-                                validation_extract_nw.collect().head(sample_n)
+                            validation_extract_nw = validation_extract_nw.collect().head(
+                                sample_n
                             )  # pragma: no cover
                 elif sample_frac is not None:
                     try:
-                        validation_extract_nw = validation_extract_nw.sample(
-                            fraction=sample_frac
-                        )
+                        validation_extract_nw = validation_extract_nw.sample(fraction=sample_frac)
                     except AttributeError:  # pragma: no cover
                         # For LazyFrames without sample method, collect first then sample
                         validation_extract_native = (
                             validation_extract_nw.collect().to_native()
                         )  # pragma: no cover
-                        if hasattr(
-                            validation_extract_native, "sample"
-                        ):  # pragma: no cover
+                        if hasattr(validation_extract_native, "sample"):  # pragma: no cover
                             # PySpark DataFrame has sample method
-                            validation_extract_native = (
-                                validation_extract_native.sample(fraction=sample_frac)
+                            validation_extract_native = validation_extract_native.sample(
+                                fraction=sample_frac
                             )  # pragma: no cover
                             validation_extract_nw = nw.from_native(
                                 validation_extract_native
                             )  # pragma: no cover
                         else:
                             # Fallback: use fraction to calculate head size
-                            collected = (
-                                validation_extract_nw.collect()
-                            )  # pragma: no cover
+                            collected = validation_extract_nw.collect()  # pragma: no cover
                             sample_size = max(
                                 1, int(len(collected) * sample_frac)
                             )  # pragma: no cover
-                            validation_extract_nw = collected.head(
-                                sample_size
-                            )  # pragma: no cover
+                            validation_extract_nw = collected.head(sample_size)  # pragma: no cover
 
                 # Ensure a limit is set on the number of rows to extract
                 try:
@@ -14019,9 +14288,7 @@ class Validate:
                     if column is not None:
                         column_names = column
                         column_names_subset = ["_row_num_"] + column
-                        validation_extract_nw = validation_extract_nw.select(
-                            column_names_subset
-                        )
+                        validation_extract_nw = validation_extract_nw.select(column_names_subset)
 
                     validation_extract_nw = (
                         validation_extract_nw.with_columns(
@@ -14030,9 +14297,8 @@ class Validate:
                         # First sort by the columns to group duplicates and by row numbers
                         # within groups; this type of sorting will preserve the original order in a
                         # single operation
-                        .sort(by=["group_min_row"] + column_names + ["_row_num_"]).drop(
-                            "group_min_row"
-                        )
+                        .sort(by=["group_min_row"] + column_names + ["_row_num_"])
+                        .drop("group_min_row")
                     )
 
                 # Ensure that the extract is collected and set to its native format
@@ -14327,8 +14593,7 @@ class Validate:
                 validation_step = self.validation_info[step_num - 1]
                 step_descriptor = (
                     validation_step.autobrief
-                    if hasattr(validation_step, "autobrief")
-                    and validation_step.autobrief
+                    if hasattr(validation_step, "autobrief") and validation_step.autobrief
                     else f"Validation step {step_num}"
                 )
                 failures.append(f"Step {step_num}: {step_descriptor}")
@@ -14338,9 +14603,8 @@ class Validate:
             if message:
                 msg = message
             else:
-                msg = (
-                    f"The following steps exceeded the {level} threshold level:\n"
-                    + "\n".join(failures)
+                msg = f"The following steps exceeded the {level} threshold level:\n" + "\n".join(
+                    failures
                 )
             raise AssertionError(msg)
 
@@ -14485,9 +14749,7 @@ class Validate:
         # Return True if any steps exceeded the threshold
         return any(status.values())
 
-    def n(
-        self, i: int | list[int] | None = None, scalar: bool = False
-    ) -> dict[int, int] | int:
+    def n(self, i: int | list[int] | None = None, scalar: bool = False) -> dict[int, int] | int:
         """
         Provides a dictionary of the number of test units for each validation step.
 
@@ -15556,8 +15818,7 @@ class Validate:
 
         for validation_info in self.validation_info:
             report_entry = {
-                field: getattr(validation_info, field)
-                for field in VALIDATION_REPORT_FIELDS
+                field: getattr(validation_info, field) for field in VALIDATION_REPORT_FIELDS
             }
 
             # If preprocessing functions are included in the report, convert them to strings
@@ -15664,17 +15925,14 @@ class Validate:
         validation_info = [
             validation
             for validation in self.validation_info
-            if validation.assertion_type in ROW_BASED_VALIDATION_TYPES
-            and validation.active
+            if validation.assertion_type in ROW_BASED_VALIDATION_TYPES and validation.active
         ]
 
         # TODO: ensure that the stored evaluation tables across all steps have not been mutated
         # from the original table (via any `pre=` functions)
 
         # Obtain the validation steps that are to be used for sundering
-        validation_steps_i = [
-            validation.assertion_type for validation in validation_info
-        ]
+        validation_steps_i = [validation.assertion_type for validation in validation_info]
 
         if len(validation_steps_i) == 0:
             if type == "pass":
@@ -15726,9 +15984,7 @@ class Validate:
             if labeled_tbl_nw is None:
                 labeled_tbl_nw = results_tbl
             else:
-                labeled_tbl_nw = labeled_tbl_nw.join(
-                    results_tbl, on=index_name, how="left"
-                )
+                labeled_tbl_nw = labeled_tbl_nw.join(results_tbl, on=index_name, how="left")
 
         # Get list of columns that are the `pb_is_good_` columns
         pb_is_good_cols = [f"pb_is_good_{i}" for i in range(len(validation_steps_i))]
@@ -15827,9 +16083,7 @@ class Validate:
         # Step not found
         return None
 
-    def get_note(
-        self, i: int, key: str, format: str = "dict"
-    ) -> dict[str, str] | str | None:
+    def get_note(self, i: int, key: str, format: str = "dict") -> dict[str, str] | str | None:
         """
         Get a specific note from a validation step by its step number and note key.
 
@@ -16080,9 +16334,7 @@ class Validate:
 
             # Create the label, table type, and thresholds HTML fragments
             label_html = _create_label_html(label=self.label, start_time="")
-            table_type_html = _create_table_type_html(
-                tbl_type=tbl_info, tbl_name=self.tbl_name
-            )
+            table_type_html = _create_table_type_html(tbl_type=tbl_info, tbl_name=self.tbl_name)
             thresholds_html = _create_thresholds_html(
                 thresholds=thresholds, locale=locale, df_lib=df_lib
             )
@@ -16102,9 +16354,7 @@ class Validate:
                 {
                     "status_color": "",
                     "i": "",
-                    "type_upd": VALIDATION_REPORT_TEXT["no_validation_steps_text"][
-                        lang
-                    ],
+                    "type_upd": VALIDATION_REPORT_TEXT["no_validation_steps_text"][lang],
                     "columns_upd": "",
                     "values_upd": "",
                     "tbl": "",
@@ -16130,9 +16380,7 @@ class Validate:
                     locations=loc.column_labels(),
                 )
                 .tab_style(
-                    style=style.text(
-                        size="28px", weight="bold", align=before, color="#444444"
-                    ),
+                    style=style.text(size="28px", weight="bold", align=before, color="#444444"),
                     locations=loc.title(),
                 )
                 .tab_style(
@@ -16152,9 +16400,7 @@ class Validate:
                         "status_color": "",
                         "i": "",
                         "type_upd": VALIDATION_REPORT_TEXT["report_col_step"][lang],
-                        "columns_upd": VALIDATION_REPORT_TEXT["report_col_columns"][
-                            lang
-                        ],
+                        "columns_upd": VALIDATION_REPORT_TEXT["report_col_columns"][lang],
                         "values_upd": VALIDATION_REPORT_TEXT["report_col_values"][lang],
                         "tbl": "TBL",
                         "eval": "EVAL",
@@ -16190,15 +16436,11 @@ class Validate:
                     columns=["tbl", "eval", "w_upd", "e_upd", "c_upd", "extract_upd"],
                 )
                 .cols_align(align="right", columns=["test_units", "pass", "fail"])
-                .cols_align(
-                    align=before, columns=["type_upd", "columns_upd", "values_upd"]
-                )
+                .cols_align(align=before, columns=["type_upd", "columns_upd", "values_upd"])
                 .cols_move_to_start(columns=column_order)
                 .tab_options(table_font_size="90%")
                 .tab_source_note(
-                    source_note=VALIDATION_REPORT_TEXT["use_validation_methods_text"][
-                        lang
-                    ]
+                    source_note=VALIDATION_REPORT_TEXT["use_validation_methods_text"][lang]
                 )
             )
 
@@ -16208,9 +16450,7 @@ class Validate:
                 )  # pragma: no cover
 
             if incl_header:
-                gt_tbl = gt_tbl.tab_header(
-                    title=html(title_text), subtitle=html(combined_subtitle)
-                )
+                gt_tbl = gt_tbl.tab_header(title=html(title_text), subtitle=html(combined_subtitle))
 
             # If the version of `great_tables` is `>=0.17.0` then disable Quarto table processing
             if version("great_tables") >= "0.17.0":
@@ -16219,16 +16459,12 @@ class Validate:
             return gt_tbl
 
         # Convert the `validation_info` object to a dictionary
-        validation_info_dict = _validation_info_as_dict(
-            validation_info=self.validation_info
-        )
+        validation_info_dict = _validation_info_as_dict(validation_info=self.validation_info)
 
         # Has the validation been performed? We can check the first `time_processed` entry in the
         # dictionary to see if it is `None` or not; The output of many cells in the reporting table
         # will be made blank if the validation has not been performed
-        interrogation_performed = (
-            validation_info_dict.get("proc_duration_s", [None])[0] is not None
-        )
+        interrogation_performed = validation_info_dict.get("proc_duration_s", [None])[0] is not None
 
         # Determine which steps are those using segmented data
         segmented_steps = [
@@ -16271,9 +16507,7 @@ class Validate:
         for i, column in enumerate(columns):
             # Check if this validation has a synthetic target column note
             has_synthetic_column = (
-                notes[i] is not None
-                and isinstance(notes[i], dict)
-                and "syn_target_col" in notes[i]
+                notes[i] is not None and isinstance(notes[i], dict) and "syn_target_col" in notes[i]
             )
 
             column_text = None
@@ -16295,10 +16529,16 @@ class Validate:
             elif assertion_type[i] in ["conjointly", "specially"]:
                 column_text = ""
             else:
-                column_text = str(column)
+                # Handle both string columns and list columns
+                # For single-element lists like ['a'], display as 'a'
+                # For multi-element lists, display as comma-separated values
+                if isinstance(column, list):
+                    column_text = ", ".join(str(c) for c in column)
+                else:
+                    column_text = str(column)
 
-            # Apply underline styling for synthetic columns (using the purple color from the icon)
-            # Only apply styling if column_text is not empty and not a special marker
+            # Apply underline styling for synthetic columns; only apply styling if column_text is
+            # not empty and not a special marker
             if (
                 has_synthetic_column
                 and column_text
@@ -16350,9 +16590,7 @@ class Validate:
             elif assertion_type[i] in ["col_vals_between", "col_vals_outside"]:
                 left_bracket = "[" if inclusive[i][0] else "("
                 right_bracket = "]" if inclusive[i][1] else ")"
-                values_upd.append(
-                    f"{left_bracket}{value[0]}, {value[1]}{right_bracket}"
-                )
+                values_upd.append(f"{left_bracket}{value[0]}, {value[1]}{right_bracket}")
 
             # If the assertion type is a comparison of a set of values; strip the leading and
             # trailing square brackets and single quotes
@@ -16377,6 +16615,69 @@ class Validate:
                 bound_finder = value.get("bound_finder")
                 tol_value = bound_finder.keywords.get("tol", 0) if bound_finder else 0
                 values_upd.append(f"p = {p_value}<br/>tol = {tol_value}")
+
+            elif assertion_type[i] in ["data_freshness"]:
+                # Format max_age nicely for display
+                max_age = value.get("max_age")
+                max_age_str = _format_timedelta(max_age) if max_age else "&mdash;"
+
+                # Build additional lines with non-default parameters
+                extra_lines = []
+
+                if value.get("reference_time") is not None:
+                    ref_time = value["reference_time"]
+
+                    # Format datetime across two lines: date and time+tz
+                    if hasattr(ref_time, "strftime"):
+                        date_str = ref_time.strftime("@%Y-%m-%d")
+                        time_str = " " + ref_time.strftime("%H:%M:%S")
+
+                        # Add timezone offset if present
+                        if hasattr(ref_time, "tzinfo") and ref_time.tzinfo is not None:
+                            tz_offset = ref_time.strftime("%z")
+                            if tz_offset:
+                                time_str += tz_offset
+                        extra_lines.append(date_str)
+                        extra_lines.append(time_str)
+                    else:
+                        extra_lines.append(f"@{ref_time}")
+
+                # Timezone and allow_tz_mismatch on same line
+                tz_line_parts = []
+                if value.get("timezone") is not None:
+                    # Convert timezone name to ISO 8601 offset format
+                    tz_name = value["timezone"]
+
+                    try:
+                        tz_obj = ZoneInfo(tz_name)
+
+                        # Get the current offset for this timezone
+                        now = datetime.datetime.now(tz_obj)
+                        offset = now.strftime("%z")
+
+                        # Format as ISO 8601 extended: -07:00 (insert colon)
+                        if len(offset) == 5:
+                            tz_display = f"{offset[:3]}:{offset[3:]}"
+                        else:
+                            tz_display = offset
+
+                    except Exception:
+                        tz_display = tz_name
+                    tz_line_parts.append(tz_display)
+
+                if value.get("allow_tz_mismatch"):
+                    tz_line_parts.append("~tz")
+
+                if tz_line_parts:
+                    extra_lines.append(" ".join(tz_line_parts))
+
+                if extra_lines:
+                    extra_html = "<br/>".join(extra_lines)
+                    values_upd.append(
+                        f'{max_age_str}<br/><span style="font-size: 9px;">{extra_html}</span>'
+                    )
+                else:
+                    values_upd.append(max_age_str)
 
             elif assertion_type[i] in ["col_schema_match"]:
                 values_upd.append("SCHEMA")
@@ -16418,6 +16719,32 @@ class Validate:
                     values_upd.append(value["prompt"])  # pragma: no cover
                 else:  # pragma: no cover
                     values_upd.append(str(value))  # pragma: no cover
+
+            # Handle aggregation methods (col_sum_gt, col_avg_eq, etc.)
+            elif is_valid_agg(assertion_type[i]):
+                # Extract the value and tolerance from the values dict
+                agg_value = value.get("value")
+                tol_value = value.get("tol", 0)
+
+                # Format the value (could be a number, Column, or ReferenceColumn)
+                if hasattr(agg_value, "__repr__"):
+                    # For Column or ReferenceColumn objects, use their repr
+                    value_str = repr(agg_value)
+                else:
+                    value_str = str(agg_value)
+
+                # Format tolerance - only show on second line if non-zero
+                if tol_value != 0:
+                    # Format tolerance based on its type
+                    if isinstance(tol_value, tuple):
+                        # Asymmetric bounds: (lower, upper)
+                        tol_str = f"tol=({tol_value[0]}, {tol_value[1]})"
+                    else:
+                        # Symmetric tolerance
+                        tol_str = f"tol={tol_value}"
+                    values_upd.append(f"{value_str}<br/>{tol_str}")
+                else:
+                    values_upd.append(value_str)
 
             # If the assertion type is not recognized, add the value as a string
             else:  # pragma: no cover
@@ -16552,9 +16879,7 @@ class Validate:
                 status_color_list.append(SEVERITY_LEVEL_COLORS["warning"])  # CASE 4
             else:
                 # No threshold exceeded for {W, E, C} and NOT `all_passed`
-                status_color_list.append(
-                    SEVERITY_LEVEL_COLORS["green"] + "66"
-                )  # CASE 5
+                status_color_list.append(SEVERITY_LEVEL_COLORS["green"] + "66")  # CASE 5
 
         # Add the `status_color` entry to the dictionary
         validation_info_dict["status_color"] = status_color_list
@@ -16606,9 +16931,7 @@ class Validate:
             csv_text = extract_nw.write_csv()
 
             # Use Base64 encoding to encode the CSV text
-            csv_text_encoded = base64.b64encode(csv_text.encode("utf-8")).decode(
-                "utf-8"
-            )
+            csv_text_encoded = base64.b64encode(csv_text.encode("utf-8")).decode("utf-8")
 
             output_file_name = f"extract_{format(step_num, '04d')}.csv"
 
@@ -16677,14 +17000,10 @@ class Validate:
         # If no interrogation performed, populate the `i` entry with a sequence of integers
         # from `1` to the number of validation steps
         if not interrogation_performed:
-            validation_info_dict["i"] = list(
-                range(1, len(validation_info_dict["type_upd"]) + 1)
-            )
+            validation_info_dict["i"] = list(range(1, len(validation_info_dict["type_upd"]) + 1))
 
         # Create a table time string
-        table_time = _create_table_time_html(
-            time_start=self.time_start, time_end=self.time_end
-        )
+        table_time = _create_table_time_html(time_start=self.time_start, time_end=self.time_end)
 
         # Create the title text
         title_text = _get_title_text(
@@ -16696,9 +17015,7 @@ class Validate:
 
         # Create the label, table type, and thresholds HTML fragments
         label_html = _create_label_html(label=self.label, start_time=self.time_start)
-        table_type_html = _create_table_type_html(
-            tbl_type=tbl_info, tbl_name=self.tbl_name
-        )
+        table_type_html = _create_table_type_html(tbl_type=tbl_info, tbl_name=self.tbl_name)
         thresholds_html = _create_thresholds_html(
             thresholds=thresholds, locale=locale, df_lib=df_lib
         )
@@ -16734,9 +17051,7 @@ class Validate:
                 locations=loc.column_labels(),
             )
             .tab_style(
-                style=style.text(
-                    size="28px", weight="bold", align=before, color="#444444"
-                ),
+                style=style.text(size="28px", weight="bold", align=before, color="#444444"),
                 locations=loc.title(),
             )
             .tab_style(
@@ -16759,15 +17074,11 @@ class Validate:
                 locations=loc.body(columns="type_upd", rows=segmented_steps),
             )
             .tab_style(
-                style=style.fill(
-                    color="#FCFCFC" if interrogation_performed else "white"
-                ),
+                style=style.fill(color="#FCFCFC" if interrogation_performed else "white"),
                 locations=loc.body(columns=["w_upd", "e_upd", "c_upd"]),
             )
             .tab_style(
-                style=style.fill(
-                    color="#FCFCFC" if interrogation_performed else "white"
-                ),
+                style=style.fill(color="#FCFCFC" if interrogation_performed else "white"),
                 locations=loc.body(columns=["tbl", "eval"]),
             )
             .tab_style(
@@ -16817,9 +17128,7 @@ class Validate:
             .tab_style(
                 style=style.fill(
                     color=(
-                        from_column(column="status_color")
-                        if interrogation_performed
-                        else "white"
+                        from_column(column="status_color") if interrogation_performed else "white"
                     )
                 ),
                 locations=loc.body(columns="status_color"),
@@ -16829,9 +17138,7 @@ class Validate:
                 locations=loc.body(columns="status_color"),
             )
             .tab_style(
-                style=style.css(
-                    "white-space: nowrap; text-overflow: ellipsis; overflow: hidden;"
-                ),
+                style=style.css("white-space: nowrap; text-overflow: ellipsis; overflow: hidden;"),
                 locations=loc.body(columns=["columns_upd", "values_upd"]),
             )
             .cols_label(
@@ -16881,14 +17188,21 @@ class Validate:
         )
 
         if incl_header:
-            gt_tbl = gt_tbl.tab_header(
-                title=html(title_text), subtitle=html(combined_subtitle)
-            )
+            gt_tbl = gt_tbl.tab_header(title=html(title_text), subtitle=html(combined_subtitle))
 
         if incl_footer:
             # Add table time as HTML source note if enabled
             if incl_footer_timings:
                 gt_tbl = gt_tbl.tab_source_note(source_note=html(table_time))
+
+            # Add governance metadata as source note if any metadata is present
+            governance_html = _create_governance_metadata_html(
+                owner=self.owner,
+                consumers=self.consumers,
+                version=self.version,
+            )
+            if governance_html:
+                gt_tbl = gt_tbl.tab_source_note(source_note=html(governance_html))
 
             # Create notes markdown from validation steps and add as separate source note if enabled
             if incl_footer_notes:
@@ -16931,9 +17245,7 @@ class Validate:
         if eval_error:
             gt_tbl = gt_tbl.tab_style(
                 style=style.fill(color="#FFC1C159"),
-                locations=loc.body(
-                    rows=[i for i, error in enumerate(eval_error) if error]
-                ),
+                locations=loc.body(rows=[i for i, error in enumerate(eval_error) if error]),
             )
             gt_tbl = gt_tbl.tab_style(
                 style=style.text(color="#B22222"),
@@ -17127,9 +17439,7 @@ class Validate:
             raise ValueError("The limit must be an integer value greater than 0.")
 
         # Convert the `validation_info` object to a dictionary
-        validation_info_dict = _validation_info_as_dict(
-            validation_info=self.validation_info
-        )
+        validation_info_dict = _validation_info_as_dict(validation_info=self.validation_info)
 
         # Obtain the language and locale
         lang = self.lang
@@ -17137,9 +17447,7 @@ class Validate:
 
         # Filter the dictionary to include only the information for the selected step
         validation_step = {
-            key: value[i - 1]
-            for key, value in validation_info_dict.items()
-            if key != "i"
+            key: value[i - 1] for key, value in validation_info_dict.items() if key != "i"
         }
 
         # From `validation_step` pull out key values for the report
@@ -17161,9 +17469,7 @@ class Validate:
                 column_list = list(self.data.columns)
                 column_position = column_list.index(column) + 1
             elif isinstance(column, list):
-                column_position = [
-                    list(self.data.columns).index(col) + 1 for col in column
-                ]
+                column_position = [list(self.data.columns).index(col) + 1 for col in column]
             else:
                 column_position = None  # pragma: no cover
         else:
@@ -17255,6 +17561,18 @@ class Validate:
                     lang=lang,
                     debug_return_df=debug_return_df,
                 )
+
+        elif is_valid_agg(assertion_type):
+            step_report = _step_report_aggregate(
+                assertion_type=assertion_type,
+                i=i,
+                column=column,
+                values=values,
+                all_passed=all_passed,
+                val_info=val_info,
+                header=header,
+                lang=lang,
+            )
 
         else:
             step_report = None  # pragma: no cover
@@ -17381,15 +17699,11 @@ class Validate:
             "critical": "critical",
         }
 
-        report = {
-            key: report_original[key]
-            for key in names_dict.keys()
-            if key in report_original
-        }
+        report = {key: report_original[key] for key in names_dict.keys() if key in report_original}
 
-        df_validation_results = pl.DataFrame(
-            data=report, schema=schema, strict=False
-        ).rename(names_dict)
+        df_validation_results = pl.DataFrame(data=report, schema=schema, strict=False).rename(
+            names_dict
+        )
 
         return df_validation_results
 
@@ -17404,9 +17718,7 @@ class Validate:
         """
 
         # Get the largest value of `i_o` in the `validation_info`
-        max_i_o = max(
-            [validation.i_o for validation in self.validation_info], default=0
-        )
+        max_i_o = max([validation.i_o for validation in self.validation_info], default=0)
 
         # Set the `i_o` attribute to the largest value of `i_o` plus 1
         validation_info.i_o = max_i_o + 1
@@ -17457,9 +17769,7 @@ class Validate:
 
                 # Evaluate the column expression
                 if isinstance(column_expr, ColumnSelectorNarwhals):
-                    columns_resolved = ColumnSelectorNarwhals(column_expr).resolve(
-                        table=table
-                    )
+                    columns_resolved = ColumnSelectorNarwhals(column_expr).resolve(table=table)
                 else:
                     columns_resolved = column_expr.resolve(columns=columns, table=table)
 
@@ -17553,9 +17863,7 @@ class Validate:
                 # If the `segments` expression is a string, that string is taken as a column name
                 # for which segmentation should occur across unique values in the column
                 if isinstance(segments_expr, str):
-                    seg_tuples = _seg_expr_from_string(
-                        data_tbl=table, segments_expr=segments_expr
-                    )
+                    seg_tuples = _seg_expr_from_string(data_tbl=table, segments_expr=segments_expr)
 
                 # If the 'segments' expression is a tuple, then normalize it to a list of tuples
                 # - ("col", "value") -> [("col", "value")]
@@ -17602,9 +17910,7 @@ class Validate:
 
         return self
 
-    def _get_validation_dict(
-        self, i: int | list[int] | None, attr: str
-    ) -> dict[int, int]:
+    def _get_validation_dict(self, i: int | list[int] | None, attr: str) -> dict[int, int]:
         """
         Utility function to get a dictionary of validation attributes for each validation step.
 
@@ -17625,10 +17931,7 @@ class Validate:
             i = [i]
 
         if i is None:
-            return {
-                validation.i: getattr(validation, attr)
-                for validation in self.validation_info
-            }
+            return {validation.i: getattr(validation, attr) for validation in self.validation_info}
 
         return {
             validation.i: getattr(validation, attr)
@@ -17658,23 +17961,13 @@ class Validate:
         # Create a summary of validation results as a dictionary
         summary = {
             "n_steps": len(self.validation_info),
-            "n_passing_steps": sum(
-                1 for step in self.validation_info if step.all_passed
-            ),
-            "n_failing_steps": sum(
-                1 for step in self.validation_info if not step.all_passed
-            ),
+            "n_passing_steps": sum(1 for step in self.validation_info if step.all_passed),
+            "n_failing_steps": sum(1 for step in self.validation_info if not step.all_passed),
             "n_warning_steps": sum(1 for step in self.validation_info if step.warning),
             "n_error_steps": sum(1 for step in self.validation_info if step.error),
-            "n_critical_steps": sum(
-                1 for step in self.validation_info if step.critical
-            ),
-            "list_passing_steps": [
-                step.i for step in self.validation_info if step.all_passed
-            ],
-            "list_failing_steps": [
-                step.i for step in self.validation_info if not step.all_passed
-            ],
+            "n_critical_steps": sum(1 for step in self.validation_info if step.critical),
+            "list_passing_steps": [step.i for step in self.validation_info if step.all_passed],
+            "list_failing_steps": [step.i for step in self.validation_info if not step.all_passed],
             "dict_n": {step.i: step.n for step in self.validation_info},
             "dict_n_passed": {step.i: step.n_passed for step in self.validation_info},
             "dict_n_failed": {step.i: step.n_failed for step in self.validation_info},
@@ -17988,9 +18281,7 @@ def _process_brief(
                 segment_value_str = ", ".join(str(v) for v in segments[0])
             else:
                 # Multiple segments: join each segment with commas, separate segments with " | "
-                segment_value_str = " | ".join(
-                    [", ".join(str(v) for v in seg) for seg in segments]
-                )
+                segment_value_str = " | ".join([", ".join(str(v) for v in seg) for seg in segments])
         else:
             # For regular lists or other types, convert to string
             if isinstance(segment_value, list):
@@ -18005,6 +18296,265 @@ def _process_brief(
         brief = brief.replace("{segment_value}", segment_value_str)
 
     return brief
+
+
+def _parse_max_age(max_age: str | datetime.timedelta) -> datetime.timedelta:
+    """
+    Parse a max_age specification into a timedelta.
+
+    Parameters
+    ----------
+    max_age
+        Either a timedelta object or a string like "24 hours", "1 day", "30 minutes",
+        or compound expressions like "2 hours 15 minutes", "1 day 6 hours", etc.
+
+    Returns
+    -------
+    datetime.timedelta
+        The parsed timedelta.
+
+    Raises
+    ------
+    ValueError
+        If the string format is invalid or the unit is not recognized.
+    """
+    if isinstance(max_age, datetime.timedelta):
+        return max_age
+
+    if not isinstance(max_age, str):
+        raise TypeError(
+            f"The `max_age` parameter must be a string or timedelta, got {type(max_age).__name__}."
+        )
+
+    # Parse string format like "24 hours", "1 day", "30 minutes", etc.
+    max_age_str = max_age.strip().lower()
+
+    # Define unit mappings (singular and plural forms)
+    unit_mappings = {
+        "second": "seconds",
+        "seconds": "seconds",
+        "sec": "seconds",
+        "secs": "seconds",
+        "s": "seconds",
+        "minute": "minutes",
+        "minutes": "minutes",
+        "min": "minutes",
+        "mins": "minutes",
+        "m": "minutes",
+        "hour": "hours",
+        "hours": "hours",
+        "hr": "hours",
+        "hrs": "hours",
+        "h": "hours",
+        "day": "days",
+        "days": "days",
+        "d": "days",
+        "week": "weeks",
+        "weeks": "weeks",
+        "wk": "weeks",
+        "wks": "weeks",
+        "w": "weeks",
+    }
+
+    import re
+
+    # Pattern to find all number+unit pairs (supports compound expressions)
+    # Matches: "2 hours 15 minutes", "1day6h", "30 min", etc.
+    compound_pattern = r"(\d+(?:\.\d+)?)\s*([a-zA-Z]+)"
+    matches = re.findall(compound_pattern, max_age_str)
+
+    if not matches:
+        raise ValueError(
+            f"Invalid max_age format: '{max_age}'. Expected format like '24 hours', "
+            f"'1 day', '30 minutes', '2 hours 15 minutes', etc."
+        )
+
+    # Accumulate timedelta from all matched components
+    total_td = datetime.timedelta()
+    valid_units = ["seconds", "minutes", "hours", "days", "weeks"]
+
+    for value_str, unit in matches:
+        value = float(value_str)
+
+        # Normalize the unit
+        unit_lower = unit.lower()
+        if unit_lower not in unit_mappings:
+            raise ValueError(
+                f"Unknown time unit '{unit}' in max_age '{max_age}'. "
+                f"Valid units are: {', '.join(valid_units)} (or their abbreviations)."
+            )
+
+        normalized_unit = unit_mappings[unit_lower]
+
+        # Add to total timedelta
+        if normalized_unit == "seconds":
+            total_td += datetime.timedelta(seconds=value)
+        elif normalized_unit == "minutes":
+            total_td += datetime.timedelta(minutes=value)
+        elif normalized_unit == "hours":
+            total_td += datetime.timedelta(hours=value)
+        elif normalized_unit == "days":
+            total_td += datetime.timedelta(days=value)
+        elif normalized_unit == "weeks":
+            total_td += datetime.timedelta(weeks=value)
+
+    return total_td
+
+
+def _parse_timezone(timezone: str) -> datetime.tzinfo:
+    """
+    Parse a timezone string into a tzinfo object.
+
+    Supports:
+    - IANA timezone names: "America/New_York", "Europe/London", "UTC"
+    - Offset strings: "-7", "+5", "-07:00", "+05:30"
+
+    Parameters
+    ----------
+    timezone
+        The timezone string to parse.
+
+    Returns
+    -------
+    datetime.tzinfo
+        The parsed timezone object.
+
+    Raises
+    ------
+    ValueError
+        If the timezone is not valid.
+    """
+    import re
+
+    # Check for offset formats: "-7", "+5", "-07:00", "+05:30", etc.
+    # Match: optional sign, 1-2 digits, optional colon and 2 more digits
+    offset_pattern = r"^([+-]?)(\d{1,2})(?::(\d{2}))?$"
+    match = re.match(offset_pattern, timezone.strip())
+
+    if match:
+        sign_str, hours_str, minutes_str = match.groups()
+        hours = int(hours_str)
+        minutes = int(minutes_str) if minutes_str else 0
+
+        # Apply sign (default positive if not specified)
+        total_minutes = hours * 60 + minutes
+        if sign_str == "-":
+            total_minutes = -total_minutes
+
+        return datetime.timezone(datetime.timedelta(minutes=total_minutes))
+
+    # Try IANA timezone names (zoneinfo is standard in Python 3.9+)
+    try:
+        return ZoneInfo(timezone)
+    except KeyError:
+        pass
+
+    raise ValueError(
+        f"Invalid timezone: '{timezone}'. Use an IANA timezone name "
+        f"(e.g., 'America/New_York', 'UTC') or an offset (e.g., '-7', '+05:30')."
+    )
+
+
+def _validate_timezone(timezone: str) -> None:
+    """
+    Validate that a timezone string is valid.
+
+    Parameters
+    ----------
+    timezone
+        The timezone string to validate.
+
+    Raises
+    ------
+    ValueError
+        If the timezone is not valid.
+    """
+    # Use _parse_timezone to validate - it will raise ValueError if invalid
+    _parse_timezone(timezone)
+
+
+def _parse_reference_time(reference_time: str) -> datetime.datetime:
+    """
+    Parse a reference time string into a datetime object.
+
+    Parameters
+    ----------
+    reference_time
+        An ISO 8601 formatted datetime string.
+
+    Returns
+    -------
+    datetime.datetime
+        The parsed datetime object.
+
+    Raises
+    ------
+    ValueError
+        If the string cannot be parsed.
+    """
+    # Try parsing with fromisoformat (handles most ISO 8601 formats)
+    try:
+        return datetime.datetime.fromisoformat(reference_time)
+    except ValueError:
+        pass
+
+    # Try parsing common formats
+    formats = [
+        "%Y-%m-%d %H:%M:%S",
+        "%Y-%m-%d %H:%M:%S%z",
+        "%Y-%m-%dT%H:%M:%S",
+        "%Y-%m-%dT%H:%M:%S%z",
+        "%Y-%m-%d",
+    ]
+
+    for fmt in formats:
+        try:
+            return datetime.datetime.strptime(reference_time, fmt)
+        except ValueError:
+            continue
+
+    raise ValueError(
+        f"Could not parse reference_time '{reference_time}'. "
+        f"Please use ISO 8601 format like '2024-01-15T10:30:00' or '2024-01-15T10:30:00+00:00'."
+    )
+
+
+def _format_timedelta(td: datetime.timedelta) -> str:
+    """
+    Format a timedelta into a human-readable string.
+
+    Parameters
+    ----------
+    td
+        The timedelta to format.
+
+    Returns
+    -------
+    str
+        A human-readable string like "24 hours", "2 days 5 hours", etc.
+    """
+    total_seconds = td.total_seconds()
+
+    if total_seconds < 60:
+        val = round(total_seconds, 1)
+        return f"{val}s"
+    elif total_seconds < 3600:
+        val = round(total_seconds / 60, 1)
+        return f"{val}m"
+    elif total_seconds < 86400:
+        val = round(total_seconds / 3600, 1)
+        return f"{val}h"
+    elif total_seconds < 604800:
+        # For days, show "xd yh" format for better readability
+        days = int(total_seconds // 86400)
+        remaining_hours = round((total_seconds % 86400) / 3600, 1)
+        if remaining_hours == 0:
+            return f"{days}d"
+        else:
+            return f"{days}d {remaining_hours}h"
+    else:
+        val = round(total_seconds / 604800)
+        return f"{val}w"
 
 
 def _transform_auto_brief(brief: str | bool | None) -> str | None:
@@ -18201,6 +18751,14 @@ def _create_autobrief_or_failure_text(
             for_failure=for_failure,
         )
 
+    if assertion_type == "data_freshness":
+        return _create_text_data_freshness(
+            lang=lang,
+            column=column,
+            value=values,
+            for_failure=for_failure,
+        )
+
     if assertion_type == "col_pct_null":
         return _create_text_col_pct_null(
             lang=lang,
@@ -18221,9 +18779,7 @@ def _create_autobrief_or_failure_text(
         return _create_text_prompt(
             lang=lang,
             prompt=(
-                values["prompt"]
-                if isinstance(values, dict) and "prompt" in values
-                else str(values)
+                values["prompt"] if isinstance(values, dict) and "prompt" in values else str(values)
             ),
             for_failure=for_failure,
         )
@@ -18320,9 +18876,7 @@ def _create_text_set(
     return text
 
 
-def _create_text_null(
-    lang: str, column: str, not_: bool = False, for_failure: bool = False
-) -> str:
+def _create_text_null(lang: str, column: str, not_: bool = False, for_failure: bool = False) -> str:
     type_ = _expect_failure_type(for_failure=for_failure)
 
     column_text = _prep_column_text(column=column)
@@ -18339,9 +18893,7 @@ def _create_text_null(
     return text
 
 
-def _create_text_regex(
-    lang: str, column: str, pattern: str, for_failure: bool = False
-) -> str:
+def _create_text_regex(lang: str, column: str, pattern: str, for_failure: bool = False) -> str:
     type_ = _expect_failure_type(for_failure=for_failure)
 
     column_text = _prep_column_text(column=column)
@@ -18378,9 +18930,7 @@ def _create_text_col_exists(lang: str, column: str, for_failure: bool = False) -
 
     column_text = _prep_column_text(column=column)
 
-    return EXPECT_FAIL_TEXT[f"col_exists_{type_}_text"][lang].format(
-        column_text=column_text
-    )
+    return EXPECT_FAIL_TEXT[f"col_exists_{type_}_text"][lang].format(column_text=column_text)
 
 
 def _create_text_col_schema_match(lang: str, for_failure: bool) -> str:
@@ -18425,28 +18975,74 @@ def _create_text_rows_complete(
     return text
 
 
-def _create_text_row_count_match(
-    lang: str, value: dict, for_failure: bool = False
-) -> str:
+def _create_text_row_count_match(lang: str, value: dict, for_failure: bool = False) -> str:
     type_ = _expect_failure_type(for_failure=for_failure)
 
     values_text = _prep_values_text(value["count"], lang=lang)
 
-    return EXPECT_FAIL_TEXT[f"row_count_match_n_{type_}_text"][lang].format(
-        values_text=values_text
-    )
+    return EXPECT_FAIL_TEXT[f"row_count_match_n_{type_}_text"][lang].format(values_text=values_text)
 
 
-def _create_text_col_count_match(
-    lang: str, value: dict, for_failure: bool = False
-) -> str:
+def _create_text_col_count_match(lang: str, value: dict, for_failure: bool = False) -> str:
     type_ = _expect_failure_type(for_failure=for_failure)
 
     values_text = _prep_values_text(value["count"], lang=lang)
 
-    return EXPECT_FAIL_TEXT[f"col_count_match_n_{type_}_text"][lang].format(
-        values_text=values_text
-    )
+    return EXPECT_FAIL_TEXT[f"col_count_match_n_{type_}_text"][lang].format(values_text=values_text)
+
+
+def _create_text_data_freshness(
+    lang: str,
+    column: str | None,
+    value: dict,
+    for_failure: bool = False,
+) -> str:
+    """Create text for data_freshness validation."""
+    type_ = _expect_failure_type(for_failure=for_failure)
+
+    column_text = _prep_column_text(column=column)
+    max_age_text = _format_timedelta(value.get("max_age"))
+
+    if for_failure:
+        age = value.get("age")
+        age_text = _format_timedelta(age) if age else "unknown"
+        return EXPECT_FAIL_TEXT[f"data_freshness_{type_}_text"][lang].format(
+            column_text=column_text,
+            max_age_text=max_age_text,
+            age_text=age_text,
+        )
+    else:
+        return EXPECT_FAIL_TEXT[f"data_freshness_{type_}_text"][lang].format(
+            column_text=column_text,
+            max_age_text=max_age_text,
+        )
+
+
+def _create_text_data_freshness(
+    lang: str,
+    column: str | None,
+    value: dict,
+    for_failure: bool = False,
+) -> str:
+    """Create text for data_freshness validation."""
+    type_ = _expect_failure_type(for_failure=for_failure)
+
+    column_text = _prep_column_text(column=column)
+    max_age_text = _format_timedelta(value.get("max_age"))
+
+    if for_failure:
+        age = value.get("age")
+        age_text = _format_timedelta(age) if age else "unknown"
+        return EXPECT_FAIL_TEXT[f"data_freshness_{type_}_text"][lang].format(
+            column_text=column_text,
+            max_age_text=max_age_text,
+            age_text=age_text,
+        )
+    else:
+        return EXPECT_FAIL_TEXT[f"data_freshness_{type_}_text"][lang].format(
+            column_text=column_text,
+            max_age_text=max_age_text,
+        )
 
 
 def _create_text_col_pct_null(
@@ -18525,9 +19121,7 @@ def _create_text_col_pct_null(
 
     # Format numbers with locale-aware formatting
     p_formatted = _format_number_safe(p_value, decimals=1, locale=fmt_locale)
-    p_original_formatted = _format_number_safe(
-        p_value_original, decimals=2, locale=fmt_locale
-    )
+    p_original_formatted = _format_number_safe(p_value_original, decimals=2, locale=fmt_locale)
 
     # Choose the appropriate translation key based on tolerance
     if not has_tolerance:
@@ -18539,16 +19133,10 @@ def _create_text_col_pct_null(
     elif is_asymmetric or isinstance(tol_value, tuple):
         # Use deviation format for tuple tolerances (including symmetric ones)
         # Format the deviation values with signs (using proper minus sign U+2212)
-        lower_dev = (
-            f"−{_format_number_safe(lower_pct_delta, decimals=1, locale=fmt_locale)}%"
-        )
-        upper_dev = (
-            f"+{_format_number_safe(upper_pct_delta, decimals=1, locale=fmt_locale)}%"
-        )
+        lower_dev = f"−{_format_number_safe(lower_pct_delta, decimals=1, locale=fmt_locale)}%"
+        upper_dev = f"+{_format_number_safe(upper_pct_delta, decimals=1, locale=fmt_locale)}%"
 
-        text = EXPECT_FAIL_TEXT[f"col_pct_null_{type_}_text_tol_deviation"][
-            lang
-        ].format(
+        text = EXPECT_FAIL_TEXT[f"col_pct_null_{type_}_text_tol_deviation"][lang].format(
             column_text=column_text,
             lower_dev=lower_dev,
             upper_dev=upper_dev,
@@ -18556,9 +19144,7 @@ def _create_text_col_pct_null(
         )
     else:
         # Single value tolerance - use the symmetric ± format
-        tol_formatted = _format_number_safe(
-            lower_pct_delta, decimals=1, locale=fmt_locale
-        )
+        tol_formatted = _format_number_safe(lower_pct_delta, decimals=1, locale=fmt_locale)
         text = EXPECT_FAIL_TEXT[f"col_pct_null_{type_}_text_tol"][lang].format(
             column_text=column_text,
             p=p_formatted,
@@ -18740,9 +19326,7 @@ def _seg_expr_from_tuple(segments_expr: tuple) -> list[tuple[str, Any]]:
             seg_tuples = [(column, segment)]
     # If the first element is not a string, raise an error
     else:  # pragma: no cover
-        raise ValueError(
-            "The first element of the segments expression must be a string."
-        )
+        raise ValueError("The first element of the segments expression must be a string.")
 
     return seg_tuples
 
@@ -18852,22 +19436,16 @@ def _apply_segments(data_tbl: Any, segments_expr: tuple[str, str]) -> Any:
                     content = segment_str[2:-2]  # pragma: no cover
 
                     # Try parsing as date first
-                    if (
-                        len(content) == 10 and content.count("-") == 2
-                    ):  # pragma: no cover
+                    if len(content) == 10 and content.count("-") == 2:  # pragma: no cover
                         try:  # pragma: no cover
-                            parsed_value = date.fromisoformat(
-                                content
-                            )  # pragma: no cover
+                            parsed_value = date.fromisoformat(content)  # pragma: no cover
                         except ValueError:  # pragma: no cover
                             pass  # pragma: no cover
 
                     # Try parsing as datetime
                     if parsed_value is None:  # pragma: no cover
                         try:  # pragma: no cover
-                            parsed_dt = datetime.fromisoformat(
-                                content.replace(" UTC", "")
-                            )
+                            parsed_dt = datetime.fromisoformat(content.replace(" UTC", ""))
                             if parsed_dt.time() == datetime.min.time():
                                 parsed_value = parsed_dt.date()
                             else:
@@ -18916,9 +19494,7 @@ def _apply_segments(data_tbl: Any, segments_expr: tuple[str, str]) -> Any:
         if segment is None:
             data_tbl = data_tbl.filter(data_tbl[column].isnull())  # pragma: no cover
         elif isinstance(segment, list):
-            data_tbl = data_tbl.filter(
-                data_tbl[column].isin(segment)
-            )  # pragma: no cover
+            data_tbl = data_tbl.filter(data_tbl[column].isin(segment))  # pragma: no cover
         else:
             data_tbl = data_tbl.filter(data_tbl[column] == segment)
 
@@ -19010,9 +19586,7 @@ def _get_title_text(
     if interrogation_performed:
         return title
 
-    no_interrogation_text = VALIDATION_REPORT_TEXT["no_interrogation_performed_text"][
-        lang
-    ]
+    no_interrogation_text = VALIDATION_REPORT_TEXT["no_interrogation_performed_text"][lang]
 
     # If no interrogation was performed, return title text indicating that
     if lang not in RTL_LANGUAGES:
@@ -19046,9 +19620,7 @@ def _get_title_text(
 
 
 def _process_title_text(title: str | None, tbl_name: str | None, lang: str) -> str:
-    default_title_text = VALIDATION_REPORT_TEXT["pointblank_validation_title_text"][
-        lang
-    ]
+    default_title_text = VALIDATION_REPORT_TEXT["pointblank_validation_title_text"][lang]
 
     if title is None:
         title_text = ""
@@ -19067,9 +19639,7 @@ def _process_title_text(title: str | None, tbl_name: str | None, lang: str) -> s
     return title_text
 
 
-def _transform_tbl_preprocessed(
-    pre: Any, seg: Any, interrogation_performed: bool
-) -> list[str]:
+def _transform_tbl_preprocessed(pre: Any, seg: Any, interrogation_performed: bool) -> list[str]:
     # If no interrogation was performed, return a list of empty strings
     if not interrogation_performed:
         return ["" for _ in range(len(pre))]
@@ -19146,14 +19716,10 @@ def _format_single_number_with_gt(
     df = df_lib.DataFrame({"value": [value]})
 
     # Create GT object and format the column
-    gt_obj = GT(df).fmt_number(
-        columns="value", n_sigfig=n_sigfig, compact=compact, locale=locale
-    )
+    gt_obj = GT(df).fmt_number(columns="value", n_sigfig=n_sigfig, compact=compact, locale=locale)
 
     # Extract the formatted value using _get_column_of_values
-    formatted_values = _get_column_of_values(
-        gt_obj, column_name="value", context="html"
-    )
+    formatted_values = _get_column_of_values(gt_obj, column_name="value", context="html")
 
     return formatted_values[0]  # Return the single formatted value
 
@@ -19182,11 +19748,7 @@ def _transform_test_units(
 
     return [
         (
-            (
-                str(test_units[i])
-                if test_units[i] < 10000
-                else _format_number_safe(test_units[i])
-            )
+            (str(test_units[i]) if test_units[i] < 10000 else _format_number_safe(test_units[i]))
             if active[i]
             else "&mdash;"
         )
@@ -19230,9 +19792,7 @@ def _format_single_float_with_gt(
     gt_obj = GT(df).fmt_number(columns="value", decimals=decimals, locale=locale)
 
     # Extract the formatted value using _get_column_of_values
-    formatted_values = _get_column_of_values(
-        gt_obj, column_name="value", context="html"
-    )
+    formatted_values = _get_column_of_values(gt_obj, column_name="value", context="html")
 
     return formatted_values[0]  # Return the single formatted value
 
@@ -19252,14 +19812,10 @@ def _transform_passed_failed(
     def _format_float_safe(value: float) -> str:
         if df_lib is not None:
             # Use GT-based formatting to avoid Pandas dependency completely
-            return _format_single_float_with_gt(
-                value, decimals=2, locale=locale, df_lib=df_lib
-            )
+            return _format_single_float_with_gt(value, decimals=2, locale=locale, df_lib=df_lib)
         else:
             # Fallback to the original behavior
-            return vals.fmt_number(value, decimals=2, locale=locale)[
-                0
-            ]  # pragma: no cover
+            return vals.fmt_number(value, decimals=2, locale=locale)[0]  # pragma: no cover
 
     passed_failed = [
         (
@@ -19286,11 +19842,7 @@ def _transform_w_e_c(values, color, interrogation_performed):
             else (
                 f'<span style="color: {color};">&#9679;</span>'
                 if value is True
-                else (
-                    f'<span style="color: {color};">&cir;</span>'
-                    if value is False
-                    else value
-                )
+                else (f'<span style="color: {color};">&cir;</span>' if value is False else value)
             )
         )
         for value in values
@@ -19337,11 +19889,7 @@ def _transform_assertion_str(
         # In some sandboxed HTML environments (e.g., Streamlit), <p> tags don't inherit
         # font-size from parent divs, so we add inline styles directly to the <p> tags
         brief_str = [
-            (
-                re.sub(r"<p>", r'<p style="font-size: inherit; margin: 0;">', x)
-                if x.strip()
-                else x
-            )
+            (re.sub(r"<p>", r'<p style="font-size: inherit; margin: 0;">', x) if x.strip() else x)
             for x in brief_str
         ]
 
@@ -19376,9 +19924,7 @@ def _transform_assertion_str(
         </div>
         {brief_div}
         """
-        for assertion, svg, size, brief_div in zip(
-            assertion_str, svg_icon, text_size, brief_divs
-        )
+        for assertion, svg, size, brief_div in zip(assertion_str, svg_icon, text_size, brief_divs)
     ]
 
     # If the `segments` list is not empty, prepend a segmentation div to the `type_upd` strings
@@ -19436,6 +19982,71 @@ def _extract_pre_argument(source: str) -> str:
     pre_arg = source[pre_start + len("pre=") : pre_end].strip()
 
     return pre_arg
+
+
+def _create_governance_metadata_html(
+    owner: str | None,
+    consumers: list[str] | None,
+    version: str | None,
+) -> str:
+    """
+    Create HTML for governance metadata display in the report footer.
+
+    Parameters
+    ----------
+    owner
+        The owner of the data being validated.
+    consumers
+        List of consumers who depend on the data.
+    version
+        The version of the validation plan.
+
+    Returns
+    -------
+    str
+        HTML string containing formatted governance metadata, or empty string if no metadata.
+    """
+    if owner is None and consumers is None and version is None:
+        return ""
+
+    metadata_parts = []
+
+    # Common style for the metadata badges (similar to timing style but slightly smaller font)
+    badge_style = (
+        "background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; "
+        "margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; "
+        "border-radius: 0; padding: 2px 10px 2px 10px; font-size: 11px;"
+    )
+    label_style = (
+        "color: #777; font-weight: bold; font-size: 9px; text-transform: uppercase; "
+        "margin-right: 3px;"
+    )
+
+    if owner is not None:
+        metadata_parts.append(
+            f"<span style='{badge_style}'><span style='{label_style}'>Owner:</span> {owner}</span>"
+        )
+
+    if consumers is not None and len(consumers) > 0:
+        consumers_str = ", ".join(consumers)
+        metadata_parts.append(
+            f"<span style='{badge_style}'>"
+            f"<span style='{label_style}'>Consumers:</span> {consumers_str}"
+            f"</span>"
+        )
+
+    if version is not None:
+        metadata_parts.append(
+            f"<span style='{badge_style}'>"
+            f"<span style='{label_style}'>Version:</span> {version}"
+            f"</span>"
+        )
+
+    return (
+        f"<div style='margin-top: 5px; margin-bottom: 5px; margin-left: 10px;'>"
+        f"{''.join(metadata_parts)}"
+        f"</div>"
+    )
 
 
 def _create_table_time_html(
@@ -19599,9 +20210,7 @@ def _format_single_integer_with_gt(value: int, locale: str = "en", df_lib=None) 
     gt_obj = GT(df).fmt_integer(columns="value", locale=locale)
 
     # Extract the formatted value using _get_column_of_values
-    formatted_values = _get_column_of_values(
-        gt_obj, column_name="value", context="html"
-    )
+    formatted_values = _get_column_of_values(gt_obj, column_name="value", context="html")
 
     return formatted_values[0]  # Return the single formatted value
 
@@ -19641,9 +20250,7 @@ def _format_single_float_with_gt_custom(
     )
 
     # Extract the formatted value using _get_column_of_values
-    formatted_values = _get_column_of_values(
-        gt_obj, column_name="value", context="html"
-    )
+    formatted_values = _get_column_of_values(gt_obj, column_name="value", context="html")
 
     return formatted_values[0]  # Return the single formatted value
 
@@ -19739,9 +20346,7 @@ def _create_thresholds_html(thresholds: Thresholds, locale: str, df_lib=None) ->
         )
         if thresholds.critical_fraction is not None
         else (
-            _format_integer_safe(
-                thresholds.critical_count, locale=locale, df_lib=df_lib
-            )
+            _format_integer_safe(thresholds.critical_count, locale=locale, df_lib=df_lib)
             if thresholds.critical_count is not None
             else "&mdash;"
         )
@@ -19787,9 +20392,7 @@ def _create_thresholds_html(thresholds: Thresholds, locale: str, df_lib=None) ->
     )
 
 
-def _create_local_threshold_note_html(
-    thresholds: Thresholds, locale: str = "en"
-) -> str:
+def _create_local_threshold_note_html(thresholds: Thresholds, locale: str = "en") -> str:
     """
     Create a miniature HTML representation of local thresholds for display in notes.
 
@@ -19810,7 +20413,7 @@ def _create_local_threshold_note_html(
         HTML string containing the formatted threshold information.
     """
     if thresholds == Thresholds():
-        return ""
+        return ""  # pragma: no cover
 
     # Get df_lib for formatting
     df_lib = None
@@ -19818,10 +20421,10 @@ def _create_local_threshold_note_html(
         import polars as pl
 
         df_lib = pl
-    elif _is_lib_present("pandas"):
-        import pandas as pd
+    elif _is_lib_present("pandas"):  # pragma: no cover
+        import pandas as pd  # pragma: no cover
 
-        df_lib = pd
+        df_lib = pd  # pragma: no cover
 
     # Helper function to format threshold values using the shared formatting functions
     def _format_threshold_value(fraction: float | None, count: int | None) -> str:
@@ -19829,12 +20432,12 @@ def _create_local_threshold_note_html(
             # Format as fraction/percentage with locale formatting
             if fraction == 0:
                 return "0"
-            elif fraction < 0.01:
+            elif fraction < 0.01:  # pragma: no cover
                 # For very small fractions, show "<0.01" with locale formatting
                 formatted = _format_number_safe(
                     0.01, decimals=2, locale=locale, df_lib=df_lib
-                )
-                return f"&lt;{formatted}"
+                )  # pragma: no cover
+                return f"&lt;{formatted}"  # pragma: no cover
             else:
                 # Use shared formatting function with drop_trailing_zeros
                 formatted = _format_number_safe(
@@ -19851,13 +20454,9 @@ def _create_local_threshold_note_html(
         else:
             return "&mdash;"
 
-    warning = _format_threshold_value(
-        thresholds.warning_fraction, thresholds.warning_count
-    )
+    warning = _format_threshold_value(thresholds.warning_fraction, thresholds.warning_count)
     error = _format_threshold_value(thresholds.error_fraction, thresholds.error_count)
-    critical = _format_threshold_value(
-        thresholds.critical_fraction, thresholds.critical_count
-    )
+    critical = _format_threshold_value(thresholds.critical_fraction, thresholds.critical_count)
 
     warning_color = SEVERITY_LEVEL_COLORS["warning"]
     error_color = SEVERITY_LEVEL_COLORS["error"]
@@ -19885,14 +20484,10 @@ def _create_local_threshold_note_html(
         )
 
     # Join with "|" separator (only between multiple thresholds)
-    thresholds_html = (
-        f'<span style="font-family: monospace;">{"|".join(threshold_parts)}</span>'
-    )
+    thresholds_html = f'<span style="font-family: monospace;">{"|".join(threshold_parts)}</span>'
 
     # Get localized text and format with threshold HTML
-    localized_text = NOTES_TEXT["local_threshold"].get(
-        locale, NOTES_TEXT["local_threshold"]["en"]
-    )
+    localized_text = NOTES_TEXT["local_threshold"].get(locale, NOTES_TEXT["local_threshold"]["en"])
     note_html = localized_text.replace("{thresholds}", thresholds_html)
 
     return note_html
@@ -19923,39 +20518,33 @@ def _create_local_threshold_note_text(thresholds: Thresholds) -> str:
         if fraction is not None:
             if fraction == 0:
                 return "0"
-            elif fraction < 0.01:
-                return "<0.01"
+            elif fraction < 0.01:  # pragma: no cover
+                return "<0.01"  # pragma: no cover
             else:
                 return f"{fraction:.2f}".rstrip("0").rstrip(".")
         elif count is not None:
             return str(count)
         else:
-            return "—"
+            return "—"  # pragma: no cover
 
     parts = []
 
     if thresholds.warning is not None:
-        warning = _format_threshold_value(
-            thresholds.warning_fraction, thresholds.warning_count
-        )
+        warning = _format_threshold_value(thresholds.warning_fraction, thresholds.warning_count)
         parts.append(f"W: {warning}")
 
     if thresholds.error is not None:
-        error = _format_threshold_value(
-            thresholds.error_fraction, thresholds.error_count
-        )
+        error = _format_threshold_value(thresholds.error_fraction, thresholds.error_count)
         parts.append(f"E: {error}")
 
     if thresholds.critical is not None:
-        critical = _format_threshold_value(
-            thresholds.critical_fraction, thresholds.critical_count
-        )
+        critical = _format_threshold_value(thresholds.critical_fraction, thresholds.critical_count)
         parts.append(f"C: {critical}")
 
     if parts:
         return "Step-specific thresholds set: " + ", ".join(parts)
     else:
-        return ""
+        return ""  # pragma: no cover
 
 
 def _create_threshold_reset_note_html(locale: str = "en") -> str:
@@ -20023,9 +20612,7 @@ def _create_no_columns_resolved_note_html(
     )
 
     # Format the column expression with monospace font
-    col_expr_html = (
-        f"<code style='font-family: \"IBM Plex Mono\", monospace;'>{column_expr}</code>"
-    )
+    col_expr_html = f"<code style='font-family: \"IBM Plex Mono\", monospace;'>{column_expr}</code>"
 
     # Build the HTML note
     html = f"{intro} {col_expr_html} {no_resolve}."
@@ -20033,9 +20620,7 @@ def _create_no_columns_resolved_note_html(
     return html
 
 
-def _create_no_columns_resolved_note_text(
-    column_expr: str, available_columns: list[str]
-) -> str:
+def _create_no_columns_resolved_note_text(column_expr: str, available_columns: list[str]) -> str:
     """
     Create a plain text note explaining that a column expression resolved to no columns.
 
@@ -20077,9 +20662,7 @@ def _create_column_not_found_note_html(
     # Get translated strings
     intro = NOTES_TEXT.get("target_column_provided", {}).get(
         locale,
-        NOTES_TEXT.get("target_column_provided", {}).get(
-            "en", "The target column provided"
-        ),
+        NOTES_TEXT.get("target_column_provided", {}).get("en", "The target column provided"),
     )
     not_found = NOTES_TEXT.get("does_not_match_any_columns", {}).get(
         locale,
@@ -20089,9 +20672,7 @@ def _create_column_not_found_note_html(
     )
 
     # Format the column name with monospace font
-    col_name_html = (
-        f"<code style='font-family: \"IBM Plex Mono\", monospace;'>{column_name}</code>"
-    )
+    col_name_html = f"<code style='font-family: \"IBM Plex Mono\", monospace;'>{column_name}</code>"
 
     # Build the HTML note
     html = f"{intro} ({col_name_html}) {not_found}."
@@ -20099,9 +20680,7 @@ def _create_column_not_found_note_html(
     return html
 
 
-def _create_column_not_found_note_text(
-    column_name: str, available_columns: list[str]
-) -> str:
+def _create_column_not_found_note_text(column_name: str, available_columns: list[str]) -> str:
     """
     Create a plain text note explaining that a specific column was not found.
 
@@ -20154,9 +20733,7 @@ def _create_comparison_column_not_found_note_html(
     )
     intro_with_for = NOTES_TEXT.get("comparison_column_for", {}).get(
         locale,
-        NOTES_TEXT.get("comparison_column_for", {}).get(
-            "en", "The comparison column provided for"
-        ),
+        NOTES_TEXT.get("comparison_column_for", {}).get("en", "The comparison column provided for"),
     )
     not_found = NOTES_TEXT.get("does_not_match_any_columns", {}).get(
         locale,
@@ -20166,14 +20743,14 @@ def _create_comparison_column_not_found_note_html(
     )
 
     # Format the column name with monospace font
-    col_name_html = (
-        f"<code style='font-family: \"IBM Plex Mono\", monospace;'>{column_name}</code>"
-    )
+    col_name_html = f"<code style='font-family: \"IBM Plex Mono\", monospace;'>{column_name}</code>"
 
     # Add position if provided (for between/outside validations)
     if position:
         # Format position parameter with monospace font (e.g., "left=", "right=")
-        position_param = f"<code style='font-family: \"IBM Plex Mono\", monospace;'>{position}=</code>"
+        position_param = (
+            f"<code style='font-family: \"IBM Plex Mono\", monospace;'>{position}=</code>"
+        )
         # Use the "for" version of the intro text
         html = f"{intro_with_for} {position_param} ({col_name_html}) {not_found}."
     else:
@@ -20254,12 +20831,8 @@ def _create_preprocessing_note_html(
     # Helper function to get singular or plural form
     def get_row_text(count: int) -> str:
         if count == 1:
-            return NOTES_TEXT.get("row", {}).get(
-                locale, NOTES_TEXT.get("row", {}).get("en", "row")
-            )
-        return NOTES_TEXT.get("rows", {}).get(
-            locale, NOTES_TEXT.get("rows", {}).get("en", "rows")
-        )
+            return NOTES_TEXT.get("row", {}).get(locale, NOTES_TEXT.get("row", {}).get("en", "row"))
+        return NOTES_TEXT.get("rows", {}).get(locale, NOTES_TEXT.get("rows", {}).get("en", "rows"))
 
     def get_col_text(count: int) -> str:
         if count == 1:
@@ -20297,9 +20870,7 @@ def _create_preprocessing_note_html(
     else:
         cols_display = f"{processed_cols} {processed_cols_text}"
 
-    processed_dim = (
-        f'<span style="font-family: monospace;">[{rows_display}, {cols_display}]</span>'
-    )
+    processed_dim = f'<span style="font-family: monospace;">[{rows_display}, {cols_display}]</span>'
 
     # Build the HTML note
     html = f"{precondition_text}: {table_dims_text} {original_dim} → {processed_dim}."
@@ -20382,9 +20953,7 @@ def _create_preprocessing_no_change_note_text() -> str:
     return "Precondition applied: no table dimension change."
 
 
-def _create_synthetic_target_column_note_html(
-    column_name: str, locale: str = "en"
-) -> str:
+def _create_synthetic_target_column_note_html(column_name: str, locale: str = "en") -> str:
     """
     Create an HTML note indicating that the target column was created via preprocessing.
 
@@ -20403,21 +20972,15 @@ def _create_synthetic_target_column_note_html(
     # Get translated strings
     synthetic_text = NOTES_TEXT.get("synthetic_target_column", {}).get(
         locale,
-        NOTES_TEXT.get("synthetic_target_column", {}).get(
-            "en", "Synthetic target column"
-        ),
+        NOTES_TEXT.get("synthetic_target_column", {}).get("en", "Synthetic target column"),
     )
     created_via_text = NOTES_TEXT.get("created_via_preprocessing", {}).get(
         locale,
-        NOTES_TEXT.get("created_via_preprocessing", {}).get(
-            "en", "created via preprocessing"
-        ),
+        NOTES_TEXT.get("created_via_preprocessing", {}).get("en", "created via preprocessing"),
     )
 
     # Format the column name with monospace font
-    col_name_html = (
-        f"<code style='font-family: \"IBM Plex Mono\", monospace;'>{column_name}</code>"
-    )
+    col_name_html = f"<code style='font-family: \"IBM Plex Mono\", monospace;'>{column_name}</code>"
 
     # Build the HTML note
     html = f"{synthetic_text} {col_name_html} {created_via_text}."
@@ -20479,9 +21042,7 @@ def _create_col_schema_match_note_html(schema_info: dict, locale: str = "en") ->
     disclosure_text = VALIDATION_REPORT_TEXT["note_schema_comparison_disclosure"].get(
         locale, VALIDATION_REPORT_TEXT["note_schema_comparison_disclosure"]["en"]
     )
-    settings_title_text = VALIDATION_REPORT_TEXT[
-        "note_schema_comparison_match_settings_title"
-    ].get(
+    settings_title_text = VALIDATION_REPORT_TEXT["note_schema_comparison_match_settings_title"].get(
         locale,
         VALIDATION_REPORT_TEXT["note_schema_comparison_match_settings_title"]["en"],
     )
@@ -20497,24 +21058,18 @@ def _create_col_schema_match_note_html(schema_info: dict, locale: str = "en") ->
         n_expect = len(expect_schema)
         n_target = len(target_schema)
         if n_expect != n_target:
-            count_mismatch_text = VALIDATION_REPORT_TEXT[
-                "note_schema_column_count_mismatch"
-            ].get(
+            count_mismatch_text = VALIDATION_REPORT_TEXT["note_schema_column_count_mismatch"].get(
                 locale,
                 VALIDATION_REPORT_TEXT["note_schema_column_count_mismatch"]["en"],
             )
-            failures.append(
-                count_mismatch_text.format(n_expect=n_expect, n_target=n_target)
-            )
+            failures.append(count_mismatch_text.format(n_expect=n_expect, n_target=n_target))
 
         # Check for unmatched columns
-        unmatched_cols = [
-            col for col, info in columns_dict.items() if not info["colname_matched"]
-        ]
+        unmatched_cols = [col for col, info in columns_dict.items() if not info["colname_matched"]]
         if unmatched_cols:
-            unmatched_text = VALIDATION_REPORT_TEXT[
-                "note_schema_unmatched_columns"
-            ].get(locale, VALIDATION_REPORT_TEXT["note_schema_unmatched_columns"]["en"])
+            unmatched_text = VALIDATION_REPORT_TEXT["note_schema_unmatched_columns"].get(
+                locale, VALIDATION_REPORT_TEXT["note_schema_unmatched_columns"]["en"]
+            )
             failures.append(unmatched_text.format(n=len(unmatched_cols)))
 
         # Check for wrong order (if in_order=True)
@@ -20525,44 +21080,36 @@ def _create_col_schema_match_note_html(schema_info: dict, locale: str = "en") ->
                 if info["colname_matched"] and not info["index_matched"]
             ]
             if wrong_order:
-                wrong_order_text = VALIDATION_REPORT_TEXT[
-                    "note_schema_wrong_order"
-                ].get(locale, VALIDATION_REPORT_TEXT["note_schema_wrong_order"]["en"])
+                wrong_order_text = VALIDATION_REPORT_TEXT["note_schema_wrong_order"].get(
+                    locale, VALIDATION_REPORT_TEXT["note_schema_wrong_order"]["en"]
+                )
                 failures.append(wrong_order_text.format(n=len(wrong_order)))
 
         # Check for dtype mismatches
         dtype_mismatches = [
             col
             for col, info in columns_dict.items()
-            if info["colname_matched"]
-            and info["dtype_present"]
-            and not info["dtype_matched"]
+            if info["colname_matched"] and info["dtype_present"] and not info["dtype_matched"]
         ]
         if dtype_mismatches:
-            dtype_mismatch_text = VALIDATION_REPORT_TEXT[
-                "note_schema_dtype_mismatch"
-            ].get(locale, VALIDATION_REPORT_TEXT["note_schema_dtype_mismatch"]["en"])
+            dtype_mismatch_text = VALIDATION_REPORT_TEXT["note_schema_dtype_mismatch"].get(
+                locale, VALIDATION_REPORT_TEXT["note_schema_dtype_mismatch"]["en"]
+            )
             failures.append(dtype_mismatch_text.format(n=len(dtype_mismatches)))
 
         if failures:
             summary = (
-                f'<span style="color:#FF3300;">✗</span> {failed_text}: '
-                + ", ".join(failures)
-                + "."
+                f'<span style="color:#FF3300;">✗</span> {failed_text}: ' + ", ".join(failures) + "."
             )
         else:
-            summary = f'<span style="color:#FF3300;">✗</span> {failed_text}.'
+            summary = f'<span style="color:#FF3300;">✗</span> {failed_text}.'  # pragma: no cover
 
     # Generate the step report table using the existing function
     # We'll call either _step_report_schema_in_order or _step_report_schema_any_order
     # depending on the in_order parameter
-    if in_order:
-        step_report_gt = _step_report_schema_in_order(
-            step=1,
-            schema_info=schema_info,
-            header=None,
-            lang=locale,
-            debug_return_df=False,
+    if in_order:  # pragma: no cover
+        step_report_gt = _step_report_schema_in_order(  # pragma: no cover
+            step=1, schema_info=schema_info, header=None, lang=locale, debug_return_df=False
         )
     else:
         step_report_gt = _step_report_schema_any_order(
@@ -20584,9 +21131,7 @@ def _create_col_schema_match_note_html(schema_info: dict, locale: str = "en") ->
     )
 
     # Remove the inner div containing column_schema_match_str
-    settings_html = re.sub(
-        r'<div style="margin-right: 5px;">.*?</div>', "", settings_html, count=1
-    )
+    settings_html = re.sub(r'<div style="margin-right: 5px;">.*?</div>', "", settings_html, count=1)
 
     # Change padding-top from 7px to 2px
     settings_html = settings_html.replace("padding-top: 7px;", "padding-top: 2px;")
@@ -20690,9 +21235,7 @@ def _step_report_row_based(
         assert inclusive is not None
         symbol_left = "&lt;" if inclusive[0] else "&le;"
         symbol_right = "&gt;" if inclusive[1] else "&ge;"
-        text = (
-            f"{column} {symbol_left} {values[0]}, {column} {symbol_right} {values[1]}"
-        )
+        text = f"{column} {symbol_left} {values[0]}, {column} {symbol_right} {values[1]}"
     elif assertion_type == "col_vals_in_set":
         elements = ", ".join(map(str, values))
         text = f"{column} &isinv; {{{elements}}}"
@@ -20701,9 +21244,7 @@ def _step_report_row_based(
         text = f"{column} &NotElement; {{{elements}}}"
     elif assertion_type == "col_vals_regex":
         pattern = values["pattern"]
-        text = STEP_REPORT_TEXT["column_matches_regex"][lang].format(
-            column=column, values=pattern
-        )
+        text = STEP_REPORT_TEXT["column_matches_regex"][lang].format(column=column, values=pattern)
     elif assertion_type == "col_vals_null":
         text = STEP_REPORT_TEXT["column_is_null"][lang].format(column=column)
     elif assertion_type == "col_vals_not_null":
@@ -20717,7 +21258,9 @@ def _step_report_row_based(
             text = STEP_REPORT_TEXT["rows_complete_subset"][lang]
 
     # Wrap assertion text in a <code> tag
-    text = f"<code style='color: #303030; font-family: monospace; font-size: smaller;'>{text}</code>"
+    text = (
+        f"<code style='color: #303030; font-family: monospace; font-size: smaller;'>{text}</code>"
+    )
 
     if all_passed:
         # Style the target column in green and add borders but only if that column is present
@@ -20754,11 +21297,7 @@ def _step_report_row_based(
         if header is None:
             return step_report
 
-        title = (
-            STEP_REPORT_TEXT["report_for_step_i"][lang].format(i=i)
-            + " "
-            + CHECK_MARK_SPAN
-        )
+        title = STEP_REPORT_TEXT["report_for_step_i"][lang].format(i=i) + " " + CHECK_MARK_SPAN
         assertion_header_text = STEP_REPORT_TEXT["assertion_header_text"][lang]
 
         # Use 'success_statement_no_column' for col_vals_expr() since it doesn't target
@@ -20856,9 +21395,9 @@ def _step_report_row_based(
 
         # Use failure_rate_summary_no_column for col_vals_expr since it doesn't target a specific column
         if assertion_type == "col_vals_expr":
-            failure_rate_stmt = STEP_REPORT_TEXT["failure_rate_summary_no_column"][
-                lang
-            ].format(failure_rate=failure_rate_metrics)
+            failure_rate_stmt = STEP_REPORT_TEXT["failure_rate_summary_no_column"][lang].format(
+                failure_rate=failure_rate_metrics
+            )
         else:
             failure_rate_stmt = STEP_REPORT_TEXT["failure_rate_summary"][lang].format(
                 failure_rate=failure_rate_metrics,
@@ -20939,9 +21478,7 @@ def _step_report_rows_distinct(
         text = STEP_REPORT_TEXT["rows_distinct_all"][lang].format(column=column)
     else:
         columns_list = ", ".join(column)
-        text = STEP_REPORT_TEXT["rows_distinct_subset"][lang].format(
-            columns_subset=columns_list
-        )
+        text = STEP_REPORT_TEXT["rows_distinct_subset"][lang].format(columns_subset=columns_list)
 
     if all_passed:
         step_report = tbl_preview
@@ -20949,11 +21486,7 @@ def _step_report_rows_distinct(
         if header is None:
             return step_report
 
-        title = (
-            STEP_REPORT_TEXT["report_for_step_i"][lang].format(i=i)
-            + " "
-            + CHECK_MARK_SPAN
-        )
+        title = STEP_REPORT_TEXT["report_for_step_i"][lang].format(i=i) + " " + CHECK_MARK_SPAN
 
         success_stmt = STEP_REPORT_TEXT["success_statement_no_column"][lang].format(
             n=n,
@@ -21005,24 +21538,22 @@ def _step_report_rows_distinct(
         title = STEP_REPORT_TEXT["report_for_step_i"][lang].format(i=i)
         failure_rate_metrics = f"<strong>{n_failed}</strong> / <strong>{n}</strong>"
 
-        failure_rate_stmt = STEP_REPORT_TEXT["failure_rate_summary_rows_distinct"][
-            lang
-        ].format(
+        failure_rate_stmt = STEP_REPORT_TEXT["failure_rate_summary_rows_distinct"][lang].format(
             failure_rate=failure_rate_metrics,
             column_position=column_position,
         )
 
         if limit < extract_length:  # pragma: no cover
             extract_length_resolved = limit
-            extract_text = STEP_REPORT_TEXT["extract_text_first_rows_distinct"][
-                lang
-            ].format(extract_length_resolved=extract_length_resolved)
+            extract_text = STEP_REPORT_TEXT["extract_text_first_rows_distinct"][lang].format(
+                extract_length_resolved=extract_length_resolved
+            )
 
         else:
             extract_length_resolved = extract_length
-            extract_text = STEP_REPORT_TEXT["extract_text_all_rows_distinct"][
-                lang
-            ].format(extract_length_resolved=extract_length_resolved)
+            extract_text = STEP_REPORT_TEXT["extract_text_all_rows_distinct"][lang].format(
+                extract_length_resolved=extract_length_resolved
+            )
 
         details = (
             f"<div style='font-size: 13.6px; {direction_rtl}'>"
@@ -21052,6 +21583,296 @@ def _step_report_rows_distinct(
 
         # Create the header with `header` string
         step_report = step_report.tab_header(title=md(header))
+
+    return step_report
+
+
+def _step_report_aggregate(
+    assertion_type: str,
+    i: int,
+    column: str,
+    values: dict,
+    all_passed: bool,
+    val_info: dict | None,
+    header: str,
+    lang: str,
+) -> GT:
+    """
+    Generate a step report for aggregate validation methods (col_sum_*, col_avg_*, col_sd_*).
+
+    This creates a 1-row table showing the computed aggregate value vs. the target value,
+    along with tolerance and pass/fail status.
+    """
+
+    # Determine whether the `lang` value represents a right-to-left language
+    is_rtl_lang = lang in RTL_LANGUAGES
+    direction_rtl = " direction: rtl;" if is_rtl_lang else ""
+
+    # Parse assertion type to get aggregate function and comparison operator
+    # Format: col_{agg}_{comp} (e.g., col_sum_eq, col_avg_gt, col_sd_le)
+    parts = assertion_type.split("_")
+    agg_type = parts[1]  # sum, avg, sd
+    comp_type = parts[2]  # eq, gt, ge, lt, le
+
+    # Map aggregate type to display name
+    agg_display = {"sum": "SUM", "avg": "AVG", "sd": "SD"}.get(agg_type, agg_type.upper())
+
+    # Map comparison type to symbol
+    comp_symbols = {
+        "eq": "=",
+        "gt": "&gt;",
+        "ge": "&ge;",
+        "lt": "&lt;",
+        "le": "&le;",
+    }
+    comp_symbol = comp_symbols.get(comp_type, comp_type)
+
+    # Get computed values from val_info (stored during interrogation)
+    if val_info is not None:
+        actual = val_info.get("actual", None)
+        target = val_info.get("target", None)
+        tol = val_info.get("tol", 0)
+        lower_bound = val_info.get("lower_bound", target)
+        upper_bound = val_info.get("upper_bound", target)
+    else:
+        # Fallback if val_info is not available
+        actual = None
+        target = values.get("value", None)
+        tol = values.get("tol", 0)
+        lower_bound = target
+        upper_bound = target
+
+    # Format column name for display (handle list vs string)
+    if isinstance(column, list):
+        column_display = column[0] if len(column) == 1 else ", ".join(column)
+    else:
+        column_display = str(column)
+
+    # Generate assertion text for header
+    if target is not None:
+        target_display = f"{target:,.6g}" if isinstance(target, float) else f"{target:,}"
+        assertion_text = f"{agg_display}({column_display}) {comp_symbol} {target_display}"
+    else:
+        assertion_text = f"{agg_display}({column_display}) {comp_symbol} ?"
+
+    # Calculate difference from boundary
+    if actual is not None and target is not None:
+        if comp_type == "eq":
+            # For equality, show distance from target (considering tolerance)
+            if lower_bound == upper_bound:
+                difference = actual - target
+            else:
+                # With tolerance, show distance from nearest bound
+                if actual < lower_bound:
+                    difference = actual - lower_bound
+                elif actual > upper_bound:
+                    difference = actual - upper_bound
+                else:
+                    difference = 0  # Within bounds
+        elif comp_type in ["gt", "ge"]:
+            # Distance from lower bound (positive if passing)
+            difference = actual - lower_bound
+        elif comp_type in ["lt", "le"]:
+            # Distance from upper bound (negative if passing)
+            difference = actual - upper_bound
+        else:
+            difference = actual - target
+    else:
+        difference = None
+
+    # Format values for display
+    def format_value(v):
+        if v is None:
+            return "&mdash;"
+        if isinstance(v, float):
+            return f"{v:,.6g}"
+        return f"{v:,}"
+
+    # Format tolerance for display
+    if tol == 0:
+        tol_display = "&mdash;"
+    elif isinstance(tol, tuple):
+        tol_display = f"(-{tol[0]}, +{tol[1]})"
+    else:
+        tol_display = f"&plusmn;{tol}"
+
+    # Format difference with sign
+    if difference is not None:
+        if difference == 0:
+            diff_display = "0"
+        elif difference > 0:
+            diff_display = (
+                f"+{difference:,.6g}" if isinstance(difference, float) else f"+{difference:,}"
+            )
+        else:
+            diff_display = (
+                f"{difference:,.6g}" if isinstance(difference, float) else f"{difference:,}"
+            )
+    else:
+        diff_display = "&mdash;"
+
+    # Create pass/fail indicator
+    if all_passed:
+        status_html = CHECK_MARK_SPAN
+        status_color = "#4CA64C"
+    else:
+        status_html = CROSS_MARK_SPAN
+        status_color = "#CF142B"
+
+    # Select DataFrame library (prefer Polars, fall back to Pandas)
+    if _is_lib_present("polars"):
+        import polars as pl
+
+        df_lib = pl
+    elif _is_lib_present("pandas"):  # pragma: no cover
+        import pandas as pd  # pragma: no cover
+
+        df_lib = pd  # pragma: no cover
+    else:  # pragma: no cover
+        raise ImportError(
+            "Neither Polars nor Pandas is available for step report generation"
+        )  # pragma: no cover
+
+    # Create the data for the 1-row table
+    report_data = df_lib.DataFrame(
+        {
+            "actual": [format_value(actual)],
+            "target": [format_value(target)],
+            "tolerance": [tol_display],
+            "difference": [diff_display],
+            "status": [status_html],
+        }
+    )
+
+    # Create GT table with styling matching preview() and other step reports
+    step_report = (
+        GT(report_data, id="pb_step_tbl")
+        .opt_table_font(font=google_font(name="IBM Plex Sans"))
+        .opt_align_table_header(align="left")
+        .cols_label(
+            actual="ACTUAL",
+            target="EXPECTED",
+            tolerance="TOL",
+            difference="DIFFERENCE",
+            status="",
+        )
+        .cols_align(align="center")
+        .fmt_markdown(columns=["actual", "target", "tolerance", "difference", "status"])
+        .tab_style(
+            style=style.text(color="black", font=google_font(name="IBM Plex Mono"), size="13px"),
+            locations=loc.body(columns=["actual", "target", "tolerance", "difference"]),
+        )
+        .tab_style(
+            style=style.text(size="13px"),
+            locations=loc.body(columns="status"),
+        )
+        .tab_style(
+            style=style.text(color="gray20", font=google_font(name="IBM Plex Mono"), size="12px"),
+            locations=loc.column_labels(),
+        )
+        .tab_style(
+            style=style.borders(
+                sides=["top", "bottom"], color="#E9E9E9", style="solid", weight="1px"
+            ),
+            locations=loc.body(),
+        )
+        .tab_options(
+            table_body_vlines_style="solid",
+            table_body_vlines_width="1px",
+            table_body_vlines_color="#E9E9E9",
+            column_labels_vlines_style="solid",
+            column_labels_vlines_width="1px",
+            column_labels_vlines_color="#F2F2F2",
+        )
+        .cols_width(
+            cases={
+                "actual": "200px",
+                "target": "200px",
+                "tolerance": "150px",
+                "difference": "200px",
+                "status": "50px",
+            }
+        )
+    )
+
+    # Apply styling based on pass/fail
+    if all_passed:
+        step_report = step_report.tab_style(
+            style=[
+                style.text(color="#006400"),
+                style.fill(color="#4CA64C33"),
+            ],
+            locations=loc.body(columns="status"),
+        )
+    else:
+        step_report = step_report.tab_style(
+            style=[
+                style.text(color="#B22222"),
+                style.fill(color="#FFC1C159"),
+            ],
+            locations=loc.body(columns="status"),
+        )
+
+    # If the version of `great_tables` is `>=0.17.0` then disable Quarto table processing
+    if version("great_tables") >= "0.17.0":
+        step_report = step_report.tab_options(quarto_disable_processing=True)
+
+    # If no header requested, return the table as-is
+    if header is None:
+        return step_report
+
+    # Create header content
+    assertion_header_text = STEP_REPORT_TEXT["assertion_header_text"][lang]
+
+    # Wrap assertion text in styled code tag
+    assertion_code = (
+        f"<code style='color: #303030; font-family: monospace; font-size: smaller;'>"
+        f"{assertion_text}</code>"
+    )
+
+    if all_passed:
+        title = STEP_REPORT_TEXT["report_for_step_i"][lang].format(i=i) + " " + CHECK_MARK_SPAN
+        result_stmt = STEP_REPORT_TEXT.get("agg_success_statement", {}).get(
+            lang,
+            f"The aggregate value for column <code>{column_display}</code> satisfies the condition.",
+        )
+        if isinstance(result_stmt, str) and "{column}" in result_stmt:
+            result_stmt = result_stmt.format(column=column_display)
+    else:
+        title = STEP_REPORT_TEXT["report_for_step_i"][lang].format(i=i) + " " + CROSS_MARK_SPAN
+        result_stmt = STEP_REPORT_TEXT.get("agg_failure_statement", {}).get(
+            lang,
+            f"The aggregate value for column <code>{column_display}</code> does not satisfy the condition.",
+        )
+        if isinstance(result_stmt, str) and "{column}" in result_stmt:
+            result_stmt = result_stmt.format(column=column_display)
+
+    details = (
+        f"<div style='font-size: 13.6px; {direction_rtl}'>"
+        "<div style='padding-top: 7px;'>"
+        f"{assertion_header_text} <span style='border-style: solid; border-width: thin; "
+        "border-color: lightblue; padding-left: 2px; padding-right: 2px;'>"
+        "<code style='color: #303030; background-color: transparent; "
+        f"position: relative; bottom: 1px;'>{assertion_code}</code></span>"
+        "</div>"
+        "<div style='padding-top: 7px;'>"
+        f"{result_stmt}"
+        "</div>"
+        "</div>"
+    )
+
+    # Generate the default template text for the header when `":default:"` is used
+    if header == ":default:":
+        header = "{title}{details}"
+
+    # Use commonmark to convert the header text to HTML
+    header = commonmark.commonmark(header)
+
+    # Place any templated text in the header
+    header = header.format(title=title, details=details)
+
+    # Create the header with `header` string
+    step_report = step_report.tab_header(title=md(header))
 
     return step_report
 
@@ -21130,22 +21951,22 @@ def _step_report_schema_in_order(
 
         # Check if this column exists in exp_columns_dict (it might not if it's a duplicate)
         # For duplicates, we need to handle them specially
-        if column_name_exp_i not in exp_columns_dict:
+        if column_name_exp_i not in exp_columns_dict:  # pragma: no cover
             # This is a duplicate or invalid column, mark it as incorrect
-            col_exp_correct.append(CROSS_MARK_SPAN)
+            col_exp_correct.append(CROSS_MARK_SPAN)  # pragma: no cover
 
             # For dtype, check if there's a dtype specified in the schema
-            if len(expect_schema[i]) > 1:
-                dtype_value = expect_schema[i][1]
-                if isinstance(dtype_value, list):
-                    dtype_exp.append(" | ".join(dtype_value))
-                else:
-                    dtype_exp.append(str(dtype_value))
-            else:
-                dtype_exp.append("&mdash;")
+            if len(expect_schema[i]) > 1:  # pragma: no cover
+                dtype_value = expect_schema[i][1]  # pragma: no cover
+                if isinstance(dtype_value, list):  # pragma: no cover
+                    dtype_exp.append(" | ".join(dtype_value))  # pragma: no cover
+                else:  # pragma: no cover
+                    dtype_exp.append(str(dtype_value))  # pragma: no cover
+            else:  # pragma: no cover
+                dtype_exp.append("&mdash;")  # pragma: no cover
 
-            dtype_exp_correct.append("&mdash;")
-            continue
+            dtype_exp_correct.append("&mdash;")  # pragma: no cover
+            continue  # pragma: no cover
 
         #
         # `col_exp_correct` values
@@ -21277,9 +22098,7 @@ def _step_report_schema_in_order(
             }
         )
         .tab_style(
-            style=style.text(
-                color="black", font=google_font(name="IBM Plex Mono"), size="13px"
-            ),
+            style=style.text(color="black", font=google_font(name="IBM Plex Mono"), size="13px"),
             locations=loc.body(
                 columns=["col_name_target", "dtype_target", "col_name_exp", "dtype_exp"]
             ),
@@ -21289,15 +22108,11 @@ def _step_report_schema_in_order(
             locations=loc.body(columns=["index_target", "index_exp"]),
         )
         .tab_style(
-            style=style.borders(
-                sides="left", color="#E5E5E5", style="double", weight="3px"
-            ),
+            style=style.borders(sides="left", color="#E5E5E5", style="double", weight="3px"),
             locations=loc.body(columns="index_exp"),
         )
         .tab_style(
-            style=style.css(
-                "white-space: nowrap; text-overflow: ellipsis; overflow: hidden;"
-            ),
+            style=style.css("white-space: nowrap; text-overflow: ellipsis; overflow: hidden;"),
             locations=loc.body(
                 columns=["col_name_target", "dtype_target", "col_name_exp", "dtype_exp"]
             ),
@@ -21373,12 +22188,9 @@ def _step_report_schema_in_order(
 
         # Add a border below the row that terminates the target table schema
         step_report = step_report.tab_style(
-            style=style.borders(
-                sides="bottom", color="#6699CC80", style="solid", weight="1px"
-            ),
+            style=style.borders(sides="bottom", color="#6699CC80", style="solid", weight="1px"),
             locations=loc.body(
-                rows=len(colnames_tgt)
-                - 1  # ty: ignore (bug in GT, should allow an int)
+                rows=len(colnames_tgt) - 1  # ty: ignore (bug in GT, should allow an int)
             ),
         )
 
@@ -21399,11 +22211,7 @@ def _step_report_schema_in_order(
     passing_symbol = CHECK_MARK_SPAN if all_passed else CROSS_MARK_SPAN
 
     # Generate the title for the step report
-    title = (
-        STEP_REPORT_TEXT["report_for_step_i"][lang].format(i=step)
-        + " "
-        + passing_symbol
-    )
+    title = STEP_REPORT_TEXT["report_for_step_i"][lang].format(i=step) + " " + passing_symbol
 
     # Generate the details for the step report
     details = _create_col_schema_match_params_html(
@@ -21625,9 +22433,7 @@ def _step_report_schema_any_order(
                 dtype_exp.append("")  # pragma: no cover
 
             elif len(exp_columns_dict[column_name_exp_i]["dtype_input"]) > 1:
-                dtype = exp_columns_dict[column_name_exp_i][
-                    "dtype_input"
-                ]  # pragma: no cover
+                dtype = exp_columns_dict[column_name_exp_i]["dtype_input"]  # pragma: no cover
 
                 if (
                     exp_columns_dict[column_name_exp_i]["dtype_matched_pos"] is not None
@@ -21664,13 +22470,9 @@ def _step_report_schema_any_order(
 
             if not exp_columns_dict[column_name_exp_i]["colname_matched"]:
                 dtype_exp_correct.append("&mdash;")
-            elif not exp_columns_dict[column_name_exp_i][
-                "dtype_present"
-            ]:  # pragma: no cover
+            elif not exp_columns_dict[column_name_exp_i]["dtype_present"]:  # pragma: no cover
                 dtype_exp_correct.append("")  # pragma: no cover
-            elif exp_columns_dict[column_name_exp_i][
-                "dtype_matched"
-            ]:  # pragma: no cover
+            elif exp_columns_dict[column_name_exp_i]["dtype_matched"]:  # pragma: no cover
                 dtype_exp_correct.append(CHECK_MARK_SPAN)  # pragma: no cover
             else:  # pragma: no cover
                 dtype_exp_correct.append(CROSS_MARK_SPAN)  # pragma: no cover
@@ -21685,9 +22487,7 @@ def _step_report_schema_any_order(
             # Generate the range and convert to strings
             index_exp = [
                 str(i + len(columns_found) - 1)
-                for i in range(
-                    last_index_int, last_index_int + len(colnames_exp_unmatched)
-                )
+                for i in range(last_index_int, last_index_int + len(colnames_exp_unmatched))
             ]
 
         else:
@@ -21752,9 +22552,7 @@ def _step_report_schema_any_order(
         )
         .cols_align(align="right", columns="index_exp")
         .tab_style(
-            style=style.text(
-                color="black", font=google_font(name="IBM Plex Mono"), size="13px"
-            ),
+            style=style.text(color="black", font=google_font(name="IBM Plex Mono"), size="13px"),
             locations=loc.body(
                 columns=["col_name_target", "dtype_target", "col_name_exp", "dtype_exp"]
             ),
@@ -21764,15 +22562,11 @@ def _step_report_schema_any_order(
             locations=loc.body(columns=["index_target", "index_exp"]),
         )
         .tab_style(
-            style=style.borders(
-                sides="left", color="#E5E5E5", style="double", weight="3px"
-            ),
+            style=style.borders(sides="left", color="#E5E5E5", style="double", weight="3px"),
             locations=loc.body(columns="index_exp"),
         )
         .tab_style(
-            style=style.css(
-                "white-space: nowrap; text-overflow: ellipsis; overflow: hidden;"
-            ),
+            style=style.css("white-space: nowrap; text-overflow: ellipsis; overflow: hidden;"),
             locations=loc.body(
                 columns=["col_name_target", "dtype_target", "col_name_exp", "dtype_exp"]
             ),
@@ -21847,11 +22641,7 @@ def _step_report_schema_any_order(
     passing_symbol = CHECK_MARK_SPAN if all_passed else CROSS_MARK_SPAN
 
     # Generate the title for the step report
-    title = (
-        STEP_REPORT_TEXT["report_for_step_i"][lang].format(i=step)
-        + " "
-        + passing_symbol
-    )
+    title = STEP_REPORT_TEXT["report_for_step_i"][lang].format(i=step) + " " + passing_symbol
 
     # Generate the details for the step report
     details = _create_col_schema_match_params_html(
@@ -21893,7 +22683,9 @@ def _create_label_text_html(
     margin_top: str = "2px",
 ) -> str:
     if strikethrough:
-        strikethrough_rules = f" text-decoration: line-through; text-decoration-color: {strikethrough_color};"
+        strikethrough_rules = (
+            f" text-decoration: line-through; text-decoration-color: {strikethrough_color};"
+        )
     else:
         strikethrough_rules = ""
 

@@ -1,0 +1,64 @@
+{
+  "first_names": {
+    "male": [
+      "Alexander", "Andreas", "Benjamin", "Christian", "Daniel", "David", "Dominik", "Eric",
+      "Fabian", "Felix", "Florian", "Gabriel", "Hans", "Jan", "Jonas", "Kevin",
+      "Lars", "Luca", "Lukas", "Marcel", "Marco", "Markus", "Martin", "Matthias",
+      "Max", "Michael", "Nicolas", "Nico", "Noah", "Oliver", "Pascal", "Patrick",
+      "Peter", "Philipp", "Rafael", "Reto", "Roman", "Samuel", "Sascha", "Sebastian",
+      "Simon", "Stefan", "Thomas", "Tim", "Tobias", "Urs", "Walter", "Werner",
+      "Adrian", "Alain", "André", "Antoine", "Bruno", "Christoph", "Claude", "Diego",
+      "Fabrice", "François", "Frédéric", "Guillaume", "Heinrich", "Jacques", "Jean", "Jérôme",
+      "Julien", "Laurent", "Louis", "Marc", "Mathieu", "Maurice", "Michel", "Olivier",
+      "Paul", "Philippe", "Pierre", "Raphaël", "René", "Roger", "Stéphane", "Thierry",
+      "Alessandro", "Antonio", "Carlo", "Claudio", "Enrico", "Francesco", "Gianluca", "Giorgio",
+      "Giovanni", "Giuseppe", "Leonardo", "Lorenzo", "Luciano", "Luigi", "Matteo", "Paolo",
+      "Pietro", "Roberto", "Salvatore", "Stefano", "Yves", "Beat", "Fritz", "Jakob",
+      "Johann", "Josef", "Karl", "Konrad", "Kurt", "Manfred", "Otto", "Rudolf"
+    ],
+    "female": [
+      "Alexandra", "Andrea", "Angela", "Anna", "Barbara", "Beatrice", "Brigitte", "Caroline",
+      "Carole", "Catherine", "Charlotte", "Christina", "Claudia", "Cornelia", "Daniela", "Diana",
+      "Elisabeth", "Emma", "Eva", "Fabienne", "Franziska", "Gabriela", "Heidi", "Irene",
+      "Isabelle", "Jana", "Jennifer", "Jessica", "Julia", "Karin", "Kathrin", "Laura",
+      "Lea", "Lena", "Lisa", "Maria", "Marianne", "Marion", "Martina", "Melanie",
+      "Michelle", "Monika", "Nadia", "Nadine", "Natalie", "Nicole", "Nina", "Olivia",
+      "Patricia", "Petra", "Regula", "Rita", "Ruth", "Sabine", "Sandra", "Sara",
+      "Sarah", "Silvia", "Simone", "Sonja", "Sophie", "Stefanie", "Susanne", "Tamara",
+      "Tanja", "Ursula", "Vanessa", "Verena", "Veronika", "Yvonne", "Alice", "Amélie",
+      "Camille", "Céline", "Chantal", "Claire", "Corinne", "Delphine", "Émilie", "Hélène",
+      "Laure", "Laurence", "Louise", "Manon", "Marie", "Marguerite", "Mathilde", "Nathalie",
+      "Pauline", "Sandrine", "Valérie", "Virginie", "Alessandra", "Alessia", "Chiara", "Elena",
+      "Eleonora", "Federica", "Francesca", "Giulia", "Lucia", "Marta", "Valentina", "Annette",
+      "Doris", "Edith", "Gertrud", "Gisela", "Helga", "Hildegard", "Ingrid", "Margrit"
+    ],
+    "neutral": [
+      "Andrea", "Dominique", "Luca", "Elia", "Noa", "Sascha", "Kim", "Robin", "Yannick"
+    ]
+  },
+  "last_names": [
+    "Müller", "Meier", "Schmid", "Keller", "Weber", "Huber", "Schneider", "Meyer",
+    "Steiner", "Fischer", "Gerber", "Brunner", "Baumann", "Frei", "Zimmermann", "Moser",
+    "Widmer", "Wyss", "Graf", "Roth", "Suter", "Bühler", "Studer", "Schwarz",
+    "Kaufmann", "Hofmann", "Hartmann", "Scherer", "Wenger", "Baumgartner", "Lüthi", "Hofer",
+    "Berger", "Kunz", "Kessler", "Maurer", "Kohler", "Herzog", "Sommer", "Vogel",
+    "Koch", "Arnold", "Hug", "Moor", "Bieri", "Fuchs", "Aebi", "Küng",
+    "Jenni", "Egger", "Blaser", "Flückiger", "Lang", "Ammann", "Wirth", "Burri",
+    "Stauffer", "Peter", "Grob", "Gross", "Bösch", "Beck", "Siegrist", "Zürcher", "Rüegg",
+    "Martin", "Dupont", "Bernard", "Favre", "Blanc", "Rochat", "Clerc", "Jaccard",
+    "Bonvin", "Bianchi", "Bernasconi", "Ferrari", "Bentivegna", "Bentivoglio", "Caroni", "Rossi",
+    "Fontana", "Lombardi", "Zanetti", "Pedroni", "Lupi", "Soldini", "Rezzonico"
+  ],
+  "name_formats": [
+    "{first_name} {last_name}",
+    "{prefix} {first_name} {last_name}",
+    "{first_name} {last_name} {suffix}",
+    "{prefix} {first_name} {last_name} {suffix}"
+  ],
+  "prefixes": {
+    "male": ["Herr", "Dr.", "Prof.", "Dr. med.", "lic. iur.", "Ing.", "M.", "Monsieur", "Sig."],
+    "female": ["Frau", "Dr.", "Prof.", "Dr. med.", "lic. iur.", "Ing.", "Mme", "Madame", "Sig.ra"],
+    "neutral": ["Dr.", "Prof.", "Dr. med.", "lic. iur.", "Ing."]
+  },
+  "suffixes": ["Jr.", "Sr.", "I", "II", "III"]
+}

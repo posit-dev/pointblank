@@ -1,0 +1,38 @@
+{
+  "first_names": {
+    "male": [
+      "Alexander", "Dmitry", "Maxim", "Sergei", "Andrei", "Alexei", "Ivan", "Mikhail", "Nikolai", "Vladimir",
+      "Pavel", "Konstantin", "Yuri", "Viktor", "Oleg", "Anton", "Igor", "Evgeny", "Artem", "Denis",
+      "Kirill", "Roman", "Ilya", "Nikita", "Vladislav", "Anatoly", "Boris", "Gennady", "Georgy", "Grigory",
+      "Leonid", "Pyotr", "Stanislav", "Timofey", "Valery", "Vasily", "Vitaly", "Vyacheslav", "Yegor", "Zakhar",
+      "Arseny", "Daniil", "Fyodor", "Gleb", "Matvey", "Semyon", "Stepan", "Taras", "Vadim", "Yaroslav",
+      "Eduard", "Mark", "Lev", "Bogdan", "Ruslan", "Timur", "Albert", "David", "Erik", "Felix"
+    ],
+    "female": [
+      "Anna", "Maria", "Elena", "Olga", "Natalia", "Tatiana", "Irina", "Svetlana", "Ekaterina", "Yulia",
+      "Anastasia", "Oksana", "Larisa", "Lyudmila", "Galina", "Nina", "Valentina", "Vera", "Nadezhda", "Tamara",
+      "Marina", "Daria", "Polina", "Sofia", "Viktoria", "Alina", "Kristina", "Yelena", "Alexandra", "Elizaveta",
+      "Kira", "Ksenia", "Lyubov", "Margarita", "Raisa", "Veronika", "Zinaida", "Alla", "Diana", "Eva",
+      "Valeria", "Angelina", "Milana", "Alisa", "Vasilisa", "Ulyana", "Arina", "Varvara", "Yevgenia", "Zlata",
+      "Alyona", "Karina", "Maya", "Nelli", "Regina", "Snezhana", "Yana", "Zhanna", "Albina", "Liliya"
+    ],
+    "neutral": ["Sasha", "Zhenya", "Valya", "Slava", "Nikita", "Artem", "Daniil", "Misha", "Vanya", "Roma"]
+  },
+  "last_names": [
+    "Ivanov", "Smirnov", "Kuznetsov", "Popov", "Vasiliev", "Petrov", "Sokolov", "Mikhailov", "Novikov", "Fedorov",
+    "Morozov", "Volkov", "Alekseev", "Lebedev", "Semenov", "Egorov", "Pavlov", "Kozlov", "Stepanov", "Nikolaev",
+    "Orlov", "Andreev", "Makarov", "Nikitin", "Zakharov", "Zaitsev", "Soloviev", "Borisov", "Yakovlev", "Grigoryev",
+    "Romanov", "Vorobyov", "Sergeev", "Kuzmin", "Frolov", "Alexandrov", "Dmitriev", "Korolev", "Gusev", "Kiselev",
+    "Ilyin", "Maksimov", "Polyakov", "Sorokin", "Vinogradov", "Kovalev", "Belov", "Medvedev", "Antonov", "Tarasov",
+    "Zhukov", "Baranov", "Filippov", "Komarov", "Davydov", "Belyaev", "Gerasimov", "Bogdanov", "Osipov", "Sidorov"
+  ],
+  "name_formats": [
+    "{first_name} {last_name}"
+  ],
+  "prefixes": {
+    "male": ["Gospodin", "G-n", "Dr.", "Prof."],
+    "female": ["Gospozha", "G-zha", "Dr.", "Prof."],
+    "neutral": ["Dr.", "Prof."]
+  },
+  "suffixes": ["PhD", "Dr.", "Jr.", "Sr."]
+}

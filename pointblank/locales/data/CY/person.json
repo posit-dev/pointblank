@@ -1,0 +1,38 @@
+{
+  "first_names": {
+    "male": [
+      "Andreas", "Giorgos", "Nikos", "Costas", "Michalis", "Christos", "Panayiotis", "Stelios", "Yiannis", "Marios",
+      "Antonis", "Savvas", "Charalambos", "Demetris", "Kyriacos", "Alexandros", "Petros", "Loizos", "Marcos", "Neophytos",
+      "Stavros", "Theodoros", "Pavlos", "Vasilis", "Lefteris", "Angelos", "Spyros", "Makis", "Lakis", "Phivos",
+      "Nearchos", "Evagoras", "Chrysostomos", "Polyvios", "Adamos", "Lambros", "Sofronis", "Miltiades", "Zenon", "Glafkos",
+      "Iacovos", "Cleanthis", "Orestis", "Tasos", "Charis", "Sotiris", "Filippos", "Gregoris", "Aristos", "Dinos",
+      "Renos", "Paris", "Achilleas", "Theofilos", "Leontios", "Avgoustinos", "Kyriakos", "Nektarios", "Nikiforos", "Symeon"
+    ],
+    "female": [
+      "Maria", "Eleni", "Anna", "Christina", "Georgia", "Androulla", "Despina", "Ioanna", "Sophia", "Katerina",
+      "Anthoulla", "Panayiota", "Maroulla", "Niki", "Stella", "Athena", "Irene", "Loukia", "Chryso", "Eftychia",
+      "Anastasia", "Vasiliki", "Dimitra", "Kyriaki", "Theodora", "Stavroulla", "Angeliki", "Evdokia", "Photini", "Eleftheria",
+      "Androniki", "Chrystalla", "Xenia", "Paraskevi", "Polyxeni", "Calliope", "Demetra", "Ariadne", "Melina", "Panagiota",
+      "Sotiroulla", "Evanthia", "Charoulla", "Myria", "Erato", "Nitsa", "Frosso", "Lella", "Roulla", "Toulla",
+      "Marina", "Natalia", "Alexandra", "Elena", "Lia", "Kika", "Rena", "Flora", "Chloe", "Zoe"
+    ],
+    "neutral": ["Andrea", "Niki", "Charis", "Paris", "Alexis", "Christodoulos", "Alex", "Chris", "Sasha", "Nikki"]
+  },
+  "last_names": [
+    "Papadopoulos", "Georgiou", "Christodoulou", "Ioannou", "Constantinou", "Nicolaou", "Charalambous", "Antoniou", "Michaelidis", "Kyriacou",
+    "Petrou", "Loizou", "Demetriou", "Andreou", "Panayiotou", "Savvides", "Stylianou", "Philippou", "Hadjipetrou", "Mavros",
+    "Papanicolaou", "Vassiliou", "Economides", "Panayi", "Theodoulou", "Stavrou", "Markides", "Alexandrou", "Soteriou", "Evangelou",
+    "Constantinides", "Chrysostomou", "Lambrou", "Charitou", "Pavlou", "Anastasiou", "Komodromos", "Efstathiou", "Gregoriou", "Yiangou",
+    "Polycarpou", "Hadjigeorgiou", "Koutsoftas", "Ttofis", "Shiakallis", "Kkolas", "Pitsillides", "Kourris", "Paphitis", "Kleanthous",
+    "Odysseos", "Zenios", "Kypri", "Christofi", "Neophytou", "Kyprianou", "Makrides", "Leonidou", "Mavrommatis", "Papacostas"
+  ],
+  "name_formats": [
+    "{first_name} {last_name}"
+  ],
+  "prefixes": {
+    "male": ["Mr.", "Dr.", "Prof.", "Eng."],
+    "female": ["Mrs.", "Ms.", "Dr.", "Prof.", "Eng."],
+    "neutral": ["Dr.", "Prof.", "Eng."]
+  },
+  "suffixes": ["PhD", "MBA", "MSc", "BSc"]
+}

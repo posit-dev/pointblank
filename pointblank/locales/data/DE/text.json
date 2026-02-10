@@ -1,0 +1,50 @@
+{
+  "words": [
+    "der", "die", "das", "und", "ist", "in", "zu", "den", "von", "mit",
+    "auf", "für", "nicht", "sich", "ein", "eine", "als", "auch", "es", "an",
+    "werden", "aus", "er", "hat", "dass", "sie", "nach", "bei", "um", "noch",
+    "wie", "über", "so", "nur", "oder", "aber", "vor", "zur", "bis", "mehr",
+    "durch", "man", "sein", "wurde", "seinen", "diesem", "dieser", "schon", "wenn", "können",
+    "heute", "morgen", "gestern", "immer", "nie", "oft", "manchmal", "vielleicht",
+    "Haus", "Stadt", "Land", "Mensch", "Zeit", "Jahr", "Tag", "Welt", "Leben", "Arbeit",
+    "Geld", "Kind", "Frau", "Mann", "Hand", "Kopf", "Auge", "Wort", "Bild", "Frage",
+    "gut", "neu", "groß", "klein", "alt", "jung", "lang", "kurz", "hoch", "tief",
+    "schnell", "langsam", "stark", "schwach", "reich", "arm", "schön", "hässlich", "hell", "dunkel",
+    "gehen", "kommen", "sehen", "machen", "wissen", "sagen", "geben", "nehmen", "finden", "denken",
+    "stehen", "lassen", "bleiben", "heißen", "bringen", "sprechen", "halten", "führen", "liegen", "zeigen"
+  ],
+  "sentence_patterns": [
+    "Der {adjective} {noun} {verb} den {adjective} {noun}.",
+    "Ein {noun} {verb} {adverb} im {noun}.",
+    "{proper_noun} {verb} den {adjective} {noun} {adverb}."
+  ],
+  "adjectives": [
+    "schnell", "braun", "faul", "langsam", "groß", "klein", "alt", "neu", "jung",
+    "hell", "dunkel", "laut", "leise", "heiß", "kalt", "warm", "kühl", "weich", "hart",
+    "glatt", "rau", "sauber", "schmutzig", "glücklich", "traurig", "wütend", "ruhig", "mutig",
+    "schüchtern", "klug", "dumm", "freundlich", "gemein", "reich", "arm", "stark", "schwach",
+    "groß", "klein", "breit", "schmal", "tief", "flach", "dick", "dünn", "schwer",
+    "leicht", "voll", "leer", "offen", "geschlossen", "nass", "trocken", "frisch", "alt"
+  ],
+  "nouns": [
+    "Hund", "Katze", "Vogel", "Fisch", "Baum", "Haus", "Auto", "Buch", "Tisch", "Stuhl",
+    "Tür", "Fenster", "Straße", "Fluss", "Berg", "Meer", "Himmel", "Sonne", "Mond",
+    "Stern", "Wolke", "Regen", "Schnee", "Wind", "Feuer", "Wasser", "Erde", "Luft",
+    "Stein", "Holz", "Metall", "Glas", "Papier", "Stoff", "Essen", "Trinken", "Geld",
+    "Zeit", "Ort", "Person", "Kind", "Mann", "Frau", "Junge", "Mädchen", "Freund",
+    "Familie", "Schule", "Arbeit", "Stadt", "Land", "Welt", "Leben", "Tag", "Nacht",
+    "Morgen", "Abend", "Woche", "Monat", "Jahr", "Geschichte", "Lied", "Spiel", "Sport"
+  ],
+  "verbs": [
+    "läuft", "springt", "geht", "spricht", "sieht", "hört", "fühlt", "denkt", "weiß",
+    "will", "braucht", "mag", "liebt", "hasst", "findet", "gibt", "nimmt", "macht",
+    "sagt", "erzählt", "fragt", "antwortet", "hilft", "arbeitet", "spielt", "liest", "schreibt",
+    "zeichnet", "singt", "tanzt", "kocht", "isst", "trinkt", "schläft", "wacht", "öffnet",
+    "schließt", "beginnt", "beendet", "fängt", "hört", "bewegt", "bleibt", "kommt", "geht"
+  ],
+  "adverbs": [
+    "schnell", "langsam", "vorsichtig", "glücklich", "traurig", "laut", "leise",
+    "leicht", "kaum", "immer", "nie", "oft", "manchmal", "gewöhnlich",
+    "wirklich", "sehr", "ziemlich", "fast", "schon", "noch", "gerade", "nur"
+  ]
+}

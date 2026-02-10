@@ -1,0 +1,38 @@
+{
+  "first_names": {
+    "male": [
+      "Juan", "Carlos", "Luis", "José", "Andrés", "Jorge", "David", "Daniel", "Miguel", "Santiago",
+      "Sebastián", "Alejandro", "Felipe", "Camilo", "Diego", "Nicolás", "Julián", "Sergio", "Fernando", "Ricardo",
+      "Mauricio", "Oscar", "Fabián", "Iván", "Pablo", "Javier", "Álvaro", "César", "Eduardo", "Gustavo",
+      "Héctor", "Jaime", "Leonardo", "Manuel", "Mario", "Pedro", "Rafael", "Roberto", "Rodrigo", "Víctor",
+      "Adrián", "Alberto", "Alfonso", "Arturo", "Bernardo", "Cristian", "Enrique", "Ernesto", "Francisco", "Gabriel",
+      "Germán", "Guillermo", "Hernán", "Hugo", "Ignacio", "Jesús", "Joaquín", "Martín", "Mateo", "Tomás"
+    ],
+    "female": [
+      "María", "Ana", "Luz", "Diana", "Paola", "Andrea", "Carolina", "Sandra", "Claudia", "Patricia",
+      "Mónica", "Laura", "Adriana", "Natalia", "Marcela", "Catalina", "Paula", "Juliana", "Valentina", "Daniela",
+      "Camila", "Sofía", "Isabella", "Mariana", "Alejandra", "Angélica", "Beatriz", "Carmen", "Cecilia", "Clara",
+      "Cristina", "Elena", "Esperanza", "Gabriela", "Gloria", "Inés", "Isabel", "Johana", "Liliana", "Lorena",
+      "Lucía", "Luisa", "Martha", "Mercedes", "Milena", "Nelly", "Olga", "Rosa", "Silvia", "Teresa",
+      "Vanessa", "Verónica", "Victoria", "Viviana", "Ximena", "Yolanda", "Zoraida", "Yuliana", "Leidy", "Karen"
+    ],
+    "neutral": ["Alex", "Ariel", "Andrea", "René", "Guadalupe", "Jesús", "Cruz", "Dominique", "Noel", "Ángel"]
+  },
+  "last_names": [
+    "García", "Rodríguez", "Martínez", "López", "González", "Hernández", "Sánchez", "Ramírez", "Torres", "Flores",
+    "Rivera", "Gómez", "Díaz", "Reyes", "Morales", "Jiménez", "Ruiz", "Álvarez", "Romero", "Vargas",
+    "Castro", "Ortiz", "Rubio", "Marín", "Muñoz", "Moreno", "Rojas", "Gutiérrez", "Cardona", "Valencia",
+    "Mejía", "Ospina", "Arias", "Giraldo", "Pérez", "Herrera", "Salazar", "Duque", "Agudelo", "Castaño",
+    "Londoño", "Zuluaga", "Jaramillo", "Cárdenas", "Ochoa", "Correa", "Parra", "Ramos", "Vásquez", "Medina",
+    "Zapata", "Montoya", "Uribe", "Sierra", "Arango", "Quintero", "Bedoya", "Posada", "Restrepo", "Echeverri"
+  ],
+  "name_formats": [
+    "{first_name} {last_name}"
+  ],
+  "prefixes": {
+    "male": ["Sr.", "Don", "Dr.", "Lic.", "Ing.", "Prof."],
+    "female": ["Sra.", "Srta.", "Doña", "Dra.", "Lic.", "Ing.", "Prof."],
+    "neutral": ["Dr.", "Lic.", "Ing.", "Prof."]
+  },
+  "suffixes": ["Jr.", "PhD", "MBA"]
+}

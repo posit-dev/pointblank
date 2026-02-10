@@ -1,0 +1,39 @@
+{
+  "first_names": {
+    "male": [
+      "Juan", "Carlos", "Jorge", "Luis", "José", "Miguel", "Daniel", "Pablo", "Martín", "Alejandro",
+      "Fernando", "Ricardo", "Eduardo", "Sergio", "Diego", "Andrés", "Marcelo", "Gustavo", "Roberto", "Raúl",
+      "Nicolás", "Matías", "Lucas", "Facundo", "Tomás", "Agustín", "Sebastián", "Leandro", "Maximiliano", "Franco",
+      "Gonzalo", "Ignacio", "Federico", "Santiago", "Joaquín", "Ezequiel", "Rodrigo", "Hernán", "Mauricio", "Cristian",
+      "Gabriel", "Javier", "Oscar", "Ramón", "Alberto", "Víctor", "Julio", "César", "Rubén", "Mario",
+      "Emiliano", "Lautaro", "Thiago", "Benjamín", "Valentín", "Bruno", "Axel", "Kevin", "Brian", "Iván"
+    ],
+    "female": [
+      "María", "Ana", "Laura", "Claudia", "Silvia", "Patricia", "Graciela", "Mónica", "Adriana", "Marta",
+      "Gabriela", "Verónica", "Mariana", "Carolina", "Florencia", "Luciana", "Romina", "Valeria", "Daniela", "Vanesa",
+      "Julieta", "Camila", "Sofía", "Martina", "Micaela", "Agustina", "Victoria", "Lucía", "Paula", "Natalia",
+      "Mercedes", "Susana", "Rosa", "Elena", "Teresa", "Carmen", "Alicia", "Beatriz", "Norma", "Liliana",
+      "Soledad", "Celeste", "Milagros", "Rocío", "Belén", "Candela", "Antonella", "Aldana", "Brenda", "Yamila",
+      "Macarena", "Gisela", "Andrea", "Sandra", "Viviana", "Cecilia", "Alejandra", "Silvana", "Lorena", "Paola"
+    ],
+    "neutral": ["Alex", "Ariel", "Andrea", "René", "Guadalupe", "Jesús", "Cruz", "Dominique", "Noel", "Ángel"]
+  },
+  "last_names": [
+    "González", "Rodríguez", "Gómez", "Fernández", "López", "Díaz", "Martínez", "Pérez", "García", "Sánchez",
+    "Romero", "Sosa", "Álvarez", "Torres", "Ruiz", "Ramírez", "Flores", "Acosta", "Benítez", "Medina",
+    "Suárez", "Herrera", "Aguirre", "Pereyra", "Gutiérrez", "Giménez", "Molina", "Silva", "Castro", "Rojas",
+    "Ortiz", "Moreno", "Núñez", "Iglesias", "Domínguez", "Méndez", "Vargas", "Cabrera", "Ríos", "Peralta",
+    "Luna", "Vega", "Córdoba", "Figueroa", "Contreras", "Ledesma", "Muñoz", "Ojeda", "Ponce", "Quiroga",
+    "Ramos", "Navarro", "Campos", "Vera", "Vidal", "Godoy", "Bravo", "Espinoza", "Páez", "Carrizo",
+    "Bustos", "Lucero", "Miranda", "Duarte", "Arias", "Villalba", "Cardozo", "Mansilla", "Ibáñez", "Cáceres"
+  ],
+  "name_formats": [
+    "{first_name} {last_name}"
+  ],
+  "prefixes": {
+    "male": ["Sr.", "Don", "Dr.", "Lic.", "Ing.", "Prof."],
+    "female": ["Sra.", "Srta.", "Doña", "Dra.", "Lic.", "Ing.", "Prof."],
+    "neutral": ["Dr.", "Lic.", "Ing.", "Prof."]
+  },
+  "suffixes": ["Jr.", "PhD", "MBA"]
+}

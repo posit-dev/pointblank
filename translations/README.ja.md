@@ -302,6 +302,41 @@ pb run validation.yaml --exit-code
 pb run validation.py --exit-code
 ```
 
+## リアルなテストデータの生成
+
+バリデーションワークフロー用のテストデータが必要ですか？`generate_dataset()` 関数は、スキーマ定義に基づいてリアルでロケール対応の合成データを作成します。本番データなしでパイプラインを開発したり、再現可能なシナリオで CI/CD テストを実行したり、本番データが利用可能になる前にワークフローのプロトタイプを作成するのにとても便利です。
+
+```python
+import pointblank as pb
+
+# フィールド制約付きのスキーマを定義
+schema = pb.Schema(
+    user_id=pb.int_field(min_val=1, unique=True),
+    name=pb.string_field(preset="name"),
+    email=pb.string_field(preset="email"),
+    age=pb.int_field(min_val=18, max_val=100),
+    status=pb.string_field(allowed=["active", "pending", "inactive"]),
+)
+
+# 100行のリアルなテストデータを生成
+data = pb.generate_dataset(schema, n=100, seed=23)
+```
+
+| user_id             | name             | email                       | age | status   |
+|---------------------|------------------|-----------------------------|-----|----------|
+| 7188536481533917197 | Vivienne Rios    | vrios27@hotmail.com         | 55  | pending  |
+| 2674009078779859984 | William Schaefer | wschaefer28@yandex.com      | 28  | active   |
+| 7652102777077138151 | Lily Hansen      | lily779@aol.com             | 20  | active   |
+| 157503859921753049  | Shirley Mays     | shirley_mays@protonmail.com | 93  | inactive |
+| 2829213282471975080 | Sean Dawson      | sean_dawson@hotmail.com     | 57  | pending  |
+
+ジェネレーターは以下の機能で高度なデータ生成をサポートしています：
+
+- **プリセットによるリアルなデータ**: `"name"`、`"email"`、`"address"`、`"phone"` などの組み込みプリセットを使用
+- **50カ国以上のサポート**: ロケール固有のデータを生成（例：`country="DE"` でドイツの住所）
+- **フィールド制約**: 範囲、パターン、一意性、許可値を制御
+- **複数の出力形式**: デフォルトで Polars DataFrame を返しますが、Pandas（`output="pandas"`）や辞書（`output="dict"`）もサポート
+
 ## Pointblank を際立たせる特徴
 
 - **完全な検証ワークフロー**: データアクセスから検証、レポート作成まで単一のパイプラインで

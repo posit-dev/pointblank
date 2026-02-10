@@ -10,6 +10,11 @@ format:
     include-in-header:
       - text: |
           <script src="https://cdn.jsdelivr.net/gh/posit-dev/supported-by-posit/js/badge.min.js"></script>
+          <script async src="https://plausible.io/js/pa-71QkMiRx8iHcMxnqr8Iw5.js"></script>
+          <script>
+            window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};
+            plausible.init()
+          </script>
     theme: flatly
     css:
       - styles.css
@@ -103,6 +108,9 @@ website:
             - user-guide/preview.qmd
             - user-guide/col-summary-tbl.qmd
             - user-guide/missing-vals-tbl.qmd
+        - section: "Test Data Generation"
+          contents:
+            - user-guide/test-data-generation.qmd
         - section: "The Pointblank CLI"
           contents:
             - user-guide/cli-data-inspection.qmd
@@ -189,6 +197,7 @@ quartodoc:
         - name: Validate.rows_complete
         - name: Validate.col_exists
         - name: Validate.col_pct_null
+        - name: Validate.data_freshness
         - name: Validate.col_schema_match
         - name: Validate.row_count_match
         - name: Validate.col_count_match
@@ -291,6 +300,21 @@ quartodoc:
         - name: write_file
         - name: read_file
         - name: config
+    - title: Test Data Generation
+      desc: >
+        Generate synthetic test data based on schema definitions. Use `generate_dataset()` to
+        create data from a `Schema` object. The helper functions define typed fields with
+        constraints for realistic test data generation.
+      contents:
+        - name: generate_dataset
+        - name: int_field
+        - name: float_field
+        - name: string_field
+        - name: bool_field
+        - name: date_field
+        - name: datetime_field
+        - name: time_field
+        - name: duration_field
     - title: Prebuilt Actions
       desc: >
         The *Prebuilt Actions* group contains a function that can be used to send a Slack
