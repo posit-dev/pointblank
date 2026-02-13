@@ -192,6 +192,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
   <ul>
   <li><a href="#parameters" id="toc-parameters" class="nav-link active" data-scroll-target="#parameters">Parameters</a></li>
   <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
+  <li><a href="#raises" id="toc-raises" class="nav-link" data-scroll-target="#raises">Raises</a></li>
   <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
   </ul>
 </nav>
@@ -217,7 +218,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 
 </header>
 
-<p style="font-size: 1rem; font-style: italic; margin-top: -10px; line-height: 1;">Create a duration column specification.</p>
+<p style="font-size: 1rem; font-style: italic; margin-top: -10px; line-height: 1;">Create a duration column specification for use in a schema.</p>
 
 
 
@@ -230,16 +231,18 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    unique<span class="op">=</span><span class="va">False</span>,</span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    generator<span class="op">=</span><span class="va">None</span>,</span>
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The <a href="../reference/duration_field.html#pointblank.duration_field" title="0"><code>duration_field()</code></a> function defines the constraints and behavior for a duration (timedelta) column when generating synthetic data with <a href="../reference/generate_dataset.html#pointblank.generate_dataset" title="0"><code>generate_dataset()</code></a>. You can control the duration range with <code>min_duration=</code> and <code>max_duration=</code>, enforce uniqueness with <code>unique=True</code>, and introduce null values with <code>nullable=True</code> and <code>null_probability=</code>.</p>
+<p>Duration values are generated uniformly (at second-level resolution) within the specified range. If no range is provided, the default range is 0 seconds to 30 days. Both <code>min_duration=</code> and <code>max_duration=</code> accept <code>datetime.timedelta</code> objects or colon-separated strings in <code>"HH:MM:SS"</code> or <code>"MM:SS"</code> format.</p>
 <section id="parameters" class="level2 doc-section doc-section-parameters">
 <h3 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters">Parameters</h3>
 <dl style="border-style: solid; border-width: 2px; border-color: #00AC1480; padding: 1rem; padding-bottom: 0.25rem;">
 <dt><code><span class="parameter-name"><strong>min_duration</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><code>str</code> | <code>timedelta</code> | None</span> <span class="parameter-default-sep">=</span> <span class="parameter-default">None</span></code></dt>
 <dd>
-<p>Minimum duration (inclusive). Can be string or <code>timedelta</code> object.</p>
+<p>Minimum duration (inclusive). Can be a <code>"HH:MM:SS"</code> or <code>"MM:SS"</code> string, or a <code>datetime.timedelta</code> object. Default is <code>None</code> (defaults to 0 seconds).</p>
 </dd>
 <dt><code><span class="parameter-name"><strong>max_duration</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><code>str</code> | <code>timedelta</code> | None</span> <span class="parameter-default-sep">=</span> <span class="parameter-default">None</span></code></dt>
 <dd>
-<p>Maximum duration (inclusive). Can be string or <code>timedelta</code> object.</p>
+<p>Maximum duration (inclusive). Can be a <code>"HH:MM:SS"</code> or <code>"MM:SS"</code> string, or a <code>datetime.timedelta</code> object. Default is <code>None</code> (defaults to 30 days).</p>
 </dd>
 <dt><code><span class="parameter-name"><strong>nullable</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><code>bool</code></span> <span class="parameter-default-sep">=</span> <span class="parameter-default">False</span></code></dt>
 <dd>
@@ -247,15 +250,15 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </dd>
 <dt><code><span class="parameter-name"><strong>null_probability</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><code>float</code></span> <span class="parameter-default-sep">=</span> <span class="parameter-default">0.0</span></code></dt>
 <dd>
-<p>Probability of generating null when <code>nullable=True</code>. Default is <code>0.0</code>.</p>
+<p>Probability of generating a null value for each row when <code>nullable=True</code>. Must be between <code>0.0</code> and <code>1.0</code>. Default is <code>0.0</code>.</p>
 </dd>
 <dt><code><span class="parameter-name"><strong>unique</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><code>bool</code></span> <span class="parameter-default-sep">=</span> <span class="parameter-default">False</span></code></dt>
 <dd>
-<p>Whether all values must be unique. Default is <code>False</code>.</p>
+<p>Whether all values must be unique. Default is <code>False</code>. With second-level resolution within a duration range, uniqueness is feasible for moderate dataset sizes.</p>
 </dd>
 <dt><code><span class="parameter-name"><strong>generator</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><code>Callable</code>[[], <code>Any</code>] | None</span> <span class="parameter-default-sep">=</span> <span class="parameter-default">None</span></code></dt>
 <dd>
-<p>Custom callable that generates values. Overrides other settings.</p>
+<p>Custom callable that generates values. When provided, this overrides all other constraints. The callable should take no arguments and return a single <code>datetime.timedelta</code> value.</p>
 </dd>
 </dl>
 </section>
@@ -264,7 +267,16 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <dl style="border-style: solid; border-width: 2px; border-color: #0059AC80; padding: 1rem; padding-bottom: 0.25rem;">
 <dt><code><span class="parameter-name"></span> <span class="parameter-annotation-sep" style="margin-left: -8px;"></span> <span class="parameter-annotation"><code>DurationField</code></span></code></dt>
 <dd>
-<p>A duration field specification.</p>
+<p>A duration field specification that can be passed to <a href="../reference/Schema.html#pointblank.Schema" title="0"><code>Schema()</code></a>.</p>
+</dd>
+</dl>
+</section>
+<section id="raises" class="level2 doc-section doc-section-raises">
+<h3 class="doc-section doc-section-raises anchored" data-anchor-id="raises">Raises</h3>
+<dl>
+<dt><code><span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><code>ValueError</code></span></code></dt>
+<dd>
+<p>If <code>min_duration</code> is greater than <code>max_duration</code>, or if a duration string cannot be parsed.</p>
 </dd>
 </dl>
 </section>
@@ -288,25 +300,23 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
         margin: 10px 0;
         border-radius: 2px;
     ">
-<p>Define a schema with duration fields and generate test data:</p>
-<div id="3935d294" class="cell" data-execution_count="1">
+<p>The <code>min_duration=</code> and <code>max_duration=</code> parameters accept <code>timedelta</code> objects for defining duration ranges:</p>
+<div id="760be62a" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> datetime <span class="im">import</span> timedelta</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Define a schema with duration field specifications</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    session_length<span class="op">=</span>pb.duration_field(</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>        min_duration<span class="op">=</span>timedelta(minutes<span class="op">=</span><span class="dv">5</span>),</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>        max_duration<span class="op">=</span>timedelta(hours<span class="op">=</span><span class="dv">2</span>)</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    ),</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    wait_time<span class="op">=</span>pb.duration_field(</span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>        min_duration<span class="op">=</span>timedelta(seconds<span class="op">=</span><span class="dv">30</span>),</span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>        max_duration<span class="op">=</span>timedelta(minutes<span class="op">=</span><span class="dv">15</span>)</span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    ),</span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate 100 rows of test data</span></span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>pb.generate_dataset(schema, n<span class="op">=</span><span class="dv">100</span>, seed<span class="op">=</span><span class="dv">23</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    session_length<span class="op">=</span>pb.duration_field(</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>        min_duration<span class="op">=</span>timedelta(minutes<span class="op">=</span><span class="dv">5</span>),</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>        max_duration<span class="op">=</span>timedelta(hours<span class="op">=</span><span class="dv">2</span>),</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    wait_time<span class="op">=</span>pb.duration_field(</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>        min_duration<span class="op">=</span>timedelta(seconds<span class="op">=</span><span class="dv">30</span>),</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>        max_duration<span class="op">=</span>timedelta(minutes<span class="op">=</span><span class="dv">15</span>),</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>pb.generate_dataset(schema, n<span class="op">=</span><span class="dv">100</span>, seed<span class="op">=</span><span class="dv">23</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div><style>
 .dataframe > thead > tr,
@@ -318,7 +328,52 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <small>shape: (100, 2)</small><table class="dataframe table table-sm table-striped small"><thead><tr><th>session_length</th><th>wait_time</th></tr><tr><td>duration[μs]</td><td>duration[μs]</td></tr></thead><tbody><tr><td>1h 51m 24s</td><td>13m 48s</td></tr><tr><td>44m 34s</td><td>5m 26s</td></tr><tr><td>1h 58m 16s</td><td>14m 39s</td></tr><tr><td>16m 24s</td><td>1m 55s</td></tr><tr><td>7m 19s</td><td>47s</td></tr><tr><td>…</td><td>…</td></tr><tr><td>34m 48s</td><td>4m 13s</td></tr><tr><td>40m 16s</td><td>4m 54s</td></tr><tr><td>25m 24s</td><td>3m 3s</td></tr><tr><td>19m 37s</td><td>2m 19s</td></tr><tr><td>1h 29m 36s</td><td>11m 4s</td></tr></tbody></table></div>
 </div>
 </div>
-<p>Duration values are uniformly distributed within the specified range.</p>
+<p>Colon-separated strings can also be used for quick duration definitions:</p>
+<div id="c8f527aa" class="cell" data-execution_count="2">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    call_duration<span class="op">=</span>pb.duration_field(min_duration<span class="op">=</span><span class="st">"0:01:00"</span>, max_duration<span class="op">=</span><span class="st">"1:30:00"</span>),</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    break_time<span class="op">=</span>pb.duration_field(min_duration<span class="op">=</span><span class="st">"0:05:00"</span>, max_duration<span class="op">=</span><span class="st">"0:30:00"</span>),</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>pb.generate_dataset(schema, n<span class="op">=</span><span class="dv">30</span>, seed<span class="op">=</span><span class="dv">42</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="2">
+<div><style>
+.dataframe > thead > tr,
+.dataframe > tbody > tr {
+  text-align: right;
+  white-space: pre-wrap;
+}
+</style>
+<small>shape: (30, 2)</small><table class="dataframe table table-sm table-striped small"><thead><tr><th>call_duration</th><th>break_time</th></tr><tr><td>duration[μs]</td><td>duration[μs]</td></tr></thead><tbody><tr><td>1h 28m 18s</td><td>26m 49s</td></tr><tr><td>16m 12s</td><td>8m 48s</td></tr><tr><td>4m 24s</td><td>5m 51s</td></tr><tr><td>38m 33s</td><td>14m 23s</td></tr><tr><td>34m 26s</td><td>13m 21s</td></tr><tr><td>…</td><td>…</td></tr><tr><td>31m 5s</td><td>28m 56s</td></tr><tr><td>1h 2m 19s</td><td>23m 36s</td></tr><tr><td>1h 21m 27s</td><td>19m 19s</td></tr><tr><td>38m 58s</td><td>12m 31s</td></tr><tr><td>1m 53s</td><td>20m 19s</td></tr></tbody></table></div>
+</div>
+</div>
+<p>Optional durations can be created with <code>nullable=True</code>, and duration fields work well alongside other field types:</p>
+<div id="a790a5d2" class="cell" data-execution_count="3">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    task_id<span class="op">=</span>pb.int_field(min_val<span class="op">=</span><span class="dv">1</span>, max_val<span class="op">=</span><span class="dv">500</span>, unique<span class="op">=</span><span class="va">True</span>),</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    time_spent<span class="op">=</span>pb.duration_field(</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>        min_duration<span class="op">=</span>timedelta(minutes<span class="op">=</span><span class="dv">1</span>),</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>        max_duration<span class="op">=</span>timedelta(hours<span class="op">=</span><span class="dv">8</span>),</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    overtime<span class="op">=</span>pb.duration_field(</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>        min_duration<span class="op">=</span>timedelta(<span class="dv">0</span>),</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>        max_duration<span class="op">=</span>timedelta(hours<span class="op">=</span><span class="dv">4</span>),</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>        nullable<span class="op">=</span><span class="va">True</span>, null_probability<span class="op">=</span><span class="fl">0.6</span>,</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>pb.generate_dataset(schema, n<span class="op">=</span><span class="dv">30</span>, seed<span class="op">=</span><span class="dv">7</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="3">
+<div><style>
+.dataframe > thead > tr,
+.dataframe > tbody > tr {
+  text-align: right;
+  white-space: pre-wrap;
+}
+</style>
+<small>shape: (30, 3)</small><table class="dataframe table table-sm table-striped small"><thead><tr><th>task_id</th><th>time_spent</th><th>overtime</th></tr><tr><td>i64</td><td>duration[μs]</td><td>duration[μs]</td></tr></thead><tbody><tr><td>166</td><td>2h 57m 51s</td><td>null</td></tr><tr><td>486</td><td>1h 23m 23s</td><td>41m 11s</td></tr><tr><td>78</td><td>3h 36m 37s</td><td>null</td></tr><tr><td>203</td><td>5h 56m 29s</td><td>2h 57m 44s</td></tr><tr><td>334</td><td>27m 22s</td><td>null</td></tr><tr><td>…</td><td>…</td><td>…</td></tr><tr><td>31</td><td>5h 9m 48s</td><td>2h 34m 24s</td></tr><tr><td>424</td><td>1h 8m 36s</td><td>null</td></tr><tr><td>290</td><td>2h 2m 55s</td><td>1h 57s</td></tr><tr><td>64</td><td>5h 45m 24s</td><td>null</td></tr><tr><td>115</td><td>5h 43m 39s</td><td>2h 51m 19s</td></tr></tbody></table></div>
+</div>
+</div>
 
 
 </section>

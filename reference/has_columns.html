@@ -279,7 +279,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
         border-radius: 2px;
     ">
 <p>Using <a href="../reference/has_columns.html#pointblank.has_columns" title="0"><code>has_columns()</code></a> with the <code>active=</code> parameter to conditionally run a validation step:</p>
-<div id="4b41a584" class="cell" data-execution_count="2">
+<div id="3626263d" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -486,7 +486,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 <p>The first step ran because column <code>a</code> exists. The second step was skipped because column <code>z</code> is missing, and the report note explains which column was not found.</p>
 <p>When checking for multiple columns, the step is only active when <em>all</em> columns are present:</p>
-<div id="92ebac35" class="cell" data-execution_count="3">
+<div id="d836ecdc" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_gt(columns<span class="op">=</span><span class="st">"a"</span>, value<span class="op">=</span><span class="dv">0</span>, active<span class="op">=</span>pb.has_columns(<span class="st">"a"</span>, <span class="st">"b"</span>))</span>
@@ -688,7 +688,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 <p>The first step is active because both <code>a</code> and <code>b</code> exist. The second step is skipped because <code>x</code> and <code>y</code> are missing.</p>
 <p>Column names can also be provided as a list:</p>
-<div id="e29b4329" class="cell" data-execution_count="4">
+<div id="f5d10c6a" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>tbl)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_gt(columns<span class="op">=</span><span class="st">"a"</span>, value<span class="op">=</span><span class="dv">0</span>, active<span class="op">=</span>pb.has_columns([<span class="st">"a"</span>, <span class="st">"b"</span>]))</span>
