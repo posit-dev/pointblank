@@ -1541,8 +1541,8 @@ def generate_dataset(
     Generate synthetic test data from a schema.
 
     This function generates random data that conforms to a schema's column definitions. When the
-    schema is defined using `Field` objects with constraints (e.g., `min_val`, `max_val`,
-    `pattern`, `preset`), the generated data will respect those constraints.
+    schema is defined using `Field` objects with constraints (e.g., `min_val=`, `max_val=`,
+    `pattern=`, `preset=`), the generated data will respect those constraints.
 
     Parameters
     ----------
@@ -1552,19 +1552,19 @@ def generate_dataset(
         `string_field()`) for fine-grained control, or as a simple dtype string (e.g.,
         `"Int64"`, `"String"`) for unconstrained generation.
     n
-        Number of rows to generate. Default is `100`.
+        Number of rows to generate. The default is `100`.
     seed
         Random seed for reproducibility. If provided, the same seed will produce
         the same data. Default is `None` (non-deterministic).
     output
-        Output format for the generated data. Options are: (1) `"polars"` (default) returns a
+        Output format for the generated data. Options are: (1) `"polars"` (the default) returns a
         Polars DataFrame, (2) `"pandas"` returns a Pandas DataFrame, and (3) `"dict"` returns
         a dictionary of lists.
     country
         Country code for locale-aware generation when using presets. Accepts ISO 3166-1 alpha-2
-        codes (e.g., `"US"`, `"DE"`, `"FR"`) or alpha-3 codes (e.g., `"USA"`, `"DEU"`,
-        `"FRA"`). This affects the format and content of preset-generated data such as
-        addresses, phone numbers, names, and postal codes. Default is `"US"`.
+        codes (e.g., `"US"`, `"DE"`, `"FR"`) or alpha-3 codes (e.g., `"USA"`, `"DEU"`, `"FRA"`).
+        This affects the format and content of preset-generated data such as addresses, phone
+        numbers, names, and postal codes. The default is `"US"`.
 
     Returns
     -------
@@ -1588,20 +1588,20 @@ def generate_dataset(
       and phone numbers formatted for the specified country. For example, `country="DE"` yields
       German street names and PLZ postal codes, while `country="JP"` yields Japanese addresses.
     - **Person-related presets** (`"name"`, `"name_full"`, `"first_name"`, `"last_name"`,
-      `"email"`, `"user_name"`): produce culturally appropriate names for the specified country.
+      `"email"`, `"user_name"`) produce culturally appropriate names for the specified country.
       For example, `country="FR"` produces French names, while `country="KR"` produces Korean
       names.
     - **Financial presets** (`"iban"`, `"ssn"`, `"license_plate"`): produce identifiers in the
       format used by the specified country.
 
     When multiple columns in the same schema use related presets, the generated data is
-    automatically coherent across those columns within each row. Person-related presets will
-    share the same identity (e.g., the email is derived from the name), and address-related
-    presets will share the same location (e.g., the city matches the address).
+    automatically coherent across those columns within each row. Person-related presets will share
+    the same identity (e.g., the email is derived from the name), and address-related presets will
+    share the same location (e.g., the city matches the address).
 
     Supported Countries
     -------------------
-    The `country=` parameter currently supports **50 countries** with full locale data:
+    The `country=` parameter currently supports 50 countries with full locale data:
 
     **Europe (32 countries):** Austria (`"AT"`), Belgium (`"BE"`), Bulgaria (`"BG"`),
     Croatia (`"HR"`), Cyprus (`"CY"`), Czech Republic (`"CZ"`), Denmark (`"DK"`),
@@ -1623,7 +1623,7 @@ def generate_dataset(
 
     Examples
     --------
-    Generate test data from a schema with field constraints:
+    Here we define a schema with field constraints and generate test data from it:
 
     ```{python}
     import pointblank as pb
@@ -1638,7 +1638,8 @@ def generate_dataset(
     pb.preview(pb.generate_dataset(schema, n=100, seed=23))
     ```
 
-    Generate data from a simple dtype-only schema as a Pandas DataFrame:
+    It's also possible to generate data from a simple, dtype-only schema. Setting
+    `output="pandas"` returns a Pandas DataFrame:
 
     ```{python}
     schema = pb.Schema(name="String", age="Int64", active="Boolean")
@@ -1646,7 +1647,8 @@ def generate_dataset(
     pb.preview(pb.generate_dataset(schema, n=50, seed=23, output="pandas"))
     ```
 
-    Generate data with German addresses and names by using `country="DE"`:
+    When using presets, the `country=` parameter controls the locale. Here, `country="DE"`
+    produces German names and addresses:
 
     ```{python}
     schema = pb.Schema(
@@ -1658,7 +1660,7 @@ def generate_dataset(
     pb.preview(pb.generate_dataset(schema, n=20, seed=23, country="DE"))
     ```
 
-    Generate a mixed-type dataset combining several field types with nullable columns:
+    We can combine several field types with nullable columns in a mixed-type dataset:
 
     ```{python}
     from datetime import date, timedelta
@@ -1676,7 +1678,7 @@ def generate_dataset(
         ),
     )
 
-    pb.preview(pb.generate_dataset(schema, n=50, seed=99))
+    pb.preview(pb.generate_dataset(schema, n=50, seed=23))
     ```
     """
     return schema.generate(n=n, seed=seed, output=output, country=country)

@@ -343,7 +343,8 @@ def int_field(
 
     Examples
     --------
-    Use `min_val=` and `max_val=` to constrain ranges, and `allowed=` for categorical integers:
+    The `min_val=` and `max_val=` parameters constrain generated ranges, while `allowed=`
+    restricts values to a specific set:
 
     ```{python}
     import pointblank as pb
@@ -357,8 +358,8 @@ def int_field(
     pb.preview(pb.generate_dataset(schema, n=100, seed=23))
     ```
 
-    Use `nullable=True` together with `null_probability=` to introduce missing values, and
-    select a smaller dtype with `dtype=`:
+    It's possible to introduce missing values with `nullable=True` and `null_probability=`,
+    and to select a smaller dtype with `dtype=`:
 
     ```{python}
     schema = pb.Schema(
@@ -372,7 +373,8 @@ def int_field(
     pb.preview(pb.generate_dataset(schema, n=50, seed=42))
     ```
 
-    Use `unique=True` to produce distinct identifiers within a range:
+    We can also enforce uniqueness with `unique=True` to produce distinct identifiers within
+    a range:
 
     ```{python}
     schema = pb.Schema(
@@ -383,7 +385,7 @@ def int_field(
     pb.preview(pb.generate_dataset(schema, n=30, seed=10))
     ```
 
-    Provide a custom `generator=` callable to control value generation directly:
+    For complete control, a custom `generator=` callable can be provided:
 
     ```{python}
     import random
@@ -564,7 +566,7 @@ def float_field(
 
     Examples
     --------
-    Use `min_val=` and `max_val=` to define value ranges for different columns:
+    The `min_val=` and `max_val=` parameters define the generated value ranges:
 
     ```{python}
     import pointblank as pb
@@ -578,8 +580,8 @@ def float_field(
     pb.preview(pb.generate_dataset(schema, n=100, seed=23))
     ```
 
-    Use `allowed=` to restrict to discrete float values, useful for fixed pricing tiers or
-    measurement levels:
+    It's also possible to restrict values to a discrete set with `allowed=`, which is useful
+    for fixed pricing tiers or measurement levels:
 
     ```{python}
     schema = pb.Schema(
@@ -590,7 +592,7 @@ def float_field(
     pb.preview(pb.generate_dataset(schema, n=50, seed=42))
     ```
 
-    Introduce null values to simulate missing measurements:
+    We can simulate missing measurements by introducing null values:
 
     ```{python}
     schema = pb.Schema(
@@ -604,7 +606,8 @@ def float_field(
     pb.preview(pb.generate_dataset(schema, n=30, seed=7))
     ```
 
-    Use `dtype="Float32"` for reduced precision and a custom `generator=` for full control:
+    Setting `dtype="Float32"` gives reduced precision, and a custom `generator=` provides
+    full control over value generation:
 
     ```{python}
     import random, math
@@ -871,7 +874,8 @@ def string_field(
 
     Examples
     --------
-    Use `preset=` to generate realistic personal data and `allowed=` for categorical values:
+    The `preset=` parameter generates realistic personal data, while `allowed=` restricts
+    values to a categorical set:
 
     ```{python}
     import pointblank as pb
@@ -885,8 +889,8 @@ def string_field(
     pb.preview(pb.generate_dataset(schema, n=100, seed=23))
     ```
 
-    Use `pattern=` to generate strings matching a regular expression (e.g., product codes,
-    identifiers):
+    We can also generate strings that match a regular expression with `pattern=` (e.g.,
+    product codes, identifiers):
 
     ```{python}
     schema = pb.Schema(
@@ -898,8 +902,8 @@ def string_field(
     pb.preview(pb.generate_dataset(schema, n=30, seed=42))
     ```
 
-    Use `min_length=` and `max_length=` for random alphanumeric strings, with `nullable=True`
-    to introduce missing values:
+    For random alphanumeric strings, `min_length=` and `max_length=` control the length.
+    Adding `nullable=True` introduces missing values:
 
     ```{python}
     schema = pb.Schema(
@@ -913,7 +917,7 @@ def string_field(
     pb.preview(pb.generate_dataset(schema, n=30, seed=7))
     ```
 
-    Combine business and internet presets to generate a company directory:
+    It's possible to combine business and internet presets to build a company directory:
 
     ```{python}
     schema = pb.Schema(
@@ -1055,7 +1059,8 @@ def bool_field(
 
     Examples
     --------
-    Use `p_true=` to control the distribution of `True`/`False` values:
+    The `p_true=` parameter controls the distribution of `True`/`False` values, allowing
+    you to simulate different probabilities:
 
     ```{python}
     import pointblank as pb
@@ -1069,7 +1074,8 @@ def bool_field(
     pb.preview(pb.generate_dataset(schema, n=100, seed=23))
     ```
 
-    Use `nullable=True` with `null_probability=` to simulate optional boolean flags:
+    Optional boolean flags can be simulated by combining `nullable=True` with
+    `null_probability=`:
 
     ```{python}
     schema = pb.Schema(
@@ -1083,7 +1089,7 @@ def bool_field(
     pb.preview(pb.generate_dataset(schema, n=50, seed=42))
     ```
 
-    Combine with other field types in a realistic schema:
+    Boolean fields can be combined with other field types in a realistic schema:
 
     ```{python}
     schema = pb.Schema(
@@ -1254,7 +1260,8 @@ def date_field(
 
     Examples
     --------
-    Use `min_date=` and `max_date=` with `datetime.date` objects to define date ranges:
+    The `min_date=` and `max_date=` parameters accept `datetime.date` objects to define date
+    ranges:
 
     ```{python}
     import pointblank as pb
@@ -1274,7 +1281,7 @@ def date_field(
     pb.preview(pb.generate_dataset(schema, n=100, seed=23))
     ```
 
-    Use ISO format strings instead of `date` objects for convenience:
+    For convenience, ISO format strings can be used instead of `date` objects:
 
     ```{python}
     schema = pb.Schema(
@@ -1285,7 +1292,8 @@ def date_field(
     pb.preview(pb.generate_dataset(schema, n=50, seed=42))
     ```
 
-    Use `nullable=True` to introduce missing dates and `unique=True` for distinct values:
+    We can introduce missing dates with `nullable=True` and enforce distinct values using
+    `unique=True`:
 
     ```{python}
     schema = pb.Schema(
@@ -1464,7 +1472,8 @@ def datetime_field(
 
     Examples
     --------
-    Use `min_date=` and `max_date=` with `datetime` objects:
+    The `min_date=` and `max_date=` parameters accept `datetime` objects for precise range
+    definitions:
 
     ```{python}
     import pointblank as pb
@@ -1484,7 +1493,7 @@ def datetime_field(
     pb.preview(pb.generate_dataset(schema, n=100, seed=23))
     ```
 
-    Use ISO format strings for a quick setup:
+    For a quick setup, ISO format strings work just as well:
 
     ```{python}
     schema = pb.Schema(
@@ -1497,7 +1506,8 @@ def datetime_field(
     pb.preview(pb.generate_dataset(schema, n=30, seed=42))
     ```
 
-    Use `nullable=True` for optional timestamps and combine with other field types:
+    Optional timestamps can be simulated with `nullable=True`, and datetime fields work
+    nicely alongside other field types:
 
     ```{python}
     schema = pb.Schema(
@@ -1671,7 +1681,8 @@ def time_field(
 
     Examples
     --------
-    Use `min_time=` and `max_time=` with `datetime.time` objects to define business hours:
+    The `min_time=` and `max_time=` parameters accept `datetime.time` objects, making it
+    easy to define business-hours ranges:
 
     ```{python}
     import pointblank as pb
@@ -1691,7 +1702,7 @@ def time_field(
     pb.preview(pb.generate_dataset(schema, n=100, seed=23))
     ```
 
-    Use ISO format strings for convenience:
+    ISO format strings can also be used for convenience:
 
     ```{python}
     schema = pb.Schema(
@@ -1702,7 +1713,8 @@ def time_field(
     pb.preview(pb.generate_dataset(schema, n=30, seed=42))
     ```
 
-    Use `nullable=True` for optional time values and combine with other field types:
+    It's possible to introduce optional time values with `nullable=True` and combine them
+    with other field types:
 
     ```{python}
     schema = pb.Schema(
@@ -1887,7 +1899,8 @@ def duration_field(
 
     Examples
     --------
-    Use `min_duration=` and `max_duration=` with `timedelta` objects:
+    The `min_duration=` and `max_duration=` parameters accept `timedelta` objects for
+    defining duration ranges:
 
     ```{python}
     import pointblank as pb
@@ -1907,7 +1920,7 @@ def duration_field(
     pb.preview(pb.generate_dataset(schema, n=100, seed=23))
     ```
 
-    Use colon-separated string format for quick duration definitions:
+    Colon-separated strings can also be used for quick duration definitions:
 
     ```{python}
     schema = pb.Schema(
@@ -1918,7 +1931,8 @@ def duration_field(
     pb.preview(pb.generate_dataset(schema, n=30, seed=42))
     ```
 
-    Use `nullable=True` for optional durations and combine with other field types:
+    Optional durations can be created with `nullable=True`, and duration fields work well
+    alongside other field types:
 
     ```{python}
     schema = pb.Schema(
