@@ -1917,7 +1917,7 @@ def duration_field(
         ),
     )
 
-    pb.preview(pb.generate_dataset(schema, n=100, seed=23))
+    pb.generate_dataset(schema, n=100, seed=23)
     ```
 
     Colon-separated strings can also be used for quick duration definitions:
@@ -1928,7 +1928,7 @@ def duration_field(
         break_time=pb.duration_field(min_duration="0:05:00", max_duration="0:30:00"),
     )
 
-    pb.preview(pb.generate_dataset(schema, n=30, seed=42))
+    pb.generate_dataset(schema, n=30, seed=42)
     ```
 
     Optional durations can be created with `nullable=True`, and duration fields work well
@@ -1948,7 +1948,7 @@ def duration_field(
         ),
     )
 
-    pb.preview(pb.generate_dataset(schema, n=30, seed=7))
+    pb.generate_dataset(schema, n=30, seed=7)
     ```
     """
     return DurationField(
