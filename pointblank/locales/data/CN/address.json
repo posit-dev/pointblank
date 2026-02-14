@@ -805,7 +805,7 @@
       "Dongxiao Street",
       "Yanhe Road",
       "Wenjin North Road",
-      "翠园Road",
+      "Cuiyuan Road",
       "Shenhui Road",
       "Bagualing Road",
       "Hongling North Road"
@@ -3505,9 +3505,9 @@
   },
   "postcode_format": "######",
   "address_formats": [
-    "{city}{street}{building_number}号",
-    "{state}{city}{street}{building_number}号{unit}室",
-    "{city}{street}{building_number}号{unit}单元"
+    "{city}{street}{building_number}",
+    "{state}{city}{street}{building_number}{unit}",
+    "{city}{street}{building_number}{unit}"
   ],
   "country": "China",
   "country_code": "CN",
