@@ -1,0 +1,59 @@
+{
+    "first_names": {
+        "male": [
+            "Wei", "Jun", "Jie", "Xiang", "Ming",
+            "Yi", "Hao", "Zhi", "Kai", "Hong",
+            "Cheng", "Yong", "Jian", "Liang", "Sheng",
+            "Muhammad", "Ahmad", "Mohd", "Abdul", "Ibrahim",
+            "Ismail", "Azman", "Faizal", "Hafiz", "Rizwan",
+            "Rajesh", "Suresh", "Kumar", "Ravi", "Arjun",
+            "Ganesh", "Vikram", "Dinesh", "Mohan", "Siva",
+            "James", "David", "Daniel", "Ryan", "Marcus",
+            "Brandon", "Sean", "Justin", "Aaron", "Kevin",
+            "Darren", "Eugene", "Timothy", "Adrian", "Kenneth"
+        ],
+        "female": [
+            "Hui", "Ying", "Xin", "Ling", "Mei",
+            "Yan", "Jia", "Wen", "Li", "Fang",
+            "Shu", "Yun", "Qi", "Zhen", "Min",
+            "Nur", "Siti", "Aisyah", "Fatimah", "Nurul",
+            "Aisha", "Zulaikha", "Farah", "Nadia", "Aminah",
+            "Priya", "Lakshmi", "Kavitha", "Deepa", "Sumathi",
+            "Revathi", "Nithya", "Selvi", "Malathi", "Devi",
+            "Rachel", "Grace", "Sarah", "Amanda", "Michelle",
+            "Nicole", "Cheryl", "Karen", "Vanessa", "Joanne",
+            "Catherine", "Samantha", "Jessica", "Melissa", "Stephanie"
+        ],
+        "neutral": [
+            "Alex", "Sam", "Jordan", "Robin", "Riley",
+            "Avery", "Casey", "Jamie", "Morgan", "Taylor",
+            "Jing", "Yu", "Lin", "Feng", "Chen"
+        ]
+    },
+    "last_names": [
+        "Tan", "Lim", "Lee", "Ng", "Ong",
+        "Wong", "Goh", "Chua", "Chan", "Koh",
+        "Teo", "Ang", "Yeo", "Ho", "Sim",
+        "Wee", "Foo", "Chong", "Low", "Tay",
+        "Toh", "Chew", "Lau", "Seah", "Phua",
+        "Ibrahim", "Abdullah", "Ismail", "Hassan", "Rahman",
+        "Ahmad", "Mohamed", "Yusof", "Othman", "Ali",
+        "Pillai", "Nair", "Menon", "Kumar", "Singh",
+        "Sharma", "Patel", "Nathan", "Krishnan", "Murthy",
+        "Chen", "Zhang", "Wang", "Liu", "Yang"
+    ],
+    "name_formats": [
+        "{first_name} {last_name}",
+        "{first_name} {first_name} {last_name}",
+        "{prefix} {first_name} {last_name}"
+    ],
+    "prefixes": {
+        "male": ["Mr", "Mr.", "Dr", "Dr.", "Prof", "Prof."],
+        "female": ["Ms", "Ms.", "Mrs", "Mrs.", "Mdm", "Mdm.", "Dr", "Dr.", "Prof", "Prof."],
+        "neutral": ["Dr", "Dr.", "Prof", "Prof."]
+    },
+    "suffixes": [
+        "BBM", "PBM", "PBS", "JP", "PhD", "MD",
+        "CPA", "PMP", "ACCA", "CA", "CFA"
+    ]
+}
