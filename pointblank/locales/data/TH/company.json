@@ -1,0 +1,66 @@
+{
+  "suffixes": [
+    "Co., Ltd.", "Public Company Limited", "PCL", "Ltd.", "Group", "Holdings",
+    "Corporation", "Industries", "Trading", "Services", "Solutions",
+    "Technologies", "International", "Enterprise", "Partners"
+  ],
+  "formats": [
+    "{last_name} {suffix}",
+    "{adjective} {noun} {suffix}",
+    "{adjective} {noun}",
+    "{noun} {suffix}"
+  ],
+  "adjectives": [
+    "Thai", "Siam", "Bangkok", "Royal", "Golden", "Grand",
+    "National", "United", "Premier", "Pacific", "Asian",
+    "Central", "Advanced", "Modern", "Eastern", "Southern",
+    "Northern", "Global", "Superior", "Continental"
+  ],
+  "nouns": [
+    "Bank", "Telecom", "Energy", "Oil", "Holdings", "Properties",
+    "Foods", "Cement", "Retail", "Manufacturing", "Construction",
+    "Petroleum", "Aviation", "Insurance", "Finance", "Beverage",
+    "Sugar", "Chemicals", "Steel", "Hospitality"
+  ],
+  "well_known_companies": [
+    {"name": "PTT Public Company Limited", "cities": ["Bangkok", "Rayong"]},
+    {"name": "CP All Public Company Limited", "cities": ["Bangkok", "Nonthaburi"]},
+    {"name": "Siam Cement Group", "cities": ["Bangkok", "Saraburi"]},
+    {"name": "Bangkok Bank", "cities": ["Bangkok", "Chiang Mai", "Phuket"]},
+    {"name": "Kasikornbank", "cities": ["Bangkok", "Chiang Mai"]},
+    {"name": "AIS (Advanced Info Service)", "cities": ["Bangkok", "Nonthaburi"]},
+    {"name": "Thai Beverage", "cities": ["Bangkok", "Pathum Thani"]},
+    {"name": "Central Group", "cities": ["Bangkok", "Chiang Mai", "Phuket"]},
+    {"name": "SCB (Siam Commercial Bank)", "cities": ["Bangkok", "Chiang Mai"]},
+    {"name": "True Corporation", "cities": ["Bangkok", "Nonthaburi"]},
+    {"name": "Charoen Pokphand Foods", "cities": ["Bangkok", "Nakhon Ratchasima"]},
+    {"name": "Thai Airways International", "cities": ["Bangkok", "Phuket", "Chiang Mai"]},
+    {"name": "Krungthai Bank", "cities": ["Bangkok", "Khon Kaen"]},
+    {"name": "Minor International", "cities": ["Bangkok", "Phuket"]},
+    {"name": "Indorama Ventures", "cities": ["Bangkok", "Rayong"]},
+    {"name": "Bangkok Dusit Medical", "cities": ["Bangkok", "Samut Prakan"]},
+    {"name": "Gulf Energy Development", "cities": ["Bangkok", "Rayong"]},
+    {"name": "Delta Electronics Thailand", "cities": ["Bangkok", "Samut Prakan"]},
+    {"name": "Banpu Public Company Limited", "cities": ["Bangkok", "Lampang"]},
+    {"name": "Land and Houses", "cities": ["Bangkok", "Nonthaburi", "Chiang Mai"]}
+  ],
+  "jobs": [
+    "Software Engineer", "Product Manager", "Data Analyst", "Marketing Manager", "Sales Executive",
+    "HR Manager", "Financial Analyst", "Project Manager", "Operations Manager", "UI/UX Designer",
+    "Frontend Developer", "Backend Developer", "DevOps Engineer", "QA Engineer", "Data Scientist",
+    "Accountant", "Business Analyst", "Hotel Manager", "Tour Guide", "Chef",
+    "Civil Engineer", "Architect", "Nurse", "Teacher", "Pharmacist"
+  ],
+  "catch_phrase_adjectives": [
+    "Innovative", "Reliable", "Professional", "Dynamic", "Trusted", "Leading", "Modern", "Sustainable",
+    "Customer-focused", "Quality-driven", "Excellent", "Advanced", "Strategic", "Premium"
+  ],
+  "catch_phrase_nouns": [
+    "solutions", "services", "quality", "excellence", "innovation", "value", "partnership", "growth",
+    "performance", "reliability", "integrity", "success", "results", "commitment"
+  ],
+  "catch_phrase_verbs": [
+    "deliver", "create", "build", "provide", "enable", "achieve", "drive", "transform", "empower",
+    "connect", "innovate", "lead", "develop", "optimize", "enhance"
+  ]
+}
