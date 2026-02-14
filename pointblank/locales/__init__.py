@@ -169,6 +169,21 @@ COUNTRY_CODE_MAP: dict[str, str] = {
     # Philippines
     "PH": "PH",
     "PHL": "PH",
+    # South Africa
+    "ZA": "ZA",
+    "ZAF": "ZA",
+    # Nigeria
+    "NG": "NG",
+    "NGA": "NG",
+    # Thailand
+    "TH": "TH",
+    "THA": "TH",
+    # United Arab Emirates
+    "AE": "AE",
+    "ARE": "AE",
+    # Singapore
+    "SG": "SG",
+    "SGP": "SG",
 }
 
 # Countries that have complete locale data files
@@ -223,49 +238,14 @@ COUNTRIES_WITH_FULL_DATA: list[str] = [
     "SE",  # Sweden
     "SK",  # Slovakia
     "SI",  # Slovenia
+    "TH",  # Thailand
     "TR",  # Turkey
     "TW",  # Taiwan
+    "ZA",  # South Africa
+    "AE",  # United Arab Emirates
+    "NG",  # Nigeria
+    "SG",  # Singapore
 ]
-
-# Fallback chains for countries (when a country's data is incomplete)
-COUNTRY_FALLBACKS: dict[str, list[str]] = {
-    # English-speaking countries fall back to US
-    "GB": ["GB", "US"],
-    "IE": ["IE", "GB", "US"],
-    "AU": ["AU", "GB", "US"],
-    "CA": ["CA", "US"],
-    # German-speaking countries
-    "DE": ["DE", "US"],
-    "AT": ["AT", "DE", "US"],
-    "CH": ["CH", "DE", "US"],
-    # French-speaking
-    "FR": ["FR", "US"],
-    # Belgian (Dutch/French bilingual)
-    "BE": ["BE", "NL", "FR", "US"],
-    # Scandinavian
-    "DK": ["DK", "DE", "US"],
-    "NO": ["NO", "DK", "DE", "US"],
-    "SE": ["SE", "DK", "DE", "US"],
-    "FI": ["FI", "SE", "US"],
-    # Spanish-speaking
-    "ES": ["ES", "US"],
-    "MX": ["MX", "ES", "US"],
-    # Portuguese-speaking
-    "PT": ["PT", "US"],
-    "BR": ["BR", "PT", "US"],
-    # Other European
-    "IT": ["IT", "US"],
-    "NL": ["NL", "US"],
-    "PL": ["PL", "US"],
-    "RU": ["RU", "US"],
-    # Asian countries
-    "JP": ["JP", "US"],
-    "KR": ["KR", "US"],
-    "CN": ["CN", "US"],
-    "TW": ["TW", "CN", "US"],
-    # Turkey
-    "TR": ["TR", "US"],
-}
 
 
 @dataclass
@@ -459,8 +439,8 @@ def _normalize_country(country: str) -> str:
     if code in COUNTRY_CODE_MAP:
         return COUNTRY_CODE_MAP[code]
 
-    # If already a valid 2-letter code in fallbacks, use it
-    if code in COUNTRY_FALLBACKS:
+    # If already a valid 2-letter code in COUNTRIES_WITH_FULL_DATA, use it
+    if code in COUNTRIES_WITH_FULL_DATA:
         return code
 
     # Default to US with a warning (or raise an error)
@@ -471,7 +451,7 @@ def _normalize_country(country: str) -> str:
 
 
 class LocaleRegistry:
-    """Registry for country data with fallback support."""
+    """Registry for country data loading and caching."""
 
     _instance: LocaleRegistry | None = None
     _cache: dict[str, LocaleData]
@@ -484,7 +464,7 @@ class LocaleRegistry:
 
     def get(self, country: str) -> LocaleData:
         """
-        Get country data with fallback chain.
+        Get country data.
 
         Parameters
         ----------
@@ -495,7 +475,7 @@ class LocaleRegistry:
         Returns
         -------
         LocaleData
-            The country data, falling back to parent countries if needed.
+            The country data.
         """
         # Normalize to 2-letter country code
         country_code = _normalize_country(country)
@@ -503,32 +483,26 @@ class LocaleRegistry:
         if country_code in self._cache:
             return self._cache[country_code]
 
-        # Get fallback chain
-        fallback_chain = COUNTRY_FALLBACKS.get(country_code, [country_code, "US"])
-        if country_code not in fallback_chain:
-            fallback_chain = [country_code] + fallback_chain
-
-        # Load data with fallback
-        locale_data = self._load_with_fallback(fallback_chain)
+        # Load country data
+        locale_data = self._load_country_data(country_code)
         self._cache[country_code] = locale_data
         return locale_data
 
-    def _load_with_fallback(self, fallback_chain: list[str]) -> LocaleData:
-        """Load country data, falling back through the chain."""
-        merged_data = LocaleData(locale=fallback_chain[0])
+    def _load_country_data(self, country_code: str) -> LocaleData:
+        """Load country data with shared base data."""
+        locale_data = LocaleData(locale=country_code)
 
         # Load shared/universal data first (e.g., file extensions, MIME types)
         shared_data = self._load_country_files("_shared")
         if shared_data:
-            self._merge_data(merged_data, shared_data)
+            self._merge_data(locale_data, shared_data)
 
-        # Load in reverse order so more specific countries override
-        for country in reversed(fallback_chain):
-            data = self._load_country_files(country)
-            if data:
-                self._merge_data(merged_data, data)
+        # Load country-specific data (overrides shared data)
+        country_data = self._load_country_files(country_code)
+        if country_data:
+            self._merge_data(locale_data, country_data)
 
-        return merged_data
+        return locale_data
 
     def _load_country_files(self, country: str) -> dict[str, Any] | None:
         """Load all data files for a country."""
