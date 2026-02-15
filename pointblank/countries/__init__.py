@@ -576,14 +576,70 @@ class LocaleGenerator:
     _row_persons: list[dict[str, str]] | None = None
 
     def _get_person(self, gender: str | None = None) -> dict[str, str]:
-        """Get a coherent person (first_name, last_name, gender) from the data."""
+        """Get a coherent person (first_name, last_name, gender) from the data.
+
+        If person data has ``ethnic_groups``, picks a group first (weighted by population
+        share) then draws first and last names from within that group so they remain
+        ethnically coherent.
+        """
         # If no gender specified, randomly select one (weighted toward male/female)
         if gender is None:
             gender = self.rng.choice(["male", "female"])
 
+        # Check for ethnic_groups system
+        ethnic_groups = self._data.person.get("ethnic_groups")
+        if ethnic_groups:
+            return self._get_person_from_ethnic_group(gender, ethnic_groups)
+
         return {
             "first_name": self._generate_first_name(gender),
             "last_name": self._generate_last_name(gender),
+            "gender": gender,
+        }
+
+    def _get_person_from_ethnic_group(self, gender: str, ethnic_groups: dict) -> dict[str, str]:
+        """Pick an ethnic group weighted by population share, then draw names from it."""
+        groups = list(ethnic_groups.keys())
+        weights = [ethnic_groups[g].get("weight", 1.0) for g in groups]
+
+        # Weighted random selection
+        total = sum(weights)
+        r = self.rng.random() * total
+        cumulative = 0.0
+        chosen_group = groups[-1]
+        for g, w in zip(groups, weights):
+            cumulative += w
+            if r <= cumulative:
+                chosen_group = g
+                break
+
+        group_data = ethnic_groups[chosen_group]
+        first_names = group_data.get("first_names", {})
+        last_names = group_data.get("last_names", ["Smith"])
+
+        # Pick first name (gender-aware)
+        if gender in first_names:
+            first_name = self.rng.choice(first_names[gender])
+        else:
+            all_fn = []
+            for cat in first_names.values():
+                if isinstance(cat, list):
+                    all_fn.extend(cat)
+            first_name = self.rng.choice(all_fn) if all_fn else "Alex"
+
+        # Pick last name (may be gendered dict for some groups)
+        if isinstance(last_names, dict):
+            if gender in last_names:
+                last_name = self.rng.choice(last_names[gender])
+            else:
+                all_ln = [n for v in last_names.values() for n in v]
+                last_name = self.rng.choice(all_ln) if all_ln else "Smith"
+        else:
+            last_name = self.rng.choice(last_names)
+
+        return {
+            "first_name": first_name,
+            "last_name": last_name,
             "gender": gender,
         }
 
