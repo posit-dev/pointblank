@@ -843,7 +843,7 @@
             "Battery Street"
         ]
     },
-    "postcode_format": "@@@ ####",
+    "postcode_format": "??? ####",
     "address_formats": [
         "{street} {building_number}, {city} {postcode}",
         "{building_number}, {street}, {city}",
@@ -867,5 +867,6 @@
         "Gozo": [
             "21"
         ]
-    }
+    },
+    "phone_format": "+356 {area_code}## ####"
 }

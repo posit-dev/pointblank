@@ -1616,11 +1616,26 @@ class TestLocaleDataFiles:
                         f"{country}: each first name in {gender} should be a string"
                     )
 
-            # last_names should be a list of strings
-            assert isinstance(data["last_names"], list), f"{country}: last_names should be a list"
-            assert len(data["last_names"]) > 0, f"{country}: last_names should not be empty"
-            for name in data["last_names"]:
-                assert isinstance(name, str), f"{country}: each last_name should be a string"
+            # last_names should be a list of strings OR a dict with gendered keys
+            last_names = data["last_names"]
+            if isinstance(last_names, dict):
+                # Gendered last names (e.g., IS patronymics)
+                for gender_key in last_names:
+                    assert isinstance(last_names[gender_key], list), (
+                        f"{country}: last_names[{gender_key}] should be a list"
+                    )
+                    for name in last_names[gender_key]:
+                        assert isinstance(name, str), (
+                            f"{country}: each last_name in {gender_key} should be a string"
+                        )
+                # At least one category should have names
+                all_names = [n for v in last_names.values() for n in v]
+                assert len(all_names) > 0, f"{country}: last_names should not be empty"
+            else:
+                assert isinstance(last_names, list), f"{country}: last_names should be a list"
+                assert len(last_names) > 0, f"{country}: last_names should not be empty"
+                for name in last_names:
+                    assert isinstance(name, str), f"{country}: each last_name should be a string"
 
             # name_formats should be a list with valid placeholders
             assert isinstance(data["name_formats"], list), (

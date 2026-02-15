@@ -583,7 +583,7 @@ class LocaleGenerator:
 
         return {
             "first_name": self._generate_first_name(gender),
-            "last_name": self._generate_last_name(),
+            "last_name": self._generate_last_name(gender),
             "gender": gender,
         }
 
@@ -609,9 +609,27 @@ class LocaleGenerator:
 
         return self.rng.choice(name_list)
 
-    def _generate_last_name(self) -> str:
-        """Generate a random last name (internal, no caching)."""
+    def _generate_last_name(self, gender: str | None = None) -> str:
+        """Generate a random last name (internal, no caching).
+
+        If last_names is a dict with 'male'/'female' keys (e.g., IS patronymics),
+        picks from the gender-appropriate list.
+        """
         names = self._data.person.get("last_names", ["Smith"])
+
+        if isinstance(names, dict):
+            # Gendered last names (e.g., Icelandic patronymics)
+            if gender and gender in names:
+                name_list = names[gender]
+            else:
+                # Flatten all categories
+                all_names = []
+                for cat_names in names.values():
+                    if isinstance(cat_names, list):
+                        all_names.extend(cat_names)
+                name_list = all_names if all_names else ["Smith"]
+            return self.rng.choice(name_list)
+
         return self.rng.choice(names)
 
     def init_row_persons(self, n_rows: int) -> None:
@@ -883,6 +901,20 @@ class LocaleGenerator:
         prefix = location.get("postcode_prefix", "")
         postcode_format = self._data.address.get("postcode_format", "")
 
+        # Handle template-based postcode formats (e.g., GB)
+        if "{" in postcode_format:
+            district = str(self.rng.randint(1, 9))
+            if self.rng.random() < 0.3:
+                district += self.rng.choice("ABCDEFGHJKLMNPRSTUW")
+            sector = str(self.rng.randint(0, 9))
+            unit = "".join(self.rng.choice("ABDEFGHJLNPQRSTUWXYZ") for _ in range(2))
+            return postcode_format.format(
+                postcode_prefix=prefix,
+                postcode_district=district,
+                postcode_sector=sector,
+                postcode_unit=unit,
+            )
+
         # If format uses pattern characters (? for letter, # for digit), generate accordingly
         if "?" in postcode_format or "#" in postcode_format:
             # Generate the full postcode from the format pattern
@@ -937,7 +969,8 @@ class LocaleGenerator:
 
     def building_number(self) -> str:
         """Generate a random building number."""
-        return str(self.rng.randint(1, 9999))
+        max_num = self._data.address.get("building_number_max", 9999)
+        return str(self.rng.randint(1, max_num))
 
     def address(self) -> str:
         """Generate a full coherent address (city, state, postcode are consistent)."""
@@ -979,11 +1012,18 @@ class LocaleGenerator:
         state_codes = area_codes.get(state, ["555"])  # 555 is fictional fallback
         area_code = self.rng.choice(state_codes)
 
-        # Generate the rest of the number
-        exchange = str(self.rng.randint(200, 999))  # Exchange can't start with 0 or 1
-        subscriber = str(self.rng.randint(0, 9999)).zfill(4)
+        # Use country-specific phone format if available
+        phone_format = self._data.address.get("phone_format", "({area_code}) ###-####")
 
-        return f"({area_code}) {exchange}-{subscriber}"
+        # Substitute {area_code} and replace # with random digits
+        result = phone_format.replace("{area_code}", area_code)
+        chars = []
+        for ch in result:
+            if ch == "#":
+                chars.append(str(self.rng.randint(0, 9)))
+            else:
+                chars.append(ch)
+        return "".join(chars)
 
     def latitude(self) -> str:
         """Generate a random latitude (bounded by current location if available)."""
@@ -1044,39 +1084,54 @@ class LocaleGenerator:
         adjectives = self._data.company.get("adjectives", ["Global", "Advanced"])
         nouns = self._data.company.get("nouns", ["Solutions", "Systems"])
 
-        # Count how many {last_name} placeholders are in the format
-        # and generate distinct last names for each
-        last_name_count = fmt.count("{last_name}")
-        if last_name_count <= 1:
-            company_last_name = self._generate_last_name()
-            return fmt.format(
-                last_name=company_last_name,
-                suffix=self.rng.choice(suffixes),
-                adjective=self.rng.choice(adjectives),
-                noun=self.rng.choice(nouns),
-            )
-        else:
-            # Generate distinct last names for formats like "{last_name} and {last_name}"
-            last_names = []
-            for _ in range(last_name_count):
-                new_name = self._generate_last_name()
-                # Ensure we don't repeat the same name
+        # Helper to pick distinct values from a list
+        def _pick_distinct(values: list[str], count: int) -> list[str]:
+            picked: list[str] = []
+            for _ in range(count):
+                val = self.rng.choice(values)
                 attempts = 0
-                while new_name in last_names and attempts < 10:
-                    new_name = self._generate_last_name()
+                while val in picked and attempts < 10:
+                    val = self.rng.choice(values)
                     attempts += 1
-                last_names.append(new_name)
+                picked.append(val)
+            return picked
 
-            # Replace placeholders one at a time
-            result = fmt
-            for name in last_names:
-                result = result.replace("{last_name}", name, 1)
+        # Count how many of each placeholder are in the format
+        last_name_count = fmt.count("{last_name}")
+        adjective_count = fmt.count("{adjective}")
+        noun_count = fmt.count("{noun}")
 
-            return result.format(
-                suffix=self.rng.choice(suffixes),
-                adjective=self.rng.choice(adjectives),
-                noun=self.rng.choice(nouns),
+        # Generate distinct values for repeated placeholders
+        distinct_last_names = (
+            _pick_distinct(
+                [self._generate_last_name() for _ in range(max(last_name_count * 3, 5))],
+                last_name_count,
             )
+            if last_name_count > 0
+            else []
+        )
+        distinct_adjectives = (
+            _pick_distinct(adjectives, adjective_count) if adjective_count > 0 else []
+        )
+        distinct_nouns = _pick_distinct(nouns, noun_count) if noun_count > 0 else []
+
+        # Replace placeholders one at a time for each category
+        result = fmt
+        for name in distinct_last_names:
+            result = result.replace("{last_name}", name, 1)
+        for adj in distinct_adjectives:
+            result = result.replace("{adjective}", adj, 1)
+        for noun in distinct_nouns:
+            result = result.replace("{noun}", noun, 1)
+
+        # Replace remaining single-instance placeholders
+        return (
+            result.format(
+                suffix=self.rng.choice(suffixes),
+            )
+            if "{suffix}" in result
+            else result
+        )
 
     def job(self) -> str:
         """Generate a random job title."""
