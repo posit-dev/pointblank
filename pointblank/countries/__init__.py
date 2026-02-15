@@ -641,6 +641,7 @@ class LocaleGenerator:
             "first_name": first_name,
             "last_name": last_name,
             "gender": gender,
+            "ethnic_group": chosen_group,
         }
 
     def _generate_first_name(self, gender: str | None = None) -> str:
@@ -798,7 +799,16 @@ class LocaleGenerator:
         }
 
         # Get prefix based on gender from locale data
+        # If person belongs to an ethnic group with its own prefixes, use those
         prefixes = self._data.person.get("prefixes", {})
+        ethnic_group_name = person.get("ethnic_group")
+        if ethnic_group_name:
+            ethnic_groups = self._data.person.get("ethnic_groups", {})
+            group_data = ethnic_groups.get(ethnic_group_name, {})
+            group_prefixes = group_data.get("prefixes")
+            if group_prefixes:
+                prefixes = group_prefixes
+
         prefix_list = prefixes.get(person_gender, prefixes.get("neutral", []))
 
         # Separate common honorifics and professional titles from locale data
@@ -1181,13 +1191,16 @@ class LocaleGenerator:
             result = result.replace("{noun}", noun, 1)
 
         # Replace remaining single-instance placeholders
-        return (
-            result.format(
-                suffix=self.rng.choice(suffixes),
-            )
-            if "{suffix}" in result
-            else result
-        )
+        if "{suffix}" in result:
+            suffix = self.rng.choice(suffixes)
+            # Avoid repeating the last word as suffix (e.g., "Life Life")
+            last_word = result.split()[-1] if result.split() else ""
+            if suffix == last_word:
+                alt = [s for s in suffixes if s != suffix]
+                if alt:
+                    suffix = self.rng.choice(alt)
+            return result.format(suffix=suffix)
+        return result
 
     def job(self) -> str:
         """Generate a random job title."""
@@ -1199,9 +1212,8 @@ class LocaleGenerator:
         adjectives = self._data.company.get("catch_phrase_adjectives", ["Innovative", "Dynamic"])
         nouns = self._data.company.get("catch_phrase_nouns", ["solutions", "paradigms"])
         verbs = self._data.company.get("catch_phrase_verbs", ["deliver", "leverage"])
-        return (
-            f"{self.rng.choice(adjectives)} {self.rng.choice(nouns)} that {self.rng.choice(verbs)}"
-        )
+        connector = self._data.company.get("catch_phrase_connector", "that")
+        return f"{self.rng.choice(adjectives)} {self.rng.choice(nouns)} {connector} {self.rng.choice(verbs)}"
 
     # =========================================================================
     # Internet
@@ -1377,11 +1389,8 @@ class LocaleGenerator:
 
     def iban(self) -> str:
         """Generate a random IBAN."""
-        # Simplified - generates a plausible-looking IBAN
+        # Simplified - generates a plausible-looking IBAN using the locale's country code
         country = self._data.address.get("country_code", "US")
-        if country == "US":
-            # US doesn't use IBAN, use DE as example
-            country = "DE"
 
         check_digits = f"{self.rng.randint(10, 99)}"
         bank_code = "".join(str(self.rng.randint(0, 9)) for _ in range(8))

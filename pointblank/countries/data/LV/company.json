@@ -1,6 +1,15 @@
 {
   "suffixes": [
-    "SIA", "AS", "IK", "ZS", "PS", "Group", "Latvia", "LV", "Baltic", "Holding"
+    "SIA",
+    "AS",
+    "IK",
+    "ZS",
+    "PS",
+    "Group",
+    "Latvia",
+    "LV",
+    "Baltic",
+    "Holding"
   ],
   "formats": [
     "{last_name} {suffix}",
@@ -9,52 +18,248 @@
     "{noun} {suffix}"
   ],
   "adjectives": [
-    "Latvian", "Baltic", "Riga", "Northern", "European", "United", "Global", "Premier", "First", "Modern",
-    "Digital", "Smart", "Dynamic", "National", "Advanced", "New", "Central", "East", "Nordic", "Hanseatic"
+    "Latvian",
+    "Baltic",
+    "Riga",
+    "Northern",
+    "European",
+    "United",
+    "Global",
+    "Premier",
+    "First",
+    "Modern",
+    "Digital",
+    "Smart",
+    "Dynamic",
+    "National",
+    "Advanced",
+    "New",
+    "Central",
+    "East",
+    "Nordic",
+    "Hanseatic"
   ],
   "nouns": [
-    "Bank", "Telecom", "Energy", "Power", "Gas", "Pharma", "Chemicals", "Electronics", "Engineering",
-    "Manufacturing", "Logistics", "Transport", "Trading", "Insurance", "Finance", "Construction", "Foods", "Retail", "Steel", "Shipping"
+    "Bank",
+    "Telecom",
+    "Energy",
+    "Power",
+    "Gas",
+    "Pharma",
+    "Chemicals",
+    "Electronics",
+    "Engineering",
+    "Manufacturing",
+    "Logistics",
+    "Transport",
+    "Trading",
+    "Insurance",
+    "Finance",
+    "Construction",
+    "Foods",
+    "Retail",
+    "Steel",
+    "Shipping"
   ],
   "well_known_companies": [
-    {"name": "Latvenergo", "cities": ["Riga"]},
-    {"name": "Latvijas Dzelzceļš", "cities": ["Riga"]},
-    {"name": "Latvijas Pasts", "cities": ["Riga"]},
-    {"name": "airBaltic", "cities": ["Riga"]},
-    {"name": "Maxima Latvija", "cities": ["Riga", "Daugavpils", "Liepaja"]},
-    {"name": "Rimi Latvia", "cities": ["Riga", "Jelgava", "Ventspils"]},
-    {"name": "Swedbank Latvia", "cities": ["Riga", "Daugavpils", "Liepaja"]},
-    {"name": "SEB banka", "cities": ["Riga", "Jelgava"]},
-    {"name": "Citadele banka", "cities": ["Riga"]},
-    {"name": "Latvijas Mobilais Telefons", "cities": ["Riga"]},
-    {"name": "Tele2 Latvia", "cities": ["Riga", "Jurmala"]},
-    {"name": "Bite Latvia", "cities": ["Riga"]},
-    {"name": "Latvijas Gaze", "cities": ["Riga"]},
-    {"name": "Riga International Airport", "cities": ["Riga"]},
-    {"name": "Aldaris", "cities": ["Riga"]},
-    {"name": "Grindeks", "cities": ["Riga"]},
-    {"name": "Olainfarm", "cities": ["Olaine", "Riga"]},
-    {"name": "Laima", "cities": ["Riga"]},
-    {"name": "Latvijas Finieris", "cities": ["Riga"]},
-    {"name": "Printful", "cities": ["Riga"]}
+    {
+      "name": "Latvenergo",
+      "cities": [
+        "Riga"
+      ]
+    },
+    {
+      "name": "Latvijas Dzelzceļš",
+      "cities": [
+        "Riga"
+      ]
+    },
+    {
+      "name": "Latvijas Pasts",
+      "cities": [
+        "Riga"
+      ]
+    },
+    {
+      "name": "airBaltic",
+      "cities": [
+        "Riga"
+      ]
+    },
+    {
+      "name": "Maxima Latvija",
+      "cities": [
+        "Riga",
+        "Daugavpils",
+        "Liepaja"
+      ]
+    },
+    {
+      "name": "Rimi Latvia",
+      "cities": [
+        "Riga",
+        "Jelgava",
+        "Ventspils"
+      ]
+    },
+    {
+      "name": "Swedbank Latvia",
+      "cities": [
+        "Riga",
+        "Daugavpils",
+        "Liepaja"
+      ]
+    },
+    {
+      "name": "SEB banka",
+      "cities": [
+        "Riga",
+        "Jelgava"
+      ]
+    },
+    {
+      "name": "Citadele banka",
+      "cities": [
+        "Riga"
+      ]
+    },
+    {
+      "name": "Latvijas Mobilais Telefons",
+      "cities": [
+        "Riga"
+      ]
+    },
+    {
+      "name": "Tele2 Latvia",
+      "cities": [
+        "Riga",
+        "Jurmala"
+      ]
+    },
+    {
+      "name": "Bite Latvia",
+      "cities": [
+        "Riga"
+      ]
+    },
+    {
+      "name": "Latvijas Gaze",
+      "cities": [
+        "Riga"
+      ]
+    },
+    {
+      "name": "Riga International Airport",
+      "cities": [
+        "Riga"
+      ]
+    },
+    {
+      "name": "Aldaris",
+      "cities": [
+        "Riga"
+      ]
+    },
+    {
+      "name": "Grindeks",
+      "cities": [
+        "Riga"
+      ]
+    },
+    {
+      "name": "Olainfarm",
+      "cities": [
+        "Olaine",
+        "Riga"
+      ]
+    },
+    {
+      "name": "Laima",
+      "cities": [
+        "Riga"
+      ]
+    },
+    {
+      "name": "Latvijas Finieris",
+      "cities": [
+        "Riga"
+      ]
+    },
+    {
+      "name": "Printful",
+      "cities": [
+        "Riga"
+      ]
+    }
   ],
   "jobs": [
-    "Software Engineer", "Product Manager", "Data Analyst", "Marketing Manager", "Sales Representative",
-    "HR Manager", "Financial Analyst", "Project Manager", "Operations Manager", "UI/UX Designer",
-    "Frontend Developer", "Backend Developer", "DevOps Engineer", "QA Engineer", "Data Scientist",
-    "Accountant", "Business Analyst", "Customer Service Representative", "Logistics Coordinator", "Procurement Specialist",
-    "Mechanical Engineer", "Electrical Engineer", "Production Manager", "Quality Manager", "IT Administrator"
+    "Software Engineer",
+    "Product Manager",
+    "Data Analyst",
+    "Marketing Manager",
+    "Sales Representative",
+    "HR Manager",
+    "Financial Analyst",
+    "Project Manager",
+    "Operations Manager",
+    "UI/UX Designer",
+    "Frontend Developer",
+    "Backend Developer",
+    "DevOps Engineer",
+    "QA Engineer",
+    "Data Scientist",
+    "Accountant",
+    "Business Analyst",
+    "Customer Service Representative",
+    "Logistics Coordinator",
+    "Procurement Specialist",
+    "Mechanical Engineer",
+    "Electrical Engineer",
+    "Production Manager",
+    "Quality Manager",
+    "IT Administrator"
   ],
   "catch_phrase_adjectives": [
-    "Innovative", "Reliable", "Professional", "Dynamic", "Trusted", "Leading", "Modern", "Sustainable",
-    "Customer-focused", "Quality-driven", "Baltic", "Nordic"
+    "Innovative",
+    "Reliable",
+    "Professional",
+    "Dynamic",
+    "Trusted",
+    "Leading",
+    "Modern",
+    "Sustainable",
+    "Customer-focused",
+    "Quality-driven",
+    "Baltic",
+    "Nordic"
   ],
   "catch_phrase_nouns": [
-    "solutions", "services", "quality", "excellence", "innovation", "value", "partnership", "growth",
-    "performance", "reliability", "integrity", "success"
+    "solutions",
+    "services",
+    "quality",
+    "excellence",
+    "innovation",
+    "value",
+    "partnership",
+    "growth",
+    "performance",
+    "reliability",
+    "integrity",
+    "success"
   ],
   "catch_phrase_verbs": [
-    "deliver", "create", "build", "provide", "enable", "achieve", "drive", "transform", "empower",
-    "connect", "innovate", "lead"
-  ]
+    "deliver",
+    "create",
+    "build",
+    "provide",
+    "enable",
+    "achieve",
+    "drive",
+    "transform",
+    "empower",
+    "connect",
+    "innovate",
+    "lead"
+  ],
+  "catch_phrase_connector": "that"
 }

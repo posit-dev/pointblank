@@ -1,7 +1,19 @@
 {
   "suffixes": [
-    "Group", "Co., Ltd.", "Limited", "Corporation", "Tech", "Technology", "Holdings", "Investment",
-    "Industries", "Enterprises", "International", "Solutions", "Services", "Systems"
+    "Group",
+    "Co., Ltd.",
+    "Limited",
+    "Corporation",
+    "Tech",
+    "Technology",
+    "Holdings",
+    "Investment",
+    "Industries",
+    "Enterprises",
+    "International",
+    "Solutions",
+    "Services",
+    "Systems"
   ],
   "formats": [
     "{last_name} {suffix}",
@@ -10,67 +22,465 @@
     "{noun} {suffix}"
   ],
   "adjectives": [
-    "Global", "International", "Advanced", "Premier", "Dynamic", "Innovative", "Strategic", "United", "Digital", "Modern",
-    "Smart", "Future", "Grand", "Prime", "Superior", "Elite", "Pioneer", "Leading", "Universal", "Pacific",
-    "Golden", "Silver", "Eastern", "Southern", "Western", "Northern", "Central", "New", "Great", "Long",
-    "Bright", "Star", "Fortune", "Victory", "Harmony", "Prosperity", "Rising", "Evergreen", "Phoenix", "Dragon"
+    "Global",
+    "International",
+    "Advanced",
+    "Premier",
+    "Dynamic",
+    "Innovative",
+    "Strategic",
+    "United",
+    "Digital",
+    "Modern",
+    "Smart",
+    "Future",
+    "Grand",
+    "Prime",
+    "Superior",
+    "Elite",
+    "Pioneer",
+    "Leading",
+    "Universal",
+    "Pacific",
+    "Golden",
+    "Silver",
+    "Eastern",
+    "Southern",
+    "Western",
+    "Northern",
+    "Central",
+    "New",
+    "Great",
+    "Long",
+    "Bright",
+    "Star",
+    "Fortune",
+    "Victory",
+    "Harmony",
+    "Prosperity",
+    "Rising",
+    "Evergreen",
+    "Phoenix",
+    "Dragon"
   ],
   "nouns": [
-    "Tech", "Electronics", "Communications", "Networks", "Software", "Data", "Cloud", "AI", "Energy", "Materials",
-    "Pharma", "Foods", "Auto", "Property", "Finance", "Investment", "Trade", "Logistics", "Education", "Media",
-    "Solutions", "Systems", "Industries", "Resources", "Development", "Construction", "Manufacturing", "Engineering",
-    "Retail", "Commerce", "Healthcare", "Biotech", "Semiconductor", "Robotics", "Aerospace", "Shipping"
+    "Tech",
+    "Electronics",
+    "Communications",
+    "Networks",
+    "Software",
+    "Data",
+    "Cloud",
+    "AI",
+    "Energy",
+    "Materials",
+    "Pharma",
+    "Foods",
+    "Auto",
+    "Property",
+    "Finance",
+    "Investment",
+    "Trade",
+    "Logistics",
+    "Education",
+    "Media",
+    "Solutions",
+    "Systems",
+    "Industries",
+    "Resources",
+    "Development",
+    "Construction",
+    "Manufacturing",
+    "Engineering",
+    "Retail",
+    "Commerce",
+    "Healthcare",
+    "Biotech",
+    "Semiconductor",
+    "Robotics",
+    "Aerospace",
+    "Shipping"
   ],
   "well_known_companies": [
-    {"name": "Huawei", "cities": ["Shenzhen", "Beijing", "Shanghai", "Hangzhou", "Chengdu", "Dongguan"]},
-    {"name": "Alibaba", "cities": ["Hangzhou", "Beijing", "Shanghai", "Shenzhen", "Guangzhou"]},
-    {"name": "Tencent", "cities": ["Shenzhen", "Beijing", "Shanghai", "Guangzhou", "Chengdu"]},
-    {"name": "Baidu", "cities": ["Beijing", "Shanghai", "Shenzhen", "Guangzhou"]},
-    {"name": "JD.com", "cities": ["Beijing", "Shanghai", "Guangzhou", "Chengdu", "Wuhan"]},
-    {"name": "Xiaomi", "cities": ["Beijing", "Shenzhen", "Shanghai", "Wuhan", "Nanjing"]},
-    {"name": "ByteDance", "cities": ["Beijing", "Shanghai", "Shenzhen", "Hangzhou", "Chengdu"]},
-    {"name": "Meituan", "cities": ["Beijing", "Shanghai", "Shenzhen", "Guangzhou", "Chengdu"]},
-    {"name": "Pinduoduo", "cities": ["Shanghai", "Beijing", "Guangzhou", "Hangzhou"]},
-    {"name": "NetEase", "cities": ["Hangzhou", "Beijing", "Shanghai", "Guangzhou"]},
-    {"name": "DiDi", "cities": ["Beijing", "Shanghai", "Shenzhen", "Hangzhou", "Chengdu"]},
-    {"name": "BYD", "cities": ["Shenzhen", "Xi'an", "Changsha", "Hefei", "Nanjing"]},
-    {"name": "CATL", "cities": ["Ningbo", "Shanghai", "Shenzhen", "Chengdu"]},
-    {"name": "Geely", "cities": ["Hangzhou", "Ningbo", "Shanghai", "Beijing"]},
-    {"name": "NIO", "cities": ["Shanghai", "Beijing", "Hefei", "Nanjing"]},
-    {"name": "ICBC", "cities": ["Beijing", "Shanghai", "Shenzhen", "Guangzhou"]},
-    {"name": "China Mobile", "cities": ["Beijing", "Shanghai", "Guangzhou", "Shenzhen", "Chengdu"]},
-    {"name": "Sinopec", "cities": ["Beijing", "Shanghai", "Nanjing", "Guangzhou"]},
-    {"name": "PetroChina", "cities": ["Beijing", "Shanghai", "Guangzhou", "Dalian"]},
-    {"name": "State Grid", "cities": ["Beijing", "Shanghai", "Nanjing", "Xi'an"]},
-    {"name": "Midea", "cities": ["Foshan", "Guangzhou", "Shanghai", "Wuxi"]},
-    {"name": "Haier", "cities": ["Qingdao", "Shanghai", "Beijing", "Shenzhen"]},
-    {"name": "Gree Electric", "cities": ["Zhuhai", "Guangzhou", "Chongqing", "Hefei"]},
-    {"name": "Lenovo", "cities": ["Beijing", "Shanghai", "Shenzhen", "Chengdu", "Wuhan"]},
-    {"name": "ZTE", "cities": ["Shenzhen", "Nanjing", "Xi'an", "Chengdu"]},
-    {"name": "BOE Technology", "cities": ["Beijing", "Hefei", "Chengdu", "Chongqing", "Wuhan"]},
-    {"name": "SMIC", "cities": ["Shanghai", "Beijing", "Shenzhen", "Tianjin"]},
-    {"name": "Vanke", "cities": ["Shenzhen", "Shanghai", "Beijing", "Guangzhou", "Hangzhou"]},
-    {"name": "SF Express", "cities": ["Shenzhen", "Beijing", "Shanghai", "Guangzhou", "Chengdu"]},
-    {"name": "Air China", "cities": ["Beijing", "Shanghai", "Chengdu", "Hangzhou"]}
+    {
+      "name": "Huawei",
+      "cities": [
+        "Shenzhen",
+        "Beijing",
+        "Shanghai",
+        "Hangzhou",
+        "Chengdu",
+        "Dongguan"
+      ]
+    },
+    {
+      "name": "Alibaba",
+      "cities": [
+        "Hangzhou",
+        "Beijing",
+        "Shanghai",
+        "Shenzhen",
+        "Guangzhou"
+      ]
+    },
+    {
+      "name": "Tencent",
+      "cities": [
+        "Shenzhen",
+        "Beijing",
+        "Shanghai",
+        "Guangzhou",
+        "Chengdu"
+      ]
+    },
+    {
+      "name": "Baidu",
+      "cities": [
+        "Beijing",
+        "Shanghai",
+        "Shenzhen",
+        "Guangzhou"
+      ]
+    },
+    {
+      "name": "JD.com",
+      "cities": [
+        "Beijing",
+        "Shanghai",
+        "Guangzhou",
+        "Chengdu",
+        "Wuhan"
+      ]
+    },
+    {
+      "name": "Xiaomi",
+      "cities": [
+        "Beijing",
+        "Shenzhen",
+        "Shanghai",
+        "Wuhan",
+        "Nanjing"
+      ]
+    },
+    {
+      "name": "ByteDance",
+      "cities": [
+        "Beijing",
+        "Shanghai",
+        "Shenzhen",
+        "Hangzhou",
+        "Chengdu"
+      ]
+    },
+    {
+      "name": "Meituan",
+      "cities": [
+        "Beijing",
+        "Shanghai",
+        "Shenzhen",
+        "Guangzhou",
+        "Chengdu"
+      ]
+    },
+    {
+      "name": "Pinduoduo",
+      "cities": [
+        "Shanghai",
+        "Beijing",
+        "Guangzhou",
+        "Hangzhou"
+      ]
+    },
+    {
+      "name": "NetEase",
+      "cities": [
+        "Hangzhou",
+        "Beijing",
+        "Shanghai",
+        "Guangzhou"
+      ]
+    },
+    {
+      "name": "DiDi",
+      "cities": [
+        "Beijing",
+        "Shanghai",
+        "Shenzhen",
+        "Hangzhou",
+        "Chengdu"
+      ]
+    },
+    {
+      "name": "BYD",
+      "cities": [
+        "Shenzhen",
+        "Xi'an",
+        "Changsha",
+        "Hefei",
+        "Nanjing"
+      ]
+    },
+    {
+      "name": "CATL",
+      "cities": [
+        "Ningbo",
+        "Shanghai",
+        "Shenzhen",
+        "Chengdu"
+      ]
+    },
+    {
+      "name": "Geely",
+      "cities": [
+        "Hangzhou",
+        "Ningbo",
+        "Shanghai",
+        "Beijing"
+      ]
+    },
+    {
+      "name": "NIO",
+      "cities": [
+        "Shanghai",
+        "Beijing",
+        "Hefei",
+        "Nanjing"
+      ]
+    },
+    {
+      "name": "ICBC",
+      "cities": [
+        "Beijing",
+        "Shanghai",
+        "Shenzhen",
+        "Guangzhou"
+      ]
+    },
+    {
+      "name": "China Mobile",
+      "cities": [
+        "Beijing",
+        "Shanghai",
+        "Guangzhou",
+        "Shenzhen",
+        "Chengdu"
+      ]
+    },
+    {
+      "name": "Sinopec",
+      "cities": [
+        "Beijing",
+        "Shanghai",
+        "Nanjing",
+        "Guangzhou"
+      ]
+    },
+    {
+      "name": "PetroChina",
+      "cities": [
+        "Beijing",
+        "Shanghai",
+        "Guangzhou",
+        "Dalian"
+      ]
+    },
+    {
+      "name": "State Grid",
+      "cities": [
+        "Beijing",
+        "Shanghai",
+        "Nanjing",
+        "Xi'an"
+      ]
+    },
+    {
+      "name": "Midea",
+      "cities": [
+        "Foshan",
+        "Guangzhou",
+        "Shanghai",
+        "Wuxi"
+      ]
+    },
+    {
+      "name": "Haier",
+      "cities": [
+        "Qingdao",
+        "Shanghai",
+        "Beijing",
+        "Shenzhen"
+      ]
+    },
+    {
+      "name": "Gree Electric",
+      "cities": [
+        "Zhuhai",
+        "Guangzhou",
+        "Chongqing",
+        "Hefei"
+      ]
+    },
+    {
+      "name": "Lenovo",
+      "cities": [
+        "Beijing",
+        "Shanghai",
+        "Shenzhen",
+        "Chengdu",
+        "Wuhan"
+      ]
+    },
+    {
+      "name": "ZTE",
+      "cities": [
+        "Shenzhen",
+        "Nanjing",
+        "Xi'an",
+        "Chengdu"
+      ]
+    },
+    {
+      "name": "BOE Technology",
+      "cities": [
+        "Beijing",
+        "Hefei",
+        "Chengdu",
+        "Chongqing",
+        "Wuhan"
+      ]
+    },
+    {
+      "name": "SMIC",
+      "cities": [
+        "Shanghai",
+        "Beijing",
+        "Shenzhen",
+        "Tianjin"
+      ]
+    },
+    {
+      "name": "Vanke",
+      "cities": [
+        "Shenzhen",
+        "Shanghai",
+        "Beijing",
+        "Guangzhou",
+        "Hangzhou"
+      ]
+    },
+    {
+      "name": "SF Express",
+      "cities": [
+        "Shenzhen",
+        "Beijing",
+        "Shanghai",
+        "Guangzhou",
+        "Chengdu"
+      ]
+    },
+    {
+      "name": "Air China",
+      "cities": [
+        "Beijing",
+        "Shanghai",
+        "Chengdu",
+        "Hangzhou"
+      ]
+    }
   ],
   "jobs": [
-    "Software Engineer", "Product Manager", "Data Analyst", "Marketing Manager", "Sales Representative",
-    "HR Manager", "Financial Analyst", "Project Manager", "Operations Manager", "UI/UX Designer",
-    "Frontend Developer", "Backend Developer", "QA Engineer", "DevOps Engineer", "Data Scientist",
-    "Machine Learning Engineer", "Cloud Architect", "Security Analyst", "Business Analyst", "Consultant",
-    "Account Manager", "Customer Service Representative", "Accountant", "Administrative Assistant",
-    "Graphic Designer", "Content Writer", "Technical Writer", "Research Scientist", "Supply Chain Manager"
+    "Software Engineer",
+    "Product Manager",
+    "Data Analyst",
+    "Marketing Manager",
+    "Sales Representative",
+    "HR Manager",
+    "Financial Analyst",
+    "Project Manager",
+    "Operations Manager",
+    "UI/UX Designer",
+    "Frontend Developer",
+    "Backend Developer",
+    "QA Engineer",
+    "DevOps Engineer",
+    "Data Scientist",
+    "Machine Learning Engineer",
+    "Cloud Architect",
+    "Security Analyst",
+    "Business Analyst",
+    "Consultant",
+    "Account Manager",
+    "Customer Service Representative",
+    "Accountant",
+    "Administrative Assistant",
+    "Graphic Designer",
+    "Content Writer",
+    "Technical Writer",
+    "Research Scientist",
+    "Supply Chain Manager"
   ],
   "catch_phrase_adjectives": [
-    "Innovative", "Leading", "Intelligent", "Efficient", "Professional", "Excellent", "Premium", "Advanced", "Global", "Digital",
-    "World-class", "Cutting-edge", "Revolutionary", "Transformative", "Seamless", "Scalable", "Robust", "Agile", "Strategic", "Dynamic"
+    "Innovative",
+    "Leading",
+    "Intelligent",
+    "Efficient",
+    "Professional",
+    "Excellent",
+    "Premium",
+    "Advanced",
+    "Global",
+    "Digital",
+    "World-class",
+    "Cutting-edge",
+    "Revolutionary",
+    "Transformative",
+    "Seamless",
+    "Scalable",
+    "Robust",
+    "Agile",
+    "Strategic",
+    "Dynamic"
   ],
   "catch_phrase_nouns": [
-    "solutions", "platforms", "services", "technologies", "products", "experiences", "ecosystems", "systems", "strategies", "transformations",
-    "innovations", "capabilities", "frameworks", "methodologies", "approaches", "integrations", "optimizations", "journeys"
+    "solutions",
+    "platforms",
+    "services",
+    "technologies",
+    "products",
+    "experiences",
+    "ecosystems",
+    "systems",
+    "strategies",
+    "transformations",
+    "innovations",
+    "capabilities",
+    "frameworks",
+    "methodologies",
+    "approaches",
+    "integrations",
+    "optimizations",
+    "journeys"
   ],
   "catch_phrase_verbs": [
-    "empower", "lead", "create", "optimize", "drive", "accelerate", "enable", "achieve", "build", "deliver",
-    "transform", "revolutionize", "streamline", "maximize", "enhance", "unlock", "catalyze", "scale", "modernize"
-  ]
+    "empower",
+    "lead",
+    "create",
+    "optimize",
+    "drive",
+    "accelerate",
+    "enable",
+    "achieve",
+    "build",
+    "deliver",
+    "transform",
+    "revolutionize",
+    "streamline",
+    "maximize",
+    "enhance",
+    "unlock",
+    "catalyze",
+    "scale",
+    "modernize"
+  ],
+  "catch_phrase_connector": "that"
 }

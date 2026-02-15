@@ -1,5 +1,11 @@
 {
-  "suffixes": ["Ltd", "Limited", "NZ Ltd", "Group", "Holdings"],
+  "suffixes": [
+    "Ltd",
+    "Limited",
+    "NZ Ltd",
+    "Group",
+    "Holdings"
+  ],
   "formats": [
     "{last_name} {suffix}",
     "{adjective} {noun} {suffix}",
@@ -7,59 +13,248 @@
     "{last_name} & {last_name} {suffix}"
   ],
   "adjectives": [
-    "Kiwi", "Pacific", "Southern", "New Zealand", "National",
-    "Modern", "International", "Regional", "Global", "Digital",
-    "Innovative", "Green", "Premium", "Elite", "Professional",
-    "Smart", "Creative", "Dynamic", "Strategic", "Coastal"
+    "Kiwi",
+    "Pacific",
+    "Southern",
+    "New Zealand",
+    "National",
+    "Modern",
+    "International",
+    "Regional",
+    "Global",
+    "Digital",
+    "Innovative",
+    "Green",
+    "Premium",
+    "Elite",
+    "Professional",
+    "Smart",
+    "Creative",
+    "Dynamic",
+    "Strategic",
+    "Coastal"
   ],
   "nouns": [
-    "Technology", "Industries", "Trading", "Construction", "Property",
-    "Energy", "Finance", "Insurance", "Consulting", "Logistics",
-    "Pharmaceuticals", "Media", "IT", "Services", "Solutions",
-    "Systems", "Investments", "Holdings", "Partners", "Group"
+    "Technology",
+    "Industries",
+    "Trading",
+    "Construction",
+    "Property",
+    "Energy",
+    "Finance",
+    "Insurance",
+    "Consulting",
+    "Logistics",
+    "Pharmaceuticals",
+    "Media",
+    "IT",
+    "Services",
+    "Solutions",
+    "Systems",
+    "Investments",
+    "Holdings",
+    "Partners",
+    "Group"
   ],
   "well_known_companies": [
-    {"name": "Fonterra", "cities": ["Auckland"]},
-    {"name": "Fisher & Paykel Healthcare", "cities": ["Auckland"]},
-    {"name": "Fletcher Building", "cities": ["Auckland"]},
-    {"name": "Spark New Zealand", "cities": ["Wellington"]},
-    {"name": "Air New Zealand", "cities": ["Auckland"]},
-    {"name": "Meridian Energy", "cities": ["Wellington"]},
-    {"name": "Mercury NZ", "cities": ["Auckland"]},
-    {"name": "Contact Energy", "cities": ["Wellington"]},
-    {"name": "Genesis Energy", "cities": ["Auckland"]},
-    {"name": "a2 Milk Company", "cities": ["Auckland"]},
-    {"name": "Mainfreight", "cities": ["Auckland"]},
-    {"name": "Ryman Healthcare", "cities": ["Auckland"]},
-    {"name": "Auckland International Airport", "cities": ["Auckland"]},
-    {"name": "Xero", "cities": ["Wellington"]},
-    {"name": "Pushpay", "cities": ["Auckland"]},
-    {"name": "Vista Group", "cities": ["Auckland"]},
-    {"name": "Rocket Lab", "cities": ["Auckland"]},
-    {"name": "Zespri", "cities": ["Tauranga"]},
-    {"name": "Silver Fern Farms", "cities": ["Dunedin"]},
-    {"name": "Countdown", "cities": ["Auckland"]}
+    {
+      "name": "Fonterra",
+      "cities": [
+        "Auckland"
+      ]
+    },
+    {
+      "name": "Fisher & Paykel Healthcare",
+      "cities": [
+        "Auckland"
+      ]
+    },
+    {
+      "name": "Fletcher Building",
+      "cities": [
+        "Auckland"
+      ]
+    },
+    {
+      "name": "Spark New Zealand",
+      "cities": [
+        "Wellington"
+      ]
+    },
+    {
+      "name": "Air New Zealand",
+      "cities": [
+        "Auckland"
+      ]
+    },
+    {
+      "name": "Meridian Energy",
+      "cities": [
+        "Wellington"
+      ]
+    },
+    {
+      "name": "Mercury NZ",
+      "cities": [
+        "Auckland"
+      ]
+    },
+    {
+      "name": "Contact Energy",
+      "cities": [
+        "Wellington"
+      ]
+    },
+    {
+      "name": "Genesis Energy",
+      "cities": [
+        "Auckland"
+      ]
+    },
+    {
+      "name": "a2 Milk Company",
+      "cities": [
+        "Auckland"
+      ]
+    },
+    {
+      "name": "Mainfreight",
+      "cities": [
+        "Auckland"
+      ]
+    },
+    {
+      "name": "Ryman Healthcare",
+      "cities": [
+        "Auckland"
+      ]
+    },
+    {
+      "name": "Auckland International Airport",
+      "cities": [
+        "Auckland"
+      ]
+    },
+    {
+      "name": "Xero",
+      "cities": [
+        "Wellington"
+      ]
+    },
+    {
+      "name": "Pushpay",
+      "cities": [
+        "Auckland"
+      ]
+    },
+    {
+      "name": "Vista Group",
+      "cities": [
+        "Auckland"
+      ]
+    },
+    {
+      "name": "Rocket Lab",
+      "cities": [
+        "Auckland"
+      ]
+    },
+    {
+      "name": "Zespri",
+      "cities": [
+        "Tauranga"
+      ]
+    },
+    {
+      "name": "Silver Fern Farms",
+      "cities": [
+        "Dunedin"
+      ]
+    },
+    {
+      "name": "Countdown",
+      "cities": [
+        "Auckland"
+      ]
+    }
   ],
   "jobs": [
-    "Software Developer", "Engineer", "Teacher", "Nurse", "Doctor",
-    "Lawyer", "Architect", "Designer", "Journalist", "Consultant",
-    "Accountant", "Sales Representative", "Project Manager", "Director", "Real Estate Agent",
-    "Electrician", "Carpenter", "Mechanic", "Chef", "Waiter",
-    "Police Officer", "Firefighter", "Hairdresser", "Dentist", "Physiotherapist"
+    "Software Developer",
+    "Engineer",
+    "Teacher",
+    "Nurse",
+    "Doctor",
+    "Lawyer",
+    "Architect",
+    "Designer",
+    "Journalist",
+    "Consultant",
+    "Accountant",
+    "Sales Representative",
+    "Project Manager",
+    "Director",
+    "Real Estate Agent",
+    "Electrician",
+    "Carpenter",
+    "Mechanic",
+    "Chef",
+    "Waiter",
+    "Police Officer",
+    "Firefighter",
+    "Hairdresser",
+    "Dentist",
+    "Physiotherapist"
   ],
   "catch_phrase_adjectives": [
-    "innovative", "sustainable", "professional", "dynamic", "creative",
-    "efficient", "reliable", "modern", "kiwi", "green",
-    "quality", "global", "local", "smart", "digital"
+    "innovative",
+    "sustainable",
+    "professional",
+    "dynamic",
+    "creative",
+    "efficient",
+    "reliable",
+    "modern",
+    "kiwi",
+    "green",
+    "quality",
+    "global",
+    "local",
+    "smart",
+    "digital"
   ],
   "catch_phrase_nouns": [
-    "solutions", "services", "quality", "innovation", "growth",
-    "partnership", "results", "values", "collaboration", "future",
-    "technology", "design", "strategy", "development", "success"
+    "solutions",
+    "services",
+    "quality",
+    "innovation",
+    "growth",
+    "partnership",
+    "results",
+    "values",
+    "collaboration",
+    "future",
+    "technology",
+    "design",
+    "strategy",
+    "development",
+    "success"
   ],
   "catch_phrase_verbs": [
-    "creates", "delivers", "develops", "drives", "builds",
-    "shapes", "inspires", "connects", "strengthens", "transforms",
-    "optimises", "achieves", "enables", "ensures", "promotes"
-  ]
+    "creates",
+    "delivers",
+    "develops",
+    "drives",
+    "builds",
+    "shapes",
+    "inspires",
+    "connects",
+    "strengthens",
+    "transforms",
+    "optimises",
+    "achieves",
+    "enables",
+    "ensures",
+    "promotes"
+  ],
+  "catch_phrase_connector": "that"
 }

@@ -1,7 +1,20 @@
 {
   "suffixes": [
-    "Inc", "LLC", "Corp", "Ltd", "Co", "Group", "Holdings", "Partners", "Associates",
-    "Solutions", "Services", "Technologies", "Industries", "Enterprises", "International"
+    "Inc",
+    "LLC",
+    "Corp",
+    "Ltd",
+    "Co",
+    "Group",
+    "Holdings",
+    "Partners",
+    "Associates",
+    "Solutions",
+    "Services",
+    "Technologies",
+    "Industries",
+    "Enterprises",
+    "International"
   ],
   "formats": [
     "{last_name} {suffix}",
@@ -11,121 +24,835 @@
     "{last_name} {noun}"
   ],
   "adjectives": [
-    "Global", "Advanced", "Premier", "Elite", "Dynamic", "Innovative", "Strategic",
-    "Integrated", "United", "National", "American", "Pacific", "Atlantic", "Digital",
-    "Creative", "Modern", "Classic", "Universal", "Professional", "Quality", "Superior",
-    "First", "Prime", "Apex", "Summit", "Peak", "Frontier", "Horizon", "Vista",
-    "Pioneer", "Legacy", "Heritage", "Prestige", "Sterling", "Golden", "Silver"
+    "Global",
+    "Advanced",
+    "Premier",
+    "Elite",
+    "Dynamic",
+    "Innovative",
+    "Strategic",
+    "Integrated",
+    "United",
+    "National",
+    "American",
+    "Pacific",
+    "Atlantic",
+    "Digital",
+    "Creative",
+    "Modern",
+    "Classic",
+    "Universal",
+    "Professional",
+    "Quality",
+    "Superior",
+    "First",
+    "Prime",
+    "Apex",
+    "Summit",
+    "Peak",
+    "Frontier",
+    "Horizon",
+    "Vista",
+    "Pioneer",
+    "Legacy",
+    "Heritage",
+    "Prestige",
+    "Sterling",
+    "Golden",
+    "Silver"
   ],
   "nouns": [
-    "Solutions", "Systems", "Technologies", "Industries", "Services", "Consulting",
-    "Ventures", "Capital", "Investments", "Financial", "Development", "Management",
-    "Marketing", "Communications", "Media", "Software", "Hardware", "Networks",
-    "Security", "Analytics", "Data", "Research", "Engineering", "Manufacturing",
-    "Construction", "Properties", "Realty", "Insurance", "Healthcare", "Logistics",
-    "Transport", "Energy", "Resources", "Materials", "Products", "Brands", "Foods",
-    "Beverages", "Retail", "Commerce", "Trade", "Supply", "Distribution"
+    "Solutions",
+    "Systems",
+    "Technologies",
+    "Industries",
+    "Services",
+    "Consulting",
+    "Ventures",
+    "Capital",
+    "Investments",
+    "Financial",
+    "Development",
+    "Management",
+    "Marketing",
+    "Communications",
+    "Media",
+    "Software",
+    "Hardware",
+    "Networks",
+    "Security",
+    "Analytics",
+    "Data",
+    "Research",
+    "Engineering",
+    "Manufacturing",
+    "Construction",
+    "Properties",
+    "Realty",
+    "Insurance",
+    "Healthcare",
+    "Logistics",
+    "Transport",
+    "Energy",
+    "Resources",
+    "Materials",
+    "Products",
+    "Brands",
+    "Foods",
+    "Beverages",
+    "Retail",
+    "Commerce",
+    "Trade",
+    "Supply",
+    "Distribution"
   ],
   "well_known_companies": [
-    {"name": "Microsoft", "cities": ["Seattle", "Redmond", "San Francisco", "New York", "Austin", "Boston"]},
-    {"name": "Apple", "cities": ["Cupertino", "San Francisco", "Austin", "New York"]},
-    {"name": "Google", "cities": ["Mountain View", "San Francisco", "New York", "Seattle", "Austin", "Chicago"]},
-    {"name": "Amazon", "cities": ["Seattle", "San Francisco", "New York", "Austin", "Nashville", "Arlington", "Boston"]},
-    {"name": "Meta", "cities": ["Menlo Park", "San Francisco", "New York", "Seattle", "Austin"]},
-    {"name": "Netflix", "cities": ["Los Gatos", "Los Angeles", "New York"]},
-    {"name": "Salesforce", "cities": ["San Francisco", "Indianapolis", "New York", "Chicago", "Atlanta"]},
-    {"name": "Adobe", "cities": ["San Jose", "San Francisco", "Seattle", "New York"]},
-    {"name": "Oracle", "cities": ["Austin", "San Francisco", "Seattle", "New York"]},
-    {"name": "IBM", "cities": ["Armonk", "New York", "Austin", "San Francisco", "Boston"]},
-    {"name": "Intel", "cities": ["Santa Clara", "Portland", "Phoenix", "Austin", "Boston"]},
-    {"name": "Cisco", "cities": ["San Jose", "San Francisco", "New York", "Austin"]},
-    {"name": "NVIDIA", "cities": ["Santa Clara", "Seattle", "Austin", "Boston"]},
-    {"name": "PayPal", "cities": ["San Jose", "Scottsdale", "Austin", "New York"]},
-    {"name": "Uber", "cities": ["San Francisco", "New York", "Chicago", "Los Angeles"]},
-    {"name": "Airbnb", "cities": ["San Francisco", "Seattle", "New York"]},
-    {"name": "Spotify", "cities": ["New York", "Los Angeles", "Boston"]},
-    {"name": "LinkedIn", "cities": ["Sunnyvale", "San Francisco", "New York", "Chicago"]},
-    {"name": "Shopify", "cities": ["New York", "San Francisco"]},
-    {"name": "Zoom", "cities": ["San Jose", "Denver", "Phoenix", "New York"]},
-    {"name": "Slack", "cities": ["San Francisco", "New York", "Denver"]},
-    {"name": "Stripe", "cities": ["San Francisco", "Seattle", "New York"]},
-    {"name": "Dropbox", "cities": ["San Francisco", "Seattle", "New York", "Austin"]},
-    {"name": "JPMorgan Chase", "cities": ["New York", "Chicago", "Houston", "San Francisco"]},
-    {"name": "Goldman Sachs", "cities": ["New York", "San Francisco", "Salt Lake City", "Dallas"]},
-    {"name": "Morgan Stanley", "cities": ["New York", "San Francisco", "Houston"]},
-    {"name": "Bank of America", "cities": ["Charlotte", "New York", "San Francisco", "Chicago", "Dallas"]},
-    {"name": "Citigroup", "cities": ["New York", "San Francisco", "Chicago", "Dallas"]},
-    {"name": "Wells Fargo", "cities": ["San Francisco", "Charlotte", "New York", "Minneapolis", "Phoenix", "Dallas"]},
-    {"name": "BlackRock", "cities": ["New York", "San Francisco"]},
-    {"name": "Fidelity Investments", "cities": ["Boston", "New York", "Dallas", "Salt Lake City"]},
-    {"name": "Charles Schwab", "cities": ["San Francisco", "Austin", "Denver", "Phoenix"]},
-    {"name": "American Express", "cities": ["New York", "Phoenix", "Fort Lauderdale", "Salt Lake City"]},
-    {"name": "Johnson & Johnson", "cities": ["New Brunswick", "Philadelphia", "San Francisco", "Boston"]},
-    {"name": "Pfizer", "cities": ["New York", "San Francisco", "Boston"]},
-    {"name": "UnitedHealth Group", "cities": ["Minneapolis", "Atlanta", "Dallas", "Phoenix", "Boston"]},
-    {"name": "CVS Health", "cities": ["Woonsocket", "Hartford", "New York", "Phoenix", "Boston"]},
-    {"name": "Merck", "cities": ["Kenilworth", "San Francisco", "Boston"]},
-    {"name": "Walmart", "cities": ["Bentonville", "San Francisco", "Dallas", "Atlanta", "Chicago"]},
-    {"name": "Target", "cities": ["Minneapolis", "San Francisco", "New York", "Chicago", "Dallas"]},
-    {"name": "Costco", "cities": ["Seattle", "San Francisco", "Los Angeles", "Phoenix", "Dallas"]},
-    {"name": "Home Depot", "cities": ["Atlanta", "Dallas", "Denver", "Phoenix", "San Francisco"]},
-    {"name": "Starbucks", "cities": ["Seattle", "San Francisco", "New York", "Chicago", "Los Angeles"]},
-    {"name": "Nike", "cities": ["Portland", "Los Angeles", "New York"]},
-    {"name": "The Coca-Cola Company", "cities": ["Atlanta", "New York", "Chicago", "Dallas"]},
-    {"name": "PepsiCo", "cities": ["Purchase", "New York", "Chicago", "Dallas"]},
-    {"name": "McKinsey & Company", "cities": ["New York", "Chicago", "San Francisco", "Boston", "Dallas", "Atlanta"]},
-    {"name": "Boston Consulting Group", "cities": ["Boston", "New York", "Chicago", "San Francisco", "Los Angeles"]},
-    {"name": "Bain & Company", "cities": ["Boston", "New York", "Chicago", "San Francisco", "Dallas"]},
-    {"name": "Deloitte", "cities": ["New York", "Chicago", "San Francisco", "Los Angeles", "Dallas", "Atlanta", "Boston"]},
-    {"name": "PwC", "cities": ["New York", "Chicago", "San Francisco", "Los Angeles", "Dallas", "Atlanta"]},
-    {"name": "EY", "cities": ["New York", "Chicago", "San Francisco", "Los Angeles", "Dallas", "Atlanta"]},
-    {"name": "KPMG", "cities": ["New York", "Chicago", "San Francisco", "Los Angeles", "Dallas", "Atlanta"]},
-    {"name": "Accenture", "cities": ["New York", "Chicago", "San Francisco", "Atlanta", "Dallas"]},
-    {"name": "Disney", "cities": ["Burbank", "Los Angeles", "New York", "Orlando"]},
-    {"name": "Warner Bros.", "cities": ["Burbank", "Los Angeles", "New York"]},
-    {"name": "NBCUniversal", "cities": ["New York", "Los Angeles", "Orlando"]},
-    {"name": "Tesla", "cities": ["Austin", "Fremont", "Palo Alto", "New York"]},
-    {"name": "Ford", "cities": ["Detroit", "Dearborn", "Chicago", "Dallas"]},
-    {"name": "General Motors", "cities": ["Detroit", "Austin", "San Francisco", "New York"]},
-    {"name": "Boeing", "cities": ["Chicago", "Seattle", "Arlington", "St. Louis", "Los Angeles"]},
-    {"name": "Lockheed Martin", "cities": ["Bethesda", "Fort Worth", "Denver", "Orlando", "San Francisco"]},
-    {"name": "SpaceX", "cities": ["Hawthorne", "Austin", "Seattle", "Cape Canaveral"]},
-    {"name": "AT&T", "cities": ["Dallas", "Atlanta", "San Francisco", "New York"]},
-    {"name": "Verizon", "cities": ["New York", "Basking Ridge", "Boston", "San Francisco"]},
-    {"name": "T-Mobile", "cities": ["Bellevue", "New York", "Dallas"]}
+    {
+      "name": "Microsoft",
+      "cities": [
+        "Seattle",
+        "Redmond",
+        "San Francisco",
+        "New York",
+        "Austin",
+        "Boston"
+      ]
+    },
+    {
+      "name": "Apple",
+      "cities": [
+        "Cupertino",
+        "San Francisco",
+        "Austin",
+        "New York"
+      ]
+    },
+    {
+      "name": "Google",
+      "cities": [
+        "Mountain View",
+        "San Francisco",
+        "New York",
+        "Seattle",
+        "Austin",
+        "Chicago"
+      ]
+    },
+    {
+      "name": "Amazon",
+      "cities": [
+        "Seattle",
+        "San Francisco",
+        "New York",
+        "Austin",
+        "Nashville",
+        "Arlington",
+        "Boston"
+      ]
+    },
+    {
+      "name": "Meta",
+      "cities": [
+        "Menlo Park",
+        "San Francisco",
+        "New York",
+        "Seattle",
+        "Austin"
+      ]
+    },
+    {
+      "name": "Netflix",
+      "cities": [
+        "Los Gatos",
+        "Los Angeles",
+        "New York"
+      ]
+    },
+    {
+      "name": "Salesforce",
+      "cities": [
+        "San Francisco",
+        "Indianapolis",
+        "New York",
+        "Chicago",
+        "Atlanta"
+      ]
+    },
+    {
+      "name": "Adobe",
+      "cities": [
+        "San Jose",
+        "San Francisco",
+        "Seattle",
+        "New York"
+      ]
+    },
+    {
+      "name": "Oracle",
+      "cities": [
+        "Austin",
+        "San Francisco",
+        "Seattle",
+        "New York"
+      ]
+    },
+    {
+      "name": "IBM",
+      "cities": [
+        "Armonk",
+        "New York",
+        "Austin",
+        "San Francisco",
+        "Boston"
+      ]
+    },
+    {
+      "name": "Intel",
+      "cities": [
+        "Santa Clara",
+        "Portland",
+        "Phoenix",
+        "Austin",
+        "Boston"
+      ]
+    },
+    {
+      "name": "Cisco",
+      "cities": [
+        "San Jose",
+        "San Francisco",
+        "New York",
+        "Austin"
+      ]
+    },
+    {
+      "name": "NVIDIA",
+      "cities": [
+        "Santa Clara",
+        "Seattle",
+        "Austin",
+        "Boston"
+      ]
+    },
+    {
+      "name": "PayPal",
+      "cities": [
+        "San Jose",
+        "Scottsdale",
+        "Austin",
+        "New York"
+      ]
+    },
+    {
+      "name": "Uber",
+      "cities": [
+        "San Francisco",
+        "New York",
+        "Chicago",
+        "Los Angeles"
+      ]
+    },
+    {
+      "name": "Airbnb",
+      "cities": [
+        "San Francisco",
+        "Seattle",
+        "New York"
+      ]
+    },
+    {
+      "name": "Spotify",
+      "cities": [
+        "New York",
+        "Los Angeles",
+        "Boston"
+      ]
+    },
+    {
+      "name": "LinkedIn",
+      "cities": [
+        "Sunnyvale",
+        "San Francisco",
+        "New York",
+        "Chicago"
+      ]
+    },
+    {
+      "name": "Shopify",
+      "cities": [
+        "New York",
+        "San Francisco"
+      ]
+    },
+    {
+      "name": "Zoom",
+      "cities": [
+        "San Jose",
+        "Denver",
+        "Phoenix",
+        "New York"
+      ]
+    },
+    {
+      "name": "Slack",
+      "cities": [
+        "San Francisco",
+        "New York",
+        "Denver"
+      ]
+    },
+    {
+      "name": "Stripe",
+      "cities": [
+        "San Francisco",
+        "Seattle",
+        "New York"
+      ]
+    },
+    {
+      "name": "Dropbox",
+      "cities": [
+        "San Francisco",
+        "Seattle",
+        "New York",
+        "Austin"
+      ]
+    },
+    {
+      "name": "JPMorgan Chase",
+      "cities": [
+        "New York",
+        "Chicago",
+        "Houston",
+        "San Francisco"
+      ]
+    },
+    {
+      "name": "Goldman Sachs",
+      "cities": [
+        "New York",
+        "San Francisco",
+        "Salt Lake City",
+        "Dallas"
+      ]
+    },
+    {
+      "name": "Morgan Stanley",
+      "cities": [
+        "New York",
+        "San Francisco",
+        "Houston"
+      ]
+    },
+    {
+      "name": "Bank of America",
+      "cities": [
+        "Charlotte",
+        "New York",
+        "San Francisco",
+        "Chicago",
+        "Dallas"
+      ]
+    },
+    {
+      "name": "Citigroup",
+      "cities": [
+        "New York",
+        "San Francisco",
+        "Chicago",
+        "Dallas"
+      ]
+    },
+    {
+      "name": "Wells Fargo",
+      "cities": [
+        "San Francisco",
+        "Charlotte",
+        "New York",
+        "Minneapolis",
+        "Phoenix",
+        "Dallas"
+      ]
+    },
+    {
+      "name": "BlackRock",
+      "cities": [
+        "New York",
+        "San Francisco"
+      ]
+    },
+    {
+      "name": "Fidelity Investments",
+      "cities": [
+        "Boston",
+        "New York",
+        "Dallas",
+        "Salt Lake City"
+      ]
+    },
+    {
+      "name": "Charles Schwab",
+      "cities": [
+        "San Francisco",
+        "Austin",
+        "Denver",
+        "Phoenix"
+      ]
+    },
+    {
+      "name": "American Express",
+      "cities": [
+        "New York",
+        "Phoenix",
+        "Fort Lauderdale",
+        "Salt Lake City"
+      ]
+    },
+    {
+      "name": "Johnson & Johnson",
+      "cities": [
+        "New Brunswick",
+        "Philadelphia",
+        "San Francisco",
+        "Boston"
+      ]
+    },
+    {
+      "name": "Pfizer",
+      "cities": [
+        "New York",
+        "San Francisco",
+        "Boston"
+      ]
+    },
+    {
+      "name": "UnitedHealth Group",
+      "cities": [
+        "Minneapolis",
+        "Atlanta",
+        "Dallas",
+        "Phoenix",
+        "Boston"
+      ]
+    },
+    {
+      "name": "CVS Health",
+      "cities": [
+        "Woonsocket",
+        "Hartford",
+        "New York",
+        "Phoenix",
+        "Boston"
+      ]
+    },
+    {
+      "name": "Merck",
+      "cities": [
+        "Kenilworth",
+        "San Francisco",
+        "Boston"
+      ]
+    },
+    {
+      "name": "Walmart",
+      "cities": [
+        "Bentonville",
+        "San Francisco",
+        "Dallas",
+        "Atlanta",
+        "Chicago"
+      ]
+    },
+    {
+      "name": "Target",
+      "cities": [
+        "Minneapolis",
+        "San Francisco",
+        "New York",
+        "Chicago",
+        "Dallas"
+      ]
+    },
+    {
+      "name": "Costco",
+      "cities": [
+        "Seattle",
+        "San Francisco",
+        "Los Angeles",
+        "Phoenix",
+        "Dallas"
+      ]
+    },
+    {
+      "name": "Home Depot",
+      "cities": [
+        "Atlanta",
+        "Dallas",
+        "Denver",
+        "Phoenix",
+        "San Francisco"
+      ]
+    },
+    {
+      "name": "Starbucks",
+      "cities": [
+        "Seattle",
+        "San Francisco",
+        "New York",
+        "Chicago",
+        "Los Angeles"
+      ]
+    },
+    {
+      "name": "Nike",
+      "cities": [
+        "Portland",
+        "Los Angeles",
+        "New York"
+      ]
+    },
+    {
+      "name": "The Coca-Cola Company",
+      "cities": [
+        "Atlanta",
+        "New York",
+        "Chicago",
+        "Dallas"
+      ]
+    },
+    {
+      "name": "PepsiCo",
+      "cities": [
+        "Purchase",
+        "New York",
+        "Chicago",
+        "Dallas"
+      ]
+    },
+    {
+      "name": "McKinsey & Company",
+      "cities": [
+        "New York",
+        "Chicago",
+        "San Francisco",
+        "Boston",
+        "Dallas",
+        "Atlanta"
+      ]
+    },
+    {
+      "name": "Boston Consulting Group",
+      "cities": [
+        "Boston",
+        "New York",
+        "Chicago",
+        "San Francisco",
+        "Los Angeles"
+      ]
+    },
+    {
+      "name": "Bain & Company",
+      "cities": [
+        "Boston",
+        "New York",
+        "Chicago",
+        "San Francisco",
+        "Dallas"
+      ]
+    },
+    {
+      "name": "Deloitte",
+      "cities": [
+        "New York",
+        "Chicago",
+        "San Francisco",
+        "Los Angeles",
+        "Dallas",
+        "Atlanta",
+        "Boston"
+      ]
+    },
+    {
+      "name": "PwC",
+      "cities": [
+        "New York",
+        "Chicago",
+        "San Francisco",
+        "Los Angeles",
+        "Dallas",
+        "Atlanta"
+      ]
+    },
+    {
+      "name": "EY",
+      "cities": [
+        "New York",
+        "Chicago",
+        "San Francisco",
+        "Los Angeles",
+        "Dallas",
+        "Atlanta"
+      ]
+    },
+    {
+      "name": "KPMG",
+      "cities": [
+        "New York",
+        "Chicago",
+        "San Francisco",
+        "Los Angeles",
+        "Dallas",
+        "Atlanta"
+      ]
+    },
+    {
+      "name": "Accenture",
+      "cities": [
+        "New York",
+        "Chicago",
+        "San Francisco",
+        "Atlanta",
+        "Dallas"
+      ]
+    },
+    {
+      "name": "Disney",
+      "cities": [
+        "Burbank",
+        "Los Angeles",
+        "New York",
+        "Orlando"
+      ]
+    },
+    {
+      "name": "Warner Bros.",
+      "cities": [
+        "Burbank",
+        "Los Angeles",
+        "New York"
+      ]
+    },
+    {
+      "name": "NBCUniversal",
+      "cities": [
+        "New York",
+        "Los Angeles",
+        "Orlando"
+      ]
+    },
+    {
+      "name": "Tesla",
+      "cities": [
+        "Austin",
+        "Fremont",
+        "Palo Alto",
+        "New York"
+      ]
+    },
+    {
+      "name": "Ford",
+      "cities": [
+        "Detroit",
+        "Dearborn",
+        "Chicago",
+        "Dallas"
+      ]
+    },
+    {
+      "name": "General Motors",
+      "cities": [
+        "Detroit",
+        "Austin",
+        "San Francisco",
+        "New York"
+      ]
+    },
+    {
+      "name": "Boeing",
+      "cities": [
+        "Chicago",
+        "Seattle",
+        "Arlington",
+        "St. Louis",
+        "Los Angeles"
+      ]
+    },
+    {
+      "name": "Lockheed Martin",
+      "cities": [
+        "Bethesda",
+        "Fort Worth",
+        "Denver",
+        "Orlando",
+        "San Francisco"
+      ]
+    },
+    {
+      "name": "SpaceX",
+      "cities": [
+        "Hawthorne",
+        "Austin",
+        "Seattle",
+        "Cape Canaveral"
+      ]
+    },
+    {
+      "name": "AT&T",
+      "cities": [
+        "Dallas",
+        "Atlanta",
+        "San Francisco",
+        "New York"
+      ]
+    },
+    {
+      "name": "Verizon",
+      "cities": [
+        "New York",
+        "Basking Ridge",
+        "Boston",
+        "San Francisco"
+      ]
+    },
+    {
+      "name": "T-Mobile",
+      "cities": [
+        "Bellevue",
+        "New York",
+        "Dallas"
+      ]
+    }
   ],
   "jobs": [
-    "Software Engineer", "Product Manager", "Data Analyst", "Marketing Manager",
-    "Sales Representative", "Human Resources Manager", "Financial Analyst",
-    "Project Manager", "Business Analyst", "Operations Manager", "Customer Service Representative",
-    "Accountant", "Administrative Assistant", "Executive Assistant", "Graphic Designer",
-    "Web Developer", "Network Administrator", "Database Administrator", "System Administrator",
-    "Quality Assurance Engineer", "Technical Writer", "Content Writer", "UX Designer",
-    "UI Designer", "DevOps Engineer", "Cloud Architect", "Security Analyst",
-    "Data Scientist", "Machine Learning Engineer", "Research Scientist", "Consultant",
-    "Attorney", "Paralegal", "Nurse", "Physician", "Pharmacist", "Teacher", "Professor",
-    "Librarian", "Social Worker", "Counselor", "Psychologist", "Chef", "Restaurant Manager",
-    "Hotel Manager", "Event Coordinator", "Real Estate Agent", "Insurance Agent",
-    "Bank Teller", "Loan Officer", "Financial Advisor", "Investment Analyst",
-    "Supply Chain Manager", "Logistics Coordinator", "Warehouse Manager", "Buyer",
-    "Procurement Specialist", "Mechanical Engineer", "Electrical Engineer", "Civil Engineer",
-    "Chemical Engineer", "Environmental Engineer", "Architect", "Interior Designer",
-    "Construction Manager", "Plumber", "Electrician", "Carpenter", "HVAC Technician"
+    "Software Engineer",
+    "Product Manager",
+    "Data Analyst",
+    "Marketing Manager",
+    "Sales Representative",
+    "Human Resources Manager",
+    "Financial Analyst",
+    "Project Manager",
+    "Business Analyst",
+    "Operations Manager",
+    "Customer Service Representative",
+    "Accountant",
+    "Administrative Assistant",
+    "Executive Assistant",
+    "Graphic Designer",
+    "Web Developer",
+    "Network Administrator",
+    "Database Administrator",
+    "System Administrator",
+    "Quality Assurance Engineer",
+    "Technical Writer",
+    "Content Writer",
+    "UX Designer",
+    "UI Designer",
+    "DevOps Engineer",
+    "Cloud Architect",
+    "Security Analyst",
+    "Data Scientist",
+    "Machine Learning Engineer",
+    "Research Scientist",
+    "Consultant",
+    "Attorney",
+    "Paralegal",
+    "Nurse",
+    "Physician",
+    "Pharmacist",
+    "Teacher",
+    "Professor",
+    "Librarian",
+    "Social Worker",
+    "Counselor",
+    "Psychologist",
+    "Chef",
+    "Restaurant Manager",
+    "Hotel Manager",
+    "Event Coordinator",
+    "Real Estate Agent",
+    "Insurance Agent",
+    "Bank Teller",
+    "Loan Officer",
+    "Financial Advisor",
+    "Investment Analyst",
+    "Supply Chain Manager",
+    "Logistics Coordinator",
+    "Warehouse Manager",
+    "Buyer",
+    "Procurement Specialist",
+    "Mechanical Engineer",
+    "Electrical Engineer",
+    "Civil Engineer",
+    "Chemical Engineer",
+    "Environmental Engineer",
+    "Architect",
+    "Interior Designer",
+    "Construction Manager",
+    "Plumber",
+    "Electrician",
+    "Carpenter",
+    "HVAC Technician"
   ],
   "catch_phrase_adjectives": [
-    "Innovative", "Dynamic", "Cutting-edge", "World-class", "Best-in-class",
-    "Industry-leading", "Revolutionary", "Transformative", "Disruptive", "Seamless",
-    "Scalable", "Robust", "Agile", "Holistic", "Synergistic", "Strategic",
-    "Customer-centric", "Data-driven", "Cloud-native", "AI-powered"
+    "Innovative",
+    "Dynamic",
+    "Cutting-edge",
+    "World-class",
+    "Best-in-class",
+    "Industry-leading",
+    "Revolutionary",
+    "Transformative",
+    "Disruptive",
+    "Seamless",
+    "Scalable",
+    "Robust",
+    "Agile",
+    "Holistic",
+    "Synergistic",
+    "Strategic",
+    "Customer-centric",
+    "Data-driven",
+    "Cloud-native",
+    "AI-powered"
   ],
   "catch_phrase_nouns": [
-    "solutions", "platforms", "frameworks", "ecosystems", "paradigms", "strategies",
-    "methodologies", "approaches", "technologies", "innovations", "capabilities",
-    "experiences", "journeys", "transformations", "optimizations", "integrations"
+    "solutions",
+    "platforms",
+    "frameworks",
+    "ecosystems",
+    "paradigms",
+    "strategies",
+    "methodologies",
+    "approaches",
+    "technologies",
+    "innovations",
+    "capabilities",
+    "experiences",
+    "journeys",
+    "transformations",
+    "optimizations",
+    "integrations"
   ],
   "catch_phrase_verbs": [
-    "deliver", "leverage", "optimize", "transform", "revolutionize", "empower",
-    "accelerate", "streamline", "maximize", "enhance", "drive", "enable",
-    "unlock", "catalyze", "orchestrate", "scale", "modernize", "digitize"
-  ]
+    "deliver",
+    "leverage",
+    "optimize",
+    "transform",
+    "revolutionize",
+    "empower",
+    "accelerate",
+    "streamline",
+    "maximize",
+    "enhance",
+    "drive",
+    "enable",
+    "unlock",
+    "catalyze",
+    "orchestrate",
+    "scale",
+    "modernize",
+    "digitize"
+  ],
+  "catch_phrase_connector": "that"
 }

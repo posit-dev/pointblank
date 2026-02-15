@@ -1,7 +1,23 @@
 {
   "suffixes": [
-    "NV", "SA", "BVBA", "SPRL", "CV", "SC", "CVBA", "SCRL", "VOF", "SNC",
-    "Comm.V", "SCS", "GCV", "SE", "SCA", "SCOMM", "Group", "Holding"
+    "NV",
+    "SA",
+    "BVBA",
+    "SPRL",
+    "CV",
+    "SC",
+    "CVBA",
+    "SCRL",
+    "VOF",
+    "SNC",
+    "Comm.V",
+    "SCS",
+    "GCV",
+    "SE",
+    "SCA",
+    "SCOMM",
+    "Group",
+    "Holding"
   ],
   "formats": [
     "{last_name} {suffix}",
@@ -12,118 +28,630 @@
     "{adjective} {noun}"
   ],
   "adjectives": [
-    "Belgian", "Royal", "National", "International", "European", "Global", "United",
-    "Northern", "Southern", "Central", "East", "West", "Premium", "First", "Advanced",
-    "Modern", "Classic", "Digital", "Smart", "Green", "Blue", "Golden", "Silver",
-    "Flemish", "Walloon", "Bruxelles"
+    "Belgian",
+    "Royal",
+    "National",
+    "International",
+    "European",
+    "Global",
+    "United",
+    "Northern",
+    "Southern",
+    "Central",
+    "East",
+    "West",
+    "Premium",
+    "First",
+    "Advanced",
+    "Modern",
+    "Classic",
+    "Digital",
+    "Smart",
+    "Green",
+    "Blue",
+    "Golden",
+    "Silver",
+    "Flemish",
+    "Walloon",
+    "Bruxelles"
   ],
   "nouns": [
-    "Solutions", "Services", "Industries", "Technologies", "Systems", "Logistics",
-    "Trading", "Finance", "Consulting", "Engineering", "Construction", "Transport",
-    "Energy", "Pharma", "Biotech", "Medical", "Foods", "Brewing", "Chocolate",
-    "Textiles", "Chemicals", "Steel", "Diamond", "Port", "Media", "Telecom",
-    "Insurance", "Banking", "Investment", "Real Estate", "Retail", "Distribution"
+    "Solutions",
+    "Services",
+    "Industries",
+    "Technologies",
+    "Systems",
+    "Logistics",
+    "Trading",
+    "Finance",
+    "Consulting",
+    "Engineering",
+    "Construction",
+    "Transport",
+    "Energy",
+    "Pharma",
+    "Biotech",
+    "Medical",
+    "Foods",
+    "Brewing",
+    "Chocolate",
+    "Textiles",
+    "Chemicals",
+    "Steel",
+    "Diamond",
+    "Port",
+    "Media",
+    "Telecom",
+    "Insurance",
+    "Banking",
+    "Investment",
+    "Real Estate",
+    "Retail",
+    "Distribution"
   ],
   "well_known_companies": [
-    {"name": "Anheuser-Busch InBev", "cities": ["Leuven", "Bruxelles"]},
-    {"name": "KBC Group", "cities": ["Bruxelles", "Antwerp", "Leuven"]},
-    {"name": "Proximus", "cities": ["Bruxelles"]},
-    {"name": "Colruyt Group", "cities": ["Bruxelles"]},
-    {"name": "UCB", "cities": ["Bruxelles"]},
-    {"name": "Solvay", "cities": ["Bruxelles"]},
-    {"name": "Umicore", "cities": ["Bruxelles", "Antwerp"]},
-    {"name": "Ageas", "cities": ["Bruxelles", "Antwerp"]},
-    {"name": "bpost", "cities": ["Bruxelles"]},
-    {"name": "Telenet", "cities": ["Mechelen", "Bruxelles"]},
-    {"name": "Delhaize", "cities": ["Bruxelles"]},
-    {"name": "Elia", "cities": ["Bruxelles"]},
-    {"name": "Sofina", "cities": ["Bruxelles"]},
-    {"name": "Ackermans & van Haaren", "cities": ["Antwerp"]},
-    {"name": "Groupe Bruxelles Lambert", "cities": ["Bruxelles"]},
-    {"name": "D'Ieteren", "cities": ["Bruxelles"]},
-    {"name": "Bekaert", "cities": ["Kortrijk"]},
-    {"name": "Barco", "cities": ["Kortrijk"]},
-    {"name": "Lotus Bakeries", "cities": ["Lembeke"]},
-    {"name": "Puratos", "cities": ["Bruxelles"]},
-    {"name": "Barry Callebaut", "cities": ["Bruxelles"]},
-    {"name": "Godiva", "cities": ["Bruxelles"]},
-    {"name": "Leonidas", "cities": ["Bruxelles"]},
-    {"name": "Neuhaus", "cities": ["Bruxelles"]},
-    {"name": "Côte d'Or", "cities": ["Bruxelles"]},
-    {"name": "Stella Artois", "cities": ["Leuven"]},
-    {"name": "Jupiler", "cities": ["Liège"]},
-    {"name": "Duvel Moortgat", "cities": ["Antwerp"]},
-    {"name": "Chimay", "cities": ["Chimay"]},
-    {"name": "Westmalle", "cities": ["Antwerp"]},
-    {"name": "Dexia", "cities": ["Bruxelles"]},
-    {"name": "ING Belgium", "cities": ["Bruxelles", "Antwerp", "Ghent", "Liège"]},
-    {"name": "BNP Paribas Fortis", "cities": ["Bruxelles", "Antwerp", "Ghent", "Liège"]},
-    {"name": "Belfius", "cities": ["Bruxelles"]},
-    {"name": "AXA Belgium", "cities": ["Bruxelles", "Antwerp", "Liège"]},
-    {"name": "AG Insurance", "cities": ["Bruxelles"]},
-    {"name": "Ethias", "cities": ["Liège"]},
-    {"name": "Port of Antwerp-Bruges", "cities": ["Antwerp", "Bruges"]},
-    {"name": "SNCB/NMBS", "cities": ["Bruxelles"]},
-    {"name": "Brussels Airlines", "cities": ["Bruxelles"]},
-    {"name": "Sabena Technics", "cities": ["Bruxelles"]},
-    {"name": "Jan De Nul", "cities": ["Aalst"]},
-    {"name": "DEME", "cities": ["Antwerp"]},
-    {"name": "Besix", "cities": ["Bruxelles"]},
-    {"name": "CFE", "cities": ["Bruxelles"]},
-    {"name": "Arcelor Mittal Belgium", "cities": ["Ghent", "Liège"]},
-    {"name": "BASF Antwerpen", "cities": ["Antwerp"]},
-    {"name": "Janssen Pharmaceutica", "cities": ["Beerse"]},
-    {"name": "GSK Belgium", "cities": ["Bruxelles", "Wavre"]},
-    {"name": "Pfizer Belgium", "cities": ["Bruxelles"]},
-    {"name": "Agfa-Gevaert", "cities": ["Mortsel"]},
-    {"name": "Atlas Copco Belgium", "cities": ["Antwerp"]},
-    {"name": "Volvo Cars Ghent", "cities": ["Ghent"]},
-    {"name": "Audi Brussels", "cities": ["Bruxelles"]},
-    {"name": "Van Hool", "cities": ["Lier"]},
-    {"name": "Recticel", "cities": ["Bruxelles"]},
-    {"name": "Ontex", "cities": ["Aalst"]},
-    {"name": "EVS Broadcast Equipment", "cities": ["Liège"]},
-    {"name": "Melexis", "cities": ["Ypres"]},
-    {"name": "Materialise", "cities": ["Leuven"]},
-    {"name": "Collibra", "cities": ["Bruxelles"]},
-    {"name": "Showpad", "cities": ["Ghent"]},
-    {"name": "Teamleader", "cities": ["Ghent"]},
-    {"name": "Cake", "cities": ["Antwerp"]},
-    {"name": "Cowboy", "cities": ["Bruxelles"]},
-    {"name": "Deliverect", "cities": ["Ghent"]},
-    {"name": "Odoo", "cities": ["Louvain-la-Neuve"]},
-    {"name": "Unleashed", "cities": ["Ghent"]},
-    {"name": "Silverfin", "cities": ["Ghent"]},
-    {"name": "Guardsquare", "cities": ["Leuven"]},
-    {"name": "Skyline Communications", "cities": ["Izegem"]},
-    {"name": "Lansweeper", "cities": ["Dendermonde"]},
-    {"name": "Mediagenix", "cities": ["Bruxelles"]},
-    {"name": "Sibelco", "cities": ["Antwerp"]},
-    {"name": "Spadel", "cities": ["Bruxelles"]},
-    {"name": "Vandemoortele", "cities": ["Ghent"]},
-    {"name": "Agristo", "cities": ["Harelbeke"]}
+    {
+      "name": "Anheuser-Busch InBev",
+      "cities": [
+        "Leuven",
+        "Bruxelles"
+      ]
+    },
+    {
+      "name": "KBC Group",
+      "cities": [
+        "Bruxelles",
+        "Antwerp",
+        "Leuven"
+      ]
+    },
+    {
+      "name": "Proximus",
+      "cities": [
+        "Bruxelles"
+      ]
+    },
+    {
+      "name": "Colruyt Group",
+      "cities": [
+        "Bruxelles"
+      ]
+    },
+    {
+      "name": "UCB",
+      "cities": [
+        "Bruxelles"
+      ]
+    },
+    {
+      "name": "Solvay",
+      "cities": [
+        "Bruxelles"
+      ]
+    },
+    {
+      "name": "Umicore",
+      "cities": [
+        "Bruxelles",
+        "Antwerp"
+      ]
+    },
+    {
+      "name": "Ageas",
+      "cities": [
+        "Bruxelles",
+        "Antwerp"
+      ]
+    },
+    {
+      "name": "bpost",
+      "cities": [
+        "Bruxelles"
+      ]
+    },
+    {
+      "name": "Telenet",
+      "cities": [
+        "Mechelen",
+        "Bruxelles"
+      ]
+    },
+    {
+      "name": "Delhaize",
+      "cities": [
+        "Bruxelles"
+      ]
+    },
+    {
+      "name": "Elia",
+      "cities": [
+        "Bruxelles"
+      ]
+    },
+    {
+      "name": "Sofina",
+      "cities": [
+        "Bruxelles"
+      ]
+    },
+    {
+      "name": "Ackermans & van Haaren",
+      "cities": [
+        "Antwerp"
+      ]
+    },
+    {
+      "name": "Groupe Bruxelles Lambert",
+      "cities": [
+        "Bruxelles"
+      ]
+    },
+    {
+      "name": "D'Ieteren",
+      "cities": [
+        "Bruxelles"
+      ]
+    },
+    {
+      "name": "Bekaert",
+      "cities": [
+        "Kortrijk"
+      ]
+    },
+    {
+      "name": "Barco",
+      "cities": [
+        "Kortrijk"
+      ]
+    },
+    {
+      "name": "Lotus Bakeries",
+      "cities": [
+        "Lembeke"
+      ]
+    },
+    {
+      "name": "Puratos",
+      "cities": [
+        "Bruxelles"
+      ]
+    },
+    {
+      "name": "Barry Callebaut",
+      "cities": [
+        "Bruxelles"
+      ]
+    },
+    {
+      "name": "Godiva",
+      "cities": [
+        "Bruxelles"
+      ]
+    },
+    {
+      "name": "Leonidas",
+      "cities": [
+        "Bruxelles"
+      ]
+    },
+    {
+      "name": "Neuhaus",
+      "cities": [
+        "Bruxelles"
+      ]
+    },
+    {
+      "name": "Côte d'Or",
+      "cities": [
+        "Bruxelles"
+      ]
+    },
+    {
+      "name": "Stella Artois",
+      "cities": [
+        "Leuven"
+      ]
+    },
+    {
+      "name": "Jupiler",
+      "cities": [
+        "Liège"
+      ]
+    },
+    {
+      "name": "Duvel Moortgat",
+      "cities": [
+        "Antwerp"
+      ]
+    },
+    {
+      "name": "Chimay",
+      "cities": [
+        "Chimay"
+      ]
+    },
+    {
+      "name": "Westmalle",
+      "cities": [
+        "Antwerp"
+      ]
+    },
+    {
+      "name": "Dexia",
+      "cities": [
+        "Bruxelles"
+      ]
+    },
+    {
+      "name": "ING Belgium",
+      "cities": [
+        "Bruxelles",
+        "Antwerp",
+        "Ghent",
+        "Liège"
+      ]
+    },
+    {
+      "name": "BNP Paribas Fortis",
+      "cities": [
+        "Bruxelles",
+        "Antwerp",
+        "Ghent",
+        "Liège"
+      ]
+    },
+    {
+      "name": "Belfius",
+      "cities": [
+        "Bruxelles"
+      ]
+    },
+    {
+      "name": "AXA Belgium",
+      "cities": [
+        "Bruxelles",
+        "Antwerp",
+        "Liège"
+      ]
+    },
+    {
+      "name": "AG Insurance",
+      "cities": [
+        "Bruxelles"
+      ]
+    },
+    {
+      "name": "Ethias",
+      "cities": [
+        "Liège"
+      ]
+    },
+    {
+      "name": "Port of Antwerp-Bruges",
+      "cities": [
+        "Antwerp",
+        "Bruges"
+      ]
+    },
+    {
+      "name": "SNCB/NMBS",
+      "cities": [
+        "Bruxelles"
+      ]
+    },
+    {
+      "name": "Brussels Airlines",
+      "cities": [
+        "Bruxelles"
+      ]
+    },
+    {
+      "name": "Sabena Technics",
+      "cities": [
+        "Bruxelles"
+      ]
+    },
+    {
+      "name": "Jan De Nul",
+      "cities": [
+        "Aalst"
+      ]
+    },
+    {
+      "name": "DEME",
+      "cities": [
+        "Antwerp"
+      ]
+    },
+    {
+      "name": "Besix",
+      "cities": [
+        "Bruxelles"
+      ]
+    },
+    {
+      "name": "CFE",
+      "cities": [
+        "Bruxelles"
+      ]
+    },
+    {
+      "name": "Arcelor Mittal Belgium",
+      "cities": [
+        "Ghent",
+        "Liège"
+      ]
+    },
+    {
+      "name": "BASF Antwerpen",
+      "cities": [
+        "Antwerp"
+      ]
+    },
+    {
+      "name": "Janssen Pharmaceutica",
+      "cities": [
+        "Beerse"
+      ]
+    },
+    {
+      "name": "GSK Belgium",
+      "cities": [
+        "Bruxelles",
+        "Wavre"
+      ]
+    },
+    {
+      "name": "Pfizer Belgium",
+      "cities": [
+        "Bruxelles"
+      ]
+    },
+    {
+      "name": "Agfa-Gevaert",
+      "cities": [
+        "Mortsel"
+      ]
+    },
+    {
+      "name": "Atlas Copco Belgium",
+      "cities": [
+        "Antwerp"
+      ]
+    },
+    {
+      "name": "Volvo Cars Ghent",
+      "cities": [
+        "Ghent"
+      ]
+    },
+    {
+      "name": "Audi Brussels",
+      "cities": [
+        "Bruxelles"
+      ]
+    },
+    {
+      "name": "Van Hool",
+      "cities": [
+        "Lier"
+      ]
+    },
+    {
+      "name": "Recticel",
+      "cities": [
+        "Bruxelles"
+      ]
+    },
+    {
+      "name": "Ontex",
+      "cities": [
+        "Aalst"
+      ]
+    },
+    {
+      "name": "EVS Broadcast Equipment",
+      "cities": [
+        "Liège"
+      ]
+    },
+    {
+      "name": "Melexis",
+      "cities": [
+        "Ypres"
+      ]
+    },
+    {
+      "name": "Materialise",
+      "cities": [
+        "Leuven"
+      ]
+    },
+    {
+      "name": "Collibra",
+      "cities": [
+        "Bruxelles"
+      ]
+    },
+    {
+      "name": "Showpad",
+      "cities": [
+        "Ghent"
+      ]
+    },
+    {
+      "name": "Teamleader",
+      "cities": [
+        "Ghent"
+      ]
+    },
+    {
+      "name": "Cake",
+      "cities": [
+        "Antwerp"
+      ]
+    },
+    {
+      "name": "Cowboy",
+      "cities": [
+        "Bruxelles"
+      ]
+    },
+    {
+      "name": "Deliverect",
+      "cities": [
+        "Ghent"
+      ]
+    },
+    {
+      "name": "Odoo",
+      "cities": [
+        "Louvain-la-Neuve"
+      ]
+    },
+    {
+      "name": "Unleashed",
+      "cities": [
+        "Ghent"
+      ]
+    },
+    {
+      "name": "Silverfin",
+      "cities": [
+        "Ghent"
+      ]
+    },
+    {
+      "name": "Guardsquare",
+      "cities": [
+        "Leuven"
+      ]
+    },
+    {
+      "name": "Skyline Communications",
+      "cities": [
+        "Izegem"
+      ]
+    },
+    {
+      "name": "Lansweeper",
+      "cities": [
+        "Dendermonde"
+      ]
+    },
+    {
+      "name": "Mediagenix",
+      "cities": [
+        "Bruxelles"
+      ]
+    },
+    {
+      "name": "Sibelco",
+      "cities": [
+        "Antwerp"
+      ]
+    },
+    {
+      "name": "Spadel",
+      "cities": [
+        "Bruxelles"
+      ]
+    },
+    {
+      "name": "Vandemoortele",
+      "cities": [
+        "Ghent"
+      ]
+    },
+    {
+      "name": "Agristo",
+      "cities": [
+        "Harelbeke"
+      ]
+    }
   ],
   "jobs": [
-    "Software Engineer", "Product Manager", "Data Analyst", "Marketing Manager",
-    "Sales Representative", "Human Resources Manager", "Financial Analyst",
-    "Project Manager", "Business Analyst", "Operations Manager", "Accountant",
-    "Administrative Assistant", "Graphic Designer", "Web Developer", "DevOps Engineer",
-    "Quality Assurance Engineer", "Technical Writer", "UX Designer", "Consultant",
-    "Attorney", "Nurse", "Physician", "Pharmacist", "Teacher", "Professor",
-    "Engineer", "Architect", "Construction Manager", "Electrician", "Mechanic",
-    "Chef", "Restaurant Manager", "Hotel Manager", "Bank Teller", "Financial Advisor",
-    "Supply Chain Manager", "Logistics Coordinator", "Buyer", "Civil Engineer"
+    "Software Engineer",
+    "Product Manager",
+    "Data Analyst",
+    "Marketing Manager",
+    "Sales Representative",
+    "Human Resources Manager",
+    "Financial Analyst",
+    "Project Manager",
+    "Business Analyst",
+    "Operations Manager",
+    "Accountant",
+    "Administrative Assistant",
+    "Graphic Designer",
+    "Web Developer",
+    "DevOps Engineer",
+    "Quality Assurance Engineer",
+    "Technical Writer",
+    "UX Designer",
+    "Consultant",
+    "Attorney",
+    "Nurse",
+    "Physician",
+    "Pharmacist",
+    "Teacher",
+    "Professor",
+    "Engineer",
+    "Architect",
+    "Construction Manager",
+    "Electrician",
+    "Mechanic",
+    "Chef",
+    "Restaurant Manager",
+    "Hotel Manager",
+    "Bank Teller",
+    "Financial Advisor",
+    "Supply Chain Manager",
+    "Logistics Coordinator",
+    "Buyer",
+    "Civil Engineer"
   ],
   "catch_phrase_adjectives": [
-    "innovative", "reliable", "dynamic", "sustainable", "quality", "professional",
-    "creative", "efficient", "flexible", "trusted", "leading", "experienced"
+    "innovative",
+    "reliable",
+    "dynamic",
+    "sustainable",
+    "quality",
+    "professional",
+    "creative",
+    "efficient",
+    "flexible",
+    "trusted",
+    "leading",
+    "experienced"
   ],
   "catch_phrase_nouns": [
-    "solutions", "services", "quality", "innovation", "excellence", "partnership",
-    "expertise", "performance", "growth", "success", "value", "results"
+    "solutions",
+    "services",
+    "quality",
+    "innovation",
+    "excellence",
+    "partnership",
+    "expertise",
+    "performance",
+    "growth",
+    "success",
+    "value",
+    "results"
   ],
   "catch_phrase_verbs": [
-    "delivering", "providing", "creating", "building", "driving", "enabling",
-    "empowering", "transforming", "connecting", "inspiring", "achieving", "exceeding"
-  ]
+    "delivering",
+    "providing",
+    "creating",
+    "building",
+    "driving",
+    "enabling",
+    "empowering",
+    "transforming",
+    "connecting",
+    "inspiring",
+    "achieving",
+    "exceeding"
+  ],
+  "catch_phrase_connector": "that"
 }

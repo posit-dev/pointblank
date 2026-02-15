@@ -1,9 +1,46 @@
 {
   "colors": [
-    "Red", "Blue", "Green", "Yellow", "Orange", "Purple", "Pink", "Brown", "Black", "White",
-    "Gray", "Gold", "Silver", "Maroon", "Navy", "Olive", "Teal", "Aqua", "Coral", "Salmon",
-    "Turquoise", "Indigo", "Violet", "Crimson", "Burgundy", "Lavender", "Beige", "Ivory", "Tan", "Khaki"
+    "Red",
+    "Blue",
+    "Green",
+    "Yellow",
+    "Orange",
+    "Purple",
+    "Pink",
+    "Brown",
+    "Black",
+    "White",
+    "Gray",
+    "Gold",
+    "Silver",
+    "Maroon",
+    "Navy",
+    "Olive",
+    "Teal",
+    "Aqua",
+    "Coral",
+    "Salmon",
+    "Turquoise",
+    "Indigo",
+    "Violet",
+    "Crimson",
+    "Burgundy",
+    "Lavender",
+    "Beige",
+    "Ivory",
+    "Tan",
+    "Khaki"
   ],
-  "currency_symbols": ["R"],
-  "currency_formats": ["R{amount}", "R {amount}"]
+  "currency_symbols": [
+    "R"
+  ],
+  "currency_formats": [
+    "R{amount}",
+    "R {amount}"
+  ],
+  "currency_codes": [
+    "ZAR"
+  ],
+  "ssn_format": "#############",
+  "license_plate_format": "??-##-??-??"
 }

@@ -1,6 +1,15 @@
 {
   "suffixes": [
-    "d.d.", "d.o.o.", "j.d.o.o.", "k.d.", "j.t.d.", "Group", "Hrvatska", "HR", "Holdings", "Corp."
+    "d.d.",
+    "d.o.o.",
+    "j.d.o.o.",
+    "k.d.",
+    "j.t.d.",
+    "Group",
+    "Hrvatska",
+    "HR",
+    "Holdings",
+    "Corp."
   ],
   "formats": [
     "{last_name} {suffix}",
@@ -9,52 +18,241 @@
     "{noun} {suffix}"
   ],
   "adjectives": [
-    "Croatian", "Hrvatska", "Adriatic", "Jadran", "National", "United", "Global", "Premier", "First", "Dalmatian",
-    "Digital", "Smart", "Dynamic", "European", "Advanced", "New", "Central", "Mediterranean", "Modern", "Green"
+    "Croatian",
+    "Hrvatska",
+    "Adriatic",
+    "Jadran",
+    "National",
+    "United",
+    "Global",
+    "Premier",
+    "First",
+    "Dalmatian",
+    "Digital",
+    "Smart",
+    "Dynamic",
+    "European",
+    "Advanced",
+    "New",
+    "Central",
+    "Mediterranean",
+    "Modern",
+    "Green"
   ],
   "nouns": [
-    "Bank", "Telecom", "Energy", "Power", "Shipping", "Tourism", "Agro", "Pharma", "Engineering",
-    "Manufacturing", "Logistics", "Transport", "Trading", "Insurance", "Finance", "Construction", "Foods", "Tech", "Marine", "Oil"
+    "Bank",
+    "Telecom",
+    "Energy",
+    "Power",
+    "Shipping",
+    "Tourism",
+    "Agro",
+    "Pharma",
+    "Engineering",
+    "Manufacturing",
+    "Logistics",
+    "Transport",
+    "Trading",
+    "Insurance",
+    "Finance",
+    "Construction",
+    "Foods",
+    "Tech",
+    "Marine",
+    "Oil"
   ],
   "well_known_companies": [
-    {"name": "INA", "cities": ["Zagreb"]},
-    {"name": "HEP", "cities": ["Zagreb"]},
-    {"name": "Hrvatska pošta", "cities": ["Zagreb"]},
-    {"name": "Hrvatski Telekom", "cities": ["Zagreb"]},
-    {"name": "Podravka", "cities": ["Koprivnica"]},
-    {"name": "Pliva", "cities": ["Zagreb"]},
-    {"name": "Agrokor", "cities": ["Zagreb"]},
-    {"name": "Konzum", "cities": ["Zagreb", "Split", "Rijeka"]},
-    {"name": "Atlantic Grupa", "cities": ["Zagreb"]},
-    {"name": "Rimac Automobili", "cities": ["Zagreb"]},
-    {"name": "Končar", "cities": ["Zagreb"]},
-    {"name": "Đuro Đaković", "cities": ["Slavonski Brod"]},
-    {"name": "Jadrolinija", "cities": ["Rijeka"]},
-    {"name": "Croatia Airlines", "cities": ["Zagreb"]},
-    {"name": "Privredna banka Zagreb", "cities": ["Zagreb"]},
-    {"name": "Zagrebačka banka", "cities": ["Zagreb"]},
-    {"name": "Uljanik", "cities": ["Pula"]},
-    {"name": "Infobip", "cities": ["Zagreb"]},
-    {"name": "Nanobit", "cities": ["Zagreb"]},
-    {"name": "Photon", "cities": ["Zagreb"]}
+    {
+      "name": "INA",
+      "cities": [
+        "Zagreb"
+      ]
+    },
+    {
+      "name": "HEP",
+      "cities": [
+        "Zagreb"
+      ]
+    },
+    {
+      "name": "Hrvatska pošta",
+      "cities": [
+        "Zagreb"
+      ]
+    },
+    {
+      "name": "Hrvatski Telekom",
+      "cities": [
+        "Zagreb"
+      ]
+    },
+    {
+      "name": "Podravka",
+      "cities": [
+        "Koprivnica"
+      ]
+    },
+    {
+      "name": "Pliva",
+      "cities": [
+        "Zagreb"
+      ]
+    },
+    {
+      "name": "Agrokor",
+      "cities": [
+        "Zagreb"
+      ]
+    },
+    {
+      "name": "Konzum",
+      "cities": [
+        "Zagreb",
+        "Split",
+        "Rijeka"
+      ]
+    },
+    {
+      "name": "Atlantic Grupa",
+      "cities": [
+        "Zagreb"
+      ]
+    },
+    {
+      "name": "Rimac Automobili",
+      "cities": [
+        "Zagreb"
+      ]
+    },
+    {
+      "name": "Končar",
+      "cities": [
+        "Zagreb"
+      ]
+    },
+    {
+      "name": "Đuro Đaković",
+      "cities": [
+        "Slavonski Brod"
+      ]
+    },
+    {
+      "name": "Jadrolinija",
+      "cities": [
+        "Rijeka"
+      ]
+    },
+    {
+      "name": "Croatia Airlines",
+      "cities": [
+        "Zagreb"
+      ]
+    },
+    {
+      "name": "Privredna banka Zagreb",
+      "cities": [
+        "Zagreb"
+      ]
+    },
+    {
+      "name": "Zagrebačka banka",
+      "cities": [
+        "Zagreb"
+      ]
+    },
+    {
+      "name": "Uljanik",
+      "cities": [
+        "Pula"
+      ]
+    },
+    {
+      "name": "Infobip",
+      "cities": [
+        "Zagreb"
+      ]
+    },
+    {
+      "name": "Nanobit",
+      "cities": [
+        "Zagreb"
+      ]
+    },
+    {
+      "name": "Photon",
+      "cities": [
+        "Zagreb"
+      ]
+    }
   ],
   "jobs": [
-    "Software Engineer", "Product Manager", "Data Analyst", "Marketing Manager", "Sales Representative",
-    "HR Manager", "Financial Analyst", "Project Manager", "Operations Manager", "UI/UX Designer",
-    "Frontend Developer", "Backend Developer", "DevOps Engineer", "QA Engineer", "Data Scientist",
-    "Accountant", "Business Analyst", "Customer Service Representative", "Logistics Coordinator", "Tourism Manager",
-    "Marine Engineer", "Hospitality Manager", "Winemaker", "Chef", "Ship Captain"
+    "Software Engineer",
+    "Product Manager",
+    "Data Analyst",
+    "Marketing Manager",
+    "Sales Representative",
+    "HR Manager",
+    "Financial Analyst",
+    "Project Manager",
+    "Operations Manager",
+    "UI/UX Designer",
+    "Frontend Developer",
+    "Backend Developer",
+    "DevOps Engineer",
+    "QA Engineer",
+    "Data Scientist",
+    "Accountant",
+    "Business Analyst",
+    "Customer Service Representative",
+    "Logistics Coordinator",
+    "Tourism Manager",
+    "Marine Engineer",
+    "Hospitality Manager",
+    "Winemaker",
+    "Chef",
+    "Ship Captain"
   ],
   "catch_phrase_adjectives": [
-    "Innovative", "Reliable", "Professional", "Dynamic", "Trusted", "Leading", "Modern", "Sustainable",
-    "Customer-focused", "Quality-driven", "European", "Croatian"
+    "Innovative",
+    "Reliable",
+    "Professional",
+    "Dynamic",
+    "Trusted",
+    "Leading",
+    "Modern",
+    "Sustainable",
+    "Customer-focused",
+    "Quality-driven",
+    "European",
+    "Croatian"
   ],
   "catch_phrase_nouns": [
-    "solutions", "services", "quality", "excellence", "innovation", "value", "partnership", "growth",
-    "performance", "reliability", "integrity", "success"
+    "solutions",
+    "services",
+    "quality",
+    "excellence",
+    "innovation",
+    "value",
+    "partnership",
+    "growth",
+    "performance",
+    "reliability",
+    "integrity",
+    "success"
   ],
   "catch_phrase_verbs": [
-    "deliver", "create", "build", "provide", "enable", "achieve", "drive", "transform", "empower",
-    "connect", "innovate", "lead"
-  ]
+    "deliver",
+    "create",
+    "build",
+    "provide",
+    "enable",
+    "achieve",
+    "drive",
+    "transform",
+    "empower",
+    "connect",
+    "innovate",
+    "lead"
+  ],
+  "catch_phrase_connector": "that"
 }

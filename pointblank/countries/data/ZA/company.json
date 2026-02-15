@@ -1,8 +1,20 @@
 {
   "suffixes": [
-    "(Pty) Ltd", "Ltd", "Holdings", "Group", "Corporation", "Inc.",
-    "Investments", "Enterprises", "Industries", "Solutions",
-    "Technologies", "Services", "Trading", "Capital", "Partners"
+    "(Pty) Ltd",
+    "Ltd",
+    "Holdings",
+    "Group",
+    "Corporation",
+    "Inc.",
+    "Investments",
+    "Enterprises",
+    "Industries",
+    "Solutions",
+    "Technologies",
+    "Services",
+    "Trading",
+    "Capital",
+    "Partners"
   ],
   "formats": [
     "{last_name} {suffix}",
@@ -11,56 +23,277 @@
     "{noun} {suffix}"
   ],
   "adjectives": [
-    "African", "Southern", "National", "United", "Premier", "Golden",
-    "Continental", "First", "Dynamic", "Protea", "Rainbow", "Standard",
-    "Discovery", "Sasol", "Investec", "Imperial", "Momentum", "Liberty",
-    "Vodacom", "Capitec"
+    "African",
+    "Southern",
+    "National",
+    "United",
+    "Premier",
+    "Golden",
+    "Continental",
+    "First",
+    "Dynamic",
+    "Protea",
+    "Rainbow",
+    "Standard",
+    "Discovery",
+    "Sasol",
+    "Investec",
+    "Imperial",
+    "Momentum",
+    "Liberty",
+    "Vodacom",
+    "Capitec"
   ],
   "nouns": [
-    "Bank", "Mining", "Energy", "Holdings", "Properties", "Realty",
-    "Foods", "Retail", "Manufacturing", "Telecommunications",
-    "Construction", "Resources", "Logistics", "Insurance", "Finance",
-    "Minerals", "Petroleum", "Infrastructure", "Breweries", "Steel"
+    "Bank",
+    "Mining",
+    "Energy",
+    "Holdings",
+    "Properties",
+    "Realty",
+    "Foods",
+    "Retail",
+    "Manufacturing",
+    "Telecommunications",
+    "Construction",
+    "Resources",
+    "Logistics",
+    "Insurance",
+    "Finance",
+    "Minerals",
+    "Petroleum",
+    "Infrastructure",
+    "Breweries",
+    "Steel"
   ],
   "well_known_companies": [
-    {"name": "Naspers", "cities": ["Cape Town", "Johannesburg", "Sandton"]},
-    {"name": "Standard Bank Group", "cities": ["Johannesburg", "Cape Town", "Durban"]},
-    {"name": "MTN Group", "cities": ["Johannesburg", "Sandton", "Cape Town"]},
-    {"name": "Sasol Limited", "cities": ["Johannesburg", "Sandton"]},
-    {"name": "FirstRand Limited", "cities": ["Johannesburg", "Sandton"]},
-    {"name": "Shoprite Holdings", "cities": ["Cape Town", "Stellenbosch"]},
-    {"name": "Vodacom Group", "cities": ["Midrand", "Johannesburg", "Cape Town"]},
-    {"name": "Woolworths Holdings", "cities": ["Cape Town", "Johannesburg"]},
-    {"name": "Pick n Pay Stores", "cities": ["Cape Town", "Johannesburg", "Durban"]},
-    {"name": "Discovery Limited", "cities": ["Johannesburg", "Sandton"]},
-    {"name": "Anglo American Platinum", "cities": ["Johannesburg", "Rustenburg"]},
-    {"name": "Absa Group", "cities": ["Johannesburg", "Cape Town", "Pretoria"]},
-    {"name": "Nedbank Group", "cities": ["Johannesburg", "Sandton"]},
-    {"name": "Investec", "cities": ["Johannesburg", "Sandton", "Cape Town"]},
-    {"name": "Capitec Bank", "cities": ["Stellenbosch", "Cape Town", "Johannesburg"]},
-    {"name": "Old Mutual", "cities": ["Cape Town", "Johannesburg", "Sandton"]},
-    {"name": "Tiger Brands", "cities": ["Johannesburg", "Sandton"]},
-    {"name": "Sanlam", "cities": ["Cape Town", "Stellenbosch", "Johannesburg"]},
-    {"name": "Bidvest Group", "cities": ["Johannesburg", "Sandton"]},
-    {"name": "Sappi Limited", "cities": ["Johannesburg", "Sandton", "Durban"]}
+    {
+      "name": "Naspers",
+      "cities": [
+        "Cape Town",
+        "Johannesburg",
+        "Sandton"
+      ]
+    },
+    {
+      "name": "Standard Bank Group",
+      "cities": [
+        "Johannesburg",
+        "Cape Town",
+        "Durban"
+      ]
+    },
+    {
+      "name": "MTN Group",
+      "cities": [
+        "Johannesburg",
+        "Sandton",
+        "Cape Town"
+      ]
+    },
+    {
+      "name": "Sasol Limited",
+      "cities": [
+        "Johannesburg",
+        "Sandton"
+      ]
+    },
+    {
+      "name": "FirstRand Limited",
+      "cities": [
+        "Johannesburg",
+        "Sandton"
+      ]
+    },
+    {
+      "name": "Shoprite Holdings",
+      "cities": [
+        "Cape Town",
+        "Stellenbosch"
+      ]
+    },
+    {
+      "name": "Vodacom Group",
+      "cities": [
+        "Midrand",
+        "Johannesburg",
+        "Cape Town"
+      ]
+    },
+    {
+      "name": "Woolworths Holdings",
+      "cities": [
+        "Cape Town",
+        "Johannesburg"
+      ]
+    },
+    {
+      "name": "Pick n Pay Stores",
+      "cities": [
+        "Cape Town",
+        "Johannesburg",
+        "Durban"
+      ]
+    },
+    {
+      "name": "Discovery Limited",
+      "cities": [
+        "Johannesburg",
+        "Sandton"
+      ]
+    },
+    {
+      "name": "Anglo American Platinum",
+      "cities": [
+        "Johannesburg",
+        "Rustenburg"
+      ]
+    },
+    {
+      "name": "Absa Group",
+      "cities": [
+        "Johannesburg",
+        "Cape Town",
+        "Pretoria"
+      ]
+    },
+    {
+      "name": "Nedbank Group",
+      "cities": [
+        "Johannesburg",
+        "Sandton"
+      ]
+    },
+    {
+      "name": "Investec",
+      "cities": [
+        "Johannesburg",
+        "Sandton",
+        "Cape Town"
+      ]
+    },
+    {
+      "name": "Capitec Bank",
+      "cities": [
+        "Stellenbosch",
+        "Cape Town",
+        "Johannesburg"
+      ]
+    },
+    {
+      "name": "Old Mutual",
+      "cities": [
+        "Cape Town",
+        "Johannesburg",
+        "Sandton"
+      ]
+    },
+    {
+      "name": "Tiger Brands",
+      "cities": [
+        "Johannesburg",
+        "Sandton"
+      ]
+    },
+    {
+      "name": "Sanlam",
+      "cities": [
+        "Cape Town",
+        "Stellenbosch",
+        "Johannesburg"
+      ]
+    },
+    {
+      "name": "Bidvest Group",
+      "cities": [
+        "Johannesburg",
+        "Sandton"
+      ]
+    },
+    {
+      "name": "Sappi Limited",
+      "cities": [
+        "Johannesburg",
+        "Sandton",
+        "Durban"
+      ]
+    }
   ],
   "jobs": [
-    "Software Engineer", "Product Manager", "Data Analyst", "Marketing Manager", "Sales Executive",
-    "HR Manager", "Financial Analyst", "Project Manager", "Operations Manager", "UI/UX Designer",
-    "Frontend Developer", "Backend Developer", "DevOps Engineer", "QA Engineer", "Data Scientist",
-    "Accountant", "Business Analyst", "Mining Engineer", "Geologist", "Environmental Consultant",
-    "Civil Engineer", "Architect", "Nurse", "Teacher", "Quantity Surveyor"
+    "Software Engineer",
+    "Product Manager",
+    "Data Analyst",
+    "Marketing Manager",
+    "Sales Executive",
+    "HR Manager",
+    "Financial Analyst",
+    "Project Manager",
+    "Operations Manager",
+    "UI/UX Designer",
+    "Frontend Developer",
+    "Backend Developer",
+    "DevOps Engineer",
+    "QA Engineer",
+    "Data Scientist",
+    "Accountant",
+    "Business Analyst",
+    "Mining Engineer",
+    "Geologist",
+    "Environmental Consultant",
+    "Civil Engineer",
+    "Architect",
+    "Nurse",
+    "Teacher",
+    "Quantity Surveyor"
   ],
   "catch_phrase_adjectives": [
-    "Innovative", "Reliable", "Professional", "Dynamic", "Trusted", "Leading", "Modern", "Sustainable",
-    "Customer-focused", "Quality-driven", "Excellent", "Advanced", "Strategic", "Premium"
+    "Innovative",
+    "Reliable",
+    "Professional",
+    "Dynamic",
+    "Trusted",
+    "Leading",
+    "Modern",
+    "Sustainable",
+    "Customer-focused",
+    "Quality-driven",
+    "Excellent",
+    "Advanced",
+    "Strategic",
+    "Premium"
   ],
   "catch_phrase_nouns": [
-    "solutions", "services", "quality", "excellence", "innovation", "value", "partnership", "growth",
-    "performance", "reliability", "integrity", "success", "results", "commitment"
+    "solutions",
+    "services",
+    "quality",
+    "excellence",
+    "innovation",
+    "value",
+    "partnership",
+    "growth",
+    "performance",
+    "reliability",
+    "integrity",
+    "success",
+    "results",
+    "commitment"
   ],
   "catch_phrase_verbs": [
-    "deliver", "create", "build", "provide", "enable", "achieve", "drive", "transform", "empower",
-    "connect", "innovate", "lead", "develop", "optimize", "enhance"
-  ]
+    "deliver",
+    "create",
+    "build",
+    "provide",
+    "enable",
+    "achieve",
+    "drive",
+    "transform",
+    "empower",
+    "connect",
+    "innovate",
+    "lead",
+    "develop",
+    "optimize",
+    "enhance"
+  ],
+  "catch_phrase_connector": "that"
 }
