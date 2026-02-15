@@ -10,10 +10,10 @@ from datetime import date, datetime, time, timedelta
 from typing import TYPE_CHECKING, Any, Callable
 
 from pointblank._utils import _is_lib_present
+from pointblank.countries import LocaleGenerator
 from pointblank.field import Field
 from pointblank.generate.base import GeneratorConfig
 from pointblank.generate.regex import generate_from_regex
-from pointblank.locales import LocaleGenerator
 
 if TYPE_CHECKING:
     pass

@@ -507,7 +507,7 @@ class LocaleRegistry:
     def _load_country_files(self, country: str) -> dict[str, Any] | None:
         """Load all data files for a country."""
         try:
-            data_path = files("pointblank.locales.data") / country
+            data_path = files("pointblank.countries.data") / country
             if not data_path.is_dir():
                 return None
 
