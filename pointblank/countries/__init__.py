@@ -1193,10 +1193,10 @@ class LocaleGenerator:
         # Replace remaining single-instance placeholders
         if "{suffix}" in result:
             suffix = self.rng.choice(suffixes)
-            # Avoid repeating the last word as suffix (e.g., "Life Life")
-            last_word = result.split()[-1] if result.split() else ""
-            if suffix == last_word:
-                alt = [s for s in suffixes if s != suffix]
+            # Avoid repeating any word already in the name as the suffix
+            existing_words = set(result.replace("{suffix}", "").split())
+            if suffix in existing_words:
+                alt = [s for s in suffixes if s not in existing_words]
                 if alt:
                     suffix = self.rng.choice(alt)
             return result.format(suffix=suffix)
@@ -1286,7 +1286,7 @@ class LocaleGenerator:
         tlds = self._data.internet.get("tlds", ["com", "org", "net"])
         words = self._data.text.get("words", ["example", "test", "sample"])
 
-        domain = self.rng.choice(words).lower()
+        domain = _transliterate_to_ascii(self.rng.choice(words).lower())
         domain = "".join(c for c in domain if c.isalnum())
 
         return f"{self.rng.choice(protocols)}www.{domain}.{self.rng.choice(tlds)}"
@@ -1296,7 +1296,7 @@ class LocaleGenerator:
         tlds = self._data.internet.get("tlds", ["com", "org", "net"])
         words = self._data.text.get("words", ["example", "test", "sample"])
 
-        domain = self.rng.choice(words).lower()
+        domain = _transliterate_to_ascii(self.rng.choice(words).lower())
         domain = "".join(c for c in domain if c.isalnum())
 
         return f"{domain}.{self.rng.choice(tlds)}"
@@ -1494,7 +1494,7 @@ class LocaleGenerator:
         """Generate a random file name."""
         words = self._data.text.get("words", ["document", "file", "report"])
         extensions = self._data.misc.get("file_extensions", ["txt", "pdf", "doc", "xlsx"])
-        word = self.rng.choice(words).lower()
+        word = _transliterate_to_ascii(self.rng.choice(words).lower())
         word = "".join(c for c in word if c.isalnum())
         return f"{word}.{self.rng.choice(extensions)}"
 
