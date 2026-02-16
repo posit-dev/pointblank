@@ -503,5 +503,394 @@
     "digitalisiert",
     "entwickelt"
   ],
-  "catch_phrase_connector": "die"
+  "catch_phrase_connector": "die",
+  "industries": [
+    {
+      "name": "technology",
+      "weight": 0.18,
+      "jobs": [
+        "Softwareentwickler",
+        "Produktmanager",
+        "Datenanalyst",
+        "Webentwickler",
+        "DevOps-Ingenieur",
+        "Cloud-Architekt",
+        "Sicherheitsanalyst",
+        "Data Scientist",
+        "Qualitätsingenieur",
+        "Netzwerkadministrator",
+        "Datenbankadministrator",
+        "Systemadministrator"
+      ],
+      "well_known": [
+        "SAP",
+        "Siemens",
+        "Infineon",
+        "Zalando",
+        "Delivery Hero",
+        "HelloFresh",
+        "N26",
+        "Auto1 Group",
+        "Rocket Internet",
+        "Google",
+        "Amazon",
+        "Microsoft",
+        "Apple"
+      ],
+      "company_suffixes": [
+        "Technologien",
+        "Software",
+        "Lösungen",
+        "Digital",
+        "Systeme"
+      ],
+      "company_nouns": [
+        "Software",
+        "Technologie",
+        "Systeme",
+        "Daten",
+        "Analytik",
+        "Netzwerke",
+        "Sicherheit"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{adjective} {noun}",
+        "{last_name} {noun}"
+      ]
+    },
+    {
+      "name": "healthcare",
+      "weight": 0.1,
+      "jobs": [
+        "Arzt",
+        "Apotheker"
+      ],
+      "well_known": [
+        "Bayer",
+        "Fresenius"
+      ],
+      "company_suffixes": [
+        "Gesundheit",
+        "Medizin",
+        "Klinik"
+      ],
+      "company_nouns": [
+        "Gesundheit",
+        "Medizin",
+        "Klinik"
+      ],
+      "company_formats": [
+        "{city} Klinikum",
+        "{city} Universitätsklinikum",
+        "Klinikum {city}",
+        "{city} Krankenhaus",
+        "{last_name}-Klinik"
+      ]
+    },
+    {
+      "name": "finance",
+      "weight": 0.1,
+      "jobs": [
+        "Finanzanalyst",
+        "Buchhalter",
+        "Bankangestellter",
+        "Finanzberater"
+      ],
+      "well_known": [
+        "Deutsche Bank",
+        "Commerzbank",
+        "Allianz",
+        "Munich Re"
+      ],
+      "company_suffixes": [
+        "Finanz",
+        "Kapital",
+        "Investitionen",
+        "Partner",
+        "Gruppe"
+      ],
+      "company_nouns": [
+        "Kapital",
+        "Investitionen",
+        "Finanz",
+        "Beratung"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{last_name} und {last_name}",
+        "{adjective} {noun} {suffix}",
+        "Sparkasse {city}",
+        "{city} Volksbank"
+      ]
+    },
+    {
+      "name": "education",
+      "weight": 0.07,
+      "jobs": [
+        "Lehrer",
+        "Professor"
+      ],
+      "well_known": [],
+      "company_suffixes": [],
+      "company_nouns": [],
+      "company_formats": [
+        "Universität {city}",
+        "Technische Universität {city}",
+        "Hochschule {city}",
+        "Fachhochschule {city}",
+        "{city} Gymnasium",
+        "{city} Gesamtschule"
+      ]
+    },
+    {
+      "name": "legal",
+      "weight": 0.04,
+      "jobs": [
+        "Rechtsanwalt"
+      ],
+      "well_known": [],
+      "company_suffixes": [],
+      "company_nouns": [],
+      "company_formats": [
+        "Kanzlei {last_name} & {last_name}",
+        "{last_name} Rechtsanwälte",
+        "{last_name}, {last_name} & Partner"
+      ]
+    },
+    {
+      "name": "consulting",
+      "weight": 0.08,
+      "jobs": [
+        "Berater",
+        "Business Analyst",
+        "Projektmanager"
+      ],
+      "well_known": [
+        "McKinsey & Company",
+        "Boston Consulting Group",
+        "Deloitte",
+        "PwC",
+        "EY",
+        "KPMG"
+      ],
+      "company_suffixes": [
+        "Beratung",
+        "Gruppe",
+        "Partner",
+        "Consulting"
+      ],
+      "company_nouns": [
+        "Beratung",
+        "Management",
+        "Strategie"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun} {suffix}",
+        "{last_name} und {last_name}"
+      ]
+    },
+    {
+      "name": "marketing_creative",
+      "weight": 0.06,
+      "jobs": [
+        "Marketing-Manager",
+        "Grafikdesigner",
+        "UX-Designer",
+        "Technischer Redakteur"
+      ],
+      "well_known": [],
+      "company_suffixes": [
+        "Medien",
+        "Kreativ",
+        "Studios",
+        "Kommunikation",
+        "Gruppe"
+      ],
+      "company_nouns": [
+        "Medien",
+        "Kreativ",
+        "Kommunikation",
+        "Marketing",
+        "Design"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun}",
+        "{last_name} und {last_name}"
+      ]
+    },
+    {
+      "name": "hospitality",
+      "weight": 0.05,
+      "jobs": [
+        "Koch",
+        "Hotelmanager"
+      ],
+      "well_known": [],
+      "company_suffixes": [
+        "Gastronomie",
+        "Gruppe",
+        "Hotels"
+      ],
+      "company_nouns": [
+        "Gastronomie",
+        "Hotels",
+        "Restaurants",
+        "Catering"
+      ],
+      "company_formats": [
+        "{last_name}s Restaurant",
+        "Hotel {city}",
+        "{adjective} Catering {suffix}",
+        "{city} Kongresszentrum"
+      ]
+    },
+    {
+      "name": "real_estate",
+      "weight": 0.04,
+      "jobs": [
+        "Immobilienmakler"
+      ],
+      "well_known": [],
+      "company_suffixes": [
+        "Immobilien",
+        "Grundstücke",
+        "Gruppe"
+      ],
+      "company_nouns": [
+        "Immobilien",
+        "Grundstücke"
+      ],
+      "company_formats": [
+        "{last_name} Immobilien",
+        "{city} Immobilien",
+        "{adjective} {noun} {suffix}"
+      ]
+    },
+    {
+      "name": "engineering",
+      "weight": 0.1,
+      "jobs": [
+        "Maschinenbauingenieur",
+        "Elektroingenieur",
+        "Bauingenieur",
+        "Architekt",
+        "Bauleiter"
+      ],
+      "well_known": [
+        "Volkswagen",
+        "BMW",
+        "Mercedes-Benz",
+        "Porsche",
+        "Audi",
+        "Bosch",
+        "Continental",
+        "ThyssenKrupp",
+        "BASF",
+        "Airbus",
+        "Tesla"
+      ],
+      "company_suffixes": [
+        "Technik",
+        "Industrie",
+        "Fertigung",
+        "GmbH"
+      ],
+      "company_nouns": [
+        "Technik",
+        "Fertigung",
+        "Bau",
+        "Industrie"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun} {suffix}",
+        "{last_name} und {last_name}",
+        "{city} Ingenieurbüro"
+      ]
+    },
+    {
+      "name": "corporate",
+      "weight": 0.07,
+      "jobs": [
+        "Betriebsleiter",
+        "Verwaltungsassistent",
+        "Personalleiter",
+        "Vertriebsmitarbeiter",
+        "Kundenberater",
+        "Geschäftsführer"
+      ],
+      "well_known": [
+        "Henkel",
+        "Adidas",
+        "Puma",
+        "Deutsche Post DHL",
+        "Lufthansa"
+      ],
+      "company_suffixes": [
+        "GmbH",
+        "AG",
+        "Gruppe",
+        "Unternehmen"
+      ],
+      "company_nouns": [
+        "Lösungen",
+        "Dienstleistungen",
+        "Management",
+        "Industrie"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun} {suffix}",
+        "{last_name} und {last_name}"
+      ]
+    },
+    {
+      "name": "social_services",
+      "weight": 0.02,
+      "jobs": [
+        "Sozialarbeiter"
+      ],
+      "well_known": [],
+      "company_suffixes": [],
+      "company_nouns": [],
+      "company_formats": [
+        "{city} Sozialwerk",
+        "Caritas {city}",
+        "Diakonie {city}",
+        "{city} Familienberatung"
+      ]
+    },
+    {
+      "name": "energy_telecom",
+      "weight": 0.03,
+      "jobs": [
+        "Netzwerkadministrator",
+        "Systemadministrator"
+      ],
+      "well_known": [
+        "Deutsche Telekom",
+        "E.ON",
+        "RWE"
+      ],
+      "company_suffixes": [
+        "Energie",
+        "Strom",
+        "Kommunikation",
+        "Netzwerke"
+      ],
+      "company_nouns": [
+        "Energie",
+        "Strom",
+        "Kommunikation",
+        "Netzwerke"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{last_name} {suffix}"
+      ]
+    }
+  ]
 }

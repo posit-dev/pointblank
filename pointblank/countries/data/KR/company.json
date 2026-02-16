@@ -325,5 +325,221 @@
     "pioneer",
     "shape"
   ],
-  "catch_phrase_connector": "that"
+  "catch_phrase_connector": "that",
+  "industries": [
+    {
+      "name": "consulting",
+      "weight": 0.12,
+      "jobs": [
+        "Project Manager",
+        "Management Consultant",
+        "Business Analyst"
+      ],
+      "well_known": [],
+      "company_suffixes": [
+        "Consulting",
+        "Group",
+        "Partners",
+        "Associates",
+        "Advisory"
+      ],
+      "company_nouns": [
+        "Consulting",
+        "Management",
+        "Strategy",
+        "Advisory"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun} {suffix}",
+        "{last_name} & {last_name}"
+      ]
+    },
+    {
+      "name": "corporate",
+      "weight": 0.16,
+      "jobs": [
+        "Sales Representative",
+        "HR Manager",
+        "Operations Manager"
+      ],
+      "well_known": [
+        "SK Hynix",
+        "POSCO",
+        "Samsung SDI",
+        "LG Chem",
+        "Samsung Display",
+        "Korean Air",
+        "Asiana Airlines",
+        "Lotte Corporation",
+        "CJ Corporation",
+        "Hanwha Group",
+        "Doosan Group"
+      ],
+      "company_suffixes": [
+        "Corp",
+        "Group",
+        "Holdings",
+        "Inc",
+        "Co"
+      ],
+      "company_nouns": [
+        "Solutions",
+        "Services",
+        "Management",
+        "Industries"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun} {suffix}",
+        "{last_name} and {last_name}"
+      ]
+    },
+    {
+      "name": "engineering",
+      "weight": 0.16,
+      "jobs": [
+        "Semiconductor Engineer",
+        "Display Engineer",
+        "Battery Engineer",
+        "Automotive Engineer",
+        "Chemical Engineer"
+      ],
+      "well_known": [
+        "Hyundai Motor",
+        "Kia Motors",
+        "Hyundai Mobis"
+      ],
+      "company_suffixes": [
+        "Engineering",
+        "Industries",
+        "Manufacturing",
+        "Corp"
+      ],
+      "company_nouns": [
+        "Engineering",
+        "Manufacturing",
+        "Construction",
+        "Industries"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun} {suffix}",
+        "{city} Engineering Group"
+      ]
+    },
+    {
+      "name": "finance",
+      "weight": 0.16,
+      "jobs": [
+        "Financial Analyst",
+        "Investment Banker",
+        "Fund Manager",
+        "Accountant"
+      ],
+      "well_known": [
+        "KB Financial Group",
+        "Shinhan Financial Group",
+        "Hana Financial Group"
+      ],
+      "company_suffixes": [
+        "Financial",
+        "Capital",
+        "Investments",
+        "Partners",
+        "Group"
+      ],
+      "company_nouns": [
+        "Capital",
+        "Investments",
+        "Financial",
+        "Wealth",
+        "Advisory"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{last_name} & {last_name}",
+        "{adjective} {noun} {suffix}",
+        "{city} Savings Bank"
+      ]
+    },
+    {
+      "name": "marketing_creative",
+      "weight": 0.12,
+      "jobs": [
+        "Marketing Manager",
+        "Content Creator",
+        "K-pop Manager",
+        "Esports Manager",
+        "Entertainment Producer"
+      ],
+      "well_known": [],
+      "company_suffixes": [
+        "Media",
+        "Creative",
+        "Studios",
+        "Communications",
+        "Group"
+      ],
+      "company_nouns": [
+        "Media",
+        "Creative",
+        "Communications",
+        "Marketing",
+        "Design"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun}",
+        "{last_name} & {last_name}"
+      ]
+    },
+    {
+      "name": "technology",
+      "weight": 0.28,
+      "jobs": [
+        "Software Engineer",
+        "Product Manager",
+        "Data Scientist",
+        "UI/UX Designer",
+        "Frontend Developer",
+        "Backend Developer",
+        "DevOps Engineer",
+        "Mobile Developer",
+        "AI Engineer",
+        "Game Developer"
+      ],
+      "well_known": [
+        "Samsung Electronics",
+        "LG Electronics",
+        "Naver",
+        "Kakao",
+        "Coupang",
+        "Krafton",
+        "NC Soft",
+        "Netmarble"
+      ],
+      "company_suffixes": [
+        "Technologies",
+        "Software",
+        "Solutions",
+        "Labs",
+        "Digital",
+        "Systems"
+      ],
+      "company_nouns": [
+        "Software",
+        "Technologies",
+        "Systems",
+        "Data",
+        "Analytics",
+        "Networks"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{adjective} {noun}",
+        "{last_name} {noun}"
+      ]
+    }
+  ]
 }

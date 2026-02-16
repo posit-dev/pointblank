@@ -361,5 +361,284 @@
     "connect",
     "lead"
   ],
-  "catch_phrase_connector": "that"
+  "catch_phrase_connector": "that",
+  "industries": [
+    {
+      "name": "consulting",
+      "weight": 0.11,
+      "jobs": [
+        "Project Manager"
+      ],
+      "well_known": [],
+      "company_suffixes": [
+        "Consulting",
+        "Group",
+        "Partners",
+        "Associates",
+        "Advisory"
+      ],
+      "company_nouns": [
+        "Consulting",
+        "Management",
+        "Strategy",
+        "Advisory"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun} {suffix}",
+        "{last_name} & {last_name}"
+      ]
+    },
+    {
+      "name": "corporate",
+      "weight": 0.14,
+      "jobs": [
+        "Sales Representative",
+        "HR Manager",
+        "Operations Manager",
+        "Account Manager",
+        "Business Development Manager"
+      ],
+      "well_known": [
+        "HSBC",
+        "Standard Chartered",
+        "CK Hutchison",
+        "Sun Hung Kai Properties",
+        "New World Development",
+        "Henderson Land",
+        "Swire Properties",
+        "MTR Corporation",
+        "AIA Group",
+        "Link REIT",
+        "CLP Holdings",
+        "Jardine Matheson",
+        "Wharf Holdings",
+        "Lenovo",
+        "Li & Fung",
+        "Dairy Farm",
+        "Mandarin Oriental",
+        "Shangri-La Hotels"
+      ],
+      "company_suffixes": [
+        "Ltd",
+        "Holdings",
+        "Group",
+        "International",
+        "Corp"
+      ],
+      "company_nouns": [
+        "Solutions",
+        "Services",
+        "Management",
+        "Industries"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun} {suffix}",
+        "{last_name} and {last_name}"
+      ]
+    },
+    {
+      "name": "engineering",
+      "weight": 0.14,
+      "jobs": [
+        "Architect",
+        "Quantity Surveyor"
+      ],
+      "well_known": [
+        "HK Electric"
+      ],
+      "company_suffixes": [
+        "Engineering",
+        "Industries",
+        "Manufacturing",
+        "Corp"
+      ],
+      "company_nouns": [
+        "Engineering",
+        "Manufacturing",
+        "Construction",
+        "Industries"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun} {suffix}",
+        "{city} Engineering Group"
+      ]
+    },
+    {
+      "name": "finance",
+      "weight": 0.14,
+      "jobs": [
+        "Financial Analyst",
+        "Investment Banker",
+        "Fund Manager",
+        "Risk Analyst",
+        "Compliance Officer",
+        "Auditor",
+        "Trade Finance Specialist"
+      ],
+      "well_known": [
+        "Hang Seng Bank",
+        "Bank of China Hong Kong",
+        "Hong Kong Exchanges"
+      ],
+      "company_suffixes": [
+        "Financial",
+        "Capital",
+        "Investments",
+        "Partners",
+        "Group"
+      ],
+      "company_nouns": [
+        "Capital",
+        "Investments",
+        "Financial",
+        "Wealth",
+        "Advisory"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{last_name} & {last_name}",
+        "{adjective} {noun} {suffix}",
+        "{city} Savings Bank"
+      ]
+    },
+    {
+      "name": "legal",
+      "weight": 0.05,
+      "jobs": [
+        "Legal Counsel",
+        "Paralegal"
+      ],
+      "well_known": [],
+      "company_suffixes": [],
+      "company_nouns": [],
+      "company_formats": [
+        "{last_name} & {last_name} Law",
+        "{last_name} Legal Services",
+        "{city} Legal Associates"
+      ]
+    },
+    {
+      "name": "logistics",
+      "weight": 0.05,
+      "jobs": [
+        "Logistics Coordinator"
+      ],
+      "well_known": [
+        "Cathay Pacific"
+      ],
+      "company_suffixes": [
+        "Logistics",
+        "Transport",
+        "Distribution",
+        "Supply"
+      ],
+      "company_nouns": [
+        "Logistics",
+        "Transport",
+        "Distribution",
+        "Supply"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{last_name} {suffix}",
+        "{city} Freight Services"
+      ]
+    },
+    {
+      "name": "marketing_creative",
+      "weight": 0.11,
+      "jobs": [
+        "Marketing Manager",
+        "Interior Designer"
+      ],
+      "well_known": [
+        "Galaxy Entertainment"
+      ],
+      "company_suffixes": [
+        "Media",
+        "Creative",
+        "Studios",
+        "Communications",
+        "Group"
+      ],
+      "company_nouns": [
+        "Media",
+        "Creative",
+        "Communications",
+        "Marketing",
+        "Design"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun}",
+        "{last_name} & {last_name}"
+      ]
+    },
+    {
+      "name": "real_estate_insurance",
+      "weight": 0.03,
+      "jobs": [
+        "Property Agent"
+      ],
+      "well_known": [],
+      "company_suffixes": [
+        "Realty",
+        "Properties",
+        "Insurance",
+        "Group"
+      ],
+      "company_nouns": [
+        "Properties",
+        "Realty",
+        "Insurance"
+      ],
+      "company_formats": [
+        "{last_name} Realty",
+        "{city} Real Estate",
+        "{last_name} Insurance Agency"
+      ]
+    },
+    {
+      "name": "technology",
+      "weight": 0.24,
+      "jobs": [
+        "Software Engineer",
+        "Product Manager",
+        "Data Analyst",
+        "UI/UX Designer",
+        "Frontend Developer",
+        "Backend Developer",
+        "QA Engineer",
+        "DevOps Engineer",
+        "Data Scientist"
+      ],
+      "well_known": [
+        "Techtronic Industries"
+      ],
+      "company_suffixes": [
+        "Technologies",
+        "Software",
+        "Solutions",
+        "Labs",
+        "Digital",
+        "Systems"
+      ],
+      "company_nouns": [
+        "Software",
+        "Technologies",
+        "Systems",
+        "Data",
+        "Analytics",
+        "Networks"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{adjective} {noun}",
+        "{last_name} {noun}"
+      ]
+    }
+  ]
 }

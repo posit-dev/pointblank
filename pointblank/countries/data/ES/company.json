@@ -641,5 +641,432 @@
     "diseñamos",
     "gestionamos"
   ],
-  "catch_phrase_connector": "que"
+  "catch_phrase_connector": "que",
+  "industries": [
+    {
+      "name": "consulting",
+      "weight": 0.08,
+      "jobs": [
+        "Analista",
+        "Consultor",
+        "Jefe de proyecto",
+        "Analista",
+        "Consultora",
+        "Jefa de proyecto"
+      ],
+      "well_known": [],
+      "company_suffixes": [
+        "Consulting",
+        "Group",
+        "Partners",
+        "Associates",
+        "Advisory"
+      ],
+      "company_nouns": [
+        "Consulting",
+        "Management",
+        "Strategy",
+        "Advisory"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun} {suffix}",
+        "{last_name} & {last_name}"
+      ]
+    },
+    {
+      "name": "corporate",
+      "weight": 0.11,
+      "jobs": [
+        "Administrador",
+        "Agente comercial",
+        "Comercial",
+        "Coordinador",
+        "Director",
+        "Gerente",
+        "Policía",
+        "Secretario",
+        "Administradora",
+        "Coordinadora",
+        "Directora",
+        "Gerente",
+        "Secretaria"
+      ],
+      "well_known": [
+        "Telefónica",
+        "Banco Santander",
+        "BBVA",
+        "Inditex",
+        "Mapfre",
+        "Ferrovial",
+        "ACS",
+        "Acciona",
+        "Aena",
+        "Sacyr",
+        "FCC",
+        "OHL",
+        "Abertis",
+        "Cellnex",
+        "Mercadona",
+        "El Corte Inglés",
+        "Dia",
+        "Carrefour España",
+        "Eroski",
+        "Prosegur",
+        "Técnicas Reunidas",
+        "Acerinox",
+        "ArcelorMittal España",
+        "Navantia",
+        "Airbus España",
+        "Correos",
+        "Viscofan",
+        "Osborne",
+        "González Byass"
+      ],
+      "company_suffixes": [
+        "S.A.",
+        "S.L.",
+        "Grupo",
+        "Holding"
+      ],
+      "company_nouns": [
+        "Solutions",
+        "Services",
+        "Management",
+        "Industries"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun} {suffix}",
+        "{last_name} and {last_name}"
+      ]
+    },
+    {
+      "name": "education",
+      "weight": 0.06,
+      "jobs": [
+        "Científico",
+        "Investigador",
+        "Maestro",
+        "Profesor",
+        "Científica",
+        "Investigadora",
+        "Maestra",
+        "Profesora"
+      ],
+      "well_known": [],
+      "company_suffixes": [],
+      "company_nouns": [],
+      "company_formats": [
+        "Universidad de {city}",
+        "Universidad {last_name}",
+        "Instituto {last_name}",
+        "Colegio {last_name}"
+      ]
+    },
+    {
+      "name": "engineering",
+      "weight": 0.11,
+      "jobs": [
+        "Arquitecto",
+        "Ingeniero",
+        "Técnico",
+        "Arquitecta",
+        "Ingeniera",
+        "Técnica"
+      ],
+      "well_known": [
+        "Iberdrola",
+        "Repsol",
+        "Endesa",
+        "Naturgy",
+        "Red Eléctrica",
+        "Siemens Gamesa",
+        "Seat",
+        "Cepsa"
+      ],
+      "company_suffixes": [
+        "Engineering",
+        "Industries",
+        "Manufacturing",
+        "Corp"
+      ],
+      "company_nouns": [
+        "Engineering",
+        "Manufacturing",
+        "Construction",
+        "Industries"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun} {suffix}",
+        "{city} Engineering Group"
+      ]
+    },
+    {
+      "name": "finance",
+      "weight": 0.11,
+      "jobs": [
+        "Asesor fiscal",
+        "Auditor",
+        "Cajero",
+        "Contable",
+        "Economista",
+        "Asesora fiscal",
+        "Auditora",
+        "Contable",
+        "Economista"
+      ],
+      "well_known": [
+        "CaixaBank"
+      ],
+      "company_suffixes": [
+        "Financial",
+        "Capital",
+        "Investments",
+        "Partners",
+        "Group"
+      ],
+      "company_nouns": [
+        "Capital",
+        "Investments",
+        "Financial",
+        "Wealth",
+        "Advisory"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{last_name} & {last_name}",
+        "{adjective} {noun} {suffix}",
+        "{city} Savings Bank"
+      ]
+    },
+    {
+      "name": "healthcare",
+      "weight": 0.08,
+      "jobs": [
+        "Enfermero",
+        "Farmacéutico",
+        "Médico",
+        "Psicólogo",
+        "Veterinario",
+        "Enfermera",
+        "Farmacéutica",
+        "Médica",
+        "Psicóloga",
+        "Veterinaria"
+      ],
+      "well_known": [
+        "Grifols",
+        "Almirall",
+        "PharmaMar"
+      ],
+      "company_suffixes": [
+        "Health",
+        "Medical",
+        "Healthcare"
+      ],
+      "company_nouns": [
+        "Healthcare",
+        "Medical",
+        "Health"
+      ],
+      "company_formats": [
+        "Hospital de {city}",
+        "Clínica {last_name}",
+        "Centro Médico {city}",
+        "Hospital General de {city}"
+      ]
+    },
+    {
+      "name": "hospitality",
+      "weight": 0.05,
+      "jobs": [
+        "Chef",
+        "Recepcionista",
+        "Recepcionista"
+      ],
+      "well_known": [
+        "Meliá Hotels",
+        "NH Hotel Group",
+        "Ebro Foods",
+        "Pescanova",
+        "Campofrío",
+        "Mahou San Miguel",
+        "Estrella Damm"
+      ],
+      "company_suffixes": [
+        "Hospitality",
+        "Group",
+        "Hotels",
+        "Restaurants"
+      ],
+      "company_nouns": [
+        "Hospitality",
+        "Hotels",
+        "Restaurants",
+        "Catering"
+      ],
+      "company_formats": [
+        "Restaurante {last_name}",
+        "Hotel {city}",
+        "Hostal {last_name}",
+        "Parador de {city}"
+      ]
+    },
+    {
+      "name": "legal",
+      "weight": 0.04,
+      "jobs": [
+        "Abogado",
+        "Abogada"
+      ],
+      "well_known": [],
+      "company_suffixes": [],
+      "company_nouns": [],
+      "company_formats": [
+        "Bufete {last_name}",
+        "{last_name} & {last_name} Abogados",
+        "Despacho {last_name}"
+      ]
+    },
+    {
+      "name": "logistics",
+      "weight": 0.04,
+      "jobs": [
+        "Conductor",
+        "Piloto"
+      ],
+      "well_known": [
+        "Iberia",
+        "Vueling",
+        "Renfe"
+      ],
+      "company_suffixes": [
+        "Logistics",
+        "Transport",
+        "Distribution",
+        "Supply"
+      ],
+      "company_nouns": [
+        "Logistics",
+        "Transport",
+        "Distribution",
+        "Supply"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{last_name} {suffix}",
+        "{city} Freight Services"
+      ]
+    },
+    {
+      "name": "marketing_creative",
+      "weight": 0.08,
+      "jobs": [
+        "Diseñador",
+        "Editor",
+        "Locutor",
+        "Periodista",
+        "Publicista",
+        "Traductor",
+        "Diseñadora",
+        "Editora",
+        "Periodista",
+        "Publicista",
+        "Traductora"
+      ],
+      "well_known": [
+        "Puig",
+        "Mango",
+        "Desigual",
+        "RTVE",
+        "Mediaset España",
+        "Atresmedia",
+        "Prisa",
+        "Vocento",
+        "Henneo",
+        "La Vanguardia",
+        "Grupo Planeta",
+        "Random House Mondadori"
+      ],
+      "company_suffixes": [
+        "Media",
+        "Creative",
+        "Studios",
+        "Communications",
+        "Group"
+      ],
+      "company_nouns": [
+        "Media",
+        "Creative",
+        "Communications",
+        "Marketing",
+        "Design"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun}",
+        "{last_name} & {last_name}"
+      ]
+    },
+    {
+      "name": "technology",
+      "weight": 0.19,
+      "jobs": [
+        "Desarrollador",
+        "Programador",
+        "Desarrolladora",
+        "Programadora"
+      ],
+      "well_known": [
+        "Amadeus IT",
+        "Indra"
+      ],
+      "company_suffixes": [
+        "Technologies",
+        "Software",
+        "Solutions",
+        "Labs",
+        "Digital",
+        "Systems"
+      ],
+      "company_nouns": [
+        "Software",
+        "Technologies",
+        "Systems",
+        "Data",
+        "Analytics",
+        "Networks"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{adjective} {noun}",
+        "{last_name} {noun}"
+      ]
+    },
+    {
+      "name": "trades",
+      "weight": 0.04,
+      "jobs": [
+        "Electricista",
+        "Fontanero",
+        "Jardinero",
+        "Mecánico",
+        "Pintor",
+        "Soldador"
+      ],
+      "well_known": [],
+      "company_suffixes": [
+        "Services",
+        "Co"
+      ],
+      "company_nouns": [],
+      "company_formats": [
+        "{last_name} Instalaciones",
+        "{last_name} Construcciones",
+        "Servicios {city}"
+      ]
+    }
+  ]
 }

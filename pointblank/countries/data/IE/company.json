@@ -771,5 +771,381 @@
     "serve",
     "care"
   ],
-  "catch_phrase_connector": "that"
+  "catch_phrase_connector": "that",
+  "industries": [
+    {
+      "name": "consulting",
+      "weight": 0.09,
+      "jobs": [
+        "Project Manager",
+        "Business Analyst"
+      ],
+      "well_known": [
+        "Accenture Ireland",
+        "PwC Ireland",
+        "KPMG Ireland",
+        "Deloitte Ireland"
+      ],
+      "company_suffixes": [
+        "Consulting",
+        "Group",
+        "Partners",
+        "Associates",
+        "Advisory"
+      ],
+      "company_nouns": [
+        "Consulting",
+        "Management",
+        "Strategy",
+        "Advisory"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun} {suffix}",
+        "{last_name} & {last_name}"
+      ]
+    },
+    {
+      "name": "corporate",
+      "weight": 0.11,
+      "jobs": [
+        "Sales Executive",
+        "HR Manager",
+        "Operations Manager",
+        "Customer Service Representative",
+        "Account Manager",
+        "Garda",
+        "Civil Servant"
+      ],
+      "well_known": [
+        "Ryanair",
+        "CRH",
+        "Smurfit Kappa",
+        "Kerry Group",
+        "AIB",
+        "DCC",
+        "Kingspan",
+        "Glanbia",
+        "Musgrave",
+        "Dunnes Stores",
+        "Penneys",
+        "SuperValu",
+        "Tesco Ireland",
+        "Lidl Ireland",
+        "Aldi Ireland",
+        "ESB",
+        "Energia",
+        "Irish Ferries",
+        "Stena Line Ireland",
+        "Bus Éireann",
+        "Irish Rail",
+        "Dublin Bus",
+        "Aer Lingus",
+        "DAA",
+        "Irish Life",
+        "Zurich Ireland",
+        "Aviva Ireland",
+        "EY Ireland",
+        "Grant Thornton Ireland",
+        "Arthur Cox",
+        "A&L Goodbody",
+        "McCann FitzGerald",
+        "William Fry",
+        "Matheson",
+        "Diageo Ireland",
+        "Heineken Ireland",
+        "Britvic Ireland",
+        "Baileys",
+        "Jameson",
+        "Kerrygold",
+        "Lakeland Dairies",
+        "Kepak",
+        "Greencore",
+        "Allergan",
+        "Pfizer Ireland",
+        "MSD Ireland",
+        "Johnson & Johnson Ireland",
+        "Boston Scientific Ireland",
+        "Medtronic Ireland",
+        "Stryker Ireland",
+        "Abbott Ireland",
+        "Intel Ireland",
+        "Apple Ireland",
+        "Google Ireland",
+        "Meta Ireland",
+        "Amazon Ireland",
+        "LinkedIn Ireland",
+        "Twitter Ireland",
+        "Salesforce Ireland",
+        "Stripe Ireland",
+        "Workday Ireland",
+        "SAP Ireland",
+        "Oracle Ireland",
+        "IBM Ireland",
+        "Dell Ireland",
+        "HP Ireland"
+      ],
+      "company_suffixes": [
+        "Ltd",
+        "plc",
+        "Group",
+        "Holdings",
+        "Partners"
+      ],
+      "company_nouns": [
+        "Solutions",
+        "Services",
+        "Management",
+        "Industries"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun} {suffix}",
+        "{last_name} and {last_name}"
+      ]
+    },
+    {
+      "name": "education",
+      "weight": 0.07,
+      "jobs": [
+        "Teacher",
+        "Lecturer",
+        "Researcher"
+      ],
+      "well_known": [],
+      "company_suffixes": [],
+      "company_nouns": [],
+      "company_formats": [
+        "University of {city}",
+        "{city} University",
+        "{city} Academy",
+        "{city} School District"
+      ]
+    },
+    {
+      "name": "engineering",
+      "weight": 0.11,
+      "jobs": [
+        "Engineer",
+        "Architect",
+        "Quantity Surveyor",
+        "Farm Manager",
+        "Agricultural Advisor"
+      ],
+      "well_known": [
+        "Bord Gáis Energy",
+        "Coillte"
+      ],
+      "company_suffixes": [
+        "Engineering",
+        "Industries",
+        "Manufacturing",
+        "Corp"
+      ],
+      "company_nouns": [
+        "Engineering",
+        "Manufacturing",
+        "Construction",
+        "Industries"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun} {suffix}",
+        "{city} Engineering Group"
+      ]
+    },
+    {
+      "name": "finance",
+      "weight": 0.11,
+      "jobs": [
+        "Financial Analyst",
+        "Accountant"
+      ],
+      "well_known": [
+        "Bank of Ireland",
+        "FBD Insurance"
+      ],
+      "company_suffixes": [
+        "Financial",
+        "Capital",
+        "Investments",
+        "Partners",
+        "Group"
+      ],
+      "company_nouns": [
+        "Capital",
+        "Investments",
+        "Financial",
+        "Wealth",
+        "Advisory"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{last_name} & {last_name}",
+        "{adjective} {noun} {suffix}",
+        "{city} Savings Bank"
+      ]
+    },
+    {
+      "name": "healthcare",
+      "weight": 0.09,
+      "jobs": [
+        "Nurse",
+        "Doctor",
+        "Pharmacist",
+        "Veterinarian",
+        "Physiotherapist"
+      ],
+      "well_known": [
+        "ICON Clinical Research",
+        "Jazz Pharmaceuticals"
+      ],
+      "company_suffixes": [
+        "Health",
+        "Medical",
+        "Healthcare"
+      ],
+      "company_nouns": [
+        "Healthcare",
+        "Medical",
+        "Health"
+      ],
+      "company_formats": [
+        "{city} General Hospital",
+        "{city} Medical Center",
+        "{city} Regional Health",
+        "{last_name} Medical Group"
+      ]
+    },
+    {
+      "name": "hospitality",
+      "weight": 0.06,
+      "jobs": [
+        "Chef",
+        "Hotel Manager",
+        "Publican"
+      ],
+      "well_known": [
+        "Dairygold",
+        "Dawn Meats",
+        "ABP Food Group"
+      ],
+      "company_suffixes": [
+        "Hospitality",
+        "Group",
+        "Hotels",
+        "Restaurants"
+      ],
+      "company_nouns": [
+        "Hospitality",
+        "Hotels",
+        "Restaurants",
+        "Catering"
+      ],
+      "company_formats": [
+        "The {adjective} {noun}",
+        "{last_name}'s Restaurant",
+        "{city} Grand Hotel"
+      ]
+    },
+    {
+      "name": "legal",
+      "weight": 0.05,
+      "jobs": [
+        "Solicitor",
+        "Barrister"
+      ],
+      "well_known": [],
+      "company_suffixes": [],
+      "company_nouns": [],
+      "company_formats": [
+        "{last_name} & {last_name} Law",
+        "{last_name} Legal Services",
+        "{city} Legal Associates"
+      ]
+    },
+    {
+      "name": "marketing_creative",
+      "weight": 0.09,
+      "jobs": [
+        "Marketing Manager"
+      ],
+      "well_known": [
+        "Flutter Entertainment"
+      ],
+      "company_suffixes": [
+        "Media",
+        "Creative",
+        "Studios",
+        "Communications",
+        "Group"
+      ],
+      "company_nouns": [
+        "Media",
+        "Creative",
+        "Communications",
+        "Marketing",
+        "Design"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun}",
+        "{last_name} & {last_name}"
+      ]
+    },
+    {
+      "name": "social_services",
+      "weight": 0.01,
+      "jobs": [
+        "Social Worker"
+      ],
+      "well_known": [],
+      "company_suffixes": [],
+      "company_nouns": [],
+      "company_formats": [
+        "{city} Community Services",
+        "{city} Family Services",
+        "{city} Social Services Agency"
+      ]
+    },
+    {
+      "name": "technology",
+      "weight": 0.2,
+      "jobs": [
+        "Software Engineer",
+        "Product Manager",
+        "Data Analyst",
+        "IT Support Specialist",
+        "Quality Assurance Engineer",
+        "UX Designer",
+        "Frontend Developer",
+        "Backend Developer",
+        "DevOps Engineer"
+      ],
+      "well_known": [
+        "Microsoft Ireland"
+      ],
+      "company_suffixes": [
+        "Technologies",
+        "Software",
+        "Solutions",
+        "Labs",
+        "Digital",
+        "Systems"
+      ],
+      "company_nouns": [
+        "Software",
+        "Technologies",
+        "Systems",
+        "Data",
+        "Analytics",
+        "Networks"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{adjective} {noun}",
+        "{last_name} {noun}"
+      ]
+    }
+  ]
 }

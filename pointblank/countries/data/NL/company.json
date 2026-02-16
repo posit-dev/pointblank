@@ -676,5 +676,402 @@
     "ondersteunen",
     "versterken"
   ],
-  "catch_phrase_connector": "die"
+  "catch_phrase_connector": "die",
+  "industries": [
+    {
+      "name": "consulting",
+      "weight": 0.09,
+      "jobs": [
+        "Projectmanager",
+        "Business Analyst",
+        "Consultant"
+      ],
+      "well_known": [
+        "KPMG Nederland",
+        "Deloitte Nederland",
+        "PwC Nederland"
+      ],
+      "company_suffixes": [
+        "Consulting",
+        "Group",
+        "Partners",
+        "Associates",
+        "Advisory"
+      ],
+      "company_nouns": [
+        "Consulting",
+        "Management",
+        "Strategy",
+        "Advisory"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun} {suffix}",
+        "{last_name} & {last_name}"
+      ]
+    },
+    {
+      "name": "corporate",
+      "weight": 0.11,
+      "jobs": [
+        "Verkoper",
+        "HR-manager",
+        "Operations Manager",
+        "Accountmanager",
+        "Administratief medewerker",
+        "Directeur"
+      ],
+      "well_known": [
+        "Shell",
+        "Unilever",
+        "Philips",
+        "ING Group",
+        "ABN AMRO",
+        "Heineken",
+        "Ahold Delhaize",
+        "KLM",
+        "Randstad",
+        "EY Nederland",
+        "DSM",
+        "Akzo Nobel",
+        "TNT",
+        "PostNL",
+        "NS",
+        "ProRail",
+        "Schiphol Group",
+        "Aegon",
+        "NN Group",
+        "ASR Nederland",
+        "Wolters Kluwer",
+        "RELX",
+        "VodafoneZiggo",
+        "KPN",
+        "T-Mobile Nederland",
+        "Albert Heijn",
+        "Jumbo Supermarkten",
+        "HEMA",
+        "Wehkamp",
+        "Brunel",
+        "Arcadis",
+        "Fugro",
+        "BAM Groep",
+        "Heijmans",
+        "VolkerWessels",
+        "Boskalis",
+        "Damen Shipyards",
+        "Vopak",
+        "SBM Offshore",
+        "Bunge Loders Croklaan",
+        "Lamb Weston",
+        "Grolsch",
+        "Bavaria",
+        "Blokker",
+        "Action",
+        "Hunkemöller",
+        "Rituals",
+        "G-Star RAW",
+        "Scotch & Soda",
+        "Tommy Hilfiger",
+        "Calvin Klein",
+        "Suitsupply",
+        "Van Lanschot Kempen",
+        "IMC Trading",
+        "Optiver",
+        "Flow Traders"
+      ],
+      "company_suffixes": [
+        "B.V.",
+        "N.V.",
+        "Groep",
+        "Holding"
+      ],
+      "company_nouns": [
+        "Solutions",
+        "Services",
+        "Management",
+        "Industries"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun} {suffix}",
+        "{last_name} and {last_name}"
+      ]
+    },
+    {
+      "name": "education",
+      "weight": 0.07,
+      "jobs": [
+        "Leraar",
+        "Hoogleraar"
+      ],
+      "well_known": [],
+      "company_suffixes": [],
+      "company_nouns": [],
+      "company_formats": [
+        "Universiteit {city}",
+        "Hogeschool {city}",
+        "Technische Universiteit {city}",
+        "{city} Lyceum"
+      ]
+    },
+    {
+      "name": "engineering",
+      "weight": 0.11,
+      "jobs": [
+        "Kwaliteitsmanager",
+        "Werktuigbouwkundig ingenieur",
+        "Elektrotechnisch ingenieur",
+        "Civiel ingenieur",
+        "Architect",
+        "Bouwmanager"
+      ],
+      "well_known": [],
+      "company_suffixes": [
+        "Engineering",
+        "Industries",
+        "Manufacturing",
+        "Corp"
+      ],
+      "company_nouns": [
+        "Engineering",
+        "Manufacturing",
+        "Construction",
+        "Industries"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun} {suffix}",
+        "{city} Engineering Group"
+      ]
+    },
+    {
+      "name": "finance",
+      "weight": 0.11,
+      "jobs": [
+        "Financieel analist",
+        "Boekhouder",
+        "Bankmedewerker",
+        "Financieel adviseur"
+      ],
+      "well_known": [
+        "Rabobank",
+        "Bunq",
+        "Triodos Bank"
+      ],
+      "company_suffixes": [
+        "Financial",
+        "Capital",
+        "Investments",
+        "Partners",
+        "Group"
+      ],
+      "company_nouns": [
+        "Capital",
+        "Investments",
+        "Financial",
+        "Wealth",
+        "Advisory"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{last_name} & {last_name}",
+        "{adjective} {noun} {suffix}",
+        "{city} Savings Bank"
+      ]
+    },
+    {
+      "name": "healthcare",
+      "weight": 0.09,
+      "jobs": [
+        "Arts",
+        "Apotheker"
+      ],
+      "well_known": [],
+      "company_suffixes": [
+        "Health",
+        "Medical",
+        "Healthcare"
+      ],
+      "company_nouns": [
+        "Healthcare",
+        "Medical",
+        "Health"
+      ],
+      "company_formats": [
+        "{city} Ziekenhuis",
+        "Medisch Centrum {city}",
+        "{last_name} Kliniek",
+        "Universitair Medisch Centrum {city}"
+      ]
+    },
+    {
+      "name": "hospitality",
+      "weight": 0.06,
+      "jobs": [
+        "Kok",
+        "Hotelmanager"
+      ],
+      "well_known": [
+        "FrieslandCampina",
+        "Vion Food Group",
+        "Tony's Chocolonely",
+        "Douwe Egberts"
+      ],
+      "company_suffixes": [
+        "Hospitality",
+        "Group",
+        "Hotels",
+        "Restaurants"
+      ],
+      "company_nouns": [
+        "Hospitality",
+        "Hotels",
+        "Restaurants",
+        "Catering"
+      ],
+      "company_formats": [
+        "Restaurant {last_name}",
+        "Hotel {city}",
+        "Grand Hotel {city}"
+      ]
+    },
+    {
+      "name": "legal",
+      "weight": 0.04,
+      "jobs": [
+        "Advocaat"
+      ],
+      "well_known": [],
+      "company_suffixes": [],
+      "company_nouns": [],
+      "company_formats": [
+        "Advocatenkantoor {last_name}",
+        "{last_name} & {last_name} Advocaten",
+        "{last_name} Juridisch Advies"
+      ]
+    },
+    {
+      "name": "marketing_creative",
+      "weight": 0.09,
+      "jobs": [
+        "Marketingmanager",
+        "Grafisch ontwerper"
+      ],
+      "well_known": [],
+      "company_suffixes": [
+        "Media",
+        "Creative",
+        "Studios",
+        "Communications",
+        "Group"
+      ],
+      "company_nouns": [
+        "Media",
+        "Creative",
+        "Communications",
+        "Marketing",
+        "Design"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun}",
+        "{last_name} & {last_name}"
+      ]
+    },
+    {
+      "name": "real_estate_insurance",
+      "weight": 0.02,
+      "jobs": [
+        "Makelaar"
+      ],
+      "well_known": [],
+      "company_suffixes": [
+        "Realty",
+        "Properties",
+        "Insurance",
+        "Group"
+      ],
+      "company_nouns": [
+        "Properties",
+        "Realty",
+        "Insurance"
+      ],
+      "company_formats": [
+        "{last_name} Realty",
+        "{city} Real Estate",
+        "{last_name} Insurance Agency"
+      ]
+    },
+    {
+      "name": "social_services",
+      "weight": 0.01,
+      "jobs": [
+        "Maatschappelijk werker"
+      ],
+      "well_known": [],
+      "company_suffixes": [],
+      "company_nouns": [],
+      "company_formats": [
+        "{city} Community Services",
+        "{city} Family Services",
+        "{city} Social Services Agency"
+      ]
+    },
+    {
+      "name": "technology",
+      "weight": 0.2,
+      "jobs": [
+        "Softwareontwikkelaar",
+        "Productmanager",
+        "Data-analist",
+        "Webontwikkelaar",
+        "Netwerkbeheerder",
+        "Databasebeheerder",
+        "Systeembeheerder",
+        "Technisch schrijver",
+        "UX-ontwerper",
+        "DevOps-engineer",
+        "Cloud-architect",
+        "Security-analist",
+        "Data Scientist"
+      ],
+      "well_known": [
+        "ASML",
+        "Adyen",
+        "Booking.com",
+        "TomTom",
+        "NXP Semiconductors",
+        "Signify",
+        "Coolblue",
+        "Bol.com",
+        "Exact",
+        "AFAS Software",
+        "Unit4",
+        "Elastic",
+        "Miro",
+        "Mollie"
+      ],
+      "company_suffixes": [
+        "Technologies",
+        "Software",
+        "Solutions",
+        "Labs",
+        "Digital",
+        "Systems"
+      ],
+      "company_nouns": [
+        "Software",
+        "Technologies",
+        "Systems",
+        "Data",
+        "Analytics",
+        "Networks"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{adjective} {noun}",
+        "{last_name} {noun}"
+      ]
+    }
+  ]
 }

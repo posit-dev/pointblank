@@ -297,5 +297,236 @@
     "drive",
     "build"
   ],
-  "catch_phrase_connector": "that"
+  "catch_phrase_connector": "that",
+  "industries": [
+    {
+      "name": "consulting",
+      "weight": 0.12,
+      "jobs": [
+        "Project Manager"
+      ],
+      "well_known": [],
+      "company_suffixes": [
+        "Consulting",
+        "Group",
+        "Partners",
+        "Associates",
+        "Advisory"
+      ],
+      "company_nouns": [
+        "Consulting",
+        "Management",
+        "Strategy",
+        "Advisory"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun} {suffix}",
+        "{last_name} & {last_name}"
+      ]
+    },
+    {
+      "name": "corporate",
+      "weight": 0.15,
+      "jobs": [
+        "Operations Manager",
+        "Business Development Manager",
+        "Human Resources Manager"
+      ],
+      "well_known": [
+        "DBS Group Holdings",
+        "Singtel",
+        "Keppel Corporation",
+        "Wilmar International",
+        "PSA International",
+        "SembCorp Industries",
+        "Olam International",
+        "ComfortDelGro"
+      ],
+      "company_suffixes": [
+        "Pte Ltd",
+        "Ltd",
+        "Holdings",
+        "Group",
+        "International"
+      ],
+      "company_nouns": [
+        "Solutions",
+        "Services",
+        "Management",
+        "Industries"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun} {suffix}",
+        "{last_name} and {last_name}"
+      ]
+    },
+    {
+      "name": "engineering",
+      "weight": 0.15,
+      "jobs": [
+        "Marine Engineer"
+      ],
+      "well_known": [
+        "ST Engineering"
+      ],
+      "company_suffixes": [
+        "Engineering",
+        "Industries",
+        "Manufacturing",
+        "Corp"
+      ],
+      "company_nouns": [
+        "Engineering",
+        "Manufacturing",
+        "Construction",
+        "Industries"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun} {suffix}",
+        "{city} Engineering Group"
+      ]
+    },
+    {
+      "name": "finance",
+      "weight": 0.15,
+      "jobs": [
+        "Financial Analyst",
+        "Accountant",
+        "Risk Analyst",
+        "Compliance Officer",
+        "Investment Banker",
+        "Trade Finance Specialist",
+        "Wealth Manager",
+        "Portfolio Manager",
+        "Quantitative Analyst"
+      ],
+      "well_known": [
+        "OCBC Bank",
+        "United Overseas Bank",
+        "CapitaLand",
+        "Singapore Exchange",
+        "Mapletree Investments"
+      ],
+      "company_suffixes": [
+        "Financial",
+        "Capital",
+        "Investments",
+        "Partners",
+        "Group"
+      ],
+      "company_nouns": [
+        "Capital",
+        "Investments",
+        "Financial",
+        "Wealth",
+        "Advisory"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{last_name} & {last_name}",
+        "{adjective} {noun} {suffix}",
+        "{city} Savings Bank"
+      ]
+    },
+    {
+      "name": "logistics",
+      "weight": 0.06,
+      "jobs": [
+        "Supply Chain Manager",
+        "Logistics Coordinator",
+        "Shipping Manager"
+      ],
+      "well_known": [
+        "Singapore Airlines",
+        "Ninjavan"
+      ],
+      "company_suffixes": [
+        "Logistics",
+        "Transport",
+        "Distribution",
+        "Supply"
+      ],
+      "company_nouns": [
+        "Logistics",
+        "Transport",
+        "Distribution",
+        "Supply"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{last_name} {suffix}",
+        "{city} Freight Services"
+      ]
+    },
+    {
+      "name": "marketing_creative",
+      "weight": 0.12,
+      "jobs": [
+        "Marketing Manager"
+      ],
+      "well_known": [],
+      "company_suffixes": [
+        "Media",
+        "Creative",
+        "Studios",
+        "Communications",
+        "Group"
+      ],
+      "company_nouns": [
+        "Media",
+        "Creative",
+        "Communications",
+        "Marketing",
+        "Design"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun}",
+        "{last_name} & {last_name}"
+      ]
+    },
+    {
+      "name": "technology",
+      "weight": 0.26,
+      "jobs": [
+        "Software Engineer",
+        "Data Scientist",
+        "UX Designer",
+        "Systems Administrator",
+        "Full Stack Developer",
+        "DevOps Engineer",
+        "Product Manager"
+      ],
+      "well_known": [
+        "Grab Holdings",
+        "Sea Limited",
+        "Razer Inc",
+        "Lazada Group"
+      ],
+      "company_suffixes": [
+        "Technologies",
+        "Software",
+        "Solutions",
+        "Labs",
+        "Digital",
+        "Systems"
+      ],
+      "company_nouns": [
+        "Software",
+        "Technologies",
+        "Systems",
+        "Data",
+        "Analytics",
+        "Networks"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{adjective} {noun}",
+        "{last_name} {noun}"
+      ]
+    }
+  ]
 }

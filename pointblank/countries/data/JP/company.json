@@ -591,5 +591,305 @@
     "develop",
     "inspire"
   ],
-  "catch_phrase_connector": "that"
+  "catch_phrase_connector": "that",
+  "industries": [
+    {
+      "name": "technology",
+      "weight": 0.18,
+      "jobs": [
+        "Software Engineer",
+        "Product Manager",
+        "Data Scientist",
+        "System Administrator",
+        "Network Engineer",
+        "Security Specialist",
+        "Technical Writer"
+      ],
+      "well_known": [
+        "Sony",
+        "Panasonic",
+        "Hitachi",
+        "Toshiba",
+        "Fujitsu",
+        "NEC",
+        "Canon",
+        "Nikon",
+        "SoftBank",
+        "Rakuten",
+        "LINE",
+        "Mercari",
+        "CyberAgent",
+        "Google Japan",
+        "Amazon Japan",
+        "Microsoft Japan",
+        "Apple Japan",
+        "Meta Japan"
+      ],
+      "company_suffixes": [
+        "Technologies",
+        "Software",
+        "Solutions",
+        "Labs",
+        "Digital",
+        "Systems"
+      ],
+      "company_nouns": [
+        "Software",
+        "Technologies",
+        "Systems",
+        "Data",
+        "Analytics"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{adjective} {noun}",
+        "{last_name} {noun}"
+      ]
+    },
+    {
+      "name": "healthcare",
+      "weight": 0.08,
+      "jobs": [
+        "Pharmacist",
+        "Medical Doctor",
+        "Nurse"
+      ],
+      "well_known": [
+        "Takeda Pharmaceutical",
+        "Astellas Pharma"
+      ],
+      "company_suffixes": [
+        "Health",
+        "Medical",
+        "Pharma"
+      ],
+      "company_nouns": [
+        "Healthcare",
+        "Medical",
+        "Pharma"
+      ],
+      "company_formats": [
+        "{city} General Hospital",
+        "{city} Medical Center",
+        "{city} University Hospital",
+        "{last_name} Clinic"
+      ]
+    },
+    {
+      "name": "finance",
+      "weight": 0.1,
+      "jobs": [
+        "Finance Manager",
+        "Accountant",
+        "Tax Specialist"
+      ],
+      "well_known": [
+        "Mitsubishi UFJ Financial",
+        "Sumitomo Mitsui Banking",
+        "Mizuho Financial",
+        "Nomura Holdings",
+        "Daiwa Securities",
+        "Nippon Life",
+        "Tokio Marine"
+      ],
+      "company_suffixes": [
+        "Financial",
+        "Capital",
+        "Securities",
+        "Group"
+      ],
+      "company_nouns": [
+        "Capital",
+        "Securities",
+        "Financial",
+        "Insurance"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun} {suffix}",
+        "{city} Credit Bank"
+      ]
+    },
+    {
+      "name": "consulting",
+      "weight": 0.08,
+      "jobs": [
+        "Consultant",
+        "Business Analyst",
+        "Project Manager",
+        "Account Executive"
+      ],
+      "well_known": [
+        "McKinsey & Company",
+        "Boston Consulting Group",
+        "Bain & Company",
+        "Deloitte Tohmatsu",
+        "PwC Japan",
+        "EY Japan",
+        "KPMG Japan",
+        "Accenture Japan"
+      ],
+      "company_suffixes": [
+        "Consulting",
+        "Group",
+        "Partners",
+        "Associates"
+      ],
+      "company_nouns": [
+        "Consulting",
+        "Management",
+        "Strategy",
+        "Advisory"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun} {suffix}"
+      ]
+    },
+    {
+      "name": "marketing_creative",
+      "weight": 0.06,
+      "jobs": [
+        "Marketing Manager",
+        "Design Engineer",
+        "Customer Support"
+      ],
+      "well_known": [
+        "Nintendo",
+        "Bandai Namco",
+        "Capcom",
+        "Square Enix",
+        "Sega",
+        "Dentsu",
+        "Recruit Holdings",
+        "Shiseido",
+        "Kao"
+      ],
+      "company_suffixes": [
+        "Media",
+        "Creative",
+        "Studios",
+        "Communications"
+      ],
+      "company_nouns": [
+        "Media",
+        "Creative",
+        "Communications",
+        "Marketing"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun}"
+      ]
+    },
+    {
+      "name": "engineering",
+      "weight": 0.1,
+      "jobs": [
+        "Manufacturing Engineer",
+        "Mechanical Engineer",
+        "Electrical Engineer",
+        "Civil Engineer",
+        "Architect",
+        "Field Engineer",
+        "Quality Assurance"
+      ],
+      "well_known": [
+        "Toyota",
+        "Honda",
+        "Nissan"
+      ],
+      "company_suffixes": [
+        "Engineering",
+        "Industries",
+        "Manufacturing",
+        "Corp"
+      ],
+      "company_nouns": [
+        "Engineering",
+        "Manufacturing",
+        "Construction",
+        "Industries"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun} {suffix}",
+        "{city} Engineering Group"
+      ]
+    },
+    {
+      "name": "corporate",
+      "weight": 0.12,
+      "jobs": [
+        "Sales Manager",
+        "Operations Manager",
+        "HR Manager",
+        "Legal Counsel",
+        "Research Scientist",
+        "Executive Director",
+        "Department Head",
+        "Team Leader",
+        "General Manager",
+        "Vice President",
+        "Managing Director",
+        "Chief Executive Officer",
+        "Board Member"
+      ],
+      "well_known": [
+        "Mitsubishi Corporation",
+        "Mitsui & Co.",
+        "Sumitomo Corporation",
+        "Itochu",
+        "Marubeni",
+        "Fast Retailing",
+        "Seven & i Holdings",
+        "Aeon",
+        "ANA Holdings",
+        "Japan Airlines",
+        "JR East",
+        "JR West",
+        "NTT",
+        "KDDI"
+      ],
+      "company_suffixes": [
+        "Corp",
+        "Group",
+        "Holdings",
+        "Inc"
+      ],
+      "company_nouns": [
+        "Solutions",
+        "Services",
+        "Management",
+        "Industries"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun} {suffix}"
+      ]
+    },
+    {
+      "name": "logistics",
+      "weight": 0.04,
+      "jobs": [
+        "Supply Chain Manager"
+      ],
+      "well_known": [],
+      "company_suffixes": [
+        "Logistics",
+        "Transport",
+        "Distribution"
+      ],
+      "company_nouns": [
+        "Logistics",
+        "Transport",
+        "Distribution"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{last_name} {suffix}",
+        "{city} Freight Services"
+      ]
+    }
+  ]
 }

@@ -326,5 +326,260 @@
     "develop",
     "design"
   ],
-  "catch_phrase_connector": "that"
+  "catch_phrase_connector": "that",
+  "industries": [
+    {
+      "name": "consulting",
+      "weight": 0.11,
+      "jobs": [
+        "Project Manager",
+        "Business Analyst"
+      ],
+      "well_known": [],
+      "company_suffixes": [
+        "Consulting",
+        "Group",
+        "Partners",
+        "Associates",
+        "Advisory"
+      ],
+      "company_nouns": [
+        "Consulting",
+        "Management",
+        "Strategy",
+        "Advisory"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun} {suffix}",
+        "{last_name} & {last_name}"
+      ]
+    },
+    {
+      "name": "corporate",
+      "weight": 0.14,
+      "jobs": [
+        "Sales Manager",
+        "Operations Manager",
+        "HR Manager",
+        "Customer Service Representative"
+      ],
+      "well_known": [
+        "Hon Hai Precision",
+        "Pegatron",
+        "Wistron",
+        "Inventec",
+        "Largan Precision",
+        "Uni-President Enterprises",
+        "Evergreen Marine"
+      ],
+      "company_suffixes": [
+        "Corp",
+        "Inc",
+        "Holdings",
+        "Group",
+        "International"
+      ],
+      "company_nouns": [
+        "Solutions",
+        "Services",
+        "Management",
+        "Industries"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun} {suffix}",
+        "{last_name} and {last_name}"
+      ]
+    },
+    {
+      "name": "engineering",
+      "weight": 0.14,
+      "jobs": [
+        "Process Engineer",
+        "Quality Engineer",
+        "Manufacturing Engineer"
+      ],
+      "well_known": [
+        "Formosa Plastics",
+        "Giant Manufacturing"
+      ],
+      "company_suffixes": [
+        "Engineering",
+        "Industries",
+        "Manufacturing",
+        "Corp"
+      ],
+      "company_nouns": [
+        "Engineering",
+        "Manufacturing",
+        "Construction",
+        "Industries"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun} {suffix}",
+        "{city} Engineering Group"
+      ]
+    },
+    {
+      "name": "finance",
+      "weight": 0.14,
+      "jobs": [
+        "Financial Analyst",
+        "Accountant"
+      ],
+      "well_known": [
+        "Cathay Financial Holdings",
+        "Fubon Financial Holdings",
+        "CTBC Financial Holding"
+      ],
+      "company_suffixes": [
+        "Financial",
+        "Capital",
+        "Investments",
+        "Partners",
+        "Group"
+      ],
+      "company_nouns": [
+        "Capital",
+        "Investments",
+        "Financial",
+        "Wealth",
+        "Advisory"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{last_name} & {last_name}",
+        "{adjective} {noun} {suffix}",
+        "{city} Savings Bank"
+      ]
+    },
+    {
+      "name": "legal",
+      "weight": 0.06,
+      "jobs": [
+        "Legal Counsel"
+      ],
+      "well_known": [],
+      "company_suffixes": [],
+      "company_nouns": [],
+      "company_formats": [
+        "{last_name} & {last_name} Law",
+        "{last_name} Legal Services",
+        "{city} Legal Associates"
+      ]
+    },
+    {
+      "name": "logistics",
+      "weight": 0.06,
+      "jobs": [
+        "Supply Chain Manager",
+        "Procurement Specialist"
+      ],
+      "well_known": [
+        "EVA Air",
+        "China Airlines"
+      ],
+      "company_suffixes": [
+        "Logistics",
+        "Transport",
+        "Distribution",
+        "Supply"
+      ],
+      "company_nouns": [
+        "Logistics",
+        "Transport",
+        "Distribution",
+        "Supply"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{last_name} {suffix}",
+        "{city} Freight Services"
+      ]
+    },
+    {
+      "name": "marketing_creative",
+      "weight": 0.11,
+      "jobs": [
+        "Marketing Manager"
+      ],
+      "well_known": [],
+      "company_suffixes": [
+        "Media",
+        "Creative",
+        "Studios",
+        "Communications",
+        "Group"
+      ],
+      "company_nouns": [
+        "Media",
+        "Creative",
+        "Communications",
+        "Marketing",
+        "Design"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun}",
+        "{last_name} & {last_name}"
+      ]
+    },
+    {
+      "name": "technology",
+      "weight": 0.25,
+      "jobs": [
+        "Software Engineer",
+        "Hardware Engineer",
+        "IC Design Engineer",
+        "Product Manager",
+        "Data Scientist",
+        "Machine Learning Engineer",
+        "Frontend Developer",
+        "Backend Developer",
+        "Full Stack Developer",
+        "Test Engineer",
+        "R&D Engineer",
+        "Systems Analyst",
+        "Network Administrator",
+        "UI/UX Designer",
+        "Technical Writer"
+      ],
+      "well_known": [
+        "TSMC",
+        "MediaTek",
+        "Delta Electronics",
+        "ASUS",
+        "Acer",
+        "HTC",
+        "Quanta Computer",
+        "Compal Electronics",
+        "Novatek Microelectronics",
+        "Realtek Semiconductor",
+        "ASE Technology"
+      ],
+      "company_suffixes": [
+        "Technologies",
+        "Software",
+        "Solutions",
+        "Labs",
+        "Digital",
+        "Systems"
+      ],
+      "company_nouns": [
+        "Software",
+        "Technologies",
+        "Systems",
+        "Data",
+        "Analytics",
+        "Networks"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{adjective} {noun}",
+        "{last_name} {noun}"
+      ]
+    }
+  ]
 }
