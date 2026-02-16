@@ -360,6 +360,9 @@ _TRANSLITERATION_MAP: dict[str, str] = {
     "Ð": "D",
     "þ": "th",
     "Þ": "Th",
+    # French ligatures
+    "œ": "oe",
+    "Œ": "Oe",
     # Other
     "đ": "d",
     "Đ": "D",
