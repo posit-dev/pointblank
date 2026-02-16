@@ -301,7 +301,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
         border-radius: 2px;
     ">
 <p>The <code>min_date=</code> and <code>max_date=</code> parameters accept <code>datetime</code> objects for precise range definitions:</p>
-<div id="87323dfe" class="cell" data-execution_count="1">
+<div id="8fed2b86" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> datetime <span class="im">import</span> datetime</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -450,7 +450,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 </div>
 <p>For a quick setup, ISO format strings work just as well:</p>
-<div id="06ffc85e" class="cell" data-execution_count="2">
+<div id="9e736911" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    event_time<span class="op">=</span>pb.datetime_field(</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>        min_date<span class="op">=</span><span class="st">"2024-03-01T08:00:00"</span>,</span>
@@ -580,7 +580,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 </div>
 <p>Optional timestamps can be simulated with <code>nullable=True</code>, and datetime fields work nicely alongside other field types:</p>
-<div id="afeb7365" class="cell" data-execution_count="3">
+<div id="dc559839" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    order_id<span class="op">=</span>pb.int_field(min_val<span class="op">=</span><span class="dv">1000</span>, max_val<span class="op">=</span><span class="dv">9999</span>, unique<span class="op">=</span><span class="va">True</span>),</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    placed_at<span class="op">=</span>pb.datetime_field(</span>

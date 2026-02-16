@@ -311,7 +311,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
         border-radius: 2px;
     ">
 <p>The <code>min_val=</code> and <code>max_val=</code> parameters constrain generated ranges, while <code>allowed=</code> restricts values to a specific set:</p>
-<div id="85c6b6cd" class="cell" data-execution_count="1">
+<div id="505d6a94" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
@@ -466,7 +466,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 </div>
 <p>It’s possible to introduce missing values with <code>nullable=True</code> and <code>null_probability=</code>, and to select a smaller dtype with <code>dtype=</code>:</p>
-<div id="edbde91b" class="cell" data-execution_count="2">
+<div id="42fb21a1" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    score<span class="op">=</span>pb.int_field(min_val<span class="op">=</span><span class="dv">0</span>, max_val<span class="op">=</span><span class="dv">255</span>, dtype<span class="op">=</span><span class="st">"UInt8"</span>),</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    optional_val<span class="op">=</span>pb.int_field(</span>
@@ -609,7 +609,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 </div>
 <p>We can also enforce uniqueness with <code>unique=True</code> to produce distinct identifiers within a range:</p>
-<div id="ef39bd4d" class="cell" data-execution_count="3">
+<div id="d4bafa81" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    record_id<span class="op">=</span>pb.int_field(min_val<span class="op">=</span><span class="dv">1000</span>, max_val<span class="op">=</span><span class="dv">9999</span>, unique<span class="op">=</span><span class="va">True</span>),</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    priority<span class="op">=</span>pb.int_field(allowed<span class="op">=</span>[<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>]),</span>
@@ -749,7 +749,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 </div>
 <p>For complete control, a custom <code>generator=</code> callable can be provided:</p>
-<div id="c49bf5d5" class="cell" data-execution_count="4">
+<div id="757ee8af" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> random</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>rng <span class="op">=</span> random.Random(<span class="dv">0</span>)</span>

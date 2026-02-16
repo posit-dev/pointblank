@@ -296,7 +296,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
         border-radius: 2px;
     ">
 <p>The <code>p_true=</code> parameter controls the distribution of <code>True</code>/<code>False</code> values, allowing you to simulate different probabilities:</p>
-<div id="41c5a51c" class="cell" data-execution_count="1">
+<div id="926a0858" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
@@ -451,7 +451,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 </div>
 <p>Optional boolean flags can be simulated by combining <code>nullable=True</code> with <code>null_probability=</code>:</p>
-<div id="e32e3000" class="cell" data-execution_count="2">
+<div id="a06f96c8" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    opted_in<span class="op">=</span>pb.bool_field(p_true<span class="op">=</span><span class="fl">0.6</span>),</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    has_referral<span class="op">=</span>pb.bool_field(</span>
@@ -594,7 +594,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 </div>
 <p>Boolean fields can be combined with other field types in a realistic schema:</p>
-<div id="2b5a30d7" class="cell" data-execution_count="3">
+<div id="4c1d7859" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    user_id<span class="op">=</span>pb.int_field(min_val<span class="op">=</span><span class="dv">1</span>, unique<span class="op">=</span><span class="va">True</span>),</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    name<span class="op">=</span>pb.string_field(preset<span class="op">=</span><span class="st">"name"</span>),</span>
