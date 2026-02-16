@@ -772,12 +772,276 @@ class LocaleGenerator:
             return f"{last} {first}"
         return f"{first} {last}"
 
+    # Maps job titles to the type of professional title they warrant.
+    # The type is then matched against available locale prefixes.
+    # Keys are lowercase job titles; values are title categories.
+    _TITLE_CATEGORY_DOCTOR = "doctor"
+    _TITLE_CATEGORY_PROFESSOR = "professor"
+    _TITLE_CATEGORY_ENGINEER = "engineer"
+    _TITLE_CATEGORY_LAWYER = "lawyer"
+    _TITLE_CATEGORY_ARCHITECT = "architect"
+
+    # Jobs that warrant a "Dr." (or locale equivalent) title
+    _DOCTOR_JOBS: set[str] = {
+        # English
+        "doctor",
+        "physician",
+        "dentist",
+        "pharmacist",
+        "veterinarian",
+        "psychologist",
+        "psychiatrist",
+        "surgeon",
+        # German
+        "arzt",
+        "zahnarzt",
+        "apotheker",
+        "tierarzt",
+        # Italian
+        "medico",
+        "farmacista",
+        "veterinario",
+        # Spanish
+        "médico",
+        "médica",
+        "dentista",
+        "farmacéutico",
+        "farmacéutica",
+        "veterinario",
+        "veterinaria",
+        "psicólogo",
+        "psicóloga",
+        # Portuguese
+        "médico",
+        "dentista",
+        "farmacêutico",
+        # French
+        "médecin",
+        "dentiste",
+        "pharmacien",
+        # Dutch
+        "arts",
+        # Danish
+        "læge",
+        "tandlæge",
+        # Norwegian
+        "lege",
+        # Swedish
+        "läkare",
+        "tandläkare",
+        # Finnish
+        "lääkäri",
+        "hammaslääkäri",
+        # Polish
+        "lekarz",
+        # Turkish
+        "doktor",
+        "diş hekimi",
+        # Hungarian
+        "orvos",
+        # Czech
+        "lékař",
+    }
+
+    # Jobs that warrant a "Prof." (or locale equivalent) title
+    _PROFESSOR_JOBS: set[str] = {
+        # English
+        "professor",
+        "lecturer",
+        "research scientist",
+        # German
+        "professor",
+        "forscher",
+        "wissenschaftler",
+        # Italian
+        "professore",
+        # Spanish
+        "profesor",
+        "profesora",
+        # Portuguese
+        "professor",
+        # Dutch
+        "hoogleraar",
+        # Danish
+        "professor",
+        # Swedish
+        "professor",
+        # Finnish
+        "professori",
+        # Polish
+        "profesor",
+    }
+
+    # Jobs that warrant an "Ing." (or locale equivalent) title — used in IT, AT, CZ, NL
+    _ENGINEER_JOBS: set[str] = {
+        # English
+        "engineer",
+        "mechanical engineer",
+        "electrical engineer",
+        "civil engineer",
+        "chemical engineer",
+        "environmental engineer",
+        "software engineer",
+        # German
+        "ingenieur",
+        # Italian
+        "ingegnere",
+        # Spanish
+        "ingeniero",
+        "ingeniera",
+        # Czech
+        "inženýr",
+    }
+
+    # Jobs that warrant an "Avv." title — Italian lawyers
+    _LAWYER_JOBS: set[str] = {
+        "avvocato",
+        "attorney",
+        "lawyer",
+        "solicitor",
+        "barrister",
+        "rechtsanwalt",
+        "advokat",
+        "advocaat",
+        "abogado",
+        "abogada",
+        "advogado",
+        "avocat",
+    }
+
+    # Jobs that warrant an "Arch." title — Italian architects
+    _ARCHITECT_JOBS: set[str] = {
+        "architetto",
+        "architekt",
+        "architect",
+        "arquitecto",
+        "arquitecta",
+        "arquiteto",
+        "architecte",
+        "arkkitehti",
+        "arkitekt",
+    }
+
+    # Maps title categories to the locale prefixes that represent them.
+    # Each entry is: category -> set of prefix strings that could represent it.
+    _TITLE_PREFIX_MAP: dict[str, set[str]] = {
+        "doctor": {
+            "Dr.",
+            "Dr",
+            "Dott.",
+            "Dott.ssa",
+            "Dra.",
+            "Prof. Dr.",
+            "Mr. dr.",
+            "Prof. dr.",
+            # German field-specific (CH prefix data)
+            "Dr. med.",
+            "Dr. med. dent.",
+            "Dr. med. vet.",
+            "Dr. rer. nat.",
+            "Dr. phil.",
+        },
+        "professor": {
+            "Prof.",
+            "Prof",
+            "Professor",
+            "Prof.ssa",
+            "Pr.",
+            "Prof. Dr.",
+            "Prof. dr.",
+        },
+        "engineer": {"Ing.", "DI", "Ir.", "Bc.", "Dr.-Ing."},
+        "lawyer": {"Avv.", "Lcdo.", "Lcda.", "lic. iur."},
+        "architect": {"Arch."},
+    }
+
+    # Countries where the common honorific (Herr/Frau) is stacked before the
+    # professional title: "Herr Dr. med. Ludwig Fröhlich"
+    _STACKING_COUNTRIES: set[str] = {"DE", "AT", "CH"}
+
+    # German field-specific doctoral-title expansions, keyed by job (lowercase).
+    # Maps specific jobs to the appropriate German doctoral discipline abbreviation.
+    _GERMAN_DOCTOR_FIELDS: dict[str, str] = {
+        # Medical doctors  →  Dr. med.
+        "arzt": "Dr. med.",
+        "doctor": "Dr. med.",
+        "physician": "Dr. med.",
+        "surgeon": "Dr. med.",
+        "psychiatrist": "Dr. med.",
+        "medico": "Dr. med.",
+        "médecin": "Dr. med.",
+        "médico": "Dr. med.",
+        "médica": "Dr. med.",
+        # Dentists  →  Dr. med. dent.
+        "zahnarzt": "Dr. med. dent.",
+        "dentist": "Dr. med. dent.",
+        "dentista": "Dr. med. dent.",
+        "dentiste": "Dr. med. dent.",
+        # Veterinarians  →  Dr. med. vet.
+        "tierarzt": "Dr. med. vet.",
+        "veterinarian": "Dr. med. vet.",
+        "veterinario": "Dr. med. vet.",
+        "veterinaria": "Dr. med. vet.",
+        # Pharmacists  →  Dr. rer. nat.
+        "apotheker": "Dr. rer. nat.",
+        "pharmacist": "Dr. rer. nat.",
+        "farmacista": "Dr. rer. nat.",
+        "farmacéutico": "Dr. rer. nat.",
+        "farmacéutica": "Dr. rer. nat.",
+        "farmacêutico": "Dr. rer. nat.",
+        "pharmacien": "Dr. rer. nat.",
+        # Psychologists  →  Dr. phil.
+        "psychologist": "Dr. phil.",
+        "psychologe": "Dr. phil.",
+        "psicólogo": "Dr. phil.",
+        "psicóloga": "Dr. phil.",
+    }
+
+    def _get_title_for_job(self, job: str, available_prefixes: list[str]) -> tuple[str, str] | None:
+        """Return the appropriate professional title prefix for a job, if available.
+
+        Checks if the current job maps to a title category (doctor, professor, etc.)
+        and whether the locale has a matching prefix in its prefix list.
+
+        Returns a ``(prefix, category)`` tuple, or ``None`` if no match (meaning the
+        caller should use default logic).
+        """
+        job_lower = job.lower()
+
+        # Determine which title category this job belongs to
+        category = None
+        if job_lower in self._DOCTOR_JOBS:
+            category = self._TITLE_CATEGORY_DOCTOR
+        elif job_lower in self._PROFESSOR_JOBS:
+            category = self._TITLE_CATEGORY_PROFESSOR
+        elif job_lower in self._ENGINEER_JOBS:
+            category = self._TITLE_CATEGORY_ENGINEER
+        elif job_lower in self._LAWYER_JOBS:
+            category = self._TITLE_CATEGORY_LAWYER
+        elif job_lower in self._ARCHITECT_JOBS:
+            category = self._TITLE_CATEGORY_ARCHITECT
+
+        if category is None:
+            return None
+
+        # Find matching prefixes from the locale's available prefix list
+        valid_prefixes = self._TITLE_PREFIX_MAP.get(category, set())
+        matches = [p for p in available_prefixes if p in valid_prefixes]
+
+        if matches:
+            return (self.rng.choice(matches), category)
+        return None
+
     def name_full(self, gender: str | None = None) -> str:
         """Generate a full name with optional prefix and rare suffix.
 
         Includes honorific prefixes with realistic frequencies:
         - Common honorifics (Mr., Ms., Mrs., etc.): ~95% of names
         - Professional titles (Dr., Prof., Rev., etc.): ~5% of names
+
+        When job/company coherence is active and the person's job warrants a
+        professional title (e.g., Doctor → Dr., Professor → Prof.), that title
+        is always used as the prefix.
 
         Suffixes (Jr., II, III) appear very rarely (~1 in 2000).
         """
@@ -794,16 +1058,43 @@ class LocaleGenerator:
         # These should appear infrequently
         professional_titles = {
             "Dr.",
+            "Dr",
             "Prof.",
+            "Prof",
             "Professor",
             "Rev.",
             "Pr.",
             "Prof. Dr.",
+            "Prof. dr.",
+            "Mr. dr.",
             "Rabbi",
             "Father",
             "Sister",
             "Pastor",
             "Elder",
+            # Locale-specific professional titles
+            "Dott.",
+            "Dott.ssa",
+            "Prof.ssa",
+            "Ing.",
+            "Avv.",
+            "Arch.",
+            "Mag.",
+            "DI",
+            "Ir.",
+            "Bc.",
+            "Mgr.",
+            "Dra.",
+            "Lcdo.",
+            "Lcda.",
+            # German field-specific doctoral titles (e.g. CH prefix data)
+            "Dr. med.",
+            "Dr. med. dent.",
+            "Dr. med. vet.",
+            "Dr. rer. nat.",
+            "Dr. phil.",
+            "Dr.-Ing.",
+            "lic. iur.",
         }
 
         # Get prefix based on gender from locale data
@@ -823,9 +1114,37 @@ class LocaleGenerator:
         locale_common = [p for p in prefix_list if p not in professional_titles]
         locale_professional = [p for p in prefix_list if p in professional_titles]
 
-        # Select prefix with realistic probabilities
-        # ~95% common honorific, ~5% professional title
-        if locale_professional and self.rng.random() < 0.05:
+        # Check if employer coherence is active and the job warrants a title
+        title_result = None
+        employer = self._get_current_employer()
+        current_job = ""
+        if employer is not None:
+            current_job = employer.get("job", "")
+            title_result = self._get_title_for_job(current_job, locale_professional)
+
+        # Select prefix
+        if title_result is not None:
+            job_title_prefix, title_category = title_result
+
+            # In German-speaking countries the common honorific (Herr/Frau) is
+            # stacked in front of the professional title, and doctor-category
+            # titles are expanded with their discipline: "Herr Dr. med. Ludwig"
+            if self.country_code in self._STACKING_COUNTRIES:
+                # Expand Dr. to field-specific variant for doctor-category titles
+                if title_category == self._TITLE_CATEGORY_DOCTOR:
+                    job_title_prefix = self._GERMAN_DOCTOR_FIELDS.get(
+                        current_job.lower(), job_title_prefix
+                    )
+                # Prepend the common honorific (Herr / Frau)
+                if locale_common:
+                    common = self.rng.choice(locale_common)
+                    prefix = f"{common} {job_title_prefix}"
+                else:
+                    prefix = job_title_prefix
+            else:
+                prefix = job_title_prefix
+        elif locale_professional and self.rng.random() < 0.05:
+            # Random professional title (~5% chance when no job coherence)
             prefix = self.rng.choice(locale_professional)
         elif locale_common:
             prefix = self.rng.choice(locale_common)
