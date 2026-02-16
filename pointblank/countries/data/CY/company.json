@@ -250,5 +250,258 @@
     "innovate",
     "lead"
   ],
-  "catch_phrase_connector": "that"
+  "catch_phrase_connector": "that",
+  "industries": [
+    {
+      "name": "consulting",
+      "weight": 0.12,
+      "jobs": [
+        "Project Manager",
+        "Business Analyst"
+      ],
+      "well_known": [],
+      "company_suffixes": [
+        "Consulting",
+        "Group",
+        "Partners",
+        "Associates",
+        "Advisory"
+      ],
+      "company_nouns": [
+        "Consulting",
+        "Management",
+        "Strategy",
+        "Advisory"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun} {suffix}",
+        "{last_name} & {last_name}"
+      ]
+    },
+    {
+      "name": "corporate",
+      "weight": 0.15,
+      "jobs": [
+        "Sales Representative",
+        "HR Manager",
+        "Operations Manager",
+        "Customer Service Representative"
+      ],
+      "well_known": [
+        "CYTA",
+        "EAC",
+        "Petrolina",
+        "KEAN Soft Drinks",
+        "Laiki Sporting",
+        "Cyprus Cement",
+        "Vassiliko Cement Works",
+        "Columbia Shipmanagement",
+        "Interorient Navigation",
+        "Forthnet",
+        "Leptos Estates",
+        "Aristo Developers",
+        "Photos Photiades Group",
+        "KEO"
+      ],
+      "company_suffixes": [
+        "Ltd",
+        "Holdings",
+        "Group",
+        "International",
+        "plc"
+      ],
+      "company_nouns": [
+        "Solutions",
+        "Services",
+        "Management",
+        "Industries"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun} {suffix}",
+        "{last_name} and {last_name}"
+      ]
+    },
+    {
+      "name": "finance",
+      "weight": 0.15,
+      "jobs": [
+        "Financial Analyst",
+        "Accountant",
+        "Investment Analyst",
+        "Tax Consultant",
+        "Bank Manager"
+      ],
+      "well_known": [
+        "Bank of Cyprus",
+        "Hellenic Bank"
+      ],
+      "company_suffixes": [
+        "Financial",
+        "Capital",
+        "Investments",
+        "Partners",
+        "Group"
+      ],
+      "company_nouns": [
+        "Capital",
+        "Investments",
+        "Financial",
+        "Wealth",
+        "Advisory"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{last_name} & {last_name}",
+        "{adjective} {noun} {suffix}",
+        "{city} Savings Bank"
+      ]
+    },
+    {
+      "name": "hospitality",
+      "weight": 0.08,
+      "jobs": [
+        "Tourism Manager",
+        "Hotel Manager"
+      ],
+      "well_known": [
+        "Lordos Hotels",
+        "Louis Hotels"
+      ],
+      "company_suffixes": [
+        "Hospitality",
+        "Group",
+        "Hotels",
+        "Restaurants"
+      ],
+      "company_nouns": [
+        "Hospitality",
+        "Hotels",
+        "Restaurants",
+        "Catering"
+      ],
+      "company_formats": [
+        "The {adjective} {noun}",
+        "{last_name}'s Restaurant",
+        "{city} Grand Hotel"
+      ]
+    },
+    {
+      "name": "logistics",
+      "weight": 0.06,
+      "jobs": [
+        "Shipping Coordinator",
+        "Maritime Officer",
+        "Ship Captain",
+        "Pilot"
+      ],
+      "well_known": [
+        "Cyprus Airways",
+        "Hermes Airports"
+      ],
+      "company_suffixes": [
+        "Logistics",
+        "Transport",
+        "Distribution",
+        "Supply"
+      ],
+      "company_nouns": [
+        "Logistics",
+        "Transport",
+        "Distribution",
+        "Supply"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{last_name} {suffix}",
+        "{city} Freight Services"
+      ]
+    },
+    {
+      "name": "marketing_creative",
+      "weight": 0.12,
+      "jobs": [
+        "Marketing Manager"
+      ],
+      "well_known": [],
+      "company_suffixes": [
+        "Media",
+        "Creative",
+        "Studios",
+        "Communications",
+        "Group"
+      ],
+      "company_nouns": [
+        "Media",
+        "Creative",
+        "Communications",
+        "Marketing",
+        "Design"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun}",
+        "{last_name} & {last_name}"
+      ]
+    },
+    {
+      "name": "real_estate_insurance",
+      "weight": 0.03,
+      "jobs": [
+        "Real Estate Agent",
+        "Insurance Agent",
+        "Property Developer"
+      ],
+      "well_known": [],
+      "company_suffixes": [
+        "Realty",
+        "Properties",
+        "Insurance",
+        "Group"
+      ],
+      "company_nouns": [
+        "Properties",
+        "Realty",
+        "Insurance"
+      ],
+      "company_formats": [
+        "{last_name} Realty",
+        "{city} Real Estate",
+        "{last_name} Insurance Agency"
+      ]
+    },
+    {
+      "name": "technology",
+      "weight": 0.28,
+      "jobs": [
+        "Software Engineer",
+        "Product Manager",
+        "Data Analyst",
+        "UI/UX Designer"
+      ],
+      "well_known": [],
+      "company_suffixes": [
+        "Technologies",
+        "Software",
+        "Solutions",
+        "Labs",
+        "Digital",
+        "Systems"
+      ],
+      "company_nouns": [
+        "Software",
+        "Technologies",
+        "Systems",
+        "Data",
+        "Analytics",
+        "Networks"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{adjective} {noun}",
+        "{last_name} {noun}"
+      ]
+    }
+  ]
 }

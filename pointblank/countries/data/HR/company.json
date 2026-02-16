@@ -252,5 +252,258 @@
     "innovate",
     "lead"
   ],
-  "catch_phrase_connector": "that"
+  "catch_phrase_connector": "that",
+  "industries": [
+    {
+      "name": "consulting",
+      "weight": 0.11,
+      "jobs": [
+        "Project Manager",
+        "Business Analyst"
+      ],
+      "well_known": [],
+      "company_suffixes": [
+        "Consulting",
+        "Group",
+        "Partners",
+        "Associates",
+        "Advisory"
+      ],
+      "company_nouns": [
+        "Consulting",
+        "Management",
+        "Strategy",
+        "Advisory"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun} {suffix}",
+        "{last_name} & {last_name}"
+      ]
+    },
+    {
+      "name": "corporate",
+      "weight": 0.14,
+      "jobs": [
+        "Sales Representative",
+        "HR Manager",
+        "Operations Manager",
+        "Customer Service Representative"
+      ],
+      "well_known": [
+        "INA",
+        "HEP",
+        "Hrvatski Telekom",
+        "Podravka",
+        "Pliva",
+        "Agrokor",
+        "Konzum",
+        "Atlantic Grupa",
+        "Rimac Automobili",
+        "Končar",
+        "Đuro Đaković",
+        "Jadrolinija",
+        "Uljanik",
+        "Nanobit",
+        "Photon"
+      ],
+      "company_suffixes": [
+        "d.d.",
+        "d.o.o.",
+        "Group",
+        "Holdings"
+      ],
+      "company_nouns": [
+        "Solutions",
+        "Services",
+        "Management",
+        "Industries"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun} {suffix}",
+        "{last_name} and {last_name}"
+      ]
+    },
+    {
+      "name": "engineering",
+      "weight": 0.14,
+      "jobs": [
+        "Marine Engineer"
+      ],
+      "well_known": [],
+      "company_suffixes": [
+        "Engineering",
+        "Industries",
+        "Manufacturing",
+        "Corp"
+      ],
+      "company_nouns": [
+        "Engineering",
+        "Manufacturing",
+        "Construction",
+        "Industries"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun} {suffix}",
+        "{city} Engineering Group"
+      ]
+    },
+    {
+      "name": "finance",
+      "weight": 0.14,
+      "jobs": [
+        "Financial Analyst",
+        "Accountant"
+      ],
+      "well_known": [
+        "Privredna banka Zagreb",
+        "Zagrebačka banka"
+      ],
+      "company_suffixes": [
+        "Financial",
+        "Capital",
+        "Investments",
+        "Partners",
+        "Group"
+      ],
+      "company_nouns": [
+        "Capital",
+        "Investments",
+        "Financial",
+        "Wealth",
+        "Advisory"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{last_name} & {last_name}",
+        "{adjective} {noun} {suffix}",
+        "{city} Savings Bank"
+      ]
+    },
+    {
+      "name": "hospitality",
+      "weight": 0.07,
+      "jobs": [
+        "Tourism Manager",
+        "Hospitality Manager",
+        "Winemaker",
+        "Chef"
+      ],
+      "well_known": [],
+      "company_suffixes": [
+        "Hospitality",
+        "Group",
+        "Hotels",
+        "Restaurants"
+      ],
+      "company_nouns": [
+        "Hospitality",
+        "Hotels",
+        "Restaurants",
+        "Catering"
+      ],
+      "company_formats": [
+        "The {adjective} {noun}",
+        "{last_name}'s Restaurant",
+        "{city} Grand Hotel"
+      ]
+    },
+    {
+      "name": "logistics",
+      "weight": 0.05,
+      "jobs": [
+        "Logistics Coordinator",
+        "Ship Captain"
+      ],
+      "well_known": [
+        "Hrvatska pošta",
+        "Croatia Airlines"
+      ],
+      "company_suffixes": [
+        "Logistics",
+        "Transport",
+        "Distribution",
+        "Supply"
+      ],
+      "company_nouns": [
+        "Logistics",
+        "Transport",
+        "Distribution",
+        "Supply"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{last_name} {suffix}",
+        "{city} Freight Services"
+      ]
+    },
+    {
+      "name": "marketing_creative",
+      "weight": 0.11,
+      "jobs": [
+        "Marketing Manager"
+      ],
+      "well_known": [],
+      "company_suffixes": [
+        "Media",
+        "Creative",
+        "Studios",
+        "Communications",
+        "Group"
+      ],
+      "company_nouns": [
+        "Media",
+        "Creative",
+        "Communications",
+        "Marketing",
+        "Design"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun}",
+        "{last_name} & {last_name}"
+      ]
+    },
+    {
+      "name": "technology",
+      "weight": 0.25,
+      "jobs": [
+        "Software Engineer",
+        "Product Manager",
+        "Data Analyst",
+        "UI/UX Designer",
+        "Frontend Developer",
+        "Backend Developer",
+        "DevOps Engineer",
+        "QA Engineer",
+        "Data Scientist"
+      ],
+      "well_known": [
+        "Infobip"
+      ],
+      "company_suffixes": [
+        "Technologies",
+        "Software",
+        "Solutions",
+        "Labs",
+        "Digital",
+        "Systems"
+      ],
+      "company_nouns": [
+        "Software",
+        "Technologies",
+        "Systems",
+        "Data",
+        "Analytics",
+        "Networks"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{adjective} {noun}",
+        "{last_name} {noun}"
+      ]
+    }
+  ]
 }

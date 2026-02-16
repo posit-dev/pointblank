@@ -250,5 +250,201 @@
     "innovate",
     "lead"
   ],
-  "catch_phrase_connector": "that"
+  "catch_phrase_connector": "that",
+  "industries": [
+    {
+      "name": "consulting",
+      "weight": 0.14,
+      "jobs": [
+        "Project Manager",
+        "EU Affairs Specialist"
+      ],
+      "well_known": [],
+      "company_suffixes": [
+        "Consulting",
+        "Group",
+        "Partners",
+        "Associates",
+        "Advisory"
+      ],
+      "company_nouns": [
+        "Consulting",
+        "Management",
+        "Strategy",
+        "Advisory"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun} {suffix}",
+        "{last_name} & {last_name}"
+      ]
+    },
+    {
+      "name": "corporate",
+      "weight": 0.17,
+      "jobs": [
+        "Sales Representative",
+        "HR Manager",
+        "Operations Manager"
+      ],
+      "well_known": [
+        "ArcelorMittal",
+        "Tenaris",
+        "SES",
+        "Luxair",
+        "Cargolux",
+        "Banque de Luxembourg",
+        "BGL BNP Paribas",
+        "Spuerkeess",
+        "POST Luxembourg",
+        "Lombard International",
+        "Amazon Europe",
+        "PayPal Europe",
+        "Ferrero International",
+        "Goodyear Luxembourg",
+        "Guardian Europe",
+        "Millicom"
+      ],
+      "company_suffixes": [
+        "S.A.",
+        "S.à r.l.",
+        "Group",
+        "Holdings",
+        "International"
+      ],
+      "company_nouns": [
+        "Solutions",
+        "Services",
+        "Management",
+        "Industries"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun} {suffix}",
+        "{last_name} and {last_name}"
+      ]
+    },
+    {
+      "name": "finance",
+      "weight": 0.17,
+      "jobs": [
+        "Financial Analyst",
+        "Fund Administrator",
+        "Compliance Officer",
+        "Risk Manager",
+        "Asset Manager",
+        "Private Banker",
+        "Accountant",
+        "Tax Consultant",
+        "Auditor",
+        "Investment Analyst",
+        "Portfolio Manager",
+        "Wealth Advisor",
+        "Treasury Manager"
+      ],
+      "well_known": [
+        "Clearstream"
+      ],
+      "company_suffixes": [
+        "Financial",
+        "Capital",
+        "Investments",
+        "Partners",
+        "Group"
+      ],
+      "company_nouns": [
+        "Capital",
+        "Investments",
+        "Financial",
+        "Wealth",
+        "Advisory"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{last_name} & {last_name}",
+        "{adjective} {noun} {suffix}",
+        "{city} Savings Bank"
+      ]
+    },
+    {
+      "name": "legal",
+      "weight": 0.07,
+      "jobs": [
+        "Legal Counsel"
+      ],
+      "well_known": [],
+      "company_suffixes": [],
+      "company_nouns": [],
+      "company_formats": [
+        "{last_name} & {last_name} Law",
+        "{last_name} Legal Services",
+        "{city} Legal Associates"
+      ]
+    },
+    {
+      "name": "marketing_creative",
+      "weight": 0.14,
+      "jobs": [
+        "Marketing Manager",
+        "Translator"
+      ],
+      "well_known": [
+        "RTL Group"
+      ],
+      "company_suffixes": [
+        "Media",
+        "Creative",
+        "Studios",
+        "Communications",
+        "Group"
+      ],
+      "company_nouns": [
+        "Media",
+        "Creative",
+        "Communications",
+        "Marketing",
+        "Design"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun}",
+        "{last_name} & {last_name}"
+      ]
+    },
+    {
+      "name": "technology",
+      "weight": 0.31,
+      "jobs": [
+        "Software Engineer",
+        "Product Manager",
+        "Data Analyst",
+        "UI/UX Designer"
+      ],
+      "well_known": [
+        "Delphi Technologies",
+        "Skype Communications"
+      ],
+      "company_suffixes": [
+        "Technologies",
+        "Software",
+        "Solutions",
+        "Labs",
+        "Digital",
+        "Systems"
+      ],
+      "company_nouns": [
+        "Software",
+        "Technologies",
+        "Systems",
+        "Data",
+        "Analytics",
+        "Networks"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{adjective} {noun}",
+        "{last_name} {noun}"
+      ]
+    }
+  ]
 }

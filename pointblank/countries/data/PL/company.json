@@ -259,5 +259,323 @@
     "zapewnia",
     "promuje"
   ],
-  "catch_phrase_connector": "które"
+  "catch_phrase_connector": "które",
+  "industries": [
+    {
+      "name": "consulting",
+      "weight": 0.09,
+      "jobs": [
+        "Konsultant",
+        "Kierownik projektu"
+      ],
+      "well_known": [],
+      "company_suffixes": [
+        "Consulting",
+        "Group",
+        "Partners",
+        "Associates",
+        "Advisory"
+      ],
+      "company_nouns": [
+        "Consulting",
+        "Management",
+        "Strategy",
+        "Advisory"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun} {suffix}",
+        "{last_name} & {last_name}"
+      ]
+    },
+    {
+      "name": "corporate",
+      "weight": 0.11,
+      "jobs": [
+        "Sprzedawca",
+        "Dyrektor",
+        "Policjant",
+        "Strażak"
+      ],
+      "well_known": [
+        "PZU",
+        "LPP",
+        "Dino Polska",
+        "Żabka",
+        "CCC",
+        "Cyfrowy Polsat",
+        "Orange Polska",
+        "Play",
+        "Biedronka",
+        "Budimex"
+      ],
+      "company_suffixes": [
+        "S.A.",
+        "Sp. z o.o.",
+        "Grupa",
+        "Holding"
+      ],
+      "company_nouns": [
+        "Solutions",
+        "Services",
+        "Management",
+        "Industries"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun} {suffix}",
+        "{last_name} and {last_name}"
+      ]
+    },
+    {
+      "name": "education",
+      "weight": 0.06,
+      "jobs": [
+        "Nauczyciel"
+      ],
+      "well_known": [],
+      "company_suffixes": [],
+      "company_nouns": [],
+      "company_formats": [
+        "Uniwersytet w {city}",
+        "Politechnika {city}",
+        "Liceum {last_name}"
+      ]
+    },
+    {
+      "name": "engineering",
+      "weight": 0.11,
+      "jobs": [
+        "Inżynier",
+        "Architekt"
+      ],
+      "well_known": [
+        "PKN Orlen",
+        "KGHM",
+        "PGE",
+        "Lotos"
+      ],
+      "company_suffixes": [
+        "Engineering",
+        "Industries",
+        "Manufacturing",
+        "Corp"
+      ],
+      "company_nouns": [
+        "Engineering",
+        "Manufacturing",
+        "Construction",
+        "Industries"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun} {suffix}",
+        "{city} Engineering Group"
+      ]
+    },
+    {
+      "name": "finance",
+      "weight": 0.11,
+      "jobs": [
+        "Księgowy"
+      ],
+      "well_known": [
+        "PKO Bank Polski",
+        "mBank"
+      ],
+      "company_suffixes": [
+        "Financial",
+        "Capital",
+        "Investments",
+        "Partners",
+        "Group"
+      ],
+      "company_nouns": [
+        "Capital",
+        "Investments",
+        "Financial",
+        "Wealth",
+        "Advisory"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{last_name} & {last_name}",
+        "{adjective} {noun} {suffix}",
+        "{city} Savings Bank"
+      ]
+    },
+    {
+      "name": "healthcare",
+      "weight": 0.09,
+      "jobs": [
+        "Pielęgniarka",
+        "Lekarz",
+        "Dentysta",
+        "Fizjoterapeuta"
+      ],
+      "well_known": [],
+      "company_suffixes": [
+        "Health",
+        "Medical",
+        "Healthcare"
+      ],
+      "company_nouns": [
+        "Healthcare",
+        "Medical",
+        "Health"
+      ],
+      "company_formats": [
+        "Szpital w {city}",
+        "Klinika {last_name}",
+        "Centrum Medyczne {city}"
+      ]
+    },
+    {
+      "name": "hospitality",
+      "weight": 0.05,
+      "jobs": [
+        "Kucharz",
+        "Kelner"
+      ],
+      "well_known": [],
+      "company_suffixes": [
+        "Hospitality",
+        "Group",
+        "Hotels",
+        "Restaurants"
+      ],
+      "company_nouns": [
+        "Hospitality",
+        "Hotels",
+        "Restaurants",
+        "Catering"
+      ],
+      "company_formats": [
+        "Restauracja {last_name}",
+        "Hotel {city}",
+        "Zajazd {last_name}"
+      ]
+    },
+    {
+      "name": "legal",
+      "weight": 0.04,
+      "jobs": [
+        "Prawnik"
+      ],
+      "well_known": [],
+      "company_suffixes": [],
+      "company_nouns": [],
+      "company_formats": [
+        "Kancelaria {last_name}",
+        "{last_name} & {last_name} Adwokaci"
+      ]
+    },
+    {
+      "name": "marketing_creative",
+      "weight": 0.09,
+      "jobs": [
+        "Projektant",
+        "Dziennikarz"
+      ],
+      "well_known": [],
+      "company_suffixes": [
+        "Media",
+        "Creative",
+        "Studios",
+        "Communications",
+        "Group"
+      ],
+      "company_nouns": [
+        "Media",
+        "Creative",
+        "Communications",
+        "Marketing",
+        "Design"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun}",
+        "{last_name} & {last_name}"
+      ]
+    },
+    {
+      "name": "real_estate_insurance",
+      "weight": 0.02,
+      "jobs": [
+        "Pośrednik nieruchomości"
+      ],
+      "well_known": [],
+      "company_suffixes": [
+        "Realty",
+        "Properties",
+        "Insurance",
+        "Group"
+      ],
+      "company_nouns": [
+        "Properties",
+        "Realty",
+        "Insurance"
+      ],
+      "company_formats": [
+        "{last_name} Realty",
+        "{city} Real Estate",
+        "{last_name} Insurance Agency"
+      ]
+    },
+    {
+      "name": "technology",
+      "weight": 0.19,
+      "jobs": [
+        "Programista"
+      ],
+      "well_known": [
+        "CD Projekt",
+        "Allegro",
+        "Comarch",
+        "Asseco"
+      ],
+      "company_suffixes": [
+        "Technologies",
+        "Software",
+        "Solutions",
+        "Labs",
+        "Digital",
+        "Systems"
+      ],
+      "company_nouns": [
+        "Software",
+        "Technologies",
+        "Systems",
+        "Data",
+        "Analytics",
+        "Networks"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{adjective} {noun}",
+        "{last_name} {noun}"
+      ]
+    },
+    {
+      "name": "trades",
+      "weight": 0.04,
+      "jobs": [
+        "Elektryk",
+        "Stolarz",
+        "Mechanik",
+        "Fryzjer"
+      ],
+      "well_known": [],
+      "company_suffixes": [
+        "Services",
+        "Co"
+      ],
+      "company_nouns": [],
+      "company_formats": [
+        "{last_name} Instalacje",
+        "{last_name} Elektro",
+        "{city} Usługi Domowe"
+      ]
+    }
+  ]
 }

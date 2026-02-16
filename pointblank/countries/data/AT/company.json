@@ -262,5 +262,327 @@
     "sichert",
     "fördert"
   ],
-  "catch_phrase_connector": "die"
+  "catch_phrase_connector": "die",
+  "industries": [
+    {
+      "name": "consulting",
+      "weight": 0.09,
+      "jobs": [
+        "Berater",
+        "Projektleiter"
+      ],
+      "well_known": [],
+      "company_suffixes": [
+        "Consulting",
+        "Group",
+        "Partners",
+        "Associates",
+        "Advisory"
+      ],
+      "company_nouns": [
+        "Consulting",
+        "Management",
+        "Strategy",
+        "Advisory"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun} {suffix}",
+        "{last_name} & {last_name}"
+      ]
+    },
+    {
+      "name": "corporate",
+      "weight": 0.11,
+      "jobs": [
+        "Verkäufer",
+        "Geschäftsführer",
+        "Polizist",
+        "Feuerwehrmann"
+      ],
+      "well_known": [
+        "Erste Group",
+        "Voestalpine",
+        "A1 Telekom Austria",
+        "BAWAG",
+        "Wienerberger",
+        "Andritz",
+        "Mayr-Melnhof",
+        "UNIQA",
+        "Lenzing",
+        "ÖBB",
+        "Austrian Airlines",
+        "Swarovski",
+        "Manner",
+        "SPAR Österreich",
+        "Strabag"
+      ],
+      "company_suffixes": [
+        "GmbH",
+        "AG",
+        "KG",
+        "Gruppe",
+        "Holding"
+      ],
+      "company_nouns": [
+        "Solutions",
+        "Services",
+        "Management",
+        "Industries"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun} {suffix}",
+        "{last_name} and {last_name}"
+      ]
+    },
+    {
+      "name": "education",
+      "weight": 0.06,
+      "jobs": [
+        "Lehrer"
+      ],
+      "well_known": [],
+      "company_suffixes": [],
+      "company_nouns": [],
+      "company_formats": [
+        "Universität {city}",
+        "{city} Hochschule",
+        "Technische Universität {city}",
+        "{city} Gymnasium"
+      ]
+    },
+    {
+      "name": "engineering",
+      "weight": 0.11,
+      "jobs": [
+        "Ingenieur",
+        "Architekt"
+      ],
+      "well_known": [
+        "OMV",
+        "Verbund",
+        "Red Bull"
+      ],
+      "company_suffixes": [
+        "Engineering",
+        "Industries",
+        "Manufacturing",
+        "Corp"
+      ],
+      "company_nouns": [
+        "Engineering",
+        "Manufacturing",
+        "Construction",
+        "Industries"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun} {suffix}",
+        "{city} Engineering Group"
+      ]
+    },
+    {
+      "name": "finance",
+      "weight": 0.11,
+      "jobs": [
+        "Buchhalter"
+      ],
+      "well_known": [
+        "Raiffeisen Bank International",
+        "Vienna Insurance Group"
+      ],
+      "company_suffixes": [
+        "Financial",
+        "Capital",
+        "Investments",
+        "Partners",
+        "Group"
+      ],
+      "company_nouns": [
+        "Capital",
+        "Investments",
+        "Financial",
+        "Wealth",
+        "Advisory"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{last_name} & {last_name}",
+        "{adjective} {noun} {suffix}",
+        "{city} Savings Bank"
+      ]
+    },
+    {
+      "name": "healthcare",
+      "weight": 0.09,
+      "jobs": [
+        "Krankenschwester",
+        "Arzt",
+        "Zahnarzt",
+        "Physiotherapeut"
+      ],
+      "well_known": [],
+      "company_suffixes": [
+        "Health",
+        "Medical",
+        "Healthcare"
+      ],
+      "company_nouns": [
+        "Healthcare",
+        "Medical",
+        "Health"
+      ],
+      "company_formats": [
+        "Klinikum {city}",
+        "{city} Krankenhaus",
+        "{city} Universitätsklinik",
+        "{last_name} Medizin"
+      ]
+    },
+    {
+      "name": "hospitality",
+      "weight": 0.05,
+      "jobs": [
+        "Koch",
+        "Kellner"
+      ],
+      "well_known": [],
+      "company_suffixes": [
+        "Hospitality",
+        "Group",
+        "Hotels",
+        "Restaurants"
+      ],
+      "company_nouns": [
+        "Hospitality",
+        "Hotels",
+        "Restaurants",
+        "Catering"
+      ],
+      "company_formats": [
+        "Hotel {city}",
+        "Restaurant {last_name}",
+        "Gasthof {last_name}",
+        "{city} Grand Hotel"
+      ]
+    },
+    {
+      "name": "legal",
+      "weight": 0.04,
+      "jobs": [
+        "Rechtsanwalt"
+      ],
+      "well_known": [],
+      "company_suffixes": [],
+      "company_nouns": [],
+      "company_formats": [
+        "Kanzlei {last_name}",
+        "{last_name} & {last_name} Rechtsanwälte",
+        "{last_name} Rechtsberatung"
+      ]
+    },
+    {
+      "name": "marketing_creative",
+      "weight": 0.09,
+      "jobs": [
+        "Designer",
+        "Journalist"
+      ],
+      "well_known": [],
+      "company_suffixes": [
+        "Media",
+        "Creative",
+        "Studios",
+        "Communications",
+        "Group"
+      ],
+      "company_nouns": [
+        "Media",
+        "Creative",
+        "Communications",
+        "Marketing",
+        "Design"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun}",
+        "{last_name} & {last_name}"
+      ]
+    },
+    {
+      "name": "real_estate_insurance",
+      "weight": 0.02,
+      "jobs": [
+        "Immobilienmakler"
+      ],
+      "well_known": [],
+      "company_suffixes": [
+        "Realty",
+        "Properties",
+        "Insurance",
+        "Group"
+      ],
+      "company_nouns": [
+        "Properties",
+        "Realty",
+        "Insurance"
+      ],
+      "company_formats": [
+        "{last_name} Realty",
+        "{city} Real Estate",
+        "{last_name} Insurance Agency"
+      ]
+    },
+    {
+      "name": "technology",
+      "weight": 0.19,
+      "jobs": [
+        "Softwareentwickler"
+      ],
+      "well_known": [],
+      "company_suffixes": [
+        "Technologies",
+        "Software",
+        "Solutions",
+        "Labs",
+        "Digital",
+        "Systems"
+      ],
+      "company_nouns": [
+        "Software",
+        "Technologies",
+        "Systems",
+        "Data",
+        "Analytics",
+        "Networks"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{adjective} {noun}",
+        "{last_name} {noun}"
+      ]
+    },
+    {
+      "name": "trades",
+      "weight": 0.04,
+      "jobs": [
+        "Elektriker",
+        "Tischler",
+        "Mechaniker",
+        "Friseur"
+      ],
+      "well_known": [],
+      "company_suffixes": [
+        "Services",
+        "Co"
+      ],
+      "company_nouns": [],
+      "company_formats": [
+        "{last_name} Handwerk",
+        "{last_name} Elektrotechnik",
+        "{city} Haustechnik"
+      ]
+    }
+  ]
 }
