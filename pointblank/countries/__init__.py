@@ -355,6 +355,11 @@ _TRANSLITERATION_MAP: dict[str, str] = {
     "Ť": "T",
     "ň": "n",
     "Ň": "N",
+    # Icelandic
+    "ð": "d",
+    "Ð": "D",
+    "þ": "th",
+    "Þ": "Th",
     # Other
     "đ": "d",
     "Đ": "D",
@@ -1323,7 +1328,17 @@ class LocaleGenerator:
         if num_words is None:
             num_words = self.rng.randint(5, 15)
 
-        words = [self.word() for _ in range(num_words)]
+        words: list[str] = []
+        for _ in range(num_words):
+            w = self.word()
+            # Avoid consecutive duplicate words
+            if words and w.lower() == words[-1].lower():
+                # Draw a replacement (try up to 5 times)
+                for _ in range(5):
+                    w = self.word()
+                    if w.lower() != words[-1].lower():
+                        break
+            words.append(w)
         words[0] = words[0].capitalize()
         return " ".join(words) + "."
 
@@ -1387,16 +1402,74 @@ class LocaleGenerator:
             total += d
         return (10 - (total % 10)) % 10
 
+    # IBAN total lengths (ISO 13616) by country code
+    _IBAN_LENGTHS: dict[str, int] = {
+        "AE": 23,
+        "AT": 20,
+        "AU": 22,
+        "BE": 16,
+        "BG": 22,
+        "BR": 29,
+        "CA": 22,
+        "CH": 21,
+        "CL": 22,
+        "CN": 22,
+        "CO": 22,
+        "CY": 28,
+        "CZ": 24,
+        "DE": 22,
+        "DK": 18,
+        "EE": 20,
+        "ES": 24,
+        "FI": 18,
+        "FR": 27,
+        "GB": 22,
+        "GR": 27,
+        "HK": 22,
+        "HR": 21,
+        "HU": 28,
+        "ID": 22,
+        "IE": 22,
+        "IN": 22,
+        "IS": 26,
+        "IT": 27,
+        "JP": 22,
+        "KR": 22,
+        "LT": 20,
+        "LU": 20,
+        "LV": 21,
+        "MT": 31,
+        "MX": 22,
+        "NL": 18,
+        "NO": 15,
+        "NZ": 22,
+        "PH": 22,
+        "PL": 28,
+        "PT": 25,
+        "RO": 24,
+        "RU": 22,
+        "SE": 24,
+        "SG": 22,
+        "SI": 19,
+        "SK": 24,
+        "TR": 26,
+        "TW": 22,
+        "US": 22,
+        "ZA": 22,
+    }
+
     def iban(self) -> str:
-        """Generate a random IBAN."""
-        # Simplified - generates a plausible-looking IBAN using the locale's country code
+        """Generate a random IBAN with correct country-specific length."""
         country = self._data.address.get("country_code", "US")
 
-        check_digits = f"{self.rng.randint(10, 99)}"
-        bank_code = "".join(str(self.rng.randint(0, 9)) for _ in range(8))
-        account = "".join(str(self.rng.randint(0, 9)) for _ in range(10))
+        # Total length includes 2-char country + 2-char check digits + BBAN
+        total_len = self._IBAN_LENGTHS.get(country, 22)
+        bban_len = total_len - 4  # subtract country code (2) + check digits (2)
 
-        return f"{country}{check_digits}{bank_code}{account}"
+        check_digits = f"{self.rng.randint(10, 99)}"
+        bban = "".join(str(self.rng.randint(0, 9)) for _ in range(bban_len))
+
+        return f"{country}{check_digits}{bban}"
 
     def currency_code(self) -> str:
         """Generate a random currency code."""
