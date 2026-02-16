@@ -1165,7 +1165,7 @@ class TestCountrySupport:
 
         # Test all countries with full data
         for country in COUNTRIES_WITH_FULL_DATA:
-            df = generate_dataset(schema, n=50, seed=42, country=country)
+            df = generate_dataset(schema, n=50, seed=23, country=country)
 
             for i, row in enumerate(df.iter_rows()):
                 address, city, state, postcode = row
