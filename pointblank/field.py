@@ -370,7 +370,7 @@ def int_field(
         ),
     )
 
-    pb.preview(pb.generate_dataset(schema, n=50, seed=42))
+    pb.preview(pb.generate_dataset(schema, n=50, seed=23))
     ```
 
     We can also enforce uniqueness with `unique=True` to produce distinct identifiers within
@@ -589,7 +589,7 @@ def float_field(
         weight_kg=pb.float_field(min_val=0.5, max_val=100.0),
     )
 
-    pb.preview(pb.generate_dataset(schema, n=50, seed=42))
+    pb.preview(pb.generate_dataset(schema, n=50, seed=23))
     ```
 
     We can simulate missing measurements by introducing null values:
@@ -899,7 +899,7 @@ def string_field(
         sku=pb.string_field(pattern=r"[A-Z]{2}[0-9]{6}"),
     )
 
-    pb.preview(pb.generate_dataset(schema, n=30, seed=42))
+    pb.preview(pb.generate_dataset(schema, n=30, seed=23))
     ```
 
     For random alphanumeric strings, `min_length=` and `max_length=` control the length.
@@ -1086,7 +1086,7 @@ def bool_field(
         ),
     )
 
-    pb.preview(pb.generate_dataset(schema, n=50, seed=42))
+    pb.preview(pb.generate_dataset(schema, n=50, seed=23))
     ```
 
     Boolean fields can be combined with other field types in a realistic schema:
@@ -1289,7 +1289,7 @@ def date_field(
         signup_date=pb.date_field(min_date="2023-06-01", max_date="2024-06-01"),
     )
 
-    pb.preview(pb.generate_dataset(schema, n=50, seed=42))
+    pb.preview(pb.generate_dataset(schema, n=50, seed=23))
     ```
 
     We can introduce missing dates with `nullable=True` and enforce distinct values using
@@ -1503,7 +1503,7 @@ def datetime_field(
         ),
     )
 
-    pb.preview(pb.generate_dataset(schema, n=30, seed=42))
+    pb.preview(pb.generate_dataset(schema, n=30, seed=23))
     ```
 
     Optional timestamps can be simulated with `nullable=True`, and datetime fields work
@@ -1710,7 +1710,7 @@ def time_field(
         alarm_time=pb.time_field(min_time="05:00:00", max_time="09:00:00"),
     )
 
-    pb.preview(pb.generate_dataset(schema, n=30, seed=42))
+    pb.preview(pb.generate_dataset(schema, n=30, seed=23))
     ```
 
     It's possible to introduce optional time values with `nullable=True` and combine them
@@ -1928,7 +1928,7 @@ def duration_field(
         break_time=pb.duration_field(min_duration="0:05:00", max_duration="0:30:00"),
     )
 
-    pb.generate_dataset(schema, n=30, seed=42)
+    pb.generate_dataset(schema, n=30, seed=23)
     ```
 
     Optional durations can be created with `nullable=True`, and duration fields work well
