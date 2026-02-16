@@ -313,7 +313,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
         border-radius: 2px;
     ">
 <p>Here we define a schema with field constraints and generate test data from it:</p>
-<div id="a7d676b9" class="cell" data-execution_count="1">
+<div id="ffd4887b" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
@@ -481,7 +481,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 </div>
 <p>It’s also possible to generate data from a simple, dtype-only schema. Setting <code>output="pandas"</code> returns a Pandas DataFrame:</p>
-<div id="687ffb04" class="cell" data-execution_count="2">
+<div id="1f2b5049" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(name<span class="op">=</span><span class="st">"String"</span>, age<span class="op">=</span><span class="st">"Int64"</span>, active<span class="op">=</span><span class="st">"Boolean"</span>)</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>pb.preview(pb.generate_dataset(schema, n<span class="op">=</span><span class="dv">50</span>, seed<span class="op">=</span><span class="dv">23</span>, output<span class="op">=</span><span class="st">"pandas"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -630,7 +630,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 </div>
 <p>When using presets, the <code>country=</code> parameter controls the locale. Here, <code>country="DE"</code> produces German names and addresses:</p>
-<div id="ec948f39" class="cell" data-execution_count="3">
+<div id="0eaad75a" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    name<span class="op">=</span>pb.string_field(preset<span class="op">=</span><span class="st">"name"</span>),</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    address<span class="op">=</span>pb.string_field(preset<span class="op">=</span><span class="st">"address"</span>),</span>
@@ -716,7 +716,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
   <tr>
     <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; color: gray;font-family: IBM Plex Mono;font-size: 10px; border-right: 2px solid #6699CC80;" class="gt_row gt_right">1</td>
     <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Ottokar Wittmann</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Brückenstraße 8995, Wohnung 110, 60542 Sachsenhausen</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Paradiesgasse 8995, Whg. 110, 60542 Sachsenhausen</td>
     <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Sachsenhausen</td>
   </tr>
   <tr>
@@ -734,7 +734,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
   <tr>
     <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; color: gray;font-family: IBM Plex Mono;font-size: 10px; border-right: 2px solid #6699CC80;" class="gt_row gt_right">4</td>
     <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Klaus Fabian</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Kavalierstraße 6446, Wohnung 998, 06230 Dessau-Roßlau</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Kavalierstraße 6446, Whg. 998, 06230 Dessau-Roßlau</td>
     <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Dessau-Roßlau</td>
   </tr>
   <tr>
@@ -746,31 +746,31 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
   <tr>
     <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; color: gray;font-family: IBM Plex Mono;font-size: 10px; border-right: 2px solid #6699CC80;" class="gt_row gt_right">16</td>
     <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Franz Eberhardt</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Königsallee 2838, 44616 Bochum</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Dr.-Ruer-Platz 6583, 44027 Bochum</td>
     <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Bochum</td>
   </tr>
   <tr>
     <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; color: gray;font-family: IBM Plex Mono;font-size: 10px; border-right: 2px solid #6699CC80;" class="gt_row gt_right">17</td>
     <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Kilian Heinze</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Schwanseestraße 7868, Wohnung 539, 99882 Weimar</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Amalienstraße 1341, Whg. 706, 99479 Weimar</td>
     <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Weimar</td>
   </tr>
   <tr>
     <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; color: gray;font-family: IBM Plex Mono;font-size: 10px; border-right: 2px solid #6699CC80;" class="gt_row gt_right">18</td>
     <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Margit Anders</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Braunschweiger Straße 4349, Wohnung 885, 38130 Wolfsburg</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Beethovenstraße 8621, 38441 Wolfsburg</td>
     <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Wolfsburg</td>
   </tr>
   <tr>
     <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; color: gray;font-family: IBM Plex Mono;font-size: 10px; border-right: 2px solid #6699CC80;" class="gt_row gt_right">19</td>
     <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Eleonore Witte</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Prenzlauer Allee 6183, Wohnung 422, 10479 Prenzlauer Berg</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Kollwitzstraße 8157, 10407 Prenzlauer Berg</td>
     <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Prenzlauer Berg</td>
   </tr>
   <tr>
     <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; color: gray;font-family: IBM Plex Mono;font-size: 10px; border-right: 2px solid #6699CC80;" class="gt_row gt_right">20</td>
     <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Ida Förster</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Walddörferstraße 5238, Wohnung 281, 22054 Wandsbek</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Bismarckstraße 4779, Whg. 358, 22056 Wandsbek</td>
     <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Wandsbek</td>
   </tr>
 </tbody>
@@ -783,7 +783,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 </div>
 <p>We can combine several field types with nullable columns in a mixed-type dataset:</p>
-<div id="368b466d" class="cell" data-execution_count="4">
+<div id="cbc6f461" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> datetime <span class="im">import</span> date, timedelta</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>

@@ -301,7 +301,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
         border-radius: 2px;
     ">
 <p>The <code>min_time=</code> and <code>max_time=</code> parameters accept <code>datetime.time</code> objects, making it easy to define business-hours ranges:</p>
-<div id="30f94d3a" class="cell" data-execution_count="1">
+<div id="0f6c05a9" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> datetime <span class="im">import</span> time</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -450,7 +450,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 </div>
 <p>ISO format strings can also be used for convenience:</p>
-<div id="baaded34" class="cell" data-execution_count="2">
+<div id="1eb4efe6" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    login_time<span class="op">=</span>pb.time_field(min_time<span class="op">=</span><span class="st">"06:00:00"</span>, max_time<span class="op">=</span><span class="st">"23:59:59"</span>),</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    alarm_time<span class="op">=</span>pb.time_field(min_time<span class="op">=</span><span class="st">"05:00:00"</span>, max_time<span class="op">=</span><span class="st">"09:00:00"</span>),</span>
@@ -590,7 +590,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 </div>
 <p>It’s possible to introduce optional time values with <code>nullable=True</code> and combine them with other field types:</p>
-<div id="d17a7fdc" class="cell" data-execution_count="3">
+<div id="63dc0e5a" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    employee_id<span class="op">=</span>pb.int_field(min_val<span class="op">=</span><span class="dv">100</span>, max_val<span class="op">=</span><span class="dv">999</span>, unique<span class="op">=</span><span class="va">True</span>),</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    check_in<span class="op">=</span>pb.time_field(min_time<span class="op">=</span><span class="st">"07:00:00"</span>, max_time<span class="op">=</span><span class="st">"10:00:00"</span>),</span>

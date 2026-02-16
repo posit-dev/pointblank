@@ -301,7 +301,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
         border-radius: 2px;
     ">
 <p>The <code>min_date=</code> and <code>max_date=</code> parameters accept <code>datetime.date</code> objects to define date ranges:</p>
-<div id="28009113" class="cell" data-execution_count="1">
+<div id="26df82f6" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> datetime <span class="im">import</span> date</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -450,7 +450,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 </div>
 <p>For convenience, ISO format strings can be used instead of <code>date</code> objects:</p>
-<div id="cf7ba56d" class="cell" data-execution_count="2">
+<div id="2b096f03" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    event_date<span class="op">=</span>pb.date_field(min_date<span class="op">=</span><span class="st">"2024-01-01"</span>, max_date<span class="op">=</span><span class="st">"2024-12-31"</span>),</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    signup_date<span class="op">=</span>pb.date_field(min_date<span class="op">=</span><span class="st">"2023-06-01"</span>, max_date<span class="op">=</span><span class="st">"2024-06-01"</span>),</span>
@@ -590,7 +590,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 </div>
 <p>We can introduce missing dates with <code>nullable=True</code> and enforce distinct values using <code>unique=True</code>:</p>
-<div id="966bc78d" class="cell" data-execution_count="3">
+<div id="a4afe2d2" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    order_date<span class="op">=</span>pb.date_field(</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>        min_date<span class="op">=</span><span class="st">"2024-01-01"</span>, max_date<span class="op">=</span><span class="st">"2024-03-31"</span>,</span>
