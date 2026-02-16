@@ -446,12 +446,17 @@ ADDRESS_RELATED_PRESETS = {
     "longitude",
 }
 PERSON_RELATED_PRESETS = {"name", "name_full", "first_name", "last_name", "email", "user_name"}
+BUSINESS_RELATED_PRESETS = {"job", "company"}
 
 
-def _get_coherence_needs(fields: dict[str, Field]) -> tuple[bool, bool]:
+def _get_coherence_needs(fields: dict[str, Field]) -> tuple[bool, bool, bool]:
     """Check what coherence is needed for the given fields."""
     needs_address = False
     needs_person = False
+    needs_business = False
+
+    found_job = False
+    found_company = False
 
     for field in fields.values():
         preset = getattr(field, "preset", None)
@@ -459,8 +464,16 @@ def _get_coherence_needs(fields: dict[str, Field]) -> tuple[bool, bool]:
             needs_address = True
         if preset in PERSON_RELATED_PRESETS:
             needs_person = True
+        if preset == "job":
+            found_job = True
+        if preset == "company":
+            found_company = True
 
-    return needs_address, needs_person
+    # Business coherence only needed when BOTH job and company are present
+    if found_job and found_company:
+        needs_business = True
+
+    return needs_address, needs_person, needs_business
 
 
 def _generate_column_with_row_context(
@@ -509,8 +522,8 @@ def generate_dataframe(
         Generated DataFrame in the format specified by config.output.
     """
     # Check what coherence is needed
-    needs_address, needs_person = _get_coherence_needs(fields)
-    needs_coherence = needs_address or needs_person
+    needs_address, needs_person, needs_business = _get_coherence_needs(fields)
+    needs_coherence = needs_address or needs_person or needs_business
 
     # Set up shared locale generator if any coherence is needed
     shared_locale_gen = None
@@ -520,6 +533,12 @@ def generate_dataframe(
             shared_locale_gen.init_row_locations(config.n)
         if needs_person:
             shared_locale_gen.init_row_persons(config.n)
+        if needs_business:
+            # Business coherence also needs location context for templates like
+            # "{city} General Hospital", so init locations if not already done
+            if not needs_address:
+                shared_locale_gen.init_row_locations(config.n)
+            shared_locale_gen.init_row_employers(config.n)
 
     # Determine which presets need row context
     coherent_presets = set()
@@ -527,6 +546,8 @@ def generate_dataframe(
         coherent_presets.update(ADDRESS_RELATED_PRESETS)
     if needs_person:
         coherent_presets.update(PERSON_RELATED_PRESETS)
+    if needs_business:
+        coherent_presets.update(BUSINESS_RELATED_PRESETS)
 
     # Generate data for each column
     data: dict[str, list[Any]] = {}
@@ -541,10 +562,12 @@ def generate_dataframe(
 
     # Clean up
     if shared_locale_gen is not None:
-        if needs_address:
+        if needs_address or needs_business:
             shared_locale_gen.clear_row_locations()
         if needs_person:
             shared_locale_gen.clear_row_persons()
+        if needs_business:
+            shared_locale_gen.clear_row_employers()
 
     # Convert to requested output format
     if config.output == "dict":

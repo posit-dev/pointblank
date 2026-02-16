@@ -530,5 +530,402 @@
     "numérise",
     "développe"
   ],
-  "catch_phrase_connector": "qui"
+  "catch_phrase_connector": "qui",
+  "industries": [
+    {
+      "name": "technology",
+      "weight": 0.16,
+      "jobs": [
+        "Ingénieur logiciel",
+        "Chef de produit",
+        "Analyste de données",
+        "Développeur web",
+        "Ingénieur DevOps",
+        "Architecte cloud",
+        "Analyste sécurité",
+        "Data scientist",
+        "Ingénieur qualité",
+        "Administrateur réseau",
+        "Administrateur de base de données",
+        "Administrateur système"
+      ],
+      "well_known": [
+        "Dassault Systèmes",
+        "Capgemini",
+        "Atos",
+        "Sopra Steria",
+        "OVHcloud",
+        "Criteo",
+        "Ubisoft",
+        "Deezer",
+        "BlaBlaCar",
+        "Doctolib",
+        "Google",
+        "Amazon",
+        "Microsoft",
+        "Meta"
+      ],
+      "company_suffixes": [
+        "Technologies",
+        "Software",
+        "Solutions",
+        "Labs",
+        "Digital",
+        "Systèmes"
+      ],
+      "company_nouns": [
+        "Software",
+        "Technologies",
+        "Systèmes",
+        "Données",
+        "Analytique",
+        "Réseaux",
+        "Sécurité"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{adjective} {noun}",
+        "{last_name} {noun}"
+      ]
+    },
+    {
+      "name": "healthcare",
+      "weight": 0.08,
+      "jobs": [
+        "Médecin",
+        "Pharmacien"
+      ],
+      "well_known": [
+        "Sanofi"
+      ],
+      "company_suffixes": [
+        "Santé",
+        "Médical",
+        "Pharmacie"
+      ],
+      "company_nouns": [
+        "Santé",
+        "Médical"
+      ],
+      "company_formats": [
+        "Hôpital de {city}",
+        "Centre Hospitalier de {city}",
+        "Clinique {last_name}",
+        "CHU de {city}",
+        "Centre Médical de {city}"
+      ]
+    },
+    {
+      "name": "finance",
+      "weight": 0.1,
+      "jobs": [
+        "Analyste financier",
+        "Comptable",
+        "Conseiller bancaire"
+      ],
+      "well_known": [
+        "BNP Paribas",
+        "Société Générale",
+        "Crédit Agricole",
+        "AXA"
+      ],
+      "company_suffixes": [
+        "Finance",
+        "Capital",
+        "Investissements",
+        "Partenaires",
+        "Groupe"
+      ],
+      "company_nouns": [
+        "Capital",
+        "Investissements",
+        "Finance",
+        "Patrimoine"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{last_name} et {last_name}",
+        "{adjective} {noun} {suffix}",
+        "Caisse d'Épargne de {city}"
+      ]
+    },
+    {
+      "name": "education",
+      "weight": 0.07,
+      "jobs": [
+        "Professeur",
+        "Enseignant"
+      ],
+      "well_known": [],
+      "company_suffixes": [],
+      "company_nouns": [],
+      "company_formats": [
+        "Université de {city}",
+        "Lycée {last_name}",
+        "Collège {last_name}",
+        "École {last_name}",
+        "Institut de {city}"
+      ]
+    },
+    {
+      "name": "legal",
+      "weight": 0.04,
+      "jobs": [
+        "Avocat"
+      ],
+      "well_known": [],
+      "company_suffixes": [],
+      "company_nouns": [],
+      "company_formats": [
+        "Cabinet {last_name} & {last_name}",
+        "{last_name} Avocats",
+        "Cabinet {last_name}"
+      ]
+    },
+    {
+      "name": "consulting",
+      "weight": 0.08,
+      "jobs": [
+        "Consultant",
+        "Analyste métier",
+        "Chef de projet"
+      ],
+      "well_known": [
+        "McKinsey & Company",
+        "Boston Consulting Group",
+        "Bain & Company",
+        "Deloitte",
+        "PwC",
+        "EY",
+        "KPMG",
+        "Accenture"
+      ],
+      "company_suffixes": [
+        "Conseil",
+        "Groupe",
+        "Partenaires",
+        "Consulting"
+      ],
+      "company_nouns": [
+        "Conseil",
+        "Management",
+        "Stratégie"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun} {suffix}",
+        "{last_name} et {last_name}"
+      ]
+    },
+    {
+      "name": "marketing_creative",
+      "weight": 0.06,
+      "jobs": [
+        "Responsable marketing",
+        "Graphiste",
+        "Designer UX",
+        "Rédacteur technique"
+      ],
+      "well_known": [
+        "Publicis",
+        "Vivendi"
+      ],
+      "company_suffixes": [
+        "Médias",
+        "Créatif",
+        "Studios",
+        "Communication",
+        "Groupe"
+      ],
+      "company_nouns": [
+        "Médias",
+        "Créatif",
+        "Communication",
+        "Marketing",
+        "Design"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun}",
+        "{last_name} et {last_name}"
+      ]
+    },
+    {
+      "name": "hospitality",
+      "weight": 0.05,
+      "jobs": [
+        "Cuisinier",
+        "Directeur d'hôtel"
+      ],
+      "well_known": [
+        "Danone",
+        "Pernod Ricard"
+      ],
+      "company_suffixes": [
+        "Hôtellerie",
+        "Groupe",
+        "Hôtels",
+        "Restauration"
+      ],
+      "company_nouns": [
+        "Hôtellerie",
+        "Hôtels",
+        "Restauration",
+        "Traiteur"
+      ],
+      "company_formats": [
+        "Restaurant {last_name}",
+        "Hôtel {city}",
+        "{adjective} Traiteur {suffix}"
+      ]
+    },
+    {
+      "name": "real_estate",
+      "weight": 0.04,
+      "jobs": [
+        "Agent immobilier"
+      ],
+      "well_known": [],
+      "company_suffixes": [
+        "Immobilier",
+        "Propriétés",
+        "Groupe"
+      ],
+      "company_nouns": [
+        "Immobilier",
+        "Propriétés"
+      ],
+      "company_formats": [
+        "{last_name} Immobilier",
+        "{city} Immobilier",
+        "Agence {last_name}"
+      ]
+    },
+    {
+      "name": "engineering",
+      "weight": 0.1,
+      "jobs": [
+        "Ingénieur mécanique",
+        "Ingénieur électrique",
+        "Ingénieur civil",
+        "Architecte"
+      ],
+      "well_known": [
+        "Renault",
+        "Peugeot",
+        "Citroën",
+        "Michelin",
+        "Airbus",
+        "Safran",
+        "Thales",
+        "Schneider Electric",
+        "Vinci",
+        "Saint-Gobain",
+        "Bouygues"
+      ],
+      "company_suffixes": [
+        "Ingénierie",
+        "Industries",
+        "Production",
+        "SA"
+      ],
+      "company_nouns": [
+        "Ingénierie",
+        "Production",
+        "Construction",
+        "Industries"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun} {suffix}",
+        "{last_name} et {last_name}",
+        "Bureau d'Études {last_name}"
+      ]
+    },
+    {
+      "name": "corporate",
+      "weight": 0.08,
+      "jobs": [
+        "Responsable des opérations",
+        "Assistant administratif",
+        "Responsable RH",
+        "Commercial",
+        "Conseiller clientèle",
+        "Directeur général"
+      ],
+      "well_known": [
+        "LVMH",
+        "L'Oréal",
+        "Carrefour",
+        "Hermès",
+        "Kering",
+        "TotalEnergies"
+      ],
+      "company_suffixes": [
+        "SA",
+        "SAS",
+        "SARL",
+        "Groupe",
+        "Entreprises"
+      ],
+      "company_nouns": [
+        "Solutions",
+        "Services",
+        "Management",
+        "Industries"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun} {suffix}",
+        "{last_name} et {last_name}"
+      ]
+    },
+    {
+      "name": "social_services",
+      "weight": 0.02,
+      "jobs": [
+        "Travailleur social"
+      ],
+      "well_known": [],
+      "company_suffixes": [],
+      "company_nouns": [],
+      "company_formats": [
+        "Services Sociaux de {city}",
+        "Centre Communautaire de {city}",
+        "Association Familiale de {city}"
+      ]
+    },
+    {
+      "name": "energy_telecom",
+      "weight": 0.03,
+      "jobs": [
+        "Administrateur réseau"
+      ],
+      "well_known": [
+        "Orange",
+        "Air France",
+        "SNCF",
+        "La Poste",
+        "Engie",
+        "EDF",
+        "Veolia"
+      ],
+      "company_suffixes": [
+        "Énergie",
+        "Télécom",
+        "Communications",
+        "Réseaux"
+      ],
+      "company_nouns": [
+        "Énergie",
+        "Télécom",
+        "Communications",
+        "Réseaux"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{last_name} {suffix}"
+      ]
+    }
+  ]
 }

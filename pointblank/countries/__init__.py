@@ -1114,49 +1114,128 @@ class LocaleGenerator:
         return f"{self.rng.uniform(lon_min, lon_max):.6f}"
 
     # =========================================================================
-    # Company
+    # Company / Employer coherence
     # =========================================================================
 
-    def company(self) -> str:
-        """Generate a random company name.
+    _row_employers: list[dict[str, str]] | None = None
 
-        Has a ~15% chance to return a well-known company name, with preference
-        for companies that have offices in the current city (if location context is active).
-        Otherwise generates a fictional company name.
+    def _pick_industry(self) -> dict | None:
+        """Pick a random industry weighted by its weight, or None if no industries data."""
+        industries = self._data.company.get("industries", [])
+        if not industries:
+            return None
+
+        weights = [ind.get("weight", 1.0) for ind in industries]
+        total = sum(weights)
+        r = self.rng.random() * total
+        cumulative = 0.0
+        for ind in industries:
+            cumulative += ind.get("weight", 1.0)
+            if r <= cumulative:
+                return ind
+        return industries[-1]
+
+    def _get_employer(self) -> dict[str, str]:
+        """Generate a coherent employer: pick an industry, then job + company from it."""
+        industry = self._pick_industry()
+        if industry is None:
+            # No industries data — fall back to independent generation
+            return {
+                "job": self._generate_job_standalone(),
+                "company": self._generate_company_standalone(),
+                "industry": "general",
+            }
+
+        # Pick a job from this industry
+        jobs = industry.get("jobs", [])
+        job = self.rng.choice(jobs) if jobs else self._generate_job_standalone()
+
+        # Pick a company appropriate for this industry
+        company = self._generate_company_for_industry(industry)
+
+        return {
+            "job": job,
+            "company": company,
+            "industry": industry.get("name", "general"),
+        }
+
+    def _generate_company_for_industry(self, industry: dict) -> str:
+        """Generate a company name appropriate for the given industry.
+
+        Uses a mix of well-known companies (with city preference), industry-specific
+        local formats (using location context), and generic fictional names.
         """
-        # 15% chance to use a well-known company
-        if self.rng.random() < 0.15:
-            well_known = self._data.company.get("well_known_companies", [])
-            if well_known:
-                # Get current city if location context is active
-                current_city = None
-                if self._row_locations is not None and self._current_row is not None:
-                    current_city = self._row_locations[self._current_row].get("city")
+        well_known_names = industry.get("well_known", [])
 
-                # Collect all companies, preferring those in the current city
-                city_companies = []
-                all_companies = []
+        # 20% chance to use a well-known company from this industry
+        if well_known_names and self.rng.random() < 0.20:
+            # Resolve well-known names against the full well_known_companies list
+            # to get city data for location-aware selection
+            well_known_all = self._data.company.get("well_known_companies", [])
+            well_known_map = {}
+            for wk in well_known_all:
+                name = wk.get("name") if isinstance(wk, dict) else wk
+                cities = wk.get("cities", []) if isinstance(wk, dict) else []
+                well_known_map[name] = cities
 
-                for company in well_known:
-                    name = company.get("name") if isinstance(company, dict) else company
-                    cities = company.get("cities", []) if isinstance(company, dict) else []
-                    all_companies.append(name)
-                    if current_city and current_city in cities:
-                        city_companies.append(name)
+            # Get current city if location context is active
+            current_city = None
+            if self._row_locations is not None and self._current_row is not None:
+                current_city = self._row_locations[self._current_row].get("city")
 
-                # 70% chance to use city-relevant company if available
-                if city_companies and self.rng.random() < 0.7:
-                    return self.rng.choice(city_companies)
-                elif all_companies:
-                    return self.rng.choice(all_companies)
+            # Prefer companies in the current city
+            city_companies = []
+            for name in well_known_names:
+                cities = well_known_map.get(name, [])
+                if current_city and current_city in cities:
+                    city_companies.append(name)
 
-        # Generate a fictional company name
-        formats = self._data.company.get("formats", ["{last_name} {suffix}"])
+            if city_companies and self.rng.random() < 0.7:
+                return self.rng.choice(city_companies)
+            else:
+                return self.rng.choice(well_known_names)
+
+        # 80% chance: generate a fictional company using industry-specific formats
+        return self._generate_fictional_company_for_industry(industry)
+
+    def _generate_fictional_company_for_industry(self, industry: dict) -> str:
+        """Generate a fictional company name using industry-specific templates."""
+        # Use industry-specific formats, falling back to general formats
+        formats = industry.get("company_formats", [])
+        if not formats:
+            formats = self._data.company.get("formats", ["{last_name} {suffix}"])
         fmt = self.rng.choice(formats)
 
-        suffixes = self._data.company.get("suffixes", ["Inc", "LLC", "Corp"])
+        # Get industry-specific or general word pools
+        suffixes = industry.get("company_suffixes", [])
+        if not suffixes:
+            suffixes = self._data.company.get("suffixes", ["Inc", "LLC", "Corp"])
+        nouns = industry.get("company_nouns", [])
+        if not nouns:
+            nouns = self._data.company.get("nouns", ["Solutions", "Systems"])
         adjectives = self._data.company.get("adjectives", ["Global", "Advanced"])
-        nouns = self._data.company.get("nouns", ["Solutions", "Systems"])
+
+        # Resolve location-based placeholders
+        location = self._get_current_location()
+        city = location.get("city", "Springfield")
+        # Prefer exonym for company names
+        exonym = location.get("exonym")
+        if exonym:
+            city = exonym
+        state = location.get("state", "State")
+
+        # Handle {city} and {state} placeholders first
+        result = fmt.replace("{city}", city).replace("{state}", state)
+
+        # Now handle standard company name placeholders
+        result = self._fill_company_placeholders(result, suffixes, adjectives, nouns)
+
+        return result
+
+    def _fill_company_placeholders(
+        self, fmt: str, suffixes: list[str], adjectives: list[str], nouns: list[str]
+    ) -> str:
+        """Fill standard company name placeholders ({last_name}, {adjective}, {noun}, {suffix})."""
 
         # Helper to pick distinct values from a list
         def _pick_distinct(values: list[str], count: int) -> list[str]:
@@ -1210,8 +1289,117 @@ class LocaleGenerator:
             return result.format(suffix=suffix)
         return result
 
+    def init_row_employers(self, n_rows: int) -> None:
+        """
+        Pre-generate employer data for multiple rows to ensure job/company coherence.
+
+        This should be called before generating a dataset with both job and company columns.
+        When active, job() and company() will use the employer for the current row
+        (set via set_row()).
+
+        Must be called AFTER init_row_locations() so that company name templates
+        (e.g., "{city} General Hospital") use the correct location for each row.
+
+        Parameters
+        ----------
+        n_rows
+            Number of rows to pre-generate employers for.
+        """
+        employers = []
+        for i in range(n_rows):
+            # Temporarily set the row index so _get_current_location() returns
+            # the correct location for this row's employer
+            self._current_row = i
+            employers.append(self._get_employer())
+        self._current_row = None
+        self._row_employers = employers
+
+    def clear_row_employers(self) -> None:
+        """Clear all pre-generated row employers."""
+        self._row_employers = None
+
+    def _get_current_employer(self) -> dict[str, str] | None:
+        """Get the current cached employer for the active row, or None if not active."""
+        if self._row_employers is not None and self._current_row is not None:
+            return self._row_employers[self._current_row]
+        return None
+
+    # =========================================================================
+    # Company (public methods)
+    # =========================================================================
+
+    def company(self) -> str:
+        """Generate a random company name.
+
+        When employer coherence is active (both job and company columns in the dataset),
+        returns the company from the pre-generated employer for this row.
+
+        Otherwise, has a ~15% chance to return a well-known company name (with preference
+        for companies that have offices in the current city), and generates a fictional
+        company name the rest of the time.
+        """
+        # If employer coherence is active, use the pre-generated company
+        employer = self._get_current_employer()
+        if employer is not None:
+            return employer["company"]
+
+        # No coherence: standalone generation
+        return self._generate_company_standalone()
+
+    def _generate_company_standalone(self) -> str:
+        """Generate a company name without employer coherence (original behavior)."""
+        # 15% chance to use a well-known company
+        if self.rng.random() < 0.15:
+            well_known = self._data.company.get("well_known_companies", [])
+            if well_known:
+                # Get current city if location context is active
+                current_city = None
+                if self._row_locations is not None and self._current_row is not None:
+                    current_city = self._row_locations[self._current_row].get("city")
+
+                # Collect all companies, preferring those in the current city
+                city_companies = []
+                all_companies = []
+
+                for company in well_known:
+                    name = company.get("name") if isinstance(company, dict) else company
+                    cities = company.get("cities", []) if isinstance(company, dict) else []
+                    all_companies.append(name)
+                    if current_city and current_city in cities:
+                        city_companies.append(name)
+
+                # 70% chance to use city-relevant company if available
+                if city_companies and self.rng.random() < 0.7:
+                    return self.rng.choice(city_companies)
+                elif all_companies:
+                    return self.rng.choice(all_companies)
+
+        # Generate a fictional company name
+        formats = self._data.company.get("formats", ["{last_name} {suffix}"])
+        fmt = self.rng.choice(formats)
+
+        suffixes = self._data.company.get("suffixes", ["Inc", "LLC", "Corp"])
+        adjectives = self._data.company.get("adjectives", ["Global", "Advanced"])
+        nouns = self._data.company.get("nouns", ["Solutions", "Systems"])
+
+        return self._fill_company_placeholders(fmt, suffixes, adjectives, nouns)
+
     def job(self) -> str:
-        """Generate a random job title."""
+        """Generate a random job title.
+
+        When employer coherence is active (both job and company columns in the dataset),
+        returns the job from the pre-generated employer for this row.
+        """
+        # If employer coherence is active, use the pre-generated job
+        employer = self._get_current_employer()
+        if employer is not None:
+            return employer["job"]
+
+        # No coherence: standalone generation
+        return self._generate_job_standalone()
+
+    def _generate_job_standalone(self) -> str:
+        """Generate a job title without employer coherence (original behavior)."""
         jobs = self._data.company.get("jobs", ["Manager"])
         return self.rng.choice(jobs)
 

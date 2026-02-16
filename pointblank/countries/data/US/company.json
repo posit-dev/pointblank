@@ -854,5 +854,390 @@
     "modernize",
     "digitize"
   ],
-  "catch_phrase_connector": "that"
+  "catch_phrase_connector": "that",
+  "industries": [
+    {
+      "name": "technology",
+      "weight": 0.18,
+      "jobs": [
+        "Software Engineer",
+        "Product Manager",
+        "Data Analyst",
+        "Web Developer",
+        "DevOps Engineer",
+        "Cloud Architect",
+        "Security Analyst",
+        "Data Scientist",
+        "Machine Learning Engineer",
+        "Quality Assurance Engineer",
+        "Network Administrator",
+        "Database Administrator",
+        "System Administrator"
+      ],
+      "well_known": [
+        "Microsoft",
+        "Apple",
+        "Google",
+        "Amazon",
+        "Meta",
+        "Netflix",
+        "Salesforce",
+        "Adobe",
+        "Oracle",
+        "IBM",
+        "Intel",
+        "Cisco",
+        "NVIDIA",
+        "PayPal",
+        "Uber",
+        "Airbnb",
+        "Spotify",
+        "LinkedIn",
+        "Shopify",
+        "Zoom",
+        "Slack",
+        "Stripe",
+        "Dropbox"
+      ],
+      "company_suffixes": ["Technologies", "Software", "Solutions", "Labs", "Digital", "Systems"],
+      "company_nouns": ["Software", "Technologies", "Systems", "Data", "Analytics", "Networks", "Security", "Solutions"],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{adjective} {noun}",
+        "{last_name} {noun}"
+      ]
+    },
+    {
+      "name": "healthcare",
+      "weight": 0.10,
+      "jobs": [
+        "Nurse",
+        "Physician",
+        "Pharmacist",
+        "Counselor",
+        "Psychologist"
+      ],
+      "well_known": [
+        "Johnson & Johnson",
+        "Pfizer",
+        "UnitedHealth Group",
+        "CVS Health",
+        "Merck"
+      ],
+      "company_suffixes": ["Health", "Medical", "Healthcare"],
+      "company_nouns": ["Healthcare", "Medical", "Health"],
+      "company_formats": [
+        "{city} General Hospital",
+        "{city} Medical Center",
+        "{city} Regional Health",
+        "{city} Community Health",
+        "{state} Health System",
+        "{last_name} Medical Group",
+        "{adjective} Healthcare {suffix}"
+      ]
+    },
+    {
+      "name": "finance",
+      "weight": 0.12,
+      "jobs": [
+        "Financial Analyst",
+        "Accountant",
+        "Bank Teller",
+        "Loan Officer",
+        "Financial Advisor",
+        "Investment Analyst"
+      ],
+      "well_known": [
+        "JPMorgan Chase",
+        "Goldman Sachs",
+        "Morgan Stanley",
+        "Bank of America",
+        "Citigroup",
+        "Wells Fargo",
+        "BlackRock",
+        "Fidelity Investments",
+        "Charles Schwab",
+        "American Express"
+      ],
+      "company_suffixes": ["Financial", "Capital", "Investments", "Partners", "Group"],
+      "company_nouns": ["Capital", "Investments", "Financial", "Wealth", "Advisory"],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{last_name} & {last_name}",
+        "{adjective} {noun} {suffix}",
+        "{city} Federal Credit Union",
+        "{city} Savings Bank",
+        "{state} Community Bank"
+      ]
+    },
+    {
+      "name": "education",
+      "weight": 0.07,
+      "jobs": [
+        "Teacher",
+        "Professor",
+        "Librarian",
+        "Research Scientist"
+      ],
+      "well_known": [],
+      "company_suffixes": [],
+      "company_nouns": [],
+      "company_formats": [
+        "University of {state}",
+        "{city} State University",
+        "{city} Community College",
+        "{city} Public Schools",
+        "{city} Academy",
+        "{state} Institute of Technology",
+        "{last_name} University",
+        "{city} School District"
+      ]
+    },
+    {
+      "name": "legal",
+      "weight": 0.04,
+      "jobs": [
+        "Attorney",
+        "Paralegal"
+      ],
+      "well_known": [],
+      "company_suffixes": [],
+      "company_nouns": [],
+      "company_formats": [
+        "{last_name} & {last_name} Law",
+        "{last_name}, {last_name} & Associates",
+        "{last_name} Law Group",
+        "{last_name} Legal Services",
+        "{city} Legal Associates"
+      ]
+    },
+    {
+      "name": "consulting",
+      "weight": 0.08,
+      "jobs": [
+        "Consultant",
+        "Business Analyst",
+        "Project Manager"
+      ],
+      "well_known": [
+        "McKinsey & Company",
+        "Boston Consulting Group",
+        "Bain & Company",
+        "Deloitte",
+        "PwC",
+        "EY",
+        "KPMG",
+        "Accenture"
+      ],
+      "company_suffixes": ["Consulting", "Group", "Partners", "Associates", "Advisory"],
+      "company_nouns": ["Consulting", "Management", "Strategy", "Advisory"],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun} {suffix}",
+        "{last_name} & {last_name}"
+      ]
+    },
+    {
+      "name": "marketing_creative",
+      "weight": 0.08,
+      "jobs": [
+        "Marketing Manager",
+        "Graphic Designer",
+        "UX Designer",
+        "UI Designer",
+        "Content Writer",
+        "Technical Writer"
+      ],
+      "well_known": [
+        "Disney",
+        "Warner Bros.",
+        "NBCUniversal"
+      ],
+      "company_suffixes": ["Media", "Creative", "Studios", "Communications", "Group"],
+      "company_nouns": ["Media", "Creative", "Communications", "Marketing", "Design"],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun}",
+        "{last_name} & {last_name}"
+      ]
+    },
+    {
+      "name": "hospitality",
+      "weight": 0.06,
+      "jobs": [
+        "Chef",
+        "Restaurant Manager",
+        "Hotel Manager",
+        "Event Coordinator"
+      ],
+      "well_known": [
+        "Starbucks",
+        "The Coca-Cola Company",
+        "PepsiCo"
+      ],
+      "company_suffixes": ["Hospitality", "Group", "Hotels", "Restaurants"],
+      "company_nouns": ["Hospitality", "Hotels", "Restaurants", "Catering"],
+      "company_formats": [
+        "The {adjective} {noun}",
+        "{last_name}'s Restaurant",
+        "{city} Grand Hotel",
+        "{adjective} Catering {suffix}",
+        "{city} Convention Center"
+      ]
+    },
+    {
+      "name": "real_estate_insurance",
+      "weight": 0.04,
+      "jobs": [
+        "Real Estate Agent",
+        "Insurance Agent"
+      ],
+      "well_known": [],
+      "company_suffixes": ["Realty", "Properties", "Insurance", "Group"],
+      "company_nouns": ["Properties", "Realty", "Insurance", "Real Estate"],
+      "company_formats": [
+        "{last_name} Realty",
+        "{city} Real Estate",
+        "{last_name} Insurance Agency",
+        "{adjective} {noun} {suffix}",
+        "{state} Insurance Group"
+      ]
+    },
+    {
+      "name": "engineering",
+      "weight": 0.08,
+      "jobs": [
+        "Mechanical Engineer",
+        "Electrical Engineer",
+        "Civil Engineer",
+        "Chemical Engineer",
+        "Environmental Engineer",
+        "Architect",
+        "Interior Designer",
+        "Construction Manager"
+      ],
+      "well_known": [
+        "Tesla",
+        "Ford",
+        "General Motors",
+        "Boeing",
+        "Lockheed Martin",
+        "SpaceX"
+      ],
+      "company_suffixes": ["Engineering", "Industries", "Manufacturing", "Corp"],
+      "company_nouns": ["Engineering", "Manufacturing", "Construction", "Industries"],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun} {suffix}",
+        "{last_name} & {last_name}",
+        "{city} Engineering Group"
+      ]
+    },
+    {
+      "name": "corporate",
+      "weight": 0.07,
+      "jobs": [
+        "Operations Manager",
+        "Administrative Assistant",
+        "Executive Assistant",
+        "Human Resources Manager",
+        "Sales Representative",
+        "Customer Service Representative"
+      ],
+      "well_known": [
+        "Walmart",
+        "Target",
+        "Costco",
+        "Home Depot",
+        "Nike"
+      ],
+      "company_suffixes": ["Inc", "LLC", "Corp", "Group", "Enterprises"],
+      "company_nouns": ["Solutions", "Services", "Management", "Industries"],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun} {suffix}",
+        "{last_name} and {last_name}"
+      ]
+    },
+    {
+      "name": "trades",
+      "weight": 0.04,
+      "jobs": [
+        "Plumber",
+        "Electrician",
+        "Carpenter",
+        "HVAC Technician"
+      ],
+      "well_known": [],
+      "company_suffixes": ["Services", "Co", "LLC"],
+      "company_nouns": [],
+      "company_formats": [
+        "{last_name} Plumbing",
+        "{last_name} Electric",
+        "{last_name} Construction",
+        "{city} Plumbing & Heating",
+        "{last_name} HVAC Services",
+        "{city} Home Services"
+      ]
+    },
+    {
+      "name": "logistics",
+      "weight": 0.04,
+      "jobs": [
+        "Supply Chain Manager",
+        "Logistics Coordinator",
+        "Warehouse Manager",
+        "Buyer",
+        "Procurement Specialist"
+      ],
+      "well_known": [
+        "Amazon"
+      ],
+      "company_suffixes": ["Logistics", "Transport", "Distribution", "Supply"],
+      "company_nouns": ["Logistics", "Transport", "Distribution", "Supply"],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{last_name} {suffix}",
+        "{city} Freight Services",
+        "{state} Distribution Center"
+      ]
+    },
+    {
+      "name": "social_services",
+      "weight": 0.02,
+      "jobs": [
+        "Social Worker"
+      ],
+      "well_known": [],
+      "company_suffixes": [],
+      "company_nouns": [],
+      "company_formats": [
+        "{city} Community Services",
+        "{city} Family Services",
+        "{state} Department of Social Services",
+        "{city} Youth and Family Center",
+        "{city} Social Services Agency"
+      ]
+    },
+    {
+      "name": "telecom",
+      "weight": 0.02,
+      "jobs": [
+        "Network Administrator",
+        "System Administrator",
+        "Customer Service Representative"
+      ],
+      "well_known": [
+        "AT&T",
+        "Verizon",
+        "T-Mobile"
+      ],
+      "company_suffixes": ["Communications", "Telecom", "Networks"],
+      "company_nouns": ["Communications", "Networks", "Telecom"],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{last_name} {suffix}"
+      ]
+    }
+  ]
 }

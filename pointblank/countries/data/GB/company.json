@@ -777,5 +777,462 @@
     "modernise",
     "digitise"
   ],
-  "catch_phrase_connector": "that"
+  "catch_phrase_connector": "that",
+  "industries": [
+    {
+      "name": "technology",
+      "weight": 0.18,
+      "jobs": [
+        "Software Engineer",
+        "Product Manager",
+        "Data Analyst",
+        "Web Developer",
+        "DevOps Engineer",
+        "Cloud Architect",
+        "Security Analyst",
+        "Data Scientist",
+        "Machine Learning Engineer",
+        "QA Engineer",
+        "Network Administrator",
+        "Database Administrator",
+        "Systems Administrator"
+      ],
+      "well_known": [
+        "ARM Holdings",
+        "Sage Group",
+        "Sophos",
+        "Darktrace",
+        "Wise",
+        "Revolut",
+        "Monzo",
+        "Deliveroo",
+        "ASOS",
+        "Ocado",
+        "Rightmove",
+        "Autotrader"
+      ],
+      "company_suffixes": [
+        "Technologies",
+        "Software",
+        "Solutions",
+        "Labs",
+        "Digital",
+        "Systems"
+      ],
+      "company_nouns": [
+        "Software",
+        "Technologies",
+        "Systems",
+        "Data",
+        "Analytics",
+        "Networks",
+        "Security",
+        "Solutions"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{adjective} {noun}",
+        "{last_name} {noun}"
+      ]
+    },
+    {
+      "name": "healthcare",
+      "weight": 0.1,
+      "jobs": [
+        "Nurse",
+        "Doctor",
+        "Pharmacist",
+        "Counsellor",
+        "Psychologist"
+      ],
+      "well_known": [
+        "GlaxoSmithKline",
+        "AstraZeneca"
+      ],
+      "company_suffixes": [
+        "Health",
+        "Medical",
+        "Healthcare"
+      ],
+      "company_nouns": [
+        "Healthcare",
+        "Medical",
+        "Health"
+      ],
+      "company_formats": [
+        "{city} General Hospital",
+        "{city} Medical Centre",
+        "{city} Royal Infirmary",
+        "{city} Community Health",
+        "Royal {city} Hospital",
+        "{last_name} Medical Group"
+      ]
+    },
+    {
+      "name": "finance",
+      "weight": 0.12,
+      "jobs": [
+        "Financial Analyst",
+        "Accountant",
+        "Bank Clerk",
+        "Mortgage Adviser",
+        "Financial Adviser",
+        "Investment Analyst"
+      ],
+      "well_known": [
+        "HSBC",
+        "Barclays",
+        "Lloyds Banking Group",
+        "NatWest Group",
+        "Standard Chartered",
+        "Schroders",
+        "Legal & General",
+        "Aviva",
+        "Prudential"
+      ],
+      "company_suffixes": [
+        "Financial",
+        "Capital",
+        "Investments",
+        "Partners",
+        "Group"
+      ],
+      "company_nouns": [
+        "Capital",
+        "Investments",
+        "Financial",
+        "Wealth",
+        "Advisory"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{last_name} & {last_name}",
+        "{adjective} {noun} {suffix}",
+        "{city} Building Society",
+        "{city} Savings Bank"
+      ]
+    },
+    {
+      "name": "education",
+      "weight": 0.07,
+      "jobs": [
+        "Teacher",
+        "Lecturer",
+        "Librarian",
+        "Research Scientist"
+      ],
+      "well_known": [],
+      "company_suffixes": [],
+      "company_nouns": [],
+      "company_formats": [
+        "University of {city}",
+        "{city} Metropolitan University",
+        "{city} College",
+        "{city} Academy",
+        "{city} School",
+        "{last_name} University"
+      ]
+    },
+    {
+      "name": "legal",
+      "weight": 0.04,
+      "jobs": [
+        "Solicitor",
+        "Barrister",
+        "Paralegal"
+      ],
+      "well_known": [],
+      "company_suffixes": [],
+      "company_nouns": [],
+      "company_formats": [
+        "{last_name} & {last_name} Solicitors",
+        "{last_name}, {last_name} & Partners",
+        "{last_name} Law",
+        "{city} Legal Associates"
+      ]
+    },
+    {
+      "name": "consulting",
+      "weight": 0.08,
+      "jobs": [
+        "Consultant",
+        "Business Analyst",
+        "Project Manager"
+      ],
+      "well_known": [
+        "PwC UK",
+        "Deloitte UK",
+        "EY UK",
+        "KPMG UK",
+        "Accenture UK",
+        "Capgemini UK"
+      ],
+      "company_suffixes": [
+        "Consulting",
+        "Group",
+        "Partners",
+        "Associates",
+        "Advisory"
+      ],
+      "company_nouns": [
+        "Consulting",
+        "Management",
+        "Strategy",
+        "Advisory"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun} {suffix}",
+        "{last_name} & {last_name}"
+      ]
+    },
+    {
+      "name": "marketing_creative",
+      "weight": 0.08,
+      "jobs": [
+        "Marketing Manager",
+        "Graphic Designer",
+        "UX Designer",
+        "UI Designer",
+        "Content Writer",
+        "Technical Writer"
+      ],
+      "well_known": [
+        "BBC",
+        "ITV",
+        "Channel 4",
+        "WPP",
+        "Pearson",
+        "RELX",
+        "Sky",
+        "Burberry"
+      ],
+      "company_suffixes": [
+        "Media",
+        "Creative",
+        "Studios",
+        "Communications",
+        "Group"
+      ],
+      "company_nouns": [
+        "Media",
+        "Creative",
+        "Communications",
+        "Marketing",
+        "Design"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun}",
+        "{last_name} & {last_name}"
+      ]
+    },
+    {
+      "name": "hospitality",
+      "weight": 0.06,
+      "jobs": [
+        "Chef",
+        "Restaurant Manager",
+        "Hotel Manager",
+        "Events Coordinator"
+      ],
+      "well_known": [
+        "Compass Group",
+        "InterContinental Hotels",
+        "Whitbread"
+      ],
+      "company_suffixes": [
+        "Hospitality",
+        "Group",
+        "Hotels",
+        "Restaurants"
+      ],
+      "company_nouns": [
+        "Hospitality",
+        "Hotels",
+        "Restaurants",
+        "Catering"
+      ],
+      "company_formats": [
+        "The {adjective} {noun}",
+        "{last_name}'s Restaurant",
+        "{city} Grand Hotel",
+        "{adjective} Catering {suffix}"
+      ]
+    },
+    {
+      "name": "real_estate_insurance",
+      "weight": 0.04,
+      "jobs": [
+        "Estate Agent",
+        "Insurance Broker"
+      ],
+      "well_known": [],
+      "company_suffixes": [
+        "Properties",
+        "Insurance",
+        "Group",
+        "Estates"
+      ],
+      "company_nouns": [
+        "Properties",
+        "Estates",
+        "Insurance"
+      ],
+      "company_formats": [
+        "{last_name} Estates",
+        "{city} Property Services",
+        "{last_name} Insurance",
+        "{adjective} {noun} {suffix}"
+      ]
+    },
+    {
+      "name": "engineering",
+      "weight": 0.08,
+      "jobs": [
+        "Mechanical Engineer",
+        "Electrical Engineer",
+        "Civil Engineer",
+        "Chemical Engineer",
+        "Environmental Engineer",
+        "Architect",
+        "Interior Designer",
+        "Construction Manager"
+      ],
+      "well_known": [
+        "Rolls-Royce",
+        "BAE Systems",
+        "Jaguar Land Rover",
+        "Bentley Motors",
+        "McLaren",
+        "Aston Martin",
+        "Dyson"
+      ],
+      "company_suffixes": [
+        "Engineering",
+        "Industries",
+        "Manufacturing",
+        "Ltd"
+      ],
+      "company_nouns": [
+        "Engineering",
+        "Manufacturing",
+        "Construction",
+        "Industries"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun} {suffix}",
+        "{last_name} & {last_name}",
+        "{city} Engineering Group"
+      ]
+    },
+    {
+      "name": "corporate",
+      "weight": 0.07,
+      "jobs": [
+        "Operations Manager",
+        "Administrator",
+        "Executive Assistant",
+        "HR Manager",
+        "Sales Executive",
+        "Customer Service Adviser"
+      ],
+      "well_known": [
+        "Tesco",
+        "Sainsbury's",
+        "Marks & Spencer",
+        "JD Sports",
+        "Next",
+        "John Lewis Partnership",
+        "Boots",
+        "WH Smith",
+        "Unilever"
+      ],
+      "company_suffixes": [
+        "Ltd",
+        "PLC",
+        "Group",
+        "Enterprises"
+      ],
+      "company_nouns": [
+        "Solutions",
+        "Services",
+        "Management",
+        "Industries"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun} {suffix}",
+        "{last_name} and {last_name}"
+      ]
+    },
+    {
+      "name": "trades",
+      "weight": 0.03,
+      "jobs": [
+        "Plumber",
+        "Electrician",
+        "Carpenter"
+      ],
+      "well_known": [],
+      "company_suffixes": [
+        "Services",
+        "Ltd"
+      ],
+      "company_nouns": [],
+      "company_formats": [
+        "{last_name} Plumbing",
+        "{last_name} Electrical",
+        "{last_name} Construction",
+        "{city} Plumbing & Heating",
+        "{last_name} Building Services"
+      ]
+    },
+    {
+      "name": "logistics",
+      "weight": 0.03,
+      "jobs": [
+        "Supply Chain Manager",
+        "Logistics Coordinator",
+        "Warehouse Manager",
+        "Buyer",
+        "Procurement Manager"
+      ],
+      "well_known": [],
+      "company_suffixes": [
+        "Logistics",
+        "Transport",
+        "Distribution",
+        "Freight"
+      ],
+      "company_nouns": [
+        "Logistics",
+        "Transport",
+        "Distribution",
+        "Supply"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{last_name} {suffix}",
+        "{city} Freight Services"
+      ]
+    },
+    {
+      "name": "social_services",
+      "weight": 0.02,
+      "jobs": [
+        "Social Worker"
+      ],
+      "well_known": [],
+      "company_suffixes": [],
+      "company_nouns": [],
+      "company_formats": [
+        "{city} Community Services",
+        "{city} Family Services",
+        "{city} Council Social Services",
+        "{city} Youth and Family Centre"
+      ]
+    }
+  ]
 }
