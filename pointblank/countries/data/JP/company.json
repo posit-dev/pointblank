@@ -1,0 +1,595 @@
+{
+  "suffixes": [
+    "K.K.",
+    "Co., Ltd.",
+    "Inc.",
+    "Corp.",
+    "Ltd.",
+    "G.K.",
+    "LLC"
+  ],
+  "formats": [
+    "{adjective} {noun} {suffix}",
+    "{noun} {suffix}",
+    "{adjective} {noun}"
+  ],
+  "adjectives": [
+    "Nihon",
+    "Tokyo",
+    "Osaka",
+    "Kyoto",
+    "Global",
+    "Pacific",
+    "Asia",
+    "Yamato",
+    "Sakura",
+    "Fuji",
+    "Sunrise",
+    "Imperial",
+    "Premier",
+    "United",
+    "Central",
+    "Eastern",
+    "Western",
+    "Northern",
+    "Southern",
+    "Advanced",
+    "Digital",
+    "Smart",
+    "Neo",
+    "Next",
+    "Future",
+    "Prime",
+    "Elite",
+    "Royal",
+    "Grand",
+    "First",
+    "Dynamic",
+    "Innovative",
+    "Creative",
+    "Strategic",
+    "Professional",
+    "National",
+    "International",
+    "Universal",
+    "General",
+    "Special",
+    "Super",
+    "Mega",
+    "Ultra"
+  ],
+  "nouns": [
+    "Solutions",
+    "Systems",
+    "Technologies",
+    "Industries",
+    "Holdings",
+    "Group",
+    "Trading",
+    "Manufacturing",
+    "Electronics",
+    "Communications",
+    "Networks",
+    "Services",
+    "Consulting",
+    "Research",
+    "Development",
+    "Engineering",
+    "Construction",
+    "Finance",
+    "Insurance",
+    "Real Estate",
+    "Transportation",
+    "Logistics",
+    "Retail",
+    "Foods",
+    "Chemical",
+    "Pharmaceutical",
+    "Medical",
+    "Energy",
+    "Power",
+    "Steel",
+    "Materials",
+    "Automotive",
+    "Aerospace",
+    "Marine",
+    "Precision",
+    "Machinery",
+    "Instruments",
+    "Optics",
+    "Semiconductor",
+    "Software",
+    "Information",
+    "Data",
+    "Cloud",
+    "Mobile",
+    "Media",
+    "Entertainment"
+  ],
+  "well_known_companies": [
+    {
+      "name": "Toyota",
+      "cities": [
+        "Toyota City",
+        "Tokyo",
+        "Nagoya"
+      ]
+    },
+    {
+      "name": "Honda",
+      "cities": [
+        "Tokyo"
+      ]
+    },
+    {
+      "name": "Nissan",
+      "cities": [
+        "Yokohama",
+        "Tokyo"
+      ]
+    },
+    {
+      "name": "Sony",
+      "cities": [
+        "Tokyo"
+      ]
+    },
+    {
+      "name": "Panasonic",
+      "cities": [
+        "Osaka",
+        "Tokyo"
+      ]
+    },
+    {
+      "name": "Hitachi",
+      "cities": [
+        "Tokyo"
+      ]
+    },
+    {
+      "name": "Toshiba",
+      "cities": [
+        "Tokyo"
+      ]
+    },
+    {
+      "name": "Fujitsu",
+      "cities": [
+        "Tokyo",
+        "Kawasaki"
+      ]
+    },
+    {
+      "name": "NEC",
+      "cities": [
+        "Tokyo"
+      ]
+    },
+    {
+      "name": "Canon",
+      "cities": [
+        "Tokyo"
+      ]
+    },
+    {
+      "name": "Nikon",
+      "cities": [
+        "Tokyo"
+      ]
+    },
+    {
+      "name": "Nintendo",
+      "cities": [
+        "Kyoto"
+      ]
+    },
+    {
+      "name": "Bandai Namco",
+      "cities": [
+        "Tokyo"
+      ]
+    },
+    {
+      "name": "Capcom",
+      "cities": [
+        "Osaka"
+      ]
+    },
+    {
+      "name": "Square Enix",
+      "cities": [
+        "Tokyo"
+      ]
+    },
+    {
+      "name": "Sega",
+      "cities": [
+        "Tokyo"
+      ]
+    },
+    {
+      "name": "SoftBank",
+      "cities": [
+        "Tokyo"
+      ]
+    },
+    {
+      "name": "Rakuten",
+      "cities": [
+        "Tokyo"
+      ]
+    },
+    {
+      "name": "LINE",
+      "cities": [
+        "Tokyo"
+      ]
+    },
+    {
+      "name": "Mercari",
+      "cities": [
+        "Tokyo"
+      ]
+    },
+    {
+      "name": "CyberAgent",
+      "cities": [
+        "Tokyo"
+      ]
+    },
+    {
+      "name": "Mitsubishi UFJ Financial",
+      "cities": [
+        "Tokyo"
+      ]
+    },
+    {
+      "name": "Sumitomo Mitsui Banking",
+      "cities": [
+        "Tokyo",
+        "Osaka"
+      ]
+    },
+    {
+      "name": "Mizuho Financial",
+      "cities": [
+        "Tokyo"
+      ]
+    },
+    {
+      "name": "Nomura Holdings",
+      "cities": [
+        "Tokyo"
+      ]
+    },
+    {
+      "name": "Daiwa Securities",
+      "cities": [
+        "Tokyo"
+      ]
+    },
+    {
+      "name": "Nippon Life",
+      "cities": [
+        "Tokyo",
+        "Osaka"
+      ]
+    },
+    {
+      "name": "Tokio Marine",
+      "cities": [
+        "Tokyo"
+      ]
+    },
+    {
+      "name": "Mitsubishi Corporation",
+      "cities": [
+        "Tokyo"
+      ]
+    },
+    {
+      "name": "Mitsui & Co.",
+      "cities": [
+        "Tokyo"
+      ]
+    },
+    {
+      "name": "Sumitomo Corporation",
+      "cities": [
+        "Tokyo"
+      ]
+    },
+    {
+      "name": "Itochu",
+      "cities": [
+        "Tokyo",
+        "Osaka"
+      ]
+    },
+    {
+      "name": "Marubeni",
+      "cities": [
+        "Tokyo"
+      ]
+    },
+    {
+      "name": "Fast Retailing",
+      "cities": [
+        "Tokyo",
+        "Yamaguchi"
+      ]
+    },
+    {
+      "name": "Seven & i Holdings",
+      "cities": [
+        "Tokyo"
+      ]
+    },
+    {
+      "name": "Aeon",
+      "cities": [
+        "Chiba",
+        "Tokyo"
+      ]
+    },
+    {
+      "name": "Shiseido",
+      "cities": [
+        "Tokyo"
+      ]
+    },
+    {
+      "name": "Kao",
+      "cities": [
+        "Tokyo"
+      ]
+    },
+    {
+      "name": "Takeda Pharmaceutical",
+      "cities": [
+        "Tokyo",
+        "Osaka"
+      ]
+    },
+    {
+      "name": "Astellas Pharma",
+      "cities": [
+        "Tokyo"
+      ]
+    },
+    {
+      "name": "ANA Holdings",
+      "cities": [
+        "Tokyo"
+      ]
+    },
+    {
+      "name": "Japan Airlines",
+      "cities": [
+        "Tokyo"
+      ]
+    },
+    {
+      "name": "JR East",
+      "cities": [
+        "Tokyo"
+      ]
+    },
+    {
+      "name": "JR West",
+      "cities": [
+        "Osaka"
+      ]
+    },
+    {
+      "name": "NTT",
+      "cities": [
+        "Tokyo"
+      ]
+    },
+    {
+      "name": "KDDI",
+      "cities": [
+        "Tokyo"
+      ]
+    },
+    {
+      "name": "Dentsu",
+      "cities": [
+        "Tokyo"
+      ]
+    },
+    {
+      "name": "Recruit Holdings",
+      "cities": [
+        "Tokyo"
+      ]
+    },
+    {
+      "name": "McKinsey & Company",
+      "cities": [
+        "Tokyo"
+      ]
+    },
+    {
+      "name": "Boston Consulting Group",
+      "cities": [
+        "Tokyo"
+      ]
+    },
+    {
+      "name": "Bain & Company",
+      "cities": [
+        "Tokyo"
+      ]
+    },
+    {
+      "name": "Deloitte Tohmatsu",
+      "cities": [
+        "Tokyo",
+        "Osaka"
+      ]
+    },
+    {
+      "name": "PwC Japan",
+      "cities": [
+        "Tokyo"
+      ]
+    },
+    {
+      "name": "EY Japan",
+      "cities": [
+        "Tokyo"
+      ]
+    },
+    {
+      "name": "KPMG Japan",
+      "cities": [
+        "Tokyo"
+      ]
+    },
+    {
+      "name": "Accenture Japan",
+      "cities": [
+        "Tokyo"
+      ]
+    },
+    {
+      "name": "Google Japan",
+      "cities": [
+        "Tokyo"
+      ]
+    },
+    {
+      "name": "Amazon Japan",
+      "cities": [
+        "Tokyo"
+      ]
+    },
+    {
+      "name": "Microsoft Japan",
+      "cities": [
+        "Tokyo"
+      ]
+    },
+    {
+      "name": "Apple Japan",
+      "cities": [
+        "Tokyo"
+      ]
+    },
+    {
+      "name": "Meta Japan",
+      "cities": [
+        "Tokyo"
+      ]
+    }
+  ],
+  "jobs": [
+    "Software Engineer",
+    "Sales Manager",
+    "Project Manager",
+    "Consultant",
+    "Account Executive",
+    "Marketing Manager",
+    "Product Manager",
+    "Design Engineer",
+    "Quality Assurance",
+    "Operations Manager",
+    "Business Analyst",
+    "Data Scientist",
+    "System Administrator",
+    "Network Engineer",
+    "Security Specialist",
+    "HR Manager",
+    "Finance Manager",
+    "Legal Counsel",
+    "Research Scientist",
+    "Technical Writer",
+    "Customer Support",
+    "Field Engineer",
+    "Supply Chain Manager",
+    "Manufacturing Engineer",
+    "Mechanical Engineer",
+    "Electrical Engineer",
+    "Civil Engineer",
+    "Architect",
+    "Pharmacist",
+    "Medical Doctor",
+    "Nurse",
+    "Accountant",
+    "Tax Specialist",
+    "Executive Director",
+    "Department Head",
+    "Team Leader",
+    "General Manager",
+    "Vice President",
+    "Managing Director",
+    "Chief Executive Officer",
+    "Board Member"
+  ],
+  "catch_phrase_adjectives": [
+    "innovative",
+    "reliable",
+    "trusted",
+    "advanced",
+    "cutting-edge",
+    "sustainable",
+    "efficient",
+    "professional",
+    "global",
+    "local",
+    "customer-focused",
+    "quality-driven",
+    "forward-thinking",
+    "creative",
+    "dedicated",
+    "experienced",
+    "comprehensive",
+    "integrated",
+    "flexible",
+    "responsive",
+    "dynamic",
+    "strategic",
+    "world-class"
+  ],
+  "catch_phrase_nouns": [
+    "solutions",
+    "services",
+    "technologies",
+    "innovations",
+    "partnerships",
+    "values",
+    "strategies",
+    "success",
+    "futures",
+    "visions",
+    "outcomes",
+    "frameworks",
+    "capabilities",
+    "experiences",
+    "commitments",
+    "results"
+  ],
+  "catch_phrase_verbs": [
+    "deliver",
+    "create",
+    "build",
+    "provide",
+    "enable",
+    "drive",
+    "achieve",
+    "connect",
+    "transform",
+    "empower",
+    "support",
+    "advance",
+    "pioneer",
+    "lead",
+    "innovate",
+    "develop",
+    "inspire"
+  ],
+  "catch_phrase_connector": "that"
+}

@@ -1,0 +1,624 @@
+{
+  "suffixes": [
+    "Inc",
+    "Ltd",
+    "Corp",
+    "Co",
+    "Group",
+    "Holdings",
+    "Partners",
+    "Associates",
+    "Solutions",
+    "Services",
+    "Technologies",
+    "Industries",
+    "Enterprises",
+    "International",
+    "Canada",
+    "Ltée",
+    "Enr"
+  ],
+  "formats": [
+    "{last_name} {suffix}",
+    "{last_name} and {last_name}",
+    "{adjective} {noun} {suffix}",
+    "{adjective} {noun}",
+    "{last_name} {noun}",
+    "{noun} Canada"
+  ],
+  "adjectives": [
+    "Canadian",
+    "National",
+    "Northern",
+    "Pacific",
+    "Atlantic",
+    "Prairie",
+    "Arctic",
+    "Global",
+    "Advanced",
+    "Premier",
+    "Elite",
+    "Dynamic",
+    "Innovative",
+    "Strategic",
+    "Integrated",
+    "United",
+    "Digital",
+    "Creative",
+    "Modern",
+    "Classic",
+    "Universal",
+    "Professional",
+    "Quality",
+    "Superior",
+    "First",
+    "Prime",
+    "Apex",
+    "Summit",
+    "Peak",
+    "Frontier",
+    "Horizon",
+    "Vista",
+    "Pioneer",
+    "Legacy",
+    "Heritage",
+    "Prestige",
+    "Sterling",
+    "Golden",
+    "Silver",
+    "Maple",
+    "True North"
+  ],
+  "nouns": [
+    "Solutions",
+    "Systems",
+    "Technologies",
+    "Industries",
+    "Services",
+    "Consulting",
+    "Ventures",
+    "Capital",
+    "Investments",
+    "Financial",
+    "Development",
+    "Management",
+    "Marketing",
+    "Communications",
+    "Media",
+    "Software",
+    "Hardware",
+    "Networks",
+    "Security",
+    "Analytics",
+    "Data",
+    "Research",
+    "Engineering",
+    "Manufacturing",
+    "Construction",
+    "Properties",
+    "Realty",
+    "Insurance",
+    "Healthcare",
+    "Logistics",
+    "Transport",
+    "Energy",
+    "Resources",
+    "Materials",
+    "Products",
+    "Brands",
+    "Foods",
+    "Beverages",
+    "Retail",
+    "Commerce",
+    "Trade",
+    "Supply",
+    "Distribution",
+    "Mining",
+    "Forestry",
+    "Agriculture",
+    "Fisheries",
+    "Telecommunications"
+  ],
+  "well_known_companies": [
+    {
+      "name": "Shopify",
+      "cities": [
+        "Ottawa",
+        "Toronto",
+        "Montreal"
+      ]
+    },
+    {
+      "name": "TD Bank",
+      "cities": [
+        "Toronto",
+        "Montreal",
+        "Vancouver"
+      ]
+    },
+    {
+      "name": "Royal Bank of Canada",
+      "cities": [
+        "Toronto",
+        "Montreal",
+        "Vancouver",
+        "Calgary"
+      ]
+    },
+    {
+      "name": "Scotiabank",
+      "cities": [
+        "Toronto",
+        "Montreal",
+        "Vancouver",
+        "Calgary",
+        "Ottawa"
+      ]
+    },
+    {
+      "name": "BMO Financial Group",
+      "cities": [
+        "Toronto",
+        "Montreal",
+        "Vancouver"
+      ]
+    },
+    {
+      "name": "CIBC",
+      "cities": [
+        "Toronto",
+        "Montreal",
+        "Vancouver",
+        "Calgary"
+      ]
+    },
+    {
+      "name": "Manulife",
+      "cities": [
+        "Toronto",
+        "Montreal",
+        "Vancouver"
+      ]
+    },
+    {
+      "name": "Sun Life Financial",
+      "cities": [
+        "Toronto",
+        "Montreal"
+      ]
+    },
+    {
+      "name": "Loblaws",
+      "cities": [
+        "Toronto",
+        "Montreal",
+        "Vancouver",
+        "Calgary"
+      ]
+    },
+    {
+      "name": "Canadian Tire",
+      "cities": [
+        "Toronto",
+        "Calgary",
+        "Vancouver",
+        "Montreal"
+      ]
+    },
+    {
+      "name": "Bell Canada",
+      "cities": [
+        "Montreal",
+        "Toronto",
+        "Ottawa",
+        "Vancouver"
+      ]
+    },
+    {
+      "name": "Rogers Communications",
+      "cities": [
+        "Toronto",
+        "Vancouver",
+        "Calgary"
+      ]
+    },
+    {
+      "name": "TELUS",
+      "cities": [
+        "Vancouver",
+        "Toronto",
+        "Calgary",
+        "Edmonton"
+      ]
+    },
+    {
+      "name": "Bombardier",
+      "cities": [
+        "Montreal",
+        "Toronto"
+      ]
+    },
+    {
+      "name": "CAE",
+      "cities": [
+        "Montreal",
+        "Toronto",
+        "Ottawa"
+      ]
+    },
+    {
+      "name": "Air Canada",
+      "cities": [
+        "Montreal",
+        "Toronto",
+        "Vancouver",
+        "Calgary"
+      ]
+    },
+    {
+      "name": "WestJet",
+      "cities": [
+        "Calgary",
+        "Toronto",
+        "Vancouver"
+      ]
+    },
+    {
+      "name": "CN Rail",
+      "cities": [
+        "Montreal",
+        "Toronto",
+        "Vancouver",
+        "Edmonton"
+      ]
+    },
+    {
+      "name": "CP Rail",
+      "cities": [
+        "Calgary",
+        "Montreal",
+        "Toronto",
+        "Vancouver"
+      ]
+    },
+    {
+      "name": "Enbridge",
+      "cities": [
+        "Calgary",
+        "Toronto"
+      ]
+    },
+    {
+      "name": "Suncor Energy",
+      "cities": [
+        "Calgary"
+      ]
+    },
+    {
+      "name": "Imperial Oil",
+      "cities": [
+        "Calgary"
+      ]
+    },
+    {
+      "name": "Nutrien",
+      "cities": [
+        "Saskatoon",
+        "Calgary"
+      ]
+    },
+    {
+      "name": "Magna International",
+      "cities": [
+        "Aurora",
+        "Toronto"
+      ]
+    },
+    {
+      "name": "BlackBerry",
+      "cities": [
+        "Waterloo",
+        "Ottawa"
+      ]
+    },
+    {
+      "name": "OpenText",
+      "cities": [
+        "Waterloo",
+        "Toronto"
+      ]
+    },
+    {
+      "name": "Thomson Reuters",
+      "cities": [
+        "Toronto"
+      ]
+    },
+    {
+      "name": "CGI Group",
+      "cities": [
+        "Montreal",
+        "Toronto",
+        "Ottawa"
+      ]
+    },
+    {
+      "name": "Constellation Software",
+      "cities": [
+        "Toronto"
+      ]
+    },
+    {
+      "name": "Couche-Tard",
+      "cities": [
+        "Montreal",
+        "Quebec City"
+      ]
+    },
+    {
+      "name": "Dollarama",
+      "cities": [
+        "Montreal"
+      ]
+    },
+    {
+      "name": "Hudson's Bay Company",
+      "cities": [
+        "Toronto"
+      ]
+    },
+    {
+      "name": "Saputo",
+      "cities": [
+        "Montreal"
+      ]
+    },
+    {
+      "name": "Brookfield Asset Management",
+      "cities": [
+        "Toronto"
+      ]
+    },
+    {
+      "name": "Power Corporation",
+      "cities": [
+        "Montreal"
+      ]
+    },
+    {
+      "name": "George Weston Limited",
+      "cities": [
+        "Toronto"
+      ]
+    },
+    {
+      "name": "Empire Company",
+      "cities": [
+        "Stellarton",
+        "Toronto"
+      ]
+    },
+    {
+      "name": "Metro Inc.",
+      "cities": [
+        "Montreal",
+        "Toronto"
+      ]
+    },
+    {
+      "name": "Deloitte",
+      "cities": [
+        "Toronto",
+        "Montreal",
+        "Vancouver"
+      ]
+    },
+    {
+      "name": "PwC",
+      "cities": [
+        "Toronto",
+        "Montreal"
+      ]
+    },
+    {
+      "name": "EY",
+      "cities": [
+        "Toronto",
+        "Montreal"
+      ]
+    },
+    {
+      "name": "KPMG",
+      "cities": [
+        "Toronto",
+        "Montreal",
+        "Vancouver"
+      ]
+    },
+    {
+      "name": "Accenture",
+      "cities": [
+        "Toronto"
+      ]
+    },
+    {
+      "name": "Amazon",
+      "cities": [
+        "Vancouver",
+        "Toronto"
+      ]
+    },
+    {
+      "name": "Google",
+      "cities": [
+        "Toronto",
+        "Montreal",
+        "Waterloo"
+      ]
+    },
+    {
+      "name": "Microsoft",
+      "cities": [
+        "Vancouver",
+        "Toronto"
+      ]
+    },
+    {
+      "name": "Electronic Arts",
+      "cities": [
+        "Vancouver",
+        "Montreal"
+      ]
+    },
+    {
+      "name": "Ubisoft",
+      "cities": [
+        "Montreal",
+        "Toronto"
+      ]
+    }
+  ],
+  "jobs": [
+    "Software Engineer",
+    "Product Manager",
+    "Data Analyst",
+    "Marketing Manager",
+    "Sales Representative",
+    "Human Resources Manager",
+    "Financial Analyst",
+    "Project Manager",
+    "Business Analyst",
+    "Operations Manager",
+    "Customer Service Representative",
+    "Accountant",
+    "Administrative Assistant",
+    "Executive Assistant",
+    "Graphic Designer",
+    "Web Developer",
+    "Network Administrator",
+    "Database Administrator",
+    "System Administrator",
+    "Quality Assurance Engineer",
+    "Technical Writer",
+    "Content Writer",
+    "UX Designer",
+    "UI Designer",
+    "DevOps Engineer",
+    "Cloud Architect",
+    "Security Analyst",
+    "Data Scientist",
+    "Machine Learning Engineer",
+    "Research Scientist",
+    "Consultant",
+    "Lawyer",
+    "Paralegal",
+    "Nurse",
+    "Physician",
+    "Pharmacist",
+    "Teacher",
+    "Professor",
+    "Librarian",
+    "Social Worker",
+    "Counsellor",
+    "Psychologist",
+    "Chef",
+    "Restaurant Manager",
+    "Hotel Manager",
+    "Event Coordinator",
+    "Real Estate Agent",
+    "Insurance Agent",
+    "Bank Teller",
+    "Loan Officer",
+    "Financial Advisor",
+    "Investment Analyst",
+    "Supply Chain Manager",
+    "Logistics Coordinator",
+    "Warehouse Manager",
+    "Buyer",
+    "Procurement Specialist",
+    "Mechanical Engineer",
+    "Electrical Engineer",
+    "Civil Engineer",
+    "Chemical Engineer",
+    "Environmental Engineer",
+    "Architect",
+    "Interior Designer",
+    "Construction Manager",
+    "Plumber",
+    "Electrician",
+    "Carpenter",
+    "HVAC Technician",
+    "Mining Engineer",
+    "Forestry Technician",
+    "Agricultural Specialist",
+    "Oil Field Worker"
+  ],
+  "catch_phrase_adjectives": [
+    "Innovative",
+    "Dynamic",
+    "Cutting-edge",
+    "World-class",
+    "Best-in-class",
+    "Industry-leading",
+    "Revolutionary",
+    "Transformative",
+    "Disruptive",
+    "Seamless",
+    "Scalable",
+    "Robust",
+    "Agile",
+    "Holistic",
+    "Synergistic",
+    "Strategic",
+    "Sustainable",
+    "Forward-thinking",
+    "Client-focused",
+    "Results-driven",
+    "Canadian-made",
+    "Trusted",
+    "Reliable",
+    "Bilingual",
+    "Nationwide"
+  ],
+  "catch_phrase_nouns": [
+    "solutions",
+    "services",
+    "platforms",
+    "systems",
+    "strategies",
+    "insights",
+    "innovations",
+    "technologies",
+    "partnerships",
+    "experiences",
+    "outcomes",
+    "results",
+    "values",
+    "success",
+    "capabilities",
+    "initiatives",
+    "commitments",
+    "principles"
+  ],
+  "catch_phrase_verbs": [
+    "deliver",
+    "drive",
+    "enable",
+    "empower",
+    "accelerate",
+    "transform",
+    "optimize",
+    "streamline",
+    "leverage",
+    "maximize",
+    "achieve",
+    "unlock",
+    "create",
+    "build",
+    "develop",
+    "implement",
+    "integrate",
+    "connect"
+  ],
+  "catch_phrase_connector": "that"
+}

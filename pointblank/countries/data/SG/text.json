@@ -1,0 +1,55 @@
+{
+    "words": [
+        "the", "of", "and", "to", "in", "a", "is", "that", "for", "it",
+        "was", "on", "are", "as", "with", "his", "they", "be", "at", "one",
+        "have", "this", "from", "by", "not", "but", "what", "all", "were", "when",
+        "we", "there", "can", "an", "your", "which", "their", "if", "has", "will",
+        "each", "about", "how", "up", "out", "them", "then", "she", "many", "some",
+        "so", "these", "would", "other", "into", "more", "her", "two", "like", "him",
+        "time", "very", "could", "no", "make", "just", "been", "than", "its", "now",
+        "people", "way", "may", "down", "after", "should", "still", "between", "back", "much",
+        "new", "also", "because", "any", "day", "same", "get", "here", "well", "where",
+        "only", "come", "made", "find", "long", "city", "world", "part", "work", "place"
+    ],
+    "sentence_patterns": [
+        "{article} {adjective} {noun} {verb} {adverb}.",
+        "{article} {noun} {verb} {article} {adjective} {noun}.",
+        "{noun} {verb} {adverb} {preposition} {article} {noun}.",
+        "{article} {adjective} {noun} {verb} {preposition} {article} {noun}.",
+        "{pronoun} {verb} {article} {adjective} {noun} {adverb}."
+    ],
+    "adjectives": [
+        "beautiful", "bright", "busy", "clean", "clever",
+        "cool", "creative", "digital", "dynamic", "efficient",
+        "fast", "friendly", "global", "great", "green",
+        "happy", "innovative", "lush", "modern", "new",
+        "orderly", "premier", "prosperous", "quick", "safe",
+        "smart", "strong", "sunny", "tall", "tropical",
+        "vibrant", "warm", "young", "diverse", "reliable"
+    ],
+    "nouns": [
+        "building", "business", "city", "community", "company",
+        "country", "development", "economy", "education", "family",
+        "food", "garden", "government", "harbour", "island",
+        "market", "nation", "office", "park", "people",
+        "port", "project", "river", "school", "service",
+        "skyline", "street", "system", "technology", "tower",
+        "trade", "transport", "university", "water", "world"
+    ],
+    "verbs": [
+        "build", "connect", "create", "deliver", "develop",
+        "discover", "drive", "enable", "enjoy", "explore",
+        "find", "grow", "improve", "innovate", "inspire",
+        "lead", "learn", "make", "move", "offer",
+        "plan", "provide", "reach", "serve", "share",
+        "show", "solve", "start", "support", "transform"
+    ],
+    "adverbs": [
+        "always", "brightly", "carefully", "clearly", "efficiently",
+        "fast", "frequently", "gently", "happily", "here",
+        "honestly", "just", "kindly", "mostly", "nearly",
+        "often", "quickly", "quietly", "really", "simply",
+        "smoothly", "still", "surely", "today", "together",
+        "usually", "very", "warmly", "well", "widely"
+    ]
+}

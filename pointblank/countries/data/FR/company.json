@@ -1,0 +1,534 @@
+{
+  "suffixes": [
+    "SA",
+    "SARL",
+    "SAS",
+    "SNC",
+    "EURL",
+    "SE",
+    "GIE",
+    "SCOP",
+    "SCI",
+    "SASU"
+  ],
+  "formats": [
+    "{last_name} {suffix}",
+    "{last_name} et {last_name}",
+    "{adjective} {noun} {suffix}",
+    "{adjective} {noun}",
+    "{last_name} {noun}"
+  ],
+  "adjectives": [
+    "Française",
+    "Parisienne",
+    "Européenne",
+    "Internationale",
+    "Nationale",
+    "Générale",
+    "Première",
+    "Nouvelle",
+    "Centrale",
+    "Moderne",
+    "Grande",
+    "Haute",
+    "Belle",
+    "Jeune",
+    "Dynamique",
+    "Innovante",
+    "Stratégique",
+    "Digitale",
+    "Créative",
+    "Globale",
+    "Premium",
+    "Elite",
+    "Universelle"
+  ],
+  "nouns": [
+    "Solutions",
+    "Systèmes",
+    "Technologies",
+    "Industries",
+    "Services",
+    "Conseil",
+    "Développement",
+    "Gestion",
+    "Marketing",
+    "Logiciels",
+    "Réseaux",
+    "Sécurité",
+    "Analytique",
+    "Données",
+    "Recherche",
+    "Ingénierie",
+    "Fabrication",
+    "Construction",
+    "Immobilier",
+    "Assurance",
+    "Santé",
+    "Logistique",
+    "Transport",
+    "Énergie",
+    "Ressources",
+    "Matériaux",
+    "Produits",
+    "Commerce",
+    "Distribution",
+    "Communication",
+    "Médias",
+    "Finance",
+    "Investissements"
+  ],
+  "well_known_companies": [
+    {
+      "name": "TotalEnergies",
+      "cities": [
+        "Paris",
+        "La Défense"
+      ]
+    },
+    {
+      "name": "LVMH",
+      "cities": [
+        "Paris"
+      ]
+    },
+    {
+      "name": "L'Oréal",
+      "cities": [
+        "Paris",
+        "Clichy"
+      ]
+    },
+    {
+      "name": "Sanofi",
+      "cities": [
+        "Paris",
+        "Lyon"
+      ]
+    },
+    {
+      "name": "BNP Paribas",
+      "cities": [
+        "Paris"
+      ]
+    },
+    {
+      "name": "Société Générale",
+      "cities": [
+        "Paris",
+        "La Défense"
+      ]
+    },
+    {
+      "name": "Crédit Agricole",
+      "cities": [
+        "Paris",
+        "Montrouge"
+      ]
+    },
+    {
+      "name": "AXA",
+      "cities": [
+        "Paris"
+      ]
+    },
+    {
+      "name": "Carrefour",
+      "cities": [
+        "Paris",
+        "Massy"
+      ]
+    },
+    {
+      "name": "Danone",
+      "cities": [
+        "Paris"
+      ]
+    },
+    {
+      "name": "Pernod Ricard",
+      "cities": [
+        "Paris"
+      ]
+    },
+    {
+      "name": "Renault",
+      "cities": [
+        "Boulogne-Billancourt",
+        "Paris"
+      ]
+    },
+    {
+      "name": "Peugeot",
+      "cities": [
+        "Paris"
+      ]
+    },
+    {
+      "name": "Citroën",
+      "cities": [
+        "Paris"
+      ]
+    },
+    {
+      "name": "Michelin",
+      "cities": [
+        "Clermont-Ferrand"
+      ]
+    },
+    {
+      "name": "Air France",
+      "cities": [
+        "Paris",
+        "Roissy"
+      ]
+    },
+    {
+      "name": "Orange",
+      "cities": [
+        "Paris"
+      ]
+    },
+    {
+      "name": "Bouygues",
+      "cities": [
+        "Paris"
+      ]
+    },
+    {
+      "name": "Vinci",
+      "cities": [
+        "Paris",
+        "Nanterre"
+      ]
+    },
+    {
+      "name": "Saint-Gobain",
+      "cities": [
+        "Paris",
+        "La Défense"
+      ]
+    },
+    {
+      "name": "Schneider Electric",
+      "cities": [
+        "Rueil-Malmaison",
+        "Paris"
+      ]
+    },
+    {
+      "name": "Thales",
+      "cities": [
+        "Paris",
+        "La Défense"
+      ]
+    },
+    {
+      "name": "Dassault Systèmes",
+      "cities": [
+        "Vélizy-Villacoublay",
+        "Paris"
+      ]
+    },
+    {
+      "name": "Capgemini",
+      "cities": [
+        "Paris"
+      ]
+    },
+    {
+      "name": "Atos",
+      "cities": [
+        "Bezons",
+        "Paris"
+      ]
+    },
+    {
+      "name": "Sopra Steria",
+      "cities": [
+        "Paris"
+      ]
+    },
+    {
+      "name": "Airbus",
+      "cities": [
+        "Toulouse"
+      ]
+    },
+    {
+      "name": "Safran",
+      "cities": [
+        "Paris"
+      ]
+    },
+    {
+      "name": "Hermès",
+      "cities": [
+        "Paris"
+      ]
+    },
+    {
+      "name": "Kering",
+      "cities": [
+        "Paris"
+      ]
+    },
+    {
+      "name": "Publicis",
+      "cities": [
+        "Paris"
+      ]
+    },
+    {
+      "name": "Vivendi",
+      "cities": [
+        "Paris"
+      ]
+    },
+    {
+      "name": "Engie",
+      "cities": [
+        "Paris",
+        "La Défense"
+      ]
+    },
+    {
+      "name": "EDF",
+      "cities": [
+        "Paris"
+      ]
+    },
+    {
+      "name": "Veolia",
+      "cities": [
+        "Paris"
+      ]
+    },
+    {
+      "name": "SNCF",
+      "cities": [
+        "Paris",
+        "Saint-Denis"
+      ]
+    },
+    {
+      "name": "La Poste",
+      "cities": [
+        "Paris"
+      ]
+    },
+    {
+      "name": "Ubisoft",
+      "cities": [
+        "Paris",
+        "Montreuil"
+      ]
+    },
+    {
+      "name": "Deezer",
+      "cities": [
+        "Paris"
+      ]
+    },
+    {
+      "name": "BlaBlaCar",
+      "cities": [
+        "Paris"
+      ]
+    },
+    {
+      "name": "Doctolib",
+      "cities": [
+        "Paris"
+      ]
+    },
+    {
+      "name": "OVHcloud",
+      "cities": [
+        "Roubaix",
+        "Paris"
+      ]
+    },
+    {
+      "name": "Criteo",
+      "cities": [
+        "Paris"
+      ]
+    },
+    {
+      "name": "McKinsey & Company",
+      "cities": [
+        "Paris"
+      ]
+    },
+    {
+      "name": "Boston Consulting Group",
+      "cities": [
+        "Paris"
+      ]
+    },
+    {
+      "name": "Bain & Company",
+      "cities": [
+        "Paris"
+      ]
+    },
+    {
+      "name": "Deloitte",
+      "cities": [
+        "Paris",
+        "La Défense"
+      ]
+    },
+    {
+      "name": "PwC",
+      "cities": [
+        "Paris",
+        "Neuilly-sur-Seine"
+      ]
+    },
+    {
+      "name": "EY",
+      "cities": [
+        "Paris",
+        "La Défense"
+      ]
+    },
+    {
+      "name": "KPMG",
+      "cities": [
+        "Paris",
+        "La Défense"
+      ]
+    },
+    {
+      "name": "Accenture",
+      "cities": [
+        "Paris"
+      ]
+    },
+    {
+      "name": "Google",
+      "cities": [
+        "Paris"
+      ]
+    },
+    {
+      "name": "Amazon",
+      "cities": [
+        "Paris",
+        "Clichy"
+      ]
+    },
+    {
+      "name": "Microsoft",
+      "cities": [
+        "Paris",
+        "Issy-les-Moulineaux"
+      ]
+    },
+    {
+      "name": "Meta",
+      "cities": [
+        "Paris"
+      ]
+    }
+  ],
+  "jobs": [
+    "Ingénieur logiciel",
+    "Chef de produit",
+    "Analyste de données",
+    "Responsable marketing",
+    "Commercial",
+    "Responsable RH",
+    "Analyste financier",
+    "Chef de projet",
+    "Analyste métier",
+    "Responsable des opérations",
+    "Conseiller clientèle",
+    "Comptable",
+    "Assistant administratif",
+    "Graphiste",
+    "Développeur web",
+    "Administrateur réseau",
+    "Administrateur de base de données",
+    "Administrateur système",
+    "Ingénieur qualité",
+    "Rédacteur technique",
+    "Designer UX",
+    "Ingénieur DevOps",
+    "Architecte cloud",
+    "Analyste sécurité",
+    "Data scientist",
+    "Consultant",
+    "Avocat",
+    "Médecin",
+    "Pharmacien",
+    "Professeur",
+    "Enseignant",
+    "Travailleur social",
+    "Cuisinier",
+    "Directeur d'hôtel",
+    "Agent immobilier",
+    "Conseiller bancaire",
+    "Ingénieur mécanique",
+    "Ingénieur électrique",
+    "Ingénieur civil",
+    "Architecte",
+    "Directeur général"
+  ],
+  "catch_phrase_adjectives": [
+    "Innovant",
+    "Dynamique",
+    "Leader",
+    "Révolutionnaire",
+    "Transformateur",
+    "Évolutif",
+    "Robuste",
+    "Agile",
+    "Stratégique",
+    "Orienté client",
+    "Piloté par les données",
+    "Cloud-native",
+    "Propulsé par l'IA",
+    "Durable",
+    "Tourné vers l'avenir",
+    "Efficace",
+    "Flexible",
+    "Fiable"
+  ],
+  "catch_phrase_nouns": [
+    "solutions",
+    "plateformes",
+    "écosystèmes",
+    "stratégies",
+    "technologies",
+    "innovations",
+    "expériences",
+    "transformations",
+    "optimisations",
+    "intégrations",
+    "services",
+    "concepts",
+    "systèmes",
+    "processus"
+  ],
+  "catch_phrase_verbs": [
+    "livre",
+    "optimise",
+    "transforme",
+    "révolutionne",
+    "permet",
+    "accélère",
+    "rationalise",
+    "maximise",
+    "améliore",
+    "pilote",
+    "débloque",
+    "évolue",
+    "modernise",
+    "numérise",
+    "développe"
+  ],
+  "catch_phrase_connector": "qui"
+}

@@ -1,7 +1,7 @@
 import pytest
 from datetime import date, datetime, time, timedelta
 
-from pointblank.locales import COUNTRIES_WITH_FULL_DATA
+from pointblank.countries import COUNTRIES_WITH_FULL_DATA
 from pointblank.field import (
     int_field,
     float_field,
@@ -1225,7 +1225,7 @@ class TestCountrySupport:
         pytest.importorskip("polars")
 
         from pointblank import Schema, generate_dataset, string_field
-        from pointblank.locales import LocaleGenerator
+        from pointblank.countries import LocaleGenerator
 
         schema = Schema(columns=[("address", string_field(preset="address"))])
 
@@ -1253,10 +1253,10 @@ class TestGeneratorValidation:
 
     def test_credit_card_numbers_pass_luhn_validation(self):
         """Ensure generated credit card numbers pass Luhn checksum validation."""
-        from pointblank.locales import LocaleGenerator
+        from pointblank.countries import LocaleGenerator
         from pointblank._spec_utils import is_credit_card
 
-        # Test across multiple locales
+        # Test across multiple countries
         for locale in ["en_US", "de_DE", "fr_FR", "ja_JP"]:
             gen = LocaleGenerator(locale, seed=23)
 
@@ -1288,7 +1288,7 @@ class TestGeneratorValidation:
         )
 
         # The Schema.generate() doesn't use presets directly, so use LocaleGenerator
-        from pointblank.locales import LocaleGenerator
+        from pointblank.countries import LocaleGenerator
 
         gen = LocaleGenerator("en_US", seed=23)
         credit_cards = [gen.credit_card_number() for _ in range(100)]
@@ -1316,7 +1316,7 @@ class TestLocaleDataFiles:
         import os
         from pathlib import Path
 
-        locales_dir = Path(__file__).parent.parent / "pointblank" / "locales" / "data"
+        countries_dir = Path(__file__).parent.parent / "pointblank" / "countries" / "data"
         countries = COUNTRIES_WITH_FULL_DATA
         required_files = {
             "address.json",
@@ -1328,7 +1328,7 @@ class TestLocaleDataFiles:
         }
 
         for country in countries:
-            country_dir = locales_dir / country
+            country_dir = countries_dir / country
             assert country_dir.exists(), f"Country directory {country} does not exist"
 
             actual_files = {f.name for f in country_dir.iterdir() if f.suffix == ".json"}
@@ -1345,11 +1345,11 @@ class TestLocaleDataFiles:
         import json
         from pathlib import Path
 
-        locales_dir = Path(__file__).parent.parent / "pointblank" / "locales" / "data"
+        countries_dir = Path(__file__).parent.parent / "pointblank" / "countries" / "data"
         countries = COUNTRIES_WITH_FULL_DATA
 
         for country in countries:
-            country_dir = locales_dir / country
+            country_dir = countries_dir / country
             for json_file in country_dir.glob("*.json"):
                 try:
                     with open(json_file, "r", encoding="utf-8") as f:
@@ -1363,7 +1363,7 @@ class TestLocaleDataFiles:
         import json
         from pathlib import Path
 
-        locales_dir = Path(__file__).parent.parent / "pointblank" / "locales" / "data"
+        countries_dir = Path(__file__).parent.parent / "pointblank" / "countries" / "data"
         countries = COUNTRIES_WITH_FULL_DATA
         json_files = [
             "address.json",
@@ -1430,7 +1430,7 @@ class TestLocaleDataFiles:
             key_specs = expected_key_orders[json_file]
 
             for country in countries:
-                file_path = locales_dir / country / json_file
+                file_path = countries_dir / country / json_file
                 with open(file_path, "r", encoding="utf-8") as f:
                     data = json.load(f)
 
@@ -1455,7 +1455,7 @@ class TestLocaleDataFiles:
         import json
         from pathlib import Path
 
-        locales_dir = Path(__file__).parent.parent / "pointblank" / "locales" / "data"
+        countries_dir = Path(__file__).parent.parent / "pointblank" / "countries" / "data"
         countries = COUNTRIES_WITH_FULL_DATA
 
         # Common required keys for all countries
@@ -1472,7 +1472,7 @@ class TestLocaleDataFiles:
         countries = COUNTRIES_WITH_FULL_DATA
 
         for country in countries:
-            address_file = locales_dir / country / "address.json"
+            address_file = countries_dir / country / "address.json"
             with open(address_file, "r", encoding="utf-8") as f:
                 data = json.load(f)
 
@@ -1586,12 +1586,12 @@ class TestLocaleDataFiles:
         import json
         from pathlib import Path
 
-        locales_dir = Path(__file__).parent.parent / "pointblank" / "locales" / "data"
+        countries_dir = Path(__file__).parent.parent / "pointblank" / "countries" / "data"
         countries = COUNTRIES_WITH_FULL_DATA
         required_keys = {"first_names", "last_names", "name_formats", "prefixes", "suffixes"}
 
         for country in countries:
-            person_file = locales_dir / country / "person.json"
+            person_file = countries_dir / country / "person.json"
             with open(person_file, "r", encoding="utf-8") as f:
                 data = json.load(f)
 
@@ -1616,11 +1616,26 @@ class TestLocaleDataFiles:
                         f"{country}: each first name in {gender} should be a string"
                     )
 
-            # last_names should be a list of strings
-            assert isinstance(data["last_names"], list), f"{country}: last_names should be a list"
-            assert len(data["last_names"]) > 0, f"{country}: last_names should not be empty"
-            for name in data["last_names"]:
-                assert isinstance(name, str), f"{country}: each last_name should be a string"
+            # last_names should be a list of strings OR a dict with gendered keys
+            last_names = data["last_names"]
+            if isinstance(last_names, dict):
+                # Gendered last names (e.g., IS patronymics)
+                for gender_key in last_names:
+                    assert isinstance(last_names[gender_key], list), (
+                        f"{country}: last_names[{gender_key}] should be a list"
+                    )
+                    for name in last_names[gender_key]:
+                        assert isinstance(name, str), (
+                            f"{country}: each last_name in {gender_key} should be a string"
+                        )
+                # At least one category should have names
+                all_names = [n for v in last_names.values() for n in v]
+                assert len(all_names) > 0, f"{country}: last_names should not be empty"
+            else:
+                assert isinstance(last_names, list), f"{country}: last_names should be a list"
+                assert len(last_names) > 0, f"{country}: last_names should not be empty"
+                for name in last_names:
+                    assert isinstance(name, str), f"{country}: each last_name should be a string"
 
             # name_formats should be a list with valid placeholders
             assert isinstance(data["name_formats"], list), (
@@ -1662,7 +1677,7 @@ class TestLocaleDataFiles:
         import json
         from pathlib import Path
 
-        locales_dir = Path(__file__).parent.parent / "pointblank" / "locales" / "data"
+        countries_dir = Path(__file__).parent.parent / "pointblank" / "countries" / "data"
         countries = COUNTRIES_WITH_FULL_DATA
         required_keys = {
             "suffixes",
@@ -1677,7 +1692,7 @@ class TestLocaleDataFiles:
         }
 
         for country in countries:
-            company_file = locales_dir / country / "company.json"
+            company_file = countries_dir / country / "company.json"
             with open(company_file, "r", encoding="utf-8") as f:
                 data = json.load(f)
 
@@ -1741,7 +1756,7 @@ class TestLocaleDataFiles:
         import json
         from pathlib import Path
 
-        locales_dir = Path(__file__).parent.parent / "pointblank" / "locales" / "data"
+        countries_dir = Path(__file__).parent.parent / "pointblank" / "countries" / "data"
         countries = COUNTRIES_WITH_FULL_DATA
         required_keys = {
             "free_email_domains",
@@ -1752,7 +1767,7 @@ class TestLocaleDataFiles:
         }
 
         for country in countries:
-            internet_file = locales_dir / country / "internet.json"
+            internet_file = countries_dir / country / "internet.json"
             with open(internet_file, "r", encoding="utf-8") as f:
                 data = json.load(f)
 
@@ -1788,13 +1803,13 @@ class TestLocaleDataFiles:
         import json
         from pathlib import Path
 
-        locales_dir = Path(__file__).parent.parent / "pointblank" / "locales" / "data"
+        countries_dir = Path(__file__).parent.parent / "pointblank" / "countries" / "data"
         countries = COUNTRIES_WITH_FULL_DATA
         # Country-specific required keys (file_extensions/mime_types/currency_codes are universal)
         required_keys = {"colors"}
 
         for country in countries:
-            misc_file = locales_dir / country / "misc.json"
+            misc_file = countries_dir / country / "misc.json"
             with open(misc_file, "r", encoding="utf-8") as f:
                 data = json.load(f)
 
@@ -1807,7 +1822,7 @@ class TestLocaleDataFiles:
                 assert len(data[key]) > 0, f"{country}: {key} should not be empty"
 
         # Also verify that shared/universal data exists
-        shared_file = locales_dir / "_shared" / "misc.json"
+        shared_file = countries_dir / "_shared" / "misc.json"
         assert shared_file.exists(), "_shared/misc.json should exist with universal data"
         with open(shared_file, "r", encoding="utf-8") as f:
             shared_data = json.load(f)
@@ -1844,12 +1859,12 @@ class TestLocaleDataFiles:
         import json
         from pathlib import Path
 
-        locales_dir = Path(__file__).parent.parent / "pointblank" / "locales" / "data"
+        countries_dir = Path(__file__).parent.parent / "pointblank" / "countries" / "data"
         countries = COUNTRIES_WITH_FULL_DATA
         required_keys = {"words", "adjectives", "nouns", "verbs", "adverbs"}
 
         for country in countries:
-            text_file = locales_dir / country / "text.json"
+            text_file = countries_dir / country / "text.json"
             with open(text_file, "r", encoding="utf-8") as f:
                 data = json.load(f)
 
@@ -1870,18 +1885,18 @@ class TestLocaleDataFiles:
         import json
         from pathlib import Path
 
-        locales_dir = Path(__file__).parent.parent / "pointblank" / "locales" / "data"
+        countries_dir = Path(__file__).parent.parent / "pointblank" / "countries" / "data"
         countries = COUNTRIES_WITH_FULL_DATA
 
         for country in countries:
             # Load address data to get valid cities
-            address_file = locales_dir / country / "address.json"
+            address_file = countries_dir / country / "address.json"
             with open(address_file, "r", encoding="utf-8") as f:
                 address_data = json.load(f)
             valid_cities = {loc["city"] for loc in address_data["locations"]}
 
             # Load company data
-            company_file = locales_dir / country / "company.json"
+            company_file = countries_dir / country / "company.json"
             with open(company_file, "r", encoding="utf-8") as f:
                 company_data = json.load(f)
 
@@ -1902,12 +1917,12 @@ class TestLocaleDataFiles:
         import json
         from pathlib import Path
 
-        locales_dir = Path(__file__).parent.parent / "pointblank" / "locales" / "data"
+        countries_dir = Path(__file__).parent.parent / "pointblank" / "countries" / "data"
         countries = COUNTRIES_WITH_FULL_DATA
 
         for country in countries:
             # Check person.json for duplicate names
-            person_file = locales_dir / country / "person.json"
+            person_file = countries_dir / country / "person.json"
             with open(person_file, "r", encoding="utf-8") as f:
                 person_data = json.load(f)
 
@@ -1930,7 +1945,7 @@ class TestLocaleDataFiles:
                 )
 
             # Check company.json for duplicate well-known companies (must be unique)
-            company_file = locales_dir / country / "company.json"
+            company_file = countries_dir / country / "company.json"
             with open(company_file, "r", encoding="utf-8") as f:
                 company_data = json.load(f)
 
@@ -1945,12 +1960,12 @@ class TestLocaleDataFiles:
         import json
         from pathlib import Path
 
-        locales_dir = Path(__file__).parent.parent / "pointblank" / "locales" / "data"
+        countries_dir = Path(__file__).parent.parent / "pointblank" / "countries" / "data"
         countries = COUNTRIES_WITH_FULL_DATA
 
         print("\n=== Locale Data Statistics ===")
         for country in countries:
-            country_dir = locales_dir / country
+            country_dir = countries_dir / country
 
             # Address stats
             with open(country_dir / "address.json", "r", encoding="utf-8") as f:

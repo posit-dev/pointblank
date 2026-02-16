@@ -1,0 +1,781 @@
+{
+  "suffixes": [
+    "Ltd",
+    "PLC",
+    "LLP",
+    "Limited",
+    "Group",
+    "Holdings",
+    "Partners",
+    "Associates",
+    "Solutions",
+    "Services",
+    "Technologies",
+    "Industries",
+    "Enterprises",
+    "International",
+    "UK",
+    "& Co",
+    "& Sons"
+  ],
+  "formats": [
+    "{last_name} {suffix}",
+    "{last_name} and {last_name}",
+    "{adjective} {noun} {suffix}",
+    "{adjective} {noun}",
+    "{last_name} {noun}"
+  ],
+  "adjectives": [
+    "British",
+    "Royal",
+    "Imperial",
+    "National",
+    "United",
+    "Global",
+    "Premier",
+    "Advanced",
+    "Elite",
+    "Sterling",
+    "Crown",
+    "Heritage",
+    "Classic",
+    "Modern",
+    "Digital",
+    "Strategic",
+    "Integrated",
+    "Professional",
+    "Quality",
+    "Superior",
+    "First",
+    "Prime",
+    "Apex",
+    "Summit",
+    "Frontier",
+    "Horizon",
+    "Vista",
+    "Pioneer",
+    "Legacy",
+    "Prestige",
+    "Golden",
+    "Silver",
+    "Thames",
+    "Atlantic",
+    "Northern"
+  ],
+  "nouns": [
+    "Solutions",
+    "Systems",
+    "Technologies",
+    "Industries",
+    "Services",
+    "Consulting",
+    "Ventures",
+    "Capital",
+    "Investments",
+    "Financial",
+    "Development",
+    "Management",
+    "Marketing",
+    "Communications",
+    "Media",
+    "Software",
+    "Networks",
+    "Security",
+    "Analytics",
+    "Data",
+    "Research",
+    "Engineering",
+    "Manufacturing",
+    "Construction",
+    "Properties",
+    "Insurance",
+    "Healthcare",
+    "Logistics",
+    "Transport",
+    "Energy",
+    "Resources",
+    "Materials",
+    "Products",
+    "Brands",
+    "Foods",
+    "Beverages",
+    "Retail",
+    "Commerce",
+    "Trade",
+    "Supply",
+    "Distribution"
+  ],
+  "well_known_companies": [
+    {
+      "name": "HSBC",
+      "cities": [
+        "London",
+        "Birmingham",
+        "Leeds",
+        "Manchester",
+        "Edinburgh"
+      ]
+    },
+    {
+      "name": "Barclays",
+      "cities": [
+        "London",
+        "Manchester",
+        "Leeds",
+        "Glasgow",
+        "Birmingham"
+      ]
+    },
+    {
+      "name": "Lloyds Banking Group",
+      "cities": [
+        "London",
+        "Bristol",
+        "Edinburgh",
+        "Leeds"
+      ]
+    },
+    {
+      "name": "NatWest Group",
+      "cities": [
+        "London",
+        "Edinburgh",
+        "Manchester",
+        "Birmingham"
+      ]
+    },
+    {
+      "name": "BP",
+      "cities": [
+        "London",
+        "Aberdeen",
+        "Hull",
+        "Manchester"
+      ]
+    },
+    {
+      "name": "Shell UK",
+      "cities": [
+        "London",
+        "Aberdeen",
+        "Manchester"
+      ]
+    },
+    {
+      "name": "Unilever",
+      "cities": [
+        "London",
+        "Liverpool",
+        "Leeds",
+        "Manchester"
+      ]
+    },
+    {
+      "name": "GlaxoSmithKline",
+      "cities": [
+        "London",
+        "Stevenage",
+        "Ware",
+        "Cambridge"
+      ]
+    },
+    {
+      "name": "AstraZeneca",
+      "cities": [
+        "Cambridge",
+        "London",
+        "Macclesfield",
+        "Liverpool"
+      ]
+    },
+    {
+      "name": "Tesco",
+      "cities": [
+        "Welwyn Garden City",
+        "London",
+        "Manchester",
+        "Edinburgh"
+      ]
+    },
+    {
+      "name": "Sainsbury's",
+      "cities": [
+        "London",
+        "Manchester",
+        "Milton Keynes",
+        "Edinburgh"
+      ]
+    },
+    {
+      "name": "Marks & Spencer",
+      "cities": [
+        "London",
+        "Manchester",
+        "Leeds",
+        "Chester"
+      ]
+    },
+    {
+      "name": "Vodafone",
+      "cities": [
+        "London",
+        "Newbury",
+        "Manchester",
+        "Birmingham"
+      ]
+    },
+    {
+      "name": "BT Group",
+      "cities": [
+        "London",
+        "Birmingham",
+        "Manchester",
+        "Leeds",
+        "Bristol"
+      ]
+    },
+    {
+      "name": "Sky",
+      "cities": [
+        "London",
+        "Leeds",
+        "Edinburgh",
+        "Bristol"
+      ]
+    },
+    {
+      "name": "Rolls-Royce",
+      "cities": [
+        "London",
+        "Derby",
+        "Bristol",
+        "Birmingham"
+      ]
+    },
+    {
+      "name": "BAE Systems",
+      "cities": [
+        "London",
+        "Warton",
+        "Portsmouth",
+        "Barrow-in-Furness",
+        "Glasgow"
+      ]
+    },
+    {
+      "name": "Jaguar Land Rover",
+      "cities": [
+        "Coventry",
+        "Birmingham",
+        "Liverpool",
+        "Manchester"
+      ]
+    },
+    {
+      "name": "Bentley Motors",
+      "cities": [
+        "Crewe",
+        "London"
+      ]
+    },
+    {
+      "name": "McLaren",
+      "cities": [
+        "Woking",
+        "London"
+      ]
+    },
+    {
+      "name": "Aston Martin",
+      "cities": [
+        "Gaydon",
+        "London",
+        "Silverstone"
+      ]
+    },
+    {
+      "name": "Burberry",
+      "cities": [
+        "London",
+        "Leeds",
+        "Manchester"
+      ]
+    },
+    {
+      "name": "Dyson",
+      "cities": [
+        "Malmesbury",
+        "London",
+        "Bristol"
+      ]
+    },
+    {
+      "name": "ARM Holdings",
+      "cities": [
+        "Cambridge",
+        "Manchester",
+        "Sheffield"
+      ]
+    },
+    {
+      "name": "Sage Group",
+      "cities": [
+        "Newcastle upon Tyne",
+        "London",
+        "Manchester"
+      ]
+    },
+    {
+      "name": "Sophos",
+      "cities": [
+        "Abingdon",
+        "Oxford",
+        "London"
+      ]
+    },
+    {
+      "name": "Darktrace",
+      "cities": [
+        "Cambridge",
+        "London"
+      ]
+    },
+    {
+      "name": "Wise",
+      "cities": [
+        "London",
+        "Cambridge"
+      ]
+    },
+    {
+      "name": "Revolut",
+      "cities": [
+        "London"
+      ]
+    },
+    {
+      "name": "Monzo",
+      "cities": [
+        "London"
+      ]
+    },
+    {
+      "name": "Deliveroo",
+      "cities": [
+        "London",
+        "Manchester",
+        "Bristol",
+        "Edinburgh"
+      ]
+    },
+    {
+      "name": "Just Eat",
+      "cities": [
+        "London",
+        "Bristol"
+      ]
+    },
+    {
+      "name": "ASOS",
+      "cities": [
+        "London",
+        "Barnsley"
+      ]
+    },
+    {
+      "name": "Ocado",
+      "cities": [
+        "Hatfield",
+        "London",
+        "Bristol"
+      ]
+    },
+    {
+      "name": "Rightmove",
+      "cities": [
+        "London",
+        "Milton Keynes"
+      ]
+    },
+    {
+      "name": "Autotrader",
+      "cities": [
+        "Manchester",
+        "London"
+      ]
+    },
+    {
+      "name": "BBC",
+      "cities": [
+        "London",
+        "Salford",
+        "Cardiff",
+        "Glasgow",
+        "Belfast",
+        "Birmingham",
+        "Bristol"
+      ]
+    },
+    {
+      "name": "ITV",
+      "cities": [
+        "London",
+        "Manchester",
+        "Leeds"
+      ]
+    },
+    {
+      "name": "Channel 4",
+      "cities": [
+        "London",
+        "Manchester",
+        "Leeds",
+        "Bristol",
+        "Glasgow"
+      ]
+    },
+    {
+      "name": "WPP",
+      "cities": [
+        "London",
+        "Manchester"
+      ]
+    },
+    {
+      "name": "Pearson",
+      "cities": [
+        "London",
+        "Edinburgh"
+      ]
+    },
+    {
+      "name": "RELX",
+      "cities": [
+        "London",
+        "Oxford"
+      ]
+    },
+    {
+      "name": "Compass Group",
+      "cities": [
+        "Chertsey",
+        "London",
+        "Birmingham"
+      ]
+    },
+    {
+      "name": "InterContinental Hotels",
+      "cities": [
+        "Windsor",
+        "London",
+        "Manchester"
+      ]
+    },
+    {
+      "name": "Whitbread",
+      "cities": [
+        "Dunstable",
+        "London"
+      ]
+    },
+    {
+      "name": "JD Sports",
+      "cities": [
+        "Bury",
+        "Manchester",
+        "London"
+      ]
+    },
+    {
+      "name": "Next",
+      "cities": [
+        "Leicester",
+        "London",
+        "Leeds"
+      ]
+    },
+    {
+      "name": "John Lewis Partnership",
+      "cities": [
+        "London",
+        "Reading",
+        "Edinburgh",
+        "Manchester"
+      ]
+    },
+    {
+      "name": "Boots",
+      "cities": [
+        "Nottingham",
+        "London",
+        "Manchester"
+      ]
+    },
+    {
+      "name": "WH Smith",
+      "cities": [
+        "Swindon",
+        "London"
+      ]
+    },
+    {
+      "name": "Legal & General",
+      "cities": [
+        "London",
+        "Cardiff",
+        "Birmingham"
+      ]
+    },
+    {
+      "name": "Aviva",
+      "cities": [
+        "London",
+        "Norwich",
+        "York"
+      ]
+    },
+    {
+      "name": "Prudential",
+      "cities": [
+        "London",
+        "Reading"
+      ]
+    },
+    {
+      "name": "Standard Chartered",
+      "cities": [
+        "London"
+      ]
+    },
+    {
+      "name": "Schroders",
+      "cities": [
+        "London"
+      ]
+    },
+    {
+      "name": "PwC UK",
+      "cities": [
+        "London",
+        "Manchester",
+        "Birmingham",
+        "Leeds",
+        "Bristol",
+        "Edinburgh"
+      ]
+    },
+    {
+      "name": "Deloitte UK",
+      "cities": [
+        "London",
+        "Manchester",
+        "Birmingham",
+        "Bristol",
+        "Edinburgh",
+        "Leeds"
+      ]
+    },
+    {
+      "name": "EY UK",
+      "cities": [
+        "London",
+        "Manchester",
+        "Birmingham",
+        "Edinburgh",
+        "Bristol",
+        "Leeds"
+      ]
+    },
+    {
+      "name": "KPMG UK",
+      "cities": [
+        "London",
+        "Manchester",
+        "Birmingham",
+        "Leeds",
+        "Glasgow",
+        "Edinburgh"
+      ]
+    },
+    {
+      "name": "Accenture UK",
+      "cities": [
+        "London",
+        "Manchester",
+        "Newcastle upon Tyne",
+        "Edinburgh"
+      ]
+    },
+    {
+      "name": "Capgemini UK",
+      "cities": [
+        "London",
+        "Manchester",
+        "Bristol",
+        "Birmingham"
+      ]
+    },
+    {
+      "name": "National Grid",
+      "cities": [
+        "Warwick",
+        "London"
+      ]
+    },
+    {
+      "name": "SSE",
+      "cities": [
+        "Glasgow",
+        "Reading",
+        "London"
+      ]
+    },
+    {
+      "name": "Centrica",
+      "cities": [
+        "Windsor",
+        "London",
+        "Leicester"
+      ]
+    },
+    {
+      "name": "Thames Water",
+      "cities": [
+        "Reading",
+        "London"
+      ]
+    }
+  ],
+  "jobs": [
+    "Software Engineer",
+    "Product Manager",
+    "Data Analyst",
+    "Marketing Manager",
+    "Sales Executive",
+    "HR Manager",
+    "Financial Analyst",
+    "Project Manager",
+    "Business Analyst",
+    "Operations Manager",
+    "Customer Service Adviser",
+    "Accountant",
+    "Administrator",
+    "Executive Assistant",
+    "Graphic Designer",
+    "Web Developer",
+    "Network Administrator",
+    "Database Administrator",
+    "Systems Administrator",
+    "QA Engineer",
+    "Technical Writer",
+    "Content Writer",
+    "UX Designer",
+    "UI Designer",
+    "DevOps Engineer",
+    "Cloud Architect",
+    "Security Analyst",
+    "Data Scientist",
+    "Machine Learning Engineer",
+    "Research Scientist",
+    "Consultant",
+    "Solicitor",
+    "Barrister",
+    "Paralegal",
+    "Nurse",
+    "Doctor",
+    "Pharmacist",
+    "Teacher",
+    "Lecturer",
+    "Librarian",
+    "Social Worker",
+    "Counsellor",
+    "Psychologist",
+    "Chef",
+    "Restaurant Manager",
+    "Hotel Manager",
+    "Events Coordinator",
+    "Estate Agent",
+    "Insurance Broker",
+    "Bank Clerk",
+    "Mortgage Adviser",
+    "Financial Adviser",
+    "Investment Analyst",
+    "Supply Chain Manager",
+    "Logistics Coordinator",
+    "Warehouse Manager",
+    "Buyer",
+    "Procurement Manager",
+    "Mechanical Engineer",
+    "Electrical Engineer",
+    "Civil Engineer",
+    "Chemical Engineer",
+    "Environmental Engineer",
+    "Architect",
+    "Interior Designer",
+    "Construction Manager",
+    "Plumber",
+    "Electrician",
+    "Carpenter"
+  ],
+  "catch_phrase_adjectives": [
+    "Innovative",
+    "Dynamic",
+    "Cutting-edge",
+    "World-class",
+    "Best-in-class",
+    "Industry-leading",
+    "Revolutionary",
+    "Transformative",
+    "Disruptive",
+    "Seamless",
+    "Scalable",
+    "Robust",
+    "Agile",
+    "Holistic",
+    "Synergistic",
+    "Strategic",
+    "Customer-centric",
+    "Data-driven",
+    "Cloud-native",
+    "AI-powered"
+  ],
+  "catch_phrase_nouns": [
+    "solutions",
+    "platforms",
+    "frameworks",
+    "ecosystems",
+    "paradigms",
+    "strategies",
+    "methodologies",
+    "approaches",
+    "technologies",
+    "innovations",
+    "capabilities",
+    "experiences",
+    "journeys",
+    "transformations",
+    "optimizations",
+    "integrations"
+  ],
+  "catch_phrase_verbs": [
+    "deliver",
+    "leverage",
+    "optimise",
+    "transform",
+    "revolutionise",
+    "empower",
+    "accelerate",
+    "streamline",
+    "maximise",
+    "enhance",
+    "drive",
+    "enable",
+    "unlock",
+    "catalyse",
+    "orchestrate",
+    "scale",
+    "modernise",
+    "digitise"
+  ],
+  "catch_phrase_connector": "that"
+}
