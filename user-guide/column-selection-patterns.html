@@ -533,7 +533,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <p>Many of Pointblank’s validation methods perform column-level checks. These methods provide the <code>columns=</code> parameter, which accepts not just a single column name but multiple columns through various selection methods.</p>
 <p>Why is this useful? Often you’ll want to perform the same validation check (e.g., checking that numerical values are all positive) across multiple columns. Rather than defining the same rules multiple times, you can map the validation across those columns in a single step.</p>
 <p>Let’s explore this using the <code>game_revenue</code> dataset:</p>
-<div id="dd7f2c2d" class="cell" data-execution_count="2">
+<div id="2d4426b7" class="cell" data-execution_count="2">
 <div class="cell-output cell-output-display" data-execution_count="2">
 <div id="pb_preview_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>
@@ -777,7 +777,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="using-a-list-of-column-names" class="level3">
 <h3 class="anchored" data-anchor-id="using-a-list-of-column-names">Using a List of Column Names</h3>
 <p>The simplest way to validate multiple columns is to provide a list to the <code>columns=</code> parameter. In the <code>game_revenue</code> dataset, we have two columns with numerical data: <code>item_revenue</code> and <code>session_duration</code>. If we expect all values in both columns to be greater than <code>0</code>, we can write:</p>
-<div id="9ca6fb2b" class="cell" data-execution_count="3">
+<div id="1b864515" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>(</span>
@@ -972,7 +972,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 </div>
 <p>The validation report shows two validation steps were created from a single method call! All validation parameters are shared across all generated steps, including thresholds and briefs:</p>
-<div id="8b3f4f00" class="cell" data-execution_count="4">
+<div id="d8afdc9e" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>(</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>pb.load_dataset(<span class="st">"game_revenue"</span>))</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_gt(</span>
@@ -1189,7 +1189,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </ul>
 <p>Two common selectors, <a href="../reference/starts_with.html#pointblank.starts_with" title="0"><code>starts_with()</code></a> and <a href="../reference/ends_with.html#pointblank.ends_with" title="0"><code>ends_with()</code></a>, resolve columns based on text patterns in column names.</p>
 <p>The <code>game_revenue</code> dataset has three columns starting with “item”: <code>item_type</code>, <code>item_name</code>, and <code>item_revenue</code>. Let’s check that these columns contain no missing values:</p>
-<div id="813a4512" class="cell" data-execution_count="5">
+<div id="7ddb7dd7" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>(</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>pb.load_dataset(<span class="st">"game_revenue"</span>))</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_not_null(columns<span class="op">=</span>pb.starts_with(<span class="st">"item"</span>))</span>
@@ -1447,7 +1447,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <li><code>~</code> (<em>not</em>)</li>
 </ul>
 <p>For example, to select all columns except the first four:</p>
-<div id="ea5a2665" class="cell" data-execution_count="6">
+<div id="49e97f05" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>col_selection <span class="op">=</span> pb.col(pb.everything() <span class="op">-</span> pb.first_n(<span class="dv">4</span>))</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>(</span>
@@ -1889,7 +1889,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <li><code>string()</code></li>
 </ul>
 <p>Here’s an example selecting all numeric columns:</p>
-<div id="282e1919" class="cell" data-execution_count="7">
+<div id="17046fe6" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> narwhals.selectors <span class="im">as</span> ncs</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>(</span>
@@ -2084,7 +2084,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 </div>
 <p>And selecting all string columns matching “item_”:</p>
-<div id="984f6ee0" class="cell" data-execution_count="8">
+<div id="763fd777" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>(</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>pb.load_dataset(<span class="st">"game_revenue"</span>))</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_not_null(columns<span class="op">=</span>pb.col(ncs.string() <span class="op">&amp;</span> ncs.matches(<span class="st">"item_"</span>)))</span>
@@ -2282,7 +2282,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="caveats-for-using-column-selectors" class="level3">
 <h3 class="anchored" data-anchor-id="caveats-for-using-column-selectors">Caveats for Using Column Selectors</h3>
 <p>While column selectors are powerful, there are some caveats. If a selector doesn’t match any columns, the validation won’t fail but will show an ‘explosion’ in the report:</p>
-<div id="6ead152a" class="cell" data-execution_count="9">
+<div id="8eef3abc" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>(</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>pb.load_dataset(<span class="st">"game_revenue"</span>))</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_not_null(columns<span class="op">=</span>pb.starts_with(<span class="st">"items"</span>))</span>
@@ -2490,7 +2490,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <h2 class="anchored" data-anchor-id="part-2-comparing-values-between-columns">Part 2: Comparing Values Between Columns</h2>
 <p>Sometimes you need to compare values across different columns rather than against fixed values. Pointblank enables this through the <a href="../reference/col.html#pointblank.col" title="0"><code>col()</code></a> helper function.</p>
 <p>Let’s look at examples using the <code>small_table</code> dataset:</p>
-<div id="2d67f9d8" class="cell" data-execution_count="10">
+<div id="69210c95" class="cell" data-execution_count="10">
 <div class="cell-output cell-output-display" data-execution_count="10">
 <div id="pb_preview_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>
@@ -2739,7 +2739,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>.col_vals_gt(columns<span class="op">=</span><span class="st">"a"</span>, value<span class="op">=</span>pb.col(<span class="st">"x"</span>), ...)</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>...</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>This checks that each value in column <code>a</code> is greater than the corresponding value in column <code>x</code>. Here’s a concrete example:</p>
-<div id="1694cfc8" class="cell" data-execution_count="11">
+<div id="837c8c4a" class="cell" data-execution_count="11">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>(</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>pb.load_dataset(<span class="st">"small_table"</span>))</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_gt(</span>
@@ -2892,7 +2892,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 <p>Notice that the validation report shows both column names (<code>d</code> and <code>c</code>). There are two failing test units because of missing values in column <code>c</code>. When comparing across columns, missing values in either column can cause failures.</p>
 <p>To handle missing values, use <code>na_pass=True</code>:</p>
-<div id="55081b58" class="cell" data-execution_count="12">
+<div id="5bd3618b" class="cell" data-execution_count="12">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>(</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>pb.load_dataset(<span class="st">"small_table"</span>))</span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_gt(</span>
@@ -3058,7 +3058,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="using-col-in-range-checks" class="level3">
 <h3 class="anchored" data-anchor-id="using-col-in-range-checks">Using <a href="../reference/col.html#pointblank.col" title="0"><code>col()</code></a> in Range Checks</h3>
 <p>For range validations via <a href="../reference/Validate.col_vals_between.html#pointblank.Validate.col_vals_between" title="0"><code>col_vals_between()</code></a> and <a href="../reference/Validate.col_vals_outside.html#pointblank.Validate.col_vals_outside" title="0"><code>col_vals_outside()</code></a> you can use a mix of column references and fixed values:</p>
-<div id="b4667904" class="cell" data-execution_count="13">
+<div id="e8b6ddaa" class="cell" data-execution_count="13">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>(</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>pb.load_dataset(<span class="st">"small_table"</span>))</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_between(</span>
@@ -3217,7 +3217,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="advanced-examples-combining-both-approaches" class="level2">
 <h2 class="anchored" data-anchor-id="advanced-examples-combining-both-approaches">Advanced Examples: Combining Both Approaches</h2>
 <p>The true power comes from combining both approaches: validating multiple columns and using cross-column comparisons:</p>
-<div id="1b8e18d6" class="cell" data-execution_count="14">
+<div id="fcee2080" class="cell" data-execution_count="14">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>validation <span class="op">=</span> (</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>    pb.Validate(data<span class="op">=</span>pb.load_dataset(<span class="st">"small_table"</span>))</span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_gt(</span>
