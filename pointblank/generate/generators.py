@@ -5,7 +5,9 @@ Per-dtype value generators for synthetic data generation.
 from __future__ import annotations
 
 import random
+import re
 import string
+from dataclasses import replace as dc_replace
 from datetime import date, datetime, time, timedelta
 from typing import TYPE_CHECKING, Any, Callable
 
@@ -448,6 +450,13 @@ ADDRESS_RELATED_PRESETS = {
 PERSON_RELATED_PRESETS = {"name", "name_full", "first_name", "last_name", "email", "user_name"}
 BUSINESS_RELATED_PRESETS = {"job", "company"}
 
+# Default working-age bounds applied when business coherence is active
+_WORKING_AGE_MIN = 22
+_WORKING_AGE_MAX = 65
+
+# Pattern to detect age-like integer columns (case-insensitive)
+_AGE_COLUMN_RE = re.compile(r"(?:^|_)age(?:$|_)", re.IGNORECASE)
+
 
 def _get_coherence_needs(fields: dict[str, Field]) -> tuple[bool, bool, bool]:
     """Check what coherence is needed for the given fields."""
@@ -548,6 +557,25 @@ def generate_dataframe(
         coherent_presets.update(PERSON_RELATED_PRESETS)
     if needs_business:
         coherent_presets.update(BUSINESS_RELATED_PRESETS)
+
+    # When business coherence is active, constrain age-like integer columns to
+    # working-age range so generated data doesn't have 15-year-old professionals
+    # or 85-year-old active employees with fictitious employers.
+    if needs_business:
+        fields = dict(fields)  # shallow copy so we don't mutate the caller's dict
+        for col_name, col_field in list(fields.items()):
+            if col_field.is_integer() and _AGE_COLUMN_RE.search(col_name):
+                cur_min = getattr(col_field, "min_val", None)
+                cur_max = getattr(col_field, "max_val", None)
+                new_min = (
+                    max(cur_min, _WORKING_AGE_MIN) if cur_min is not None else _WORKING_AGE_MIN
+                )
+                new_max = (
+                    min(cur_max, _WORKING_AGE_MAX) if cur_max is not None else _WORKING_AGE_MAX
+                )
+                # Only replace if the bounds actually changed
+                if new_min != cur_min or new_max != cur_max:
+                    fields[col_name] = dc_replace(col_field, min_val=new_min, max_val=new_max)
 
     # Generate data for each column
     data: dict[str, list[Any]] = {}
