@@ -446,6 +446,7 @@ ADDRESS_RELATED_PRESETS = {
     "phone_number",
     "latitude",
     "longitude",
+    "license_plate",
 }
 PERSON_RELATED_PRESETS = {"name", "name_full", "first_name", "last_name", "email", "user_name"}
 BUSINESS_RELATED_PRESETS = {"job", "company"}

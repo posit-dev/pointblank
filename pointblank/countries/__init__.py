@@ -2010,10 +2010,330 @@ class LocaleGenerator:
         fmt = self._data.misc.get("ssn_format", "###-##-####")
         return self._generate_from_format(fmt)
 
+    # License plate letters — I, O, Q, U are excluded to avoid confusion
+    # with 1, 0, and V (standard practice across most jurisdictions)
+    _PLATE_LETTERS = "ABCDEFGHJKLMNPRSTVWXYZ"
+
+    # Province/state-specific license plate formats.
+    # Keys are state_abbr values from the location data.
+    # Format chars: ? = letter (restricted), # = digit, literal chars kept as-is.
+    # A tuple value means one format is chosen at random (for provinces with variants).
+
+    _CA_PLATE_FORMATS: dict[str, str | tuple[str, ...]] = {
+        "AB": "???-####",  # Alberta: ABC-1234 (7 chars)
+        "BC": "??# ##?",  # British Columbia: AB1 23C
+        "MB": "??? ###",  # Manitoba: ABC 123
+        "NB": "??? ###",  # New Brunswick: ABC 123
+        "NL": "??? ###",  # Newfoundland & Labrador: ABC 123
+        "NT": "######",  # Northwest Territories: 6 digits
+        "NS": "??? ###",  # Nova Scotia: ABC 123
+        "NU": "######",  # Nunavut: 6 digits
+        "ON": "C??? ###",  # Ontario: current series starts with C (e.g. CDWA 054)
+        "PE": "??? ###",  # Prince Edward Island: ABC 123
+        "QC": "??? ###",  # Quebec: ABC 123
+        "SK": "??? ###",  # Saskatchewan: ABC 123
+        "YT": "??? ###",  # Yukon: ABC 123
+    }
+
+    # US plates vary by state. Not all 50 states are in the location data, so
+    # we cover the ones that are. Falls back to the generic format for others.
+    _US_PLATE_FORMATS: dict[str, str | tuple[str, ...]] = {
+        "AZ": "???####",  # Arizona: ABC1234
+        "CA": "#???###",  # California: 1ABC234
+        "CO": "???-###",  # Colorado: ABC-123
+        "FL": "??? ?##?",  # Florida: ABC D12E
+        "GA": "???####",  # Georgia: ABC1234
+        "IL": "?? #####",  # Illinois: AB 12345
+        "IN": "###?",  # Indiana: 123A (short format)
+        "LA": "### ???",  # Louisiana: 123 ABC
+        "MA": "#??-??##",  # Massachusetts: 1AB-CD23
+        "MD": "#??####",  # Maryland: 1AB1234
+        "MI": "??? ####",  # Michigan: ABC 1234
+        "MN": "###-???",  # Minnesota: 123-ABC
+        "NC": "???-####",  # North Carolina: ABC-1234
+        "NV": "##?-###",  # Nevada: 12A-345
+        "NY": "???-####",  # New York: ABC-1234
+        "OH": "??? ####",  # Ohio: ABC 1234
+        "OR": "### ???",  # Oregon: 123 ABC
+        "PA": "???-####",  # Pennsylvania: ABC-1234
+        "TN": "?##-##?",  # Tennessee: A12-34B
+        "TX": "???-####",  # Texas: ABC-1234
+        "WA": "???####",  # Washington: ABC1234
+    }
+
+    # Germany: plates start with 1-3 letter city/district code, then 1-2 letters,
+    # then 1-4 digits. The city code is derived from the person's location.
+    _DE_CITY_PLATE_CODES: dict[str, str] = {
+        "Aachen": "AC",
+        "Altona": "HH",
+        "Augsburg": "A",
+        "Berlin": "B",
+        "Bielefeld": "BI",
+        "Bochum": "BO",
+        "Bonn": "BN",
+        "Bornheim": "BN",
+        "Brandenburg an der Havel": "BRB",
+        "Braunschweig": "BS",
+        "Bremen": "HB",
+        "Bremerhaven": "HB",
+        "Charlottenburg": "B",
+        "Chemnitz": "C",
+        "Cottbus": "CB",
+        "Darmstadt": "DA",
+        "Dessau-Roßlau": "DE",
+        "Dortmund": "DO",
+        "Dresden": "DD",
+        "Duisburg": "DU",
+        "Düsseldorf": "D",
+        "Eimsbüttel": "HH",
+        "Erfurt": "EF",
+        "Essen": "E",
+        "Flensburg": "FL",
+        "Frankfurt (Oder)": "FF",
+        "Frankfurt am Main": "F",
+        "Freiburg im Breisgau": "FR",
+        "Friedrichshain": "B",
+        "Fürth": "FÜ",
+        "Gelsenkirchen": "GE",
+        "Gera": "G",
+        "Greifswald": "HGW",
+        "Göttingen": "GÖ",
+        "Halle (Saale)": "HAL",
+        "Hamburg": "HH",
+        "Hannover": "H",
+        "Harburg": "HH",
+        "Heidelberg": "HD",
+        "Heilbronn": "HN",
+        "Hildesheim": "HI",
+        "Homburg": "HOM",
+        "Ingolstadt": "IN",
+        "Jena": "J",
+        "Kaiserslautern": "KL",
+        "Karlsruhe": "KA",
+        "Kassel": "KS",
+        "Kiel": "KI",
+        "Koblenz": "KO",
+        "Konstanz": "KN",
+        "Kreuzberg": "B",
+        "Köln": "K",
+        "Leipzig": "L",
+        "Ludwigshafen am Rhein": "LU",
+        "Lübeck": "HL",
+        "Magdeburg": "MD",
+        "Mainz": "MZ",
+        "Mannheim": "MA",
+        "Maxvorstadt": "M",
+        "Mitte": "B",
+        "Mönchengladbach": "MG",
+        "München": "M",
+        "Münster": "MS",
+        "Neukölln": "B",
+        "Neumünster": "NMS",
+        "Neunkirchen": "NK",
+        "Nürnberg": "N",
+        "Offenbach am Main": "OF",
+        "Oldenburg": "OL",
+        "Osnabrück": "OS",
+        "Pforzheim": "PF",
+        "Plauen": "V",
+        "Potsdam": "P",
+        "Prenzlauer Berg": "B",
+        "Regensburg": "R",
+        "Reutlingen": "RT",
+        "Rostock": "HRO",
+        "Saarbrücken": "SB",
+        "Sachsenhausen": "F",
+        "Salzgitter": "SZ",
+        "Schwabing": "M",
+        "Schwerin": "SN",
+        "Schöneberg": "B",
+        "St. Pauli": "HH",
+        "Stralsund": "HST",
+        "Stuttgart": "S",
+        "Trier": "TR",
+        "Tübingen": "TÜ",
+        "Ulm": "UL",
+        "Völklingen": "VK",
+        "Wandsbek": "HH",
+        "Weimar": "WE",
+        "Wiesbaden": "WI",
+        "Wolfsburg": "WOB",
+        "Wuppertal": "W",
+        "Würzburg": "WÜ",
+        "Zwickau": "Z",
+    }
+
+    # Australia: state-based formats
+    _AU_PLATE_FORMATS: dict[str, str | tuple[str, ...]] = {
+        "ACT": "??? ##?",  # ACT: ABC 12D
+        "NSW": "??##??",  # NSW: AB12CD
+        "NT": "??##??",  # NT: AB12CD
+        "QLD": "###???",  # Queensland: 123ABC
+        "SA": "?###???",  # South Australia: A123BCD (newer) or S###???
+        "TAS": "?-####",  # Tasmania: A-1234
+        "VIC": "#??-###",  # Victoria: 1AB-234
+        "WA": "#???###",  # Western Australia: 1ABC234
+    }
+
+    # Great Britain: plates encode age identifier from location
+    # Format: 2 area letters + 2-digit age identifier + 3 random letters
+    # The area letters are based on DVLA regional offices.
+    # Keys match the state_abbr values in the GB location data.
+    _GB_AREA_CODES: dict[str, list[str]] = {
+        # Greater London boroughs
+        "GL": ["LA", "LB", "LC", "LD", "LE", "LF", "LG", "LH", "LJ", "LK"],
+        # West Midlands
+        "WM": ["BA", "BB", "BC", "BD", "BE", "BF", "BG", "BH", "BJ", "BK"],
+        # Greater Manchester
+        "GM": ["MA", "MB", "MC", "MD", "ME", "MF", "MG", "MH", "MJ", "MK"],
+        # Merseyside (Liverpool area)
+        "MS": ["CA", "CB", "CC", "CD", "CE", "CF", "CG", "CH", "CJ", "CK"],
+        # West Yorkshire
+        "WY": ["YA", "YB", "YC", "YD", "YE", "YF", "YG", "YH", "YJ", "YK"],
+        # South Yorkshire
+        "SY": ["YA", "YB", "YC", "YD", "YE", "YF"],
+        # Hampshire
+        "HA": ["HW", "HX", "HY"],
+        # Lancashire
+        "LA": ["PA", "PB", "PC", "PD", "PE", "PF"],
+        # Nottinghamshire
+        "NG": ["FA", "FB", "FC", "FD", "FE", "FF"],
+        # Leicestershire
+        "LE": ["FA", "FB", "FC", "FD"],
+        # Lincolnshire
+        "LN": ["FG", "FH", "FJ", "FK"],
+        # Norfolk
+        "NF": ["AA", "AB", "AC", "AD", "AE"],
+        # Suffolk
+        "SF": ["AF", "AG", "AH", "AJ", "AK"],
+        # Cambridgeshire
+        "CB": ["EA", "EB", "EC", "ED"],
+        # Essex
+        "ES": ["EE", "EF", "EG", "EH"],
+        # Hertfordshire
+        "HT": ["EJ", "EK"],
+        # Bedfordshire
+        "BD": ["EA", "EB"],
+        # Buckinghamshire
+        "BK": ["EC", "ED"],
+        # Oxfordshire
+        "OX": ["DA", "DB", "DC"],
+        # Devon
+        "DV": ["DA", "DB", "DC", "DD"],
+        # Dorset
+        "DO": ["DE", "DF", "DG"],
+        # Somerset
+        "SM": ["WA", "WB", "WC"],
+        # Sussex / Surrey area
+        "SU": ["KA", "KB", "KC", "KD", "KE"],
+        # Bristol
+        "BS": ["WD", "WE", "WF"],
+        # Wiltshire
+        "WI": ["WG", "WH", "WJ"],
+        # North Yorkshire
+        "NY": ["YA", "YB", "YC"],
+        # Cheshire
+        "CH": ["DA", "DB"],
+        # Cumbria
+        "CU": ["PA", "PB"],
+        # Durham / Tees Valley
+        "DU": ["NA", "NB", "NC", "ND"],
+        # Northumberland
+        "NH": ["NE", "NF", "NG"],
+        # Tyne and Wear
+        "TW": ["NA", "NB", "NC"],
+        # Herefordshire
+        "HE": ["RA", "RB"],
+        # Worcestershire
+        "WO": ["RC", "RD"],
+        # Staffordshire
+        "ST": ["BA", "BB"],
+        # Derbyshire
+        "DE": ["FA", "FB"],
+        # East Riding / Hull
+        "ER": ["YA", "YB"],
+        # Exeter region
+        "EX": ["DA", "DB"],
+        # Bournemouth / Poole
+        "BU": ["DE", "DF"],
+    }
+
+    def _generate_plate_format(self, fmt: str) -> str:
+        """Generate a license plate string from a format pattern using restricted letters.
+
+        Like ``_generate_from_format`` but uses the restricted plate alphabet
+        (no I, O, Q, U) for ``?`` characters.
+        """
+        result: list[str] = []
+        for char in fmt:
+            if char == "#":
+                result.append(str(self.rng.randint(0, 9)))
+            elif char == "?":
+                result.append(self.rng.choice(self._PLATE_LETTERS))
+            elif char == "*":
+                result.append(self.rng.choice(self._PLATE_LETTERS + "0123456789"))
+            else:
+                result.append(char)
+        return "".join(result)
+
     def license_plate(self) -> str:
-        """Generate a random license plate."""
+        """Generate a random license plate.
+
+        When location coherence is active, produces province/state-specific
+        formats for CA, US, DE, AU, and GB. Otherwise falls back to the
+        country's generic format.
+        """
+        location = self._get_current_location()
+        state_abbr = location.get("state_abbr", "")
+        city = location.get("city", "")
+
+        # --- Canada ---
+        if self.country_code == "CA":
+            fmt = self._CA_PLATE_FORMATS.get(state_abbr)
+            if fmt is not None:
+                if isinstance(fmt, tuple):
+                    fmt = self.rng.choice(fmt)
+                return self._generate_plate_format(fmt)
+
+        # --- United States ---
+        if self.country_code == "US":
+            fmt = self._US_PLATE_FORMATS.get(state_abbr)
+            if fmt is not None:
+                if isinstance(fmt, tuple):
+                    fmt = self.rng.choice(fmt)
+                return self._generate_plate_format(fmt)
+
+        # --- Germany ---
+        if self.country_code == "DE":
+            city_code = self._DE_CITY_PLATE_CODES.get(city, "XX")
+            # After the city code: 1-2 random letters, then 1-4 digits
+            # Total characters (after city code + dash) must be ≤ 8
+            n_letters = self.rng.choice([1, 2])
+            max_digits = min(4, 8 - len(city_code) - n_letters)
+            n_digits = self.rng.randint(max(1, max_digits - 1), max_digits)
+            letters = "".join(self.rng.choice(self._PLATE_LETTERS) for _ in range(n_letters))
+            digits = "".join(str(self.rng.randint(0, 9)) for _ in range(n_digits))
+            return f"{city_code}-{letters} {digits}"
+
+        # --- Australia ---
+        if self.country_code == "AU":
+            fmt = self._AU_PLATE_FORMATS.get(state_abbr)
+            if fmt is not None:
+                if isinstance(fmt, tuple):
+                    fmt = self.rng.choice(fmt)
+                return self._generate_plate_format(fmt)
+
+        # --- Great Britain ---
+        if self.country_code == "GB":
+            area_codes = self._GB_AREA_CODES.get(state_abbr, ["AA"])
+            area = self.rng.choice(area_codes)
+            age_id = self.rng.randint(10, 79)
+            random_letters = "".join(self.rng.choice(self._PLATE_LETTERS) for _ in range(3))
+            return f"{area}{age_id} {random_letters}"
+
+        # --- Fallback: use country's generic format with restricted letters ---
         fmt = self._data.misc.get("license_plate_format", "???-####")
-        return self._generate_from_format(fmt)
+        return self._generate_plate_format(fmt)
 
     # =========================================================================
     # Date/Time (string representations)
