@@ -69,11 +69,21 @@ AVAILABLE_PRESETS = frozenset(
         "currency_code",
         # Identifiers
         "uuid4",
+        "md5",
+        "sha1",
+        "sha256",
         "ssn",
         "license_plate",
+        # Barcodes
+        "ean8",
+        "ean13",
         # Date/Time (for string representations)
         "date_this_year",
         "date_this_decade",
+        "date_between",
+        "date_range",
+        "future_date",
+        "past_date",
         "time",
         # Misc
         "color_name",
