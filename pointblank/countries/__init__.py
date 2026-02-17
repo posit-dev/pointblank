@@ -1003,7 +1003,7 @@ class LocaleGenerator:
         Checks if the current job maps to a title category (doctor, professor, etc.)
         and whether the locale has a matching prefix in its prefix list.
 
-        Returns a ``(prefix, category)`` tuple, or ``None`` if no match (meaning the
+        Returns a `(prefix, category)` tuple, or `None` if no match (meaning the
         caller should use default logic).
         """
         job_lower = job.lower()
@@ -2261,8 +2261,8 @@ class LocaleGenerator:
     def _generate_plate_format(self, fmt: str) -> str:
         """Generate a license plate string from a format pattern using restricted letters.
 
-        Like ``_generate_from_format`` but uses the restricted plate alphabet
-        (no I, O, Q, U) for ``?`` characters.
+        Like `_generate_from_format` but uses the restricted plate alphabet (no I, O, Q, U) for `?`
+        characters.
         """
         result: list[str] = []
         for char in fmt:
