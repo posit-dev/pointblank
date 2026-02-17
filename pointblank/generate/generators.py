@@ -136,11 +136,21 @@ def _generate_from_preset(preset: str, generator: LocaleGenerator) -> str:
         "currency_code": generator.currency_code,
         # Identifiers
         "uuid4": generator.uuid4,
+        "md5": generator.md5,
+        "sha1": generator.sha1,
+        "sha256": generator.sha256,
         "ssn": generator.ssn,
         "license_plate": generator.license_plate,
+        # Barcodes
+        "ean8": generator.ean8,
+        "ean13": generator.ean13,
         # Date/Time
         "date_this_year": generator.date_this_year,
         "date_this_decade": generator.date_this_decade,
+        "date_between": generator.date_between,
+        "date_range": generator.date_range,
+        "future_date": generator.future_date,
+        "past_date": generator.past_date,
         "time": generator.time,
         # Misc
         "color_name": generator.color_name,
