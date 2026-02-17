@@ -1584,24 +1584,31 @@ def generate_dataset(
     `country=` parameter. The following presets are particularly affected:
 
     - **Address-related presets** (`"address"`, `"city"`, `"state"`, `"postcode"`,
-      `"phone_number"`, `"latitude"`, `"longitude"`): produce addresses, cities, postal codes,
-      and phone numbers formatted for the specified country. For example, `country="DE"` yields
-      German street names and PLZ postal codes, while `country="JP"` yields Japanese addresses.
+      `"phone_number"`, `"latitude"`, `"longitude"`, `"license_plate"`): produce addresses,
+      cities, postal codes, phone numbers, and license plates formatted for the specified
+      country. For example, `country="DE"` yields German street names and PLZ postal codes,
+      while `country="JP"` yields Japanese addresses. License plates for CA, US, DE, AU, and
+      GB use province/state-specific formats when location fields are present.
     - **Person-related presets** (`"name"`, `"name_full"`, `"first_name"`, `"last_name"`,
       `"email"`, `"user_name"`) produce culturally appropriate names for the specified country.
       For example, `country="FR"` produces French names, while `country="KR"` produces Korean
       names.
+    - **Business-related presets** (`"job"`, `"company"`): when both are present, the job and
+      company are drawn from the same industry for realism. The `"name_full"` preset will also
+      add profession-matched titles (e.g., "Dr." for doctors, "Prof." for professors), and
+      integer columns named `age` are automatically constrained to working-age range (22--65).
     - **Financial presets** (`"iban"`, `"ssn"`, `"license_plate"`): produce identifiers in the
       format used by the specified country.
 
     When multiple columns in the same schema use related presets, the generated data is
     automatically coherent across those columns within each row. Person-related presets will share
-    the same identity (e.g., the email is derived from the name), and address-related presets will
-    share the same location (e.g., the city matches the address).
+    the same identity (e.g., the email is derived from the name), address-related presets will
+    share the same location (e.g., the city matches the address), and business-related presets
+    will share the same industry context.
 
     Supported Countries
     -------------------
-    The `country=` parameter currently supports 50 countries with full locale data:
+    The `country=` parameter currently supports 55 countries with full locale data:
 
     **Europe (32 countries):** Austria (`"AT"`), Belgium (`"BE"`), Bulgaria (`"BG"`),
     Croatia (`"HR"`), Cyprus (`"CY"`), Czech Republic (`"CZ"`), Denmark (`"DK"`),
@@ -1615,11 +1622,13 @@ def generate_dataset(
     **Americas (7 countries):** Argentina (`"AR"`), Brazil (`"BR"`), Canada (`"CA"`),
     Chile (`"CL"`), Colombia (`"CO"`), Mexico (`"MX"`), United States (`"US"`)
 
-    **Asia-Pacific (10 countries):** Australia (`"AU"`), China (`"CN"`), Hong Kong (`"HK"`),
+    **Asia-Pacific (12 countries):** Australia (`"AU"`), China (`"CN"`), Hong Kong (`"HK"`),
     India (`"IN"`), Indonesia (`"ID"`), Japan (`"JP"`), New Zealand (`"NZ"`),
-    Philippines (`"PH"`), South Korea (`"KR"`), Taiwan (`"TW"`)
+    Philippines (`"PH"`), Singapore (`"SG"`), South Korea (`"KR"`), Taiwan (`"TW"`),
+    Thailand (`"TH"`)
 
-    **Middle East (1 country):** Turkey (`"TR"`)
+    **Middle East & Africa (4 countries):** Nigeria (`"NG"`), South Africa (`"ZA"`),
+    Turkey (`"TR"`), United Arab Emirates (`"AE"`)
 
     Examples
     --------
