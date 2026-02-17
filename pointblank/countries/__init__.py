@@ -2004,6 +2004,21 @@ class LocaleGenerator:
         ]
         return "-".join(parts)
 
+    def md5(self) -> str:
+        """Generate a random MD5 hash string (32 hex characters)."""
+        hex_chars = "0123456789abcdef"
+        return "".join(self.rng.choice(hex_chars) for _ in range(32))
+
+    def sha1(self) -> str:
+        """Generate a random SHA-1 hash string (40 hex characters)."""
+        hex_chars = "0123456789abcdef"
+        return "".join(self.rng.choice(hex_chars) for _ in range(40))
+
+    def sha256(self) -> str:
+        """Generate a random SHA-256 hash string (64 hex characters)."""
+        hex_chars = "0123456789abcdef"
+        return "".join(self.rng.choice(hex_chars) for _ in range(64))
+
     def ssn(self) -> str:
         """Generate a random SSN-like identifier."""
         # US format: XXX-XX-XXXX
@@ -2336,6 +2351,28 @@ class LocaleGenerator:
         return self._generate_plate_format(fmt)
 
     # =========================================================================
+    # Barcodes
+    # =========================================================================
+
+    def ean8(self) -> str:
+        """Generate a random EAN-8 barcode string with valid check digit."""
+        digits = [self.rng.randint(0, 9) for _ in range(7)]
+        # EAN-8 check digit: alternate weights 3, 1 from the left
+        total = sum(d * (3 if i % 2 == 0 else 1) for i, d in enumerate(digits))
+        check = (10 - (total % 10)) % 10
+        digits.append(check)
+        return "".join(str(d) for d in digits)
+
+    def ean13(self) -> str:
+        """Generate a random EAN-13 barcode string with valid check digit."""
+        digits = [self.rng.randint(0, 9) for _ in range(12)]
+        # EAN-13 check digit: alternate weights 1, 3 from the left
+        total = sum(d * (1 if i % 2 == 0 else 3) for i, d in enumerate(digits))
+        check = (10 - (total % 10)) % 10
+        digits.append(check)
+        return "".join(str(d) for d in digits)
+
+    # =========================================================================
     # Date/Time (string representations)
     # =========================================================================
 
@@ -2366,6 +2403,53 @@ class LocaleGenerator:
         minute = self.rng.randint(0, 59)
         second = self.rng.randint(0, 59)
         return f"{hour:02d}:{minute:02d}:{second:02d}"
+
+    def date_between(self, start_year: int = 2000, end_year: int = 2025) -> str:
+        """Generate a random date between two years as ISO string."""
+        from datetime import date, timedelta
+
+        start = date(start_year, 1, 1)
+        end = date(end_year, 12, 31)
+        days = (end - start).days
+        random_date = start + timedelta(days=self.rng.randint(0, max(days, 1)))
+        return random_date.isoformat()
+
+    def date_range(self) -> str:
+        """Generate a random date range as 'YYYY-MM-DD \u2013 YYYY-MM-DD'.
+
+        Produces two dates (start \u2264 end) spanning 1 day to ~4 years,
+        with the start date falling between 2000 and 2025.
+        The dates are joined with a CLDR en-dash range separator (\u2013).
+        """
+        from datetime import date, timedelta
+
+        # Pick a random start date between 2000 and 2025
+        epoch = date(2000, 1, 1)
+        ceiling = date(2025, 12, 31)
+        span = (ceiling - epoch).days
+        start = epoch + timedelta(days=self.rng.randint(0, span))
+
+        # Pick a random duration (1 day to ~4 years)
+        duration = self.rng.randint(1, 1460)
+        end = start + timedelta(days=duration)
+
+        return f"{start.isoformat()} \u2013 {end.isoformat()}"
+
+    def future_date(self) -> str:
+        """Generate a random date in the future (up to 1 year ahead) as ISO string."""
+        from datetime import date, timedelta
+
+        today = date.today()
+        random_date = today + timedelta(days=self.rng.randint(1, 365))
+        return random_date.isoformat()
+
+    def past_date(self) -> str:
+        """Generate a random date in the past (up to 10 years back) as ISO string."""
+        from datetime import date, timedelta
+
+        today = date.today()
+        random_date = today - timedelta(days=self.rng.randint(1, 3650))
+        return random_date.isoformat()
 
     # =========================================================================
     # Misc
