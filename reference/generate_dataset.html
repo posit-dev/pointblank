@@ -278,19 +278,20 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <h3 class="doc-section doc-section-presets-and-the-country-parameter anchored" data-anchor-id="presets-and-the-country-parameter">Presets and the <code>country=</code> Parameter</h3>
 <p>Several <a href="../reference/string_field.html#pointblank.string_field" title="0"><code>string_field()</code></a> presets produce locale-aware data that varies depending on the <code>country=</code> parameter. The following presets are particularly affected:</p>
 <ul>
-<li><strong>Address-related presets</strong> (<code>"address"</code>, <code>"city"</code>, <code>"state"</code>, <code>"postcode"</code>, <code>"phone_number"</code>, <code>"latitude"</code>, <code>"longitude"</code>): produce addresses, cities, postal codes, and phone numbers formatted for the specified country. For example, <code>country="DE"</code> yields German street names and PLZ postal codes, while <code>country="JP"</code> yields Japanese addresses.</li>
+<li><strong>Address-related presets</strong> (<code>"address"</code>, <code>"city"</code>, <code>"state"</code>, <code>"postcode"</code>, <code>"phone_number"</code>, <code>"latitude"</code>, <code>"longitude"</code>, <code>"license_plate"</code>): produce addresses, cities, postal codes, phone numbers, and license plates formatted for the specified country. For example, <code>country="DE"</code> yields German street names and PLZ postal codes, while <code>country="JP"</code> yields Japanese addresses. License plates for CA, US, DE, AU, and GB use province/state-specific formats when location fields are present.</li>
 <li><strong>Person-related presets</strong> (<code>"name"</code>, <code>"name_full"</code>, <code>"first_name"</code>, <code>"last_name"</code>, <code>"email"</code>, <code>"user_name"</code>) produce culturally appropriate names for the specified country. For example, <code>country="FR"</code> produces French names, while <code>country="KR"</code> produces Korean names.</li>
+<li><strong>Business-related presets</strong> (<code>"job"</code>, <code>"company"</code>): when both are present, the job and company are drawn from the same industry for realism. The <code>"name_full"</code> preset will also add profession-matched titles (e.g., “Dr.” for doctors, “Prof.” for professors), and integer columns named <code>age</code> are automatically constrained to working-age range (22–65).</li>
 <li><strong>Financial presets</strong> (<code>"iban"</code>, <code>"ssn"</code>, <code>"license_plate"</code>): produce identifiers in the format used by the specified country.</li>
 </ul>
-<p>When multiple columns in the same schema use related presets, the generated data is automatically coherent across those columns within each row. Person-related presets will share the same identity (e.g., the email is derived from the name), and address-related presets will share the same location (e.g., the city matches the address).</p>
+<p>When multiple columns in the same schema use related presets, the generated data is automatically coherent across those columns within each row. Person-related presets will share the same identity (e.g., the email is derived from the name), address-related presets will share the same location (e.g., the city matches the address), and business-related presets will share the same industry context.</p>
 </section>
 <section id="supported-countries" class="level2 doc-section doc-section-supported-countries">
 <h3 class="doc-section doc-section-supported-countries anchored" data-anchor-id="supported-countries">Supported Countries</h3>
-<p>The <code>country=</code> parameter currently supports 50 countries with full locale data:</p>
+<p>The <code>country=</code> parameter currently supports 55 countries with full locale data:</p>
 <p><strong>Europe (32 countries):</strong> Austria (<code>"AT"</code>), Belgium (<code>"BE"</code>), Bulgaria (<code>"BG"</code>), Croatia (<code>"HR"</code>), Cyprus (<code>"CY"</code>), Czech Republic (<code>"CZ"</code>), Denmark (<code>"DK"</code>), Estonia (<code>"EE"</code>), Finland (<code>"FI"</code>), France (<code>"FR"</code>), Germany (<code>"DE"</code>), Greece (<code>"GR"</code>), Hungary (<code>"HU"</code>), Iceland (<code>"IS"</code>), Ireland (<code>"IE"</code>), Italy (<code>"IT"</code>), Latvia (<code>"LV"</code>), Lithuania (<code>"LT"</code>), Luxembourg (<code>"LU"</code>), Malta (<code>"MT"</code>), Netherlands (<code>"NL"</code>), Norway (<code>"NO"</code>), Poland (<code>"PL"</code>), Portugal (<code>"PT"</code>), Romania (<code>"RO"</code>), Russia (<code>"RU"</code>), Slovakia (<code>"SK"</code>), Slovenia (<code>"SI"</code>), Spain (<code>"ES"</code>), Sweden (<code>"SE"</code>), Switzerland (<code>"CH"</code>), United Kingdom (<code>"GB"</code>)</p>
 <p><strong>Americas (7 countries):</strong> Argentina (<code>"AR"</code>), Brazil (<code>"BR"</code>), Canada (<code>"CA"</code>), Chile (<code>"CL"</code>), Colombia (<code>"CO"</code>), Mexico (<code>"MX"</code>), United States (<code>"US"</code>)</p>
-<p><strong>Asia-Pacific (10 countries):</strong> Australia (<code>"AU"</code>), China (<code>"CN"</code>), Hong Kong (<code>"HK"</code>), India (<code>"IN"</code>), Indonesia (<code>"ID"</code>), Japan (<code>"JP"</code>), New Zealand (<code>"NZ"</code>), Philippines (<code>"PH"</code>), South Korea (<code>"KR"</code>), Taiwan (<code>"TW"</code>)</p>
-<p><strong>Middle East (1 country):</strong> Turkey (<code>"TR"</code>)</p>
+<p><strong>Asia-Pacific (12 countries):</strong> Australia (<code>"AU"</code>), China (<code>"CN"</code>), Hong Kong (<code>"HK"</code>), India (<code>"IN"</code>), Indonesia (<code>"ID"</code>), Japan (<code>"JP"</code>), New Zealand (<code>"NZ"</code>), Philippines (<code>"PH"</code>), Singapore (<code>"SG"</code>), South Korea (<code>"KR"</code>), Taiwan (<code>"TW"</code>), Thailand (<code>"TH"</code>)</p>
+<p><strong>Middle East &amp; Africa (4 countries):</strong> Nigeria (<code>"NG"</code>), South Africa (<code>"ZA"</code>), Turkey (<code>"TR"</code>), United Arab Emirates (<code>"AE"</code>)</p>
 </section>
 <section id="examples" class="level2 doc-section doc-section-examples">
 <h3 class="doc-section doc-section-examples anchored" data-anchor-id="examples"><span style="
@@ -313,7 +314,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
         border-radius: 2px;
     ">
 <p>Here we define a schema with field constraints and generate test data from it:</p>
-<div id="2d104376" class="cell" data-execution_count="1">
+<div id="b7a4045f" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
@@ -481,7 +482,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 </div>
 <p>It’s also possible to generate data from a simple, dtype-only schema. Setting <code>output="pandas"</code> returns a Pandas DataFrame:</p>
-<div id="9d4fcddc" class="cell" data-execution_count="2">
+<div id="80913021" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(name<span class="op">=</span><span class="st">"String"</span>, age<span class="op">=</span><span class="st">"Int64"</span>, active<span class="op">=</span><span class="st">"Boolean"</span>)</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>pb.preview(pb.generate_dataset(schema, n<span class="op">=</span><span class="dv">50</span>, seed<span class="op">=</span><span class="dv">23</span>, output<span class="op">=</span><span class="st">"pandas"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -630,7 +631,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 </div>
 <p>When using presets, the <code>country=</code> parameter controls the locale. Here, <code>country="DE"</code> produces German names and addresses:</p>
-<div id="4d30953f" class="cell" data-execution_count="3">
+<div id="7e3726e4" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    name<span class="op">=</span>pb.string_field(preset<span class="op">=</span><span class="st">"name"</span>),</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    address<span class="op">=</span>pb.string_field(preset<span class="op">=</span><span class="st">"address"</span>),</span>
@@ -783,7 +784,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 </div>
 <p>We can combine several field types with nullable columns in a mixed-type dataset:</p>
-<div id="c0feb750" class="cell" data-execution_count="4">
+<div id="ef54239d" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> datetime <span class="im">import</span> date, timedelta</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
