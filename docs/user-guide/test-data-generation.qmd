@@ -436,16 +436,16 @@ applying it to production data, or for creating reproducible test fixtures in yo
 ## Pytest Fixture
 
 When Pointblank is installed, a `generate_dataset` **pytest fixture** is automatically available
-in all your test files. There is no need to import anything or add configuration to `conftest.py`
-— the fixture is registered via pytest's plugin system.
+in all your test files. There is no need to import anything or add configuration to `conftest.py`:
+the fixture is registered via pytest's plugin system.
 
 The fixture works identically to `pb.generate_dataset()`, but with one key difference: when you
 don't supply a `seed=` parameter, a deterministic seed is automatically derived from the test's
 fully-qualified name. This means:
 
-- The **same test** always produces the **same data** — no manual seed management required.
-- **Different tests** get different seeds, so they exercise different datasets.
-- You can still pass an explicit `seed=` to override the automatic seed when needed.
+- the **same test** always produces the **same data**: no manual seed management required.
+- *different tests* get different seeds, so they exercise different datasets.
+- you can still pass an explicit `seed=` to override the automatic seed when needed.
 
 ### Basic Usage
 
@@ -468,7 +468,7 @@ def test_etl_handles_nulls(generate_dataset):
     assert result.filter(pl.col("email").is_null()).shape[0] == 0
 ```
 
-All parameters from `generate_dataset()` are supported — `n`, `seed`, `output`, and `country`:
+All parameters from `generate_dataset()` are supported: `n=`, `seed=`, `output=`, and `country=`:
 
 ```python
 def test_german_data(generate_dataset):
@@ -483,8 +483,7 @@ def test_german_data(generate_dataset):
 
 ### Multiple Datasets in One Test
 
-Calling the fixture multiple times within the same test produces different (but still
-deterministic) data on each call:
+Calling the fixture multiple times within the same test produces different (but still deterministic) data on each call:
 
 ```python
 def test_merge_pipeline(generate_dataset):
