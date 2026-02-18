@@ -28,6 +28,7 @@ class TestGeneratorConfig:
     def test_default_config(self):
         """Test default configuration values."""
         config = GeneratorConfig()
+
         assert config.n == 100
         assert config.seed is None
         assert config.output == "polars"
@@ -37,6 +38,7 @@ class TestGeneratorConfig:
     def test_custom_config(self):
         """Test custom configuration values."""
         config = GeneratorConfig(n=50, seed=23, output="pandas", country="DE")
+
         assert config.n == 50
         assert config.seed == 23
         assert config.output == "pandas"
@@ -561,14 +563,17 @@ class TestSchemaGenerate:
 
         # Polars (default)
         df_polars = schema.generate(n=5, seed=23, output="polars")
+
         assert isinstance(df_polars, pl.DataFrame)
 
         # Pandas
         df_pandas = schema.generate(n=5, seed=23, output="pandas")
+
         assert isinstance(df_pandas, pd.DataFrame)
 
         # Dict
         df_dict = schema.generate(n=5, seed=23, output="dict")
+
         assert isinstance(df_dict, dict)
 
 
@@ -618,14 +623,17 @@ class TestGenerateDatasetFunction:
 
         # Polars (default)
         df_polars = generate_dataset(schema, n=5, seed=23)
+
         assert isinstance(df_polars, pl.DataFrame)
 
         # Pandas
         df_pandas = generate_dataset(schema, n=5, seed=23, output="pandas")
+
         assert isinstance(df_pandas, pd.DataFrame)
 
         # Dict
         df_dict = generate_dataset(schema, n=5, seed=23, output="dict")
+
         assert isinstance(df_dict, dict)
 
     def test_generate_dataset_reproducibility(self):
@@ -1583,6 +1591,370 @@ class TestUserAgentPreset:
         has_uc = any("UCBrowser" in ua for ua in uas)
         has_360 = any("QIHU 360" in ua for ua in uas)
         assert has_uc or has_360
+
+
+class TestLocaleMixing:
+    """Tests for multi-country locale mixing (country as list or dict)."""
+
+    # ── allocate_rows unit tests ──────────────────────────────────────────
+
+    def test_allocate_rows_equal_weights(self):
+        """Equal weights split rows evenly (with remainder distribution)."""
+        from pointblank.generate.generators import _allocate_rows
+
+        alloc = _allocate_rows({"US": 1.0, "DE": 1.0, "FR": 1.0}, 100)
+
+        assert sum(alloc.values()) == 100
+
+        # Each country should get 33 or 34 rows
+        for count in alloc.values():
+            assert count in (33, 34)
+
+    def test_allocate_rows_weighted(self):
+        """Weighted allocation gives proportional row counts."""
+        from pointblank.generate.generators import _allocate_rows
+
+        alloc = _allocate_rows({"US": 0.7, "DE": 0.3}, 100)
+
+        assert sum(alloc.values()) == 100
+        assert alloc["US"] == 70
+        assert alloc["DE"] == 30
+
+    def test_allocate_rows_unnormalized_weights(self):
+        """Weights that don't sum to 1.0 are auto-normalized."""
+        from pointblank.generate.generators import _allocate_rows
+
+        alloc = _allocate_rows({"US": 3.0, "DE": 7.0}, 100)
+
+        assert sum(alloc.values()) == 100
+        assert alloc["US"] == 30
+        assert alloc["DE"] == 70
+
+    def test_allocate_rows_single_country(self):
+        """Single-country dict allocates all rows."""
+        from pointblank.generate.generators import _allocate_rows
+
+        alloc = _allocate_rows({"US": 1.0}, 50)
+
+        assert alloc == {"US": 50}
+
+    def test_allocate_rows_zero_n(self):
+        """Zero rows gives zero rows per country."""
+        from pointblank.generate.generators import _allocate_rows
+
+        alloc = _allocate_rows({"US": 0.5, "DE": 0.5}, 0)
+
+        assert sum(alloc.values()) == 0
+
+    # ── List form ─────────────────────────────────────────────────────────
+
+    def test_list_form_basic(self):
+        """Passing a list of countries produces rows from all countries."""
+        config = GeneratorConfig(n=60, seed=23, output="dict", country=["US", "DE", "FR"])
+        fields = {"name": string_field(preset="name")}
+        result = generate_dataframe(fields, config)
+
+        assert len(result["name"]) == 60
+
+    def test_list_form_row_count(self):
+        """List form produces exactly n rows."""
+        config = GeneratorConfig(n=100, seed=23, output="dict", country=["US", "DE"])
+        fields = {"city": string_field(preset="city")}
+        result = generate_dataframe(fields, config)
+
+        assert len(result["city"]) == 100
+
+    def test_list_single_element_equivalent_to_string(self):
+        """A single-element list produces identical output to a plain string."""
+        config_str = GeneratorConfig(n=50, seed=23, output="dict", country="DE")
+        config_list = GeneratorConfig(n=50, seed=23, output="dict", country=["DE"])
+        fields = {"name": string_field(preset="name")}
+        result_str = generate_dataframe(fields, config_str)
+        result_list = generate_dataframe(fields, config_list)
+        assert result_str["name"] == result_list["name"]
+
+    # ── Dict form ─────────────────────────────────────────────────────────
+
+    def test_dict_form_basic(self):
+        """Passing a dict of weights produces rows from all countries."""
+        config = GeneratorConfig(n=100, seed=23, output="dict", country={"US": 0.7, "DE": 0.3})
+        fields = {"name": string_field(preset="name")}
+        result = generate_dataframe(fields, config)
+        assert len(result["name"]) == 100
+
+    def test_dict_single_element_equivalent_to_string(self):
+        """A single-element dict produces identical output to a plain string."""
+        config_str = GeneratorConfig(n=50, seed=23, output="dict", country="FR")
+        config_dict = GeneratorConfig(n=50, seed=23, output="dict", country={"FR": 1.0})
+        fields = {"name": string_field(preset="name")}
+        result_str = generate_dataframe(fields, config_str)
+        result_dict = generate_dataframe(fields, config_dict)
+        assert result_str["name"] == result_dict["name"]
+
+    def test_dict_form_weight_normalization(self):
+        """Weights that sum to more/less than 1.0 work correctly."""
+        config = GeneratorConfig(n=100, seed=23, output="dict", country={"US": 5, "DE": 5})
+        fields = {"city": string_field(preset="city")}
+        result = generate_dataframe(fields, config)
+        assert len(result["city"]) == 100
+
+    # ── Shuffle behavior ──────────────────────────────────────────────────
+
+    def test_shuffle_true_interleaves(self):
+        """With shuffle=True (default), rows from different countries are mixed."""
+        # Use a simple int column + a name preset so we can detect mixing
+        config = GeneratorConfig(
+            n=100,
+            seed=23,
+            output="dict",
+            country=["US", "JP"],
+            shuffle=True,
+        )
+        fields = {"name": string_field(preset="name")}
+        result = generate_dataframe(fields, config)
+        # With 50 US + 50 JP rows shuffled, it's very unlikely that all US
+        # rows come before all JP rows. But we can't deterministically know
+        # the exact order. Just verify row count is correct.
+        assert len(result["name"]) == 100
+
+    def test_shuffle_false_groups_by_country(self):
+        """With shuffle=False, rows are grouped by country in dict order."""
+        config = GeneratorConfig(
+            n=100,
+            seed=23,
+            output="dict",
+            country={"US": 0.5, "JP": 0.5},
+            shuffle=False,
+        )
+        # Use city preset since US and JP cities are distinguishable
+        fields = {"city": string_field(preset="city")}
+        result = generate_dataframe(fields, config)
+        assert len(result["city"]) == 100
+        # The first 50 should all be from US data, last 50 from JP.
+        # We can verify by generating the batches separately and comparing.
+        config_us = GeneratorConfig(
+            n=50, seed=(23 + hash("US")) % (2**31), output="dict", country="US"
+        )
+        config_jp = GeneratorConfig(
+            n=50, seed=(23 + hash("JP")) % (2**31), output="dict", country="JP"
+        )
+        us_only = generate_dataframe(fields, config_us)
+        jp_only = generate_dataframe(fields, config_jp)
+        assert result["city"][:50] == us_only["city"]
+        assert result["city"][50:] == jp_only["city"]
+
+    def test_shuffle_true_differs_from_false(self):
+        """shuffle=True and shuffle=False produce different row orderings."""
+        fields = {"name": string_field(preset="name")}
+        config_shuffled = GeneratorConfig(
+            n=100,
+            seed=23,
+            output="dict",
+            country=["US", "DE"],
+            shuffle=True,
+        )
+        config_blocked = GeneratorConfig(
+            n=100,
+            seed=23,
+            output="dict",
+            country=["US", "DE"],
+            shuffle=False,
+        )
+        result_shuffled = generate_dataframe(fields, config_shuffled)
+        result_blocked = generate_dataframe(fields, config_blocked)
+
+        # Same set of values, different order
+        assert sorted(result_shuffled["name"]) == sorted(result_blocked["name"])
+
+        # But different ordering (extremely unlikely to be same by chance)
+        assert result_shuffled["name"] != result_blocked["name"]
+
+    # ── Reproducibility ───────────────────────────────────────────────────
+
+    def test_reproducibility_list_form(self):
+        """Same seed + list country produces identical output."""
+        fields = {"name": string_field(preset="name")}
+        config1 = GeneratorConfig(n=50, seed=23, output="dict", country=["US", "DE"])
+        config2 = GeneratorConfig(n=50, seed=23, output="dict", country=["US", "DE"])
+        r1 = generate_dataframe(fields, config1)
+        r2 = generate_dataframe(fields, config2)
+
+        assert r1["name"] == r2["name"]
+
+    def test_reproducibility_dict_form(self):
+        """Same seed + dict country produces identical output."""
+        fields = {"city": string_field(preset="city")}
+        config1 = GeneratorConfig(n=50, seed=23, output="dict", country={"US": 0.8, "FR": 0.2})
+        config2 = GeneratorConfig(n=50, seed=23, output="dict", country={"US": 0.8, "FR": 0.2})
+        r1 = generate_dataframe(fields, config1)
+        r2 = generate_dataframe(fields, config2)
+        assert r1["city"] == r2["city"]
+
+    # ── Coherence within mixed rows ───────────────────────────────────────
+
+    def test_coherence_preserved_across_countries(self):
+        """Person coherence (name + email) works in multi-country mixing."""
+        import unicodedata
+
+        config = GeneratorConfig(
+            n=60,
+            seed=23,
+            output="dict",
+            country=["US", "FR"],
+            shuffle=False,
+        )
+        fields = {
+            "name": string_field(preset="name"),
+            "email": string_field(preset="email"),
+        }
+        result = generate_dataframe(fields, config)
+
+        def _strip_accents(s: str) -> str:
+            return "".join(
+                c for c in unicodedata.normalize("NFD", s) if unicodedata.category(c) != "Mn"
+            )
+
+        # Every email should contain some fragment of the name (lower-cased,
+        # accent-stripped, since emails drop diacritics).
+        for name, email in zip(result["name"], result["email"]):
+            normalized_name = _strip_accents(name.lower()).replace(".", "").replace("-", "")
+            name_parts = normalized_name.split()
+            email_local = (
+                email.split("@")[0].lower().replace(".", "").replace("_", "").replace("-", "")
+            )
+            found = any(part in email_local for part in name_parts if len(part) > 1)
+            assert found, f"Email '{email}' doesn't match name '{name}'"
+
+    def test_address_coherence_across_countries(self):
+        """Address coherence (city + postcode) works in multi-country mixing."""
+        config = GeneratorConfig(
+            n=40,
+            seed=23,
+            output="dict",
+            country=["US", "DE"],
+            shuffle=False,
+        )
+        fields = {
+            "city": string_field(preset="city"),
+            "postcode": string_field(preset="postcode"),
+        }
+        result = generate_dataframe(fields, config)
+        assert len(result["city"]) == 40
+        assert len(result["postcode"]) == 40
+
+    def test_schema_generate_list_form(self):
+        """Schema.generate() accepts list country form."""
+        from pointblank.schema import Schema
+
+        schema = Schema(name=string_field(preset="name"))
+        df = schema.generate(n=30, seed=23, output="dict", country=["US", "DE"])
+        assert len(df["name"]) == 30
+
+    def test_schema_generate_dict_form(self):
+        """Schema.generate() accepts dict country form."""
+        from pointblank.schema import Schema
+
+        schema = Schema(name=string_field(preset="name"))
+        df = schema.generate(n=30, seed=23, output="dict", country={"US": 0.7, "DE": 0.3})
+        assert len(df["name"]) == 30
+
+    def test_generate_dataset_function_list_form(self):
+        """generate_dataset() function accepts list country form."""
+        from pointblank.schema import Schema, generate_dataset as gen_ds
+
+        schema = Schema(name=string_field(preset="name"))
+        df = gen_ds(schema, n=30, seed=23, output="dict", country=["US", "FR"])
+        assert len(df["name"]) == 30
+
+    def test_generate_dataset_function_dict_form(self):
+        """generate_dataset() function accepts dict country form."""
+        from pointblank.schema import Schema, generate_dataset as gen_ds
+
+        schema = Schema(city=string_field(preset="city"))
+        df = gen_ds(schema, n=30, seed=23, output="dict", country={"US": 0.6, "JP": 0.4})
+        assert len(df["city"]) == 30
+
+    def test_generate_dataset_function_shuffle_param(self):
+        """generate_dataset() passes shuffle= through correctly."""
+        from pointblank.schema import Schema, generate_dataset as gen_ds
+
+        schema = Schema(name=string_field(preset="name"))
+        df_shuffled = gen_ds(
+            schema, n=50, seed=23, output="dict", country=["US", "DE"], shuffle=True
+        )
+        df_blocked = gen_ds(
+            schema, n=50, seed=23, output="dict", country=["US", "DE"], shuffle=False
+        )
+
+        # Same values, different order
+        assert sorted(df_shuffled["name"]) == sorted(df_blocked["name"])
+        assert df_shuffled["name"] != df_blocked["name"]
+
+    # ── Polars output format ──────────────────────────────────────────────
+
+    def test_polars_output_multi_country(self):
+        """Multi-country mixing works with Polars output."""
+        config = GeneratorConfig(n=30, seed=23, output="polars", country=["US", "DE"])
+        fields = {"name": string_field(preset="name")}
+        import polars as pl
+
+        result = generate_dataframe(fields, config)
+        assert isinstance(result, pl.DataFrame)
+        assert result.shape[0] == 30
+
+    # ── Non-preset columns in mixed mode ──────────────────────────────────
+
+    def test_non_preset_columns_work_in_mixed_mode(self):
+        """Integer and float columns work alongside country mixing."""
+        config = GeneratorConfig(
+            n=60,
+            seed=23,
+            output="dict",
+            country=["US", "DE", "FR"],
+        )
+
+        fields = {
+            "name": string_field(preset="name"),
+            "age": int_field(min_val=18, max_val=80),
+            "score": float_field(min_val=0.0, max_val=100.0),
+        }
+
+        result = generate_dataframe(fields, config)
+
+        assert len(result["name"]) == 60
+        assert len(result["age"]) == 60
+        assert len(result["score"]) == 60
+
+        # Age and score constraints should still hold
+        assert all(18 <= a <= 80 for a in result["age"])
+        assert all(0.0 <= s <= 100.0 for s in result["score"])
+
+    # ── Validation errors ─────────────────────────────────────────────────
+
+    def test_empty_list_raises_error(self):
+        """Empty list country raises ValueError."""
+        with pytest.raises(ValueError, match="country list must contain at least one"):
+            GeneratorConfig(n=10, country=[])
+
+    def test_empty_dict_raises_error(self):
+        """Empty dict country raises ValueError."""
+        with pytest.raises(ValueError, match="country dict must contain at least one"):
+            GeneratorConfig(n=10, country={})
+
+    def test_negative_weight_raises_error(self):
+        """Negative weight raises ValueError."""
+        with pytest.raises(ValueError, match="must be positive"):
+            GeneratorConfig(n=10, country={"US": -0.5, "DE": 0.5})
+
+    def test_zero_weight_raises_error(self):
+        """Zero weight raises ValueError."""
+        with pytest.raises(ValueError, match="must be positive"):
+            GeneratorConfig(n=10, country={"US": 0.0, "DE": 1.0})
+
+    def test_invalid_country_type_raises_error(self):
+        """Invalid country type raises TypeError."""
+        with pytest.raises(TypeError, match="must be a str, list\\[str\\], or dict"):
+            GeneratorConfig(n=10, country=42)  # type: ignore[arg-type]
 
 
 class TestLocaleDataFiles:

@@ -542,6 +542,36 @@ def generate_dataframe(
     DataFrame
         Generated DataFrame in the format specified by config.output.
     """
+    # Dispatch: single-country fast path vs. multi-country mixing path
+    country = config.country
+    if isinstance(country, str):
+        data = _generate_single_country(fields, config, country)
+    elif isinstance(country, list):
+        if len(country) == 1:
+            data = _generate_single_country(fields, config, country[0])
+        else:
+            weights = {c: 1.0 for c in country}
+            data = _generate_multi_country(fields, config, weights)
+    elif isinstance(country, dict):
+        if len(country) == 1:
+            data = _generate_single_country(fields, config, next(iter(country)))
+        else:
+            data = _generate_multi_country(fields, config, country)
+    else:
+        raise TypeError(
+            f"country must be str, list[str], or dict[str, float], got {type(country).__name__}"
+        )
+
+    # Convert to requested output format
+    return _to_output_format(data, config.output)
+
+
+def _generate_single_country(
+    fields: dict[str, Field],
+    config: GeneratorConfig,
+    country: str,
+) -> dict[str, list[Any]]:
+    """Generate data for a single country (original code path)."""
     # Check what coherence is needed
     needs_address, needs_person, needs_business = _get_coherence_needs(fields)
     needs_coherence = needs_address or needs_person or needs_business
@@ -549,7 +579,7 @@ def generate_dataframe(
     # Set up shared locale generator if any coherence is needed
     shared_locale_gen = None
     if needs_coherence:
-        shared_locale_gen = _get_locale_generator(config.country, config.seed)
+        shared_locale_gen = _get_locale_generator(country, config.seed)
         if needs_address:
             shared_locale_gen.init_row_locations(config.n)
         if needs_person:
@@ -609,11 +639,105 @@ def generate_dataframe(
         if needs_business:
             shared_locale_gen.clear_row_employers()
 
-    # Convert to requested output format
-    if config.output == "dict":
+    return data
+
+
+# ---------------------------------------------------------------------------
+# Multi-country mixing helpers
+# ---------------------------------------------------------------------------
+
+
+def _allocate_rows(weights: dict[str, float], n: int) -> dict[str, int]:
+    """Allocate *n* rows across countries proportionally to *weights*.
+
+    Uses largest-remainder allocation so counts always sum to exactly *n*.
+    """
+    total_weight = sum(weights.values())
+    # Initial allocation via floor
+    allocations = {k: int(n * w / total_weight) for k, w in weights.items()}
+    # Distribute remainder by largest fractional part
+    remainder = n - sum(allocations.values())
+    fractional = {k: (n * w / total_weight) - allocations[k] for k, w in weights.items()}
+    for k in sorted(fractional, key=lambda x: fractional[x], reverse=True)[:remainder]:
+        allocations[k] += 1
+    return allocations
+
+
+def _generate_multi_country(
+    fields: dict[str, Field],
+    config: GeneratorConfig,
+    weights: dict[str, float],
+) -> dict[str, list[Any]]:
+    """Generate data mixing rows from multiple countries.
+
+    Each row is pre-assigned to a country. Then each country's rows are
+    generated as an independent single-country batch (preserving coherence).
+    Finally the rows are interleaved (shuffled) or left in country blocks
+    depending on ``config.shuffle``.
+    """
+    allocations = _allocate_rows(weights, config.n)
+
+    # Filter out countries with 0 rows
+    allocations = {k: v for k, v in allocations.items() if v > 0}
+
+    if not allocations:
+        # Edge case: n=0
+        return {col_name: [] for col_name in fields}
+
+    # Generate per-country data batches.  Each batch gets a deterministic seed
+    # derived from the base seed + country code so results are reproducible and
+    # independent across countries.
+    country_batches: dict[str, dict[str, list[Any]]] = {}
+    country_order = list(allocations.keys())
+
+    for idx, country_code in enumerate(country_order):
+        n_rows = allocations[country_code]
+        if n_rows == 0:
+            continue
+
+        # Derive a per-country seed so that adding/removing a country doesn't
+        # change the data for the other countries.
+        if config.seed is not None:
+            country_seed = (config.seed + hash(country_code)) % (2**31)
+        else:
+            country_seed = None
+
+        from dataclasses import replace as _dc_replace
+
+        country_config = _dc_replace(config, n=n_rows, seed=country_seed, country=country_code)
+        country_batches[country_code] = _generate_single_country(
+            fields, country_config, country_code
+        )
+
+    # Build row-index ordering.  Start with country blocks in dict order.
+    row_indices: list[tuple[str, int]] = []
+    for country_code in country_order:
+        if country_code in country_batches:
+            n_rows = allocations[country_code]
+            for i in range(n_rows):
+                row_indices.append((country_code, i))
+
+    # Shuffle if requested (default)
+    if config.shuffle:
+        shuffle_rng = random.Random(config.seed)
+        shuffle_rng.shuffle(row_indices)
+
+    # Assemble final columns in the shuffled/block order
+    data: dict[str, list[Any]] = {col_name: [] for col_name in fields}
+    for country_code, local_row_idx in row_indices:
+        batch = country_batches[country_code]
+        for col_name in fields:
+            data[col_name].append(batch[col_name][local_row_idx])
+
+    return data
+
+
+def _to_output_format(data: dict[str, list[Any]], output: str) -> Any:
+    """Convert a dict-of-lists to the requested output format."""
+    if output == "dict":
         return data
 
-    if config.output == "polars":
+    if output == "polars":
         if not _is_lib_present("polars"):
             raise ImportError(
                 "The Polars library is not installed but is required when specifying "
@@ -623,7 +747,7 @@ def generate_dataframe(
 
         return pl.DataFrame(data)
 
-    if config.output == "pandas":
+    if output == "pandas":
         if not _is_lib_present("pandas"):
             raise ImportError(
                 "The Pandas library is not installed but is required when specifying "
@@ -633,4 +757,4 @@ def generate_dataframe(
 
         return pd.DataFrame(data)
 
-    raise ValueError(f"Unknown output format: {config.output}")
+    raise ValueError(f"Unknown output format: {output}")
