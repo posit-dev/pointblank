@@ -1,11 +1,3 @@
-"""
-Country-based data generation for synthetic test data.
-
-This module provides country-specific data generation without external dependencies.
-It supports generating realistic names, addresses, emails, and other data types
-with proper localization based on ISO 3166-1 country codes.
-"""
-
 from __future__ import annotations
 
 import json
@@ -587,9 +579,8 @@ class LocaleGenerator:
     def _get_person(self, gender: str | None = None) -> dict[str, str]:
         """Get a coherent person (first_name, last_name, gender) from the data.
 
-        If person data has ``ethnic_groups``, picks a group first (weighted by population
-        share) then draws first and last names from within that group so they remain
-        ethnically coherent.
+        If person data has `ethnic_groups`, picks a group first (weighted by population share) then
+        draws first and last names from within that group so they remain ethnically coherent.
         """
         # If no gender specified, randomly select one (weighted toward male/female)
         if gender is None:
@@ -678,8 +669,8 @@ class LocaleGenerator:
     def _generate_last_name(self, gender: str | None = None) -> str:
         """Generate a random last name (internal, no caching).
 
-        If last_names is a dict with 'male'/'female' keys (e.g., IS patronymics),
-        picks from the gender-appropriate list.
+        If last_names is a dict with 'male'/'female' keys (e.g., IS patronymics), picks from the
+        gender-appropriate list.
         """
         names = self._data.person.get("last_names", ["Smith"])
 
@@ -702,9 +693,9 @@ class LocaleGenerator:
         """
         Pre-generate person data for multiple rows to ensure coherence across columns.
 
-        This should be called before generating a dataset with person-related columns.
-        When active, first_name(), last_name(), name(), email() will use the person
-        for the current row (set via set_row()).
+        This should be called before generating a dataset with person-related columns. When active,
+        `first_name()`, `last_name()`, `name()`, `email()` will use the person for the current row
+        (set via `set_row()`).
 
         Parameters
         ----------
@@ -721,8 +712,8 @@ class LocaleGenerator:
         """
         Select a new random person and cache it for coherent generation.
 
-        Call this before generating related person components (first_name, last_name, email)
-        to ensure they all refer to the same person.
+        Call this before generating related person components (first_name, last_name, email) to
+        ensure they all refer to the same person.
 
         Returns
         -------

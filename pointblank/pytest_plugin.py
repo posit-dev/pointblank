@@ -42,8 +42,13 @@ def generate_dataset(request: pytest.FixtureRequest):
         Random seed.  When `None`, a seed is derived from the test's node ID.
     output : `"polars"` | `"pandas"` | `"dict"`, default `"polars"`
         Output format.
-    country : str, default `"US"`
-        Country code for locale-aware generation.
+    country : str | list[str] | dict[str, float], default `"US"`
+        Country code(s) for locale-aware generation. Accepts a single code
+        (e.g., `"US"`), a list for equal mixing (e.g., `["US", "DE"]`), or a
+        dict with weights (e.g., `{"US": 0.7, "DE": 0.3}`).
+    shuffle : bool, default `True`
+        When using multi-country mixing, interleave rows randomly (`True`) or
+        keep them grouped by country (`False`).
 
     Returns
     -------
@@ -91,7 +96,8 @@ def generate_dataset(request: pytest.FixtureRequest):
         n: int = 100,
         seed: int | None = None,
         output: Literal["polars", "pandas", "dict"] = "polars",
-        country: str = "US",
+        country: str | list[str] | dict[str, float] = "US",
+        shuffle: bool = True,
     ) -> Any:
         nonlocal call_count
 
@@ -105,7 +111,9 @@ def generate_dataset(request: pytest.FixtureRequest):
         # after a failure (e.g., `generate_dataset.last_seed`).
         _generate.last_seed = seed
 
-        return _generate_dataset(schema, n=n, seed=seed, output=output, country=country)
+        return _generate_dataset(
+            schema, n=n, seed=seed, output=output, country=country, shuffle=shuffle
+        )
 
     # Expose seed metadata on the callable so users can inspect it in
     # debuggers, assertion messages, or failure output.
