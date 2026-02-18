@@ -1394,7 +1394,7 @@ Validation steps can be thought of as sequential validations on the target
 data. We call `Validate`'s validation methods to build up a validation plan: a collection of steps
 that, in the aggregate, provides good validation coverage.
 
-col_vals_gt(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', value: 'float | int | Column', na_pass: 'bool' = False, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
+col_vals_gt(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', value: 'float | int | Column', na_pass: 'bool' = False, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True) -> 'Validate'
 
         Are column data greater than a fixed value or data in another column?
 
@@ -1447,9 +1447,14 @@ col_vals_gt(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSe
             the entire brief will be automatically generated. If `None` (the default) then there
             won't be a brief.
         active
-            A boolean value indicating whether the validation step should be active. Using `False`
-            will make the validation step inactive (still reporting its presence and keeping indexes
-            for the steps unchanged).
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing. Inspection
+            functions like [`has_columns()`](`pointblank.has_columns`) and
+            [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
+            based on properties of the target table.
 
         Returns
         -------
@@ -1619,7 +1624,7 @@ col_vals_gt(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSe
         - Row 3: `c` is `2` and `b` is `2`.
         
 
-col_vals_lt(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', value: 'float | int | Column', na_pass: 'bool' = False, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
+col_vals_lt(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', value: 'float | int | Column', na_pass: 'bool' = False, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True) -> 'Validate'
 
         Are column data less than a fixed value or data in another column?
 
@@ -1672,9 +1677,14 @@ col_vals_lt(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSe
             the entire brief will be automatically generated. If `None` (the default) then there
             won't be a brief.
         active
-            A boolean value indicating whether the validation step should be active. Using `False`
-            will make the validation step inactive (still reporting its presence and keeping indexes
-            for the steps unchanged).
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing. Inspection
+            functions like [`has_columns()`](`pointblank.has_columns`) and
+            [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
+            based on properties of the target table.
 
         Returns
         -------
@@ -1844,7 +1854,7 @@ col_vals_lt(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSe
         - Row 2: `b` is `1` and `c` is `1`.
         
 
-col_vals_ge(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', value: 'float | int | Column', na_pass: 'bool' = False, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
+col_vals_ge(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', value: 'float | int | Column', na_pass: 'bool' = False, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True) -> 'Validate'
 
         Are column data greater than or equal to a fixed value or data in another column?
 
@@ -1897,9 +1907,14 @@ col_vals_ge(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSe
             the entire brief will be automatically generated. If `None` (the default) then there
             won't be a brief.
         active
-            A boolean value indicating whether the validation step should be active. Using `False`
-            will make the validation step inactive (still reporting its presence and keeping indexes
-            for the steps unchanged).
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing. Inspection
+            functions like [`has_columns()`](`pointblank.has_columns`) and
+            [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
+            based on properties of the target table.
 
         Returns
         -------
@@ -2069,7 +2084,7 @@ col_vals_ge(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSe
         - Row 4: `b` is `3` and `c` is `4`.
         
 
-col_vals_le(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', value: 'float | int | Column', na_pass: 'bool' = False, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
+col_vals_le(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', value: 'float | int | Column', na_pass: 'bool' = False, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True) -> 'Validate'
 
         Are column data less than or equal to a fixed value or data in another column?
 
@@ -2122,9 +2137,14 @@ col_vals_le(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSe
             the entire brief will be automatically generated. If `None` (the default) then there
             won't be a brief.
         active
-            A boolean value indicating whether the validation step should be active. Using `False`
-            will make the validation step inactive (still reporting its presence and keeping indexes
-            for the steps unchanged).
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing. Inspection
+            functions like [`has_columns()`](`pointblank.has_columns`) and
+            [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
+            based on properties of the target table.
 
         Returns
         -------
@@ -2294,7 +2314,7 @@ col_vals_le(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSe
         - Row 4: `c` is `3` and `b` is `2`.
         
 
-col_vals_eq(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', value: 'float | int | Column', na_pass: 'bool' = False, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
+col_vals_eq(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', value: 'float | int | Column', na_pass: 'bool' = False, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True) -> 'Validate'
 
         Are column data equal to a fixed value or data in another column?
 
@@ -2347,9 +2367,14 @@ col_vals_eq(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSe
             the entire brief will be automatically generated. If `None` (the default) then there
             won't be a brief.
         active
-            A boolean value indicating whether the validation step should be active. Using `False`
-            will make the validation step inactive (still reporting its presence and keeping indexes
-            for the steps unchanged).
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing. Inspection
+            functions like [`has_columns()`](`pointblank.has_columns`) and
+            [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
+            based on properties of the target table.
 
         Returns
         -------
@@ -2517,7 +2542,7 @@ col_vals_eq(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSe
         - Row 5: `a` is `5` and `b` is `4`.
         
 
-col_vals_ne(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', value: 'float | int | Column', na_pass: 'bool' = False, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
+col_vals_ne(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', value: 'float | int | Column', na_pass: 'bool' = False, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True) -> 'Validate'
 
         Are column data not equal to a fixed value or data in another column?
 
@@ -2570,9 +2595,14 @@ col_vals_ne(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSe
             the entire brief will be automatically generated. If `None` (the default) then there
             won't be a brief.
         active
-            A boolean value indicating whether the validation step should be active. Using `False`
-            will make the validation step inactive (still reporting its presence and keeping indexes
-            for the steps unchanged).
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing. Inspection
+            functions like [`has_columns()`](`pointblank.has_columns`) and
+            [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
+            based on properties of the target table.
 
         Returns
         -------
@@ -2738,7 +2768,7 @@ col_vals_ne(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSe
         0 and 4, where `a` is `5` and `b` is `5` in both cases (i.e., they are equal to each other).
         
 
-col_vals_between(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', left: 'float | int | Column', right: 'float | int | Column', inclusive: 'tuple[bool, bool]' = (True, True), na_pass: 'bool' = False, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
+col_vals_between(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', left: 'float | int | Column', right: 'float | int | Column', inclusive: 'tuple[bool, bool]' = (True, True), na_pass: 'bool' = False, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True) -> 'Validate'
 
         Do column data lie between two specified values or data in other columns?
 
@@ -2801,9 +2831,14 @@ col_vals_between(self, columns: 'str | list[str] | Column | ColumnSelector | Col
             the entire brief will be automatically generated. If `None` (the default) then there
             won't be a brief.
         active
-            A boolean value indicating whether the validation step should be active. Using `False`
-            will make the validation step inactive (still reporting its presence and keeping indexes
-            for the steps unchanged).
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing. Inspection
+            functions like [`has_columns()`](`pointblank.has_columns`) and
+            [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
+            based on properties of the target table.
 
         Returns
         -------
@@ -2983,7 +3018,7 @@ col_vals_between(self, columns: 'str | list[str] | Column | ColumnSelector | Col
         - Row 4: `b` is `8` but the bounds are `3` (`a`) and `7` (`c`).
         
 
-col_vals_outside(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', left: 'float | int | Column', right: 'float | int | Column', inclusive: 'tuple[bool, bool]' = (True, True), na_pass: 'bool' = False, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
+col_vals_outside(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', left: 'float | int | Column', right: 'float | int | Column', inclusive: 'tuple[bool, bool]' = (True, True), na_pass: 'bool' = False, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True) -> 'Validate'
 
         Do column data lie outside of two specified values or data in other columns?
 
@@ -3046,9 +3081,14 @@ col_vals_outside(self, columns: 'str | list[str] | Column | ColumnSelector | Col
             the entire brief will be automatically generated. If `None` (the default) then there
             won't be a brief.
         active
-            A boolean value indicating whether the validation step should be active. Using `False`
-            will make the validation step inactive (still reporting its presence and keeping indexes
-            for the steps unchanged).
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing. Inspection
+            functions like [`has_columns()`](`pointblank.has_columns`) and
+            [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
+            based on properties of the target table.
 
         Returns
         -------
@@ -3228,7 +3268,7 @@ col_vals_outside(self, columns: 'str | list[str] | Column | ColumnSelector | Col
         - Row 5: `b` is `6` and the bounds are `5` (`a`) and `7` (`c`).
         
 
-col_vals_in_set(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', set: 'Collection[Any]', pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
+col_vals_in_set(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', set: 'Collection[Any]', pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True) -> 'Validate'
 
         Validate whether column values are in a set of values.
 
@@ -3276,9 +3316,14 @@ col_vals_in_set(self, columns: 'str | list[str] | Column | ColumnSelector | Colu
             the entire brief will be automatically generated. If `None` (the default) then there
             won't be a brief.
         active
-            A boolean value indicating whether the validation step should be active. Using `False`
-            will make the validation step inactive (still reporting its presence and keeping indexes
-            for the steps unchanged).
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing. Inspection
+            functions like [`has_columns()`](`pointblank.has_columns`) and
+            [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
+            based on properties of the target table.
 
         Returns
         -------
@@ -3475,7 +3520,7 @@ col_vals_in_set(self, columns: 'str | list[str] | Column | ColumnSelector | Colu
         specified set.
         
 
-col_vals_not_in_set(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', set: 'Collection[Any]', pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
+col_vals_not_in_set(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', set: 'Collection[Any]', pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True) -> 'Validate'
 
         Validate whether column values are not in a set of values.
 
@@ -3523,9 +3568,14 @@ col_vals_not_in_set(self, columns: 'str | list[str] | Column | ColumnSelector | 
             the entire brief will be automatically generated. If `None` (the default) then there
             won't be a brief.
         active
-            A boolean value indicating whether the validation step should be active. Using `False`
-            will make the validation step inactive (still reporting its presence and keeping indexes
-            for the steps unchanged).
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing. Inspection
+            functions like [`has_columns()`](`pointblank.has_columns`) and
+            [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
+            based on properties of the target table.
 
         Returns
         -------
@@ -3699,7 +3749,7 @@ col_vals_not_in_set(self, columns: 'str | list[str] | Column | ColumnSelector | 
         statuses in the `InvalidStatus` enum.
         
 
-col_vals_increasing(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', allow_stationary: 'bool' = False, decreasing_tol: 'float | None' = None, na_pass: 'bool' = False, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
+col_vals_increasing(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', allow_stationary: 'bool' = False, decreasing_tol: 'float | None' = None, na_pass: 'bool' = False, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True) -> 'Validate'
 
         Are column data increasing by row?
 
@@ -3758,9 +3808,14 @@ col_vals_increasing(self, columns: 'str | list[str] | Column | ColumnSelector | 
             the entire brief will be automatically generated. If `None` (the default) then there
             won't be a brief.
         active
-            A boolean value indicating whether the validation step should be active. Using `False`
-            will make the validation step inactive (still reporting its presence and keeping indexes
-            for the steps unchanged).
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing. Inspection
+            functions like [`has_columns()`](`pointblank.has_columns`) and
+            [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
+            based on properties of the target table.
 
         Returns
         -------
@@ -3827,7 +3882,7 @@ col_vals_increasing(self, columns: 'str | list[str] | Column | ColumnSelector | 
         ```
         
 
-col_vals_decreasing(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', allow_stationary: 'bool' = False, increasing_tol: 'float | None' = None, na_pass: 'bool' = False, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
+col_vals_decreasing(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', allow_stationary: 'bool' = False, increasing_tol: 'float | None' = None, na_pass: 'bool' = False, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True) -> 'Validate'
 
         Are column data decreasing by row?
 
@@ -3886,9 +3941,14 @@ col_vals_decreasing(self, columns: 'str | list[str] | Column | ColumnSelector | 
             the entire brief will be automatically generated. If `None` (the default) then there
             won't be a brief.
         active
-            A boolean value indicating whether the validation step should be active. Using `False`
-            will make the validation step inactive (still reporting its presence and keeping indexes
-            for the steps unchanged).
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing. Inspection
+            functions like [`has_columns()`](`pointblank.has_columns`) and
+            [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
+            based on properties of the target table.
 
         Returns
         -------
@@ -3955,7 +4015,7 @@ col_vals_decreasing(self, columns: 'str | list[str] | Column | ColumnSelector | 
         ```
         
 
-col_vals_null(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
+col_vals_null(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True) -> 'Validate'
 
         Validate whether values in a column are Null.
 
@@ -3997,9 +4057,14 @@ col_vals_null(self, columns: 'str | list[str] | Column | ColumnSelector | Column
             the entire brief will be automatically generated. If `None` (the default) then there
             won't be a brief.
         active
-            A boolean value indicating whether the validation step should be active. Using `False`
-            will make the validation step inactive (still reporting its presence and keeping indexes
-            for the steps unchanged).
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing. Inspection
+            functions like [`has_columns()`](`pointblank.has_columns`) and
+            [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
+            based on properties of the target table.
 
         Returns
         -------
@@ -4141,7 +4206,7 @@ col_vals_null(self, columns: 'str | list[str] | Column | ColumnSelector | Column
         two non-Null values in column `b`.
         
 
-col_vals_not_null(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
+col_vals_not_null(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True) -> 'Validate'
 
         Validate whether values in a column are not Null.
 
@@ -4183,9 +4248,14 @@ col_vals_not_null(self, columns: 'str | list[str] | Column | ColumnSelector | Co
             the entire brief will be automatically generated. If `None` (the default) then there
             won't be a brief.
         active
-            A boolean value indicating whether the validation step should be active. Using `False`
-            will make the validation step inactive (still reporting its presence and keeping indexes
-            for the steps unchanged).
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing. Inspection
+            functions like [`has_columns()`](`pointblank.has_columns`) and
+            [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
+            based on properties of the target table.
 
         Returns
         -------
@@ -4327,7 +4397,7 @@ col_vals_not_null(self, columns: 'str | list[str] | Column | ColumnSelector | Co
         two Null values in column `b`.
         
 
-col_vals_regex(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', pattern: 'str', na_pass: 'bool' = False, inverse: 'bool' = False, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
+col_vals_regex(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', pattern: 'str', na_pass: 'bool' = False, inverse: 'bool' = False, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True) -> 'Validate'
 
         Validate whether column values match a regular expression pattern.
 
@@ -4378,9 +4448,14 @@ col_vals_regex(self, columns: 'str | list[str] | Column | ColumnSelector | Colum
             the entire brief will be automatically generated. If `None` (the default) then there
             won't be a brief.
         active
-            A boolean value indicating whether the validation step should be active. Using `False`
-            will make the validation step inactive (still reporting its presence and keeping indexes
-            for the steps unchanged).
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing. Inspection
+            functions like [`has_columns()`](`pointblank.has_columns`) and
+            [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
+            based on properties of the target table.
 
         Returns
         -------
@@ -4523,7 +4598,7 @@ col_vals_regex(self, columns: 'str | list[str] | Column | ColumnSelector | Colum
         string values of rows 1 and 2 in column `b`.
         
 
-col_vals_within_spec(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', spec: 'str', na_pass: 'bool' = False, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
+col_vals_within_spec(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', spec: 'str', na_pass: 'bool' = False, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True) -> 'Validate'
 
         Validate whether column values fit within a specification.
 
@@ -4575,9 +4650,14 @@ col_vals_within_spec(self, columns: 'str | list[str] | Column | ColumnSelector |
             the entire brief will be automatically generated. If `None` (the default) then there
             won't be a brief.
         active
-            A boolean value indicating whether the validation step should be active. Using `False`
-            will make the validation step inactive (still reporting its presence and keeping indexes
-            for the steps unchanged).
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing. Inspection
+            functions like [`has_columns()`](`pointblank.has_columns`) and
+            [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
+            based on properties of the target table.
 
         Returns
         -------
@@ -4741,7 +4821,7 @@ col_vals_within_spec(self, columns: 'str | list[str] | Column | ColumnSelector |
         The validation table shows that one test unit failed (the invalid email address in row 3).
         
 
-col_vals_expr(self, expr: 'Any', pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
+col_vals_expr(self, expr: 'Any', pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True) -> 'Validate'
 
         Validate column values using a custom expression.
 
@@ -4784,9 +4864,14 @@ col_vals_expr(self, expr: 'Any', pre: 'Callable | None' = None, segments: 'Segme
             the entire brief will be automatically generated. If `None` (the default) then there
             won't be a brief.
         active
-            A boolean value indicating whether the validation step should be active. Using `False`
-            will make the validation step inactive (still reporting its presence and keeping indexes
-            for the steps unchanged).
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing. Inspection
+            functions like [`has_columns()`](`pointblank.has_columns`) and
+            [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
+            based on properties of the target table.
 
         Returns
         -------
@@ -4912,7 +4997,7 @@ col_vals_expr(self, expr: 'Any', pre: 'Callable | None' = None, segments: 'Segme
         by using `col_vals_expr()`. All test units passed, with no failing test units.
         
 
-col_sum_gt(self: 'Validate', columns: 'str | Collection[str]', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool' = True) -> 'Validate'
+col_sum_gt(self: 'Validate', columns: 'str | Collection[str]', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool | Callable' = True) -> 'Validate'
 Does the column sum satisfy a greater than comparison?
 
     The `col_sum_gt()` validation method checks whether the sum of values in a column
@@ -4960,9 +5045,14 @@ Does the column sum satisfy a greater than comparison?
         levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
         define the actions.
     active
-        A boolean value indicating whether the validation step should be active. Using `False`
-        will make the validation step inactive (still reporting its presence and keeping indexes
-        for the steps unchanged).
+        A boolean value or callable that determines whether the validation step should be
+        active. Using `False` will make the validation step inactive (still reporting its
+        presence and keeping indexes for the steps unchanged). A callable can also be
+        provided; it will receive the data table as its single argument and must return a
+        boolean value. The callable is evaluated *before* any `pre=` processing.
+        Inspection functions like [`has_columns()`](`pointblank.has_columns`) and
+        [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate
+        a step based on properties of the target table.
 
     Returns
     -------
@@ -5088,7 +5178,7 @@ Does the column sum satisfy a greater than comparison?
     validation
     ```
 
-col_sum_lt(self: 'Validate', columns: 'str | Collection[str]', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool' = True) -> 'Validate'
+col_sum_lt(self: 'Validate', columns: 'str | Collection[str]', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool | Callable' = True) -> 'Validate'
 Does the column sum satisfy a less than comparison?
 
     The `col_sum_lt()` validation method checks whether the sum of values in a column
@@ -5136,9 +5226,14 @@ Does the column sum satisfy a less than comparison?
         levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
         define the actions.
     active
-        A boolean value indicating whether the validation step should be active. Using `False`
-        will make the validation step inactive (still reporting its presence and keeping indexes
-        for the steps unchanged).
+        A boolean value or callable that determines whether the validation step should be
+        active. Using `False` will make the validation step inactive (still reporting its
+        presence and keeping indexes for the steps unchanged). A callable can also be
+        provided; it will receive the data table as its single argument and must return a
+        boolean value. The callable is evaluated *before* any `pre=` processing.
+        Inspection functions like [`has_columns()`](`pointblank.has_columns`) and
+        [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate
+        a step based on properties of the target table.
 
     Returns
     -------
@@ -5264,7 +5359,7 @@ Does the column sum satisfy a less than comparison?
     validation
     ```
 
-col_sum_ge(self: 'Validate', columns: 'str | Collection[str]', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool' = True) -> 'Validate'
+col_sum_ge(self: 'Validate', columns: 'str | Collection[str]', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool | Callable' = True) -> 'Validate'
 Does the column sum satisfy a greater than or equal to comparison?
 
     The `col_sum_ge()` validation method checks whether the sum of values in a column
@@ -5312,9 +5407,14 @@ Does the column sum satisfy a greater than or equal to comparison?
         levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
         define the actions.
     active
-        A boolean value indicating whether the validation step should be active. Using `False`
-        will make the validation step inactive (still reporting its presence and keeping indexes
-        for the steps unchanged).
+        A boolean value or callable that determines whether the validation step should be
+        active. Using `False` will make the validation step inactive (still reporting its
+        presence and keeping indexes for the steps unchanged). A callable can also be
+        provided; it will receive the data table as its single argument and must return a
+        boolean value. The callable is evaluated *before* any `pre=` processing.
+        Inspection functions like [`has_columns()`](`pointblank.has_columns`) and
+        [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate
+        a step based on properties of the target table.
 
     Returns
     -------
@@ -5440,7 +5540,7 @@ Does the column sum satisfy a greater than or equal to comparison?
     validation
     ```
 
-col_sum_le(self: 'Validate', columns: 'str | Collection[str]', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool' = True) -> 'Validate'
+col_sum_le(self: 'Validate', columns: 'str | Collection[str]', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool | Callable' = True) -> 'Validate'
 Does the column sum satisfy a less than or equal to comparison?
 
     The `col_sum_le()` validation method checks whether the sum of values in a column
@@ -5488,9 +5588,14 @@ Does the column sum satisfy a less than or equal to comparison?
         levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
         define the actions.
     active
-        A boolean value indicating whether the validation step should be active. Using `False`
-        will make the validation step inactive (still reporting its presence and keeping indexes
-        for the steps unchanged).
+        A boolean value or callable that determines whether the validation step should be
+        active. Using `False` will make the validation step inactive (still reporting its
+        presence and keeping indexes for the steps unchanged). A callable can also be
+        provided; it will receive the data table as its single argument and must return a
+        boolean value. The callable is evaluated *before* any `pre=` processing.
+        Inspection functions like [`has_columns()`](`pointblank.has_columns`) and
+        [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate
+        a step based on properties of the target table.
 
     Returns
     -------
@@ -5616,7 +5721,7 @@ Does the column sum satisfy a less than or equal to comparison?
     validation
     ```
 
-col_sum_eq(self: 'Validate', columns: 'str | Collection[str]', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool' = True) -> 'Validate'
+col_sum_eq(self: 'Validate', columns: 'str | Collection[str]', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool | Callable' = True) -> 'Validate'
 Does the column sum satisfy an equal to comparison?
 
     The `col_sum_eq()` validation method checks whether the sum of values in a column
@@ -5665,9 +5770,14 @@ Does the column sum satisfy an equal to comparison?
         levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
         define the actions.
     active
-        A boolean value indicating whether the validation step should be active. Using `False`
-        will make the validation step inactive (still reporting its presence and keeping indexes
-        for the steps unchanged).
+        A boolean value or callable that determines whether the validation step should be
+        active. Using `False` will make the validation step inactive (still reporting its
+        presence and keeping indexes for the steps unchanged). A callable can also be
+        provided; it will receive the data table as its single argument and must return a
+        boolean value. The callable is evaluated *before* any `pre=` processing.
+        Inspection functions like [`has_columns()`](`pointblank.has_columns`) and
+        [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate
+        a step based on properties of the target table.
 
     Returns
     -------
@@ -5794,7 +5904,7 @@ Does the column sum satisfy an equal to comparison?
     validation
     ```
 
-col_avg_gt(self: 'Validate', columns: 'str | Collection[str]', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool' = True) -> 'Validate'
+col_avg_gt(self: 'Validate', columns: 'str | Collection[str]', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool | Callable' = True) -> 'Validate'
 Does the column average satisfy a greater than comparison?
 
     The `col_avg_gt()` validation method checks whether the average of values in a column
@@ -5842,9 +5952,14 @@ Does the column average satisfy a greater than comparison?
         levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
         define the actions.
     active
-        A boolean value indicating whether the validation step should be active. Using `False`
-        will make the validation step inactive (still reporting its presence and keeping indexes
-        for the steps unchanged).
+        A boolean value or callable that determines whether the validation step should be
+        active. Using `False` will make the validation step inactive (still reporting its
+        presence and keeping indexes for the steps unchanged). A callable can also be
+        provided; it will receive the data table as its single argument and must return a
+        boolean value. The callable is evaluated *before* any `pre=` processing.
+        Inspection functions like [`has_columns()`](`pointblank.has_columns`) and
+        [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate
+        a step based on properties of the target table.
 
     Returns
     -------
@@ -5970,7 +6085,7 @@ Does the column average satisfy a greater than comparison?
     validation
     ```
 
-col_avg_lt(self: 'Validate', columns: 'str | Collection[str]', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool' = True) -> 'Validate'
+col_avg_lt(self: 'Validate', columns: 'str | Collection[str]', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool | Callable' = True) -> 'Validate'
 Does the column average satisfy a less than comparison?
 
     The `col_avg_lt()` validation method checks whether the average of values in a column
@@ -6018,9 +6133,14 @@ Does the column average satisfy a less than comparison?
         levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
         define the actions.
     active
-        A boolean value indicating whether the validation step should be active. Using `False`
-        will make the validation step inactive (still reporting its presence and keeping indexes
-        for the steps unchanged).
+        A boolean value or callable that determines whether the validation step should be
+        active. Using `False` will make the validation step inactive (still reporting its
+        presence and keeping indexes for the steps unchanged). A callable can also be
+        provided; it will receive the data table as its single argument and must return a
+        boolean value. The callable is evaluated *before* any `pre=` processing.
+        Inspection functions like [`has_columns()`](`pointblank.has_columns`) and
+        [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate
+        a step based on properties of the target table.
 
     Returns
     -------
@@ -6146,7 +6266,7 @@ Does the column average satisfy a less than comparison?
     validation
     ```
 
-col_avg_ge(self: 'Validate', columns: 'str | Collection[str]', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool' = True) -> 'Validate'
+col_avg_ge(self: 'Validate', columns: 'str | Collection[str]', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool | Callable' = True) -> 'Validate'
 Does the column average satisfy a greater than or equal to comparison?
 
     The `col_avg_ge()` validation method checks whether the average of values in a column
@@ -6194,9 +6314,14 @@ Does the column average satisfy a greater than or equal to comparison?
         levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
         define the actions.
     active
-        A boolean value indicating whether the validation step should be active. Using `False`
-        will make the validation step inactive (still reporting its presence and keeping indexes
-        for the steps unchanged).
+        A boolean value or callable that determines whether the validation step should be
+        active. Using `False` will make the validation step inactive (still reporting its
+        presence and keeping indexes for the steps unchanged). A callable can also be
+        provided; it will receive the data table as its single argument and must return a
+        boolean value. The callable is evaluated *before* any `pre=` processing.
+        Inspection functions like [`has_columns()`](`pointblank.has_columns`) and
+        [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate
+        a step based on properties of the target table.
 
     Returns
     -------
@@ -6322,7 +6447,7 @@ Does the column average satisfy a greater than or equal to comparison?
     validation
     ```
 
-col_avg_le(self: 'Validate', columns: 'str | Collection[str]', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool' = True) -> 'Validate'
+col_avg_le(self: 'Validate', columns: 'str | Collection[str]', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool | Callable' = True) -> 'Validate'
 Does the column average satisfy a less than or equal to comparison?
 
     The `col_avg_le()` validation method checks whether the average of values in a column
@@ -6370,9 +6495,14 @@ Does the column average satisfy a less than or equal to comparison?
         levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
         define the actions.
     active
-        A boolean value indicating whether the validation step should be active. Using `False`
-        will make the validation step inactive (still reporting its presence and keeping indexes
-        for the steps unchanged).
+        A boolean value or callable that determines whether the validation step should be
+        active. Using `False` will make the validation step inactive (still reporting its
+        presence and keeping indexes for the steps unchanged). A callable can also be
+        provided; it will receive the data table as its single argument and must return a
+        boolean value. The callable is evaluated *before* any `pre=` processing.
+        Inspection functions like [`has_columns()`](`pointblank.has_columns`) and
+        [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate
+        a step based on properties of the target table.
 
     Returns
     -------
@@ -6498,7 +6628,7 @@ Does the column average satisfy a less than or equal to comparison?
     validation
     ```
 
-col_avg_eq(self: 'Validate', columns: 'str | Collection[str]', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool' = True) -> 'Validate'
+col_avg_eq(self: 'Validate', columns: 'str | Collection[str]', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool | Callable' = True) -> 'Validate'
 Does the column average satisfy an equal to comparison?
 
     The `col_avg_eq()` validation method checks whether the average of values in a column
@@ -6547,9 +6677,14 @@ Does the column average satisfy an equal to comparison?
         levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
         define the actions.
     active
-        A boolean value indicating whether the validation step should be active. Using `False`
-        will make the validation step inactive (still reporting its presence and keeping indexes
-        for the steps unchanged).
+        A boolean value or callable that determines whether the validation step should be
+        active. Using `False` will make the validation step inactive (still reporting its
+        presence and keeping indexes for the steps unchanged). A callable can also be
+        provided; it will receive the data table as its single argument and must return a
+        boolean value. The callable is evaluated *before* any `pre=` processing.
+        Inspection functions like [`has_columns()`](`pointblank.has_columns`) and
+        [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate
+        a step based on properties of the target table.
 
     Returns
     -------
@@ -6676,7 +6811,7 @@ Does the column average satisfy an equal to comparison?
     validation
     ```
 
-col_sd_gt(self: 'Validate', columns: 'str | Collection[str]', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool' = True) -> 'Validate'
+col_sd_gt(self: 'Validate', columns: 'str | Collection[str]', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool | Callable' = True) -> 'Validate'
 Does the column standard deviation satisfy a greater than comparison?
 
     The `col_sd_gt()` validation method checks whether the standard deviation of values in a column
@@ -6724,9 +6859,14 @@ Does the column standard deviation satisfy a greater than comparison?
         levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
         define the actions.
     active
-        A boolean value indicating whether the validation step should be active. Using `False`
-        will make the validation step inactive (still reporting its presence and keeping indexes
-        for the steps unchanged).
+        A boolean value or callable that determines whether the validation step should be
+        active. Using `False` will make the validation step inactive (still reporting its
+        presence and keeping indexes for the steps unchanged). A callable can also be
+        provided; it will receive the data table as its single argument and must return a
+        boolean value. The callable is evaluated *before* any `pre=` processing.
+        Inspection functions like [`has_columns()`](`pointblank.has_columns`) and
+        [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate
+        a step based on properties of the target table.
 
     Returns
     -------
@@ -6852,7 +6992,7 @@ Does the column standard deviation satisfy a greater than comparison?
     validation
     ```
 
-col_sd_lt(self: 'Validate', columns: 'str | Collection[str]', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool' = True) -> 'Validate'
+col_sd_lt(self: 'Validate', columns: 'str | Collection[str]', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool | Callable' = True) -> 'Validate'
 Does the column standard deviation satisfy a less than comparison?
 
     The `col_sd_lt()` validation method checks whether the standard deviation of values in a column
@@ -6900,9 +7040,14 @@ Does the column standard deviation satisfy a less than comparison?
         levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
         define the actions.
     active
-        A boolean value indicating whether the validation step should be active. Using `False`
-        will make the validation step inactive (still reporting its presence and keeping indexes
-        for the steps unchanged).
+        A boolean value or callable that determines whether the validation step should be
+        active. Using `False` will make the validation step inactive (still reporting its
+        presence and keeping indexes for the steps unchanged). A callable can also be
+        provided; it will receive the data table as its single argument and must return a
+        boolean value. The callable is evaluated *before* any `pre=` processing.
+        Inspection functions like [`has_columns()`](`pointblank.has_columns`) and
+        [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate
+        a step based on properties of the target table.
 
     Returns
     -------
@@ -7028,7 +7173,7 @@ Does the column standard deviation satisfy a less than comparison?
     validation
     ```
 
-col_sd_ge(self: 'Validate', columns: 'str | Collection[str]', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool' = True) -> 'Validate'
+col_sd_ge(self: 'Validate', columns: 'str | Collection[str]', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool | Callable' = True) -> 'Validate'
 Does the column standard deviation satisfy a greater than or equal to comparison?
 
     The `col_sd_ge()` validation method checks whether the standard deviation of values in a column
@@ -7076,9 +7221,14 @@ Does the column standard deviation satisfy a greater than or equal to comparison
         levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
         define the actions.
     active
-        A boolean value indicating whether the validation step should be active. Using `False`
-        will make the validation step inactive (still reporting its presence and keeping indexes
-        for the steps unchanged).
+        A boolean value or callable that determines whether the validation step should be
+        active. Using `False` will make the validation step inactive (still reporting its
+        presence and keeping indexes for the steps unchanged). A callable can also be
+        provided; it will receive the data table as its single argument and must return a
+        boolean value. The callable is evaluated *before* any `pre=` processing.
+        Inspection functions like [`has_columns()`](`pointblank.has_columns`) and
+        [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate
+        a step based on properties of the target table.
 
     Returns
     -------
@@ -7204,7 +7354,7 @@ Does the column standard deviation satisfy a greater than or equal to comparison
     validation
     ```
 
-col_sd_le(self: 'Validate', columns: 'str | Collection[str]', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool' = True) -> 'Validate'
+col_sd_le(self: 'Validate', columns: 'str | Collection[str]', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool | Callable' = True) -> 'Validate'
 Does the column standard deviation satisfy a less than or equal to comparison?
 
     The `col_sd_le()` validation method checks whether the standard deviation of values in a column
@@ -7252,9 +7402,14 @@ Does the column standard deviation satisfy a less than or equal to comparison?
         levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
         define the actions.
     active
-        A boolean value indicating whether the validation step should be active. Using `False`
-        will make the validation step inactive (still reporting its presence and keeping indexes
-        for the steps unchanged).
+        A boolean value or callable that determines whether the validation step should be
+        active. Using `False` will make the validation step inactive (still reporting its
+        presence and keeping indexes for the steps unchanged). A callable can also be
+        provided; it will receive the data table as its single argument and must return a
+        boolean value. The callable is evaluated *before* any `pre=` processing.
+        Inspection functions like [`has_columns()`](`pointblank.has_columns`) and
+        [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate
+        a step based on properties of the target table.
 
     Returns
     -------
@@ -7380,7 +7535,7 @@ Does the column standard deviation satisfy a less than or equal to comparison?
     validation
     ```
 
-col_sd_eq(self: 'Validate', columns: 'str | Collection[str]', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool' = True) -> 'Validate'
+col_sd_eq(self: 'Validate', columns: 'str | Collection[str]', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool | Callable' = True) -> 'Validate'
 Does the column standard deviation satisfy an equal to comparison?
 
     The `col_sd_eq()` validation method checks whether the standard deviation of values in a column
@@ -7429,9 +7584,14 @@ Does the column standard deviation satisfy an equal to comparison?
         levels. If provided, the [`Actions`](`pointblank.Actions`) class should be used to
         define the actions.
     active
-        A boolean value indicating whether the validation step should be active. Using `False`
-        will make the validation step inactive (still reporting its presence and keeping indexes
-        for the steps unchanged).
+        A boolean value or callable that determines whether the validation step should be
+        active. Using `False` will make the validation step inactive (still reporting its
+        presence and keeping indexes for the steps unchanged). A callable can also be
+        provided; it will receive the data table as its single argument and must return a
+        boolean value. The callable is evaluated *before* any `pre=` processing.
+        Inspection functions like [`has_columns()`](`pointblank.has_columns`) and
+        [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate
+        a step based on properties of the target table.
 
     Returns
     -------
@@ -7558,7 +7718,7 @@ Does the column standard deviation satisfy an equal to comparison?
     validation
     ```
 
-rows_distinct(self, columns_subset: 'str | list[str] | None' = None, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
+rows_distinct(self, columns_subset: 'str | list[str] | None' = None, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True) -> 'Validate'
 
         Validate whether rows in the table are distinct.
 
@@ -7600,9 +7760,14 @@ rows_distinct(self, columns_subset: 'str | list[str] | None' = None, pre: 'Calla
             the entire brief will be automatically generated. If `None` (the default) then there
             won't be a brief.
         active
-            A boolean value indicating whether the validation step should be active. Using `False`
-            will make the validation step inactive (still reporting its presence and keeping indexes
-            for the steps unchanged).
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing. Inspection
+            functions like [`has_columns()`](`pointblank.has_columns`) and
+            [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
+            based on properties of the target table.
 
         Returns
         -------
@@ -7748,7 +7913,7 @@ rows_distinct(self, columns_subset: 'str | list[str] | None' = None, pre: 'Calla
         others.
         
 
-rows_complete(self, columns_subset: 'str | list[str] | None' = None, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
+rows_complete(self, columns_subset: 'str | list[str] | None' = None, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True) -> 'Validate'
 
         Validate whether row data are complete by having no missing values.
 
@@ -7790,9 +7955,14 @@ rows_complete(self, columns_subset: 'str | list[str] | None' = None, pre: 'Calla
             the entire brief will be automatically generated. If `None` (the default) then there
             won't be a brief.
         active
-            A boolean value indicating whether the validation step should be active. Using `False`
-            will make the validation step inactive (still reporting its presence and keeping indexes
-            for the steps unchanged).
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing. Inspection
+            functions like [`has_columns()`](`pointblank.has_columns`) and
+            [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
+            based on properties of the target table.
 
         Returns
         -------
@@ -7938,7 +8108,7 @@ rows_complete(self, columns_subset: 'str | list[str] | None' = None, pre: 'Calla
         others.
         
 
-col_exists(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
+col_exists(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True) -> 'Validate'
 
         Validate whether one or more columns exist in the table.
 
@@ -7970,9 +8140,14 @@ col_exists(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSel
             the entire brief will be automatically generated. If `None` (the default) then there
             won't be a brief.
         active
-            A boolean value indicating whether the validation step should be active. Using `False`
-            will make the validation step inactive (still reporting its presence and keeping indexes
-            for the steps unchanged).
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing. Inspection
+            functions like [`has_columns()`](`pointblank.has_columns`) and
+            [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
+            based on properties of the target table.
 
         Returns
         -------
@@ -8060,7 +8235,7 @@ col_exists(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSel
         failing validation step (the check for column `c`, which doesn't exist).
         
 
-col_pct_null(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', p: 'float', tol: 'Tolerance' = 0, thresholds: 'int | float | None | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
+col_pct_null(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnSelectorNarwhals', p: 'float', tol: 'Tolerance' = 0, thresholds: 'int | float | None | bool | tuple | dict | Thresholds' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True) -> 'Validate'
 
         Validate whether a column has a specific percentage of Null values.
 
@@ -8103,9 +8278,14 @@ col_pct_null(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnS
             the entire brief will be automatically generated. If `None` (the default) then there
             won't be a brief.
         active
-            A boolean value indicating whether the validation step should be active. Using `False`
-            will make the validation step inactive (still reporting its presence and keeping indexes
-            for the steps unchanged).
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing. Inspection
+            functions like [`has_columns()`](`pointblank.has_columns`) and
+            [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
+            based on properties of the target table.
 
         Returns
         -------
@@ -8301,7 +8481,7 @@ col_pct_null(self, columns: 'str | list[str] | Column | ColumnSelector | ColumnS
         calculates to 2.7 to 3.9, which rounds down to 2 to 3 rows).
         
 
-data_freshness(self, column: 'str', max_age: 'str | datetime.timedelta', reference_time: 'datetime.datetime | str | None' = None, timezone: 'str | None' = None, allow_tz_mismatch: 'bool' = False, pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
+data_freshness(self, column: 'str', max_age: 'str | datetime.timedelta', reference_time: 'datetime.datetime | str | None' = None, timezone: 'str | None' = None, allow_tz_mismatch: 'bool' = False, pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True) -> 'Validate'
 
         Validate that data in a datetime column is not older than a specified maximum age.
 
@@ -8357,9 +8537,14 @@ data_freshness(self, column: 'str', max_age: 'str | datetime.timedelta', referen
             the entire brief will be automatically generated. If `None` (the default) then there
             won't be a brief.
         active
-            A boolean value indicating whether the validation step should be active. Using `False`
-            will make the validation step inactive (still reporting its presence and keeping indexes
-            for the steps unchanged).
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing. Inspection
+            functions like [`has_columns()`](`pointblank.has_columns`) and
+            [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
+            based on properties of the target table.
 
         Returns
         -------
@@ -8566,7 +8751,7 @@ data_freshness(self, column: 'str', max_age: 'str | datetime.timedelta', referen
         ```
         
 
-col_schema_match(self, schema: 'Schema', complete: 'bool' = True, in_order: 'bool' = True, case_sensitive_colnames: 'bool' = True, case_sensitive_dtypes: 'bool' = True, full_match_dtypes: 'bool' = True, pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
+col_schema_match(self, schema: 'Schema', complete: 'bool' = True, in_order: 'bool' = True, case_sensitive_colnames: 'bool' = True, case_sensitive_dtypes: 'bool' = True, full_match_dtypes: 'bool' = True, pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True) -> 'Validate'
 
         Do columns in the table (and their types) match a predefined schema?
 
@@ -8624,9 +8809,14 @@ col_schema_match(self, schema: 'Schema', complete: 'bool' = True, in_order: 'boo
             the entire brief will be automatically generated. If `None` (the default) then there
             won't be a brief.
         active
-            A boolean value indicating whether the validation step should be active. Using `False`
-            will make the validation step inactive (still reporting its presence and keeping indexes
-            for the steps unchanged).
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing. Inspection
+            functions like [`has_columns()`](`pointblank.has_columns`) and
+            [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
+            based on properties of the target table.
 
         Returns
         -------
@@ -8726,7 +8916,7 @@ col_schema_match(self, schema: 'Schema', complete: 'bool' = True, in_order: 'boo
         since the table columns and their types match the schema.
         
 
-row_count_match(self, count: 'int | Any', tol: 'Tolerance' = 0, inverse: 'bool' = False, pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
+row_count_match(self, count: 'int | Any', tol: 'Tolerance' = 0, inverse: 'bool' = False, pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True) -> 'Validate'
 
         Validate whether the row count of the table matches a specified count.
 
@@ -8777,9 +8967,14 @@ row_count_match(self, count: 'int | Any', tol: 'Tolerance' = 0, inverse: 'bool' 
             the entire brief will be automatically generated. If `None` (the default) then there
             won't be a brief.
         active
-            A boolean value indicating whether the validation step should be active. Using `False`
-            will make the validation step inactive (still reporting its presence and keeping indexes
-            for the steps unchanged).
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing. Inspection
+            functions like [`has_columns()`](`pointblank.has_columns`) and
+            [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
+            based on properties of the target table.
 
         Returns
         -------
@@ -8880,7 +9075,7 @@ row_count_match(self, count: 'int | Any', tol: 'Tolerance' = 0, inverse: 'bool' 
 
         
 
-col_count_match(self, count: 'int | Any', inverse: 'bool' = False, pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
+col_count_match(self, count: 'int | Any', inverse: 'bool' = False, pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True) -> 'Validate'
 
         Validate whether the column count of the table matches a specified count.
 
@@ -8923,9 +9118,14 @@ col_count_match(self, count: 'int | Any', inverse: 'bool' = False, pre: 'Callabl
             the entire brief will be automatically generated. If `None` (the default) then there
             won't be a brief.
         active
-            A boolean value indicating whether the validation step should be active. Using `False`
-            will make the validation step inactive (still reporting its presence and keeping indexes
-            for the steps unchanged).
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing. Inspection
+            functions like [`has_columns()`](`pointblank.has_columns`) and
+            [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
+            based on properties of the target table.
 
         Returns
         -------
@@ -8995,7 +9195,7 @@ col_count_match(self, count: 'int | Any', inverse: 'bool' = False, pre: 'Callabl
         columns in the target table. So, the single test unit passed.
         
 
-tbl_match(self, tbl_compare: 'Any', pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
+tbl_match(self, tbl_compare: 'Any', pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True) -> 'Validate'
 
         Validate whether the target table matches a comparison table.
 
@@ -9042,9 +9242,14 @@ tbl_match(self, tbl_compare: 'Any', pre: 'Callable | None' = None, thresholds: '
             the entire brief will be automatically generated. If `None` (the default) then there
             won't be a brief.
         active
-            A boolean value indicating whether the validation step should be active. Using `False`
-            will make the validation step inactive (still reporting its presence and keeping indexes
-            for the steps unchanged).
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing. Inspection
+            functions like [`has_columns()`](`pointblank.has_columns`) and
+            [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
+            based on properties of the target table.
 
         Returns
         -------
@@ -9218,7 +9423,7 @@ tbl_match(self, tbl_compare: 'Any', pre: 'Callable | None' = None, thresholds: '
         (one value is different in column `c`).
         
 
-conjointly(self, *exprs: 'Callable', pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
+conjointly(self, *exprs: 'Callable', pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True) -> 'Validate'
 
         Perform multiple row-wise validations for joint validity.
 
@@ -9261,9 +9466,14 @@ conjointly(self, *exprs: 'Callable', pre: 'Callable | None' = None, thresholds: 
             the entire brief will be automatically generated. If `None` (the default) then there
             won't be a brief.
         active
-            A boolean value indicating whether the validation step should be active. Using `False`
-            will make the validation step inactive (still reporting its presence and keeping indexes
-            for the steps unchanged).
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing. Inspection
+            functions like [`has_columns()`](`pointblank.has_columns`) and
+            [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
+            based on properties of the target table.
 
         Returns
         -------
@@ -9417,7 +9627,7 @@ conjointly(self, *exprs: 'Callable', pre: 'Callable | None' = None, thresholds: 
         information on how to use it with different table backends.
         
 
-specially(self, expr: 'Callable', pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
+specially(self, expr: 'Callable', pre: 'Callable | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True) -> 'Validate'
 
         Perform a specialized validation with customized logic.
 
@@ -9475,9 +9685,14 @@ specially(self, expr: 'Callable', pre: 'Callable | None' = None, thresholds: 'in
             the entire brief will be automatically generated. If `None` (the default) then there
             won't be a brief.
         active
-            A boolean value indicating whether the validation step should be active. Using `False`
-            will make the validation step inactive (still reporting its presence and keeping indexes
-            for the steps unchanged).
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing. Inspection
+            functions like [`has_columns()`](`pointblank.has_columns`) and
+            [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
+            based on properties of the target table.
 
         Returns
         -------
@@ -9717,7 +9932,7 @@ specially(self, expr: 'Callable', pre: 'Callable | None' = None, thresholds: 'in
         virtually any data quality requirement in your organization.
         
 
-prompt(self, prompt: 'str', model: 'str', columns_subset: 'str | list[str] | None' = None, batch_size: 'int' = 1000, max_concurrent: 'int' = 3, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool' = True) -> 'Validate'
+prompt(self, prompt: 'str', model: 'str', columns_subset: 'str | list[str] | None' = None, batch_size: 'int' = 1000, max_concurrent: 'int' = 3, pre: 'Callable | None' = None, segments: 'SegmentSpec | None' = None, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, actions: 'Actions | None' = None, brief: 'str | bool | None' = None, active: 'bool | Callable' = True) -> 'Validate'
 
         Validate rows using AI/LLM-powered analysis.
 
@@ -9790,9 +10005,14 @@ prompt(self, prompt: 'str', model: 'str', columns_subset: 'str | list[str] | Non
             the entire brief will be automatically generated. If `None` (the default) then there
             won't be a brief.
         active
-            A boolean value indicating whether the validation step should be active. Using `False`
-            will make the validation step inactive (still reporting its presence and keeping indexes
-            for the steps unchanged).
+            A boolean value or callable that determines whether the validation step should be
+            active. Using `False` will make the validation step inactive (still reporting its
+            presence and keeping indexes for the steps unchanged). A callable can also be
+            provided; it will receive the data table as its single argument and must return a
+            boolean value. The callable is evaluated *before* any `pre=` processing. Inspection
+            functions like [`has_columns()`](`pointblank.has_columns`) and
+            [`has_rows()`](`pointblank.has_rows`) can be used here to conditionally activate a step
+            based on properties of the target table.
 
         Returns
         -------
@@ -15529,29 +15749,30 @@ generate_dataset(schema: 'Schema', n: 'int' = 100, seed: 'int | None' = None, ou
     Generate synthetic test data from a schema.
 
     This function generates random data that conforms to a schema's column definitions. When the
-    schema is defined using `Field` objects with constraints (e.g., `min_val`, `max_val`,
-    `pattern`, `preset`), the generated data will respect those constraints.
-
-    This is a convenience function that wraps `Schema.generate()` for a more functional style
-    of usage, similar to how `load_dataset()` loads built-in datasets.
+    schema is defined using `Field` objects with constraints (e.g., `min_val=`, `max_val=`,
+    `pattern=`, `preset=`), the generated data will respect those constraints.
 
     Parameters
     ----------
     schema
-        The schema object defining the structure and constraints of the data to generate.
+        The schema object defining the structure and constraints of the data to generate. Each
+        column can be specified using a field helper function (e.g., `int_field()`,
+        `string_field()`) for fine-grained control, or as a simple dtype string (e.g.,
+        `"Int64"`, `"String"`) for unconstrained generation.
     n
-        Number of rows to generate. Default is `100`.
+        Number of rows to generate. The default is `100`.
     seed
         Random seed for reproducibility. If provided, the same seed will produce
         the same data. Default is `None` (non-deterministic).
     output
-        Output format for the generated data. Options are: (1) `"polars"` (default) returns a
+        Output format for the generated data. Options are: (1) `"polars"` (the default) returns a
         Polars DataFrame, (2) `"pandas"` returns a Pandas DataFrame, and (3) `"dict"` returns
         a dictionary of lists.
     country
-        Country code for realistic data generation when using presets (e.g., `preset="email"`,
-        `preset="address"`). Accepts ISO 3166-1 alpha-2 codes (e.g., `"US"`, `"DE"`, `"FR"`)
-        or alpha-3 codes (e.g., `"USA"`, `"DEU"`, `"FRA"`). Default is `"US"`.
+        Country code for locale-aware generation when using presets. Accepts ISO 3166-1 alpha-2
+        codes (e.g., `"US"`, `"DE"`, `"FR"`) or alpha-3 codes (e.g., `"USA"`, `"DEU"`, `"FRA"`).
+        This affects the format and content of preset-generated data such as addresses, phone
+        numbers, names, and postal codes. The default is `"US"`.
 
     Returns
     -------
@@ -15565,12 +15786,37 @@ generate_dataset(schema: 'Schema', n: 'int' = 100, seed: 'int | None' = None, ou
     ImportError
         If required optional dependencies are not installed.
 
+    Presets and the `country=` Parameter
+    ------------------------------------
+    Several `string_field()` presets produce locale-aware data that varies depending on the
+    `country=` parameter. The following presets are particularly affected:
+
+    - **Address-related presets** (`"address"`, `"city"`, `"state"`, `"postcode"`,
+      `"phone_number"`, `"latitude"`, `"longitude"`, `"license_plate"`): produce addresses,
+      cities, postal codes, phone numbers, and license plates formatted for the specified
+      country. For example, `country="DE"` yields German street names and PLZ postal codes,
+      while `country="JP"` yields Japanese addresses. License plates for CA, US, DE, AU, and
+      GB use province/state-specific formats when location fields are present.
+    - **Person-related presets** (`"name"`, `"name_full"`, `"first_name"`, `"last_name"`,
+      `"email"`, `"user_name"`) produce culturally appropriate names for the specified country.
+      For example, `country="FR"` produces French names, while `country="KR"` produces Korean
+      names.
+    - **Business-related presets** (`"job"`, `"company"`): when both are present, the job and
+      company are drawn from the same industry for realism. The `"name_full"` preset will also
+      add profession-matched titles (e.g., "Dr." for doctors, "Prof." for professors), and
+      integer columns named `age` are automatically constrained to working-age range (22--65).
+    - **Financial presets** (`"iban"`, `"ssn"`, `"license_plate"`): produce identifiers in the
+      format used by the specified country.
+
+    When multiple columns in the same schema use related presets, the generated data is
+    automatically coherent across those columns within each row. Person-related presets will share
+    the same identity (e.g., the email is derived from the name), address-related presets will
+    share the same location (e.g., the city matches the address), and business-related presets
+    will share the same industry context.
+
     Supported Countries
     -------------------
-    The `country=` parameter controls the country used for generating realistic data with
-    presets (e.g., `preset="email"`, `preset="address"`). This affects location-specific
-    formats like addresses, phone numbers, and postal codes. Currently, **50 countries** are
-    supported with full locale data:
+    The `country=` parameter currently supports 55 countries with full locale data:
 
     **Europe (32 countries):** Austria (`"AT"`), Belgium (`"BE"`), Bulgaria (`"BG"`),
     Croatia (`"HR"`), Cyprus (`"CY"`), Czech Republic (`"CZ"`), Denmark (`"DK"`),
@@ -15584,15 +15830,71 @@ generate_dataset(schema: 'Schema', n: 'int' = 100, seed: 'int | None' = None, ou
     **Americas (7 countries):** Argentina (`"AR"`), Brazil (`"BR"`), Canada (`"CA"`),
     Chile (`"CL"`), Colombia (`"CO"`), Mexico (`"MX"`), United States (`"US"`)
 
-    **Asia-Pacific (10 countries):** Australia (`"AU"`), China (`"CN"`), Hong Kong (`"HK"`),
+    **Asia-Pacific (12 countries):** Australia (`"AU"`), China (`"CN"`), Hong Kong (`"HK"`),
     India (`"IN"`), Indonesia (`"ID"`), Japan (`"JP"`), New Zealand (`"NZ"`),
-    Philippines (`"PH"`), South Korea (`"KR"`), Taiwan (`"TW"`)
+    Philippines (`"PH"`), Singapore (`"SG"`), South Korea (`"KR"`), Taiwan (`"TW"`),
+    Thailand (`"TH"`)
 
-    **Middle East (1 country):** Turkey (`"TR"`)
+    **Middle East & Africa (4 countries):** Nigeria (`"NG"`), South Africa (`"ZA"`),
+    Turkey (`"TR"`), United Arab Emirates (`"AE"`)
+
+    Pytest Fixture
+    --------------
+    When Pointblank is installed, a `generate_dataset` pytest fixture is automatically
+    available in all test files: no imports or `conftest.py` setup required. The fixture
+    behaves identically to this function, but derives a deterministic seed from the test's
+    fully-qualified name when `seed=` is not provided.
+
+    This means:
+
+    - the **same test** always produces the **same data**, with no manual seed management.
+    - **different tests** get different seeds, so they exercise different data.
+    - **you** can still pass an explicit `seed=` to override the automatic seed.
+    - **calling** the fixture **multiple times** within one test produces different (but still
+    deterministic) data on each call.
+    - the fixture exposes `.default_seed` and `.last_seed` attributes for debugging.
+
+    ```python
+    def test_my_pipeline(generate_dataset):
+        import pointblank as pb
+
+        schema = pb.Schema(
+            user_id=pb.int_field(unique=True),
+            email=pb.string_field(preset="email"),
+            age=pb.int_field(min_val=18, max_val=100),
+        )
+        df = generate_dataset(schema, n=500, country="DE")
+        # seed is derived from "test_my_pipeline" — same data every run
+        result = my_pipeline(df)
+        assert result.shape[0] == 500
+    ```
+
+    Multiple datasets can be generated within the same test, each with its own
+    deterministic seed:
+
+    When a test fails, include the seed in the assertion message so the failure is easy to
+    reproduce:
+
+    ```python
+    def test_age_range(generate_dataset):
+        df = generate_dataset(schema, n=100)
+        assert df["age"].min() >= 18, f"Failed with seed {generate_dataset.last_seed}"
+    ```
+
+    Seed Stability
+    --------------
+    A given seed (whether explicit or auto-derived) is guaranteed to produce identical output
+    **within the same Pointblank version**. Across versions, changes to country data files or
+    generator logic may alter the output for a given seed.
+
+    For CI pipelines that require bit-exact data across library upgrades, save generated
+    DataFrames as Parquet or CSV snapshot files rather than relying on cross-version seed
+    stability. This is the same approach used by snapshot-testing tools like `pytest-snapshot`
+    and `syrupy`.
 
     Examples
     --------
-    Generate test data from a schema with field constraints:
+    Here we define a schema with field constraints and generate test data from it:
 
     ```python
     import pointblank as pb
@@ -15604,18 +15906,20 @@ generate_dataset(schema: 'Schema', n: 'int' = 100, seed: 'int | None' = None, ou
         status=pb.string_field(allowed=["active", "pending", "inactive"]),
     )
 
-    # Generate 100 rows of test data
     pb.preview(pb.generate_dataset(schema, n=100, seed=23))
     ```
 
-    Generate data from a simple dtype-only schema as a Pandas DataFrame:
+    It's also possible to generate data from a simple, dtype-only schema. Setting
+    `output="pandas"` returns a Pandas DataFrame:
 
     ```python
     schema = pb.Schema(name="String", age="Int64", active="Boolean")
+
     pb.preview(pb.generate_dataset(schema, n=50, seed=23, output="pandas"))
     ```
 
-    Generate data with German addresses by using `country="DE"`:
+    When using presets, the `country=` parameter controls the locale. Here, `country="DE"`
+    produces German names and addresses:
 
     ```python
     schema = pb.Schema(
@@ -15623,65 +15927,158 @@ generate_dataset(schema: 'Schema', n: 'int' = 100, seed: 'int | None' = None, ou
         address=pb.string_field(preset="address"),
         city=pb.string_field(preset="city"),
     )
+
     pb.preview(pb.generate_dataset(schema, n=20, seed=23, country="DE"))
+    ```
+
+    We can combine several field types with nullable columns in a mixed-type dataset:
+
+    ```python
+    from datetime import date, timedelta
+
+    schema = pb.Schema(
+        id=pb.int_field(min_val=1, unique=True),
+        name=pb.string_field(preset="name"),
+        score=pb.float_field(min_val=0.0, max_val=100.0),
+        is_active=pb.bool_field(p_true=0.75),
+        joined=pb.date_field(min_date=date(2020, 1, 1), max_date=date(2024, 12, 31)),
+        session_time=pb.duration_field(
+            min_duration=timedelta(minutes=1),
+            max_duration=timedelta(hours=3),
+            nullable=True, null_probability=0.2,
+        ),
+    )
+
+    pb.generate_dataset(schema, n=50, seed=23)
     ```
     
 
 int_field(min_val: 'int | None' = None, max_val: 'int | None' = None, allowed: 'list[int] | None' = None, nullable: 'bool' = False, null_probability: 'float' = 0.0, unique: 'bool' = False, generator: 'Callable[[], Any] | None' = None, dtype: 'str' = 'Int64') -> 'IntField'
 
-    Create an integer column specification.
+    Create an integer column specification for use in a schema.
+
+    The `int_field()` function defines the constraints and behavior for an integer column when
+    generating synthetic data with `generate_dataset()`. You can control the range of values
+    with `min_val=` and `max_val=`, restrict values to a specific set with `allowed=`, enforce
+    uniqueness with `unique=True`, and introduce null values with `nullable=True` and
+    `null_probability=`. The `dtype=` parameter lets you choose the specific integer type (e.g.,
+    `"Int8"`, `"UInt16"`, `"Int64"`), which also determines the valid range of values.
+
+    When no constraints are specified, values are drawn uniformly from the full range of the
+    chosen integer dtype. If both `min_val=` and `max_val=` are provided, values are drawn
+    uniformly from that range. If `allowed=` is provided, values are sampled from that specific
+    list.
 
     Parameters
     ----------
     min_val
-        Minimum value (inclusive). Default is `None` (no minimum).
+        Minimum value (inclusive). Default is `None` (no minimum, uses dtype lower bound).
     max_val
-        Maximum value (inclusive). Default is `None` (no maximum).
+        Maximum value (inclusive). Default is `None` (no maximum, uses dtype upper bound).
     allowed
-        List of allowed values (categorical constraint). When provided,
-        values are sampled from this list.
+        List of allowed values (categorical constraint). When provided, values are sampled from
+        this list. Cannot be combined with `min_val=`/`max_val=`.
     nullable
         Whether the column can contain null values. Default is `False`.
     null_probability
-        Probability of generating null when `nullable=True`. Default is `0.0`.
+        Probability of generating a null value for each row when `nullable=True`. Must be
+        between `0.0` and `1.0`. Default is `0.0`.
     unique
-        Whether all values must be unique. Default is `False`.
+        Whether all values must be unique. Default is `False`. When `True`, the generator will
+        retry until it produces `n` distinct values (subject to retry limits).
     generator
-        Custom callable that generates values. Overrides other settings.
+        Custom callable that generates values. When provided, this overrides all other
+        constraints (`min_val=`, `max_val=`, `allowed=`, etc.). The callable should take no
+        arguments and return a single integer value.
     dtype
-        Integer dtype. Default is `"Int64"`. Options: `"Int8"`, `"Int16"`,
-        `"Int32"`, `"Int64"`, `"UInt8"`, `"UInt16"`, `"UInt32"`, `"UInt64"`.
+        Integer dtype. Default is `"Int64"`. Options: `"Int8"`, `"Int16"`, `"Int32"`,
+        `"Int64"`, `"UInt8"`, `"UInt16"`, `"UInt32"`, `"UInt64"`.
 
     Returns
     -------
     IntField
-        An integer field specification.
+        An integer field specification that can be passed to `Schema()`.
+
+    Raises
+    ------
+    ValueError
+        If `min_val` is greater than `max_val`, if `allowed` is an empty list, if
+        `null_probability` is not between `0.0` and `1.0`, or if `dtype` is not a valid
+        integer type.
 
     Examples
     --------
-    Define a schema with integer fields and generate test data:
+    The `min_val=` and `max_val=` parameters constrain generated ranges, while `allowed=`
+    restricts values to a specific set:
 
     ```python
     import pointblank as pb
 
-    # Define a schema with integer field specifications
     schema = pb.Schema(
         user_id=pb.int_field(min_val=1, unique=True),
         age=pb.int_field(min_val=0, max_val=120),
         rating=pb.int_field(allowed=[1, 2, 3, 4, 5]),
     )
 
-    # Generate 100 rows of test data
     pb.preview(pb.generate_dataset(schema, n=100, seed=23))
     ```
 
-    The generated data will have unique user IDs starting from `1`, ages between `0`-`120`,
-    and ratings sampled from the allowed values.
+    It's possible to introduce missing values with `nullable=True` and `null_probability=`,
+    and to select a smaller dtype with `dtype=`:
+
+    ```python
+    schema = pb.Schema(
+        score=pb.int_field(min_val=0, max_val=255, dtype="UInt8"),
+        optional_val=pb.int_field(
+            min_val=1, max_val=50,
+            nullable=True, null_probability=0.3,
+        ),
+    )
+
+    pb.preview(pb.generate_dataset(schema, n=50, seed=23))
+    ```
+
+    We can also enforce uniqueness with `unique=True` to produce distinct identifiers within
+    a range:
+
+    ```python
+    schema = pb.Schema(
+        record_id=pb.int_field(min_val=1000, max_val=9999, unique=True),
+        priority=pb.int_field(allowed=[1, 2, 3]),
+    )
+
+    pb.preview(pb.generate_dataset(schema, n=30, seed=10))
+    ```
+
+    For complete control, a custom `generator=` callable can be provided:
+
+    ```python
+    import random
+
+    rng = random.Random(0)
+
+    schema = pb.Schema(
+        even_numbers=pb.int_field(generator=lambda: rng.choice(range(0, 100, 2))),
+    )
+
+    pb.preview(pb.generate_dataset(schema, n=20, seed=5))
+    ```
     
 
 float_field(min_val: 'float | None' = None, max_val: 'float | None' = None, allowed: 'list[float] | None' = None, nullable: 'bool' = False, null_probability: 'float' = 0.0, unique: 'bool' = False, generator: 'Callable[[], Any] | None' = None, dtype: 'str' = 'Float64') -> 'FloatField'
 
-    Create a floating-point column specification.
+    Create a floating-point column specification for use in a schema.
+
+    The `float_field()` function defines the constraints and behavior for a floating-point column
+    when generating synthetic data with `generate_dataset()`. You can control the range of values
+    with `min_val=` and `max_val=`, restrict values to a specific set with `allowed=`, enforce
+    uniqueness with `unique=True`, and introduce null values with `nullable=True` and
+    `null_probability=`. The `dtype=` parameter lets you choose between `"Float32"` and
+    `"Float64"` precision.
+
+    When both `min_val=` and `max_val=` are provided, values are drawn from a uniform
+    distribution across that range. If neither is specified, values are drawn uniformly from a
+    large default range. If `allowed=` is provided, values are sampled from that specific list.
 
     Parameters
     ----------
@@ -15690,346 +16087,737 @@ float_field(min_val: 'float | None' = None, max_val: 'float | None' = None, allo
     max_val
         Maximum value (inclusive). Default is `None` (no maximum).
     allowed
-        List of allowed values (categorical constraint). When provided,
-        values are sampled from this list.
+        List of allowed values (categorical constraint). When provided, values are sampled from
+        this list. Cannot be combined with `min_val=`/`max_val=`.
     nullable
         Whether the column can contain null values. Default is `False`.
     null_probability
-        Probability of generating null when `nullable=True`. Default is `0.0`.
+        Probability of generating a null value for each row when `nullable=True`. Must be
+        between `0.0` and `1.0`. Default is `0.0`.
     unique
-        Whether all values must be unique. Default is `False`.
+        Whether all values must be unique. Default is `False`. When `True`, the generator will
+        retry until it produces `n` distinct values.
     generator
-        Custom callable that generates values. Overrides other settings.
+        Custom callable that generates values. When provided, this overrides all other
+        constraints. The callable should take no arguments and return a single float value.
     dtype
         Float dtype. Default is `"Float64"`. Options: `"Float32"`, `"Float64"`.
 
     Returns
     -------
     FloatField
-        A float field specification.
+        A float field specification that can be passed to `Schema()`.
+
+    Raises
+    ------
+    ValueError
+        If `min_val` is greater than `max_val`, if `allowed` is an empty list, if
+        `null_probability` is not between `0.0` and `1.0`, or if `dtype` is not a valid
+        float type.
 
     Examples
     --------
-    Define a schema with float fields and generate test data:
+    The `min_val=` and `max_val=` parameters define the generated value ranges:
 
     ```python
     import pointblank as pb
 
-    # Define a schema with float field specifications
     schema = pb.Schema(
         price=pb.float_field(min_val=0.01, max_val=9999.99),
         probability=pb.float_field(min_val=0.0, max_val=1.0),
         temperature=pb.float_field(min_val=-40.0, max_val=50.0),
     )
 
-    # Generate 100 rows of test data
     pb.preview(pb.generate_dataset(schema, n=100, seed=23))
     ```
 
-    Values are uniformly distributed across the specified ranges.
+    It's also possible to restrict values to a discrete set with `allowed=`, which is useful
+    for fixed pricing tiers or measurement levels:
+
+    ```python
+    schema = pb.Schema(
+        discount=pb.float_field(allowed=[0.05, 0.10, 0.15, 0.20, 0.25]),
+        weight_kg=pb.float_field(min_val=0.5, max_val=100.0),
+    )
+
+    pb.preview(pb.generate_dataset(schema, n=50, seed=23))
+    ```
+
+    We can simulate missing measurements by introducing null values:
+
+    ```python
+    schema = pb.Schema(
+        reading=pb.float_field(
+            min_val=0.0, max_val=500.0,
+            nullable=True, null_probability=0.2,
+        ),
+        calibration=pb.float_field(min_val=0.9, max_val=1.1),
+    )
+
+    pb.preview(pb.generate_dataset(schema, n=30, seed=7))
+    ```
+
+    Setting `dtype="Float32"` gives reduced precision, and a custom `generator=` provides
+    full control over value generation:
+
+    ```python
+    import random, math
+
+    rng = random.Random(0)
+
+    schema = pb.Schema(
+        sensor_value=pb.float_field(min_val=-10.0, max_val=10.0, dtype="Float32"),
+        log_value=pb.float_field(generator=lambda: math.log(rng.uniform(1, 1000))),
+    )
+
+    pb.preview(pb.generate_dataset(schema, n=20, seed=99))
+    ```
     
 
 string_field(min_length: 'int | None' = None, max_length: 'int | None' = None, pattern: 'str | None' = None, preset: 'str | None' = None, allowed: 'list[str] | None' = None, nullable: 'bool' = False, null_probability: 'float' = 0.0, unique: 'bool' = False, generator: 'Callable[[], Any] | None' = None) -> 'StringField'
 
-    Create a string column specification.
+    Create a string column specification for use in a schema.
+
+    The `string_field()` function defines the constraints and behavior for a string column when
+    generating synthetic data with `generate_dataset()`. It provides three main modes of string
+    generation: (1) controlled random strings with `min_length=`/`max_length=`, (2) strings
+    matching a regular expression via `pattern=`, or (3) realistic data using `preset=` (e.g.,
+    `"email"`, `"name"`, `"address"`). You can also restrict values to a fixed set with
+    `allowed=`. Only one of `preset=`, `pattern=`, or `allowed=` can be specified at a time.
+
+    When no special mode is selected, random alphanumeric strings are generated with lengths
+    between `min_length=` and `max_length=` (defaulting to 1--20 characters).
 
     Parameters
     ----------
     min_length
-        Minimum string length. Default is `None` (no minimum).
+        Minimum string length (for random string generation). Default is `None` (defaults to
+        `1`). Only applies when `preset=`, `pattern=`, and `allowed=` are all `None`.
     max_length
-        Maximum string length. Default is `None` (no maximum).
+        Maximum string length (for random string generation). Default is `None` (defaults to
+        `20`). Only applies when `preset=`, `pattern=`, and `allowed=` are all `None`.
     pattern
-        Regular expression pattern for generated strings.
+        Regular expression pattern that generated strings must match. Supports character
+        classes (e.g., `[A-Z]`, `[0-9]`), quantifiers (e.g., `{3}`, `{2,5}`), alternation,
+        and groups. Cannot be combined with `preset=` or `allowed=`.
     preset
-        Preset for realistic data (e.g., `"email"`, `"name"`, `"phone_number"`).
+        Preset name for generating realistic data. When specified, values are produced using
+        locale-aware data generation, and the `country=` parameter of `generate_dataset()`
+        controls the locale. Cannot be combined with `pattern=` or `allowed=`. See the
+        **Available Presets** section below for the full list.
     allowed
-        List of allowed values (categorical constraint).
+        List of allowed string values (categorical constraint). Values are sampled uniformly
+        from this list. Cannot be combined with `preset=` or `pattern=`.
     nullable
         Whether the column can contain null values. Default is `False`.
     null_probability
-        Probability of generating null when `nullable=True`. Default is `0.0`.
+        Probability of generating a null value for each row when `nullable=True`. Must be
+        between `0.0` and `1.0`. Default is `0.0`.
     unique
-        Whether all values must be unique. Default is `False`.
+        Whether all values must be unique. Default is `False`. When `True`, the generator will
+        retry until it produces `n` distinct values.
     generator
-        Custom callable that generates values. Overrides other settings.
+        Custom callable that generates values. When provided, this overrides all other
+        constraints. The callable should take no arguments and return a single string value.
 
     Returns
     -------
     StringField
-        A string field specification.
+        A string field specification that can be passed to `Schema()`.
+
+    Raises
+    ------
+    ValueError
+        If more than one of `preset=`, `pattern=`, or `allowed=` is specified; if `allowed=`
+        is an empty list; if `min_length` or `max_length` is negative; if `min_length` exceeds
+        `max_length`; or if `preset` is not a recognized preset name.
+
+    Available Presets
+    -----------------
+    The `preset=` parameter accepts one of the following preset names, organized by category.
+    When a preset is used, the `country=` parameter of `generate_dataset()` controls the locale
+    for region-specific formatting (e.g., address formats, phone number patterns).
+
+    **Personal:** `"name"` (first + last name), `"name_full"` (full name with possible prefix
+    or suffix), `"first_name"`, `"last_name"`, `"email"` (realistic email address),
+    `"phone_number"`, `"address"` (full street address), `"city"`, `"state"`, `"country"`,
+    `"postcode"`, `"latitude"`, `"longitude"`
+
+    **Business:** `"company"` (company name), `"job"` (job title), `"catch_phrase"`
+
+    **Internet:** `"url"`, `"domain_name"`, `"ipv4"`, `"ipv6"`, `"user_name"`, `"password"`
+
+    **Text:** `"text"` (paragraph of text), `"sentence"`, `"paragraph"`, `"word"`
+
+    **Financial:** `"credit_card_number"`, `"iban"`, `"currency_code"`
+
+    **Identifiers:** `"uuid4"`, `"md5"` (MD5 hash, 32 hex chars), `"sha1"` (SHA-1 hash,
+    40 hex chars), `"sha256"` (SHA-256 hash, 64 hex chars), `"ssn"` (social security number),
+    `"license_plate"`
+
+    **Barcodes:** `"ean8"` (EAN-8 barcode with valid check digit), `"ean13"` (EAN-13 barcode
+    with valid check digit)
+
+    **Date/Time (as strings):** `"date_this_year"`, `"date_this_decade"`, `"date_between"`
+    (random date between 2000–2025), `"date_range"` (two dates joined with an en-dash, e.g.,
+    `"2012-05-12 – 2015-11-22"`), `"future_date"` (up to 1 year ahead), `"past_date"`
+    (up to 10 years back), `"time"`
+
+    **Miscellaneous:** `"color_name"`, `"file_name"`, `"file_extension"`, `"mime_type"`
+
+    Coherent Data Generation
+    ------------------------
+    When multiple columns in the same schema use related presets, the generated data will be
+    coherent across those columns within each row. Specifically:
+
+    - **Person-related presets** (`"name"`, `"name_full"`, `"first_name"`, `"last_name"`,
+      `"email"`, `"user_name"`): the email and username will be derived from the person's name.
+    - **Address-related presets** (`"address"`, `"city"`, `"state"`, `"postcode"`,
+      `"phone_number"`, `"latitude"`, `"longitude"`): the city, state, and postcode will
+      correspond to the same location within the address.
+
+    This coherence is automatic and requires no additional configuration.
 
     Examples
     --------
-    Define a schema with string fields and generate test data:
+    The `preset=` parameter generates realistic personal data, while `allowed=` restricts
+    values to a categorical set:
 
     ```python
     import pointblank as pb
 
-    # Define a schema with string field specifications
     schema = pb.Schema(
         name=pb.string_field(preset="name"),
         email=pb.string_field(preset="email", unique=True),
         status=pb.string_field(allowed=["active", "pending", "inactive"]),
-        code=pb.string_field(pattern=r"[A-Z]{3}-[0-9]{4}"),
     )
 
-    # Generate 100 rows of test data
     pb.preview(pb.generate_dataset(schema, n=100, seed=23))
     ```
 
-    The generated data will have coherent names and emails (derived from the name),
-    statuses sampled from the allowed values, and codes matching the regex pattern.
+    We can also generate strings that match a regular expression with `pattern=` (e.g.,
+    product codes, identifiers):
+
+    ```python
+    schema = pb.Schema(
+        product_code=pb.string_field(pattern=r"[A-Z]{3}-[0-9]{4}"),
+        batch_id=pb.string_field(pattern=r"BATCH-[A-Z][0-9]{3}"),
+        sku=pb.string_field(pattern=r"[A-Z]{2}[0-9]{6}"),
+    )
+
+    pb.preview(pb.generate_dataset(schema, n=30, seed=23))
+    ```
+
+    For random alphanumeric strings, `min_length=` and `max_length=` control the length.
+    Adding `nullable=True` introduces missing values:
+
+    ```python
+    schema = pb.Schema(
+        short_code=pb.string_field(min_length=3, max_length=5),
+        notes=pb.string_field(
+            min_length=10, max_length=50,
+            nullable=True, null_probability=0.4,
+        ),
+    )
+
+    pb.preview(pb.generate_dataset(schema, n=30, seed=7))
+    ```
+
+    It's possible to combine business and internet presets to build a company directory:
+
+    ```python
+    schema = pb.Schema(
+        company=pb.string_field(preset="company"),
+        domain=pb.string_field(preset="domain_name"),
+        industry_tag=pb.string_field(allowed=["tech", "finance", "health", "retail"]),
+    )
+
+    pb.preview(pb.generate_dataset(schema, n=20, seed=55))
+    ```
     
 
 bool_field(p_true: 'float' = 0.5, nullable: 'bool' = False, null_probability: 'float' = 0.0, unique: 'bool' = False, generator: 'Callable[[], Any] | None' = None) -> 'BoolField'
 
-    Create a boolean column specification.
+    Create a boolean column specification for use in a schema.
+
+    The `bool_field()` function defines the constraints and behavior for a boolean column when
+    generating synthetic data with `generate_dataset()`. The `p_true=` parameter controls the
+    probability of generating `True` values, which is useful for simulating real-world
+    distributions where events may be rare or common (e.g., 5% fraud rate, 80% active users).
+
+    By default, `True` and `False` are equally likely (`p_true=0.5`). Setting `p_true=0.0`
+    produces all `False` values, and `p_true=1.0` produces all `True` values.
 
     Parameters
     ----------
     p_true
         Probability of generating `True`. Default is `0.5` (equal probability).
-        Must be between 0.0 and 1.0.
+        Must be between `0.0` and `1.0`.
     nullable
         Whether the column can contain null values. Default is `False`.
     null_probability
-        Probability of generating null when `nullable=True`. Default is `0.0`.
+        Probability of generating a null value for each row when `nullable=True`. Must be
+        between `0.0` and `1.0`. Default is `0.0`.
     unique
-        Whether all values must be unique. Default is `False`.
-        Note: Boolean can only have 2 unique non-null values.
+        Whether all values must be unique. Default is `False`. Note that boolean columns can
+        only have 2 unique non-null values, so `n` must be `<= 2` when `unique=True` (or
+        `<= 3` with `nullable=True`).
     generator
-        Custom callable that generates values. Overrides other settings.
+        Custom callable that generates values. When provided, this overrides all other
+        constraints. The callable should take no arguments and return a single boolean value.
 
     Returns
     -------
     BoolField
-        A boolean field specification.
+        A boolean field specification that can be passed to `Schema()`.
+
+    Raises
+    ------
+    ValueError
+        If `p_true` is not between `0.0` and `1.0`, or if `null_probability` is not between
+        `0.0` and `1.0`.
 
     Examples
     --------
-    Define a schema with boolean fields and generate test data:
+    The `p_true=` parameter controls the distribution of `True`/`False` values, allowing
+    you to simulate different probabilities:
 
     ```python
     import pointblank as pb
 
-    # Define a schema with boolean field specifications
     schema = pb.Schema(
-        is_active=pb.bool_field(p_true=0.8),      # 80% True
-        is_premium=pb.bool_field(p_true=0.2),     # 20% True
-        is_verified=pb.bool_field(),              # 50% True (default)
+        is_active=pb.bool_field(p_true=0.8),
+        is_premium=pb.bool_field(p_true=0.2),
+        is_verified=pb.bool_field(),
     )
 
-    # Generate 100 rows of test data
     pb.preview(pb.generate_dataset(schema, n=100, seed=23))
     ```
 
-    The `p_true=` parameter controls the probability of generating `True` values,
-    which is helpful for simulating real-world distributions.
+    Optional boolean flags can be simulated by combining `nullable=True` with
+    `null_probability=`:
+
+    ```python
+    schema = pb.Schema(
+        opted_in=pb.bool_field(p_true=0.6),
+        has_referral=pb.bool_field(
+            p_true=0.3,
+            nullable=True, null_probability=0.25,
+        ),
+    )
+
+    pb.preview(pb.generate_dataset(schema, n=50, seed=23))
+    ```
+
+    Boolean fields can be combined with other field types in a realistic schema:
+
+    ```python
+    schema = pb.Schema(
+        user_id=pb.int_field(min_val=1, unique=True),
+        name=pb.string_field(preset="name"),
+        email_verified=pb.bool_field(p_true=0.9),
+        is_admin=pb.bool_field(p_true=0.05),
+    )
+
+    pb.preview(pb.generate_dataset(schema, n=30, seed=10))
+    ```
     
 
 date_field(min_date: 'str | date | None' = None, max_date: 'str | date | None' = None, nullable: 'bool' = False, null_probability: 'float' = 0.0, unique: 'bool' = False, generator: 'Callable[[], Any] | None' = None) -> 'DateField'
 
-    Create a date column specification.
+    Create a date column specification for use in a schema.
+
+    The `date_field()` function defines the constraints and behavior for a date column when
+    generating synthetic data with `generate_dataset()`. You can control the date range with
+    `min_date=` and `max_date=`, enforce uniqueness with `unique=True`, and introduce null
+    values with `nullable=True` and `null_probability=`.
+
+    Dates are generated uniformly within the specified range. If no range is provided, the
+    default range is 2000-01-01 to 2030-12-31. Both `min_date=` and `max_date=` accept either
+    `datetime.date` objects or ISO 8601 date strings (e.g., `"2024-06-15"`).
 
     Parameters
     ----------
     min_date
-        Minimum date (inclusive). Can be ISO string or `date` object.
+        Minimum date (inclusive). Can be an ISO format string (e.g., `"2020-01-01"`) or a
+        `datetime.date` object. Default is `None` (defaults to `2000-01-01`).
     max_date
-        Maximum date (inclusive). Can be ISO string or `date` object.
+        Maximum date (inclusive). Can be an ISO format string (e.g., `"2024-12-31"`) or a
+        `datetime.date` object. Default is `None` (defaults to `2030-12-31`).
     nullable
         Whether the column can contain null values. Default is `False`.
     null_probability
-        Probability of generating null when `nullable=True`. Default is `0.0`.
+        Probability of generating a null value for each row when `nullable=True`. Must be
+        between `0.0` and `1.0`. Default is `0.0`.
     unique
-        Whether all values must be unique. Default is `False`.
+        Whether all values must be unique. Default is `False`. When `True`, the generator will
+        retry until it produces `n` distinct dates. Ensure the date range is large enough to
+        accommodate the requested number of unique dates.
     generator
-        Custom callable that generates values. Overrides other settings.
+        Custom callable that generates values. When provided, this overrides all other
+        constraints. The callable should take no arguments and return a single `datetime.date`
+        value.
 
     Returns
     -------
     DateField
-        A date field specification.
+        A date field specification that can be passed to `Schema()`.
+
+    Raises
+    ------
+    ValueError
+        If `min_date` is later than `max_date`, or if a date string cannot be parsed.
 
     Examples
     --------
-    Define a schema with date fields and generate test data:
+    The `min_date=` and `max_date=` parameters accept `datetime.date` objects to define date
+    ranges:
 
     ```python
     import pointblank as pb
     from datetime import date
 
-    # Define a schema with date field specifications
     schema = pb.Schema(
         birth_date=pb.date_field(
             min_date=date(1960, 1, 1),
-            max_date=date(2005, 12, 31)
+            max_date=date(2005, 12, 31),
         ),
         hire_date=pb.date_field(
             min_date=date(2020, 1, 1),
-            max_date=date(2024, 12, 31)
+            max_date=date(2024, 12, 31),
         ),
     )
 
-    # Generate 100 rows of test data
     pb.preview(pb.generate_dataset(schema, n=100, seed=23))
     ```
 
-    Date values are uniformly distributed within the specified range.
+    For convenience, ISO format strings can be used instead of `date` objects:
+
+    ```python
+    schema = pb.Schema(
+        event_date=pb.date_field(min_date="2024-01-01", max_date="2024-12-31"),
+        signup_date=pb.date_field(min_date="2023-06-01", max_date="2024-06-01"),
+    )
+
+    pb.preview(pb.generate_dataset(schema, n=50, seed=23))
+    ```
+
+    We can introduce missing dates with `nullable=True` and enforce distinct values using
+    `unique=True`:
+
+    ```python
+    schema = pb.Schema(
+        order_date=pb.date_field(
+            min_date="2024-01-01", max_date="2024-03-31",
+            unique=True,
+        ),
+        cancel_date=pb.date_field(
+            min_date="2024-01-01", max_date="2024-12-31",
+            nullable=True, null_probability=0.5,
+        ),
+    )
+
+    pb.preview(pb.generate_dataset(schema, n=30, seed=7))
+    ```
     
 
 datetime_field(min_date: 'str | datetime | None' = None, max_date: 'str | datetime | None' = None, nullable: 'bool' = False, null_probability: 'float' = 0.0, unique: 'bool' = False, generator: 'Callable[[], Any] | None' = None) -> 'DatetimeField'
 
-    Create a datetime column specification.
+    Create a datetime column specification for use in a schema.
+
+    The `datetime_field()` function defines the constraints and behavior for a datetime column
+    when generating synthetic data with `generate_dataset()`. You can control the datetime range
+    with `min_date=` and `max_date=`, enforce uniqueness with `unique=True`, and introduce null
+    values with `nullable=True` and `null_probability=`.
+
+    Datetime values are generated uniformly (at second-level resolution) within the specified
+    range. If no range is provided, the default range is 2000-01-01T00:00:00 to
+    2030-12-31T23:59:59. Both `min_date=` and `max_date=` accept `datetime` objects, `date`
+    objects (which are converted to datetimes at midnight), or ISO 8601 datetime strings.
 
     Parameters
     ----------
     min_date
-        Minimum datetime (inclusive). Can be ISO string or `datetime` object.
+        Minimum datetime (inclusive). Can be an ISO format string (e.g.,
+        `"2024-01-01T00:00:00"`), a `datetime.datetime` object, or a `datetime.date` object.
+        Default is `None` (defaults to `2000-01-01 00:00:00`).
     max_date
-        Maximum datetime (inclusive). Can be ISO string or `datetime` object.
+        Maximum datetime (inclusive). Can be an ISO format string, a `datetime.datetime`
+        object, or a `datetime.date` object. Default is `None` (defaults to
+        `2030-12-31 23:59:59`).
     nullable
         Whether the column can contain null values. Default is `False`.
     null_probability
-        Probability of generating null when `nullable=True`. Default is `0.0`.
+        Probability of generating a null value for each row when `nullable=True`. Must be
+        between `0.0` and `1.0`. Default is `0.0`.
     unique
-        Whether all values must be unique. Default is `False`.
+        Whether all values must be unique. Default is `False`. With second-level resolution
+        over a wide range, collisions are unlikely for moderate dataset sizes.
     generator
-        Custom callable that generates values. Overrides other settings.
+        Custom callable that generates values. When provided, this overrides all other
+        constraints. The callable should take no arguments and return a single
+        `datetime.datetime` value.
 
     Returns
     -------
     DatetimeField
-        A datetime field specification.
+        A datetime field specification that can be passed to `Schema()`.
+
+    Raises
+    ------
+    ValueError
+        If `min_date` is later than `max_date`, or if a datetime string cannot be parsed.
 
     Examples
     --------
-    Define a schema with datetime fields and generate test data:
+    The `min_date=` and `max_date=` parameters accept `datetime` objects for precise range
+    definitions:
 
     ```python
     import pointblank as pb
     from datetime import datetime
 
-    # Define a schema with datetime field specifications
     schema = pb.Schema(
         created_at=pb.datetime_field(
             min_date=datetime(2024, 1, 1),
-            max_date=datetime(2024, 12, 31)
+            max_date=datetime(2024, 12, 31),
         ),
         updated_at=pb.datetime_field(
             min_date=datetime(2024, 6, 1),
-            max_date=datetime(2024, 12, 31)
+            max_date=datetime(2024, 12, 31),
         ),
     )
 
-    # Generate 100 rows of test data
     pb.preview(pb.generate_dataset(schema, n=100, seed=23))
     ```
 
-    Datetime values are uniformly distributed within the specified range.
+    For a quick setup, ISO format strings work just as well:
+
+    ```python
+    schema = pb.Schema(
+        event_time=pb.datetime_field(
+            min_date="2024-03-01T08:00:00",
+            max_date="2024-03-01T18:00:00",
+        ),
+    )
+
+    pb.preview(pb.generate_dataset(schema, n=30, seed=23))
+    ```
+
+    Optional timestamps can be simulated with `nullable=True`, and datetime fields work
+    nicely alongside other field types:
+
+    ```python
+    schema = pb.Schema(
+        order_id=pb.int_field(min_val=1000, max_val=9999, unique=True),
+        placed_at=pb.datetime_field(
+            min_date=datetime(2024, 1, 1),
+            max_date=datetime(2024, 12, 31),
+        ),
+        shipped_at=pb.datetime_field(
+            min_date=datetime(2024, 1, 2),
+            max_date=datetime(2025, 1, 15),
+            nullable=True, null_probability=0.3,
+        ),
+    )
+
+    pb.preview(pb.generate_dataset(schema, n=30, seed=7))
+    ```
     
 
 time_field(min_time: 'str | time | None' = None, max_time: 'str | time | None' = None, nullable: 'bool' = False, null_probability: 'float' = 0.0, unique: 'bool' = False, generator: 'Callable[[], Any] | None' = None) -> 'TimeField'
 
-    Create a time column specification.
+    Create a time column specification for use in a schema.
+
+    The `time_field()` function defines the constraints and behavior for a time-of-day column
+    when generating synthetic data with `generate_dataset()`. You can control the time range
+    with `min_time=` and `max_time=`, enforce uniqueness with `unique=True`, and introduce null
+    values with `nullable=True` and `null_probability=`.
+
+    Time values are generated uniformly (at second-level resolution) within the specified range.
+    If no range is provided, the default range is 00:00:00 to 23:59:59. Both `min_time=` and
+    `max_time=` accept `datetime.time` objects or ISO format time strings (e.g., `"09:30:00"`).
 
     Parameters
     ----------
     min_time
-        Minimum time (inclusive). Can be ISO string or `time` object.
+        Minimum time (inclusive). Can be an ISO format string (e.g., `"08:00:00"`) or a
+        `datetime.time` object. Default is `None` (defaults to `00:00:00`).
     max_time
-        Maximum time (inclusive). Can be ISO string or `time` object.
+        Maximum time (inclusive). Can be an ISO format string (e.g., `"17:30:00"`) or a
+        `datetime.time` object. Default is `None` (defaults to `23:59:59`).
     nullable
         Whether the column can contain null values. Default is `False`.
     null_probability
-        Probability of generating null when `nullable=True`. Default is `0.0`.
+        Probability of generating a null value for each row when `nullable=True`. Must be
+        between `0.0` and `1.0`. Default is `0.0`.
     unique
-        Whether all values must be unique. Default is `False`.
+        Whether all values must be unique. Default is `False`. With second-level resolution
+        within a time range, uniqueness is feasible for moderate dataset sizes.
     generator
-        Custom callable that generates values. Overrides other settings.
+        Custom callable that generates values. When provided, this overrides all other
+        constraints. The callable should take no arguments and return a single value.
 
     Returns
     -------
     TimeField
-        A time field specification.
+        A time field specification that can be passed to `Schema()`.
+
+    Raises
+    ------
+    ValueError
+        If `min_time` is later than `max_time`, or if a time string cannot be parsed.
 
     Examples
     --------
-    Define a schema with time fields and generate test data:
+    The `min_time=` and `max_time=` parameters accept `datetime.time` objects, making it
+    easy to define business-hours ranges:
 
     ```python
     import pointblank as pb
     from datetime import time
 
-    # Define a schema with time field specifications
     schema = pb.Schema(
         start_time=pb.time_field(
             min_time=time(9, 0, 0),
-            max_time=time(12, 0, 0)
+            max_time=time(12, 0, 0),
         ),
         end_time=pb.time_field(
             min_time=time(13, 0, 0),
-            max_time=time(17, 0, 0)
+            max_time=time(17, 0, 0),
         ),
     )
 
-    # Generate 100 rows of test data
     pb.preview(pb.generate_dataset(schema, n=100, seed=23))
     ```
 
-    Time values are uniformly distributed within the specified range.
+    ISO format strings can also be used for convenience:
+
+    ```python
+    schema = pb.Schema(
+        login_time=pb.time_field(min_time="06:00:00", max_time="23:59:59"),
+        alarm_time=pb.time_field(min_time="05:00:00", max_time="09:00:00"),
+    )
+
+    pb.preview(pb.generate_dataset(schema, n=30, seed=23))
+    ```
+
+    It's possible to introduce optional time values with `nullable=True` and combine them
+    with other field types:
+
+    ```python
+    schema = pb.Schema(
+        employee_id=pb.int_field(min_val=100, max_val=999, unique=True),
+        check_in=pb.time_field(min_time="07:00:00", max_time="10:00:00"),
+        check_out=pb.time_field(
+            min_time="16:00:00", max_time="20:00:00",
+            nullable=True, null_probability=0.15,
+        ),
+    )
+
+    pb.preview(pb.generate_dataset(schema, n=30, seed=7))
+    ```
     
 
 duration_field(min_duration: 'str | timedelta | None' = None, max_duration: 'str | timedelta | None' = None, nullable: 'bool' = False, null_probability: 'float' = 0.0, unique: 'bool' = False, generator: 'Callable[[], Any] | None' = None) -> 'DurationField'
 
-    Create a duration column specification.
+    Create a duration column specification for use in a schema.
+
+    The `duration_field()` function defines the constraints and behavior for a duration
+    (timedelta) column when generating synthetic data with `generate_dataset()`. You can
+    control the duration range with `min_duration=` and `max_duration=`, enforce uniqueness
+    with `unique=True`, and introduce null values with `nullable=True` and `null_probability=`.
+
+    Duration values are generated uniformly (at second-level resolution) within the specified
+    range. If no range is provided, the default range is 0 seconds to 30 days. Both
+    `min_duration=` and `max_duration=` accept `datetime.timedelta` objects or colon-separated
+    strings in `"HH:MM:SS"` or `"MM:SS"` format.
 
     Parameters
     ----------
     min_duration
-        Minimum duration (inclusive). Can be string or `timedelta` object.
+        Minimum duration (inclusive). Can be a `"HH:MM:SS"` or `"MM:SS"` string, or a
+        `datetime.timedelta` object. Default is `None` (defaults to 0 seconds).
     max_duration
-        Maximum duration (inclusive). Can be string or `timedelta` object.
+        Maximum duration (inclusive). Can be a `"HH:MM:SS"` or `"MM:SS"` string, or a
+        `datetime.timedelta` object. Default is `None` (defaults to 30 days).
     nullable
         Whether the column can contain null values. Default is `False`.
     null_probability
-        Probability of generating null when `nullable=True`. Default is `0.0`.
+        Probability of generating a null value for each row when `nullable=True`. Must be
+        between `0.0` and `1.0`. Default is `0.0`.
     unique
-        Whether all values must be unique. Default is `False`.
+        Whether all values must be unique. Default is `False`. With second-level resolution
+        within a duration range, uniqueness is feasible for moderate dataset sizes.
     generator
-        Custom callable that generates values. Overrides other settings.
+        Custom callable that generates values. When provided, this overrides all other
+        constraints. The callable should take no arguments and return a single
+        `datetime.timedelta` value.
 
     Returns
     -------
     DurationField
-        A duration field specification.
+        A duration field specification that can be passed to `Schema()`.
+
+    Raises
+    ------
+    ValueError
+        If `min_duration` is greater than `max_duration`, or if a duration string cannot be
+        parsed.
 
     Examples
     --------
-    Define a schema with duration fields and generate test data:
+    The `min_duration=` and `max_duration=` parameters accept `timedelta` objects for
+    defining duration ranges:
 
     ```python
     import pointblank as pb
     from datetime import timedelta
 
-    # Define a schema with duration field specifications
     schema = pb.Schema(
         session_length=pb.duration_field(
             min_duration=timedelta(minutes=5),
-            max_duration=timedelta(hours=2)
+            max_duration=timedelta(hours=2),
         ),
         wait_time=pb.duration_field(
             min_duration=timedelta(seconds=30),
-            max_duration=timedelta(minutes=15)
+            max_duration=timedelta(minutes=15),
         ),
     )
 
-    # Generate 100 rows of test data
     pb.generate_dataset(schema, n=100, seed=23)
     ```
 
-    Duration values are uniformly distributed within the specified range.
+    Colon-separated strings can also be used for quick duration definitions:
+
+    ```python
+    schema = pb.Schema(
+        call_duration=pb.duration_field(min_duration="0:01:00", max_duration="1:30:00"),
+        break_time=pb.duration_field(min_duration="0:05:00", max_duration="0:30:00"),
+    )
+
+    pb.generate_dataset(schema, n=30, seed=23)
+    ```
+
+    Optional durations can be created with `nullable=True`, and duration fields work well
+    alongside other field types:
+
+    ```python
+    schema = pb.Schema(
+        task_id=pb.int_field(min_val=1, max_val=500, unique=True),
+        time_spent=pb.duration_field(
+            min_duration=timedelta(minutes=1),
+            max_duration=timedelta(hours=8),
+        ),
+        overtime=pb.duration_field(
+            min_duration=timedelta(0),
+            max_duration=timedelta(hours=4),
+            nullable=True, null_probability=0.6,
+        ),
+    )
+
+    pb.generate_dataset(schema, n=30, seed=7)
+    ```
     
 
 
