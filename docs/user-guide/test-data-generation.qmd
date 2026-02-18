@@ -253,6 +253,7 @@ The `preset=` parameter in `string_field()` supports many data types:
 - `file_name`: file name
 - `file_extension`: file extension
 - `mime_type`: MIME type
+- `user_agent`: browser user agent string (country-weighted)
 
 ## Country-Specific Data
 
