@@ -1644,6 +1644,7 @@ def generate_dataset(
     - **you** can still pass an explicit `seed=` to override the automatic seed.
     - **calling** the fixture **multiple times** within one test produces different (but still
     deterministic) data on each call.
+    - the fixture exposes `.default_seed` and `.last_seed` attributes for debugging.
 
     ```python
     def test_my_pipeline(generate_dataset):
@@ -1668,6 +1669,15 @@ def generate_dataset(
         customers = generate_dataset(customer_schema, n=1000, country="US")
         orders = generate_dataset(order_schema, n=5000)
         # Both DataFrames are deterministic; each call gets a unique seed
+    ```
+
+    When a test fails, include the seed in the assertion message so the failure is easy to
+    reproduce:
+
+    ```python
+    def test_age_range(generate_dataset):
+        df = generate_dataset(schema, n=100)
+        assert df["age"].min() >= 18, f"Failed with seed {generate_dataset.last_seed}"
     ```
 
     Seed Stability

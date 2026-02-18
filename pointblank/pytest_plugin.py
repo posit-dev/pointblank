@@ -51,6 +51,16 @@ def generate_dataset(request: pytest.FixtureRequest):
         Generated data, identical to what `pointblank.generate_dataset()`
         returns.
 
+    Attributes
+    ----------
+    default_seed : int
+        The base seed derived from the test's node ID. Available before any
+        call is made. Useful for reproducing results outside the fixture.
+    last_seed : int or None
+        The seed actually used for the most recent call. This accounts for
+        the call counter (auto-seeded calls) or an explicit `seed=` override.
+        `None` before the first call.
+
     Notes
     -----
     **Seed stability caveat:**  The seed guarantees identical output *within
@@ -59,6 +69,13 @@ def generate_dataset(request: pytest.FixtureRequest):
     CI pipelines that require bit-exact data across upgrades, save generated
     DataFrames as Parquet/CSV snapshots rather than relying on seed
     reproducibility.
+
+    **Seed introspection:**  When a test fails, the seed that produced the
+    failing data is available via ``generate_dataset.last_seed``. You can
+    include it in assertion messages for easy reproduction::
+
+        df = generate_dataset(schema, n=100)
+        assert df["age"].min() >= 18, f"Failed with seed {generate_dataset.last_seed}"
     """
 
     from pointblank.schema import generate_dataset as _generate_dataset
@@ -84,6 +101,15 @@ def generate_dataset(request: pytest.FixtureRequest):
             seed = (default_seed + call_count) % (2**31)
             call_count += 1
 
+        # Record the seed that was actually used so callers can inspect it
+        # after a failure (e.g., `generate_dataset.last_seed`).
+        _generate.last_seed = seed
+
         return _generate_dataset(schema, n=n, seed=seed, output=output, country=country)
+
+    # Expose seed metadata on the callable so users can inspect it in
+    # debuggers, assertion messages, or failure output.
+    _generate.default_seed = default_seed  # type: ignore[attr-defined]
+    _generate.last_seed = None  # type: ignore[attr-defined]
 
     return _generate

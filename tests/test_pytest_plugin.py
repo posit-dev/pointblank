@@ -209,6 +209,65 @@ class TestFixtureDifferentTestsDifferentData:
             )
 
 
+class TestFixtureSeedIntrospection:
+    """Verify .default_seed and .last_seed attributes."""
+
+    def test_default_seed_available_before_any_call(self, generate_dataset):
+        """default_seed should be set as soon as the fixture is created."""
+        assert isinstance(generate_dataset.default_seed, int)
+        assert 0 <= generate_dataset.default_seed < 2**31
+
+    def test_last_seed_is_none_before_first_call(self, generate_dataset):
+        """last_seed should be None until the first call."""
+        assert generate_dataset.last_seed is None
+
+    def test_last_seed_set_after_auto_seeded_call(self, generate_dataset):
+        """After an auto-seeded call, last_seed should equal default_seed + 0."""
+        generate_dataset(SIMPLE_SCHEMA, n=5)
+        assert generate_dataset.last_seed == generate_dataset.default_seed
+
+    def test_last_seed_set_after_explicit_seed(self, generate_dataset):
+        """After an explicit seed call, last_seed should be that explicit seed."""
+        generate_dataset(SIMPLE_SCHEMA, n=5, seed=777)
+        assert generate_dataset.last_seed == 777
+
+    def test_last_seed_updates_with_call_counter(self, generate_dataset):
+        """Successive auto-seeded calls should increment last_seed."""
+        base = generate_dataset.default_seed
+
+        generate_dataset(SIMPLE_SCHEMA, n=5)
+        assert generate_dataset.last_seed == base % (2**31)
+
+        generate_dataset(SIMPLE_SCHEMA, n=5)
+        assert generate_dataset.last_seed == (base + 1) % (2**31)
+
+        generate_dataset(SIMPLE_SCHEMA, n=5)
+        assert generate_dataset.last_seed == (base + 2) % (2**31)
+
+    def test_explicit_seed_does_not_affect_last_seed_of_next_auto(self, generate_dataset):
+        """An explicit-seed call should not disrupt the call counter for auto seeds."""
+        base = generate_dataset.default_seed
+
+        # Auto-seeded call #0
+        generate_dataset(SIMPLE_SCHEMA, n=5)
+        assert generate_dataset.last_seed == base
+
+        # Explicit-seed call (should not increment counter)
+        generate_dataset(SIMPLE_SCHEMA, n=5, seed=42)
+        assert generate_dataset.last_seed == 42
+
+        # Auto-seeded call #1 (counter should still be 1, not 2)
+        generate_dataset(SIMPLE_SCHEMA, n=5)
+        assert generate_dataset.last_seed == (base + 1) % (2**31)
+
+    def test_last_seed_in_assertion_message(self, generate_dataset):
+        """Demonstrates using last_seed in an assertion message."""
+        df = generate_dataset(SIMPLE_SCHEMA, n=10, output="dict")
+        seed = generate_dataset.last_seed
+        # This assertion always passes; it verifies the pattern works
+        assert len(df["id"]) == 10, f"Failed with seed {seed}"
+
+
 class TestFixtureParametrize:
     """Parametrized tests get different seeds per parameter."""
 

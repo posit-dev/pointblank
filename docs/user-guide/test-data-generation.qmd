@@ -451,9 +451,7 @@ fully-qualified name. This means:
 
 Use it by adding `generate_dataset` to your test function's parameter list:
 
-```python
-# test_pipeline.py
-
+```{.python filename="test_pipeline.py"}
 import pointblank as pb
 
 def test_etl_handles_nulls(generate_dataset):
@@ -516,8 +514,7 @@ def test_name_normalizer(generate_dataset, country):
 
 Define schemas as fixtures in `conftest.py` and compose them with `generate_dataset`:
 
-```python
-# conftest.py
+```{.python filename="conftest.py"}
 import pytest
 import pointblank as pb
 
@@ -529,18 +526,47 @@ def customer_schema():
         email=pb.string_field(preset="email"),
         city=pb.string_field(preset="city"),
     )
+```
 
-# test_validation.py
+```{.python filename="test_validation.py"}
 def test_customer_validation(generate_dataset, customer_schema):
     df = generate_dataset(customer_schema, n=200, country="DE")
     validation = pb.Validate(df).col_vals_not_null(columns="email").interrogate()
     assert validation.all_passed()
+```
 
-# test_export.py
+```{.python filename="test_export.py"}
 def test_customer_export(generate_dataset, customer_schema):
     df = generate_dataset(customer_schema, n=50, country="JP")
     exported = export_to_parquet(df)
     assert exported.exists()
+```
+
+### Debugging with Seed Introspection
+
+The fixture callable exposes two attributes that make debugging failed tests straightforward:
+
+- `generate_dataset.default_seed`: the base seed derived from the test name (available before any call)
+- `generate_dataset.last_seed`: the seed actually used for the most recent call (accounts for the call counter and explicit overrides)
+
+Include `.last_seed` in assertion messages so failures are immediately reproducible:
+
+```python
+def test_age_range(generate_dataset):
+    schema = pb.Schema(age=pb.int_field(min_val=18, max_val=100))
+    df = generate_dataset(schema, n=500)
+    min_age = df["age"].min()
+    assert min_age >= 18, (
+        f"Expected min age >= 18, got {min_age} (seed={generate_dataset.last_seed})"
+    )
+```
+
+You can also use `.default_seed` to reproduce the exact dataset outside of pytest:
+
+```python
+# In a REPL or notebook, reproduce the data from a failed test:
+import pointblank as pb
+df = pb.generate_dataset(schema, n=500, seed=<default_seed_from_output>)
 ```
 
 ### Seed Stability
