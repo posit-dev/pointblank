@@ -308,7 +308,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <p><strong>Identifiers:</strong> <code>"uuid4"</code>, <code>"md5"</code> (MD5 hash, 32 hex chars), <code>"sha1"</code> (SHA-1 hash, 40 hex chars), <code>"sha256"</code> (SHA-256 hash, 64 hex chars), <code>"ssn"</code> (social security number), <code>"license_plate"</code></p>
 <p><strong>Barcodes:</strong> <code>"ean8"</code> (EAN-8 barcode with valid check digit), <code>"ean13"</code> (EAN-13 barcode with valid check digit)</p>
 <p><strong>Date/Time (as strings):</strong> <code>"date_this_year"</code>, <code>"date_this_decade"</code>, <code>"date_between"</code> (random date between 2000–2025), <code>"date_range"</code> (two dates joined with an en-dash, e.g., <code>"2012-05-12 – 2015-11-22"</code>), <code>"future_date"</code> (up to 1 year ahead), <code>"past_date"</code> (up to 10 years back), <code>"time"</code></p>
-<p><strong>Miscellaneous:</strong> <code>"color_name"</code>, <code>"file_name"</code>, <code>"file_extension"</code>, <code>"mime_type"</code></p>
+<p><strong>Miscellaneous:</strong> <code>"color_name"</code>, <code>"file_name"</code>, <code>"file_extension"</code>, <code>"mime_type"</code>, <code>"user_agent"</code> (browser user agent string with country-specific browser weighting)</p>
 </section>
 <section id="coherent-data-generation" class="level2 doc-section doc-section-coherent-data-generation">
 <h3 class="doc-section doc-section-coherent-data-generation anchored" data-anchor-id="coherent-data-generation">Coherent Data Generation</h3>
@@ -340,7 +340,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
         border-radius: 2px;
     ">
 <p>The <code>preset=</code> parameter generates realistic personal data, while <code>allowed=</code> restricts values to a categorical set:</p>
-<div id="62983e31" class="cell" data-execution_count="1">
+<div id="f2d1e251" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
@@ -495,7 +495,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 </div>
 <p>We can also generate strings that match a regular expression with <code>pattern=</code> (e.g., product codes, identifiers):</p>
-<div id="aeaaf0cd" class="cell" data-execution_count="2">
+<div id="2e5ce36a" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    product_code<span class="op">=</span>pb.string_field(pattern<span class="op">=</span><span class="vs">r"</span><span class="pp">[A-Z]</span><span class="op">{3}</span><span class="vs">-</span><span class="pp">[0-9]</span><span class="op">{4}</span><span class="vs">"</span>),</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    batch_id<span class="op">=</span>pb.string_field(pattern<span class="op">=</span><span class="vs">r"BATCH-</span><span class="pp">[A-Z][0-9]</span><span class="op">{3}</span><span class="vs">"</span>),</span>
@@ -648,7 +648,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 </div>
 <p>For random alphanumeric strings, <code>min_length=</code> and <code>max_length=</code> control the length. Adding <code>nullable=True</code> introduces missing values:</p>
-<div id="db329f13" class="cell" data-execution_count="3">
+<div id="62ae53a9" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    short_code<span class="op">=</span>pb.string_field(min_length<span class="op">=</span><span class="dv">3</span>, max_length<span class="op">=</span><span class="dv">5</span>),</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    notes<span class="op">=</span>pb.string_field(</span>
@@ -791,7 +791,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 </div>
 <p>It’s possible to combine business and internet presets to build a company directory:</p>
-<div id="7c99686d" class="cell" data-execution_count="4">
+<div id="d6746b37" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    company<span class="op">=</span>pb.string_field(preset<span class="op">=</span><span class="st">"company"</span>),</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    domain<span class="op">=</span>pb.string_field(preset<span class="op">=</span><span class="st">"domain_name"</span>),</span>
