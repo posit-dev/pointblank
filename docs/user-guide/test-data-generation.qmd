@@ -369,6 +369,57 @@ You can use either ISO 3166-1 alpha-2 codes (e.g., `"US"`) or alpha-3 codes (e.g
 
 Additional countries and expanded coverage are planned for future releases.
 
+### Mixing Multiple Countries
+
+When you need test data that spans multiple locales (e.g., simulating an international customer
+base), you can pass a list or dict to the `country=` parameter instead of a single string.
+
+Passing a list of country codes splits rows equally across those countries. Here, 200 rows are
+divided evenly among the US, Germany, and Japan (~67 each):
+
+```{python}
+schema = pb.Schema(
+    name=pb.string_field(preset="name"),
+    city=pb.string_field(preset="city"),
+    postcode=pb.string_field(preset="postcode"),
+)
+
+pb.preview(pb.generate_dataset(schema, n=200, seed=23, country=["US", "DE", "JP"]))
+```
+
+To control the proportion of rows per country, pass a dict mapping country codes to weights. The
+following generates 200 rows with 70% from the US, 20% from Germany, and 10% from France:
+
+```{python}
+pb.preview(
+    pb.generate_dataset(
+        schema, n=200, seed=23,
+        country={"US": 0.7, "DE": 0.2, "FR": 0.1},
+    )
+)
+```
+
+Weights are auto-normalized, so `{"US": 7, "DE": 2, "FR": 1}` is equivalent to the example above.
+Row counts are allocated using largest-remainder apportionment, ensuring they always sum to exactly
+`n`.
+
+By default, rows from different countries are interleaved randomly (`shuffle=True`). Set
+`shuffle=False` to keep rows grouped by country in the order the countries are listed:
+
+```{python}
+pb.preview(
+    pb.generate_dataset(
+        schema, n=120, seed=23,
+        country=["US", "DE", "JP"], shuffle=False,
+    )
+)
+```
+
+All coherence systems (address, person, business) work correctly within each country's batch of
+rows. A French row will have a French name with a matching French email; a Japanese row will have a
+Japanese name with a matching Japanese email. Non-preset columns (integers, floats, booleans, dates)
+are generated independently for each batch but still respect their field constraints.
+
 ## Output Formats
 
 The `generate_dataset()` function supports multiple output formats via the `output=` parameter,
@@ -381,20 +432,20 @@ schema = pb.Schema(
 )
 ```
 
-The default output is a **Polars DataFrame**, which offers excellent performance and a modern API
-for data manipulation:
+The default output is a Polars DataFrame, which offers excellent performance and a modern API for
+data manipulation:
 
 ```{python}
-# Polars DataFrame (default)
 polars_df = pb.generate_dataset(schema, n=100, seed=23, output="polars")
+
 pb.preview(polars_df)
 ```
 
 If your workflow uses Pandas, simply specify `output="pandas"` to get a **Pandas DataFrame**:
 
 ```{python}
-# Pandas DataFrame
 pandas_df = pb.generate_dataset(schema, n=100, seed=23, output="pandas")
+
 pb.preview(pandas_df)
 ```
 
@@ -592,7 +643,7 @@ By incorporating test data generation into your process, you can:
 - create reproducible test fixtures for automated testing and CI/CD pipelines
 - generate locale-specific data for internationalization testing across 55 countries
 - ensure coherent relationships between related fields like names, emails, addresses, jobs, and
-  license plates
+license plates
 - produce datasets of any size with consistent, realistic values
 
 Whether you're building validation logic, testing data pipelines, or simply need sample data for
