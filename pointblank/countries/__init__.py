@@ -585,7 +585,7 @@ class LocaleGenerator:
     addresses, etc. based on country-specific patterns and data.
     """
 
-    def __init__(self, country: str = "US", seed: int | None = None, weighted: bool = False):
+    def __init__(self, country: str = "US", seed: int | None = None, weighted: bool = True):
         """
         Initialize the country data generator.
 
@@ -2739,7 +2739,7 @@ _default_registry = LocaleRegistry()
 
 
 def get_generator(
-    country: str = "US", seed: int | None = None, weighted: bool = False
+    country: str = "US", seed: int | None = None, weighted: bool = True
 ) -> LocaleGenerator:
     """
     Get a country data generator instance.

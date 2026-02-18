@@ -798,7 +798,7 @@ class Schema:
         output: Literal["polars", "pandas", "dict"] = "polars",
         country: str | list[str] | dict[str, float] = "US",
         shuffle: bool = True,
-        weighted: bool = False,
+        weighted: bool = True,
     ) -> Any:
         """
         Generate synthetic test data conforming to this schema.
@@ -834,7 +834,7 @@ class Schema:
             Common names like "James" and "Smith" appear far more often than rare names. Large
             cities like New York and Los Angeles dominate over small towns. Only affects data files
             that have been migrated to the tiered format; flat-list data always uses uniform
-            sampling. Default is `False`.
+            sampling. Default is `True`.
 
         Returns
         -------
@@ -1571,7 +1571,7 @@ def generate_dataset(
     output: Literal["polars", "pandas", "dict"] = "polars",
     country: str | list[str] | dict[str, float] = "US",
     shuffle: bool = True,
-    weighted: bool = False,
+    weighted: bool = True,
 ) -> Any:
     """
     Generate synthetic test data from a schema.
@@ -1612,7 +1612,7 @@ def generate_dataset(
         Common names like "James" and "Smith" appear far more often than rare names. Large
         cities like New York and Los Angeles dominate over small towns. Only affects data files
         that have been migrated to the tiered format; flat-list data always uses uniform
-        sampling. Default is `False`.
+        sampling. Default is `True`.
 
     Returns
     -------

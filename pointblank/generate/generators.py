@@ -37,7 +37,7 @@ INTEGER_BOUNDS = {
 
 
 def _get_locale_generator(
-    country: str = "US", seed: int | None = None, weighted: bool = False
+    country: str = "US", seed: int | None = None, weighted: bool = True
 ) -> LocaleGenerator:
     """Get a LocaleGenerator instance with the specified country."""
     return LocaleGenerator(country=country, seed=seed, weighted=weighted)

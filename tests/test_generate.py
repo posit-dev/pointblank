@@ -2236,10 +2236,10 @@ class TestWeightedSampling:
 
     # --- GeneratorConfig ---
 
-    def test_config_weighted_default_false(self):
-        """GeneratorConfig defaults weighted to False."""
+    def test_config_weighted_default_true(self):
+        """GeneratorConfig defaults weighted to True."""
         config = GeneratorConfig()
-        assert config.weighted is False
+        assert config.weighted is True
 
     def test_config_weighted_true(self):
         """GeneratorConfig accepts weighted=True."""

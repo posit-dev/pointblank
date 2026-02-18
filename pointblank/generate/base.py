@@ -50,7 +50,7 @@ class GeneratorConfig:
     output: Literal["polars", "pandas", "dict"] = "polars"
     country: str | list[str] | dict[str, float] = "US"
     shuffle: bool = True
-    weighted: bool = False
+    weighted: bool = True
     max_unique_retries: int = 1000
 
     def __post_init__(self):
