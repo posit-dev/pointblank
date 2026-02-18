@@ -194,6 +194,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
   <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
   <li><a href="#raises" id="toc-raises" class="nav-link" data-scroll-target="#raises">Raises</a></li>
   <li><a href="#presets-and-the-country-parameter" id="toc-presets-and-the-country-parameter" class="nav-link" data-scroll-target="#presets-and-the-country-parameter">Presets and the <code>country=</code> Parameter</a></li>
+  <li><a href="#locale-mixing" id="toc-locale-mixing" class="nav-link" data-scroll-target="#locale-mixing">Locale Mixing</a></li>
   <li><a href="#supported-countries" id="toc-supported-countries" class="nav-link" data-scroll-target="#supported-countries">Supported Countries</a></li>
   <li><a href="#pytest-fixture" id="toc-pytest-fixture" class="nav-link" data-scroll-target="#pytest-fixture">Pytest Fixture</a></li>
   <li><a href="#seed-stability" id="toc-seed-stability" class="nav-link" data-scroll-target="#seed-stability">Seed Stability</a></li>
@@ -227,7 +228,14 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 
 
 <p style="font-size: 12px; color: rgb(170, 170, 170); margin-bottom: -14px;">USAGE</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>generate_dataset(schema, n<span class="op">=</span><span class="dv">100</span>, seed<span class="op">=</span><span class="va">None</span>, output<span class="op">=</span><span class="st">'polars'</span>, country<span class="op">=</span><span class="st">'US'</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>generate_dataset(</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    schema,</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    n<span class="op">=</span><span class="dv">100</span>,</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    seed<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    output<span class="op">=</span><span class="st">'polars'</span>,</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    country<span class="op">=</span><span class="st">'US'</span>,</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    shuffle<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>This function generates random data that conforms to a schema’s column definitions. When the schema is defined using <code>Field</code> objects with constraints (e.g., <code>min_val=</code>, <code>max_val=</code>, <code>pattern=</code>, <code>preset=</code>), the generated data will respect those constraints.</p>
 <section id="parameters" class="level2 doc-section doc-section-parameters">
 <h3 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters">Parameters</h3>
@@ -248,9 +256,13 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <dd>
 <p>Output format for the generated data. Options are: (1) <code>"polars"</code> (the default) returns a Polars DataFrame, (2) <code>"pandas"</code> returns a Pandas DataFrame, and (3) <code>"dict"</code> returns a dictionary of lists.</p>
 </dd>
-<dt><code><span class="parameter-name"><strong>country</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><code>str</code></span> <span class="parameter-default-sep">=</span> <span class="parameter-default">'US'</span></code></dt>
+<dt><code><span class="parameter-name"><strong>country</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><code>str</code> | <code>list</code>[<code>str</code>] | <code>dict</code>[<code>str</code>, <code>float</code>]</span> <span class="parameter-default-sep">=</span> <span class="parameter-default">'US'</span></code></dt>
 <dd>
-<p>Country code for locale-aware generation when using presets. Accepts ISO 3166-1 alpha-2 codes (e.g., <code>"US"</code>, <code>"DE"</code>, <code>"FR"</code>) or alpha-3 codes (e.g., <code>"USA"</code>, <code>"DEU"</code>, <code>"FRA"</code>). This affects the format and content of preset-generated data such as addresses, phone numbers, names, and postal codes. The default is <code>"US"</code>.</p>
+<p>Country code(s) for locale-aware generation when using presets. Accepts a single ISO 3166-1 alpha-2 or alpha-3 code (e.g., <code>"US"</code>, <code>"DEU"</code>), a list of codes for uniform mixing (e.g., <code>["US", "DE", "JP"]</code>), or a dict mapping codes to positive weights (e.g., <code>{"US": 60, "DE": 25, "JP": 15}</code>). See the <em>Locale Mixing</em> section below for details. The default is <code>"US"</code>.</p>
+</dd>
+<dt><code><span class="parameter-name"><strong>shuffle</strong></span> <span class="parameter-annotation-sep">:</span> <span class="parameter-annotation"><code>bool</code></span> <span class="parameter-default-sep">=</span> <span class="parameter-default">True</span></code></dt>
+<dd>
+<p>When <code>country=</code> is a list or dict (multi-country mixing), controls whether rows from different countries are interleaved randomly (<code>True</code>, the default) or grouped by country in the order the countries are specified (<code>False</code>). Ignored when <code>country=</code> is a single string.</p>
 </dd>
 </dl>
 </section>
@@ -286,6 +298,14 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <li><strong>Financial presets</strong> (<code>"iban"</code>, <code>"ssn"</code>, <code>"license_plate"</code>): produce identifiers in the format used by the specified country.</li>
 </ul>
 <p>When multiple columns in the same schema use related presets, the generated data is automatically coherent across those columns within each row. Person-related presets will share the same identity (e.g., the email is derived from the name), address-related presets will share the same location (e.g., the city matches the address), and business-related presets will share the same industry context.</p>
+</section>
+<section id="locale-mixing" class="level2 doc-section doc-section-locale-mixing">
+<h3 class="doc-section doc-section-locale-mixing anchored" data-anchor-id="locale-mixing">Locale Mixing</h3>
+<p>The <code>country=</code> parameter accepts three input forms for flexible locale control:</p>
+<ol type="1">
+<li>a <strong>single string</strong> (the default), such as <code>"US"</code> or <code>"DEU"</code>, which generates all rows from one locale; (2) a <strong>list of strings</strong>, such as <code>["US", "DE", "JP"]</code>, which splits rows equally across the listed countries; and (3) a <strong>dict of weights</strong>, such as <code>{"US": 0.6, "DE": 0.3, "FR": 0.1}</code>, which allocates rows proportionally (weights are auto-normalized, so <code>{"US": 6, "DE": 3, "FR": 1}</code> is equivalent).</li>
+</ol>
+<p>Row counts are distributed using largest-remainder apportionment so they always sum to exactly <code>n=</code>. Each country’s rows are generated as an independent batch (preserving all cross-column coherence within each batch), then either interleaved randomly (<code>shuffle=True</code>, the default) or left in contiguous country blocks (<code>shuffle=False</code>).</p>
 </section>
 <section id="supported-countries" class="level2 doc-section doc-section-supported-countries">
 <h3 class="doc-section doc-section-supported-countries anchored" data-anchor-id="supported-countries">Supported Countries</h3>
@@ -354,7 +374,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
         border-radius: 2px;
     ">
 <p>Here we define a schema with field constraints and generate test data from it:</p>
-<div id="34f93140" class="cell" data-execution_count="1">
+<div id="34a773e8" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
@@ -522,7 +542,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 </div>
 <p>It’s also possible to generate data from a simple, dtype-only schema. Setting <code>output="pandas"</code> returns a Pandas DataFrame:</p>
-<div id="0b4a2162" class="cell" data-execution_count="2">
+<div id="59ae58a0" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(name<span class="op">=</span><span class="st">"String"</span>, age<span class="op">=</span><span class="st">"Int64"</span>, active<span class="op">=</span><span class="st">"Boolean"</span>)</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>pb.preview(pb.generate_dataset(schema, n<span class="op">=</span><span class="dv">50</span>, seed<span class="op">=</span><span class="dv">23</span>, output<span class="op">=</span><span class="st">"pandas"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -671,7 +691,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 </div>
 <p>When using presets, the <code>country=</code> parameter controls the locale. Here, <code>country="DE"</code> produces German names and addresses:</p>
-<div id="d0b4e5fc" class="cell" data-execution_count="3">
+<div id="13716dd7" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    name<span class="op">=</span>pb.string_field(preset<span class="op">=</span><span class="st">"name"</span>),</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    address<span class="op">=</span>pb.string_field(preset<span class="op">=</span><span class="st">"address"</span>),</span>
@@ -824,7 +844,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 </div>
 <p>We can combine several field types with nullable columns in a mixed-type dataset:</p>
-<div id="d6aa17a8" class="cell" data-execution_count="4">
+<div id="8c03f748" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> datetime <span class="im">import</span> date, timedelta</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
