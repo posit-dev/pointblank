@@ -1630,6 +1630,57 @@ def generate_dataset(
     **Middle East & Africa (4 countries):** Nigeria (`"NG"`), South Africa (`"ZA"`),
     Turkey (`"TR"`), United Arab Emirates (`"AE"`)
 
+    Pytest Fixture
+    --------------
+    When Pointblank is installed, a `generate_dataset` pytest fixture is automatically
+    available in all test files: no imports or `conftest.py` setup required. The fixture
+    behaves identically to this function, but derives a deterministic seed from the test's
+    fully-qualified name when `seed=` is not provided.
+
+    This means:
+
+    - the **same test** always produces the **same data**, with no manual seed management.
+    - **different tests** get different seeds, so they exercise different data.
+    - **you** can still pass an explicit `seed=` to override the automatic seed.
+    - **calling** the fixture **multiple times** within one test produces different (but still
+    deterministic) data on each call.
+
+    ```python
+    def test_my_pipeline(generate_dataset):
+        import pointblank as pb
+
+        schema = pb.Schema(
+            user_id=pb.int_field(unique=True),
+            email=pb.string_field(preset="email"),
+            age=pb.int_field(min_val=18, max_val=100),
+        )
+        df = generate_dataset(schema, n=500, country="DE")
+        # seed is derived from "test_my_pipeline" — same data every run
+        result = my_pipeline(df)
+        assert result.shape[0] == 500
+    ```
+
+    Multiple datasets can be generated within the same test, each with its own
+    deterministic seed:
+
+    ```python
+    def test_merge(generate_dataset):
+        customers = generate_dataset(customer_schema, n=1000, country="US")
+        orders = generate_dataset(order_schema, n=5000)
+        # Both DataFrames are deterministic; each call gets a unique seed
+    ```
+
+    Seed Stability
+    --------------
+    A given seed (whether explicit or auto-derived) is guaranteed to produce identical output
+    **within the same Pointblank version**. Across versions, changes to country data files or
+    generator logic may alter the output for a given seed.
+
+    For CI pipelines that require bit-exact data across library upgrades, save generated
+    DataFrames as Parquet or CSV snapshot files rather than relying on cross-version seed
+    stability. This is the same approach used by snapshot-testing tools like `pytest-snapshot`
+    and `syrupy`.
+
     Examples
     --------
     Here we define a schema with field constraints and generate test data from it:

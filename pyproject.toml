@@ -119,6 +119,9 @@ dev = [
 [project.urls]
 homepage = "https://github.com/posit-dev/pointblank"
 
+[project.entry-points.pytest11]
+pointblank = "pointblank.pytest_plugin"
+
 [project.scripts]
 pb = "pointblank.cli:cli"
 
