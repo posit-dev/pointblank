@@ -69,11 +69,21 @@ AVAILABLE_PRESETS = frozenset(
         "currency_code",
         # Identifiers
         "uuid4",
+        "md5",
+        "sha1",
+        "sha256",
         "ssn",
         "license_plate",
+        # Barcodes
+        "ean8",
+        "ean13",
         # Date/Time (for string representations)
         "date_this_year",
         "date_this_decade",
+        "date_between",
+        "date_range",
+        "future_date",
+        "past_date",
         "time",
         # Misc
         "color_name",
@@ -853,9 +863,17 @@ def string_field(
 
     **Financial:** `"credit_card_number"`, `"iban"`, `"currency_code"`
 
-    **Identifiers:** `"uuid4"`, `"ssn"` (social security number), `"license_plate"`
+    **Identifiers:** `"uuid4"`, `"md5"` (MD5 hash, 32 hex chars), `"sha1"` (SHA-1 hash,
+    40 hex chars), `"sha256"` (SHA-256 hash, 64 hex chars), `"ssn"` (social security number),
+    `"license_plate"`
 
-    **Date/Time (as strings):** `"date_this_year"`, `"date_this_decade"`, `"time"`
+    **Barcodes:** `"ean8"` (EAN-8 barcode with valid check digit), `"ean13"` (EAN-13 barcode
+    with valid check digit)
+
+    **Date/Time (as strings):** `"date_this_year"`, `"date_this_decade"`, `"date_between"`
+    (random date between 2000–2025), `"date_range"` (two dates joined with an en-dash, e.g.,
+    `"2012-05-12 – 2015-11-22"`), `"future_date"` (up to 1 year ahead), `"past_date"`
+    (up to 10 years back), `"time"`
 
     **Miscellaneous:** `"color_name"`, `"file_name"`, `"file_extension"`, `"mime_type"`
 

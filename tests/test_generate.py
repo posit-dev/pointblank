@@ -885,7 +885,140 @@ class TestCountrySupport:
                 .interrogate()
             )
 
-            assert validation.all_passed(), f"Internet presets failed for country {country}"
+            assert validation.all_passed()
+
+    def test_hash_presets(self):
+        """Test hash presets produce valid hex strings of correct length."""
+        pytest.importorskip("polars")
+        from pointblank import Schema, Validate, generate_dataset, string_field
+
+        schema = Schema(
+            md5_hash=string_field(preset="md5"),
+            sha1_hash=string_field(preset="sha1"),
+            sha256_hash=string_field(preset="sha256"),
+        )
+
+        df = generate_dataset(schema, n=20, seed=42, country="US")
+
+        validation = (
+            Validate(df)
+            .col_vals_not_null(columns=["md5_hash", "sha1_hash", "sha256_hash"])
+            .col_vals_regex(columns="md5_hash", pattern=r"^[0-9a-f]{32}$")
+            .col_vals_regex(columns="sha1_hash", pattern=r"^[0-9a-f]{40}$")
+            .col_vals_regex(columns="sha256_hash", pattern=r"^[0-9a-f]{64}$")
+            .interrogate()
+        )
+
+        assert validation.all_passed(), "Hash presets failed"
+
+    def test_hash_presets_deterministic(self):
+        """Test hash presets produce deterministic output with same seed."""
+        pytest.importorskip("polars")
+        from pointblank import Schema, generate_dataset, string_field
+
+        schema = Schema(
+            md5_hash=string_field(preset="md5"),
+            sha256_hash=string_field(preset="sha256"),
+        )
+
+        df1 = generate_dataset(schema, n=10, seed=99)
+        df2 = generate_dataset(schema, n=10, seed=99)
+        assert df1.equals(df2)
+
+    def test_barcode_presets(self):
+        """Test barcode presets produce valid barcodes with correct check digits."""
+        pytest.importorskip("polars")
+        from pointblank import Schema, Validate, generate_dataset, string_field
+
+        schema = Schema(
+            ean8_code=string_field(preset="ean8"),
+            ean13_code=string_field(preset="ean13"),
+        )
+
+        df = generate_dataset(schema, n=50, seed=42, country="US")
+
+        # Check format: all digits, correct length
+        validation = (
+            Validate(df)
+            .col_vals_not_null(columns=["ean8_code", "ean13_code"])
+            .col_vals_regex(columns="ean8_code", pattern=r"^\d{8}$")
+            .col_vals_regex(columns="ean13_code", pattern=r"^\d{13}$")
+            .interrogate()
+        )
+
+        assert validation.all_passed()
+
+        # Verify EAN-8 check digits
+        for barcode in df["ean8_code"].to_list():
+            digits = [int(c) for c in barcode]
+            total = sum(d * (3 if i % 2 == 0 else 1) for i, d in enumerate(digits[:7]))
+            expected_check = (10 - (total % 10)) % 10
+            assert digits[7] == expected_check
+
+        # Verify EAN-13 check digits
+        for barcode in df["ean13_code"].to_list():
+            digits = [int(c) for c in barcode]
+            total = sum(d * (1 if i % 2 == 0 else 3) for i, d in enumerate(digits[:12]))
+            expected_check = (10 - (total % 10)) % 10
+            assert digits[12] == expected_check
+
+    def test_date_range_presets(self):
+        """Test date-related string presets produce valid output."""
+        pytest.importorskip("polars")
+        from datetime import date
+
+        from pointblank import Schema, Validate, generate_dataset, string_field
+
+        schema = Schema(
+            date_btwn=string_field(preset="date_between"),
+            date_rng=string_field(preset="date_range"),
+            future=string_field(preset="future_date"),
+            past=string_field(preset="past_date"),
+        )
+
+        df = generate_dataset(schema, n=30, seed=42, country="US")
+
+        # date_between and future/past should be single ISO dates
+        validation = (
+            Validate(df)
+            .col_vals_not_null(columns=["date_btwn", "date_rng", "future", "past"])
+            .col_vals_regex(
+                columns=["date_btwn", "future", "past"],
+                pattern=r"^\d{4}-\d{2}-\d{2}$",
+            )
+            # date_range should be "YYYY-MM-DD – YYYY-MM-DD" (en-dash)
+            .col_vals_regex(
+                columns="date_rng",
+                pattern=r"^\d{4}-\d{2}-\d{2} \u2013 \d{4}-\d{2}-\d{2}$",
+            )
+            .interrogate()
+        )
+
+        assert validation.all_passed()
+
+        # Verify date_between values are within default range (2000–2025)
+        today = date.today()
+        for val in df["date_btwn"].to_list():
+            d = date.fromisoformat(val)
+            assert date(2000, 1, 1) <= d <= date(2025, 12, 31)
+
+        # Verify date_range start <= end
+        for val in df["date_rng"].to_list():
+            parts = val.split(" \u2013 ")
+            assert len(parts) == 2, f"date_range format invalid: {val}"
+            start = date.fromisoformat(parts[0])
+            end = date.fromisoformat(parts[1])
+            assert start <= end
+
+        # Verify future_date values are after today
+        for val in df["future"].to_list():
+            d = date.fromisoformat(val)
+            assert d > today
+
+        # Verify past_date values are before today
+        for val in df["past"].to_list():
+            d = date.fromisoformat(val)
+            assert d < today
 
     def test_combined_schema_validation(self):
         """Comprehensive test combining multiple field types and validations."""
@@ -947,7 +1080,7 @@ class TestCountrySupport:
             .interrogate()
         )
 
-        assert validation.all_passed(), "Combined schema validation failed"
+        assert validation.all_passed()
 
     def test_comprehensive_schema_all_countries_with_full_data(self):
         """
@@ -1016,8 +1149,16 @@ class TestCountrySupport:
                 # Identifiers (using presets)
                 # =====================================================================
                 ("uuid", string_field(preset="uuid4")),
+                ("md5_hash", string_field(preset="md5")),
+                ("sha1_hash", string_field(preset="sha1")),
+                ("sha256_hash", string_field(preset="sha256")),
                 ("ssn", string_field(preset="ssn")),
                 ("license_plate", string_field(preset="license_plate")),
+                # =====================================================================
+                # Barcodes (using presets)
+                # =====================================================================
+                ("ean8_code", string_field(preset="ean8")),
+                ("ean13_code", string_field(preset="ean13")),
                 # =====================================================================
                 # Text Content (using presets)
                 # =====================================================================
@@ -1031,6 +1172,13 @@ class TestCountrySupport:
                 ("file_name", string_field(preset="file_name")),
                 ("file_ext", string_field(preset="file_extension")),
                 ("mime_type", string_field(preset="mime_type")),
+                # =====================================================================
+                # Date Range Presets (using presets)
+                # =====================================================================
+                ("date_btwn", string_field(preset="date_between")),
+                ("date_rng", string_field(preset="date_range")),
+                ("future", string_field(preset="future_date")),
+                ("past", string_field(preset="past_date")),
                 # =====================================================================
                 # Integer Fields (with constraints)
                 # =====================================================================
@@ -1115,16 +1263,14 @@ class TestCountrySupport:
 
             # Verify basic structure
             assert df.shape[0] == 10
-            assert df.shape[1] == 57
+            assert df.shape[1] == 66
 
             # Verify no unexpected errors occurred (all values generated successfully)
             # Check a few key columns are not empty strings
             for col in ["name", "email", "city", "company", "address"]:
                 values = df[col].to_list()
 
-                assert all(v is not None and len(str(v)) > 0 for v in values), (
-                    f"Column {col} has empty values for {country}"
-                )
+                assert all(v is not None and len(str(v)) > 0 for v in values)
 
     def test_address_city_state_coherence_all_countries(self):
         """
@@ -1174,10 +1320,7 @@ class TestCountrySupport:
                 # (addresses contain the city name in the format string)
                 # For cities with exonyms, check the native name instead
                 native_name = EXONYM_TO_NATIVE.get(city, city)
-                assert native_name in address, (
-                    f"[{country}] Row {i}: City '{native_name}' (exonym: '{city}') "
-                    f"not found in address '{address}'"
-                )
+                assert native_name in address
 
     def test_address_city_coherence_with_abbreviations(self):
         """
@@ -1212,10 +1355,7 @@ class TestCountrySupport:
                 if city not in address:
                     mismatches.append(f"Row {i}: city='{city}' not in address='{address}'")
 
-            assert len(mismatches) == 0, (
-                f"[{country}] Found {len(mismatches)} city/address mismatches:\n"
-                + "\n".join(mismatches[:5])  # Show first 5
-            )
+            assert len(mismatches) == 0
 
     def test_address_only_still_generates_coherent_addresses(self):
         """
@@ -1242,10 +1382,7 @@ class TestCountrySupport:
                 address = row[0]
                 found_city = any(city in address for city in valid_cities if city)
 
-                assert found_city, (
-                    f"[{country}] Row {i}: Address '{address}' does not contain "
-                    f"any valid city from the locale data"
-                )
+                assert found_city
 
 
 class TestGeneratorValidation:
@@ -1265,15 +1402,13 @@ class TestGeneratorValidation:
                 cc = gen.credit_card_number()
 
                 # Check it passes the full credit card validation (regex + Luhn)
-                assert is_credit_card(cc), (
-                    f"Credit card '{cc}' generated for {locale} failed validation"
-                )
+                assert is_credit_card(cc)
 
                 # Also verify length is correct for card type
                 if cc.startswith("37"):  # Amex
-                    assert len(cc) == 15, f"Amex card should be 15 digits: {cc}"
+                    assert len(cc) == 15
                 else:  # Visa (4), MC (5), Discover (6011)
-                    assert len(cc) == 16, f"Non-Amex card should be 16 digits: {cc}"
+                    assert len(cc) == 16
 
     def test_credit_cards_with_col_vals_within_spec(self):
         """Ensure generated credit cards pass col_vals_within_spec validation."""
@@ -1305,7 +1440,7 @@ class TestGeneratorValidation:
             .interrogate()
         )
 
-        assert validation.all_passed(), "Generated credit cards failed col_vals_within_spec"
+        assert validation.all_passed()
 
 
 class TestLocaleDataFiles:
@@ -1329,13 +1464,13 @@ class TestLocaleDataFiles:
 
         for country in countries:
             country_dir = countries_dir / country
-            assert country_dir.exists(), f"Country directory {country} does not exist"
+            assert country_dir.exists()
 
             actual_files = {f.name for f in country_dir.iterdir() if f.suffix == ".json"}
             missing = required_files - actual_files
             extra = actual_files - required_files
 
-            assert not missing, f"Country {country} is missing files: {missing}"
+            assert not missing
             # Extra files are allowed but we note them
             if extra:
                 print(f"Note: Country {country} has extra files: {extra}")
@@ -1354,7 +1489,7 @@ class TestLocaleDataFiles:
                 try:
                     with open(json_file, "r", encoding="utf-8") as f:
                         data = json.load(f)
-                    assert isinstance(data, dict), f"{json_file} should contain a JSON object"
+                    assert isinstance(data, dict)
                 except json.JSONDecodeError as e:
                     pytest.fail(f"Invalid JSON in {json_file}: {e}")
 
@@ -1445,10 +1580,7 @@ class TestLocaleDataFiles:
                 filtered_keys = [k for k in actual_keys if k in expected_order]
 
                 # Verify the order matches
-                assert filtered_keys == expected_order, (
-                    f"{country}/{json_file}: Key order mismatch. "
-                    f"Expected {expected_order}, got {filtered_keys}"
-                )
+                assert filtered_keys == expected_order
 
     def test_address_json_schema_consistency(self):
         """Ensure address.json files have consistent schema across countries."""
@@ -1477,13 +1609,12 @@ class TestLocaleDataFiles:
                 data = json.load(f)
 
             missing_keys = common_required_keys - set(data.keys())
-            assert not missing_keys, f"address.json for {country} is missing keys: {missing_keys}"
+            assert not missing_keys
 
             # Check streets_by_city structure (all countries use this)
-            assert "streets_by_city" in data, f"{country}: should have 'streets_by_city'"
-            assert isinstance(data["streets_by_city"], dict), (
-                f"{country}: streets_by_city should be a dict"
-            )
+            assert "streets_by_city" in data
+            assert isinstance(data["streets_by_city"], dict)
+
             # Validate that each city in locations has streets
             city_names = {loc["city"] for loc in data["locations"]}
             streets_cities = set(data["streets_by_city"].keys())
@@ -1493,93 +1624,61 @@ class TestLocaleDataFiles:
             )
 
             # Validate locations structure
-            assert isinstance(data["locations"], list), f"{country}: locations should be a list"
-            assert len(data["locations"]) > 0, f"{country}: locations should not be empty"
+            assert isinstance(data["locations"], list)
+            assert len(data["locations"]) > 0
 
             for loc in data["locations"]:
-                assert "city" in loc, f"{country}: each location should have 'city'"
-                assert "state" in loc, f"{country}: each location should have 'state'"
-                assert "state_abbr" in loc, f"{country}: each location should have 'state_abbr'"
-                assert "postcode_prefix" in loc, (
-                    f"{country}: each location should have 'postcode_prefix'"
-                )
+                assert "city" in loc
+                assert "state" in loc
+                assert "state_abbr" in loc
+                assert "postcode_prefix" in loc
+
                 # Validate lat/lon bounding box fields
-                assert "lat_min" in loc, f"{country}: each location should have 'lat_min'"
-                assert "lat_max" in loc, f"{country}: each location should have 'lat_max'"
-                assert "lon_min" in loc, f"{country}: each location should have 'lon_min'"
-                assert "lon_max" in loc, f"{country}: each location should have 'lon_max'"
+                assert "lat_min" in loc
+                assert "lat_max" in loc
+                assert "lon_min" in loc
+                assert "lon_max" in loc
+
                 # Validate lat/lon bounds are numeric and valid
-                assert isinstance(loc["lat_min"], (int, float)), (
-                    f"{country}: lat_min should be numeric"
-                )
-                assert isinstance(loc["lat_max"], (int, float)), (
-                    f"{country}: lat_max should be numeric"
-                )
-                assert isinstance(loc["lon_min"], (int, float)), (
-                    f"{country}: lon_min should be numeric"
-                )
-                assert isinstance(loc["lon_max"], (int, float)), (
-                    f"{country}: lon_max should be numeric"
-                )
-                assert loc["lat_min"] < loc["lat_max"], (
-                    f"{country}/{loc['city']}: lat_min should be less than lat_max"
-                )
-                assert loc["lon_min"] < loc["lon_max"], (
-                    f"{country}/{loc['city']}: lon_min should be less than lon_max"
-                )
+                assert isinstance(loc["lat_min"], (int, float))
+                assert isinstance(loc["lat_max"], (int, float))
+                assert isinstance(loc["lon_min"], (int, float))
+                assert isinstance(loc["lon_max"], (int, float))
+                assert loc["lat_min"] < loc["lat_max"]
+                assert loc["lon_min"] < loc["lon_max"]
+
                 # Validate latitude range (-90 to 90) and longitude range (-180 to 180)
-                assert -90 <= loc["lat_min"] <= 90, f"{country}/{loc['city']}: lat_min out of range"
-                assert -90 <= loc["lat_max"] <= 90, f"{country}/{loc['city']}: lat_max out of range"
-                assert -180 <= loc["lon_min"] <= 180, (
-                    f"{country}/{loc['city']}: lon_min out of range"
-                )
-                assert -180 <= loc["lon_max"] <= 180, (
-                    f"{country}/{loc['city']}: lon_max out of range"
-                )
+                assert -90 <= loc["lat_min"] <= 90
+                assert -90 <= loc["lat_max"] <= 90
+                assert -180 <= loc["lon_min"] <= 180
+                assert -180 <= loc["lon_max"] <= 180
 
             # Validate other required fields
-            assert isinstance(data["phone_area_codes"], dict), (
-                f"{country}: phone_area_codes should be a dict"
-            )
-            assert len(data["phone_area_codes"]) > 0, (
-                f"{country}: phone_area_codes should not be empty"
-            )
+            assert isinstance(data["phone_area_codes"], dict)
+            assert len(data["phone_area_codes"]) > 0
 
             # Validate postcode_format
-            assert isinstance(data["postcode_format"], str), (
-                f"{country}: postcode_format should be a string"
-            )
-            assert len(data["postcode_format"]) > 0, (
-                f"{country}: postcode_format should not be empty"
-            )
+            assert isinstance(data["postcode_format"], str)
+            assert len(data["postcode_format"]) > 0
 
             # Validate address_formats
-            assert isinstance(data["address_formats"], list), (
-                f"{country}: address_formats should be a list"
-            )
-            assert len(data["address_formats"]) > 0, (
-                f"{country}: address_formats should not be empty"
-            )
+            assert isinstance(data["address_formats"], list)
+            assert len(data["address_formats"]) > 0
+
             for fmt in data["address_formats"]:
-                assert isinstance(fmt, str), f"{country}: each address_format should be a string"
+                assert isinstance(fmt, str)
 
             # Validate country and country_code
-            assert isinstance(data["country"], str), f"{country}: country should be a string"
-            assert isinstance(data["country_code"], str), (
-                f"{country}: country_code should be a string"
-            )
-            assert len(data["country_code"]) == 2, (
-                f"{country}: country_code should be 2 characters (ISO 3166-1 alpha-2)"
-            )
+            assert isinstance(data["country"], str)
+            assert isinstance(data["country_code"], str)
+            assert len(data["country_code"]) == 2
 
             # Validate streets_by_city structure
             for city, streets in data["streets_by_city"].items():
-                assert isinstance(streets, list), f"{country}/{city}: streets should be a list"
-                assert len(streets) > 0, f"{country}/{city}: streets should not be empty"
+                assert isinstance(streets, list)
+                assert len(streets) > 0
                 for street in streets:
-                    assert isinstance(street, str), (
-                        f"{country}/{city}: each street should be a string"
-                    )
+                    assert isinstance(street, str)
 
     def test_person_json_schema_consistency(self):
         """Ensure person.json files have consistent schema across countries."""

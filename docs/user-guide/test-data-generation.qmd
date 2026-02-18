@@ -219,13 +219,25 @@ The `preset=` parameter in `string_field()` supports many data types:
 **Identifiers:**
 
 - `uuid4`: UUID version 4
+- `md5`: MD5 hash (32 hex characters)
+- `sha1`: SHA-1 hash (40 hex characters)
+- `sha256`: SHA-256 hash (64 hex characters)
 - `ssn`: Social Security Number (country-specific format)
 - `license_plate`: vehicle license plate (location-aware for CA, US, DE, AU, GB)
+
+**Barcodes:**
+
+- `ean8`: EAN-8 barcode with valid check digit
+- `ean13`: EAN-13 barcode with valid check digit
 
 **Date/Time:**
 
 - `date_this_year`: a date within the current year
 - `date_this_decade`: a date within the current decade
+- `date_between`: a random date between 2000 and 2025
+- `date_range`: two dates joined with an en-dash (e.g., `"2012-05-12 – 2015-11-22"`)
+- `future_date`: a date up to 1 year in the future
+- `past_date`: a date up to 10 years in the past
 - `time`: a time value
 
 **Text:**
