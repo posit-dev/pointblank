@@ -35,6 +35,11 @@ class GeneratorConfig:
         When `country` specifies multiple countries, controls whether the output rows are randomly
         interleaved (`True`, the default) or grouped in contiguous country blocks (`False`). Has no
         effect when `country` is a single string.
+    weighted
+        When `True`, names and locations are sampled according to real-world frequency tiers (e.g.,
+        common names like "James" appear far more often than rare names like "Zebediah"). When
+        `False` (the default), all entries are equally likely. Only affects data files that have
+        been migrated to the tiered format; flat-list data always uses uniform sampling.
     max_unique_retries
         Maximum number of retries when generating unique values. If the generator fails to produce a
         unique value after this many attempts, it will raise an error to prevent infinite loops.
@@ -45,6 +50,7 @@ class GeneratorConfig:
     output: Literal["polars", "pandas", "dict"] = "polars"
     country: str | list[str] | dict[str, float] = "US"
     shuffle: bool = True
+    weighted: bool = True
     max_unique_retries: int = 1000
 
     def __post_init__(self):

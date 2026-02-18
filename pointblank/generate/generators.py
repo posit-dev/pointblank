@@ -36,9 +36,11 @@ INTEGER_BOUNDS = {
 }
 
 
-def _get_locale_generator(country: str = "US", seed: int | None = None) -> LocaleGenerator:
+def _get_locale_generator(
+    country: str = "US", seed: int | None = None, weighted: bool = True
+) -> LocaleGenerator:
     """Get a LocaleGenerator instance with the specified country."""
-    return LocaleGenerator(country=country, seed=seed)
+    return LocaleGenerator(country=country, seed=seed, weighted=weighted)
 
 
 def _generate_integer(field: Field, rng: random.Random, generator: Any | None = None) -> int:
@@ -430,7 +432,7 @@ def generate_column(
     preset = getattr(field, "preset", None)
     if preset is not None:
         # Use config country
-        locale_gen = _get_locale_generator(config.country, config.seed)
+        locale_gen = _get_locale_generator(config.country, config.seed, config.weighted)
 
     # Generate values
     if field.unique:
@@ -579,7 +581,7 @@ def _generate_single_country(
     # Set up shared locale generator if any coherence is needed
     shared_locale_gen = None
     if needs_coherence:
-        shared_locale_gen = _get_locale_generator(country, config.seed)
+        shared_locale_gen = _get_locale_generator(country, config.seed, config.weighted)
         if needs_address:
             shared_locale_gen.init_row_locations(config.n)
         if needs_person:

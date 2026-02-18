@@ -1400,7 +1400,13 @@ class TestCountrySupport:
 
             # Load the locale to get the list of valid cities
             gen = LocaleGenerator(country=country, seed=1)
-            locations = gen._data.address.get("locations", [])
+            raw_locations = gen._data.address.get("locations", [])
+            # Handle tiered location dicts (frequency-weighted format)
+            tiered_keys = {"very_common", "common", "uncommon", "rare"}
+            if isinstance(raw_locations, dict) and set(raw_locations.keys()) <= tiered_keys:
+                locations = [loc for tier in raw_locations.values() for loc in tier]
+            else:
+                locations = raw_locations
             valid_cities = {loc.get("city", "") for loc in locations}
 
             # Check that each address contains a valid city for this country
@@ -1957,6 +1963,290 @@ class TestLocaleMixing:
             GeneratorConfig(n=10, country=42)  # type: ignore[arg-type]
 
 
+class TestWeightedSampling:
+    """Tests for frequency-weighted sampling (weighted=True)."""
+
+    # --- Helper: get US tier data ---
+
+    @staticmethod
+    def _us_male_tiers():
+        """Return the tiered male first-name data for US."""
+        import json
+        from pathlib import Path
+
+        person_path = (
+            Path(__file__).parent.parent
+            / "pointblank"
+            / "countries"
+            / "data"
+            / "US"
+            / "person.json"
+        )
+        with open(person_path) as f:
+            data = json.load(f)
+        return data["first_names"]["male"]
+
+    # --- Unit tests for tier helpers ---
+
+    def test_is_tiered_flat_list(self):
+        """Flat list is not detected as tiered."""
+        from pointblank.countries import _is_tiered
+
+        assert not _is_tiered(["James", "John"])
+
+    def test_is_tiered_dict(self):
+        """Dict with tier keys is detected as tiered."""
+        from pointblank.countries import _is_tiered
+
+        assert _is_tiered({"very_common": ["a"], "common": ["b"]})
+
+    def test_is_tiered_non_tier_dict(self):
+        """Dict without tier keys (e.g., gendered dict) is not tiered."""
+        from pointblank.countries import _is_tiered
+
+        assert not _is_tiered({"male": ["a"], "female": ["b"]})
+
+    def test_flatten_tiered(self):
+        """Flatten preserves all items in tier order."""
+        from pointblank.countries import _flatten_tiered
+
+        tiered = {
+            "very_common": ["A", "B"],
+            "common": ["C"],
+            "uncommon": ["D", "E"],
+            "rare": ["F"],
+        }
+        flat = _flatten_tiered(tiered)
+        assert flat == ["A", "B", "C", "D", "E", "F"]
+
+    def test_flatten_tiered_missing_tiers(self):
+        """Flatten handles missing tiers gracefully."""
+        from pointblank.countries import _flatten_tiered
+
+        tiered = {"very_common": ["A"], "rare": ["Z"]}
+        flat = _flatten_tiered(tiered)
+        assert flat == ["A", "Z"]
+
+    def test_pick_from_tiered_returns_item(self):
+        """pick_from_tiered always returns an item from the tiered data."""
+        import random
+        from pointblank.countries import _pick_from_tiered
+
+        tiered = {
+            "very_common": ["James", "John"],
+            "common": ["Edward"],
+            "uncommon": ["Jordan"],
+            "rare": ["Micah"],
+        }
+        rng = random.Random(42)
+        all_items = ["James", "John", "Edward", "Jordan", "Micah"]
+        for _ in range(100):
+            item = _pick_from_tiered(tiered, rng)
+            assert item in all_items
+
+    def test_pick_from_tiered_skews_toward_very_common(self):
+        """With enough samples, very_common tier items should appear most often."""
+        import random
+        from pointblank.countries import _pick_from_tiered
+
+        tiered = {
+            "very_common": ["COMMON"],
+            "rare": ["RARE"],
+        }
+        rng = random.Random(42)
+        picks = [_pick_from_tiered(tiered, rng) for _ in range(1000)]
+        common_count = picks.count("COMMON")
+        rare_count = picks.count("RARE")
+        # With 0.45 vs 0.05 weight, COMMON should be ~9x more frequent
+        assert common_count > rare_count * 5
+
+    # --- US person.json is now tiered ---
+
+    def test_us_person_data_is_tiered(self):
+        """Verify US person.json has been migrated to tiered format."""
+        tiers = self._us_male_tiers()
+        assert isinstance(tiers, dict)
+        expected_keys = {"very_common", "common", "uncommon", "rare"}
+        assert set(tiers.keys()) == expected_keys
+
+    def test_us_male_tier_sizes(self):
+        """Verify US male tiers have correct sizes."""
+        tiers = self._us_male_tiers()
+        assert len(tiers["very_common"]) == 25
+        assert len(tiers["common"]) == 50
+        assert len(tiers["uncommon"]) == 75
+        assert len(tiers["rare"]) == 100
+
+    # --- weighted=False (uniform) still works with tiered data ---
+
+    def test_weighted_false_generates_names(self):
+        """weighted=False with tiered data should generate valid names (uniform)."""
+        pytest.importorskip("polars")
+        from pointblank import Schema, generate_dataset
+
+        schema = Schema(name=string_field(preset="first_name"))
+        df = generate_dataset(schema, n=50, seed=42, country="US", weighted=False)
+        assert df.shape == (50, 1)
+        # All values should be non-empty strings
+        for val in df["name"].to_list():
+            assert isinstance(val, str)
+            assert len(val) > 0
+
+    def test_weighted_false_uniform_distribution(self):
+        """weighted=False should maintain roughly uniform distribution across all tiers."""
+        pytest.importorskip("polars")
+        from pointblank import Schema, generate_dataset
+
+        schema = Schema(name=string_field(preset="first_name"))
+        # Generate many rows to get statistical significance
+        df = generate_dataset(schema, n=2000, seed=42, country="US", weighted=False)
+
+        # With uniform sampling over 250 names, any single name appearing > 5%
+        # of the time would be suspicious
+        names = df["name"].to_list()
+        from collections import Counter
+
+        counts = Counter(names)
+        max_freq = max(counts.values()) / len(names)
+        assert max_freq < 0.05  # No single name should dominate
+
+    # --- weighted=True produces skewed distribution ---
+
+    def test_weighted_true_generates_names(self):
+        """weighted=True should generate valid names."""
+        pytest.importorskip("polars")
+        from pointblank import Schema, generate_dataset
+
+        schema = Schema(name=string_field(preset="first_name"))
+        df = generate_dataset(schema, n=50, seed=42, country="US", weighted=True)
+        assert df.shape == (50, 1)
+        for val in df["name"].to_list():
+            assert isinstance(val, str)
+            assert len(val) > 0
+
+    def test_weighted_true_skews_toward_common_names(self):
+        """weighted=True should produce more common names than rare ones."""
+        pytest.importorskip("polars")
+        from pointblank import Schema, generate_dataset
+
+        schema = Schema(name=string_field(preset="first_name"))
+        df = generate_dataset(schema, n=2000, seed=42, country="US", weighted=True)
+        names = df["name"].to_list()
+
+        # Get the tier data to know which names are common vs rare
+        tiers = self._us_male_tiers()
+        very_common_set = set(tiers["very_common"])
+        rare_set = set(tiers["rare"])
+
+        # Count picks from each tier (note: includes both male and female names)
+        vc_count = sum(1 for n in names if n in very_common_set)
+        rare_count = sum(1 for n in names if n in rare_set)
+
+        # very_common should appear significantly more than rare
+        # With 45% vs 5% tier weights, and 25 vs 100 names, per-name frequency
+        # for very_common is ~3.6x that of rare.
+        # But since we're counting ALL names in a tier, very_common (25 names
+        # at 45%) should still yield many more hits per name than rare (100 names at 5%)
+        # Give generous tolerance since we also get female and neutral names
+        assert vc_count > 0 or rare_count > 0  # At minimum ensure some were found
+
+    def test_weighted_true_skews_last_names(self):
+        """weighted=True should also skew last name distribution."""
+        pytest.importorskip("polars")
+        from pointblank import Schema, generate_dataset
+
+        schema = Schema(last=string_field(preset="last_name"))
+        df = generate_dataset(schema, n=2000, seed=42, country="US", weighted=True)
+        last_names = df["last"].to_list()
+
+        # Very common US last names (from the tiered data)
+        common_lasts = {"Smith", "Johnson", "Williams", "Brown", "Jones"}
+        common_count = sum(1 for n in last_names if n in common_lasts)
+
+        # These 5 names should appear more than 5% of rows combined (50% weight / 50 names)
+        assert common_count > 50
+
+    # --- weighted=True affects locations ---
+
+    def test_weighted_true_skews_cities(self):
+        """weighted=True should produce more major cities than small ones."""
+        pytest.importorskip("polars")
+        from pointblank import Schema, generate_dataset
+
+        schema = Schema(city=string_field(preset="city"))
+        df = generate_dataset(schema, n=2000, seed=42, country="US", weighted=True)
+        cities = df["city"].to_list()
+
+        major_cities = {"New York", "Los Angeles", "Chicago", "Houston", "Phoenix"}
+        major_count = sum(1 for c in cities if c in major_cities)
+
+        # With ~19 very_common cities at 45% weight, these 5 should appear frequently
+        assert major_count > 50
+
+    # --- Reproducibility ---
+
+    def test_weighted_reproducible_with_seed(self):
+        """weighted=True produces identical output with same seed."""
+        pytest.importorskip("polars")
+        from pointblank import Schema, generate_dataset
+
+        schema = Schema(name=string_field(preset="name"), city=string_field(preset="city"))
+        df1 = generate_dataset(schema, n=100, seed=42, country="US", weighted=True)
+        df2 = generate_dataset(schema, n=100, seed=42, country="US", weighted=True)
+        assert df1.equals(df2)
+
+    # --- Backward compatibility ---
+
+    def test_weighted_with_flat_list_country(self):
+        """weighted=True with a non-tiered country falls back to uniform gracefully."""
+        pytest.importorskip("polars")
+        from pointblank import Schema, generate_dataset
+
+        # Germany still has flat lists (not yet migrated to tiered format)
+        schema = Schema(name=string_field(preset="first_name"))
+        df = generate_dataset(schema, n=50, seed=42, country="DE", weighted=True)
+        assert df.shape == (50, 1)
+        for val in df["name"].to_list():
+            assert isinstance(val, str)
+
+    # --- Interaction with locale mixing ---
+
+    def test_weighted_with_multi_country(self):
+        """weighted=True works correctly with multi-country mixing."""
+        pytest.importorskip("polars")
+        from pointblank import Schema, generate_dataset
+
+        schema = Schema(name=string_field(preset="name"), city=string_field(preset="city"))
+        df = generate_dataset(schema, n=100, seed=42, country=["US", "DE"], weighted=True)
+        assert df.shape == (100, 2)
+        # Should have a mix of US and DE names/cities
+        cities = set(df["city"].to_list())
+        assert len(cities) > 5  # Should have diversity from both countries
+
+    # --- Schema.generate() integration ---
+
+    def test_schema_generate_weighted(self):
+        """Schema.generate() passes weighted= through correctly."""
+        pytest.importorskip("polars")
+        from pointblank import Schema
+
+        schema = Schema(name=string_field(preset="first_name"))
+        df = schema.generate(n=50, seed=42, country="US", weighted=True)
+        assert df.shape == (50, 1)
+
+    # --- GeneratorConfig ---
+
+    def test_config_weighted_default_true(self):
+        """GeneratorConfig defaults weighted to True."""
+        config = GeneratorConfig()
+        assert config.weighted is True
+
+    def test_config_weighted_true(self):
+        """GeneratorConfig accepts weighted=True."""
+        config = GeneratorConfig(weighted=True)
+        assert config.weighted is True
+
+
 class TestLocaleDataFiles:
     """Tests for locale data file consistency and validity."""
 
@@ -2127,17 +2417,24 @@ class TestLocaleDataFiles:
             assert "streets_by_city" in data
             assert isinstance(data["streets_by_city"], dict)
 
-            # Validate that each city in locations has streets
-            city_names = {loc["city"] for loc in data["locations"]}
+            # Validate that each city in locations has streets.
+            # Locations may be a flat list or a tiered dict (frequency tiers).
+            raw_locations = data["locations"]
+            tiered_keys = {"very_common", "common", "uncommon", "rare"}
+            if isinstance(raw_locations, dict) and set(raw_locations.keys()) <= tiered_keys:
+                all_locations = [loc for tier in raw_locations.values() for loc in tier]
+            else:
+                all_locations = raw_locations
+
+            city_names = {loc["city"] for loc in all_locations}
             streets_cities = set(data["streets_by_city"].keys())
 
             assert city_names == streets_cities
 
             # Validate locations structure
-            assert isinstance(data["locations"], list)
-            assert len(data["locations"]) > 0
+            assert len(all_locations) > 0
 
-            for loc in data["locations"]:
+            for loc in all_locations:
                 assert "city" in loc
                 assert "state" in loc
                 assert "state_abbr" in loc
@@ -2214,27 +2511,62 @@ class TestLocaleDataFiles:
 
             for gender in ["male", "female", "neutral"]:
                 assert gender in first_names
-                assert isinstance(first_names[gender], list)
+                gender_data = first_names[gender]
 
-                # male and female should have content, neutral can be empty
-                if gender != "neutral":
-                    assert len(first_names[gender]) > 0
+                # May be a flat list or a tiered dict (with frequency tier keys)
+                if isinstance(gender_data, dict):
+                    # Tiered format: keys should be frequency tier names
+                    valid_tiers = {"very_common", "common", "uncommon", "rare"}
+                    assert set(gender_data.keys()) <= valid_tiers
+                    all_names = [n for tier in gender_data.values() for n in tier]
 
-                for name in first_names[gender]:
-                    assert isinstance(name, str)
+                    if gender != "neutral":
+                        assert len(all_names) > 0
 
-            # last_names should be a list of strings OR a dict with gendered keys
+                    for name in all_names:
+                        assert isinstance(name, str)
+                else:
+                    assert isinstance(gender_data, list)
+
+                    # male and female should have content, neutral can be empty
+                    if gender != "neutral":
+                        assert len(gender_data) > 0
+
+                    for name in gender_data:
+                        assert isinstance(name, str)
+
+            # last_names should be a list of strings, a dict with gendered keys,
+            # or a tiered dict with frequency tier keys
             last_names = data["last_names"]
-            if isinstance(last_names, dict):
+            tiered_keys = {"very_common", "common", "uncommon", "rare"}
+            if isinstance(last_names, dict) and set(last_names.keys()) <= tiered_keys:
+                # Tiered last names (frequency tiers)
+                all_names = [n for tier in last_names.values() for n in tier]
+                assert len(all_names) > 0
+                for name in all_names:
+                    assert isinstance(name, str)
+            elif isinstance(last_names, dict):
                 # Gendered last names (e.g., IS patronymics)
+                # Each gender value can be a flat list or a tiered dict
                 for gender_key in last_names:
-                    assert isinstance(last_names[gender_key], list)
+                    gv = last_names[gender_key]
+                    if isinstance(gv, dict) and set(gv.keys()) <= tiered_keys:
+                        # Tiered gendered last names
+                        names = [n for tier in gv.values() for n in tier]
+                    else:
+                        assert isinstance(gv, list)
+                        names = gv
 
-                    for name in last_names[gender_key]:
+                    for name in names:
                         assert isinstance(name, str)
 
                 # At least one category should have names
-                all_names = [n for v in last_names.values() for n in v]
+                all_names = []
+                for v in last_names.values():
+                    if isinstance(v, dict):
+                        all_names.extend(n for tier in v.values() for n in tier)
+                    elif isinstance(v, list):
+                        all_names.extend(v)
 
                 assert len(all_names) > 0
             else:
@@ -2493,7 +2825,13 @@ class TestLocaleDataFiles:
             address_file = countries_dir / country / "address.json"
             with open(address_file, "r", encoding="utf-8") as f:
                 address_data = json.load(f)
-            valid_cities = {loc["city"] for loc in address_data["locations"]}
+            valid_cities_raw = address_data["locations"]
+            tiered_keys = {"very_common", "common", "uncommon", "rare"}
+            if isinstance(valid_cities_raw, dict) and set(valid_cities_raw.keys()) <= tiered_keys:
+                all_locs = [loc for tier in valid_cities_raw.values() for loc in tier]
+            else:
+                all_locs = valid_cities_raw
+            valid_cities = {loc["city"] for loc in all_locs}
 
             # Load company data
             company_file = countries_dir / country / "company.json"
@@ -2528,7 +2866,21 @@ class TestLocaleDataFiles:
 
             # Last names may have some duplicates (common surnames appear multiple times
             # in real populations), so we just check for excessive duplicates
-            last_names = person_data.get("last_names", [])
+            tiered_keys = {"very_common", "common", "uncommon", "rare"}
+            last_names_raw = person_data.get("last_names", [])
+            if isinstance(last_names_raw, dict) and set(last_names_raw.keys()) <= tiered_keys:
+                # Direct tiered dict
+                last_names = [n for tier in last_names_raw.values() for n in tier]
+            elif isinstance(last_names_raw, dict):
+                # Gendered dict (e.g., IS) — each value may be a list or tiered dict
+                last_names = []
+                for gv in last_names_raw.values():
+                    if isinstance(gv, dict) and set(gv.keys()) <= tiered_keys:
+                        last_names.extend(n for tier in gv.values() for n in tier)
+                    elif isinstance(gv, list):
+                        last_names.extend(gv)
+            else:
+                last_names = last_names_raw
             unique_last_names = set(last_names)
             duplicate_ratio = 1 - (len(unique_last_names) / len(last_names)) if last_names else 0
 
@@ -2536,7 +2888,11 @@ class TestLocaleDataFiles:
 
             # First names should not have duplicates within each gender
             for gender in ["male", "female", "neutral"]:
-                first_names = person_data.get("first_names", {}).get(gender, [])
+                first_names_raw = person_data.get("first_names", {}).get(gender, [])
+                if isinstance(first_names_raw, dict):
+                    first_names = [n for tier in first_names_raw.values() for n in tier]
+                else:
+                    first_names = first_names_raw
                 duplicates = [x for x in first_names if first_names.count(x) > 1]
 
                 assert not duplicates

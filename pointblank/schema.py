@@ -798,6 +798,7 @@ class Schema:
         output: Literal["polars", "pandas", "dict"] = "polars",
         country: str | list[str] | dict[str, float] = "US",
         shuffle: bool = True,
+        weighted: bool = True,
     ) -> Any:
         """
         Generate synthetic test data conforming to this schema.
@@ -828,6 +829,12 @@ class Schema:
             randomly interleaved (`True`, the default) or grouped in contiguous country blocks
             (`False`). The shuffle is deterministic with the seed. Has no effect when `country` is
             a single string. Default is `True`.
+        weighted
+            When `True`, names and locations are sampled according to real-world frequency tiers.
+            Common names like "James" and "Smith" appear far more often than rare names. Large
+            cities like New York and Los Angeles dominate over small towns. Only affects data files
+            that have been migrated to the tiered format; flat-list data always uses uniform
+            sampling. Default is `True`.
 
         Returns
         -------
@@ -953,6 +960,7 @@ class Schema:
             output=output,
             country=country,
             shuffle=shuffle,
+            weighted=weighted,
         )
 
         return generate_dataframe(fields, config)
@@ -1563,6 +1571,7 @@ def generate_dataset(
     output: Literal["polars", "pandas", "dict"] = "polars",
     country: str | list[str] | dict[str, float] = "US",
     shuffle: bool = True,
+    weighted: bool = True,
 ) -> Any:
     """
     Generate synthetic test data from a schema.
@@ -1598,6 +1607,12 @@ def generate_dataset(
         different countries are interleaved randomly (`True`, the default) or grouped by country
         in the order the countries are specified (`False`). Ignored when `country=` is a single
         string.
+    weighted
+        When `True`, names and locations are sampled according to real-world frequency tiers.
+        Common names like "James" and "Smith" appear far more often than rare names. Large
+        cities like New York and Los Angeles dominate over small towns. Only affects data files
+        that have been migrated to the tiered format; flat-list data always uses uniform
+        sampling. Default is `True`.
 
     Returns
     -------
@@ -1800,4 +1815,6 @@ def generate_dataset(
     pb.generate_dataset(schema, n=50, seed=23)
     ```
     """
-    return schema.generate(n=n, seed=seed, output=output, country=country, shuffle=shuffle)
+    return schema.generate(
+        n=n, seed=seed, output=output, country=country, shuffle=shuffle, weighted=weighted
+    )

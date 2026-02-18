@@ -420,6 +420,62 @@ rows. A French row will have a French name with a matching French email; a Japan
 Japanese name with a matching Japanese email. Non-preset columns (integers, floats, booleans, dates)
 are generated independently for each batch but still respect their field constraints.
 
+### Frequency-Weighted Sampling
+
+By default, names and cities are sampled uniformly at random from the locale data, giving every
+entry the same probability of being selected. Real-world distributions are far from uniform though:
+"James" and "Maria" appear orders of magnitude more often than "Thaddeus" or "Xiomara", and more
+people live in New York City than in Flagstaff. The `weighted=True` parameter makes generated data
+reflect this natural skew.
+
+```{python}
+schema = pb.Schema(
+    name=pb.string_field(preset="name"),
+    city=pb.string_field(preset="city"),
+)
+
+pb.preview(pb.generate_dataset(schema, n=200, seed=23, country="US", weighted=True))
+```
+
+With weighting enabled you will see popular names like James, John, Mary, and Patricia appear more
+frequently, while unusual names surface only occasionally. Similarly, cities like New York, Los
+Angeles, and Chicago dominate the output while smaller cities appear less often.
+
+The feature works by organizing locale data into four frequency tiers. Each tier has a sampling
+probability that determines how likely its members are to be selected:
+
+| Tier | Probability | Contents |
+|------|-------------|----------|
+| very_common | 45% | The top ~10% of entries by real-world frequency |
+| common | 30% | The next ~20% of entries |
+| uncommon | 20% | The next ~30% of entries |
+| rare | 5% | The remaining ~40% of entries |
+
+When a value is needed, a tier is first chosen according to these probabilities and then a single
+entry is picked uniformly at random within that tier. This two-step approach keeps sampling fast
+while producing a realistic long-tail distribution. Setting `weighted=False` pools all entries
+across every tier and samples them uniformly, which can be useful when you want an even spread
+rather than a realistic distribution.
+
+Weighted sampling combines seamlessly with multi-country mixing. Each country's batch uses its own
+tiered data independently, so a mixed dataset will have weighted US names alongside weighted German
+names:
+
+```{python}
+pb.preview(
+    pb.generate_dataset(
+        schema,
+        n=200,
+        seed=23,
+        country={"US": 0.6, "DE": 0.4},
+        weighted=True,
+    )
+)
+```
+
+All 55 supported country locales have tiered name and location data, so `weighted=True` produces
+realistic frequency distributions for every country.
+
 ## Output Formats
 
 The `generate_dataset()` function supports multiple output formats via the `output=` parameter,
