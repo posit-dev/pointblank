@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import json
 import random
+import re
 import unicodedata
 from dataclasses import dataclass, field
 from importlib.resources import files
@@ -2506,6 +2507,133 @@ class LocaleGenerator:
             ],
         )
         return self.rng.choice(mime_types)
+
+    # Country-to-region mapping for browser weight profiles
+    _COUNTRY_BROWSER_REGION: dict[str, str] = {
+        # North America
+        "US": "north_america",
+        "CA": "north_america",
+        "MX": "south_america",
+        # Western Europe
+        "GB": "western_europe",
+        "DE": "western_europe",
+        "FR": "western_europe",
+        "IT": "western_europe",
+        "ES": "western_europe",
+        "NL": "western_europe",
+        "BE": "western_europe",
+        "AT": "western_europe",
+        "CH": "western_europe",
+        "IE": "western_europe",
+        "PT": "western_europe",
+        "LU": "western_europe",
+        # Nordic
+        "SE": "nordic",
+        "NO": "nordic",
+        "DK": "nordic",
+        "FI": "nordic",
+        "IS": "nordic",
+        # Eastern Europe
+        "PL": "eastern_europe",
+        "CZ": "eastern_europe",
+        "SK": "eastern_europe",
+        "HU": "eastern_europe",
+        "RO": "eastern_europe",
+        "BG": "eastern_europe",
+        "HR": "eastern_europe",
+        "SI": "eastern_europe",
+        "LT": "eastern_europe",
+        "LV": "eastern_europe",
+        "EE": "eastern_europe",
+        "CY": "eastern_europe",
+        "MT": "eastern_europe",
+        "GR": "eastern_europe",
+        # Russia
+        "RU": "russia",
+        # Japan
+        "JP": "japan",
+        # South Korea
+        "KR": "south_korea",
+        # China / Greater China
+        "CN": "china",
+        "HK": "china",
+        "TW": "china",
+        # South Asia
+        "IN": "south_asia",
+        # Southeast Asia
+        "ID": "southeast_asia",
+        "PH": "southeast_asia",
+        "TH": "southeast_asia",
+        "SG": "southeast_asia",
+        # Oceania
+        "AU": "oceania",
+        "NZ": "oceania",
+        # South America
+        "BR": "south_america",
+        "AR": "south_america",
+        "CL": "south_america",
+        "CO": "south_america",
+        # Middle East / Africa
+        "TR": "middle_east_africa",
+        "AE": "middle_east_africa",
+        "NG": "middle_east_africa",
+        "ZA": "middle_east_africa",
+    }
+
+    def user_agent(self) -> str:
+        """Generate a random user agent string with country-specific browser weighting."""
+
+        # Get user agent template data from misc
+        ua_templates = self._data.misc.get("user_agent_templates", {})
+        if not ua_templates:
+            return "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36"
+
+        # Get browser weight profiles
+        profiles = self._data.misc.get("browser_weight_profiles", {})
+
+        # Determine which profile to use for this country
+        region = self._COUNTRY_BROWSER_REGION.get(self.country_code, "global")
+        weights = profiles.get(region, profiles.get("global", {}))
+
+        if not weights:
+            # No weight profiles — pick a random category
+            chosen_category = self.rng.choice(list(ua_templates.keys()))
+        else:
+            # Filter to only categories that have templates available
+            available = [(cat, w) for cat, w in weights.items() if cat in ua_templates]
+            if not available:
+                chosen_category = self.rng.choice(list(ua_templates.keys()))
+            else:
+                # Weighted selection of browser category
+                categories, cat_weights = zip(*available)
+                total = sum(cat_weights)
+                r = self.rng.random() * total
+                cumulative = 0.0
+                chosen_category = categories[-1]
+                for cat, w in zip(categories, cat_weights):
+                    cumulative += w
+                    if r <= cumulative:
+                        chosen_category = cat
+                        break
+
+        # Assemble a UA string from the chosen category's template
+        cat_data = ua_templates[chosen_category]
+        templates = cat_data.get("templates", [])
+        if not templates:
+            return "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36"
+
+        # Pick a random template
+        template = self.rng.choice(templates)
+
+        # Fill in all {placeholder} variables from the category's variable lists
+        def _replace_var(match: re.Match) -> str:
+            var_name = match.group(1)
+            values = cat_data.get(var_name, [])
+            if values:
+                return self.rng.choice(values)
+            return match.group(0)  # Leave placeholder if no values
+
+        return re.sub(r"\{(\w+)\}", _replace_var, template)
 
     # =========================================================================
     # Utilities
