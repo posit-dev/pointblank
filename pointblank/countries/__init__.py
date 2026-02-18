@@ -540,6 +540,43 @@ class LocaleRegistry:
         self._cache.clear()
 
 
+# Default frequency tier weights for weighted sampling.
+# Keys must match the tier names used in tiered data files.
+FREQUENCY_TIERS: dict[str, float] = {
+    "very_common": 0.45,
+    "common": 0.30,
+    "uncommon": 0.20,
+    "rare": 0.05,
+}
+
+_TIER_KEYS = frozenset(FREQUENCY_TIERS)
+
+
+def _is_tiered(data: Any) -> bool:
+    """Return True if *data* is a dict whose keys are frequency tier names."""
+    return isinstance(data, dict) and bool(_TIER_KEYS & set(data.keys()))
+
+
+def _flatten_tiered(data: dict[str, list]) -> list:
+    """Flatten a tiered dict into a single flat list (preserves order by tier)."""
+    items: list = []
+    for tier in FREQUENCY_TIERS:
+        items.extend(data.get(tier, []))
+    return items
+
+
+def _pick_from_tiered(tiered_data: dict[str, list], rng: random.Random) -> Any:
+    """Pick an item from a tiered dict using frequency weights."""
+    available_tiers = [t for t in FREQUENCY_TIERS if t in tiered_data and tiered_data[t]]
+    if not available_tiers:
+        # Fallback: flatten and pick uniformly
+        all_items = [item for tier_list in tiered_data.values() for item in tier_list]
+        return rng.choice(all_items) if all_items else None
+    weights = [FREQUENCY_TIERS[t] for t in available_tiers]
+    chosen_tier = rng.choices(available_tiers, weights=weights, k=1)[0]
+    return rng.choice(tiered_data[chosen_tier])
+
+
 class LocaleGenerator:
     """
     Generator for country-specific test data.
@@ -548,7 +585,7 @@ class LocaleGenerator:
     addresses, etc. based on country-specific patterns and data.
     """
 
-    def __init__(self, country: str = "US", seed: int | None = None):
+    def __init__(self, country: str = "US", seed: int | None = None, weighted: bool = False):
         """
         Initialize the country data generator.
 
@@ -559,9 +596,14 @@ class LocaleGenerator:
             Also accepts legacy locale codes like "en_US" for backwards compatibility.
         seed
             Random seed for reproducibility.
+        weighted
+            When True, names and locations are sampled according to real-world frequency
+            tiers (common names appear far more often than rare names). Only affects data
+            files using the tiered format; flat-list data always uses uniform sampling.
         """
         self.country_code = _normalize_country(country)
         self.rng = random.Random(seed)
+        self.weighted = weighted
         self._registry = LocaleRegistry()
         self._data = self._registry.get(self.country_code)
 
@@ -649,43 +691,70 @@ class LocaleGenerator:
         names = self._data.person.get("first_names", {})
 
         if gender and gender in names:
-            name_list = names[gender]
+            name_data = names[gender]
         elif "neutral" in names:
             # Combine all available names
-            all_names = []
+            name_data = []
             for category in ["male", "female", "neutral"]:
-                all_names.extend(names.get(category, []))
-            name_list = all_names if all_names else ["Alex"]
+                cat_data = names.get(category, [])
+                if _is_tiered(cat_data):
+                    name_data.extend(_flatten_tiered(cat_data))
+                elif isinstance(cat_data, list):
+                    name_data.extend(cat_data)
+            name_data = name_data if name_data else ["Alex"]
         else:
             # Flatten all categories
-            all_names = []
+            name_data = []
             for category_names in names.values():
-                if isinstance(category_names, list):
-                    all_names.extend(category_names)
-            name_list = all_names if all_names else ["Alex"]
+                if _is_tiered(category_names):
+                    name_data.extend(_flatten_tiered(category_names))
+                elif isinstance(category_names, list):
+                    name_data.extend(category_names)
+            name_data = name_data if name_data else ["Alex"]
 
-        return self.rng.choice(name_list)
+        # Tiered weighted sampling
+        if self.weighted and _is_tiered(name_data):
+            return _pick_from_tiered(name_data, self.rng)
+
+        # Flat list (or tiered with weighted=False — flatten first)
+        if _is_tiered(name_data):
+            name_data = _flatten_tiered(name_data)
+
+        return self.rng.choice(name_data)
 
     def _generate_last_name(self, gender: str | None = None) -> str:
         """Generate a random last name (internal, no caching).
 
         If last_names is a dict with 'male'/'female' keys (e.g., IS patronymics), picks from the
-        gender-appropriate list.
+        gender-appropriate list.  Also handles frequency-tiered dicts when ``self.weighted``.
         """
         names = self._data.person.get("last_names", ["Smith"])
+
+        # Tiered last names (top-level tiers without gender sub-keys)
+        if _is_tiered(names):
+            if self.weighted:
+                return _pick_from_tiered(names, self.rng)
+            return self.rng.choice(_flatten_tiered(names))
 
         if isinstance(names, dict):
             # Gendered last names (e.g., Icelandic patronymics)
             if gender and gender in names:
-                name_list = names[gender]
+                name_data = names[gender]
             else:
                 # Flatten all categories
                 all_names = []
                 for cat_names in names.values():
                     if isinstance(cat_names, list):
                         all_names.extend(cat_names)
-                name_list = all_names if all_names else ["Smith"]
-            return self.rng.choice(name_list)
+                    elif _is_tiered(cat_names):
+                        all_names.extend(_flatten_tiered(cat_names))
+                name_data = all_names if all_names else ["Smith"]
+
+            if self.weighted and _is_tiered(name_data):
+                return _pick_from_tiered(name_data, self.rng)
+            if _is_tiered(name_data):
+                name_data = _flatten_tiered(name_data)
+            return self.rng.choice(name_data)
 
         return self.rng.choice(names)
 
@@ -1178,8 +1247,21 @@ class LocaleGenerator:
     def _get_location(self) -> dict[str, str]:
         """Get a coherent location (city, state, postcode_prefix) from the data."""
         locations = self._data.address.get("locations", [])
-        if locations:
+
+        # Tiered locations
+        if _is_tiered(locations):
+            if self.weighted:
+                loc = _pick_from_tiered(locations, self.rng)
+                if loc is not None:
+                    return loc
+            else:
+                flat = _flatten_tiered(locations)
+                if flat:
+                    return self.rng.choice(flat)
+
+        elif locations:
             return self.rng.choice(locations)
+
         # Fallback for old-style data
         return {
             "city": "Springfield",
@@ -2656,7 +2738,9 @@ class LocaleGenerator:
 _default_registry = LocaleRegistry()
 
 
-def get_generator(country: str = "US", seed: int | None = None) -> LocaleGenerator:
+def get_generator(
+    country: str = "US", seed: int | None = None, weighted: bool = False
+) -> LocaleGenerator:
     """
     Get a country data generator instance.
 
@@ -2667,10 +2751,12 @@ def get_generator(country: str = "US", seed: int | None = None) -> LocaleGenerat
         Also accepts legacy locale codes like "en_US" for backwards compatibility.
     seed
         Random seed for reproducibility.
+    weighted
+        When True, names and locations are sampled with real-world frequency tiers.
 
     Returns
     -------
     LocaleGenerator
         A generator configured for the specified country.
     """
-    return LocaleGenerator(country=country, seed=seed)
+    return LocaleGenerator(country=country, seed=seed, weighted=weighted)

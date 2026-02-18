@@ -49,6 +49,9 @@ def generate_dataset(request: pytest.FixtureRequest):
     shuffle : bool, default `True`
         When using multi-country mixing, interleave rows randomly (`True`) or
         keep them grouped by country (`False`).
+    weighted : bool, default `False`
+        When `True`, names and locations are sampled according to real-world
+        frequency tiers (common names appear more often than rare names).
 
     Returns
     -------
@@ -98,6 +101,7 @@ def generate_dataset(request: pytest.FixtureRequest):
         output: Literal["polars", "pandas", "dict"] = "polars",
         country: str | list[str] | dict[str, float] = "US",
         shuffle: bool = True,
+        weighted: bool = False,
     ) -> Any:
         nonlocal call_count
 
@@ -112,7 +116,13 @@ def generate_dataset(request: pytest.FixtureRequest):
         _generate.last_seed = seed
 
         return _generate_dataset(
-            schema, n=n, seed=seed, output=output, country=country, shuffle=shuffle
+            schema,
+            n=n,
+            seed=seed,
+            output=output,
+            country=country,
+            shuffle=shuffle,
+            weighted=weighted,
         )
 
     # Expose seed metadata on the callable so users can inspect it in
