@@ -145,6 +145,7 @@ class TestGenerateColumnBoolean:
 
         assert len(values) == 100
         assert all(isinstance(v, bool) for v in values)
+
         # Should have a mix of True and False with enough samples
         assert True in values
         assert False in values
@@ -170,6 +171,7 @@ class TestGenerateColumnDate:
 
         min_date = date(2023, 1, 1)
         max_date = date(2023, 12, 31)
+
         assert all(min_date <= v <= max_date for v in values)
 
 
@@ -197,9 +199,11 @@ class TestGenerateColumnTime:
 
         assert len(values) == 10
         assert all(isinstance(v, str) for v in values)
+
         # Verify time format HH:MM:SS
         for v in values:
             parts = v.split(":")
+
             assert len(parts) == 3
             assert 0 <= int(parts[0]) <= 23
             assert 0 <= int(parts[1]) <= 59
@@ -212,6 +216,7 @@ class TestGenerateColumnTime:
         values = generate_column(field, config)
 
         assert len(values) == 100
+
         # Verify all times are within the 9:00-12:00 range
         for v in values:
             parts = v.split(":")
@@ -221,7 +226,8 @@ class TestGenerateColumnTime:
             time_seconds = hour * 3600 + minute * 60 + second
             min_seconds = 9 * 3600  # 09:00:00
             max_seconds = 12 * 3600  # 12:00:00
-            assert min_seconds <= time_seconds <= max_seconds, f"Time {v} not in range 09:00-12:00"
+
+            assert min_seconds <= time_seconds <= max_seconds
 
     def test_generate_time_different_fields_have_different_values(self):
         """Test that different time fields generate different values (not the same row values)."""
@@ -241,15 +247,17 @@ class TestGenerateColumnTime:
 
         # Verify the values are different (start_time should be 9-12, end_time should be 13-17)
         for st, et in zip(start_times, end_times):
-            assert st != et, f"start_time {st} should not equal end_time {et}"
+            assert st != et
 
             # Verify start_time is in 9-12 range
             st_hour = int(st.split(":")[0])
-            assert 9 <= st_hour <= 12, f"start_time hour {st_hour} not in range 9-12"
+
+            assert 9 <= st_hour <= 12
 
             # Verify end_time is in 13-17 range
             et_hour = int(et.split(":")[0])
-            assert 13 <= et_hour <= 17, f"end_time hour {et_hour} not in range 13-17"
+
+            assert 13 <= et_hour <= 17
 
     def test_generate_time_with_string_constraints(self):
         """Test generating a Time column with string min/max constraints."""
@@ -258,6 +266,7 @@ class TestGenerateColumnTime:
         values = generate_column(field, config)
 
         assert len(values) == 100
+
         for v in values:
             parts = v.split(":")
             hour = int(parts[0])
@@ -266,7 +275,8 @@ class TestGenerateColumnTime:
             time_seconds = hour * 3600 + minute * 60 + second
             min_seconds = 14 * 3600  # 14:00:00
             max_seconds = 18 * 3600 + 30 * 60  # 18:30:00
-            assert min_seconds <= time_seconds <= max_seconds, f"Time {v} not in range"
+
+            assert min_seconds <= time_seconds <= max_seconds
 
 
 class TestGenerateColumnDuration:
@@ -290,8 +300,9 @@ class TestGenerateColumnDuration:
         values = generate_column(field, config)
 
         assert len(values) == 100
+
         for v in values:
-            assert min_dur <= v <= max_dur, f"Duration {v} not in range {min_dur}-{max_dur}"
+            assert min_dur <= v <= max_dur
 
     def test_generate_duration_different_fields_have_different_values(self):
         """Test that different duration fields generate different values."""
@@ -316,14 +327,10 @@ class TestGenerateColumnDuration:
 
         # Verify values are in their respective ranges
         for sl in session_lengths:
-            assert timedelta(hours=1) <= sl <= timedelta(hours=3), (
-                f"session_length {sl} not in 1-3 hour range"
-            )
+            assert timedelta(hours=1) <= sl <= timedelta(hours=3)
 
         for wt in wait_times:
-            assert timedelta(seconds=10) <= wt <= timedelta(minutes=5), (
-                f"wait_time {wt} not in 10sec-5min range"
-            )
+            assert timedelta(seconds=10) <= wt <= timedelta(minutes=5)
 
     def test_generate_duration_with_small_range(self):
         """Test generating durations with a very small range."""
@@ -334,8 +341,9 @@ class TestGenerateColumnDuration:
         values = generate_column(field, config)
 
         assert len(values) == 50
+
         for v in values:
-            assert min_dur <= v <= max_dur, f"Duration {v} not in narrow range"
+            assert min_dur <= v <= max_dur
 
 
 class TestGenerateColumnUnique:
@@ -641,6 +649,7 @@ class TestGenerateDatasetFunction:
 
         # Should not raise with valid country code
         df = generate_dataset(schema, n=5, seed=23, country="DE")
+
         assert df.shape[0] == 5
 
 
@@ -678,6 +687,7 @@ class TestCountrySupport:
 
         for country in self.COUNTRIES:
             df = generate_dataset(schema, n=10, seed=23, country=country)
+
             assert df.shape[0] == 10, f"Failed for country {country}"
             assert list(df.columns) == ["name", "email", "city"]
 
@@ -718,9 +728,7 @@ class TestCountrySupport:
             )
 
             # All validations should pass
-            assert validation.all_passed(), (
-                f"Validation failed for country {country}: {validation.get_sundered_data()}"
-            )
+            assert validation.all_passed()
 
     def test_email_format_across_countries(self):
         """Test that email preset generates valid email formats across countries."""
@@ -739,7 +747,7 @@ class TestCountrySupport:
                 .interrogate()
             )
 
-            assert validation.all_passed(), f"Email validation failed for country {country}"
+            assert validation.all_passed()
 
     def test_numeric_constraints_with_pointblank(self):
         """Test that numeric constraints are respected and validated by Pointblank."""
@@ -838,7 +846,7 @@ class TestCountrySupport:
                 .interrogate()
             )
 
-            assert validation.all_passed(), f"Personal presets failed for country {country}"
+            assert validation.all_passed()
 
     def test_business_presets_across_countries(self):
         """Test business data presets work across multiple countries."""
@@ -861,7 +869,7 @@ class TestCountrySupport:
                 .interrogate()
             )
 
-            assert validation.all_passed(), f"Business presets failed for country {country}"
+            assert validation.all_passed()
 
     def test_internet_presets_across_countries(self):
         """Test internet-related presets work across countries."""
@@ -898,7 +906,7 @@ class TestCountrySupport:
             sha256_hash=string_field(preset="sha256"),
         )
 
-        df = generate_dataset(schema, n=20, seed=42, country="US")
+        df = generate_dataset(schema, n=20, seed=23, country="US")
 
         validation = (
             Validate(df)
@@ -909,7 +917,7 @@ class TestCountrySupport:
             .interrogate()
         )
 
-        assert validation.all_passed(), "Hash presets failed"
+        assert validation.all_passed()
 
     def test_hash_presets_deterministic(self):
         """Test hash presets produce deterministic output with same seed."""
@@ -923,6 +931,7 @@ class TestCountrySupport:
 
         df1 = generate_dataset(schema, n=10, seed=99)
         df2 = generate_dataset(schema, n=10, seed=99)
+
         assert df1.equals(df2)
 
     def test_barcode_presets(self):
@@ -935,7 +944,7 @@ class TestCountrySupport:
             ean13_code=string_field(preset="ean13"),
         )
 
-        df = generate_dataset(schema, n=50, seed=42, country="US")
+        df = generate_dataset(schema, n=50, seed=23, country="US")
 
         # Check format: all digits, correct length
         validation = (
@@ -953,6 +962,7 @@ class TestCountrySupport:
             digits = [int(c) for c in barcode]
             total = sum(d * (3 if i % 2 == 0 else 1) for i, d in enumerate(digits[:7]))
             expected_check = (10 - (total % 10)) % 10
+
             assert digits[7] == expected_check
 
         # Verify EAN-13 check digits
@@ -960,6 +970,7 @@ class TestCountrySupport:
             digits = [int(c) for c in barcode]
             total = sum(d * (1 if i % 2 == 0 else 3) for i, d in enumerate(digits[:12]))
             expected_check = (10 - (total % 10)) % 10
+
             assert digits[12] == expected_check
 
     def test_date_range_presets(self):
@@ -976,7 +987,7 @@ class TestCountrySupport:
             past=string_field(preset="past_date"),
         )
 
-        df = generate_dataset(schema, n=30, seed=42, country="US")
+        df = generate_dataset(schema, n=30, seed=23, country="US")
 
         # date_between and future/past should be single ISO dates
         validation = (
@@ -1000,24 +1011,29 @@ class TestCountrySupport:
         today = date.today()
         for val in df["date_btwn"].to_list():
             d = date.fromisoformat(val)
+
             assert date(2000, 1, 1) <= d <= date(2025, 12, 31)
 
         # Verify date_range start <= end
         for val in df["date_rng"].to_list():
             parts = val.split(" \u2013 ")
-            assert len(parts) == 2, f"date_range format invalid: {val}"
+
+            assert len(parts) == 2
             start = date.fromisoformat(parts[0])
             end = date.fromisoformat(parts[1])
+
             assert start <= end
 
         # Verify future_date values are after today
         for val in df["future"].to_list():
             d = date.fromisoformat(val)
+
             assert d > today
 
         # Verify past_date values are before today
         for val in df["past"].to_list():
             d = date.fromisoformat(val)
+
             assert d < today
 
     def test_combined_schema_validation(self):
@@ -1172,6 +1188,7 @@ class TestCountrySupport:
                 ("file_name", string_field(preset="file_name")),
                 ("file_ext", string_field(preset="file_extension")),
                 ("mime_type", string_field(preset="mime_type")),
+                ("ua_string", string_field(preset="user_agent")),
                 # =====================================================================
                 # Date Range Presets (using presets)
                 # =====================================================================
@@ -1263,7 +1280,7 @@ class TestCountrySupport:
 
             # Verify basic structure
             assert df.shape[0] == 10
-            assert df.shape[1] == 66
+            assert df.shape[1] == 67
 
             # Verify no unexpected errors occurred (all values generated successfully)
             # Check a few key columns are not empty strings
@@ -1320,6 +1337,7 @@ class TestCountrySupport:
                 # (addresses contain the city name in the format string)
                 # For cities with exonyms, check the native name instead
                 native_name = EXONYM_TO_NATIVE.get(city, city)
+
                 assert native_name in address
 
     def test_address_city_coherence_with_abbreviations(self):
@@ -1443,6 +1461,130 @@ class TestGeneratorValidation:
         assert validation.all_passed()
 
 
+class TestUserAgentPreset:
+    """Tests for the user_agent preset with country-specific browser weighting."""
+
+    def test_user_agent_returns_string(self):
+        """User agent preset returns a non-empty string."""
+        pytest.importorskip("polars")
+        from pointblank import Schema, generate_dataset, string_field
+
+        schema = Schema(columns=[("ua", string_field(preset="user_agent"))])
+        df = generate_dataset(schema, n=20, seed=23)
+
+        assert df.shape == (20, 1)
+
+        for val in df["ua"].to_list():
+            assert isinstance(val, str)
+            assert len(val) > 0
+
+    def test_user_agent_looks_realistic(self):
+        """Generated user agents contain expected fragments."""
+        pytest.importorskip("polars")
+        from pointblank import Schema, generate_dataset, string_field
+
+        schema = Schema(columns=[("ua", string_field(preset="user_agent"))])
+        df = generate_dataset(schema, n=100, seed=123)
+        ua_strings = df["ua"].to_list()
+
+        # All should contain "Mozilla/5.0" (universal UA prefix)
+        for ua in ua_strings:
+            assert "Mozilla/5.0" in ua
+
+    def test_user_agent_reproducible_with_seed(self):
+        """Same seed produces same user agents."""
+        pytest.importorskip("polars")
+        from pointblank import Schema, generate_dataset, string_field
+
+        schema = Schema(columns=[("ua", string_field(preset="user_agent"))])
+        df1 = generate_dataset(schema, n=50, seed=999)
+        df2 = generate_dataset(schema, n=50, seed=999)
+
+        assert df1["ua"].to_list() == df2["ua"].to_list()
+
+    def test_user_agent_country_weighting_varies(self):
+        """Different countries produce different browser distributions."""
+        pytest.importorskip("polars")
+        from pointblank import Schema, generate_dataset, string_field
+
+        schema = Schema(columns=[("ua", string_field(preset="user_agent"))])
+        n = 500
+
+        # US should have more Safari (iPhone market share)
+        us_df = generate_dataset(schema, n=n, seed=23, country="US")
+
+        # Russia should have Yandex browser strings
+        ru_df = generate_dataset(schema, n=n, seed=23, country="RU")
+
+        # South Korea should have Whale browser strings
+        kr_df = generate_dataset(schema, n=n, seed=23, country="KR")
+
+        us_uas = us_df["ua"].to_list()
+        ru_uas = ru_df["ua"].to_list()
+        kr_uas = kr_df["ua"].to_list()
+
+        # Yandex should appear in Russian results (high weight)
+        ru_yandex = sum(1 for ua in ru_uas if "YaBrowser" in ua)
+        us_yandex = sum(1 for ua in us_uas if "YaBrowser" in ua)
+
+        assert ru_yandex > us_yandex
+
+        # Whale should appear in Korean results
+        kr_whale = sum(1 for ua in kr_uas if "Whale" in ua)
+        us_whale = sum(1 for ua in us_uas if "Whale" in ua)
+
+        assert kr_whale > us_whale
+
+    def test_user_agent_all_countries(self):
+        """User agent works for all supported countries."""
+        pytest.importorskip("polars")
+        from pointblank import Schema, generate_dataset, string_field
+
+        schema = Schema(columns=[("ua", string_field(preset="user_agent"))])
+        for country in COUNTRIES_WITH_FULL_DATA:
+            df = generate_dataset(schema, n=5, seed=23, country=country)
+
+            assert df.shape == (5, 1)
+
+            for val in df["ua"].to_list():
+                assert isinstance(val, str)
+                assert len(val) > 20  # UAs are long strings
+
+    def test_user_agent_browser_diversity(self):
+        """Large sample contains multiple browser types."""
+        pytest.importorskip("polars")
+        from pointblank import Schema, generate_dataset, string_field
+
+        schema = Schema(columns=[("ua", string_field(preset="user_agent"))])
+        df = generate_dataset(schema, n=1000, seed=23)
+        uas = df["ua"].to_list()
+
+        # Should see Chrome, Safari, Firefox, and Edge at minimum
+        has_chrome = any("Chrome" in ua and "Edg" not in ua and "OPR" not in ua for ua in uas)
+        has_safari = any("Safari" in ua and "Chrome" not in ua for ua in uas)
+        has_firefox = any("Firefox" in ua for ua in uas)
+        has_edge = any("Edg/" in ua or "EdgA/" in ua for ua in uas)
+
+        assert has_chrome
+        assert has_safari
+        assert has_firefox
+        assert has_edge
+
+    def test_user_agent_china_specific_browsers(self):
+        """Chinese locale produces region-specific browsers (UC, 360)."""
+        pytest.importorskip("polars")
+        from pointblank import Schema, generate_dataset, string_field
+
+        schema = Schema(columns=[("ua", string_field(preset="user_agent"))])
+        df = generate_dataset(schema, n=1000, seed=23, country="CN")
+        uas = df["ua"].to_list()
+
+        # China profile has UC Browser and 360 Safe Browser weights
+        has_uc = any("UCBrowser" in ua for ua in uas)
+        has_360 = any("QIHU 360" in ua for ua in uas)
+        assert has_uc or has_360
+
+
 class TestLocaleDataFiles:
     """Tests for locale data file consistency and validity."""
 
@@ -1464,16 +1606,13 @@ class TestLocaleDataFiles:
 
         for country in countries:
             country_dir = countries_dir / country
+
             assert country_dir.exists()
 
             actual_files = {f.name for f in country_dir.iterdir() if f.suffix == ".json"}
             missing = required_files - actual_files
-            extra = actual_files - required_files
 
             assert not missing
-            # Extra files are allowed but we note them
-            if extra:
-                print(f"Note: Country {country} has extra files: {extra}")
 
     def test_all_json_files_are_valid(self):
         """Ensure all JSON files can be parsed without errors."""
@@ -1609,6 +1748,7 @@ class TestLocaleDataFiles:
                 data = json.load(f)
 
             missing_keys = common_required_keys - set(data.keys())
+
             assert not missing_keys
 
             # Check streets_by_city structure (all countries use this)
@@ -1618,10 +1758,8 @@ class TestLocaleDataFiles:
             # Validate that each city in locations has streets
             city_names = {loc["city"] for loc in data["locations"]}
             streets_cities = set(data["streets_by_city"].keys())
-            assert city_names == streets_cities, (
-                f"{country}: streets_by_city cities should match location cities. "
-                f"Missing: {city_names - streets_cities}, Extra: {streets_cities - city_names}"
-            )
+
+            assert city_names == streets_cities
 
             # Validate locations structure
             assert isinstance(data["locations"], list)
@@ -1695,81 +1833,77 @@ class TestLocaleDataFiles:
                 data = json.load(f)
 
             missing_keys = required_keys - set(data.keys())
-            assert not missing_keys, f"person.json for {country} is missing keys: {missing_keys}"
+            assert not missing_keys
 
             # first_names should be a dict with male/female/neutral keys
             first_names = data["first_names"]
-            assert isinstance(first_names, dict), f"{country}: first_names should be a dict"
+
+            assert isinstance(first_names, dict)
+
             for gender in ["male", "female", "neutral"]:
-                assert gender in first_names, f"{country}: first_names should have '{gender}' key"
-                assert isinstance(first_names[gender], list), (
-                    f"{country}: first_names[{gender}] should be a list"
-                )
+                assert gender in first_names
+                assert isinstance(first_names[gender], list)
+
                 # male and female should have content, neutral can be empty
                 if gender != "neutral":
-                    assert len(first_names[gender]) > 0, (
-                        f"{country}: first_names[{gender}] should not be empty"
-                    )
+                    assert len(first_names[gender]) > 0
+
                 for name in first_names[gender]:
-                    assert isinstance(name, str), (
-                        f"{country}: each first name in {gender} should be a string"
-                    )
+                    assert isinstance(name, str)
 
             # last_names should be a list of strings OR a dict with gendered keys
             last_names = data["last_names"]
             if isinstance(last_names, dict):
                 # Gendered last names (e.g., IS patronymics)
                 for gender_key in last_names:
-                    assert isinstance(last_names[gender_key], list), (
-                        f"{country}: last_names[{gender_key}] should be a list"
-                    )
+                    assert isinstance(last_names[gender_key], list)
+
                     for name in last_names[gender_key]:
-                        assert isinstance(name, str), (
-                            f"{country}: each last_name in {gender_key} should be a string"
-                        )
+                        assert isinstance(name, str)
+
                 # At least one category should have names
                 all_names = [n for v in last_names.values() for n in v]
-                assert len(all_names) > 0, f"{country}: last_names should not be empty"
+
+                assert len(all_names) > 0
             else:
-                assert isinstance(last_names, list), f"{country}: last_names should be a list"
-                assert len(last_names) > 0, f"{country}: last_names should not be empty"
+                assert isinstance(last_names, list)
+                assert len(last_names) > 0
+
                 for name in last_names:
-                    assert isinstance(name, str), f"{country}: each last_name should be a string"
+                    assert isinstance(name, str)
 
             # name_formats should be a list with valid placeholders
-            assert isinstance(data["name_formats"], list), (
-                f"{country}: name_formats should be a list"
-            )
-            assert len(data["name_formats"]) > 0, f"{country}: name_formats should not be empty"
-            valid_name_placeholders = {"{first_name}", "{last_name}"}
+            assert isinstance(data["name_formats"], list)
+            assert len(data["name_formats"]) > 0
+
             for fmt in data["name_formats"]:
-                assert isinstance(fmt, str), f"{country}: each name_format should be a string"
+                assert isinstance(fmt, str)
+
                 # Check that format contains at least first_name or last_name
                 has_name = "{first_name}" in fmt or "{last_name}" in fmt
-                assert has_name, f"{country}: name_format '{fmt}' should contain a name placeholder"
+
+                assert has_name
 
             # prefixes should be a dict with male/female/neutral keys
             prefixes = data["prefixes"]
-            assert isinstance(prefixes, dict), f"{country}: prefixes should be a dict"
+
+            assert isinstance(prefixes, dict)
+
             for gender in ["male", "female", "neutral"]:
-                assert gender in prefixes, f"{country}: prefixes should have '{gender}' key"
-                assert isinstance(prefixes[gender], list), (
-                    f"{country}: prefixes[{gender}] should be a list"
-                )
+                assert gender in prefixes
+                assert isinstance(prefixes[gender], list)
+
                 # male and female should have content
                 if gender != "neutral":
-                    assert len(prefixes[gender]) > 0, (
-                        f"{country}: prefixes[{gender}] should not be empty"
-                    )
+                    assert len(prefixes[gender]) > 0
                 for prefix in prefixes[gender]:
-                    assert isinstance(prefix, str), (
-                        f"{country}: each prefix in {gender} should be a string"
-                    )
+                    assert isinstance(prefix, str)
 
             # suffixes should be a list of strings
-            assert isinstance(data["suffixes"], list), f"{country}: suffixes should be a list"
+            assert isinstance(data["suffixes"], list)
+
             for suffix in data["suffixes"]:
-                assert isinstance(suffix, str), f"{country}: each suffix should be a string"
+                assert isinstance(suffix, str)
 
     def test_company_json_schema_consistency(self):
         """Ensure company.json files have consistent schema across countries."""
@@ -1796,7 +1930,8 @@ class TestLocaleDataFiles:
                 data = json.load(f)
 
             missing_keys = required_keys - set(data.keys())
-            assert not missing_keys, f"company.json for {country} is missing keys: {missing_keys}"
+
+            assert not missing_keys
 
             # Validate list keys are lists with content
             list_keys = {
@@ -1810,35 +1945,25 @@ class TestLocaleDataFiles:
                 "catch_phrase_verbs",
             }
             for key in list_keys:
-                assert isinstance(data[key], list), f"{country}: {key} should be a list"
-                assert len(data[key]) > 0, f"{country}: {key} should not be empty"
+                assert isinstance(data[key], list)
+                assert len(data[key]) > 0
 
             # Validate well_known_companies structure
             well_known = data["well_known_companies"]
-            assert isinstance(well_known, list), f"{country}: well_known_companies should be a list"
-            assert len(well_known) > 0, f"{country}: well_known_companies should not be empty"
+
+            assert isinstance(well_known, list)
+            assert len(well_known) > 0
 
             for company in well_known:
-                assert isinstance(company, dict), (
-                    f"{country}: each well_known_company should be a dict"
-                )
-                assert "name" in company, f"{country}: each well_known_company should have 'name'"
-                assert "cities" in company, (
-                    f"{country}: each well_known_company should have 'cities'"
-                )
-                assert isinstance(company["name"], str), (
-                    f"{country}: company name should be a string"
-                )
-                assert isinstance(company["cities"], list), (
-                    f"{country}: company cities should be a list"
-                )
-                assert len(company["cities"]) > 0, (
-                    f"{country}: company '{company['name']}' should have at least one city"
-                )
+                assert isinstance(company, dict)
+                assert "name" in company
+                assert "cities" in company
+                assert isinstance(company["name"], str)
+                assert isinstance(company["cities"], list)
+                assert len(company["cities"]) > 0
+
                 for city in company["cities"]:
-                    assert isinstance(city, str), (
-                        f"{country}: each city in '{company['name']}' should be a string"
-                    )
+                    assert isinstance(city, str)
 
             # Validate formats contain valid placeholders
             valid_placeholders = {"{last_name}", "{suffix}", "{adjective}", "{noun}"}
@@ -1848,7 +1973,7 @@ class TestLocaleDataFiles:
 
                 placeholders = set(re.findall(r"\{[^}]+\}", fmt))
                 invalid = placeholders - valid_placeholders
-                assert not invalid, f"{country}: format '{fmt}' has invalid placeholders: {invalid}"
+                assert not invalid
 
     def test_internet_json_schema_consistency(self):
         """Ensure internet.json files have consistent schema across countries."""
@@ -1871,27 +1996,25 @@ class TestLocaleDataFiles:
                 data = json.load(f)
 
             missing_keys = required_keys - set(data.keys())
-            assert not missing_keys, f"internet.json for {country} is missing keys: {missing_keys}"
+
+            assert not missing_keys
 
             # Validate all required keys are lists with content and contain strings
             for key in required_keys:
-                assert isinstance(data[key], list), f"{country}: {key} should be a list"
-                assert len(data[key]) > 0, f"{country}: {key} should not be empty"
+                assert isinstance(data[key], list)
+                assert len(data[key]) > 0
+
                 for item in data[key]:
-                    assert isinstance(item, str), (
-                        f"{country}: each item in {key} should be a string"
-                    )
+                    assert isinstance(item, str)
 
             # Validate email domains look like domains
             for domain in data["free_email_domains"]:
-                assert "." in domain, f"{country}: email domain '{domain}' should contain a dot"
+                assert "." in domain
 
             # Validate TLDs (stored without dots, e.g., 'com' not '.com')
             for tld in data["tlds"]:
-                assert len(tld) > 0, f"{country}: TLD should not be empty"
-                assert not tld.startswith("."), (
-                    f"{country}: TLD '{tld}' should not start with a dot"
-                )
+                assert len(tld) > 0
+                assert not tld.startswith(".")
 
     def test_misc_json_schema_consistency(self):
         """Ensure misc.json files have consistent schema across countries.
@@ -1913,45 +2036,51 @@ class TestLocaleDataFiles:
                 data = json.load(f)
 
             missing_keys = required_keys - set(data.keys())
-            assert not missing_keys, f"misc.json for {country} is missing keys: {missing_keys}"
+
+            assert not missing_keys
 
             # Validate arrays are non-empty
             for key in required_keys:
-                assert isinstance(data[key], list), f"{country}: {key} should be a list"
-                assert len(data[key]) > 0, f"{country}: {key} should not be empty"
+                assert isinstance(data[key], list)
+                assert len(data[key]) > 0
 
         # Also verify that shared/universal data exists
         shared_file = countries_dir / "_shared" / "misc.json"
-        assert shared_file.exists(), "_shared/misc.json should exist with universal data"
+
+        assert shared_file.exists()
+
         with open(shared_file, "r", encoding="utf-8") as f:
             shared_data = json.load(f)
 
         # Validate file_extensions
-        assert "file_extensions" in shared_data, "_shared should have file_extensions"
-        assert isinstance(shared_data["file_extensions"], list), "file_extensions should be a list"
-        assert len(shared_data["file_extensions"]) > 0, "file_extensions should not be empty"
+        assert "file_extensions" in shared_data
+        assert isinstance(shared_data["file_extensions"], list)
+        assert len(shared_data["file_extensions"]) > 0
         for ext in shared_data["file_extensions"]:
-            assert isinstance(ext, str), "each file_extension should be a string"
-            assert len(ext) > 0, f"file_extension should not be empty"
+            assert isinstance(ext, str)
+            assert len(ext) > 0
+
             # Extensions are stored without dots (e.g., 'txt' not '.txt')
-            assert not ext.startswith("."), f"file_extension '{ext}' should not start with a dot"
+            assert not ext.startswith(".")
 
         # Validate mime_types
-        assert "mime_types" in shared_data, "_shared should have mime_types"
-        assert isinstance(shared_data["mime_types"], list), "mime_types should be a list"
-        assert len(shared_data["mime_types"]) > 0, "mime_types should not be empty"
+        assert "mime_types" in shared_data
+        assert isinstance(shared_data["mime_types"], list)
+        assert len(shared_data["mime_types"]) > 0
+
         for mime in shared_data["mime_types"]:
-            assert isinstance(mime, str), "each mime_type should be a string"
-            assert "/" in mime, f"mime_type '{mime}' should contain a slash"
+            assert isinstance(mime, str)
+            assert "/" in mime
 
         # Validate currency_codes (ISO 4217)
-        assert "currency_codes" in shared_data, "_shared should have currency_codes"
-        assert isinstance(shared_data["currency_codes"], list), "currency_codes should be a list"
-        assert len(shared_data["currency_codes"]) > 0, "currency_codes should not be empty"
+        assert "currency_codes" in shared_data
+        assert isinstance(shared_data["currency_codes"], list)
+        assert len(shared_data["currency_codes"]) > 0
+
         for code in shared_data["currency_codes"]:
-            assert isinstance(code, str), "each currency_code should be a string"
-            assert len(code) == 3, f"currency_code '{code}' should be 3 characters (ISO 4217)"
-            assert code.isupper(), f"currency_code '{code}' should be uppercase"
+            assert isinstance(code, str)
+            assert len(code) == 3
+            assert code.isupper()
 
     def test_text_json_schema_consistency(self):
         """Ensure text.json files have consistent schema across countries."""
@@ -1968,16 +2097,16 @@ class TestLocaleDataFiles:
                 data = json.load(f)
 
             missing_keys = required_keys - set(data.keys())
-            assert not missing_keys, f"text.json for {country} is missing keys: {missing_keys}"
+
+            assert not missing_keys
 
             # Validate arrays are non-empty and contain strings
             for key in required_keys:
-                assert isinstance(data[key], list), f"{country}: {key} should be a list"
-                assert len(data[key]) > 0, f"{country}: {key} should not be empty"
+                assert isinstance(data[key], list)
+                assert len(data[key]) > 0
+
                 for item in data[key]:
-                    assert isinstance(item, str), (
-                        f"{country}: each item in {key} should be a string"
-                    )
+                    assert isinstance(item, str)
 
     def test_well_known_companies_cities_exist_in_locations(self):
         """Ensure well-known company cities match cities defined in address.json locations."""
@@ -2003,7 +2132,7 @@ class TestLocaleDataFiles:
             for company in company_data.get("well_known_companies", []):
                 company_name = company.get("name", "Unknown")
                 for city in company.get("cities", []):
-                    # This is a warning, not a hard failure - companies may have offices
+                    # This is a warning, not a hard failure as companies may have offices
                     # in cities we haven't added to our locations list yet
                     if city not in valid_cities:
                         print(
@@ -2030,18 +2159,15 @@ class TestLocaleDataFiles:
             last_names = person_data.get("last_names", [])
             unique_last_names = set(last_names)
             duplicate_ratio = 1 - (len(unique_last_names) / len(last_names)) if last_names else 0
-            assert duplicate_ratio < 0.1, (
-                f"{country}: person.json has too many duplicate last_names "
-                f"({duplicate_ratio:.1%} duplicates)"
-            )
+
+            assert duplicate_ratio < 0.1
 
             # First names should not have duplicates within each gender
             for gender in ["male", "female", "neutral"]:
                 first_names = person_data.get("first_names", {}).get(gender, [])
                 duplicates = [x for x in first_names if first_names.count(x) > 1]
-                assert not duplicates, (
-                    f"{country}: person.json has duplicate {gender} first_names: {set(duplicates)}"
-                )
+
+                assert not duplicates
 
             # Check company.json for duplicate well-known companies (must be unique)
             company_file = countries_dir / country / "company.json"
@@ -2050,45 +2176,5 @@ class TestLocaleDataFiles:
 
             company_names = [c["name"] for c in company_data.get("well_known_companies", [])]
             duplicates = [x for x in company_names if company_names.count(x) > 1]
-            assert not duplicates, (
-                f"{country}: company.json has duplicate well_known_companies: {set(duplicates)}"
-            )
 
-    def test_locale_data_statistics(self):
-        """Print statistics about locale data for review."""
-        import json
-        from pathlib import Path
-
-        countries_dir = Path(__file__).parent.parent / "pointblank" / "countries" / "data"
-        countries = COUNTRIES_WITH_FULL_DATA
-
-        print("\n=== Locale Data Statistics ===")
-        for country in countries:
-            country_dir = countries_dir / country
-
-            # Address stats
-            with open(country_dir / "address.json", "r", encoding="utf-8") as f:
-                addr = json.load(f)
-            locations = len(addr.get("locations", []))
-            # Count streets from streets_by_city (sum of all city street lists)
-            streets_by_city = addr.get("streets_by_city", {})
-            streets = sum(len(v) for v in streets_by_city.values()) if streets_by_city else 0
-            states = len(addr.get("phone_area_codes", {}))
-
-            # Person stats
-            with open(country_dir / "person.json", "r", encoding="utf-8") as f:
-                person = json.load(f)
-            first_names = len(person.get("first_names", []))
-            last_names = len(person.get("last_names", []))
-
-            # Text stats
-            with open(country_dir / "text.json", "r", encoding="utf-8") as f:
-                text = json.load(f)
-            words = len(text.get("words", []))
-            adjectives = len(text.get("adjectives", []))
-            nouns = len(text.get("nouns", []))
-
-            print(f"\n{country}:")
-            print(f"  Address: {locations} locations, {streets} streets, {states} states/regions")
-            print(f"  Person: {first_names} first names, {last_names} last names")
-            print(f"  Text: {words} words, {adjectives} adjectives, {nouns} nouns")
+            assert not duplicates
