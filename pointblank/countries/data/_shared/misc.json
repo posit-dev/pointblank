@@ -38,5 +38,424 @@
     "SHP", "SLE", "SOS", "SRD", "SSP", "STN", "SVC", "SYP", "SZL", "THB",
     "TJS", "TMT", "TND", "TOP", "TRY", "TTD", "TWD", "TZS", "UAH", "UGX",
     "USD", "UYU", "UZS", "VES", "VND", "VUV", "WST", "YER", "ZAR", "ZMW", "ZWL"
-  ]
+  ],
+  "user_agent_templates": {
+    "chrome_desktop": {
+      "templates": [
+        "Mozilla/5.0 ({os}) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{version}.0.0.0 Safari/537.36"
+      ],
+      "os": [
+        "Windows NT 10.0; Win64; x64",
+        "Windows NT 11.0; Win64; x64",
+        "Macintosh; Intel Mac OS X 10_15_7",
+        "Macintosh; Intel Mac OS X 13_6_7",
+        "Macintosh; Intel Mac OS X 14_5",
+        "Macintosh; Intel Mac OS X 14_7_6",
+        "Macintosh; Intel Mac OS X 15_0",
+        "Macintosh; Intel Mac OS X 15_1_1",
+        "Macintosh; Intel Mac OS X 15_2",
+        "Macintosh; Intel Mac OS X 15_3",
+        "X11; Linux x86_64",
+        "X11; Fedora; Linux x86_64",
+        "X11; Ubuntu; Linux x86_64",
+        "X11; CrOS x86_64 14541.0.0",
+        "X11; CrOS x86_64 14816.0.0",
+        "X11; CrOS aarch64 14541.0.0"
+      ],
+      "version": [
+        "120", "121", "122", "123", "124", "125", "126", "127", "128",
+        "129", "130", "131", "132", "133", "134", "135", "136", "137"
+      ]
+    },
+    "chrome_mobile": {
+      "templates": [
+        "Mozilla/5.0 (Linux; Android {android}; {device}) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{version}.0.0.0 Mobile Safari/537.36",
+        "Mozilla/5.0 (iPhone; CPU iPhone OS {ios} like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/{version}.0.0.0 Mobile/15E148 Safari/604.1",
+        "Mozilla/5.0 (iPad; CPU OS {ios} like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/{version}.0.0.0 Mobile/15E148 Safari/604.1"
+      ],
+      "android": ["10", "11", "12", "13", "14", "15"],
+      "device": [
+        "K", "SM-S928B", "SM-S924B", "SM-S921B", "SM-S938B",
+        "SM-A546B", "SM-A356B", "SM-A256B", "SM-G991B",
+        "Pixel 9 Pro", "Pixel 9", "Pixel 8 Pro", "Pixel 8a", "Pixel 7a",
+        "SAMSUNG SM-S926B", "RMX3630", "M2101K6G",
+        "22101316G", "CPH2579", "V2312"
+      ],
+      "ios": [
+        "16_6", "16_7_8", "17_0", "17_1_2", "17_2", "17_3_1", "17_4_1",
+        "17_5_1", "17_6", "17_7", "18_0", "18_1", "18_1_1", "18_2", "18_3"
+      ],
+      "version": [
+        "120", "121", "122", "123", "124", "125", "126", "127", "128",
+        "129", "130", "131", "132", "133", "134", "135", "136", "137"
+      ]
+    },
+    "safari_desktop": {
+      "templates": [
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X {macos}) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/{version} Safari/605.1.15"
+      ],
+      "macos": [
+        "10_15_7", "13_6_7", "14_0", "14_1_2", "14_3_1", "14_5", "14_6_1",
+        "14_7_6", "15_0", "15_0_1", "15_1", "15_1_1", "15_2", "15_3"
+      ],
+      "version": [
+        "16.4", "16.5", "16.6", "17.0", "17.1", "17.2", "17.2.1", "17.3",
+        "17.4", "17.4.1", "17.5", "17.6", "18.0", "18.1", "18.2", "18.3"
+      ]
+    },
+    "safari_mobile": {
+      "templates": [
+        "Mozilla/5.0 (iPhone; CPU iPhone OS {ios} like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/{version} Mobile/15E148 Safari/604.1",
+        "Mozilla/5.0 (iPad; CPU OS {ios} like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/{version} Mobile/15E148 Safari/604.1"
+      ],
+      "ios": [
+        "16_6", "16_7_8", "17_0", "17_1_2", "17_2", "17_3_1", "17_4_1",
+        "17_5_1", "17_6", "17_7", "18_0", "18_1", "18_1_1", "18_2", "18_3"
+      ],
+      "version": [
+        "16.4", "16.5", "16.6", "17.0", "17.1", "17.2", "17.3", "17.4",
+        "17.5", "17.6", "17.7", "18.0", "18.1", "18.2", "18.3"
+      ]
+    },
+    "firefox_desktop": {
+      "templates": [
+        "Mozilla/5.0 ({os}; rv:{version}.0) Gecko/20100101 Firefox/{version}.0"
+      ],
+      "os": [
+        "Windows NT 10.0; Win64; x64",
+        "Windows NT 11.0; Win64; x64",
+        "Macintosh; Intel Mac OS X 10.15",
+        "Macintosh; Intel Mac OS X 14.7",
+        "Macintosh; Intel Mac OS X 15.3",
+        "X11; Linux x86_64",
+        "X11; Ubuntu; Linux x86_64",
+        "X11; Fedora; Linux x86_64",
+        "X11; Linux i686"
+      ],
+      "version": [
+        "115", "118", "120", "121", "122", "123", "124", "125", "126",
+        "127", "128", "129", "130", "131", "132", "133", "134", "135",
+        "136", "137"
+      ]
+    },
+    "firefox_mobile": {
+      "templates": [
+        "Mozilla/5.0 (Android {android}; Mobile; rv:{version}.0) Gecko/{version}.0 Firefox/{version}.0",
+        "Mozilla/5.0 (iPhone; CPU iPhone OS {ios} like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) FxiOS/{version}.0 Mobile/15E148 Safari/605.1.15"
+      ],
+      "android": ["11", "12", "13", "14", "15"],
+      "ios": [
+        "17_5_1", "17_6", "17_7", "18_0", "18_1", "18_2", "18_3"
+      ],
+      "version": [
+        "124", "125", "126", "127", "128", "129", "130", "131",
+        "132", "133", "134", "135", "136", "137"
+      ]
+    },
+    "edge_desktop": {
+      "templates": [
+        "Mozilla/5.0 ({os}) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{version}.0.0.0 Safari/537.36 Edg/{version}.0.0.0"
+      ],
+      "os": [
+        "Windows NT 10.0; Win64; x64",
+        "Windows NT 11.0; Win64; x64",
+        "Macintosh; Intel Mac OS X 10_15_7",
+        "Macintosh; Intel Mac OS X 14_7_6",
+        "Macintosh; Intel Mac OS X 15_2",
+        "Macintosh; Intel Mac OS X 15_3",
+        "X11; Linux x86_64"
+      ],
+      "version": [
+        "120", "121", "122", "123", "124", "125", "126", "127", "128",
+        "129", "130", "131", "132", "133", "134", "135", "136", "137"
+      ]
+    },
+    "edge_mobile": {
+      "templates": [
+        "Mozilla/5.0 (Linux; Android {android}; {device}) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{version}.0.0.0 Mobile Safari/537.36 EdgA/{version}.0.0.0",
+        "Mozilla/5.0 (iPhone; CPU iPhone OS {ios} like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 EdgiOS/{version}.0.0.0 Mobile/15E148 Safari/604.1"
+      ],
+      "android": ["12", "13", "14", "15"],
+      "device": [
+        "K", "SM-S928B", "SM-A546B", "Pixel 8 Pro", "Pixel 9",
+        "SM-G991B", "SM-S921B"
+      ],
+      "ios": [
+        "17_5_1", "17_6", "17_7", "18_0", "18_1", "18_2", "18_3"
+      ],
+      "version": [
+        "126", "127", "128", "129", "130", "131", "132", "133",
+        "134", "135", "136", "137"
+      ]
+    },
+    "samsung_mobile": {
+      "templates": [
+        "Mozilla/5.0 (Linux; Android {android}; {device}) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/{sb_version} Chrome/{chrome_version}.0.0.0 Mobile Safari/537.36"
+      ],
+      "android": ["12", "13", "14", "15"],
+      "device": [
+        "SM-S928B", "SM-S924B", "SM-S921B", "SM-S918B", "SM-S916B",
+        "SM-S911B", "SM-S908B", "SM-S906B", "SM-S901B",
+        "SM-G998B", "SM-G996B", "SM-G991B", "SM-G986B",
+        "SM-A546B", "SM-A536B", "SM-A356B", "SM-A256B", "SM-A156B",
+        "SM-S938B", "SM-F956B", "SM-F946B", "SM-F936B", "SM-F926B"
+      ],
+      "sb_version": [
+        "23.0", "24.0", "25.0", "26.0", "27.0", "28.0"
+      ],
+      "chrome_version": [
+        "115", "118", "120", "122", "125", "128", "130"
+      ]
+    },
+    "opera_desktop": {
+      "templates": [
+        "Mozilla/5.0 ({os}) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{chrome_version}.0.0.0 Safari/537.36 OPR/{opr_version}.0.0.0"
+      ],
+      "os": [
+        "Windows NT 10.0; Win64; x64",
+        "Windows NT 11.0; Win64; x64",
+        "Macintosh; Intel Mac OS X 10_15_7",
+        "Macintosh; Intel Mac OS X 14_7_6",
+        "Macintosh; Intel Mac OS X 15_2",
+        "Macintosh; Intel Mac OS X 15_3",
+        "X11; Linux x86_64"
+      ],
+      "chrome_version": [
+        "126", "127", "128", "129", "130", "131", "132", "133",
+        "134", "135", "136", "137"
+      ],
+      "opr_version": [
+        "112", "113", "114", "115", "116", "117", "118",
+        "119", "120", "121"
+      ]
+    },
+    "opera_mobile": {
+      "templates": [
+        "Mozilla/5.0 (Linux; Android {android}; {device}) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{chrome_version}.0.0.0 Mobile Safari/537.36 OPR/{opr_version}.0.0.0"
+      ],
+      "android": ["11", "12", "13", "14", "15"],
+      "device": [
+        "K", "SM-A546B", "SM-S928B", "Pixel 8a", "RMX3630",
+        "22101316G", "CPH2579", "V2312"
+      ],
+      "chrome_version": [
+        "126", "127", "128", "129", "130", "131", "132", "133",
+        "134", "135", "136"
+      ],
+      "opr_version": [
+        "78", "79", "80", "81", "82", "83", "84", "85", "86"
+      ]
+    },
+    "vivaldi_desktop": {
+      "templates": [
+        "Mozilla/5.0 ({os}) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{chrome_version}.0.0.0 Safari/537.36 Vivaldi/{vivaldi_version}"
+      ],
+      "os": [
+        "Windows NT 10.0; Win64; x64",
+        "Windows NT 11.0; Win64; x64",
+        "Macintosh; Intel Mac OS X 10_15_7",
+        "Macintosh; Intel Mac OS X 14_7_6",
+        "Macintosh; Intel Mac OS X 15_2",
+        "Macintosh; Intel Mac OS X 15_3",
+        "X11; Linux x86_64",
+        "X11; Fedora; Linux x86_64"
+      ],
+      "chrome_version": [
+        "128", "129", "130", "131", "132", "133", "134", "135", "136", "137"
+      ],
+      "vivaldi_version": [
+        "6.7.3329.41", "6.8.3381.46", "6.9.3447.54", "7.0.3495.27",
+        "7.1.3570.39", "7.1.3570.47", "7.2.3610.47"
+      ]
+    },
+    "uc_mobile": {
+      "templates": [
+        "Mozilla/5.0 (Linux; U; Android {android}; en-US; {device} Build/{build}) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/100.0.4896.127 UCBrowser/{uc_version} Mobile Safari/537.36"
+      ],
+      "android": ["11", "12", "13", "14", "15"],
+      "device": [
+        "SM-A546B", "SM-A536B", "SM-A356B", "SM-A256B",
+        "SM-G991B", "SM-S921B", "SM-S928B",
+        "Redmi Note 12", "Redmi Note 13", "Redmi 12",
+        "POCO X5 Pro 5G", "POCO M5", "POCO F5",
+        "V2312", "V2330", "V2254A",
+        "CPH2579", "CPH2581", "CPH2471",
+        "RMX3630", "RMX3686", "RMX3834",
+        "22101316G", "23129RAA4G"
+      ],
+      "build": [
+        "UP1A.231005.007", "TP1A.220624.014", "TKQ1.221114.001",
+        "SP1A.210812.016", "AP2A.240905.003", "AP3A.241005.015"
+      ],
+      "uc_version": [
+        "16.3.2.1220", "16.4.1.1216", "16.5.8.1206",
+        "16.6.2.1208", "16.7.6.1206", "16.8.2.1218"
+      ]
+    },
+    "yandex_desktop": {
+      "templates": [
+        "Mozilla/5.0 ({os}) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{chrome_version}.0.0.0 YaBrowser/{ya_version} Safari/537.36"
+      ],
+      "os": [
+        "Windows NT 10.0; Win64; x64",
+        "Windows NT 11.0; Win64; x64",
+        "Macintosh; Intel Mac OS X 10_15_7",
+        "Macintosh; Intel Mac OS X 14_7_6",
+        "Macintosh; Intel Mac OS X 15_2",
+        "Macintosh; Intel Mac OS X 15_3",
+        "X11; Linux x86_64"
+      ],
+      "chrome_version": [
+        "128", "130", "131", "132", "133", "134", "135", "136"
+      ],
+      "ya_version": [
+        "24.7.0.0", "24.10.0.0", "24.12.0.0", "25.1.0.0",
+        "25.2.0.0", "25.3.0.0"
+      ]
+    },
+    "yandex_mobile": {
+      "templates": [
+        "Mozilla/5.0 (Linux; Android {android}; {device}) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{chrome_version}.0.0.0 YaBrowser/{ya_version} Mobile Safari/537.36",
+        "Mozilla/5.0 (iPhone; CPU iPhone OS {ios} like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/{safari_version} YaBrowser/{ya_version} Mobile/15E148 Safari/604.1"
+      ],
+      "android": ["12", "13", "14", "15"],
+      "device": [
+        "K", "SM-A546B", "SM-S928B", "SM-G991B",
+        "Pixel 8 Pro", "Redmi Note 12", "22101316G"
+      ],
+      "ios": [
+        "17_5_1", "17_6", "17_7", "18_0", "18_1", "18_2", "18_3"
+      ],
+      "chrome_version": ["130", "131", "132", "133", "134", "135"],
+      "safari_version": ["17.6", "17.7", "18.0", "18.1", "18.2"],
+      "ya_version": [
+        "24.10.0.0", "24.12.0.0", "25.1.0.0", "25.1.7.340",
+        "25.2.0.0", "25.3.0.0"
+      ]
+    },
+    "whale_desktop": {
+      "templates": [
+        "Mozilla/5.0 ({os}) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{chrome_version}.0.0.0 Whale/{whale_version} Safari/537.36"
+      ],
+      "os": [
+        "Windows NT 10.0; Win64; x64",
+        "Windows NT 11.0; Win64; x64",
+        "Macintosh; Intel Mac OS X 10_15_7",
+        "Macintosh; Intel Mac OS X 14_7_6",
+        "Macintosh; Intel Mac OS X 15_2",
+        "Macintosh; Intel Mac OS X 15_3",
+        "X11; Linux x86_64"
+      ],
+      "chrome_version": ["130", "131", "132", "133", "134", "135", "136"],
+      "whale_version": [
+        "3.28.224.21", "4.25.232.17", "4.27.280.18",
+        "4.28.310.14", "4.29.370.20", "4.30.4.0"
+      ]
+    },
+    "qihu_360_desktop": {
+      "templates": [
+        "Mozilla/5.0 ({os}) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{chrome_version}.0.0.0 Safari/537.36 QIHU {product}"
+      ],
+      "os": [
+        "Windows NT 10.0; Win64; x64",
+        "Windows NT 10.0; WOW64",
+        "Windows NT 11.0; Win64; x64"
+      ],
+      "chrome_version": ["109", "114", "118", "120", "122", "124"],
+      "product": ["360SE", "360EE"]
+    }
+  },
+  "browser_weight_profiles": {
+    "global": {
+      "chrome_desktop": 30, "chrome_mobile": 35, "safari_desktop": 5,
+      "safari_mobile": 13, "firefox_desktop": 2.5, "firefox_mobile": 0.5,
+      "edge_desktop": 5, "edge_mobile": 1, "samsung_mobile": 2.5,
+      "opera_desktop": 1, "opera_mobile": 1.5, "vivaldi_desktop": 0.5,
+      "uc_mobile": 1, "yandex_desktop": 0.5, "yandex_mobile": 0.5
+    },
+    "north_america": {
+      "chrome_desktop": 22, "chrome_mobile": 28, "safari_desktop": 8,
+      "safari_mobile": 22, "firefox_desktop": 3, "firefox_mobile": 0.5,
+      "edge_desktop": 8, "edge_mobile": 1.5, "samsung_mobile": 2,
+      "opera_desktop": 0.5, "opera_mobile": 0.5, "vivaldi_desktop": 0.5
+    },
+    "western_europe": {
+      "chrome_desktop": 28, "chrome_mobile": 30, "safari_desktop": 6,
+      "safari_mobile": 16, "firefox_desktop": 5, "firefox_mobile": 1,
+      "edge_desktop": 5, "edge_mobile": 1, "samsung_mobile": 3,
+      "opera_desktop": 1.5, "opera_mobile": 1, "vivaldi_desktop": 0.5
+    },
+    "nordic": {
+      "chrome_desktop": 25, "chrome_mobile": 26, "safari_desktop": 8,
+      "safari_mobile": 20, "firefox_desktop": 4, "firefox_mobile": 0.5,
+      "edge_desktop": 5, "edge_mobile": 1, "samsung_mobile": 4,
+      "opera_desktop": 1.5, "opera_mobile": 1, "vivaldi_desktop": 1
+    },
+    "eastern_europe": {
+      "chrome_desktop": 28, "chrome_mobile": 32, "safari_desktop": 3,
+      "safari_mobile": 10, "firefox_desktop": 4, "firefox_mobile": 0.5,
+      "edge_desktop": 6, "edge_mobile": 1, "samsung_mobile": 4,
+      "opera_desktop": 4, "opera_mobile": 3, "vivaldi_desktop": 0.5
+    },
+    "russia": {
+      "chrome_desktop": 22, "chrome_mobile": 28, "safari_desktop": 3,
+      "safari_mobile": 8, "firefox_desktop": 4, "firefox_mobile": 0.5,
+      "edge_desktop": 5, "edge_mobile": 1, "samsung_mobile": 3,
+      "opera_desktop": 5, "opera_mobile": 2.5,
+      "yandex_desktop": 10, "yandex_mobile": 5
+    },
+    "japan": {
+      "chrome_desktop": 20, "chrome_mobile": 22, "safari_desktop": 10,
+      "safari_mobile": 28, "firefox_desktop": 3, "firefox_mobile": 0.5,
+      "edge_desktop": 8, "edge_mobile": 1.5, "samsung_mobile": 1,
+      "opera_desktop": 0.5, "opera_mobile": 0.5, "vivaldi_desktop": 0.5
+    },
+    "south_korea": {
+      "chrome_desktop": 22, "chrome_mobile": 22, "safari_desktop": 5,
+      "safari_mobile": 18, "firefox_desktop": 1, "firefox_mobile": 0.2,
+      "edge_desktop": 5, "edge_mobile": 0.5, "samsung_mobile": 10,
+      "opera_desktop": 0.5, "opera_mobile": 0.3,
+      "whale_desktop": 8
+    },
+    "china": {
+      "chrome_desktop": 22, "chrome_mobile": 20, "safari_desktop": 3,
+      "safari_mobile": 15, "firefox_desktop": 2, "firefox_mobile": 0.3,
+      "edge_desktop": 8, "edge_mobile": 1, "samsung_mobile": 2,
+      "opera_desktop": 1, "opera_mobile": 0.5,
+      "uc_mobile": 8, "qihu_360_desktop": 5
+    },
+    "south_asia": {
+      "chrome_desktop": 18, "chrome_mobile": 50, "safari_desktop": 2,
+      "safari_mobile": 8, "firefox_desktop": 1.5, "firefox_mobile": 0.5,
+      "edge_desktop": 3, "edge_mobile": 1, "samsung_mobile": 5,
+      "opera_desktop": 1, "opera_mobile": 4,
+      "uc_mobile": 5
+    },
+    "southeast_asia": {
+      "chrome_desktop": 20, "chrome_mobile": 42, "safari_desktop": 3,
+      "safari_mobile": 12, "firefox_desktop": 2, "firefox_mobile": 0.5,
+      "edge_desktop": 4, "edge_mobile": 1, "samsung_mobile": 5,
+      "opera_desktop": 1, "opera_mobile": 3,
+      "uc_mobile": 5
+    },
+    "oceania": {
+      "chrome_desktop": 22, "chrome_mobile": 25, "safari_desktop": 10,
+      "safari_mobile": 25, "firefox_desktop": 3, "firefox_mobile": 0.5,
+      "edge_desktop": 7, "edge_mobile": 1.5, "samsung_mobile": 2,
+      "opera_desktop": 0.5, "opera_mobile": 0.5, "vivaldi_desktop": 0.5
+    },
+    "south_america": {
+      "chrome_desktop": 28, "chrome_mobile": 40, "safari_desktop": 3,
+      "safari_mobile": 8, "firefox_desktop": 2, "firefox_mobile": 0.5,
+      "edge_desktop": 4, "edge_mobile": 1, "samsung_mobile": 3,
+      "opera_desktop": 2, "opera_mobile": 5, "vivaldi_desktop": 0.3
+    },
+    "middle_east_africa": {
+      "chrome_desktop": 22, "chrome_mobile": 42, "safari_desktop": 3,
+      "safari_mobile": 10, "firefox_desktop": 2, "firefox_mobile": 0.5,
+      "edge_desktop": 5, "edge_mobile": 1, "samsung_mobile": 5,
+      "opera_desktop": 1, "opera_mobile": 5,
+      "uc_mobile": 3
+    }
+  }
 }

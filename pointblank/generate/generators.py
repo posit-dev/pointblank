@@ -157,6 +157,7 @@ def _generate_from_preset(preset: str, generator: LocaleGenerator) -> str:
         "file_name": generator.file_name,
         "file_extension": generator.file_extension,
         "mime_type": generator.mime_type,
+        "user_agent": generator.user_agent,
     }
 
     generator = preset_mapping.get(preset)

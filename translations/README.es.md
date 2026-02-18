@@ -333,6 +333,7 @@ data = pb.generate_dataset(schema, n=100, seed=23)
 El generador soporta generación de datos sofisticada con estas capacidades:
 
 - **Datos realistas con presets**: Usa presets integrados como `"name"`, `"email"`, `"address"`, `"phone"`, etc.
+- **Cadenas de user agent**: Genera cadenas de user agent de navegador altamente variadas y realistas de 17 categorías de navegadores con más de 42.000 combinaciones únicas
 - **Soporte de 50+ países**: Genera datos específicos de localización (ej., `country="DE"` para direcciones alemanas)
 - **Restricciones de campos**: Controla rangos, patrones, unicidad y valores permitidos
 - **Múltiples formatos de salida**: Devuelve DataFrames de Polars por defecto, pero también soporta Pandas (`output="pandas"`) o diccionarios (`output="dict"`)
@@ -343,6 +344,7 @@ El generador soporta generación de datos sofisticada con estas capacidades:
 - **Construido para la colaboración**: Comparte resultados con colegas a través de hermosos informes interactivos
 - **Salidas prácticas**: Obtén exactamente lo que necesitas: recuentos, extractos, resúmenes o informes completos
 - **Implementación flexible**: Úsalo en notebooks, scripts o pipelines de datos
+- **Generación de datos sintéticos**: Crea datos de prueba realistas con más de 30 presets, cadenas de user agent, formateo adaptado al locale y soporte de más de 50 países
 - **Personalizable**: Adapta los pasos de validación e informes a tus necesidades específicas
 - **Internacionalización**: Los informes pueden generarse en 40 idiomas, incluidos inglés, español, francés y alemán
 

@@ -90,6 +90,7 @@ AVAILABLE_PRESETS = frozenset(
         "file_name",
         "file_extension",
         "mime_type",
+        "user_agent",
     }
 )
 
@@ -875,7 +876,8 @@ def string_field(
     `"2012-05-12 – 2015-11-22"`), `"future_date"` (up to 1 year ahead), `"past_date"`
     (up to 10 years back), `"time"`
 
-    **Miscellaneous:** `"color_name"`, `"file_name"`, `"file_extension"`, `"mime_type"`
+    **Miscellaneous:** `"color_name"`, `"file_name"`, `"file_extension"`, `"mime_type"`,
+    `"user_agent"` (browser user agent string with country-specific browser weighting)
 
     Coherent Data Generation
     ------------------------
