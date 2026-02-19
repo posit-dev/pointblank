@@ -113,6 +113,8 @@ def _generate_from_preset(preset: str, generator: LocaleGenerator) -> str:
         "city": generator.city,
         "state": generator.state,
         "country": generator.country,
+        "country_code_2": generator.country_code_2,
+        "country_code_3": generator.country_code_3,
         "postcode": generator.postcode,
         "latitude": generator.latitude,
         "longitude": generator.longitude,
