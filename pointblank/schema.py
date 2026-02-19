@@ -867,7 +867,7 @@ class Schema:
         -------------------
         The `country=` parameter controls the country used for generating realistic data with
         presets (e.g., `preset="email"`, `preset="address"`). This affects location-specific formats
-        like addresses, phone numbers, and postal codes. Currently, **55 countries** are supported
+        like addresses, phone numbers, and postal codes. Currently, **71 countries** are supported
         with full locale data:
 
         **Europe (32 countries):** Austria (`"AT"`), Belgium (`"BE"`), Bulgaria (`"BG"`), Croatia
@@ -878,15 +878,20 @@ class Schema:
         Portugal (`"PT"`), Romania (`"RO"`), Russia (`"RU"`), Slovakia (`"SK"`), Slovenia (`"SI"`),
         Spain (`"ES"`), Sweden (`"SE"`), Switzerland (`"CH"`), United Kingdom (`"GB"`)
 
-        **Americas (7 countries):** Argentina (`"AR"`), Brazil (`"BR"`), Canada (`"CA"`), Chile
-        (`"CL"`), Colombia (`"CO"`), Mexico (`"MX"`), United States (`"US"`)
+        **Americas (9 countries):** Argentina (`"AR"`), Brazil (`"BR"`), Canada (`"CA"`), Chile
+        (`"CL"`), Colombia (`"CO"`), Costa Rica (`"CR"`), Mexico (`"MX"`), Peru (`"PE"`),
+        United States (`"US"`)
 
-        **Asia-Pacific (12 countries):** Australia (`"AU"`), China (`"CN"`), Hong Kong (`"HK"`),
-        India (`"IN"`), Indonesia (`"ID"`), Japan (`"JP"`), New Zealand (`"NZ"`), Philippines
-        (`"PH"`), Singapore (`"SG"`), South Korea (`"KR"`), Taiwan (`"TW"`), Thailand (`"TH"`)
+        **Asia-Pacific (17 countries):** Australia (`"AU"`), Bangladesh (`"BD"`), China (`"CN"`),
+        Hong Kong (`"HK"`), India (`"IN"`), Indonesia (`"ID"`), Japan (`"JP"`), Malaysia (`"MY"`),
+        New Zealand (`"NZ"`), Pakistan (`"PK"`), Philippines (`"PH"`), Singapore (`"SG"`),
+        South Korea (`"KR"`), Sri Lanka (`"LK"`), Taiwan (`"TW"`), Thailand (`"TH"`),
+        Vietnam (`"VN"`)
 
-        **Middle East & Africa (4 countries):** Nigeria (`"NG"`), South Africa (`"ZA"`), Turkey
-        (`"TR"`), United Arab Emirates (`"AE"`)
+        **Middle East & Africa (13 countries):** Algeria (`"DZ"`), Egypt (`"EG"`),
+        Ethiopia (`"ET"`), Ghana (`"GH"`), Kenya (`"KE"`), Morocco (`"MA"`), Nigeria (`"NG"`),
+        Senegal (`"SN"`), South Africa (`"ZA"`), Tunisia (`"TN"`), Turkey (`"TR"`),
+        Uganda (`"UG"`), United Arab Emirates (`"AE"`)
 
         Examples
         --------
@@ -1672,7 +1677,7 @@ def generate_dataset(
 
     Supported Countries
     -------------------
-    The `country=` parameter currently supports 55 countries with full locale data:
+    The `country=` parameter currently supports 71 countries with full locale data:
 
     **Europe (32 countries):** Austria (`"AT"`), Belgium (`"BE"`), Bulgaria (`"BG"`),
     Croatia (`"HR"`), Cyprus (`"CY"`), Czech Republic (`"CZ"`), Denmark (`"DK"`),
@@ -1683,16 +1688,20 @@ def generate_dataset(
     Slovakia (`"SK"`), Slovenia (`"SI"`), Spain (`"ES"`), Sweden (`"SE"`),
     Switzerland (`"CH"`), United Kingdom (`"GB"`)
 
-    **Americas (7 countries):** Argentina (`"AR"`), Brazil (`"BR"`), Canada (`"CA"`),
-    Chile (`"CL"`), Colombia (`"CO"`), Mexico (`"MX"`), United States (`"US"`)
+    **Americas (9 countries):** Argentina (`"AR"`), Brazil (`"BR"`), Canada (`"CA"`),
+    Chile (`"CL"`), Colombia (`"CO"`), Costa Rica (`"CR"`), Mexico (`"MX"`),
+    Peru (`"PE"`), United States (`"US"`)
 
-    **Asia-Pacific (12 countries):** Australia (`"AU"`), China (`"CN"`), Hong Kong (`"HK"`),
-    India (`"IN"`), Indonesia (`"ID"`), Japan (`"JP"`), New Zealand (`"NZ"`),
-    Philippines (`"PH"`), Singapore (`"SG"`), South Korea (`"KR"`), Taiwan (`"TW"`),
-    Thailand (`"TH"`)
+    **Asia-Pacific (17 countries):** Australia (`"AU"`), Bangladesh (`"BD"`),
+    China (`"CN"`), Hong Kong (`"HK"`), India (`"IN"`), Indonesia (`"ID"`),
+    Japan (`"JP"`), Malaysia (`"MY"`), New Zealand (`"NZ"`), Pakistan (`"PK"`),
+    Philippines (`"PH"`), Singapore (`"SG"`), South Korea (`"KR"`),
+    Sri Lanka (`"LK"`), Taiwan (`"TW"`), Thailand (`"TH"`), Vietnam (`"VN"`)
 
-    **Middle East & Africa (4 countries):** Nigeria (`"NG"`), South Africa (`"ZA"`),
-    Turkey (`"TR"`), United Arab Emirates (`"AE"`)
+    **Middle East & Africa (13 countries):** Algeria (`"DZ"`), Egypt (`"EG"`),
+    Ethiopia (`"ET"`), Ghana (`"GH"`), Kenya (`"KE"`), Morocco (`"MA"`),
+    Nigeria (`"NG"`), Senegal (`"SN"`), South Africa (`"ZA"`), Tunisia (`"TN"`),
+    Turkey (`"TR"`), Uganda (`"UG"`), United Arab Emirates (`"AE"`)
 
     Pytest Fixture
     --------------
