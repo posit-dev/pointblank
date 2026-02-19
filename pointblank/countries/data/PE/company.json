@@ -1,0 +1,584 @@
+{
+  "suffixes": [
+    "S.A.",
+    "S.A.C.",
+    "S.R.L.",
+    "E.I.R.L.",
+    "Corp",
+    "Group"
+  ],
+  "formats": [
+    "{last_name} {suffix}",
+    "{adjective} {noun} {suffix}",
+    "{noun} del Perú {suffix}",
+    "Grupo {last_name}"
+  ],
+  "adjectives": [
+    "Peruana",
+    "Nacional",
+    "Andina",
+    "Imperial",
+    "Colonial",
+    "Pacific",
+    "Golden",
+    "Royal",
+    "United",
+    "Global",
+    "Continental",
+    "Premier",
+    "Inca",
+    "Solar",
+    "Sur",
+    "Norte",
+    "Gran",
+    "Nueva",
+    "Alta",
+    "Real"
+  ],
+  "nouns": [
+    "Trading",
+    "Industrias",
+    "Minera",
+    "Constructora",
+    "Alimentos",
+    "Servicios",
+    "Inversiones",
+    "Comercial",
+    "Agroindustrial",
+    "Textil",
+    "Transportes",
+    "Inmobiliaria",
+    "Financiera",
+    "Pesquera",
+    "Energía",
+    "Tecnología",
+    "Consulting",
+    "Logística",
+    "Distribuidora",
+    "Exportadora"
+  ],
+  "well_known_companies": [
+    {
+      "name": "BCP (Banco de Crédito del Perú)",
+      "cities": [
+        "Lima"
+      ]
+    },
+    {
+      "name": "Interbank",
+      "cities": [
+        "Lima"
+      ]
+    },
+    {
+      "name": "Alicorp",
+      "cities": [
+        "Lima"
+      ]
+    },
+    {
+      "name": "Southern Copper",
+      "cities": [
+        "Lima"
+      ]
+    },
+    {
+      "name": "Buenaventura",
+      "cities": [
+        "Lima"
+      ]
+    },
+    {
+      "name": "Credicorp",
+      "cities": [
+        "Lima"
+      ]
+    },
+    {
+      "name": "BBVA Perú",
+      "cities": [
+        "Lima"
+      ]
+    },
+    {
+      "name": "Gloria Group",
+      "cities": [
+        "Arequipa"
+      ]
+    },
+    {
+      "name": "Backus (AB InBev)",
+      "cities": [
+        "Lima"
+      ]
+    },
+    {
+      "name": "Repsol Perú",
+      "cities": [
+        "Lima"
+      ]
+    },
+    {
+      "name": "Scotiabank Perú",
+      "cities": [
+        "Lima"
+      ]
+    },
+    {
+      "name": "Graña y Montero",
+      "cities": [
+        "Lima"
+      ]
+    },
+    {
+      "name": "Ferreycorp",
+      "cities": [
+        "Lima"
+      ]
+    },
+    {
+      "name": "Cementos Pacasmayo",
+      "cities": [
+        "Lima"
+      ]
+    },
+    {
+      "name": "InRetail",
+      "cities": [
+        "Lima"
+      ]
+    }
+  ],
+  "jobs": [
+    "Ingeniero Civil",
+    "Contador",
+    "Abogado",
+    "Médico",
+    "Ingeniero de Sistemas",
+    "Administrador",
+    "Economista",
+    "Arquitecto",
+    "Profesor",
+    "Enfermera",
+    "Marketing Executive",
+    "Sales Manager",
+    "HR Manager",
+    "Financial Analyst",
+    "Mining Engineer",
+    "Agricultural Engineer",
+    "Project Manager",
+    "Software Developer",
+    "Data Analyst",
+    "Operations Manager",
+    "Auditor",
+    "Business Consultant",
+    "Chemical Engineer",
+    "Environmental Engineer",
+    "Geologist"
+  ],
+  "catch_phrase_adjectives": [
+    "innovador",
+    "confiable",
+    "líder",
+    "calidad",
+    "premium",
+    "sostenible",
+    "dinámico",
+    "progresivo",
+    "eficiente",
+    "superior"
+  ],
+  "catch_phrase_nouns": [
+    "soluciones",
+    "servicios",
+    "productos",
+    "excelencia",
+    "calidad",
+    "valor",
+    "crecimiento",
+    "alianza",
+    "innovación",
+    "rendimiento"
+  ],
+  "catch_phrase_verbs": [
+    "ofrece",
+    "crea",
+    "construye",
+    "impulsa",
+    "permite",
+    "asegura",
+    "provee",
+    "logra",
+    "transforma",
+    "conecta"
+  ],
+  "catch_phrase_connector": "que",
+  "industries": [
+    {
+      "name": "Mining",
+      "weight": 0.15,
+      "jobs": [
+        "Mining Engineer",
+        "Geologist",
+        "Safety Officer",
+        "Plant Operator",
+        "Environmental Specialist"
+      ],
+      "well_known": [
+        "Southern Copper",
+        "Buenaventura",
+        "Antamina",
+        "Cerro Verde"
+      ],
+      "company_suffixes": [
+        "Minera",
+        "Mining",
+        "Resources"
+      ],
+      "company_nouns": [
+        "Minera",
+        "Mining",
+        "Mineral",
+        "Resources"
+      ],
+      "company_formats": [
+        "{adjective} {noun} S.A.C.",
+        "Compañía {noun} del Perú"
+      ]
+    },
+    {
+      "name": "Banking & Finance",
+      "weight": 0.12,
+      "jobs": [
+        "Bank Officer",
+        "Credit Analyst",
+        "Financial Advisor",
+        "Auditor",
+        "Risk Manager"
+      ],
+      "well_known": [
+        "BCP",
+        "Interbank",
+        "BBVA Perú",
+        "Scotiabank Perú",
+        "Credicorp"
+      ],
+      "company_suffixes": [
+        "Financiera",
+        "Bank",
+        "Capital",
+        "Inversiones"
+      ],
+      "company_nouns": [
+        "Financiera",
+        "Capital",
+        "Banco",
+        "Inversiones"
+      ],
+      "company_formats": [
+        "{adjective} {noun} S.A."
+      ]
+    },
+    {
+      "name": "Agriculture & Agribusiness",
+      "weight": 0.1,
+      "jobs": [
+        "Agricultural Engineer",
+        "Farm Manager",
+        "Export Coordinator",
+        "Quality Controller"
+      ],
+      "well_known": [
+        "Camposol",
+        "Danper",
+        "Virú",
+        "Gloria Group"
+      ],
+      "company_suffixes": [
+        "Agroindustrial",
+        "Agro",
+        "Foods",
+        "Export"
+      ],
+      "company_nouns": [
+        "Agro",
+        "Agroindustrial",
+        "Alimentos",
+        "Export"
+      ],
+      "company_formats": [
+        "{adjective} {noun} S.A.C."
+      ]
+    },
+    {
+      "name": "Construction & Real Estate",
+      "weight": 0.1,
+      "jobs": [
+        "Civil Engineer",
+        "Architect",
+        "Project Manager",
+        "Surveyor",
+        "Site Engineer"
+      ],
+      "well_known": [
+        "Graña y Montero",
+        "Cosapi",
+        "AENZA"
+      ],
+      "company_suffixes": [
+        "Constructora",
+        "Inmobiliaria",
+        "Ingeniería"
+      ],
+      "company_nouns": [
+        "Constructora",
+        "Inmobiliaria",
+        "Engineering",
+        "Properties"
+      ],
+      "company_formats": [
+        "{adjective} {noun} S.A.C."
+      ]
+    },
+    {
+      "name": "Retail & Consumer",
+      "weight": 0.1,
+      "jobs": [
+        "Store Manager",
+        "Sales Executive",
+        "Merchandiser",
+        "Logistics Coordinator"
+      ],
+      "well_known": [
+        "InRetail",
+        "Falabella Perú",
+        "Supermercados Peruanos",
+        "Cencosud Perú"
+      ],
+      "company_suffixes": [
+        "Comercial",
+        "Trading",
+        "Retail"
+      ],
+      "company_nouns": [
+        "Comercial",
+        "Trading",
+        "Tienda",
+        "Store"
+      ],
+      "company_formats": [
+        "{adjective} {noun} S.A.C."
+      ]
+    },
+    {
+      "name": "Food & Beverage",
+      "weight": 0.08,
+      "jobs": [
+        "Food Technologist",
+        "Production Manager",
+        "Quality Controller",
+        "Supply Chain Manager"
+      ],
+      "well_known": [
+        "Alicorp",
+        "Gloria Group",
+        "Backus",
+        "Laive"
+      ],
+      "company_suffixes": [
+        "Alimentos",
+        "Foods",
+        "Bebidas"
+      ],
+      "company_nouns": [
+        "Alimentos",
+        "Food",
+        "Bebidas",
+        "Nutrición"
+      ],
+      "company_formats": [
+        "{adjective} {noun} S.A."
+      ]
+    },
+    {
+      "name": "Telecommunications",
+      "weight": 0.06,
+      "jobs": [
+        "Network Engineer",
+        "Customer Service Rep",
+        "Sales Manager",
+        "Technical Support"
+      ],
+      "well_known": [
+        "Movistar Perú",
+        "Claro Perú",
+        "Entel Perú",
+        "Bitel"
+      ],
+      "company_suffixes": [
+        "Telecom",
+        "Communications",
+        "Networks"
+      ],
+      "company_nouns": [
+        "Telecom",
+        "Red",
+        "Comunicaciones",
+        "Connect"
+      ],
+      "company_formats": [
+        "{adjective} {noun} S.A.C."
+      ]
+    },
+    {
+      "name": "Fishing & Marine",
+      "weight": 0.05,
+      "jobs": [
+        "Marine Biologist",
+        "Fleet Manager",
+        "Processing Plant Worker",
+        "Export Manager"
+      ],
+      "well_known": [
+        "TASA",
+        "Austral Group",
+        "Hayduk",
+        "Exalmar"
+      ],
+      "company_suffixes": [
+        "Pesquera",
+        "Marine",
+        "Seafood"
+      ],
+      "company_nouns": [
+        "Pesquera",
+        "Marine",
+        "Seafood",
+        "Maritima"
+      ],
+      "company_formats": [
+        "{adjective} {noun} S.A."
+      ]
+    },
+    {
+      "name": "Tourism & Hospitality",
+      "weight": 0.07,
+      "jobs": [
+        "Tour Guide",
+        "Hotel Manager",
+        "Chef",
+        "Travel Consultant",
+        "Receptionist"
+      ],
+      "well_known": [
+        "Belmond",
+        "Inkaterra",
+        "Casa Andina"
+      ],
+      "company_suffixes": [
+        "Tours",
+        "Travel",
+        "Hotels",
+        "Turismo"
+      ],
+      "company_nouns": [
+        "Tours",
+        "Travel",
+        "Hotel",
+        "Turismo"
+      ],
+      "company_formats": [
+        "{adjective} {noun} S.A.C."
+      ]
+    },
+    {
+      "name": "Energy",
+      "weight": 0.05,
+      "jobs": [
+        "Electrical Engineer",
+        "Power Plant Operator",
+        "Project Engineer",
+        "HSE Manager"
+      ],
+      "well_known": [
+        "Enel Perú",
+        "Engie Perú",
+        "Electroperú"
+      ],
+      "company_suffixes": [
+        "Energy",
+        "Energía",
+        "Power"
+      ],
+      "company_nouns": [
+        "Energía",
+        "Power",
+        "Electric",
+        "Solar"
+      ],
+      "company_formats": [
+        "{adjective} {noun} S.A."
+      ]
+    },
+    {
+      "name": "Healthcare",
+      "weight": 0.06,
+      "jobs": [
+        "Doctor",
+        "Nurse",
+        "Pharmacist",
+        "Hospital Administrator",
+        "Lab Technician"
+      ],
+      "well_known": [
+        "Clínica Ricardo Palma",
+        "Clínica San Felipe",
+        "Auna"
+      ],
+      "company_suffixes": [
+        "Salud",
+        "Healthcare",
+        "Medical",
+        "Clínica"
+      ],
+      "company_nouns": [
+        "Salud",
+        "Medical",
+        "Health",
+        "Clínica"
+      ],
+      "company_formats": [
+        "{adjective} {noun} S.A.C."
+      ]
+    },
+    {
+      "name": "Textiles",
+      "weight": 0.06,
+      "jobs": [
+        "Textile Engineer",
+        "Quality Inspector",
+        "Production Manager",
+        "Designer"
+      ],
+      "well_known": [
+        "Creditex",
+        "Michell & Cía",
+        "Inca Tops"
+      ],
+      "company_suffixes": [
+        "Textil",
+        "Fabrics",
+        "Fashion"
+      ],
+      "company_nouns": [
+        "Textil",
+        "Fabrics",
+        "Moda",
+        "Apparel"
+      ],
+      "company_formats": [
+        "{adjective} {noun} S.A.C."
+      ]
+    }
+  ]
+}

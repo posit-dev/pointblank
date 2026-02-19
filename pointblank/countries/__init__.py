@@ -177,6 +177,24 @@ COUNTRY_CODE_MAP: dict[str, str] = {
     # Singapore
     "SG": "SG",
     "SGP": "SG",
+    # Egypt
+    "EG": "EG",
+    "EGY": "EG",
+    # Pakistan
+    "PK": "PK",
+    "PAK": "PK",
+    # Bangladesh
+    "BD": "BD",
+    "BGD": "BD",
+    # Vietnam
+    "VN": "VN",
+    "VNM": "VN",
+    # Malaysia
+    "MY": "MY",
+    "MYS": "MY",
+    # Peru
+    "PE": "PE",
+    "PER": "PE",
 }
 
 # Countries that have complete locale data files
@@ -187,6 +205,7 @@ COUNTRIES_WITH_FULL_DATA: list[str] = [
     "AR",  # Argentina
     "AT",  # Austria
     "AU",  # Australia
+    "BD",  # Bangladesh
     "BE",  # Belgium
     "BG",  # Bulgaria
     "BR",  # Brazil
@@ -200,6 +219,7 @@ COUNTRIES_WITH_FULL_DATA: list[str] = [
     "DE",  # Germany
     "DK",  # Denmark
     "EE",  # Estonia
+    "EG",  # Egypt
     "ES",  # Spain
     "FI",  # Finland
     "FR",  # France
@@ -220,11 +240,14 @@ COUNTRIES_WITH_FULL_DATA: list[str] = [
     "LU",  # Luxembourg
     "MT",  # Malta
     "MX",  # Mexico
+    "MY",  # Malaysia
     "NL",  # Netherlands
     "NO",  # Norway
     "NZ",  # New Zealand
-    "PL",  # Poland
+    "PE",  # Peru
     "PH",  # Philippines
+    "PK",  # Pakistan
+    "PL",  # Poland
     "PT",  # Portugal
     "RO",  # Romania
     "RU",  # Russia
@@ -234,6 +257,7 @@ COUNTRIES_WITH_FULL_DATA: list[str] = [
     "TH",  # Thailand
     "TR",  # Turkey
     "TW",  # Taiwan
+    "VN",  # Vietnam
     "ZA",  # South Africa
     "AE",  # United Arab Emirates
     "NG",  # Nigeria
