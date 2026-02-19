@@ -1,0 +1,73 @@
+{
+  "suffixes": ["Ltd.", "Co.", "Group", "Ghana Ltd.", "Enterprise"],
+  "formats": [
+    "{last_name} {suffix}",
+    "{adjective} {noun} {suffix}",
+    "{noun} {suffix}",
+    "{last_name} & {last_name} {suffix}"
+  ],
+  "adjectives": [
+    "Golden", "Royal", "Premier", "National", "West African",
+    "Continental", "Tropical", "Modern", "Dynamic", "Pioneer",
+    "Heritage", "United", "Supreme", "Global", "Advanced",
+    "Capital", "Coastal", "Savannah", "Atlantic", "Rising"
+  ],
+  "nouns": [
+    "Trading", "Industries", "Construction", "Mining", "Ventures",
+    "Holdings", "Services", "Solutions", "Technologies", "Logistics",
+    "Properties", "Resources", "Investments", "Agricultural", "Cocoa",
+    "Enterprise", "Markets", "Agro", "Fisheries", "Commodities"
+  ],
+  "well_known_companies": [
+    {"name": "MTN Ghana", "cities": ["Accra"]},
+    {"name": "Vodafone Ghana", "cities": ["Accra"]},
+    {"name": "Ghana Commercial Bank", "cities": ["Accra"]},
+    {"name": "Ecobank Ghana", "cities": ["Accra"]},
+    {"name": "Stanbic Bank Ghana", "cities": ["Accra"]},
+    {"name": "AngloGold Ashanti", "cities": ["Obuasi"]},
+    {"name": "Newmont Ghana", "cities": ["Accra"]},
+    {"name": "Ghana Cocoa Board", "cities": ["Accra"]},
+    {"name": "Tullow Oil Ghana", "cities": ["Accra", "Takoradi"]},
+    {"name": "Fan Milk Ghana", "cities": ["Accra"]},
+    {"name": "Unilever Ghana", "cities": ["Accra", "Tema"]},
+    {"name": "Nestle Ghana", "cities": ["Accra", "Tema"]},
+    {"name": "Volta River Authority", "cities": ["Accra", "Tema"]},
+    {"name": "Ghana Ports and Harbours Authority", "cities": ["Tema", "Takoradi"]},
+    {"name": "Electricity Company of Ghana", "cities": ["Accra"]}
+  ],
+  "jobs": [
+    "Software Engineer", "Accountant", "Teacher", "Nurse", "Farmer",
+    "Market Trader", "Driver", "Banker", "Civil Engineer", "Doctor",
+    "Pharmacist", "Lawyer", "Journalist", "Electrician", "Plumber",
+    "Fisherman", "Cocoa Farmer", "Chef", "Tailor", "Mechanic",
+    "Security Guard", "Sales Representative", "Administrator", "Pastor", "Lecturer"
+  ],
+  "catch_phrase_adjectives": [
+    "innovative", "reliable", "dynamic", "leading", "trusted",
+    "sustainable", "premier", "excellent", "professional", "cutting-edge",
+    "progressive", "quality", "dedicated", "expert", "responsive"
+  ],
+  "catch_phrase_nouns": [
+    "solutions", "service", "excellence", "growth", "partnership",
+    "innovation", "value", "quality", "performance", "success",
+    "development", "technology", "leadership", "opportunity", "commitment"
+  ],
+  "catch_phrase_verbs": [
+    "delivers", "enables", "transforms", "drives", "empowers",
+    "creates", "builds", "achieves", "inspires", "connects",
+    "develops", "enhances", "maximizes", "strengthens", "provides"
+  ],
+  "catch_phrase_connector": "that",
+  "industries": [
+    {"name": "mining", "weight": 0.15, "jobs": ["Mining Engineer", "Geologist", "Safety Officer"], "well_known": ["AngloGold Ashanti", "Newmont Ghana"], "company_suffixes": ["Mining Ltd.", "Resources"], "company_nouns": ["Mining", "Resources", "Gold"], "company_formats": ["{adjective} {noun} {suffix}"]},
+    {"name": "finance", "weight": 0.12, "jobs": ["Banker", "Accountant", "Financial Analyst"], "well_known": ["Ghana Commercial Bank", "Ecobank Ghana"], "company_suffixes": ["Bank", "Finance"], "company_nouns": ["Capital", "Finance", "Banking"], "company_formats": ["{adjective} {noun} {suffix}"]},
+    {"name": "telecommunications", "weight": 0.12, "jobs": ["Network Engineer", "Sales Representative", "Customer Service"], "well_known": ["MTN Ghana", "Vodafone Ghana"], "company_suffixes": ["Telecom", "Communications"], "company_nouns": ["Telecom", "Mobile", "Networks"], "company_formats": ["{adjective} {noun} {suffix}"]},
+    {"name": "agriculture", "weight": 0.15, "jobs": ["Cocoa Farmer", "Agronomist", "Farm Manager"], "well_known": ["Ghana Cocoa Board"], "company_suffixes": ["Agro Ltd.", "Farms"], "company_nouns": ["Cocoa", "Agricultural", "Farms"], "company_formats": ["{adjective} {noun} {suffix}"]},
+    {"name": "energy", "weight": 0.08, "jobs": ["Electrical Engineer", "Power Plant Operator", "Energy Consultant"], "well_known": ["Volta River Authority", "Electricity Company of Ghana"], "company_suffixes": ["Energy", "Power"], "company_nouns": ["Power", "Energy", "Electricity"], "company_formats": ["{adjective} {noun} {suffix}"]},
+    {"name": "oil_gas", "weight": 0.08, "jobs": ["Petroleum Engineer", "Drilling Supervisor", "HSE Officer"], "well_known": ["Tullow Oil Ghana"], "company_suffixes": ["Oil", "Petroleum"], "company_nouns": ["Oil", "Petroleum", "Energy"], "company_formats": ["{adjective} {noun} {suffix}"]},
+    {"name": "manufacturing", "weight": 0.10, "jobs": ["Factory Manager", "Quality Controller", "Production Supervisor"], "well_known": ["Fan Milk Ghana", "Unilever Ghana"], "company_suffixes": ["Industries", "Manufacturing"], "company_nouns": ["Industries", "Manufacturing", "Products"], "company_formats": ["{adjective} {noun} {suffix}"]},
+    {"name": "technology", "weight": 0.08, "jobs": ["Software Developer", "IT Consultant", "Data Analyst"], "well_known": [], "company_suffixes": ["Tech", "Digital"], "company_nouns": ["Tech", "Digital", "Software"], "company_formats": ["{adjective} {noun} {suffix}"]},
+    {"name": "education", "weight": 0.06, "jobs": ["Teacher", "Lecturer", "Education Consultant"], "well_known": [], "company_suffixes": ["Academy", "Institute"], "company_nouns": ["Academy", "Learning", "Education"], "company_formats": ["{adjective} {noun} {suffix}"]},
+    {"name": "healthcare", "weight": 0.06, "jobs": ["Doctor", "Nurse", "Pharmacist"], "well_known": [], "company_suffixes": ["Health", "Medical"], "company_nouns": ["Health", "Medical", "Care"], "company_formats": ["{adjective} {noun} {suffix}"]}
+  ]
+}

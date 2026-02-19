@@ -1,0 +1,152 @@
+{
+  "suffixes": ["PLC", "Share Company", "Trading", "Enterprise", "Import-Export", "Industries"],
+  "formats": [
+    "{adjective} {noun} {suffix}",
+    "{noun} {suffix}",
+    "{adjective} {noun}"
+  ],
+  "adjectives": [
+    "Ethiopian", "Abyssinian", "Addis", "National", "Federal",
+    "Golden", "Blue Nile", "Highland", "Unity", "Victory",
+    "Premier", "Modern", "Progressive", "Continental", "Cooperative",
+    "Millennium", "Dynamic", "Advanced", "Pioneer", "United"
+  ],
+  "nouns": [
+    "Trading", "Construction", "Agriculture", "Investment", "Transport",
+    "Engineering", "Leather", "Coffee", "Textile", "Cement",
+    "Minerals", "Telecom", "Insurance", "Brewery", "Pharmaceuticals",
+    "Logistics", "Properties", "Energy", "Packaging", "Holdings"
+  ],
+  "well_known_companies": [
+    {"name": "Ethiopian Airlines", "cities": ["Addis Ababa", "Dire Dawa"]},
+    {"name": "Ethio Telecom", "cities": ["Addis Ababa"]},
+    {"name": "Commercial Bank of Ethiopia", "cities": ["Addis Ababa", "Bahir Dar", "Mekelle"]},
+    {"name": "Dashen Bank", "cities": ["Addis Ababa", "Gondar"]},
+    {"name": "Awash Bank", "cities": ["Addis Ababa", "Hawassa"]},
+    {"name": "MIDROC Ethiopia", "cities": ["Addis Ababa"]},
+    {"name": "BGI Ethiopia", "cities": ["Addis Ababa", "Kombolcha"]},
+    {"name": "Habesha Breweries", "cities": ["Adama"]},
+    {"name": "Derba MIDROC Cement", "cities": ["Addis Ababa"]},
+    {"name": "Anbessa City Bus", "cities": ["Addis Ababa"]},
+    {"name": "Ethiopian Insurance Corporation", "cities": ["Addis Ababa"]},
+    {"name": "Dangote Cement Ethiopia", "cities": ["Dire Dawa"]},
+    {"name": "Mugher Cement Enterprise", "cities": ["Addis Ababa"]},
+    {"name": "Ethiopian Electric Power", "cities": ["Addis Ababa"]},
+    {"name": "Berhanena Selam Printing", "cities": ["Addis Ababa"]}
+  ],
+  "jobs": [
+    "Software Developer", "Accountant", "Civil Engineer", "Teacher", "Nurse",
+    "Doctor", "Agronomist", "Bank Teller", "Marketing Manager", "Driver",
+    "Pilot", "Architect", "Pharmacist", "Lawyer", "Economist",
+    "Electrical Engineer", "Journalist", "Hotel Manager", "Chef", "Sales Representative",
+    "Auditor", "Geologist", "Veterinarian", "Customs Officer", "University Lecturer"
+  ],
+  "catch_phrase_adjectives": [
+    "reliable", "innovative", "efficient", "trusted", "leading",
+    "sustainable", "professional", "quality", "modern", "dedicated",
+    "committed", "pioneering", "dynamic", "excellent", "progressive"
+  ],
+  "catch_phrase_nouns": [
+    "solutions", "services", "excellence", "partnership", "growth",
+    "innovation", "development", "progress", "quality", "success",
+    "prosperity", "advancement", "achievement", "commitment", "transformation"
+  ],
+  "catch_phrase_verbs": [
+    "deliver", "provide", "build", "create", "transform",
+    "achieve", "drive", "inspire", "empower", "connect",
+    "advance", "innovate", "strengthen", "develop", "enable"
+  ],
+  "catch_phrase_connector": "that",
+  "industries": [
+    {
+      "name": "agriculture",
+      "weight": 0.18,
+      "jobs": ["Agronomist", "Farm Manager", "Agricultural Engineer", "Quality Inspector", "Export Manager"],
+      "well_known": ["Ethiopian Commodity Exchange", "Ethiopian Coffee Exporters"],
+      "company_suffixes": ["Agro PLC", "Farm Enterprise", "Agricultural Trading"],
+      "company_nouns": ["Coffee", "Farm", "Grain", "Livestock", "Agricultural"],
+      "company_formats": ["{adjective} {noun} {suffix}", "{noun} {suffix}"]
+    },
+    {
+      "name": "construction",
+      "weight": 0.14,
+      "jobs": ["Civil Engineer", "Site Manager", "Architect", "Surveyor", "Project Manager"],
+      "well_known": ["MIDROC Construction", "Sur Construction"],
+      "company_suffixes": ["Construction PLC", "Engineering", "Builders"],
+      "company_nouns": ["Construction", "Building", "Engineering", "Infrastructure", "Development"],
+      "company_formats": ["{adjective} {noun} {suffix}", "{noun} {suffix}"]
+    },
+    {
+      "name": "finance",
+      "weight": 0.12,
+      "jobs": ["Bank Teller", "Accountant", "Loan Officer", "Auditor", "Financial Analyst"],
+      "well_known": ["Commercial Bank of Ethiopia", "Dashen Bank", "Awash Bank"],
+      "company_suffixes": ["Bank", "Insurance", "Microfinance"],
+      "company_nouns": ["Finance", "Capital", "Credit", "Savings", "Investment"],
+      "company_formats": ["{adjective} {noun} {suffix}", "{noun} {suffix}"]
+    },
+    {
+      "name": "manufacturing",
+      "weight": 0.10,
+      "jobs": ["Factory Manager", "Quality Control", "Production Supervisor", "Industrial Engineer", "Technician"],
+      "well_known": ["Derba MIDROC Cement", "Mugher Cement Enterprise"],
+      "company_suffixes": ["Industries PLC", "Manufacturing", "Enterprises"],
+      "company_nouns": ["Textile", "Leather", "Cement", "Steel", "Packaging"],
+      "company_formats": ["{adjective} {noun} {suffix}", "{noun} {suffix}"]
+    },
+    {
+      "name": "transport",
+      "weight": 0.10,
+      "jobs": ["Pilot", "Driver", "Logistics Manager", "Fleet Coordinator", "Dispatcher"],
+      "well_known": ["Ethiopian Airlines", "Anbessa City Bus"],
+      "company_suffixes": ["Transport", "Logistics", "Aviation"],
+      "company_nouns": ["Transport", "Cargo", "Logistics", "Freight", "Airways"],
+      "company_formats": ["{adjective} {noun} {suffix}", "{noun} {suffix}"]
+    },
+    {
+      "name": "telecom",
+      "weight": 0.08,
+      "jobs": ["Network Engineer", "Systems Administrator", "Customer Service", "Sales Manager", "IT Specialist"],
+      "well_known": ["Ethio Telecom", "Safaricom Ethiopia"],
+      "company_suffixes": ["Telecom", "Communications", "Networks"],
+      "company_nouns": ["Telecom", "Digital", "Network", "Communications", "Tech"],
+      "company_formats": ["{adjective} {noun} {suffix}", "{noun} {suffix}"]
+    },
+    {
+      "name": "hospitality",
+      "weight": 0.08,
+      "jobs": ["Hotel Manager", "Chef", "Tour Guide", "Receptionist", "Event Coordinator"],
+      "well_known": ["Sheraton Addis", "Kuriftu Resorts"],
+      "company_suffixes": ["Hotels", "Resort", "Lodge"],
+      "company_nouns": ["Hotel", "Resort", "Lodge", "Tourism", "Hospitality"],
+      "company_formats": ["{adjective} {noun} {suffix}", "{noun} {suffix}"]
+    },
+    {
+      "name": "energy",
+      "weight": 0.07,
+      "jobs": ["Electrical Engineer", "Power Plant Operator", "Energy Analyst", "Environmental Engineer", "Technician"],
+      "well_known": ["Ethiopian Electric Power", "Ethiopian Electric Utility"],
+      "company_suffixes": ["Energy", "Power", "Utilities"],
+      "company_nouns": ["Energy", "Power", "Solar", "Hydro", "Electric"],
+      "company_formats": ["{adjective} {noun} {suffix}", "{noun} {suffix}"]
+    },
+    {
+      "name": "healthcare",
+      "weight": 0.07,
+      "jobs": ["Doctor", "Nurse", "Pharmacist", "Lab Technician", "Public Health Officer"],
+      "well_known": ["St. Paul Hospital", "Tikur Anbessa Hospital"],
+      "company_suffixes": ["Health", "Hospital", "Pharmaceuticals"],
+      "company_nouns": ["Health", "Medical", "Pharma", "Clinical", "Care"],
+      "company_formats": ["{adjective} {noun} {suffix}", "{noun} {suffix}"]
+    },
+    {
+      "name": "education",
+      "weight": 0.06,
+      "jobs": ["Teacher", "University Lecturer", "School Director", "Education Officer", "Researcher"],
+      "well_known": ["Addis Ababa University", "Haramaya University"],
+      "company_suffixes": ["Academy", "Institute", "School"],
+      "company_nouns": ["Education", "Learning", "Academy", "Training", "Knowledge"],
+      "company_formats": ["{adjective} {noun} {suffix}", "{noun} {suffix}"]
+    }
+  ]
+}
