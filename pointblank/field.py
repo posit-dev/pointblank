@@ -44,6 +44,8 @@ AVAILABLE_PRESETS = frozenset(
         "city",
         "state",
         "country",
+        "country_code_2",
+        "country_code_3",
         "postcode",
         "latitude",
         "longitude",
@@ -854,7 +856,8 @@ def string_field(
     **Personal:** `"name"` (first + last name), `"name_full"` (full name with possible prefix
     or suffix), `"first_name"`, `"last_name"`, `"email"` (realistic email address),
     `"phone_number"`, `"address"` (full street address), `"city"`, `"state"`, `"country"`,
-    `"postcode"`, `"latitude"`, `"longitude"`
+    `"country_code_2"` (ISO 3166-1 alpha-2 code, e.g., `"US"`), `"country_code_3"` (ISO
+    3166-1 alpha-3 code, e.g., `"USA"`), `"postcode"`, `"latitude"`, `"longitude"`
 
     **Business:** `"company"` (company name), `"job"` (job title), `"catch_phrase"`
 

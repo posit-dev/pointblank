@@ -191,6 +191,8 @@ The `preset=` parameter in `string_field()` supports many data types:
 - `city`: city name
 - `state`: state/province name
 - `country`: country name
+- `country_code_2`: ISO 3166-1 alpha-2 country code (e.g., `"US"`)
+- `country_code_3`: ISO 3166-1 alpha-3 country code (e.g., `"USA"`)
 - `postcode`: postal/ZIP code
 - `latitude`: latitude coordinate
 - `longitude`: longitude coordinate
