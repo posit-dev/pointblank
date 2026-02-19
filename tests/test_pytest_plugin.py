@@ -160,8 +160,8 @@ class TestFixtureExplicitSeed:
         """When seed is passed explicitly, it should be used instead of the auto-derived one."""
         from pointblank.schema import generate_dataset as raw_generate
 
-        df_fixture = generate_dataset(SIMPLE_SCHEMA, n=10, seed=42, output="dict")
-        df_raw = raw_generate(SIMPLE_SCHEMA, n=10, seed=42, output="dict")
+        df_fixture = generate_dataset(SIMPLE_SCHEMA, n=10, seed=23, output="dict")
+        df_raw = raw_generate(SIMPLE_SCHEMA, n=10, seed=23, output="dict")
 
         assert df_fixture["id"] == df_raw["id"]
         assert df_fixture["value"] == df_raw["value"]
@@ -253,8 +253,8 @@ class TestFixtureSeedIntrospection:
         assert generate_dataset.last_seed == base
 
         # Explicit-seed call (should not increment counter)
-        generate_dataset(SIMPLE_SCHEMA, n=5, seed=42)
-        assert generate_dataset.last_seed == 42
+        generate_dataset(SIMPLE_SCHEMA, n=5, seed=23)
+        assert generate_dataset.last_seed == 23
 
         # Auto-seeded call #1 (counter should still be 1, not 2)
         generate_dataset(SIMPLE_SCHEMA, n=5)
