@@ -15744,7 +15744,7 @@ Generate synthetic test data based on schema definitions. Use
 `generate_dataset()` to create data from a `Schema` object. The helper functions define typed fields
 with constraints for realistic test data generation.
 
-generate_dataset(schema: 'Schema', n: 'int' = 100, seed: 'int | None' = None, output: "Literal['polars', 'pandas', 'dict']" = 'polars', country: 'str' = 'US') -> 'Any'
+generate_dataset(schema: 'Schema', n: 'int' = 100, seed: 'int | None' = None, output: "Literal['polars', 'pandas', 'dict']" = 'polars', country: 'str | list[str] | dict[str, float]' = 'US', shuffle: 'bool' = True, weighted: 'bool' = True) -> 'Any'
 
     Generate synthetic test data from a schema.
 
@@ -15769,10 +15769,22 @@ generate_dataset(schema: 'Schema', n: 'int' = 100, seed: 'int | None' = None, ou
         Polars DataFrame, (2) `"pandas"` returns a Pandas DataFrame, and (3) `"dict"` returns
         a dictionary of lists.
     country
-        Country code for locale-aware generation when using presets. Accepts ISO 3166-1 alpha-2
-        codes (e.g., `"US"`, `"DE"`, `"FR"`) or alpha-3 codes (e.g., `"USA"`, `"DEU"`, `"FRA"`).
-        This affects the format and content of preset-generated data such as addresses, phone
-        numbers, names, and postal codes. The default is `"US"`.
+        Country code(s) for locale-aware generation when using presets. Accepts a single
+        ISO 3166-1 alpha-2 or alpha-3 code (e.g., `"US"`, `"DEU"`), a list of codes for
+        uniform mixing (e.g., `["US", "DE", "JP"]`), or a dict mapping codes to positive
+        weights (e.g., `{"US": 60, "DE": 25, "JP": 15}`). See the *Locale Mixing* section
+        below for details. The default is `"US"`.
+    shuffle
+        When `country=` is a list or dict (multi-country mixing), controls whether rows from
+        different countries are interleaved randomly (`True`, the default) or grouped by country
+        in the order the countries are specified (`False`). Ignored when `country=` is a single
+        string.
+    weighted
+        When `True`, names and locations are sampled according to real-world frequency tiers.
+        Common names like "James" and "Smith" appear far more often than rare names. Large
+        cities like New York and Los Angeles dominate over small towns. Only affects data files
+        that have been migrated to the tiered format; flat-list data always uses uniform
+        sampling. Default is `True`.
 
     Returns
     -------
@@ -15814,9 +15826,25 @@ generate_dataset(schema: 'Schema', n: 'int' = 100, seed: 'int | None' = None, ou
     share the same location (e.g., the city matches the address), and business-related presets
     will share the same industry context.
 
+    Locale Mixing
+    -------------
+    The `country=` parameter accepts three input forms for flexible locale control:
+
+    (1) a **single string** (the default), such as `"US"` or `"DEU"`, which generates
+    all rows from one locale; (2) a **list of strings**, such as `["US", "DE", "JP"]`,
+    which splits rows equally across the listed countries; and (3) a **dict of weights**,
+    such as `{"US": 0.6, "DE": 0.3, "FR": 0.1}`, which allocates rows proportionally
+    (weights are auto-normalized, so `{"US": 6, "DE": 3, "FR": 1}` is equivalent).
+
+    Row counts are distributed using largest-remainder apportionment so they always sum
+    to exactly `n=`. Each country's rows are generated as an independent batch (preserving
+    all cross-column coherence within each batch), then either interleaved randomly
+    (`shuffle=True`, the default) or left in contiguous country blocks
+    (`shuffle=False`).
+
     Supported Countries
     -------------------
-    The `country=` parameter currently supports 55 countries with full locale data:
+    The `country=` parameter currently supports 71 countries with full locale data:
 
     **Europe (32 countries):** Austria (`"AT"`), Belgium (`"BE"`), Bulgaria (`"BG"`),
     Croatia (`"HR"`), Cyprus (`"CY"`), Czech Republic (`"CZ"`), Denmark (`"DK"`),
@@ -15827,16 +15855,20 @@ generate_dataset(schema: 'Schema', n: 'int' = 100, seed: 'int | None' = None, ou
     Slovakia (`"SK"`), Slovenia (`"SI"`), Spain (`"ES"`), Sweden (`"SE"`),
     Switzerland (`"CH"`), United Kingdom (`"GB"`)
 
-    **Americas (7 countries):** Argentina (`"AR"`), Brazil (`"BR"`), Canada (`"CA"`),
-    Chile (`"CL"`), Colombia (`"CO"`), Mexico (`"MX"`), United States (`"US"`)
+    **Americas (9 countries):** Argentina (`"AR"`), Brazil (`"BR"`), Canada (`"CA"`),
+    Chile (`"CL"`), Colombia (`"CO"`), Costa Rica (`"CR"`), Mexico (`"MX"`),
+    Peru (`"PE"`), United States (`"US"`)
 
-    **Asia-Pacific (12 countries):** Australia (`"AU"`), China (`"CN"`), Hong Kong (`"HK"`),
-    India (`"IN"`), Indonesia (`"ID"`), Japan (`"JP"`), New Zealand (`"NZ"`),
-    Philippines (`"PH"`), Singapore (`"SG"`), South Korea (`"KR"`), Taiwan (`"TW"`),
-    Thailand (`"TH"`)
+    **Asia-Pacific (17 countries):** Australia (`"AU"`), Bangladesh (`"BD"`),
+    China (`"CN"`), Hong Kong (`"HK"`), India (`"IN"`), Indonesia (`"ID"`),
+    Japan (`"JP"`), Malaysia (`"MY"`), New Zealand (`"NZ"`), Pakistan (`"PK"`),
+    Philippines (`"PH"`), Singapore (`"SG"`), South Korea (`"KR"`),
+    Sri Lanka (`"LK"`), Taiwan (`"TW"`), Thailand (`"TH"`), Vietnam (`"VN"`)
 
-    **Middle East & Africa (4 countries):** Nigeria (`"NG"`), South Africa (`"ZA"`),
-    Turkey (`"TR"`), United Arab Emirates (`"AE"`)
+    **Middle East & Africa (13 countries):** Algeria (`"DZ"`), Egypt (`"EG"`),
+    Ethiopia (`"ET"`), Ghana (`"GH"`), Kenya (`"KE"`), Morocco (`"MA"`),
+    Nigeria (`"NG"`), Senegal (`"SN"`), South Africa (`"ZA"`), Tunisia (`"TN"`),
+    Turkey (`"TR"`), Uganda (`"UG"`), United Arab Emirates (`"AE"`)
 
     Pytest Fixture
     --------------
@@ -16263,7 +16295,8 @@ string_field(min_length: 'int | None' = None, max_length: 'int | None' = None, p
     `"2012-05-12 – 2015-11-22"`), `"future_date"` (up to 1 year ahead), `"past_date"`
     (up to 10 years back), `"time"`
 
-    **Miscellaneous:** `"color_name"`, `"file_name"`, `"file_extension"`, `"mime_type"`
+    **Miscellaneous:** `"color_name"`, `"file_name"`, `"file_extension"`, `"mime_type"`,
+    `"user_agent"` (browser user agent string with country-specific browser weighting)
 
     Coherent Data Generation
     ------------------------
