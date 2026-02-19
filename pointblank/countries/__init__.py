@@ -177,16 +177,65 @@ COUNTRY_CODE_MAP: dict[str, str] = {
     # Singapore
     "SG": "SG",
     "SGP": "SG",
+    # Egypt
+    "EG": "EG",
+    "EGY": "EG",
+    # Pakistan
+    "PK": "PK",
+    "PAK": "PK",
+    # Bangladesh
+    "BD": "BD",
+    "BGD": "BD",
+    # Vietnam
+    "VN": "VN",
+    "VNM": "VN",
+    # Malaysia
+    "MY": "MY",
+    "MYS": "MY",
+    # Peru
+    "PE": "PE",
+    "PER": "PE",
+    # Kenya
+    "KE": "KE",
+    "KEN": "KE",
+    # Morocco
+    "MA": "MA",
+    "MAR": "MA",
+    # Algeria
+    "DZ": "DZ",
+    "DZA": "DZ",
+    # Tunisia
+    "TN": "TN",
+    "TUN": "TN",
+    # Ghana
+    "GH": "GH",
+    "GHA": "GH",
+    # Ethiopia
+    "ET": "ET",
+    "ETH": "ET",
+    # Senegal
+    "SN": "SN",
+    "SEN": "SN",
+    # Uganda
+    "UG": "UG",
+    "UGA": "UG",
+    # Costa Rica
+    "CR": "CR",
+    "CRI": "CR",
+    # Sri Lanka
+    "LK": "LK",
+    "LKA": "LK",
 }
 
 # Countries that have complete locale data files
 # These are the ISO alpha-2 codes for countries with full address, company,
 # internet, misc, person, and text JSON files in the data directory
 COUNTRIES_WITH_FULL_DATA: list[str] = [
-    "US",  # United States
+    "AE",  # United Arab Emirates
     "AR",  # Argentina
     "AT",  # Austria
     "AU",  # Australia
+    "BD",  # Bangladesh
     "BE",  # Belgium
     "BG",  # Bulgaria
     "BR",  # Brazil
@@ -195,15 +244,20 @@ COUNTRIES_WITH_FULL_DATA: list[str] = [
     "CL",  # Chile
     "CN",  # China
     "CO",  # Colombia
+    "CR",  # Costa Rica
     "CY",  # Cyprus
     "CZ",  # Czech Republic
     "DE",  # Germany
     "DK",  # Denmark
+    "DZ",  # Algeria
     "EE",  # Estonia
+    "EG",  # Egypt
     "ES",  # Spain
+    "ET",  # Ethiopia
     "FI",  # Finland
     "FR",  # France
     "GB",  # United Kingdom
+    "GH",  # Ghana
     "GR",  # Greece
     "HK",  # Hong Kong
     "HR",  # Croatia
@@ -214,30 +268,40 @@ COUNTRIES_WITH_FULL_DATA: list[str] = [
     "IS",  # Iceland
     "IT",  # Italy
     "JP",  # Japan
+    "KE",  # Kenya
     "KR",  # South Korea
-    "LV",  # Latvia
+    "LK",  # Sri Lanka
     "LT",  # Lithuania
     "LU",  # Luxembourg
+    "LV",  # Latvia
+    "MA",  # Morocco
     "MT",  # Malta
     "MX",  # Mexico
+    "MY",  # Malaysia
+    "NG",  # Nigeria
     "NL",  # Netherlands
     "NO",  # Norway
     "NZ",  # New Zealand
-    "PL",  # Poland
+    "PE",  # Peru
     "PH",  # Philippines
+    "PK",  # Pakistan
+    "PL",  # Poland
     "PT",  # Portugal
     "RO",  # Romania
     "RU",  # Russia
     "SE",  # Sweden
-    "SK",  # Slovakia
+    "SG",  # Singapore
     "SI",  # Slovenia
+    "SK",  # Slovakia
+    "SN",  # Senegal
     "TH",  # Thailand
+    "TN",  # Tunisia
     "TR",  # Turkey
     "TW",  # Taiwan
+    "UG",  # Uganda
+    "US",  # United States
+    "VN",  # Vietnam
     "ZA",  # South Africa
-    "AE",  # United Arab Emirates
-    "NG",  # Nigeria
-    "SG",  # Singapore
 ]
 
 

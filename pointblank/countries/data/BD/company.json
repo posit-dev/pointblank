@@ -1,0 +1,593 @@
+{
+  "suffixes": [
+    "Ltd",
+    "Limited",
+    "Group",
+    "Industries",
+    "Enterprises",
+    "Trading",
+    "Corporation",
+    "Holdings"
+  ],
+  "formats": [
+    "{last_name} {suffix}",
+    "{last_name} & {last_name} {suffix}",
+    "{adjective} {noun} {suffix}",
+    "{noun} {suffix}"
+  ],
+  "adjectives": [
+    "Bengal",
+    "Golden",
+    "Green",
+    "Royal",
+    "United",
+    "National",
+    "Eastern",
+    "Prime",
+    "Delta",
+    "Pacific",
+    "Modern",
+    "Pioneer",
+    "Summit",
+    "Apex",
+    "Global",
+    "Progressive",
+    "Dynamic",
+    "Premier",
+    "Superior",
+    "Advanced"
+  ],
+  "nouns": [
+    "Garments",
+    "Textiles",
+    "Jute",
+    "Ceramics",
+    "Pharmaceuticals",
+    "Foods",
+    "Industries",
+    "Trading",
+    "Agro",
+    "Leather",
+    "Fabrics",
+    "Knit",
+    "Apparels",
+    "Fashions",
+    "Holdings",
+    "Ventures",
+    "Solutions",
+    "Services",
+    "Systems",
+    "Technologies"
+  ],
+  "well_known_companies": [
+    {
+      "name": "Grameenphone",
+      "cities": [
+        "Dhaka"
+      ]
+    },
+    {
+      "name": "BRAC",
+      "cities": [
+        "Dhaka"
+      ]
+    },
+    {
+      "name": "Beximco Group",
+      "cities": [
+        "Dhaka"
+      ]
+    },
+    {
+      "name": "Square Group",
+      "cities": [
+        "Dhaka"
+      ]
+    },
+    {
+      "name": "Bashundhara Group",
+      "cities": [
+        "Dhaka"
+      ]
+    },
+    {
+      "name": "Walton Group",
+      "cities": [
+        "Dhaka"
+      ]
+    },
+    {
+      "name": "ACI Limited",
+      "cities": [
+        "Dhaka"
+      ]
+    },
+    {
+      "name": "Robi Axiata",
+      "cities": [
+        "Dhaka"
+      ]
+    },
+    {
+      "name": "Banglalink",
+      "cities": [
+        "Dhaka"
+      ]
+    },
+    {
+      "name": "City Group",
+      "cities": [
+        "Dhaka"
+      ]
+    },
+    {
+      "name": "PRAN-RFL Group",
+      "cities": [
+        "Dhaka"
+      ]
+    },
+    {
+      "name": "Renata Limited",
+      "cities": [
+        "Dhaka"
+      ]
+    },
+    {
+      "name": "Meghna Group",
+      "cities": [
+        "Dhaka"
+      ]
+    },
+    {
+      "name": "Akij Group",
+      "cities": [
+        "Dhaka"
+      ]
+    },
+    {
+      "name": "Ha-Meem Group",
+      "cities": [
+        "Dhaka"
+      ]
+    }
+  ],
+  "jobs": [
+    "Garment Worker",
+    "Quality Inspector",
+    "Production Manager",
+    "Software Engineer",
+    "Bank Officer",
+    "Teacher",
+    "Doctor",
+    "Civil Engineer",
+    "Pharmacist",
+    "Accountant",
+    "Marketing Executive",
+    "Sales Manager",
+    "HR Manager",
+    "IT Specialist",
+    "Architect",
+    "Journalist",
+    "Lawyer",
+    "Research Analyst",
+    "Supply Chain Manager",
+    "Operations Manager",
+    "Project Manager",
+    "Data Analyst",
+    "Business Consultant",
+    "Financial Analyst",
+    "Graphic Designer"
+  ],
+  "catch_phrase_adjectives": [
+    "innovative",
+    "reliable",
+    "trusted",
+    "quality",
+    "premium",
+    "sustainable",
+    "dynamic",
+    "progressive",
+    "efficient",
+    "superior"
+  ],
+  "catch_phrase_nouns": [
+    "solutions",
+    "services",
+    "products",
+    "excellence",
+    "quality",
+    "value",
+    "growth",
+    "partnership",
+    "innovation",
+    "performance"
+  ],
+  "catch_phrase_verbs": [
+    "delivers",
+    "creates",
+    "builds",
+    "drives",
+    "enables",
+    "ensures",
+    "provides",
+    "achieves",
+    "transforms",
+    "connects"
+  ],
+  "catch_phrase_connector": "that",
+  "industries": [
+    {
+      "name": "Garments & Textiles",
+      "weight": 0.25,
+      "jobs": [
+        "Garment Worker",
+        "Quality Inspector",
+        "Production Manager",
+        "Merchandiser",
+        "Pattern Maker"
+      ],
+      "well_known": [
+        "Ha-Meem Group",
+        "DBL Group",
+        "Epyllion Group"
+      ],
+      "company_suffixes": [
+        "Garments",
+        "Fashions",
+        "Knit",
+        "Apparels",
+        "Textiles"
+      ],
+      "company_nouns": [
+        "Fashion",
+        "Knit",
+        "Apparel",
+        "Garment",
+        "Textile"
+      ],
+      "company_formats": [
+        "{adjective} {noun} Ltd",
+        "{last_name} {noun} Ltd"
+      ]
+    },
+    {
+      "name": "Pharmaceuticals",
+      "weight": 0.1,
+      "jobs": [
+        "Pharmacist",
+        "Quality Control Manager",
+        "Medical Representative",
+        "Research Scientist"
+      ],
+      "well_known": [
+        "Square Pharmaceuticals",
+        "Beximco Pharma",
+        "Renata Limited",
+        "Incepta Pharmaceuticals"
+      ],
+      "company_suffixes": [
+        "Pharmaceuticals",
+        "Pharma",
+        "Healthcare",
+        "Biotech"
+      ],
+      "company_nouns": [
+        "Pharma",
+        "Healthcare",
+        "Medicine",
+        "Bio"
+      ],
+      "company_formats": [
+        "{adjective} {noun} Ltd",
+        "{last_name} Pharmaceuticals"
+      ]
+    },
+    {
+      "name": "Banking & Finance",
+      "weight": 0.1,
+      "jobs": [
+        "Bank Officer",
+        "Credit Analyst",
+        "Branch Manager",
+        "Financial Advisor",
+        "Teller"
+      ],
+      "well_known": [
+        "Dutch-Bangla Bank",
+        "BRAC Bank",
+        "Eastern Bank",
+        "City Bank"
+      ],
+      "company_suffixes": [
+        "Bank",
+        "Finance",
+        "Capital",
+        "Investments"
+      ],
+      "company_nouns": [
+        "Bank",
+        "Finance",
+        "Capital",
+        "Credit"
+      ],
+      "company_formats": [
+        "{adjective} {noun} Ltd",
+        "{last_name} {noun}"
+      ]
+    },
+    {
+      "name": "Telecommunications",
+      "weight": 0.08,
+      "jobs": [
+        "Network Engineer",
+        "Customer Service Rep",
+        "Sales Executive",
+        "Technical Support"
+      ],
+      "well_known": [
+        "Grameenphone",
+        "Robi Axiata",
+        "Banglalink",
+        "Teletalk"
+      ],
+      "company_suffixes": [
+        "Telecom",
+        "Communications",
+        "Networks"
+      ],
+      "company_nouns": [
+        "Telecom",
+        "Network",
+        "Communication",
+        "Connect"
+      ],
+      "company_formats": [
+        "{adjective} {noun} Ltd"
+      ]
+    },
+    {
+      "name": "Information Technology",
+      "weight": 0.08,
+      "jobs": [
+        "Software Engineer",
+        "Web Developer",
+        "Data Analyst",
+        "System Administrator",
+        "QA Engineer"
+      ],
+      "well_known": [
+        "Brain Station 23",
+        "Kaz Software",
+        "Therap BD",
+        "TigerIT"
+      ],
+      "company_suffixes": [
+        "Technologies",
+        "Tech",
+        "IT Solutions",
+        "Software"
+      ],
+      "company_nouns": [
+        "Tech",
+        "Software",
+        "Digital",
+        "Systems"
+      ],
+      "company_formats": [
+        "{adjective} {noun} Ltd",
+        "{last_name} Technologies"
+      ]
+    },
+    {
+      "name": "Agriculture & Food",
+      "weight": 0.1,
+      "jobs": [
+        "Farm Manager",
+        "Food Technologist",
+        "Quality Controller",
+        "Supply Chain Officer"
+      ],
+      "well_known": [
+        "PRAN-RFL Group",
+        "ACI Foods",
+        "Olympic Industries",
+        "Bombay Sweets"
+      ],
+      "company_suffixes": [
+        "Foods",
+        "Agro",
+        "Dairy",
+        "Industries"
+      ],
+      "company_nouns": [
+        "Food",
+        "Agro",
+        "Farm",
+        "Harvest"
+      ],
+      "company_formats": [
+        "{adjective} {noun} Ltd",
+        "{last_name} Foods"
+      ]
+    },
+    {
+      "name": "Construction & Real Estate",
+      "weight": 0.07,
+      "jobs": [
+        "Civil Engineer",
+        "Architect",
+        "Project Manager",
+        "Site Engineer",
+        "Surveyor"
+      ],
+      "well_known": [
+        "Bashundhara Group",
+        "Concord Group",
+        "Rancon Group"
+      ],
+      "company_suffixes": [
+        "Developers",
+        "Properties",
+        "Construction",
+        "Builders"
+      ],
+      "company_nouns": [
+        "Construction",
+        "Properties",
+        "Builders",
+        "Developers"
+      ],
+      "company_formats": [
+        "{adjective} {noun} Ltd",
+        "{last_name} Developers"
+      ]
+    },
+    {
+      "name": "Jute & Natural Fiber",
+      "weight": 0.04,
+      "jobs": [
+        "Jute Grader",
+        "Mill Worker",
+        "Production Supervisor",
+        "Export Manager"
+      ],
+      "well_known": [
+        "Bangladesh Jute Mills Corp",
+        "Janata Jute Mills"
+      ],
+      "company_suffixes": [
+        "Jute Mills",
+        "Fiber Industries",
+        "Natural Products"
+      ],
+      "company_nouns": [
+        "Jute",
+        "Fiber",
+        "Natural"
+      ],
+      "company_formats": [
+        "{adjective} {noun} Ltd"
+      ]
+    },
+    {
+      "name": "Ceramics & Steel",
+      "weight": 0.05,
+      "jobs": [
+        "Production Engineer",
+        "Kiln Operator",
+        "Quality Inspector",
+        "Factory Manager"
+      ],
+      "well_known": [
+        "RAK Ceramics Bangladesh",
+        "Mir Ceramics",
+        "BSRM Steel"
+      ],
+      "company_suffixes": [
+        "Ceramics",
+        "Steel",
+        "Industries"
+      ],
+      "company_nouns": [
+        "Ceramics",
+        "Steel",
+        "Metal",
+        "Industry"
+      ],
+      "company_formats": [
+        "{adjective} {noun} Ltd"
+      ]
+    },
+    {
+      "name": "Education",
+      "weight": 0.05,
+      "jobs": [
+        "Teacher",
+        "Professor",
+        "Lecturer",
+        "Academic Coordinator",
+        "Researcher"
+      ],
+      "well_known": [
+        "BRAC University",
+        "North South University",
+        "IUB"
+      ],
+      "company_suffixes": [
+        "Academy",
+        "Institute",
+        "School",
+        "Education"
+      ],
+      "company_nouns": [
+        "Academy",
+        "Education",
+        "Learning",
+        "School"
+      ],
+      "company_formats": [
+        "{adjective} {noun}"
+      ]
+    },
+    {
+      "name": "Healthcare",
+      "weight": 0.04,
+      "jobs": [
+        "Doctor",
+        "Nurse",
+        "Lab Technician",
+        "Hospital Administrator"
+      ],
+      "well_known": [
+        "Apollo Hospitals Dhaka",
+        "Square Hospital",
+        "United Hospital"
+      ],
+      "company_suffixes": [
+        "Hospital",
+        "Clinic",
+        "Healthcare",
+        "Diagnostics"
+      ],
+      "company_nouns": [
+        "Health",
+        "Care",
+        "Medical",
+        "Wellness"
+      ],
+      "company_formats": [
+        "{adjective} {noun} Ltd"
+      ]
+    },
+    {
+      "name": "Leather & Footwear",
+      "weight": 0.04,
+      "jobs": [
+        "Leather Technician",
+        "Shoe Designer",
+        "Tannery Worker",
+        "Export Coordinator"
+      ],
+      "well_known": [
+        "Apex Footwear",
+        "Bata Bangladesh",
+        "Jennys"
+      ],
+      "company_suffixes": [
+        "Leather",
+        "Footwear",
+        "Shoes"
+      ],
+      "company_nouns": [
+        "Leather",
+        "Footwear",
+        "Shoes",
+        "Hide"
+      ],
+      "company_formats": [
+        "{adjective} {noun} Ltd",
+        "{last_name} Leather"
+      ]
+    }
+  ]
+}

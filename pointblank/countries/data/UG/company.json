@@ -1,0 +1,152 @@
+{
+  "suffixes": ["Ltd", "Limited", "Co. Ltd", "Enterprises", "Trading", "Industries"],
+  "formats": [
+    "{adjective} {noun} {suffix}",
+    "{noun} {suffix}",
+    "{adjective} {noun}"
+  ],
+  "adjectives": [
+    "Uganda", "National", "East African", "Pearl", "Victoria",
+    "Great", "United", "Modern", "Premier", "Royal",
+    "Golden", "Progressive", "Dynamic", "Continental", "Pioneer",
+    "Classic", "Superior", "Advanced", "Equatorial", "Highland"
+  ],
+  "nouns": [
+    "Trading", "Construction", "Agriculture", "Investment", "Transport",
+    "Engineering", "Telecom", "Insurance", "Breweries", "Pharmaceuticals",
+    "Logistics", "Properties", "Energy", "Manufacturing", "Holdings",
+    "Coffee", "Tea", "Cement", "Steel", "Foods"
+  ],
+  "well_known_companies": [
+    {"name": "MTN Uganda", "cities": ["Kampala"]},
+    {"name": "Stanbic Bank Uganda", "cities": ["Kampala", "Jinja"]},
+    {"name": "Uganda Breweries", "cities": ["Kampala", "Lira"]},
+    {"name": "Roofings Group", "cities": ["Kampala"]},
+    {"name": "Mukwano Group", "cities": ["Kampala", "Lira"]},
+    {"name": "Cipla Quality Chemical", "cities": ["Kampala"]},
+    {"name": "Kakira Sugar", "cities": ["Jinja"]},
+    {"name": "Umeme Limited", "cities": ["Kampala"]},
+    {"name": "Bank of Uganda", "cities": ["Kampala"]},
+    {"name": "Uganda Telecom", "cities": ["Kampala"]},
+    {"name": "Hima Cement", "cities": ["Kasese"]},
+    {"name": "Nation Media Group Uganda", "cities": ["Kampala"]},
+    {"name": "Uganda Airlines", "cities": ["Entebbe"]},
+    {"name": "Dfcu Bank", "cities": ["Kampala"]},
+    {"name": "Uganda Coffee Development Authority", "cities": ["Kampala"]}
+  ],
+  "jobs": [
+    "Software Developer", "Accountant", "Civil Engineer", "Teacher", "Nurse",
+    "Doctor", "Agronomist", "Bank Teller", "Marketing Manager", "Driver",
+    "Architect", "Pharmacist", "Lawyer", "Economist", "Journalist",
+    "Hotel Manager", "Chef", "Sales Representative", "Auditor", "Veterinarian",
+    "Customs Officer", "University Lecturer", "Social Worker", "Tour Guide", "Electrician"
+  ],
+  "catch_phrase_adjectives": [
+    "reliable", "innovative", "efficient", "trusted", "leading",
+    "sustainable", "professional", "quality", "modern", "dedicated",
+    "committed", "pioneering", "dynamic", "excellent", "progressive"
+  ],
+  "catch_phrase_nouns": [
+    "solutions", "services", "excellence", "partnership", "growth",
+    "innovation", "development", "progress", "quality", "success",
+    "prosperity", "advancement", "achievement", "commitment", "transformation"
+  ],
+  "catch_phrase_verbs": [
+    "deliver", "provide", "build", "create", "transform",
+    "achieve", "drive", "inspire", "empower", "connect",
+    "advance", "innovate", "strengthen", "develop", "enable"
+  ],
+  "catch_phrase_connector": "that",
+  "industries": [
+    {
+      "name": "agriculture",
+      "weight": 0.18,
+      "jobs": ["Agronomist", "Farm Manager", "Agricultural Engineer", "Quality Inspector", "Export Manager"],
+      "well_known": ["Kakira Sugar", "Uganda Coffee Development Authority"],
+      "company_suffixes": ["Agro Ltd", "Farm Enterprises", "Agricultural Trading"],
+      "company_nouns": ["Coffee", "Tea", "Sugar", "Farm", "Agricultural"],
+      "company_formats": ["{adjective} {noun} {suffix}", "{noun} {suffix}"]
+    },
+    {
+      "name": "finance",
+      "weight": 0.14,
+      "jobs": ["Bank Teller", "Accountant", "Loan Officer", "Auditor", "Financial Analyst"],
+      "well_known": ["Stanbic Bank Uganda", "Dfcu Bank", "Bank of Uganda"],
+      "company_suffixes": ["Bank", "Insurance", "Microfinance"],
+      "company_nouns": ["Finance", "Capital", "Credit", "Savings", "Investment"],
+      "company_formats": ["{adjective} {noun} {suffix}", "{noun} {suffix}"]
+    },
+    {
+      "name": "telecom",
+      "weight": 0.12,
+      "jobs": ["Network Engineer", "Systems Administrator", "Customer Service", "Sales Manager", "IT Specialist"],
+      "well_known": ["MTN Uganda", "Airtel Uganda", "Uganda Telecom"],
+      "company_suffixes": ["Telecom", "Communications", "Networks"],
+      "company_nouns": ["Telecom", "Digital", "Network", "Communications", "Mobile"],
+      "company_formats": ["{adjective} {noun} {suffix}", "{noun} {suffix}"]
+    },
+    {
+      "name": "manufacturing",
+      "weight": 0.10,
+      "jobs": ["Factory Manager", "Quality Control", "Production Supervisor", "Industrial Engineer", "Technician"],
+      "well_known": ["Roofings Group", "Mukwano Group", "Hima Cement"],
+      "company_suffixes": ["Industries Ltd", "Manufacturing", "Enterprises"],
+      "company_nouns": ["Steel", "Cement", "Plastics", "Packaging", "Foods"],
+      "company_formats": ["{adjective} {noun} {suffix}", "{noun} {suffix}"]
+    },
+    {
+      "name": "construction",
+      "weight": 0.10,
+      "jobs": ["Civil Engineer", "Site Manager", "Architect", "Surveyor", "Project Manager"],
+      "well_known": ["Roko Construction", "China State Construction"],
+      "company_suffixes": ["Construction Ltd", "Engineering", "Builders"],
+      "company_nouns": ["Construction", "Building", "Engineering", "Infrastructure", "Development"],
+      "company_formats": ["{adjective} {noun} {suffix}", "{noun} {suffix}"]
+    },
+    {
+      "name": "energy",
+      "weight": 0.08,
+      "jobs": ["Electrical Engineer", "Power Plant Operator", "Energy Analyst", "Technician", "Environmental Engineer"],
+      "well_known": ["Umeme Limited", "Uganda Electricity Generation Company"],
+      "company_suffixes": ["Energy", "Power", "Utilities"],
+      "company_nouns": ["Energy", "Power", "Solar", "Hydro", "Electric"],
+      "company_formats": ["{adjective} {noun} {suffix}", "{noun} {suffix}"]
+    },
+    {
+      "name": "tourism",
+      "weight": 0.08,
+      "jobs": ["Hotel Manager", "Tour Guide", "Safari Guide", "Receptionist", "Event Coordinator"],
+      "well_known": ["Serena Hotels Uganda", "Uganda Tourism Board"],
+      "company_suffixes": ["Safaris", "Lodge", "Tours"],
+      "company_nouns": ["Safari", "Lodge", "Tourism", "Adventure", "Wildlife"],
+      "company_formats": ["{adjective} {noun} {suffix}", "{noun} {suffix}"]
+    },
+    {
+      "name": "healthcare",
+      "weight": 0.07,
+      "jobs": ["Doctor", "Nurse", "Pharmacist", "Lab Technician", "Public Health Officer"],
+      "well_known": ["Mulago Hospital", "International Hospital Kampala"],
+      "company_suffixes": ["Health", "Hospital", "Pharmaceuticals"],
+      "company_nouns": ["Health", "Medical", "Pharma", "Clinical", "Care"],
+      "company_formats": ["{adjective} {noun} {suffix}", "{noun} {suffix}"]
+    },
+    {
+      "name": "education",
+      "weight": 0.07,
+      "jobs": ["Teacher", "University Lecturer", "School Director", "Education Officer", "Researcher"],
+      "well_known": ["Makerere University", "Uganda Christian University"],
+      "company_suffixes": ["Academy", "Institute", "School"],
+      "company_nouns": ["Education", "Learning", "Academy", "Training", "Knowledge"],
+      "company_formats": ["{adjective} {noun} {suffix}", "{noun} {suffix}"]
+    },
+    {
+      "name": "media",
+      "weight": 0.06,
+      "jobs": ["Journalist", "Editor", "TV Presenter", "Radio Host", "Content Creator"],
+      "well_known": ["Nation Media Group Uganda", "New Vision"],
+      "company_suffixes": ["Media", "Broadcasting", "Communications"],
+      "company_nouns": ["Media", "News", "Broadcasting", "Digital", "Content"],
+      "company_formats": ["{adjective} {noun} {suffix}", "{noun} {suffix}"]
+    }
+  ]
+}

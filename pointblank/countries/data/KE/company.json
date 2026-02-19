@@ -1,0 +1,73 @@
+{
+  "suffixes": ["Ltd.", "PLC", "Co.", "Group", "Holdings"],
+  "formats": [
+    "{last_name} {suffix}",
+    "{adjective} {noun} {suffix}",
+    "{noun} {suffix}",
+    "{last_name} & {last_name} {suffix}"
+  ],
+  "adjectives": [
+    "Kenyan", "East African", "National", "Modern", "International",
+    "Global", "Safari", "Highland", "Savanna", "United",
+    "New", "Advanced", "Premier", "Great Rift", "Equatorial",
+    "Pioneer", "Smart", "Majestic", "Tropical", "Continental"
+  ],
+  "nouns": [
+    "Trading", "Industries", "Construction", "Engineering", "Foods",
+    "Technology", "Agriculture", "Logistics", "Pharma", "Transport",
+    "Telecom", "Services", "Solutions", "Investments", "Holdings",
+    "Development", "Resources", "Properties", "Systems", "Insurance"
+  ],
+  "well_known_companies": [
+    {"name": "Safaricom", "cities": ["Nairobi"]},
+    {"name": "Kenya Airways", "cities": ["Nairobi"]},
+    {"name": "Equity Bank", "cities": ["Nairobi"]},
+    {"name": "KCB Group", "cities": ["Nairobi"]},
+    {"name": "East African Breweries", "cities": ["Nairobi"]},
+    {"name": "Bamburi Cement", "cities": ["Mombasa"]},
+    {"name": "Kenya Power", "cities": ["Nairobi"]},
+    {"name": "Nation Media Group", "cities": ["Nairobi"]},
+    {"name": "Cooperative Bank", "cities": ["Nairobi"]},
+    {"name": "BAT Kenya", "cities": ["Nairobi"]},
+    {"name": "Kenya Commercial Bank", "cities": ["Nairobi"]},
+    {"name": "NCBA Group", "cities": ["Nairobi"]},
+    {"name": "Jubilee Insurance", "cities": ["Nairobi"]},
+    {"name": "Telkom Kenya", "cities": ["Nairobi"]},
+    {"name": "Kenya Pipeline Company", "cities": ["Mombasa", "Nairobi"]}
+  ],
+  "jobs": [
+    "Software Engineer", "Teacher", "Doctor", "Engineer", "Accountant",
+    "Pharmacist", "Lawyer", "Architect", "Marketing Manager", "Sales Representative",
+    "Project Manager", "Graphic Designer", "Journalist", "Civil Servant", "Bank Teller",
+    "Mechanic", "Electrician", "Chef", "Dentist", "University Professor",
+    "Tour Guide", "Farmer", "Nurse", "Pilot", "Police Officer"
+  ],
+  "catch_phrase_adjectives": [
+    "innovative", "reliable", "professional", "trusted", "leading",
+    "premier", "dynamic", "efficient", "sustainable", "modern",
+    "visionary", "strategic", "creative", "integrated", "digital"
+  ],
+  "catch_phrase_nouns": [
+    "solutions", "services", "excellence", "innovation", "growth",
+    "partnership", "quality", "success", "technology", "future",
+    "development", "progress", "strategy", "results", "value"
+  ],
+  "catch_phrase_verbs": [
+    "delivers", "creates", "builds", "drives", "shapes",
+    "transforms", "inspires", "empowers", "connects", "achieves",
+    "enables", "advances", "strengthens", "optimizes", "sustains"
+  ],
+  "catch_phrase_connector": "that",
+  "industries": [
+    {"name": "Agriculture", "weight": 0.18},
+    {"name": "Telecommunications", "weight": 0.12},
+    {"name": "Banking & Finance", "weight": 0.12},
+    {"name": "Tourism", "weight": 0.10},
+    {"name": "Manufacturing", "weight": 0.10},
+    {"name": "Technology", "weight": 0.10},
+    {"name": "Construction", "weight": 0.08},
+    {"name": "Retail & Distribution", "weight": 0.08},
+    {"name": "Energy", "weight": 0.06},
+    {"name": "Transport & Logistics", "weight": 0.06}
+  ]
+}

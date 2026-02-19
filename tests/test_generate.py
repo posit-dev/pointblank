@@ -1,7 +1,7 @@
 import pytest
 from datetime import date, datetime, time, timedelta
 
-from pointblank.countries import COUNTRIES_WITH_FULL_DATA
+from pointblank.countries import COUNTRIES_WITH_FULL_DATA, _transliterate_to_ascii
 from pointblank.field import (
     int_field,
     float_field,
@@ -1800,7 +1800,6 @@ class TestLocaleMixing:
 
     def test_coherence_preserved_across_countries(self):
         """Person coherence (name + email) works in multi-country mixing."""
-        import unicodedata
 
         config = GeneratorConfig(
             n=60,
@@ -1815,15 +1814,12 @@ class TestLocaleMixing:
         }
         result = generate_dataframe(fields, config)
 
-        def _strip_accents(s: str) -> str:
-            return "".join(
-                c for c in unicodedata.normalize("NFD", s) if unicodedata.category(c) != "Mn"
-            )
-
         # Every email should contain some fragment of the name (lower-cased,
-        # accent-stripped, since emails drop diacritics).
+        # transliterated to ASCII, since emails use the same transliteration).
         for name, email in zip(result["name"], result["email"]):
-            normalized_name = _strip_accents(name.lower()).replace(".", "").replace("-", "")
+            normalized_name = (
+                _transliterate_to_ascii(name).lower().replace(".", "").replace("-", "")
+            )
             name_parts = normalized_name.split()
             email_local = (
                 email.split("@")[0].lower().replace(".", "").replace("_", "").replace("-", "")

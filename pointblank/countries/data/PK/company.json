@@ -1,0 +1,43 @@
+{
+  "suffixes": ["Pvt. Ltd.", "Ltd.", "Group", "Industries", "Corporation"],
+  "formats": ["{last_name} {suffix}", "{adjective} {noun} {suffix}", "{noun} {suffix}", "{last_name} & {last_name} {suffix}"],
+  "adjectives": ["Pakistan", "National", "Allied", "United", "Global", "Premier", "Modern", "Progressive", "Strategic", "Royal", "Crescent", "Diamond", "Pearl", "Indus", "Frontier", "Eastern", "Central", "Pioneer", "Standard", "Superior"],
+  "nouns": ["Trading", "Industries", "Engineering", "Textiles", "Foods", "Technology", "Enterprises", "Services", "Construction", "Pharma", "Cement", "Steel", "Motors", "Chemicals", "Solutions", "Logistics", "Telecom", "Holdings", "Resources", "Systems"],
+  "well_known_companies": [
+    { "name": "Pakistan State Oil", "cities": ["Karachi"] },
+    { "name": "Engro Corporation", "cities": ["Karachi"] },
+    { "name": "Habib Bank", "cities": ["Karachi"] },
+    { "name": "Lucky Cement", "cities": ["Karachi"] },
+    { "name": "Jazz", "cities": ["Islamabad"] },
+    { "name": "Telenor Pakistan", "cities": ["Islamabad"] },
+    { "name": "Nestle Pakistan", "cities": ["Lahore"] },
+    { "name": "Packages Ltd", "cities": ["Lahore"] },
+    { "name": "Fauji Fertilizer", "cities": ["Rawalpindi"] },
+    { "name": "K-Electric", "cities": ["Karachi"] },
+    { "name": "PTCL", "cities": ["Islamabad"] },
+    { "name": "National Foods", "cities": ["Karachi"] },
+    { "name": "Gul Ahmed Textile", "cities": ["Karachi"] },
+    { "name": "Daewoo Pakistan", "cities": ["Lahore"] },
+    { "name": "Interloop", "cities": ["Faisalabad"] }
+  ],
+  "jobs": ["Software Developer", "Doctor", "Teacher", "Engineer", "Accountant", "Banker", "Lawyer", "Architect", "Marketing Manager", "Sales Executive", "Project Manager", "Graphic Designer", "Pharmacist", "Journalist", "Civil Servant", "Mechanic", "Electrician", "Chef", "Nurse", "Professor", "Pilot", "Police Officer", "Army Officer", "Textile Worker", "Farmer"],
+  "catch_phrase_adjectives": ["innovative", "reliable", "trusted", "leading", "dynamic", "quality", "progressive", "professional", "sustainable", "modern", "strategic", "premier", "advanced", "excellent", "committed"],
+  "catch_phrase_nouns": ["solutions", "services", "quality", "excellence", "innovation", "growth", "partnership", "success", "technology", "progress", "development", "value", "results", "integrity", "commitment"],
+  "catch_phrase_verbs": ["delivers", "creates", "builds", "drives", "empowers", "transforms", "connects", "enables", "achieves", "inspires", "shapes", "advances", "strengthens", "optimizes", "sustains"],
+  "catch_phrase_connector": "that",
+  "industries": [
+    { "name": "technology", "weight": 0.14, "jobs": ["Software Developer"], "well_known": ["Jazz", "Telenor Pakistan", "PTCL"], "company_suffixes": ["Technologies", "Software", "Solutions", "Systems"], "company_nouns": ["Software", "Technologies", "Systems", "Data"], "company_formats": ["{adjective} {noun} {suffix}", "{last_name} {noun}"] },
+    { "name": "corporate", "weight": 0.12, "jobs": ["Marketing Manager", "Sales Executive", "Civil Servant"], "well_known": ["Pakistan State Oil", "Engro Corporation", "K-Electric"], "company_suffixes": ["Group", "Corporation", "Holdings"], "company_nouns": ["Industries", "Trading", "Services"], "company_formats": ["{last_name} {suffix}", "{adjective} {noun} {suffix}"] },
+    { "name": "finance", "weight": 0.10, "jobs": ["Accountant", "Banker"], "well_known": ["Habib Bank"], "company_suffixes": ["Financial", "Capital", "Investments", "Bank"], "company_nouns": ["Capital", "Investments", "Financial"], "company_formats": ["{last_name} {suffix}", "{last_name} & {last_name}"] },
+    { "name": "engineering", "weight": 0.12, "jobs": ["Engineer", "Architect"], "well_known": ["Lucky Cement", "Fauji Fertilizer"], "company_suffixes": ["Engineering", "Industries", "Manufacturing"], "company_nouns": ["Engineering", "Construction", "Industries"], "company_formats": ["{last_name} {suffix}", "{adjective} {noun} {suffix}"] },
+    { "name": "healthcare", "weight": 0.09, "jobs": ["Doctor", "Pharmacist", "Nurse"], "well_known": [], "company_suffixes": ["Hospital", "Medical", "Healthcare"], "company_nouns": ["Healthcare", "Medical"], "company_formats": ["{city} Hospital", "{last_name} Clinic"] },
+    { "name": "education", "weight": 0.07, "jobs": ["Teacher", "Professor"], "well_known": [], "company_suffixes": [], "company_nouns": [], "company_formats": ["{city} University", "{last_name} Academy", "Institute of {city}"] },
+    { "name": "legal", "weight": 0.04, "jobs": ["Lawyer"], "well_known": [], "company_suffixes": [], "company_nouns": [], "company_formats": ["{last_name} & {last_name} Law", "{last_name} Associates"] },
+    { "name": "hospitality", "weight": 0.05, "jobs": ["Chef"], "well_known": [], "company_suffixes": ["Hotels", "Restaurants"], "company_nouns": ["Hotels", "Hospitality"], "company_formats": ["{city} Grand Hotel", "{last_name} Restaurant"] },
+    { "name": "marketing_creative", "weight": 0.06, "jobs": ["Graphic Designer", "Journalist"], "well_known": [], "company_suffixes": ["Media", "Creative", "Communications"], "company_nouns": ["Media", "Creative"], "company_formats": ["{last_name} {suffix}", "{adjective} {noun}"] },
+    { "name": "trades", "weight": 0.06, "jobs": ["Mechanic", "Electrician", "Textile Worker"], "well_known": ["Gul Ahmed Textile", "Interloop"], "company_suffixes": ["Services", "Co"], "company_nouns": [], "company_formats": ["{last_name} Services", "{city} Textiles"] },
+    { "name": "consulting", "weight": 0.05, "jobs": ["Project Manager"], "well_known": [], "company_suffixes": ["Consulting", "Advisory"], "company_nouns": ["Consulting", "Management"], "company_formats": ["{last_name} {suffix}", "{adjective} {noun} {suffix}"] },
+    { "name": "transport", "weight": 0.05, "jobs": ["Pilot", "Police Officer", "Army Officer", "Farmer"], "well_known": ["Daewoo Pakistan"], "company_suffixes": ["Transport", "Logistics"], "company_nouns": ["Transport", "Logistics"], "company_formats": ["{adjective} {noun} {suffix}"] },
+    { "name": "real_estate_insurance", "weight": 0.05, "jobs": [], "well_known": [], "company_suffixes": ["Properties", "Realty"], "company_nouns": ["Properties", "Estate"], "company_formats": ["{last_name} Properties", "{city} Estate"] }
+  ]
+}
