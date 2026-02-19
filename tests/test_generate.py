@@ -856,6 +856,102 @@ class TestCountrySupport:
 
             assert validation.all_passed()
 
+    def test_country_code_presets_across_countries(self):
+        """Test country_code_2 and country_code_3 presets."""
+        pytest.importorskip("polars")
+        from pointblank import Schema, Validate, generate_dataset, string_field
+
+        schema = Schema(
+            country_code_2=string_field(preset="country_code_2"),
+            country_code_3=string_field(preset="country_code_3"),
+        )
+
+        # Expected values from the COUNTRY_INFO mapping
+        expected = {
+            "US": ("US", "USA"),
+            "DE": ("DE", "DEU"),
+            "FR": ("FR", "FRA"),
+            "JP": ("JP", "JPN"),
+            "BR": ("BR", "BRA"),
+            "GB": ("GB", "GBR"),
+            "AU": ("AU", "AUS"),
+            "IN": ("IN", "IND"),
+        }
+
+        for country, (exp_code_2, exp_code_3) in expected.items():
+            df = generate_dataset(schema, n=5, seed=23, country=country)
+
+            # All rows should have the same country codes for a single-country dataset
+            validation = (
+                Validate(df)
+                .col_vals_not_null(columns=["country_code_2", "country_code_3"])
+                .col_vals_in_set(columns="country_code_2", set=[exp_code_2])
+                .col_vals_in_set(columns="country_code_3", set=[exp_code_3])
+                .interrogate()
+            )
+
+            assert validation.all_passed(), f"Failed for country {country}"
+
+    def test_country_code_presets_multi_country(self):
+        """Test country_code_2 and country_code_3 with multiple countries."""
+        pytest.importorskip("polars")
+        from pointblank import Schema, Validate, generate_dataset, string_field
+
+        schema = Schema(
+            country_code_2=string_field(preset="country_code_2"),
+            country_code_3=string_field(preset="country_code_3"),
+            city=string_field(preset="city"),
+        )
+
+        df = generate_dataset(schema, n=20, seed=23, country=["US", "DE", "JP"])
+
+        assert df.shape[0] == 20
+
+        # Check that all expected country codes appear
+        validation = (
+            Validate(df)
+            .col_vals_not_null(columns=["country_code_2", "country_code_3"])
+            .col_vals_in_set(
+                columns="country_code_2",
+                set=["US", "DE", "JP"],
+            )
+            .col_vals_in_set(
+                columns="country_code_3",
+                set=["USA", "DEU", "JPN"],
+            )
+            .interrogate()
+        )
+
+        assert validation.all_passed()
+
+    def test_country_code_presets_with_other_presets(self):
+        """Test country code presets combined with name, city, and country presets."""
+        pytest.importorskip("polars")
+        from pointblank import Schema, Validate, generate_dataset, string_field
+
+        schema = Schema(
+            name=string_field(preset="name"),
+            city=string_field(preset="city"),
+            country=string_field(preset="country"),
+            country_code_2=string_field(preset="country_code_2"),
+            country_code_3=string_field(preset="country_code_3"),
+        )
+
+        df = generate_dataset(schema, n=10, seed=23, country="ES")
+
+        validation = (
+            Validate(df)
+            .col_vals_not_null(
+                columns=["name", "city", "country", "country_code_2", "country_code_3"]
+            )
+            .col_vals_in_set(columns="country", set=["Spain"])
+            .col_vals_in_set(columns="country_code_2", set=["ES"])
+            .col_vals_in_set(columns="country_code_3", set=["ESP"])
+            .interrogate()
+        )
+
+        assert validation.all_passed()
+
     def test_business_presets_across_countries(self):
         """Test business data presets work across multiple countries."""
         pytest.importorskip("polars")
@@ -2081,7 +2177,7 @@ class TestWeightedSampling:
         from pointblank import Schema, generate_dataset
 
         schema = Schema(name=string_field(preset="first_name"))
-        df = generate_dataset(schema, n=50, seed=42, country="US", weighted=False)
+        df = generate_dataset(schema, n=50, seed=23, country="US", weighted=False)
         assert df.shape == (50, 1)
         # All values should be non-empty strings
         for val in df["name"].to_list():
@@ -2095,7 +2191,7 @@ class TestWeightedSampling:
 
         schema = Schema(name=string_field(preset="first_name"))
         # Generate many rows to get statistical significance
-        df = generate_dataset(schema, n=2000, seed=42, country="US", weighted=False)
+        df = generate_dataset(schema, n=2000, seed=23, country="US", weighted=False)
 
         # With uniform sampling over 250 names, any single name appearing > 5%
         # of the time would be suspicious
@@ -2114,7 +2210,7 @@ class TestWeightedSampling:
         from pointblank import Schema, generate_dataset
 
         schema = Schema(name=string_field(preset="first_name"))
-        df = generate_dataset(schema, n=50, seed=42, country="US", weighted=True)
+        df = generate_dataset(schema, n=50, seed=23, country="US", weighted=True)
         assert df.shape == (50, 1)
         for val in df["name"].to_list():
             assert isinstance(val, str)
@@ -2126,7 +2222,7 @@ class TestWeightedSampling:
         from pointblank import Schema, generate_dataset
 
         schema = Schema(name=string_field(preset="first_name"))
-        df = generate_dataset(schema, n=2000, seed=42, country="US", weighted=True)
+        df = generate_dataset(schema, n=2000, seed=23, country="US", weighted=True)
         names = df["name"].to_list()
 
         # Get the tier data to know which names are common vs rare
@@ -2152,7 +2248,7 @@ class TestWeightedSampling:
         from pointblank import Schema, generate_dataset
 
         schema = Schema(last=string_field(preset="last_name"))
-        df = generate_dataset(schema, n=2000, seed=42, country="US", weighted=True)
+        df = generate_dataset(schema, n=2000, seed=23, country="US", weighted=True)
         last_names = df["last"].to_list()
 
         # Very common US last names (from the tiered data)
@@ -2170,7 +2266,7 @@ class TestWeightedSampling:
         from pointblank import Schema, generate_dataset
 
         schema = Schema(city=string_field(preset="city"))
-        df = generate_dataset(schema, n=2000, seed=42, country="US", weighted=True)
+        df = generate_dataset(schema, n=2000, seed=23, country="US", weighted=True)
         cities = df["city"].to_list()
 
         major_cities = {"New York", "Los Angeles", "Chicago", "Houston", "Phoenix"}
@@ -2187,8 +2283,8 @@ class TestWeightedSampling:
         from pointblank import Schema, generate_dataset
 
         schema = Schema(name=string_field(preset="name"), city=string_field(preset="city"))
-        df1 = generate_dataset(schema, n=100, seed=42, country="US", weighted=True)
-        df2 = generate_dataset(schema, n=100, seed=42, country="US", weighted=True)
+        df1 = generate_dataset(schema, n=100, seed=23, country="US", weighted=True)
+        df2 = generate_dataset(schema, n=100, seed=23, country="US", weighted=True)
         assert df1.equals(df2)
 
     # --- Backward compatibility ---
@@ -2200,7 +2296,7 @@ class TestWeightedSampling:
 
         # Germany still has flat lists (not yet migrated to tiered format)
         schema = Schema(name=string_field(preset="first_name"))
-        df = generate_dataset(schema, n=50, seed=42, country="DE", weighted=True)
+        df = generate_dataset(schema, n=50, seed=23, country="DE", weighted=True)
         assert df.shape == (50, 1)
         for val in df["name"].to_list():
             assert isinstance(val, str)
@@ -2213,7 +2309,7 @@ class TestWeightedSampling:
         from pointblank import Schema, generate_dataset
 
         schema = Schema(name=string_field(preset="name"), city=string_field(preset="city"))
-        df = generate_dataset(schema, n=100, seed=42, country=["US", "DE"], weighted=True)
+        df = generate_dataset(schema, n=100, seed=23, country=["US", "DE"], weighted=True)
         assert df.shape == (100, 2)
         # Should have a mix of US and DE names/cities
         cities = set(df["city"].to_list())
@@ -2227,7 +2323,7 @@ class TestWeightedSampling:
         from pointblank import Schema
 
         schema = Schema(name=string_field(preset="first_name"))
-        df = schema.generate(n=50, seed=42, country="US", weighted=True)
+        df = schema.generate(n=50, seed=23, country="US", weighted=True)
         assert df.shape == (50, 1)
 
     # --- GeneratorConfig ---
