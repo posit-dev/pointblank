@@ -300,7 +300,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="available-presets" class="level2 doc-section doc-section-available-presets">
 <h3 class="doc-section doc-section-available-presets anchored" data-anchor-id="available-presets">Available Presets</h3>
 <p>The <code>preset=</code> parameter accepts one of the following preset names, organized by category. When a preset is used, the <code>country=</code> parameter of <a href="../reference/generate_dataset.html#pointblank.generate_dataset" title="0"><code>generate_dataset()</code></a> controls the locale for region-specific formatting (e.g., address formats, phone number patterns).</p>
-<p><strong>Personal:</strong> <code>"name"</code> (first + last name), <code>"name_full"</code> (full name with possible prefix or suffix), <code>"first_name"</code>, <code>"last_name"</code>, <code>"email"</code> (realistic email address), <code>"phone_number"</code>, <code>"address"</code> (full street address), <code>"city"</code>, <code>"state"</code>, <code>"country"</code>, <code>"postcode"</code>, <code>"latitude"</code>, <code>"longitude"</code></p>
+<p><strong>Personal:</strong> <code>"name"</code> (first + last name), <code>"name_full"</code> (full name with possible prefix or suffix), <code>"first_name"</code>, <code>"last_name"</code>, <code>"email"</code> (realistic email address), <code>"phone_number"</code>, <code>"address"</code> (full street address), <code>"city"</code>, <code>"state"</code>, <code>"country"</code>, <code>"country_code_2"</code> (ISO 3166-1 alpha-2 code, e.g., <code>"US"</code>), <code>"country_code_3"</code> (ISO 3166-1 alpha-3 code, e.g., <code>"USA"</code>), <code>"postcode"</code>, <code>"latitude"</code>, <code>"longitude"</code></p>
 <p><strong>Business:</strong> <code>"company"</code> (company name), <code>"job"</code> (job title), <code>"catch_phrase"</code></p>
 <p><strong>Internet:</strong> <code>"url"</code>, <code>"domain_name"</code>, <code>"ipv4"</code>, <code>"ipv6"</code>, <code>"user_name"</code>, <code>"password"</code></p>
 <p><strong>Text:</strong> <code>"text"</code> (paragraph of text), <code>"sentence"</code>, <code>"paragraph"</code>, <code>"word"</code></p>
@@ -340,7 +340,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
         border-radius: 2px;
     ">
 <p>The <code>preset=</code> parameter generates realistic personal data, while <code>allowed=</code> restricts values to a categorical set:</p>
-<div id="7615a3f7" class="cell" data-execution_count="1">
+<div id="b080e219" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
@@ -495,7 +495,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 </div>
 <p>We can also generate strings that match a regular expression with <code>pattern=</code> (e.g., product codes, identifiers):</p>
-<div id="9c25c712" class="cell" data-execution_count="2">
+<div id="ed4097fc" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    product_code<span class="op">=</span>pb.string_field(pattern<span class="op">=</span><span class="vs">r"</span><span class="pp">[A-Z]</span><span class="op">{3}</span><span class="vs">-</span><span class="pp">[0-9]</span><span class="op">{4}</span><span class="vs">"</span>),</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    batch_id<span class="op">=</span>pb.string_field(pattern<span class="op">=</span><span class="vs">r"BATCH-</span><span class="pp">[A-Z][0-9]</span><span class="op">{3}</span><span class="vs">"</span>),</span>
@@ -648,7 +648,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 </div>
 <p>For random alphanumeric strings, <code>min_length=</code> and <code>max_length=</code> control the length. Adding <code>nullable=True</code> introduces missing values:</p>
-<div id="b39ae745" class="cell" data-execution_count="3">
+<div id="20a574a0" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    short_code<span class="op">=</span>pb.string_field(min_length<span class="op">=</span><span class="dv">3</span>, max_length<span class="op">=</span><span class="dv">5</span>),</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    notes<span class="op">=</span>pb.string_field(</span>
@@ -791,7 +791,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 </div>
 <p>It’s possible to combine business and internet presets to build a company directory:</p>
-<div id="023df240" class="cell" data-execution_count="4">
+<div id="effafe93" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    company<span class="op">=</span>pb.string_field(preset<span class="op">=</span><span class="st">"company"</span>),</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    domain<span class="op">=</span>pb.string_field(preset<span class="op">=</span><span class="st">"domain_name"</span>),</span>

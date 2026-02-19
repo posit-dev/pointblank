@@ -554,7 +554,7 @@ Note
 <section id="quick-start" class="level2">
 <h2 class="anchored" data-anchor-id="quick-start">Quick Start</h2>
 <p>Generate test data using a schema with field constraints:</p>
-<div id="2a869563" class="cell" data-execution_count="2">
+<div id="73aa7a66" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Define a schema with typed field specifications</span></span>
@@ -794,7 +794,7 @@ Note
 <section id="integer-fields" class="level3">
 <h3 class="anchored" data-anchor-id="integer-fields">Integer Fields</h3>
 <p>Integer fields support range constraints with <code>min_val</code> and <code>max_val</code>, discrete allowed values with <code>allowed</code>, and uniqueness enforcement with <code>unique=True</code>:</p>
-<div id="1e2b3348" class="cell" data-execution_count="3">
+<div id="9963e5b4" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">id</span><span class="op">=</span>pb.int_field(min_val<span class="op">=</span><span class="dv">1000</span>, max_val<span class="op">=</span><span class="dv">9999</span>, unique<span class="op">=</span><span class="va">True</span>),</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    quantity<span class="op">=</span>pb.int_field(min_val<span class="op">=</span><span class="dv">1</span>, max_val<span class="op">=</span><span class="dv">100</span>),</span>
@@ -951,7 +951,7 @@ Note
 <section id="float-fields" class="level3">
 <h3 class="anchored" data-anchor-id="float-fields">Float Fields</h3>
 <p>Float fields work similarly to integers, with <code>min_val</code> and <code>max_val</code> defining the range of generated values:</p>
-<div id="bb7340f6" class="cell" data-execution_count="4">
+<div id="ffccacf3" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    price<span class="op">=</span>pb.float_field(min_val<span class="op">=</span><span class="fl">0.0</span>, max_val<span class="op">=</span><span class="fl">1000.0</span>),</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    discount<span class="op">=</span>pb.float_field(min_val<span class="op">=</span><span class="fl">0.0</span>, max_val<span class="op">=</span><span class="fl">0.5</span>),</span>
@@ -1108,7 +1108,7 @@ Note
 <section id="string-fields-with-presets" class="level3">
 <h3 class="anchored" data-anchor-id="string-fields-with-presets">String Fields with Presets</h3>
 <p>Presets generate realistic data like names, emails, and addresses. When you include related fields like <code>name</code> and <code>email</code> in the same schema, Pointblank ensures <strong>coherence</strong> (e.g., the email address will be derived from the person’s name), making the generated data more realistic:</p>
-<div id="eac2c2dc" class="cell" data-execution_count="5">
+<div id="41603dc8" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    full_name<span class="op">=</span>pb.string_field(preset<span class="op">=</span><span class="st">"name"</span>),</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    email<span class="op">=</span>pb.string_field(preset<span class="op">=</span><span class="st">"email"</span>),</span>
@@ -1278,7 +1278,7 @@ Note
 <section id="string-fields-with-patterns" class="level3">
 <h3 class="anchored" data-anchor-id="string-fields-with-patterns">String Fields with Patterns</h3>
 <p>Use regex patterns to generate strings matching specific formats:</p>
-<div id="387ae3a4" class="cell" data-execution_count="6">
+<div id="cd389d98" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    product_code<span class="op">=</span>pb.string_field(pattern<span class="op">=</span><span class="vs">r"</span><span class="pp">[A-Z]</span><span class="op">{3}</span><span class="vs">-</span><span class="pp">[0-9]</span><span class="op">{4}</span><span class="vs">"</span>),</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    phone<span class="op">=</span>pb.string_field(pattern<span class="op">=</span><span class="vs">r"</span><span class="ch">\(</span><span class="pp">[0-9]</span><span class="op">{3}</span><span class="ch">\)</span><span class="vs"> </span><span class="pp">[0-9]</span><span class="op">{3}</span><span class="vs">-</span><span class="pp">[0-9]</span><span class="op">{4}</span><span class="vs">"</span>),</span>
@@ -1435,7 +1435,7 @@ Note
 <section id="boolean-fields" class="level3">
 <h3 class="anchored" data-anchor-id="boolean-fields">Boolean Fields</h3>
 <p>Control the probability of <code>True</code> values:</p>
-<div id="261693f2" class="cell" data-execution_count="7">
+<div id="f65506b2" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    is_active<span class="op">=</span>pb.bool_field(p_true<span class="op">=</span><span class="fl">0.8</span>),      <span class="co"># 80% True</span></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    is_premium<span class="op">=</span>pb.bool_field(p_true<span class="op">=</span><span class="fl">0.2</span>),     <span class="co"># 20% True</span></span>
@@ -1592,7 +1592,7 @@ Note
 <section id="date-and-datetime-fields" class="level3">
 <h3 class="anchored" data-anchor-id="date-and-datetime-fields">Date and Datetime Fields</h3>
 <p>Temporal fields accept Python <code>date</code> and <code>datetime</code> objects for their range boundaries, generating values uniformly distributed within the specified period:</p>
-<div id="5777c985" class="cell" data-execution_count="8">
+<div id="2d1f24ee" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> datetime <span class="im">import</span> date, datetime</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
@@ -1760,6 +1760,8 @@ Note
 <li><code>city</code>: city name</li>
 <li><code>state</code>: state/province name</li>
 <li><code>country</code>: country name</li>
+<li><code>country_code_2</code>: ISO 3166-1 alpha-2 country code (e.g., <code>"US"</code>)</li>
+<li><code>country_code_3</code>: ISO 3166-1 alpha-3 country code (e.g., <code>"USA"</code>)</li>
 <li><code>postcode</code>: postal/ZIP code</li>
 <li><code>latitude</code>: latitude coordinate</li>
 <li><code>longitude</code>: longitude coordinate</li>
@@ -1829,7 +1831,7 @@ Note
 <h2 class="anchored" data-anchor-id="country-specific-data">Country-Specific Data</h2>
 <p>One of the most powerful features is generating locale-aware data. Use the <code>country=</code> parameter to generate data specific to a country. This affects names, cities, addresses, and other locale-sensitive presets.</p>
 <p>Let’s create a schema that includes several location-related fields. When generating data for a specific country, Pointblank ensures <em>consistency across related fields</em>. The city, address, postcode, and coordinates will all correspond to the same location:</p>
-<div id="33fe9e64" class="cell" data-execution_count="9">
+<div id="28cbfa40" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Schema with linked location fields</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    name<span class="op">=</span>pb.string_field(preset<span class="op">=</span><span class="st">"name"</span>),</span>
@@ -1841,7 +1843,7 @@ Note
 <span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Here’s German data with authentic names and addresses from cities like Berlin, Munich, and Hamburg. Notice how the latitude/longitude coordinates match real locations in Germany:</p>
-<div id="1517f48f" class="cell" data-execution_count="10">
+<div id="b6555742" class="cell" data-execution_count="10">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>pb.preview(pb.generate_dataset(schema, n<span class="op">=</span><span class="dv">200</span>, seed<span class="op">=</span><span class="dv">23</span>, country<span class="op">=</span><span class="st">"DE"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="10">
 <div id="pb_preview_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
@@ -2024,7 +2026,7 @@ Note
 </div>
 </div>
 <p>Japanese data includes names in romanized form and addresses from cities like Tokyo, Osaka, and Kyoto. The coordinates fall within Japan’s geographic boundaries:</p>
-<div id="446a46bf" class="cell" data-execution_count="11">
+<div id="059a2237" class="cell" data-execution_count="11">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>pb.preview(pb.generate_dataset(schema, n<span class="op">=</span><span class="dv">200</span>, seed<span class="op">=</span><span class="dv">23</span>, country<span class="op">=</span><span class="st">"JP"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="11">
 <div id="pb_preview_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
@@ -2207,7 +2209,7 @@ Note
 </div>
 </div>
 <p>Brazilian data features Portuguese names and addresses from cities like São Paulo, Rio de Janeiro, and Brasília. The postal codes follow Brazil’s CEP format:</p>
-<div id="c70eaed9" class="cell" data-execution_count="12">
+<div id="784b99c9" class="cell" data-execution_count="12">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>pb.preview(pb.generate_dataset(schema, n<span class="op">=</span><span class="dv">200</span>, seed<span class="op">=</span><span class="dv">23</span>, country<span class="op">=</span><span class="st">"BR"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="12">
 <div id="pb_preview_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
@@ -2402,7 +2404,7 @@ Note
 <li>integer columns whose name contains <code>age</code> (e.g., <code>age</code>, <code>person_age</code>) are automatically constrained to working-age range (22–65).</li>
 </ul>
 <p>Here’s an example showing all three coherence systems working together:</p>
-<div id="e729587e" class="cell" data-execution_count="13">
+<div id="e2ed6694" class="cell" data-execution_count="13">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    name<span class="op">=</span>pb.string_field(preset<span class="op">=</span><span class="st">"name_full"</span>),</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    email<span class="op">=</span>pb.string_field(preset<span class="op">=</span><span class="st">"email"</span>),</span>
@@ -2646,7 +2648,7 @@ Note
 <h3 class="anchored" data-anchor-id="mixing-multiple-countries">Mixing Multiple Countries</h3>
 <p>When you need test data that spans multiple locales (e.g., simulating an international customer base), you can pass a list or dict to the <code>country=</code> parameter instead of a single string.</p>
 <p>Passing a list of country codes splits rows equally across those countries. Here, 200 rows are divided evenly among the US, Germany, and Japan (~67 each):</p>
-<div id="00e1401e" class="cell" data-execution_count="14">
+<div id="f3660e3d" class="cell" data-execution_count="14">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>    name<span class="op">=</span>pb.string_field(preset<span class="op">=</span><span class="st">"name"</span>),</span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    city<span class="op">=</span>pb.string_field(preset<span class="op">=</span><span class="st">"city"</span>),</span>
@@ -2711,9 +2713,9 @@ Note
 <table style="table-layout: fixed;; width: 0px" class="gt_table" data-quarto-disable-processing="true" data-quarto-bootstrap="false">
 <colgroup>
   <col style="width:33.4px;">
-  <col style="width:192px;">
-  <col style="width:169px;">
-  <col style="width:137px;">
+  <col style="width:185px;">
+  <col style="width:193px;">
+  <col style="width:122px;">
 </colgroup>
 
 <thead>
@@ -2731,63 +2733,63 @@ Note
 <tbody class="gt_table_body">
   <tr>
     <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; color: gray;font-family: IBM Plex Mono;font-size: 10px; border-right: 2px solid #6699CC80;" class="gt_row gt_right">1</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Patrick Vogel</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Regensburg</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">93242</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Ulrike Ziegler</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Bremen</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">28441</td>
   </tr>
   <tr>
     <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; color: gray;font-family: IBM Plex Mono;font-size: 10px; border-right: 2px solid #6699CC80;" class="gt_row gt_right">2</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Yuji Yamanaka</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Hiroshima</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">730-8235</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Minoru Nishimura</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Shizuoka</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">420-1909</td>
   </tr>
   <tr>
     <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; color: gray;font-family: IBM Plex Mono;font-size: 10px; border-right: 2px solid #6699CC80;" class="gt_row gt_right">3</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Miles Hill</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Charlotte</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">28267</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Lisa Reynolds</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Minneapolis</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">55433</td>
   </tr>
   <tr>
     <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; color: gray;font-family: IBM Plex Mono;font-size: 10px; border-right: 2px solid #6699CC80;" class="gt_row gt_right">4</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Scott Allen</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Austin</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">78739</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Arlo Miller</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Denver</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">80260</td>
   </tr>
   <tr>
     <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; border-bottom: 2px solid #6699CC80; color: gray;font-family: IBM Plex Mono;font-size: 10px; border-right: 2px solid #6699CC80;" class="gt_row gt_right">5</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; border-bottom: 2px solid #6699CC80;" class="gt_row gt_left">Heidi Lehmann</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; border-bottom: 2px solid #6699CC80;" class="gt_row gt_left">Aachen</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; border-bottom: 2px solid #6699CC80;" class="gt_row gt_left">52943</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; border-bottom: 2px solid #6699CC80;" class="gt_row gt_left">Rüdiger Hartung</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; border-bottom: 2px solid #6699CC80;" class="gt_row gt_left">München</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; border-bottom: 2px solid #6699CC80;" class="gt_row gt_left">80304</td>
   </tr>
   <tr>
     <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; color: gray;font-family: IBM Plex Mono;font-size: 10px; border-right: 2px solid #6699CC80;" class="gt_row gt_right">196</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Chika Terashima</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Iizuka</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">820-3180</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Shiori Kato</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Kobe</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">650-7728</td>
   </tr>
   <tr>
     <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; color: gray;font-family: IBM Plex Mono;font-size: 10px; border-right: 2px solid #6699CC80;" class="gt_row gt_right">197</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Rhett Cruz</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Philadelphia</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">19179</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Donna Ramirez</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">St. Petersburg</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">33704</td>
   </tr>
   <tr>
     <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; color: gray;font-family: IBM Plex Mono;font-size: 10px; border-right: 2px solid #6699CC80;" class="gt_row gt_right">198</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Susan Moreno</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Gaithersburg</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">20811</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Everett Lee</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Dallas</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">75228</td>
   </tr>
   <tr>
     <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; color: gray;font-family: IBM Plex Mono;font-size: 10px; border-right: 2px solid #6699CC80;" class="gt_row gt_right">199</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Jan Geiger</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Bremen</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">28662</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Sonja Stadler</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Frankfurt am Main</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">60064</td>
   </tr>
   <tr>
     <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; color: gray;font-family: IBM Plex Mono;font-size: 10px; border-right: 2px solid #6699CC80;" class="gt_row gt_right">200</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Kiichi Takemura</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Chiba</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">260-2095</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Ayumi Kamiya</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Shinagawa</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">140-0181</td>
   </tr>
 </tbody>
 
@@ -2799,7 +2801,7 @@ Note
 </div>
 </div>
 <p>To control the proportion of rows per country, pass a dict mapping country codes to weights. The following generates 200 rows with 70% from the US, 20% from Germany, and 10% from France:</p>
-<div id="446d4cac" class="cell" data-execution_count="15">
+<div id="8ec6f537" class="cell" data-execution_count="15">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>pb.preview(</span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>    pb.generate_dataset(</span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>        schema, n<span class="op">=</span><span class="dv">200</span>, seed<span class="op">=</span><span class="dv">23</span>,</span>
@@ -2863,9 +2865,9 @@ Note
 <table style="table-layout: fixed;; width: 0px" class="gt_table" data-quarto-disable-processing="true" data-quarto-bootstrap="false">
 <colgroup>
   <col style="width:33.4px;">
-  <col style="width:198px;">
-  <col style="width:167px;">
-  <col style="width:135px;">
+  <col style="width:193px;">
+  <col style="width:177px;">
+  <col style="width:130px;">
 </colgroup>
 
 <thead>
@@ -2883,63 +2885,63 @@ Note
 <tbody class="gt_table_body">
   <tr>
     <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; color: gray;font-family: IBM Plex Mono;font-size: 10px; border-right: 2px solid #6699CC80;" class="gt_row gt_right">1</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Donald Hansen</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">San Antonio</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">78223</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Cameron Gomez</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">San Diego</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">92139</td>
   </tr>
   <tr>
     <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; color: gray;font-family: IBM Plex Mono;font-size: 10px; border-right: 2px solid #6699CC80;" class="gt_row gt_right">2</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Uwe Böhme</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Fürth</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">90285</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Torsten Schütz</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Augsburg</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">86165</td>
   </tr>
   <tr>
     <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; color: gray;font-family: IBM Plex Mono;font-size: 10px; border-right: 2px solid #6699CC80;" class="gt_row gt_right">3</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Alexander Tucker</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Charlotte</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">28267</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Sawyer Gonzalez</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Minneapolis</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">55429</td>
   </tr>
   <tr>
     <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; color: gray;font-family: IBM Plex Mono;font-size: 10px; border-right: 2px solid #6699CC80;" class="gt_row gt_right">4</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Lisa Hernandez</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Austin</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">78713</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Virginia Willis</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Denver</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">80211</td>
   </tr>
   <tr>
     <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; border-bottom: 2px solid #6699CC80; color: gray;font-family: IBM Plex Mono;font-size: 10px; border-right: 2px solid #6699CC80;" class="gt_row gt_right">5</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; border-bottom: 2px solid #6699CC80;" class="gt_row gt_left">Joan Sanders</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; border-bottom: 2px solid #6699CC80;" class="gt_row gt_left">Bowie</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; border-bottom: 2px solid #6699CC80;" class="gt_row gt_left">20706</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; border-bottom: 2px solid #6699CC80;" class="gt_row gt_left">Anna Carter</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; border-bottom: 2px solid #6699CC80;" class="gt_row gt_left">Columbus</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; border-bottom: 2px solid #6699CC80;" class="gt_row gt_left">31916</td>
   </tr>
   <tr>
     <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; color: gray;font-family: IBM Plex Mono;font-size: 10px; border-right: 2px solid #6699CC80;" class="gt_row gt_right">196</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Sascha Lang</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Münster</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">48158</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Erika Stadler</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Rostock</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">18816</td>
   </tr>
   <tr>
     <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; color: gray;font-family: IBM Plex Mono;font-size: 10px; border-right: 2px solid #6699CC80;" class="gt_row gt_right">197</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Spencer Ward</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Philadelphia</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">19184</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Martha Castillo</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">St. Petersburg</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">33762</td>
   </tr>
   <tr>
     <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; color: gray;font-family: IBM Plex Mono;font-size: 10px; border-right: 2px solid #6699CC80;" class="gt_row gt_right">198</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Matthew Reed</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Gaithersburg</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">20803</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Frances Allen</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Dallas</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">75291</td>
   </tr>
   <tr>
     <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; color: gray;font-family: IBM Plex Mono;font-size: 10px; border-right: 2px solid #6699CC80;" class="gt_row gt_right">199</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Frances Wilson</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Columbus</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">31945</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Andrew Walker</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Indianapolis</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">46238</td>
   </tr>
   <tr>
     <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; color: gray;font-family: IBM Plex Mono;font-size: 10px; border-right: 2px solid #6699CC80;" class="gt_row gt_right">200</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Thomas André</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Grenoble</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">38022</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Christophe Fabre</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Montpellier</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">34039</td>
   </tr>
 </tbody>
 
@@ -2952,7 +2954,7 @@ Note
 </div>
 <p>Weights are auto-normalized, so <code>{"US": 7, "DE": 2, "FR": 1}</code> is equivalent to the example above. Row counts are allocated using largest-remainder apportionment, ensuring they always sum to exactly <code>n</code>.</p>
 <p>By default, rows from different countries are interleaved randomly (<code>shuffle=True</code>). Set <code>shuffle=False</code> to keep rows grouped by country in the order the countries are listed:</p>
-<div id="3f8e0886" class="cell" data-execution_count="16">
+<div id="aa5e04da" class="cell" data-execution_count="16">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>pb.preview(</span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>    pb.generate_dataset(</span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>        schema, n<span class="op">=</span><span class="dv">120</span>, seed<span class="op">=</span><span class="dv">23</span>,</span>
@@ -3016,9 +3018,9 @@ Note
 <table style="table-layout: fixed;; width: 0px" class="gt_table" data-quarto-disable-processing="true" data-quarto-bootstrap="false">
 <colgroup>
   <col style="width:33.4px;">
-  <col style="width:195px;">
-  <col style="width:171px;">
-  <col style="width:132px;">
+  <col style="width:219px;">
+  <col style="width:164px;">
+  <col style="width:117px;">
 </colgroup>
 
 <thead>
@@ -3036,63 +3038,63 @@ Note
 <tbody class="gt_table_body">
   <tr>
     <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; color: gray;font-family: IBM Plex Mono;font-size: 10px; border-right: 2px solid #6699CC80;" class="gt_row gt_right">1</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Helen Turner</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">San Francisco</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">94141</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Noah Black</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Winston-Salem</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">27157</td>
   </tr>
   <tr>
     <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; color: gray;font-family: IBM Plex Mono;font-size: 10px; border-right: 2px solid #6699CC80;" class="gt_row gt_right">2</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Sebastian Allen</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Buffalo</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">14203</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Katherine Christensen</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Baton Rouge</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">70853</td>
   </tr>
   <tr>
     <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; color: gray;font-family: IBM Plex Mono;font-size: 10px; border-right: 2px solid #6699CC80;" class="gt_row gt_right">3</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Logan Brown</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Peoria</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">61645</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Sharon Perry</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Charlotte</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">28283</td>
   </tr>
   <tr>
     <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; color: gray;font-family: IBM Plex Mono;font-size: 10px; border-right: 2px solid #6699CC80;" class="gt_row gt_right">4</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Madison Dunn</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Hialeah</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">33010</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Thomas Henderson</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Rochester</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">14695</td>
   </tr>
   <tr>
     <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; border-bottom: 2px solid #6699CC80; color: gray;font-family: IBM Plex Mono;font-size: 10px; border-right: 2px solid #6699CC80;" class="gt_row gt_right">5</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; border-bottom: 2px solid #6699CC80;" class="gt_row gt_left">Carl Henry</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; border-bottom: 2px solid #6699CC80;" class="gt_row gt_left">Philadelphia</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; border-bottom: 2px solid #6699CC80;" class="gt_row gt_left">19107</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; border-bottom: 2px solid #6699CC80;" class="gt_row gt_left">Mateo Young</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; border-bottom: 2px solid #6699CC80;" class="gt_row gt_left">St. Petersburg</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; border-bottom: 2px solid #6699CC80;" class="gt_row gt_left">33708</td>
   </tr>
   <tr>
     <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; color: gray;font-family: IBM Plex Mono;font-size: 10px; border-right: 2px solid #6699CC80;" class="gt_row gt_right">116</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Shinya Itakura</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Kanazawa</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">920-9491</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Masahiro Nakanishi</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Toyohashi</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">440-3779</td>
   </tr>
   <tr>
     <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; color: gray;font-family: IBM Plex Mono;font-size: 10px; border-right: 2px solid #6699CC80;" class="gt_row gt_right">117</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Takashi Honda</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Kobe</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">650-5769</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Kazuya Maehara</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Sapporo</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">060-0388</td>
   </tr>
   <tr>
     <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; color: gray;font-family: IBM Plex Mono;font-size: 10px; border-right: 2px solid #6699CC80;" class="gt_row gt_right">118</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Takahiro Nagata</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Suwa</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">392-4367</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Ayane Uemura</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Iida</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">395-2895</td>
   </tr>
   <tr>
     <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; color: gray;font-family: IBM Plex Mono;font-size: 10px; border-right: 2px solid #6699CC80;" class="gt_row gt_right">119</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Hiromi Yoshizawa</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Kawasaki</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">210-7998</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Masahiro Ozawa</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Okayama</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">700-7656</td>
   </tr>
   <tr>
     <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; color: gray;font-family: IBM Plex Mono;font-size: 10px; border-right: 2px solid #6699CC80;" class="gt_row gt_right">120</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Chihiro Honda</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Natori</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">981-1047</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Ai Yamamoto</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Sendai</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">980-3044</td>
   </tr>
 </tbody>
 
@@ -3108,7 +3110,7 @@ Note
 <section id="frequency-weighted-sampling" class="level3">
 <h3 class="anchored" data-anchor-id="frequency-weighted-sampling">Frequency-Weighted Sampling</h3>
 <p>By default, names and cities are sampled uniformly at random from the locale data, giving every entry the same probability of being selected. Real-world distributions are far from uniform though: “James” and “Maria” appear orders of magnitude more often than “Thaddeus” or “Xiomara”, and more people live in New York City than in Flagstaff. The <code>weighted=True</code> parameter makes generated data reflect this natural skew.</p>
-<div id="c7870cd0" class="cell" data-execution_count="17">
+<div id="4e480a2b" class="cell" data-execution_count="17">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>    name<span class="op">=</span>pb.string_field(preset<span class="op">=</span><span class="st">"name"</span>),</span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>    city<span class="op">=</span>pb.string_field(preset<span class="op">=</span><span class="st">"city"</span>),</span>
@@ -3282,7 +3284,7 @@ Note
 </table>
 <p>When a value is needed, a tier is first chosen according to these probabilities and then a single entry is picked uniformly at random within that tier. This two-step approach keeps sampling fast while producing a realistic long-tail distribution. Setting <code>weighted=False</code> pools all entries across every tier and samples them uniformly, which can be useful when you want an even spread rather than a realistic distribution.</p>
 <p>Weighted sampling combines seamlessly with multi-country mixing. Each country’s batch uses its own tiered data independently, so a mixed dataset will have weighted US names alongside weighted German names:</p>
-<div id="92d86abb" class="cell" data-execution_count="18">
+<div id="a0be0e61" class="cell" data-execution_count="18">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>pb.preview(</span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>    pb.generate_dataset(</span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>        schema,</span>
@@ -3349,8 +3351,8 @@ Note
 <table style="table-layout: fixed;; width: 0px" class="gt_table" data-quarto-disable-processing="true" data-quarto-bootstrap="false">
 <colgroup>
   <col style="width:33.4px;">
-  <col style="width:269px;">
-  <col style="width:230px;">
+  <col style="width:250px;">
+  <col style="width:250px;">
 </colgroup>
 
 <thead>
@@ -3367,53 +3369,53 @@ Note
 <tbody class="gt_table_body">
   <tr>
     <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; color: gray;font-family: IBM Plex Mono;font-size: 10px; border-right: 2px solid #6699CC80;" class="gt_row gt_right">1</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Joan Sanders</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">San Antonio</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Steven Grant</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">San Diego</td>
   </tr>
   <tr>
     <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; color: gray;font-family: IBM Plex Mono;font-size: 10px; border-right: 2px solid #6699CC80;" class="gt_row gt_right">2</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Uwe Kühne</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Düsseldorf</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Helga Schmitz</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Berlin</td>
   </tr>
   <tr>
     <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; color: gray;font-family: IBM Plex Mono;font-size: 10px; border-right: 2px solid #6699CC80;" class="gt_row gt_right">3</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">James Adams</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Charlotte</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Julian Lee</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Minneapolis</td>
   </tr>
   <tr>
     <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; color: gray;font-family: IBM Plex Mono;font-size: 10px; border-right: 2px solid #6699CC80;" class="gt_row gt_right">4</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Serenity Williams</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Austin</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Tyler Williams</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Denver</td>
   </tr>
   <tr>
     <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; border-bottom: 2px solid #6699CC80; color: gray;font-family: IBM Plex Mono;font-size: 10px; border-right: 2px solid #6699CC80;" class="gt_row gt_right">5</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; border-bottom: 2px solid #6699CC80;" class="gt_row gt_left">Joseph Graham</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; border-bottom: 2px solid #6699CC80;" class="gt_row gt_left">Bowie</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; border-bottom: 2px solid #6699CC80;" class="gt_row gt_left">Doris Wong</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; border-bottom: 2px solid #6699CC80;" class="gt_row gt_left">Columbus</td>
   </tr>
   <tr>
     <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; color: gray;font-family: IBM Plex Mono;font-size: 10px; border-right: 2px solid #6699CC80;" class="gt_row gt_right">196</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Michael Peters</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Neukölln</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Ralf Baum</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Dresden</td>
   </tr>
   <tr>
     <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; color: gray;font-family: IBM Plex Mono;font-size: 10px; border-right: 2px solid #6699CC80;" class="gt_row gt_right">197</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Penelope Wright</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Philadelphia</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Carol Moore</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">St. Petersburg</td>
   </tr>
   <tr>
     <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; color: gray;font-family: IBM Plex Mono;font-size: 10px; border-right: 2px solid #6699CC80;" class="gt_row gt_right">198</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Joseph Phillips</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Gaithersburg</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Heather Adams</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Dallas</td>
   </tr>
   <tr>
     <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; color: gray;font-family: IBM Plex Mono;font-size: 10px; border-right: 2px solid #6699CC80;" class="gt_row gt_right">199</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Brian Nguyen</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Columbus</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Keith Woods</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Indianapolis</td>
   </tr>
   <tr>
     <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E; color: gray;font-family: IBM Plex Mono;font-size: 10px; border-right: 2px solid #6699CC80;" class="gt_row gt_right">200</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Melanie Burger</td>
-    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Stralsund</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Nicole Otto</td>
+    <td style="height: 14px; padding: 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: black;font-family: IBM Plex Mono;font-size: 12px; border-top: 1px solid #E9E9E;border-bottom: 1px solid #E9E9E;" class="gt_row gt_left">Leipzig</td>
   </tr>
 </tbody>
 
@@ -3430,14 +3432,14 @@ Note
 <section id="output-formats" class="level2">
 <h2 class="anchored" data-anchor-id="output-formats">Output Formats</h2>
 <p>The <a href="../reference/generate_dataset.html#pointblank.generate_dataset" title="0"><code>generate_dataset()</code></a> function supports multiple output formats via the <code>output=</code> parameter, making it easy to integrate with your preferred data processing library.</p>
-<div id="974cd977" class="cell" data-execution_count="19">
+<div id="d86d6253" class="cell" data-execution_count="19">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">id</span><span class="op">=</span>pb.int_field(min_val<span class="op">=</span><span class="dv">1</span>),</span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>    name<span class="op">=</span>pb.string_field(preset<span class="op">=</span><span class="st">"name"</span>),</span>
 <span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>The default output is a Polars DataFrame, which offers excellent performance and a modern API for data manipulation:</p>
-<div id="65fa17b3" class="cell" data-execution_count="20">
+<div id="8245758a" class="cell" data-execution_count="20">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>polars_df <span class="op">=</span> pb.generate_dataset(schema, n<span class="op">=</span><span class="dv">100</span>, seed<span class="op">=</span><span class="dv">23</span>, output<span class="op">=</span><span class="st">"polars"</span>)</span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>pb.preview(polars_df)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -3574,7 +3576,7 @@ Note
 </div>
 </div>
 <p>If your workflow uses Pandas, simply specify <code>output="pandas"</code> to get a <strong>Pandas DataFrame</strong>:</p>
-<div id="bdee9f7c" class="cell" data-execution_count="21">
+<div id="59399df8" class="cell" data-execution_count="21">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>pandas_df <span class="op">=</span> pb.generate_dataset(schema, n<span class="op">=</span><span class="dv">100</span>, seed<span class="op">=</span><span class="dv">23</span>, output<span class="op">=</span><span class="st">"pandas"</span>)</span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>pb.preview(pandas_df)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -3715,7 +3717,7 @@ Note
 <section id="using-generated-data-for-validation-testing" class="level2">
 <h2 class="anchored" data-anchor-id="using-generated-data-for-validation-testing">Using Generated Data for Validation Testing</h2>
 <p>A common use case is generating test data to validate your validation rules:</p>
-<div id="b7945c6c" class="cell" data-execution_count="22">
+<div id="a5349601" class="cell" data-execution_count="22">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define a schema with constraints</span></span>
 <span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
 <span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>    user_id<span class="op">=</span>pb.int_field(min_val<span class="op">=</span><span class="dv">1</span>, unique<span class="op">=</span><span class="va">True</span>),</span>
@@ -3816,7 +3818,7 @@ Note
     <td colspan="14" class="gt_heading gt_title gt_font_normal" style="color: #444444;font-size: 28px;text-align: left;font-weight: bold; text-align: left;">Pointblank Validation</td>
   </tr>
   <tr class="gt_heading">
-    <td colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style="text-align: left;"><div><span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2026-02-19|15:25:22</span><div style="padding-top: 10px; padding-bottom: 5px;"><span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 10px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 10px 2px 10px; font-size: 10px;">Polars</span></div></div></td>
+    <td colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style="text-align: left;"><div><span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2026-02-19|18:25:25</span><div style="padding-top: 10px; padding-bottom: 5px;"><span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 10px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 10px 2px 10px; font-size: 10px;">Polars</span></div></div></td>
   </tr>
 <tr class="gt_col_headings">
   <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-status_color"></th>
