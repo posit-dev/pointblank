@@ -819,9 +819,9 @@ async def profile_dataframe(
     # Sample data if needed
     if sample_size > 0 and df.shape[0] > sample_size:
         if hasattr(df, "sample"):  # pandas
-            df_sample = df.sample(n=sample_size, random_state=42)
+            df_sample = df.sample(n=sample_size, random_state=23)
         else:  # polars
-            df_sample = df.sample(n=sample_size, seed=42)
+            df_sample = df.sample(n=sample_size, seed=23)
         await ctx.report_progress(20, 100, f"Sampling {sample_size} rows for analysis...")
     else:
         df_sample = df
