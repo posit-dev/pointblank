@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from datetime import date, datetime, time, timedelta
-from typing import TYPE_CHECKING, Any, Callable
+from typing import TYPE_CHECKING, Any, Callable, Literal
 
 if TYPE_CHECKING:
     pass
@@ -17,6 +17,7 @@ __all__ = [
     "datetime_field",
     "time_field",
     "duration_field",
+    "profile_fields",
     # Classes (for type hints and advanced usage)
     "Field",
     "IntField",
@@ -1982,3 +1983,253 @@ def duration_field(
         unique=unique,
         generator=generator,
     )
+
+
+# =============================================================================
+# Profile Fields Helper
+# =============================================================================
+
+# All presets that can appear in any profile set
+_PROFILE_PRESETS = frozenset(
+    {
+        "first_name",
+        "last_name",
+        "name",
+        "email",
+        "address",
+        "city",
+        "state",
+        "postcode",
+        "phone_number",
+        "company",
+        "job",
+    }
+)
+
+# Name-related subsets for split_name validation
+_SPLIT_NAME_PRESETS = frozenset({"first_name", "last_name"})
+_COMBINED_NAME_PRESETS = frozenset({"name"})
+
+# Base sets keyed by set name. Each list defines the column order.
+# When split_name=True, "first_name"/"last_name" are used; when False, "name" is used.
+_PROFILE_SETS: dict[str, list[str]] = {
+    "minimal": ["first_name", "last_name", "email", "phone_number"],
+    "standard": ["first_name", "last_name", "email", "city", "state", "postcode", "phone_number"],
+    "full": [
+        "first_name",
+        "last_name",
+        "email",
+        "address",
+        "city",
+        "state",
+        "postcode",
+        "phone_number",
+        "company",
+        "job",
+    ],
+}
+
+# Canonical ordering for all profile presets (used when include= adds new presets)
+_PROFILE_ORDER = [
+    "first_name",
+    "last_name",
+    "name",
+    "email",
+    "address",
+    "city",
+    "state",
+    "postcode",
+    "phone_number",
+    "company",
+    "job",
+]
+
+# Alias for Python's built-in set, since the parameter name `set` shadows it
+# inside profile_fields().
+_builtin_set = set
+
+
+def profile_fields(
+    *,
+    set: Literal["minimal", "standard", "full"] = "standard",
+    split_name: bool = True,
+    include: list[str] | None = None,
+    exclude: list[str] | None = None,
+    prefix: str | None = None,
+) -> dict[str, StringField]:
+    """
+    Create a dict of string field specifications representing a person profile.
+
+    Returns a dictionary of `StringField` objects suitable for `**`-unpacking into a `Schema()`.
+    Each field uses a preset that participates in the existing coherence system, so generated
+    data will have coherent names, emails, addresses, and phone numbers within each row.
+
+    Parameters
+    ----------
+    set
+        The base set of profile fields to include. Options are `"minimal"` (name, email, phone;
+        3-4 columns depending on `split_name=`), `"standard"` (name, email, city, state,
+        postcode, phone; 6-7 columns), and `"full"` (name, email, address, city, state,
+        postcode, phone, company, job; 9-10 columns). Default is `"standard"`.
+    split_name
+        Whether to split the name into separate `first_name` and `last_name` columns (`True`,
+        the default) or use a single combined `name` column (`False`).
+    include
+        List of additional preset names to add to the base set. For example,
+        `include=["company"]` adds a company column to the `"standard"` set. Presets already
+        in the base set are silently ignored.
+    exclude
+        List of preset names to remove from the (possibly augmented) set. For example,
+        `exclude=["postcode"]` removes the postcode column. Presets not in the set are silently
+        ignored.
+    prefix
+        Optional string to prepend to every column name. For example, `prefix="customer_"`
+        produces keys like `"customer_first_name"`, `"customer_email"`, etc.
+
+    Returns
+    -------
+    dict[str, StringField]
+        A dictionary mapping column names to `StringField` objects, ordered logically (name fields
+        first, then contact, address, phone, business).
+
+    Raises
+    ------
+    ValueError
+        If `set=` is not one of `"minimal"`, `"standard"`, or `"full"`; if `include=` or `exclude=`
+        contain unknown preset names; if a preset appears in both `include=` and `exclude=`; or if
+        `include=` contains name presets incompatible with the `split_name=` setting.
+
+    Examples
+    --------
+    The default call returns the `"standard"` set of profile columns. The `**` operator unpacks the
+    returned dictionary directly into `Schema()`, as if each `string_field()` call had been written
+    by hand. All coherence rules apply automatically: emails are derived from names, and
+    city/state/postcode/phone are internally consistent.
+
+    ```{python}
+    import pointblank as pb
+
+    schema = pb.Schema(
+        user_id=pb.int_field(unique=True),
+        **pb.profile_fields(),
+    )
+
+    pb.preview(pb.generate_dataset(schema, n=100, seed=23))
+    ```
+
+    Use `set=` to control how many columns are generated. The `"minimal"` set includes only `name`,
+    `email`, and `phone`, while `"full"` adds `address`, `company`, and `job`. Setting
+    `split_name=False` collapses `first_name` and `last_name` into a single combined `name` column:
+
+    ```{python}
+    schema = pb.Schema(
+        **pb.profile_fields(set="minimal", split_name=False),
+        balance=pb.float_field(min_val=0, max_val=10000),
+    )
+
+    pb.preview(pb.generate_dataset(schema, n=50, seed=23))
+    ```
+
+    The `include=` and `exclude=` parameters let you customize the column set without switching to a
+    different base set. Here we start from the `"full"` set but drop the business columns:
+
+    ```{python}
+    schema = pb.Schema(
+        **pb.profile_fields(set="full", exclude=["company", "job"]),
+    )
+
+    pb.preview(pb.generate_dataset(schema, n=50, seed=23, country="DE"))
+    ```
+
+    The `prefix=` parameter prepends a string to every column name, which is especially useful when
+    a schema needs two independent profiles (e.g., a sender and a recipient). Each prefixed group
+    maintains its own coherence:
+
+    ```{python}
+    schema = pb.Schema(
+        **pb.profile_fields(set="minimal", prefix="sender_"),
+        **pb.profile_fields(set="minimal", prefix="recipient_"),
+    )
+
+    pb.preview(pb.generate_dataset(schema, n=50, seed=23))
+    ```
+    """
+
+    # --- Validate set parameter ---
+    if set not in _PROFILE_SETS:
+        raise ValueError(f"Invalid set '{set}'. Must be 'minimal', 'standard', or 'full'.")
+
+    # --- Normalize include/exclude to lists ---
+    include = list(include) if include is not None else []
+    exclude = list(exclude) if exclude is not None else []
+
+    # --- Validate preset names ---
+    for preset_name in include:
+        if preset_name not in _PROFILE_PRESETS:
+            raise ValueError(
+                f"Unknown preset '{preset_name}'. "
+                f"Available profile presets: {sorted(_PROFILE_PRESETS)}"
+            )
+
+    for preset_name in exclude:
+        if preset_name not in _PROFILE_PRESETS:
+            raise ValueError(
+                f"Unknown preset '{preset_name}'. "
+                f"Available profile presets: {sorted(_PROFILE_PRESETS)}"
+            )
+
+    # --- Check for include/exclude conflicts ---
+    overlap = _builtin_set(include) & _builtin_set(exclude)
+    if overlap:
+        conflicts = sorted(overlap)
+        raise ValueError(
+            f"Preset{'s' if len(conflicts) > 1 else ''} {', '.join(repr(p) for p in conflicts)} "
+            f"{'appear' if len(conflicts) > 1 else 'appears'} in both include and exclude."
+        )
+
+    # --- Validate name preset compatibility with split_name ---
+    if split_name:
+        # split_name=True: cannot include "name" (the combined preset)
+        if "name" in include:
+            raise ValueError(
+                "Use split_name=False to include 'name', "
+                "or include 'first_name'/'last_name' instead."
+            )
+    else:
+        # split_name=False: cannot include "first_name" or "last_name"
+        bad = [p for p in include if p in _SPLIT_NAME_PRESETS]
+        if bad:
+            raise ValueError(
+                f"Use split_name=True to include {'/'.join(repr(p) for p in sorted(bad))}, "
+                "or include 'name' instead."
+            )
+
+    # --- Build the preset list ---
+    # Start with the base set
+    base = list(_PROFILE_SETS[set])
+
+    # Apply split_name: replace first_name/last_name with name if needed
+    if not split_name:
+        base = ["name" if p == "first_name" else p for p in base if p != "last_name"]
+
+    # Convert to an ordered set (preserving order)
+    presets = dict.fromkeys(base)
+
+    # Add includes (maintaining canonical order)
+    for preset_name in include:
+        presets[preset_name] = None
+
+    # Remove excludes
+    for preset_name in exclude:
+        presets.pop(preset_name, None)
+
+    # Sort by canonical order
+    ordered_presets = [p for p in _PROFILE_ORDER if p in presets]
+
+    # --- Build the result dict ---
+    result: dict[str, StringField] = {}
+    for preset_name in ordered_presets:
+        col_name = f"{prefix}{preset_name}" if prefix else preset_name
+        result[col_name] = StringField(preset=preset_name)
+
+    return result
