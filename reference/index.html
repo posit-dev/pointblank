@@ -558,7 +558,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </section>
 <section id="test-data-generation" class="level2">
 <h2 class="anchored" data-anchor-id="test-data-generation">Test Data Generation</h2>
-<p>Generate synthetic test data based on schema definitions. Use <a href="../reference/generate_dataset.html#pointblank.generate_dataset" title="0"><code>generate_dataset()</code></a> to create data from a <a href="../reference/Schema.html#pointblank.Schema" title="0"><code>Schema</code></a> object. The helper functions define typed fields with constraints for realistic test data generation.</p>
+<p>Generate synthetic test data based on schema definitions. Use <a href="../reference/generate_dataset.html#pointblank.generate_dataset" title="0"><code>generate_dataset()</code></a> to create data from a <a href="../reference/Schema.html#pointblank.Schema" title="0"><code>Schema</code></a> object. The helper functions define typed fields with constraints for realistic test data generation. The <a href="../reference/profile_fields.html#pointblank.profile_fields" title="0"><code>profile_fields()</code></a> helper creates a complete person-profile schema (name, email, address, phone, etc.) in a single call.</p>
 <div class="caption-top table" style="border-top-style: dashed; border-bottom-style: dashed;">
 <dl style="margin-top: 10px;">
 
@@ -588,6 +588,9 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 
 <dt><a href="../reference/duration_field.html#pointblank.duration_field">duration_field()</a></dt>
 <dd style="text-indent: 20px; margin-top: -3px;">Create a duration column specification for use in a schema.</dd>
+
+<dt><a href="../reference/profile_fields.html#pointblank.profile_fields">profile_fields()</a></dt>
+<dd style="text-indent: 20px; margin-top: -3px;">Create a dict of string field specifications representing a person profile.</dd>
 
 </dl>
 </div>
