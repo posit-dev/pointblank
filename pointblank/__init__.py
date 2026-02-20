@@ -41,6 +41,7 @@ from pointblank.field import (
     duration_field,
     float_field,
     int_field,
+    profile_fields,
     string_field,
     time_field,
 )
@@ -125,6 +126,7 @@ __all__ = [
     "datetime_field",
     "time_field",
     "duration_field",
+    "profile_fields",
     # Data generation - configuration
     "GeneratorConfig",
     # Data generation - convenience function
