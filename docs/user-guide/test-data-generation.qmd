@@ -56,6 +56,7 @@ Pointblank provides helper functions for defining typed columns with constraints
 | `datetime_field()` | Datetime columns | `min_val`, `max_val` |
 | `time_field()` | Time columns | `min_val`, `max_val` |
 | `duration_field()` | Duration columns | `min_val`, `max_val` |
+| `profile_fields()` | Bundled person-profile fields | `set`, `split_name`, `include`, `exclude`, `prefix` |
 
 ### Integer Fields
 
@@ -256,6 +257,141 @@ The `preset=` parameter in `string_field()` supports many data types:
 - `file_extension`: file extension
 - `mime_type`: MIME type
 - `user_agent`: browser user agent string (country-weighted)
+
+## Profile Fields
+
+When generating person-profile data, you often need several related presets together: a name, an
+email derived from that name, an address, a phone number, and so on. Rather than wiring up each
+column individually, the `profile_fields()` helper returns a ready-made dictionary of
+`StringField` objects that you can unpack directly into a `Schema()`.
+
+### Basic Usage
+
+With no arguments, `profile_fields()` returns the **standard** set of seven columns:
+`first_name`, `last_name`, `email`, `city`, `state`, `postcode`, and `phone_number`. All
+coherence rules apply automatically: emails are derived from names, and city/state/postcode/phone
+are internally consistent.
+
+```{python}
+schema = pb.Schema(
+    user_id=pb.int_field(unique=True, min_val=1),
+    **pb.profile_fields(),
+)
+
+pb.preview(pb.generate_dataset(schema, n=100, seed=23))
+```
+
+The `**` operator unpacks the dictionary into keyword arguments, as if you had written each
+`string_field(preset=...)` call by hand.
+
+### Choosing a Set
+
+Three built-in sets control how many columns are generated:
+
+| Set | Columns |
+|-----|------|
+| `"minimal"` | `first_name`, `last_name`, `email`, `phone_number` |
+| `"standard"` | `first_name`, `last_name`, `email`, `city`, `state`, `postcode`, `phone_number` |
+| `"full"` | `first_name`, `last_name`, `email`, `address`, `city`, `state`, `postcode`, `phone_number`, `company`, `job` |
+
+```{python}
+# Minimal profile: just name, email, and phone
+pb.preview(
+    pb.generate_dataset(
+        pb.Schema(**pb.profile_fields(set="minimal")),
+        n=100, seed=23,
+    )
+)
+```
+
+```{python}
+# Full profile: includes address, company, and job title
+pb.preview(
+    pb.generate_dataset(
+        pb.Schema(**pb.profile_fields(set="full")),
+        n=100, seed=23,
+    )
+)
+```
+
+### Combined vs. Split Names
+
+By default, names are split into `first_name` and `last_name` columns. Set `split_name=False` to
+get a single `name` column instead:
+
+```{python}
+pb.preview(
+    pb.generate_dataset(
+        pb.Schema(**pb.profile_fields(set="minimal", split_name=False)),
+        n=100, seed=23,
+    )
+)
+```
+
+### Adding and Removing Columns
+
+Use `include=` to add presets to the base set and `exclude=` to remove them. Both accept lists of
+preset names. The available profile presets are: `first_name`, `last_name`, `name`, `email`,
+`address`, `city`, `state`, `postcode`, `phone_number`, `company`, and `job`.
+
+```{python}
+# Standard set + company column
+pb.preview(
+    pb.generate_dataset(
+        pb.Schema(**pb.profile_fields(include=["company"])),
+        n=100, seed=23,
+    )
+)
+```
+
+```{python}
+# Standard set without city and state
+pb.preview(
+    pb.generate_dataset(
+        pb.Schema(**pb.profile_fields(exclude=["city", "state"])),
+        n=100, seed=23,
+    )
+)
+```
+
+You can combine `include=` and `exclude=` in the same call, as long as the same preset does not
+appear in both.
+
+### Column Prefixes
+
+The `prefix=` parameter prepends a string to every column name. This is especially useful when a
+schema needs two independent profiles (e.g., sender and recipient):
+
+```{python}
+schema = pb.Schema(
+    **pb.profile_fields(set="minimal", prefix="sender_"),
+    **pb.profile_fields(set="minimal", prefix="recipient_"),
+)
+
+pb.preview(pb.generate_dataset(schema, n=100, seed=23))
+```
+
+Each prefixed group maintains its own coherence: the sender's email is derived from the sender's
+name, and the recipient's email from the recipient's name.
+
+### Combining with Other Field Types
+
+Since `profile_fields()` returns a plain dictionary, it composes naturally with any other field
+types:
+
+```{python}
+schema = pb.Schema(
+    id=pb.int_field(unique=True, min_val=1000),
+    **pb.profile_fields(),
+    active=pb.bool_field(p_true=0.8),
+    signup_date=pb.date_field(
+        min_date="2024-01-01",
+        max_date="2025-12-31",
+    ),
+)
+
+pb.preview(pb.generate_dataset(schema, n=100, seed=23, country="DE"))
+```
 
 ## Country-Specific Data
 
