@@ -374,7 +374,7 @@ def col(
     #| echo: false
     #| output: false
     import pointblank as pb
-    pb.config(report_incl_header=False, report_incl_footer=False, preview_incl_header=False)
+    pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
     ```
 
     Suppose we have a table with columns `a` and `b` and we'd like to validate that the values in
@@ -573,7 +573,7 @@ def ref(column_name: str) -> ReferenceColumn:
     #| echo: false
     #| output: false
     import pointblank as pb
-    pb.config(report_incl_header=False, report_incl_footer=False, preview_incl_header=False)
+    pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
     ```
 
     Suppose we have two DataFrames: a current data table and a reference (historical) table.
@@ -715,7 +715,7 @@ def starts_with(text: str, case_sensitive: bool = False) -> StartsWith:
     #| echo: false
     #| output: false
     import pointblank as pb
-    pb.config(report_incl_header=False, report_incl_footer=False, preview_incl_header=False)
+    pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
     ```
 
     Suppose we have a table with columns `name`, `paid_2021`, `paid_2022`, and `person_id` and
@@ -877,7 +877,7 @@ def ends_with(text: str, case_sensitive: bool = False) -> EndsWith:
     #| echo: false
     #| output: false
     import pointblank as pb
-    pb.config(report_incl_header=False, report_incl_footer=False, preview_incl_header=False)
+    pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
     ```
 
     Suppose we have a table with columns `name`, `2021_pay`, `2022_pay`, and `person_id` and
@@ -1040,7 +1040,7 @@ def contains(text: str, case_sensitive: bool = False) -> Contains:
     #| echo: false
     #| output: false
     import pointblank as pb
-    pb.config(report_incl_header=False, report_incl_footer=False, preview_incl_header=False)
+    pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
     ```
 
     Suppose we have a table with columns `name`, `2021_pay_total`, `2022_pay_total`, and `person_id`
@@ -1203,7 +1203,7 @@ def matches(pattern: str, case_sensitive: bool = False) -> Matches:
     #| echo: false
     #| output: false
     import pointblank as pb
-    pb.config(report_incl_header=False, report_incl_footer=False, preview_incl_header=False)
+    pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
     ```
 
     Suppose we have a table with columns `name`, `id_old`, `new_identifier`, and `pay_2021` and we'd
@@ -1348,7 +1348,7 @@ def everything() -> Everything:
     #| echo: false
     #| output: false
     import pointblank as pb
-    pb.config(report_incl_header=False, report_incl_footer=False, preview_incl_header=False)
+    pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
     ```
 
     Suppose we have a table with several numeric columns and we'd like to validate that all these
@@ -1503,7 +1503,7 @@ def first_n(n: int, offset: int = 0) -> FirstN:
     #| echo: false
     #| output: false
     import pointblank as pb
-    pb.config(report_incl_header=False, report_incl_footer=False, preview_incl_header=False)
+    pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
     ```
 
     Suppose we have a table with columns `paid_2021`, `paid_2022`, `paid_2023`, `paid_2024`, and
@@ -1662,7 +1662,7 @@ def last_n(n: int, offset: int = 0) -> LastN:
     #| echo: false
     #| output: false
     import pointblank as pb
-    pb.config(report_incl_header=False, report_incl_footer=False, preview_incl_header=False)
+    pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
     ```
 
     Suppose we have a table with columns `name`, `paid_2021`, `paid_2022`, `paid_2023`, and
@@ -2036,7 +2036,7 @@ def expr_col(column_name: str) -> ColumnExpression:
     #| echo: false
     #| output: false
     import pointblank as pb
-    pb.config(report_incl_header=False, report_incl_footer=False, preview_incl_header=False)
+    pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
     ```
     Let's say we have a table with three columns: `a`, `b`, and `c`. We want to validate that:
 

@@ -1,0 +1,3103 @@
+from __future__ import annotations
+
+import json
+import random
+import re
+import unicodedata
+from dataclasses import dataclass, field
+from importlib.resources import files
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    pass
+
+__all__ = [
+    "LocaleRegistry",
+    "LocaleGenerator",
+    "get_generator",
+    "COUNTRY_CODE_MAP",
+    "COUNTRY_INFO",
+    "COUNTRIES_WITH_FULL_DATA",
+]
+
+
+# ISO 3166-1 country code mappings
+# Maps alpha-2 (2-letter) and alpha-3 (3-letter) codes to internal data directory names
+COUNTRY_CODE_MAP: dict[str, str] = {
+    # United States
+    "US": "US",
+    "USA": "US",
+    # United Kingdom
+    "GB": "GB",
+    "GBR": "GB",
+    "UK": "GB",  # Common alias
+    # Ireland
+    "IE": "IE",
+    "IRL": "IE",
+    # Iceland
+    "IS": "IS",
+    "ISL": "IS",
+    # Australia
+    "AU": "AU",
+    "AUS": "AU",
+    # Argentina
+    "AR": "AR",
+    "ARG": "AR",
+    # Canada
+    "CA": "CA",
+    "CAN": "CA",
+    # Germany
+    "DE": "DE",
+    "DEU": "DE",
+    # Greece
+    "GR": "GR",
+    "GRC": "GR",
+    # Austria
+    "AT": "AT",
+    "AUT": "AT",
+    # Switzerland
+    "CH": "CH",
+    "CHE": "CH",
+    # Chile
+    "CL": "CL",
+    "CHL": "CL",
+    # France
+    "FR": "FR",
+    "FRA": "FR",
+    # Spain
+    "ES": "ES",
+    "ESP": "ES",
+    # Mexico
+    "MX": "MX",
+    "MEX": "MX",
+    # Malta
+    "MT": "MT",
+    "MLT": "MT",
+    # Portugal
+    "PT": "PT",
+    "PRT": "PT",
+    # Brazil
+    "BR": "BR",
+    "BRA": "BR",
+    # India
+    "IN": "IN",
+    "IND": "IN",
+    # Italy
+    "IT": "IT",
+    "ITA": "IT",
+    # Netherlands
+    "NL": "NL",
+    "NLD": "NL",
+    # Belgium
+    "BE": "BE",
+    "BEL": "BE",
+    # Bulgaria
+    "BG": "BG",
+    "BGR": "BG",
+    # Poland
+    "PL": "PL",
+    "POL": "PL",
+    # Romania
+    "RO": "RO",
+    "ROU": "RO",
+    # Russia
+    "RU": "RU",
+    "RUS": "RU",
+    # Slovakia
+    "SK": "SK",
+    "SVK": "SK",
+    # Slovenia
+    "SI": "SI",
+    "SVN": "SI",
+    # Japan
+    "JP": "JP",
+    "JPN": "JP",
+    # South Korea
+    "KR": "KR",
+    "KOR": "KR",
+    # Latvia
+    "LV": "LV",
+    "LVA": "LV",
+    # Lithuania
+    "LT": "LT",
+    "LTU": "LT",
+    # Luxembourg
+    "LU": "LU",
+    "LUX": "LU",
+    # China
+    "CN": "CN",
+    "CHN": "CN",
+    # Colombia
+    "CO": "CO",
+    "COL": "CO",
+    # Cyprus
+    "CY": "CY",
+    "CYP": "CY",
+    # Czech Republic
+    "CZ": "CZ",
+    "CZE": "CZ",
+    # Estonia
+    "EE": "EE",
+    "EST": "EE",
+    # Hong Kong
+    "HK": "HK",
+    "HKG": "HK",
+    # Croatia
+    "HR": "HR",
+    "HRV": "HR",
+    # Hungary
+    "HU": "HU",
+    "HUN": "HU",
+    # Indonesia
+    "ID": "ID",
+    "IDN": "ID",
+    # Taiwan
+    "TW": "TW",
+    "TWN": "TW",
+    # Turkey
+    "TR": "TR",
+    "TUR": "TR",
+    # New Zealand
+    "NZ": "NZ",
+    "NZL": "NZ",
+    # Philippines
+    "PH": "PH",
+    "PHL": "PH",
+    # South Africa
+    "ZA": "ZA",
+    "ZAF": "ZA",
+    # Nigeria
+    "NG": "NG",
+    "NGA": "NG",
+    # Thailand
+    "TH": "TH",
+    "THA": "TH",
+    # United Arab Emirates
+    "AE": "AE",
+    "ARE": "AE",
+    # Singapore
+    "SG": "SG",
+    "SGP": "SG",
+    # Egypt
+    "EG": "EG",
+    "EGY": "EG",
+    # Pakistan
+    "PK": "PK",
+    "PAK": "PK",
+    # Bangladesh
+    "BD": "BD",
+    "BGD": "BD",
+    # Vietnam
+    "VN": "VN",
+    "VNM": "VN",
+    # Malaysia
+    "MY": "MY",
+    "MYS": "MY",
+    # Peru
+    "PE": "PE",
+    "PER": "PE",
+    # Kenya
+    "KE": "KE",
+    "KEN": "KE",
+    # Morocco
+    "MA": "MA",
+    "MAR": "MA",
+    # Algeria
+    "DZ": "DZ",
+    "DZA": "DZ",
+    # Tunisia
+    "TN": "TN",
+    "TUN": "TN",
+    # Ghana
+    "GH": "GH",
+    "GHA": "GH",
+    # Ethiopia
+    "ET": "ET",
+    "ETH": "ET",
+    # Senegal
+    "SN": "SN",
+    "SEN": "SN",
+    # Uganda
+    "UG": "UG",
+    "UGA": "UG",
+    # Costa Rica
+    "CR": "CR",
+    "CRI": "CR",
+    # Sri Lanka
+    "LK": "LK",
+    "LKA": "LK",
+}
+
+# Countries that have complete locale data files
+# These are the ISO alpha-2 codes for countries with full address, company,
+# internet, misc, person, and text JSON files in the data directory
+COUNTRIES_WITH_FULL_DATA: list[str] = [
+    "AE",  # United Arab Emirates
+    "AR",  # Argentina
+    "AT",  # Austria
+    "AU",  # Australia
+    "BD",  # Bangladesh
+    "BE",  # Belgium
+    "BG",  # Bulgaria
+    "BR",  # Brazil
+    "CA",  # Canada
+    "CH",  # Switzerland
+    "CL",  # Chile
+    "CN",  # China
+    "CO",  # Colombia
+    "CR",  # Costa Rica
+    "CY",  # Cyprus
+    "CZ",  # Czech Republic
+    "DE",  # Germany
+    "DK",  # Denmark
+    "DZ",  # Algeria
+    "EE",  # Estonia
+    "EG",  # Egypt
+    "ES",  # Spain
+    "ET",  # Ethiopia
+    "FI",  # Finland
+    "FR",  # France
+    "GB",  # United Kingdom
+    "GH",  # Ghana
+    "GR",  # Greece
+    "HK",  # Hong Kong
+    "HR",  # Croatia
+    "HU",  # Hungary
+    "ID",  # Indonesia
+    "IE",  # Ireland
+    "IN",  # India
+    "IS",  # Iceland
+    "IT",  # Italy
+    "JP",  # Japan
+    "KE",  # Kenya
+    "KR",  # South Korea
+    "LK",  # Sri Lanka
+    "LT",  # Lithuania
+    "LU",  # Luxembourg
+    "LV",  # Latvia
+    "MA",  # Morocco
+    "MT",  # Malta
+    "MX",  # Mexico
+    "MY",  # Malaysia
+    "NG",  # Nigeria
+    "NL",  # Netherlands
+    "NO",  # Norway
+    "NZ",  # New Zealand
+    "PE",  # Peru
+    "PH",  # Philippines
+    "PK",  # Pakistan
+    "PL",  # Poland
+    "PT",  # Portugal
+    "RO",  # Romania
+    "RU",  # Russia
+    "SE",  # Sweden
+    "SG",  # Singapore
+    "SI",  # Slovenia
+    "SK",  # Slovakia
+    "SN",  # Senegal
+    "TH",  # Thailand
+    "TN",  # Tunisia
+    "TR",  # Turkey
+    "TW",  # Taiwan
+    "UG",  # Uganda
+    "US",  # United States
+    "VN",  # Vietnam
+    "ZA",  # South Africa
+]
+
+# Comprehensive country info mapping: alpha-2 -> (alpha-3, English name)
+COUNTRY_INFO: dict[str, tuple[str, str]] = {
+    "AD": ("AND", "Andorra"),
+    "AE": ("ARE", "United Arab Emirates"),
+    "AF": ("AFG", "Afghanistan"),
+    "AG": ("ATG", "Antigua & Barbuda"),
+    "AI": ("AIA", "Anguilla"),
+    "AL": ("ALB", "Albania"),
+    "AM": ("ARM", "Armenia"),
+    "AO": ("AGO", "Angola"),
+    "AR": ("ARG", "Argentina"),
+    "AS": ("ASM", "American Samoa"),
+    "AT": ("AUT", "Austria"),
+    "AU": ("AUS", "Australia"),
+    "AW": ("ABW", "Aruba"),
+    "AX": ("ALA", "\u00c5land Islands"),
+    "AZ": ("AZE", "Azerbaijan"),
+    "BA": ("BIH", "Bosnia & Herzegovina"),
+    "BB": ("BRB", "Barbados"),
+    "BD": ("BGD", "Bangladesh"),
+    "BE": ("BEL", "Belgium"),
+    "BF": ("BFA", "Burkina Faso"),
+    "BG": ("BGR", "Bulgaria"),
+    "BH": ("BHR", "Bahrain"),
+    "BI": ("BDI", "Burundi"),
+    "BJ": ("BEN", "Benin"),
+    "BL": ("BLM", "St. Barth\u00e9lemy"),
+    "BM": ("BMU", "Bermuda"),
+    "BN": ("BRN", "Brunei"),
+    "BO": ("BOL", "Bolivia"),
+    "BR": ("BRA", "Brazil"),
+    "BS": ("BHS", "Bahamas"),
+    "BT": ("BTN", "Bhutan"),
+    "BW": ("BWA", "Botswana"),
+    "BY": ("BLR", "Belarus"),
+    "BZ": ("BLZ", "Belize"),
+    "CA": ("CAN", "Canada"),
+    "CC": ("CCK", "Cocos (Keeling) Islands"),
+    "CD": ("COD", "Congo (DRC)"),
+    "CF": ("CAF", "Central African Republic"),
+    "CG": ("COG", "Congo (Republic)"),
+    "CH": ("CHE", "Switzerland"),
+    "CI": ("CIV", "C\u00f4te d\u2019Ivoire"),
+    "CK": ("COK", "Cook Islands"),
+    "CL": ("CHL", "Chile"),
+    "CM": ("CMR", "Cameroon"),
+    "CN": ("CHN", "China"),
+    "CO": ("COL", "Colombia"),
+    "CR": ("CRI", "Costa Rica"),
+    "CU": ("CUB", "Cuba"),
+    "CV": ("CPV", "Cape Verde"),
+    "CW": ("CUW", "Cura\u00e7ao"),
+    "CY": ("CYP", "Cyprus"),
+    "CZ": ("CZE", "Czech Republic"),
+    "DE": ("DEU", "Germany"),
+    "DJ": ("DJI", "Djibouti"),
+    "DK": ("DNK", "Denmark"),
+    "DM": ("DMA", "Dominica"),
+    "DO": ("DOM", "Dominican Republic"),
+    "DZ": ("DZA", "Algeria"),
+    "EC": ("ECU", "Ecuador"),
+    "EE": ("EST", "Estonia"),
+    "EG": ("EGY", "Egypt"),
+    "EH": ("ESH", "Western Sahara"),
+    "ER": ("ERI", "Eritrea"),
+    "ES": ("ESP", "Spain"),
+    "ET": ("ETH", "Ethiopia"),
+    "EU": ("EUR", "European Union"),
+    "FI": ("FIN", "Finland"),
+    "FJ": ("FJI", "Fiji"),
+    "FK": ("FLK", "Falkland Islands"),
+    "FM": ("FSM", "Micronesia"),
+    "FO": ("FRO", "Faroe Islands"),
+    "FR": ("FRA", "France"),
+    "GA": ("GAB", "Gabon"),
+    "GB": ("GBR", "United Kingdom"),
+    "GD": ("GRD", "Grenada"),
+    "GE": ("GEO", "Georgia"),
+    "GF": ("GUF", "French Guiana"),
+    "GG": ("GGY", "Guernsey"),
+    "GH": ("GHA", "Ghana"),
+    "GI": ("GIB", "Gibraltar"),
+    "GL": ("GRL", "Greenland"),
+    "GM": ("GMB", "Gambia"),
+    "GN": ("GIN", "Guinea"),
+    "GP": ("GLP", "Guadeloupe"),
+    "GQ": ("GNQ", "Equatorial Guinea"),
+    "GR": ("GRC", "Greece"),
+    "GS": ("SGS", "South Georgia & South Sandwich Islands"),
+    "GT": ("GTM", "Guatemala"),
+    "GU": ("GUM", "Guam"),
+    "GW": ("GNB", "Guinea-Bissau"),
+    "GY": ("GUY", "Guyana"),
+    "HK": ("HKG", "Hong Kong"),
+    "HN": ("HND", "Honduras"),
+    "HR": ("HRV", "Croatia"),
+    "HT": ("HTI", "Haiti"),
+    "HU": ("HUN", "Hungary"),
+    "ID": ("IDN", "Indonesia"),
+    "IE": ("IRL", "Ireland"),
+    "IL": ("ISR", "Israel"),
+    "IM": ("IMN", "Isle of Man"),
+    "IN": ("IND", "India"),
+    "IO": ("IOT", "British Indian Ocean Territory"),
+    "IQ": ("IRQ", "Iraq"),
+    "IR": ("IRN", "Iran"),
+    "IS": ("ISL", "Iceland"),
+    "IT": ("ITA", "Italy"),
+    "JE": ("JEY", "Jersey"),
+    "JM": ("JAM", "Jamaica"),
+    "JO": ("JOR", "Jordan"),
+    "JP": ("JPN", "Japan"),
+    "KE": ("KEN", "Kenya"),
+    "KG": ("KGZ", "Kyrgyzstan"),
+    "KH": ("KHM", "Cambodia"),
+    "KI": ("KIR", "Kiribati"),
+    "KM": ("COM", "Comoros"),
+    "KN": ("KNA", "St. Kitts & Nevis"),
+    "KP": ("PRK", "North Korea"),
+    "KR": ("KOR", "South Korea"),
+    "KW": ("KWT", "Kuwait"),
+    "KY": ("CYM", "Cayman Islands"),
+    "KZ": ("KAZ", "Kazakhstan"),
+    "LA": ("LAO", "Laos"),
+    "LB": ("LBN", "Lebanon"),
+    "LC": ("LCA", "St. Lucia"),
+    "LI": ("LIE", "Liechtenstein"),
+    "LK": ("LKA", "Sri Lanka"),
+    "LR": ("LBR", "Liberia"),
+    "LS": ("LSO", "Lesotho"),
+    "LT": ("LTU", "Lithuania"),
+    "LU": ("LUX", "Luxembourg"),
+    "LV": ("LVA", "Latvia"),
+    "LY": ("LBY", "Libya"),
+    "MA": ("MAR", "Morocco"),
+    "MC": ("MCO", "Monaco"),
+    "MD": ("MDA", "Moldova"),
+    "ME": ("MNE", "Montenegro"),
+    "MF": ("MAF", "St. Martin"),
+    "MG": ("MDG", "Madagascar"),
+    "MH": ("MHL", "Marshall Islands"),
+    "MK": ("MKD", "North Macedonia"),
+    "ML": ("MLI", "Mali"),
+    "MM": ("MMR", "Myanmar"),
+    "MN": ("MNG", "Mongolia"),
+    "MO": ("MAC", "Macao"),
+    "MP": ("MNP", "Northern Mariana Islands"),
+    "MQ": ("MTQ", "Martinique"),
+    "MR": ("MRT", "Mauritania"),
+    "MS": ("MSR", "Montserrat"),
+    "MT": ("MLT", "Malta"),
+    "MU": ("MUS", "Mauritius"),
+    "MV": ("MDV", "Maldives"),
+    "MW": ("MWI", "Malawi"),
+    "MX": ("MEX", "Mexico"),
+    "MY": ("MYS", "Malaysia"),
+    "MZ": ("MOZ", "Mozambique"),
+    "NA": ("NAM", "Namibia"),
+    "NC": ("NCL", "New Caledonia"),
+    "NE": ("NER", "Niger"),
+    "NF": ("NFK", "Norfolk Island"),
+    "NG": ("NGA", "Nigeria"),
+    "NI": ("NIC", "Nicaragua"),
+    "NL": ("NLD", "Netherlands"),
+    "NO": ("NOR", "Norway"),
+    "NP": ("NPL", "Nepal"),
+    "NR": ("NRU", "Nauru"),
+    "NU": ("NIU", "Niue"),
+    "NZ": ("NZL", "New Zealand"),
+    "OM": ("OMN", "Oman"),
+    "PA": ("PAN", "Panama"),
+    "PE": ("PER", "Peru"),
+    "PF": ("PYF", "French Polynesia"),
+    "PG": ("PNG", "Papua New Guinea"),
+    "PH": ("PHL", "Philippines"),
+    "PK": ("PAK", "Pakistan"),
+    "PL": ("POL", "Poland"),
+    "PM": ("SPM", "St. Pierre & Miquelon"),
+    "PN": ("PCN", "Pitcairn Islands"),
+    "PR": ("PRI", "Puerto Rico"),
+    "PS": ("PSE", "Palestine"),
+    "PT": ("PRT", "Portugal"),
+    "PW": ("PLW", "Palau"),
+    "PY": ("PRY", "Paraguay"),
+    "QA": ("QAT", "Qatar"),
+    "RE": ("REU", "R\u00e9union"),
+    "RO": ("ROU", "Romania"),
+    "RS": ("SRB", "Serbia"),
+    "RU": ("RUS", "Russia"),
+    "RW": ("RWA", "Rwanda"),
+    "SA": ("SAU", "Saudi Arabia"),
+    "SB": ("SLB", "Solomon Islands"),
+    "SC": ("SYC", "Seychelles"),
+    "SD": ("SDN", "Sudan"),
+    "SE": ("SWE", "Sweden"),
+    "SG": ("SGP", "Singapore"),
+    "SI": ("SVN", "Slovenia"),
+    "SK": ("SVK", "Slovakia"),
+    "SL": ("SLE", "Sierra Leone"),
+    "SM": ("SMR", "San Marino"),
+    "SN": ("SEN", "Senegal"),
+    "SO": ("SOM", "Somalia"),
+    "SR": ("SUR", "Suriname"),
+    "SS": ("SSD", "South Sudan"),
+    "ST": ("STP", "S\u00e3o Tom\u00e9 & Pr\u00edncipe"),
+    "SV": ("SLV", "El Salvador"),
+    "SX": ("SXM", "Sint Maarten"),
+    "SY": ("SYR", "Syria"),
+    "SZ": ("SWZ", "Eswatini"),
+    "TC": ("TCA", "Turks & Caicos Islands"),
+    "TD": ("TCD", "Chad"),
+    "TF": ("ATF", "French Southern Territories"),
+    "TG": ("TGO", "Togo"),
+    "TH": ("THA", "Thailand"),
+    "TJ": ("TJK", "Tajikistan"),
+    "TK": ("TKL", "Tokelau"),
+    "TL": ("TLS", "East Timor"),
+    "TM": ("TKM", "Turkmenistan"),
+    "TN": ("TUN", "Tunisia"),
+    "TO": ("TON", "Tonga"),
+    "TR": ("TUR", "Turkey"),
+    "TT": ("TTO", "Trinidad & Tobago"),
+    "TV": ("TUV", "Tuvalu"),
+    "TW": ("TWN", "Taiwan"),
+    "TZ": ("TZA", "Tanzania"),
+    "UA": ("UKR", "Ukraine"),
+    "UG": ("UGA", "Uganda"),
+    "US": ("USA", "United States"),
+    "UY": ("URY", "Uruguay"),
+    "UZ": ("UZB", "Uzbekistan"),
+    "VA": ("VAT", "Vatican City"),
+    "VC": ("VCT", "St. Vincent & Grenadines"),
+    "VE": ("VEN", "Venezuela"),
+    "VG": ("VGB", "British Virgin Islands"),
+    "VI": ("VIR", "U.S. Virgin Islands"),
+    "VN": ("VNM", "Vietnam"),
+    "VU": ("VUT", "Vanuatu"),
+    "WF": ("WLF", "Wallis & Futuna"),
+    "WS": ("WSM", "Samoa"),
+    "YE": ("YEM", "Yemen"),
+    "YT": ("MYT", "Mayotte"),
+    "ZA": ("ZAF", "South Africa"),
+    "ZM": ("ZMB", "Zambia"),
+    "ZW": ("ZWE", "Zimbabwe"),
+}
+
+
+@dataclass
+class LocaleData:
+    """Container for all locale-specific data."""
+
+    locale: str
+    person: dict[str, Any] = field(default_factory=dict)
+    address: dict[str, Any] = field(default_factory=dict)
+    company: dict[str, Any] = field(default_factory=dict)
+    internet: dict[str, Any] = field(default_factory=dict)
+    text: dict[str, Any] = field(default_factory=dict)
+    misc: dict[str, Any] = field(default_factory=dict)
+
+
+# Transliteration map for special characters (umlauts add 'e', others simplified)
+_TRANSLITERATION_MAP: dict[str, str] = {
+    # German umlauts -> add 'e'
+    "ä": "ae",
+    "ö": "oe",
+    "ü": "ue",
+    "Ä": "Ae",
+    "Ö": "Oe",
+    "Ü": "Ue",
+    "ß": "ss",
+    # Scandinavian
+    "å": "aa",
+    "Å": "Aa",
+    "ø": "oe",
+    "Ø": "Oe",
+    "æ": "ae",
+    "Æ": "Ae",
+    # French/Spanish/Portuguese/Italian accents
+    "à": "a",
+    "á": "a",
+    "â": "a",
+    "ã": "a",
+    "À": "A",
+    "Á": "A",
+    "Â": "A",
+    "Ã": "A",
+    "è": "e",
+    "é": "e",
+    "ê": "e",
+    "ë": "e",
+    "È": "E",
+    "É": "E",
+    "Ê": "E",
+    "Ë": "E",
+    "ì": "i",
+    "í": "i",
+    "î": "i",
+    "ï": "i",
+    "Ì": "I",
+    "Í": "I",
+    "Î": "I",
+    "Ï": "I",
+    "ò": "o",
+    "ó": "o",
+    "ô": "o",
+    "õ": "o",
+    "Ò": "O",
+    "Ó": "O",
+    "Ô": "O",
+    "Õ": "O",
+    "ù": "u",
+    "ú": "u",
+    "û": "u",
+    "Ù": "U",
+    "Ú": "U",
+    "Û": "U",
+    "ñ": "n",
+    "Ñ": "N",
+    "ç": "c",
+    "Ç": "C",
+    "ý": "y",
+    "ÿ": "y",
+    "Ý": "Y",
+    # Eastern European
+    "ł": "l",
+    "Ł": "L",
+    "ń": "n",
+    "Ń": "N",
+    "ś": "s",
+    "Ś": "S",
+    "ź": "z",
+    "Ź": "Z",
+    "ż": "z",
+    "Ż": "Z",
+    "ć": "c",
+    "Ć": "C",
+    "ě": "e",
+    "Ě": "E",
+    "š": "s",
+    "Š": "S",
+    "č": "c",
+    "Č": "C",
+    "ř": "r",
+    "Ř": "R",
+    "ž": "z",
+    "Ž": "Z",
+    "ů": "u",
+    "Ů": "U",
+    "ď": "d",
+    "Ď": "D",
+    "ť": "t",
+    "Ť": "T",
+    "ň": "n",
+    "Ň": "N",
+    # Icelandic
+    "ð": "d",
+    "Ð": "D",
+    "þ": "th",
+    "Þ": "Th",
+    # French ligatures
+    "œ": "oe",
+    "Œ": "Oe",
+    # Other
+    "đ": "d",
+    "Đ": "D",
+    "ğ": "g",
+    "Ğ": "G",
+    "ı": "i",
+    "İ": "I",
+    "ş": "s",
+    "Ş": "S",
+    "ț": "t",
+    "Ț": "T",
+    "ă": "a",
+    "Ă": "A",
+}
+
+
+def _transliterate_to_ascii(text: str) -> str:
+    """
+    Transliterate text to ASCII-safe characters for email addresses and usernames.
+
+    Handles German umlauts specially (ü -> ue, ö -> oe, ä -> ae) and converts
+    other accented characters to their base ASCII equivalents.
+
+    Parameters
+    ----------
+    text
+        The text to transliterate.
+
+    Returns
+    -------
+    str
+        ASCII-safe version of the text.
+    """
+    # First apply our custom transliteration map
+    result = []
+    for char in text:
+        if char in _TRANSLITERATION_MAP:
+            result.append(_TRANSLITERATION_MAP[char])
+        else:
+            result.append(char)
+    text = "".join(result)
+
+    # Then use unicodedata to handle any remaining non-ASCII characters
+    # NFD decomposes characters (e.g., é -> e + combining accent)
+    # We then filter to keep only ASCII characters
+    normalized = unicodedata.normalize("NFD", text)
+    ascii_text = "".join(c for c in normalized if unicodedata.category(c) != "Mn")
+
+    return ascii_text
+
+
+def _normalize_country(country: str) -> str:
+    """
+    Normalize a country code to the standard 2-letter ISO 3166-1 alpha-2 format.
+
+    Parameters
+    ----------
+    country
+        Country code in alpha-2 (US), alpha-3 (USA), or legacy locale format (en_US).
+
+    Returns
+    -------
+    str
+        The normalized 2-letter country code.
+
+    Raises
+    ------
+    ValueError
+        If the country code is not recognized.
+    """
+    # Uppercase and strip whitespace
+    code = country.strip().upper()
+
+    # Handle legacy locale format (en_US, de-DE, etc.)
+    if "_" in code or "-" in code:
+        # Extract country part from locale code
+        parts = code.replace("-", "_").split("_")
+        if len(parts) == 2:
+            code = parts[1]  # Take the country part (US from en_US)
+
+    # Look up in the country code map
+    if code in COUNTRY_CODE_MAP:
+        return COUNTRY_CODE_MAP[code]
+
+    # If already a valid 2-letter code in COUNTRIES_WITH_FULL_DATA, use it
+    if code in COUNTRIES_WITH_FULL_DATA:
+        return code
+
+    # Default to US with a warning (or raise an error)
+    raise ValueError(
+        f"Unknown country code: {country!r}. "
+        f"Supported codes: {', '.join(sorted(set(COUNTRY_CODE_MAP.keys())))}"
+    )
+
+
+class LocaleRegistry:
+    """Registry for country data loading and caching."""
+
+    _instance: LocaleRegistry | None = None
+    _cache: dict[str, LocaleData]
+
+    def __new__(cls) -> LocaleRegistry:
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+            cls._instance._cache = {}
+        return cls._instance
+
+    def get(self, country: str) -> LocaleData:
+        """
+        Get country data.
+
+        Parameters
+        ----------
+        country
+            Country code (e.g., "US", "DE", "USA", "DEU").
+            Also accepts legacy locale codes like "en_US" for backwards compatibility.
+
+        Returns
+        -------
+        LocaleData
+            The country data.
+        """
+        # Normalize to 2-letter country code
+        country_code = _normalize_country(country)
+
+        if country_code in self._cache:
+            return self._cache[country_code]
+
+        # Load country data
+        locale_data = self._load_country_data(country_code)
+        self._cache[country_code] = locale_data
+        return locale_data
+
+    def _load_country_data(self, country_code: str) -> LocaleData:
+        """Load country data with shared base data."""
+        locale_data = LocaleData(locale=country_code)
+
+        # Load shared/universal data first (e.g., file extensions, MIME types)
+        shared_data = self._load_country_files("_shared")
+        if shared_data:
+            self._merge_data(locale_data, shared_data)
+
+        # Load country-specific data (overrides shared data)
+        country_data = self._load_country_files(country_code)
+        if country_data:
+            self._merge_data(locale_data, country_data)
+
+        return locale_data
+
+    def _load_country_files(self, country: str) -> dict[str, Any] | None:
+        """Load all data files for a country."""
+        try:
+            data_path = files("pointblank.countries.data") / country
+            if not data_path.is_dir():
+                return None
+
+            result: dict[str, Any] = {}
+            for category in ["person", "address", "company", "internet", "text", "misc"]:
+                file_path = data_path / f"{category}.json"
+                try:
+                    content = file_path.read_text(encoding="utf-8")
+                    result[category] = json.loads(content)
+                except (FileNotFoundError, json.JSONDecodeError):
+                    pass
+
+            return result if result else None
+        except (TypeError, FileNotFoundError):
+            return None
+
+    def _merge_data(self, target: LocaleData, source: dict[str, Any]) -> None:
+        """Merge source data into target LocaleData."""
+        for category, data in source.items():
+            if hasattr(target, category):
+                existing = getattr(target, category)
+                if isinstance(existing, dict) and isinstance(data, dict):
+                    existing.update(data)
+                else:
+                    setattr(target, category, data)
+
+    def clear_cache(self) -> None:
+        """Clear the country data cache."""
+        self._cache.clear()
+
+
+# Default frequency tier weights for weighted sampling.
+# Keys must match the tier names used in tiered data files.
+FREQUENCY_TIERS: dict[str, float] = {
+    "very_common": 0.45,
+    "common": 0.30,
+    "uncommon": 0.20,
+    "rare": 0.05,
+}
+
+_TIER_KEYS = frozenset(FREQUENCY_TIERS)
+
+
+def _is_tiered(data: Any) -> bool:
+    """Return True if *data* is a dict whose keys are frequency tier names."""
+    return isinstance(data, dict) and bool(_TIER_KEYS & set(data.keys()))
+
+
+def _flatten_tiered(data: dict[str, list]) -> list:
+    """Flatten a tiered dict into a single flat list (preserves order by tier)."""
+    items: list = []
+    for tier in FREQUENCY_TIERS:
+        items.extend(data.get(tier, []))
+    return items
+
+
+def _pick_from_tiered(tiered_data: dict[str, list], rng: random.Random) -> Any:
+    """Pick an item from a tiered dict using frequency weights."""
+    available_tiers = [t for t in FREQUENCY_TIERS if t in tiered_data and tiered_data[t]]
+    if not available_tiers:
+        # Fallback: flatten and pick uniformly
+        all_items = [item for tier_list in tiered_data.values() for item in tier_list]
+        return rng.choice(all_items) if all_items else None
+    weights = [FREQUENCY_TIERS[t] for t in available_tiers]
+    chosen_tier = rng.choices(available_tiers, weights=weights, k=1)[0]
+    return rng.choice(tiered_data[chosen_tier])
+
+
+class LocaleGenerator:
+    """
+    Generator for country-specific test data.
+
+    This class provides methods to generate realistic data like names, emails,
+    addresses, etc. based on country-specific patterns and data.
+    """
+
+    def __init__(self, country: str = "US", seed: int | None = None, weighted: bool = True):
+        """
+        Initialize the country data generator.
+
+        Parameters
+        ----------
+        country
+            Country code (e.g., "US", "DE", "USA", "DEU").
+            Also accepts legacy locale codes like "en_US" for backwards compatibility.
+        seed
+            Random seed for reproducibility.
+        weighted
+            When True, names and locations are sampled according to real-world frequency
+            tiers (common names appear far more often than rare names). Only affects data
+            files using the tiered format; flat-list data always uses uniform sampling.
+        """
+        self.country_code = _normalize_country(country)
+        self.rng = random.Random(seed)
+        self.weighted = weighted
+        self._registry = LocaleRegistry()
+        self._data = self._registry.get(self.country_code)
+
+    def seed(self, seed: int) -> None:
+        """Set the random seed."""
+        self.rng.seed(seed)
+
+    # =========================================================================
+    # Person
+    # =========================================================================
+
+    _current_person: dict[str, str] | None = None
+    _row_persons: list[dict[str, str]] | None = None
+
+    def _get_person(self, gender: str | None = None) -> dict[str, str]:
+        """Get a coherent person (first_name, last_name, gender) from the data.
+
+        If person data has `ethnic_groups`, picks a group first (weighted by population share) then
+        draws first and last names from within that group so they remain ethnically coherent.
+        """
+        # If no gender specified, randomly select one (weighted toward male/female)
+        if gender is None:
+            gender = self.rng.choice(["male", "female"])
+
+        # Check for ethnic_groups system
+        ethnic_groups = self._data.person.get("ethnic_groups")
+        if ethnic_groups:
+            return self._get_person_from_ethnic_group(gender, ethnic_groups)
+
+        return {
+            "first_name": self._generate_first_name(gender),
+            "last_name": self._generate_last_name(gender),
+            "gender": gender,
+        }
+
+    def _get_person_from_ethnic_group(self, gender: str, ethnic_groups: dict) -> dict[str, str]:
+        """Pick an ethnic group weighted by population share, then draw names from it."""
+        groups = list(ethnic_groups.keys())
+        weights = [ethnic_groups[g].get("weight", 1.0) for g in groups]
+
+        # Weighted random selection
+        total = sum(weights)
+        r = self.rng.random() * total
+        cumulative = 0.0
+        chosen_group = groups[-1]
+        for g, w in zip(groups, weights):
+            cumulative += w
+            if r <= cumulative:
+                chosen_group = g
+                break
+
+        group_data = ethnic_groups[chosen_group]
+        first_names = group_data.get("first_names", {})
+        last_names = group_data.get("last_names", ["Smith"])
+
+        # Pick first name (gender-aware)
+        if gender in first_names:
+            first_name = self.rng.choice(first_names[gender])
+        else:
+            all_fn = []
+            for cat in first_names.values():
+                if isinstance(cat, list):
+                    all_fn.extend(cat)
+            first_name = self.rng.choice(all_fn) if all_fn else "Alex"
+
+        # Pick last name (may be gendered dict for some groups)
+        if isinstance(last_names, dict):
+            if gender in last_names:
+                last_name = self.rng.choice(last_names[gender])
+            else:
+                all_ln = [n for v in last_names.values() for n in v]
+                last_name = self.rng.choice(all_ln) if all_ln else "Smith"
+        else:
+            last_name = self.rng.choice(last_names)
+
+        return {
+            "first_name": first_name,
+            "last_name": last_name,
+            "gender": gender,
+            "ethnic_group": chosen_group,
+        }
+
+    def _generate_first_name(self, gender: str | None = None) -> str:
+        """Generate a random first name (internal, no caching)."""
+        names = self._data.person.get("first_names", {})
+
+        if gender and gender in names:
+            name_data = names[gender]
+        elif "neutral" in names:
+            # Combine all available names
+            name_data = []
+            for category in ["male", "female", "neutral"]:
+                cat_data = names.get(category, [])
+                if _is_tiered(cat_data):
+                    name_data.extend(_flatten_tiered(cat_data))
+                elif isinstance(cat_data, list):
+                    name_data.extend(cat_data)
+            name_data = name_data if name_data else ["Alex"]
+        else:
+            # Flatten all categories
+            name_data = []
+            for category_names in names.values():
+                if _is_tiered(category_names):
+                    name_data.extend(_flatten_tiered(category_names))
+                elif isinstance(category_names, list):
+                    name_data.extend(category_names)
+            name_data = name_data if name_data else ["Alex"]
+
+        # Tiered weighted sampling
+        if self.weighted and _is_tiered(name_data):
+            return _pick_from_tiered(name_data, self.rng)
+
+        # Flat list (or tiered with weighted=False — flatten first)
+        if _is_tiered(name_data):
+            name_data = _flatten_tiered(name_data)
+
+        return self.rng.choice(name_data)
+
+    def _generate_last_name(self, gender: str | None = None) -> str:
+        """Generate a random last name (internal, no caching).
+
+        If last_names is a dict with 'male'/'female' keys (e.g., IS patronymics), picks from the
+        gender-appropriate list.  Also handles frequency-tiered dicts when ``self.weighted``.
+        """
+        names = self._data.person.get("last_names", ["Smith"])
+
+        # Tiered last names (top-level tiers without gender sub-keys)
+        if _is_tiered(names):
+            if self.weighted:
+                return _pick_from_tiered(names, self.rng)
+            return self.rng.choice(_flatten_tiered(names))
+
+        if isinstance(names, dict):
+            # Gendered last names (e.g., Icelandic patronymics)
+            if gender and gender in names:
+                name_data = names[gender]
+            else:
+                # Flatten all categories
+                all_names = []
+                for cat_names in names.values():
+                    if isinstance(cat_names, list):
+                        all_names.extend(cat_names)
+                    elif _is_tiered(cat_names):
+                        all_names.extend(_flatten_tiered(cat_names))
+                name_data = all_names if all_names else ["Smith"]
+
+            if self.weighted and _is_tiered(name_data):
+                return _pick_from_tiered(name_data, self.rng)
+            if _is_tiered(name_data):
+                name_data = _flatten_tiered(name_data)
+            return self.rng.choice(name_data)
+
+        return self.rng.choice(names)
+
+    def init_row_persons(self, n_rows: int) -> None:
+        """
+        Pre-generate person data for multiple rows to ensure coherence across columns.
+
+        This should be called before generating a dataset with person-related columns. When active,
+        `first_name()`, `last_name()`, `name()`, `email()` will use the person for the current row
+        (set via `set_row()`).
+
+        Parameters
+        ----------
+        n_rows
+            Number of rows to pre-generate persons for.
+        """
+        self._row_persons = [self._get_person() for _ in range(n_rows)]
+
+    def clear_row_persons(self) -> None:
+        """Clear all pre-generated row persons."""
+        self._row_persons = None
+
+    def new_person(self, gender: str | None = None) -> dict[str, str]:
+        """
+        Select a new random person and cache it for coherent generation.
+
+        Call this before generating related person components (first_name, last_name, email) to
+        ensure they all refer to the same person.
+
+        Returns
+        -------
+        dict
+            The selected person with first_name and last_name.
+        """
+        self._current_person = self._get_person(gender)
+        return self._current_person
+
+    def _get_current_person(self) -> dict[str, str]:
+        """Get the current cached person, or select a new one."""
+        # If row persons are active, use those
+        if self._row_persons is not None and self._current_row is not None:
+            return self._row_persons[self._current_row]
+        # Otherwise use single cached person
+        if self._current_person is None:
+            self._current_person = self._get_person()
+        return self._current_person
+
+    def clear_person(self) -> None:
+        """Clear the cached person so the next call will select a new one."""
+        self._current_person = None
+
+    def first_name(self, gender: str | None = None) -> str:
+        """Generate a random first name (coherent with current person context)."""
+        person = self._get_current_person()
+        return person.get("first_name", "Alex")
+
+    def last_name(self) -> str:
+        """Generate a random last name (coherent with current person context)."""
+        person = self._get_current_person()
+        return person.get("last_name", "Smith")
+
+    def name(self, gender: str | None = None) -> str:
+        """Generate a simple full name (first + last, coherent with current person context).
+
+        For names with prefixes (Mr., Ms., Dr., etc.) and occasional suffixes (Jr., III),
+        use name_full() instead.
+        """
+        person = self._get_current_person()
+        first = person.get("first_name", "Alex")
+        last = person.get("last_name", "Smith")
+
+        # Check if locale uses "last first" order (e.g., Japanese)
+        formats = self._data.person.get("name_formats", ["{first_name} {last_name}"])
+        # Use the simplest format (usually first one, which is typically "first last" or "last first")
+        if formats and "{last_name} {first_name}" in formats[0]:
+            return f"{last} {first}"
+        return f"{first} {last}"
+
+    # Maps job titles to the type of professional title they warrant.
+    # The type is then matched against available locale prefixes.
+    # Keys are lowercase job titles; values are title categories.
+    _TITLE_CATEGORY_DOCTOR = "doctor"
+    _TITLE_CATEGORY_PROFESSOR = "professor"
+    _TITLE_CATEGORY_ENGINEER = "engineer"
+    _TITLE_CATEGORY_LAWYER = "lawyer"
+    _TITLE_CATEGORY_ARCHITECT = "architect"
+
+    # Jobs that warrant a "Dr." (or locale equivalent) title
+    _DOCTOR_JOBS: set[str] = {
+        # English
+        "doctor",
+        "physician",
+        "dentist",
+        "pharmacist",
+        "veterinarian",
+        "psychologist",
+        "psychiatrist",
+        "surgeon",
+        # German
+        "arzt",
+        "zahnarzt",
+        "apotheker",
+        "tierarzt",
+        # Italian
+        "medico",
+        "farmacista",
+        "veterinario",
+        # Spanish
+        "médico",
+        "médica",
+        "dentista",
+        "farmacéutico",
+        "farmacéutica",
+        "veterinario",
+        "veterinaria",
+        "psicólogo",
+        "psicóloga",
+        # Portuguese
+        "médico",
+        "dentista",
+        "farmacêutico",
+        # French
+        "médecin",
+        "dentiste",
+        "pharmacien",
+        # Dutch
+        "arts",
+        # Danish
+        "læge",
+        "tandlæge",
+        # Norwegian
+        "lege",
+        # Swedish
+        "läkare",
+        "tandläkare",
+        # Finnish
+        "lääkäri",
+        "hammaslääkäri",
+        # Polish
+        "lekarz",
+        # Turkish
+        "doktor",
+        "diş hekimi",
+        # Hungarian
+        "orvos",
+        # Czech
+        "lékař",
+    }
+
+    # Jobs that warrant a "Prof." (or locale equivalent) title
+    _PROFESSOR_JOBS: set[str] = {
+        # English
+        "professor",
+        "lecturer",
+        "research scientist",
+        # German
+        "professor",
+        "forscher",
+        "wissenschaftler",
+        # Italian
+        "professore",
+        # Spanish
+        "profesor",
+        "profesora",
+        # Portuguese
+        "professor",
+        # Dutch
+        "hoogleraar",
+        # Danish
+        "professor",
+        # Swedish
+        "professor",
+        # Finnish
+        "professori",
+        # Polish
+        "profesor",
+    }
+
+    # Jobs that warrant an "Ing." (or locale equivalent) title — used in IT, AT, CZ, NL
+    _ENGINEER_JOBS: set[str] = {
+        # English
+        "engineer",
+        "mechanical engineer",
+        "electrical engineer",
+        "civil engineer",
+        "chemical engineer",
+        "environmental engineer",
+        "software engineer",
+        # German
+        "ingenieur",
+        # Italian
+        "ingegnere",
+        # Spanish
+        "ingeniero",
+        "ingeniera",
+        # Czech
+        "inženýr",
+    }
+
+    # Jobs that warrant an "Avv." title — Italian lawyers
+    _LAWYER_JOBS: set[str] = {
+        "avvocato",
+        "attorney",
+        "lawyer",
+        "solicitor",
+        "barrister",
+        "rechtsanwalt",
+        "advokat",
+        "advocaat",
+        "abogado",
+        "abogada",
+        "advogado",
+        "avocat",
+    }
+
+    # Jobs that warrant an "Arch." title — Italian architects
+    _ARCHITECT_JOBS: set[str] = {
+        "architetto",
+        "architekt",
+        "architect",
+        "arquitecto",
+        "arquitecta",
+        "arquiteto",
+        "architecte",
+        "arkkitehti",
+        "arkitekt",
+    }
+
+    # Maps title categories to the locale prefixes that represent them.
+    # Each entry is: category -> set of prefix strings that could represent it.
+    _TITLE_PREFIX_MAP: dict[str, set[str]] = {
+        "doctor": {
+            "Dr.",
+            "Dr",
+            "Dott.",
+            "Dott.ssa",
+            "Dra.",
+            "Prof. Dr.",
+            "Mr. dr.",
+            "Prof. dr.",
+            # German field-specific (CH prefix data)
+            "Dr. med.",
+            "Dr. med. dent.",
+            "Dr. med. vet.",
+            "Dr. rer. nat.",
+            "Dr. phil.",
+        },
+        "professor": {
+            "Prof.",
+            "Prof",
+            "Professor",
+            "Prof.ssa",
+            "Pr.",
+            "Prof. Dr.",
+            "Prof. dr.",
+        },
+        "engineer": {"Ing.", "DI", "Ir.", "Bc.", "Dr.-Ing."},
+        "lawyer": {"Avv.", "Lcdo.", "Lcda.", "lic. iur."},
+        "architect": {"Arch."},
+    }
+
+    # Countries where the common honorific (Herr/Frau) is stacked before the
+    # professional title: "Herr Dr. med. Ludwig Fröhlich"
+    _STACKING_COUNTRIES: set[str] = {"DE", "AT", "CH"}
+
+    # German field-specific doctoral-title expansions, keyed by job (lowercase).
+    # Maps specific jobs to the appropriate German doctoral discipline abbreviation.
+    _GERMAN_DOCTOR_FIELDS: dict[str, str] = {
+        # Medical doctors  →  Dr. med.
+        "arzt": "Dr. med.",
+        "doctor": "Dr. med.",
+        "physician": "Dr. med.",
+        "surgeon": "Dr. med.",
+        "psychiatrist": "Dr. med.",
+        "medico": "Dr. med.",
+        "médecin": "Dr. med.",
+        "médico": "Dr. med.",
+        "médica": "Dr. med.",
+        # Dentists  →  Dr. med. dent.
+        "zahnarzt": "Dr. med. dent.",
+        "dentist": "Dr. med. dent.",
+        "dentista": "Dr. med. dent.",
+        "dentiste": "Dr. med. dent.",
+        # Veterinarians  →  Dr. med. vet.
+        "tierarzt": "Dr. med. vet.",
+        "veterinarian": "Dr. med. vet.",
+        "veterinario": "Dr. med. vet.",
+        "veterinaria": "Dr. med. vet.",
+        # Pharmacists  →  Dr. rer. nat.
+        "apotheker": "Dr. rer. nat.",
+        "pharmacist": "Dr. rer. nat.",
+        "farmacista": "Dr. rer. nat.",
+        "farmacéutico": "Dr. rer. nat.",
+        "farmacéutica": "Dr. rer. nat.",
+        "farmacêutico": "Dr. rer. nat.",
+        "pharmacien": "Dr. rer. nat.",
+        # Psychologists  →  Dr. phil.
+        "psychologist": "Dr. phil.",
+        "psychologe": "Dr. phil.",
+        "psicólogo": "Dr. phil.",
+        "psicóloga": "Dr. phil.",
+    }
+
+    def _get_title_for_job(self, job: str, available_prefixes: list[str]) -> tuple[str, str] | None:
+        """Return the appropriate professional title prefix for a job, if available.
+
+        Checks if the current job maps to a title category (doctor, professor, etc.)
+        and whether the locale has a matching prefix in its prefix list.
+
+        Returns a `(prefix, category)` tuple, or `None` if no match (meaning the
+        caller should use default logic).
+        """
+        job_lower = job.lower()
+
+        # Determine which title category this job belongs to
+        category = None
+        if job_lower in self._DOCTOR_JOBS:
+            category = self._TITLE_CATEGORY_DOCTOR
+        elif job_lower in self._PROFESSOR_JOBS:
+            category = self._TITLE_CATEGORY_PROFESSOR
+        elif job_lower in self._ENGINEER_JOBS:
+            category = self._TITLE_CATEGORY_ENGINEER
+        elif job_lower in self._LAWYER_JOBS:
+            category = self._TITLE_CATEGORY_LAWYER
+        elif job_lower in self._ARCHITECT_JOBS:
+            category = self._TITLE_CATEGORY_ARCHITECT
+
+        if category is None:
+            return None
+
+        # Find matching prefixes from the locale's available prefix list
+        valid_prefixes = self._TITLE_PREFIX_MAP.get(category, set())
+        matches = [p for p in available_prefixes if p in valid_prefixes]
+
+        if matches:
+            return (self.rng.choice(matches), category)
+        return None
+
+    def name_full(self, gender: str | None = None) -> str:
+        """Generate a full name with optional prefix and rare suffix.
+
+        Includes honorific prefixes with realistic frequencies:
+        - Common honorifics (Mr., Ms., Mrs., etc.): ~95% of names
+        - Professional titles (Dr., Prof., Rev., etc.): ~5% of names
+
+        When job/company coherence is active and the person's job warrants a
+        professional title (e.g., Doctor → Dr., Professor → Prof.), that title
+        is always used as the prefix.
+
+        Suffixes (Jr., II, III) appear very rarely (~1 in 2000).
+        """
+        person = self._get_current_person()
+        first = person.get("first_name", "Alex")
+        last = person.get("last_name", "Smith")
+
+        # Get gender for prefix selection (from person context or parameter)
+        person_gender = person.get("gender", "neutral")
+        if gender:
+            person_gender = gender
+
+        # Professional titles are rare (~2-3% of population for Dr., ~0.5% for Prof.)
+        # These should appear infrequently
+        professional_titles = {
+            "Dr.",
+            "Dr",
+            "Prof.",
+            "Prof",
+            "Professor",
+            "Rev.",
+            "Pr.",
+            "Prof. Dr.",
+            "Prof. dr.",
+            "Mr. dr.",
+            "Rabbi",
+            "Father",
+            "Sister",
+            "Pastor",
+            "Elder",
+            # Locale-specific professional titles
+            "Dott.",
+            "Dott.ssa",
+            "Prof.ssa",
+            "Ing.",
+            "Avv.",
+            "Arch.",
+            "Mag.",
+            "DI",
+            "Ir.",
+            "Bc.",
+            "Mgr.",
+            "Dra.",
+            "Lcdo.",
+            "Lcda.",
+            # German field-specific doctoral titles (e.g. CH prefix data)
+            "Dr. med.",
+            "Dr. med. dent.",
+            "Dr. med. vet.",
+            "Dr. rer. nat.",
+            "Dr. phil.",
+            "Dr.-Ing.",
+            "lic. iur.",
+        }
+
+        # Get prefix based on gender from locale data
+        # If person belongs to an ethnic group with its own prefixes, use those
+        prefixes = self._data.person.get("prefixes", {})
+        ethnic_group_name = person.get("ethnic_group")
+        if ethnic_group_name:
+            ethnic_groups = self._data.person.get("ethnic_groups", {})
+            group_data = ethnic_groups.get(ethnic_group_name, {})
+            group_prefixes = group_data.get("prefixes")
+            if group_prefixes:
+                prefixes = group_prefixes
+
+        prefix_list = prefixes.get(person_gender, prefixes.get("neutral", []))
+
+        # Separate common honorifics and professional titles from locale data
+        locale_common = [p for p in prefix_list if p not in professional_titles]
+        locale_professional = [p for p in prefix_list if p in professional_titles]
+
+        # Check if employer coherence is active and the job warrants a title
+        title_result = None
+        employer = self._get_current_employer()
+        current_job = ""
+        if employer is not None:
+            current_job = employer.get("job", "")
+            title_result = self._get_title_for_job(current_job, locale_professional)
+
+        # Select prefix
+        if title_result is not None:
+            job_title_prefix, title_category = title_result
+
+            # In German-speaking countries the common honorific (Herr/Frau) is
+            # stacked in front of the professional title, and doctor-category
+            # titles are expanded with their discipline: "Herr Dr. med. Ludwig"
+            if self.country_code in self._STACKING_COUNTRIES:
+                # Expand Dr. to field-specific variant for doctor-category titles
+                if title_category == self._TITLE_CATEGORY_DOCTOR:
+                    job_title_prefix = self._GERMAN_DOCTOR_FIELDS.get(
+                        current_job.lower(), job_title_prefix
+                    )
+                # Prepend the common honorific (Herr / Frau)
+                if locale_common:
+                    common = self.rng.choice(locale_common)
+                    prefix = f"{common} {job_title_prefix}"
+                else:
+                    prefix = job_title_prefix
+            else:
+                prefix = job_title_prefix
+        elif locale_professional and self.rng.random() < 0.05:
+            # Random professional title (~5% chance when no job coherence)
+            prefix = self.rng.choice(locale_professional)
+        elif locale_common:
+            prefix = self.rng.choice(locale_common)
+        else:
+            # Fallback defaults if no common prefixes in locale
+            fallback = {"male": "Mr.", "female": "Ms.", "neutral": "Mr."}
+            prefix = fallback.get(person_gender, "")
+
+        # Get suffix - very rare (approximately 1/2000 chance)
+        suffix = ""
+        if self.rng.random() < 0.0005:  # 1 in 2000
+            suffixes = self._data.person.get("suffixes", [])
+            # Filter out empty strings
+            suffixes = [s for s in suffixes if s]
+            if suffixes:
+                suffix = self.rng.choice(suffixes)
+
+        # Check if locale uses "last first" order (e.g., Japanese)
+        formats = self._data.person.get("name_formats", ["{first_name} {last_name}"])
+        if formats and "{last_name} {first_name}" in formats[0]:
+            # For "last first" cultures, prefix typically comes before everything
+            parts = [prefix, last, first] if prefix else [last, first]
+        else:
+            parts = [prefix, first, last] if prefix else [first, last]
+
+        if suffix:
+            parts.append(suffix)
+
+        return " ".join(parts)
+
+    # =========================================================================
+    # Address
+    # =========================================================================
+
+    _current_location: dict[str, str] | None = None
+    _row_locations: list[dict[str, str]] | None = None
+    _current_row: int | None = None
+
+    def _get_location(self) -> dict[str, str]:
+        """Get a coherent location (city, state, postcode_prefix) from the data."""
+        locations = self._data.address.get("locations", [])
+
+        # Tiered locations
+        if _is_tiered(locations):
+            if self.weighted:
+                loc = _pick_from_tiered(locations, self.rng)
+                if loc is not None:
+                    return loc
+            else:
+                flat = _flatten_tiered(locations)
+                if flat:
+                    return self.rng.choice(flat)
+
+        elif locations:
+            return self.rng.choice(locations)
+
+        # Fallback for old-style data
+        return {
+            "city": "Springfield",
+            "state": "State",
+            "state_abbr": "ST",
+            "postcode_prefix": "000",
+        }
+
+    def init_row_locations(self, n_rows: int) -> None:
+        """
+        Pre-generate locations for multiple rows to ensure coherence across columns.
+
+        This should be called before generating a dataset with address-related columns.
+        When active, city(), state(), postcode() etc. will use the location for the
+        current row (set via set_row()).
+
+        Parameters
+        ----------
+        n_rows
+            Number of rows to pre-generate locations for.
+        """
+        self._row_locations = [self._get_location() for _ in range(n_rows)]
+        self._current_row = None
+
+    def set_row(self, row_index: int) -> None:
+        """
+        Set the current row index for location-based generation.
+
+        When row locations are initialized, this sets which row's location to use.
+
+        Parameters
+        ----------
+        row_index
+            The row index (0-based).
+        """
+        self._current_row = row_index
+
+    def clear_row_locations(self) -> None:
+        """Clear all pre-generated row locations."""
+        self._row_locations = None
+        self._current_row = None
+
+    def new_location(self) -> dict[str, str]:
+        """
+        Select a new random location and cache it for coherent address generation.
+
+        Call this before generating related address components (city, state, postcode)
+        to ensure they all refer to the same location.
+
+        Returns
+        -------
+        dict
+            The selected location with city, state, state_abbr, and postcode_prefix.
+        """
+        self._current_location = self._get_location()
+        return self._current_location
+
+    def _get_current_location(self) -> dict[str, str]:
+        """Get the current cached location, or select a new one."""
+        # If row locations are active, use those
+        if self._row_locations is not None and self._current_row is not None:
+            return self._row_locations[self._current_row]
+        # Otherwise use single cached location
+        if self._current_location is None:
+            self._current_location = self._get_location()
+        return self._current_location
+
+    def clear_location(self) -> None:
+        """Clear the cached location so the next call will select a new one."""
+        self._current_location = None
+
+    def city(self) -> str:
+        """Generate a random city name (coherent with current location context).
+
+        Returns the exonym (English name) if available, otherwise the native city name.
+        This allows addresses to use native names while city presets use international names.
+        """
+        location = self._get_current_location()
+        # Prefer exonym (English name) for standalone city preset
+        return location.get("exonym", location.get("city", "Springfield"))
+
+    def _city_native(self) -> str:
+        """Get the native city name (used internally for addresses).
+
+        Always returns the native name, ignoring any exonym.
+        """
+        location = self._get_current_location()
+        return location.get("city", "Springfield")
+
+    def state(self, abbr: bool = False) -> str:
+        """Generate a random state/province name (coherent with current location context)."""
+        location = self._get_current_location()
+        if abbr:
+            return location.get("state_abbr", "ST")
+        return location.get("state", "State")
+
+    def country(self) -> str:
+        """Generate the country name for this locale."""
+        return self._data.address.get("country", "United States")
+
+    def country_name(self) -> str:
+        """Generate the standardized English country name for this locale.
+
+        Uses the `COUNTRY_INFO` mapping to return a clean, standardized English name.
+        Falls back to the address data country name if the code is not found in the mapping.
+        """
+        info = COUNTRY_INFO.get(self.country_code)
+        if info is not None:
+            return info[1]
+        return self._data.address.get("country", "United States")
+
+    def country_code_2(self) -> str:
+        """Generate the ISO 3166-1 alpha-2 (2-letter) country code for this locale."""
+        return self.country_code
+
+    def country_code_3(self) -> str:
+        """Generate the ISO 3166-1 alpha-3 (3-letter) country code for this locale.
+
+        Uses the `COUNTRY_INFO` mapping to look up the 3-letter code from the
+        locale's 2-letter code.
+        """
+        info = COUNTRY_INFO.get(self.country_code)
+        if info is not None:
+            return info[0]
+        # Fallback: try reverse lookup in COUNTRY_CODE_MAP for a 3-letter entry
+        for code, normalized in COUNTRY_CODE_MAP.items():
+            if normalized == self.country_code and len(code) == 3:
+                return code
+        return self.country_code
+
+    def postcode(self) -> str:
+        """Generate a random postal code (coherent with current location context)."""
+        location = self._get_current_location()
+        prefix = location.get("postcode_prefix", "")
+        postcode_format = self._data.address.get("postcode_format", "")
+
+        # Handle template-based postcode formats (e.g., GB)
+        if "{" in postcode_format:
+            district = str(self.rng.randint(1, 9))
+            if self.rng.random() < 0.3:
+                district += self.rng.choice("ABCDEFGHJKLMNPRSTUW")
+            sector = str(self.rng.randint(0, 9))
+            unit = "".join(self.rng.choice("ABDEFGHJLNPQRSTUWXYZ") for _ in range(2))
+            return postcode_format.format(
+                postcode_prefix=prefix,
+                postcode_district=district,
+                postcode_sector=sector,
+                postcode_unit=unit,
+            )
+
+        # If format uses pattern characters (? for letter, # for digit), generate accordingly
+        if "?" in postcode_format or "#" in postcode_format:
+            # Generate the full postcode from the format pattern
+            # Replace ? with random uppercase letter, # with random digit
+            result = []
+            prefix_idx = 0
+            for char in postcode_format:
+                if char == "?":
+                    # Use prefix character if available, otherwise random letter
+                    if prefix_idx < len(prefix) and prefix[prefix_idx].isalpha():
+                        result.append(prefix[prefix_idx])
+                        prefix_idx += 1
+                    else:
+                        result.append(self.rng.choice("ABCDEFGHIJKLMNOPQRSTUVWXYZ"))
+                elif char == "#":
+                    # Use prefix character if available, otherwise random digit
+                    if prefix_idx < len(prefix) and prefix[prefix_idx].isdigit():
+                        result.append(prefix[prefix_idx])
+                        prefix_idx += 1
+                    else:
+                        result.append(str(self.rng.randint(0, 9)))
+                else:
+                    # Keep literal characters (spaces, dashes, etc.)
+                    result.append(char)
+            return "".join(result)
+
+        # Default: append digits to complete the postal code
+        remaining = 5 - len(prefix)
+        suffix = "".join(str(self.rng.randint(0, 9)) for _ in range(remaining))
+        return prefix + suffix
+
+    def street_name(self) -> str:
+        """Generate a random street name.
+
+        If the locale has `streets_by_city`, use city-specific streets.
+        Otherwise, fall back to combining `street_names` and `street_suffixes`.
+        """
+        # Check if locale uses city-specific streets
+        streets_by_city = self._data.address.get("streets_by_city")
+        if streets_by_city:
+            # Get current city from location
+            location = self._get_current_location()
+            city = location.get("city", "")
+            city_streets = streets_by_city.get(city)
+            if city_streets:
+                return self.rng.choice(city_streets)
+
+        # Fall back to old street_names + street_suffixes approach
+        names = self._data.address.get("street_names", ["Main"])
+        suffixes = self._data.address.get("street_suffixes", ["St"])
+        return f"{self.rng.choice(names)} {self.rng.choice(suffixes)}"
+
+    def building_number(self) -> str:
+        """Generate a random building number."""
+        max_num = self._data.address.get("building_number_max", 9999)
+        return str(self.rng.randint(1, max_num))
+
+    def address(self) -> str:
+        """Generate a full coherent address (city, state, postcode are consistent)."""
+        # Only select a new location if row locations are not active
+        # This ensures coherence with other address-related columns (city, state, etc.)
+        using_row_context = self._row_locations is not None and self._current_row is not None
+        if not using_row_context:
+            self.new_location()
+
+        formats = self._data.address.get(
+            "address_formats",
+            ["{building_number} {street}, {city}, {state} {postcode}"],
+        )
+        fmt = self.rng.choice(formats)
+
+        result = fmt.format(
+            building_number=self.building_number(),
+            street=self.street_name(),
+            city=self._city_native(),  # Use native name in addresses
+            state=self.state(abbr=False),
+            state_abbr=self.state(abbr=True),
+            postcode=self.postcode(),
+            country=self.country(),
+            unit=str(self.rng.randint(1, 999)),
+        )
+
+        # Clear location after generating full address (only if we set it)
+        if not using_row_context:
+            self.clear_location()
+        return result
+
+    def phone_number(self) -> str:
+        """Generate a phone number with area code matching the current location's state."""
+        location = self._get_current_location()
+        state = location.get("state", "California")
+
+        # Get area codes for this state
+        area_codes = self._data.address.get("phone_area_codes", {})
+        state_codes = area_codes.get(state, ["555"])  # 555 is fictional fallback
+        area_code = self.rng.choice(state_codes)
+
+        # Use country-specific phone format if available
+        phone_format = self._data.address.get("phone_format", "({area_code}) ###-####")
+
+        # Substitute {area_code} and replace # with random digits
+        result = phone_format.replace("{area_code}", area_code)
+        chars = []
+        for ch in result:
+            if ch == "#":
+                chars.append(str(self.rng.randint(0, 9)))
+            else:
+                chars.append(ch)
+        return "".join(chars)
+
+    def latitude(self) -> str:
+        """Generate a random latitude (bounded by current location if available)."""
+        location = self._get_current_location()
+        lat_min = location.get("lat_min", -90)
+        lat_max = location.get("lat_max", 90)
+        return f"{self.rng.uniform(lat_min, lat_max):.6f}"
+
+    def longitude(self) -> str:
+        """Generate a random longitude (bounded by current location if available)."""
+        location = self._get_current_location()
+        lon_min = location.get("lon_min", -180)
+        lon_max = location.get("lon_max", 180)
+        return f"{self.rng.uniform(lon_min, lon_max):.6f}"
+
+    # =========================================================================
+    # Company / Employer coherence
+    # =========================================================================
+
+    _row_employers: list[dict[str, str]] | None = None
+
+    def _pick_industry(self) -> dict | None:
+        """Pick a random industry weighted by its weight, or None if no industries data."""
+        industries = self._data.company.get("industries", [])
+        if not industries:
+            return None
+
+        weights = [ind.get("weight", 1.0) for ind in industries]
+        total = sum(weights)
+        r = self.rng.random() * total
+        cumulative = 0.0
+        for ind in industries:
+            cumulative += ind.get("weight", 1.0)
+            if r <= cumulative:
+                return ind
+        return industries[-1]
+
+    def _get_employer(self) -> dict[str, str]:
+        """Generate a coherent employer: pick an industry, then job + company from it."""
+        industry = self._pick_industry()
+        if industry is None:
+            # No industries data — fall back to independent generation
+            return {
+                "job": self._generate_job_standalone(),
+                "company": self._generate_company_standalone(),
+                "industry": "general",
+            }
+
+        # Pick a job from this industry
+        jobs = industry.get("jobs", [])
+        job = self.rng.choice(jobs) if jobs else self._generate_job_standalone()
+
+        # Pick a company appropriate for this industry
+        company = self._generate_company_for_industry(industry)
+
+        return {
+            "job": job,
+            "company": company,
+            "industry": industry.get("name", "general"),
+        }
+
+    def _generate_company_for_industry(self, industry: dict) -> str:
+        """Generate a company name appropriate for the given industry.
+
+        Uses a mix of well-known companies (with city preference), industry-specific
+        local formats (using location context), and generic fictional names.
+        """
+        well_known_names = industry.get("well_known", [])
+
+        # 20% chance to use a well-known company from this industry
+        if well_known_names and self.rng.random() < 0.20:
+            # Resolve well-known names against the full well_known_companies list
+            # to get city data for location-aware selection
+            well_known_all = self._data.company.get("well_known_companies", [])
+            well_known_map = {}
+            for wk in well_known_all:
+                name = wk.get("name") if isinstance(wk, dict) else wk
+                cities = wk.get("cities", []) if isinstance(wk, dict) else []
+                well_known_map[name] = cities
+
+            # Get current city if location context is active
+            current_city = None
+            if self._row_locations is not None and self._current_row is not None:
+                current_city = self._row_locations[self._current_row].get("city")
+
+            # Prefer companies in the current city
+            city_companies = []
+            for name in well_known_names:
+                cities = well_known_map.get(name, [])
+                if current_city and current_city in cities:
+                    city_companies.append(name)
+
+            if city_companies and self.rng.random() < 0.7:
+                return self.rng.choice(city_companies)
+            else:
+                return self.rng.choice(well_known_names)
+
+        # 80% chance: generate a fictional company using industry-specific formats
+        return self._generate_fictional_company_for_industry(industry)
+
+    def _generate_fictional_company_for_industry(self, industry: dict) -> str:
+        """Generate a fictional company name using industry-specific templates."""
+        # Use industry-specific formats, falling back to general formats
+        formats = industry.get("company_formats", [])
+        if not formats:
+            formats = self._data.company.get("formats", ["{last_name} {suffix}"])
+        fmt = self.rng.choice(formats)
+
+        # Get industry-specific or general word pools
+        suffixes = industry.get("company_suffixes", [])
+        if not suffixes:
+            suffixes = self._data.company.get("suffixes", ["Inc", "LLC", "Corp"])
+        nouns = industry.get("company_nouns", [])
+        if not nouns:
+            nouns = self._data.company.get("nouns", ["Solutions", "Systems"])
+        adjectives = self._data.company.get("adjectives", ["Global", "Advanced"])
+
+        # Resolve location-based placeholders
+        location = self._get_current_location()
+        city = location.get("city", "Springfield")
+        # Prefer exonym for company names
+        exonym = location.get("exonym")
+        if exonym:
+            city = exonym
+        state = location.get("state", "State")
+
+        # Handle {city} and {state} placeholders first
+        result = fmt.replace("{city}", city).replace("{state}", state)
+
+        # Now handle standard company name placeholders
+        result = self._fill_company_placeholders(result, suffixes, adjectives, nouns)
+
+        return result
+
+    def _fill_company_placeholders(
+        self, fmt: str, suffixes: list[str], adjectives: list[str], nouns: list[str]
+    ) -> str:
+        """Fill standard company name placeholders ({last_name}, {adjective}, {noun}, {suffix})."""
+
+        # Helper to pick distinct values from a list
+        def _pick_distinct(values: list[str], count: int) -> list[str]:
+            picked: list[str] = []
+            for _ in range(count):
+                val = self.rng.choice(values)
+                attempts = 0
+                while val in picked and attempts < 10:
+                    val = self.rng.choice(values)
+                    attempts += 1
+                picked.append(val)
+            return picked
+
+        # Count how many of each placeholder are in the format
+        last_name_count = fmt.count("{last_name}")
+        adjective_count = fmt.count("{adjective}")
+        noun_count = fmt.count("{noun}")
+
+        # Generate distinct values for repeated placeholders
+        distinct_last_names = (
+            _pick_distinct(
+                [self._generate_last_name() for _ in range(max(last_name_count * 3, 5))],
+                last_name_count,
+            )
+            if last_name_count > 0
+            else []
+        )
+        distinct_adjectives = (
+            _pick_distinct(adjectives, adjective_count) if adjective_count > 0 else []
+        )
+        distinct_nouns = _pick_distinct(nouns, noun_count) if noun_count > 0 else []
+
+        # Replace placeholders one at a time for each category
+        result = fmt
+        for name in distinct_last_names:
+            result = result.replace("{last_name}", name, 1)
+        for adj in distinct_adjectives:
+            result = result.replace("{adjective}", adj, 1)
+        for noun in distinct_nouns:
+            result = result.replace("{noun}", noun, 1)
+
+        # Replace remaining single-instance placeholders
+        if "{suffix}" in result:
+            suffix = self.rng.choice(suffixes)
+            # Avoid repeating any word already in the name as the suffix
+            existing_words = set(result.replace("{suffix}", "").split())
+            if suffix in existing_words:
+                alt = [s for s in suffixes if s not in existing_words]
+                if alt:
+                    suffix = self.rng.choice(alt)
+            return result.format(suffix=suffix)
+        return result
+
+    def init_row_employers(self, n_rows: int) -> None:
+        """
+        Pre-generate employer data for multiple rows to ensure job/company coherence.
+
+        This should be called before generating a dataset with both job and company columns.
+        When active, job() and company() will use the employer for the current row
+        (set via set_row()).
+
+        Must be called AFTER init_row_locations() so that company name templates
+        (e.g., "{city} General Hospital") use the correct location for each row.
+
+        Parameters
+        ----------
+        n_rows
+            Number of rows to pre-generate employers for.
+        """
+        employers = []
+        for i in range(n_rows):
+            # Temporarily set the row index so _get_current_location() returns
+            # the correct location for this row's employer
+            self._current_row = i
+            employers.append(self._get_employer())
+        self._current_row = None
+        self._row_employers = employers
+
+    def clear_row_employers(self) -> None:
+        """Clear all pre-generated row employers."""
+        self._row_employers = None
+
+    def _get_current_employer(self) -> dict[str, str] | None:
+        """Get the current cached employer for the active row, or None if not active."""
+        if self._row_employers is not None and self._current_row is not None:
+            return self._row_employers[self._current_row]
+        return None
+
+    # =========================================================================
+    # Company (public methods)
+    # =========================================================================
+
+    def company(self) -> str:
+        """Generate a random company name.
+
+        When employer coherence is active (both job and company columns in the dataset),
+        returns the company from the pre-generated employer for this row.
+
+        Otherwise, has a ~15% chance to return a well-known company name (with preference
+        for companies that have offices in the current city), and generates a fictional
+        company name the rest of the time.
+        """
+        # If employer coherence is active, use the pre-generated company
+        employer = self._get_current_employer()
+        if employer is not None:
+            return employer["company"]
+
+        # No coherence: standalone generation
+        return self._generate_company_standalone()
+
+    def _generate_company_standalone(self) -> str:
+        """Generate a company name without employer coherence (original behavior)."""
+        # 15% chance to use a well-known company
+        if self.rng.random() < 0.15:
+            well_known = self._data.company.get("well_known_companies", [])
+            if well_known:
+                # Get current city if location context is active
+                current_city = None
+                if self._row_locations is not None and self._current_row is not None:
+                    current_city = self._row_locations[self._current_row].get("city")
+
+                # Collect all companies, preferring those in the current city
+                city_companies = []
+                all_companies = []
+
+                for company in well_known:
+                    name = company.get("name") if isinstance(company, dict) else company
+                    cities = company.get("cities", []) if isinstance(company, dict) else []
+                    all_companies.append(name)
+                    if current_city and current_city in cities:
+                        city_companies.append(name)
+
+                # 70% chance to use city-relevant company if available
+                if city_companies and self.rng.random() < 0.7:
+                    return self.rng.choice(city_companies)
+                elif all_companies:
+                    return self.rng.choice(all_companies)
+
+        # Generate a fictional company name
+        formats = self._data.company.get("formats", ["{last_name} {suffix}"])
+        fmt = self.rng.choice(formats)
+
+        suffixes = self._data.company.get("suffixes", ["Inc", "LLC", "Corp"])
+        adjectives = self._data.company.get("adjectives", ["Global", "Advanced"])
+        nouns = self._data.company.get("nouns", ["Solutions", "Systems"])
+
+        return self._fill_company_placeholders(fmt, suffixes, adjectives, nouns)
+
+    def job(self) -> str:
+        """Generate a random job title.
+
+        When employer coherence is active (both job and company columns in the dataset),
+        returns the job from the pre-generated employer for this row.
+        """
+        # If employer coherence is active, use the pre-generated job
+        employer = self._get_current_employer()
+        if employer is not None:
+            return employer["job"]
+
+        # No coherence: standalone generation
+        return self._generate_job_standalone()
+
+    def _generate_job_standalone(self) -> str:
+        """Generate a job title without employer coherence (original behavior)."""
+        jobs = self._data.company.get("jobs", ["Manager"])
+        return self.rng.choice(jobs)
+
+    def catch_phrase(self) -> str:
+        """Generate a random business catch phrase."""
+        adjectives = self._data.company.get("catch_phrase_adjectives", ["Innovative", "Dynamic"])
+        nouns = self._data.company.get("catch_phrase_nouns", ["solutions", "paradigms"])
+        verbs = self._data.company.get("catch_phrase_verbs", ["deliver", "leverage"])
+        connector = self._data.company.get("catch_phrase_connector", "that")
+        return f"{self.rng.choice(adjectives)} {self.rng.choice(nouns)} {connector} {self.rng.choice(verbs)}"
+
+    # =========================================================================
+    # Internet
+    # =========================================================================
+
+    def email(self) -> str:
+        """Generate a random email address (coherent with current person context)."""
+        # Get person data - uses cached person if available
+        person = self._get_current_person()
+        first = person.get("first_name", "user").lower()
+        last = person.get("last_name", "name").lower()
+        domains = self._data.internet.get("free_email_domains", ["gmail.com", "outlook.com"])
+
+        # Transliterate to ASCII for valid email addresses
+        first = _transliterate_to_ascii(first)
+        last = _transliterate_to_ascii(last)
+
+        # Clean names for email (remove non-alphanumeric)
+        first = "".join(c for c in first if c.isalnum())
+        last = "".join(c for c in last if c.isalnum())
+
+        # Various realistic email patterns
+        patterns = [
+            f"{first}.{last}",  # john.smith
+            f"{first}{last}",  # johnsmith
+            f"{first}_{last}",  # john_smith
+            f"{first[0]}{last}",  # jsmith
+            f"{first}{self.rng.randint(1, 999)}",  # john123
+            f"{first[0]}{last}{self.rng.randint(1, 99)}",  # jsmith42
+            f"{first}.{last}{self.rng.randint(1, 99)}",  # john.smith99
+            f"{first[0]}_{last}",  # j_smith
+        ]
+
+        return f"{self.rng.choice(patterns)}@{self.rng.choice(domains)}"
+
+    def user_name(self) -> str:
+        """Generate a random username (coherent with current person context)."""
+        # Get person data - uses cached person if available
+        person = self._get_current_person()
+        first = person.get("first_name", "user").lower()
+        last = person.get("last_name", "name").lower()
+
+        # Transliterate to ASCII for valid usernames
+        first = _transliterate_to_ascii(first)
+        last = _transliterate_to_ascii(last)
+
+        # Clean names
+        first = "".join(c for c in first if c.isalnum())
+        last = "".join(c for c in last if c.isalnum())
+
+        patterns = [
+            f"{first}{last}",
+            f"{first}_{last}",
+            f"{first}{self.rng.randint(1, 999)}",
+            f"{first[0]}{last}{self.rng.randint(1, 99)}",
+        ]
+
+        return self.rng.choice(patterns)
+
+    def password(self, length: int = 12) -> str:
+        """Generate a random password."""
+        import string
+
+        chars = string.ascii_letters + string.digits + "!@#$%^&*"
+        return "".join(self.rng.choice(chars) for _ in range(length))
+
+    def url(self) -> str:
+        """Generate a random URL."""
+        protocols = ["https://"]
+        tlds = self._data.internet.get("tlds", ["com", "org", "net"])
+        words = self._data.text.get("words", ["example", "test", "sample"])
+
+        domain = _transliterate_to_ascii(self.rng.choice(words).lower())
+        domain = "".join(c for c in domain if c.isalnum())
+
+        return f"{self.rng.choice(protocols)}www.{domain}.{self.rng.choice(tlds)}"
+
+    def domain_name(self) -> str:
+        """Generate a random domain name."""
+        tlds = self._data.internet.get("tlds", ["com", "org", "net"])
+        words = self._data.text.get("words", ["example", "test", "sample"])
+
+        domain = _transliterate_to_ascii(self.rng.choice(words).lower())
+        domain = "".join(c for c in domain if c.isalnum())
+
+        return f"{domain}.{self.rng.choice(tlds)}"
+
+    def ipv4(self) -> str:
+        """Generate a random IPv4 address."""
+        return ".".join(str(self.rng.randint(0, 255)) for _ in range(4))
+
+    def ipv6(self) -> str:
+        """Generate a random IPv6 address."""
+        return ":".join(f"{self.rng.randint(0, 65535):04x}" for _ in range(8))
+
+    # =========================================================================
+    # Text
+    # =========================================================================
+
+    def word(self) -> str:
+        """Generate a random word."""
+        words = self._data.text.get("words", ["lorem", "ipsum", "dolor"])
+        return self.rng.choice(words)
+
+    def sentence(self, num_words: int | None = None) -> str:
+        """Generate a random sentence."""
+        if num_words is None:
+            num_words = self.rng.randint(5, 15)
+
+        words: list[str] = []
+        for _ in range(num_words):
+            w = self.word()
+            # Avoid consecutive duplicate words
+            if words and w.lower() == words[-1].lower():
+                # Draw a replacement (try up to 5 times)
+                for _ in range(5):
+                    w = self.word()
+                    if w.lower() != words[-1].lower():
+                        break
+            words.append(w)
+        words[0] = words[0].capitalize()
+        return " ".join(words) + "."
+
+    def paragraph(self, num_sentences: int | None = None) -> str:
+        """Generate a random paragraph."""
+        if num_sentences is None:
+            num_sentences = self.rng.randint(3, 7)
+
+        return " ".join(self.sentence() for _ in range(num_sentences))
+
+    def text(self, max_chars: int = 200) -> str:
+        """Generate random text up to max_chars."""
+        result = []
+        current_length = 0
+
+        while current_length < max_chars:
+            sentence = self.sentence()
+            if current_length + len(sentence) + 1 > max_chars:
+                break
+            result.append(sentence)
+            current_length += len(sentence) + 1
+
+        return " ".join(result) if result else self.sentence()[:max_chars]
+
+    # =========================================================================
+    # Financial
+    # =========================================================================
+
+    def credit_card_number(self) -> str:
+        """Generate a random credit card number (not valid for transactions)."""
+        # Generate a 16-digit number with valid Luhn checksum
+        prefix = self.rng.choice(["4", "5", "37", "6011"])  # Visa, MC, Amex, Discover
+        length = 15 if prefix == "37" else 16
+
+        # Generate digits (minus check digit)
+        digits = list(prefix)
+        while len(digits) < length - 1:
+            digits.append(str(self.rng.randint(0, 9)))
+
+        # Calculate Luhn check digit
+        check_digit = self._luhn_checksum(digits)
+        digits.append(str(check_digit))
+
+        return "".join(digits)
+
+    def _luhn_checksum(self, digits: list[str]) -> int:
+        """Calculate Luhn check digit for a partial card number.
+
+        The check digit is appended to make the full number pass the Luhn algorithm.
+        We process from right to left, doubling every second digit starting from
+        the rightmost digit of the partial number (since the check digit will be
+        at position 0 and won't be doubled).
+        """
+        nums = [int(d) for d in digits]
+        total = 0
+        for i, d in enumerate(reversed(nums)):
+            if i % 2 == 0:  # These positions get doubled (check digit at pos 0 won't be)
+                d = d * 2
+                if d > 9:
+                    d -= 9
+            total += d
+        return (10 - (total % 10)) % 10
+
+    # IBAN total lengths (ISO 13616) by country code
+    _IBAN_LENGTHS: dict[str, int] = {
+        "AE": 23,
+        "AT": 20,
+        "AU": 22,
+        "BE": 16,
+        "BG": 22,
+        "BR": 29,
+        "CA": 22,
+        "CH": 21,
+        "CL": 22,
+        "CN": 22,
+        "CO": 22,
+        "CY": 28,
+        "CZ": 24,
+        "DE": 22,
+        "DK": 18,
+        "EE": 20,
+        "ES": 24,
+        "FI": 18,
+        "FR": 27,
+        "GB": 22,
+        "GR": 27,
+        "HK": 22,
+        "HR": 21,
+        "HU": 28,
+        "ID": 22,
+        "IE": 22,
+        "IN": 22,
+        "IS": 26,
+        "IT": 27,
+        "JP": 22,
+        "KR": 22,
+        "LT": 20,
+        "LU": 20,
+        "LV": 21,
+        "MT": 31,
+        "MX": 22,
+        "NL": 18,
+        "NO": 15,
+        "NZ": 22,
+        "PH": 22,
+        "PL": 28,
+        "PT": 25,
+        "RO": 24,
+        "RU": 22,
+        "SE": 24,
+        "SG": 22,
+        "SI": 19,
+        "SK": 24,
+        "TR": 26,
+        "TW": 22,
+        "US": 22,
+        "ZA": 22,
+    }
+
+    def iban(self) -> str:
+        """Generate a random IBAN with correct country-specific length."""
+        country = self._data.address.get("country_code", "US")
+
+        # Total length includes 2-char country + 2-char check digits + BBAN
+        total_len = self._IBAN_LENGTHS.get(country, 22)
+        bban_len = total_len - 4  # subtract country code (2) + check digits (2)
+
+        check_digits = f"{self.rng.randint(10, 99)}"
+        bban = "".join(str(self.rng.randint(0, 9)) for _ in range(bban_len))
+
+        return f"{country}{check_digits}{bban}"
+
+    def currency_code(self) -> str:
+        """Generate a random currency code."""
+        codes = self._data.misc.get("currency_codes", ["USD", "EUR", "GBP", "JPY", "CNY"])
+        return self.rng.choice(codes)
+
+    # =========================================================================
+    # Identifiers
+    # =========================================================================
+
+    def uuid4(self) -> str:
+        """Generate a random UUID4."""
+        # Use our RNG to generate deterministic UUIDs
+        hex_chars = "0123456789abcdef"
+        parts = [
+            "".join(self.rng.choice(hex_chars) for _ in range(8)),
+            "".join(self.rng.choice(hex_chars) for _ in range(4)),
+            "4" + "".join(self.rng.choice(hex_chars) for _ in range(3)),  # Version 4
+            self.rng.choice("89ab")
+            + "".join(self.rng.choice(hex_chars) for _ in range(3)),  # Variant
+            "".join(self.rng.choice(hex_chars) for _ in range(12)),
+        ]
+        return "-".join(parts)
+
+    def md5(self) -> str:
+        """Generate a random MD5 hash string (32 hex characters)."""
+        hex_chars = "0123456789abcdef"
+        return "".join(self.rng.choice(hex_chars) for _ in range(32))
+
+    def sha1(self) -> str:
+        """Generate a random SHA-1 hash string (40 hex characters)."""
+        hex_chars = "0123456789abcdef"
+        return "".join(self.rng.choice(hex_chars) for _ in range(40))
+
+    def sha256(self) -> str:
+        """Generate a random SHA-256 hash string (64 hex characters)."""
+        hex_chars = "0123456789abcdef"
+        return "".join(self.rng.choice(hex_chars) for _ in range(64))
+
+    def ssn(self) -> str:
+        """Generate a random SSN-like identifier."""
+        # US format: XXX-XX-XXXX
+        fmt = self._data.misc.get("ssn_format", "###-##-####")
+        return self._generate_from_format(fmt)
+
+    # License plate letters — I, O, Q, U are excluded to avoid confusion
+    # with 1, 0, and V (standard practice across most jurisdictions)
+    _PLATE_LETTERS = "ABCDEFGHJKLMNPRSTVWXYZ"
+
+    # Province/state-specific license plate formats.
+    # Keys are state_abbr values from the location data.
+    # Format chars: ? = letter (restricted), # = digit, literal chars kept as-is.
+    # A tuple value means one format is chosen at random (for provinces with variants).
+
+    _CA_PLATE_FORMATS: dict[str, str | tuple[str, ...]] = {
+        "AB": "???-####",  # Alberta: ABC-1234 (7 chars)
+        "BC": "??# ##?",  # British Columbia: AB1 23C
+        "MB": "??? ###",  # Manitoba: ABC 123
+        "NB": "??? ###",  # New Brunswick: ABC 123
+        "NL": "??? ###",  # Newfoundland & Labrador: ABC 123
+        "NT": "######",  # Northwest Territories: 6 digits
+        "NS": "??? ###",  # Nova Scotia: ABC 123
+        "NU": "######",  # Nunavut: 6 digits
+        "ON": "C??? ###",  # Ontario: current series starts with C (e.g. CDWA 054)
+        "PE": "??? ###",  # Prince Edward Island: ABC 123
+        "QC": "??? ###",  # Quebec: ABC 123
+        "SK": "??? ###",  # Saskatchewan: ABC 123
+        "YT": "??? ###",  # Yukon: ABC 123
+    }
+
+    # US plates vary by state. Not all 50 states are in the location data, so
+    # we cover the ones that are. Falls back to the generic format for others.
+    _US_PLATE_FORMATS: dict[str, str | tuple[str, ...]] = {
+        "AZ": "???####",  # Arizona: ABC1234
+        "CA": "#???###",  # California: 1ABC234
+        "CO": "???-###",  # Colorado: ABC-123
+        "FL": "??? ?##?",  # Florida: ABC D12E
+        "GA": "???####",  # Georgia: ABC1234
+        "IL": "?? #####",  # Illinois: AB 12345
+        "IN": "###?",  # Indiana: 123A (short format)
+        "LA": "### ???",  # Louisiana: 123 ABC
+        "MA": "#??-??##",  # Massachusetts: 1AB-CD23
+        "MD": "#??####",  # Maryland: 1AB1234
+        "MI": "??? ####",  # Michigan: ABC 1234
+        "MN": "###-???",  # Minnesota: 123-ABC
+        "NC": "???-####",  # North Carolina: ABC-1234
+        "NV": "##?-###",  # Nevada: 12A-345
+        "NY": "???-####",  # New York: ABC-1234
+        "OH": "??? ####",  # Ohio: ABC 1234
+        "OR": "### ???",  # Oregon: 123 ABC
+        "PA": "???-####",  # Pennsylvania: ABC-1234
+        "TN": "?##-##?",  # Tennessee: A12-34B
+        "TX": "???-####",  # Texas: ABC-1234
+        "WA": "???####",  # Washington: ABC1234
+    }
+
+    # Germany: plates start with 1-3 letter city/district code, then 1-2 letters,
+    # then 1-4 digits. The city code is derived from the person's location.
+    _DE_CITY_PLATE_CODES: dict[str, str] = {
+        "Aachen": "AC",
+        "Altona": "HH",
+        "Augsburg": "A",
+        "Berlin": "B",
+        "Bielefeld": "BI",
+        "Bochum": "BO",
+        "Bonn": "BN",
+        "Bornheim": "BN",
+        "Brandenburg an der Havel": "BRB",
+        "Braunschweig": "BS",
+        "Bremen": "HB",
+        "Bremerhaven": "HB",
+        "Charlottenburg": "B",
+        "Chemnitz": "C",
+        "Cottbus": "CB",
+        "Darmstadt": "DA",
+        "Dessau-Roßlau": "DE",
+        "Dortmund": "DO",
+        "Dresden": "DD",
+        "Duisburg": "DU",
+        "Düsseldorf": "D",
+        "Eimsbüttel": "HH",
+        "Erfurt": "EF",
+        "Essen": "E",
+        "Flensburg": "FL",
+        "Frankfurt (Oder)": "FF",
+        "Frankfurt am Main": "F",
+        "Freiburg im Breisgau": "FR",
+        "Friedrichshain": "B",
+        "Fürth": "FÜ",
+        "Gelsenkirchen": "GE",
+        "Gera": "G",
+        "Greifswald": "HGW",
+        "Göttingen": "GÖ",
+        "Halle (Saale)": "HAL",
+        "Hamburg": "HH",
+        "Hannover": "H",
+        "Harburg": "HH",
+        "Heidelberg": "HD",
+        "Heilbronn": "HN",
+        "Hildesheim": "HI",
+        "Homburg": "HOM",
+        "Ingolstadt": "IN",
+        "Jena": "J",
+        "Kaiserslautern": "KL",
+        "Karlsruhe": "KA",
+        "Kassel": "KS",
+        "Kiel": "KI",
+        "Koblenz": "KO",
+        "Konstanz": "KN",
+        "Kreuzberg": "B",
+        "Köln": "K",
+        "Leipzig": "L",
+        "Ludwigshafen am Rhein": "LU",
+        "Lübeck": "HL",
+        "Magdeburg": "MD",
+        "Mainz": "MZ",
+        "Mannheim": "MA",
+        "Maxvorstadt": "M",
+        "Mitte": "B",
+        "Mönchengladbach": "MG",
+        "München": "M",
+        "Münster": "MS",
+        "Neukölln": "B",
+        "Neumünster": "NMS",
+        "Neunkirchen": "NK",
+        "Nürnberg": "N",
+        "Offenbach am Main": "OF",
+        "Oldenburg": "OL",
+        "Osnabrück": "OS",
+        "Pforzheim": "PF",
+        "Plauen": "V",
+        "Potsdam": "P",
+        "Prenzlauer Berg": "B",
+        "Regensburg": "R",
+        "Reutlingen": "RT",
+        "Rostock": "HRO",
+        "Saarbrücken": "SB",
+        "Sachsenhausen": "F",
+        "Salzgitter": "SZ",
+        "Schwabing": "M",
+        "Schwerin": "SN",
+        "Schöneberg": "B",
+        "St. Pauli": "HH",
+        "Stralsund": "HST",
+        "Stuttgart": "S",
+        "Trier": "TR",
+        "Tübingen": "TÜ",
+        "Ulm": "UL",
+        "Völklingen": "VK",
+        "Wandsbek": "HH",
+        "Weimar": "WE",
+        "Wiesbaden": "WI",
+        "Wolfsburg": "WOB",
+        "Wuppertal": "W",
+        "Würzburg": "WÜ",
+        "Zwickau": "Z",
+    }
+
+    # Australia: state-based formats
+    _AU_PLATE_FORMATS: dict[str, str | tuple[str, ...]] = {
+        "ACT": "??? ##?",  # ACT: ABC 12D
+        "NSW": "??##??",  # NSW: AB12CD
+        "NT": "??##??",  # NT: AB12CD
+        "QLD": "###???",  # Queensland: 123ABC
+        "SA": "?###???",  # South Australia: A123BCD (newer) or S###???
+        "TAS": "?-####",  # Tasmania: A-1234
+        "VIC": "#??-###",  # Victoria: 1AB-234
+        "WA": "#???###",  # Western Australia: 1ABC234
+    }
+
+    # Great Britain: plates encode age identifier from location
+    # Format: 2 area letters + 2-digit age identifier + 3 random letters
+    # The area letters are based on DVLA regional offices.
+    # Keys match the state_abbr values in the GB location data.
+    _GB_AREA_CODES: dict[str, list[str]] = {
+        # Greater London boroughs
+        "GL": ["LA", "LB", "LC", "LD", "LE", "LF", "LG", "LH", "LJ", "LK"],
+        # West Midlands
+        "WM": ["BA", "BB", "BC", "BD", "BE", "BF", "BG", "BH", "BJ", "BK"],
+        # Greater Manchester
+        "GM": ["MA", "MB", "MC", "MD", "ME", "MF", "MG", "MH", "MJ", "MK"],
+        # Merseyside (Liverpool area)
+        "MS": ["CA", "CB", "CC", "CD", "CE", "CF", "CG", "CH", "CJ", "CK"],
+        # West Yorkshire
+        "WY": ["YA", "YB", "YC", "YD", "YE", "YF", "YG", "YH", "YJ", "YK"],
+        # South Yorkshire
+        "SY": ["YA", "YB", "YC", "YD", "YE", "YF"],
+        # Hampshire
+        "HA": ["HW", "HX", "HY"],
+        # Lancashire
+        "LA": ["PA", "PB", "PC", "PD", "PE", "PF"],
+        # Nottinghamshire
+        "NG": ["FA", "FB", "FC", "FD", "FE", "FF"],
+        # Leicestershire
+        "LE": ["FA", "FB", "FC", "FD"],
+        # Lincolnshire
+        "LN": ["FG", "FH", "FJ", "FK"],
+        # Norfolk
+        "NF": ["AA", "AB", "AC", "AD", "AE"],
+        # Suffolk
+        "SF": ["AF", "AG", "AH", "AJ", "AK"],
+        # Cambridgeshire
+        "CB": ["EA", "EB", "EC", "ED"],
+        # Essex
+        "ES": ["EE", "EF", "EG", "EH"],
+        # Hertfordshire
+        "HT": ["EJ", "EK"],
+        # Bedfordshire
+        "BD": ["EA", "EB"],
+        # Buckinghamshire
+        "BK": ["EC", "ED"],
+        # Oxfordshire
+        "OX": ["DA", "DB", "DC"],
+        # Devon
+        "DV": ["DA", "DB", "DC", "DD"],
+        # Dorset
+        "DO": ["DE", "DF", "DG"],
+        # Somerset
+        "SM": ["WA", "WB", "WC"],
+        # Sussex / Surrey area
+        "SU": ["KA", "KB", "KC", "KD", "KE"],
+        # Bristol
+        "BS": ["WD", "WE", "WF"],
+        # Wiltshire
+        "WI": ["WG", "WH", "WJ"],
+        # North Yorkshire
+        "NY": ["YA", "YB", "YC"],
+        # Cheshire
+        "CH": ["DA", "DB"],
+        # Cumbria
+        "CU": ["PA", "PB"],
+        # Durham / Tees Valley
+        "DU": ["NA", "NB", "NC", "ND"],
+        # Northumberland
+        "NH": ["NE", "NF", "NG"],
+        # Tyne and Wear
+        "TW": ["NA", "NB", "NC"],
+        # Herefordshire
+        "HE": ["RA", "RB"],
+        # Worcestershire
+        "WO": ["RC", "RD"],
+        # Staffordshire
+        "ST": ["BA", "BB"],
+        # Derbyshire
+        "DE": ["FA", "FB"],
+        # East Riding / Hull
+        "ER": ["YA", "YB"],
+        # Exeter region
+        "EX": ["DA", "DB"],
+        # Bournemouth / Poole
+        "BU": ["DE", "DF"],
+    }
+
+    def _generate_plate_format(self, fmt: str) -> str:
+        """Generate a license plate string from a format pattern using restricted letters.
+
+        Like `_generate_from_format` but uses the restricted plate alphabet (no I, O, Q, U) for `?`
+        characters.
+        """
+        result: list[str] = []
+        for char in fmt:
+            if char == "#":
+                result.append(str(self.rng.randint(0, 9)))
+            elif char == "?":
+                result.append(self.rng.choice(self._PLATE_LETTERS))
+            elif char == "*":
+                result.append(self.rng.choice(self._PLATE_LETTERS + "0123456789"))
+            else:
+                result.append(char)
+        return "".join(result)
+
+    def license_plate(self) -> str:
+        """Generate a random license plate.
+
+        When location coherence is active, produces province/state-specific
+        formats for CA, US, DE, AU, and GB. Otherwise falls back to the
+        country's generic format.
+        """
+        location = self._get_current_location()
+        state_abbr = location.get("state_abbr", "")
+        city = location.get("city", "")
+
+        # --- Canada ---
+        if self.country_code == "CA":
+            fmt = self._CA_PLATE_FORMATS.get(state_abbr)
+            if fmt is not None:
+                if isinstance(fmt, tuple):
+                    fmt = self.rng.choice(fmt)
+                return self._generate_plate_format(fmt)
+
+        # --- United States ---
+        if self.country_code == "US":
+            fmt = self._US_PLATE_FORMATS.get(state_abbr)
+            if fmt is not None:
+                if isinstance(fmt, tuple):
+                    fmt = self.rng.choice(fmt)
+                return self._generate_plate_format(fmt)
+
+        # --- Germany ---
+        if self.country_code == "DE":
+            city_code = self._DE_CITY_PLATE_CODES.get(city, "XX")
+            # After the city code: 1-2 random letters, then 1-4 digits
+            # Total characters (after city code + dash) must be ≤ 8
+            n_letters = self.rng.choice([1, 2])
+            max_digits = min(4, 8 - len(city_code) - n_letters)
+            n_digits = self.rng.randint(max(1, max_digits - 1), max_digits)
+            letters = "".join(self.rng.choice(self._PLATE_LETTERS) for _ in range(n_letters))
+            digits = "".join(str(self.rng.randint(0, 9)) for _ in range(n_digits))
+            return f"{city_code}-{letters} {digits}"
+
+        # --- Australia ---
+        if self.country_code == "AU":
+            fmt = self._AU_PLATE_FORMATS.get(state_abbr)
+            if fmt is not None:
+                if isinstance(fmt, tuple):
+                    fmt = self.rng.choice(fmt)
+                return self._generate_plate_format(fmt)
+
+        # --- Great Britain ---
+        if self.country_code == "GB":
+            area_codes = self._GB_AREA_CODES.get(state_abbr, ["AA"])
+            area = self.rng.choice(area_codes)
+            age_id = self.rng.randint(10, 79)
+            random_letters = "".join(self.rng.choice(self._PLATE_LETTERS) for _ in range(3))
+            return f"{area}{age_id} {random_letters}"
+
+        # --- Fallback: use country's generic format with restricted letters ---
+        fmt = self._data.misc.get("license_plate_format", "???-####")
+        return self._generate_plate_format(fmt)
+
+    # =========================================================================
+    # Barcodes
+    # =========================================================================
+
+    def ean8(self) -> str:
+        """Generate a random EAN-8 barcode string with valid check digit."""
+        digits = [self.rng.randint(0, 9) for _ in range(7)]
+        # EAN-8 check digit: alternate weights 3, 1 from the left
+        total = sum(d * (3 if i % 2 == 0 else 1) for i, d in enumerate(digits))
+        check = (10 - (total % 10)) % 10
+        digits.append(check)
+        return "".join(str(d) for d in digits)
+
+    def ean13(self) -> str:
+        """Generate a random EAN-13 barcode string with valid check digit."""
+        digits = [self.rng.randint(0, 9) for _ in range(12)]
+        # EAN-13 check digit: alternate weights 1, 3 from the left
+        total = sum(d * (1 if i % 2 == 0 else 3) for i, d in enumerate(digits))
+        check = (10 - (total % 10)) % 10
+        digits.append(check)
+        return "".join(str(d) for d in digits)
+
+    # =========================================================================
+    # Date/Time (string representations)
+    # =========================================================================
+
+    def date_this_year(self) -> str:
+        """Generate a random date from this year as ISO string."""
+        from datetime import date, timedelta
+
+        today = date.today()
+        start = date(today.year, 1, 1)
+        days = (today - start).days
+        random_date = start + timedelta(days=self.rng.randint(0, max(days, 1)))
+        return random_date.isoformat()
+
+    def date_this_decade(self) -> str:
+        """Generate a random date from this decade as ISO string."""
+        from datetime import date, timedelta
+
+        today = date.today()
+        decade_start = (today.year // 10) * 10
+        start = date(decade_start, 1, 1)
+        days = (today - start).days
+        random_date = start + timedelta(days=self.rng.randint(0, max(days, 1)))
+        return random_date.isoformat()
+
+    def time(self) -> str:
+        """Generate a random time as string."""
+        hour = self.rng.randint(0, 23)
+        minute = self.rng.randint(0, 59)
+        second = self.rng.randint(0, 59)
+        return f"{hour:02d}:{minute:02d}:{second:02d}"
+
+    def date_between(self, start_year: int = 2000, end_year: int = 2025) -> str:
+        """Generate a random date between two years as ISO string."""
+        from datetime import date, timedelta
+
+        start = date(start_year, 1, 1)
+        end = date(end_year, 12, 31)
+        days = (end - start).days
+        random_date = start + timedelta(days=self.rng.randint(0, max(days, 1)))
+        return random_date.isoformat()
+
+    def date_range(self) -> str:
+        """Generate a random date range as 'YYYY-MM-DD \u2013 YYYY-MM-DD'.
+
+        Produces two dates (start \u2264 end) spanning 1 day to ~4 years,
+        with the start date falling between 2000 and 2025.
+        The dates are joined with a CLDR en-dash range separator (\u2013).
+        """
+        from datetime import date, timedelta
+
+        # Pick a random start date between 2000 and 2025
+        epoch = date(2000, 1, 1)
+        ceiling = date(2025, 12, 31)
+        span = (ceiling - epoch).days
+        start = epoch + timedelta(days=self.rng.randint(0, span))
+
+        # Pick a random duration (1 day to ~4 years)
+        duration = self.rng.randint(1, 1460)
+        end = start + timedelta(days=duration)
+
+        return f"{start.isoformat()} \u2013 {end.isoformat()}"
+
+    def future_date(self) -> str:
+        """Generate a random date in the future (up to 1 year ahead) as ISO string."""
+        from datetime import date, timedelta
+
+        today = date.today()
+        random_date = today + timedelta(days=self.rng.randint(1, 365))
+        return random_date.isoformat()
+
+    def past_date(self) -> str:
+        """Generate a random date in the past (up to 10 years back) as ISO string."""
+        from datetime import date, timedelta
+
+        today = date.today()
+        random_date = today - timedelta(days=self.rng.randint(1, 3650))
+        return random_date.isoformat()
+
+    # =========================================================================
+    # Misc
+    # =========================================================================
+
+    def color_name(self) -> str:
+        """Generate a random color name."""
+        colors = self._data.misc.get(
+            "colors",
+            [
+                "Red",
+                "Blue",
+                "Green",
+                "Yellow",
+                "Purple",
+                "Orange",
+                "Pink",
+                "Brown",
+                "Black",
+                "White",
+                "Gray",
+                "Cyan",
+                "Magenta",
+            ],
+        )
+        return self.rng.choice(colors)
+
+    def file_name(self) -> str:
+        """Generate a random file name."""
+        words = self._data.text.get("words", ["document", "file", "report"])
+        extensions = self._data.misc.get("file_extensions", ["txt", "pdf", "doc", "xlsx"])
+        word = _transliterate_to_ascii(self.rng.choice(words).lower())
+        word = "".join(c for c in word if c.isalnum())
+        return f"{word}.{self.rng.choice(extensions)}"
+
+    def file_extension(self) -> str:
+        """Generate a random file extension."""
+        extensions = self._data.misc.get(
+            "file_extensions", ["txt", "pdf", "doc", "xlsx", "png", "jpg"]
+        )
+        return self.rng.choice(extensions)
+
+    def mime_type(self) -> str:
+        """Generate a random MIME type."""
+        mime_types = self._data.misc.get(
+            "mime_types",
+            [
+                "text/plain",
+                "text/html",
+                "application/json",
+                "application/pdf",
+                "image/png",
+                "image/jpeg",
+            ],
+        )
+        return self.rng.choice(mime_types)
+
+    # Country-to-region mapping for browser weight profiles
+    _COUNTRY_BROWSER_REGION: dict[str, str] = {
+        # North America
+        "US": "north_america",
+        "CA": "north_america",
+        "MX": "south_america",
+        # Western Europe
+        "GB": "western_europe",
+        "DE": "western_europe",
+        "FR": "western_europe",
+        "IT": "western_europe",
+        "ES": "western_europe",
+        "NL": "western_europe",
+        "BE": "western_europe",
+        "AT": "western_europe",
+        "CH": "western_europe",
+        "IE": "western_europe",
+        "PT": "western_europe",
+        "LU": "western_europe",
+        # Nordic
+        "SE": "nordic",
+        "NO": "nordic",
+        "DK": "nordic",
+        "FI": "nordic",
+        "IS": "nordic",
+        # Eastern Europe
+        "PL": "eastern_europe",
+        "CZ": "eastern_europe",
+        "SK": "eastern_europe",
+        "HU": "eastern_europe",
+        "RO": "eastern_europe",
+        "BG": "eastern_europe",
+        "HR": "eastern_europe",
+        "SI": "eastern_europe",
+        "LT": "eastern_europe",
+        "LV": "eastern_europe",
+        "EE": "eastern_europe",
+        "CY": "eastern_europe",
+        "MT": "eastern_europe",
+        "GR": "eastern_europe",
+        # Russia
+        "RU": "russia",
+        # Japan
+        "JP": "japan",
+        # South Korea
+        "KR": "south_korea",
+        # China / Greater China
+        "CN": "china",
+        "HK": "china",
+        "TW": "china",
+        # South Asia
+        "IN": "south_asia",
+        # Southeast Asia
+        "ID": "southeast_asia",
+        "PH": "southeast_asia",
+        "TH": "southeast_asia",
+        "SG": "southeast_asia",
+        # Oceania
+        "AU": "oceania",
+        "NZ": "oceania",
+        # South America
+        "BR": "south_america",
+        "AR": "south_america",
+        "CL": "south_america",
+        "CO": "south_america",
+        # Middle East / Africa
+        "TR": "middle_east_africa",
+        "AE": "middle_east_africa",
+        "NG": "middle_east_africa",
+        "ZA": "middle_east_africa",
+    }
+
+    def user_agent(self) -> str:
+        """Generate a random user agent string with country-specific browser weighting."""
+
+        # Get user agent template data from misc
+        ua_templates = self._data.misc.get("user_agent_templates", {})
+        if not ua_templates:
+            return "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36"
+
+        # Get browser weight profiles
+        profiles = self._data.misc.get("browser_weight_profiles", {})
+
+        # Determine which profile to use for this country
+        region = self._COUNTRY_BROWSER_REGION.get(self.country_code, "global")
+        weights = profiles.get(region, profiles.get("global", {}))
+
+        if not weights:
+            # No weight profiles — pick a random category
+            chosen_category = self.rng.choice(list(ua_templates.keys()))
+        else:
+            # Filter to only categories that have templates available
+            available = [(cat, w) for cat, w in weights.items() if cat in ua_templates]
+            if not available:
+                chosen_category = self.rng.choice(list(ua_templates.keys()))
+            else:
+                # Weighted selection of browser category
+                categories, cat_weights = zip(*available)
+                total = sum(cat_weights)
+                r = self.rng.random() * total
+                cumulative = 0.0
+                chosen_category = categories[-1]
+                for cat, w in zip(categories, cat_weights):
+                    cumulative += w
+                    if r <= cumulative:
+                        chosen_category = cat
+                        break
+
+        # Assemble a UA string from the chosen category's template
+        cat_data = ua_templates[chosen_category]
+        templates = cat_data.get("templates", [])
+        if not templates:
+            return "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36"
+
+        # Pick a random template
+        template = self.rng.choice(templates)
+
+        # Fill in all {placeholder} variables from the category's variable lists
+        def _replace_var(match: re.Match) -> str:
+            var_name = match.group(1)
+            values = cat_data.get(var_name, [])
+            if values:
+                return self.rng.choice(values)
+            return match.group(0)  # Leave placeholder if no values
+
+        return re.sub(r"\{(\w+)\}", _replace_var, template)
+
+    # =========================================================================
+    # Utilities
+    # =========================================================================
+
+    def _generate_from_format(self, fmt: str) -> str:
+        """
+        Generate a string from a format pattern.
+
+        Patterns:
+        - # = digit (0-9)
+        - ? = uppercase letter (A-Z)
+        - * = alphanumeric
+        """
+        result = []
+        for char in fmt:
+            if char == "#":
+                result.append(str(self.rng.randint(0, 9)))
+            elif char == "?":
+                result.append(self.rng.choice("ABCDEFGHIJKLMNOPQRSTUVWXYZ"))
+            elif char == "*":
+                result.append(self.rng.choice("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"))
+            else:
+                result.append(char)
+        return "".join(result)
+
+
+# Module-level convenience function
+_default_registry = LocaleRegistry()
+
+
+def get_generator(
+    country: str = "US", seed: int | None = None, weighted: bool = True
+) -> LocaleGenerator:
+    """
+    Get a country data generator instance.
+
+    Parameters
+    ----------
+    country
+        Country code (e.g., "US", "DE", "USA", "DEU").
+        Also accepts legacy locale codes like "en_US" for backwards compatibility.
+    seed
+        Random seed for reproducibility.
+    weighted
+        When True, names and locations are sampled with real-world frequency tiers.
+
+    Returns
+    -------
+    LocaleGenerator
+        A generator configured for the specified country.
+    """
+    return LocaleGenerator(country=country, seed=seed, weighted=weighted)

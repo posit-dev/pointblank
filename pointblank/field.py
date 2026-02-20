@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from datetime import date, datetime, time, timedelta
-from typing import TYPE_CHECKING, Any, Callable
+from typing import TYPE_CHECKING, Any, Callable, Literal
 
 if TYPE_CHECKING:
     pass
@@ -17,6 +17,7 @@ __all__ = [
     "datetime_field",
     "time_field",
     "duration_field",
+    "profile_fields",
     # Classes (for type hints and advanced usage)
     "Field",
     "IntField",
@@ -44,6 +45,8 @@ AVAILABLE_PRESETS = frozenset(
         "city",
         "state",
         "country",
+        "country_code_2",
+        "country_code_3",
         "postcode",
         "latitude",
         "longitude",
@@ -69,17 +72,28 @@ AVAILABLE_PRESETS = frozenset(
         "currency_code",
         # Identifiers
         "uuid4",
+        "md5",
+        "sha1",
+        "sha256",
         "ssn",
         "license_plate",
+        # Barcodes
+        "ean8",
+        "ean13",
         # Date/Time (for string representations)
         "date_this_year",
         "date_this_decade",
+        "date_between",
+        "date_range",
+        "future_date",
+        "past_date",
         "time",
         # Misc
         "color_name",
         "file_name",
         "file_extension",
         "mime_type",
+        "user_agent",
     }
 )
 
@@ -290,54 +304,114 @@ def int_field(
     dtype: str = "Int64",
 ) -> IntField:
     """
-    Create an integer column specification.
+    Create an integer column specification for use in a schema.
+
+    The `int_field()` function defines the constraints and behavior for an integer column when
+    generating synthetic data with `generate_dataset()`. You can control the range of values
+    with `min_val=` and `max_val=`, restrict values to a specific set with `allowed=`, enforce
+    uniqueness with `unique=True`, and introduce null values with `nullable=True` and
+    `null_probability=`. The `dtype=` parameter lets you choose the specific integer type (e.g.,
+    `"Int8"`, `"UInt16"`, `"Int64"`), which also determines the valid range of values.
+
+    When no constraints are specified, values are drawn uniformly from the full range of the
+    chosen integer dtype. If both `min_val=` and `max_val=` are provided, values are drawn
+    uniformly from that range. If `allowed=` is provided, values are sampled from that specific
+    list.
 
     Parameters
     ----------
     min_val
-        Minimum value (inclusive). Default is `None` (no minimum).
+        Minimum value (inclusive). Default is `None` (no minimum, uses dtype lower bound).
     max_val
-        Maximum value (inclusive). Default is `None` (no maximum).
+        Maximum value (inclusive). Default is `None` (no maximum, uses dtype upper bound).
     allowed
-        List of allowed values (categorical constraint). When provided,
-        values are sampled from this list.
+        List of allowed values (categorical constraint). When provided, values are sampled from
+        this list. Cannot be combined with `min_val=`/`max_val=`.
     nullable
         Whether the column can contain null values. Default is `False`.
     null_probability
-        Probability of generating null when `nullable=True`. Default is `0.0`.
+        Probability of generating a null value for each row when `nullable=True`. Must be
+        between `0.0` and `1.0`. Default is `0.0`.
     unique
-        Whether all values must be unique. Default is `False`.
+        Whether all values must be unique. Default is `False`. When `True`, the generator will
+        retry until it produces `n` distinct values (subject to retry limits).
     generator
-        Custom callable that generates values. Overrides other settings.
+        Custom callable that generates values. When provided, this overrides all other
+        constraints (`min_val=`, `max_val=`, `allowed=`, etc.). The callable should take no
+        arguments and return a single integer value.
     dtype
-        Integer dtype. Default is `"Int64"`. Options: `"Int8"`, `"Int16"`,
-        `"Int32"`, `"Int64"`, `"UInt8"`, `"UInt16"`, `"UInt32"`, `"UInt64"`.
+        Integer dtype. Default is `"Int64"`. Options: `"Int8"`, `"Int16"`, `"Int32"`,
+        `"Int64"`, `"UInt8"`, `"UInt16"`, `"UInt32"`, `"UInt64"`.
 
     Returns
     -------
     IntField
-        An integer field specification.
+        An integer field specification that can be passed to `Schema()`.
+
+    Raises
+    ------
+    ValueError
+        If `min_val` is greater than `max_val`, if `allowed` is an empty list, if
+        `null_probability` is not between `0.0` and `1.0`, or if `dtype` is not a valid
+        integer type.
 
     Examples
     --------
-    Define a schema with integer fields and generate test data:
+    The `min_val=` and `max_val=` parameters constrain generated ranges, while `allowed=`
+    restricts values to a specific set:
 
     ```{python}
     import pointblank as pb
 
-    # Define a schema with integer field specifications
     schema = pb.Schema(
         user_id=pb.int_field(min_val=1, unique=True),
         age=pb.int_field(min_val=0, max_val=120),
         rating=pb.int_field(allowed=[1, 2, 3, 4, 5]),
     )
 
-    # Generate 100 rows of test data
     pb.preview(pb.generate_dataset(schema, n=100, seed=23))
     ```
 
-    The generated data will have unique user IDs starting from `1`, ages between `0`-`120`,
-    and ratings sampled from the allowed values.
+    It's possible to introduce missing values with `nullable=True` and `null_probability=`,
+    and to select a smaller dtype with `dtype=`:
+
+    ```{python}
+    schema = pb.Schema(
+        score=pb.int_field(min_val=0, max_val=255, dtype="UInt8"),
+        optional_val=pb.int_field(
+            min_val=1, max_val=50,
+            nullable=True, null_probability=0.3,
+        ),
+    )
+
+    pb.preview(pb.generate_dataset(schema, n=50, seed=23))
+    ```
+
+    We can also enforce uniqueness with `unique=True` to produce distinct identifiers within
+    a range:
+
+    ```{python}
+    schema = pb.Schema(
+        record_id=pb.int_field(min_val=1000, max_val=9999, unique=True),
+        priority=pb.int_field(allowed=[1, 2, 3]),
+    )
+
+    pb.preview(pb.generate_dataset(schema, n=30, seed=10))
+    ```
+
+    For complete control, a custom `generator=` callable can be provided:
+
+    ```{python}
+    import random
+
+    rng = random.Random(0)
+
+    schema = pb.Schema(
+        even_numbers=pb.int_field(generator=lambda: rng.choice(range(0, 100, 2))),
+    )
+
+    pb.preview(pb.generate_dataset(schema, n=20, seed=5))
+    ```
     """
     return IntField(
         min_val=min_val,
@@ -456,7 +530,18 @@ def float_field(
     dtype: str = "Float64",
 ) -> FloatField:
     """
-    Create a floating-point column specification.
+    Create a floating-point column specification for use in a schema.
+
+    The `float_field()` function defines the constraints and behavior for a floating-point column
+    when generating synthetic data with `generate_dataset()`. You can control the range of values
+    with `min_val=` and `max_val=`, restrict values to a specific set with `allowed=`, enforce
+    uniqueness with `unique=True`, and introduce null values with `nullable=True` and
+    `null_probability=`. The `dtype=` parameter lets you choose between `"Float32"` and
+    `"Float64"` precision.
+
+    When both `min_val=` and `max_val=` are provided, values are drawn from a uniform
+    distribution across that range. If neither is specified, values are drawn uniformly from a
+    large default range. If `allowed=` is provided, values are sampled from that specific list.
 
     Parameters
     ----------
@@ -465,43 +550,91 @@ def float_field(
     max_val
         Maximum value (inclusive). Default is `None` (no maximum).
     allowed
-        List of allowed values (categorical constraint). When provided,
-        values are sampled from this list.
+        List of allowed values (categorical constraint). When provided, values are sampled from
+        this list. Cannot be combined with `min_val=`/`max_val=`.
     nullable
         Whether the column can contain null values. Default is `False`.
     null_probability
-        Probability of generating null when `nullable=True`. Default is `0.0`.
+        Probability of generating a null value for each row when `nullable=True`. Must be
+        between `0.0` and `1.0`. Default is `0.0`.
     unique
-        Whether all values must be unique. Default is `False`.
+        Whether all values must be unique. Default is `False`. When `True`, the generator will
+        retry until it produces `n` distinct values.
     generator
-        Custom callable that generates values. Overrides other settings.
+        Custom callable that generates values. When provided, this overrides all other
+        constraints. The callable should take no arguments and return a single float value.
     dtype
         Float dtype. Default is `"Float64"`. Options: `"Float32"`, `"Float64"`.
 
     Returns
     -------
     FloatField
-        A float field specification.
+        A float field specification that can be passed to `Schema()`.
+
+    Raises
+    ------
+    ValueError
+        If `min_val` is greater than `max_val`, if `allowed` is an empty list, if
+        `null_probability` is not between `0.0` and `1.0`, or if `dtype` is not a valid
+        float type.
 
     Examples
     --------
-    Define a schema with float fields and generate test data:
+    The `min_val=` and `max_val=` parameters define the generated value ranges:
 
     ```{python}
     import pointblank as pb
 
-    # Define a schema with float field specifications
     schema = pb.Schema(
         price=pb.float_field(min_val=0.01, max_val=9999.99),
         probability=pb.float_field(min_val=0.0, max_val=1.0),
         temperature=pb.float_field(min_val=-40.0, max_val=50.0),
     )
 
-    # Generate 100 rows of test data
     pb.preview(pb.generate_dataset(schema, n=100, seed=23))
     ```
 
-    Values are uniformly distributed across the specified ranges.
+    It's also possible to restrict values to a discrete set with `allowed=`, which is useful
+    for fixed pricing tiers or measurement levels:
+
+    ```{python}
+    schema = pb.Schema(
+        discount=pb.float_field(allowed=[0.05, 0.10, 0.15, 0.20, 0.25]),
+        weight_kg=pb.float_field(min_val=0.5, max_val=100.0),
+    )
+
+    pb.preview(pb.generate_dataset(schema, n=50, seed=23))
+    ```
+
+    We can simulate missing measurements by introducing null values:
+
+    ```{python}
+    schema = pb.Schema(
+        reading=pb.float_field(
+            min_val=0.0, max_val=500.0,
+            nullable=True, null_probability=0.2,
+        ),
+        calibration=pb.float_field(min_val=0.9, max_val=1.1),
+    )
+
+    pb.preview(pb.generate_dataset(schema, n=30, seed=7))
+    ```
+
+    Setting `dtype="Float32"` gives reduced precision, and a custom `generator=` provides
+    full control over value generation:
+
+    ```{python}
+    import random, math
+
+    rng = random.Random(0)
+
+    schema = pb.Schema(
+        sensor_value=pb.float_field(min_val=-10.0, max_val=10.0, dtype="Float32"),
+        log_value=pb.float_field(generator=lambda: math.log(rng.uniform(1, 1000))),
+    )
+
+    pb.preview(pb.generate_dataset(schema, n=20, seed=99))
+    ```
     """
     return FloatField(
         min_val=min_val,
@@ -659,55 +792,166 @@ def string_field(
     generator: Callable[[], Any] | None = None,
 ) -> StringField:
     """
-    Create a string column specification.
+    Create a string column specification for use in a schema.
+
+    The `string_field()` function defines the constraints and behavior for a string column when
+    generating synthetic data with `generate_dataset()`. It provides three main modes of string
+    generation: (1) controlled random strings with `min_length=`/`max_length=`, (2) strings
+    matching a regular expression via `pattern=`, or (3) realistic data using `preset=` (e.g.,
+    `"email"`, `"name"`, `"address"`). You can also restrict values to a fixed set with
+    `allowed=`. Only one of `preset=`, `pattern=`, or `allowed=` can be specified at a time.
+
+    When no special mode is selected, random alphanumeric strings are generated with lengths
+    between `min_length=` and `max_length=` (defaulting to 1--20 characters).
 
     Parameters
     ----------
     min_length
-        Minimum string length. Default is `None` (no minimum).
+        Minimum string length (for random string generation). Default is `None` (defaults to
+        `1`). Only applies when `preset=`, `pattern=`, and `allowed=` are all `None`.
     max_length
-        Maximum string length. Default is `None` (no maximum).
+        Maximum string length (for random string generation). Default is `None` (defaults to
+        `20`). Only applies when `preset=`, `pattern=`, and `allowed=` are all `None`.
     pattern
-        Regular expression pattern for generated strings.
+        Regular expression pattern that generated strings must match. Supports character
+        classes (e.g., `[A-Z]`, `[0-9]`), quantifiers (e.g., `{3}`, `{2,5}`), alternation,
+        and groups. Cannot be combined with `preset=` or `allowed=`.
     preset
-        Preset for realistic data (e.g., `"email"`, `"name"`, `"phone_number"`).
+        Preset name for generating realistic data. When specified, values are produced using
+        locale-aware data generation, and the `country=` parameter of `generate_dataset()`
+        controls the locale. Cannot be combined with `pattern=` or `allowed=`. See the
+        **Available Presets** section below for the full list.
     allowed
-        List of allowed values (categorical constraint).
+        List of allowed string values (categorical constraint). Values are sampled uniformly
+        from this list. Cannot be combined with `preset=` or `pattern=`.
     nullable
         Whether the column can contain null values. Default is `False`.
     null_probability
-        Probability of generating null when `nullable=True`. Default is `0.0`.
+        Probability of generating a null value for each row when `nullable=True`. Must be
+        between `0.0` and `1.0`. Default is `0.0`.
     unique
-        Whether all values must be unique. Default is `False`.
+        Whether all values must be unique. Default is `False`. When `True`, the generator will
+        retry until it produces `n` distinct values.
     generator
-        Custom callable that generates values. Overrides other settings.
+        Custom callable that generates values. When provided, this overrides all other
+        constraints. The callable should take no arguments and return a single string value.
 
     Returns
     -------
     StringField
-        A string field specification.
+        A string field specification that can be passed to `Schema()`.
+
+    Raises
+    ------
+    ValueError
+        If more than one of `preset=`, `pattern=`, or `allowed=` is specified; if `allowed=`
+        is an empty list; if `min_length` or `max_length` is negative; if `min_length` exceeds
+        `max_length`; or if `preset` is not a recognized preset name.
+
+    Available Presets
+    -----------------
+    The `preset=` parameter accepts one of the following preset names, organized by category.
+    When a preset is used, the `country=` parameter of `generate_dataset()` controls the locale
+    for region-specific formatting (e.g., address formats, phone number patterns).
+
+    **Personal:** `"name"` (first + last name), `"name_full"` (full name with possible prefix
+    or suffix), `"first_name"`, `"last_name"`, `"email"` (realistic email address),
+    `"phone_number"`, `"address"` (full street address), `"city"`, `"state"`, `"country"`,
+    `"country_code_2"` (ISO 3166-1 alpha-2 code, e.g., `"US"`), `"country_code_3"` (ISO
+    3166-1 alpha-3 code, e.g., `"USA"`), `"postcode"`, `"latitude"`, `"longitude"`
+
+    **Business:** `"company"` (company name), `"job"` (job title), `"catch_phrase"`
+
+    **Internet:** `"url"`, `"domain_name"`, `"ipv4"`, `"ipv6"`, `"user_name"`, `"password"`
+
+    **Text:** `"text"` (paragraph of text), `"sentence"`, `"paragraph"`, `"word"`
+
+    **Financial:** `"credit_card_number"`, `"iban"`, `"currency_code"`
+
+    **Identifiers:** `"uuid4"`, `"md5"` (MD5 hash, 32 hex chars), `"sha1"` (SHA-1 hash,
+    40 hex chars), `"sha256"` (SHA-256 hash, 64 hex chars), `"ssn"` (social security number),
+    `"license_plate"`
+
+    **Barcodes:** `"ean8"` (EAN-8 barcode with valid check digit), `"ean13"` (EAN-13 barcode
+    with valid check digit)
+
+    **Date/Time (as strings):** `"date_this_year"`, `"date_this_decade"`, `"date_between"`
+    (random date between 2000–2025), `"date_range"` (two dates joined with an en-dash, e.g.,
+    `"2012-05-12 – 2015-11-22"`), `"future_date"` (up to 1 year ahead), `"past_date"`
+    (up to 10 years back), `"time"`
+
+    **Miscellaneous:** `"color_name"`, `"file_name"`, `"file_extension"`, `"mime_type"`,
+    `"user_agent"` (browser user agent string with country-specific browser weighting)
+
+    Coherent Data Generation
+    ------------------------
+    When multiple columns in the same schema use related presets, the generated data will be
+    coherent across those columns within each row. Specifically:
+
+    - **Person-related presets** (`"name"`, `"name_full"`, `"first_name"`, `"last_name"`,
+      `"email"`, `"user_name"`): the email and username will be derived from the person's name.
+    - **Address-related presets** (`"address"`, `"city"`, `"state"`, `"postcode"`,
+      `"phone_number"`, `"latitude"`, `"longitude"`): the city, state, and postcode will
+      correspond to the same location within the address.
+
+    This coherence is automatic and requires no additional configuration.
 
     Examples
     --------
-    Define a schema with string fields and generate test data:
+    The `preset=` parameter generates realistic personal data, while `allowed=` restricts
+    values to a categorical set:
 
     ```{python}
     import pointblank as pb
 
-    # Define a schema with string field specifications
     schema = pb.Schema(
         name=pb.string_field(preset="name"),
         email=pb.string_field(preset="email", unique=True),
         status=pb.string_field(allowed=["active", "pending", "inactive"]),
-        code=pb.string_field(pattern=r"[A-Z]{3}-[0-9]{4}"),
     )
 
-    # Generate 100 rows of test data
     pb.preview(pb.generate_dataset(schema, n=100, seed=23))
     ```
 
-    The generated data will have coherent names and emails (derived from the name),
-    statuses sampled from the allowed values, and codes matching the regex pattern.
+    We can also generate strings that match a regular expression with `pattern=` (e.g.,
+    product codes, identifiers):
+
+    ```{python}
+    schema = pb.Schema(
+        product_code=pb.string_field(pattern=r"[A-Z]{3}-[0-9]{4}"),
+        batch_id=pb.string_field(pattern=r"BATCH-[A-Z][0-9]{3}"),
+        sku=pb.string_field(pattern=r"[A-Z]{2}[0-9]{6}"),
+    )
+
+    pb.preview(pb.generate_dataset(schema, n=30, seed=23))
+    ```
+
+    For random alphanumeric strings, `min_length=` and `max_length=` control the length.
+    Adding `nullable=True` introduces missing values:
+
+    ```{python}
+    schema = pb.Schema(
+        short_code=pb.string_field(min_length=3, max_length=5),
+        notes=pb.string_field(
+            min_length=10, max_length=50,
+            nullable=True, null_probability=0.4,
+        ),
+    )
+
+    pb.preview(pb.generate_dataset(schema, n=30, seed=7))
+    ```
+
+    It's possible to combine business and internet presets to build a company directory:
+
+    ```{python}
+    schema = pb.Schema(
+        company=pb.string_field(preset="company"),
+        domain=pb.string_field(preset="domain_name"),
+        industry_tag=pb.string_field(allowed=["tech", "finance", "health", "retail"]),
+    )
+
+    pb.preview(pb.generate_dataset(schema, n=20, seed=55))
+    ```
     """
     return StringField(
         min_length=min_length,
@@ -798,48 +1042,89 @@ def bool_field(
     generator: Callable[[], Any] | None = None,
 ) -> BoolField:
     """
-    Create a boolean column specification.
+    Create a boolean column specification for use in a schema.
+
+    The `bool_field()` function defines the constraints and behavior for a boolean column when
+    generating synthetic data with `generate_dataset()`. The `p_true=` parameter controls the
+    probability of generating `True` values, which is useful for simulating real-world
+    distributions where events may be rare or common (e.g., 5% fraud rate, 80% active users).
+
+    By default, `True` and `False` are equally likely (`p_true=0.5`). Setting `p_true=0.0`
+    produces all `False` values, and `p_true=1.0` produces all `True` values.
 
     Parameters
     ----------
     p_true
         Probability of generating `True`. Default is `0.5` (equal probability).
-        Must be between 0.0 and 1.0.
+        Must be between `0.0` and `1.0`.
     nullable
         Whether the column can contain null values. Default is `False`.
     null_probability
-        Probability of generating null when `nullable=True`. Default is `0.0`.
+        Probability of generating a null value for each row when `nullable=True`. Must be
+        between `0.0` and `1.0`. Default is `0.0`.
     unique
-        Whether all values must be unique. Default is `False`.
-        Note: Boolean can only have 2 unique non-null values.
+        Whether all values must be unique. Default is `False`. Note that boolean columns can
+        only have 2 unique non-null values, so `n` must be `<= 2` when `unique=True` (or
+        `<= 3` with `nullable=True`).
     generator
-        Custom callable that generates values. Overrides other settings.
+        Custom callable that generates values. When provided, this overrides all other
+        constraints. The callable should take no arguments and return a single boolean value.
 
     Returns
     -------
     BoolField
-        A boolean field specification.
+        A boolean field specification that can be passed to `Schema()`.
+
+    Raises
+    ------
+    ValueError
+        If `p_true` is not between `0.0` and `1.0`, or if `null_probability` is not between
+        `0.0` and `1.0`.
 
     Examples
     --------
-    Define a schema with boolean fields and generate test data:
+    The `p_true=` parameter controls the distribution of `True`/`False` values, allowing
+    you to simulate different probabilities:
 
     ```{python}
     import pointblank as pb
 
-    # Define a schema with boolean field specifications
     schema = pb.Schema(
-        is_active=pb.bool_field(p_true=0.8),      # 80% True
-        is_premium=pb.bool_field(p_true=0.2),     # 20% True
-        is_verified=pb.bool_field(),              # 50% True (default)
+        is_active=pb.bool_field(p_true=0.8),
+        is_premium=pb.bool_field(p_true=0.2),
+        is_verified=pb.bool_field(),
     )
 
-    # Generate 100 rows of test data
     pb.preview(pb.generate_dataset(schema, n=100, seed=23))
     ```
 
-    The `p_true=` parameter controls the probability of generating `True` values,
-    which is helpful for simulating real-world distributions.
+    Optional boolean flags can be simulated by combining `nullable=True` with
+    `null_probability=`:
+
+    ```{python}
+    schema = pb.Schema(
+        opted_in=pb.bool_field(p_true=0.6),
+        has_referral=pb.bool_field(
+            p_true=0.3,
+            nullable=True, null_probability=0.25,
+        ),
+    )
+
+    pb.preview(pb.generate_dataset(schema, n=50, seed=23))
+    ```
+
+    Boolean fields can be combined with other field types in a realistic schema:
+
+    ```{python}
+    schema = pb.Schema(
+        user_id=pb.int_field(min_val=1, unique=True),
+        name=pb.string_field(preset="name"),
+        email_verified=pb.bool_field(p_true=0.9),
+        is_admin=pb.bool_field(p_true=0.05),
+    )
+
+    pb.preview(pb.generate_dataset(schema, n=30, seed=10))
+    ```
     """
     return BoolField(
         p_true=p_true,
@@ -954,53 +1239,100 @@ def date_field(
     generator: Callable[[], Any] | None = None,
 ) -> DateField:
     """
-    Create a date column specification.
+    Create a date column specification for use in a schema.
+
+    The `date_field()` function defines the constraints and behavior for a date column when
+    generating synthetic data with `generate_dataset()`. You can control the date range with
+    `min_date=` and `max_date=`, enforce uniqueness with `unique=True`, and introduce null
+    values with `nullable=True` and `null_probability=`.
+
+    Dates are generated uniformly within the specified range. If no range is provided, the
+    default range is 2000-01-01 to 2030-12-31. Both `min_date=` and `max_date=` accept either
+    `datetime.date` objects or ISO 8601 date strings (e.g., `"2024-06-15"`).
 
     Parameters
     ----------
     min_date
-        Minimum date (inclusive). Can be ISO string or `date` object.
+        Minimum date (inclusive). Can be an ISO format string (e.g., `"2020-01-01"`) or a
+        `datetime.date` object. Default is `None` (defaults to `2000-01-01`).
     max_date
-        Maximum date (inclusive). Can be ISO string or `date` object.
+        Maximum date (inclusive). Can be an ISO format string (e.g., `"2024-12-31"`) or a
+        `datetime.date` object. Default is `None` (defaults to `2030-12-31`).
     nullable
         Whether the column can contain null values. Default is `False`.
     null_probability
-        Probability of generating null when `nullable=True`. Default is `0.0`.
+        Probability of generating a null value for each row when `nullable=True`. Must be
+        between `0.0` and `1.0`. Default is `0.0`.
     unique
-        Whether all values must be unique. Default is `False`.
+        Whether all values must be unique. Default is `False`. When `True`, the generator will
+        retry until it produces `n` distinct dates. Ensure the date range is large enough to
+        accommodate the requested number of unique dates.
     generator
-        Custom callable that generates values. Overrides other settings.
+        Custom callable that generates values. When provided, this overrides all other
+        constraints. The callable should take no arguments and return a single `datetime.date`
+        value.
 
     Returns
     -------
     DateField
-        A date field specification.
+        A date field specification that can be passed to `Schema()`.
+
+    Raises
+    ------
+    ValueError
+        If `min_date` is later than `max_date`, or if a date string cannot be parsed.
 
     Examples
     --------
-    Define a schema with date fields and generate test data:
+    The `min_date=` and `max_date=` parameters accept `datetime.date` objects to define date
+    ranges:
 
     ```{python}
     import pointblank as pb
     from datetime import date
 
-    # Define a schema with date field specifications
     schema = pb.Schema(
         birth_date=pb.date_field(
             min_date=date(1960, 1, 1),
-            max_date=date(2005, 12, 31)
+            max_date=date(2005, 12, 31),
         ),
         hire_date=pb.date_field(
             min_date=date(2020, 1, 1),
-            max_date=date(2024, 12, 31)
+            max_date=date(2024, 12, 31),
         ),
     )
 
-    # Generate 100 rows of test data
     pb.preview(pb.generate_dataset(schema, n=100, seed=23))
     ```
 
-    Date values are uniformly distributed within the specified range.
+    For convenience, ISO format strings can be used instead of `date` objects:
+
+    ```{python}
+    schema = pb.Schema(
+        event_date=pb.date_field(min_date="2024-01-01", max_date="2024-12-31"),
+        signup_date=pb.date_field(min_date="2023-06-01", max_date="2024-06-01"),
+    )
+
+    pb.preview(pb.generate_dataset(schema, n=50, seed=23))
+    ```
+
+    We can introduce missing dates with `nullable=True` and enforce distinct values using
+    `unique=True`:
+
+    ```{python}
+    schema = pb.Schema(
+        order_date=pb.date_field(
+            min_date="2024-01-01", max_date="2024-03-31",
+            unique=True,
+        ),
+        cancel_date=pb.date_field(
+            min_date="2024-01-01", max_date="2024-12-31",
+            nullable=True, null_probability=0.5,
+        ),
+    )
+
+    pb.preview(pb.generate_dataset(schema, n=30, seed=7))
+    ```
     """
     return DateField(
         min_date=min_date,
@@ -1117,53 +1449,106 @@ def datetime_field(
     generator: Callable[[], Any] | None = None,
 ) -> DatetimeField:
     """
-    Create a datetime column specification.
+    Create a datetime column specification for use in a schema.
+
+    The `datetime_field()` function defines the constraints and behavior for a datetime column
+    when generating synthetic data with `generate_dataset()`. You can control the datetime range
+    with `min_date=` and `max_date=`, enforce uniqueness with `unique=True`, and introduce null
+    values with `nullable=True` and `null_probability=`.
+
+    Datetime values are generated uniformly (at second-level resolution) within the specified
+    range. If no range is provided, the default range is 2000-01-01T00:00:00 to
+    2030-12-31T23:59:59. Both `min_date=` and `max_date=` accept `datetime` objects, `date`
+    objects (which are converted to datetimes at midnight), or ISO 8601 datetime strings.
 
     Parameters
     ----------
     min_date
-        Minimum datetime (inclusive). Can be ISO string or `datetime` object.
+        Minimum datetime (inclusive). Can be an ISO format string (e.g.,
+        `"2024-01-01T00:00:00"`), a `datetime.datetime` object, or a `datetime.date` object.
+        Default is `None` (defaults to `2000-01-01 00:00:00`).
     max_date
-        Maximum datetime (inclusive). Can be ISO string or `datetime` object.
+        Maximum datetime (inclusive). Can be an ISO format string, a `datetime.datetime`
+        object, or a `datetime.date` object. Default is `None` (defaults to
+        `2030-12-31 23:59:59`).
     nullable
         Whether the column can contain null values. Default is `False`.
     null_probability
-        Probability of generating null when `nullable=True`. Default is `0.0`.
+        Probability of generating a null value for each row when `nullable=True`. Must be
+        between `0.0` and `1.0`. Default is `0.0`.
     unique
-        Whether all values must be unique. Default is `False`.
+        Whether all values must be unique. Default is `False`. With second-level resolution
+        over a wide range, collisions are unlikely for moderate dataset sizes.
     generator
-        Custom callable that generates values. Overrides other settings.
+        Custom callable that generates values. When provided, this overrides all other
+        constraints. The callable should take no arguments and return a single
+        `datetime.datetime` value.
 
     Returns
     -------
     DatetimeField
-        A datetime field specification.
+        A datetime field specification that can be passed to `Schema()`.
+
+    Raises
+    ------
+    ValueError
+        If `min_date` is later than `max_date`, or if a datetime string cannot be parsed.
 
     Examples
     --------
-    Define a schema with datetime fields and generate test data:
+    The `min_date=` and `max_date=` parameters accept `datetime` objects for precise range
+    definitions:
 
     ```{python}
     import pointblank as pb
     from datetime import datetime
 
-    # Define a schema with datetime field specifications
     schema = pb.Schema(
         created_at=pb.datetime_field(
             min_date=datetime(2024, 1, 1),
-            max_date=datetime(2024, 12, 31)
+            max_date=datetime(2024, 12, 31),
         ),
         updated_at=pb.datetime_field(
             min_date=datetime(2024, 6, 1),
-            max_date=datetime(2024, 12, 31)
+            max_date=datetime(2024, 12, 31),
         ),
     )
 
-    # Generate 100 rows of test data
     pb.preview(pb.generate_dataset(schema, n=100, seed=23))
     ```
 
-    Datetime values are uniformly distributed within the specified range.
+    For a quick setup, ISO format strings work just as well:
+
+    ```{python}
+    schema = pb.Schema(
+        event_time=pb.datetime_field(
+            min_date="2024-03-01T08:00:00",
+            max_date="2024-03-01T18:00:00",
+        ),
+    )
+
+    pb.preview(pb.generate_dataset(schema, n=30, seed=23))
+    ```
+
+    Optional timestamps can be simulated with `nullable=True`, and datetime fields work
+    nicely alongside other field types:
+
+    ```{python}
+    schema = pb.Schema(
+        order_id=pb.int_field(min_val=1000, max_val=9999, unique=True),
+        placed_at=pb.datetime_field(
+            min_date=datetime(2024, 1, 1),
+            max_date=datetime(2024, 12, 31),
+        ),
+        shipped_at=pb.datetime_field(
+            min_date=datetime(2024, 1, 2),
+            max_date=datetime(2025, 1, 15),
+            nullable=True, null_probability=0.3,
+        ),
+    )
+
+    pb.preview(pb.generate_dataset(schema, n=30, seed=7))
+    ```
     """
     return DatetimeField(
         min_date=min_date,
@@ -1277,53 +1662,96 @@ def time_field(
     generator: Callable[[], Any] | None = None,
 ) -> TimeField:
     """
-    Create a time column specification.
+    Create a time column specification for use in a schema.
+
+    The `time_field()` function defines the constraints and behavior for a time-of-day column
+    when generating synthetic data with `generate_dataset()`. You can control the time range
+    with `min_time=` and `max_time=`, enforce uniqueness with `unique=True`, and introduce null
+    values with `nullable=True` and `null_probability=`.
+
+    Time values are generated uniformly (at second-level resolution) within the specified range.
+    If no range is provided, the default range is 00:00:00 to 23:59:59. Both `min_time=` and
+    `max_time=` accept `datetime.time` objects or ISO format time strings (e.g., `"09:30:00"`).
 
     Parameters
     ----------
     min_time
-        Minimum time (inclusive). Can be ISO string or `time` object.
+        Minimum time (inclusive). Can be an ISO format string (e.g., `"08:00:00"`) or a
+        `datetime.time` object. Default is `None` (defaults to `00:00:00`).
     max_time
-        Maximum time (inclusive). Can be ISO string or `time` object.
+        Maximum time (inclusive). Can be an ISO format string (e.g., `"17:30:00"`) or a
+        `datetime.time` object. Default is `None` (defaults to `23:59:59`).
     nullable
         Whether the column can contain null values. Default is `False`.
     null_probability
-        Probability of generating null when `nullable=True`. Default is `0.0`.
+        Probability of generating a null value for each row when `nullable=True`. Must be
+        between `0.0` and `1.0`. Default is `0.0`.
     unique
-        Whether all values must be unique. Default is `False`.
+        Whether all values must be unique. Default is `False`. With second-level resolution
+        within a time range, uniqueness is feasible for moderate dataset sizes.
     generator
-        Custom callable that generates values. Overrides other settings.
+        Custom callable that generates values. When provided, this overrides all other
+        constraints. The callable should take no arguments and return a single value.
 
     Returns
     -------
     TimeField
-        A time field specification.
+        A time field specification that can be passed to `Schema()`.
+
+    Raises
+    ------
+    ValueError
+        If `min_time` is later than `max_time`, or if a time string cannot be parsed.
 
     Examples
     --------
-    Define a schema with time fields and generate test data:
+    The `min_time=` and `max_time=` parameters accept `datetime.time` objects, making it
+    easy to define business-hours ranges:
 
     ```{python}
     import pointblank as pb
     from datetime import time
 
-    # Define a schema with time field specifications
     schema = pb.Schema(
         start_time=pb.time_field(
             min_time=time(9, 0, 0),
-            max_time=time(12, 0, 0)
+            max_time=time(12, 0, 0),
         ),
         end_time=pb.time_field(
             min_time=time(13, 0, 0),
-            max_time=time(17, 0, 0)
+            max_time=time(17, 0, 0),
         ),
     )
 
-    # Generate 100 rows of test data
     pb.preview(pb.generate_dataset(schema, n=100, seed=23))
     ```
 
-    Time values are uniformly distributed within the specified range.
+    ISO format strings can also be used for convenience:
+
+    ```{python}
+    schema = pb.Schema(
+        login_time=pb.time_field(min_time="06:00:00", max_time="23:59:59"),
+        alarm_time=pb.time_field(min_time="05:00:00", max_time="09:00:00"),
+    )
+
+    pb.preview(pb.generate_dataset(schema, n=30, seed=23))
+    ```
+
+    It's possible to introduce optional time values with `nullable=True` and combine them
+    with other field types:
+
+    ```{python}
+    schema = pb.Schema(
+        employee_id=pb.int_field(min_val=100, max_val=999, unique=True),
+        check_in=pb.time_field(min_time="07:00:00", max_time="10:00:00"),
+        check_out=pb.time_field(
+            min_time="16:00:00", max_time="20:00:00",
+            nullable=True, null_probability=0.15,
+        ),
+    )
+
+    pb.preview(pb.generate_dataset(schema, n=30, seed=7))
+    ```
     """
     return TimeField(
         min_time=min_time,
@@ -1449,53 +1877,103 @@ def duration_field(
     generator: Callable[[], Any] | None = None,
 ) -> DurationField:
     """
-    Create a duration column specification.
+    Create a duration column specification for use in a schema.
+
+    The `duration_field()` function defines the constraints and behavior for a duration
+    (timedelta) column when generating synthetic data with `generate_dataset()`. You can
+    control the duration range with `min_duration=` and `max_duration=`, enforce uniqueness
+    with `unique=True`, and introduce null values with `nullable=True` and `null_probability=`.
+
+    Duration values are generated uniformly (at second-level resolution) within the specified
+    range. If no range is provided, the default range is 0 seconds to 30 days. Both
+    `min_duration=` and `max_duration=` accept `datetime.timedelta` objects or colon-separated
+    strings in `"HH:MM:SS"` or `"MM:SS"` format.
 
     Parameters
     ----------
     min_duration
-        Minimum duration (inclusive). Can be string or `timedelta` object.
+        Minimum duration (inclusive). Can be a `"HH:MM:SS"` or `"MM:SS"` string, or a
+        `datetime.timedelta` object. Default is `None` (defaults to 0 seconds).
     max_duration
-        Maximum duration (inclusive). Can be string or `timedelta` object.
+        Maximum duration (inclusive). Can be a `"HH:MM:SS"` or `"MM:SS"` string, or a
+        `datetime.timedelta` object. Default is `None` (defaults to 30 days).
     nullable
         Whether the column can contain null values. Default is `False`.
     null_probability
-        Probability of generating null when `nullable=True`. Default is `0.0`.
+        Probability of generating a null value for each row when `nullable=True`. Must be
+        between `0.0` and `1.0`. Default is `0.0`.
     unique
-        Whether all values must be unique. Default is `False`.
+        Whether all values must be unique. Default is `False`. With second-level resolution
+        within a duration range, uniqueness is feasible for moderate dataset sizes.
     generator
-        Custom callable that generates values. Overrides other settings.
+        Custom callable that generates values. When provided, this overrides all other
+        constraints. The callable should take no arguments and return a single
+        `datetime.timedelta` value.
 
     Returns
     -------
     DurationField
-        A duration field specification.
+        A duration field specification that can be passed to `Schema()`.
+
+    Raises
+    ------
+    ValueError
+        If `min_duration` is greater than `max_duration`, or if a duration string cannot be
+        parsed.
 
     Examples
     --------
-    Define a schema with duration fields and generate test data:
+    The `min_duration=` and `max_duration=` parameters accept `timedelta` objects for
+    defining duration ranges:
 
     ```{python}
     import pointblank as pb
     from datetime import timedelta
 
-    # Define a schema with duration field specifications
     schema = pb.Schema(
         session_length=pb.duration_field(
             min_duration=timedelta(minutes=5),
-            max_duration=timedelta(hours=2)
+            max_duration=timedelta(hours=2),
         ),
         wait_time=pb.duration_field(
             min_duration=timedelta(seconds=30),
-            max_duration=timedelta(minutes=15)
+            max_duration=timedelta(minutes=15),
         ),
     )
 
-    # Generate 100 rows of test data
     pb.generate_dataset(schema, n=100, seed=23)
     ```
 
-    Duration values are uniformly distributed within the specified range.
+    Colon-separated strings can also be used for quick duration definitions:
+
+    ```{python}
+    schema = pb.Schema(
+        call_duration=pb.duration_field(min_duration="0:01:00", max_duration="1:30:00"),
+        break_time=pb.duration_field(min_duration="0:05:00", max_duration="0:30:00"),
+    )
+
+    pb.generate_dataset(schema, n=30, seed=23)
+    ```
+
+    Optional durations can be created with `nullable=True`, and duration fields work well
+    alongside other field types:
+
+    ```{python}
+    schema = pb.Schema(
+        task_id=pb.int_field(min_val=1, max_val=500, unique=True),
+        time_spent=pb.duration_field(
+            min_duration=timedelta(minutes=1),
+            max_duration=timedelta(hours=8),
+        ),
+        overtime=pb.duration_field(
+            min_duration=timedelta(0),
+            max_duration=timedelta(hours=4),
+            nullable=True, null_probability=0.6,
+        ),
+    )
+
+    pb.generate_dataset(schema, n=30, seed=7)
+    ```
     """
     return DurationField(
         min_duration=min_duration,
@@ -1505,3 +1983,253 @@ def duration_field(
         unique=unique,
         generator=generator,
     )
+
+
+# =============================================================================
+# Profile Fields Helper
+# =============================================================================
+
+# All presets that can appear in any profile set
+_PROFILE_PRESETS = frozenset(
+    {
+        "first_name",
+        "last_name",
+        "name",
+        "email",
+        "address",
+        "city",
+        "state",
+        "postcode",
+        "phone_number",
+        "company",
+        "job",
+    }
+)
+
+# Name-related subsets for split_name validation
+_SPLIT_NAME_PRESETS = frozenset({"first_name", "last_name"})
+_COMBINED_NAME_PRESETS = frozenset({"name"})
+
+# Base sets keyed by set name. Each list defines the column order.
+# When split_name=True, "first_name"/"last_name" are used; when False, "name" is used.
+_PROFILE_SETS: dict[str, list[str]] = {
+    "minimal": ["first_name", "last_name", "email", "phone_number"],
+    "standard": ["first_name", "last_name", "email", "city", "state", "postcode", "phone_number"],
+    "full": [
+        "first_name",
+        "last_name",
+        "email",
+        "address",
+        "city",
+        "state",
+        "postcode",
+        "phone_number",
+        "company",
+        "job",
+    ],
+}
+
+# Canonical ordering for all profile presets (used when include= adds new presets)
+_PROFILE_ORDER = [
+    "first_name",
+    "last_name",
+    "name",
+    "email",
+    "address",
+    "city",
+    "state",
+    "postcode",
+    "phone_number",
+    "company",
+    "job",
+]
+
+# Alias for Python's built-in set, since the parameter name `set` shadows it
+# inside profile_fields().
+_builtin_set = set
+
+
+def profile_fields(
+    *,
+    set: Literal["minimal", "standard", "full"] = "standard",
+    split_name: bool = True,
+    include: list[str] | None = None,
+    exclude: list[str] | None = None,
+    prefix: str | None = None,
+) -> dict[str, StringField]:
+    """
+    Create a dict of string field specifications representing a person profile.
+
+    Returns a dictionary of `StringField` objects suitable for `**`-unpacking into a `Schema()`.
+    Each field uses a preset that participates in the existing coherence system, so generated
+    data will have coherent names, emails, addresses, and phone numbers within each row.
+
+    Parameters
+    ----------
+    set
+        The base set of profile fields to include. Options are `"minimal"` (name, email, phone;
+        3-4 columns depending on `split_name=`), `"standard"` (name, email, city, state,
+        postcode, phone; 6-7 columns), and `"full"` (name, email, address, city, state,
+        postcode, phone, company, job; 9-10 columns). Default is `"standard"`.
+    split_name
+        Whether to split the name into separate `first_name` and `last_name` columns (`True`,
+        the default) or use a single combined `name` column (`False`).
+    include
+        List of additional preset names to add to the base set. For example,
+        `include=["company"]` adds a company column to the `"standard"` set. Presets already
+        in the base set are silently ignored.
+    exclude
+        List of preset names to remove from the (possibly augmented) set. For example,
+        `exclude=["postcode"]` removes the postcode column. Presets not in the set are silently
+        ignored.
+    prefix
+        Optional string to prepend to every column name. For example, `prefix="customer_"`
+        produces keys like `"customer_first_name"`, `"customer_email"`, etc.
+
+    Returns
+    -------
+    dict[str, StringField]
+        A dictionary mapping column names to `StringField` objects, ordered logically (name fields
+        first, then contact, address, phone, business).
+
+    Raises
+    ------
+    ValueError
+        If `set=` is not one of `"minimal"`, `"standard"`, or `"full"`; if `include=` or `exclude=`
+        contain unknown preset names; if a preset appears in both `include=` and `exclude=`; or if
+        `include=` contains name presets incompatible with the `split_name=` setting.
+
+    Examples
+    --------
+    The default call returns the `"standard"` set of profile columns. The `**` operator unpacks the
+    returned dictionary directly into `Schema()`, as if each `string_field()` call had been written
+    by hand. All coherence rules apply automatically: emails are derived from names, and
+    city/state/postcode/phone are internally consistent.
+
+    ```{python}
+    import pointblank as pb
+
+    schema = pb.Schema(
+        user_id=pb.int_field(unique=True),
+        **pb.profile_fields(),
+    )
+
+    pb.preview(pb.generate_dataset(schema, n=100, seed=23))
+    ```
+
+    Use `set=` to control how many columns are generated. The `"minimal"` set includes only `name`,
+    `email`, and `phone`, while `"full"` adds `address`, `company`, and `job`. Setting
+    `split_name=False` collapses `first_name` and `last_name` into a single combined `name` column:
+
+    ```{python}
+    schema = pb.Schema(
+        **pb.profile_fields(set="minimal", split_name=False),
+        balance=pb.float_field(min_val=0, max_val=10000),
+    )
+
+    pb.preview(pb.generate_dataset(schema, n=50, seed=23))
+    ```
+
+    The `include=` and `exclude=` parameters let you customize the column set without switching to a
+    different base set. Here we start from the `"full"` set but drop the business columns:
+
+    ```{python}
+    schema = pb.Schema(
+        **pb.profile_fields(set="full", exclude=["company", "job"]),
+    )
+
+    pb.preview(pb.generate_dataset(schema, n=50, seed=23, country="DE"))
+    ```
+
+    The `prefix=` parameter prepends a string to every column name, which is especially useful when
+    a schema needs two independent profiles (e.g., a sender and a recipient). Each prefixed group
+    maintains its own coherence:
+
+    ```{python}
+    schema = pb.Schema(
+        **pb.profile_fields(set="minimal", prefix="sender_"),
+        **pb.profile_fields(set="minimal", prefix="recipient_"),
+    )
+
+    pb.preview(pb.generate_dataset(schema, n=50, seed=23))
+    ```
+    """
+
+    # --- Validate set parameter ---
+    if set not in _PROFILE_SETS:
+        raise ValueError(f"Invalid set '{set}'. Must be 'minimal', 'standard', or 'full'.")
+
+    # --- Normalize include/exclude to lists ---
+    include = list(include) if include is not None else []
+    exclude = list(exclude) if exclude is not None else []
+
+    # --- Validate preset names ---
+    for preset_name in include:
+        if preset_name not in _PROFILE_PRESETS:
+            raise ValueError(
+                f"Unknown preset '{preset_name}'. "
+                f"Available profile presets: {sorted(_PROFILE_PRESETS)}"
+            )
+
+    for preset_name in exclude:
+        if preset_name not in _PROFILE_PRESETS:
+            raise ValueError(
+                f"Unknown preset '{preset_name}'. "
+                f"Available profile presets: {sorted(_PROFILE_PRESETS)}"
+            )
+
+    # --- Check for include/exclude conflicts ---
+    overlap = _builtin_set(include) & _builtin_set(exclude)
+    if overlap:
+        conflicts = sorted(overlap)
+        raise ValueError(
+            f"Preset{'s' if len(conflicts) > 1 else ''} {', '.join(repr(p) for p in conflicts)} "
+            f"{'appear' if len(conflicts) > 1 else 'appears'} in both include and exclude."
+        )
+
+    # --- Validate name preset compatibility with split_name ---
+    if split_name:
+        # split_name=True: cannot include "name" (the combined preset)
+        if "name" in include:
+            raise ValueError(
+                "Use split_name=False to include 'name', "
+                "or include 'first_name'/'last_name' instead."
+            )
+    else:
+        # split_name=False: cannot include "first_name" or "last_name"
+        bad = [p for p in include if p in _SPLIT_NAME_PRESETS]
+        if bad:
+            raise ValueError(
+                f"Use split_name=True to include {'/'.join(repr(p) for p in sorted(bad))}, "
+                "or include 'name' instead."
+            )
+
+    # --- Build the preset list ---
+    # Start with the base set
+    base = list(_PROFILE_SETS[set])
+
+    # Apply split_name: replace first_name/last_name with name if needed
+    if not split_name:
+        base = ["name" if p == "first_name" else p for p in base if p != "last_name"]
+
+    # Convert to an ordered set (preserving order)
+    presets = dict.fromkeys(base)
+
+    # Add includes (maintaining canonical order)
+    for preset_name in include:
+        presets[preset_name] = None
+
+    # Remove excludes
+    for preset_name in exclude:
+        presets.pop(preset_name, None)
+
+    # Sort by canonical order
+    ordered_presets = [p for p in _PROFILE_ORDER if p in presets]
+
+    # --- Build the result dict ---
+    result: dict[str, StringField] = {}
+    for preset_name in ordered_presets:
+        col_name = f"{prefix}{preset_name}" if prefix else preset_name
+        result[col_name] = StringField(preset=preset_name)
+
+    return result

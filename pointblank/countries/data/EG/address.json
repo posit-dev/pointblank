@@ -1,0 +1,858 @@
+{
+  "locations": {
+    "very_common": [
+      {
+        "city": "Cairo",
+        "state": "Cairo",
+        "state_abbr": "C",
+        "postcode_prefix": "11",
+        "lat_min": 30.0,
+        "lat_max": 30.1,
+        "lon_min": 31.2,
+        "lon_max": 31.3
+      },
+      {
+        "city": "Alexandria",
+        "state": "Alexandria",
+        "state_abbr": "ALX",
+        "postcode_prefix": "21",
+        "lat_min": 31.18,
+        "lat_max": 31.22,
+        "lon_min": 29.9,
+        "lon_max": 29.96
+      },
+      {
+        "city": "Giza",
+        "state": "Giza",
+        "state_abbr": "GZ",
+        "postcode_prefix": "12",
+        "lat_min": 30.0,
+        "lat_max": 30.05,
+        "lon_min": 31.19,
+        "lon_max": 31.22
+      }
+    ],
+    "common": [
+      {
+        "city": "Shubra El Kheima",
+        "state": "Qalyubia",
+        "state_abbr": "KB",
+        "postcode_prefix": "13",
+        "lat_min": 30.1,
+        "lat_max": 30.15,
+        "lon_min": 31.24,
+        "lon_max": 31.28
+      },
+      {
+        "city": "Port Said",
+        "state": "Port Said",
+        "state_abbr": "PTS",
+        "postcode_prefix": "42",
+        "lat_min": 31.25,
+        "lat_max": 31.28,
+        "lon_min": 32.28,
+        "lon_max": 32.32
+      },
+      {
+        "city": "Suez",
+        "state": "Suez",
+        "state_abbr": "SUZ",
+        "postcode_prefix": "43",
+        "lat_min": 29.95,
+        "lat_max": 30.0,
+        "lon_min": 32.52,
+        "lon_max": 32.56
+      },
+      {
+        "city": "Luxor",
+        "state": "Luxor",
+        "state_abbr": "LX",
+        "postcode_prefix": "85",
+        "lat_min": 25.68,
+        "lat_max": 25.72,
+        "lon_min": 32.64,
+        "lon_max": 32.66
+      },
+      {
+        "city": "Mansoura",
+        "state": "Dakahlia",
+        "state_abbr": "DK",
+        "postcode_prefix": "35",
+        "lat_min": 31.03,
+        "lat_max": 31.06,
+        "lon_min": 31.37,
+        "lon_max": 31.4
+      },
+      {
+        "city": "Tanta",
+        "state": "Gharbia",
+        "state_abbr": "GH",
+        "postcode_prefix": "31",
+        "lat_min": 30.78,
+        "lat_max": 30.81,
+        "lon_min": 30.99,
+        "lon_max": 31.02
+      }
+    ],
+    "uncommon": [
+      {
+        "city": "Aswan",
+        "state": "Aswan",
+        "state_abbr": "ASN",
+        "postcode_prefix": "81",
+        "lat_min": 24.08,
+        "lat_max": 24.1,
+        "lon_min": 32.88,
+        "lon_max": 32.92
+      },
+      {
+        "city": "Ismailia",
+        "state": "Ismailia",
+        "state_abbr": "IS",
+        "postcode_prefix": "41",
+        "lat_min": 30.59,
+        "lat_max": 30.62,
+        "lon_min": 32.26,
+        "lon_max": 32.28
+      },
+      {
+        "city": "Faiyum",
+        "state": "Faiyum",
+        "state_abbr": "FYM",
+        "postcode_prefix": "63",
+        "lat_min": 29.3,
+        "lat_max": 29.33,
+        "lon_min": 30.83,
+        "lon_max": 30.86
+      },
+      {
+        "city": "Zagazig",
+        "state": "Sharqia",
+        "state_abbr": "SHR",
+        "postcode_prefix": "44",
+        "lat_min": 30.58,
+        "lat_max": 30.6,
+        "lon_min": 31.5,
+        "lon_max": 31.52
+      },
+      {
+        "city": "Assiut",
+        "state": "Assiut",
+        "state_abbr": "AST",
+        "postcode_prefix": "71",
+        "lat_min": 27.17,
+        "lat_max": 27.2,
+        "lon_min": 31.17,
+        "lon_max": 31.2
+      },
+      {
+        "city": "Damanhur",
+        "state": "Beheira",
+        "state_abbr": "BH",
+        "postcode_prefix": "22",
+        "lat_min": 31.03,
+        "lat_max": 31.05,
+        "lon_min": 30.46,
+        "lon_max": 30.48
+      },
+      {
+        "city": "Minya",
+        "state": "Minya",
+        "state_abbr": "MN",
+        "postcode_prefix": "61",
+        "lat_min": 28.08,
+        "lat_max": 28.1,
+        "lon_min": 30.74,
+        "lon_max": 30.77
+      },
+      {
+        "city": "Beni Suef",
+        "state": "Beni Suef",
+        "state_abbr": "BNS",
+        "postcode_prefix": "62",
+        "lat_min": 29.06,
+        "lat_max": 29.08,
+        "lon_min": 31.08,
+        "lon_max": 31.1
+      },
+      {
+        "city": "Qena",
+        "state": "Qena",
+        "state_abbr": "KN",
+        "postcode_prefix": "83",
+        "lat_min": 26.15,
+        "lat_max": 26.18,
+        "lon_min": 32.72,
+        "lon_max": 32.74
+      }
+    ],
+    "rare": [
+      {
+        "city": "Sohag",
+        "state": "Sohag",
+        "state_abbr": "SHG",
+        "postcode_prefix": "82",
+        "lat_min": 26.55,
+        "lat_max": 26.57,
+        "lon_min": 31.69,
+        "lon_max": 31.72
+      },
+      {
+        "city": "Hurghada",
+        "state": "Red Sea",
+        "state_abbr": "BA",
+        "postcode_prefix": "84",
+        "lat_min": 27.17,
+        "lat_max": 27.22,
+        "lon_min": 33.82,
+        "lon_max": 33.86
+      },
+      {
+        "city": "Kafr el-Sheikh",
+        "state": "Kafr el-Sheikh",
+        "state_abbr": "KFS",
+        "postcode_prefix": "33",
+        "lat_min": 31.1,
+        "lat_max": 31.13,
+        "lon_min": 30.93,
+        "lon_max": 30.95
+      },
+      {
+        "city": "Banha",
+        "state": "Qalyubia",
+        "state_abbr": "KB",
+        "postcode_prefix": "13",
+        "lat_min": 30.45,
+        "lat_max": 30.47,
+        "lon_min": 31.17,
+        "lon_max": 31.19
+      },
+      {
+        "city": "Arish",
+        "state": "North Sinai",
+        "state_abbr": "SIN",
+        "postcode_prefix": "45",
+        "lat_min": 31.12,
+        "lat_max": 31.14,
+        "lon_min": 33.79,
+        "lon_max": 33.81
+      },
+      {
+        "city": "Mallawi",
+        "state": "Minya",
+        "state_abbr": "MN",
+        "postcode_prefix": "61",
+        "lat_min": 27.72,
+        "lat_max": 27.74,
+        "lon_min": 30.83,
+        "lon_max": 30.85
+      },
+      {
+        "city": "10th of Ramadan",
+        "state": "Sharqia",
+        "state_abbr": "SHR",
+        "postcode_prefix": "44",
+        "lat_min": 30.29,
+        "lat_max": 30.32,
+        "lon_min": 31.75,
+        "lon_max": 31.78
+      },
+      {
+        "city": "6th of October",
+        "state": "Giza",
+        "state_abbr": "GZ",
+        "postcode_prefix": "12",
+        "lat_min": 29.93,
+        "lat_max": 29.97,
+        "lon_min": 30.9,
+        "lon_max": 30.95
+      },
+      {
+        "city": "New Cairo",
+        "state": "Cairo",
+        "state_abbr": "C",
+        "postcode_prefix": "11",
+        "lat_min": 30.02,
+        "lat_max": 30.06,
+        "lon_min": 31.4,
+        "lon_max": 31.47
+      },
+      {
+        "city": "Shibin El Kom",
+        "state": "Monufia",
+        "state_abbr": "MNF",
+        "postcode_prefix": "32",
+        "lat_min": 30.55,
+        "lat_max": 30.58,
+        "lon_min": 31.0,
+        "lon_max": 31.02
+      },
+      {
+        "city": "Marsa Matruh",
+        "state": "Matruh",
+        "state_abbr": "MT",
+        "postcode_prefix": "51",
+        "lat_min": 31.34,
+        "lat_max": 31.36,
+        "lon_min": 27.23,
+        "lon_max": 27.25
+      },
+      {
+        "city": "Edfu",
+        "state": "Aswan",
+        "state_abbr": "ASN",
+        "postcode_prefix": "81",
+        "lat_min": 24.97,
+        "lat_max": 24.99,
+        "lon_min": 32.87,
+        "lon_max": 32.89
+      }
+    ]
+  },
+  "streets_by_city": {
+    "Cairo": [
+      "Sharia Talaat Harb",
+      "Sharia Qasr el-Nil",
+      "Sharia 26th July",
+      "Sharia el-Muizz",
+      "Sharia Gameat el-Dowal el-Arabiya",
+      "Sharia el-Tahrir",
+      "Corniche el-Nil",
+      "Sharia Ramses",
+      "Sharia Mohamed Ali",
+      "Sharia el-Azhar",
+      "Sharia Salah Salem",
+      "Sharia el-Haram",
+      "Sharia Abbas el-Akkad",
+      "Sharia Makram Ebeid",
+      "Sharia el-Nasr",
+      "Sharia Ahmed Orabi",
+      "Sharia el-Merghany",
+      "Sharia el-Thawra",
+      "Sharia Mosaddaq",
+      "Sharia el-Sudan",
+      "Sharia Shehab",
+      "Sharia Dokki",
+      "Sharia el-Giza",
+      "Sharia Sphinx",
+      "Sharia el-Batal Ahmed Abdel Aziz",
+      "Sharia Lebanon",
+      "Sharia Syria",
+      "Sharia Baghdad",
+      "Sharia Nadi el-Seid",
+      "Sharia Ismail Mohamed",
+      "Sharia el-Maadi",
+      "Sharia el-Lasilky",
+      "Sharia el-Nasr Maadi",
+      "Sharia 9 Maadi",
+      "Sharia el-Hegaz",
+      "Sharia el-Tayaran",
+      "Sharia Port Said",
+      "Sharia Abdel Khalek Sarwat",
+      "Sharia Adly",
+      "Sharia Emad el-Din"
+    ],
+    "Alexandria": [
+      "Corniche Road",
+      "Sharia Saad Zaghloul",
+      "Sharia Nabi Daniel",
+      "Sharia el-Horreya",
+      "Sharia Abu Qir",
+      "Sharia el-Geish",
+      "Sharia Fouad",
+      "Sharia Sultan Hussein",
+      "Sharia Safiya Zaghloul",
+      "Sharia Champollion",
+      "Sharia el-Shatby",
+      "Sharia Ahmed Orabi",
+      "Sharia el-Raml",
+      "Sharia Mostafa Kamel",
+      "Sharia Gamal Abdel Nasser",
+      "Sharia el-Ibrahimiya",
+      "Sharia Victor Emanuel",
+      "Sharia Khartoum",
+      "Sharia el-Manshiya",
+      "Sharia Sherif Pasha",
+      "Sharia Attarine",
+      "Sharia Ahmed Shawky",
+      "Sharia Montazah",
+      "Sharia el-Max",
+      "Sharia El-Amriyya",
+      "Sharia Stanley",
+      "Sharia Gleem",
+      "Sharia Rushdy",
+      "Sharia Smouha",
+      "Sharia Sporting",
+      "Sharia Bulkeley",
+      "Sharia Miami",
+      "Sharia Sidi Bishr",
+      "Sharia el-Mandara",
+      "Sharia el-Asafra",
+      "Sharia Cleopatra",
+      "Sharia Kafr Abdou",
+      "Sharia Louran",
+      "Sharia el-Ibrahimiyya",
+      "Sharia el-Azarita"
+    ],
+    "Giza": [
+      "Sharia el-Haram",
+      "Sharia Faisal",
+      "Sharia el-Bahr el-A'zam",
+      "Sharia el-Mashir",
+      "Sharia el-Mohandessin",
+      "Sharia el-Ahram",
+      "Sharia Nahia",
+      "Sharia el-Manyal",
+      "Sharia el-Gama'a",
+      "Sharia el-Orouba",
+      "Sharia el-Malik Faisal",
+      "Corniche el-Nil Giza",
+      "Sharia Maryoutiya",
+      "Sharia el-Remaya",
+      "Sharia el-Muneeb",
+      "Sharia Tisan",
+      "Sharia el-Omraniya",
+      "Sharia el-Tersa",
+      "Sharia el-Saf",
+      "Sharia Hadayek el-Ahram"
+    ],
+    "Luxor": [
+      "Corniche el-Nil Luxor",
+      "Sharia el-Mahatta",
+      "Sharia Khaled ibn el-Walid",
+      "Sharia el-Karnak",
+      "Sharia el-Souk",
+      "Sharia el-Medina el-Monawara",
+      "Sharia Television",
+      "Sharia el-Rawda",
+      "Sharia Youssef Hassan",
+      "Sharia el-Salakhana",
+      "Sharia el-Halabi",
+      "Sharia Ahmed Orabi",
+      "Sharia el-Awamiya",
+      "Sharia Salah el-Din",
+      "Sharia el-Bayadiya",
+      "Sharia el-Manshiya",
+      "Sharia el-Gournah",
+      "Sharia Mohamed Farid",
+      "Sharia el-Birka",
+      "Sharia el-Toud"
+    ],
+    "Mansoura": [
+      "Sharia el-Gomhouriya",
+      "Sharia Bank Misr",
+      "Sharia el-Geish",
+      "Sharia Saad Zaghloul",
+      "Sharia el-Mahmoudeya",
+      "Sharia el-Nasr",
+      "Sharia el-Shohada",
+      "Sharia Port Said",
+      "Sharia Toriel",
+      "Sharia el-Masala",
+      "Sharia el-Mashaya",
+      "Sharia el-Sikka el-Gedida",
+      "Sharia el-Gala",
+      "Sharia el-Tahrir",
+      "Sharia Bayt el-Mal",
+      "Sharia el-Nil",
+      "Sharia Ahmed Maher",
+      "Sharia el-Salam",
+      "Sharia el-Zahra",
+      "Sharia Talaat Harb"
+    ],
+    "Tanta": [
+      "Sharia el-Bahr",
+      "Sharia el-Geish",
+      "Sharia Saad Zaghloul",
+      "Sharia el-Galaa",
+      "Sharia el-Nahda",
+      "Sharia el-Mahatta",
+      "Sharia el-Sayyed el-Badawi",
+      "Sharia el-Gomhouriya",
+      "Sharia el-Nasr",
+      "Sharia Taha Hussein",
+      "Sharia el-Ashra min Ramadan",
+      "Sharia el-Tahrir",
+      "Sharia el-Mudir",
+      "Sharia el-Stadium",
+      "Sharia el-Sadat",
+      "Sharia el-Sayed Darwish",
+      "Sharia el-Orman",
+      "Sharia el-Nile",
+      "Sharia el-Gami'",
+      "Sharia el-Sanafiry"
+    ],
+    "Shubra El Kheima": [
+      "Sharia Shubra",
+      "Sharia Ahmed Orabi",
+      "Sharia Al Khalig",
+      "Sharia Rod El Farag",
+      "Sharia El Sahel",
+      "Sharia Teraat El Tawfiqiya",
+      "Sharia El Mazalat",
+      "Sharia Mustorod",
+      "Sharia El Qalyubia",
+      "Sharia Bahtim"
+    ],
+    "Port Said": [
+      "Sharia El Gomhoreya",
+      "Sharia 23rd of July",
+      "Sharia Palestine",
+      "Sharia El Tigarey",
+      "Sharia Safiya Zaghloul",
+      "Sharia El Geish",
+      "Sharia El Nahda",
+      "Corniche Port Said",
+      "Sharia El Canal",
+      "Sharia El Manakh",
+      "Sharia Mohamed Ali",
+      "Sharia Attar El-Nabi"
+    ],
+    "Suez": [
+      "Sharia El Geish",
+      "Sharia Salah El Din",
+      "Sharia El Gomhoreya",
+      "Sharia El Shohadaa",
+      "Sharia El Arbein",
+      "Sharia Port Tawfiq",
+      "Corniche El Suez",
+      "Sharia Ahmed Hamdi",
+      "Sharia El Salam",
+      "Sharia Saad Zaghloul"
+    ],
+    "Aswan": [
+      "Corniche El Nil",
+      "Sharia Abtal El Tahrir",
+      "Sharia El Souk",
+      "Sharia Saad Zaghloul",
+      "Sharia Kesr El Haggar",
+      "Sharia El Mahatta",
+      "Sharia Abbas Farid",
+      "Sharia El Matar",
+      "Sharia El Sadat",
+      "Sharia Philae"
+    ],
+    "Ismailia": [
+      "Sharia Mohamed Ali",
+      "Sharia El Thawra",
+      "Sharia El Gomhoreya",
+      "Sharia Champollion",
+      "Sharia Sultan Hussein",
+      "Sharia El Geish",
+      "Sharia Ahmed Orabi",
+      "Corniche El Timsah",
+      "Sharia El Horreya",
+      "Sharia El Nil"
+    ],
+    "Faiyum": [
+      "Sharia Gamal Abdel Nasser",
+      "Sharia El Gomhoreya",
+      "Sharia El Madina",
+      "Sharia El Markaz",
+      "Sharia Bahr Yusuf",
+      "Sharia El Horreya",
+      "Sharia El Mahatta",
+      "Sharia Qarun",
+      "Sharia El Mostawsaf",
+      "Sharia El Salam"
+    ],
+    "Zagazig": [
+      "Sharia Saad Zaghloul",
+      "Sharia El Gomhoreya",
+      "Sharia El Geish",
+      "Sharia Ahmed Orabi",
+      "Sharia El Mahatta",
+      "Sharia El Galaa",
+      "Sharia El Thawra",
+      "Sharia Port Said",
+      "Sharia El Moez",
+      "Sharia El Salam"
+    ],
+    "Assiut": [
+      "Sharia El Gomhoreya",
+      "Sharia El Nahda",
+      "Sharia El Geish",
+      "Sharia El Thawra",
+      "Sharia Gamal Abdel Nasser",
+      "Corniche El Nil",
+      "Sharia El Mahkama",
+      "Sharia El Helaly",
+      "Sharia El Bandarey",
+      "Sharia Mohamed Farid"
+    ],
+    "Damanhur": [
+      "Sharia El Gomhoreya",
+      "Sharia El Geish",
+      "Sharia El Mahatta",
+      "Sharia Saad Zaghloul",
+      "Sharia El Thawra",
+      "Sharia El Horreya",
+      "Sharia El Nasr",
+      "Sharia El Galaa",
+      "Sharia Ahmed Orabi",
+      "Sharia El Tahrir"
+    ],
+    "Minya": [
+      "Corniche El Nil",
+      "Sharia El Gomhoreya",
+      "Sharia El Horreya",
+      "Sharia Gamal Abdel Nasser",
+      "Sharia El Mahatta",
+      "Sharia Taha Hussein",
+      "Sharia Port Said",
+      "Sharia El Geish",
+      "Sharia El Tahrir",
+      "Sharia Saad Zaghloul"
+    ],
+    "Beni Suef": [
+      "Sharia El Gomhoreya",
+      "Corniche El Nil",
+      "Sharia Saad Zaghloul",
+      "Sharia El Horreya",
+      "Sharia El Mahatta",
+      "Sharia El Geish",
+      "Sharia Ahmed Orabi",
+      "Sharia El Nasr",
+      "Sharia El Galaa",
+      "Sharia El Tahrir"
+    ],
+    "Qena": [
+      "Sharia El Gomhoreya",
+      "Corniche El Nil",
+      "Sharia El Geish",
+      "Sharia El Horreya",
+      "Sharia El Mahkama",
+      "Sharia Port Said",
+      "Sharia El Mahatta",
+      "Sharia El Galaa",
+      "Sharia Saad Zaghloul",
+      "Sharia Luxor"
+    ],
+    "Sohag": [
+      "Sharia El Gomhoreya",
+      "Corniche El Nil",
+      "Sharia El Mahatta",
+      "Sharia El Geish",
+      "Sharia El Horreya",
+      "Sharia Gamal Abdel Nasser",
+      "Sharia Port Said",
+      "Sharia El Galaa",
+      "Sharia El Nahda",
+      "Sharia El Thawra"
+    ],
+    "Hurghada": [
+      "Sharia Sheraton",
+      "Sharia El Nasr",
+      "Sharia El Corniche",
+      "Sharia El Mamsha",
+      "Sharia El Sakkala",
+      "Sharia El Dahar",
+      "Sharia El Kawsar",
+      "Sharia Ahmed El Masry",
+      "Sharia El Airport",
+      "Sharia El Bahr"
+    ],
+    "Kafr el-Sheikh": [
+      "Sharia El Gomhoreya",
+      "Sharia El Geish",
+      "Sharia El Galaa",
+      "Sharia Saad Zaghloul",
+      "Sharia El Horreya",
+      "Sharia El Thawra",
+      "Sharia El Nasr",
+      "Sharia El Mahkama",
+      "Sharia Ahmed Orabi",
+      "Sharia El Mahatta"
+    ],
+    "Banha": [
+      "Sharia El Gomhoreya",
+      "Sharia Saad Zaghloul",
+      "Sharia El Geish",
+      "Sharia El Nahda",
+      "Sharia El Galaa",
+      "Sharia El Horreya",
+      "Sharia Ahmed Orabi",
+      "Sharia El Mahkama",
+      "Sharia Nile",
+      "Sharia El Mahatta"
+    ],
+    "Arish": [
+      "Sharia 23rd of July",
+      "Sharia El Geish",
+      "Sharia El Gomhoreya",
+      "Sharia Fouad Zekry",
+      "Sharia El Corniche",
+      "Sharia El Horreya",
+      "Sharia El Salam",
+      "Sharia El Galaa",
+      "Sharia El Thawra",
+      "Sharia El Nasr"
+    ],
+    "Mallawi": [
+      "Sharia El Gomhoreya",
+      "Sharia El Geish",
+      "Sharia El Mahatta",
+      "Sharia El Horreya",
+      "Sharia Abu Bakr El Siddiq",
+      "Sharia El Galaa",
+      "Sharia El Nasr",
+      "Sharia El Canal",
+      "Sharia El Souk",
+      "Sharia Port Said"
+    ],
+    "10th of Ramadan": [
+      "El Mehwar El Markazy",
+      "Sharia El Sanaey",
+      "Sharia El Mostashmarat",
+      "Sharia El Horreya",
+      "Sharia El Geish",
+      "Sharia El Nahda",
+      "Sharia El Madaris",
+      "Sharia El Gomhoreya",
+      "Sharia El Thawra",
+      "Sharia El Salam"
+    ],
+    "6th of October": [
+      "El Mehwar El Markazy",
+      "Sharia El Hosary",
+      "Sharia El Batal Ahmed Abdel Aziz",
+      "Sharia El Haram",
+      "Sharia El Thawra",
+      "Sharia Gamal Abdel Nasser",
+      "Sharia El Shabab",
+      "Sharia Dream Land",
+      "Sharia El Wahat",
+      "Sharia El Gomhoreya"
+    ],
+    "New Cairo": [
+      "Sharia El Teseen",
+      "Sharia Mohamed Naguib",
+      "Sharia El Thawra",
+      "Sharia El Rehab",
+      "Sharia El Banafseg",
+      "Sharia El Yasmin",
+      "Sharia El Narges",
+      "Sharia El Tagamoa El Khames",
+      "Sharia El Mosheer Tantawy",
+      "Sharia El Amal"
+    ],
+    "Shibin El Kom": [
+      "Sharia El Gomhoreya",
+      "Sharia Gamal Abdel Nasser",
+      "Sharia El Geish",
+      "Sharia Saad Zaghloul",
+      "Sharia El Horreya",
+      "Sharia El Galaa",
+      "Sharia El Mahkama",
+      "Sharia El Mahatta",
+      "Sharia El Thawra",
+      "Sharia Ahmed Orabi"
+    ],
+    "Marsa Matruh": [
+      "Sharia El Corniche",
+      "Sharia El Galaa",
+      "Sharia Alexandria",
+      "Sharia El Geish",
+      "Sharia El Shatea",
+      "Sharia El Gomhoreya",
+      "Sharia El Salam",
+      "Sharia El Nasr",
+      "Sharia El Horreya",
+      "Sharia El Airport"
+    ],
+    "Edfu": [
+      "Sharia El Mabad",
+      "Sharia El Gomhoreya",
+      "Corniche El Nil",
+      "Sharia El Souk",
+      "Sharia El Geish",
+      "Sharia El Galaa",
+      "Sharia El Horreya",
+      "Sharia El Mahkama",
+      "Sharia El Mahatta",
+      "Sharia El Nasr"
+    ]
+  },
+  "postcode_format": "#####",
+  "address_formats": [
+    "{building_number} {street}, {city}, {state} {postcode}",
+    "{street}, {building_number}, {city} {postcode}"
+  ],
+  "country": "Egypt",
+  "country_code": "EG",
+  "phone_area_codes": {
+    "Cairo": [
+      "2"
+    ],
+    "Alexandria": [
+      "3"
+    ],
+    "Giza": [
+      "2"
+    ],
+    "Qalyubia": [
+      "13"
+    ],
+    "Port Said": [
+      "66"
+    ],
+    "Suez": [
+      "62"
+    ],
+    "Luxor": [
+      "95"
+    ],
+    "Dakahlia": [
+      "50"
+    ],
+    "Gharbia": [
+      "40"
+    ],
+    "Aswan": [
+      "97"
+    ],
+    "Ismailia": [
+      "64"
+    ],
+    "Faiyum": [
+      "84"
+    ],
+    "Sharqia": [
+      "55"
+    ],
+    "Assiut": [
+      "88"
+    ],
+    "Beheira": [
+      "45"
+    ],
+    "Minya": [
+      "86"
+    ],
+    "Beni Suef": [
+      "82"
+    ],
+    "Qena": [
+      "96"
+    ],
+    "Sohag": [
+      "93"
+    ],
+    "Red Sea": [
+      "65"
+    ],
+    "Kafr el-Sheikh": [
+      "47"
+    ],
+    "Monufia": [
+      "48"
+    ],
+    "North Sinai": [
+      "68"
+    ],
+    "Matruh": [
+      "46"
+    ]
+  },
+  "phone_format": "0{area_code} ####-####"
+}

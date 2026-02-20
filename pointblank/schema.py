@@ -133,7 +133,7 @@ class Schema:
     #| echo: false
     #| output: false
     import pointblank as pb
-    pb.config(report_incl_header=False, report_incl_footer=False, preview_incl_header=False)
+    pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
     ```
     A schema can be constructed via the `Schema` class in multiple ways. Let's use the following
     Polars DataFrame as a basis for constructing a schema:
@@ -796,7 +796,9 @@ class Schema:
         n: int = 100,
         seed: int | None = None,
         output: Literal["polars", "pandas", "dict"] = "polars",
-        country: str = "US",
+        country: str | list[str] | dict[str, float] = "US",
+        shuffle: bool = True,
+        weighted: bool = True,
     ) -> Any:
         """
         Generate synthetic test data conforming to this schema.
@@ -817,9 +819,22 @@ class Schema:
             Polars DataFrame, (2) `"pandas"` returns a Pandas DataFrame, and (3) `"dict"` returns
             a dictionary of lists.
         country
-            Country code for realistic data generation when using presets (e.g., `preset="email"`,
-            `preset="address"`). Accepts ISO 3166-1 alpha-2 codes (e.g., `"US"`, `"DE"`, `"FR"`)
-            or alpha-3 codes (e.g., `"USA"`, `"DEU"`, `"FRA"`). Default is `"US"`.
+            Country code(s) for realistic data generation when using presets. Accepts a single ISO
+            3166-1 alpha-2 or alpha-3 code (e.g., `"US"`, `"DEU"`), a list of codes for uniform
+            mixing (e.g., `["US", "DE", "JP"]`), or a dict mapping codes to positive weights (e.g.,
+            `{"US": 60, "DE": 25, "JP": 15}`). See the *Locale Mixing* section below for details.
+            Default is `"US"`.
+        shuffle
+            When `country=` specifies multiple countries, controls whether the output rows are
+            randomly interleaved (`True`, the default) or grouped in contiguous country blocks
+            (`False`). The shuffle is deterministic with the seed. Has no effect when `country` is
+            a single string. Default is `True`.
+        weighted
+            When `True`, names and locations are sampled according to real-world frequency tiers.
+            Common names like "James" and "Smith" appear far more often than rare names. Large
+            cities like New York and Los Angeles dominate over small towns. Only affects data files
+            that have been migrated to the tiered format; flat-list data always uses uniform
+            sampling. Default is `True`.
 
         Returns
         -------
@@ -833,30 +848,50 @@ class Schema:
         ImportError
             If required optional dependencies are not installed.
 
+        Locale Mixing
+        -------------
+        The `country=` parameter accepts three input forms for flexible locale control:
+
+        (1) a **single string** (the default), such as `"US"` or `"DEU"`, which generates all rows
+        from one locale; (2) a **list of strings**, such as `["US", "DE", "JP"]`, which splits rows
+        equally across the listed countries; and (3) a **dict of weights**, such as
+        `{"US": 0.6, "DE": 0.3, "FR": 0.1}`, which allocates rows proportionally (weights are
+        auto-normalized, so `{"US": 6, "DE": 3, "FR": 1}` is equivalent).
+
+        Row counts are distributed using largest-remainder apportionment so they always sum to
+        exactly `n=`. Each country's rows are generated as an independent batch (preserving all
+        cross-column coherence within each batch), then either interleaved randomly (`shuffle=True`,
+        the default) or left in contiguous country blocks (`shuffle=False`).
+
         Supported Countries
         -------------------
         The `country=` parameter controls the country used for generating realistic data with
-        presets (e.g., `preset="email"`, `preset="address"`). This affects location-specific
-        formats like addresses, phone numbers, and postal codes. Currently, **50 countries** are
-        supported with full locale data:
+        presets (e.g., `preset="email"`, `preset="address"`). This affects location-specific formats
+        like addresses, phone numbers, and postal codes. Currently, **71 countries** are supported
+        with full locale data:
 
-        **Europe (32 countries):** Austria (`"AT"`), Belgium (`"BE"`), Bulgaria (`"BG"`),
-        Croatia (`"HR"`), Cyprus (`"CY"`), Czech Republic (`"CZ"`), Denmark (`"DK"`),
-        Estonia (`"EE"`), Finland (`"FI"`), France (`"FR"`), Germany (`"DE"`), Greece (`"GR"`),
-        Hungary (`"HU"`), Iceland (`"IS"`), Ireland (`"IE"`), Italy (`"IT"`), Latvia (`"LV"`),
-        Lithuania (`"LT"`), Luxembourg (`"LU"`), Malta (`"MT"`), Netherlands (`"NL"`),
-        Norway (`"NO"`), Poland (`"PL"`), Portugal (`"PT"`), Romania (`"RO"`), Russia (`"RU"`),
-        Slovakia (`"SK"`), Slovenia (`"SI"`), Spain (`"ES"`), Sweden (`"SE"`),
-        Switzerland (`"CH"`), United Kingdom (`"GB"`)
+        **Europe (32 countries):** Austria (`"AT"`), Belgium (`"BE"`), Bulgaria (`"BG"`), Croatia
+        (`"HR"`), Cyprus (`"CY"`), Czech Republic (`"CZ"`), Denmark (`"DK"`), Estonia (`"EE"`),
+        Finland (`"FI"`), France (`"FR"`), Germany (`"DE"`), Greece (`"GR"`), Hungary (`"HU"`),
+        Iceland (`"IS"`), Ireland (`"IE"`), Italy (`"IT"`), Latvia (`"LV"`), Lithuania (`"LT"`),
+        Luxembourg (`"LU"`), Malta (`"MT"`), Netherlands (`"NL"`), Norway (`"NO"`), Poland (`"PL"`),
+        Portugal (`"PT"`), Romania (`"RO"`), Russia (`"RU"`), Slovakia (`"SK"`), Slovenia (`"SI"`),
+        Spain (`"ES"`), Sweden (`"SE"`), Switzerland (`"CH"`), United Kingdom (`"GB"`)
 
-        **Americas (7 countries):** Argentina (`"AR"`), Brazil (`"BR"`), Canada (`"CA"`),
-        Chile (`"CL"`), Colombia (`"CO"`), Mexico (`"MX"`), United States (`"US"`)
+        **Americas (9 countries):** Argentina (`"AR"`), Brazil (`"BR"`), Canada (`"CA"`), Chile
+        (`"CL"`), Colombia (`"CO"`), Costa Rica (`"CR"`), Mexico (`"MX"`), Peru (`"PE"`),
+        United States (`"US"`)
 
-        **Asia-Pacific (10 countries):** Australia (`"AU"`), China (`"CN"`), Hong Kong (`"HK"`),
-        India (`"IN"`), Indonesia (`"ID"`), Japan (`"JP"`), New Zealand (`"NZ"`),
-        Philippines (`"PH"`), South Korea (`"KR"`), Taiwan (`"TW"`)
+        **Asia-Pacific (17 countries):** Australia (`"AU"`), Bangladesh (`"BD"`), China (`"CN"`),
+        Hong Kong (`"HK"`), India (`"IN"`), Indonesia (`"ID"`), Japan (`"JP"`), Malaysia (`"MY"`),
+        New Zealand (`"NZ"`), Pakistan (`"PK"`), Philippines (`"PH"`), Singapore (`"SG"`),
+        South Korea (`"KR"`), Sri Lanka (`"LK"`), Taiwan (`"TW"`), Thailand (`"TH"`),
+        Vietnam (`"VN"`)
 
-        **Middle East (1 country):** Turkey (`"TR"`)
+        **Middle East & Africa (13 countries):** Algeria (`"DZ"`), Egypt (`"EG"`),
+        Ethiopia (`"ET"`), Ghana (`"GH"`), Kenya (`"KE"`), Morocco (`"MA"`), Nigeria (`"NG"`),
+        Senegal (`"SN"`), South Africa (`"ZA"`), Tunisia (`"TN"`), Turkey (`"TR"`),
+        Uganda (`"UG"`), United Arab Emirates (`"AE"`)
 
         Examples
         --------
@@ -884,6 +919,7 @@ class Schema:
 
         ```{python}
         schema = pb.Schema(name="String", age="Int64", active="Boolean")
+
         pb.preview(schema.generate(n=50, seed=123, output="pandas"))
         ```
 
@@ -895,6 +931,7 @@ class Schema:
             name=pb.string_field(preset="name"),
             city=pb.string_field(preset="city"),
         )
+
         pb.preview(schema.generate(n=20, seed=23, country="DE"))
         ```
         """
@@ -927,6 +964,8 @@ class Schema:
             seed=seed,
             output=output,
             country=country,
+            shuffle=shuffle,
+            weighted=weighted,
         )
 
         return generate_dataframe(fields, config)
@@ -1535,35 +1574,50 @@ def generate_dataset(
     n: int = 100,
     seed: int | None = None,
     output: Literal["polars", "pandas", "dict"] = "polars",
-    country: str = "US",
+    country: str | list[str] | dict[str, float] = "US",
+    shuffle: bool = True,
+    weighted: bool = True,
 ) -> Any:
     """
     Generate synthetic test data from a schema.
 
     This function generates random data that conforms to a schema's column definitions. When the
-    schema is defined using `Field` objects with constraints (e.g., `min_val`, `max_val`,
-    `pattern`, `preset`), the generated data will respect those constraints.
-
-    This is a convenience function that wraps `Schema.generate()` for a more functional style
-    of usage, similar to how `load_dataset()` loads built-in datasets.
+    schema is defined using `Field` objects with constraints (e.g., `min_val=`, `max_val=`,
+    `pattern=`, `preset=`), the generated data will respect those constraints.
 
     Parameters
     ----------
     schema
-        The schema object defining the structure and constraints of the data to generate.
+        The schema object defining the structure and constraints of the data to generate. Each
+        column can be specified using a field helper function (e.g., `int_field()`,
+        `string_field()`) for fine-grained control, or as a simple dtype string (e.g.,
+        `"Int64"`, `"String"`) for unconstrained generation.
     n
-        Number of rows to generate. Default is `100`.
+        Number of rows to generate. The default is `100`.
     seed
         Random seed for reproducibility. If provided, the same seed will produce
         the same data. Default is `None` (non-deterministic).
     output
-        Output format for the generated data. Options are: (1) `"polars"` (default) returns a
+        Output format for the generated data. Options are: (1) `"polars"` (the default) returns a
         Polars DataFrame, (2) `"pandas"` returns a Pandas DataFrame, and (3) `"dict"` returns
         a dictionary of lists.
     country
-        Country code for realistic data generation when using presets (e.g., `preset="email"`,
-        `preset="address"`). Accepts ISO 3166-1 alpha-2 codes (e.g., `"US"`, `"DE"`, `"FR"`)
-        or alpha-3 codes (e.g., `"USA"`, `"DEU"`, `"FRA"`). Default is `"US"`.
+        Country code(s) for locale-aware generation when using presets. Accepts a single
+        ISO 3166-1 alpha-2 or alpha-3 code (e.g., `"US"`, `"DEU"`), a list of codes for
+        uniform mixing (e.g., `["US", "DE", "JP"]`), or a dict mapping codes to positive
+        weights (e.g., `{"US": 60, "DE": 25, "JP": 15}`). See the *Locale Mixing* section
+        below for details. The default is `"US"`.
+    shuffle
+        When `country=` is a list or dict (multi-country mixing), controls whether rows from
+        different countries are interleaved randomly (`True`, the default) or grouped by country
+        in the order the countries are specified (`False`). Ignored when `country=` is a single
+        string.
+    weighted
+        When `True`, names and locations are sampled according to real-world frequency tiers.
+        Common names like "James" and "Smith" appear far more often than rare names. Large
+        cities like New York and Los Angeles dominate over small towns. Only affects data files
+        that have been migrated to the tiered format; flat-list data always uses uniform
+        sampling. Default is `True`.
 
     Returns
     -------
@@ -1577,12 +1631,53 @@ def generate_dataset(
     ImportError
         If required optional dependencies are not installed.
 
+    Presets and the `country=` Parameter
+    ------------------------------------
+    Several `string_field()` presets produce locale-aware data that varies depending on the
+    `country=` parameter. The following presets are particularly affected:
+
+    - **Address-related presets** (`"address"`, `"city"`, `"state"`, `"postcode"`,
+      `"phone_number"`, `"latitude"`, `"longitude"`, `"license_plate"`): produce addresses,
+      cities, postal codes, phone numbers, and license plates formatted for the specified
+      country. For example, `country="DE"` yields German street names and PLZ postal codes,
+      while `country="JP"` yields Japanese addresses. License plates for CA, US, DE, AU, and
+      GB use province/state-specific formats when location fields are present.
+    - **Person-related presets** (`"name"`, `"name_full"`, `"first_name"`, `"last_name"`,
+      `"email"`, `"user_name"`) produce culturally appropriate names for the specified country.
+      For example, `country="FR"` produces French names, while `country="KR"` produces Korean
+      names.
+    - **Business-related presets** (`"job"`, `"company"`): when both are present, the job and
+      company are drawn from the same industry for realism. The `"name_full"` preset will also
+      add profession-matched titles (e.g., "Dr." for doctors, "Prof." for professors), and
+      integer columns named `age` are automatically constrained to working-age range (22--65).
+    - **Financial presets** (`"iban"`, `"ssn"`, `"license_plate"`): produce identifiers in the
+      format used by the specified country.
+
+    When multiple columns in the same schema use related presets, the generated data is
+    automatically coherent across those columns within each row. Person-related presets will share
+    the same identity (e.g., the email is derived from the name), address-related presets will
+    share the same location (e.g., the city matches the address), and business-related presets
+    will share the same industry context.
+
+    Locale Mixing
+    -------------
+    The `country=` parameter accepts three input forms for flexible locale control:
+
+    (1) a **single string** (the default), such as `"US"` or `"DEU"`, which generates
+    all rows from one locale; (2) a **list of strings**, such as `["US", "DE", "JP"]`,
+    which splits rows equally across the listed countries; and (3) a **dict of weights**,
+    such as `{"US": 0.6, "DE": 0.3, "FR": 0.1}`, which allocates rows proportionally
+    (weights are auto-normalized, so `{"US": 6, "DE": 3, "FR": 1}` is equivalent).
+
+    Row counts are distributed using largest-remainder apportionment so they always sum
+    to exactly `n=`. Each country's rows are generated as an independent batch (preserving
+    all cross-column coherence within each batch), then either interleaved randomly
+    (`shuffle=True`, the default) or left in contiguous country blocks
+    (`shuffle=False`).
+
     Supported Countries
     -------------------
-    The `country=` parameter controls the country used for generating realistic data with
-    presets (e.g., `preset="email"`, `preset="address"`). This affects location-specific
-    formats like addresses, phone numbers, and postal codes. Currently, **50 countries** are
-    supported with full locale data:
+    The `country=` parameter currently supports 71 countries with full locale data:
 
     **Europe (32 countries):** Austria (`"AT"`), Belgium (`"BE"`), Bulgaria (`"BG"`),
     Croatia (`"HR"`), Cyprus (`"CY"`), Czech Republic (`"CZ"`), Denmark (`"DK"`),
@@ -1593,18 +1688,85 @@ def generate_dataset(
     Slovakia (`"SK"`), Slovenia (`"SI"`), Spain (`"ES"`), Sweden (`"SE"`),
     Switzerland (`"CH"`), United Kingdom (`"GB"`)
 
-    **Americas (7 countries):** Argentina (`"AR"`), Brazil (`"BR"`), Canada (`"CA"`),
-    Chile (`"CL"`), Colombia (`"CO"`), Mexico (`"MX"`), United States (`"US"`)
+    **Americas (9 countries):** Argentina (`"AR"`), Brazil (`"BR"`), Canada (`"CA"`),
+    Chile (`"CL"`), Colombia (`"CO"`), Costa Rica (`"CR"`), Mexico (`"MX"`),
+    Peru (`"PE"`), United States (`"US"`)
 
-    **Asia-Pacific (10 countries):** Australia (`"AU"`), China (`"CN"`), Hong Kong (`"HK"`),
-    India (`"IN"`), Indonesia (`"ID"`), Japan (`"JP"`), New Zealand (`"NZ"`),
-    Philippines (`"PH"`), South Korea (`"KR"`), Taiwan (`"TW"`)
+    **Asia-Pacific (17 countries):** Australia (`"AU"`), Bangladesh (`"BD"`),
+    China (`"CN"`), Hong Kong (`"HK"`), India (`"IN"`), Indonesia (`"ID"`),
+    Japan (`"JP"`), Malaysia (`"MY"`), New Zealand (`"NZ"`), Pakistan (`"PK"`),
+    Philippines (`"PH"`), Singapore (`"SG"`), South Korea (`"KR"`),
+    Sri Lanka (`"LK"`), Taiwan (`"TW"`), Thailand (`"TH"`), Vietnam (`"VN"`)
 
-    **Middle East (1 country):** Turkey (`"TR"`)
+    **Middle East & Africa (13 countries):** Algeria (`"DZ"`), Egypt (`"EG"`),
+    Ethiopia (`"ET"`), Ghana (`"GH"`), Kenya (`"KE"`), Morocco (`"MA"`),
+    Nigeria (`"NG"`), Senegal (`"SN"`), South Africa (`"ZA"`), Tunisia (`"TN"`),
+    Turkey (`"TR"`), Uganda (`"UG"`), United Arab Emirates (`"AE"`)
+
+    Pytest Fixture
+    --------------
+    When Pointblank is installed, a `generate_dataset` pytest fixture is automatically
+    available in all test files: no imports or `conftest.py` setup required. The fixture
+    behaves identically to this function, but derives a deterministic seed from the test's
+    fully-qualified name when `seed=` is not provided.
+
+    This means:
+
+    - the **same test** always produces the **same data**, with no manual seed management.
+    - **different tests** get different seeds, so they exercise different data.
+    - **you** can still pass an explicit `seed=` to override the automatic seed.
+    - **calling** the fixture **multiple times** within one test produces different (but still
+    deterministic) data on each call.
+    - the fixture exposes `.default_seed` and `.last_seed` attributes for debugging.
+
+    ```python
+    def test_my_pipeline(generate_dataset):
+        import pointblank as pb
+
+        schema = pb.Schema(
+            user_id=pb.int_field(unique=True),
+            email=pb.string_field(preset="email"),
+            age=pb.int_field(min_val=18, max_val=100),
+        )
+        df = generate_dataset(schema, n=500, country="DE")
+        # seed is derived from "test_my_pipeline" — same data every run
+        result = my_pipeline(df)
+        assert result.shape[0] == 500
+    ```
+
+    Multiple datasets can be generated within the same test, each with its own
+    deterministic seed:
+
+    ```python
+    def test_merge(generate_dataset):
+        customers = generate_dataset(customer_schema, n=1000, country="US")
+        orders = generate_dataset(order_schema, n=5000)
+        # Both DataFrames are deterministic; each call gets a unique seed
+    ```
+
+    When a test fails, include the seed in the assertion message so the failure is easy to
+    reproduce:
+
+    ```python
+    def test_age_range(generate_dataset):
+        df = generate_dataset(schema, n=100)
+        assert df["age"].min() >= 18, f"Failed with seed {generate_dataset.last_seed}"
+    ```
+
+    Seed Stability
+    --------------
+    A given seed (whether explicit or auto-derived) is guaranteed to produce identical output
+    **within the same Pointblank version**. Across versions, changes to country data files or
+    generator logic may alter the output for a given seed.
+
+    For CI pipelines that require bit-exact data across library upgrades, save generated
+    DataFrames as Parquet or CSV snapshot files rather than relying on cross-version seed
+    stability. This is the same approach used by snapshot-testing tools like `pytest-snapshot`
+    and `syrupy`.
 
     Examples
     --------
-    Generate test data from a schema with field constraints:
+    Here we define a schema with field constraints and generate test data from it:
 
     ```{python}
     import pointblank as pb
@@ -1616,18 +1778,20 @@ def generate_dataset(
         status=pb.string_field(allowed=["active", "pending", "inactive"]),
     )
 
-    # Generate 100 rows of test data
     pb.preview(pb.generate_dataset(schema, n=100, seed=23))
     ```
 
-    Generate data from a simple dtype-only schema as a Pandas DataFrame:
+    It's also possible to generate data from a simple, dtype-only schema. Setting
+    `output="pandas"` returns a Pandas DataFrame:
 
     ```{python}
     schema = pb.Schema(name="String", age="Int64", active="Boolean")
+
     pb.preview(pb.generate_dataset(schema, n=50, seed=23, output="pandas"))
     ```
 
-    Generate data with German addresses by using `country="DE"`:
+    When using presets, the `country=` parameter controls the locale. Here, `country="DE"`
+    produces German names and addresses:
 
     ```{python}
     schema = pb.Schema(
@@ -1635,7 +1799,31 @@ def generate_dataset(
         address=pb.string_field(preset="address"),
         city=pb.string_field(preset="city"),
     )
+
     pb.preview(pb.generate_dataset(schema, n=20, seed=23, country="DE"))
     ```
+
+    We can combine several field types with nullable columns in a mixed-type dataset:
+
+    ```{python}
+    from datetime import date, timedelta
+
+    schema = pb.Schema(
+        id=pb.int_field(min_val=1, unique=True),
+        name=pb.string_field(preset="name"),
+        score=pb.float_field(min_val=0.0, max_val=100.0),
+        is_active=pb.bool_field(p_true=0.75),
+        joined=pb.date_field(min_date=date(2020, 1, 1), max_date=date(2024, 12, 31)),
+        session_time=pb.duration_field(
+            min_duration=timedelta(minutes=1),
+            max_duration=timedelta(hours=3),
+            nullable=True, null_probability=0.2,
+        ),
+    )
+
+    pb.generate_dataset(schema, n=50, seed=23)
+    ```
     """
-    return schema.generate(n=n, seed=seed, output=output, country=country)
+    return schema.generate(
+        n=n, seed=seed, output=output, country=country, shuffle=shuffle, weighted=weighted
+    )

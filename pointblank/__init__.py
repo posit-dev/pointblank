@@ -41,10 +41,12 @@ from pointblank.field import (
     duration_field,
     float_field,
     int_field,
+    profile_fields,
     string_field,
     time_field,
 )
 from pointblank.generate.base import GeneratorConfig
+from pointblank.inspect import has_columns, has_rows
 from pointblank.schema import Schema, generate_dataset
 from pointblank.segments import seg_group
 from pointblank.thresholds import Actions, FinalActions, Thresholds
@@ -124,10 +126,14 @@ __all__ = [
     "datetime_field",
     "time_field",
     "duration_field",
+    "profile_fields",
     # Data generation - configuration
     "GeneratorConfig",
     # Data generation - convenience function
     "generate_dataset",
+    # Table inspection functions (for use with `active=`)
+    "has_columns",
+    "has_rows",
     # YAML functionality
     "yaml_interrogate",
     "validate_yaml",

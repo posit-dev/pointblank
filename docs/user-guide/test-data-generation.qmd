@@ -9,7 +9,7 @@ html-table-processing: none
 #| echo: false
 #| output: false
 import pointblank as pb
-pb.config(report_incl_footer=False)
+pb.config(report_incl_footer_timings=False)
 ```
 
 Pointblank provides a built-in test data generation system that creates realistic, locale-aware
@@ -56,6 +56,7 @@ Pointblank provides helper functions for defining typed columns with constraints
 | `datetime_field()` | Datetime columns | `min_val`, `max_val` |
 | `time_field()` | Time columns | `min_val`, `max_val` |
 | `duration_field()` | Duration columns | `min_val`, `max_val` |
+| `profile_fields()` | Bundled person-profile fields | `set`, `split_name`, `include`, `exclude`, `prefix` |
 
 ### Integer Fields
 
@@ -121,7 +122,7 @@ Use regex patterns to generate strings matching specific formats:
 schema = pb.Schema(
     product_code=pb.string_field(pattern=r"[A-Z]{3}-[0-9]{4}"),
     phone=pb.string_field(pattern=r"\([0-9]{3}\) [0-9]{3}-[0-9]{4}"),
-    license_plate=pb.string_field(pattern=r"[A-Z]{2}[0-9]{2} [A-Z]{3}"),
+    hex_color=pb.string_field(pattern=r"#[0-9A-F]{6}"),
 )
 
 pb.preview(pb.generate_dataset(schema, n=100, seed=23))
@@ -179,10 +180,11 @@ The `preset=` parameter in `string_field()` supports many data types:
 **Personal Data:**
 
 - `name`: full name (first + last)
-- `name_full`: full name with potential prefix/suffix
+- `name_full`: full name with optional prefix/suffix (e.g., "Dr. Ana Sousa", "Prof. Tanaka Yuki")
 - `first_name`: first name only
 - `last_name`: last name only
 - `email`: email address
+- `phone_number`: phone number in country-specific format
 
 **Location Data:**
 
@@ -190,6 +192,8 @@ The `preset=` parameter in `string_field()` supports many data types:
 - `city`: city name
 - `state`: state/province name
 - `country`: country name
+- `country_code_2`: ISO 3166-1 alpha-2 country code (e.g., `"US"`)
+- `country_code_3`: ISO 3166-1 alpha-3 country code (e.g., `"USA"`)
 - `postcode`: postal/ZIP code
 - `latitude`: latitude coordinate
 - `longitude`: longitude coordinate
@@ -218,8 +222,26 @@ The `preset=` parameter in `string_field()` supports many data types:
 **Identifiers:**
 
 - `uuid4`: UUID version 4
-- `ssn`: Social Security Number (US format)
-- `license_plate`: vehicle license plate
+- `md5`: MD5 hash (32 hex characters)
+- `sha1`: SHA-1 hash (40 hex characters)
+- `sha256`: SHA-256 hash (64 hex characters)
+- `ssn`: Social Security Number (country-specific format)
+- `license_plate`: vehicle license plate (location-aware for CA, US, DE, AU, GB)
+
+**Barcodes:**
+
+- `ean8`: EAN-8 barcode with valid check digit
+- `ean13`: EAN-13 barcode with valid check digit
+
+**Date/Time:**
+
+- `date_this_year`: a date within the current year
+- `date_this_decade`: a date within the current decade
+- `date_between`: a random date between 2000 and 2025
+- `date_range`: two dates joined with an en-dash (e.g., `"2012-05-12 – 2015-11-22"`)
+- `future_date`: a date up to 1 year in the future
+- `past_date`: a date up to 10 years in the past
+- `time`: a time value
 
 **Text:**
 
@@ -234,6 +256,142 @@ The `preset=` parameter in `string_field()` supports many data types:
 - `file_name`: file name
 - `file_extension`: file extension
 - `mime_type`: MIME type
+- `user_agent`: browser user agent string (country-weighted)
+
+## Profile Fields
+
+When generating person-profile data, you often need several related presets together: a name, an
+email derived from that name, an address, a phone number, and so on. Rather than wiring up each
+column individually, the `profile_fields()` helper returns a ready-made dictionary of
+`StringField` objects that you can unpack directly into a `Schema()`.
+
+### Basic Usage
+
+With no arguments, `profile_fields()` returns the **standard** set of seven columns:
+`first_name`, `last_name`, `email`, `city`, `state`, `postcode`, and `phone_number`. All
+coherence rules apply automatically: emails are derived from names, and city/state/postcode/phone
+are internally consistent.
+
+```{python}
+schema = pb.Schema(
+    user_id=pb.int_field(unique=True, min_val=1),
+    **pb.profile_fields(),
+)
+
+pb.preview(pb.generate_dataset(schema, n=100, seed=23))
+```
+
+The `**` operator unpacks the dictionary into keyword arguments, as if you had written each
+`string_field(preset=...)` call by hand.
+
+### Choosing a Set
+
+Three built-in sets control how many columns are generated:
+
+| Set | Columns |
+|-----|------|
+| `"minimal"` | `first_name`, `last_name`, `email`, `phone_number` |
+| `"standard"` | `first_name`, `last_name`, `email`, `city`, `state`, `postcode`, `phone_number` |
+| `"full"` | `first_name`, `last_name`, `email`, `address`, `city`, `state`, `postcode`, `phone_number`, `company`, `job` |
+
+```{python}
+# Minimal profile: just name, email, and phone
+pb.preview(
+    pb.generate_dataset(
+        pb.Schema(**pb.profile_fields(set="minimal")),
+        n=100, seed=23,
+    )
+)
+```
+
+```{python}
+# Full profile: includes address, company, and job title
+pb.preview(
+    pb.generate_dataset(
+        pb.Schema(**pb.profile_fields(set="full")),
+        n=100, seed=23,
+    )
+)
+```
+
+### Combined vs. Split Names
+
+By default, names are split into `first_name` and `last_name` columns. Set `split_name=False` to
+get a single `name` column instead:
+
+```{python}
+pb.preview(
+    pb.generate_dataset(
+        pb.Schema(**pb.profile_fields(set="minimal", split_name=False)),
+        n=100, seed=23,
+    )
+)
+```
+
+### Adding and Removing Columns
+
+Use `include=` to add presets to the base set and `exclude=` to remove them. Both accept lists of
+preset names. The available profile presets are: `first_name`, `last_name`, `name`, `email`,
+`address`, `city`, `state`, `postcode`, `phone_number`, `company`, and `job`.
+
+```{python}
+# Standard set + company column
+pb.preview(
+    pb.generate_dataset(
+        pb.Schema(**pb.profile_fields(include=["company"])),
+        n=100, seed=23,
+    )
+)
+```
+
+```{python}
+# Standard set without city and state
+pb.preview(
+    pb.generate_dataset(
+        pb.Schema(**pb.profile_fields(exclude=["city", "state"])),
+        n=100, seed=23,
+    )
+)
+```
+
+You can combine `include=` and `exclude=` in the same call, as long as the same preset does not
+appear in both.
+
+### Column Prefixes
+
+The `prefix=` parameter prepends a string to every column name. This is especially useful when a
+schema needs two independent profiles (e.g., sender and recipient):
+
+```{python}
+schema = pb.Schema(
+    **pb.profile_fields(set="minimal", prefix="sender_"),
+    **pb.profile_fields(set="minimal", prefix="recipient_"),
+)
+
+pb.preview(pb.generate_dataset(schema, n=100, seed=23))
+```
+
+Each prefixed group maintains its own coherence: the sender's email is derived from the sender's
+name, and the recipient's email from the recipient's name.
+
+### Combining with Other Field Types
+
+Since `profile_fields()` returns a plain dictionary, it composes naturally with any other field
+types:
+
+```{python}
+schema = pb.Schema(
+    id=pb.int_field(unique=True, min_val=1000),
+    **pb.profile_fields(),
+    active=pb.bool_field(p_true=0.8),
+    signup_date=pb.date_field(
+        min_date="2024-01-01",
+        max_date="2025-12-31",
+    ),
+)
+
+pb.preview(pb.generate_dataset(schema, n=100, seed=23, country="DE"))
+```
 
 ## Country-Specific Data
 
@@ -281,28 +439,180 @@ pb.preview(pb.generate_dataset(schema, n=200, seed=23, country="BR"))
 This location coherence is valuable when testing geospatial applications, address validation
 systems, or any scenario where realistic, internally-consistent location data matters.
 
+### Data Coherence
+
+Pointblank automatically links related columns to produce realistic rows. There are three
+coherence systems that activate based on which presets appear together in a schema:
+
+**Address coherence** activates when *any* address-related preset is present (`address`, `city`,
+`state`, `postcode`, `latitude`, `longitude`, `phone_number`, `license_plate`). All of these
+fields will refer to the same location within each row.
+
+**Person coherence** activates when *any* person-related preset is present (`name`, `name_full`,
+`first_name`, `last_name`, `email`, `user_name`). The email and username are derived from the
+person's name.
+
+**Business coherence** activates when *both* `job` and `company` are present. When active:
+
+- the company and job title are drawn from the same industry (e.g., a nurse will work at a
+hospital, not a law firm).
+- `name_full` gains profession-matched titles: a doctor may appear as "Dr. Ana Sousa" and a
+professor as "Prof. Tanaka Yuki". For German-speaking countries (DE, AT, CH), the honorific
+stacks before the professional title (e.g., "Herr Dr. med. Klaus Weber").
+- integer columns whose name contains `age` (e.g., `age`, `person_age`) are automatically
+constrained to working-age range (22–65).
+
+Here's an example showing all three coherence systems working together:
+
+```{python}
+schema = pb.Schema(
+    name=pb.string_field(preset="name_full"),
+    email=pb.string_field(preset="email"),
+    company=pb.string_field(preset="company"),
+    job=pb.string_field(preset="job"),
+    city=pb.string_field(preset="city"),
+    state=pb.string_field(preset="state"),
+    license_plate=pb.string_field(preset="license_plate"),
+    age=pb.int_field(),
+)
+
+pb.preview(pb.generate_dataset(schema, n=100, seed=23, country="DE"))
+```
+
+**License plate coherence** is part of address coherence. For `CA`, `US`, `DE`, `AU`, and `GB`,
+license plates follow real subregion-specific formats when location fields are present. For example,
+an Ontario row produces plates like `"CABC 123"` while a British Columbia row produces `"AB1 23C"`.
+Letters I, O, Q, and U are excluded from plate generation, matching real-world restrictions.
+
 ### Supported Countries
 
-Pointblank currently supports 50 countries with full locale data for realistic test data generation.
+Pointblank currently supports 71 countries with full locale data for realistic test data generation.
 You can use either ISO 3166-1 alpha-2 codes (e.g., `"US"`) or alpha-3 codes (e.g., `"USA"`).
 
 **Europe (32 countries):**
 
 - Austria (`AT`), Belgium (`BE`), Bulgaria (`BG`), Croatia (`HR`), Cyprus (`CY`), Czech Republic (`CZ`), Denmark (`DK`), Estonia (`EE`), Finland (`FI`), France (`FR`), Germany (`DE`), Greece (`GR`), Hungary (`HU`), Iceland (`IS`), Ireland (`IE`), Italy (`IT`), Latvia (`LV`), Lithuania (`LT`), Luxembourg (`LU`), Malta (`MT`), Netherlands (`NL`), Norway (`NO`), Poland (`PL`), Portugal (`PT`), Romania (`RO`), Russia (`RU`), Slovakia (`SK`), Slovenia (`SI`), Spain (`ES`), Sweden (`SE`), Switzerland (`CH`), United Kingdom (`GB`)
 
-**Americas (7 countries):**
+**Americas (9 countries):**
 
-- Argentina (`AR`), Brazil (`BR`), Canada (`CA`), Chile (`CL`), Colombia (`CO`), Mexico (`MX`), United States (`US`)
+- Argentina (`AR`), Brazil (`BR`), Canada (`CA`), Chile (`CL`), Colombia (`CO`), Costa Rica (`CR`), Mexico (`MX`), Peru (`PE`), United States (`US`)
 
-**Asia-Pacific (10 countries):**
+**Asia-Pacific (17 countries):**
 
-- Australia (`AU`), China (`CN`), Hong Kong (`HK`), India (`IN`), Indonesia (`ID`), Japan (`JP`), New Zealand (`NZ`), Philippines (`PH`), South Korea (`KR`), Taiwan (`TW`)
+- Australia (`AU`), Bangladesh (`BD`), China (`CN`), Hong Kong (`HK`), India (`IN`), Indonesia (`ID`), Japan (`JP`), Malaysia (`MY`), New Zealand (`NZ`), Pakistan (`PK`), Philippines (`PH`), Singapore (`SG`), South Korea (`KR`), Sri Lanka (`LK`), Taiwan (`TW`), Thailand (`TH`), Vietnam (`VN`)
 
-**Middle East (1 country):**
+**Middle East & Africa (13 countries):**
 
-- Turkey (`TR`)
+- Algeria (`DZ`), Egypt (`EG`), Ethiopia (`ET`), Ghana (`GH`), Kenya (`KE`), Morocco (`MA`), Nigeria (`NG`), Senegal (`SN`), South Africa (`ZA`), Tunisia (`TN`), Turkey (`TR`), Uganda (`UG`), United Arab Emirates (`AE`)
 
 Additional countries and expanded coverage are planned for future releases.
+
+### Mixing Multiple Countries
+
+When you need test data that spans multiple locales (e.g., simulating an international customer
+base), you can pass a list or dict to the `country=` parameter instead of a single string.
+
+Passing a list of country codes splits rows equally across those countries. Here, 200 rows are
+divided evenly among the US, Germany, and Japan (~67 each):
+
+```{python}
+schema = pb.Schema(
+    name=pb.string_field(preset="name"),
+    city=pb.string_field(preset="city"),
+    postcode=pb.string_field(preset="postcode"),
+)
+
+pb.preview(pb.generate_dataset(schema, n=200, seed=23, country=["US", "DE", "JP"]))
+```
+
+To control the proportion of rows per country, pass a dict mapping country codes to weights. The
+following generates 200 rows with 70% from the US, 20% from Germany, and 10% from France:
+
+```{python}
+pb.preview(
+    pb.generate_dataset(
+        schema, n=200, seed=23,
+        country={"US": 0.7, "DE": 0.2, "FR": 0.1},
+    )
+)
+```
+
+Weights are auto-normalized, so `{"US": 7, "DE": 2, "FR": 1}` is equivalent to the example above.
+Row counts are allocated using largest-remainder apportionment, ensuring they always sum to exactly
+`n`.
+
+By default, rows from different countries are interleaved randomly (`shuffle=True`). Set
+`shuffle=False` to keep rows grouped by country in the order the countries are listed:
+
+```{python}
+pb.preview(
+    pb.generate_dataset(
+        schema, n=120, seed=23,
+        country=["US", "DE", "JP"], shuffle=False,
+    )
+)
+```
+
+All coherence systems (address, person, business) work correctly within each country's batch of
+rows. A French row will have a French name with a matching French email; a Japanese row will have a
+Japanese name with a matching Japanese email. Non-preset columns (integers, floats, booleans, dates)
+are generated independently for each batch but still respect their field constraints.
+
+### Frequency-Weighted Sampling
+
+By default, names and cities are sampled uniformly at random from the locale data, giving every
+entry the same probability of being selected. Real-world distributions are far from uniform though:
+"James" and "Maria" appear orders of magnitude more often than "Thaddeus" or "Xiomara", and more
+people live in New York City than in Flagstaff. The `weighted=True` parameter makes generated data
+reflect this natural skew.
+
+```{python}
+schema = pb.Schema(
+    name=pb.string_field(preset="name"),
+    city=pb.string_field(preset="city"),
+)
+
+pb.preview(pb.generate_dataset(schema, n=200, seed=23, country="US", weighted=True))
+```
+
+With weighting enabled you will see popular names like James, John, Mary, and Patricia appear more
+frequently, while unusual names surface only occasionally. Similarly, cities like New York, Los
+Angeles, and Chicago dominate the output while smaller cities appear less often.
+
+The feature works by organizing locale data into four frequency tiers. Each tier has a sampling
+probability that determines how likely its members are to be selected:
+
+| Tier | Probability | Contents |
+|------|-------------|----------|
+| very_common | 45% | The top ~10% of entries by real-world frequency |
+| common | 30% | The next ~20% of entries |
+| uncommon | 20% | The next ~30% of entries |
+| rare | 5% | The remaining ~40% of entries |
+
+When a value is needed, a tier is first chosen according to these probabilities and then a single
+entry is picked uniformly at random within that tier. This two-step approach keeps sampling fast
+while producing a realistic long-tail distribution. Setting `weighted=False` pools all entries
+across every tier and samples them uniformly, which can be useful when you want an even spread
+rather than a realistic distribution.
+
+Weighted sampling combines seamlessly with multi-country mixing. Each country's batch uses its own
+tiered data independently, so a mixed dataset will have weighted US names alongside weighted German
+names:
+
+```{python}
+pb.preview(
+    pb.generate_dataset(
+        schema,
+        n=200,
+        seed=23,
+        country={"US": 0.6, "DE": 0.4},
+        weighted=True,
+    )
+)
+```
+
+All 71 supported country locales have tiered name and location data, so `weighted=True` produces
+realistic frequency distributions for every country.
 
 ## Output Formats
 
@@ -316,20 +626,20 @@ schema = pb.Schema(
 )
 ```
 
-The default output is a **Polars DataFrame**, which offers excellent performance and a modern API
-for data manipulation:
+The default output is a Polars DataFrame, which offers excellent performance and a modern API for
+data manipulation:
 
 ```{python}
-# Polars DataFrame (default)
 polars_df = pb.generate_dataset(schema, n=100, seed=23, output="polars")
+
 pb.preview(polars_df)
 ```
 
 If your workflow uses Pandas, simply specify `output="pandas"` to get a **Pandas DataFrame**:
 
 ```{python}
-# Pandas DataFrame
 pandas_df = pb.generate_dataset(schema, n=100, seed=23, output="pandas")
+
 pb.preview(pandas_df)
 ```
 
@@ -369,6 +679,153 @@ Since the generated data respects the constraints defined in the schema, it shou
 validation checks. This workflow is particularly useful for testing validation logic before
 applying it to production data, or for creating reproducible test fixtures in your CI/CD pipeline.
 
+## Pytest Fixture
+
+When Pointblank is installed, a `generate_dataset` **pytest fixture** is automatically available
+in all your test files. There is no need to import anything or add configuration to `conftest.py`:
+the fixture is registered via pytest's plugin system.
+
+The fixture works identically to `pb.generate_dataset()`, but with one key difference: when you
+don't supply a `seed=` parameter, a deterministic seed is automatically derived from the test's
+fully-qualified name. This means:
+
+- the **same test** always produces the **same data**: no manual seed management required.
+- *different tests* get different seeds, so they exercise different datasets.
+- you can still pass an explicit `seed=` to override the automatic seed when needed.
+
+### Basic Usage
+
+Use it by adding `generate_dataset` to your test function's parameter list:
+
+```{.python filename="test_pipeline.py"}
+import pointblank as pb
+
+def test_etl_handles_nulls(generate_dataset):
+    schema = pb.Schema(
+        user_id=pb.int_field(unique=True),
+        email=pb.string_field(preset="email", nullable=True, null_probability=0.3),
+        age=pb.int_field(min_val=0, max_val=120),
+    )
+
+    df = generate_dataset(schema, n=500)
+    result = my_etl_pipeline(df)
+    assert result.filter(pl.col("email").is_null()).shape[0] == 0
+```
+
+All parameters from `generate_dataset()` are supported: `n=`, `seed=`, `output=`, and `country=`:
+
+```python
+def test_german_data(generate_dataset):
+    schema = pb.Schema(
+        name=pb.string_field(preset="name"),
+        city=pb.string_field(preset="city"),
+    )
+
+    df = generate_dataset(schema, n=200, country="DE", output="pandas")
+    assert len(df) == 200
+```
+
+### Multiple Datasets in One Test
+
+Calling the fixture multiple times within the same test produces different (but still deterministic) data on each call:
+
+```python
+def test_merge_pipeline(generate_dataset):
+    customers = generate_dataset(customer_schema, n=1000, country="US")
+    orders = generate_dataset(order_schema, n=5000)
+
+    # Each call gets a unique seed derived from the test name + call index,
+    # so both DataFrames are deterministic and different from each other.
+    result = merge_pipeline(customers, orders)
+    assert result.shape[0] > 0
+```
+
+### Testing Across Locales
+
+The fixture makes locale testing particularly concise when combined with `pytest.mark.parametrize`:
+
+```python
+import pytest
+import pointblank as pb
+
+@pytest.mark.parametrize("country", ["US", "DE", "JP", "BR"])
+def test_name_normalizer(generate_dataset, country):
+    schema = pb.Schema(name=pb.string_field(preset="name_full"))
+    df = generate_dataset(schema, n=100, country=country)
+    result = normalize_names(df)
+    assert result["name"].str.len_chars().min() > 0
+```
+
+### Sharing Schemas Across Tests
+
+Define schemas as fixtures in `conftest.py` and compose them with `generate_dataset`:
+
+```{.python filename="conftest.py"}
+import pytest
+import pointblank as pb
+
+@pytest.fixture
+def customer_schema():
+    return pb.Schema(
+        id=pb.int_field(unique=True),
+        name=pb.string_field(preset="name"),
+        email=pb.string_field(preset="email"),
+        city=pb.string_field(preset="city"),
+    )
+```
+
+```{.python filename="test_validation.py"}
+def test_customer_validation(generate_dataset, customer_schema):
+    df = generate_dataset(customer_schema, n=200, country="DE")
+    validation = pb.Validate(df).col_vals_not_null(columns="email").interrogate()
+    assert validation.all_passed()
+```
+
+```{.python filename="test_export.py"}
+def test_customer_export(generate_dataset, customer_schema):
+    df = generate_dataset(customer_schema, n=50, country="JP")
+    exported = export_to_parquet(df)
+    assert exported.exists()
+```
+
+### Debugging with Seed Introspection
+
+The fixture callable exposes two attributes that make debugging failed tests straightforward:
+
+- `generate_dataset.default_seed`: the base seed derived from the test name (available before any call)
+- `generate_dataset.last_seed`: the seed actually used for the most recent call (accounts for the call counter and explicit overrides)
+
+Include `.last_seed` in assertion messages so failures are immediately reproducible:
+
+```python
+def test_age_range(generate_dataset):
+    schema = pb.Schema(age=pb.int_field(min_val=18, max_val=100))
+    df = generate_dataset(schema, n=500)
+    min_age = df["age"].min()
+    assert min_age >= 18, (
+        f"Expected min age >= 18, got {min_age} (seed={generate_dataset.last_seed})"
+    )
+```
+
+You can also use `.default_seed` to reproduce the exact dataset outside of pytest:
+
+```python
+# In a REPL or notebook, reproduce the data from a failed test:
+import pointblank as pb
+df = pb.generate_dataset(schema, n=500, seed=<default_seed_from_output>)
+```
+
+### Seed Stability
+
+A given seed (whether explicit or auto-derived) is guaranteed to produce identical output **within
+the same Pointblank version**. Across versions, changes to country data files or generator logic
+may alter the output for a given seed.
+
+For CI pipelines that require bit-exact data across library upgrades, we recommend saving
+generated DataFrames as Parquet or CSV snapshot files rather than relying on cross-version seed
+stability. This is the same approach used by snapshot-testing tools like `pytest-snapshot` and
+`syrupy`.
+
 ## Conclusion
 
 Test data generation provides a convenient way to create realistic synthetic datasets directly from
@@ -378,8 +835,9 @@ By incorporating test data generation into your process, you can:
 
 - quickly prototype validation rules before working with production data
 - create reproducible test fixtures for automated testing and CI/CD pipelines
-- generate locale-specific data for internationalization testing across many countries
-- ensure coherent relationships between related fields like names, emails, and addresses
+- generate locale-specific data for internationalization testing across 71 countries
+- ensure coherent relationships between related fields like names, emails, addresses, jobs, and
+license plates
 - produce datasets of any size with consistent, realistic values
 
 Whether you're building validation logic, testing data pipelines, or simply need sample data for

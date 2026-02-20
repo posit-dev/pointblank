@@ -910,7 +910,7 @@ def yaml_interrogate(
     #| echo: false
     #| output: false
     import pointblank as pb
-    pb.config(report_incl_header=False, report_incl_footer=False, preview_incl_header=False)
+    pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
     ```
     For the examples here, we'll use YAML configurations to define validation workflows. Let's start
     with a basic YAML workflow that validates the built-in `small_table` dataset.
@@ -1112,7 +1112,7 @@ def validate_yaml(yaml: Union[str, Path]) -> None:
     #| echo: false
     #| output: false
     import pointblank as pb
-    pb.config(report_incl_header=False, report_incl_footer=False, preview_incl_header=False)
+    pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
     ```
     For the examples here, we'll demonstrate how to validate YAML configurations before using them
     with validation workflows. This is particularly useful for building robust data validation
@@ -1278,7 +1278,7 @@ def yaml_to_python(yaml: Union[str, Path]) -> str:
     #| echo: false
     #| output: false
     import pointblank as pb
-    pb.config(report_incl_header=False, report_incl_footer=False, preview_incl_header=False)
+    pb.config(report_incl_header=False, report_incl_footer_timings=False, preview_incl_header=False)
     ```
 
     Convert a basic YAML configuration to Python code:

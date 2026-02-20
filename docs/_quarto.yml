@@ -274,6 +274,16 @@ quartodoc:
         - name: get_data_path
         - name: connect_to_table
         - name: print_database_tables
+    - title: Table Pre-checks
+      desc: >
+        The *Table Pre-checks* group contains helper functions that are designed for use with the
+        `active=` parameter of validation methods. These callables inspect the target table before
+        a validation step runs and conditionally skip the step when a precondition is not met
+        (e.g., a required column is missing or the table does not have enough rows). A descriptive,
+        locale-aware note is automatically attached to any step that is skipped.
+      contents:
+        - name: has_columns
+        - name: has_rows
     - title: YAML
       desc: >
         The *YAML* group contains functions that allow for the use of YAML to orchestrate validation
@@ -304,7 +314,8 @@ quartodoc:
       desc: >
         Generate synthetic test data based on schema definitions. Use `generate_dataset()` to
         create data from a `Schema` object. The helper functions define typed fields with
-        constraints for realistic test data generation.
+        constraints for realistic test data generation. The `profile_fields()` helper creates a
+        complete person-profile schema (name, email, address, phone, etc.) in a single call.
       contents:
         - name: generate_dataset
         - name: int_field
@@ -315,6 +326,7 @@ quartodoc:
         - name: datetime_field
         - name: time_field
         - name: duration_field
+        - name: profile_fields
     - title: Prebuilt Actions
       desc: >
         The *Prebuilt Actions* group contains a function that can be used to send a Slack

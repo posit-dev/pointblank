@@ -1,0 +1,581 @@
+{
+  "suffixes": [
+    "TNHH",
+    "Cổ phần",
+    "Corp",
+    "Group",
+    "JSC",
+    "Holdings"
+  ],
+  "formats": [
+    "Công ty {suffix} {noun}",
+    "{adjective} {noun} {suffix}",
+    "{last_name} {noun} {suffix}",
+    "{noun} Việt Nam"
+  ],
+  "adjectives": [
+    "Việt",
+    "Đông",
+    "Tây",
+    "Nam",
+    "Bắc",
+    "Sài Gòn",
+    "Hà Nội",
+    "Thăng Long",
+    "Golden",
+    "Pacific",
+    "Premier",
+    "Modern",
+    "Global",
+    "Pioneer",
+    "Summit",
+    "United",
+    "Royal",
+    "Dragon",
+    "Phoenix",
+    "Star"
+  ],
+  "nouns": [
+    "Foods",
+    "Tech",
+    "Pharma",
+    "Trade",
+    "Finance",
+    "Steel",
+    "Plastics",
+    "Electronics",
+    "Logistics",
+    "Marine",
+    "Agri",
+    "Property",
+    "Energy",
+    "Textiles",
+    "Ceramics",
+    "Telecom",
+    "Media",
+    "Construction",
+    "Auto",
+    "Software"
+  ],
+  "well_known_companies": [
+    {
+      "name": "Vingroup",
+      "cities": [
+        "Hà Nội"
+      ]
+    },
+    {
+      "name": "Viettel",
+      "cities": [
+        "Hà Nội"
+      ]
+    },
+    {
+      "name": "FPT Corporation",
+      "cities": [
+        "Hà Nội"
+      ]
+    },
+    {
+      "name": "Masan Group",
+      "cities": [
+        "Hồ Chí Minh"
+      ]
+    },
+    {
+      "name": "VinFast",
+      "cities": [
+        "Hải Phòng"
+      ]
+    },
+    {
+      "name": "Petrovietnam",
+      "cities": [
+        "Hà Nội"
+      ]
+    },
+    {
+      "name": "Vietnam Airlines",
+      "cities": [
+        "Hà Nội"
+      ]
+    },
+    {
+      "name": "Vietcombank",
+      "cities": [
+        "Hà Nội"
+      ]
+    },
+    {
+      "name": "BIDV",
+      "cities": [
+        "Hà Nội"
+      ]
+    },
+    {
+      "name": "Techcombank",
+      "cities": [
+        "Hà Nội"
+      ]
+    },
+    {
+      "name": "Vinamilk",
+      "cities": [
+        "Hồ Chí Minh"
+      ]
+    },
+    {
+      "name": "Hòa Phát Group",
+      "cities": [
+        "Hà Nội"
+      ]
+    },
+    {
+      "name": "Thế Giới Di Động",
+      "cities": [
+        "Hồ Chí Minh"
+      ]
+    },
+    {
+      "name": "Novaland",
+      "cities": [
+        "Hồ Chí Minh"
+      ]
+    },
+    {
+      "name": "VPBank",
+      "cities": [
+        "Hà Nội"
+      ]
+    }
+  ],
+  "jobs": [
+    "Software Engineer",
+    "Quality Inspector",
+    "Production Manager",
+    "Accountant",
+    "Bank Officer",
+    "Teacher",
+    "Doctor",
+    "Civil Engineer",
+    "Pharmacist",
+    "Marketing Executive",
+    "Sales Manager",
+    "HR Manager",
+    "IT Specialist",
+    "Architect",
+    "Journalist",
+    "Lawyer",
+    "Research Analyst",
+    "Operations Manager",
+    "Project Manager",
+    "Data Analyst",
+    "Business Consultant",
+    "Financial Analyst",
+    "Graphic Designer",
+    "Factory Worker",
+    "Tour Guide"
+  ],
+  "catch_phrase_adjectives": [
+    "innovative",
+    "reliable",
+    "trusted",
+    "quality",
+    "premium",
+    "sustainable",
+    "dynamic",
+    "progressive",
+    "efficient",
+    "superior"
+  ],
+  "catch_phrase_nouns": [
+    "solutions",
+    "services",
+    "products",
+    "excellence",
+    "quality",
+    "value",
+    "growth",
+    "partnership",
+    "innovation",
+    "performance"
+  ],
+  "catch_phrase_verbs": [
+    "delivers",
+    "creates",
+    "builds",
+    "drives",
+    "enables",
+    "ensures",
+    "provides",
+    "achieves",
+    "transforms",
+    "connects"
+  ],
+  "catch_phrase_connector": "that",
+  "industries": [
+    {
+      "name": "Technology",
+      "weight": 0.12,
+      "jobs": [
+        "Software Engineer",
+        "Data Analyst",
+        "QA Engineer",
+        "Product Manager",
+        "UX Designer"
+      ],
+      "well_known": [
+        "FPT Corporation",
+        "VNG Corporation",
+        "Viettel Solutions"
+      ],
+      "company_suffixes": [
+        "Technologies",
+        "Tech",
+        "Software",
+        "Solutions"
+      ],
+      "company_nouns": [
+        "Tech",
+        "Software",
+        "Digital",
+        "Systems"
+      ],
+      "company_formats": [
+        "{adjective} {noun} JSC",
+        "{last_name} Technologies"
+      ]
+    },
+    {
+      "name": "Manufacturing",
+      "weight": 0.15,
+      "jobs": [
+        "Factory Worker",
+        "Production Manager",
+        "Quality Inspector",
+        "Plant Engineer"
+      ],
+      "well_known": [
+        "VinFast",
+        "Hòa Phát Group",
+        "Samsung Vietnam"
+      ],
+      "company_suffixes": [
+        "Industries",
+        "Manufacturing",
+        "Production"
+      ],
+      "company_nouns": [
+        "Industry",
+        "Manufacturing",
+        "Production",
+        "Factory"
+      ],
+      "company_formats": [
+        "{adjective} {noun} Corp",
+        "Công ty {noun} Việt Nam"
+      ]
+    },
+    {
+      "name": "Banking & Finance",
+      "weight": 0.1,
+      "jobs": [
+        "Bank Officer",
+        "Credit Analyst",
+        "Financial Advisor",
+        "Teller",
+        "Branch Manager"
+      ],
+      "well_known": [
+        "Vietcombank",
+        "BIDV",
+        "Techcombank",
+        "VPBank"
+      ],
+      "company_suffixes": [
+        "Bank",
+        "Finance",
+        "Capital"
+      ],
+      "company_nouns": [
+        "Bank",
+        "Finance",
+        "Capital",
+        "Fund"
+      ],
+      "company_formats": [
+        "{adjective} {noun}"
+      ]
+    },
+    {
+      "name": "Real Estate",
+      "weight": 0.08,
+      "jobs": [
+        "Real Estate Agent",
+        "Property Manager",
+        "Construction Manager",
+        "Architect"
+      ],
+      "well_known": [
+        "Vingroup",
+        "Novaland",
+        "Sun Group",
+        "Vinhomes"
+      ],
+      "company_suffixes": [
+        "Properties",
+        "Land",
+        "Developers"
+      ],
+      "company_nouns": [
+        "Property",
+        "Land",
+        "Home",
+        "Estate"
+      ],
+      "company_formats": [
+        "{adjective} {noun} JSC"
+      ]
+    },
+    {
+      "name": "Retail & E-Commerce",
+      "weight": 0.1,
+      "jobs": [
+        "Sales Executive",
+        "Store Manager",
+        "Merchandiser",
+        "Logistics Coordinator"
+      ],
+      "well_known": [
+        "Thế Giới Di Động",
+        "Tiki",
+        "Shopee Vietnam",
+        "Bách Hoá Xanh"
+      ],
+      "company_suffixes": [
+        "Retail",
+        "Trading",
+        "Commerce"
+      ],
+      "company_nouns": [
+        "Trade",
+        "Mart",
+        "Shop",
+        "Store"
+      ],
+      "company_formats": [
+        "{adjective} {noun} TNHH"
+      ]
+    },
+    {
+      "name": "Food & Beverage",
+      "weight": 0.1,
+      "jobs": [
+        "Food Technologist",
+        "Supply Chain Manager",
+        "Production Supervisor",
+        "Quality Controller"
+      ],
+      "well_known": [
+        "Vinamilk",
+        "Masan Consumer",
+        "Acecook Vietnam",
+        "TH TrueMilk"
+      ],
+      "company_suffixes": [
+        "Foods",
+        "Dairy",
+        "Beverage"
+      ],
+      "company_nouns": [
+        "Food",
+        "Dairy",
+        "Nutrition",
+        "Taste"
+      ],
+      "company_formats": [
+        "{adjective} {noun} JSC",
+        "{last_name} Foods"
+      ]
+    },
+    {
+      "name": "Telecommunications",
+      "weight": 0.07,
+      "jobs": [
+        "Network Engineer",
+        "Customer Service Rep",
+        "Sales Executive",
+        "Technical Support"
+      ],
+      "well_known": [
+        "Viettel",
+        "VNPT",
+        "Mobifone",
+        "Vietnamobile"
+      ],
+      "company_suffixes": [
+        "Telecom",
+        "Communications",
+        "Networks"
+      ],
+      "company_nouns": [
+        "Telecom",
+        "Network",
+        "Connect",
+        "Mobile"
+      ],
+      "company_formats": [
+        "{adjective} {noun} Corp"
+      ]
+    },
+    {
+      "name": "Tourism & Hospitality",
+      "weight": 0.07,
+      "jobs": [
+        "Tour Guide",
+        "Hotel Manager",
+        "Travel Consultant",
+        "Chef",
+        "Receptionist"
+      ],
+      "well_known": [
+        "Vietravel",
+        "Saigontourist",
+        "Vinpearl"
+      ],
+      "company_suffixes": [
+        "Travel",
+        "Tourism",
+        "Hotels"
+      ],
+      "company_nouns": [
+        "Travel",
+        "Tour",
+        "Hotel",
+        "Resort"
+      ],
+      "company_formats": [
+        "{adjective} {noun} Corp"
+      ]
+    },
+    {
+      "name": "Healthcare",
+      "weight": 0.06,
+      "jobs": [
+        "Doctor",
+        "Nurse",
+        "Pharmacist",
+        "Lab Technician",
+        "Hospital Administrator"
+      ],
+      "well_known": [
+        "Vinmec",
+        "FV Hospital",
+        "Hoan My Medical"
+      ],
+      "company_suffixes": [
+        "Hospital",
+        "Healthcare",
+        "Pharma",
+        "Clinic"
+      ],
+      "company_nouns": [
+        "Health",
+        "Medical",
+        "Pharma",
+        "Care"
+      ],
+      "company_formats": [
+        "{adjective} {noun} JSC"
+      ]
+    },
+    {
+      "name": "Energy & Oil",
+      "weight": 0.05,
+      "jobs": [
+        "Petroleum Engineer",
+        "Plant Operator",
+        "Environmental Specialist",
+        "Project Engineer"
+      ],
+      "well_known": [
+        "Petrovietnam",
+        "PV Gas",
+        "EVN"
+      ],
+      "company_suffixes": [
+        "Energy",
+        "Power",
+        "Petroleum"
+      ],
+      "company_nouns": [
+        "Energy",
+        "Power",
+        "Fuel",
+        "Oil"
+      ],
+      "company_formats": [
+        "{adjective} {noun} Corp"
+      ]
+    },
+    {
+      "name": "Textiles & Garments",
+      "weight": 0.06,
+      "jobs": [
+        "Garment Worker",
+        "Pattern Maker",
+        "Quality Inspector",
+        "Merchandiser"
+      ],
+      "well_known": [
+        "Vinatex",
+        "Thanh Cong Textile",
+        "Phu Bai Textile"
+      ],
+      "company_suffixes": [
+        "Textiles",
+        "Garments",
+        "Fashion"
+      ],
+      "company_nouns": [
+        "Textile",
+        "Garment",
+        "Fashion",
+        "Apparel"
+      ],
+      "company_formats": [
+        "{adjective} {noun} JSC"
+      ]
+    },
+    {
+      "name": "Education",
+      "weight": 0.04,
+      "jobs": [
+        "Teacher",
+        "Professor",
+        "Lecturer",
+        "Academic Coordinator",
+        "Researcher"
+      ],
+      "well_known": [
+        "FPT Education",
+        "Vinschool",
+        "TH School"
+      ],
+      "company_suffixes": [
+        "Academy",
+        "Education",
+        "School"
+      ],
+      "company_nouns": [
+        "Academy",
+        "Education",
+        "Learning",
+        "Knowledge"
+      ],
+      "company_formats": [
+        "{adjective} {noun}"
+      ]
+    }
+  ]
+}

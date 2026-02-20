@@ -5,15 +5,17 @@ Per-dtype value generators for synthetic data generation.
 from __future__ import annotations
 
 import random
+import re
 import string
+from dataclasses import replace as dc_replace
 from datetime import date, datetime, time, timedelta
 from typing import TYPE_CHECKING, Any, Callable
 
 from pointblank._utils import _is_lib_present
+from pointblank.countries import LocaleGenerator
 from pointblank.field import Field
 from pointblank.generate.base import GeneratorConfig
 from pointblank.generate.regex import generate_from_regex
-from pointblank.locales import LocaleGenerator
 
 if TYPE_CHECKING:
     pass
@@ -34,9 +36,11 @@ INTEGER_BOUNDS = {
 }
 
 
-def _get_locale_generator(country: str = "US", seed: int | None = None) -> LocaleGenerator:
+def _get_locale_generator(
+    country: str = "US", seed: int | None = None, weighted: bool = True
+) -> LocaleGenerator:
     """Get a LocaleGenerator instance with the specified country."""
-    return LocaleGenerator(country=country, seed=seed)
+    return LocaleGenerator(country=country, seed=seed, weighted=weighted)
 
 
 def _generate_integer(field: Field, rng: random.Random, generator: Any | None = None) -> int:
@@ -109,6 +113,8 @@ def _generate_from_preset(preset: str, generator: LocaleGenerator) -> str:
         "city": generator.city,
         "state": generator.state,
         "country": generator.country,
+        "country_code_2": generator.country_code_2,
+        "country_code_3": generator.country_code_3,
         "postcode": generator.postcode,
         "latitude": generator.latitude,
         "longitude": generator.longitude,
@@ -134,17 +140,28 @@ def _generate_from_preset(preset: str, generator: LocaleGenerator) -> str:
         "currency_code": generator.currency_code,
         # Identifiers
         "uuid4": generator.uuid4,
+        "md5": generator.md5,
+        "sha1": generator.sha1,
+        "sha256": generator.sha256,
         "ssn": generator.ssn,
         "license_plate": generator.license_plate,
+        # Barcodes
+        "ean8": generator.ean8,
+        "ean13": generator.ean13,
         # Date/Time
         "date_this_year": generator.date_this_year,
         "date_this_decade": generator.date_this_decade,
+        "date_between": generator.date_between,
+        "date_range": generator.date_range,
+        "future_date": generator.future_date,
+        "past_date": generator.past_date,
         "time": generator.time,
         # Misc
         "color_name": generator.color_name,
         "file_name": generator.file_name,
         "file_extension": generator.file_extension,
         "mime_type": generator.mime_type,
+        "user_agent": generator.user_agent,
     }
 
     generator = preset_mapping.get(preset)
@@ -417,7 +434,7 @@ def generate_column(
     preset = getattr(field, "preset", None)
     if preset is not None:
         # Use config country
-        locale_gen = _get_locale_generator(config.country, config.seed)
+        locale_gen = _get_locale_generator(config.country, config.seed, config.weighted)
 
     # Generate values
     if field.unique:
@@ -444,14 +461,27 @@ ADDRESS_RELATED_PRESETS = {
     "phone_number",
     "latitude",
     "longitude",
+    "license_plate",
 }
 PERSON_RELATED_PRESETS = {"name", "name_full", "first_name", "last_name", "email", "user_name"}
+BUSINESS_RELATED_PRESETS = {"job", "company"}
+
+# Default working-age bounds applied when business coherence is active
+_WORKING_AGE_MIN = 22
+_WORKING_AGE_MAX = 65
+
+# Pattern to detect age-like integer columns (case-insensitive)
+_AGE_COLUMN_RE = re.compile(r"(?:^|_)age(?:$|_)", re.IGNORECASE)
 
 
-def _get_coherence_needs(fields: dict[str, Field]) -> tuple[bool, bool]:
+def _get_coherence_needs(fields: dict[str, Field]) -> tuple[bool, bool, bool]:
     """Check what coherence is needed for the given fields."""
     needs_address = False
     needs_person = False
+    needs_business = False
+
+    found_job = False
+    found_company = False
 
     for field in fields.values():
         preset = getattr(field, "preset", None)
@@ -459,8 +489,16 @@ def _get_coherence_needs(fields: dict[str, Field]) -> tuple[bool, bool]:
             needs_address = True
         if preset in PERSON_RELATED_PRESETS:
             needs_person = True
+        if preset == "job":
+            found_job = True
+        if preset == "company":
+            found_company = True
 
-    return needs_address, needs_person
+    # Business coherence only needed when BOTH job and company are present
+    if found_job and found_company:
+        needs_business = True
+
+    return needs_address, needs_person, needs_business
 
 
 def _generate_column_with_row_context(
@@ -508,18 +546,54 @@ def generate_dataframe(
     DataFrame
         Generated DataFrame in the format specified by config.output.
     """
+    # Dispatch: single-country fast path vs. multi-country mixing path
+    country = config.country
+    if isinstance(country, str):
+        data = _generate_single_country(fields, config, country)
+    elif isinstance(country, list):
+        if len(country) == 1:
+            data = _generate_single_country(fields, config, country[0])
+        else:
+            weights = {c: 1.0 for c in country}
+            data = _generate_multi_country(fields, config, weights)
+    elif isinstance(country, dict):
+        if len(country) == 1:
+            data = _generate_single_country(fields, config, next(iter(country)))
+        else:
+            data = _generate_multi_country(fields, config, country)
+    else:
+        raise TypeError(
+            f"country must be str, list[str], or dict[str, float], got {type(country).__name__}"
+        )
+
+    # Convert to requested output format
+    return _to_output_format(data, config.output)
+
+
+def _generate_single_country(
+    fields: dict[str, Field],
+    config: GeneratorConfig,
+    country: str,
+) -> dict[str, list[Any]]:
+    """Generate data for a single country (original code path)."""
     # Check what coherence is needed
-    needs_address, needs_person = _get_coherence_needs(fields)
-    needs_coherence = needs_address or needs_person
+    needs_address, needs_person, needs_business = _get_coherence_needs(fields)
+    needs_coherence = needs_address or needs_person or needs_business
 
     # Set up shared locale generator if any coherence is needed
     shared_locale_gen = None
     if needs_coherence:
-        shared_locale_gen = _get_locale_generator(config.country, config.seed)
+        shared_locale_gen = _get_locale_generator(country, config.seed, config.weighted)
         if needs_address:
             shared_locale_gen.init_row_locations(config.n)
         if needs_person:
             shared_locale_gen.init_row_persons(config.n)
+        if needs_business:
+            # Business coherence also needs location context for templates like
+            # "{city} General Hospital", so init locations if not already done
+            if not needs_address:
+                shared_locale_gen.init_row_locations(config.n)
+            shared_locale_gen.init_row_employers(config.n)
 
     # Determine which presets need row context
     coherent_presets = set()
@@ -527,6 +601,27 @@ def generate_dataframe(
         coherent_presets.update(ADDRESS_RELATED_PRESETS)
     if needs_person:
         coherent_presets.update(PERSON_RELATED_PRESETS)
+    if needs_business:
+        coherent_presets.update(BUSINESS_RELATED_PRESETS)
+
+    # When business coherence is active, constrain age-like integer columns to
+    # working-age range so generated data doesn't have 15-year-old professionals
+    # or 85-year-old active employees with fictitious employers.
+    if needs_business:
+        fields = dict(fields)  # shallow copy so we don't mutate the caller's dict
+        for col_name, col_field in list(fields.items()):
+            if col_field.is_integer() and _AGE_COLUMN_RE.search(col_name):
+                cur_min = getattr(col_field, "min_val", None)
+                cur_max = getattr(col_field, "max_val", None)
+                new_min = (
+                    max(cur_min, _WORKING_AGE_MIN) if cur_min is not None else _WORKING_AGE_MIN
+                )
+                new_max = (
+                    min(cur_max, _WORKING_AGE_MAX) if cur_max is not None else _WORKING_AGE_MAX
+                )
+                # Only replace if the bounds actually changed
+                if new_min != cur_min or new_max != cur_max:
+                    fields[col_name] = dc_replace(col_field, min_val=new_min, max_val=new_max)
 
     # Generate data for each column
     data: dict[str, list[Any]] = {}
@@ -541,16 +636,112 @@ def generate_dataframe(
 
     # Clean up
     if shared_locale_gen is not None:
-        if needs_address:
+        if needs_address or needs_business:
             shared_locale_gen.clear_row_locations()
         if needs_person:
             shared_locale_gen.clear_row_persons()
+        if needs_business:
+            shared_locale_gen.clear_row_employers()
 
-    # Convert to requested output format
-    if config.output == "dict":
+    return data
+
+
+# ---------------------------------------------------------------------------
+# Multi-country mixing helpers
+# ---------------------------------------------------------------------------
+
+
+def _allocate_rows(weights: dict[str, float], n: int) -> dict[str, int]:
+    """Allocate *n* rows across countries proportionally to *weights*.
+
+    Uses largest-remainder allocation so counts always sum to exactly *n*.
+    """
+    total_weight = sum(weights.values())
+    # Initial allocation via floor
+    allocations = {k: int(n * w / total_weight) for k, w in weights.items()}
+    # Distribute remainder by largest fractional part
+    remainder = n - sum(allocations.values())
+    fractional = {k: (n * w / total_weight) - allocations[k] for k, w in weights.items()}
+    for k in sorted(fractional, key=lambda x: fractional[x], reverse=True)[:remainder]:
+        allocations[k] += 1
+    return allocations
+
+
+def _generate_multi_country(
+    fields: dict[str, Field],
+    config: GeneratorConfig,
+    weights: dict[str, float],
+) -> dict[str, list[Any]]:
+    """Generate data mixing rows from multiple countries.
+
+    Each row is pre-assigned to a country. Then each country's rows are
+    generated as an independent single-country batch (preserving coherence).
+    Finally the rows are interleaved (shuffled) or left in country blocks
+    depending on ``config.shuffle``.
+    """
+    allocations = _allocate_rows(weights, config.n)
+
+    # Filter out countries with 0 rows
+    allocations = {k: v for k, v in allocations.items() if v > 0}
+
+    if not allocations:
+        # Edge case: n=0
+        return {col_name: [] for col_name in fields}
+
+    # Generate per-country data batches.  Each batch gets a deterministic seed
+    # derived from the base seed + country code so results are reproducible and
+    # independent across countries.
+    country_batches: dict[str, dict[str, list[Any]]] = {}
+    country_order = list(allocations.keys())
+
+    for idx, country_code in enumerate(country_order):
+        n_rows = allocations[country_code]
+        if n_rows == 0:
+            continue
+
+        # Derive a per-country seed so that adding/removing a country doesn't
+        # change the data for the other countries.
+        if config.seed is not None:
+            country_seed = (config.seed + hash(country_code)) % (2**31)
+        else:
+            country_seed = None
+
+        from dataclasses import replace as _dc_replace
+
+        country_config = _dc_replace(config, n=n_rows, seed=country_seed, country=country_code)
+        country_batches[country_code] = _generate_single_country(
+            fields, country_config, country_code
+        )
+
+    # Build row-index ordering.  Start with country blocks in dict order.
+    row_indices: list[tuple[str, int]] = []
+    for country_code in country_order:
+        if country_code in country_batches:
+            n_rows = allocations[country_code]
+            for i in range(n_rows):
+                row_indices.append((country_code, i))
+
+    # Shuffle if requested (default)
+    if config.shuffle:
+        shuffle_rng = random.Random(config.seed)
+        shuffle_rng.shuffle(row_indices)
+
+    # Assemble final columns in the shuffled/block order
+    data: dict[str, list[Any]] = {col_name: [] for col_name in fields}
+    for country_code, local_row_idx in row_indices:
+        batch = country_batches[country_code]
+        for col_name in fields:
+            data[col_name].append(batch[col_name][local_row_idx])
+
+    return data
+
+
+def _to_output_format(data: dict[str, list[Any]], output: str) -> Any:
+    """Convert a dict-of-lists to the requested output format."""
+    if output == "dict":
         return data
 
-    if config.output == "polars":
+    if output == "polars":
         if not _is_lib_present("polars"):
             raise ImportError(
                 "The Polars library is not installed but is required when specifying "
@@ -560,7 +751,7 @@ def generate_dataframe(
 
         return pl.DataFrame(data)
 
-    if config.output == "pandas":
+    if output == "pandas":
         if not _is_lib_present("pandas"):
             raise ImportError(
                 "The Pandas library is not installed but is required when specifying "
@@ -570,4 +761,4 @@ def generate_dataframe(
 
         return pd.DataFrame(data)
 
-    raise ValueError(f"Unknown output format: {config.output}")
+    raise ValueError(f"Unknown output format: {output}")

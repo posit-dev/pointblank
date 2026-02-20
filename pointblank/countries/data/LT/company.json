@@ -1,0 +1,497 @@
+{
+  "suffixes": [
+    "UAB",
+    "AB",
+    "IĮ",
+    "VšĮ",
+    "MB",
+    "TŪB",
+    "KŪB",
+    "Group",
+    "Lietuva",
+    "LT",
+    "Baltic",
+    "Holding"
+  ],
+  "formats": [
+    "{last_name} {suffix}",
+    "{adjective} {noun} {suffix}",
+    "{adjective} {noun}",
+    "{noun} {suffix}"
+  ],
+  "adjectives": [
+    "Lithuanian",
+    "Baltic",
+    "Vilnius",
+    "European",
+    "United",
+    "Global",
+    "Premier",
+    "First",
+    "Modern",
+    "Digital",
+    "Smart",
+    "Dynamic",
+    "National",
+    "Advanced",
+    "New",
+    "Central",
+    "East",
+    "Euro",
+    "Nordic",
+    "Hanseatic"
+  ],
+  "nouns": [
+    "Bank",
+    "Telecom",
+    "Energy",
+    "Power",
+    "Gas",
+    "Pharma",
+    "Chemicals",
+    "Electronics",
+    "Engineering",
+    "Manufacturing",
+    "Logistics",
+    "Transport",
+    "Trading",
+    "Insurance",
+    "Finance",
+    "Construction",
+    "Foods",
+    "Retail",
+    "Steel",
+    "Shipping"
+  ],
+  "well_known_companies": [
+    {
+      "name": "Ignitis Group",
+      "cities": [
+        "Vilnius"
+      ]
+    },
+    {
+      "name": "Maxima LT",
+      "cities": [
+        "Vilnius",
+        "Kaunas",
+        "Klaipeda"
+      ]
+    },
+    {
+      "name": "Orlen Lietuva",
+      "cities": [
+        "Mazeikiai"
+      ]
+    },
+    {
+      "name": "Vilkyskiu pieniné",
+      "cities": [
+        "Vilkyskiai"
+      ]
+    },
+    {
+      "name": "Achema Group",
+      "cities": [
+        "Jonava",
+        "Vilnius"
+      ]
+    },
+    {
+      "name": "Girteka Logistics",
+      "cities": [
+        "Vilnius"
+      ]
+    },
+    {
+      "name": "Vinted",
+      "cities": [
+        "Vilnius"
+      ]
+    },
+    {
+      "name": "Telia Lietuva",
+      "cities": [
+        "Vilnius",
+        "Kaunas"
+      ]
+    },
+    {
+      "name": "Tele2 Lietuva",
+      "cities": [
+        "Vilnius"
+      ]
+    },
+    {
+      "name": "Bite Lietuva",
+      "cities": [
+        "Vilnius"
+      ]
+    },
+    {
+      "name": "SEB Bankas",
+      "cities": [
+        "Vilnius",
+        "Kaunas",
+        "Klaipeda"
+      ]
+    },
+    {
+      "name": "Swedbank",
+      "cities": [
+        "Vilnius",
+        "Kaunas"
+      ]
+    },
+    {
+      "name": "Luminor Bank",
+      "cities": [
+        "Vilnius"
+      ]
+    },
+    {
+      "name": "Lidl Lietuva",
+      "cities": [
+        "Vilnius",
+        "Kaunas"
+      ]
+    },
+    {
+      "name": "Rimi Lietuva",
+      "cities": [
+        "Vilnius",
+        "Klaipeda"
+      ]
+    },
+    {
+      "name": "Iki",
+      "cities": [
+        "Vilnius",
+        "Kaunas",
+        "Siauliai"
+      ]
+    },
+    {
+      "name": "Pigu",
+      "cities": [
+        "Vilnius"
+      ]
+    },
+    {
+      "name": "Varle",
+      "cities": [
+        "Vilnius"
+      ]
+    },
+    {
+      "name": "Baltic Clipper",
+      "cities": [
+        "Klaipeda"
+      ]
+    },
+    {
+      "name": "Lietuvos gelezinkeliai",
+      "cities": [
+        "Vilnius"
+      ]
+    }
+  ],
+  "jobs": [
+    "Software Engineer",
+    "Product Manager",
+    "Data Analyst",
+    "Marketing Manager",
+    "Sales Representative",
+    "HR Manager",
+    "Financial Analyst",
+    "Project Manager",
+    "Operations Manager",
+    "UI/UX Designer",
+    "Frontend Developer",
+    "Backend Developer",
+    "DevOps Engineer",
+    "QA Engineer",
+    "Data Scientist",
+    "Accountant",
+    "Business Analyst",
+    "Customer Service Representative",
+    "Logistics Coordinator",
+    "Procurement Specialist",
+    "Mechanical Engineer",
+    "Electrical Engineer",
+    "Production Manager",
+    "Quality Manager",
+    "IT Administrator"
+  ],
+  "catch_phrase_adjectives": [
+    "Innovative",
+    "Reliable",
+    "Professional",
+    "Dynamic",
+    "Trusted",
+    "Leading",
+    "Modern",
+    "Sustainable",
+    "Customer-focused",
+    "Quality-driven",
+    "Baltic",
+    "Nordic"
+  ],
+  "catch_phrase_nouns": [
+    "solutions",
+    "services",
+    "innovations",
+    "values",
+    "partnerships",
+    "strategies",
+    "results",
+    "frameworks",
+    "principles",
+    "success"
+  ],
+  "catch_phrase_verbs": [
+    "deliver",
+    "create",
+    "build",
+    "provide",
+    "enable",
+    "achieve",
+    "drive",
+    "transform",
+    "empower",
+    "connect",
+    "innovate",
+    "lead"
+  ],
+  "catch_phrase_connector": "that",
+  "industries": [
+    {
+      "name": "consulting",
+      "weight": 0.12,
+      "jobs": [
+        "Project Manager",
+        "Business Analyst"
+      ],
+      "well_known": [],
+      "company_suffixes": [
+        "Consulting",
+        "Group",
+        "Partners",
+        "Associates",
+        "Advisory"
+      ],
+      "company_nouns": [
+        "Consulting",
+        "Management",
+        "Strategy",
+        "Advisory"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun} {suffix}",
+        "{last_name} & {last_name}"
+      ]
+    },
+    {
+      "name": "corporate",
+      "weight": 0.15,
+      "jobs": [
+        "Sales Representative",
+        "HR Manager",
+        "Operations Manager",
+        "Customer Service Representative"
+      ],
+      "well_known": [
+        "Maxima LT",
+        "Vilkyskiu pieniné",
+        "Telia Lietuva",
+        "Tele2 Lietuva",
+        "Bite Lietuva",
+        "Lidl Lietuva",
+        "Rimi Lietuva",
+        "Iki",
+        "Pigu",
+        "Varle",
+        "Baltic Clipper"
+      ],
+      "company_suffixes": [
+        "AB",
+        "UAB",
+        "Group",
+        "Holdings"
+      ],
+      "company_nouns": [
+        "Solutions",
+        "Services",
+        "Management",
+        "Industries"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun} {suffix}",
+        "{last_name} and {last_name}"
+      ]
+    },
+    {
+      "name": "engineering",
+      "weight": 0.15,
+      "jobs": [
+        "Mechanical Engineer",
+        "Electrical Engineer",
+        "Production Manager",
+        "Quality Manager"
+      ],
+      "well_known": [
+        "Ignitis Group",
+        "Orlen Lietuva",
+        "Achema Group"
+      ],
+      "company_suffixes": [
+        "Engineering",
+        "Industries",
+        "Manufacturing",
+        "Corp"
+      ],
+      "company_nouns": [
+        "Engineering",
+        "Manufacturing",
+        "Construction",
+        "Industries"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun} {suffix}",
+        "{city} Engineering Group"
+      ]
+    },
+    {
+      "name": "finance",
+      "weight": 0.15,
+      "jobs": [
+        "Financial Analyst",
+        "Accountant"
+      ],
+      "well_known": [
+        "SEB Bankas",
+        "Swedbank",
+        "Luminor Bank"
+      ],
+      "company_suffixes": [
+        "Financial",
+        "Capital",
+        "Investments",
+        "Partners",
+        "Group"
+      ],
+      "company_nouns": [
+        "Capital",
+        "Investments",
+        "Financial",
+        "Wealth",
+        "Advisory"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{last_name} & {last_name}",
+        "{adjective} {noun} {suffix}",
+        "{city} Savings Bank"
+      ]
+    },
+    {
+      "name": "logistics",
+      "weight": 0.06,
+      "jobs": [
+        "Logistics Coordinator",
+        "Procurement Specialist"
+      ],
+      "well_known": [
+        "Girteka Logistics",
+        "Lietuvos gelezinkeliai"
+      ],
+      "company_suffixes": [
+        "Logistics",
+        "Transport",
+        "Distribution",
+        "Supply"
+      ],
+      "company_nouns": [
+        "Logistics",
+        "Transport",
+        "Distribution",
+        "Supply"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{last_name} {suffix}",
+        "{city} Freight Services"
+      ]
+    },
+    {
+      "name": "marketing_creative",
+      "weight": 0.12,
+      "jobs": [
+        "Marketing Manager"
+      ],
+      "well_known": [],
+      "company_suffixes": [
+        "Media",
+        "Creative",
+        "Studios",
+        "Communications",
+        "Group"
+      ],
+      "company_nouns": [
+        "Media",
+        "Creative",
+        "Communications",
+        "Marketing",
+        "Design"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun}",
+        "{last_name} & {last_name}"
+      ]
+    },
+    {
+      "name": "technology",
+      "weight": 0.26,
+      "jobs": [
+        "Software Engineer",
+        "Product Manager",
+        "Data Analyst",
+        "UI/UX Designer",
+        "Frontend Developer",
+        "Backend Developer",
+        "DevOps Engineer",
+        "QA Engineer",
+        "Data Scientist",
+        "IT Administrator"
+      ],
+      "well_known": [
+        "Vinted"
+      ],
+      "company_suffixes": [
+        "Technologies",
+        "Software",
+        "Solutions",
+        "Labs",
+        "Digital",
+        "Systems"
+      ],
+      "company_nouns": [
+        "Software",
+        "Technologies",
+        "Systems",
+        "Data",
+        "Analytics",
+        "Networks"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{adjective} {noun}",
+        "{last_name} {noun}"
+      ]
+    }
+  ]
+}

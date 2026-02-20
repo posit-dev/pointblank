@@ -1,0 +1,644 @@
+{
+  "suffixes": [
+    "Limited",
+    "Ltd",
+    "Holdings",
+    "Group",
+    "International",
+    "Corporation",
+    "Corp",
+    "Enterprises",
+    "Company",
+    "Co",
+    "Trading",
+    "Investment",
+    "Development",
+    "Services",
+    "Solutions",
+    "Technology"
+  ],
+  "formats": [
+    "{last_name} {suffix}",
+    "{adjective} {noun} {suffix}",
+    "{adjective} {noun}",
+    "{noun} {suffix}"
+  ],
+  "adjectives": [
+    "Global",
+    "International",
+    "Pacific",
+    "Asian",
+    "Oriental",
+    "Eastern",
+    "Golden",
+    "Silver",
+    "Royal",
+    "Premier",
+    "United",
+    "Allied",
+    "Crown",
+    "Dragon",
+    "Phoenix",
+    "Star",
+    "Fortune",
+    "Prosperity",
+    "Victory",
+    "Harmony",
+    "Dynamic",
+    "Innovative",
+    "Strategic",
+    "Leading",
+    "Elite",
+    "Prime",
+    "Superior",
+    "Advanced",
+    "Modern",
+    "Smart"
+  ],
+  "nouns": [
+    "Trading",
+    "Investment",
+    "Finance",
+    "Capital",
+    "Properties",
+    "Development",
+    "Construction",
+    "Engineering",
+    "Manufacturing",
+    "Electronics",
+    "Technology",
+    "Solutions",
+    "Services",
+    "Logistics",
+    "Shipping",
+    "Transport",
+    "Import Export",
+    "Retail",
+    "Wholesale",
+    "Food",
+    "Textile",
+    "Jewelry",
+    "Securities",
+    "Insurance",
+    "Consulting"
+  ],
+  "well_known_companies": [
+    {
+      "name": "HSBC",
+      "cities": [
+        "Central",
+        "Admiralty",
+        "Tsim Sha Tsui",
+        "Mong Kok",
+        "Sha Tin"
+      ]
+    },
+    {
+      "name": "Hang Seng Bank",
+      "cities": [
+        "Central",
+        "Wan Chai",
+        "Tsim Sha Tsui",
+        "Mong Kok",
+        "Kwun Tong"
+      ]
+    },
+    {
+      "name": "Bank of China Hong Kong",
+      "cities": [
+        "Central",
+        "Admiralty",
+        "Tsim Sha Tsui",
+        "Mong Kok"
+      ]
+    },
+    {
+      "name": "Standard Chartered",
+      "cities": [
+        "Central",
+        "Admiralty",
+        "Tsim Sha Tsui"
+      ]
+    },
+    {
+      "name": "CK Hutchison",
+      "cities": [
+        "Central",
+        "Tsim Sha Tsui",
+        "Quarry Bay"
+      ]
+    },
+    {
+      "name": "Sun Hung Kai Properties",
+      "cities": [
+        "Central",
+        "Wan Chai",
+        "Tsim Sha Tsui",
+        "Sha Tin"
+      ]
+    },
+    {
+      "name": "New World Development",
+      "cities": [
+        "Central",
+        "Tsim Sha Tsui",
+        "Kwun Tong"
+      ]
+    },
+    {
+      "name": "Henderson Land",
+      "cities": [
+        "Central",
+        "Wan Chai",
+        "Mong Kok"
+      ]
+    },
+    {
+      "name": "Swire Properties",
+      "cities": [
+        "Central",
+        "Admiralty",
+        "Quarry Bay",
+        "Tai Koo"
+      ]
+    },
+    {
+      "name": "Cathay Pacific",
+      "cities": [
+        "Central",
+        "Admiralty",
+        "Tung Chung"
+      ]
+    },
+    {
+      "name": "MTR Corporation",
+      "cities": [
+        "Central",
+        "Admiralty",
+        "Kowloon City",
+        "Sha Tin"
+      ]
+    },
+    {
+      "name": "Hong Kong Exchanges",
+      "cities": [
+        "Central",
+        "Admiralty"
+      ]
+    },
+    {
+      "name": "AIA Group",
+      "cities": [
+        "Central",
+        "Wan Chai",
+        "Tsim Sha Tsui"
+      ]
+    },
+    {
+      "name": "Link REIT",
+      "cities": [
+        "Central",
+        "Wan Chai",
+        "Kwun Tong",
+        "Sha Tin"
+      ]
+    },
+    {
+      "name": "CLP Holdings",
+      "cities": [
+        "Kowloon City",
+        "Hung Hom"
+      ]
+    },
+    {
+      "name": "HK Electric",
+      "cities": [
+        "Central",
+        "Wan Chai"
+      ]
+    },
+    {
+      "name": "Jardine Matheson",
+      "cities": [
+        "Central",
+        "Quarry Bay"
+      ]
+    },
+    {
+      "name": "Wharf Holdings",
+      "cities": [
+        "Central",
+        "Tsim Sha Tsui",
+        "Hung Hom"
+      ]
+    },
+    {
+      "name": "Galaxy Entertainment",
+      "cities": [
+        "Central",
+        "Wan Chai"
+      ]
+    },
+    {
+      "name": "Techtronic Industries",
+      "cities": [
+        "Kwai Chung",
+        "Kwun Tong"
+      ]
+    },
+    {
+      "name": "Lenovo",
+      "cities": [
+        "Quarry Bay",
+        "Kwun Tong"
+      ]
+    },
+    {
+      "name": "Li & Fung",
+      "cities": [
+        "Central",
+        "Kwun Tong"
+      ]
+    },
+    {
+      "name": "Dairy Farm",
+      "cities": [
+        "Central",
+        "Quarry Bay"
+      ]
+    },
+    {
+      "name": "Mandarin Oriental",
+      "cities": [
+        "Central",
+        "Admiralty"
+      ]
+    },
+    {
+      "name": "Shangri-La Hotels",
+      "cities": [
+        "Central",
+        "Admiralty",
+        "Tsim Sha Tsui"
+      ]
+    }
+  ],
+  "jobs": [
+    "Software Engineer",
+    "Product Manager",
+    "Data Analyst",
+    "Marketing Manager",
+    "Sales Representative",
+    "HR Manager",
+    "Financial Analyst",
+    "Project Manager",
+    "Operations Manager",
+    "UI/UX Designer",
+    "Frontend Developer",
+    "Backend Developer",
+    "QA Engineer",
+    "DevOps Engineer",
+    "Data Scientist",
+    "Investment Banker",
+    "Fund Manager",
+    "Risk Analyst",
+    "Compliance Officer",
+    "Auditor",
+    "Account Manager",
+    "Business Development Manager",
+    "Trade Finance Specialist",
+    "Logistics Coordinator",
+    "Property Agent",
+    "Interior Designer",
+    "Architect",
+    "Quantity Surveyor",
+    "Legal Counsel",
+    "Paralegal"
+  ],
+  "catch_phrase_adjectives": [
+    "Innovative",
+    "Leading",
+    "Dynamic",
+    "Professional",
+    "Reliable",
+    "Trusted",
+    "Premier",
+    "Excellence",
+    "World-class",
+    "Customer-focused",
+    "Results-driven",
+    "Forward-thinking",
+    "Strategic",
+    "Agile"
+  ],
+  "catch_phrase_nouns": [
+    "solutions",
+    "services",
+    "partnerships",
+    "innovations",
+    "strategies",
+    "success",
+    "values",
+    "opportunities",
+    "results",
+    "principles",
+    "commitments"
+  ],
+  "catch_phrase_verbs": [
+    "deliver",
+    "create",
+    "drive",
+    "build",
+    "enable",
+    "empower",
+    "transform",
+    "achieve",
+    "maximize",
+    "optimize",
+    "accelerate",
+    "enhance",
+    "unlock",
+    "connect",
+    "lead"
+  ],
+  "catch_phrase_connector": "that",
+  "industries": [
+    {
+      "name": "consulting",
+      "weight": 0.11,
+      "jobs": [
+        "Project Manager"
+      ],
+      "well_known": [],
+      "company_suffixes": [
+        "Consulting",
+        "Group",
+        "Partners",
+        "Associates",
+        "Advisory"
+      ],
+      "company_nouns": [
+        "Consulting",
+        "Management",
+        "Strategy",
+        "Advisory"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun} {suffix}",
+        "{last_name} & {last_name}"
+      ]
+    },
+    {
+      "name": "corporate",
+      "weight": 0.14,
+      "jobs": [
+        "Sales Representative",
+        "HR Manager",
+        "Operations Manager",
+        "Account Manager",
+        "Business Development Manager"
+      ],
+      "well_known": [
+        "HSBC",
+        "Standard Chartered",
+        "CK Hutchison",
+        "Sun Hung Kai Properties",
+        "New World Development",
+        "Henderson Land",
+        "Swire Properties",
+        "MTR Corporation",
+        "AIA Group",
+        "Link REIT",
+        "CLP Holdings",
+        "Jardine Matheson",
+        "Wharf Holdings",
+        "Lenovo",
+        "Li & Fung",
+        "Dairy Farm",
+        "Mandarin Oriental",
+        "Shangri-La Hotels"
+      ],
+      "company_suffixes": [
+        "Ltd",
+        "Holdings",
+        "Group",
+        "International",
+        "Corp"
+      ],
+      "company_nouns": [
+        "Solutions",
+        "Services",
+        "Management",
+        "Industries"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun} {suffix}",
+        "{last_name} and {last_name}"
+      ]
+    },
+    {
+      "name": "engineering",
+      "weight": 0.14,
+      "jobs": [
+        "Architect",
+        "Quantity Surveyor"
+      ],
+      "well_known": [
+        "HK Electric"
+      ],
+      "company_suffixes": [
+        "Engineering",
+        "Industries",
+        "Manufacturing",
+        "Corp"
+      ],
+      "company_nouns": [
+        "Engineering",
+        "Manufacturing",
+        "Construction",
+        "Industries"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun} {suffix}",
+        "{city} Engineering Group"
+      ]
+    },
+    {
+      "name": "finance",
+      "weight": 0.14,
+      "jobs": [
+        "Financial Analyst",
+        "Investment Banker",
+        "Fund Manager",
+        "Risk Analyst",
+        "Compliance Officer",
+        "Auditor",
+        "Trade Finance Specialist"
+      ],
+      "well_known": [
+        "Hang Seng Bank",
+        "Bank of China Hong Kong",
+        "Hong Kong Exchanges"
+      ],
+      "company_suffixes": [
+        "Financial",
+        "Capital",
+        "Investments",
+        "Partners",
+        "Group"
+      ],
+      "company_nouns": [
+        "Capital",
+        "Investments",
+        "Financial",
+        "Wealth",
+        "Advisory"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{last_name} & {last_name}",
+        "{adjective} {noun} {suffix}",
+        "{city} Savings Bank"
+      ]
+    },
+    {
+      "name": "legal",
+      "weight": 0.05,
+      "jobs": [
+        "Legal Counsel",
+        "Paralegal"
+      ],
+      "well_known": [],
+      "company_suffixes": [],
+      "company_nouns": [],
+      "company_formats": [
+        "{last_name} & {last_name} Law",
+        "{last_name} Legal Services",
+        "{city} Legal Associates"
+      ]
+    },
+    {
+      "name": "logistics",
+      "weight": 0.05,
+      "jobs": [
+        "Logistics Coordinator"
+      ],
+      "well_known": [
+        "Cathay Pacific"
+      ],
+      "company_suffixes": [
+        "Logistics",
+        "Transport",
+        "Distribution",
+        "Supply"
+      ],
+      "company_nouns": [
+        "Logistics",
+        "Transport",
+        "Distribution",
+        "Supply"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{last_name} {suffix}",
+        "{city} Freight Services"
+      ]
+    },
+    {
+      "name": "marketing_creative",
+      "weight": 0.11,
+      "jobs": [
+        "Marketing Manager",
+        "Interior Designer"
+      ],
+      "well_known": [
+        "Galaxy Entertainment"
+      ],
+      "company_suffixes": [
+        "Media",
+        "Creative",
+        "Studios",
+        "Communications",
+        "Group"
+      ],
+      "company_nouns": [
+        "Media",
+        "Creative",
+        "Communications",
+        "Marketing",
+        "Design"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun}",
+        "{last_name} & {last_name}"
+      ]
+    },
+    {
+      "name": "real_estate_insurance",
+      "weight": 0.03,
+      "jobs": [
+        "Property Agent"
+      ],
+      "well_known": [],
+      "company_suffixes": [
+        "Realty",
+        "Properties",
+        "Insurance",
+        "Group"
+      ],
+      "company_nouns": [
+        "Properties",
+        "Realty",
+        "Insurance"
+      ],
+      "company_formats": [
+        "{last_name} Realty",
+        "{city} Real Estate",
+        "{last_name} Insurance Agency"
+      ]
+    },
+    {
+      "name": "technology",
+      "weight": 0.24,
+      "jobs": [
+        "Software Engineer",
+        "Product Manager",
+        "Data Analyst",
+        "UI/UX Designer",
+        "Frontend Developer",
+        "Backend Developer",
+        "QA Engineer",
+        "DevOps Engineer",
+        "Data Scientist"
+      ],
+      "well_known": [
+        "Techtronic Industries"
+      ],
+      "company_suffixes": [
+        "Technologies",
+        "Software",
+        "Solutions",
+        "Labs",
+        "Digital",
+        "Systems"
+      ],
+      "company_nouns": [
+        "Software",
+        "Technologies",
+        "Systems",
+        "Data",
+        "Analytics",
+        "Networks"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{adjective} {noun}",
+        "{last_name} {noun}"
+      ]
+    }
+  ]
+}

@@ -506,7 +506,7 @@ You can also set these preferences globally using `pb.config()`:
 
 ```python
 # Set global preferences
-pb.config(report_incl_header=True, report_incl_footer=False)
+pb.config(report_incl_header=True, report_incl_footer_timings=False)
 ```
 
 ## Best Practices for Validation Reports

@@ -1,19 +1,17 @@
-from pointblank import Actions, Thresholds
-from pointblank._utils import _PBUnresolvedColumn
-from pointblank.column import Column, ReferenceColumn
-from pointblank._typing import Tolerance
-
 from collections.abc import Collection
 from dataclasses import dataclass
+from pathlib import Path
+from typing import Any, Callable, Literal, ParamSpec, TypeVar
+
 from great_tables import GT
 from narwhals.typing import FrameT, IntoFrame
-from pathlib import Path
+
+from pointblank import Actions, Thresholds
 from pointblank._typing import SegmentSpec, Tolerance
 from pointblank._utils import _PBUnresolvedColumn
 from pointblank.column import Column, ColumnSelector, ColumnSelectorNarwhals, ReferenceColumn
 from pointblank.schema import Schema
 from pointblank.thresholds import Actions, FinalActions, Thresholds
-from typing import Any, Callable, Literal, ParamSpec, TypeVar
 
 __all__ = [
     "Validate",
@@ -96,7 +94,7 @@ class _ValidationInfo:
         thresholds: float | bool | tuple | dict | Thresholds | None = None,
         brief: str | bool = False,
         actions: Actions | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
     ) -> _ValidationInfo: ...
     i: int | None = ...
     i_o: int | None = ...
@@ -114,7 +112,7 @@ class _ValidationInfo:
     label: str | None = ...
     brief: str | None = ...
     autobrief: str | None = ...
-    active: bool | None = ...
+    active: bool | Callable | None = ...
     eval_error: bool | None = ...
     all_passed: bool | None = ...
     n: int | None = ...
@@ -168,7 +166,7 @@ class Validate:
         thresholds=None,
         brief: bool = False,
         actions=None,
-        active: bool = True,
+        active: bool | Callable = True,
     ): ...
     def set_tbl(
         self, tbl: FrameT | Any, tbl_name: str | None = None, label: str | None = None
@@ -184,7 +182,7 @@ class Validate:
         thresholds: int | float | bool | tuple | dict | Thresholds = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
     ) -> Validate: ...
     def col_vals_lt(
         self,
@@ -196,7 +194,7 @@ class Validate:
         thresholds: int | float | bool | tuple | dict | Thresholds = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
     ) -> Validate: ...
     def col_vals_eq(
         self,
@@ -208,7 +206,7 @@ class Validate:
         thresholds: int | float | bool | tuple | dict | Thresholds = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
     ) -> Validate: ...
     def col_vals_ne(
         self,
@@ -220,7 +218,7 @@ class Validate:
         thresholds: int | float | bool | tuple | dict | Thresholds = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
     ) -> Validate: ...
     def col_vals_ge(
         self,
@@ -232,7 +230,7 @@ class Validate:
         thresholds: int | float | bool | tuple | dict | Thresholds = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
     ) -> Validate: ...
     def col_vals_le(
         self,
@@ -244,7 +242,7 @@ class Validate:
         thresholds: int | float | bool | tuple | dict | Thresholds = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
     ) -> Validate: ...
     def col_vals_between(
         self,
@@ -258,7 +256,7 @@ class Validate:
         thresholds: int | float | bool | tuple | dict | Thresholds = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
     ) -> Validate: ...
     def col_vals_outside(
         self,
@@ -272,7 +270,7 @@ class Validate:
         thresholds: int | float | bool | tuple | dict | Thresholds = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
     ) -> Validate: ...
     def col_vals_in_set(
         self,
@@ -283,7 +281,7 @@ class Validate:
         thresholds: int | float | bool | tuple | dict | Thresholds = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
     ) -> Validate: ...
     def col_vals_not_in_set(
         self,
@@ -294,7 +292,7 @@ class Validate:
         thresholds: int | float | bool | tuple | dict | Thresholds = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
     ) -> Validate: ...
     def col_vals_increasing(
         self,
@@ -307,7 +305,7 @@ class Validate:
         thresholds: int | float | bool | tuple | dict | Thresholds = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
     ) -> Validate: ...
     def col_vals_decreasing(
         self,
@@ -320,7 +318,7 @@ class Validate:
         thresholds: int | float | bool | tuple | dict | Thresholds = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
     ) -> Validate: ...
     def col_vals_null(
         self,
@@ -330,7 +328,7 @@ class Validate:
         thresholds: int | float | bool | tuple | dict | Thresholds = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
     ) -> Validate: ...
     def col_vals_not_null(
         self,
@@ -340,7 +338,7 @@ class Validate:
         thresholds: int | float | bool | tuple | dict | Thresholds = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
     ) -> Validate: ...
     def col_vals_regex(
         self,
@@ -353,7 +351,7 @@ class Validate:
         thresholds: int | float | bool | tuple | dict | Thresholds = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
     ) -> Validate: ...
     def col_vals_within_spec(
         self,
@@ -365,7 +363,7 @@ class Validate:
         thresholds: int | float | bool | tuple | dict | Thresholds = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
     ) -> Validate: ...
     def col_vals_expr(
         self,
@@ -375,7 +373,7 @@ class Validate:
         thresholds: int | float | bool | tuple | dict | Thresholds = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
     ) -> Validate: ...
     def col_exists(
         self,
@@ -383,7 +381,7 @@ class Validate:
         thresholds: int | float | bool | tuple | dict | Thresholds = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
     ) -> Validate: ...
     def col_pct_null(
         self,
@@ -393,7 +391,7 @@ class Validate:
         thresholds: int | float | None | bool | tuple | dict | Thresholds = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
     ) -> Validate: ...
     def rows_distinct(
         self,
@@ -403,7 +401,7 @@ class Validate:
         thresholds: int | float | bool | tuple | dict | Thresholds = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
     ) -> Validate: ...
     def rows_complete(
         self,
@@ -413,7 +411,7 @@ class Validate:
         thresholds: int | float | bool | tuple | dict | Thresholds = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
     ) -> Validate: ...
     def prompt(
         self,
@@ -427,7 +425,7 @@ class Validate:
         thresholds: int | float | bool | tuple | dict | Thresholds = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
     ) -> Validate: ...
     def col_schema_match(
         self,
@@ -441,7 +439,7 @@ class Validate:
         thresholds: int | float | bool | tuple | dict | Thresholds = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
     ) -> Validate: ...
     def row_count_match(
         self,
@@ -452,7 +450,7 @@ class Validate:
         thresholds: int | float | bool | tuple | dict | Thresholds = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
     ) -> Validate: ...
     def col_count_match(
         self,
@@ -462,7 +460,7 @@ class Validate:
         thresholds: int | float | bool | tuple | dict | Thresholds = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
     ) -> Validate: ...
     def tbl_match(
         self,
@@ -471,7 +469,7 @@ class Validate:
         thresholds: int | float | bool | tuple | dict | Thresholds = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
     ) -> Validate: ...
     def conjointly(
         self,
@@ -480,7 +478,7 @@ class Validate:
         thresholds: int | float | bool | tuple | dict | Thresholds = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
     ) -> Validate: ...
     def specially(
         self,
@@ -489,7 +487,7 @@ class Validate:
         thresholds: int | float | bool | tuple | dict | Thresholds = None,
         actions: Actions | None = None,
         brief: str | bool | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
     ) -> Validate: ...
     def interrogate(
         self,
@@ -569,7 +567,7 @@ class Validate:
         thresholds: float | bool | tuple | dict | Thresholds | None = None,
         brief: str | bool = False,
         actions: Actions | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
     ) -> Validate:
         """Assert the values in a column sum to a value eq some `value`.
 
@@ -605,7 +603,7 @@ class Validate:
         thresholds: float | bool | tuple | dict | Thresholds | None = None,
         brief: str | bool = False,
         actions: Actions | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
     ) -> Validate:
         """Assert the values in a column sum to a value gt some `value`.
 
@@ -641,7 +639,7 @@ class Validate:
         thresholds: float | bool | tuple | dict | Thresholds | None = None,
         brief: str | bool = False,
         actions: Actions | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
     ) -> Validate:
         """Assert the values in a column sum to a value ge some `value`.
 
@@ -677,7 +675,7 @@ class Validate:
         thresholds: float | bool | tuple | dict | Thresholds | None = None,
         brief: str | bool = False,
         actions: Actions | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
     ) -> Validate:
         """Assert the values in a column sum to a value lt some `value`.
 
@@ -713,7 +711,7 @@ class Validate:
         thresholds: float | bool | tuple | dict | Thresholds | None = None,
         brief: str | bool = False,
         actions: Actions | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
     ) -> Validate:
         """Assert the values in a column sum to a value le some `value`.
 
@@ -749,7 +747,7 @@ class Validate:
         thresholds: float | bool | tuple | dict | Thresholds | None = None,
         brief: str | bool = False,
         actions: Actions | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
     ) -> Validate:
         """Assert the values in a column avg to a value eq some `value`.
 
@@ -785,7 +783,7 @@ class Validate:
         thresholds: float | bool | tuple | dict | Thresholds | None = None,
         brief: str | bool = False,
         actions: Actions | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
     ) -> Validate:
         """Assert the values in a column avg to a value gt some `value`.
 
@@ -821,7 +819,7 @@ class Validate:
         thresholds: float | bool | tuple | dict | Thresholds | None = None,
         brief: str | bool = False,
         actions: Actions | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
     ) -> Validate:
         """Assert the values in a column avg to a value ge some `value`.
 
@@ -857,7 +855,7 @@ class Validate:
         thresholds: float | bool | tuple | dict | Thresholds | None = None,
         brief: str | bool = False,
         actions: Actions | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
     ) -> Validate:
         """Assert the values in a column avg to a value lt some `value`.
 
@@ -893,7 +891,7 @@ class Validate:
         thresholds: float | bool | tuple | dict | Thresholds | None = None,
         brief: str | bool = False,
         actions: Actions | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
     ) -> Validate:
         """Assert the values in a column avg to a value le some `value`.
 
@@ -929,7 +927,7 @@ class Validate:
         thresholds: float | bool | tuple | dict | Thresholds | None = None,
         brief: str | bool = False,
         actions: Actions | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
     ) -> Validate:
         """Assert the values in a column sd to a value eq some `value`.
 
@@ -965,7 +963,7 @@ class Validate:
         thresholds: float | bool | tuple | dict | Thresholds | None = None,
         brief: str | bool = False,
         actions: Actions | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
     ) -> Validate:
         """Assert the values in a column sd to a value gt some `value`.
 
@@ -1001,7 +999,7 @@ class Validate:
         thresholds: float | bool | tuple | dict | Thresholds | None = None,
         brief: str | bool = False,
         actions: Actions | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
     ) -> Validate:
         """Assert the values in a column sd to a value ge some `value`.
 
@@ -1037,7 +1035,7 @@ class Validate:
         thresholds: float | bool | tuple | dict | Thresholds | None = None,
         brief: str | bool = False,
         actions: Actions | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
     ) -> Validate:
         """Assert the values in a column sd to a value lt some `value`.
 
@@ -1073,7 +1071,7 @@ class Validate:
         thresholds: float | bool | tuple | dict | Thresholds | None = None,
         brief: str | bool = False,
         actions: Actions | None = None,
-        active: bool = True,
+        active: bool | Callable = True,
     ) -> Validate:
         """Assert the values in a column sd to a value le some `value`.
 

@@ -74,6 +74,7 @@ docs = [
     "nbclient>=0.10.0",
     "nbformat>=5.10.4",
     "quartodoc>=0.8.1; python_version >= '3.9'",
+    "griffe>=0.38.1,<2",                          # Pin below griffe 2.0 which removed parse_numpy(options)
     "pandas>=2.2.3",
     "polars>=1.17.1",
     "pyspark==3.5.6",
@@ -117,6 +118,9 @@ dev = [
 
 [project.urls]
 homepage = "https://github.com/posit-dev/pointblank"
+
+[project.entry-points.pytest11]
+pointblank = "pointblank.pytest_plugin"
 
 [project.scripts]
 pb = "pointblank.cli:cli"

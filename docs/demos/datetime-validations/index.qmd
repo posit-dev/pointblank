@@ -16,7 +16,7 @@ html-table-processing: none
 import pointblank as pb
 import polars as pl
 from datetime import date, datetime
-import pytz
+from zoneinfo import ZoneInfo
 
 # Create sample data with various temporal data types
 temporal_data = pl.DataFrame({
@@ -33,10 +33,10 @@ temporal_data = pl.DataFrame({
         datetime(2024, 3, 20, 17, 22, 45)
     ],
     "event_time_tz": [
-        datetime(2023, 1, 15, 9, 0, tzinfo=pytz.timezone("America/New_York")),
-        datetime(2023, 6, 10, 12, 30, tzinfo=pytz.timezone("America/New_York")),
-        datetime(2023, 12, 5, 15, 45, tzinfo=pytz.timezone("America/New_York")),
-        datetime(2024, 3, 20, 18, 15, tzinfo=pytz.timezone("America/New_York"))
+        datetime(2023, 1, 15, 9, 0, tzinfo=ZoneInfo("America/New_York")),
+        datetime(2023, 6, 10, 12, 30, tzinfo=ZoneInfo("America/New_York")),
+        datetime(2023, 12, 5, 15, 45, tzinfo=ZoneInfo("America/New_York")),
+        datetime(2024, 3, 20, 18, 15, tzinfo=ZoneInfo("America/New_York"))
     ],
     "order_id": [1001, 1002, 1003, 1004],
     "amount": [150.0, 275.5, 89.99, 420.00]
@@ -57,7 +57,7 @@ validation = (
     )
     .col_vals_ge(
         columns="event_time_tz",
-        value=datetime(2023, 1, 1, 8, 0, tzinfo=pytz.timezone("America/New_York")),
+        value=datetime(2023, 1, 1, 8, 0, tzinfo=ZoneInfo("America/New_York")),
         brief="Timezone-aware events after 8 AM Eastern"
     )
     .col_schema_match(
@@ -82,7 +82,7 @@ validation
 import pointblank as pb
 import polars as pl
 from datetime import date, datetime
-import pytz
+from zoneinfo import ZoneInfo
 
 # Create sample data with various temporal data types
 temporal_data = pl.DataFrame({
@@ -99,10 +99,10 @@ temporal_data = pl.DataFrame({
         datetime(2024, 3, 20, 17, 22, 45)
     ],
     "event_time_tz": [
-        datetime(2023, 1, 15, 9, 0, tzinfo=pytz.timezone("America/New_York")),
-        datetime(2023, 6, 10, 12, 30, tzinfo=pytz.timezone("America/New_York")),
-        datetime(2023, 12, 5, 15, 45, tzinfo=pytz.timezone("America/New_York")),
-        datetime(2024, 3, 20, 18, 15, tzinfo=pytz.timezone("America/New_York"))
+        datetime(2023, 1, 15, 9, 0, tzinfo=ZoneInfo("America/New_York")),
+        datetime(2023, 6, 10, 12, 30, tzinfo=ZoneInfo("America/New_York")),
+        datetime(2023, 12, 5, 15, 45, tzinfo=ZoneInfo("America/New_York")),
+        datetime(2024, 3, 20, 18, 15, tzinfo=ZoneInfo("America/New_York"))
     ],
     "order_id": [1001, 1002, 1003, 1004],
     "amount": [150.0, 275.5, 89.99, 420.00]
@@ -123,7 +123,7 @@ validation = (
     )
     .col_vals_ge(
         columns="event_time_tz",
-        value=datetime(2023, 1, 1, 8, 0, tzinfo=pytz.timezone("America/New_York")),
+        value=datetime(2023, 1, 1, 8, 0, tzinfo=ZoneInfo("America/New_York")),
         brief="Timezone-aware events after 8 AM Eastern"
     )
     .col_schema_match(

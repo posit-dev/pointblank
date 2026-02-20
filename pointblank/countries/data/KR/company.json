@@ -1,0 +1,545 @@
+{
+  "suffixes": [
+    "Corporation",
+    "Corp",
+    "Co Ltd",
+    "Inc",
+    "Group",
+    "Holdings",
+    "Industries",
+    "Bank"
+  ],
+  "formats": [
+    "{last_name} {suffix}",
+    "{adjective} {noun} {suffix}",
+    "{adjective} {noun}",
+    "{noun} {suffix}"
+  ],
+  "adjectives": [
+    "Samsung",
+    "Hyundai",
+    "LG",
+    "SK",
+    "Lotte",
+    "Hanwha",
+    "Doosan",
+    "Kumho",
+    "Hanjin",
+    "CJ",
+    "Korean",
+    "Korea",
+    "Global",
+    "Asia",
+    "Pacific",
+    "United",
+    "Premier",
+    "Dynamic",
+    "Smart",
+    "Digital"
+  ],
+  "nouns": [
+    "Electronics",
+    "Motors",
+    "Heavy Industries",
+    "Engineering",
+    "Construction",
+    "Chemicals",
+    "Life",
+    "Insurance",
+    "Securities",
+    "Shipping",
+    "Airlines",
+    "Telecom",
+    "Energy",
+    "Petrochemical",
+    "Steel",
+    "Semiconductor",
+    "Display",
+    "Battery",
+    "Automotive",
+    "Entertainment"
+  ],
+  "well_known_companies": [
+    {
+      "name": "Samsung Electronics",
+      "cities": [
+        "Seoul",
+        "Suwon",
+        "Yongin",
+        "Seongnam"
+      ]
+    },
+    {
+      "name": "Hyundai Motor",
+      "cities": [
+        "Seoul",
+        "Ulsan",
+        "Namyang"
+      ]
+    },
+    {
+      "name": "SK Hynix",
+      "cities": [
+        "Seoul",
+        "Icheon",
+        "Cheongju"
+      ]
+    },
+    {
+      "name": "LG Electronics",
+      "cities": [
+        "Seoul",
+        "Pyeongtaek",
+        "Gumi"
+      ]
+    },
+    {
+      "name": "POSCO",
+      "cities": [
+        "Seoul",
+        "Pohang",
+        "Gwangyang"
+      ]
+    },
+    {
+      "name": "Kia Motors",
+      "cities": [
+        "Seoul",
+        "Hwaseong",
+        "Gwangju"
+      ]
+    },
+    {
+      "name": "KB Financial Group",
+      "cities": [
+        "Seoul",
+        "Yeouido"
+      ]
+    },
+    {
+      "name": "Shinhan Financial Group",
+      "cities": [
+        "Seoul",
+        "Jung-gu"
+      ]
+    },
+    {
+      "name": "Hyundai Mobis",
+      "cities": [
+        "Seoul",
+        "Ulsan",
+        "Changwon"
+      ]
+    },
+    {
+      "name": "Samsung SDI",
+      "cities": [
+        "Yongin",
+        "Cheonan",
+        "Ulsan"
+      ]
+    },
+    {
+      "name": "LG Chem",
+      "cities": [
+        "Seoul",
+        "Daesan",
+        "Ochang"
+      ]
+    },
+    {
+      "name": "Samsung Display",
+      "cities": [
+        "Asan",
+        "Cheonan"
+      ]
+    },
+    {
+      "name": "Naver",
+      "cities": [
+        "Seongnam",
+        "Seoul"
+      ]
+    },
+    {
+      "name": "Kakao",
+      "cities": [
+        "Seongnam",
+        "Jeju"
+      ]
+    },
+    {
+      "name": "Coupang",
+      "cities": [
+        "Seoul",
+        "Bucheon"
+      ]
+    },
+    {
+      "name": "Krafton",
+      "cities": [
+        "Seongnam",
+        "Seoul"
+      ]
+    },
+    {
+      "name": "NC Soft",
+      "cities": [
+        "Seongnam",
+        "Seoul"
+      ]
+    },
+    {
+      "name": "Netmarble",
+      "cities": [
+        "Seoul",
+        "Guro"
+      ]
+    },
+    {
+      "name": "Korean Air",
+      "cities": [
+        "Seoul",
+        "Incheon"
+      ]
+    },
+    {
+      "name": "Asiana Airlines",
+      "cities": [
+        "Seoul",
+        "Incheon"
+      ]
+    },
+    {
+      "name": "Lotte Corporation",
+      "cities": [
+        "Seoul",
+        "Songpa-gu"
+      ]
+    },
+    {
+      "name": "CJ Corporation",
+      "cities": [
+        "Seoul",
+        "Mapo-gu"
+      ]
+    },
+    {
+      "name": "Hanwha Group",
+      "cities": [
+        "Seoul",
+        "Jung-gu"
+      ]
+    },
+    {
+      "name": "Doosan Group",
+      "cities": [
+        "Seoul",
+        "Changwon"
+      ]
+    },
+    {
+      "name": "Hana Financial Group",
+      "cities": [
+        "Seoul",
+        "Jung-gu"
+      ]
+    }
+  ],
+  "jobs": [
+    "Software Engineer",
+    "Product Manager",
+    "Data Scientist",
+    "Marketing Manager",
+    "Sales Representative",
+    "HR Manager",
+    "Financial Analyst",
+    "Project Manager",
+    "Operations Manager",
+    "UI/UX Designer",
+    "Frontend Developer",
+    "Backend Developer",
+    "DevOps Engineer",
+    "Mobile Developer",
+    "AI Engineer",
+    "Semiconductor Engineer",
+    "Display Engineer",
+    "Battery Engineer",
+    "Automotive Engineer",
+    "Chemical Engineer",
+    "Investment Banker",
+    "Fund Manager",
+    "Accountant",
+    "Management Consultant",
+    "Business Analyst",
+    "Content Creator",
+    "K-pop Manager",
+    "Game Developer",
+    "Esports Manager",
+    "Entertainment Producer"
+  ],
+  "catch_phrase_adjectives": [
+    "Innovative",
+    "Leading",
+    "Global",
+    "Dynamic",
+    "Smart",
+    "Digital",
+    "Advanced",
+    "Sustainable",
+    "Future-oriented",
+    "Customer-focused",
+    "Technology-driven",
+    "World-class",
+    "Premium",
+    "Trusted"
+  ],
+  "catch_phrase_nouns": [
+    "innovations",
+    "technologies",
+    "solutions",
+    "services",
+    "values",
+    "strategies",
+    "partnerships",
+    "futures",
+    "initiatives",
+    "results",
+    "advances",
+    "success"
+  ],
+  "catch_phrase_verbs": [
+    "inspire",
+    "innovate",
+    "create",
+    "lead",
+    "deliver",
+    "transform",
+    "empower",
+    "enable",
+    "connect",
+    "build",
+    "drive",
+    "achieve",
+    "advance",
+    "pioneer",
+    "shape"
+  ],
+  "catch_phrase_connector": "that",
+  "industries": [
+    {
+      "name": "consulting",
+      "weight": 0.12,
+      "jobs": [
+        "Project Manager",
+        "Management Consultant",
+        "Business Analyst"
+      ],
+      "well_known": [],
+      "company_suffixes": [
+        "Consulting",
+        "Group",
+        "Partners",
+        "Associates",
+        "Advisory"
+      ],
+      "company_nouns": [
+        "Consulting",
+        "Management",
+        "Strategy",
+        "Advisory"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun} {suffix}",
+        "{last_name} & {last_name}"
+      ]
+    },
+    {
+      "name": "corporate",
+      "weight": 0.16,
+      "jobs": [
+        "Sales Representative",
+        "HR Manager",
+        "Operations Manager"
+      ],
+      "well_known": [
+        "SK Hynix",
+        "POSCO",
+        "Samsung SDI",
+        "LG Chem",
+        "Samsung Display",
+        "Korean Air",
+        "Asiana Airlines",
+        "Lotte Corporation",
+        "CJ Corporation",
+        "Hanwha Group",
+        "Doosan Group"
+      ],
+      "company_suffixes": [
+        "Corp",
+        "Group",
+        "Holdings",
+        "Inc",
+        "Co"
+      ],
+      "company_nouns": [
+        "Solutions",
+        "Services",
+        "Management",
+        "Industries"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun} {suffix}",
+        "{last_name} and {last_name}"
+      ]
+    },
+    {
+      "name": "engineering",
+      "weight": 0.16,
+      "jobs": [
+        "Semiconductor Engineer",
+        "Display Engineer",
+        "Battery Engineer",
+        "Automotive Engineer",
+        "Chemical Engineer"
+      ],
+      "well_known": [
+        "Hyundai Motor",
+        "Kia Motors",
+        "Hyundai Mobis"
+      ],
+      "company_suffixes": [
+        "Engineering",
+        "Industries",
+        "Manufacturing",
+        "Corp"
+      ],
+      "company_nouns": [
+        "Engineering",
+        "Manufacturing",
+        "Construction",
+        "Industries"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun} {suffix}",
+        "{city} Engineering Group"
+      ]
+    },
+    {
+      "name": "finance",
+      "weight": 0.16,
+      "jobs": [
+        "Financial Analyst",
+        "Investment Banker",
+        "Fund Manager",
+        "Accountant"
+      ],
+      "well_known": [
+        "KB Financial Group",
+        "Shinhan Financial Group",
+        "Hana Financial Group"
+      ],
+      "company_suffixes": [
+        "Financial",
+        "Capital",
+        "Investments",
+        "Partners",
+        "Group"
+      ],
+      "company_nouns": [
+        "Capital",
+        "Investments",
+        "Financial",
+        "Wealth",
+        "Advisory"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{last_name} & {last_name}",
+        "{adjective} {noun} {suffix}",
+        "{city} Savings Bank"
+      ]
+    },
+    {
+      "name": "marketing_creative",
+      "weight": 0.12,
+      "jobs": [
+        "Marketing Manager",
+        "Content Creator",
+        "K-pop Manager",
+        "Esports Manager",
+        "Entertainment Producer"
+      ],
+      "well_known": [],
+      "company_suffixes": [
+        "Media",
+        "Creative",
+        "Studios",
+        "Communications",
+        "Group"
+      ],
+      "company_nouns": [
+        "Media",
+        "Creative",
+        "Communications",
+        "Marketing",
+        "Design"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun}",
+        "{last_name} & {last_name}"
+      ]
+    },
+    {
+      "name": "technology",
+      "weight": 0.28,
+      "jobs": [
+        "Software Engineer",
+        "Product Manager",
+        "Data Scientist",
+        "UI/UX Designer",
+        "Frontend Developer",
+        "Backend Developer",
+        "DevOps Engineer",
+        "Mobile Developer",
+        "AI Engineer",
+        "Game Developer"
+      ],
+      "well_known": [
+        "Samsung Electronics",
+        "LG Electronics",
+        "Naver",
+        "Kakao",
+        "Coupang",
+        "Krafton",
+        "NC Soft",
+        "Netmarble"
+      ],
+      "company_suffixes": [
+        "Technologies",
+        "Software",
+        "Solutions",
+        "Labs",
+        "Digital",
+        "Systems"
+      ],
+      "company_nouns": [
+        "Software",
+        "Technologies",
+        "Systems",
+        "Data",
+        "Analytics",
+        "Networks"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{adjective} {noun}",
+        "{last_name} {noun}"
+      ]
+    }
+  ]
+}

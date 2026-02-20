@@ -1,0 +1,592 @@
+{
+  "suffixes": [
+    "Sdn Bhd",
+    "Bhd",
+    "Corporation",
+    "Group",
+    "Holdings",
+    "Industries"
+  ],
+  "formats": [
+    "{last_name} {suffix}",
+    "{adjective} {noun} {suffix}",
+    "{noun} {suffix}",
+    "{last_name} & {last_name} {suffix}"
+  ],
+  "adjectives": [
+    "Malaysia",
+    "Golden",
+    "Royal",
+    "United",
+    "National",
+    "Eastern",
+    "Pacific",
+    "Modern",
+    "Pioneer",
+    "Summit",
+    "Apex",
+    "Global",
+    "Progressive",
+    "Dynamic",
+    "Premier",
+    "Superior",
+    "Nusantara",
+    "Seri",
+    "Perdana",
+    "Mutiara"
+  ],
+  "nouns": [
+    "Trading",
+    "Industries",
+    "Properties",
+    "Holdings",
+    "Resources",
+    "Ventures",
+    "Solutions",
+    "Services",
+    "Systems",
+    "Technologies",
+    "Construction",
+    "Capital",
+    "Energy",
+    "Logistics",
+    "Engineering",
+    "Foods",
+    "Plantation",
+    "Manufacturing",
+    "Development",
+    "Marine"
+  ],
+  "well_known_companies": [
+    {
+      "name": "Petronas",
+      "cities": [
+        "Kuala Lumpur"
+      ]
+    },
+    {
+      "name": "Maybank",
+      "cities": [
+        "Kuala Lumpur"
+      ]
+    },
+    {
+      "name": "CIMB Group",
+      "cities": [
+        "Kuala Lumpur"
+      ]
+    },
+    {
+      "name": "Public Bank",
+      "cities": [
+        "Kuala Lumpur"
+      ]
+    },
+    {
+      "name": "Tenaga Nasional",
+      "cities": [
+        "Kuala Lumpur"
+      ]
+    },
+    {
+      "name": "Axiata Group",
+      "cities": [
+        "Kuala Lumpur"
+      ]
+    },
+    {
+      "name": "Sime Darby",
+      "cities": [
+        "Kuala Lumpur"
+      ]
+    },
+    {
+      "name": "IHH Healthcare",
+      "cities": [
+        "Kuala Lumpur"
+      ]
+    },
+    {
+      "name": "Hong Leong Group",
+      "cities": [
+        "Kuala Lumpur"
+      ]
+    },
+    {
+      "name": "Genting Group",
+      "cities": [
+        "Kuala Lumpur"
+      ]
+    },
+    {
+      "name": "AirAsia",
+      "cities": [
+        "Kuala Lumpur"
+      ]
+    },
+    {
+      "name": "Top Glove",
+      "cities": [
+        "Shah Alam"
+      ]
+    },
+    {
+      "name": "Digi Telecommunications",
+      "cities": [
+        "Shah Alam"
+      ]
+    },
+    {
+      "name": "IOI Corporation",
+      "cities": [
+        "Putrajaya"
+      ]
+    },
+    {
+      "name": "Maxis",
+      "cities": [
+        "Kuala Lumpur"
+      ]
+    }
+  ],
+  "jobs": [
+    "Software Engineer",
+    "Accountant",
+    "Bank Officer",
+    "Teacher",
+    "Doctor",
+    "Civil Engineer",
+    "Pharmacist",
+    "Marketing Executive",
+    "Sales Manager",
+    "HR Manager",
+    "IT Specialist",
+    "Architect",
+    "Journalist",
+    "Lawyer",
+    "Research Analyst",
+    "Operations Manager",
+    "Project Manager",
+    "Data Analyst",
+    "Business Consultant",
+    "Financial Analyst",
+    "Graphic Designer",
+    "Mechanical Engineer",
+    "Quantity Surveyor",
+    "Estate Manager",
+    "Oil & Gas Engineer"
+  ],
+  "catch_phrase_adjectives": [
+    "innovative",
+    "reliable",
+    "trusted",
+    "quality",
+    "premium",
+    "sustainable",
+    "dynamic",
+    "progressive",
+    "efficient",
+    "superior"
+  ],
+  "catch_phrase_nouns": [
+    "solutions",
+    "services",
+    "products",
+    "excellence",
+    "quality",
+    "value",
+    "growth",
+    "partnership",
+    "innovation",
+    "performance"
+  ],
+  "catch_phrase_verbs": [
+    "delivers",
+    "creates",
+    "builds",
+    "drives",
+    "enables",
+    "ensures",
+    "provides",
+    "achieves",
+    "transforms",
+    "connects"
+  ],
+  "catch_phrase_connector": "that",
+  "industries": [
+    {
+      "name": "Oil & Gas",
+      "weight": 0.12,
+      "jobs": [
+        "Petroleum Engineer",
+        "Geologist",
+        "Plant Operator",
+        "HSE Officer",
+        "Project Manager"
+      ],
+      "well_known": [
+        "Petronas",
+        "SapuraEnergy",
+        "Dialog Group",
+        "Yinson"
+      ],
+      "company_suffixes": [
+        "Energy",
+        "Petroleum",
+        "Resources",
+        "Oil & Gas"
+      ],
+      "company_nouns": [
+        "Energy",
+        "Petroleum",
+        "Resources",
+        "Oil"
+      ],
+      "company_formats": [
+        "{adjective} {noun} Sdn Bhd",
+        "{last_name} {noun} Bhd"
+      ]
+    },
+    {
+      "name": "Banking & Finance",
+      "weight": 0.12,
+      "jobs": [
+        "Bank Officer",
+        "Credit Analyst",
+        "Financial Advisor",
+        "Trader",
+        "Risk Manager"
+      ],
+      "well_known": [
+        "Maybank",
+        "CIMB Group",
+        "Public Bank",
+        "RHB Bank",
+        "Hong Leong Bank"
+      ],
+      "company_suffixes": [
+        "Bank",
+        "Finance",
+        "Capital",
+        "Securities"
+      ],
+      "company_nouns": [
+        "Bank",
+        "Finance",
+        "Capital",
+        "Investment"
+      ],
+      "company_formats": [
+        "{adjective} {noun} Bhd"
+      ]
+    },
+    {
+      "name": "Plantation & Agriculture",
+      "weight": 0.08,
+      "jobs": [
+        "Estate Manager",
+        "Agronomist",
+        "Plantation Worker",
+        "Mill Manager"
+      ],
+      "well_known": [
+        "Sime Darby Plantation",
+        "IOI Corporation",
+        "Kuala Lumpur Kepong",
+        "FGV Holdings"
+      ],
+      "company_suffixes": [
+        "Plantation",
+        "Agri",
+        "Palm Oil",
+        "Estate"
+      ],
+      "company_nouns": [
+        "Plantation",
+        "Agri",
+        "Palm",
+        "Estate"
+      ],
+      "company_formats": [
+        "{adjective} {noun} Bhd"
+      ]
+    },
+    {
+      "name": "Technology",
+      "weight": 0.1,
+      "jobs": [
+        "Software Engineer",
+        "Data Scientist",
+        "System Administrator",
+        "UX Designer",
+        "DevOps Engineer"
+      ],
+      "well_known": [
+        "Grab",
+        "Carsome",
+        "Aerodyne Group",
+        "MDEC"
+      ],
+      "company_suffixes": [
+        "Technologies",
+        "Tech",
+        "Solutions",
+        "Digital"
+      ],
+      "company_nouns": [
+        "Tech",
+        "Digital",
+        "Software",
+        "Systems"
+      ],
+      "company_formats": [
+        "{adjective} {noun} Sdn Bhd"
+      ]
+    },
+    {
+      "name": "Manufacturing",
+      "weight": 0.1,
+      "jobs": [
+        "Production Manager",
+        "Quality Inspector",
+        "Plant Engineer",
+        "Process Engineer"
+      ],
+      "well_known": [
+        "Top Glove",
+        "Hartalega",
+        "Press Metal",
+        "VS Industry"
+      ],
+      "company_suffixes": [
+        "Industries",
+        "Manufacturing",
+        "Products"
+      ],
+      "company_nouns": [
+        "Industry",
+        "Manufacturing",
+        "Products",
+        "Factory"
+      ],
+      "company_formats": [
+        "{adjective} {noun} Sdn Bhd"
+      ]
+    },
+    {
+      "name": "Construction & Property",
+      "weight": 0.09,
+      "jobs": [
+        "Civil Engineer",
+        "Architect",
+        "Quantity Surveyor",
+        "Project Manager",
+        "Site Engineer"
+      ],
+      "well_known": [
+        "SP Setia",
+        "Sunway Group",
+        "Gamuda",
+        "IJM Corporation"
+      ],
+      "company_suffixes": [
+        "Development",
+        "Properties",
+        "Construction",
+        "Builders"
+      ],
+      "company_nouns": [
+        "Construction",
+        "Property",
+        "Development",
+        "Builders"
+      ],
+      "company_formats": [
+        "{adjective} {noun} Bhd"
+      ]
+    },
+    {
+      "name": "Telecommunications",
+      "weight": 0.07,
+      "jobs": [
+        "Network Engineer",
+        "Sales Executive",
+        "Customer Service Rep",
+        "Technical Support"
+      ],
+      "well_known": [
+        "Maxis",
+        "Digi",
+        "Celcom Axiata",
+        "TM"
+      ],
+      "company_suffixes": [
+        "Telecom",
+        "Communications",
+        "Networks"
+      ],
+      "company_nouns": [
+        "Telecom",
+        "Mobile",
+        "Connect",
+        "Network"
+      ],
+      "company_formats": [
+        "{adjective} {noun} Sdn Bhd"
+      ]
+    },
+    {
+      "name": "Healthcare",
+      "weight": 0.07,
+      "jobs": [
+        "Doctor",
+        "Nurse",
+        "Hospital Administrator",
+        "Pharmacist",
+        "Lab Technician"
+      ],
+      "well_known": [
+        "IHH Healthcare",
+        "KPJ Healthcare",
+        "Sunway Medical"
+      ],
+      "company_suffixes": [
+        "Healthcare",
+        "Medical",
+        "Hospital",
+        "Clinic"
+      ],
+      "company_nouns": [
+        "Health",
+        "Medical",
+        "Care",
+        "Wellness"
+      ],
+      "company_formats": [
+        "{adjective} {noun} Bhd"
+      ]
+    },
+    {
+      "name": "Tourism & Hospitality",
+      "weight": 0.06,
+      "jobs": [
+        "Hotel Manager",
+        "Tour Guide",
+        "Chef",
+        "Travel Consultant",
+        "Receptionist"
+      ],
+      "well_known": [
+        "Genting Group",
+        "YTL Hotels",
+        "Shangri-La Malaysia"
+      ],
+      "company_suffixes": [
+        "Hotels",
+        "Resorts",
+        "Travel",
+        "Tourism"
+      ],
+      "company_nouns": [
+        "Hotel",
+        "Resort",
+        "Travel",
+        "Tour"
+      ],
+      "company_formats": [
+        "{adjective} {noun} Sdn Bhd"
+      ]
+    },
+    {
+      "name": "Aviation",
+      "weight": 0.05,
+      "jobs": [
+        "Pilot",
+        "Flight Attendant",
+        "Aircraft Engineer",
+        "Ground Crew",
+        "Operations Controller"
+      ],
+      "well_known": [
+        "AirAsia",
+        "Malaysia Airlines",
+        "Firefly"
+      ],
+      "company_suffixes": [
+        "Aviation",
+        "Airlines",
+        "Aerospace"
+      ],
+      "company_nouns": [
+        "Air",
+        "Aviation",
+        "Aerospace",
+        "Flight"
+      ],
+      "company_formats": [
+        "{adjective} {noun} Bhd"
+      ]
+    },
+    {
+      "name": "Food & Beverage",
+      "weight": 0.07,
+      "jobs": [
+        "Food Technologist",
+        "Supply Chain Manager",
+        "Production Supervisor",
+        "Quality Controller"
+      ],
+      "well_known": [
+        "Nestle Malaysia",
+        "Fraser & Neave",
+        "Dutch Lady"
+      ],
+      "company_suffixes": [
+        "Foods",
+        "Beverages",
+        "Dairy",
+        "F&B"
+      ],
+      "company_nouns": [
+        "Food",
+        "Beverage",
+        "Dairy",
+        "Taste"
+      ],
+      "company_formats": [
+        "{adjective} {noun} Sdn Bhd"
+      ]
+    },
+    {
+      "name": "Education",
+      "weight": 0.07,
+      "jobs": [
+        "Teacher",
+        "Lecturer",
+        "Professor",
+        "Academic Coordinator",
+        "Researcher"
+      ],
+      "well_known": [
+        "Taylor's Education",
+        "INTI International",
+        "Sunway Education"
+      ],
+      "company_suffixes": [
+        "Education",
+        "Academy",
+        "University",
+        "College"
+      ],
+      "company_nouns": [
+        "Education",
+        "Academy",
+        "Learning",
+        "College"
+      ],
+      "company_formats": [
+        "{adjective} {noun}"
+      ]
+    }
+  ]
+}
