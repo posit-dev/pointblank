@@ -225,6 +225,7 @@ def _get_api_text() -> str:
         "datetime_field",
         "time_field",
         "duration_field",
+        "profile_fields",
     ]
 
     prebuilt_actions_exported = [
