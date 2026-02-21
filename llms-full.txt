@@ -15981,7 +15981,7 @@ generate_dataset(schema: 'Schema', n: 'int' = 100, seed: 'int | None' = None, ou
         ),
     )
 
-    pb.generate_dataset(schema, n=50, seed=23)
+    pb.preview(pb.generate_dataset(schema, n=50, seed=23))
     ```
     
 
@@ -16819,7 +16819,7 @@ duration_field(min_duration: 'str | timedelta | None' = None, max_duration: 'str
         ),
     )
 
-    pb.generate_dataset(schema, n=100, seed=23)
+    pb.preview(pb.generate_dataset(schema, n=100, seed=23))
     ```
 
     Colon-separated strings can also be used for quick duration definitions:
@@ -16830,7 +16830,7 @@ duration_field(min_duration: 'str | timedelta | None' = None, max_duration: 'str
         break_time=pb.duration_field(min_duration="0:05:00", max_duration="0:30:00"),
     )
 
-    pb.generate_dataset(schema, n=30, seed=23)
+    pb.preview(pb.generate_dataset(schema, n=30, seed=23))
     ```
 
     Optional durations can be created with `nullable=True`, and duration fields work well
@@ -16850,7 +16850,106 @@ duration_field(min_duration: 'str | timedelta | None' = None, max_duration: 'str
         ),
     )
 
-    pb.generate_dataset(schema, n=30, seed=7)
+    pb.preview(pb.generate_dataset(schema, n=30, seed=7))
+    ```
+    
+
+profile_fields(*, set: "Literal['minimal', 'standard', 'full']" = 'standard', split_name: 'bool' = True, include: 'list[str] | None' = None, exclude: 'list[str] | None' = None, prefix: 'str | None' = None) -> 'dict[str, StringField]'
+
+    Create a dict of string field specifications representing a person profile.
+
+    Returns a dictionary of `StringField` objects suitable for `**`-unpacking into a `Schema()`.
+    Each field uses a preset that participates in the existing coherence system, so generated
+    data will have coherent names, emails, addresses, and phone numbers within each row.
+
+    Parameters
+    ----------
+    set
+        The base set of profile fields to include. Options are `"minimal"` (name, email, phone;
+        3-4 columns depending on `split_name=`), `"standard"` (name, email, city, state,
+        postcode, phone; 6-7 columns), and `"full"` (name, email, address, city, state,
+        postcode, phone, company, job; 9-10 columns). Default is `"standard"`.
+    split_name
+        Whether to split the name into separate `first_name` and `last_name` columns (`True`,
+        the default) or use a single combined `name` column (`False`).
+    include
+        List of additional preset names to add to the base set. For example,
+        `include=["company"]` adds a company column to the `"standard"` set. Presets already
+        in the base set are silently ignored.
+    exclude
+        List of preset names to remove from the (possibly augmented) set. For example,
+        `exclude=["postcode"]` removes the postcode column. Presets not in the set are silently
+        ignored.
+    prefix
+        Optional string to prepend to every column name. For example, `prefix="customer_"`
+        produces keys like `"customer_first_name"`, `"customer_email"`, etc.
+
+    Returns
+    -------
+    dict[str, StringField]
+        A dictionary mapping column names to `StringField` objects, ordered logically (name fields
+        first, then contact, address, phone, business).
+
+    Raises
+    ------
+    ValueError
+        If `set=` is not one of `"minimal"`, `"standard"`, or `"full"`; if `include=` or `exclude=`
+        contain unknown preset names; if a preset appears in both `include=` and `exclude=`; or if
+        `include=` contains name presets incompatible with the `split_name=` setting.
+
+    Examples
+    --------
+    The default call returns the `"standard"` set of profile columns. The `**` operator unpacks the
+    returned dictionary directly into `Schema()`, as if each `string_field()` call had been written
+    by hand. All coherence rules apply automatically: emails are derived from names, and
+    city/state/postcode/phone are internally consistent.
+
+    ```python
+    import pointblank as pb
+
+    schema = pb.Schema(
+        user_id=pb.int_field(unique=True),
+        **pb.profile_fields(),
+    )
+
+    pb.preview(pb.generate_dataset(schema, n=100, seed=23))
+    ```
+
+    Use `set=` to control how many columns are generated. The `"minimal"` set includes only `name`,
+    `email`, and `phone`, while `"full"` adds `address`, `company`, and `job`. Setting
+    `split_name=False` collapses `first_name` and `last_name` into a single combined `name` column:
+
+    ```python
+    schema = pb.Schema(
+        **pb.profile_fields(set="minimal", split_name=False),
+        balance=pb.float_field(min_val=0, max_val=10000),
+    )
+
+    pb.preview(pb.generate_dataset(schema, n=50, seed=23))
+    ```
+
+    The `include=` and `exclude=` parameters let you customize the column set without switching to a
+    different base set. Here we start from the `"full"` set but drop the business columns:
+
+    ```python
+    schema = pb.Schema(
+        **pb.profile_fields(set="full", exclude=["company", "job"]),
+    )
+
+    pb.preview(pb.generate_dataset(schema, n=50, seed=23, country="DE"))
+    ```
+
+    The `prefix=` parameter prepends a string to every column name, which is especially useful when
+    a schema needs two independent profiles (e.g., a sender and a recipient). Each prefixed group
+    maintains its own coherence:
+
+    ```python
+    schema = pb.Schema(
+        **pb.profile_fields(set="minimal", prefix="sender_"),
+        **pb.profile_fields(set="minimal", prefix="recipient_"),
+    )
+
+    pb.preview(pb.generate_dataset(schema, n=50, seed=23))
     ```
     
 
