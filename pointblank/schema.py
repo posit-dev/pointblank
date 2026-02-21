@@ -1821,7 +1821,7 @@ def generate_dataset(
         ),
     )
 
-    pb.generate_dataset(schema, n=50, seed=23)
+    pb.preview(pb.generate_dataset(schema, n=50, seed=23))
     ```
     """
     return schema.generate(

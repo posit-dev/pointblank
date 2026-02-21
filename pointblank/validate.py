@@ -90,6 +90,7 @@ from pointblank._utils import (
     _format_to_integer_value,
     _get_fn_name,
     _get_tbl_type,
+    _is_duration_dtype,
     _is_lazy_frame,
     _is_lib_present,
     _is_narwhals_table,
@@ -2441,6 +2442,27 @@ def _generate_display_table(
         none_values = {k: data[k].isnull() for k in col_names}
 
     none_values = [(k, i) for k, v in none_values.items() for i, val in enumerate(v) if val]
+
+    # Cast duration columns to string for display since Great Tables cannot handle duration types;
+    # the original dtype labels are already captured in `col_dtype_dict` / `col_dtype_dict_short`
+    # so they will still show correctly in the column headers
+    duration_cols = [
+        col_name
+        for col_name, col_dtype in col_dtype_dict.items()
+        if _is_duration_dtype(col_dtype.lower())
+    ]
+    if duration_cols:
+        if df_lib_name_gt == "polars":
+            import polars as pl
+
+            for c in duration_cols:
+                vals = data[c].to_list()
+                str_vals = [str(v) if v is not None else None for v in vals]
+                data = data.with_columns(pl.Series(c, str_vals, dtype=pl.Utf8))
+        else:
+            # Pandas (and PySpark converted to Pandas)
+            for c in duration_cols:
+                data[c] = data[c].astype(str)
 
     # Import Great Tables to get preliminary renders of the columns
     import great_tables as gt
