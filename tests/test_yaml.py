@@ -4838,3 +4838,816 @@ steps:
     assert "increasing_tol=0.2" in python_code
     assert 'spec="url"' in python_code
     assert 'model="openai:gpt-4"' in python_code
+
+
+def test_yaml_col_pct_null_basic():
+    """Test col_pct_null validation via YAML"""
+    yaml_content = """
+    tbl: small_table
+    steps:
+    - col_pct_null:
+        columns: c
+        p: 0.15
+    """
+    result = yaml_interrogate(yaml_content)
+    assert result is not None
+    assert len(result.validation_info) == 1
+    assert result.validation_info[0].assertion_type == "col_pct_null"
+
+
+def test_yaml_col_pct_null_with_tolerance():
+    """Test col_pct_null with tolerance parameter"""
+    yaml_content = """
+    tbl: small_table
+    steps:
+    - col_pct_null:
+        columns: [c]
+        p: 0.15
+        tol: 0.1
+    """
+    result = yaml_interrogate(yaml_content)
+    assert result is not None
+    assert len(result.validation_info) == 1
+
+
+def test_yaml_data_freshness_basic():
+    """Test data_freshness validation via YAML"""
+    yaml_content = """
+    tbl: small_table
+    steps:
+    - data_freshness:
+        column: date_time
+        max_age: "100000 hours"
+    """
+    result = yaml_interrogate(yaml_content)
+    assert result is not None
+    assert len(result.validation_info) == 1
+    assert result.validation_info[0].assertion_type == "data_freshness"
+
+
+def test_yaml_data_freshness_with_options():
+    """Test data_freshness with timezone and other options"""
+    yaml_content = """
+    tbl: small_table
+    steps:
+    - data_freshness:
+        column: date_time
+        max_age: "876000 hours"
+        timezone: "UTC"
+        allow_tz_mismatch: true
+    """
+    result = yaml_interrogate(yaml_content)
+    assert result is not None
+    assert len(result.validation_info) == 1
+
+
+def test_yaml_aggregate_methods_basic():
+    """Test that aggregate methods (col_sum_*, col_avg_*, col_sd_*) work in YAML"""
+    yaml_content = """
+    tbl: small_table
+    steps:
+    - col_sum_gt:
+        columns: a
+        value: 0
+    - col_avg_gt:
+        columns: a
+        value: 0
+    - col_sd_gt:
+        columns: d
+        value: 0
+    """
+    result = yaml_interrogate(yaml_content)
+    assert result is not None
+    assert len(result.validation_info) == 3
+    assert result.validation_info[0].assertion_type == "col_sum_gt"
+    assert result.validation_info[1].assertion_type == "col_avg_gt"
+    assert result.validation_info[2].assertion_type == "col_sd_gt"
+
+
+def test_yaml_aggregate_methods_all_comparators():
+    """Test all aggregate comparator variants"""
+    yaml_content = """
+    tbl: small_table
+    steps:
+    - col_sum_eq:
+        columns: a
+        value: 6
+    - col_sum_ge:
+        columns: a
+        value: 0
+    - col_sum_gt:
+        columns: a
+        value: -1
+    - col_sum_lt:
+        columns: a
+        value: 100000
+    - col_sum_le:
+        columns: a
+        value: 100000
+    """
+    result = yaml_interrogate(yaml_content)
+    assert result is not None
+    assert len(result.validation_info) == 5
+
+
+def test_yaml_aggregate_methods_with_tolerance():
+    """Test aggregate methods with tolerance parameter"""
+    yaml_content = """
+    tbl: small_table
+    steps:
+    - col_sum_eq:
+        columns: a
+        value: 6
+        tol: 1
+    - col_avg_eq:
+        columns: d
+        value: 5000
+        tol: 5000
+    """
+    result = yaml_interrogate(yaml_content)
+    assert result is not None
+    assert len(result.validation_info) == 2
+
+
+def test_yaml_aggregate_methods_with_thresholds():
+    """Test aggregate methods with thresholds"""
+    yaml_content = """
+    tbl: small_table
+    thresholds:
+      warning: 0.1
+    steps:
+    - col_sum_gt:
+        columns: a
+        value: 0
+        thresholds:
+          warning: 1
+    """
+    result = yaml_interrogate(yaml_content)
+    assert result is not None
+    assert len(result.validation_info) == 1
+
+
+def test_yaml_unknown_method_still_errors():
+    """Test that truly unknown methods still raise errors"""
+    yaml_content = """
+    tbl: small_table
+    steps:
+    - col_totally_fake:
+        columns: a
+        value: 0
+    """
+    with pytest.raises(YAMLValidationError, match="Unknown validation method"):
+        yaml_interrogate(yaml_content)
+
+
+def test_yaml_governance_owner_param():
+    """Test that owner parameter is forwarded through YAML"""
+    yaml_content = """
+    tbl: small_table
+    owner: "data-platform-team"
+    steps:
+    - col_vals_not_null:
+        columns: a
+    """
+    result = yaml_interrogate(yaml_content)
+    assert result is not None
+    assert result.owner == "data-platform-team"
+
+
+def test_yaml_governance_consumers_param():
+    """Test that consumers parameter is forwarded through YAML"""
+    yaml_content = """
+    tbl: small_table
+    consumers:
+      - ml-team
+      - analytics
+    steps:
+    - col_vals_not_null:
+        columns: a
+    """
+    result = yaml_interrogate(yaml_content)
+    assert result is not None
+    assert result.consumers == ["ml-team", "analytics"]
+
+
+def test_yaml_governance_consumers_single():
+    """Test that a single consumer string is forwarded"""
+    yaml_content = """
+    tbl: small_table
+    consumers: analytics
+    steps:
+    - col_vals_not_null:
+        columns: a
+    """
+    result = yaml_interrogate(yaml_content)
+    assert result is not None
+    # Validate normalizes single string to list
+    assert result.consumers == ["analytics"]
+
+
+def test_yaml_governance_version_param():
+    """Test that version parameter is forwarded through YAML"""
+    yaml_content = """
+    tbl: small_table
+    version: "2.1.0"
+    steps:
+    - col_vals_not_null:
+        columns: a
+    """
+    result = yaml_interrogate(yaml_content)
+    assert result is not None
+    assert result.version == "2.1.0"
+
+
+def test_yaml_governance_all_params():
+    """Test all governance params together"""
+    yaml_content = """
+    tbl: small_table
+    owner: "data-team"
+    consumers:
+      - team-a
+      - team-b
+    version: "1.0.0"
+    steps:
+    - col_vals_not_null:
+        columns: a
+    """
+    result = yaml_interrogate(yaml_content)
+    assert result is not None
+    assert result.owner == "data-team"
+    assert result.consumers == ["team-a", "team-b"]
+    assert result.version == "1.0.0"
+
+
+def test_yaml_to_python_col_pct_null():
+    """Test yaml_to_python for col_pct_null"""
+    yaml_content = """
+    tbl: small_table
+    steps:
+    - col_pct_null:
+        columns: c
+        p: 0.15
+        tol: 0.05
+    """
+    python_code = yaml_to_python(yaml_content)
+    assert ".col_pct_null(" in python_code
+    assert 'columns="c"' in python_code
+    assert "p=0.15" in python_code
+    assert "tol=0.05" in python_code
+
+
+def test_yaml_to_python_data_freshness():
+    """Test yaml_to_python for data_freshness"""
+    yaml_content = """
+    tbl: small_table
+    steps:
+    - data_freshness:
+        column: date_time
+        max_age: "24 hours"
+        timezone: "UTC"
+    """
+    python_code = yaml_to_python(yaml_content)
+    assert ".data_freshness(" in python_code
+    assert 'column="date_time"' in python_code
+    assert 'max_age="24 hours"' in python_code
+    assert 'timezone="UTC"' in python_code
+
+
+def test_yaml_to_python_aggregate_methods():
+    """Test yaml_to_python for aggregate methods"""
+    yaml_content = """
+    tbl: small_table
+    steps:
+    - col_sum_gt:
+        columns: a
+        value: 0
+    - col_avg_le:
+        columns: d
+        value: 10000
+    - col_sd_eq:
+        columns: d
+        value: 100
+        tol: 200
+    """
+    python_code = yaml_to_python(yaml_content)
+    assert ".col_sum_gt(" in python_code
+    assert ".col_avg_le(" in python_code
+    assert ".col_sd_eq(" in python_code
+    assert "tol=200" in python_code
+
+
+def test_yaml_to_python_governance_params():
+    """Test yaml_to_python includes governance parameters"""
+    yaml_content = """
+    tbl: small_table
+    owner: "data-team"
+    consumers:
+      - ml-team
+      - analytics
+    version: "1.0.0"
+    steps:
+    - col_vals_not_null:
+        columns: a
+    """
+    python_code = yaml_to_python(yaml_content)
+    assert 'owner="data-team"' in python_code
+    assert 'consumers=["ml-team", "analytics"]' in python_code
+    assert 'version="1.0.0"' in python_code
+
+
+def test_yaml_to_python_governance_single_consumer():
+    """Test yaml_to_python with single consumer string"""
+    yaml_content = """
+    tbl: small_table
+    consumers: analytics
+    steps:
+    - col_vals_not_null:
+        columns: a
+    """
+    python_code = yaml_to_python(yaml_content)
+    assert 'consumers="analytics"' in python_code
+
+
+def test_yaml_to_python_parameterless_step():
+    """Test yaml_to_python handles parameterless string steps (e.g., rows_distinct)"""
+    yaml_content = """
+    tbl: small_table
+    steps:
+    - rows_distinct
+    - rows_complete
+    """
+    python_code = yaml_to_python(yaml_content)
+    assert ".rows_distinct()" in python_code
+    assert ".rows_complete()" in python_code
+
+
+def test_yaml_combined_new_and_existing_methods():
+    """Test YAML with a mix of existing and newly-added methods"""
+    yaml_content = """
+    tbl: small_table
+    owner: "team"
+    version: "1.0.0"
+    steps:
+    - col_vals_gt:
+        columns: a
+        value: 0
+    - col_pct_null:
+        columns: c
+        p: 0.15
+    - col_sum_gt:
+        columns: a
+        value: 0
+    - col_avg_gt:
+        columns: d
+        value: 0
+    - rows_distinct
+    """
+    result = yaml_interrogate(yaml_content)
+    assert result is not None
+    assert len(result.validation_info) == 5
+    assert result.owner == "team"
+    assert result.version == "1.0.0"
+
+    types = [vi.assertion_type for vi in result.validation_info]
+    assert "col_vals_gt" in types
+    assert "col_pct_null" in types
+    assert "col_sum_gt" in types
+    assert "col_avg_gt" in types
+    assert "rows_distinct" in types
+
+
+def test_yaml_unknown_top_level_key_rejected():
+    """Test that unknown top-level keys (likely typos) are caught"""
+    yaml_content = """
+    tbl: small_table
+    tbl_nmae: "Typo Table Name"
+    steps:
+    - col_vals_not_null:
+        columns: a
+    """
+    with pytest.raises(YAMLValidationError, match="Unknown top-level key"):
+        yaml_interrogate(yaml_content)
+
+
+def test_yaml_unknown_top_level_key_error_message():
+    """Test that the error message includes the bad key and valid keys"""
+    yaml_content = """
+    tbl: small_table
+    labell: "typo"
+    steps:
+    - rows_distinct
+    """
+    with pytest.raises(YAMLValidationError, match="labell") as exc_info:
+        validate_yaml(yaml_content)
+    # Should also mention valid keys
+    assert "label" in str(exc_info.value)
+
+
+def test_yaml_to_python_reference():
+    """Test yaml_to_python renders reference parameter"""
+    yaml_content = """
+    tbl: small_table
+    reference: small_table
+    steps:
+    - col_vals_not_null:
+        columns: a
+    """
+    python_code = yaml_to_python(yaml_content)
+    assert "reference=" in python_code
+    assert 'pb.load_dataset("small_table"' in python_code
+
+
+def test_yaml_to_python_reference_with_python_expression():
+    """Test yaml_to_python renders reference with python: expression"""
+    yaml_content = """
+    tbl: small_table
+    reference:
+      python: |
+        pb.load_dataset("small_table", tbl_type="polars")
+    steps:
+    - col_vals_not_null:
+        columns: a
+    """
+    python_code = yaml_to_python(yaml_content)
+    assert "reference=" in python_code
+    assert 'pb.load_dataset("small_table", tbl_type="polars")' in python_code
+
+
+def test_yaml_active_boolean_false():
+    """Test active=false disables a step via YAML"""
+    yaml_content = """
+    tbl: small_table
+    steps:
+    - col_vals_gt:
+        columns: d
+        value: 100
+        active: false
+    - col_vals_not_null:
+        columns: a
+    """
+    result = yaml_interrogate(yaml_content)
+    assert result is not None
+    assert len(result.validation_info) == 2
+    # First step should be inactive
+    assert result.validation_info[0].active is False
+    # Second step should be active (default)
+    assert result.validation_info[1].active is True
+
+
+def test_yaml_active_boolean_true():
+    """Test active=true keeps a step active via YAML"""
+    yaml_content = """
+    tbl: small_table
+    steps:
+    - col_vals_gt:
+        columns: d
+        value: 100
+        active: true
+    """
+    result = yaml_interrogate(yaml_content)
+    assert result is not None
+    assert result.validation_info[0].active is True
+
+
+def test_yaml_active_callable_shortcut():
+    """Test active with callable shortcut syntax (e.g., has_columns)"""
+    yaml_content = """
+    tbl: small_table
+    steps:
+    - col_vals_gt:
+        columns: d
+        value: 100
+        active: "pb.has_columns('d')"
+    - col_vals_gt:
+        columns: nonexistent_column
+        value: 0
+        active: "pb.has_columns('nonexistent_column')"
+    """
+    result = yaml_interrogate(yaml_content)
+    assert result is not None
+    assert len(result.validation_info) == 2
+
+    # First step: column 'd' exists, so active should be True and step should run
+    assert result.validation_info[0].active is not False
+
+    # Second step: column 'nonexistent_column' doesn't exist,
+    # so active callable returns False and step is inactive
+    assert result.validation_info[1].active is not True
+
+
+def test_yaml_active_python_block():
+    """Test active with python: block syntax"""
+    yaml_content = """
+    tbl: small_table
+    steps:
+    - col_vals_gt:
+        columns: d
+        value: 100
+        active:
+          python: "pb.has_columns('d')"
+    """
+    result = yaml_interrogate(yaml_content)
+    assert result is not None
+    assert len(result.validation_info) == 1
+    # Column 'd' exists, so step should be active/run
+    assert result.validation_info[0].active is not False
+
+
+def test_yaml_to_python_active_boolean():
+    """Test yaml_to_python renders active=False correctly"""
+    yaml_content = """
+    tbl: small_table
+    steps:
+    - col_vals_gt:
+        columns: d
+        value: 100
+        active: false
+    """
+    python_code = yaml_to_python(yaml_content)
+    assert "active=False" in python_code
+
+
+def test_yaml_to_python_active_callable_shortcut():
+    """Test yaml_to_python preserves active callable shortcut expression"""
+    yaml_content = """
+    tbl: small_table
+    steps:
+    - col_vals_gt:
+        columns: d
+        value: 100
+        active: "pb.has_columns('d')"
+    """
+    python_code = yaml_to_python(yaml_content)
+    assert "active=pb.has_columns('d')" in python_code
+
+
+def test_yaml_to_python_active_python_block():
+    """Test yaml_to_python preserves active python: block expression"""
+    yaml_content = """
+    tbl: small_table
+    steps:
+    - col_vals_gt:
+        columns: d
+        value: 100
+        active:
+          python: "pb.has_columns('d')"
+    """
+    python_code = yaml_to_python(yaml_content)
+    assert "active=pb.has_columns('d')" in python_code
+
+
+def _exec_yaml_to_python(yaml_content: str) -> Validate:
+    """Helper: convert YAML to Python code via yaml_to_python, then exec it and return result."""
+    import pointblank as pb
+
+    python_code = yaml_to_python(yaml_content)
+
+    # Strip markdown code fences
+    code = python_code.strip()
+    if code.startswith("```python"):
+        code = code[len("```python") :].strip()
+    if code.endswith("```"):
+        code = code[: -len("```")].strip()
+
+    # Execute the generated code: split imports from expression
+    # The code has imports on top, then a blank line, then a parenthesized expression
+    parts = code.split("\n\n", 1)
+    imports_section = parts[0]
+    expression_section = parts[1] if len(parts) > 1 else ""
+
+    code_with_capture = imports_section + "\n\nresult = " + expression_section
+    exec_globals = {"__builtins__": __builtins__}
+    exec(code_with_capture, exec_globals)
+    return exec_globals["result"]
+
+
+def _compare_validation_results(yaml_result: Validate, python_result: Validate):
+    """Helper: compare two Validate objects for equivalence."""
+    # Same number of validation steps
+    assert len(yaml_result.validation_info) == len(python_result.validation_info)
+
+    for i, (y_step, p_step) in enumerate(
+        zip(yaml_result.validation_info, python_result.validation_info)
+    ):
+        # Same validation method
+        assert y_step.assertion_type == p_step.assertion_type, (
+            f"Step {i}: method mismatch: {y_step.assertion_type} vs {p_step.assertion_type}"
+        )
+        # Same pass/fail outcome
+        assert y_step.all_passed == p_step.all_passed, (
+            f"Step {i} ({y_step.assertion_type}): "
+            f"all_passed mismatch: {y_step.all_passed} vs {p_step.all_passed}"
+        )
+        # Same test unit counts
+        assert y_step.n == p_step.n, f"Step {i}: n mismatch: {y_step.n} vs {p_step.n}"
+        assert y_step.n_passed == p_step.n_passed, (
+            f"Step {i}: n_passed mismatch: {y_step.n_passed} vs {p_step.n_passed}"
+        )
+        assert y_step.n_failed == p_step.n_failed, (
+            f"Step {i}: n_failed mismatch: {y_step.n_failed} vs {p_step.n_failed}"
+        )
+
+
+def test_roundtrip_basic():
+    """Round-trip: basic YAML with parameterless and parameterized steps."""
+    yaml_content = """
+    tbl: small_table
+    steps:
+    - rows_distinct
+    - col_exists:
+        columns: [date, a, b]
+    """
+    yaml_result = yaml_interrogate(yaml_content)
+    python_result = _exec_yaml_to_python(yaml_content)
+    _compare_validation_results(yaml_result, python_result)
+
+
+def test_roundtrip_with_thresholds():
+    """Round-trip: YAML with global thresholds."""
+    yaml_content = """
+    tbl: small_table
+    tbl_name: threshold_test
+    label: Test thresholds
+    thresholds:
+      warning: 0.1
+      error: 0.25
+    steps:
+    - col_vals_gt:
+        columns: [d]
+        value: 100
+    - col_vals_not_null:
+        columns: [date, a]
+    """
+    yaml_result = yaml_interrogate(yaml_content)
+    python_result = _exec_yaml_to_python(yaml_content)
+    _compare_validation_results(yaml_result, python_result)
+    assert python_result.tbl_name == "threshold_test"
+    assert python_result.label == "Test thresholds"
+
+
+def test_roundtrip_column_validations():
+    """Round-trip: various column validation methods."""
+    yaml_content = """
+    tbl: small_table
+    steps:
+    - col_vals_gt:
+        columns: [d]
+        value: 0
+    - col_vals_lt:
+        columns: [a]
+        value: 100
+    - col_vals_between:
+        columns: [c]
+        left: 1
+        right: 10
+    - col_vals_not_null:
+        columns: [date]
+    - col_vals_in_set:
+        columns: [f]
+        set: [low, mid, high]
+    """
+    yaml_result = yaml_interrogate(yaml_content)
+    python_result = _exec_yaml_to_python(yaml_content)
+    _compare_validation_results(yaml_result, python_result)
+
+
+def test_roundtrip_regex_and_schema():
+    """Round-trip: regex and column existence validation."""
+    yaml_content = """
+    tbl: small_table
+    steps:
+    - col_vals_regex:
+        columns: [b]
+        pattern: '[0-9]-[a-z]{3}-[0-9]{3}'
+    - col_exists:
+        columns: [date, a, b, c, d, f]
+    """
+    yaml_result = yaml_interrogate(yaml_content)
+    python_result = _exec_yaml_to_python(yaml_content)
+    _compare_validation_results(yaml_result, python_result)
+
+
+def test_roundtrip_governance_metadata():
+    """Round-trip: governance metadata (owner, consumers, version) preserved."""
+    yaml_content = """
+    tbl: small_table
+    tbl_name: governance_test
+    owner: Data Engineering
+    consumers: [Analytics, Finance]
+    version: "2.1.0"
+    steps:
+    - col_vals_not_null:
+        columns: [a]
+    """
+    yaml_result = yaml_interrogate(yaml_content)
+    python_result = _exec_yaml_to_python(yaml_content)
+    _compare_validation_results(yaml_result, python_result)
+    assert python_result.owner == "Data Engineering"
+    assert python_result.consumers == ["Analytics", "Finance"]
+    assert python_result.version == "2.1.0"
+
+
+def test_roundtrip_aggregate_methods():
+    """Round-trip: aggregate validation methods (col_sum_gt, col_avg_le)."""
+    yaml_content = """
+    tbl: small_table
+    steps:
+    - col_sum_gt:
+        columns: [d]
+        value: 0
+    - col_avg_le:
+        columns: [a]
+        value: 10
+    """
+    yaml_result = yaml_interrogate(yaml_content)
+    python_result = _exec_yaml_to_python(yaml_content)
+    _compare_validation_results(yaml_result, python_result)
+
+
+def test_roundtrip_mixed_workflow():
+    """Round-trip: comprehensive workflow mixing multiple method types."""
+    yaml_content = """
+    tbl: small_table
+    tbl_name: mixed_test
+    label: Comprehensive test
+    thresholds:
+      warning: 0.1
+      error: 0.25
+      critical: 0.35
+    steps:
+    - rows_distinct
+    - col_exists:
+        columns: [date, a, b]
+    - col_vals_gt:
+        columns: [d]
+        value: 100
+    - col_vals_regex:
+        columns: [b]
+        pattern: '[0-9]-[a-z]{3}-[0-9]{3}'
+    - col_vals_not_null:
+        columns: [date, a]
+    - col_vals_between:
+        columns: [c]
+        left: 1
+        right: 10
+    - col_vals_in_set:
+        columns: [f]
+        set: [low, mid, high]
+    """
+    yaml_result = yaml_interrogate(yaml_content)
+    python_result = _exec_yaml_to_python(yaml_content)
+    _compare_validation_results(yaml_result, python_result)
+
+
+def test_roundtrip_with_brief():
+    """Round-trip: validation steps with brief descriptions."""
+    yaml_content = """
+    tbl: small_table
+    steps:
+    - col_vals_gt:
+        columns: [d]
+        value: 100
+        brief: "Values must exceed 100"
+    - col_vals_not_null:
+        columns: [a]
+        brief: true
+    """
+    yaml_result = yaml_interrogate(yaml_content)
+    python_result = _exec_yaml_to_python(yaml_content)
+    _compare_validation_results(yaml_result, python_result)
+
+
+def test_roundtrip_row_validations():
+    """Round-trip: row-level validations."""
+    yaml_content = """
+    tbl: small_table
+    steps:
+    - rows_distinct
+    - rows_complete
+    - row_count_match:
+        count: 13
+    """
+    yaml_result = yaml_interrogate(yaml_content)
+    python_result = _exec_yaml_to_python(yaml_content)
+    _compare_validation_results(yaml_result, python_result)
+
+
+def test_roundtrip_step_level_thresholds():
+    """Round-trip: step-level thresholds."""
+    yaml_content = """
+    tbl: small_table
+    steps:
+    - col_vals_gt:
+        columns: [d]
+        value: 100
+        thresholds:
+          warning: 0.05
+          error: 0.15
+    - col_vals_not_null:
+        columns: [a]
+        thresholds:
+          warning: 0.01
+    """
+    yaml_result = yaml_interrogate(yaml_content)
+    python_result = _exec_yaml_to_python(yaml_content)
+    _compare_validation_results(yaml_result, python_result)
