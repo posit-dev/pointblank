@@ -519,6 +519,11 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
   <li><a href="#pre-processing-with-the-pre-parameter" id="toc-pre-processing-with-the-pre-parameter" class="nav-link" data-scroll-target="#pre-processing-with-the-pre-parameter">Pre-processing with the <code>pre</code> Parameter</a></li>
   <li><a href="#complex-expressions" id="toc-complex-expressions" class="nav-link" data-scroll-target="#complex-expressions">Complex Expressions</a></li>
   <li><a href="#brief-descriptions" id="toc-brief-descriptions" class="nav-link" data-scroll-target="#brief-descriptions">Brief Descriptions</a></li>
+  <li><a href="#governance-metadata" id="toc-governance-metadata" class="nav-link" data-scroll-target="#governance-metadata">Governance Metadata</a></li>
+  <li><a href="#data-freshness-and-null-percentage" id="toc-data-freshness-and-null-percentage" class="nav-link" data-scroll-target="#data-freshness-and-null-percentage">Data Freshness and Null Percentage</a></li>
+  <li><a href="#aggregate-validations" id="toc-aggregate-validations" class="nav-link" data-scroll-target="#aggregate-validations">Aggregate Validations</a></li>
+  <li><a href="#step-activation-control" id="toc-step-activation-control" class="nav-link" data-scroll-target="#step-activation-control">Step Activation Control</a></li>
+  <li><a href="#reference-tables" id="toc-reference-tables" class="nav-link" data-scroll-target="#reference-tables">Reference Tables</a></li>
   </ul></li>
   <li><a href="#working-with-yaml-files" id="toc-working-with-yaml-files" class="nav-link" data-scroll-target="#working-with-yaml-files">Working with YAML Files</a>
   <ul class="collapse">
@@ -585,7 +590,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">col_vals_not_null</span><span class="kw">:</span></span>
 <span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">columns</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">a</span><span class="kw">,</span><span class="at"> b</span><span class="kw">]</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>You can save this configuration to a .yaml file and execute it using the <a href="../reference/yaml_interrogate.html#pointblank.yaml_interrogate" title="0"><code>yaml_interrogate()</code></a> function:</p>
-<div id="808f389e" class="cell" data-execution_count="1">
+<div id="1b9cb93d" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1010,7 +1015,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
   <tfoot class="gt_sourcenotes">
   
   <tr>
-    <td class="gt_sourcenote" colspan="14" style="text-align: left;"><div style="margin-top: 5px; margin-bottom: 5px;"><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin-left: 10px; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-02-21 00:52:59 UTC</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">&lt; 1 s</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 1px 5px -1px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-02-21 00:52:59 UTC</span></div></td>
+    <td class="gt_sourcenote" colspan="14" style="text-align: left;"><div style="margin-top: 5px; margin-bottom: 5px;"><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin-left: 10px; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-02-23 21:31:17 UTC</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">&lt; 1 s</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 1px 5px -1px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-02-23 21:31:17 UTC</span></div></td>
   </tr>
 
 </tfoot>
@@ -1124,7 +1129,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <section id="applying-templates-to-multiple-datasets" class="level3">
 <h3 class="anchored" data-anchor-id="applying-templates-to-multiple-datasets">Applying Templates to Multiple Datasets</h3>
 <p>Here’s a practical example showing how to apply the same validation template to multiple quarterly datasets, demonstrating the power of reusable YAML configurations:</p>
-<div id="5d04a1b7" class="cell" data-execution_count="2">
+<div id="95d21977" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1572,35 +1577,113 @@ Q2 validation: True</code></pre>
 </ul></li>
 </ul>
 </section>
+<section id="governance-metadata" class="level3">
+<h3 class="anchored" data-anchor-id="governance-metadata">Governance Metadata</h3>
+<p>YAML workflows support governance metadata that identifies ownership and usage of validation workflows. These fields are embedded in the validation report:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb30"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tbl</span><span class="kw">:</span><span class="at"> sales_data.csv</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tbl_name</span><span class="kw">:</span><span class="at"> </span><span class="st">"Sales Pipeline"</span></span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a><span class="fu">owner</span><span class="kw">:</span><span class="at"> </span><span class="st">"Data Engineering"</span></span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a><span class="fu">consumers</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">Analytics Team</span><span class="kw">,</span><span class="at"> Finance</span><span class="kw">,</span><span class="at"> Compliance</span><span class="kw">]</span></span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a><span class="fu">version</span><span class="kw">:</span><span class="at"> </span><span class="st">"2.1.0"</span></span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a><span class="fu">steps</span><span class="kw">:</span></span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">col_vals_not_null</span><span class="kw">:</span></span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">columns</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">customer_id</span><span class="kw">,</span><span class="at"> revenue</span><span class="kw">]</span></span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">col_vals_gt</span><span class="kw">:</span></span>
+<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">columns</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">revenue</span><span class="kw">]</span></span>
+<span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">value</span><span class="kw">:</span><span class="at"> </span><span class="dv">0</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The <code>owner</code>, <code>consumers</code>, and <code>version</code> fields are forwarded to the <a href="../reference/Validate.html#pointblank.Validate" title="0"><code>Validate</code></a> constructor and appear in the validation report header. These fields are optional and do not affect validation behavior.</p>
+</section>
+<section id="data-freshness-and-null-percentage" class="level3">
+<h3 class="anchored" data-anchor-id="data-freshness-and-null-percentage">Data Freshness and Null Percentage</h3>
+<p>Two additional validation methods support common data quality checks:</p>
+<p><strong><code>data_freshness</code></strong>: Validate that a date/datetime column has recent data:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb31"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">steps</span><span class="kw">:</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">data_freshness</span><span class="kw">:</span></span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">columns</span><span class="kw">:</span><span class="at"> event_date</span></span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">freshness</span><span class="kw">:</span><span class="at"> </span><span class="st">"24h"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><strong><code>col_pct_null</code></strong>: Validate that the percentage of null values is within bounds:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb32"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">steps</span><span class="kw">:</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">col_pct_null</span><span class="kw">:</span></span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">columns</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">email</span><span class="kw">,</span><span class="at"> phone</span><span class="kw">]</span></span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">value</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.05</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="aggregate-validations" class="level3">
+<h3 class="anchored" data-anchor-id="aggregate-validations">Aggregate Validations</h3>
+<p>Aggregate methods validate column-level statistics like sum, average, and standard deviation:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb33"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">steps</span><span class="kw">:</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="co">  # Check that total revenue is positive</span></span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">col_sum_gt</span><span class="kw">:</span></span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">columns</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">revenue</span><span class="kw">]</span></span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">value</span><span class="kw">:</span><span class="at"> </span><span class="dv">0</span></span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a><span class="co">  # Validate average rating is at most 5</span></span>
+<span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">col_avg_le</span><span class="kw">:</span></span>
+<span id="cb33-9"><a href="#cb33-9" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">columns</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">rating</span><span class="kw">]</span></span>
+<span id="cb33-10"><a href="#cb33-10" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">value</span><span class="kw">:</span><span class="at"> </span><span class="dv">5</span></span>
+<span id="cb33-11"><a href="#cb33-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-12"><a href="#cb33-12" aria-hidden="true" tabindex="-1"></a><span class="co">  # Ensure temperature variation is bounded</span></span>
+<span id="cb33-13"><a href="#cb33-13" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">col_sd_lt</span><span class="kw">:</span></span>
+<span id="cb33-14"><a href="#cb33-14" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">columns</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">temperature</span><span class="kw">]</span></span>
+<span id="cb33-15"><a href="#cb33-15" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">value</span><span class="kw">:</span><span class="at"> </span><span class="dv">10</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Available methods follow the <code>col_{stat}_{comparator}</code> pattern where <code>{stat}</code> is <code>sum</code>, <code>avg</code>, or <code>sd</code>, and <code>{comparator}</code> is <code>gt</code>, <code>lt</code>, <code>ge</code>, <code>le</code>, <code>eq</code>, <code>between</code>, or <code>outside</code>.</p>
+</section>
+<section id="step-activation-control" class="level3">
+<h3 class="anchored" data-anchor-id="step-activation-control">Step Activation Control</h3>
+<p>The <code>active</code> parameter allows you to temporarily disable validation steps without removing them from the configuration:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb34"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="fu">steps</span><span class="kw">:</span></span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a><span class="co">  # This step is disabled</span></span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">col_vals_gt</span><span class="kw">:</span></span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">columns</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">amount</span><span class="kw">]</span></span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">value</span><span class="kw">:</span><span class="at"> </span><span class="dv">0</span></span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">active</span><span class="kw">:</span><span class="at"> </span><span class="ch">false</span></span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a><span class="co">  # This step runs normally (active: true is the default)</span></span>
+<span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">col_vals_not_null</span><span class="kw">:</span></span>
+<span id="cb34-10"><a href="#cb34-10" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">columns</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">customer_id</span><span class="kw">]</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>This is useful for debugging, phased rollouts, or temporarily skipping steps that are known to fail.</p>
+</section>
+<section id="reference-tables" class="level3">
+<h3 class="anchored" data-anchor-id="reference-tables">Reference Tables</h3>
+<p>The <code>reference</code> top-level key specifies a reference table for comparison-based validations:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb35"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tbl</span><span class="kw">:</span><span class="at"> current_data.csv</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a><span class="fu">reference</span><span class="kw">:</span></span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a><span class="fu">  python</span><span class="kw">: </span><span class="ch">|</span></span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>    pb.load_dataset("baseline_data", tbl_type="polars")</span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a><span class="fu">steps</span><span class="kw">:</span></span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">tbl_match</span><span class="kw">:</span></span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">tbl_compare</span><span class="kw">:</span></span>
+<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a><span class="fu">        python</span><span class="kw">: </span><span class="ch">|</span></span>
+<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a>          pb.load_dataset("baseline_data", tbl_type="polars")</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
 </section>
 <section id="working-with-yaml-files" class="level2">
 <h2 class="anchored" data-anchor-id="working-with-yaml-files">Working with YAML Files</h2>
 <section id="loading-from-files" class="level3">
 <h3 class="anchored" data-anchor-id="loading-from-files">Loading from Files</h3>
 <p>You can save your YAML configuration to files and load them:</p>
-<div id="4fd764e3" class="cell" data-execution_count="3">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a YAML file</span></span>
-<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>yaml_content <span class="op">=</span> <span class="st">"""</span></span>
-<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a><span class="st">tbl: small_table</span></span>
-<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a><span class="st">tbl_name: "File-based Validation"</span></span>
-<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a><span class="st">steps:</span></span>
-<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a><span class="st">  - col_vals_between:</span></span>
-<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a><span class="st">      columns: c</span></span>
-<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a><span class="st">      left: 1</span></span>
-<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a><span class="st">      right: 10</span></span>
-<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a><span class="st">  - col_vals_in_set:</span></span>
-<span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a><span class="st">      columns: f</span></span>
-<span id="cb30-12"><a href="#cb30-12" aria-hidden="true" tabindex="-1"></a><span class="st">      set: [low, mid, high]</span></span>
-<span id="cb30-13"><a href="#cb30-13" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span></span>
-<span id="cb30-14"><a href="#cb30-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb30-15"><a href="#cb30-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Save to file</span></span>
-<span id="cb30-16"><a href="#cb30-16" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
-<span id="cb30-17"><a href="#cb30-17" aria-hidden="true" tabindex="-1"></a>yaml_file <span class="op">=</span> Path(<span class="st">"validation_config.yaml"</span>)</span>
-<span id="cb30-18"><a href="#cb30-18" aria-hidden="true" tabindex="-1"></a>yaml_file.write_text(yaml_content)</span>
-<span id="cb30-19"><a href="#cb30-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb30-20"><a href="#cb30-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Load and execute</span></span>
-<span id="cb30-21"><a href="#cb30-21" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> pb.yaml_interrogate(yaml_file)</span>
-<span id="cb30-22"><a href="#cb30-22" aria-hidden="true" tabindex="-1"></a>result</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="bbbe2ab5" class="cell" data-execution_count="3">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a YAML file</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>yaml_content <span class="op">=</span> <span class="st">"""</span></span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a><span class="st">tbl: small_table</span></span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a><span class="st">tbl_name: "File-based Validation"</span></span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a><span class="st">steps:</span></span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a><span class="st">  - col_vals_between:</span></span>
+<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a><span class="st">      columns: c</span></span>
+<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a><span class="st">      left: 1</span></span>
+<span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a><span class="st">      right: 10</span></span>
+<span id="cb36-10"><a href="#cb36-10" aria-hidden="true" tabindex="-1"></a><span class="st">  - col_vals_in_set:</span></span>
+<span id="cb36-11"><a href="#cb36-11" aria-hidden="true" tabindex="-1"></a><span class="st">      columns: f</span></span>
+<span id="cb36-12"><a href="#cb36-12" aria-hidden="true" tabindex="-1"></a><span class="st">      set: [low, mid, high]</span></span>
+<span id="cb36-13"><a href="#cb36-13" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span></span>
+<span id="cb36-14"><a href="#cb36-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-15"><a href="#cb36-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Save to file</span></span>
+<span id="cb36-16"><a href="#cb36-16" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
+<span id="cb36-17"><a href="#cb36-17" aria-hidden="true" tabindex="-1"></a>yaml_file <span class="op">=</span> Path(<span class="st">"validation_config.yaml"</span>)</span>
+<span id="cb36-18"><a href="#cb36-18" aria-hidden="true" tabindex="-1"></a>yaml_file.write_text(yaml_content)</span>
+<span id="cb36-19"><a href="#cb36-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-20"><a href="#cb36-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Load and execute</span></span>
+<span id="cb36-21"><a href="#cb36-21" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> pb.yaml_interrogate(yaml_file)</span>
+<span id="cb36-22"><a href="#cb36-22" aria-hidden="true" tabindex="-1"></a>result</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="3">
 <div id="pb_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>
@@ -1679,7 +1762,7 @@ Q2 validation: True</code></pre>
     <td colspan="14" class="gt_heading gt_title gt_font_normal" style="color: #444444;font-size: 28px;text-align: left;font-weight: bold; text-align: left;">Pointblank Validation</td>
   </tr>
   <tr class="gt_heading">
-    <td colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style="text-align: left;"><div><span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2026-02-21|00:53:00</span><div style="padding-top: 10px; padding-bottom: 5px;"><span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 15px 2px 15px; font-size: 10px;">Polars</span><span style="background-color: none; color: #222222; padding: 0.5em 0.5em; position: inherit; margin: 5px 10px 5px -4px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 15px 2px 15px; font-size: 10px;">File-based Validation</span></div></div></td>
+    <td colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style="text-align: left;"><div><span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2026-02-23|21:31:17</span><div style="padding-top: 10px; padding-bottom: 5px;"><span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 15px 2px 15px; font-size: 10px;">Polars</span><span style="background-color: none; color: #222222; padding: 0.5em 0.5em; position: inherit; margin: 5px 10px 5px -4px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 15px 2px 15px; font-size: 10px;">File-based Validation</span></div></div></td>
   </tr>
 <tr class="gt_col_headings">
   <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-status_color"></th>
@@ -1785,7 +1868,7 @@ Q2 validation: True</code></pre>
   <tfoot class="gt_sourcenotes">
   
   <tr>
-    <td class="gt_sourcenote" colspan="14" style="text-align: left;"><div style="margin-top: 5px; margin-bottom: 5px;"><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin-left: 10px; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-02-21 00:53:00 UTC</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">&lt; 1 s</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 1px 5px -1px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-02-21 00:53:00 UTC</span></div></td>
+    <td class="gt_sourcenote" colspan="14" style="text-align: left;"><div style="margin-top: 5px; margin-bottom: 5px;"><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin-left: 10px; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-02-23 21:31:17 UTC</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">&lt; 1 s</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 1px 5px -1px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-02-23 21:31:17 UTC</span></div></td>
   </tr>
 
 </tfoot>
@@ -1800,27 +1883,27 @@ Q2 validation: True</code></pre>
 <section id="converting-yaml-to-python" class="level3">
 <h3 class="anchored" data-anchor-id="converting-yaml-to-python">Converting YAML to Python</h3>
 <p>Use <a href="../reference/yaml_to_python.html#pointblank.yaml_to_python" title="0"><code>yaml_to_python()</code></a> to generate equivalent Python code from your YAML configuration:</p>
-<div id="485c66c6" class="cell" data-execution_count="4">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>yaml_config <span class="op">=</span> <span class="st">"""</span></span>
-<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="st">tbl: small_table</span></span>
-<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a><span class="st">tbl_name: "Example Validation"</span></span>
-<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a><span class="st">thresholds:</span></span>
-<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a><span class="st">  warning: 0.1</span></span>
-<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a><span class="st">  error: 0.2</span></span>
-<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a><span class="st">actions:</span></span>
-<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a><span class="st">  warning: "Warning: </span><span class="sc">{TYPE}</span><span class="st"> validation failed"</span></span>
-<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a><span class="st">steps:</span></span>
-<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a><span class="st">  - col_vals_gt:</span></span>
-<span id="cb31-11"><a href="#cb31-11" aria-hidden="true" tabindex="-1"></a><span class="st">      columns: a</span></span>
-<span id="cb31-12"><a href="#cb31-12" aria-hidden="true" tabindex="-1"></a><span class="st">      value: 0</span></span>
-<span id="cb31-13"><a href="#cb31-13" aria-hidden="true" tabindex="-1"></a><span class="st">  - col_vals_in_set:</span></span>
-<span id="cb31-14"><a href="#cb31-14" aria-hidden="true" tabindex="-1"></a><span class="st">      columns: f</span></span>
-<span id="cb31-15"><a href="#cb31-15" aria-hidden="true" tabindex="-1"></a><span class="st">      set: [low, mid, high]</span></span>
-<span id="cb31-16"><a href="#cb31-16" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span></span>
-<span id="cb31-17"><a href="#cb31-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb31-18"><a href="#cb31-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate Python code</span></span>
-<span id="cb31-19"><a href="#cb31-19" aria-hidden="true" tabindex="-1"></a>python_code <span class="op">=</span> pb.yaml_to_python(yaml_config)</span>
-<span id="cb31-20"><a href="#cb31-20" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(python_code)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="cb76b95a" class="cell" data-execution_count="4">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb37"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>yaml_config <span class="op">=</span> <span class="st">"""</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a><span class="st">tbl: small_table</span></span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a><span class="st">tbl_name: "Example Validation"</span></span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a><span class="st">thresholds:</span></span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a><span class="st">  warning: 0.1</span></span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a><span class="st">  error: 0.2</span></span>
+<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a><span class="st">actions:</span></span>
+<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a><span class="st">  warning: "Warning: </span><span class="sc">{TYPE}</span><span class="st"> validation failed"</span></span>
+<span id="cb37-9"><a href="#cb37-9" aria-hidden="true" tabindex="-1"></a><span class="st">steps:</span></span>
+<span id="cb37-10"><a href="#cb37-10" aria-hidden="true" tabindex="-1"></a><span class="st">  - col_vals_gt:</span></span>
+<span id="cb37-11"><a href="#cb37-11" aria-hidden="true" tabindex="-1"></a><span class="st">      columns: a</span></span>
+<span id="cb37-12"><a href="#cb37-12" aria-hidden="true" tabindex="-1"></a><span class="st">      value: 0</span></span>
+<span id="cb37-13"><a href="#cb37-13" aria-hidden="true" tabindex="-1"></a><span class="st">  - col_vals_in_set:</span></span>
+<span id="cb37-14"><a href="#cb37-14" aria-hidden="true" tabindex="-1"></a><span class="st">      columns: f</span></span>
+<span id="cb37-15"><a href="#cb37-15" aria-hidden="true" tabindex="-1"></a><span class="st">      set: [low, mid, high]</span></span>
+<span id="cb37-16"><a href="#cb37-16" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span></span>
+<span id="cb37-17"><a href="#cb37-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-18"><a href="#cb37-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate Python code</span></span>
+<span id="cb37-19"><a href="#cb37-19" aria-hidden="true" tabindex="-1"></a>python_code <span class="op">=</span> pb.yaml_to_python(yaml_config)</span>
+<span id="cb37-20"><a href="#cb37-20" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(python_code)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>```python
 import pointblank as pb
@@ -1853,99 +1936,99 @@ import pointblank as pb
 <section id="data-pipeline-validation" class="level3">
 <h3 class="anchored" data-anchor-id="data-pipeline-validation">Data Pipeline Validation</h3>
 <p>Here’s a comprehensive example for validating data in a processing pipeline:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb33"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tbl</span><span class="kw">:</span></span>
-<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="fu">  python</span><span class="kw">: </span><span class="ch">|</span></span>
-<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>    (</span>
-<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>      pl.scan_csv("raw_data/customer_events.csv")</span>
-<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>      .filter(pl.col("event_date") &gt;= "2024-01-01")</span>
-<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a><span class="fu">tbl_name</span><span class="kw">:</span><span class="at"> </span><span class="st">"Customer Events Pipeline Validation"</span></span>
-<span id="cb33-9"><a href="#cb33-9" aria-hidden="true" tabindex="-1"></a><span class="fu">label</span><span class="kw">:</span><span class="at"> </span><span class="st">"Daily data quality check for customer events"</span></span>
-<span id="cb33-10"><a href="#cb33-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-11"><a href="#cb33-11" aria-hidden="true" tabindex="-1"></a><span class="fu">thresholds</span><span class="kw">:</span></span>
-<span id="cb33-12"><a href="#cb33-12" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">warning</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.01</span><span class="co">   # 1% failure rate</span></span>
-<span id="cb33-13"><a href="#cb33-13" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">error</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.05</span><span class="co">     # 5% failure rate</span></span>
-<span id="cb33-14"><a href="#cb33-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-15"><a href="#cb33-15" aria-hidden="true" tabindex="-1"></a><span class="fu">actions</span><span class="kw">:</span></span>
-<span id="cb33-16"><a href="#cb33-16" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">warning</span><span class="kw">:</span><span class="at"> </span><span class="st">"Pipeline warning: {TYPE} validation found {n_failed} issues"</span></span>
-<span id="cb33-17"><a href="#cb33-17" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">error</span><span class="kw">:</span></span>
-<span id="cb33-18"><a href="#cb33-18" aria-hidden="true" tabindex="-1"></a><span class="fu">    python</span><span class="kw">: </span><span class="ch">|</span></span>
-<span id="cb33-19"><a href="#cb33-19" aria-hidden="true" tabindex="-1"></a>      lambda: print("ERROR: Pipeline validation failed - manual review required")</span>
-<span id="cb33-20"><a href="#cb33-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-21"><a href="#cb33-21" aria-hidden="true" tabindex="-1"></a><span class="fu">steps</span><span class="kw">:</span></span>
-<span id="cb33-22"><a href="#cb33-22" aria-hidden="true" tabindex="-1"></a><span class="co">  # Schema validation</span></span>
-<span id="cb33-23"><a href="#cb33-23" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">col_schema_match</span><span class="kw">:</span></span>
-<span id="cb33-24"><a href="#cb33-24" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">schema</span><span class="kw">:</span></span>
-<span id="cb33-25"><a href="#cb33-25" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">columns</span><span class="kw">:</span></span>
-<span id="cb33-26"><a href="#cb33-26" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="kw">-</span><span class="at"> </span><span class="kw">[</span><span class="at">customer_id</span><span class="kw">,</span><span class="at"> </span><span class="st">"int64"</span><span class="kw">]</span></span>
-<span id="cb33-27"><a href="#cb33-27" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="kw">-</span><span class="at"> </span><span class="kw">[</span><span class="at">event_type</span><span class="kw">,</span><span class="at"> </span><span class="st">"object"</span><span class="kw">]</span></span>
-<span id="cb33-28"><a href="#cb33-28" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="kw">-</span><span class="at"> </span><span class="kw">[</span><span class="at">event_date</span><span class="kw">,</span><span class="at"> </span><span class="st">"object"</span><span class="kw">]</span></span>
-<span id="cb33-29"><a href="#cb33-29" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="kw">-</span><span class="at"> </span><span class="kw">[</span><span class="at">revenue</span><span class="kw">,</span><span class="at"> </span><span class="st">"float64"</span><span class="kw">]</span></span>
-<span id="cb33-30"><a href="#cb33-30" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">brief</span><span class="kw">:</span><span class="at"> </span><span class="st">"Validate table structure matches expected schema"</span></span>
-<span id="cb33-31"><a href="#cb33-31" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-32"><a href="#cb33-32" aria-hidden="true" tabindex="-1"></a><span class="co">  # Data completeness</span></span>
-<span id="cb33-33"><a href="#cb33-33" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">col_vals_not_null</span><span class="kw">:</span></span>
-<span id="cb33-34"><a href="#cb33-34" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">columns</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">customer_id</span><span class="kw">,</span><span class="at"> event_type</span><span class="kw">,</span><span class="at"> event_date</span><span class="kw">]</span></span>
-<span id="cb33-35"><a href="#cb33-35" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">brief</span><span class="kw">:</span><span class="at"> </span><span class="st">"Critical fields must be complete"</span></span>
-<span id="cb33-36"><a href="#cb33-36" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-37"><a href="#cb33-37" aria-hidden="true" tabindex="-1"></a><span class="co">  # Business logic validation</span></span>
-<span id="cb33-38"><a href="#cb33-38" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">col_vals_in_set</span><span class="kw">:</span></span>
-<span id="cb33-39"><a href="#cb33-39" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">columns</span><span class="kw">:</span><span class="at"> event_type</span></span>
-<span id="cb33-40"><a href="#cb33-40" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">set</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">signup</span><span class="kw">,</span><span class="at"> purchase</span><span class="kw">,</span><span class="at"> cancellation</span><span class="kw">,</span><span class="at"> upgrade</span><span class="kw">]</span></span>
-<span id="cb33-41"><a href="#cb33-41" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">brief</span><span class="kw">:</span><span class="at"> </span><span class="st">"Event types must be from approved list"</span></span>
-<span id="cb33-42"><a href="#cb33-42" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-43"><a href="#cb33-43" aria-hidden="true" tabindex="-1"></a><span class="co">  # Data quality checks</span></span>
-<span id="cb33-44"><a href="#cb33-44" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">col_vals_gt</span><span class="kw">:</span></span>
-<span id="cb33-45"><a href="#cb33-45" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">columns</span><span class="kw">:</span><span class="at"> revenue</span></span>
-<span id="cb33-46"><a href="#cb33-46" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">value</span><span class="kw">:</span><span class="at"> </span><span class="dv">0</span></span>
-<span id="cb33-47"><a href="#cb33-47" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">na_pass</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
-<span id="cb33-48"><a href="#cb33-48" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">brief</span><span class="kw">:</span><span class="at"> </span><span class="st">"Revenue values must be positive when present"</span></span>
-<span id="cb33-49"><a href="#cb33-49" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-50"><a href="#cb33-50" aria-hidden="true" tabindex="-1"></a><span class="co">  # Temporal validation</span></span>
-<span id="cb33-51"><a href="#cb33-51" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">col_vals_expr</span><span class="kw">:</span></span>
-<span id="cb33-52"><a href="#cb33-52" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">expr</span><span class="kw">:</span></span>
-<span id="cb33-53"><a href="#cb33-53" aria-hidden="true" tabindex="-1"></a><span class="fu">        python</span><span class="kw">: </span><span class="ch">|</span></span>
-<span id="cb33-54"><a href="#cb33-54" aria-hidden="true" tabindex="-1"></a>          pl.col("event_date").str.strptime(pl.Date, "%Y-%m-%d").is_not_null()</span>
-<span id="cb33-55"><a href="#cb33-55" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">brief</span><span class="kw">:</span><span class="at"> </span><span class="st">"Event dates must be valid YYYY-MM-DD format"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb39"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tbl</span><span class="kw">:</span></span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a><span class="fu">  python</span><span class="kw">: </span><span class="ch">|</span></span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>    (</span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>      pl.scan_csv("raw_data/customer_events.csv")</span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>      .filter(pl.col("event_date") &gt;= "2024-01-01")</span>
+<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb39-7"><a href="#cb39-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-8"><a href="#cb39-8" aria-hidden="true" tabindex="-1"></a><span class="fu">tbl_name</span><span class="kw">:</span><span class="at"> </span><span class="st">"Customer Events Pipeline Validation"</span></span>
+<span id="cb39-9"><a href="#cb39-9" aria-hidden="true" tabindex="-1"></a><span class="fu">label</span><span class="kw">:</span><span class="at"> </span><span class="st">"Daily data quality check for customer events"</span></span>
+<span id="cb39-10"><a href="#cb39-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-11"><a href="#cb39-11" aria-hidden="true" tabindex="-1"></a><span class="fu">thresholds</span><span class="kw">:</span></span>
+<span id="cb39-12"><a href="#cb39-12" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">warning</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.01</span><span class="co">   # 1% failure rate</span></span>
+<span id="cb39-13"><a href="#cb39-13" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">error</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.05</span><span class="co">     # 5% failure rate</span></span>
+<span id="cb39-14"><a href="#cb39-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-15"><a href="#cb39-15" aria-hidden="true" tabindex="-1"></a><span class="fu">actions</span><span class="kw">:</span></span>
+<span id="cb39-16"><a href="#cb39-16" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">warning</span><span class="kw">:</span><span class="at"> </span><span class="st">"Pipeline warning: {TYPE} validation found {n_failed} issues"</span></span>
+<span id="cb39-17"><a href="#cb39-17" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">error</span><span class="kw">:</span></span>
+<span id="cb39-18"><a href="#cb39-18" aria-hidden="true" tabindex="-1"></a><span class="fu">    python</span><span class="kw">: </span><span class="ch">|</span></span>
+<span id="cb39-19"><a href="#cb39-19" aria-hidden="true" tabindex="-1"></a>      lambda: print("ERROR: Pipeline validation failed - manual review required")</span>
+<span id="cb39-20"><a href="#cb39-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-21"><a href="#cb39-21" aria-hidden="true" tabindex="-1"></a><span class="fu">steps</span><span class="kw">:</span></span>
+<span id="cb39-22"><a href="#cb39-22" aria-hidden="true" tabindex="-1"></a><span class="co">  # Schema validation</span></span>
+<span id="cb39-23"><a href="#cb39-23" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">col_schema_match</span><span class="kw">:</span></span>
+<span id="cb39-24"><a href="#cb39-24" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">schema</span><span class="kw">:</span></span>
+<span id="cb39-25"><a href="#cb39-25" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">columns</span><span class="kw">:</span></span>
+<span id="cb39-26"><a href="#cb39-26" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="kw">-</span><span class="at"> </span><span class="kw">[</span><span class="at">customer_id</span><span class="kw">,</span><span class="at"> </span><span class="st">"int64"</span><span class="kw">]</span></span>
+<span id="cb39-27"><a href="#cb39-27" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="kw">-</span><span class="at"> </span><span class="kw">[</span><span class="at">event_type</span><span class="kw">,</span><span class="at"> </span><span class="st">"object"</span><span class="kw">]</span></span>
+<span id="cb39-28"><a href="#cb39-28" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="kw">-</span><span class="at"> </span><span class="kw">[</span><span class="at">event_date</span><span class="kw">,</span><span class="at"> </span><span class="st">"object"</span><span class="kw">]</span></span>
+<span id="cb39-29"><a href="#cb39-29" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="kw">-</span><span class="at"> </span><span class="kw">[</span><span class="at">revenue</span><span class="kw">,</span><span class="at"> </span><span class="st">"float64"</span><span class="kw">]</span></span>
+<span id="cb39-30"><a href="#cb39-30" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">brief</span><span class="kw">:</span><span class="at"> </span><span class="st">"Validate table structure matches expected schema"</span></span>
+<span id="cb39-31"><a href="#cb39-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-32"><a href="#cb39-32" aria-hidden="true" tabindex="-1"></a><span class="co">  # Data completeness</span></span>
+<span id="cb39-33"><a href="#cb39-33" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">col_vals_not_null</span><span class="kw">:</span></span>
+<span id="cb39-34"><a href="#cb39-34" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">columns</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">customer_id</span><span class="kw">,</span><span class="at"> event_type</span><span class="kw">,</span><span class="at"> event_date</span><span class="kw">]</span></span>
+<span id="cb39-35"><a href="#cb39-35" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">brief</span><span class="kw">:</span><span class="at"> </span><span class="st">"Critical fields must be complete"</span></span>
+<span id="cb39-36"><a href="#cb39-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-37"><a href="#cb39-37" aria-hidden="true" tabindex="-1"></a><span class="co">  # Business logic validation</span></span>
+<span id="cb39-38"><a href="#cb39-38" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">col_vals_in_set</span><span class="kw">:</span></span>
+<span id="cb39-39"><a href="#cb39-39" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">columns</span><span class="kw">:</span><span class="at"> event_type</span></span>
+<span id="cb39-40"><a href="#cb39-40" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">set</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">signup</span><span class="kw">,</span><span class="at"> purchase</span><span class="kw">,</span><span class="at"> cancellation</span><span class="kw">,</span><span class="at"> upgrade</span><span class="kw">]</span></span>
+<span id="cb39-41"><a href="#cb39-41" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">brief</span><span class="kw">:</span><span class="at"> </span><span class="st">"Event types must be from approved list"</span></span>
+<span id="cb39-42"><a href="#cb39-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-43"><a href="#cb39-43" aria-hidden="true" tabindex="-1"></a><span class="co">  # Data quality checks</span></span>
+<span id="cb39-44"><a href="#cb39-44" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">col_vals_gt</span><span class="kw">:</span></span>
+<span id="cb39-45"><a href="#cb39-45" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">columns</span><span class="kw">:</span><span class="at"> revenue</span></span>
+<span id="cb39-46"><a href="#cb39-46" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">value</span><span class="kw">:</span><span class="at"> </span><span class="dv">0</span></span>
+<span id="cb39-47"><a href="#cb39-47" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">na_pass</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
+<span id="cb39-48"><a href="#cb39-48" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">brief</span><span class="kw">:</span><span class="at"> </span><span class="st">"Revenue values must be positive when present"</span></span>
+<span id="cb39-49"><a href="#cb39-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-50"><a href="#cb39-50" aria-hidden="true" tabindex="-1"></a><span class="co">  # Temporal validation</span></span>
+<span id="cb39-51"><a href="#cb39-51" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">col_vals_expr</span><span class="kw">:</span></span>
+<span id="cb39-52"><a href="#cb39-52" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">expr</span><span class="kw">:</span></span>
+<span id="cb39-53"><a href="#cb39-53" aria-hidden="true" tabindex="-1"></a><span class="fu">        python</span><span class="kw">: </span><span class="ch">|</span></span>
+<span id="cb39-54"><a href="#cb39-54" aria-hidden="true" tabindex="-1"></a>          pl.col("event_date").str.strptime(pl.Date, "%Y-%m-%d").is_not_null()</span>
+<span id="cb39-55"><a href="#cb39-55" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">brief</span><span class="kw">:</span><span class="at"> </span><span class="st">"Event dates must be valid YYYY-MM-DD format"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section>
 <section id="quality-monitoring-dashboard" class="level3">
 <h3 class="anchored" data-anchor-id="quality-monitoring-dashboard">Quality Monitoring Dashboard</h3>
 <p>For ongoing data quality monitoring:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb34"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tbl</span><span class="kw">:</span><span class="at"> warehouse/daily_metrics.parquet</span></span>
-<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tbl_name</span><span class="kw">:</span><span class="at"> </span><span class="st">"Daily Metrics Quality Check"</span></span>
-<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a><span class="fu">thresholds</span><span class="kw">:</span></span>
-<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">warning</span><span class="kw">:</span><span class="at"> </span><span class="dv">5</span><span class="co">      # 5 failing rows</span></span>
-<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">error</span><span class="kw">:</span><span class="at"> </span><span class="dv">50</span><span class="co">       # 50 failing rows</span></span>
-<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">critical</span><span class="kw">:</span><span class="at"> </span><span class="dv">100</span><span class="co">   # 100 failing rows</span></span>
-<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a><span class="fu">actions</span><span class="kw">:</span></span>
-<span id="cb34-10"><a href="#cb34-10" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">warning</span><span class="kw">:</span><span class="at"> </span><span class="st">"Quality check warning: {n_failed} rows failed {TYPE} validation"</span></span>
-<span id="cb34-11"><a href="#cb34-11" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">error</span><span class="kw">:</span><span class="at"> </span><span class="st">"Quality degradation detected: Step {step} failed for {n_failed}/{n} rows"</span></span>
-<span id="cb34-12"><a href="#cb34-12" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">critical</span><span class="kw">:</span></span>
-<span id="cb34-13"><a href="#cb34-13" aria-hidden="true" tabindex="-1"></a><span class="fu">    python</span><span class="kw">: </span><span class="ch">|</span></span>
-<span id="cb34-14"><a href="#cb34-14" aria-hidden="true" tabindex="-1"></a>      lambda: print("CRITICAL: Data quality failure detected - immediate attention required")</span>
-<span id="cb34-15"><a href="#cb34-15" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">highest_only</span><span class="kw">:</span><span class="at"> </span><span class="ch">false</span></span>
-<span id="cb34-16"><a href="#cb34-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb34-17"><a href="#cb34-17" aria-hidden="true" tabindex="-1"></a><span class="fu">steps</span><span class="kw">:</span></span>
-<span id="cb34-18"><a href="#cb34-18" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">row_count_match</span><span class="kw">:</span></span>
-<span id="cb34-19"><a href="#cb34-19" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">count</span><span class="kw">:</span><span class="at"> </span><span class="dv">10000</span></span>
-<span id="cb34-20"><a href="#cb34-20" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">brief</span><span class="kw">:</span><span class="at"> </span><span class="st">"Verify expected daily record count"</span></span>
-<span id="cb34-21"><a href="#cb34-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb34-22"><a href="#cb34-22" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">col_vals_not_null</span><span class="kw">:</span></span>
-<span id="cb34-23"><a href="#cb34-23" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">columns</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">date</span><span class="kw">,</span><span class="at"> metric_value</span><span class="kw">,</span><span class="at"> source_system</span><span class="kw">]</span></span>
-<span id="cb34-24"><a href="#cb34-24" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">brief</span><span class="kw">:</span><span class="at"> </span><span class="st">"Core fields must be complete"</span></span>
-<span id="cb34-25"><a href="#cb34-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb34-26"><a href="#cb34-26" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">col_vals_between</span><span class="kw">:</span></span>
-<span id="cb34-27"><a href="#cb34-27" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">columns</span><span class="kw">:</span><span class="at"> metric_value</span></span>
-<span id="cb34-28"><a href="#cb34-28" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">left</span><span class="kw">:</span><span class="at"> </span><span class="dv">0</span></span>
-<span id="cb34-29"><a href="#cb34-29" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">right</span><span class="kw">:</span><span class="at"> </span><span class="dv">1000000</span></span>
-<span id="cb34-30"><a href="#cb34-30" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">brief</span><span class="kw">:</span><span class="at"> </span><span class="st">"Metric values within reasonable range"</span></span>
-<span id="cb34-31"><a href="#cb34-31" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb34-32"><a href="#cb34-32" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">rows_distinct</span><span class="kw">:</span></span>
-<span id="cb34-33"><a href="#cb34-33" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">columns_subset</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">date</span><span class="kw">,</span><span class="at"> metric_name</span><span class="kw">,</span><span class="at"> source_system</span><span class="kw">]</span></span>
-<span id="cb34-34"><a href="#cb34-34" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">brief</span><span class="kw">:</span><span class="at"> </span><span class="st">"No duplicate metric records per day"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb40"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tbl</span><span class="kw">:</span><span class="at"> warehouse/daily_metrics.parquet</span></span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tbl_name</span><span class="kw">:</span><span class="at"> </span><span class="st">"Daily Metrics Quality Check"</span></span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a><span class="fu">thresholds</span><span class="kw">:</span></span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">warning</span><span class="kw">:</span><span class="at"> </span><span class="dv">5</span><span class="co">      # 5 failing rows</span></span>
+<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">error</span><span class="kw">:</span><span class="at"> </span><span class="dv">50</span><span class="co">       # 50 failing rows</span></span>
+<span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">critical</span><span class="kw">:</span><span class="at"> </span><span class="dv">100</span><span class="co">   # 100 failing rows</span></span>
+<span id="cb40-8"><a href="#cb40-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-9"><a href="#cb40-9" aria-hidden="true" tabindex="-1"></a><span class="fu">actions</span><span class="kw">:</span></span>
+<span id="cb40-10"><a href="#cb40-10" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">warning</span><span class="kw">:</span><span class="at"> </span><span class="st">"Quality check warning: {n_failed} rows failed {TYPE} validation"</span></span>
+<span id="cb40-11"><a href="#cb40-11" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">error</span><span class="kw">:</span><span class="at"> </span><span class="st">"Quality degradation detected: Step {step} failed for {n_failed}/{n} rows"</span></span>
+<span id="cb40-12"><a href="#cb40-12" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">critical</span><span class="kw">:</span></span>
+<span id="cb40-13"><a href="#cb40-13" aria-hidden="true" tabindex="-1"></a><span class="fu">    python</span><span class="kw">: </span><span class="ch">|</span></span>
+<span id="cb40-14"><a href="#cb40-14" aria-hidden="true" tabindex="-1"></a>      lambda: print("CRITICAL: Data quality failure detected - immediate attention required")</span>
+<span id="cb40-15"><a href="#cb40-15" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">highest_only</span><span class="kw">:</span><span class="at"> </span><span class="ch">false</span></span>
+<span id="cb40-16"><a href="#cb40-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-17"><a href="#cb40-17" aria-hidden="true" tabindex="-1"></a><span class="fu">steps</span><span class="kw">:</span></span>
+<span id="cb40-18"><a href="#cb40-18" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">row_count_match</span><span class="kw">:</span></span>
+<span id="cb40-19"><a href="#cb40-19" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">count</span><span class="kw">:</span><span class="at"> </span><span class="dv">10000</span></span>
+<span id="cb40-20"><a href="#cb40-20" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">brief</span><span class="kw">:</span><span class="at"> </span><span class="st">"Verify expected daily record count"</span></span>
+<span id="cb40-21"><a href="#cb40-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-22"><a href="#cb40-22" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">col_vals_not_null</span><span class="kw">:</span></span>
+<span id="cb40-23"><a href="#cb40-23" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">columns</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">date</span><span class="kw">,</span><span class="at"> metric_value</span><span class="kw">,</span><span class="at"> source_system</span><span class="kw">]</span></span>
+<span id="cb40-24"><a href="#cb40-24" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">brief</span><span class="kw">:</span><span class="at"> </span><span class="st">"Core fields must be complete"</span></span>
+<span id="cb40-25"><a href="#cb40-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-26"><a href="#cb40-26" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">col_vals_between</span><span class="kw">:</span></span>
+<span id="cb40-27"><a href="#cb40-27" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">columns</span><span class="kw">:</span><span class="at"> metric_value</span></span>
+<span id="cb40-28"><a href="#cb40-28" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">left</span><span class="kw">:</span><span class="at"> </span><span class="dv">0</span></span>
+<span id="cb40-29"><a href="#cb40-29" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">right</span><span class="kw">:</span><span class="at"> </span><span class="dv">1000000</span></span>
+<span id="cb40-30"><a href="#cb40-30" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">brief</span><span class="kw">:</span><span class="at"> </span><span class="st">"Metric values within reasonable range"</span></span>
+<span id="cb40-31"><a href="#cb40-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-32"><a href="#cb40-32" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">rows_distinct</span><span class="kw">:</span></span>
+<span id="cb40-33"><a href="#cb40-33" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">columns_subset</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">date</span><span class="kw">,</span><span class="at"> metric_name</span><span class="kw">,</span><span class="at"> source_system</span><span class="kw">]</span></span>
+<span id="cb40-34"><a href="#cb40-34" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">brief</span><span class="kw">:</span><span class="at"> </span><span class="st">"No duplicate metric records per day"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section>
 </section>
 <section id="best-practices" class="level2">

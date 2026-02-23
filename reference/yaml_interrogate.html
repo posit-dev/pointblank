@@ -196,6 +196,11 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
   <li><a href="#using-namespaces" id="toc-using-namespaces" class="nav-link" data-scroll-target="#using-namespaces">Using Namespaces</a></li>
   <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a>
   <ul class="collapse">
+  <li><a href="#governance-metadata" id="toc-governance-metadata" class="nav-link" data-scroll-target="#governance-metadata">Governance Metadata</a></li>
+  <li><a href="#aggregate-validations" id="toc-aggregate-validations" class="nav-link" data-scroll-target="#aggregate-validations">Aggregate Validations</a></li>
+  <li><a href="#data-freshness" id="toc-data-freshness" class="nav-link" data-scroll-target="#data-freshness">Data Freshness</a></li>
+  <li><a href="#active-parameter-shortcut" id="toc-active-parameter-shortcut" class="nav-link" data-scroll-target="#active-parameter-shortcut">Active Parameter Shortcut</a></li>
+  <li><a href="#null-percentage-check" id="toc-null-percentage-check" class="nav-link" data-scroll-target="#null-percentage-check">Null Percentage Check</a></li>
   <li><a href="#using-set_tbl-to-override-the-table" id="toc-using-set_tbl-to-override-the-table" class="nav-link" data-scroll-target="#using-set_tbl-to-override-the-table">Using <code>set_tbl=</code> to Override the Table</a></li>
   </ul></li>
   </ul>
@@ -274,7 +279,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 <li>List format: <code>["module.name", "another.module"]</code> imports modules directly</li>
 </ul>
 <p><strong>Option 1: Inline expressions (no namespaces needed)</strong></p>
-<div id="e2e15f64" class="cell" data-execution_count="1">
+<div id="7eb546a3" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Simple inline custom action</span></span>
@@ -374,7 +379,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     <td colspan="14" class="gt_heading gt_title gt_font_normal" style="color: #444444;font-size: 28px;text-align: left;font-weight: bold; text-align: left;">Pointblank Validation</td>
   </tr>
   <tr class="gt_heading">
-    <td colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style="text-align: left;"><div><span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2026-02-21|00:44:32</span><div style="padding-top: 10px; padding-bottom: 5px;"><span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 10px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 10px 2px 10px; font-size: 10px;">Polars</span><span><span style="background-color: #AAAAAA; color: white; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 5px; border: solid 1px #AAAAAA; font-weight: bold; padding: 2px 15px 2px 15px; font-size: smaller;">WARNING</span><span style="background-color: none; color: #333333; padding: 0.5em 0.5em; position: inherit; margin: 5px 0px 5px -4px; font-weight: bold; border: solid 1px #AAAAAA; padding: 2px 15px 2px 15px; font-size: smaller; margin-right: 5px;">0.01</span><span style="background-color: #EBBC14; color: white; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 1px; border: solid 1px #EBBC14; font-weight: bold; padding: 2px 15px 2px 15px; font-size: smaller;">ERROR</span><span style="background-color: none; color: #333333; padding: 0.5em 0.5em; position: inherit; margin: 5px 0px 5px -4px; font-weight: bold; border: solid 1px #EBBC14; padding: 2px 15px 2px 15px; font-size: smaller; margin-right: 5px;">—</span><span style="background-color: #FF3300; color: white; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 1px; border: solid 1px #FF3300; font-weight: bold; padding: 2px 15px 2px 15px; font-size: smaller;">CRITICAL</span><span style="background-color: none; color: #333333; padding: 0.5em 0.5em; position: inherit; margin: 5px 0px 5px -4px; font-weight: bold; border: solid 1px #FF3300; padding: 2px 15px 2px 15px; font-size: smaller;">—</span></span></div></div></td>
+    <td colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style="text-align: left;"><div><span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2026-02-23|21:22:30</span><div style="padding-top: 10px; padding-bottom: 5px;"><span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 10px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 10px 2px 10px; font-size: 10px;">Polars</span><span><span style="background-color: #AAAAAA; color: white; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 5px; border: solid 1px #AAAAAA; font-weight: bold; padding: 2px 15px 2px 15px; font-size: smaller;">WARNING</span><span style="background-color: none; color: #333333; padding: 0.5em 0.5em; position: inherit; margin: 5px 0px 5px -4px; font-weight: bold; border: solid 1px #AAAAAA; padding: 2px 15px 2px 15px; font-size: smaller; margin-right: 5px;">0.01</span><span style="background-color: #EBBC14; color: white; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 1px; border: solid 1px #EBBC14; font-weight: bold; padding: 2px 15px 2px 15px; font-size: smaller;">ERROR</span><span style="background-color: none; color: #333333; padding: 0.5em 0.5em; position: inherit; margin: 5px 0px 5px -4px; font-weight: bold; border: solid 1px #EBBC14; padding: 2px 15px 2px 15px; font-size: smaller; margin-right: 5px;">—</span><span style="background-color: #FF3300; color: white; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 1px; border: solid 1px #FF3300; font-weight: bold; padding: 2px 15px 2px 15px; font-size: smaller;">CRITICAL</span><span style="background-color: none; color: #333333; padding: 0.5em 0.5em; position: inherit; margin: 5px 0px 5px -4px; font-weight: bold; border: solid 1px #FF3300; padding: 2px 15px 2px 15px; font-size: smaller;">—</span></span></div></div></td>
   </tr>
 <tr class="gt_col_headings">
   <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-status_color"></th>
@@ -439,7 +444,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
   <tfoot class="gt_sourcenotes">
   
   <tr>
-    <td class="gt_sourcenote" colspan="14" style="text-align: left;"><div style="margin-top: 5px; margin-bottom: 5px;"><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin-left: 10px; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-02-21 00:44:32 UTC</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">&lt; 1 s</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 1px 5px -1px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-02-21 00:44:32 UTC</span></div></td>
+    <td class="gt_sourcenote" colspan="14" style="text-align: left;"><div style="margin-top: 5px; margin-bottom: 5px;"><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin-left: 10px; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-02-23 21:22:30 UTC</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">&lt; 1 s</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 1px 5px -1px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-02-23 21:22:30 UTC</span></div></td>
   </tr>
 
 </tfoot>
@@ -451,7 +456,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 </div>
 <p><strong>Option 2: External functions with namespaces</strong></p>
-<div id="77f784b3" class="cell" data-execution_count="2">
+<div id="b66a429c" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define a custom action function</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> my_custom_action():</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Data validation failed: please check your data."</span>)</span>
@@ -558,7 +563,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     <td colspan="14" class="gt_heading gt_title gt_font_normal" style="color: #444444;font-size: 28px;text-align: left;font-weight: bold; text-align: left;">Pointblank Validation</td>
   </tr>
   <tr class="gt_heading">
-    <td colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style="text-align: left;"><div><span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2026-02-21|00:44:32</span><div style="padding-top: 10px; padding-bottom: 5px;"><span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 10px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 10px 2px 10px; font-size: 10px;">Polars</span><span><span style="background-color: #AAAAAA; color: white; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 5px; border: solid 1px #AAAAAA; font-weight: bold; padding: 2px 15px 2px 15px; font-size: smaller;">WARNING</span><span style="background-color: none; color: #333333; padding: 0.5em 0.5em; position: inherit; margin: 5px 0px 5px -4px; font-weight: bold; border: solid 1px #AAAAAA; padding: 2px 15px 2px 15px; font-size: smaller; margin-right: 5px;">0.01</span><span style="background-color: #EBBC14; color: white; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 1px; border: solid 1px #EBBC14; font-weight: bold; padding: 2px 15px 2px 15px; font-size: smaller;">ERROR</span><span style="background-color: none; color: #333333; padding: 0.5em 0.5em; position: inherit; margin: 5px 0px 5px -4px; font-weight: bold; border: solid 1px #EBBC14; padding: 2px 15px 2px 15px; font-size: smaller; margin-right: 5px;">—</span><span style="background-color: #FF3300; color: white; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 1px; border: solid 1px #FF3300; font-weight: bold; padding: 2px 15px 2px 15px; font-size: smaller;">CRITICAL</span><span style="background-color: none; color: #333333; padding: 0.5em 0.5em; position: inherit; margin: 5px 0px 5px -4px; font-weight: bold; border: solid 1px #FF3300; padding: 2px 15px 2px 15px; font-size: smaller;">—</span></span></div></div></td>
+    <td colspan="14" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style="text-align: left;"><div><span style="text-decoration-style: solid; text-decoration-color: #ADD8E6; text-decoration-line: underline; text-underline-position: under; color: #333333; font-variant-numeric: tabular-nums; padding-left: 4px; margin-right: 5px; padding-right: 2px;">2026-02-23|21:22:30</span><div style="padding-top: 10px; padding-bottom: 5px;"><span style="background-color: #0075FF; color: #FFFFFF; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 10px 5px 0px; border: solid 1px #0075FF; font-weight: bold; padding: 2px 10px 2px 10px; font-size: 10px;">Polars</span><span><span style="background-color: #AAAAAA; color: white; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 5px; border: solid 1px #AAAAAA; font-weight: bold; padding: 2px 15px 2px 15px; font-size: smaller;">WARNING</span><span style="background-color: none; color: #333333; padding: 0.5em 0.5em; position: inherit; margin: 5px 0px 5px -4px; font-weight: bold; border: solid 1px #AAAAAA; padding: 2px 15px 2px 15px; font-size: smaller; margin-right: 5px;">0.01</span><span style="background-color: #EBBC14; color: white; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 1px; border: solid 1px #EBBC14; font-weight: bold; padding: 2px 15px 2px 15px; font-size: smaller;">ERROR</span><span style="background-color: none; color: #333333; padding: 0.5em 0.5em; position: inherit; margin: 5px 0px 5px -4px; font-weight: bold; border: solid 1px #EBBC14; padding: 2px 15px 2px 15px; font-size: smaller; margin-right: 5px;">—</span><span style="background-color: #FF3300; color: white; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 0px 5px 1px; border: solid 1px #FF3300; font-weight: bold; padding: 2px 15px 2px 15px; font-size: smaller;">CRITICAL</span><span style="background-color: none; color: #333333; padding: 0.5em 0.5em; position: inherit; margin: 5px 0px 5px -4px; font-weight: bold; border: solid 1px #FF3300; padding: 2px 15px 2px 15px; font-size: smaller;">—</span></span></div></div></td>
   </tr>
 <tr class="gt_col_headings">
   <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-status_color"></th>
@@ -623,7 +628,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
   <tfoot class="gt_sourcenotes">
   
   <tr>
-    <td class="gt_sourcenote" colspan="14" style="text-align: left;"><div style="margin-top: 5px; margin-bottom: 5px;"><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin-left: 10px; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-02-21 00:44:32 UTC</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">&lt; 1 s</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 1px 5px -1px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-02-21 00:44:32 UTC</span></div></td>
+    <td class="gt_sourcenote" colspan="14" style="text-align: left;"><div style="margin-top: 5px; margin-bottom: 5px;"><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin-left: 10px; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-02-23 21:22:30 UTC</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; margin-right: 5px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">&lt; 1 s</span><span style="background-color: #FFF; color: #444; padding: 0.5em 0.5em; position: inherit; text-transform: uppercase; margin: 5px 1px 5px -1px; border: solid 1px #999999; font-variant-numeric: tabular-nums; border-radius: 0; padding: 2px 10px 2px 10px;">2026-02-23 21:22:30 UTC</span></div></td>
   </tr>
 
 </tfoot>
@@ -657,7 +662,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
         border-radius: 2px;
     ">
 <p>For the examples here, we’ll use YAML configurations to define validation workflows. Let’s start with a basic YAML workflow that validates the built-in <code>small_table</code> dataset.</p>
-<div id="e56cdd09" class="cell" data-execution_count="4">
+<div id="99a92a99" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Define a basic YAML validation workflow</span></span>
@@ -946,7 +951,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 <p>The validation table shows the results of our YAML-defined workflow. We can see that the <code>rows_distinct()</code> validation failed (because there are duplicate rows in the table), while the column existence checks passed.</p>
 <p>Now let’s create a more comprehensive validation workflow with thresholds and metadata:</p>
-<div id="906e620f" class="cell" data-execution_count="5">
+<div id="ecc9f64a" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Advanced YAML configuration with thresholds and metadata</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>yaml_config <span class="op">=</span> <span class="st">'''</span></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="st">tbl: small_table</span></span>
@@ -980,7 +985,7 @@ Total validation steps: 4</code></pre>
 </div>
 <p>The validation results now include our custom table name and label. The thresholds we defined will determine when validation steps are marked as warnings, errors, or critical failures.</p>
 <p>You can also load YAML configurations from files. Here’s how you would work with a YAML file:</p>
-<div id="fa6202ac" class="cell" data-execution_count="6">
+<div id="d6a7a459" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tempfile</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1189,40 +1194,308 @@ Total validation steps: 4</code></pre>
 </div>
 </div>
 <p>This approach is particularly useful for storing validation configurations as part of your data pipeline or version control system, allowing you to maintain validation rules alongside your code.</p>
+<section id="governance-metadata" class="level3">
+<h4 class="anchored" data-anchor-id="governance-metadata">Governance Metadata</h4>
+<p>YAML workflows support governance metadata via <code>owner</code>, <code>consumers</code>, and <code>version</code> top-level keys. These are forwarded to the <a href="../reference/Validate.html#pointblank.Validate" title="0"><code>Validate</code></a> constructor and embedded in the validation report:</p>
+<div id="9126940b" class="cell" data-execution_count="7">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>yaml_config <span class="op">=</span> <span class="st">'''</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="st">tbl: small_table</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="st">tbl_name: sales_pipeline</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="st">owner: Data Engineering</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="st">consumers: [Analytics, Finance, Compliance]</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="st">version: "2.1.0"</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="st">steps:</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="st">- col_vals_not_null:</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="st">    columns: [a, b]</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a><span class="st">'''</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> pb.yaml_interrogate(yaml_config)</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Owner: </span><span class="sc">{</span>result<span class="sc">.</span>owner<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Consumers: </span><span class="sc">{</span>result<span class="sc">.</span>consumers<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Version: </span><span class="sc">{</span>result<span class="sc">.</span>version<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Owner: Data Engineering
+Consumers: ['Analytics', 'Finance', 'Compliance']
+Version: 2.1.0</code></pre>
+</div>
+</div>
+</section>
+<section id="aggregate-validations" class="level3">
+<h4 class="anchored" data-anchor-id="aggregate-validations">Aggregate Validations</h4>
+<p>YAML supports aggregate validation methods for checking column-level statistics. These methods validate that a column’s sum, average, or standard deviation meets a threshold:</p>
+<div id="b1dd42f2" class="cell" data-execution_count="8">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>yaml_config <span class="op">=</span> <span class="st">'''</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="st">tbl: small_table</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="st">steps:</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="st">- col_sum_gt:</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="st">    columns: [d]</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="st">    value: 0</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="st">- col_avg_le:</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="st">    columns: [a]</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="st">    value: 10</span></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a><span class="st">'''</span></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> pb.yaml_interrogate(yaml_config)</span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>result</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="8">
+<div id="pb_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans&display=swap');
+#pb_tbl table {
+          font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+        }
+
+#pb_tbl thead, tbody, tfoot, tr, td, th { border-style: none; }
+ tr { background-color: transparent; }
+#pb_tbl p { margin: 0; padding: 0; }
+ #pb_tbl .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 90%; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: auto; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
+ #pb_tbl .gt_caption { padding-top: 4px; padding-bottom: 4px; }
+ #pb_tbl .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
+ #pb_tbl .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
+ #pb_tbl .gt_heading { background-color: #FFFFFF; text-align: left; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #pb_tbl .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #pb_tbl .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #pb_tbl .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
+ #pb_tbl .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
+ #pb_tbl .gt_column_spanner_outer:first-child { padding-left: 0; }
+ #pb_tbl .gt_column_spanner_outer:last-child { padding-right: 0; }
+ #pb_tbl .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
+ #pb_tbl .gt_spanner_row { border-bottom-style: hidden; }
+ #pb_tbl .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
+ #pb_tbl .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
+ #pb_tbl .gt_from_md> :first-child { margin-top: 0; }
+ #pb_tbl .gt_from_md> :last-child { margin-bottom: 0; }
+ #pb_tbl .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
+ #pb_tbl .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
+ #pb_tbl .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
+ #pb_tbl .gt_row_group_first td { border-top-width: 2px; }
+ #pb_tbl .gt_row_group_first th { border-top-width: 2px; }
+ #pb_tbl .gt_striped { color: #333333; background-color: #F4F4F4; }
+ #pb_tbl .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #pb_tbl .gt_grand_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #pb_tbl .gt_first_grand_summary_row_bottom { border-top-style: double; border-top-width: 6px; border-top-color: #D3D3D3; }
+ #pb_tbl .gt_last_grand_summary_row_top { border-bottom-style: double; border-bottom-width: 6px; border-bottom-color: #D3D3D3; }
+ #pb_tbl .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #pb_tbl .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #pb_tbl .gt_left { text-align: left; }
+ #pb_tbl .gt_center { text-align: center; }
+ #pb_tbl .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
+ #pb_tbl .gt_font_normal { font-weight: normal; }
+ #pb_tbl .gt_font_bold { font-weight: bold; }
+ #pb_tbl .gt_font_italic { font-style: italic; }
+ #pb_tbl .gt_super { font-size: 65%; }
+ #pb_tbl .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
+ #pb_tbl .gt_asterisk { font-size: 100%; vertical-align: 0; }
+ 
+</style>
+<table style="table-layout: fixed;; width: 0px" class="gt_table" data-quarto-disable-processing="true" data-quarto-bootstrap="false">
+<colgroup>
+  <col style="width:4px;">
+  <col style="width:35px;">
+  <col style="width:190px;">
+  <col style="width:120px;">
+  <col style="width:120px;">
+  <col style="width:50px;">
+  <col style="width:50px;">
+  <col style="width:60px;">
+  <col style="width:60px;">
+  <col style="width:60px;">
+  <col style="width:30px;">
+  <col style="width:30px;">
+  <col style="width:30px;">
+  <col style="width:65px;">
+</colgroup>
+
+<thead>
+
+<tr class="gt_col_headings">
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-status_color"></th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-i"></th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-type_upd">STEP</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-columns_upd">COLUMNS</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-values_upd">VALUES</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-tbl">TBL</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-eval">EVAL</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-test_units">UNITS</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-pass">PASS</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-fail">FAIL</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-w_upd">W</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-e_upd">E</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-c_upd">C</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" style="color: #666666;font-weight: bold;" scope="col" id="pb_tbl-extract_upd">EXT</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+  <tr>
+    <td style="height: 40px; background-color: #4CA64C; color: transparent;font-size: 0px;" class="gt_row gt_left">#4CA64C</td>
+    <td style="height: 40px; color: #666666;font-size: 13px;font-weight: bold;" class="gt_row gt_right">1</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left">
+        <div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
+            <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
+<svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF;">
+    <title>col_sum_gt</title>
+    <g id="Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="col_sum_gt" transform="translate(1.500000, 1.500000)" fill-rule="nonzero">
+            <path d="M55,0 C57.4852813,0 59.7352813,1.00735931 61.363961,2.63603897 C62.9926407,4.26471863 64,6.51471863 64,9 L64,9 L64,64 L9,64 C6.51471862,64 4.26471862,62.9926407 2.63603897,61.363961 C1.00735931,59.7352814 0,57.4852814 0,55 L0,55 L0,9 C0,6.51471863 1.00735931,4.26471863 2.63603897,2.63603897 C4.26471862,1.00735931 6.51471862,0 9,0 L9,0 L55,0 Z" id="rectangle" stroke="#000000" stroke-width="2" fill="#FFFFFF"></path>
+            <g id="sum" transform="translate(18.889000, 50.000000)" fill="#000000">
+                <path d="M3.388,7.14 C2.66933333,7.14 2.03,7.01633333 1.47,6.769 C0.91,6.52166667 0.466666667,6.188 0.14,5.768 C0.0466666667,5.64666667 0,5.52533333 0,5.404 C0,5.19866667 0.098,5.04466667 0.294,4.942 C0.378,4.89533333 0.466666667,4.872 0.56,4.872 C0.718666667,4.872 0.882,4.956 1.05,5.124 C1.358,5.45066667 1.69866667,5.68866667 2.072,5.838 C2.44533333,5.98733333 2.87466667,6.062 3.36,6.062 C3.808,6.062 4.17433333,5.98966667 4.459,5.845 C4.74366667,5.70033333 4.886,5.502 4.886,5.25 C4.886,5.06333333 4.83233333,4.90933333 4.725,4.788 C4.61766667,4.66666667 4.43333333,4.55 4.172,4.438 C3.91066667,4.326 3.5,4.17666667 2.94,3.99 C1.99733333,3.69133333 1.33233333,3.38333333 0.945,3.066 C0.557666667,2.74866667 0.364,2.33333333 0.364,1.82 C0.364,1.26933333 0.604333333,0.828333333 1.085,0.497 C1.56566667,0.165666667 2.21666667,0 3.038,0 C3.64466667,0 4.207,0.100333333 4.725,0.301 C5.243,0.501666667 5.628,0.774666667 5.88,1.12 C5.964,1.232 6.006,1.34866667 6.006,1.47 C6.006,1.62866667 5.922,1.764 5.754,1.876 C5.63266667,1.95066667 5.51133333,1.988 5.39,1.988 C5.20333333,1.988 5.026,1.904 4.858,1.736 C4.634,1.512 4.375,1.34633333 4.081,1.239 C3.787,1.13166667 3.43466667,1.078 3.024,1.078 C2.58533333,1.078 2.25166667,1.14333333 2.023,1.274 C1.79433333,1.40466667 1.68,1.59133333 1.68,1.834 C1.68,2.02066667 1.73133333,2.17 1.834,2.282 C1.93666667,2.394 2.114,2.50133333 2.366,2.604 C2.618,2.70666667 3.038,2.85133333 3.626,3.038 C4.27933333,3.24333333 4.79033333,3.44866667 5.159,3.654 C5.52766667,3.85933333 5.79133333,4.088 5.95,4.34 C6.10866667,4.592 6.188,4.89533333 6.188,5.25 C6.188,5.81933333 5.93366667,6.27666667 5.425,6.622 C4.91633333,6.96733333 4.23733333,7.14 3.388,7.14 Z" id="s"></path>
+                <path d="M10.556,7.14 C9.62266667,7.14 8.89466667,6.87166667 8.372,6.335 C7.84933333,5.79833333 7.588,5.05866667 7.588,4.116 L7.588,0.658 C7.588,0.452666667 7.64633333,0.291666667 7.763,0.175 C7.87966667,0.0583333333 8.036,0 8.232,0 C8.43733333,0 8.596,0.0583333333 8.708,0.175 C8.82,0.291666667 8.876,0.452666667 8.876,0.658 L8.876,4.116 C8.876,4.732 9.04166667,5.21033333 9.373,5.551 C9.70433333,5.89166667 10.1686667,6.062 10.766,6.062 C11.494,6.062 12.0796667,5.82866667 12.523,5.362 C12.9663333,4.89533333 13.188,4.27466667 13.188,3.5 L13.188,0.658 C13.188,0.452666667 13.2463333,0.291666667 13.363,0.175 C13.4796667,0.0583333333 13.6406667,0 13.846,0 C14.0513333,0 14.2076667,0.056 14.315,0.168 C14.4223333,0.28 14.476,0.443333333 14.476,0.658 L14.476,6.482 C14.476,6.69666667 14.4223333,6.86 14.315,6.972 C14.2076667,7.084 14.0513333,7.14 13.846,7.14 C13.6406667,7.14 13.482,7.08166667 13.37,6.965 C13.258,6.84833333 13.202,6.68733333 13.202,6.482 L13.202,5.796 C12.502,6.692 11.62,7.14 10.556,7.14 Z" id="u"></path>
+                <path d="M16.842,7.14 C16.6366667,7.14 16.478,7.08166667 16.366,6.965 C16.254,6.84833333 16.198,6.68733333 16.198,6.482 L16.198,0.658 C16.198,0.452666667 16.254,0.291666667 16.366,0.175 C16.478,0.0583333333 16.6366667,0 16.842,0 C17.0473333,0 17.2083333,0.0583333333 17.325,0.175 C17.4416667,0.291666667 17.5,0.452666667 17.5,0.658 L17.5,1.302 C17.7333333,0.891333333 18.0366667,0.571666667 18.41,0.343 C18.7833333,0.114333333 19.18,0 19.6,0 C20.0293333,0 20.4073333,0.114333333 20.734,0.343 C21.0606667,0.571666667 21.3033333,0.891333333 21.462,1.302 C22.1433333,0.434 22.9133333,0 23.772,0 C24.5093333,0 25.0716667,0.238 25.459,0.714 C25.8463333,1.19 26.04,1.88066667 26.04,2.786 L26.04,6.482 C26.04,6.68733333 25.9816667,6.84833333 25.865,6.965 C25.7483333,7.08166667 25.592,7.14 25.396,7.14 C25.1906667,7.14 25.032,7.084 24.92,6.972 C24.808,6.86 24.752,6.69666667 24.752,6.482 L24.752,2.73 C24.752,2.17933333 24.6586667,1.76633333 24.472,1.491 C24.2853333,1.21566667 23.9773333,1.078 23.548,1.078 C22.8013333,1.078 22.2366667,1.50266667 21.854,2.352 L21.854,6.482 C21.854,6.68733333 21.7956667,6.84833333 21.679,6.965 C21.5623333,7.08166667 21.4013333,7.14 21.196,7.14 C20.9906667,7.14 20.8343333,7.084 20.727,6.972 C20.6196667,6.86 20.566,6.69666667 20.566,6.482 L20.566,2.968 C20.566,2.352 20.4633333,1.883 20.258,1.561 C20.0526667,1.239 19.754,1.078 19.362,1.078 C18.8113333,1.078 18.3633333,1.295 18.018,1.729 C17.6726667,2.163 17.5,2.72533333 17.5,3.416 L17.5,6.482 C17.5,6.68733333 17.4416667,6.84833333 17.325,6.965 C17.2083333,7.08166667 17.0473333,7.14 16.842,7.14 Z" id="m"></path>
+            </g>
+            <path d="M44.952381,10 L19.0476191,10 C16.8133333,10 15,11.8133333 15,14.047619 L15,39.952381 C15,42.1866667 16.8133333,44 19.0476191,44 L44.952381,44 C47.1866667,44 49,42.1866667 49,39.952381 L49,14.047619 C49,11.8133333 47.1866667,10 44.952381,10 Z M26.7947619,36.5685714 L25.8719048,35.2409524 L37.8609524,27 L25.8719048,18.7590476 L26.7947619,17.4314286 L40.7185714,27 L26.7947619,36.5685714 Z" id="greater_than" fill="#000000"></path>
+        </g>
+    </g>
+</svg>
+        </div>
+        <div style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size: 11px; display: inline-block; vertical-align: middle;">
+            <div>col_sum_gt()</div>
+        </div>
+        
+        </td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">d</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">0</td>
+    <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" class="gt_row gt_center"><svg width="25px" height="25px" viewbox="0 0 25 25" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="vertical-align: middle;">
+    <g id="unchanged" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="unchanged" transform="translate(0.500000, 0.570147)">
+            <rect id="Rectangle" x="0.125132506" y="0" width="23.749735" height="23.7894737"></rect>
+            <path d="M5.80375046,8.18194736 C3.77191832,8.18194736 2.11875046,9.83495328 2.11875046,11.8669474 C2.11875046,13.8989414 3.77191832,15.5519474 5.80375046,15.5519474 C7.8355826,15.5519474 9.48875046,13.8989414 9.48875046,11.8669474 C9.48875046,9.83495328 7.83552863,8.18194736 5.80375046,8.18194736 Z M5.80375046,14.814915 C4.17821997,14.814915 2.85578285,13.4924778 2.85578285,11.8669474 C2.85578285,10.2414169 4.17821997,8.91897975 5.80375046,8.91897975 C7.42928095,8.91897975 8.75171807,10.2414169 8.75171807,11.8669474 C8.75171807,13.4924778 7.42928095,14.814915 5.80375046,14.814915 Z" id="Shape" fill="#000000" fill-rule="nonzero"></path>
+            <path d="M13.9638189,8.699335 C13.9364621,8.70430925 13.9091059,8.71176968 13.8842359,8.71923074 C13.7822704,8.73663967 13.6877654,8.77643115 13.6056956,8.83860518 L10.2433156,11.3852598 C10.0766886,11.5046343 9.97720993,11.6986181 9.97720993,11.9025491 C9.97720993,12.1064807 10.0766886,12.3004639 10.2433156,12.4198383 L13.6056956,14.966493 C13.891697,15.1803725 14.2970729,15.1231721 14.5109517,14.8371707 C14.7248313,14.5511692 14.6676309,14.145794 14.3816294,13.9319145 L12.5313257,12.5392127 L21.8812495,12.5392127 L21.8812495,11.2658854 L12.5313257,11.2658854 L14.3816294,9.87318364 C14.6377872,9.71650453 14.7497006,9.40066014 14.6477351,9.11714553 C14.5482564,8.83363156 14.262255,8.65954352 13.9638189,8.699335 Z" id="arrow" fill="#000000" transform="translate(15.929230, 11.894737) rotate(-180.000000) translate(-15.929230, -11.894737) "></path>
+        </g>
+    </g>
+</svg></td>
+    <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" class="gt_row gt_center"><span style="color:#4CA64C;">✓</span></td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_right">1</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">1<br>1.00</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">0<br>0.00</td>
+    <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" class="gt_row gt_center">—</td>
+    <td style="height: 40px; background-color: #FCFCFC;" class="gt_row gt_center">—</td>
+    <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" class="gt_row gt_center">—</td>
+    <td style="height: 40px;" class="gt_row gt_center">—</td>
+  </tr>
+  <tr>
+    <td style="height: 40px; background-color: #4CA64C; color: transparent;font-size: 0px;" class="gt_row gt_left">#4CA64C</td>
+    <td style="height: 40px; color: #666666;font-size: 13px;font-weight: bold;" class="gt_row gt_right">2</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_left">
+        <div style="margin: 0; padding: 0; display: inline-block; height: 30px; vertical-align: middle; width: 16%;">
+            <!--?xml version="1.0" encoding="UTF-8"?--><!--?xml version="1.0" encoding="UTF-8"?-->
+<svg width="30px" height="30px" viewbox="0 0 67 67" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF;">
+    <title>col_avg_le</title>
+    <g id="Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="col_avg_le" transform="translate(1.500000, 1.500000)" fill-rule="nonzero">
+            <path d="M55,0 C57.4852813,0 59.7352813,1.00735931 61.363961,2.63603897 C62.9926407,4.26471863 64,6.51471863 64,9 L64,9 L64,64 L9,64 C6.51471862,64 4.26471862,62.9926407 2.63603897,61.363961 C1.00735931,59.7352814 0,57.4852814 0,55 L0,55 L0,9 C0,6.51471863 1.00735931,4.26471863 2.63603897,2.63603897 C4.26471862,1.00735931 6.51471862,0 9,0 L9,0 L55,0 Z" id="rectangle" stroke="#000000" stroke-width="2" fill="#FFFFFF"></path>
+            <g id="avg" transform="translate(20.058000, 50.000000)" fill="#000000">
+                <path d="M2.94,7.14 C2.03466667,7.14 1.31833333,6.93466667 0.791,6.524 C0.263666667,6.11333333 0,5.558 0,4.858 C0,4.158 0.277666667,3.60266667 0.833,3.192 C1.38833333,2.78133333 2.14666667,2.576 3.108,2.576 C3.612,2.576 4.06233333,2.64133333 4.459,2.772 C4.85566667,2.90266667 5.17533333,3.08 5.418,3.304 L5.418,2.604 C5.418,2.1 5.257,1.715 4.935,1.449 C4.613,1.183 4.13933333,1.05 3.514,1.05 C2.68333333,1.05 1.96466667,1.24133333 1.358,1.624 C1.18066667,1.72666667 1.02666667,1.778 0.896,1.778 C0.774666667,1.778 0.653333333,1.72666667 0.532,1.624 C0.429333333,1.52133333 0.378,1.4 0.378,1.26 C0.378,1.10133333 0.457333333,0.956666667 0.616,0.826 C0.952,0.574 1.37666667,0.373333333 1.89,0.224 C2.40333333,0.0746666667 2.94,0 3.5,0 C4.51733333,0 5.31066667,0.231 5.88,0.693 C6.44933333,1.155 6.734,1.80133333 6.734,2.632 L6.734,6.51 C6.734,6.71533333 6.68033333,6.87166667 6.573,6.979 C6.46566667,7.08633333 6.30933333,7.14 6.104,7.14 C5.89866667,7.14 5.74,7.08633333 5.628,6.979 C5.516,6.87166667 5.46,6.72466667 5.46,6.538 L5.46,6.146 C4.9,6.80866667 4.06,7.14 2.94,7.14 Z M3.164,6.146 C3.84533333,6.146 4.39366667,6.02233333 4.809,5.775 C5.22433333,5.52766667 5.432,5.20333333 5.432,4.802 C5.432,4.41 5.23366667,4.10433333 4.837,3.885 C4.44033333,3.66566667 3.892,3.556 3.192,3.556 C2.58533333,3.556 2.11866667,3.668 1.792,3.892 C1.46533333,4.116 1.302,4.438 1.302,4.858 C1.302,5.26866667 1.463,5.586 1.785,5.81 C2.107,6.034 2.56666667,6.146 3.164,6.146 Z" id="a"></path>
+                <path d="M11.494,7.14 C10.5326667,7.14 9.85133333,6.56133333 9.45,5.404 L7.798,0.784 C7.77,0.709333333 7.756,0.644 7.756,0.588 C7.756,0.466666667 7.798,0.357 7.882,0.259 C7.966,0.161 8.078,0.0886666667 8.218,0.042 C8.302,0.014 8.386,0 8.47,0 C8.61,0 8.73133333,0.035 8.834,0.105 C8.93666667,0.175 9.00666667,0.270666667 9.044,0.392 L10.738,5.138 C10.8593333,5.48333333 10.976,5.726 11.088,5.866 C11.2,6.006 11.3353333,6.076 11.494,6.076 C11.6526667,6.076 11.788,6.00833333 11.9,5.873 C12.012,5.73766667 12.1286667,5.502 12.25,5.166 L13.944,0.392 C13.9906667,0.270666667 14.063,0.177333333 14.161,0.112 C14.259,0.0466666667 14.378,0.014 14.518,0.014 C14.7326667,0.014 14.9053333,0.0723333333 15.036,0.189 C15.1666667,0.305666667 15.232,0.443333333 15.232,0.602 C15.232,0.686 15.2226667,0.746666667 15.204,0.784 L13.538,5.432 C13.3233333,6.01066667 13.0503333,6.44 12.719,6.72 C12.3876667,7 11.9793333,7.14 11.494,7.14 Z" id="v"></path>
+                <path d="M19.81,10.514 C19.1193333,10.514 18.4916667,10.4113333 17.927,10.206 C17.3623333,10.0006667 16.9073333,9.71133333 16.562,9.338 C16.4686667,9.23533333 16.422,9.12333333 16.422,9.002 C16.422,8.84333333 16.5106667,8.68933333 16.688,8.54 C16.772,8.46533333 16.8793333,8.428 17.01,8.428 C17.206,8.428 17.3926667,8.52133333 17.57,8.708 C17.794,8.94133333 18.0856667,9.12566667 18.445,9.261 C18.8043333,9.39633333 19.2266667,9.464 19.712,9.464 C20.5613333,9.464 21.2146667,9.24466667 21.672,8.806 C22.1293333,8.36733333 22.3533333,7.742 22.344,6.93 L22.344,5.866 C22.0266667,6.26733333 21.6253333,6.587 21.14,6.825 C20.6546667,7.063 20.0853333,7.182 19.432,7.182 C18.256,7.182 17.346,6.867 16.702,6.237 C16.058,5.607 15.736,4.75066667 15.736,3.668 C15.736,2.55733333 16.0626667,1.66833333 16.716,1.001 C17.3693333,0.333666667 18.3026667,0 19.516,0 C20.0946667,0 20.622,0.116666667 21.098,0.35 C21.574,0.583333333 21.9893333,0.914666667 22.344,1.344 L22.344,0.63 C22.344,0.443333333 22.407,0.291666667 22.533,0.175 C22.659,0.0583333333 22.8153333,0 23.002,0 C23.198,0 23.3543333,0.056 23.471,0.168 C23.5876667,0.28 23.646,0.434 23.646,0.63 L23.646,6.93 C23.646,7.64866667 23.4873333,8.27866667 23.17,8.82 C22.8526667,9.36133333 22.4046667,9.779 21.826,10.073 C21.2473333,10.367 20.5753333,10.514 19.81,10.514 Z M19.614,6.09 C20.1086667,6.09 20.5636667,5.99666667 20.979,5.81 C21.3943333,5.62333333 21.7256667,5.34333333 21.973,4.97 C22.2203333,4.59666667 22.344,4.13933333 22.344,3.598 C22.344,2.85133333 22.106,2.24466667 21.63,1.778 C21.154,1.31133333 20.496,1.078 19.656,1.078 C18.8253333,1.078 18.1813333,1.30433333 17.724,1.757 C17.2666667,2.20966667 17.038,2.84666667 17.038,3.668 C17.038,4.41466667 17.2596667,5.005 17.703,5.439 C18.1463333,5.873 18.7833333,6.09 19.614,6.09 Z" id="g"></path>
+            </g>
+            <path d="M46.6818182,10 L17.3181818,10 C16.0413706,10 15,11.0413705 15,12.3181818 L15,41.6818182 C15,42.9586295 16.0413706,44 17.3181818,44 L46.6818182,44 C47.9586295,44 49,42.9586295 49,41.6818182 L49,12.3181818 C49,11.0413705 47.9586295,10 46.6818182,10 Z M38.5802557,16.2784091 L39.3288352,17.6306818 L26.6361863,24.6818182 L39.3288352,31.7329545 L38.5802557,33.0852273 L23.4547228,24.6818182 L38.5802557,16.2784091 Z M40.5,37.8181818 L23.5,37.8181818 L23.5,36.2727273 L40.5,36.2727273 L40.5,37.8181818 Z" id="less_than_equal" fill="#000000"></path>
+        </g>
+    </g>
+</svg>
+        </div>
+        <div style="font-family: 'IBM Plex Mono', monospace, courier; color: black; font-size: 11px; display: inline-block; vertical-align: middle;">
+            <div>col_avg_le()</div>
+        </div>
+        
+        </td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">a</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;" class="gt_row gt_left">10</td>
+    <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" class="gt_row gt_center"><svg width="25px" height="25px" viewbox="0 0 25 25" version="1.1" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="vertical-align: middle;">
+    <g id="unchanged" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="unchanged" transform="translate(0.500000, 0.570147)">
+            <rect id="Rectangle" x="0.125132506" y="0" width="23.749735" height="23.7894737"></rect>
+            <path d="M5.80375046,8.18194736 C3.77191832,8.18194736 2.11875046,9.83495328 2.11875046,11.8669474 C2.11875046,13.8989414 3.77191832,15.5519474 5.80375046,15.5519474 C7.8355826,15.5519474 9.48875046,13.8989414 9.48875046,11.8669474 C9.48875046,9.83495328 7.83552863,8.18194736 5.80375046,8.18194736 Z M5.80375046,14.814915 C4.17821997,14.814915 2.85578285,13.4924778 2.85578285,11.8669474 C2.85578285,10.2414169 4.17821997,8.91897975 5.80375046,8.91897975 C7.42928095,8.91897975 8.75171807,10.2414169 8.75171807,11.8669474 C8.75171807,13.4924778 7.42928095,14.814915 5.80375046,14.814915 Z" id="Shape" fill="#000000" fill-rule="nonzero"></path>
+            <path d="M13.9638189,8.699335 C13.9364621,8.70430925 13.9091059,8.71176968 13.8842359,8.71923074 C13.7822704,8.73663967 13.6877654,8.77643115 13.6056956,8.83860518 L10.2433156,11.3852598 C10.0766886,11.5046343 9.97720993,11.6986181 9.97720993,11.9025491 C9.97720993,12.1064807 10.0766886,12.3004639 10.2433156,12.4198383 L13.6056956,14.966493 C13.891697,15.1803725 14.2970729,15.1231721 14.5109517,14.8371707 C14.7248313,14.5511692 14.6676309,14.145794 14.3816294,13.9319145 L12.5313257,12.5392127 L21.8812495,12.5392127 L21.8812495,11.2658854 L12.5313257,11.2658854 L14.3816294,9.87318364 C14.6377872,9.71650453 14.7497006,9.40066014 14.6477351,9.11714553 C14.5482564,8.83363156 14.262255,8.65954352 13.9638189,8.699335 Z" id="arrow" fill="#000000" transform="translate(15.929230, 11.894737) rotate(-180.000000) translate(-15.929230, -11.894737) "></path>
+        </g>
+    </g>
+</svg></td>
+    <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" class="gt_row gt_center"><span style="color:#4CA64C;">✓</span></td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px;" class="gt_row gt_right">1</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">1<br>1.00</td>
+    <td style="height: 40px; color: black;font-family: IBM Plex Mono;font-size: 11px; border-left: 1px dashed #E5E5E5;" class="gt_row gt_right">0<br>0.00</td>
+    <td style="height: 40px; background-color: #FCFCFC; border-left: 1px solid #D3D3D3;" class="gt_row gt_center">—</td>
+    <td style="height: 40px; background-color: #FCFCFC;" class="gt_row gt_center">—</td>
+    <td style="height: 40px; background-color: #FCFCFC; border-right: 1px solid #D3D3D3;" class="gt_row gt_center">—</td>
+    <td style="height: 40px;" class="gt_row gt_center">—</td>
+  </tr>
+</tbody>
+
+
+</table>
+
+</div>
+        
+</div>
+</div>
+<p>The 15 available aggregate methods follow the pattern <code>col_{stat}_{comparator}</code> where <code>{stat}</code> is <code>sum</code>, <code>avg</code>, or <code>sd</code> and <code>{comparator}</code> is <code>gt</code>, <code>lt</code>, <code>ge</code>, <code>le</code>, or <code>eq</code>.</p>
+</section>
+<section id="data-freshness" class="level3">
+<h4 class="anchored" data-anchor-id="data-freshness">Data Freshness</h4>
+<p>Check that a date/datetime column has recent data using <code>data_freshness</code>:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tbl</span><span class="kw">:</span><span class="at"> events.csv</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">steps</span><span class="kw">:</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">data_freshness</span><span class="kw">:</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">columns</span><span class="kw">:</span><span class="at"> event_date</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">freshness</span><span class="kw">:</span><span class="at"> </span><span class="st">"24h"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="active-parameter-shortcut" class="level3">
+<h4 class="anchored" data-anchor-id="active-parameter-shortcut">Active Parameter Shortcut</h4>
+<p>The <code>active=</code> parameter controls whether a validation step runs. It supports boolean values and Python expression shortcuts:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">steps</span><span class="kw">:</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">col_vals_gt</span><span class="kw">:</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">columns</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">d</span><span class="kw">]</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">value</span><span class="kw">:</span><span class="at"> </span><span class="dv">100</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">active</span><span class="kw">:</span><span class="at"> </span><span class="ch">false</span><span class="co">            # Skip this step</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">col_vals_not_null</span><span class="kw">:</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">columns</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">a</span><span class="kw">]</span></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">active</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span><span class="co">             # Always run (default)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="null-percentage-check" class="level3">
+<h4 class="anchored" data-anchor-id="null-percentage-check">Null Percentage Check</h4>
+<p>Use <code>col_pct_null</code> to validate that the percentage of null values in a column is within bounds:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb15"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">steps</span><span class="kw">:</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">col_pct_null</span><span class="kw">:</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">columns</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">a</span><span class="kw">,</span><span class="at"> b</span><span class="kw">]</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">value</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.05</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
 <section id="using-set_tbl-to-override-the-table" class="level3">
 <h4 class="anchored" data-anchor-id="using-set_tbl-to-override-the-table">Using <code>set_tbl=</code> to Override the Table</h4>
 <p>The <code>set_tbl=</code> parameter allows you to override the table specified in the YAML configuration. This is useful when you have a template validation workflow but want to apply it to different tables:</p>
-<div id="f976b3e2" class="cell" data-execution_count="7">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a test table with similar structure to small_table</span></span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>test_table <span class="op">=</span> pl.DataFrame({</span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"date"</span>: [<span class="st">"2023-01-01"</span>, <span class="st">"2023-01-02"</span>, <span class="st">"2023-01-03"</span>],</span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"a"</span>: [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>],</span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">"b"</span>: [<span class="st">"1-abc-123"</span>, <span class="st">"2-def-456"</span>, <span class="st">"3-ghi-789"</span>],</span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">"d"</span>: [<span class="dv">150</span>, <span class="dv">200</span>, <span class="dv">250</span>]</span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>})</span>
-<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Use the same YAML config but apply it to our test table</span></span>
-<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>yaml_config <span class="op">=</span> <span class="st">'''</span></span>
-<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a><span class="st">tbl: small_table  # This will be overridden</span></span>
-<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a><span class="st">tbl_name: Test Table  # This name will be used</span></span>
-<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a><span class="st">steps:</span></span>
-<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a><span class="st">- col_exists:</span></span>
-<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a><span class="st">    columns: [date, a, b, d]</span></span>
-<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a><span class="st">- col_vals_gt:</span></span>
-<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a><span class="st">    columns: [d]</span></span>
-<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a><span class="st">    value: 100</span></span>
-<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a><span class="st">'''</span></span>
-<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a><span class="co"># Execute with table override</span></span>
-<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> pb.yaml_interrogate(yaml_config, set_tbl<span class="op">=</span>test_table)</span>
-<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Validation applied to: </span><span class="sc">{</span>result<span class="sc">.</span>tbl_name<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a>result</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="566bf5cd" class="cell" data-execution_count="9">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a test table with similar structure to small_table</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>test_table <span class="op">=</span> pl.DataFrame({</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"date"</span>: [<span class="st">"2023-01-01"</span>, <span class="st">"2023-01-02"</span>, <span class="st">"2023-01-03"</span>],</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"a"</span>: [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>],</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">"b"</span>: [<span class="st">"1-abc-123"</span>, <span class="st">"2-def-456"</span>, <span class="st">"3-ghi-789"</span>],</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">"d"</span>: [<span class="dv">150</span>, <span class="dv">200</span>, <span class="dv">250</span>]</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Use the same YAML config but apply it to our test table</span></span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>yaml_config <span class="op">=</span> <span class="st">'''</span></span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a><span class="st">tbl: small_table  # This will be overridden</span></span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a><span class="st">tbl_name: Test Table  # This name will be used</span></span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a><span class="st">steps:</span></span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a><span class="st">- col_exists:</span></span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a><span class="st">    columns: [date, a, b, d]</span></span>
+<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a><span class="st">- col_vals_gt:</span></span>
+<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a><span class="st">    columns: [d]</span></span>
+<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a><span class="st">    value: 100</span></span>
+<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a><span class="st">'''</span></span>
+<span id="cb16-22"><a href="#cb16-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-23"><a href="#cb16-23" aria-hidden="true" tabindex="-1"></a><span class="co"># Execute with table override</span></span>
+<span id="cb16-24"><a href="#cb16-24" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> pb.yaml_interrogate(yaml_config, set_tbl<span class="op">=</span>test_table)</span>
+<span id="cb16-25"><a href="#cb16-25" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Validation applied to: </span><span class="sc">{</span>result<span class="sc">.</span>tbl_name<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb16-26"><a href="#cb16-26" aria-hidden="true" tabindex="-1"></a>result</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Validation applied to: Test Table</code></pre>
 </div>
-<div class="cell-output cell-output-display" data-execution_count="7">
+<div class="cell-output cell-output-display" data-execution_count="9">
 <div id="pb_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap');

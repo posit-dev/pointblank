@@ -190,6 +190,8 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
   <li><a href="#parameters" id="toc-parameters" class="nav-link active" data-scroll-target="#parameters">Parameters</a></li>
   <li><a href="#raises" id="toc-raises" class="nav-link" data-scroll-target="#raises">Raises</a></li>
   <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
+  <li><a href="#supported-top-level-keys" id="toc-supported-top-level-keys" class="nav-link" data-scroll-target="#supported-top-level-keys">Supported Top-level Keys</a></li>
+  <li><a href="#supported-validation-methods" id="toc-supported-validation-methods" class="nav-link" data-scroll-target="#supported-validation-methods">Supported Validation Methods</a></li>
   <li><a href="#see-also" id="toc-see-also" class="nav-link" data-scroll-target="#see-also">See Also</a></li>
   </ul>
 </nav>
@@ -270,7 +272,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
     ">
 <p>For the examples here, we’ll demonstrate how to validate YAML configurations before using them with validation workflows. This is particularly useful for building robust data validation systems where you want to catch configuration errors early.</p>
 <p>Let’s start with validating a basic configuration:</p>
-<div id="0139e5b1" class="cell" data-execution_count="2">
+<div id="114b6bef" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Define a basic YAML validation configuration</span></span>
@@ -291,7 +293,7 @@ gtag('config', 'G-XSFKYZM9GW', { 'anonymize_ip': true});
 </div>
 <p>The function completed without raising an exception, which means our configuration is valid and follows the expected structure.</p>
 <p>Now let’s validate a more complex configuration with thresholds and metadata:</p>
-<div id="57dfc1c3" class="cell" data-execution_count="3">
+<div id="d990a76c" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Complex YAML configuration with all optional fields</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>yaml_config <span class="op">=</span> <span class="st">'''</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="st">tbl: small_table</span></span>
@@ -328,7 +330,7 @@ Configuration has 3 validation steps</code></pre>
 </div>
 <p>This configuration includes all the optional metadata fields and complex validation steps, demonstrating that the validation handles the full range of supported options.</p>
 <p>Let’s see what happens when we try to validate an invalid configuration:</p>
-<div id="0fbee072" class="cell" data-execution_count="4">
+<div id="b159678e" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Invalid YAML configuration: missing required 'tbl' field</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>invalid_yaml <span class="op">=</span> <span class="st">'''</span></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="st">steps:</span></span>
@@ -345,7 +347,7 @@ Configuration has 3 validation steps</code></pre>
 </div>
 <p>The validation correctly identifies that our configuration is missing the required <code>'tbl'</code> field.</p>
 <p>Here’s a practical example of using validation in a workflow builder:</p>
-<div id="bb3f7f31" class="cell" data-execution_count="5">
+<div id="2e000201" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> safe_yaml_interrogate(yaml_config):</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Safely execute a YAML configuration after validation."""</span></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">try</span>:</span>
@@ -380,6 +382,37 @@ Validation completed with 1 steps</code></pre>
 </div>
 <p>This pattern of validating before executing helps build more reliable data validation pipelines by catching configuration errors early in the process.</p>
 <p>Note that this function only validates the structure and does not check if the specified data source (‘tbl’) exists or is accessible. Data source validation occurs during execution with <a href="../reference/yaml_interrogate.html#pointblank.yaml_interrogate" title="0"><code>yaml_interrogate()</code></a>.</p>
+</section>
+<section id="supported-top-level-keys" class="level2 doc-section doc-section-supported-top-level-keys">
+<h3 class="doc-section doc-section-supported-top-level-keys anchored" data-anchor-id="supported-top-level-keys">Supported Top-level Keys</h3>
+<p>The following top-level keys are recognized in the YAML configuration:</p>
+<ul>
+<li><code>tbl</code>: data source specification (required)</li>
+<li><code>steps</code>: list of validation steps (required)</li>
+<li><code>tbl_name</code>: human-readable table name</li>
+<li><code>label</code>: validation description</li>
+<li><code>df_library</code>: DataFrame library (<code>"polars"</code>, <code>"pandas"</code>, <code>"duckdb"</code>)</li>
+<li><code>lang</code>: language code</li>
+<li><code>locale</code>: locale setting</li>
+<li><code>brief</code>: global brief template</li>
+<li><code>thresholds</code>: global failure thresholds</li>
+<li><code>actions</code>: global failure actions</li>
+<li><code>final_actions</code>: actions triggered after all steps complete</li>
+<li><code>owner</code>: data owner (governance metadata)</li>
+<li><code>consumers</code>: data consumers (governance metadata)</li>
+<li><code>version</code>: validation version string (governance metadata)</li>
+<li><code>reference</code>: reference table for comparison-based validations</li>
+</ul>
+<p>Unknown top-level keys are rejected, which catches typos like <code>tbl_nmae</code> or <code>step</code>.</p>
+</section>
+<section id="supported-validation-methods" class="level2 doc-section doc-section-supported-validation-methods">
+<h3 class="doc-section doc-section-supported-validation-methods anchored" data-anchor-id="supported-validation-methods">Supported Validation Methods</h3>
+<p>In addition to all standard validation methods (e.g., <code>col_vals_gt</code>, <code>rows_distinct</code>, <code>col_schema_match</code>), the following methods are also supported:</p>
+<ul>
+<li><code>col_pct_null</code>: check the percentage of null values in a column</li>
+<li><code>data_freshness</code>: check that data is recent</li>
+<li>aggregate methods: <code>col_sum_gt</code>, <code>col_sum_lt</code>, <code>col_sum_ge</code>, <code>col_sum_le</code>, <code>col_sum_eq</code>, <code>col_avg_gt</code>, <code>col_avg_lt</code>, <code>col_avg_ge</code>, <code>col_avg_le</code>, <code>col_avg_eq</code>, <code>col_sd_gt</code>, <code>col_sd_lt</code>, <code>col_sd_ge</code>, <code>col_sd_le</code>, <code>col_sd_eq</code></li>
+</ul>
 </section>
 <section id="see-also" class="level2 doc-section doc-section-see-also">
 <h3 class="doc-section doc-section-see-also anchored" data-anchor-id="see-also">See Also</h3>
