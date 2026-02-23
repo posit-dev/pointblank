@@ -1082,6 +1082,94 @@ def yaml_interrogate(
     pipeline or version control system, allowing you to maintain validation rules alongside your
     code.
 
+    ### Governance Metadata
+
+    YAML workflows support governance metadata via `owner`, `consumers`, and `version` top-level
+    keys. These are forwarded to the `Validate` constructor and embedded in the validation report:
+
+    ```{python}
+    yaml_config = '''
+    tbl: small_table
+    tbl_name: sales_pipeline
+    owner: Data Engineering
+    consumers: [Analytics, Finance, Compliance]
+    version: "2.1.0"
+    steps:
+    - col_vals_not_null:
+        columns: [a, b]
+    '''
+
+    result = pb.yaml_interrogate(yaml_config)
+    print(f"Owner: {result.owner}")
+    print(f"Consumers: {result.consumers}")
+    print(f"Version: {result.version}")
+    ```
+
+    ### Aggregate Validations
+
+    YAML supports aggregate validation methods for checking column-level statistics. These methods
+    validate that a column's sum, average, or standard deviation meets a threshold:
+
+    ```{python}
+    yaml_config = '''
+    tbl: small_table
+    steps:
+    - col_sum_gt:
+        columns: [d]
+        value: 0
+    - col_avg_le:
+        columns: [a]
+        value: 10
+    '''
+
+    result = pb.yaml_interrogate(yaml_config)
+    result
+    ```
+
+    The 15 available aggregate methods follow the pattern `col_{stat}_{comparator}` where
+    `{stat}` is `sum`, `avg`, or `sd` and `{comparator}` is `gt`, `lt`, `ge`,
+    `le`, or `eq`.
+
+    ### Data Freshness
+
+    Check that a date/datetime column has recent data using `data_freshness`:
+
+    ```yaml
+    tbl: events.csv
+    steps:
+    - data_freshness:
+        columns: event_date
+        freshness: "24h"
+    ```
+
+    ### Active Parameter Shortcut
+
+    The `active=` parameter controls whether a validation step runs. It supports boolean values
+    and Python expression shortcuts:
+
+    ```yaml
+    steps:
+    - col_vals_gt:
+        columns: [d]
+        value: 100
+        active: false            # Skip this step
+
+    - col_vals_not_null:
+        columns: [a]
+        active: true             # Always run (default)
+    ```
+
+    ### Null Percentage Check
+
+    Use `col_pct_null` to validate that the percentage of null values in a column is within bounds:
+
+    ```yaml
+    steps:
+    - col_pct_null:
+        columns: [a, b]
+        value: 0.05
+    ```
+
     ### Using `set_tbl=` to Override the Table
 
     The `set_tbl=` parameter allows you to override the table specified in the YAML configuration.
@@ -1314,6 +1402,39 @@ def validate_yaml(yaml: Union[str, Path]) -> None:
     source ('tbl') exists or is accessible. Data source validation occurs during execution with
     `yaml_interrogate()`.
 
+    Supported Top-level Keys
+    ------------------------
+    The following top-level keys are recognized in the YAML configuration:
+
+    - `tbl`: data source specification (required)
+    - `steps`: list of validation steps (required)
+    - `tbl_name`: human-readable table name
+    - `label`: validation description
+    - `df_library`: DataFrame library (`"polars"`, `"pandas"`, `"duckdb"`)
+    - `lang`: language code
+    - `locale`: locale setting
+    - `brief`: global brief template
+    - `thresholds`: global failure thresholds
+    - `actions`: global failure actions
+    - `final_actions`: actions triggered after all steps complete
+    - `owner`: data owner (governance metadata)
+    - `consumers`: data consumers (governance metadata)
+    - `version`: validation version string (governance metadata)
+    - `reference`: reference table for comparison-based validations
+
+    Unknown top-level keys are rejected, which catches typos like `tbl_nmae` or `step`.
+
+    Supported Validation Methods
+    ----------------------------
+    In addition to all standard validation methods (e.g., `col_vals_gt`, `rows_distinct`,
+    `col_schema_match`), the following methods are also supported:
+
+    - `col_pct_null`: check the percentage of null values in a column
+    - `data_freshness`: check that data is recent
+    - aggregate methods: `col_sum_gt`, `col_sum_lt`, `col_sum_ge`, `col_sum_le`,
+      `col_sum_eq`, `col_avg_gt`, `col_avg_lt`, `col_avg_ge`, `col_avg_le`,
+      `col_avg_eq`, `col_sd_gt`, `col_sd_lt`, `col_sd_ge`, `col_sd_le`, `col_sd_eq`
+
     See Also
     --------
     yaml_interrogate : execute YAML-based validation workflows
@@ -1415,6 +1536,28 @@ def yaml_to_python(yaml: Union[str, Path]) -> str:
 
     The generated code includes all configuration parameters, thresholds, and maintains the exact
     same validation logic as the original YAML workflow.
+
+    Governance metadata (`owner`, `consumers`, `version`) and `reference` are also rendered
+    in the generated Python code:
+
+    ```{python}
+    yaml_config = '''
+    tbl: small_table
+    tbl_name: Sales Pipeline
+    owner: Data Engineering
+    consumers: [Analytics, Finance]
+    version: "2.1.0"
+    steps:
+    - col_vals_not_null:
+        columns: [a]
+    - col_sum_gt:
+        columns: [d]
+        value: 0
+    '''
+
+    python_code = pb.yaml_to_python(yaml_config)
+    print(python_code)
+    ```
 
     This function is also useful for educational purposes, helping users understand how YAML
     configurations map to the underlying Python API calls.
