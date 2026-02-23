@@ -326,6 +326,33 @@ class YAMLValidator:
         YAMLValidationError
             If the schema is invalid.
         """
+        # Define known top-level keys
+        known_keys = {
+            "tbl",
+            "steps",
+            "tbl_name",
+            "label",
+            "thresholds",
+            "actions",
+            "final_actions",
+            "brief",
+            "lang",
+            "locale",
+            "df_library",
+            "owner",
+            "consumers",
+            "version",
+            "reference",
+        }
+
+        # Warn about unknown top-level keys (likely typos)
+        unknown_keys = set(config.keys()) - known_keys
+        if unknown_keys:
+            raise YAMLValidationError(
+                f"Unknown top-level key(s): {sorted(unknown_keys)}. "
+                f"Valid keys are: {sorted(known_keys)}"
+            )
+
         # Check required fields
         if "tbl" not in config:
             raise YAMLValidationError("YAML must contain 'tbl' field")
@@ -1420,6 +1447,11 @@ def yaml_to_python(yaml: Union[str, Path]) -> str:
     if isinstance(raw_config.get("tbl"), dict) and "python" in raw_config["tbl"]:
         original_tbl_expression = raw_config["tbl"]["python"].strip()
 
+    # Extract the original reference python expression if it exists
+    original_reference_expression = None
+    if isinstance(raw_config.get("reference"), dict) and "python" in raw_config["reference"]:
+        original_reference_expression = raw_config["reference"]["python"].strip()
+
     # Extract original Actions expressions if they exist
     original_actions_expressions = {}
     if "actions" in raw_config:
@@ -1564,6 +1596,21 @@ def yaml_to_python(yaml: Union[str, Path]) -> str:
     # Add version if present (governance)
     if "version" in config:
         validate_args.append(f'version="{config["version"]}"')
+
+    # Add reference if present
+    if "reference" in config:
+        ref_spec = config["reference"]
+        if original_reference_expression:
+            validate_args.append(f"reference={original_reference_expression}")
+        elif isinstance(ref_spec, str):
+            if ref_spec.endswith((".csv", ".parquet")):
+                validate_args.append(
+                    f'reference=pb.load_dataset("{ref_spec}", tbl_type="{df_library}")'
+                )
+            else:
+                validate_args.append(
+                    f'reference=pb.load_dataset("{ref_spec}", tbl_type="{df_library}")'
+                )
 
     # Create the `pb.Validate()` call
     if len(validate_args) == 1:
