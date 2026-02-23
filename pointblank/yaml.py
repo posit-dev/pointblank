@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, Any, Iterable, Mapping, Optional, Union
 
 import yaml
 
+from pointblank._agg import is_valid_agg
 from pointblank._utils import _is_lib_present
 from pointblank.thresholds import Actions
 from pointblank.validate import Validate, load_dataset
@@ -241,11 +242,13 @@ class YAMLValidator:
         "col_vals_increasing": "col_vals_increasing",
         "col_vals_decreasing": "col_vals_decreasing",
         "col_vals_within_spec": "col_vals_within_spec",
+        "col_pct_null": "col_pct_null",
         "rows_distinct": "rows_distinct",
         "rows_complete": "rows_complete",
         "col_count_match": "col_count_match",
         "row_count_match": "row_count_match",
         "col_schema_match": "col_schema_match",
+        "data_freshness": "data_freshness",
         "tbl_match": "tbl_match",
         "prompt": "prompt",
         "conjointly": "conjointly",
@@ -620,9 +623,13 @@ class YAMLValidator:
         else:
             raise YAMLValidationError(f"Invalid step configuration type: {type(step_config)}")
 
-        # Validate that we know this method
-        if method_name not in self.validation_method_map:
-            available_methods = list(self.validation_method_map.keys())
+        # Validate that we know this method (static map or dynamic aggregate method)
+        if method_name not in self.validation_method_map and not is_valid_agg(method_name):
+            available_methods = list(self.validation_method_map.keys()) + [
+                "col_sum_*",
+                "col_avg_*",
+                "col_sd_*",
+            ]
             raise YAMLValidationError(
                 f"Unknown validation method '{method_name}'. Available methods: {available_methods}"
             )
@@ -693,7 +700,14 @@ class YAMLValidator:
         if "inclusive" in parameters and isinstance(parameters["inclusive"], list):
             parameters["inclusive"] = tuple(parameters["inclusive"])
 
-        return self.validation_method_map[method_name], parameters
+        # Resolve the method name: static map takes priority, then dynamic aggregate methods
+        if method_name in self.validation_method_map:
+            resolved_name = self.validation_method_map[method_name]
+        else:
+            # Dynamic aggregate method (col_sum_gt, col_avg_eq, etc.)
+            resolved_name = method_name
+
+        return resolved_name, parameters
 
     def build_validation(
         self, config: dict, namespaces: Optional[Union[Iterable[str], Mapping[str, str]]] = None
@@ -749,6 +763,41 @@ class YAMLValidator:
         # Set global brief if provided
         if "brief" in config:
             validate_kwargs["brief"] = config["brief"]
+
+        # Set owner if provided (governance)
+        if "owner" in config:
+            validate_kwargs["owner"] = config["owner"]
+
+        # Set consumers if provided (governance)
+        if "consumers" in config:
+            validate_kwargs["consumers"] = config["consumers"]
+
+        # Set version if provided (governance)
+        if "version" in config:
+            validate_kwargs["version"] = config["version"]
+
+        # Set final_actions if provided
+        if "final_actions" in config:
+            from pointblank.thresholds import FinalActions
+
+            final_actions_spec = config["final_actions"]
+            # Process Python expressions in final_actions
+            processed_final_actions = _process_python_expressions(
+                final_actions_spec, namespaces=namespaces
+            )
+            if isinstance(processed_final_actions, list):
+                validate_kwargs["final_actions"] = FinalActions(*processed_final_actions)
+            elif callable(processed_final_actions):
+                validate_kwargs["final_actions"] = FinalActions(processed_final_actions)
+            else:
+                validate_kwargs["final_actions"] = processed_final_actions
+
+        # Set reference data if provided
+        if "reference" in config:
+            ref_spec = config["reference"]
+            # Process as a data source (could be a dataset name, file path, or python expression)
+            ref_data = self._load_data_source(ref_spec, df_library)
+            validate_kwargs["reference"] = ref_data
 
         validation = Validate(data, **validate_kwargs)
 
@@ -1496,6 +1545,26 @@ def yaml_to_python(yaml: Union[str, Path]) -> str:
         else:
             validate_args.append(f'brief="{config["brief"]}"')
 
+    # Add owner if present (governance)
+    if "owner" in config:
+        validate_args.append(f'owner="{config["owner"]}"')
+
+    # Add consumers if present (governance)
+    if "consumers" in config:
+        consumers = config["consumers"]
+        if isinstance(consumers, list):
+            if len(consumers) == 1:
+                validate_args.append(f'consumers="{consumers[0]}"')
+            else:
+                consumers_str = "[" + ", ".join([f'"{c}"' for c in consumers]) + "]"
+                validate_args.append(f"consumers={consumers_str}")
+        elif isinstance(consumers, str):
+            validate_args.append(f'consumers="{consumers}"')
+
+    # Add version if present (governance)
+    if "version" in config:
+        validate_args.append(f'version="{config["version"]}"')
+
     # Create the `pb.Validate()` call
     if len(validate_args) == 1:
         # Single argument fits on one line
@@ -1514,6 +1583,13 @@ def yaml_to_python(yaml: Union[str, Path]) -> str:
     for step_index, step_config in enumerate(config["steps"]):
         # Get original expressions before parsing
         original_expressions = {}
+
+        # Handle string steps (parameterless methods like "rows_distinct")
+        if isinstance(step_config, str):
+            method_name, parameters = validator._parse_validation_step(step_config, namespaces=None)
+            code_lines.append(f"    .{method_name}()")
+            continue
+
         step_method = list(step_config.keys())[
             0
         ]  # Get the method name (conjointly, specially, etc.)
