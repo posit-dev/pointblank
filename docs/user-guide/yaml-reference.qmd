@@ -22,6 +22,12 @@ label: "Validation Description"        # OPTIONAL: Description for the validatio
 lang: "en"                             # OPTIONAL: Language code (default: "en")
 locale: "en"                           # OPTIONAL: Locale setting (default: "en")
 brief: "Global brief: {auto}"          # OPTIONAL: Global brief template
+owner: "Data Engineering"              # OPTIONAL: Data owner (governance metadata)
+consumers: [Analytics, Finance]        # OPTIONAL: Data consumers (governance metadata)
+version: "1.0.0"                       # OPTIONAL: Validation version (governance metadata)
+reference:                             # OPTIONAL: Reference table for comparison validations
+  python: |
+    pb.load_dataset("ref_table")
 thresholds:                            # OPTIONAL: Global failure thresholds
   warning: 0.1
   error: 0.2
@@ -31,6 +37,9 @@ actions:                               # OPTIONAL: Global failure actions
   error: "Error message template"
   critical: "Critical message template"
   highest_only: false
+final_actions:                         # OPTIONAL: Actions triggered after all steps complete
+  warning: "Post-validation warning"
+  error: "Post-validation error"
 steps:                                 # REQUIRED: List of validation steps
   - validation_method_name
   - validation_method_name:
@@ -838,6 +847,68 @@ Examples:
 - Performance-critical validations with large datasets
 - When deterministic results are required
 
+### Data Quality Methods
+
+`col_pct_null`: is the percentage of null values in a column within bounds?
+
+```yaml
+- col_pct_null:
+    columns: [column_name]             # REQUIRED: Column(s) to validate
+    value: 0.05                        # REQUIRED: Maximum allowed null fraction
+    thresholds:                        # OPTIONAL: Step-level thresholds
+      warning: 0.1
+    actions:                           # OPTIONAL: Step-level actions
+      warning: "Custom message"
+    brief: "Null rate check"           # OPTIONAL: Step description
+```
+
+`data_freshness`: is the data in a date/datetime column recent?
+
+```yaml
+- data_freshness:
+    columns: [date_column]             # REQUIRED: Date/datetime column
+    freshness: "24h"                   # REQUIRED: Maximum age of data
+    thresholds:                        # OPTIONAL: Step-level thresholds
+      warning: 0.1
+    actions:                           # OPTIONAL: Step-level actions
+      warning: "Custom message"
+    brief: "Data is recent"            # OPTIONAL: Step description
+```
+
+### Aggregate Validations
+
+Aggregate methods validate column-level statistics (sum, average, standard deviation) against a
+threshold. They follow the pattern `col_{stat}_{comparator}`:
+
+```yaml
+# Sum validations
+- col_sum_gt:
+    columns: [revenue]
+    value: 0
+    brief: "Total revenue is positive"
+
+# Average validations
+- col_avg_le:
+    columns: [rating]
+    value: 5
+    brief: "Average rating at most 5"
+
+# Standard deviation validations
+- col_sd_lt:
+    columns: [temperature]
+    value: 10
+    brief: "Temperature variation is bounded"
+```
+
+Available aggregate methods:
+
+- **Sum**: `col_sum_gt`, `col_sum_lt`, `col_sum_ge`, `col_sum_le`, `col_sum_eq`
+- **Average**: `col_avg_gt`, `col_avg_lt`, `col_avg_ge`, `col_avg_le`, `col_avg_eq`
+- **Standard deviation**: `col_sd_gt`, `col_sd_lt`, `col_sd_ge`, `col_sd_le`, `col_sd_eq`
+
+All aggregate methods accept these common parameters: `columns`, `value`, `thresholds`, `actions`,
+`brief`, `active`, and `pre`.
+
 ## Column Selection Patterns
 
 All validation methods that accept a `columns` parameter support these selection patterns:
@@ -871,6 +942,25 @@ These parameters are available for most validation methods:
 - `thresholds`: step-level failure thresholds (dict)
 - `actions`: step-level failure actions (dict)
 - `brief`: step description (string, boolean, or template)
+- `active`: whether the step is active (boolean, default: true)
+
+### Active Parameter
+
+The `active` parameter controls whether a validation step runs. It defaults to `true`; set it to
+`false` to skip a step without removing it from the configuration:
+
+```yaml
+steps:
+  # This step will be skipped
+  - col_vals_gt:
+      columns: [amount]
+      value: 0
+      active: false
+
+  # This step runs normally (default active: true)
+  - col_vals_not_null:
+      columns: [customer_id]
+```
 
 ### Brief Parameter Options
 
