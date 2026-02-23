@@ -5271,3 +5271,126 @@ def test_yaml_to_python_reference_with_python_expression():
     python_code = yaml_to_python(yaml_content)
     assert "reference=" in python_code
     assert 'pb.load_dataset("small_table", tbl_type="polars")' in python_code
+
+
+def test_yaml_active_boolean_false():
+    """Test active=false disables a step via YAML"""
+    yaml_content = """
+    tbl: small_table
+    steps:
+    - col_vals_gt:
+        columns: d
+        value: 100
+        active: false
+    - col_vals_not_null:
+        columns: a
+    """
+    result = yaml_interrogate(yaml_content)
+    assert result is not None
+    assert len(result.validation_info) == 2
+    # First step should be inactive
+    assert result.validation_info[0].active is False
+    # Second step should be active (default)
+    assert result.validation_info[1].active is True
+
+
+def test_yaml_active_boolean_true():
+    """Test active=true keeps a step active via YAML"""
+    yaml_content = """
+    tbl: small_table
+    steps:
+    - col_vals_gt:
+        columns: d
+        value: 100
+        active: true
+    """
+    result = yaml_interrogate(yaml_content)
+    assert result is not None
+    assert result.validation_info[0].active is True
+
+
+def test_yaml_active_callable_shortcut():
+    """Test active with callable shortcut syntax (e.g., has_columns)"""
+    yaml_content = """
+    tbl: small_table
+    steps:
+    - col_vals_gt:
+        columns: d
+        value: 100
+        active: "pb.has_columns('d')"
+    - col_vals_gt:
+        columns: nonexistent_column
+        value: 0
+        active: "pb.has_columns('nonexistent_column')"
+    """
+    result = yaml_interrogate(yaml_content)
+    assert result is not None
+    assert len(result.validation_info) == 2
+
+    # First step: column 'd' exists, so active should be True and step should run
+    assert result.validation_info[0].active is not False
+
+    # Second step: column 'nonexistent_column' doesn't exist,
+    # so active callable returns False and step is inactive
+    assert result.validation_info[1].active is not True
+
+
+def test_yaml_active_python_block():
+    """Test active with python: block syntax"""
+    yaml_content = """
+    tbl: small_table
+    steps:
+    - col_vals_gt:
+        columns: d
+        value: 100
+        active:
+          python: "pb.has_columns('d')"
+    """
+    result = yaml_interrogate(yaml_content)
+    assert result is not None
+    assert len(result.validation_info) == 1
+    # Column 'd' exists, so step should be active/run
+    assert result.validation_info[0].active is not False
+
+
+def test_yaml_to_python_active_boolean():
+    """Test yaml_to_python renders active=False correctly"""
+    yaml_content = """
+    tbl: small_table
+    steps:
+    - col_vals_gt:
+        columns: d
+        value: 100
+        active: false
+    """
+    python_code = yaml_to_python(yaml_content)
+    assert "active=False" in python_code
+
+
+def test_yaml_to_python_active_callable_shortcut():
+    """Test yaml_to_python preserves active callable shortcut expression"""
+    yaml_content = """
+    tbl: small_table
+    steps:
+    - col_vals_gt:
+        columns: d
+        value: 100
+        active: "pb.has_columns('d')"
+    """
+    python_code = yaml_to_python(yaml_content)
+    assert "active=pb.has_columns('d')" in python_code
+
+
+def test_yaml_to_python_active_python_block():
+    """Test yaml_to_python preserves active python: block expression"""
+    yaml_content = """
+    tbl: small_table
+    steps:
+    - col_vals_gt:
+        columns: d
+        value: 100
+        active:
+          python: "pb.has_columns('d')"
+    """
+    python_code = yaml_to_python(yaml_content)
+    assert "active=pb.has_columns('d')" in python_code
