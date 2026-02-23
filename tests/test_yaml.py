@@ -5394,3 +5394,260 @@ def test_yaml_to_python_active_python_block():
     """
     python_code = yaml_to_python(yaml_content)
     assert "active=pb.has_columns('d')" in python_code
+
+
+def _exec_yaml_to_python(yaml_content: str) -> Validate:
+    """Helper: convert YAML to Python code via yaml_to_python, then exec it and return result."""
+    import pointblank as pb
+
+    python_code = yaml_to_python(yaml_content)
+
+    # Strip markdown code fences
+    code = python_code.strip()
+    if code.startswith("```python"):
+        code = code[len("```python") :].strip()
+    if code.endswith("```"):
+        code = code[: -len("```")].strip()
+
+    # Execute the generated code: split imports from expression
+    # The code has imports on top, then a blank line, then a parenthesized expression
+    parts = code.split("\n\n", 1)
+    imports_section = parts[0]
+    expression_section = parts[1] if len(parts) > 1 else ""
+
+    code_with_capture = imports_section + "\n\nresult = " + expression_section
+    exec_globals = {"__builtins__": __builtins__}
+    exec(code_with_capture, exec_globals)
+    return exec_globals["result"]
+
+
+def _compare_validation_results(yaml_result: Validate, python_result: Validate):
+    """Helper: compare two Validate objects for equivalence."""
+    # Same number of validation steps
+    assert len(yaml_result.validation_info) == len(python_result.validation_info)
+
+    for i, (y_step, p_step) in enumerate(
+        zip(yaml_result.validation_info, python_result.validation_info)
+    ):
+        # Same validation method
+        assert y_step.assertion_type == p_step.assertion_type, (
+            f"Step {i}: method mismatch: {y_step.assertion_type} vs {p_step.assertion_type}"
+        )
+        # Same pass/fail outcome
+        assert y_step.all_passed == p_step.all_passed, (
+            f"Step {i} ({y_step.assertion_type}): "
+            f"all_passed mismatch: {y_step.all_passed} vs {p_step.all_passed}"
+        )
+        # Same test unit counts
+        assert y_step.n == p_step.n, f"Step {i}: n mismatch: {y_step.n} vs {p_step.n}"
+        assert y_step.n_passed == p_step.n_passed, (
+            f"Step {i}: n_passed mismatch: {y_step.n_passed} vs {p_step.n_passed}"
+        )
+        assert y_step.n_failed == p_step.n_failed, (
+            f"Step {i}: n_failed mismatch: {y_step.n_failed} vs {p_step.n_failed}"
+        )
+
+
+def test_roundtrip_basic():
+    """Round-trip: basic YAML with parameterless and parameterized steps."""
+    yaml_content = """
+    tbl: small_table
+    steps:
+    - rows_distinct
+    - col_exists:
+        columns: [date, a, b]
+    """
+    yaml_result = yaml_interrogate(yaml_content)
+    python_result = _exec_yaml_to_python(yaml_content)
+    _compare_validation_results(yaml_result, python_result)
+
+
+def test_roundtrip_with_thresholds():
+    """Round-trip: YAML with global thresholds."""
+    yaml_content = """
+    tbl: small_table
+    tbl_name: threshold_test
+    label: Test thresholds
+    thresholds:
+      warning: 0.1
+      error: 0.25
+    steps:
+    - col_vals_gt:
+        columns: [d]
+        value: 100
+    - col_vals_not_null:
+        columns: [date, a]
+    """
+    yaml_result = yaml_interrogate(yaml_content)
+    python_result = _exec_yaml_to_python(yaml_content)
+    _compare_validation_results(yaml_result, python_result)
+    assert python_result.tbl_name == "threshold_test"
+    assert python_result.label == "Test thresholds"
+
+
+def test_roundtrip_column_validations():
+    """Round-trip: various column validation methods."""
+    yaml_content = """
+    tbl: small_table
+    steps:
+    - col_vals_gt:
+        columns: [d]
+        value: 0
+    - col_vals_lt:
+        columns: [a]
+        value: 100
+    - col_vals_between:
+        columns: [c]
+        left: 1
+        right: 10
+    - col_vals_not_null:
+        columns: [date]
+    - col_vals_in_set:
+        columns: [f]
+        set: [low, mid, high]
+    """
+    yaml_result = yaml_interrogate(yaml_content)
+    python_result = _exec_yaml_to_python(yaml_content)
+    _compare_validation_results(yaml_result, python_result)
+
+
+def test_roundtrip_regex_and_schema():
+    """Round-trip: regex and column existence validation."""
+    yaml_content = """
+    tbl: small_table
+    steps:
+    - col_vals_regex:
+        columns: [b]
+        pattern: '[0-9]-[a-z]{3}-[0-9]{3}'
+    - col_exists:
+        columns: [date, a, b, c, d, f]
+    """
+    yaml_result = yaml_interrogate(yaml_content)
+    python_result = _exec_yaml_to_python(yaml_content)
+    _compare_validation_results(yaml_result, python_result)
+
+
+def test_roundtrip_governance_metadata():
+    """Round-trip: governance metadata (owner, consumers, version) preserved."""
+    yaml_content = """
+    tbl: small_table
+    tbl_name: governance_test
+    owner: Data Engineering
+    consumers: [Analytics, Finance]
+    version: "2.1.0"
+    steps:
+    - col_vals_not_null:
+        columns: [a]
+    """
+    yaml_result = yaml_interrogate(yaml_content)
+    python_result = _exec_yaml_to_python(yaml_content)
+    _compare_validation_results(yaml_result, python_result)
+    assert python_result.owner == "Data Engineering"
+    assert python_result.consumers == ["Analytics", "Finance"]
+    assert python_result.version == "2.1.0"
+
+
+def test_roundtrip_aggregate_methods():
+    """Round-trip: aggregate validation methods (col_sum_gt, col_avg_le)."""
+    yaml_content = """
+    tbl: small_table
+    steps:
+    - col_sum_gt:
+        columns: [d]
+        value: 0
+    - col_avg_le:
+        columns: [a]
+        value: 10
+    """
+    yaml_result = yaml_interrogate(yaml_content)
+    python_result = _exec_yaml_to_python(yaml_content)
+    _compare_validation_results(yaml_result, python_result)
+
+
+def test_roundtrip_mixed_workflow():
+    """Round-trip: comprehensive workflow mixing multiple method types."""
+    yaml_content = """
+    tbl: small_table
+    tbl_name: mixed_test
+    label: Comprehensive test
+    thresholds:
+      warning: 0.1
+      error: 0.25
+      critical: 0.35
+    steps:
+    - rows_distinct
+    - col_exists:
+        columns: [date, a, b]
+    - col_vals_gt:
+        columns: [d]
+        value: 100
+    - col_vals_regex:
+        columns: [b]
+        pattern: '[0-9]-[a-z]{3}-[0-9]{3}'
+    - col_vals_not_null:
+        columns: [date, a]
+    - col_vals_between:
+        columns: [c]
+        left: 1
+        right: 10
+    - col_vals_in_set:
+        columns: [f]
+        set: [low, mid, high]
+    """
+    yaml_result = yaml_interrogate(yaml_content)
+    python_result = _exec_yaml_to_python(yaml_content)
+    _compare_validation_results(yaml_result, python_result)
+
+
+def test_roundtrip_with_brief():
+    """Round-trip: validation steps with brief descriptions."""
+    yaml_content = """
+    tbl: small_table
+    steps:
+    - col_vals_gt:
+        columns: [d]
+        value: 100
+        brief: "Values must exceed 100"
+    - col_vals_not_null:
+        columns: [a]
+        brief: true
+    """
+    yaml_result = yaml_interrogate(yaml_content)
+    python_result = _exec_yaml_to_python(yaml_content)
+    _compare_validation_results(yaml_result, python_result)
+
+
+def test_roundtrip_row_validations():
+    """Round-trip: row-level validations."""
+    yaml_content = """
+    tbl: small_table
+    steps:
+    - rows_distinct
+    - rows_complete
+    - row_count_match:
+        count: 13
+    """
+    yaml_result = yaml_interrogate(yaml_content)
+    python_result = _exec_yaml_to_python(yaml_content)
+    _compare_validation_results(yaml_result, python_result)
+
+
+def test_roundtrip_step_level_thresholds():
+    """Round-trip: step-level thresholds."""
+    yaml_content = """
+    tbl: small_table
+    steps:
+    - col_vals_gt:
+        columns: [d]
+        value: 100
+        thresholds:
+          warning: 0.05
+          error: 0.15
+    - col_vals_not_null:
+        columns: [a]
+        thresholds:
+          warning: 0.01
+    """
+    yaml_result = yaml_interrogate(yaml_content)
+    python_result = _exec_yaml_to_python(yaml_content)
+    _compare_validation_results(yaml_result, python_result)
