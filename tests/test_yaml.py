@@ -5214,3 +5214,60 @@ def test_yaml_combined_new_and_existing_methods():
     assert "col_sum_gt" in types
     assert "col_avg_gt" in types
     assert "rows_distinct" in types
+
+
+def test_yaml_unknown_top_level_key_rejected():
+    """Test that unknown top-level keys (likely typos) are caught"""
+    yaml_content = """
+    tbl: small_table
+    tbl_nmae: "Typo Table Name"
+    steps:
+    - col_vals_not_null:
+        columns: a
+    """
+    with pytest.raises(YAMLValidationError, match="Unknown top-level key"):
+        yaml_interrogate(yaml_content)
+
+
+def test_yaml_unknown_top_level_key_error_message():
+    """Test that the error message includes the bad key and valid keys"""
+    yaml_content = """
+    tbl: small_table
+    labell: "typo"
+    steps:
+    - rows_distinct
+    """
+    with pytest.raises(YAMLValidationError, match="labell") as exc_info:
+        validate_yaml(yaml_content)
+    # Should also mention valid keys
+    assert "label" in str(exc_info.value)
+
+
+def test_yaml_to_python_reference():
+    """Test yaml_to_python renders reference parameter"""
+    yaml_content = """
+    tbl: small_table
+    reference: small_table
+    steps:
+    - col_vals_not_null:
+        columns: a
+    """
+    python_code = yaml_to_python(yaml_content)
+    assert "reference=" in python_code
+    assert 'pb.load_dataset("small_table"' in python_code
+
+
+def test_yaml_to_python_reference_with_python_expression():
+    """Test yaml_to_python renders reference with python: expression"""
+    yaml_content = """
+    tbl: small_table
+    reference:
+      python: |
+        pb.load_dataset("small_table", tbl_type="polars")
+    steps:
+    - col_vals_not_null:
+        columns: a
+    """
+    python_code = yaml_to_python(yaml_content)
+    assert "reference=" in python_code
+    assert 'pb.load_dataset("small_table", tbl_type="polars")' in python_code
