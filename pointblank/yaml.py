@@ -672,6 +672,10 @@ class YAMLValidator:
             elif key == "pre" and isinstance(value, str):
                 # Treat string directly as Python code (shortcut syntax)
                 processed_parameters[key] = _safe_eval_python_code(value, namespaces=namespaces)
+            # Special case: `active=` parameter can use shortcut syntax for callables
+            # (e.g., `active: pb.has_columns("col_a")` or `active: false`)
+            elif key == "active" and isinstance(value, str):
+                processed_parameters[key] = _safe_eval_python_code(value, namespaces=namespaces)
             else:
                 # Normal processing (requires python: block syntax)
                 processed_parameters[key] = _process_python_expressions(
@@ -1468,9 +1472,9 @@ def yaml_to_python(yaml: Union[str, Path]) -> str:
             else:
                 for key, value in obj.items():
                     new_path = f"{path}.{key}" if path else key
-                    # Special handling for `expr=` and `pre=` parameters that
-                    # can use shortcut syntax
-                    if key in ["expr", "pre"] and isinstance(value, str):
+                    # Special handling for `expr=`, `pre=`, and `active=` parameters
+                    # that can use shortcut syntax
+                    if key in ["expr", "pre", "active"] and isinstance(value, str):
                         expressions[new_path] = value.strip()
                     # Special handling for actions that might contain python: expressions
                     elif key == "actions" and isinstance(value, dict):
