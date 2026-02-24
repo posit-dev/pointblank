@@ -1,0 +1,121 @@
+{
+  "suffixes": [
+    "TOV",
+    "PP",
+    "AT",
+    "PAT",
+    "PrAT",
+    "KT",
+    "FOP",
+    "Group",
+    "Holdings",
+    "Corporation"
+  ],
+  "formats": [
+    "{last_name} {suffix}",
+    "{last_name} ta {last_name}",
+    "{adjective} {noun} {suffix}",
+    "{adjective} {noun}",
+    "{last_name} {noun}"
+  ],
+  "adjectives": [
+    "Ukrainska", "Kyivska", "Natsionalna", "Derzhavna", "Skhidna",
+    "Zakhidna", "Pivdenna", "Pivnichna", "Tsentralna", "Nova",
+    "Persha", "Yedyna", "Obiednana", "Mizhnarodna", "Suchasna",
+    "Innovatsiyna", "Stratehichna", "Premialna", "Elitna", "Hlobalna",
+    "Universalna", "Rehionalna", "Promyslova", "Tekhnichna",
+    "Tsyfrova", "Dynamichna", "Provida", "Vyshcha"
+  ],
+  "nouns": [
+    "Rishennia", "Systemy", "Tekhnolohii", "Industriya", "Posluhy",
+    "Konsaltynh", "Upravlinnia", "Rozrobka", "Menedzhment", "Marketynh",
+    "Prohramne Zabezpechennia", "Merezhi", "Bezpeka", "Analityka",
+    "Dani", "Doslidzhennia", "Tekhnika", "Vyrobnytstvo", "Budivnytstvo",
+    "Nerukhomost", "Strakhuvannia", "Okhorona Zdorovya", "Lohistyka",
+    "Transport", "Enerhiya", "Resursy", "Materialy", "Produkty",
+    "Torhivlia", "Zviazok", "Media", "Finansy", "Investytsii",
+    "Ahropromkompleks", "Metalurhiya"
+  ],
+  "well_known_companies": [
+    {
+      "name": "Naftogaz",
+      "cities": ["Kyiv"]
+    },
+    {
+      "name": "Ukrzaliznytsia",
+      "cities": ["Kyiv"]
+    },
+    {
+      "name": "Ukrposhta",
+      "cities": ["Kyiv"]
+    },
+    {
+      "name": "PrivatBank",
+      "cities": ["Dnipro", "Kyiv"]
+    },
+    {
+      "name": "Metinvest",
+      "cities": ["Kyiv", "Zaporizhzhia"]
+    },
+    {
+      "name": "DTEK",
+      "cities": ["Kyiv"]
+    },
+    {
+      "name": "Roshen",
+      "cities": ["Kyiv", "Vinnytsia"]
+    },
+    {
+      "name": "Kernel",
+      "cities": ["Kyiv"]
+    },
+    {
+      "name": "MHP",
+      "cities": ["Kyiv"]
+    },
+    {
+      "name": "Ukrtelecom",
+      "cities": ["Kyiv"]
+    },
+    {
+      "name": "Lifecell",
+      "cities": ["Kyiv"]
+    },
+    {
+      "name": "Kyivstar",
+      "cities": ["Kyiv"]
+    },
+    {
+      "name": "Epicentr",
+      "cities": ["Kyiv"]
+    },
+    {
+      "name": "Nova Poshta",
+      "cities": ["Kyiv", "Kharkiv"]
+    },
+    {
+      "name": "SoftServe",
+      "cities": ["Lviv", "Kyiv"]
+    },
+    {
+      "name": "GlobalLogic Ukraine",
+      "cities": ["Kyiv", "Lviv", "Kharkiv"]
+    },
+    {
+      "name": "EPAM Ukraine",
+      "cities": ["Kyiv", "Kharkiv", "Lviv"]
+    },
+    {
+      "name": "Ciklum",
+      "cities": ["Kyiv", "Kharkiv", "Dnipro"]
+    },
+    {
+      "name": "Interpipe",
+      "cities": ["Dnipro"]
+    },
+    {
+      "name": "Ferrexpo",
+      "cities": ["Kyiv", "Poltava"]
+    }
+  ]
+}

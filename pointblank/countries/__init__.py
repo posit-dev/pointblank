@@ -251,6 +251,7 @@ COUNTRIES_WITH_FULL_DATA: list[str] = [
     "DE",  # Germany
     "DK",  # Denmark
     "DZ",  # Algeria
+    "EC",  # Ecuador
     "EE",  # Estonia
     "EG",  # Egypt
     "ES",  # Spain
@@ -283,6 +284,7 @@ COUNTRIES_WITH_FULL_DATA: list[str] = [
     "NL",  # Netherlands
     "NO",  # Norway
     "NZ",  # New Zealand
+    "PA",  # Panama
     "PE",  # Peru
     "PH",  # Philippines
     "PK",  # Pakistan
@@ -290,6 +292,7 @@ COUNTRIES_WITH_FULL_DATA: list[str] = [
     "PT",  # Portugal
     "RO",  # Romania
     "RU",  # Russia
+    "SA",  # Saudi Arabia
     "SE",  # Sweden
     "SG",  # Singapore
     "SI",  # Slovenia
@@ -299,6 +302,7 @@ COUNTRIES_WITH_FULL_DATA: list[str] = [
     "TN",  # Tunisia
     "TR",  # Turkey
     "TW",  # Taiwan
+    "UA",  # Ukraine
     "UG",  # Uganda
     "US",  # United States
     "VN",  # Vietnam

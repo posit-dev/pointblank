@@ -1,0 +1,119 @@
+{
+  "suffixes": [
+    "LLC",
+    "Co.",
+    "WLL",
+    "Ltd.",
+    "CJSC",
+    "Holdings",
+    "Group",
+    "Corporation",
+    "International",
+    "Trading"
+  ],
+  "formats": [
+    "{last_name} {suffix}",
+    "{adjective} {noun} {suffix}",
+    "{adjective} {noun}",
+    "{noun} {suffix}"
+  ],
+  "adjectives": [
+    "Saudi", "Arabian", "National", "Royal", "United",
+    "Gulf", "First", "Premier", "Golden", "Global",
+    "International", "Modern", "Advanced", "Strategic", "Eastern",
+    "Western", "Central", "Grand", "Elite", "Al Mamlaka",
+    "Al Jazirah", "Riyadh", "Jeddah", "Makkah", "NEOM",
+    "Vision", "Future", "Digital", "Smart"
+  ],
+  "nouns": [
+    "Bank", "Telecom", "Energy", "Oil", "Petroleum",
+    "Holdings", "Properties", "Aviation", "Retail", "Construction",
+    "Logistics", "Real Estate", "Insurance", "Finance", "Mining",
+    "Steel", "Hospitality", "Tourism", "Marine", "Development",
+    "Consulting", "Technology", "Healthcare", "Education", "Agriculture",
+    "Water", "Power", "Defense", "Industries", "Trading",
+    "Contracting", "Engineering", "Transport", "Media", "Investments"
+  ],
+  "well_known_companies": [
+    {
+      "name": "Saudi Aramco",
+      "cities": ["Dhahran", "Riyadh", "Jeddah"]
+    },
+    {
+      "name": "SABIC",
+      "cities": ["Riyadh", "Jubail"]
+    },
+    {
+      "name": "Saudi Telecom Company",
+      "cities": ["Riyadh"]
+    },
+    {
+      "name": "Al Rajhi Bank",
+      "cities": ["Riyadh"]
+    },
+    {
+      "name": "Saudi National Bank",
+      "cities": ["Riyadh"]
+    },
+    {
+      "name": "ACWA Power",
+      "cities": ["Riyadh"]
+    },
+    {
+      "name": "Saudi Arabian Airlines",
+      "cities": ["Jeddah", "Riyadh"]
+    },
+    {
+      "name": "Ma'aden",
+      "cities": ["Riyadh"]
+    },
+    {
+      "name": "Almarai",
+      "cities": ["Riyadh"]
+    },
+    {
+      "name": "Abdul Latif Jameel",
+      "cities": ["Jeddah"]
+    },
+    {
+      "name": "Olayan Group",
+      "cities": ["Riyadh"]
+    },
+    {
+      "name": "Savola Group",
+      "cities": ["Jeddah"]
+    },
+    {
+      "name": "Jarir Marketing",
+      "cities": ["Riyadh"]
+    },
+    {
+      "name": "Saudi Electricity Company",
+      "cities": ["Riyadh"]
+    },
+    {
+      "name": "Bin Laden Group",
+      "cities": ["Jeddah"]
+    },
+    {
+      "name": "Dar Al Arkan",
+      "cities": ["Riyadh"]
+    },
+    {
+      "name": "Kingdom Holding Company",
+      "cities": ["Riyadh"]
+    },
+    {
+      "name": "Panda Retail",
+      "cities": ["Riyadh", "Jeddah"]
+    },
+    {
+      "name": "Mobily",
+      "cities": ["Riyadh"]
+    },
+    {
+      "name": "Zain KSA",
+      "cities": ["Riyadh"]
+    }
+  ]
+}

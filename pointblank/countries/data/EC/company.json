@@ -1,0 +1,119 @@
+{
+  "suffixes": [
+    "S.A.",
+    "Cia. Ltda.",
+    "C.A.",
+    "S.C.C.",
+    "Corp.",
+    "Holdings",
+    "Group",
+    "Internacional",
+    "Inversiones",
+    "Servicios"
+  ],
+  "formats": [
+    "{last_name} {suffix}",
+    "{last_name} y {last_name}",
+    "{adjective} {noun} {suffix}",
+    "{adjective} {noun}",
+    "{last_name} {noun}"
+  ],
+  "adjectives": [
+    "Ecuatoriana", "Nacional", "Continental", "Andina", "Pacifica",
+    "Amazonica", "Primera", "Unida", "Global", "Internacional",
+    "Moderna", "Nueva", "Central", "Premium", "Elite",
+    "Regional", "Industrial", "Tecnologica", "Digital", "Quiteña",
+    "Guayaquileña", "Cuencana", "Insular", "Tropical"
+  ],
+  "nouns": [
+    "Soluciones", "Sistemas", "Tecnologias", "Industria", "Servicios",
+    "Consultoria", "Administracion", "Desarrollo", "Gestion", "Comercio",
+    "Software", "Redes", "Seguridad", "Datos", "Investigacion",
+    "Ingenieria", "Construccion", "Inmobiliaria", "Seguros", "Salud",
+    "Logistica", "Transporte", "Energia", "Recursos", "Materiales",
+    "Productos", "Exportaciones", "Comunicacion", "Medios", "Finanzas",
+    "Agroindustria", "Bananera", "Camaronera", "Petrolera", "Minera"
+  ],
+  "well_known_companies": [
+    {
+      "name": "Banco Pichincha",
+      "cities": ["Quito", "Guayaquil"]
+    },
+    {
+      "name": "Corporacion Favorita",
+      "cities": ["Quito"]
+    },
+    {
+      "name": "Claro Ecuador",
+      "cities": ["Quito", "Guayaquil"]
+    },
+    {
+      "name": "Pronaca",
+      "cities": ["Quito"]
+    },
+    {
+      "name": "Corporacion El Rosado",
+      "cities": ["Guayaquil"]
+    },
+    {
+      "name": "Holcim Ecuador",
+      "cities": ["Guayaquil"]
+    },
+    {
+      "name": "Banco Guayaquil",
+      "cities": ["Guayaquil"]
+    },
+    {
+      "name": "Cerveceria Nacional",
+      "cities": ["Guayaquil"]
+    },
+    {
+      "name": "Petroamazonas",
+      "cities": ["Quito"]
+    },
+    {
+      "name": "Movistar Ecuador",
+      "cities": ["Quito"]
+    },
+    {
+      "name": "Diners Club Ecuador",
+      "cities": ["Quito"]
+    },
+    {
+      "name": "Grupo Eljuri",
+      "cities": ["Cuenca", "Guayaquil"]
+    },
+    {
+      "name": "Indurama",
+      "cities": ["Cuenca"]
+    },
+    {
+      "name": "Produbanco",
+      "cities": ["Quito"]
+    },
+    {
+      "name": "TAME",
+      "cities": ["Quito"]
+    },
+    {
+      "name": "Ecuavisa",
+      "cities": ["Guayaquil", "Quito"]
+    },
+    {
+      "name": "Teleamazonas",
+      "cities": ["Quito"]
+    },
+    {
+      "name": "La Fabril",
+      "cities": ["Manta"]
+    },
+    {
+      "name": "Reybanpac",
+      "cities": ["Guayaquil"]
+    },
+    {
+      "name": "Omnibus BB",
+      "cities": ["Ambato"]
+    }
+  ]
+}
