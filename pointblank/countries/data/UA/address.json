@@ -1,0 +1,635 @@
+{
+  "locations": {
+    "very_common": [
+      {
+        "city": "Kyiv",
+        "state": "Kyiv City",
+        "state_abbr": "KV",
+        "postcode_prefix": "01",
+        "lat_min": 50.35,
+        "lat_max": 50.55,
+        "lon_min": 30.35,
+        "lon_max": 30.75
+      },
+      {
+        "city": "Kharkiv",
+        "state": "Kharkivska",
+        "state_abbr": "KH",
+        "postcode_prefix": "61",
+        "lat_min": 49.9,
+        "lat_max": 50.08,
+        "lon_min": 36.15,
+        "lon_max": 36.4
+      },
+      {
+        "city": "Odesa",
+        "state": "Odeska",
+        "state_abbr": "OD",
+        "postcode_prefix": "65",
+        "lat_min": 46.4,
+        "lat_max": 46.52,
+        "lon_min": 30.65,
+        "lon_max": 30.8
+      },
+      {
+        "city": "Dnipro",
+        "state": "Dnipropetrovska",
+        "state_abbr": "DP",
+        "postcode_prefix": "49",
+        "lat_min": 48.4,
+        "lat_max": 48.52,
+        "lon_min": 34.9,
+        "lon_max": 35.1
+      },
+      {
+        "city": "Lviv",
+        "state": "Lvivska",
+        "state_abbr": "LV",
+        "postcode_prefix": "79",
+        "lat_min": 49.8,
+        "lat_max": 49.9,
+        "lon_min": 23.95,
+        "lon_max": 24.1
+      },
+      {
+        "city": "Zaporizhzhia",
+        "state": "Zaporizka",
+        "state_abbr": "ZP",
+        "postcode_prefix": "69",
+        "lat_min": 47.8,
+        "lat_max": 47.9,
+        "lon_min": 35.1,
+        "lon_max": 35.25
+      },
+      {
+        "city": "Kryvyi Rih",
+        "state": "Dnipropetrovska",
+        "state_abbr": "DP",
+        "postcode_prefix": "50",
+        "lat_min": 47.88,
+        "lat_max": 47.98,
+        "lon_min": 33.32,
+        "lon_max": 33.45
+      },
+      {
+        "city": "Mykolaiv",
+        "state": "Mykolaivska",
+        "state_abbr": "MK",
+        "postcode_prefix": "54",
+        "lat_min": 46.92,
+        "lat_max": 47.0,
+        "lon_min": 31.95,
+        "lon_max": 32.08
+      },
+      {
+        "city": "Vinnytsia",
+        "state": "Vinnytska",
+        "state_abbr": "VN",
+        "postcode_prefix": "21",
+        "lat_min": 49.2,
+        "lat_max": 49.27,
+        "lon_min": 28.43,
+        "lon_max": 28.53
+      },
+      {
+        "city": "Poltava",
+        "state": "Poltavska",
+        "state_abbr": "PL",
+        "postcode_prefix": "36",
+        "lat_min": 49.55,
+        "lat_max": 49.62,
+        "lon_min": 34.5,
+        "lon_max": 34.6
+      }
+    ],
+    "common": [
+      {
+        "city": "Chernihiv",
+        "state": "Chernihivska",
+        "state_abbr": "CH",
+        "postcode_prefix": "14",
+        "lat_min": 51.48,
+        "lat_max": 51.52,
+        "lon_min": 31.27,
+        "lon_max": 31.32
+      },
+      {
+        "city": "Kherson",
+        "state": "Khersonska",
+        "state_abbr": "KS",
+        "postcode_prefix": "73",
+        "lat_min": 46.62,
+        "lat_max": 46.68,
+        "lon_min": 32.58,
+        "lon_max": 32.66
+      },
+      {
+        "city": "Cherkasy",
+        "state": "Cherkaska",
+        "state_abbr": "CK",
+        "postcode_prefix": "18",
+        "lat_min": 49.42,
+        "lat_max": 49.47,
+        "lon_min": 32.03,
+        "lon_max": 32.1
+      },
+      {
+        "city": "Zhytomyr",
+        "state": "Zhytomyrska",
+        "state_abbr": "ZT",
+        "postcode_prefix": "10",
+        "lat_min": 50.24,
+        "lat_max": 50.28,
+        "lon_min": 28.65,
+        "lon_max": 28.7
+      },
+      {
+        "city": "Sumy",
+        "state": "Sumska",
+        "state_abbr": "SM",
+        "postcode_prefix": "40",
+        "lat_min": 50.89,
+        "lat_max": 50.94,
+        "lon_min": 34.76,
+        "lon_max": 34.82
+      },
+      {
+        "city": "Rivne",
+        "state": "Rivnenska",
+        "state_abbr": "RV",
+        "postcode_prefix": "33",
+        "lat_min": 50.6,
+        "lat_max": 50.64,
+        "lon_min": 26.23,
+        "lon_max": 26.28
+      },
+      {
+        "city": "Ivano-Frankivsk",
+        "state": "Ivano-Frankivska",
+        "state_abbr": "IF",
+        "postcode_prefix": "76",
+        "lat_min": 48.9,
+        "lat_max": 48.94,
+        "lon_min": 24.7,
+        "lon_max": 24.74
+      },
+      {
+        "city": "Ternopil",
+        "state": "Ternopilska",
+        "state_abbr": "TP",
+        "postcode_prefix": "46",
+        "lat_min": 49.53,
+        "lat_max": 49.57,
+        "lon_min": 25.57,
+        "lon_max": 25.62
+      },
+      {
+        "city": "Lutsk",
+        "state": "Volynska",
+        "state_abbr": "VO",
+        "postcode_prefix": "43",
+        "lat_min": 50.73,
+        "lat_max": 50.77,
+        "lon_min": 25.3,
+        "lon_max": 25.35
+      },
+      {
+        "city": "Uzhhorod",
+        "state": "Zakarpatska",
+        "state_abbr": "ZK",
+        "postcode_prefix": "88",
+        "lat_min": 48.6,
+        "lat_max": 48.63,
+        "lon_min": 22.28,
+        "lon_max": 22.32
+      }
+    ],
+    "uncommon": [
+      {
+        "city": "Khmelnytskyi",
+        "state": "Khmelnytska",
+        "state_abbr": "KM",
+        "postcode_prefix": "29",
+        "lat_min": 49.4,
+        "lat_max": 49.44,
+        "lon_min": 26.96,
+        "lon_max": 27.0
+      },
+      {
+        "city": "Kropyvnytskyi",
+        "state": "Kirovohradska",
+        "state_abbr": "KR",
+        "postcode_prefix": "25",
+        "lat_min": 48.5,
+        "lat_max": 48.53,
+        "lon_min": 32.25,
+        "lon_max": 32.28
+      },
+      {
+        "city": "Bila Tserkva",
+        "state": "Kyivska",
+        "state_abbr": "KO",
+        "postcode_prefix": "09",
+        "lat_min": 49.78,
+        "lat_max": 49.82,
+        "lon_min": 30.1,
+        "lon_max": 30.14
+      },
+      {
+        "city": "Kramatorsk",
+        "state": "Donetska",
+        "state_abbr": "DT",
+        "postcode_prefix": "84",
+        "lat_min": 48.72,
+        "lat_max": 48.75,
+        "lon_min": 37.55,
+        "lon_max": 37.6
+      },
+      {
+        "city": "Mukachevo",
+        "state": "Zakarpatska",
+        "state_abbr": "ZK",
+        "postcode_prefix": "89",
+        "lat_min": 48.43,
+        "lat_max": 48.46,
+        "lon_min": 22.7,
+        "lon_max": 22.73
+      },
+      {
+        "city": "Drohobych",
+        "state": "Lvivska",
+        "state_abbr": "LV",
+        "postcode_prefix": "82",
+        "lat_min": 49.33,
+        "lat_max": 49.36,
+        "lon_min": 23.49,
+        "lon_max": 23.52
+      },
+      {
+        "city": "Berdychiv",
+        "state": "Zhytomyrska",
+        "state_abbr": "ZT",
+        "postcode_prefix": "13",
+        "lat_min": 49.88,
+        "lat_max": 49.91,
+        "lon_min": 28.57,
+        "lon_max": 28.6
+      },
+      {
+        "city": "Nikopol",
+        "state": "Dnipropetrovska",
+        "state_abbr": "DP",
+        "postcode_prefix": "53",
+        "lat_min": 47.56,
+        "lat_max": 47.58,
+        "lon_min": 34.38,
+        "lon_max": 34.4
+      }
+    ],
+    "rare": [
+      {
+        "city": "Kovel",
+        "state": "Volynska",
+        "state_abbr": "VO",
+        "postcode_prefix": "45",
+        "lat_min": 51.2,
+        "lat_max": 51.23,
+        "lon_min": 24.68,
+        "lon_max": 24.71
+      },
+      {
+        "city": "Truskavets",
+        "state": "Lvivska",
+        "state_abbr": "LV",
+        "postcode_prefix": "82",
+        "lat_min": 49.27,
+        "lat_max": 49.29,
+        "lon_min": 23.5,
+        "lon_max": 23.52
+      },
+      {
+        "city": "Boryspil",
+        "state": "Kyivska",
+        "state_abbr": "KO",
+        "postcode_prefix": "08",
+        "lat_min": 50.34,
+        "lat_max": 50.36,
+        "lon_min": 30.94,
+        "lon_max": 30.96
+      },
+      {
+        "city": "Nizhyn",
+        "state": "Chernihivska",
+        "state_abbr": "CH",
+        "postcode_prefix": "16",
+        "lat_min": 51.04,
+        "lat_max": 51.06,
+        "lon_min": 31.88,
+        "lon_max": 31.9
+      },
+      {
+        "city": "Kolomyia",
+        "state": "Ivano-Frankivska",
+        "state_abbr": "IF",
+        "postcode_prefix": "78",
+        "lat_min": 48.52,
+        "lat_max": 48.54,
+        "lon_min": 25.03,
+        "lon_max": 25.05
+      }
+    ]
+  },
+  "streets_by_city": {
+    "Kyiv": [
+      "Khreshchatyk",
+      "Volodymyrska",
+      "Hrushevskoho",
+      "Saksahanskoho",
+      "Shevchenka",
+      "Velyka Vasylkivska",
+      "Prorizna",
+      "Mykhailivska",
+      "Yaroslaviv Val",
+      "Andriivskyi Uzviz",
+      "Instytutska",
+      "Bankova",
+      "Lysenka",
+      "Horodetskoho",
+      "Kostelna",
+      "Desiatynna",
+      "Mykilsko-Slobidska",
+      "Brovarskyi Prospekt",
+      "Peremohy Prospekt",
+      "Bohomoltsia",
+      "Sichovykh Striltsiv",
+      "Antovycha"
+    ],
+    "Kharkiv": [
+      "Sumska",
+      "Pushkinska",
+      "Nauky Prospekt",
+      "Heroiv Kharkova",
+      "Moskovskyi Prospekt",
+      "Haharina Prospekt",
+      "Poltavskyi Shliakh",
+      "Klochkivska",
+      "Shevchenko",
+      "Universytetska",
+      "Akademika Pavlova",
+      "Hvardiytsiv Shyronintsiv"
+    ],
+    "Odesa": [
+      "Derybasivska",
+      "Pushkinska",
+      "Rishelievska",
+      "Kanatna",
+      "Velyka Arnautska",
+      "Frantsuzky Bulvar",
+      "Hretska",
+      "Katerynyska",
+      "Preobrazhenska",
+      "Bunina",
+      "Genuezka",
+      "Havanna"
+    ],
+    "Dnipro": [
+      "Yavornytskogo Prospekt",
+      "Haharina Prospekt",
+      "Kirova Prospekt",
+      "Naberezhna Peremohy",
+      "Kosmichna",
+      "Naberezhna Lenina",
+      "Robochi",
+      "Kalynova",
+      "Heroiv Stalinhrada"
+    ],
+    "Lviv": [
+      "Rynok Ploshcha",
+      "Svobody Prospekt",
+      "Shevchenka Prospekt",
+      "Horodotska",
+      "Lychakivska",
+      "Franka",
+      "Zelena",
+      "Kopernika",
+      "Doroshenko",
+      "Vynnychenka",
+      "Bandera",
+      "Sheptytskykh"
+    ],
+    "Zaporizhzhia": [
+      "Sobornyi Prospekt",
+      "Metalurhiv Prospekt",
+      "Lenina Prospekt",
+      "Peremogy",
+      "Nezalezhnosti"
+    ],
+    "Vinnytsia": [
+      "Soborna",
+      "Keletska",
+      "Pyrogova",
+      "Kosmonavtiv Prospekt",
+      "Khmelnytske Shose"
+    ],
+    "Poltava": [
+      "Yevropeyska",
+      "Shevchenka",
+      "Nebesnoi Sotni",
+      "Stritenska",
+      "Zinkivska"
+    ],
+    "Berdychiv": [
+      "Vulytsia Yevropeiska",
+      "Vulytsia Zhytomyrska",
+      "Prospekt Myru"
+    ],
+    "Bila Tserkva": [
+      "Bulvar Oleksandriiskyi",
+      "Vulytsia Yaroslava Mudroho",
+      "Vulytsia Shevchenka"
+    ],
+    "Boryspil": [
+      "Vulytsia Kyivskyi Shliakh",
+      "Vulytsia Holovata",
+      "Prospekt Yevropy"
+    ],
+    "Cherkasy": [
+      "Bulvar Shevchenka",
+      "Vulytsia Khreshchatyk",
+      "Vulytsia Hromova"
+    ],
+    "Chernihiv": [
+      "Vulytsia Shevchenka",
+      "Prospekt Myru",
+      "Vulytsia Hetmana Polubotka"
+    ],
+    "Drohobych": [
+      "Vulytsia Hrushevska",
+      "Vulytsia Shevchenka",
+      "Vulytsia Ivana Franka"
+    ],
+    "Ivano-Frankivsk": [
+      "Vulytsia Nezalezhnosti",
+      "Vulytsia Halytska",
+      "Vulytsia Shevchenka",
+      "Vulytsia Hetmana Mazepy"
+    ],
+    "Kherson": [
+      "Prospekt Ushakova",
+      "Vulytsia Perekopska",
+      "Vulytsia Universytetska"
+    ],
+    "Khmelnytskyi": [
+      "Vulytsia Proskurivska",
+      "Vulytsia Podilska",
+      "Vulytsia Shevchenka"
+    ],
+    "Kolomyia": [
+      "Vulytsia Teatralna",
+      "Vulytsia Hrushevskoho",
+      "Vulytsia Mazepy"
+    ],
+    "Kovel": [
+      "Vulytsia Nezalezhnosti",
+      "Vulytsia Hrushevskoho",
+      "Vulytsia Brestska"
+    ],
+    "Kramatorsk": [
+      "Vulytsia Shevchenka",
+      "Prospekt Myru",
+      "Vulytsia Mashynobudivnykiv"
+    ],
+    "Kropyvnytskyi": [
+      "Vulytsia Velyka Perspektyvna",
+      "Vulytsia Shevchenka",
+      "Prospekt Universytetskyi"
+    ],
+    "Kryvyi Rih": [
+      "Prospekt Metalurhiv",
+      "Vulytsia Poshtovyi",
+      "Vulytsia Heroiv ATO"
+    ],
+    "Lutsk": [
+      "Prospekt Voli",
+      "Vulytsia Lesi Ukrainky",
+      "Vulytsia Shevchenka"
+    ],
+    "Mukachevo": [
+      "Vulytsia Dukhnoryvcha",
+      "Ploshcha Kyryla i Metodiya",
+      "Vulytsia Shevchenka"
+    ],
+    "Mykolaiv": [
+      "Prospekt Tsentralnyi",
+      "Vulytsia Admiralska",
+      "Vulytsia Velyka Morska"
+    ],
+    "Nikopol": [
+      "Prospekt Trubnykov",
+      "Vulytsia Shevchenka",
+      "Vulytsia Elektromtalna"
+    ],
+    "Nizhyn": [
+      "Vulytsia Shevchenka",
+      "Vulytsia Hoholivska",
+      "Vulytsia Moskovska"
+    ],
+    "Rivne": [
+      "Vulytsia Soborna",
+      "Vulytsia Stepana Bandery",
+      "Prospekt Myru"
+    ],
+    "Sumy": [
+      "Vulytsia Soborna",
+      "Vulytsia Petropavlivska",
+      "Vulytsia Kharkivska"
+    ],
+    "Ternopil": [
+      "Vulytsia Ruska",
+      "Bulvar Shevchenka",
+      "Vulytsia Zamkova"
+    ],
+    "Truskavets": [
+      "Vulytsia Shevchenka",
+      "Vulytsia Drohobycha",
+      "Bulvar Nezalezhnosti"
+    ],
+    "Uzhhorod": [
+      "Vulytsia Korzo",
+      "Naberezhna Nezalezhnosti",
+      "Vulytsia Shevchenka"
+    ],
+    "Zhytomyr": [
+      "Vulytsia Kyivska",
+      "Vulytsia Velyka Berdychivska",
+      "Prospekt Myru"
+    ]
+  },
+  "postcode_format": "#####",
+  "address_formats": [
+    "vul. {street} {building_number}, {city}, {state}, {postcode}",
+    "prosp. {street} {building_number}, {city}, {postcode}"
+  ],
+  "country": "Ukraine",
+  "country_code": "UA",
+  "phone_area_codes": {
+    "Kyiv City": [
+      "044"
+    ],
+    "Kharkivska": [
+      "057"
+    ],
+    "Odeska": [
+      "048"
+    ],
+    "Dnipropetrovska": [
+      "056"
+    ],
+    "Lvivska": [
+      "032"
+    ],
+    "Zaporizka": [
+      "061"
+    ],
+    "Mykolaivska": [
+      "051"
+    ],
+    "Vinnytska": [
+      "043"
+    ],
+    "Poltavska": [
+      "053"
+    ],
+    "Chernihivska": [
+      "046"
+    ],
+    "Khersonska": [
+      "055"
+    ],
+    "Cherkaska": [
+      "047"
+    ],
+    "Zhytomyrska": [
+      "041"
+    ],
+    "Sumska": [
+      "054"
+    ],
+    "Rivnenska": [
+      "036"
+    ],
+    "Ivano-Frankivska": [
+      "034"
+    ],
+    "Ternopilska": [
+      "035"
+    ],
+    "Volynska": [
+      "033"
+    ],
+    "Zakarpatska": [
+      "031"
+    ]
+  },
+  "phone_format": "+380 ({area_code}) ###-##-##"
+}

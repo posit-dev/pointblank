@@ -486,24 +486,24 @@ Letters I, O, Q, and U are excluded from plate generation, matching real-world r
 
 ### Supported Countries
 
-Pointblank currently supports 71 countries with full locale data for realistic test data generation.
+Pointblank currently supports 75 countries with full locale data for realistic test data generation.
 You can use either ISO 3166-1 alpha-2 codes (e.g., `"US"`) or alpha-3 codes (e.g., `"USA"`).
 
-**Europe (32 countries):**
+**Europe (33 countries):**
 
-- Austria (`AT`), Belgium (`BE`), Bulgaria (`BG`), Croatia (`HR`), Cyprus (`CY`), Czech Republic (`CZ`), Denmark (`DK`), Estonia (`EE`), Finland (`FI`), France (`FR`), Germany (`DE`), Greece (`GR`), Hungary (`HU`), Iceland (`IS`), Ireland (`IE`), Italy (`IT`), Latvia (`LV`), Lithuania (`LT`), Luxembourg (`LU`), Malta (`MT`), Netherlands (`NL`), Norway (`NO`), Poland (`PL`), Portugal (`PT`), Romania (`RO`), Russia (`RU`), Slovakia (`SK`), Slovenia (`SI`), Spain (`ES`), Sweden (`SE`), Switzerland (`CH`), United Kingdom (`GB`)
+- Austria (`AT`), Belgium (`BE`), Bulgaria (`BG`), Croatia (`HR`), Cyprus (`CY`), Czech Republic (`CZ`), Denmark (`DK`), Estonia (`EE`), Finland (`FI`), France (`FR`), Germany (`DE`), Greece (`GR`), Hungary (`HU`), Iceland (`IS`), Ireland (`IE`), Italy (`IT`), Latvia (`LV`), Lithuania (`LT`), Luxembourg (`LU`), Malta (`MT`), Netherlands (`NL`), Norway (`NO`), Poland (`PL`), Portugal (`PT`), Romania (`RO`), Russia (`RU`), Slovakia (`SK`), Slovenia (`SI`), Spain (`ES`), Sweden (`SE`), Switzerland (`CH`), Ukraine (`UA`), United Kingdom (`GB`)
 
-**Americas (9 countries):**
+**Americas (11 countries):**
 
-- Argentina (`AR`), Brazil (`BR`), Canada (`CA`), Chile (`CL`), Colombia (`CO`), Costa Rica (`CR`), Mexico (`MX`), Peru (`PE`), United States (`US`)
+- Argentina (`AR`), Brazil (`BR`), Canada (`CA`), Chile (`CL`), Colombia (`CO`), Costa Rica (`CR`), Ecuador (`EC`), Mexico (`MX`), Panama (`PA`), Peru (`PE`), United States (`US`)
 
 **Asia-Pacific (17 countries):**
 
 - Australia (`AU`), Bangladesh (`BD`), China (`CN`), Hong Kong (`HK`), India (`IN`), Indonesia (`ID`), Japan (`JP`), Malaysia (`MY`), New Zealand (`NZ`), Pakistan (`PK`), Philippines (`PH`), Singapore (`SG`), South Korea (`KR`), Sri Lanka (`LK`), Taiwan (`TW`), Thailand (`TH`), Vietnam (`VN`)
 
-**Middle East & Africa (13 countries):**
+**Middle East & Africa (14 countries):**
 
-- Algeria (`DZ`), Egypt (`EG`), Ethiopia (`ET`), Ghana (`GH`), Kenya (`KE`), Morocco (`MA`), Nigeria (`NG`), Senegal (`SN`), South Africa (`ZA`), Tunisia (`TN`), Turkey (`TR`), Uganda (`UG`), United Arab Emirates (`AE`)
+- Algeria (`DZ`), Egypt (`EG`), Ethiopia (`ET`), Ghana (`GH`), Kenya (`KE`), Morocco (`MA`), Nigeria (`NG`), Saudi Arabia (`SA`), Senegal (`SN`), South Africa (`ZA`), Tunisia (`TN`), Turkey (`TR`), Uganda (`UG`), United Arab Emirates (`AE`)
 
 Additional countries and expanded coverage are planned for future releases.
 
@@ -835,7 +835,7 @@ By incorporating test data generation into your process, you can:
 
 - quickly prototype validation rules before working with production data
 - create reproducible test fixtures for automated testing and CI/CD pipelines
-- generate locale-specific data for internationalization testing across 71 countries
+- generate locale-specific data for internationalization testing across 75 countries
 - ensure coherent relationships between related fields like names, emails, addresses, jobs, and
 license plates
 - produce datasets of any size with consistent, realistic values
