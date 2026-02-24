@@ -6,8 +6,8 @@
         "state": "Pichincha",
         "state_abbr": "PI",
         "postcode_prefix": "170",
-        "lat_min": -0.30,
-        "lat_max": -0.10,
+        "lat_min": -0.3,
+        "lat_max": -0.1,
         "lon_min": -78.55,
         "lon_max": -78.45
       },
@@ -17,7 +17,7 @@
         "state_abbr": "GY",
         "postcode_prefix": "090",
         "lat_min": -2.25,
-        "lat_max": -2.10,
+        "lat_max": -2.1,
         "lon_min": -79.95,
         "lon_max": -79.85
       },
@@ -131,7 +131,7 @@
         "lat_min": -0.94,
         "lat_max": -0.92,
         "lon_min": -78.62,
-        "lon_max": -78.60
+        "lon_max": -78.6
       },
       {
         "city": "Duran",
@@ -159,7 +159,7 @@
         "state_abbr": "LR",
         "postcode_prefix": "120",
         "lat_min": -1.03,
-        "lat_max": -1.00,
+        "lat_max": -1.0,
         "lon_min": -79.48,
         "lon_max": -79.45
       },
@@ -170,7 +170,7 @@
         "postcode_prefix": "091",
         "lat_min": -2.15,
         "lat_max": -2.13,
-        "lon_min": -79.60,
+        "lon_min": -79.6,
         "lon_max": -79.58
       },
       {
@@ -178,7 +178,7 @@
         "state": "Carchi",
         "state_abbr": "CR",
         "postcode_prefix": "040",
-        "lat_min": 0.80,
+        "lat_min": 0.8,
         "lat_max": 0.82,
         "lon_min": -77.73,
         "lon_max": -77.71
@@ -191,7 +191,7 @@
         "state_abbr": "SE",
         "postcode_prefix": "241",
         "lat_min": -2.22,
-        "lat_max": -2.20,
+        "lat_max": -2.2,
         "lon_min": -80.97,
         "lon_max": -80.95
       },
@@ -203,14 +203,14 @@
         "lat_min": -0.99,
         "lat_max": -0.97,
         "lon_min": -77.82,
-        "lon_max": -77.80
+        "lon_max": -77.8
       },
       {
         "city": "Puyo",
         "state": "Pastaza",
         "state_abbr": "PA",
         "postcode_prefix": "160",
-        "lat_min": -1.50,
+        "lat_min": -1.5,
         "lat_max": -1.48,
         "lon_min": -77.98,
         "lon_max": -77.96
@@ -243,7 +243,7 @@
         "lat_min": -0.76,
         "lat_max": -0.74,
         "lon_min": -90.32,
-        "lon_max": -90.30
+        "lon_max": -90.3
       },
       {
         "city": "Otavalo",
@@ -273,7 +273,7 @@
         "state_abbr": "MS",
         "postcode_prefix": "140",
         "lat_min": -2.31,
-        "lat_max": -2.30,
+        "lat_max": -2.3,
         "lon_min": -78.12,
         "lon_max": -78.11
       },
@@ -292,7 +292,7 @@
         "state": "Galapagos",
         "state_abbr": "GA",
         "postcode_prefix": "200",
-        "lat_min": -0.90,
+        "lat_min": -0.9,
         "lat_max": -0.89,
         "lon_min": -89.62,
         "lon_max": -89.61
@@ -321,40 +321,227 @@
   },
   "streets_by_city": {
     "Quito": [
-      "Avenida Amazonas", "Avenida 10 de Agosto", "Avenida 6 de Diciembre",
-      "Avenida Naciones Unidas", "Avenida Republica", "Avenida Eloy Alfaro",
-      "Calle Venezuela", "Calle Guayaquil", "Calle Sucre", "Calle Garcia Moreno",
-      "Calle Flores", "Calle Bolivar", "Avenida Patria", "Avenida Colon",
-      "Calle Juan Leon Mera", "Calle Reina Victoria", "Avenida Gonzalez Suarez",
-      "Calle La Ronda", "Avenida Mariscal Sucre", "Calle Cuenca"
+      "Avenida Amazonas",
+      "Avenida 10 de Agosto",
+      "Avenida 6 de Diciembre",
+      "Avenida Naciones Unidas",
+      "Avenida Republica",
+      "Avenida Eloy Alfaro",
+      "Calle Venezuela",
+      "Calle Guayaquil",
+      "Calle Sucre",
+      "Calle Garcia Moreno",
+      "Calle Flores",
+      "Calle Bolivar",
+      "Avenida Patria",
+      "Avenida Colon",
+      "Calle Juan Leon Mera",
+      "Calle Reina Victoria",
+      "Avenida Gonzalez Suarez",
+      "Calle La Ronda",
+      "Avenida Mariscal Sucre",
+      "Calle Cuenca"
     ],
     "Guayaquil": [
-      "Malecon Simon Bolivar", "Avenida 9 de Octubre", "Calle Boyaca",
-      "Calle 10 de Agosto", "Avenida Quito", "Calle Chile",
-      "Avenida Francisco de Orellana", "Calle Luque", "Calle Clemente Ballen",
-      "Avenida de las Americas", "Via Daule", "Avenida Juan Tanca Marengo"
+      "Malecon Simon Bolivar",
+      "Avenida 9 de Octubre",
+      "Calle Boyaca",
+      "Calle 10 de Agosto",
+      "Avenida Quito",
+      "Calle Chile",
+      "Avenida Francisco de Orellana",
+      "Calle Luque",
+      "Calle Clemente Ballen",
+      "Avenida de las Americas",
+      "Via Daule",
+      "Avenida Juan Tanca Marengo"
     ],
     "Cuenca": [
-      "Calle Larga", "Calle Gran Colombia", "Calle Bolivar",
-      "Calle Sucre", "Calle Presidente Cordova", "Avenida Solano",
-      "Calle Benigno Malo", "Calle Hermano Miguel", "Avenida 12 de Abril",
+      "Calle Larga",
+      "Calle Gran Colombia",
+      "Calle Bolivar",
+      "Calle Sucre",
+      "Calle Presidente Cordova",
+      "Avenida Solano",
+      "Calle Benigno Malo",
+      "Calle Hermano Miguel",
+      "Avenida 12 de Abril",
       "Avenida Remigio Crespo"
     ],
     "Ambato": [
-      "Calle Bolivar", "Calle Sucre", "Avenida Cevallos",
-      "Calle Montalvo", "Avenida 12 de Noviembre"
+      "Calle Bolivar",
+      "Calle Sucre",
+      "Avenida Cevallos",
+      "Calle Montalvo",
+      "Avenida 12 de Noviembre"
     ],
     "Machala": [
-      "Avenida 25 de Junio", "Calle 9 de Mayo", "Avenida Rocafuerte",
-      "Calle Bolivar", "Calle Sucre"
+      "Avenida 25 de Junio",
+      "Calle 9 de Mayo",
+      "Avenida Rocafuerte",
+      "Calle Bolivar",
+      "Calle Sucre"
     ],
     "Loja": [
-      "Calle Bolivar", "Calle Sucre", "Calle 10 de Agosto",
-      "Avenida Universitaria", "Calle Bernardo Valdivieso"
+      "Calle Bolivar",
+      "Calle Sucre",
+      "Calle 10 de Agosto",
+      "Avenida Universitaria",
+      "Calle Bernardo Valdivieso"
     ],
     "Manta": [
-      "Malecon de Manta", "Calle 11", "Avenida 4 de Noviembre",
-      "Calle 13", "Avenida Flavio Reyes"
+      "Malecon de Manta",
+      "Calle 11",
+      "Avenida 4 de Noviembre",
+      "Calle 13",
+      "Avenida Flavio Reyes"
+    ],
+    "Azogues": [
+      "Avenida 24 de Mayo",
+      "Calle Bolivar",
+      "Avenida 16 de Abril",
+      "Calle Sucre"
+    ],
+    "Babahoyo": [
+      "Avenida 10 de Agosto",
+      "Calle Bolivar",
+      "Malecon 9 de Octubre",
+      "Calle Rocafuerte"
+    ],
+    "Coca": [
+      "Avenida Alejandro Labaka",
+      "Calle Napo",
+      "Avenida 9 de Octubre",
+      "Calle Quito"
+    ],
+    "Duran": [
+      "Avenida Leon Febres Cordero",
+      "Calle Principal",
+      "Via Duran-Tambo",
+      "Calle Guayaquil"
+    ],
+    "Esmeraldas": [
+      "Avenida Libertad",
+      "Calle Bolivar",
+      "Calle Sucre",
+      "Avenida Colon"
+    ],
+    "Guaranda": [
+      "Calle Convencional de 1884",
+      "Avenida General Enriquez",
+      "Calle Sucre",
+      "Calle 10 de Agosto"
+    ],
+    "Ibarra": [
+      "Avenida Mariano Acosta",
+      "Calle Bolivar",
+      "Avenida El Retorno",
+      "Calle Sucre",
+      "Avenida Atahualpa"
+    ],
+    "Latacunga": [
+      "Calle Quito",
+      "Avenida Amazonas",
+      "Calle Guayaquil",
+      "Calle Sucre"
+    ],
+    "Macas": [
+      "Avenida 29 de Mayo",
+      "Calle Soasti",
+      "Calle Bolivar",
+      "Calle 10 de Agosto"
+    ],
+    "Milagro": [
+      "Avenida 17 de Septiembre",
+      "Calle Garcia Moreno",
+      "Calle Bolivar",
+      "Calle Rocafuerte"
+    ],
+    "Nueva Loja": [
+      "Avenida Quito",
+      "Calle Colombia",
+      "Avenida 12 de Febrero",
+      "Calle Orellana"
+    ],
+    "Otavalo": [
+      "Calle Sucre",
+      "Calle Bolivar",
+      "Avenida 31 de Octubre",
+      "Calle Roca"
+    ],
+    "Portoviejo": [
+      "Avenida Reales Tamarindos",
+      "Calle Olmedo",
+      "Calle Chile",
+      "Avenida America",
+      "Calle Sucre"
+    ],
+    "Puerto Ayora": [
+      "Avenida Charles Darwin",
+      "Calle Baltra",
+      "Calle Charles Binford",
+      "Calle Islas Plaza"
+    ],
+    "Puerto Baquerizo Moreno": [
+      "Avenida Charles Darwin",
+      "Calle Espanola",
+      "Calle Northia",
+      "Malecon"
+    ],
+    "Puyo": [
+      "Calle 9 de Octubre",
+      "Avenida Alberto Zambrano",
+      "Calle Atahualpa",
+      "Calle Francisco de Orellana"
+    ],
+    "Quevedo": [
+      "Avenida 7 de Octubre",
+      "Calle Bolivar",
+      "Calle Decima",
+      "Via Quevedo-Valencia"
+    ],
+    "Riobamba": [
+      "Calle 10 de Agosto",
+      "Calle Primera Constituyente",
+      "Avenida Daniel Leon Borja",
+      "Calle Espana"
+    ],
+    "Salinas": [
+      "Malecon de Salinas",
+      "Calle Enriquez Gallo",
+      "Avenida General Eloy Alfaro",
+      "Via Data Posorja"
+    ],
+    "Santo Domingo": [
+      "Avenida Quito",
+      "Via Chone",
+      "Avenida Tsachila",
+      "Calle Ibarra",
+      "Avenida Abraham Calazacon"
+    ],
+    "Tena": [
+      "Avenida 15 de Noviembre",
+      "Calle Amazonas",
+      "Calle Garcia Moreno",
+      "Malecon del Rio Tena"
+    ],
+    "Tulcan": [
+      "Calle Sucre",
+      "Avenida Coral",
+      "Calle Bolivar",
+      "Calle 10 de Agosto"
+    ],
+    "Vilcabamba": [
+      "Calle Sucre",
+      "Calle Bolivar",
+      "Avenida Eterna Juventud",
+      "Calle Diego Vaca de Vega"
+    ],
+    "Zamora": [
+      "Calle Sevilla de Oro",
+      "Avenida del Maestro",
+      "Calle Diego de Vaca",
+      "Calle Pio Jaramillo"
     ]
   },
   "postcode_format": "######",
@@ -365,26 +552,66 @@
   "country": "Ecuador",
   "country_code": "EC",
   "phone_area_codes": {
-    "Pichincha": ["02"],
-    "Guayas": ["04"],
-    "Azuay": ["07"],
-    "Manabi": ["05"],
-    "Tungurahua": ["03"],
-    "El Oro": ["07"],
-    "Loja": ["07"],
-    "Imbabura": ["06"],
-    "Esmeraldas": ["06"],
-    "Cotopaxi": ["03"],
-    "Los Rios": ["05"],
-    "Chimborazo": ["03"],
-    "Carchi": ["06"],
-    "Bolivar": ["03"],
-    "Cañar": ["07"],
-    "Napo": ["06"],
-    "Pastaza": ["03"],
-    "Galapagos": ["05"],
-    "Zamora Chinchipe": ["07"],
-    "Santo Domingo de los Tsachilas": ["02"]
+    "Pichincha": [
+      "02"
+    ],
+    "Guayas": [
+      "04"
+    ],
+    "Azuay": [
+      "07"
+    ],
+    "Manabi": [
+      "05"
+    ],
+    "Tungurahua": [
+      "03"
+    ],
+    "El Oro": [
+      "07"
+    ],
+    "Loja": [
+      "07"
+    ],
+    "Imbabura": [
+      "06"
+    ],
+    "Esmeraldas": [
+      "06"
+    ],
+    "Cotopaxi": [
+      "03"
+    ],
+    "Los Rios": [
+      "05"
+    ],
+    "Chimborazo": [
+      "03"
+    ],
+    "Carchi": [
+      "06"
+    ],
+    "Bolivar": [
+      "03"
+    ],
+    "Cañar": [
+      "07"
+    ],
+    "Napo": [
+      "06"
+    ],
+    "Pastaza": [
+      "03"
+    ],
+    "Galapagos": [
+      "05"
+    ],
+    "Zamora Chinchipe": [
+      "07"
+    ],
+    "Santo Domingo de los Tsachilas": [
+      "02"
+    ]
   },
   "phone_format": "+593 {area_code} ###-####"
 }

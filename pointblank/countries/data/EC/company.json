@@ -115,5 +115,120 @@
       "name": "Omnibus BB",
       "cities": ["Ambato"]
     }
+  ],
+  "jobs": [
+    "Desarrollador de Software", "Contador", "Ingeniero Civil", "Profesor", "Medico",
+    "Abogado", "Gerente de Marketing", "Vendedor", "Agronomo", "Electricista",
+    "Farmaceutico", "Enfermero", "Arquitecto", "Analista Financiero", "Gerente de Proyecto",
+    "Analista de Datos", "Gerente de RRHH", "Chef", "Periodista", "Diseñador",
+    "Petrolero", "Chofer", "Veterinario", "Dentista", "Biologo"
+  ],
+  "catch_phrase_adjectives": [
+    "confiable", "innovador", "eficiente", "reconocido", "lider",
+    "sostenible", "profesional", "calidad", "moderno", "estrategico",
+    "dinamico", "integral", "avanzado", "comprometido", "excelente"
+  ],
+  "catch_phrase_nouns": [
+    "soluciones", "servicios", "excelencia", "alianza", "crecimiento",
+    "innovacion", "desarrollo", "progreso", "calidad", "valor",
+    "resultados", "tecnologia", "estrategias", "oportunidades"
+  ],
+  "catch_phrase_verbs": [
+    "entregar", "proveer", "construir", "crear", "transformar",
+    "alcanzar", "impulsar", "inspirar", "optimizar", "desarrollar",
+    "implementar", "facilitar", "innovar", "lograr", "generar"
+  ],
+  "catch_phrase_connector": "que",
+  "industries": [
+    {
+      "name": "petroleo",
+      "weight": 0.14,
+      "jobs": ["Petrolero", "Ingeniero Civil", "Gerente de Proyecto"],
+      "well_known": ["Petroamazonas"],
+      "company_suffixes": ["Petrolera S.A.", "Energy", "Oil"],
+      "company_nouns": ["Petrolera", "Energia", "Recursos"],
+      "company_formats": ["{adjective} {noun} {suffix}", "{noun} {suffix}"]
+    },
+    {
+      "name": "finanzas",
+      "weight": 0.14,
+      "jobs": ["Analista Financiero", "Contador"],
+      "well_known": ["Banco Pichincha", "Banco Guayaquil", "Produbanco", "Diners Club Ecuador"],
+      "company_suffixes": ["Banco", "Financiera", "Inversiones"],
+      "company_nouns": ["Finanzas", "Capital", "Inversiones"],
+      "company_formats": ["{adjective} {noun} {suffix}", "{last_name} {suffix}"]
+    },
+    {
+      "name": "agricultura",
+      "weight": 0.14,
+      "jobs": ["Agronomo", "Biologo"],
+      "well_known": ["Pronaca", "Reybanpac", "La Fabril"],
+      "company_suffixes": ["Agro S.A.", "Exportaciones", "Agricola"],
+      "company_nouns": ["Agroindustria", "Bananera", "Camaronera"],
+      "company_formats": ["{adjective} {noun} {suffix}", "{noun} {suffix}"]
+    },
+    {
+      "name": "comercio",
+      "weight": 0.12,
+      "jobs": ["Vendedor", "Gerente de Marketing"],
+      "well_known": ["Corporacion Favorita", "Corporacion El Rosado"],
+      "company_suffixes": ["Comercial S.A.", "Trading", "Distribuidora"],
+      "company_nouns": ["Comercio", "Productos", "Exportaciones"],
+      "company_formats": ["{adjective} {noun} {suffix}", "{last_name} {suffix}"]
+    },
+    {
+      "name": "tecnologia",
+      "weight": 0.1,
+      "jobs": ["Desarrollador de Software", "Analista de Datos"],
+      "well_known": ["Claro Ecuador", "Movistar Ecuador"],
+      "company_suffixes": ["Tech S.A.", "Software", "Digital"],
+      "company_nouns": ["Tecnologias", "Sistemas", "Software"],
+      "company_formats": ["{adjective} {noun} {suffix}", "{noun} {suffix}"]
+    },
+    {
+      "name": "salud",
+      "weight": 0.08,
+      "jobs": ["Medico", "Enfermero", "Farmaceutico", "Dentista"],
+      "well_known": [],
+      "company_suffixes": ["Salud", "Clinica", "Farmaceutica"],
+      "company_nouns": ["Salud", "Medicina", "Farmacia"],
+      "company_formats": ["{adjective} {noun} {suffix}", "{noun} {suffix}"]
+    },
+    {
+      "name": "construccion",
+      "weight": 0.1,
+      "jobs": ["Ingeniero Civil", "Arquitecto"],
+      "well_known": ["Holcim Ecuador"],
+      "company_suffixes": ["Construccion S.A.", "Ingenieria", "Constructora"],
+      "company_nouns": ["Construccion", "Ingenieria", "Inmobiliaria"],
+      "company_formats": ["{adjective} {noun} {suffix}", "{noun} {suffix}"]
+    },
+    {
+      "name": "educacion",
+      "weight": 0.06,
+      "jobs": ["Profesor"],
+      "well_known": [],
+      "company_suffixes": [],
+      "company_nouns": [],
+      "company_formats": ["Universidad de {city}", "Instituto {city}"]
+    },
+    {
+      "name": "medios",
+      "weight": 0.06,
+      "jobs": ["Periodista", "Diseñador"],
+      "well_known": ["Ecuavisa", "Teleamazonas"],
+      "company_suffixes": ["Media", "Comunicacion", "Digital"],
+      "company_nouns": ["Medios", "Comunicacion", "Digital"],
+      "company_formats": ["{adjective} {noun} {suffix}", "{noun} {suffix}"]
+    },
+    {
+      "name": "manufactura",
+      "weight": 0.06,
+      "jobs": ["Ingeniero Civil", "Electricista"],
+      "well_known": ["Indurama", "Omnibus BB"],
+      "company_suffixes": ["Industrias S.A.", "Manufactura", "Produccion"],
+      "company_nouns": ["Industria", "Manufactura", "Produccion"],
+      "company_formats": ["{adjective} {noun} {suffix}", "{noun} {suffix}"]
+    }
   ]
 }

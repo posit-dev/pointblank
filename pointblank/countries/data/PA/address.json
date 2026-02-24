@@ -18,7 +18,7 @@
         "postcode_prefix": "0802",
         "lat_min": 9.03,
         "lat_max": 9.06,
-        "lon_min": -79.50,
+        "lon_min": -79.5,
         "lon_max": -79.47
       },
       {
@@ -68,7 +68,7 @@
         "state": "Veraguas",
         "state_abbr": "VR",
         "postcode_prefix": "0901",
-        "lat_min": 8.10,
+        "lat_min": 8.1,
         "lat_max": 8.12,
         "lon_min": -80.98,
         "lon_max": -80.96
@@ -131,7 +131,7 @@
         "lat_min": 9.42,
         "lat_max": 9.44,
         "lon_min": -82.52,
-        "lon_max": -82.50
+        "lon_max": -82.5
       },
       {
         "city": "Pacora",
@@ -150,7 +150,7 @@
         "postcode_prefix": "0804",
         "lat_min": 9.15,
         "lat_max": 9.17,
-        "lon_min": -79.10,
+        "lon_min": -79.1,
         "lon_max": -79.08
       },
       {
@@ -200,7 +200,7 @@
         "state": "Cocle",
         "state_abbr": "CC",
         "postcode_prefix": "0203",
-        "lat_min": 8.40,
+        "lat_min": 8.4,
         "lat_max": 8.42,
         "lon_min": -80.27,
         "lon_max": -80.25
@@ -210,7 +210,7 @@
         "state": "Cocle",
         "state_abbr": "CC",
         "postcode_prefix": "0204",
-        "lat_min": 8.60,
+        "lat_min": 8.6,
         "lat_max": 8.62,
         "lon_min": -80.14,
         "lon_max": -80.12
@@ -220,7 +220,7 @@
         "state": "Veraguas",
         "state_abbr": "VR",
         "postcode_prefix": "0902",
-        "lat_min": 8.50,
+        "lat_min": 8.5,
         "lat_max": 8.52,
         "lon_min": -81.07,
         "lon_max": -81.05
@@ -242,7 +242,7 @@
         "postcode_prefix": "0805",
         "lat_min": 9.12,
         "lat_max": 9.13,
-        "lon_min": -79.70,
+        "lon_min": -79.7,
         "lon_max": -79.69
       }
     ],
@@ -262,7 +262,7 @@
         "state": "Darien",
         "state_abbr": "DR",
         "postcode_prefix": "0502",
-        "lat_min": 8.40,
+        "lat_min": 8.4,
         "lat_max": 8.42,
         "lon_min": -78.14,
         "lon_max": -78.12
@@ -282,9 +282,9 @@
         "state": "Bocas del Toro",
         "state_abbr": "BT",
         "postcode_prefix": "0103",
-        "lat_min": 9.30,
+        "lat_min": 9.3,
         "lat_max": 9.31,
-        "lon_min": -82.40,
+        "lon_min": -82.4,
         "lon_max": -82.39
       },
       {
@@ -301,40 +301,180 @@
   },
   "streets_by_city": {
     "Panama City": [
-      "Via España", "Calle 50", "Avenida Balboa", "Via Argentina",
-      "Calle Uruguay", "Avenida Federico Boyd", "Via Brasil",
-      "Calle Aquilino De La Guardia", "Avenida Central", "Calle Samuel Lewis",
-      "Via Transistmica", "Calle Ricardo Arias", "Avenida Justo Arosemena",
-      "Calle Abel Bravo", "Via Porras", "Calle Eusebio A. Morales",
-      "Avenida Peru", "Calle Colombia", "Via Cincuentenario", "Calle 74"
+      "Via España",
+      "Calle 50",
+      "Avenida Balboa",
+      "Via Argentina",
+      "Calle Uruguay",
+      "Avenida Federico Boyd",
+      "Via Brasil",
+      "Calle Aquilino De La Guardia",
+      "Avenida Central",
+      "Calle Samuel Lewis",
+      "Via Transistmica",
+      "Calle Ricardo Arias",
+      "Avenida Justo Arosemena",
+      "Calle Abel Bravo",
+      "Via Porras",
+      "Calle Eusebio A. Morales",
+      "Avenida Peru",
+      "Calle Colombia",
+      "Via Cincuentenario",
+      "Calle 74"
     ],
     "San Miguelito": [
-      "Via Jose Agustin Arango", "Boulevard Omar Torrijos",
-      "Avenida Ricardo J. Alfaro", "Via Simon Bolivar", "Calle Principal"
+      "Via Jose Agustin Arango",
+      "Boulevard Omar Torrijos",
+      "Avenida Ricardo J. Alfaro",
+      "Via Simon Bolivar",
+      "Calle Principal"
     ],
     "Colon": [
-      "Avenida Central", "Calle 11", "Avenida Bolivar",
-      "Calle Amador Guerrero", "Paseo Washington"
+      "Avenida Central",
+      "Calle 11",
+      "Avenida Bolivar",
+      "Calle Amador Guerrero",
+      "Paseo Washington"
     ],
     "David": [
-      "Avenida Obaldia", "Calle Central", "Avenida 3 de Noviembre",
-      "Calle F Sur", "Avenida 1 de Enero"
+      "Avenida Obaldia",
+      "Calle Central",
+      "Avenida 3 de Noviembre",
+      "Calle F Sur",
+      "Avenida 1 de Enero"
     ],
     "La Chorrera": [
-      "Avenida de las Americas", "Calle Central",
-      "Via Panamericana", "Calle 4ta"
+      "Avenida de las Americas",
+      "Calle Central",
+      "Via Panamericana",
+      "Calle 4ta"
     ],
     "Santiago": [
-      "Avenida Central", "Calle 2da", "Via Interamericana",
+      "Avenida Central",
+      "Calle 2da",
+      "Via Interamericana",
       "Avenida Hernan Porras"
     ],
     "Chitre": [
-      "Paseo Enrique Geenzier", "Calle Manuel Maria Correa",
-      "Avenida Pérez", "Via Circunvalacion"
+      "Paseo Enrique Geenzier",
+      "Calle Manuel Maria Correa",
+      "Avenida Pérez",
+      "Via Circunvalacion"
     ],
     "Boquete": [
-      "Avenida Central", "Calle 1ra Sur", "Via Boquete",
+      "Avenida Central",
+      "Calle 1ra Sur",
+      "Via Boquete",
       "Calle Los Naranjos"
+    ],
+    "Aguadulce": [
+      "Avenida Central",
+      "Calle Principal",
+      "Via Interamericana",
+      "Calle Los Llanos"
+    ],
+    "Almirante": [
+      "Calle Principal",
+      "Avenida Central",
+      "Via Almirante"
+    ],
+    "Anton": [
+      "Avenida Central",
+      "Calle del Mercado",
+      "Via Interamericana"
+    ],
+    "Arraijan": [
+      "Via Centenario",
+      "Avenida de las Americas",
+      "Calle Principal",
+      "Via Arraijan"
+    ],
+    "Bocas del Toro": [
+      "Calle 1ra",
+      "Calle 3ra",
+      "Avenida Central",
+      "Calle del Mar"
+    ],
+    "Changuinola": [
+      "Avenida 17 de Abril",
+      "Calle Principal",
+      "Via Changuinola"
+    ],
+    "Chepo": [
+      "Via Panamericana",
+      "Calle Central",
+      "Avenida Principal"
+    ],
+    "Coronado": [
+      "Via Coronado",
+      "Calle Principal",
+      "Boulevard Coronado"
+    ],
+    "El Valle de Anton": [
+      "Avenida Central",
+      "Calle El Hato",
+      "Calle La Pintada"
+    ],
+    "Gamboa": [
+      "Calle Gamboa",
+      "Avenida del Canal",
+      "Calle Las Cruces"
+    ],
+    "Isla Contadora": [
+      "Playa Larga",
+      "Calle del Aeropuerto",
+      "Calle Principal"
+    ],
+    "La Palma": [
+      "Calle Principal",
+      "Avenida Central",
+      "Calle del Puerto"
+    ],
+    "Las Tablas": [
+      "Avenida Central",
+      "Calle Belisario Porras",
+      "Calle 2da"
+    ],
+    "Pacora": [
+      "Via Panamericana",
+      "Calle Central",
+      "Calle Principal"
+    ],
+    "Pedasi": [
+      "Calle Principal",
+      "Avenida Central",
+      "Calle del Pueblo"
+    ],
+    "Penonome": [
+      "Avenida Central",
+      "Via Interamericana",
+      "Calle San Antonio",
+      "Calle Cocle del Norte"
+    ],
+    "Portobelo": [
+      "Calle Principal",
+      "Avenida del Puerto",
+      "Calle Real"
+    ],
+    "Puerto Armuelles": [
+      "Calle Central",
+      "Avenida Principal",
+      "Calle del Muelle"
+    ],
+    "Santa Fe": [
+      "Calle Principal",
+      "Avenida Central",
+      "Calle Alto de Piedra"
+    ],
+    "Volcan": [
+      "Avenida Central",
+      "Calle Principal",
+      "Via Boquete-Volcan"
+    ],
+    "Yaviza": [
+      "Calle Principal",
+      "Via Panamericana",
+      "Calle del Rio"
     ]
   },
   "postcode_format": "####",
@@ -345,16 +485,36 @@
   "country": "Panama",
   "country_code": "PA",
   "phone_area_codes": {
-    "Panama": ["2"],
-    "Panama Oeste": ["2"],
-    "Colon": ["4"],
-    "Chiriqui": ["7"],
-    "Bocas del Toro": ["7"],
-    "Veraguas": ["9"],
-    "Herrera": ["9"],
-    "Cocle": ["9"],
-    "Los Santos": ["9"],
-    "Darien": ["2"]
+    "Panama": [
+      "2"
+    ],
+    "Panama Oeste": [
+      "2"
+    ],
+    "Colon": [
+      "4"
+    ],
+    "Chiriqui": [
+      "7"
+    ],
+    "Bocas del Toro": [
+      "7"
+    ],
+    "Veraguas": [
+      "9"
+    ],
+    "Herrera": [
+      "9"
+    ],
+    "Cocle": [
+      "9"
+    ],
+    "Los Santos": [
+      "9"
+    ],
+    "Darien": [
+      "2"
+    ]
   },
   "phone_format": "+507 {area_code}###-####"
 }

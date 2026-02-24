@@ -117,5 +117,120 @@
       "name": "Ferrexpo",
       "cities": ["Kyiv", "Poltava"]
     }
+  ],
+  "jobs": [
+    "Software Developer", "Accountant", "Civil Engineer", "Teacher", "Doctor",
+    "Lawyer", "Marketing Manager", "Sales Manager", "Agronomist", "Electrician",
+    "Mechanic", "Pharmacist", "Nurse", "Architect", "Financial Analyst",
+    "Project Manager", "Data Analyst", "HR Manager", "Logistics Coordinator", "Chef",
+    "Journalist", "Designer", "Translator", "Dentist", "Veterinarian"
+  ],
+  "catch_phrase_adjectives": [
+    "innovative", "reliable", "professional", "dynamic", "leading",
+    "modern", "trusted", "advanced", "strategic", "premier",
+    "efficient", "quality", "sustainable", "cutting-edge", "proven"
+  ],
+  "catch_phrase_nouns": [
+    "solutions", "services", "technologies", "innovations", "platforms",
+    "systems", "strategies", "partnerships", "excellence", "results",
+    "growth", "quality", "performance", "development"
+  ],
+  "catch_phrase_verbs": [
+    "deliver", "create", "build", "provide", "enable",
+    "transform", "optimize", "drive", "achieve", "empower",
+    "inspire", "accelerate", "innovate", "develop", "implement"
+  ],
+  "catch_phrase_connector": "that",
+  "industries": [
+    {
+      "name": "technology",
+      "weight": 0.16,
+      "jobs": ["Software Developer", "Data Analyst", "Project Manager"],
+      "well_known": ["SoftServe", "GlobalLogic Ukraine", "EPAM Ukraine", "Ciklum", "Kyivstar"],
+      "company_suffixes": ["Tech", "Software", "Digital", "IT"],
+      "company_nouns": ["Tekhnolohii", "Systemy", "Prohramne Zabezpechennia", "Dani"],
+      "company_formats": ["{adjective} {noun} {suffix}", "{last_name} {noun}"]
+    },
+    {
+      "name": "energy",
+      "weight": 0.14,
+      "jobs": ["Civil Engineer", "Electrician", "Mechanic"],
+      "well_known": ["Naftogaz", "DTEK"],
+      "company_suffixes": ["Enerho", "Haz", "Nafta"],
+      "company_nouns": ["Enerhiya", "Resursy", "Vyrobnytstvo"],
+      "company_formats": ["{adjective} {noun} {suffix}", "{noun} {suffix}"]
+    },
+    {
+      "name": "finance",
+      "weight": 0.12,
+      "jobs": ["Financial Analyst", "Accountant"],
+      "well_known": ["PrivatBank"],
+      "company_suffixes": ["Bank", "Finans", "Investytsii"],
+      "company_nouns": ["Finansy", "Investytsii", "Kapital"],
+      "company_formats": ["{adjective} {noun} {suffix}", "{last_name} {suffix}"]
+    },
+    {
+      "name": "agriculture",
+      "weight": 0.12,
+      "jobs": ["Agronomist"],
+      "well_known": ["Kernel", "MHP"],
+      "company_suffixes": ["Ahro", "Zerno", "Produkt"],
+      "company_nouns": ["Ahropromkompleks", "Produkty", "Torhivlia"],
+      "company_formats": ["{adjective} {noun} {suffix}", "{noun} {suffix}"]
+    },
+    {
+      "name": "logistics",
+      "weight": 0.1,
+      "jobs": ["Logistics Coordinator", "Sales Manager"],
+      "well_known": ["Nova Poshta", "Ukrzaliznytsia", "Ukrposhta"],
+      "company_suffixes": ["Trans", "Lohistyka", "Pereviznyk"],
+      "company_nouns": ["Lohistyka", "Transport", "Perevezenia"],
+      "company_formats": ["{adjective} {noun} {suffix}", "{noun} {suffix}"]
+    },
+    {
+      "name": "healthcare",
+      "weight": 0.08,
+      "jobs": ["Doctor", "Nurse", "Pharmacist", "Dentist"],
+      "well_known": [],
+      "company_suffixes": ["Med", "Pharma", "Klinika"],
+      "company_nouns": ["Okhorona Zdorovya", "Medytsyna", "Farmatsiya"],
+      "company_formats": ["{adjective} {noun} {suffix}", "{noun} {suffix}"]
+    },
+    {
+      "name": "education",
+      "weight": 0.07,
+      "jobs": ["Teacher"],
+      "well_known": [],
+      "company_suffixes": [],
+      "company_nouns": [],
+      "company_formats": ["Universytet {city}", "{city} Politechnika"]
+    },
+    {
+      "name": "legal",
+      "weight": 0.05,
+      "jobs": ["Lawyer"],
+      "well_known": [],
+      "company_suffixes": [],
+      "company_nouns": [],
+      "company_formats": ["{last_name} ta {last_name}", "{last_name} Advokaty"]
+    },
+    {
+      "name": "manufacturing",
+      "weight": 0.1,
+      "jobs": ["Mechanic", "Civil Engineer"],
+      "well_known": ["Interpipe", "Ferrexpo", "Metinvest"],
+      "company_suffixes": ["Zavod", "Vyrobnytstvo", "Industriya"],
+      "company_nouns": ["Metalurhiya", "Vyrobnytstvo", "Materialy"],
+      "company_formats": ["{adjective} {noun} {suffix}", "{city} {noun}"]
+    },
+    {
+      "name": "media",
+      "weight": 0.06,
+      "jobs": ["Journalist", "Designer"],
+      "well_known": ["Lifecell", "Ukrtelecom"],
+      "company_suffixes": ["Media", "Zviazok", "Digital"],
+      "company_nouns": ["Media", "Zviazok", "Komunikatsii"],
+      "company_formats": ["{adjective} {noun} {suffix}", "{noun} {suffix}"]
+    }
   ]
 }

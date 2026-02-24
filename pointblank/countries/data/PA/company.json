@@ -114,5 +114,120 @@
       "name": "Motta Internacional",
       "cities": ["Panama City"]
     }
+  ],
+  "jobs": [
+    "Desarrollador de Software", "Contador", "Ingeniero Civil", "Profesor", "Medico",
+    "Abogado", "Gerente de Marketing", "Vendedor", "Capitan de Barco", "Agente Aduanal",
+    "Farmaceutico", "Enfermero", "Arquitecto", "Analista Financiero", "Gerente de Proyecto",
+    "Analista de Datos", "Gerente de RRHH", "Chef", "Piloto", "Oficial de Cumplimiento",
+    "Banquero", "Chofer", "Veterinario", "Dentista", "Gerente de Logistica"
+  ],
+  "catch_phrase_adjectives": [
+    "confiable", "innovador", "eficiente", "reconocido", "lider",
+    "sostenible", "profesional", "calidad", "moderno", "estrategico",
+    "dinamico", "integral", "avanzado", "comprometido", "excelente"
+  ],
+  "catch_phrase_nouns": [
+    "soluciones", "servicios", "excelencia", "alianza", "crecimiento",
+    "innovacion", "desarrollo", "progreso", "calidad", "valor",
+    "resultados", "tecnologia", "estrategias", "oportunidades"
+  ],
+  "catch_phrase_verbs": [
+    "entregar", "proveer", "construir", "crear", "transformar",
+    "alcanzar", "impulsar", "inspirar", "optimizar", "desarrollar",
+    "implementar", "facilitar", "innovar", "lograr", "generar"
+  ],
+  "catch_phrase_connector": "que",
+  "industries": [
+    {
+      "name": "logistica",
+      "weight": 0.18,
+      "jobs": ["Gerente de Logistica", "Agente Aduanal", "Capitan de Barco"],
+      "well_known": ["Panama Ports Company", "Colon Free Zone", "Autoridad del Canal de Panama"],
+      "company_suffixes": ["Logistica S.A.", "Naviera", "Portuaria"],
+      "company_nouns": ["Logistica", "Naviera", "Portuaria", "Maritima"],
+      "company_formats": ["{adjective} {noun} {suffix}", "{noun} {suffix}"]
+    },
+    {
+      "name": "finanzas",
+      "weight": 0.16,
+      "jobs": ["Analista Financiero", "Banquero", "Contador", "Oficial de Cumplimiento"],
+      "well_known": ["Banco General", "Banistmo", "Global Bank", "Multibank"],
+      "company_suffixes": ["Bank", "Financiera", "Inversiones"],
+      "company_nouns": ["Finanzas", "Inversiones", "Bancaria"],
+      "company_formats": ["{adjective} {noun} {suffix}", "{last_name} {suffix}"]
+    },
+    {
+      "name": "aviacion",
+      "weight": 0.1,
+      "jobs": ["Piloto", "Gerente de Logistica"],
+      "well_known": ["Copa Airlines", "Tocumen International Airport"],
+      "company_suffixes": ["Aviation", "Air", "Airlines"],
+      "company_nouns": ["Aviacion", "Aerea", "Vuelos"],
+      "company_formats": ["{adjective} {noun} {suffix}", "{noun} {suffix}"]
+    },
+    {
+      "name": "comercio",
+      "weight": 0.12,
+      "jobs": ["Vendedor", "Gerente de Marketing"],
+      "well_known": ["Super 99", "Grupo Rey", "Grupo Melo"],
+      "company_suffixes": ["Trading", "Comercial S.A.", "Distribuidora"],
+      "company_nouns": ["Comercio", "Productos", "Trading"],
+      "company_formats": ["{adjective} {noun} {suffix}", "{last_name} {suffix}"]
+    },
+    {
+      "name": "tecnologia",
+      "weight": 0.08,
+      "jobs": ["Desarrollador de Software", "Analista de Datos"],
+      "well_known": ["Cable & Wireless Panama", "Dell Panama"],
+      "company_suffixes": ["Tech S.A.", "Software", "Digital"],
+      "company_nouns": ["Tecnologias", "Sistemas", "Software"],
+      "company_formats": ["{adjective} {noun} {suffix}", "{noun} {suffix}"]
+    },
+    {
+      "name": "salud",
+      "weight": 0.08,
+      "jobs": ["Medico", "Enfermero", "Farmaceutico", "Dentista"],
+      "well_known": [],
+      "company_suffixes": ["Salud", "Clinica", "Farmaceutica"],
+      "company_nouns": ["Salud", "Medicina", "Farmacia"],
+      "company_formats": ["{adjective} {noun} {suffix}", "{noun} {suffix}"]
+    },
+    {
+      "name": "construccion",
+      "weight": 0.1,
+      "jobs": ["Ingeniero Civil", "Arquitecto"],
+      "well_known": [],
+      "company_suffixes": ["Construccion S.A.", "Ingenieria", "Constructora"],
+      "company_nouns": ["Construccion", "Ingenieria", "Inmobiliaria"],
+      "company_formats": ["{adjective} {noun} {suffix}", "{noun} {suffix}"]
+    },
+    {
+      "name": "educacion",
+      "weight": 0.06,
+      "jobs": ["Profesor"],
+      "well_known": [],
+      "company_suffixes": [],
+      "company_nouns": [],
+      "company_formats": ["Universidad de {city}", "Instituto {city}"]
+    },
+    {
+      "name": "alimentos",
+      "weight": 0.06,
+      "jobs": ["Chef", "Vendedor"],
+      "well_known": ["Cerveceria Nacional"],
+      "company_suffixes": ["Alimentos S.A.", "Foods", "Bebidas"],
+      "company_nouns": ["Alimentos", "Bebidas", "Productos"],
+      "company_formats": ["{adjective} {noun} {suffix}", "{noun} {suffix}"]
+    },
+    {
+      "name": "legal",
+      "weight": 0.06,
+      "jobs": ["Abogado", "Oficial de Cumplimiento"],
+      "well_known": [],
+      "company_suffixes": [],
+      "company_nouns": [],
+      "company_formats": ["{last_name} y {last_name}", "{last_name} Abogados"]
+    }
   ]
 }

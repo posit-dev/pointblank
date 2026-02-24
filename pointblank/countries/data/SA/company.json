@@ -115,5 +115,120 @@
       "name": "Zain KSA",
       "cities": ["Riyadh"]
     }
+  ],
+  "jobs": [
+    "Software Engineer", "Petroleum Engineer", "Civil Engineer", "Doctor", "Pharmacist",
+    "Accountant", "Financial Analyst", "Sales Executive", "Marketing Manager", "Teacher",
+    "Architect", "HR Manager", "Project Manager", "Nurse", "Lawyer",
+    "Data Analyst", "Bank Officer", "Chef", "Pilot", "Logistics Coordinator",
+    "Electrical Engineer", "Geologist", "Dentist", "Journalist", "Designer"
+  ],
+  "catch_phrase_adjectives": [
+    "innovative", "reliable", "trusted", "dynamic", "leading",
+    "premier", "visionary", "sustainable", "strategic", "advanced",
+    "professional", "quality", "modern", "integrated", "world-class"
+  ],
+  "catch_phrase_nouns": [
+    "solutions", "services", "innovations", "partnerships", "excellence",
+    "growth", "values", "performance", "platforms", "infrastructure",
+    "opportunities", "development", "technologies", "strategies"
+  ],
+  "catch_phrase_verbs": [
+    "deliver", "create", "build", "provide", "enable",
+    "transform", "achieve", "empower", "drive", "inspire",
+    "accelerate", "optimize", "develop", "innovate", "implement"
+  ],
+  "catch_phrase_connector": "that",
+  "industries": [
+    {
+      "name": "oil_and_gas",
+      "weight": 0.18,
+      "jobs": ["Petroleum Engineer", "Geologist", "Project Manager"],
+      "well_known": ["Saudi Aramco", "SABIC", "Ma'aden"],
+      "company_suffixes": ["Energy", "Petroleum", "Oil"],
+      "company_nouns": ["Energy", "Oil", "Petroleum", "Industries"],
+      "company_formats": ["{adjective} {noun} {suffix}", "{noun} {suffix}"]
+    },
+    {
+      "name": "finance",
+      "weight": 0.14,
+      "jobs": ["Financial Analyst", "Accountant", "Bank Officer"],
+      "well_known": ["Al Rajhi Bank", "Saudi National Bank"],
+      "company_suffixes": ["Bank", "Financial", "Capital", "Investments"],
+      "company_nouns": ["Finance", "Capital", "Investments"],
+      "company_formats": ["{adjective} {noun} {suffix}", "{last_name} {suffix}"]
+    },
+    {
+      "name": "construction",
+      "weight": 0.12,
+      "jobs": ["Civil Engineer", "Architect"],
+      "well_known": ["Bin Laden Group"],
+      "company_suffixes": ["Contracting", "Construction", "Engineering"],
+      "company_nouns": ["Construction", "Engineering", "Development"],
+      "company_formats": ["{adjective} {noun} {suffix}", "{last_name} {suffix}"]
+    },
+    {
+      "name": "technology",
+      "weight": 0.1,
+      "jobs": ["Software Engineer", "Data Analyst"],
+      "well_known": ["Saudi Telecom Company", "Mobily", "Zain KSA"],
+      "company_suffixes": ["Tech", "Digital", "Systems"],
+      "company_nouns": ["Technology", "Systems", "Digital"],
+      "company_formats": ["{adjective} {noun} {suffix}", "{noun} {suffix}"]
+    },
+    {
+      "name": "healthcare",
+      "weight": 0.08,
+      "jobs": ["Doctor", "Nurse", "Pharmacist", "Dentist"],
+      "well_known": [],
+      "company_suffixes": ["Medical", "Healthcare", "Pharma"],
+      "company_nouns": ["Healthcare", "Medical", "Pharma"],
+      "company_formats": ["{adjective} {noun} {suffix}", "{noun} {suffix}"]
+    },
+    {
+      "name": "retail",
+      "weight": 0.1,
+      "jobs": ["Sales Executive", "Marketing Manager"],
+      "well_known": ["Jarir Marketing", "Panda Retail", "Savola Group"],
+      "company_suffixes": ["Trading", "Retail", "Group"],
+      "company_nouns": ["Trading", "Retail", "Commerce"],
+      "company_formats": ["{adjective} {noun} {suffix}", "{last_name} {suffix}"]
+    },
+    {
+      "name": "real_estate",
+      "weight": 0.08,
+      "jobs": ["Architect", "Project Manager"],
+      "well_known": ["Dar Al Arkan", "Kingdom Holding Company"],
+      "company_suffixes": ["Properties", "Real Estate", "Development"],
+      "company_nouns": ["Properties", "Real Estate", "Development"],
+      "company_formats": ["{adjective} {noun} {suffix}", "{noun} {suffix}"]
+    },
+    {
+      "name": "education",
+      "weight": 0.06,
+      "jobs": ["Teacher"],
+      "well_known": [],
+      "company_suffixes": [],
+      "company_nouns": [],
+      "company_formats": ["University of {city}", "{city} Academy"]
+    },
+    {
+      "name": "logistics",
+      "weight": 0.08,
+      "jobs": ["Logistics Coordinator", "Pilot"],
+      "well_known": ["Saudi Arabian Airlines"],
+      "company_suffixes": ["Logistics", "Transport", "Marine"],
+      "company_nouns": ["Logistics", "Transport", "Aviation"],
+      "company_formats": ["{adjective} {noun} {suffix}", "{noun} {suffix}"]
+    },
+    {
+      "name": "agriculture",
+      "weight": 0.06,
+      "jobs": ["Logistics Coordinator"],
+      "well_known": ["Almarai"],
+      "company_suffixes": ["Agriculture", "Foods", "Dairy"],
+      "company_nouns": ["Agriculture", "Foods", "Farming"],
+      "company_formats": ["{adjective} {noun} {suffix}", "{noun} {suffix}"]
+    }
   ]
 }
