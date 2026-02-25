@@ -1,0 +1,112 @@
+{
+  "suffixes": ["S.A.", "S.R.L.", "Ltda.", "y Cía.", "S.A. de C.V.", "e Hijos", "y Asociados", "Corp.", "S.C.", "Sociedad Anónima"],
+  "formats": [
+    "{last_name} {suffix}",
+    "{adjective} {noun} {suffix}",
+    "{noun} {suffix}",
+    "{adjective} {suffix}",
+    "{last_name} y {last_name} {suffix}"
+  ],
+  "adjectives": [
+    "Nacional", "Central", "Internacional", "Regional", "Global",
+    "Industrial", "Comercial", "Agrícola", "Financiera", "Moderna",
+    "Estratégica", "Profesional", "Digital", "Innovadora", "Maya",
+    "Tropical", "Colonial", "Centroamericana", "Pacífica", "Atlántica",
+    "Continental", "Metropolitana", "Intercontinental", "Corporativa",
+    "Integral", "Unificada", "Progresiva", "Dinámica"
+  ],
+  "nouns": [
+    "Comercio", "Industria", "Construcción", "Tecnología", "Alimentos",
+    "Textiles", "Café", "Azúcar", "Banano", "Agricultura",
+    "Finanzas", "Transporte", "Logística", "Energía", "Turismo",
+    "Exportaciones", "Importaciones", "Servicios", "Comunicaciones", "Minería",
+    "Inversiones", "Capital", "Desarrollo", "Producción", "Distribución",
+    "Consultores", "Asociados", "Grupo", "Holding", "Medios",
+    "Soluciones", "Recursos", "Sistemas", "Ingeniería", "Farmacia",
+    "Educación"
+  ],
+  "well_known_companies": [
+    {"name": "Grupo Pantaleón", "cities": ["Guatemala City", "Escuintla", "Santa Lucía Cotzumalguapa"]},
+    {"name": "Pollo Campero", "cities": ["Guatemala City", "Mixco", "Villa Nueva", "Quetzaltenango", "Escuintla", "Cobán"]},
+    {"name": "Cervecería Centro Americana", "cities": ["Guatemala City"]},
+    {"name": "Banco Industrial", "cities": ["Guatemala City", "Mixco", "Villa Nueva", "Quetzaltenango", "Escuintla", "Cobán", "Huehuetenango"]},
+    {"name": "Banco G&T Continental", "cities": ["Guatemala City", "Quetzaltenango", "Escuintla", "Cobán"]},
+    {"name": "Cementos Progreso", "cities": ["Guatemala City", "San Juan Sacatepéquez"]},
+    {"name": "Disagro", "cities": ["Guatemala City", "Escuintla", "Retalhuleu"]},
+    {"name": "Grupo Multi Inversiones", "cities": ["Guatemala City", "Mixco", "Villa Nueva"]},
+    {"name": "Telus", "cities": ["Guatemala City", "Quetzaltenango", "Cobán"]},
+    {"name": "Tigo Guatemala", "cities": ["Guatemala City", "Mixco", "Villa Nueva", "Quetzaltenango", "Escuintla"]},
+    {"name": "Claro Guatemala", "cities": ["Guatemala City", "Mixco", "Quetzaltenango", "Escuintla", "Cobán"]},
+    {"name": "Ingenio Magdalena", "cities": ["Escuintla", "Guatemala City"]},
+    {"name": "Grupo Solid", "cities": ["Guatemala City", "Escuintla"]},
+    {"name": "La Fragua", "cities": ["Guatemala City", "Mixco", "Villa Nueva", "Quetzaltenango"]},
+    {"name": "BAM", "cities": ["Guatemala City", "Quetzaltenango", "Cobán", "Huehuetenango"]},
+    {"name": "Banrural", "cities": ["Guatemala City", "Mixco", "Villa Nueva", "Quetzaltenango", "Escuintla", "Cobán", "Huehuetenango", "Antigua Guatemala"]},
+    {"name": "Grupo Hame", "cities": ["Guatemala City", "Retalhuleu", "Escuintla"]},
+    {"name": "Kern's", "cities": ["Guatemala City", "Escuintla"]},
+    {"name": "Rica Reditek", "cities": ["Guatemala City"]},
+    {"name": "Saúl E. Méndez", "cities": ["Guatemala City", "Quetzaltenango"]},
+    {"name": "Olmeca", "cities": ["Guatemala City", "Escuintla"]},
+    {"name": "Agua Pura Salvavidas", "cities": ["Guatemala City", "Mixco"]},
+    {"name": "Liztex", "cities": ["Guatemala City", "Mixco"]},
+    {"name": "PRONET", "cities": ["Guatemala City"]},
+    {"name": "Energuate", "cities": ["Guatemala City", "Cobán", "Puerto Barrios"]},
+    {"name": "EEGSA", "cities": ["Guatemala City", "Mixco", "Villa Nueva"]},
+    {"name": "Avianca Guatemala", "cities": ["Guatemala City"]},
+    {"name": "TAG Airlines", "cities": ["Guatemala City", "Flores"]},
+    {"name": "Litegua", "cities": ["Guatemala City", "Puerto Barrios"]},
+    {"name": "Ducal", "cities": ["Guatemala City", "Escuintla"]},
+    {"name": "Aceros de Guatemala", "cities": ["Guatemala City"]},
+    {"name": "Grupo Cayalá", "cities": ["Guatemala City"]},
+    {"name": "Corporación Castillo Hermanos", "cities": ["Guatemala City", "Quetzaltenango"]},
+    {"name": "Grupo Terra Guatemala", "cities": ["Guatemala City", "Escuintla"]},
+    {"name": "AgroAmérica", "cities": ["Guatemala City", "Retalhuleu", "Escuintla"]},
+    {"name": "Grupo Bimbo Guatemala", "cities": ["Guatemala City", "Mixco"]},
+    {"name": "Tiendas Max", "cities": ["Guatemala City", "Mixco", "Villa Nueva"]},
+    {"name": "Pricesmart Guatemala", "cities": ["Guatemala City"]},
+    {"name": "Walmart Guatemala", "cities": ["Guatemala City", "Mixco", "Villa Nueva", "Quetzaltenango"]},
+    {"name": "Los Tres Tiempos", "cities": ["Guatemala City"]},
+    {"name": "Sophos", "cities": ["Guatemala City", "Antigua Guatemala"]},
+    {"name": "De Museo", "cities": ["Guatemala City", "Antigua Guatemala"]},
+    {"name": "IRTRA", "cities": ["Guatemala City", "Retalhuleu"]},
+    {"name": "Guatemalteca de Aviación", "cities": ["Guatemala City"]}
+  ],
+  "jobs": [
+    "Abogado", "Administrador", "Agricultor", "Arquitecto", "Cajero",
+    "Carpintero", "Chef", "Chofer", "Contador", "Dentista",
+    "Director", "Diseñador", "Doctor", "Economista", "Electricista",
+    "Enfermero", "Farmacéutico", "Gerente", "Ingeniero", "Maestro",
+    "Mecánico", "Mercadólogo", "Mesero", "Notario", "Obrero",
+    "Periodista", "Piloto", "Plomero", "Policía", "Profesor",
+    "Programador", "Psicólogo", "Publicista", "Químico", "Recepcionista",
+    "Secretario", "Soldador", "Técnico", "Vendedor", "Veterinario",
+    "Albañil", "Panadero", "Zapatero"
+  ],
+  "catch_phrase_adjectives": [
+    "innovadora", "moderna", "confiable", "profesional", "digital",
+    "global", "estratégica", "sostenible", "eficiente", "integral",
+    "dinámica", "creativa", "líder", "competitiva", "responsable"
+  ],
+  "catch_phrase_nouns": [
+    "soluciones", "servicios", "oportunidades", "resultados", "crecimiento",
+    "desarrollo", "calidad", "tecnología", "innovación", "excelencia",
+    "compromiso", "valor", "confianza", "futuro", "transformación"
+  ],
+  "catch_phrase_verbs": [
+    "ofrece", "construye", "desarrolla", "innova", "transforma",
+    "impulsa", "conecta", "fortalece", "crea", "lidera"
+  ],
+  "catch_phrase_connector": [
+    "y", "con", "para", "en", "a través de"
+  ],
+  "industries": [
+    "Agricultura", "Agroindustria", "Azúcar y caña", "Banca y finanzas",
+    "Café", "Cardamomo", "Comercio", "Construcción",
+    "Educación", "Energía", "Manufactura", "Minería",
+    "Palma africana", "Salud", "Tecnología", "Telecomunicaciones",
+    "Textiles y maquila", "Transporte y logística", "Turismo",
+    "Alimentos y bebidas", "Bienes raíces", "Consultoría",
+    "Ingeniería", "Medios de comunicación", "Petróleo y gas",
+    "Seguros", "Servicios financieros"
+  ]
+}

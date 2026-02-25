@@ -867,7 +867,7 @@ class Schema:
         -------------------
         The `country=` parameter controls the country used for generating realistic data with
         presets (e.g., `preset="email"`, `preset="address"`). This affects location-specific formats
-        like addresses, phone numbers, and postal codes. Currently, **85 countries** are supported
+        like addresses, phone numbers, and postal codes. Currently, **91 countries** are supported
         with full locale data:
 
         **Europe (35 countries):** Austria (`"AT"`), Belgium (`"BE"`), Bulgaria (`"BG"`), Croatia
@@ -1680,7 +1680,7 @@ def generate_dataset(
 
     Supported Countries
     -------------------
-    The `country=` parameter currently supports 85 countries with full locale data:
+    The `country=` parameter currently supports 91 countries with full locale data:
 
     **Europe (35 countries):** Austria (`"AT"`), Belgium (`"BE"`), Bulgaria (`"BG"`),
     Croatia (`"HR"`), Cyprus (`"CY"`), Czech Republic (`"CZ"`), Denmark (`"DK"`),

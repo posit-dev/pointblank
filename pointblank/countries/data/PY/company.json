@@ -1,0 +1,104 @@
+{
+  "suffixes": ["S.A.", "S.R.L.", "S.A.C.I.", "S.A.E.", "S.C.A.", "Ltda.", "S.A.E.C.A."],
+  "formats": [
+    "{last_name} {suffix}",
+    "{last_name} & {last_name} {suffix}",
+    "{adjective} {noun} {suffix}",
+    "{noun} {suffix}"
+  ],
+  "adjectives": [
+    "Nacional", "General", "Central", "Comercial", "Industrial",
+    "Nueva", "Gran", "Primera", "Principal", "Moderna",
+    "Internacional", "Americana", "Paraguaya", "Continental", "Regional",
+    "Dinámica", "Progresiva", "Innovadora", "Sostenible", "Verde",
+    "Solidaria", "Comunitaria", "Digital", "Tecnológica", "Social",
+    "Urbana", "Rural", "Agrícola", "Financiera", "Económica"
+  ],
+  "nouns": [
+    "Empresa", "Compañía", "Sociedad", "Industrias", "Servicios",
+    "Comercio", "Soluciones", "Grupo", "Holdings", "Desarrollo",
+    "Tecnologías", "Inversiones", "Construcción", "Transporte", "Comunicación",
+    "Energía", "Distribución", "Producción", "Agricultura", "Finanzas",
+    "Seguros", "Inmobiliaria", "Trading", "Consultoría", "Logística",
+    "Informática", "Ingeniería", "Telecomunicaciones", "Edificación", "Ambiente",
+    "Turismo", "Ganadería", "Soja", "Yerba", "Alimentación", "Capacitación"
+  ],
+  "well_known_companies": [
+    {"name": "Itaipú Binacional", "cities": ["Asunción", "Hernandarias", "Ciudad del Este"]},
+    {"name": "Yacyretá", "cities": ["Asunción", "Ayolas", "Encarnación"]},
+    {"name": "Tigo Paraguay", "cities": ["Asunción", "Ciudad del Este", "Encarnación", "San Lorenzo"]},
+    {"name": "Personal Paraguay", "cities": ["Asunción", "Ciudad del Este", "Encarnación"]},
+    {"name": "Claro Paraguay", "cities": ["Asunción", "Ciudad del Este", "San Lorenzo"]},
+    {"name": "Banco Nacional de Fomento", "cities": ["Asunción", "Ciudad del Este", "Encarnación", "Concepción"]},
+    {"name": "Banco Continental", "cities": ["Asunción", "Ciudad del Este", "Encarnación"]},
+    {"name": "Banco Itaú Paraguay", "cities": ["Asunción", "Ciudad del Este"]},
+    {"name": "Sudameris Bank", "cities": ["Asunción", "Ciudad del Este", "Encarnación"]},
+    {"name": "Banco Regional", "cities": ["Asunción", "Ciudad del Este", "Encarnación", "Concepción"]},
+    {"name": "COPACO", "cities": ["Asunción", "San Lorenzo", "Luque"]},
+    {"name": "ANDE", "cities": ["Asunción", "San Lorenzo", "Ciudad del Este", "Encarnación"]},
+    {"name": "ESSAP", "cities": ["Asunción", "San Lorenzo", "Luque"]},
+    {"name": "Petropar", "cities": ["Asunción", "Villa Elisa"]},
+    {"name": "TABESA", "cities": ["Asunción", "San Lorenzo"]},
+    {"name": "Grupo Cartes", "cities": ["Asunción"]},
+    {"name": "Grupo Vázquez", "cities": ["Asunción", "Ciudad del Este"]},
+    {"name": "Grupo Zucolillo", "cities": ["Asunción"]},
+    {"name": "Cargill Paraguay", "cities": ["Asunción", "Ciudad del Este", "Encarnación"]},
+    {"name": "ADM Paraguay", "cities": ["Asunción", "Ciudad del Este"]},
+    {"name": "Louis Dreyfus Paraguay", "cities": ["Asunción", "Ciudad del Este"]},
+    {"name": "Bunge Paraguay", "cities": ["Asunción", "Ciudad del Este"]},
+    {"name": "Frigomerc", "cities": ["Asunción", "Mariano Roque Alonso"]},
+    {"name": "Cervepar", "cities": ["Asunción", "Ypané"]},
+    {"name": "Coca-Cola Paraguay", "cities": ["Asunción"]},
+    {"name": "Unilever Paraguay", "cities": ["Asunción"]},
+    {"name": "Cooperativa Chortitzer", "cities": ["Loma Plata", "Filadelfia", "Asunción"]},
+    {"name": "Cooperativa Neuland", "cities": ["Neuland", "Asunción"]},
+    {"name": "Cooperativa Fernheim", "cities": ["Filadelfia", "Asunción"]},
+    {"name": "LAP - Aeropuerto Silvio Pettirossi", "cities": ["Luque"]},
+    {"name": "Samuelsohn", "cities": ["Asunción"]},
+    {"name": "Mapfre Paraguay", "cities": ["Asunción", "Ciudad del Este"]},
+    {"name": "Sancor Seguros Paraguay", "cities": ["Asunción"]},
+    {"name": "Visión Banco", "cities": ["Asunción", "Ciudad del Este", "Encarnación", "San Lorenzo"]},
+    {"name": "Banco Familiar", "cities": ["Asunción", "Ciudad del Este", "Encarnación"]},
+    {"name": "Banco Atlas", "cities": ["Asunción", "Ciudad del Este"]},
+    {"name": "BBVA Paraguay", "cities": ["Asunción"]},
+    {"name": "Interfisa Banco", "cities": ["Asunción", "Ciudad del Este", "Encarnación"]},
+    {"name": "La Rural del Paraná", "cities": ["Encarnación"]},
+    {"name": "Shopping del Sol", "cities": ["Asunción"]},
+    {"name": "Superseis", "cities": ["Asunción", "San Lorenzo", "Luque", "Lambaré"]},
+    {"name": "Real S.A.", "cities": ["Asunción", "San Lorenzo", "Fernando de la Mora"]},
+    {"name": "Toyotoshi", "cities": ["Asunción", "Ciudad del Este"]},
+    {"name": "Diesa", "cities": ["Asunción", "Ciudad del Este"]}
+  ],
+  "jobs": [
+    "Director", "Directora", "Contador", "Contadora", "Ingeniero",
+    "Ingeniera", "Médico", "Médica", "Maestro", "Maestra",
+    "Abogado", "Abogada", "Agricultor", "Agricultora", "Chofer",
+    "Comerciante", "Enfermero", "Enfermera", "Secretario", "Secretaria",
+    "Técnico", "Técnica", "Periodista", "Farmacéutico", "Farmacéutica",
+    "Arquitecto", "Arquitecta", "Consultor", "Consultora", "Analista",
+    "Programador", "Programadora", "Diseñador", "Diseñadora", "Jefe de proyecto",
+    "Cajero", "Cajera", "Guardia", "Electricista", "Plomero",
+    "Carpintero", "Albañil", "Cocinero", "Cocinera", "Guía turístico"
+  ],
+  "catch_phrase_adjectives": [
+    "innovador", "sostenible", "moderno", "eficiente", "confiable",
+    "dinámico", "efectivo", "estratégico", "responsable", "integrado"
+  ],
+  "catch_phrase_nouns": [
+    "soluciones", "servicios", "sistemas", "tecnologías", "desarrollo",
+    "excelencia", "innovación", "crecimiento", "progreso", "calidad"
+  ],
+  "catch_phrase_verbs": [
+    "transformar", "innovar", "desarrollar", "optimizar", "crear",
+    "mejorar", "construir", "conectar", "inspirar", "realizar"
+  ],
+  "catch_phrase_connector": [
+    "para", "con", "hacia", "y", "en favor de"
+  ],
+  "industries": [
+    "Agricultura", "Ganadería", "Banca", "Turismo", "Tecnología",
+    "Construcción", "Transporte", "Energía", "Telecomunicaciones", "Salud",
+    "Educación", "Comercio", "Soja", "Yerba Mate", "Inmobiliaria",
+    "Seguros", "Alimentación", "Hotelería", "Artesanía", "Forestal"
+  ]
+}

@@ -486,7 +486,7 @@ Letters I, O, Q, and U are excluded from plate generation, matching real-world r
 
 ### Supported Countries
 
-Pointblank currently supports 85 countries with full locale data for realistic test data generation.
+Pointblank currently supports 91 countries with full locale data for realistic test data generation.
 You can use either ISO 3166-1 alpha-2 codes (e.g., `"US"`) or alpha-3 codes (e.g., `"USA"`).
 
 **Europe (35 countries):**
@@ -835,7 +835,7 @@ By incorporating test data generation into your process, you can:
 
 - quickly prototype validation rules before working with production data
 - create reproducible test fixtures for automated testing and CI/CD pipelines
-- generate locale-specific data for internationalization testing across 85 countries
+- generate locale-specific data for internationalization testing across 91 countries
 - ensure coherent relationships between related fields like names, emails, addresses, jobs, and
 license plates
 - produce datasets of any size with consistent, realistic values

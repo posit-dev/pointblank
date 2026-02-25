@@ -264,6 +264,7 @@ COUNTRIES_WITH_FULL_DATA: list[str] = [
     "GE",  # Georgia
     "GH",  # Ghana
     "GR",  # Greece
+    "GT",  # Guatemala
     "HK",  # Hong Kong
     "HR",  # Croatia
     "HU",  # Hungary
@@ -279,6 +280,7 @@ COUNTRIES_WITH_FULL_DATA: list[str] = [
     "KE",  # Kenya
     "KR",  # South Korea
     "KZ",  # Kazakhstan
+    "LB",  # Lebanon
     "LK",  # Sri Lanka
     "LT",  # Lithuania
     "LU",  # Luxembourg
@@ -290,6 +292,7 @@ COUNTRIES_WITH_FULL_DATA: list[str] = [
     "NG",  # Nigeria
     "NL",  # Netherlands
     "NO",  # Norway
+    "NP",  # Nepal
     "NZ",  # New Zealand
     "PA",  # Panama
     "PE",  # Peru
@@ -297,9 +300,11 @@ COUNTRIES_WITH_FULL_DATA: list[str] = [
     "PK",  # Pakistan
     "PL",  # Poland
     "PT",  # Portugal
+    "PY",  # Paraguay
     "RO",  # Romania
     "RS",  # Serbia
     "RU",  # Russia
+    "RW",  # Rwanda
     "SA",  # Saudi Arabia
     "SE",  # Sweden
     "SG",  # Singapore
@@ -315,6 +320,7 @@ COUNTRIES_WITH_FULL_DATA: list[str] = [
     "UG",  # Uganda
     "US",  # United States
     "UY",  # Uruguay
+    "UZ",  # Uzbekistan
     "VN",  # Vietnam
     "ZA",  # South Africa
 ]
