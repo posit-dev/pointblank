@@ -17843,29 +17843,16 @@ class Validate:
 
         return step_report
 
-    def get_dataframe(
-        self,
-        tbl_type: Literal["polars", "pandas", "duckdb"] = "polars",
-        keep_extracts: bool = False,
-    ):
+    def get_dataframe(self, tbl_type: Literal["polars", "pandas", "duckdb"] = "polars"):
         """
         Validation results as a dataframe
 
-        The `get_dataframe()` method returns a dataframe that represents the validation
-        report. This dataframe provides a summary of the validation results, including the
-        validation steps, the number of test units, the number of failing test units, and the
-        fraction of failing test units. This can be particularly helpful for logging purposes
-        and enables write validation summaries to CSVs and other on-disk formats.
+        The `get_dataframe()` method returns a dataframe that represents the validation report. This dataframe provides a summary of the validation results, including the validation steps, the number of test units, the number of failing test units, and the fraction of failing test units. This can be particularly helpful for logging purposes and enables writing validation summaries to CSVs and other on-disk formats.
 
         Parameters
         ----------
         tbl_type :
-            The output backend for the dataframe. The named options are `"polars"`,
-        `"pandas"`, and `"duckdb"`. Default is 'polars'.
-
-        keep_extracts:
-            An option to keep any collected extract data for failing rows from validation steps. By
-        default, this is `False` (i.e., extract data is removed to save space).
+            The output backend for the dataframe. The named options are `"polars"`, `"pandas"`, and `"duckdb"`. Default is 'polars'.
 
         Supported DataFrame Types
         -------------------------
@@ -17883,7 +17870,7 @@ class Validate:
 
         # Create a validation
         validation = (
-            pb.Validate(data=pb.load_dataset("small_table", tbl_type = "duckdb"), label="My validation")
+            pb.Validate(data=pb.load_dataset("small_table", tbl_type = "polars"), label="My validation")
             .col_vals_gt(columns="d", value=100)
             .col_vals_regex(columns="b", pattern=r"[0-9]-[a-z]{3}-[0-9]{3}")
             .interrogate()
@@ -17907,8 +17894,8 @@ class Validate:
         # Grab the summary data from validation info helper function
         report_original = _validation_info_as_dict(self.validation_info)
 
-        # Pop the extracts off unless specified to keep
-        if keep_extracts is False and "extract" in report_original:
+        # Pop the extracts off if present
+        if "extract" in report_original:
             report_original.pop("extract")
 
         # Remove keys to be dropped
@@ -17931,29 +17918,39 @@ class Validate:
         # Create the schema for the df
         schema = pl.Schema(
             {
-                "assertion_type": pl.String,  # assertion_type
-                "column": pl.String,  # column
-                "values": pl.Unknown,  # values
-                "pre": pl.Unknown,  # pre
-                "active": pl.String,  # active
-                "n": pl.Int64,  # n
-                "n_passed": pl.Int64,  # n_passed
-                "f_passed": pl.Float64,  # f_passed
-                "n_failed": pl.Int64,  # n_failed
-                "f_failed": pl.Float64,  # f_failed
-                "warning": pl.Boolean,  # warning
-                "error": pl.Boolean,  # error
-                "critical": pl.Boolean,  # critical
+                "active": pl.Boolean,
+                "i": pl.Int64,
+                "assertion_type": pl.String,
+                "column": pl.String,
+                "values": pl.Object,
+                "pre": pl.Object,
+                "segments": pl.String,
+                "eval_error": pl.Boolean,
+                "n": pl.Int64,
+                "all_passed": pl.Boolean,
+                "n_passed": pl.Int64,
+                "f_passed": pl.Float64,
+                "n_failed": pl.Int64,
+                "f_failed": pl.Float64,
+                "warning": pl.Boolean,
+                "error": pl.Boolean,
+                "critical": pl.Boolean,
+                "brief": pl.String,
+                "autobrief": pl.String,  # Default brief if none found
             }
         )
 
         names_dict = {
-            "assertion_type": "step",
+            "active": "active",
+            "i": "step_number",
+            "assertion_type": "step_decription",
             "column": "columns",
             "values": "values",
-            "pre": "tbl",
-            "active": "eval",
+            "pre": "original_pre",
+            "segments": "original_segments",
+            "eval_error": "step_evaluated",
             "n": "units",
+            "all_passed": "all_units_passed",
             "n_passed": "pass_n",
             "f_passed": "pass_pct",
             "n_failed": "failed_n",
@@ -17961,12 +17958,38 @@ class Validate:
             "warning": "warning",
             "error": "error",
             "critical": "critical",
+            "brief": "input_brief",
+            "autobrief": "autobrief",
         }
 
         report = {key: report_original[key] for key in names_dict.keys() if key in report_original}
 
-        df_validation_results = pl.DataFrame(data=report, schema=schema, strict=False).rename(
-            names_dict
+        df_validation_results = (
+            pl.DataFrame(data=report, schema=schema)
+            .rename(names_dict)
+            .with_columns(
+                brief=pl.coalesce("input_brief", "autobrief"),
+                preprocessed=pl.when(pl.col("original_pre").is_not_null())
+                .then(pl.lit(True))
+                .otherwise(pl.lit(False)),
+                segmented=pl.when(pl.col("original_segments").is_not_null())
+                .then(pl.lit(True))
+                .otherwise(pl.lit(False)),
+                # Extract pattern from values if it's a dict, otherwise keep as-is
+                values=pl.col("values").map_elements(
+                    lambda x: x.get("pattern") if isinstance(x, dict) and "pattern" in x else x,
+                    return_dtype=pl.Object
+                )
+            )
+            .with_columns(
+                pl.when(pl.col("active") == False)
+                .then(pl.lit("-"))
+                .otherwise(pl.col(col))
+                .alias(col)
+                for col in ["step_evaluated", "units", "all_units_passed", "pass_n", "pass_pct",
+                            "failed_n", "failed_pct", "warning", "error", "critical"]
+            )
+            .drop(["input_brief", "autobrief", "original_pre", "original_segments"])
         )
 
         return df_validation_results
