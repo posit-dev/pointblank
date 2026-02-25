@@ -1,0 +1,748 @@
+{
+  "suffixes": [
+    "Co., Ltd.",
+    "PLC",
+    "Ltd.",
+    "Corp.",
+    "Inc.",
+    "Group",
+    "Holdings",
+    "Enterprise",
+    "Trading",
+    "Solutions"
+  ],
+  "formats": [
+    "{last_name} {suffix}",
+    "{adjective} {noun} {suffix}",
+    "{noun} {suffix}",
+    "{adjective} {suffix}",
+    "{last_name} & {last_name} {suffix}"
+  ],
+  "adjectives": [
+    "Angkor",
+    "Mekong",
+    "Khmer",
+    "Royal",
+    "Golden",
+    "Pacific",
+    "Global",
+    "National",
+    "United",
+    "Premier",
+    "Central",
+    "Oriental",
+    "Modern",
+    "Dynamic",
+    "International",
+    "Strategic",
+    "Progressive",
+    "Digital",
+    "Creative",
+    "Imperial",
+    "Grand",
+    "Emerald",
+    "Bayon",
+    "Tonle",
+    "Phnom",
+    "Mekong Delta",
+    "Asian",
+    "Continental"
+  ],
+  "nouns": [
+    "Commerce",
+    "Industries",
+    "Construction",
+    "Technology",
+    "Foods",
+    "Textiles",
+    "Rice",
+    "Agriculture",
+    "Finance",
+    "Transport",
+    "Logistics",
+    "Energy",
+    "Tourism",
+    "Exports",
+    "Imports",
+    "Services",
+    "Communications",
+    "Investments",
+    "Capital",
+    "Development",
+    "Production",
+    "Distribution",
+    "Resources",
+    "Systems",
+    "Engineering",
+    "Properties",
+    "Education",
+    "Media",
+    "Pharma",
+    "Trading",
+    "Garments",
+    "Consulting"
+  ],
+  "well_known_companies": [
+    {
+      "name": "Cellcard",
+      "cities": ["Phnom Penh", "Siem Reap", "Battambang", "Sihanoukville"]
+    },
+    {
+      "name": "Smart Axiata",
+      "cities": ["Phnom Penh", "Siem Reap", "Battambang", "Kampong Cham"]
+    },
+    {
+      "name": "Metfone",
+      "cities": ["Phnom Penh", "Siem Reap", "Battambang", "Sihanoukville", "Kampong Cham"]
+    },
+    {
+      "name": "ABA Bank",
+      "cities": ["Phnom Penh", "Siem Reap", "Battambang", "Sihanoukville", "Kampong Cham"]
+    },
+    {
+      "name": "ACLEDA Bank",
+      "cities": ["Phnom Penh", "Siem Reap", "Battambang", "Sihanoukville", "Kampong Cham", "Kampot"]
+    },
+    {
+      "name": "Canadia Bank",
+      "cities": ["Phnom Penh", "Siem Reap", "Battambang"]
+    },
+    {
+      "name": "Wing Cambodia",
+      "cities": ["Phnom Penh", "Siem Reap", "Battambang", "Kampong Cham"]
+    },
+    {
+      "name": "Prince Group",
+      "cities": ["Phnom Penh", "Sihanoukville"]
+    },
+    {
+      "name": "Chip Mong Group",
+      "cities": ["Phnom Penh", "Siem Reap", "Sihanoukville"]
+    },
+    {
+      "name": "Vattanac Group",
+      "cities": ["Phnom Penh"]
+    },
+    {
+      "name": "NagaWorld",
+      "cities": ["Phnom Penh"]
+    },
+    {
+      "name": "Electricite du Cambodge",
+      "cities": ["Phnom Penh", "Siem Reap", "Battambang", "Kampong Cham"]
+    },
+    {
+      "name": "Cambodia Angkor Air",
+      "cities": ["Phnom Penh", "Siem Reap"]
+    },
+    {
+      "name": "Royal Group",
+      "cities": ["Phnom Penh", "Siem Reap", "Sihanoukville"]
+    },
+    {
+      "name": "Khmer Brewery",
+      "cities": ["Phnom Penh", "Sihanoukville"]
+    },
+    {
+      "name": "Cambodia Beer",
+      "cities": ["Phnom Penh"]
+    },
+    {
+      "name": "Borey Peng Huoth",
+      "cities": ["Phnom Penh", "Siem Reap"]
+    },
+    {
+      "name": "Sokha Hotels and Resorts",
+      "cities": ["Phnom Penh", "Siem Reap", "Sihanoukville"]
+    },
+    {
+      "name": "Mong Reththy Group",
+      "cities": ["Phnom Penh", "Sihanoukville"]
+    },
+    {
+      "name": "Ly Hour Group",
+      "cities": ["Phnom Penh", "Siem Reap"]
+    },
+    {
+      "name": "Hattha Bank",
+      "cities": ["Phnom Penh", "Siem Reap", "Battambang", "Kampong Cham"]
+    },
+    {
+      "name": "Prasac Microfinance",
+      "cities": ["Phnom Penh", "Siem Reap", "Battambang", "Kampong Cham", "Prey Veng"]
+    },
+    {
+      "name": "Sathapana Bank",
+      "cities": ["Phnom Penh", "Siem Reap", "Battambang"]
+    },
+    {
+      "name": "PPWSA",
+      "cities": ["Phnom Penh"]
+    },
+    {
+      "name": "Brown Coffee",
+      "cities": ["Phnom Penh", "Siem Reap"]
+    },
+    {
+      "name": "Toyota Cambodia",
+      "cities": ["Phnom Penh"]
+    },
+    {
+      "name": "Honda Cambodia",
+      "cities": ["Phnom Penh"]
+    },
+    {
+      "name": "Soma Group",
+      "cities": ["Phnom Penh"]
+    },
+    {
+      "name": "Phnom Penh Commercial Bank",
+      "cities": ["Phnom Penh", "Siem Reap"]
+    },
+    {
+      "name": "Cambodia Post Bank",
+      "cities": ["Phnom Penh", "Battambang"]
+    },
+    {
+      "name": "Amret Microfinance",
+      "cities": ["Phnom Penh", "Siem Reap", "Battambang", "Kampong Cham"]
+    },
+    {
+      "name": "Pestech Cambodia",
+      "cities": ["Phnom Penh"]
+    },
+    {
+      "name": "RMA Cambodia",
+      "cities": ["Phnom Penh"]
+    },
+    {
+      "name": "Confirel",
+      "cities": ["Phnom Penh", "Kampong Speu"]
+    },
+    {
+      "name": "DFI Lucky",
+      "cities": ["Phnom Penh", "Siem Reap"]
+    },
+    {
+      "name": "SilkAir Cambodia",
+      "cities": ["Phnom Penh", "Siem Reap"]
+    },
+    {
+      "name": "Cambrew",
+      "cities": ["Sihanoukville"]
+    },
+    {
+      "name": "Cambodia Airways",
+      "cities": ["Phnom Penh", "Siem Reap"]
+    },
+    {
+      "name": "Worldbridge Group",
+      "cities": ["Phnom Penh"]
+    },
+    {
+      "name": "Kirirom Group",
+      "cities": ["Phnom Penh", "Kampong Speu"]
+    },
+    {
+      "name": "Phnom Penh Sugar",
+      "cities": ["Phnom Penh", "Kampong Speu"]
+    },
+    {
+      "name": "Hyundai Cambodia",
+      "cities": ["Phnom Penh"]
+    }
+  ],
+  "jobs": [
+    "Accountant",
+    "Administrator",
+    "Architect",
+    "Bank Teller",
+    "Business Analyst",
+    "Carpenter",
+    "Cashier",
+    "Chef",
+    "Civil Engineer",
+    "Consultant",
+    "Customer Service Representative",
+    "Data Analyst",
+    "Dentist",
+    "Designer",
+    "Director",
+    "Doctor",
+    "Driver",
+    "Economist",
+    "Electrician",
+    "Engineer",
+    "Farmer",
+    "Financial Analyst",
+    "General Manager",
+    "Hotel Manager",
+    "HR Manager",
+    "IT Specialist",
+    "Journalist",
+    "Lawyer",
+    "Lecturer",
+    "Marketing Manager",
+    "Mechanic",
+    "Nurse",
+    "Pharmacist",
+    "Pilot",
+    "Programmer",
+    "Professor",
+    "Project Manager",
+    "Receptionist",
+    "Sales Manager",
+    "Secretary",
+    "Security Guard",
+    "Software Developer",
+    "Teacher",
+    "Technician",
+    "Tour Guide",
+    "Translator",
+    "Veterinarian",
+    "Waiter"
+  ],
+  "catch_phrase_adjectives": [
+    "innovative",
+    "modern",
+    "reliable",
+    "professional",
+    "digital",
+    "global",
+    "strategic",
+    "sustainable",
+    "efficient",
+    "dynamic",
+    "creative",
+    "leading",
+    "competitive",
+    "responsible",
+    "integrated"
+  ],
+  "catch_phrase_nouns": [
+    "solutions",
+    "services",
+    "opportunities",
+    "results",
+    "growth",
+    "development",
+    "quality",
+    "technology",
+    "innovation",
+    "excellence",
+    "commitment",
+    "value",
+    "trust",
+    "future",
+    "transformation"
+  ],
+  "catch_phrase_verbs": [
+    "delivers",
+    "builds",
+    "develops",
+    "innovates",
+    "transforms",
+    "empowers",
+    "connects",
+    "strengthens",
+    "creates",
+    "leads",
+    "drives",
+    "enables",
+    "inspires",
+    "achieves",
+    "unites"
+  ],
+  "catch_phrase_connector": [
+    "and",
+    "with",
+    "for"
+  ],
+  "industries": [
+    {
+      "name": "tourism",
+      "weight": 0.15,
+      "jobs": [
+        "Tour Guide",
+        "Hotel Manager",
+        "Receptionist",
+        "Waiter",
+        "Translator",
+        "Driver"
+      ],
+      "well_known": [
+        "Sokha Hotels and Resorts",
+        "NagaWorld",
+        "Cambodia Angkor Air"
+      ],
+      "company_suffixes": [
+        "Co., Ltd.",
+        "Group",
+        "Enterprise"
+      ],
+      "company_nouns": [
+        "Tourism",
+        "Travel",
+        "Hospitality",
+        "Adventures",
+        "Resorts"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "Hotel {last_name}",
+        "{last_name} {noun} {suffix}"
+      ]
+    },
+    {
+      "name": "agriculture",
+      "weight": 0.12,
+      "jobs": [
+        "Farmer",
+        "Veterinarian",
+        "Technician"
+      ],
+      "well_known": [
+        "Mong Reththy Group",
+        "Confirel",
+        "Phnom Penh Sugar"
+      ],
+      "company_suffixes": [
+        "Co., Ltd.",
+        "Trading",
+        "Enterprise"
+      ],
+      "company_nouns": [
+        "Agriculture",
+        "Rice",
+        "Exports",
+        "Farming",
+        "Produce"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{last_name} {suffix}",
+        "{last_name} {noun} {suffix}"
+      ]
+    },
+    {
+      "name": "garments_textiles",
+      "weight": 0.12,
+      "jobs": [
+        "General Manager",
+        "Technician",
+        "Designer",
+        "Administrator"
+      ],
+      "well_known": [
+        "Soma Group"
+      ],
+      "company_suffixes": [
+        "Co., Ltd.",
+        "Ltd.",
+        "Corp."
+      ],
+      "company_nouns": [
+        "Garments",
+        "Textiles",
+        "Fashion",
+        "Apparel"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{last_name} {noun} {suffix}"
+      ]
+    },
+    {
+      "name": "construction",
+      "weight": 0.10,
+      "jobs": [
+        "Architect",
+        "Civil Engineer",
+        "Carpenter",
+        "Electrician",
+        "Project Manager"
+      ],
+      "well_known": [
+        "Chip Mong Group",
+        "Borey Peng Huoth",
+        "Worldbridge Group"
+      ],
+      "company_suffixes": [
+        "Co., Ltd.",
+        "Corp.",
+        "Group"
+      ],
+      "company_nouns": [
+        "Construction",
+        "Engineering",
+        "Development",
+        "Properties",
+        "Building"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{last_name} {suffix}",
+        "{last_name} Construction {suffix}"
+      ]
+    },
+    {
+      "name": "finance",
+      "weight": 0.10,
+      "jobs": [
+        "Accountant",
+        "Financial Analyst",
+        "Bank Teller",
+        "Business Analyst",
+        "Economist"
+      ],
+      "well_known": [
+        "ABA Bank",
+        "ACLEDA Bank",
+        "Canadia Bank",
+        "Wing Cambodia",
+        "Hattha Bank",
+        "Prasac Microfinance",
+        "Sathapana Bank",
+        "Amret Microfinance",
+        "Ly Hour Group"
+      ],
+      "company_suffixes": [
+        "PLC",
+        "Co., Ltd.",
+        "Corp."
+      ],
+      "company_nouns": [
+        "Finance",
+        "Investments",
+        "Capital",
+        "Banking"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{last_name} Bank",
+        "{last_name} {suffix}"
+      ]
+    },
+    {
+      "name": "technology",
+      "weight": 0.06,
+      "jobs": [
+        "Programmer",
+        "Software Developer",
+        "IT Specialist",
+        "Data Analyst",
+        "Designer"
+      ],
+      "well_known": [
+        "Pestech Cambodia"
+      ],
+      "company_suffixes": [
+        "Co., Ltd.",
+        "Corp.",
+        "Solutions"
+      ],
+      "company_nouns": [
+        "Technology",
+        "Systems",
+        "Solutions",
+        "Digital",
+        "Software"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{last_name} {suffix}",
+        "{last_name} Tech {suffix}"
+      ]
+    },
+    {
+      "name": "real_estate",
+      "weight": 0.07,
+      "jobs": [
+        "Sales Manager",
+        "Marketing Manager",
+        "Consultant",
+        "Administrator"
+      ],
+      "well_known": [
+        "Prince Group",
+        "Vattanac Group",
+        "Borey Peng Huoth",
+        "Kirirom Group"
+      ],
+      "company_suffixes": [
+        "Co., Ltd.",
+        "Group",
+        "Holdings"
+      ],
+      "company_nouns": [
+        "Properties",
+        "Real Estate",
+        "Development",
+        "Land"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "Borey {last_name}",
+        "{last_name} {noun} {suffix}"
+      ]
+    },
+    {
+      "name": "food_beverage",
+      "weight": 0.08,
+      "jobs": [
+        "Chef",
+        "Waiter",
+        "Cashier",
+        "General Manager"
+      ],
+      "well_known": [
+        "Khmer Brewery",
+        "Cambodia Beer",
+        "Brown Coffee",
+        "Cambrew",
+        "DFI Lucky"
+      ],
+      "company_suffixes": [
+        "Co., Ltd.",
+        "Enterprise",
+        "Trading"
+      ],
+      "company_nouns": [
+        "Foods",
+        "Beverages",
+        "Production",
+        "Distribution"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{last_name} {suffix}"
+      ]
+    },
+    {
+      "name": "education",
+      "weight": 0.05,
+      "jobs": [
+        "Teacher",
+        "Professor",
+        "Lecturer",
+        "Administrator"
+      ],
+      "well_known": [],
+      "company_suffixes": [],
+      "company_nouns": [
+        "Education",
+        "Academy"
+      ],
+      "company_formats": [
+        "University of {city}",
+        "{adjective} Academy {suffix}",
+        "Institute of {noun}"
+      ]
+    },
+    {
+      "name": "healthcare",
+      "weight": 0.05,
+      "jobs": [
+        "Doctor",
+        "Nurse",
+        "Dentist",
+        "Pharmacist"
+      ],
+      "well_known": [],
+      "company_suffixes": [
+        "Co., Ltd."
+      ],
+      "company_nouns": [
+        "Health",
+        "Medical",
+        "Pharma"
+      ],
+      "company_formats": [
+        "Hospital {last_name}",
+        "Clinic {last_name}",
+        "{adjective} {noun} {suffix}"
+      ]
+    },
+    {
+      "name": "telecom",
+      "weight": 0.04,
+      "jobs": [
+        "Technician",
+        "Engineer",
+        "IT Specialist"
+      ],
+      "well_known": [
+        "Cellcard",
+        "Smart Axiata",
+        "Metfone"
+      ],
+      "company_suffixes": [
+        "Co., Ltd.",
+        "PLC"
+      ],
+      "company_nouns": [
+        "Communications",
+        "Telecom",
+        "Networks"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}"
+      ]
+    },
+    {
+      "name": "energy",
+      "weight": 0.03,
+      "jobs": [
+        "Engineer",
+        "Technician"
+      ],
+      "well_known": [
+        "Electricite du Cambodge"
+      ],
+      "company_suffixes": [
+        "Co., Ltd.",
+        "Corp."
+      ],
+      "company_nouns": [
+        "Energy",
+        "Power",
+        "Electric"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{last_name} {suffix}"
+      ]
+    },
+    {
+      "name": "manufacturing",
+      "weight": 0.03,
+      "jobs": [
+        "Engineer",
+        "Technician",
+        "General Manager",
+        "Mechanic"
+      ],
+      "well_known": [
+        "RMA Cambodia",
+        "Toyota Cambodia",
+        "Honda Cambodia",
+        "Hyundai Cambodia"
+      ],
+      "company_suffixes": [
+        "Co., Ltd.",
+        "Corp.",
+        "Inc."
+      ],
+      "company_nouns": [
+        "Manufacturing",
+        "Industries",
+        "Production",
+        "Assembly"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{last_name} {noun} {suffix}"
+      ]
+    }
+  ]
+}

@@ -233,12 +233,15 @@ COUNTRY_CODE_MAP: dict[str, str] = {
 # internet, misc, person, and text JSON files in the data directory
 COUNTRIES_WITH_FULL_DATA: list[str] = [
     "AE",  # United Arab Emirates
+    "AM",  # Armenia
     "AR",  # Argentina
     "AT",  # Austria
     "AU",  # Australia
+    "AZ",  # Azerbaijan
     "BD",  # Bangladesh
     "BE",  # Belgium
     "BG",  # Bulgaria
+    "BO",  # Bolivia
     "BR",  # Brazil
     "CA",  # Canada
     "CH",  # Switzerland
@@ -266,6 +269,7 @@ COUNTRIES_WITH_FULL_DATA: list[str] = [
     "GR",  # Greece
     "GT",  # Guatemala
     "HK",  # Hong Kong
+    "HN",  # Honduras
     "HR",  # Croatia
     "HU",  # Hungary
     "ID",  # Indonesia
@@ -278,6 +282,7 @@ COUNTRIES_WITH_FULL_DATA: list[str] = [
     "JO",  # Jordan
     "JP",  # Japan
     "KE",  # Kenya
+    "KH",  # Cambodia
     "KR",  # South Korea
     "KZ",  # Kazakhstan
     "LB",  # Lebanon
@@ -286,9 +291,12 @@ COUNTRIES_WITH_FULL_DATA: list[str] = [
     "LU",  # Luxembourg
     "LV",  # Latvia
     "MA",  # Morocco
+    "MD",  # Moldova
+    "MM",  # Myanmar
     "MT",  # Malta
     "MX",  # Mexico
     "MY",  # Malaysia
+    "MZ",  # Mozambique
     "NG",  # Nigeria
     "NL",  # Netherlands
     "NO",  # Norway
@@ -311,6 +319,7 @@ COUNTRIES_WITH_FULL_DATA: list[str] = [
     "SI",  # Slovenia
     "SK",  # Slovakia
     "SN",  # Senegal
+    "SV",  # El Salvador
     "TH",  # Thailand
     "TN",  # Tunisia
     "TR",  # Turkey
