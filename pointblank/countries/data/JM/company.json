@@ -1,0 +1,554 @@
+{
+  "suffixes": [
+    "Ltd.",
+    "Limited",
+    "Inc.",
+    "& Co.",
+    "Group",
+    "Holdings",
+    "Enterprises",
+    "Corporation",
+    "& Sons",
+    "Jamaica Ltd."
+  ],
+  "formats": [
+    "{last_name} {suffix}",
+    "{last_name} & {last_name} {suffix}",
+    "{adjective} {noun} {suffix}",
+    "{last_name}, {last_name} and {last_name}",
+    "{adjective} {noun}"
+  ],
+  "adjectives": [
+    "Caribbean",
+    "Island",
+    "Jamaican",
+    "Tropical",
+    "Golden",
+    "Blue Mountain",
+    "Premier",
+    "Royal",
+    "Dynamic",
+    "National",
+    "Capital",
+    "Allied",
+    "General",
+    "First",
+    "United",
+    "Continental",
+    "Strategic",
+    "Heritage",
+    "Sunrise",
+    "Global",
+    "Coastal",
+    "Modern",
+    "Advanced",
+    "Progressive",
+    "Nova",
+    "Pacific",
+    "Regional",
+    "Superior"
+  ],
+  "nouns": [
+    "Trading",
+    "Industries",
+    "Solutions",
+    "Services",
+    "Shipping",
+    "Finance",
+    "Properties",
+    "Investments",
+    "Resources",
+    "Logistics",
+    "Technologies",
+    "Development",
+    "Construction",
+    "Consulting",
+    "Distributors",
+    "Ventures",
+    "Capital",
+    "Holdings",
+    "Exports",
+    "Imports",
+    "Manufacturing",
+    "Communications",
+    "Energy",
+    "Mining",
+    "Agriculture",
+    "Foods",
+    "Beverages",
+    "Tourism",
+    "Insurance",
+    "Brokers",
+    "Associates",
+    "Media",
+    "Transport",
+    "Electronics",
+    "Pharmaceuticals",
+    "Healthcare"
+  ],
+  "well_known_companies": [
+    {
+      "name": "GraceKennedy",
+      "weight": 0.05,
+      "cities": [
+        "Kingston"
+      ]
+    },
+    {
+      "name": "Jamaica Broilers Group",
+      "weight": 0.05,
+      "cities": [
+        "Kingston"
+      ]
+    },
+    {
+      "name": "Sagicor Group Jamaica",
+      "weight": 0.05,
+      "cities": [
+        "Kingston",
+        "New Kingston"
+      ]
+    },
+    {
+      "name": "NCB Financial Group",
+      "weight": 0.05,
+      "cities": [
+        "Kingston",
+        "New Kingston"
+      ]
+    },
+    {
+      "name": "JMMB Group",
+      "weight": 0.05,
+      "cities": [
+        "Kingston",
+        "New Kingston"
+      ]
+    },
+    {
+      "name": "Jamaica Producers Group",
+      "weight": 0.03,
+      "cities": [
+        "Kingston"
+      ]
+    },
+    {
+      "name": "Caribbean Cement Company",
+      "weight": 0.03,
+      "cities": [
+        "Kingston"
+      ]
+    },
+    {
+      "name": "Seprod Limited",
+      "weight": 0.03,
+      "cities": [
+        "Kingston"
+      ]
+    },
+    {
+      "name": "Wisynco Group",
+      "weight": 0.03,
+      "cities": [
+        "Kingston"
+      ]
+    },
+    {
+      "name": "Lasco Distributors",
+      "weight": 0.03,
+      "cities": [
+        "Kingston"
+      ]
+    },
+    {
+      "name": "Digicel Jamaica",
+      "weight": 0.03,
+      "cities": [
+        "Kingston",
+        "New Kingston"
+      ]
+    },
+    {
+      "name": "FLOW Jamaica",
+      "weight": 0.03,
+      "cities": [
+        "Kingston",
+        "New Kingston"
+      ]
+    },
+    {
+      "name": "Red Stripe",
+      "weight": 0.03,
+      "cities": [
+        "Kingston"
+      ]
+    },
+    {
+      "name": "Appleton Estate",
+      "weight": 0.03,
+      "cities": [
+        "Black River"
+      ]
+    },
+    {
+      "name": "Wray & Nephew",
+      "weight": 0.03,
+      "cities": [
+        "Kingston"
+      ]
+    },
+    {
+      "name": "Jamaica National Group",
+      "weight": 0.02,
+      "cities": [
+        "Kingston",
+        "Half Way Tree"
+      ]
+    },
+    {
+      "name": "Scotiabank Jamaica",
+      "weight": 0.02,
+      "cities": [
+        "Kingston",
+        "New Kingston"
+      ]
+    },
+    {
+      "name": "Guardian Life Jamaica",
+      "weight": 0.02,
+      "cities": [
+        "Kingston"
+      ]
+    },
+    {
+      "name": "Supreme Ventures",
+      "weight": 0.02,
+      "cities": [
+        "Kingston"
+      ]
+    },
+    {
+      "name": "Mayberry Investments",
+      "weight": 0.02,
+      "cities": [
+        "Kingston",
+        "New Kingston"
+      ]
+    },
+    {
+      "name": "Victoria Mutual Building Society",
+      "weight": 0.02,
+      "cities": [
+        "Kingston",
+        "Half Way Tree"
+      ]
+    },
+    {
+      "name": "Jamaica Money Market Brokers",
+      "weight": 0.02,
+      "cities": [
+        "Kingston",
+        "New Kingston"
+      ]
+    },
+    {
+      "name": "Pan Caribbean Financial Services",
+      "weight": 0.02,
+      "cities": [
+        "Kingston"
+      ]
+    },
+    {
+      "name": "Jamaica Public Service Company",
+      "weight": 0.02,
+      "cities": [
+        "Kingston"
+      ]
+    },
+    {
+      "name": "Petrojam Limited",
+      "weight": 0.02,
+      "cities": [
+        "Kingston"
+      ]
+    },
+    {
+      "name": "Jamaica Bearings Company",
+      "weight": 0.02,
+      "cities": [
+        "Kingston"
+      ]
+    },
+    {
+      "name": "Caribbean Producers Jamaica",
+      "weight": 0.02,
+      "cities": [
+        "Kingston"
+      ]
+    },
+    {
+      "name": "Kingston Wharves",
+      "weight": 0.02,
+      "cities": [
+        "Kingston"
+      ]
+    },
+    {
+      "name": "Barita Investments",
+      "weight": 0.02,
+      "cities": [
+        "Kingston",
+        "New Kingston"
+      ]
+    },
+    {
+      "name": "Berger Paints Jamaica",
+      "weight": 0.02,
+      "cities": [
+        "Kingston"
+      ]
+    },
+    {
+      "name": "Carreras Limited",
+      "weight": 0.02,
+      "cities": [
+        "Kingston"
+      ]
+    },
+    {
+      "name": "Jamaica Stock Exchange",
+      "weight": 0.02,
+      "cities": [
+        "Kingston"
+      ]
+    },
+    {
+      "name": "Total Jamaica",
+      "weight": 0.02,
+      "cities": [
+        "Kingston"
+      ]
+    },
+    {
+      "name": "Fontana Pharmacy",
+      "weight": 0.02,
+      "cities": [
+        "Kingston",
+        "Montego Bay"
+      ]
+    },
+    {
+      "name": "Hi-Lo Food Stores",
+      "weight": 0.02,
+      "cities": [
+        "Kingston"
+      ]
+    },
+    {
+      "name": "Jamaica Observer",
+      "weight": 0.02,
+      "cities": [
+        "Kingston"
+      ]
+    },
+    {
+      "name": "The Gleaner Company",
+      "weight": 0.02,
+      "cities": [
+        "Kingston"
+      ]
+    },
+    {
+      "name": "TVJ Television Jamaica",
+      "weight": 0.02,
+      "cities": [
+        "Kingston"
+      ]
+    },
+    {
+      "name": "Knutsford Express",
+      "weight": 0.02,
+      "cities": [
+        "Kingston",
+        "Montego Bay"
+      ]
+    },
+    {
+      "name": "Salada Foods Jamaica",
+      "weight": 0.02,
+      "cities": [
+        "Kingston"
+      ]
+    },
+    {
+      "name": "Derrimon Trading",
+      "weight": 0.02,
+      "cities": [
+        "Kingston"
+      ]
+    },
+    {
+      "name": "Consolidated Bakeries",
+      "weight": 0.02,
+      "cities": [
+        "Kingston"
+      ]
+    },
+    {
+      "name": "Factories Corporation of Jamaica",
+      "weight": 0.02,
+      "cities": [
+        "Kingston"
+      ]
+    },
+    {
+      "name": "Jamaica Flour Mills",
+      "weight": 0.02,
+      "cities": [
+        "Kingston"
+      ]
+    }
+  ],
+  "jobs": [
+    "Accountant",
+    "Administrator",
+    "Agricultural Officer",
+    "Architect",
+    "Attorney-at-Law",
+    "Auditor",
+    "Baker",
+    "Bank Teller",
+    "Barista",
+    "Bauxite Worker",
+    "Bus Driver",
+    "Carpenter",
+    "Chef",
+    "Civil Servant",
+    "Clerk",
+    "Construction Worker",
+    "Customs Officer",
+    "Dentist",
+    "Doctor",
+    "Electrician",
+    "Engineer",
+    "Farmer",
+    "Fisherman",
+    "Graphic Designer",
+    "Hotel Manager",
+    "Insurance Agent",
+    "Journalist",
+    "Lawyer",
+    "Mechanic",
+    "Nurse",
+    "Pharmacist",
+    "Photographer",
+    "Plumber",
+    "Police Officer",
+    "Professor",
+    "Real Estate Agent",
+    "Security Guard",
+    "Social Worker",
+    "Software Developer",
+    "Teacher",
+    "Tour Guide",
+    "Veterinarian",
+    "Waiter"
+  ],
+  "catch_phrase_adjectives": [
+    "innovative",
+    "dynamic",
+    "reliable",
+    "trusted",
+    "progressive",
+    "sustainable",
+    "modern",
+    "premier",
+    "quality",
+    "excellent",
+    "professional",
+    "dedicated",
+    "comprehensive",
+    "strategic",
+    "creative",
+    "visionary",
+    "superior",
+    "cutting-edge",
+    "exceptional"
+  ],
+  "catch_phrase_nouns": [
+    "solutions",
+    "service",
+    "excellence",
+    "innovation",
+    "quality",
+    "values",
+    "performance",
+    "growth",
+    "leadership",
+    "partnerships",
+    "integrity",
+    "development",
+    "success",
+    "commitment"
+  ],
+  "catch_phrase_verbs": [
+    "delivering",
+    "driving",
+    "building",
+    "creating",
+    "empowering",
+    "transforming",
+    "advancing",
+    "enabling",
+    "inspiring",
+    "achieving",
+    "connecting",
+    "nurturing",
+    "cultivating",
+    "sustaining",
+    "championing"
+  ],
+  "catch_phrase_connector": "through",
+  "industries": [
+    {
+      "name": "tourism",
+      "weight": 0.2
+    },
+    {
+      "name": "bauxite_and_mining",
+      "weight": 0.14
+    },
+    {
+      "name": "agriculture",
+      "weight": 0.12
+    },
+    {
+      "name": "financial_services",
+      "weight": 0.12
+    },
+    {
+      "name": "manufacturing",
+      "weight": 0.1
+    },
+    {
+      "name": "telecommunications",
+      "weight": 0.08
+    },
+    {
+      "name": "retail_and_distribution",
+      "weight": 0.08
+    },
+    {
+      "name": "construction",
+      "weight": 0.06
+    },
+    {
+      "name": "energy",
+      "weight": 0.05
+    },
+    {
+      "name": "media_and_entertainment",
+      "weight": 0.05
+    }
+  ]
+}

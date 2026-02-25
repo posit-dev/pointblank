@@ -1,0 +1,545 @@
+{
+  "suffixes": [
+    "S.A.",
+    "S.R.L.",
+    "Ltda.",
+    "S.A.S.",
+    "& Cía.",
+    "Hnos.",
+    "Group",
+    "Holdings",
+    "e Hijos",
+    "S.C."
+  ],
+  "formats": [
+    "{last_name} {suffix}",
+    "{last_name} & {last_name} {suffix}",
+    "{adjective} {noun} {suffix}",
+    "{last_name}, {last_name} y {last_name}",
+    "{adjective} {noun}"
+  ],
+  "adjectives": [
+    "Oriental",
+    "Nacional",
+    "Uruguaya",
+    "Rioplatense",
+    "Platense",
+    "Austral",
+    "Continental",
+    "Sudamericana",
+    "General",
+    "Primera",
+    "Central",
+    "Federal",
+    "Regional",
+    "Internacional",
+    "Industrial",
+    "Comercial",
+    "Agraria",
+    "Ganadera",
+    "Portuaria",
+    "Marítima",
+    "Global",
+    "Moderna",
+    "Estratégica",
+    "Dinámica",
+    "Nueva",
+    "Gran",
+    "Alta",
+    "Premier"
+  ],
+  "nouns": [
+    "Comercio",
+    "Industria",
+    "Servicios",
+    "Soluciones",
+    "Inversiones",
+    "Finanzas",
+    "Propiedades",
+    "Negocios",
+    "Construcciones",
+    "Transportes",
+    "Tecnología",
+    "Logística",
+    "Consultoría",
+    "Alimentos",
+    "Agropecuaria",
+    "Comunicaciones",
+    "Energía",
+    "Desarrollo",
+    "Distribuidora",
+    "Exportaciones",
+    "Importaciones",
+    "Manufactura",
+    "Recursos",
+    "Seguros",
+    "Turismo",
+    "Ingeniería",
+    "Farmacéutica",
+    "Emprendimientos",
+    "Gestión",
+    "Capital",
+    "Sistemas",
+    "Operaciones",
+    "Salud",
+    "Educación",
+    "Corredores",
+    "Inmobiliaria"
+  ],
+  "well_known_companies": [
+    {
+      "name": "ANCAP",
+      "weight": 0.05,
+      "cities": [
+        "Montevideo"
+      ]
+    },
+    {
+      "name": "UTE",
+      "weight": 0.05,
+      "cities": [
+        "Montevideo"
+      ]
+    },
+    {
+      "name": "ANTEL",
+      "weight": 0.05,
+      "cities": [
+        "Montevideo"
+      ]
+    },
+    {
+      "name": "OSE",
+      "weight": 0.05,
+      "cities": [
+        "Montevideo"
+      ]
+    },
+    {
+      "name": "Banco de la República Oriental del Uruguay",
+      "weight": 0.05,
+      "cities": [
+        "Montevideo"
+      ]
+    },
+    {
+      "name": "Banco Santander Uruguay",
+      "weight": 0.03,
+      "cities": [
+        "Montevideo"
+      ]
+    },
+    {
+      "name": "Banco Itaú Uruguay",
+      "weight": 0.03,
+      "cities": [
+        "Montevideo"
+      ]
+    },
+    {
+      "name": "BBVA Uruguay",
+      "weight": 0.03,
+      "cities": [
+        "Montevideo"
+      ]
+    },
+    {
+      "name": "Scotiabank Uruguay",
+      "weight": 0.03,
+      "cities": [
+        "Montevideo"
+      ]
+    },
+    {
+      "name": "Conaprole",
+      "weight": 0.03,
+      "cities": [
+        "Montevideo"
+      ]
+    },
+    {
+      "name": "Frigorífico Nacional",
+      "weight": 0.03,
+      "cities": [
+        "Montevideo"
+      ]
+    },
+    {
+      "name": "Frigorífico Modelo",
+      "weight": 0.03,
+      "cities": [
+        "Montevideo"
+      ]
+    },
+    {
+      "name": "Tienda Inglesa",
+      "weight": 0.03,
+      "cities": [
+        "Montevideo"
+      ]
+    },
+    {
+      "name": "El País",
+      "weight": 0.03,
+      "cities": [
+        "Montevideo"
+      ]
+    },
+    {
+      "name": "El Observador",
+      "weight": 0.03,
+      "cities": [
+        "Montevideo"
+      ]
+    },
+    {
+      "name": "Canal 4 Monte Carlo",
+      "weight": 0.02,
+      "cities": [
+        "Montevideo"
+      ]
+    },
+    {
+      "name": "Canal 10 Saeta",
+      "weight": 0.02,
+      "cities": [
+        "Montevideo"
+      ]
+    },
+    {
+      "name": "Canal 12 Televisión Nacional",
+      "weight": 0.02,
+      "cities": [
+        "Montevideo"
+      ]
+    },
+    {
+      "name": "Farmashop",
+      "weight": 0.02,
+      "cities": [
+        "Montevideo"
+      ]
+    },
+    {
+      "name": "Tata Supermercados",
+      "weight": 0.02,
+      "cities": [
+        "Montevideo"
+      ]
+    },
+    {
+      "name": "Disco Uruguay",
+      "weight": 0.02,
+      "cities": [
+        "Montevideo"
+      ]
+    },
+    {
+      "name": "Grupo Cencosud Uruguay",
+      "weight": 0.02,
+      "cities": [
+        "Montevideo"
+      ]
+    },
+    {
+      "name": "Ta-Ta",
+      "weight": 0.02,
+      "cities": [
+        "Montevideo"
+      ]
+    },
+    {
+      "name": "Abitab",
+      "weight": 0.02,
+      "cities": [
+        "Montevideo"
+      ]
+    },
+    {
+      "name": "Red Pagos",
+      "weight": 0.02,
+      "cities": [
+        "Montevideo"
+      ]
+    },
+    {
+      "name": "CUTCSA",
+      "weight": 0.02,
+      "cities": [
+        "Montevideo"
+      ]
+    },
+    {
+      "name": "Pluna",
+      "weight": 0.02,
+      "cities": [
+        "Montevideo"
+      ]
+    },
+    {
+      "name": "BuquesBus",
+      "weight": 0.02,
+      "cities": [
+        "Montevideo",
+        "Colonia del Sacramento"
+      ]
+    },
+    {
+      "name": "Zonamerica",
+      "weight": 0.02,
+      "cities": [
+        "Montevideo"
+      ]
+    },
+    {
+      "name": "Dlocal",
+      "weight": 0.02,
+      "cities": [
+        "Montevideo"
+      ]
+    },
+    {
+      "name": "MercadoLibre Uruguay",
+      "weight": 0.02,
+      "cities": [
+        "Montevideo"
+      ]
+    },
+    {
+      "name": "Globant Uruguay",
+      "weight": 0.02,
+      "cities": [
+        "Montevideo"
+      ]
+    },
+    {
+      "name": "Pedidosya",
+      "weight": 0.02,
+      "cities": [
+        "Montevideo"
+      ]
+    },
+    {
+      "name": "Despegar Uruguay",
+      "weight": 0.02,
+      "cities": [
+        "Montevideo"
+      ]
+    },
+    {
+      "name": "Salus",
+      "weight": 0.02,
+      "cities": [
+        "Montevideo",
+        "Minas"
+      ]
+    },
+    {
+      "name": "Patricia",
+      "weight": 0.02,
+      "cities": [
+        "Montevideo"
+      ]
+    },
+    {
+      "name": "Nativa",
+      "weight": 0.02,
+      "cities": [
+        "Montevideo"
+      ]
+    },
+    {
+      "name": "Bimbo Uruguay",
+      "weight": 0.02,
+      "cities": [
+        "Montevideo"
+      ]
+    },
+    {
+      "name": "Mondelez Uruguay",
+      "weight": 0.02,
+      "cities": [
+        "Montevideo"
+      ]
+    },
+    {
+      "name": "Unilever Uruguay",
+      "weight": 0.02,
+      "cities": [
+        "Montevideo"
+      ]
+    },
+    {
+      "name": "PepsiCo Uruguay",
+      "weight": 0.02,
+      "cities": [
+        "Montevideo"
+      ]
+    },
+    {
+      "name": "Coca-Cola Femsa Uruguay",
+      "weight": 0.02,
+      "cities": [
+        "Montevideo"
+      ]
+    },
+    {
+      "name": "Weyerhaeuser Uruguay",
+      "weight": 0.02,
+      "cities": [
+        "Montevideo",
+        "Paysandú"
+      ]
+    },
+    {
+      "name": "UPM Uruguay",
+      "weight": 0.02,
+      "cities": [
+        "Montevideo",
+        "Fray Bentos"
+      ]
+    }
+  ],
+  "jobs": [
+    "Abogado",
+    "Contador",
+    "Ingeniero",
+    "Médico",
+    "Profesor",
+    "Arquitecto",
+    "Enfermero",
+    "Periodista",
+    "Programador",
+    "Agricultor",
+    "Ganadero",
+    "Veterinario",
+    "Obrero",
+    "Electricista",
+    "Plomero",
+    "Cocinero",
+    "Mozo",
+    "Taxista",
+    "Vendedor",
+    "Comerciante",
+    "Carpintero",
+    "Mecánico",
+    "Policía",
+    "Bombero",
+    "Militar",
+    "Escribano",
+    "Farmacéutico",
+    "Odontólogo",
+    "Psicólogo",
+    "Funcionario Público",
+    "Docente",
+    "Investigador",
+    "Diseñador Gráfico",
+    "Administrador",
+    "Economista",
+    "Sociólogo",
+    "Trabajador Social",
+    "Comunicador",
+    "Agrónomo",
+    "Gerente",
+    "Director",
+    "Secretario",
+    "Recepcionista"
+  ],
+  "catch_phrase_adjectives": [
+    "innovador",
+    "dinámico",
+    "confiable",
+    "sólido",
+    "progresista",
+    "sustentable",
+    "moderno",
+    "líder",
+    "excelente",
+    "profesional",
+    "dedicado",
+    "integral",
+    "estratégico",
+    "creativo",
+    "visionario",
+    "superior",
+    "comprometido",
+    "eficiente",
+    "responsable"
+  ],
+  "catch_phrase_nouns": [
+    "soluciones",
+    "servicio",
+    "excelencia",
+    "innovación",
+    "calidad",
+    "valores",
+    "rendimiento",
+    "crecimiento",
+    "liderazgo",
+    "alianzas",
+    "integridad",
+    "desarrollo",
+    "compromiso",
+    "confianza"
+  ],
+  "catch_phrase_verbs": [
+    "generando",
+    "impulsando",
+    "construyendo",
+    "creando",
+    "fortaleciendo",
+    "transformando",
+    "avanzando",
+    "potenciando",
+    "inspirando",
+    "logrando",
+    "conectando",
+    "cultivando",
+    "facilitando",
+    "garantizando",
+    "desarrollando"
+  ],
+  "catch_phrase_connector": "con",
+  "industries": [
+    {
+      "name": "agropecuaria",
+      "weight": 0.18
+    },
+    {
+      "name": "servicios_financieros",
+      "weight": 0.14
+    },
+    {
+      "name": "turismo",
+      "weight": 0.12
+    },
+    {
+      "name": "tecnología",
+      "weight": 0.1
+    },
+    {
+      "name": "industria_manufacturera",
+      "weight": 0.1
+    },
+    {
+      "name": "construcción",
+      "weight": 0.08
+    },
+    {
+      "name": "telecomunicaciones",
+      "weight": 0.08
+    },
+    {
+      "name": "logística_y_transporte",
+      "weight": 0.07
+    },
+    {
+      "name": "energía",
+      "weight": 0.07
+    },
+    {
+      "name": "forestal",
+      "weight": 0.06
+    }
+  ]
+}

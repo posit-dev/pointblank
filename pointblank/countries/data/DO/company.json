@@ -1,0 +1,546 @@
+{
+  "suffixes": [
+    "SRL",
+    "SA",
+    "SAS",
+    "EIRL",
+    "CxA",
+    "Inc",
+    "Corp",
+    "Ltd",
+    "Group",
+    "Holdings"
+  ],
+  "formats": [
+    "{last_name} {suffix}",
+    "{adjective} {noun} {suffix}",
+    "{adjective} {noun}",
+    "{noun} {suffix}",
+    "{last_name} & {last_name} {suffix}"
+  ],
+  "adjectives": [
+    "Dominicana",
+    "Caribeña",
+    "Nacional",
+    "Central",
+    "Tropical",
+    "Moderna",
+    "Nueva",
+    "Gran",
+    "Primera",
+    "General",
+    "Internacional",
+    "Comercial",
+    "Industrial",
+    "Financiera",
+    "Técnica",
+    "Global",
+    "Americana",
+    "Atlántica",
+    "Antillana",
+    "Cristalina",
+    "Excelente",
+    "Superior",
+    "Digital",
+    "Innovadora",
+    "Estratégica",
+    "Profesional",
+    "Quisqueyana",
+    "Insular"
+  ],
+  "nouns": [
+    "Servicios",
+    "Soluciones",
+    "Empresa",
+    "Comercio",
+    "Industrias",
+    "Tecnologías",
+    "Consultoría",
+    "Logística",
+    "Construcción",
+    "Transporte",
+    "Distribución",
+    "Agroindustria",
+    "Inmobiliaria",
+    "Energía",
+    "Telecomunicaciones",
+    "Turismo",
+    "Exportaciones",
+    "Importaciones",
+    "Inversiones",
+    "Capital",
+    "Finanzas",
+    "Desarrollo",
+    "Recursos",
+    "Infraestructura",
+    "Alimentos",
+    "Textiles",
+    "Tabaco",
+    "Azúcar",
+    "Minería",
+    "Partners",
+    "Asociados",
+    "Media",
+    "Farmacia",
+    "Sistemas",
+    "Holdings",
+    "Emprendimientos"
+  ],
+  "well_known_companies": [
+    {
+      "name": "Grupo León Jimenes",
+      "weight": 0.05,
+      "cities": [
+        "Santiago de los Caballeros",
+        "Santo Domingo"
+      ]
+    },
+    {
+      "name": "Cervecería Nacional Dominicana",
+      "weight": 0.05,
+      "cities": [
+        "Santo Domingo"
+      ]
+    },
+    {
+      "name": "Grupo Rica",
+      "weight": 0.05,
+      "cities": [
+        "Santo Domingo"
+      ]
+    },
+    {
+      "name": "Banco Popular Dominicano",
+      "weight": 0.05,
+      "cities": [
+        "Santo Domingo"
+      ]
+    },
+    {
+      "name": "Banreservas",
+      "weight": 0.05,
+      "cities": [
+        "Santo Domingo"
+      ]
+    },
+    {
+      "name": "Grupo Ramos",
+      "weight": 0.03,
+      "cities": [
+        "Santo Domingo"
+      ]
+    },
+    {
+      "name": "Grupo Punta Cana",
+      "weight": 0.03,
+      "cities": [
+        "Punta Cana"
+      ]
+    },
+    {
+      "name": "CEMEX Dominicana",
+      "weight": 0.03,
+      "cities": [
+        "Santo Domingo",
+        "San Pedro de Macorís"
+      ]
+    },
+    {
+      "name": "Claro Dominicana",
+      "weight": 0.03,
+      "cities": [
+        "Santo Domingo"
+      ]
+    },
+    {
+      "name": "Altice Dominicana",
+      "weight": 0.03,
+      "cities": [
+        "Santo Domingo"
+      ]
+    },
+    {
+      "name": "Grupo Corripio",
+      "weight": 0.03,
+      "cities": [
+        "Santo Domingo"
+      ]
+    },
+    {
+      "name": "Grupo Vicini",
+      "weight": 0.03,
+      "cities": [
+        "Santo Domingo"
+      ]
+    },
+    {
+      "name": "Grupo SID",
+      "weight": 0.03,
+      "cities": [
+        "Santo Domingo"
+      ]
+    },
+    {
+      "name": "INDOTEL",
+      "weight": 0.03,
+      "cities": [
+        "Santo Domingo"
+      ]
+    },
+    {
+      "name": "Falconbridge Dominicana",
+      "weight": 0.03,
+      "cities": [
+        "Bonao"
+      ]
+    },
+    {
+      "name": "Barrick Gold Dominicana",
+      "weight": 0.02,
+      "cities": [
+        "Cotuí"
+      ]
+    },
+    {
+      "name": "Brugal & Co",
+      "weight": 0.02,
+      "cities": [
+        "Puerto Plata",
+        "Santo Domingo"
+      ]
+    },
+    {
+      "name": "Bermúdez y Compañía",
+      "weight": 0.02,
+      "cities": [
+        "Santo Domingo"
+      ]
+    },
+    {
+      "name": "Central Romana Corporation",
+      "weight": 0.02,
+      "cities": [
+        "La Romana"
+      ]
+    },
+    {
+      "name": "Grupo Estrella",
+      "weight": 0.02,
+      "cities": [
+        "Santiago de los Caballeros"
+      ]
+    },
+    {
+      "name": "DGII",
+      "weight": 0.02,
+      "cities": [
+        "Santo Domingo"
+      ]
+    },
+    {
+      "name": "EGE Haina",
+      "weight": 0.02,
+      "cities": [
+        "Santo Domingo"
+      ]
+    },
+    {
+      "name": "Grupo Universal",
+      "weight": 0.02,
+      "cities": [
+        "Santo Domingo"
+      ]
+    },
+    {
+      "name": "Linda Pollos",
+      "weight": 0.02,
+      "cities": [
+        "Santo Domingo"
+      ]
+    },
+    {
+      "name": "Grupo Mejía Arcalá",
+      "weight": 0.02,
+      "cities": [
+        "Santo Domingo"
+      ]
+    },
+    {
+      "name": "Multicentro La Sirena",
+      "weight": 0.02,
+      "cities": [
+        "Santo Domingo"
+      ]
+    },
+    {
+      "name": "Grupo CCN",
+      "weight": 0.02,
+      "cities": [
+        "Santo Domingo"
+      ]
+    },
+    {
+      "name": "Grupo M",
+      "weight": 0.02,
+      "cities": [
+        "Santiago de los Caballeros"
+      ]
+    },
+    {
+      "name": "Induban",
+      "weight": 0.02,
+      "cities": [
+        "Santo Domingo"
+      ]
+    },
+    {
+      "name": "IMCA",
+      "weight": 0.02,
+      "cities": [
+        "Santo Domingo"
+      ]
+    },
+    {
+      "name": "Asociación Cibao",
+      "weight": 0.02,
+      "cities": [
+        "Santiago de los Caballeros"
+      ]
+    },
+    {
+      "name": "Mercasid",
+      "weight": 0.02,
+      "cities": [
+        "Santo Domingo"
+      ]
+    },
+    {
+      "name": "Superintendencia de Bancos",
+      "weight": 0.02,
+      "cities": [
+        "Santo Domingo"
+      ]
+    },
+    {
+      "name": "Aeropuertos Dominicanos XXI",
+      "weight": 0.02,
+      "cities": [
+        "Santo Domingo"
+      ]
+    },
+    {
+      "name": "Consorcio Energético Punta Cana-Macao",
+      "weight": 0.02,
+      "cities": [
+        "Punta Cana"
+      ]
+    },
+    {
+      "name": "Grupo Pellerano & Herrera",
+      "weight": 0.02,
+      "cities": [
+        "Santo Domingo"
+      ]
+    },
+    {
+      "name": "Rizek Cacao",
+      "weight": 0.02,
+      "cities": [
+        "San Francisco de Macorís"
+      ]
+    },
+    {
+      "name": "Helados Bon",
+      "weight": 0.02,
+      "cities": [
+        "Santo Domingo"
+      ]
+    },
+    {
+      "name": "La Manicera",
+      "weight": 0.02,
+      "cities": [
+        "Santo Domingo"
+      ]
+    },
+    {
+      "name": "Industrias San Miguel",
+      "weight": 0.02,
+      "cities": [
+        "Santo Domingo"
+      ]
+    },
+    {
+      "name": "Progreso",
+      "weight": 0.02,
+      "cities": [
+        "Santo Domingo"
+      ]
+    },
+    {
+      "name": "Rowe de República Dominicana",
+      "weight": 0.02,
+      "cities": [
+        "Santo Domingo"
+      ]
+    },
+    {
+      "name": "Banco BHD León",
+      "weight": 0.02,
+      "cities": [
+        "Santo Domingo"
+      ]
+    },
+    {
+      "name": "Scotiabank Dominicana",
+      "weight": 0.02,
+      "cities": [
+        "Santo Domingo"
+      ]
+    }
+  ],
+  "jobs": [
+    "Accountant",
+    "Administrator",
+    "Agronomist",
+    "Architect",
+    "Auditor",
+    "Bank Manager",
+    "Banker",
+    "Business Analyst",
+    "Carpenter",
+    "Cashier",
+    "Civil Engineer",
+    "Consultant",
+    "Customs Officer",
+    "Data Analyst",
+    "Dentist",
+    "Doctor",
+    "Driver",
+    "Economist",
+    "Electrician",
+    "Engineer",
+    "Entrepreneur",
+    "Farmer",
+    "Financial Analyst",
+    "Fisherman",
+    "Hotel Manager",
+    "HR Manager",
+    "IT Specialist",
+    "Journalist",
+    "Judge",
+    "Lawyer",
+    "Lecturer",
+    "Mechanic",
+    "Mining Engineer",
+    "Nurse",
+    "Pharmacist",
+    "Plumber",
+    "Police Officer",
+    "Professor",
+    "Project Manager",
+    "Sales Manager",
+    "Secretary",
+    "Teacher",
+    "Tour Guide"
+  ],
+  "catch_phrase_adjectives": [
+    "innovative",
+    "tropical",
+    "Caribbean",
+    "dynamic",
+    "reliable",
+    "professional",
+    "modern",
+    "strategic",
+    "integrated",
+    "digital",
+    "creative",
+    "efficient",
+    "leading",
+    "trusted",
+    "global",
+    "expert",
+    "premium",
+    "quality",
+    "advanced",
+    "smart"
+  ],
+  "catch_phrase_nouns": [
+    "solutions",
+    "services",
+    "partnership",
+    "excellence",
+    "development",
+    "growth",
+    "innovation",
+    "technology",
+    "infrastructure",
+    "resources",
+    "systems",
+    "networks",
+    "platforms",
+    "consulting",
+    "ventures"
+  ],
+  "catch_phrase_verbs": [
+    "deliver",
+    "build",
+    "transform",
+    "connect",
+    "empower",
+    "enable",
+    "accelerate",
+    "drive",
+    "create",
+    "develop",
+    "innovate",
+    "provide",
+    "support",
+    "achieve",
+    "grow"
+  ],
+  "catch_phrase_connector": "to",
+  "industries": [
+    {
+      "name": "tourism",
+      "weight": 0.18
+    },
+    {
+      "name": "mining",
+      "weight": 0.14
+    },
+    {
+      "name": "agriculture",
+      "weight": 0.13
+    },
+    {
+      "name": "telecommunications",
+      "weight": 0.12
+    },
+    {
+      "name": "banking",
+      "weight": 0.11
+    },
+    {
+      "name": "manufacturing",
+      "weight": 0.09
+    },
+    {
+      "name": "construction",
+      "weight": 0.08
+    },
+    {
+      "name": "energy",
+      "weight": 0.06
+    },
+    {
+      "name": "retail",
+      "weight": 0.05
+    },
+    {
+      "name": "technology",
+      "weight": 0.04
+    }
+  ]
+}

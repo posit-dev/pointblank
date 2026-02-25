@@ -1,0 +1,551 @@
+{
+  "suffixes": [
+    "Ltd.",
+    "Co. Ltd.",
+    "PLC",
+    "Corp.",
+    "Inc.",
+    "Group",
+    "Holdings",
+    "Enterprises",
+    "Trading",
+    "LLC"
+  ],
+  "formats": [
+    "{last_name} {suffix}",
+    "{last_name} & {last_name} {suffix}",
+    "{adjective} {noun} {suffix}",
+    "{last_name} {noun} {suffix}",
+    "{noun} {suffix}"
+  ],
+  "adjectives": [
+    "National",
+    "East African",
+    "United",
+    "Tanzania",
+    "African",
+    "Modern",
+    "Advanced",
+    "Global",
+    "Premier",
+    "Strategic",
+    "International",
+    "Dynamic",
+    "Progressive",
+    "Innovative",
+    "Creative",
+    "Reliable",
+    "Professional",
+    "Leading",
+    "Smart",
+    "Digital",
+    "Green",
+    "Sustainable",
+    "Superior",
+    "Integrated",
+    "Kilimanjaro",
+    "Serengeti",
+    "Coastal",
+    "Central"
+  ],
+  "nouns": [
+    "Solutions",
+    "Industries",
+    "Enterprises",
+    "Technologies",
+    "Systems",
+    "Services",
+    "Consulting",
+    "Trading",
+    "Construction",
+    "Engineering",
+    "Logistics",
+    "Development",
+    "Investments",
+    "Properties",
+    "Communications",
+    "Finance",
+    "Energy",
+    "Transport",
+    "Health",
+    "Agriculture",
+    "Media",
+    "Pharma",
+    "Insurance",
+    "Tourism",
+    "Security",
+    "Resources",
+    "Minerals",
+    "Hospitality",
+    "Aviation",
+    "Education",
+    "Commerce",
+    "Software",
+    "Electronics",
+    "Architecture",
+    "Mining",
+    "Capital"
+  ],
+  "well_known_companies": [
+    {
+      "name": "Tanzania Breweries",
+      "weight": 0.05,
+      "cities": [
+        "Dar es Salaam"
+      ]
+    },
+    {
+      "name": "Vodacom Tanzania",
+      "weight": 0.05,
+      "cities": [
+        "Dar es Salaam"
+      ]
+    },
+    {
+      "name": "Airtel Tanzania",
+      "weight": 0.05,
+      "cities": [
+        "Dar es Salaam"
+      ]
+    },
+    {
+      "name": "Tigo Tanzania",
+      "weight": 0.05,
+      "cities": [
+        "Dar es Salaam"
+      ]
+    },
+    {
+      "name": "CRDB Bank",
+      "weight": 0.05,
+      "cities": [
+        "Dar es Salaam",
+        "Dodoma"
+      ]
+    },
+    {
+      "name": "NMB Bank",
+      "weight": 0.03,
+      "cities": [
+        "Dar es Salaam"
+      ]
+    },
+    {
+      "name": "Tanzania Portland Cement",
+      "weight": 0.03,
+      "cities": [
+        "Dar es Salaam"
+      ]
+    },
+    {
+      "name": "Tanzania Cigarette Company",
+      "weight": 0.03,
+      "cities": [
+        "Dar es Salaam"
+      ]
+    },
+    {
+      "name": "Twiga Cement",
+      "weight": 0.03,
+      "cities": [
+        "Dar es Salaam"
+      ]
+    },
+    {
+      "name": "Dangote Cement Tanzania",
+      "weight": 0.03,
+      "cities": [
+        "Mtwara"
+      ]
+    },
+    {
+      "name": "Kilimanjaro Breweries",
+      "weight": 0.03,
+      "cities": [
+        "Arusha",
+        "Moshi"
+      ]
+    },
+    {
+      "name": "Serengeti Breweries",
+      "weight": 0.03,
+      "cities": [
+        "Dar es Salaam"
+      ]
+    },
+    {
+      "name": "Tanzania Electric Supply Company",
+      "weight": 0.03,
+      "cities": [
+        "Dar es Salaam"
+      ]
+    },
+    {
+      "name": "TANESCO",
+      "weight": 0.03,
+      "cities": [
+        "Dar es Salaam",
+        "Dodoma"
+      ]
+    },
+    {
+      "name": "Tanzania Telecommunications",
+      "weight": 0.03,
+      "cities": [
+        "Dar es Salaam"
+      ]
+    },
+    {
+      "name": "Precision Air",
+      "weight": 0.02,
+      "cities": [
+        "Dar es Salaam",
+        "Arusha"
+      ]
+    },
+    {
+      "name": "Air Tanzania",
+      "weight": 0.02,
+      "cities": [
+        "Dar es Salaam"
+      ]
+    },
+    {
+      "name": "Tanzania Revenue Authority",
+      "weight": 0.02,
+      "cities": [
+        "Dodoma",
+        "Dar es Salaam"
+      ]
+    },
+    {
+      "name": "TANAPA",
+      "weight": 0.02,
+      "cities": [
+        "Arusha"
+      ]
+    },
+    {
+      "name": "National Microfinance Bank",
+      "weight": 0.02,
+      "cities": [
+        "Dar es Salaam"
+      ]
+    },
+    {
+      "name": "Exim Bank Tanzania",
+      "weight": 0.02,
+      "cities": [
+        "Dar es Salaam"
+      ]
+    },
+    {
+      "name": "Azania Bank",
+      "weight": 0.02,
+      "cities": [
+        "Dar es Salaam"
+      ]
+    },
+    {
+      "name": "Stanbic Bank Tanzania",
+      "weight": 0.02,
+      "cities": [
+        "Dar es Salaam"
+      ]
+    },
+    {
+      "name": "Standard Chartered Tanzania",
+      "weight": 0.02,
+      "cities": [
+        "Dar es Salaam"
+      ]
+    },
+    {
+      "name": "Barclays Bank Tanzania",
+      "weight": 0.02,
+      "cities": [
+        "Dar es Salaam"
+      ]
+    },
+    {
+      "name": "Bakhresa Group",
+      "weight": 0.02,
+      "cities": [
+        "Dar es Salaam"
+      ]
+    },
+    {
+      "name": "METL Group",
+      "weight": 0.02,
+      "cities": [
+        "Dar es Salaam"
+      ]
+    },
+    {
+      "name": "IPP Group",
+      "weight": 0.02,
+      "cities": [
+        "Dar es Salaam"
+      ]
+    },
+    {
+      "name": "Amsons Group",
+      "weight": 0.02,
+      "cities": [
+        "Dar es Salaam"
+      ]
+    },
+    {
+      "name": "Motisun Group",
+      "weight": 0.02,
+      "cities": [
+        "Dar es Salaam"
+      ]
+    },
+    {
+      "name": "Sumaria Group",
+      "weight": 0.02,
+      "cities": [
+        "Dar es Salaam"
+      ]
+    },
+    {
+      "name": "Karimjee Jivanjee",
+      "weight": 0.02,
+      "cities": [
+        "Dar es Salaam"
+      ]
+    },
+    {
+      "name": "A.P. Moller Maersk Tanzania",
+      "weight": 0.02,
+      "cities": [
+        "Dar es Salaam"
+      ]
+    },
+    {
+      "name": "Geita Gold Mining",
+      "weight": 0.02,
+      "cities": [
+        "Geita"
+      ]
+    },
+    {
+      "name": "AngloGold Ashanti Tanzania",
+      "weight": 0.02,
+      "cities": [
+        "Geita",
+        "Dar es Salaam"
+      ]
+    },
+    {
+      "name": "Tanzania Petroleum Development Corporation",
+      "weight": 0.02,
+      "cities": [
+        "Dar es Salaam"
+      ]
+    },
+    {
+      "name": "Swissport Tanzania",
+      "weight": 0.02,
+      "cities": [
+        "Dar es Salaam"
+      ]
+    },
+    {
+      "name": "Dar es Salaam Stock Exchange",
+      "weight": 0.02,
+      "cities": [
+        "Dar es Salaam"
+      ]
+    },
+    {
+      "name": "DAWASCO",
+      "weight": 0.02,
+      "cities": [
+        "Dar es Salaam"
+      ]
+    },
+    {
+      "name": "TANROADS",
+      "weight": 0.02,
+      "cities": [
+        "Dodoma",
+        "Dar es Salaam"
+      ]
+    },
+    {
+      "name": "Tanzania Posts Corporation",
+      "weight": 0.02,
+      "cities": [
+        "Dodoma"
+      ]
+    },
+    {
+      "name": "Halotel",
+      "weight": 0.02,
+      "cities": [
+        "Dar es Salaam"
+      ]
+    },
+    {
+      "name": "Zantel",
+      "weight": 0.02,
+      "cities": [
+        "Zanzibar City",
+        "Dar es Salaam"
+      ]
+    },
+    {
+      "name": "Selcom Paytech",
+      "weight": 0.02,
+      "cities": [
+        "Dar es Salaam"
+      ]
+    }
+  ],
+  "jobs": [
+    "Accountant",
+    "Administrative Assistant",
+    "Analyst",
+    "Architect",
+    "Business Consultant",
+    "Civil Engineer",
+    "Computer Programmer",
+    "Data Scientist",
+    "Designer",
+    "Doctor",
+    "Economist",
+    "Electrical Engineer",
+    "Financial Advisor",
+    "Graphic Designer",
+    "Human Resources Manager",
+    "IT Manager",
+    "Journalist",
+    "Lawyer",
+    "Logistics Manager",
+    "Mechanical Engineer",
+    "Marketing Manager",
+    "Network Administrator",
+    "Operations Manager",
+    "Pharmacist",
+    "Project Manager",
+    "Quality Assurance Engineer",
+    "Research Scientist",
+    "Sales Manager",
+    "Software Developer",
+    "Systems Administrator",
+    "Teacher",
+    "Technical Writer",
+    "Translator",
+    "Urban Planner",
+    "Veterinarian",
+    "Web Developer",
+    "Agricultural Officer",
+    "Mining Engineer",
+    "Tourism Officer",
+    "Park Ranger",
+    "Nurse",
+    "Security Officer",
+    "Bank Teller"
+  ],
+  "catch_phrase_adjectives": [
+    "innovative",
+    "reliable",
+    "trusted",
+    "pioneering",
+    "comprehensive",
+    "sustainable",
+    "premium",
+    "efficient",
+    "cutting-edge",
+    "strategic",
+    "dynamic",
+    "professional",
+    "leading",
+    "modern",
+    "advanced",
+    "integrated",
+    "creative",
+    "smart",
+    "digital",
+    "robust"
+  ],
+  "catch_phrase_nouns": [
+    "solutions",
+    "services",
+    "partnerships",
+    "opportunities",
+    "excellence",
+    "innovation",
+    "performance",
+    "results",
+    "growth",
+    "value",
+    "quality",
+    "expertise",
+    "leadership",
+    "vision",
+    "success"
+  ],
+  "catch_phrase_verbs": [
+    "deliver",
+    "achieve",
+    "transform",
+    "build",
+    "create",
+    "empower",
+    "enhance",
+    "develop",
+    "drive",
+    "enable",
+    "connect",
+    "inspire",
+    "advance",
+    "optimize",
+    "lead"
+  ],
+  "catch_phrase_connector": "to",
+  "industries": [
+    {
+      "name": "mining",
+      "weight": 0.18
+    },
+    {
+      "name": "agriculture",
+      "weight": 0.16
+    },
+    {
+      "name": "tourism",
+      "weight": 0.14
+    },
+    {
+      "name": "telecommunications",
+      "weight": 0.12
+    },
+    {
+      "name": "finance",
+      "weight": 0.1
+    },
+    {
+      "name": "energy",
+      "weight": 0.08
+    },
+    {
+      "name": "construction",
+      "weight": 0.07
+    },
+    {
+      "name": "manufacturing",
+      "weight": 0.06
+    },
+    {
+      "name": "technology",
+      "weight": 0.05
+    },
+    {
+      "name": "logistics",
+      "weight": 0.04
+    }
+  ]
+}
