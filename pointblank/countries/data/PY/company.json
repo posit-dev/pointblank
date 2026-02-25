@@ -1,5 +1,13 @@
 {
-  "suffixes": ["S.A.", "S.R.L.", "S.A.C.I.", "S.A.E.", "S.C.A.", "Ltda.", "S.A.E.C.A."],
+  "suffixes": [
+    "S.A.",
+    "S.R.L.",
+    "S.A.C.I.",
+    "S.A.E.",
+    "S.C.A.",
+    "Ltda.",
+    "S.A.E.C.A."
+  ],
   "formats": [
     "{last_name} {suffix}",
     "{last_name} & {last_name} {suffix}",
@@ -7,98 +15,878 @@
     "{noun} {suffix}"
   ],
   "adjectives": [
-    "Nacional", "General", "Central", "Comercial", "Industrial",
-    "Nueva", "Gran", "Primera", "Principal", "Moderna",
-    "Internacional", "Americana", "Paraguaya", "Continental", "Regional",
-    "Dinámica", "Progresiva", "Innovadora", "Sostenible", "Verde",
-    "Solidaria", "Comunitaria", "Digital", "Tecnológica", "Social",
-    "Urbana", "Rural", "Agrícola", "Financiera", "Económica"
+    "Nacional",
+    "General",
+    "Central",
+    "Comercial",
+    "Industrial",
+    "Nueva",
+    "Gran",
+    "Primera",
+    "Principal",
+    "Moderna",
+    "Internacional",
+    "Americana",
+    "Paraguaya",
+    "Continental",
+    "Regional",
+    "Dinámica",
+    "Progresiva",
+    "Innovadora",
+    "Sostenible",
+    "Verde",
+    "Solidaria",
+    "Comunitaria",
+    "Digital",
+    "Tecnológica",
+    "Social",
+    "Urbana",
+    "Rural",
+    "Agrícola",
+    "Financiera",
+    "Económica"
   ],
   "nouns": [
-    "Empresa", "Compañía", "Sociedad", "Industrias", "Servicios",
-    "Comercio", "Soluciones", "Grupo", "Holdings", "Desarrollo",
-    "Tecnologías", "Inversiones", "Construcción", "Transporte", "Comunicación",
-    "Energía", "Distribución", "Producción", "Agricultura", "Finanzas",
-    "Seguros", "Inmobiliaria", "Trading", "Consultoría", "Logística",
-    "Informática", "Ingeniería", "Telecomunicaciones", "Edificación", "Ambiente",
-    "Turismo", "Ganadería", "Soja", "Yerba", "Alimentación", "Capacitación"
+    "Empresa",
+    "Compañía",
+    "Sociedad",
+    "Industrias",
+    "Servicios",
+    "Comercio",
+    "Soluciones",
+    "Grupo",
+    "Holdings",
+    "Desarrollo",
+    "Tecnologías",
+    "Inversiones",
+    "Construcción",
+    "Transporte",
+    "Comunicación",
+    "Energía",
+    "Distribución",
+    "Producción",
+    "Agricultura",
+    "Finanzas",
+    "Seguros",
+    "Inmobiliaria",
+    "Trading",
+    "Consultoría",
+    "Logística",
+    "Informática",
+    "Ingeniería",
+    "Telecomunicaciones",
+    "Edificación",
+    "Ambiente",
+    "Turismo",
+    "Ganadería",
+    "Soja",
+    "Yerba",
+    "Alimentación",
+    "Capacitación"
   ],
   "well_known_companies": [
-    {"name": "Itaipú Binacional", "cities": ["Asunción", "Hernandarias", "Ciudad del Este"]},
-    {"name": "Yacyretá", "cities": ["Asunción", "Ayolas", "Encarnación"]},
-    {"name": "Tigo Paraguay", "cities": ["Asunción", "Ciudad del Este", "Encarnación", "San Lorenzo"]},
-    {"name": "Personal Paraguay", "cities": ["Asunción", "Ciudad del Este", "Encarnación"]},
-    {"name": "Claro Paraguay", "cities": ["Asunción", "Ciudad del Este", "San Lorenzo"]},
-    {"name": "Banco Nacional de Fomento", "cities": ["Asunción", "Ciudad del Este", "Encarnación", "Concepción"]},
-    {"name": "Banco Continental", "cities": ["Asunción", "Ciudad del Este", "Encarnación"]},
-    {"name": "Banco Itaú Paraguay", "cities": ["Asunción", "Ciudad del Este"]},
-    {"name": "Sudameris Bank", "cities": ["Asunción", "Ciudad del Este", "Encarnación"]},
-    {"name": "Banco Regional", "cities": ["Asunción", "Ciudad del Este", "Encarnación", "Concepción"]},
-    {"name": "COPACO", "cities": ["Asunción", "San Lorenzo", "Luque"]},
-    {"name": "ANDE", "cities": ["Asunción", "San Lorenzo", "Ciudad del Este", "Encarnación"]},
-    {"name": "ESSAP", "cities": ["Asunción", "San Lorenzo", "Luque"]},
-    {"name": "Petropar", "cities": ["Asunción", "Villa Elisa"]},
-    {"name": "TABESA", "cities": ["Asunción", "San Lorenzo"]},
-    {"name": "Grupo Cartes", "cities": ["Asunción"]},
-    {"name": "Grupo Vázquez", "cities": ["Asunción", "Ciudad del Este"]},
-    {"name": "Grupo Zucolillo", "cities": ["Asunción"]},
-    {"name": "Cargill Paraguay", "cities": ["Asunción", "Ciudad del Este", "Encarnación"]},
-    {"name": "ADM Paraguay", "cities": ["Asunción", "Ciudad del Este"]},
-    {"name": "Louis Dreyfus Paraguay", "cities": ["Asunción", "Ciudad del Este"]},
-    {"name": "Bunge Paraguay", "cities": ["Asunción", "Ciudad del Este"]},
-    {"name": "Frigomerc", "cities": ["Asunción", "Mariano Roque Alonso"]},
-    {"name": "Cervepar", "cities": ["Asunción", "Ypané"]},
-    {"name": "Coca-Cola Paraguay", "cities": ["Asunción"]},
-    {"name": "Unilever Paraguay", "cities": ["Asunción"]},
-    {"name": "Cooperativa Chortitzer", "cities": ["Loma Plata", "Filadelfia", "Asunción"]},
-    {"name": "Cooperativa Neuland", "cities": ["Neuland", "Asunción"]},
-    {"name": "Cooperativa Fernheim", "cities": ["Filadelfia", "Asunción"]},
-    {"name": "LAP - Aeropuerto Silvio Pettirossi", "cities": ["Luque"]},
-    {"name": "Samuelsohn", "cities": ["Asunción"]},
-    {"name": "Mapfre Paraguay", "cities": ["Asunción", "Ciudad del Este"]},
-    {"name": "Sancor Seguros Paraguay", "cities": ["Asunción"]},
-    {"name": "Visión Banco", "cities": ["Asunción", "Ciudad del Este", "Encarnación", "San Lorenzo"]},
-    {"name": "Banco Familiar", "cities": ["Asunción", "Ciudad del Este", "Encarnación"]},
-    {"name": "Banco Atlas", "cities": ["Asunción", "Ciudad del Este"]},
-    {"name": "BBVA Paraguay", "cities": ["Asunción"]},
-    {"name": "Interfisa Banco", "cities": ["Asunción", "Ciudad del Este", "Encarnación"]},
-    {"name": "La Rural del Paraná", "cities": ["Encarnación"]},
-    {"name": "Shopping del Sol", "cities": ["Asunción"]},
-    {"name": "Superseis", "cities": ["Asunción", "San Lorenzo", "Luque", "Lambaré"]},
-    {"name": "Real S.A.", "cities": ["Asunción", "San Lorenzo", "Fernando de la Mora"]},
-    {"name": "Toyotoshi", "cities": ["Asunción", "Ciudad del Este"]},
-    {"name": "Diesa", "cities": ["Asunción", "Ciudad del Este"]}
+    {
+      "name": "Itaipú Binacional",
+      "cities": [
+        "Asunción",
+        "Hernandarias",
+        "Ciudad del Este"
+      ]
+    },
+    {
+      "name": "Yacyretá",
+      "cities": [
+        "Asunción",
+        "Ayolas",
+        "Encarnación"
+      ]
+    },
+    {
+      "name": "Tigo Paraguay",
+      "cities": [
+        "Asunción",
+        "Ciudad del Este",
+        "Encarnación",
+        "San Lorenzo"
+      ]
+    },
+    {
+      "name": "Personal Paraguay",
+      "cities": [
+        "Asunción",
+        "Ciudad del Este",
+        "Encarnación"
+      ]
+    },
+    {
+      "name": "Claro Paraguay",
+      "cities": [
+        "Asunción",
+        "Ciudad del Este",
+        "San Lorenzo"
+      ]
+    },
+    {
+      "name": "Banco Nacional de Fomento",
+      "cities": [
+        "Asunción",
+        "Ciudad del Este",
+        "Encarnación",
+        "Concepción"
+      ]
+    },
+    {
+      "name": "Banco Continental",
+      "cities": [
+        "Asunción",
+        "Ciudad del Este",
+        "Encarnación"
+      ]
+    },
+    {
+      "name": "Banco Itaú Paraguay",
+      "cities": [
+        "Asunción",
+        "Ciudad del Este"
+      ]
+    },
+    {
+      "name": "Sudameris Bank",
+      "cities": [
+        "Asunción",
+        "Ciudad del Este",
+        "Encarnación"
+      ]
+    },
+    {
+      "name": "Banco Regional",
+      "cities": [
+        "Asunción",
+        "Ciudad del Este",
+        "Encarnación",
+        "Concepción"
+      ]
+    },
+    {
+      "name": "COPACO",
+      "cities": [
+        "Asunción",
+        "San Lorenzo",
+        "Luque"
+      ]
+    },
+    {
+      "name": "ANDE",
+      "cities": [
+        "Asunción",
+        "San Lorenzo",
+        "Ciudad del Este",
+        "Encarnación"
+      ]
+    },
+    {
+      "name": "ESSAP",
+      "cities": [
+        "Asunción",
+        "San Lorenzo",
+        "Luque"
+      ]
+    },
+    {
+      "name": "Petropar",
+      "cities": [
+        "Asunción",
+        "Villa Elisa"
+      ]
+    },
+    {
+      "name": "TABESA",
+      "cities": [
+        "Asunción",
+        "San Lorenzo"
+      ]
+    },
+    {
+      "name": "Grupo Cartes",
+      "cities": [
+        "Asunción"
+      ]
+    },
+    {
+      "name": "Grupo Vázquez",
+      "cities": [
+        "Asunción",
+        "Ciudad del Este"
+      ]
+    },
+    {
+      "name": "Grupo Zucolillo",
+      "cities": [
+        "Asunción"
+      ]
+    },
+    {
+      "name": "Cargill Paraguay",
+      "cities": [
+        "Asunción",
+        "Ciudad del Este",
+        "Encarnación"
+      ]
+    },
+    {
+      "name": "ADM Paraguay",
+      "cities": [
+        "Asunción",
+        "Ciudad del Este"
+      ]
+    },
+    {
+      "name": "Louis Dreyfus Paraguay",
+      "cities": [
+        "Asunción",
+        "Ciudad del Este"
+      ]
+    },
+    {
+      "name": "Bunge Paraguay",
+      "cities": [
+        "Asunción",
+        "Ciudad del Este"
+      ]
+    },
+    {
+      "name": "Frigomerc",
+      "cities": [
+        "Asunción",
+        "Mariano Roque Alonso"
+      ]
+    },
+    {
+      "name": "Cervepar",
+      "cities": [
+        "Asunción",
+        "Ypané"
+      ]
+    },
+    {
+      "name": "Coca-Cola Paraguay",
+      "cities": [
+        "Asunción"
+      ]
+    },
+    {
+      "name": "Unilever Paraguay",
+      "cities": [
+        "Asunción"
+      ]
+    },
+    {
+      "name": "Cooperativa Chortitzer",
+      "cities": [
+        "Loma Plata",
+        "Filadelfia",
+        "Asunción"
+      ]
+    },
+    {
+      "name": "Cooperativa Neuland",
+      "cities": [
+        "Neuland",
+        "Asunción"
+      ]
+    },
+    {
+      "name": "Cooperativa Fernheim",
+      "cities": [
+        "Filadelfia",
+        "Asunción"
+      ]
+    },
+    {
+      "name": "LAP - Aeropuerto Silvio Pettirossi",
+      "cities": [
+        "Luque"
+      ]
+    },
+    {
+      "name": "Samuelsohn",
+      "cities": [
+        "Asunción"
+      ]
+    },
+    {
+      "name": "Mapfre Paraguay",
+      "cities": [
+        "Asunción",
+        "Ciudad del Este"
+      ]
+    },
+    {
+      "name": "Sancor Seguros Paraguay",
+      "cities": [
+        "Asunción"
+      ]
+    },
+    {
+      "name": "Visión Banco",
+      "cities": [
+        "Asunción",
+        "Ciudad del Este",
+        "Encarnación",
+        "San Lorenzo"
+      ]
+    },
+    {
+      "name": "Banco Familiar",
+      "cities": [
+        "Asunción",
+        "Ciudad del Este",
+        "Encarnación"
+      ]
+    },
+    {
+      "name": "Banco Atlas",
+      "cities": [
+        "Asunción",
+        "Ciudad del Este"
+      ]
+    },
+    {
+      "name": "BBVA Paraguay",
+      "cities": [
+        "Asunción"
+      ]
+    },
+    {
+      "name": "Interfisa Banco",
+      "cities": [
+        "Asunción",
+        "Ciudad del Este",
+        "Encarnación"
+      ]
+    },
+    {
+      "name": "La Rural del Paraná",
+      "cities": [
+        "Encarnación"
+      ]
+    },
+    {
+      "name": "Shopping del Sol",
+      "cities": [
+        "Asunción"
+      ]
+    },
+    {
+      "name": "Superseis",
+      "cities": [
+        "Asunción",
+        "San Lorenzo",
+        "Luque",
+        "Lambaré"
+      ]
+    },
+    {
+      "name": "Real S.A.",
+      "cities": [
+        "Asunción",
+        "San Lorenzo",
+        "Fernando de la Mora"
+      ]
+    },
+    {
+      "name": "Toyotoshi",
+      "cities": [
+        "Asunción",
+        "Ciudad del Este"
+      ]
+    },
+    {
+      "name": "Diesa",
+      "cities": [
+        "Asunción",
+        "Ciudad del Este"
+      ]
+    }
   ],
   "jobs": [
-    "Director", "Directora", "Contador", "Contadora", "Ingeniero",
-    "Ingeniera", "Médico", "Médica", "Maestro", "Maestra",
-    "Abogado", "Abogada", "Agricultor", "Agricultora", "Chofer",
-    "Comerciante", "Enfermero", "Enfermera", "Secretario", "Secretaria",
-    "Técnico", "Técnica", "Periodista", "Farmacéutico", "Farmacéutica",
-    "Arquitecto", "Arquitecta", "Consultor", "Consultora", "Analista",
-    "Programador", "Programadora", "Diseñador", "Diseñadora", "Jefe de proyecto",
-    "Cajero", "Cajera", "Guardia", "Electricista", "Plomero",
-    "Carpintero", "Albañil", "Cocinero", "Cocinera", "Guía turístico"
+    "Director",
+    "Directora",
+    "Contador",
+    "Contadora",
+    "Ingeniero",
+    "Ingeniera",
+    "Médico",
+    "Médica",
+    "Maestro",
+    "Maestra",
+    "Abogado",
+    "Abogada",
+    "Agricultor",
+    "Agricultora",
+    "Chofer",
+    "Comerciante",
+    "Enfermero",
+    "Enfermera",
+    "Secretario",
+    "Secretaria",
+    "Técnico",
+    "Técnica",
+    "Periodista",
+    "Farmacéutico",
+    "Farmacéutica",
+    "Arquitecto",
+    "Arquitecta",
+    "Consultor",
+    "Consultora",
+    "Analista",
+    "Programador",
+    "Programadora",
+    "Diseñador",
+    "Diseñadora",
+    "Jefe de proyecto",
+    "Cajero",
+    "Cajera",
+    "Guardia",
+    "Electricista",
+    "Plomero",
+    "Carpintero",
+    "Albañil",
+    "Cocinero",
+    "Cocinera",
+    "Guía turístico"
   ],
   "catch_phrase_adjectives": [
-    "innovador", "sostenible", "moderno", "eficiente", "confiable",
-    "dinámico", "efectivo", "estratégico", "responsable", "integrado"
+    "innovador",
+    "sostenible",
+    "moderno",
+    "eficiente",
+    "confiable",
+    "dinámico",
+    "efectivo",
+    "estratégico",
+    "responsable",
+    "integrado"
   ],
   "catch_phrase_nouns": [
-    "soluciones", "servicios", "sistemas", "tecnologías", "desarrollo",
-    "excelencia", "innovación", "crecimiento", "progreso", "calidad"
+    "soluciones",
+    "servicios",
+    "sistemas",
+    "tecnologías",
+    "desarrollo",
+    "excelencia",
+    "innovación",
+    "crecimiento",
+    "progreso",
+    "calidad"
   ],
   "catch_phrase_verbs": [
-    "transformar", "innovar", "desarrollar", "optimizar", "crear",
-    "mejorar", "construir", "conectar", "inspirar", "realizar"
+    "transformar",
+    "innovar",
+    "desarrollar",
+    "optimizar",
+    "crear",
+    "mejorar",
+    "construir",
+    "conectar",
+    "inspirar",
+    "realizar"
   ],
   "catch_phrase_connector": [
-    "para", "con", "hacia", "y", "en favor de"
+    "para",
+    "con",
+    "hacia",
+    "y",
+    "en favor de"
   ],
   "industries": [
-    "Agricultura", "Ganadería", "Banca", "Turismo", "Tecnología",
-    "Construcción", "Transporte", "Energía", "Telecomunicaciones", "Salud",
-    "Educación", "Comercio", "Soja", "Yerba Mate", "Inmobiliaria",
-    "Seguros", "Alimentación", "Hotelería", "Artesanía", "Forestal"
+    {
+      "name": "agriculture",
+      "weight": 0.18,
+      "jobs": [
+        "Agricultor",
+        "Agricultora",
+        "Ingeniero",
+        "Ingeniera"
+      ],
+      "well_known": [
+        "Cargill Paraguay",
+        "ADM Paraguay",
+        "Louis Dreyfus Paraguay",
+        "Bunge Paraguay"
+      ],
+      "company_suffixes": [
+        "S.A.",
+        "S.R.L.",
+        "S.A.C.I."
+      ],
+      "company_nouns": [
+        "Agricultura",
+        "Soja",
+        "Yerba",
+        "Ganadería",
+        "Producción"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{last_name} {suffix}",
+        "{last_name} & {last_name} {suffix}"
+      ]
+    },
+    {
+      "name": "finance",
+      "weight": 0.12,
+      "jobs": [
+        "Contador",
+        "Contadora",
+        "Analista"
+      ],
+      "well_known": [
+        "Banco Nacional de Fomento",
+        "Banco Continental",
+        "Banco Itaú Paraguay",
+        "Sudameris Bank",
+        "Banco Regional",
+        "Visión Banco",
+        "Banco Familiar",
+        "Banco Atlas",
+        "BBVA Paraguay",
+        "Interfisa Banco"
+      ],
+      "company_suffixes": [
+        "S.A.",
+        "S.A.E.C.A."
+      ],
+      "company_nouns": [
+        "Finanzas",
+        "Inversiones",
+        "Capital"
+      ],
+      "company_formats": [
+        "Banco {last_name}",
+        "{adjective} {noun} {suffix}",
+        "{last_name} {suffix}"
+      ]
+    },
+    {
+      "name": "energy",
+      "weight": 0.06,
+      "jobs": [
+        "Ingeniero",
+        "Ingeniera",
+        "Técnico",
+        "Técnica"
+      ],
+      "well_known": [
+        "Itaipú Binacional",
+        "Yacyretá",
+        "ANDE"
+      ],
+      "company_suffixes": [
+        "S.A."
+      ],
+      "company_nouns": [
+        "Energía"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}"
+      ]
+    },
+    {
+      "name": "telecom",
+      "weight": 0.06,
+      "jobs": [
+        "Técnico",
+        "Técnica",
+        "Programador",
+        "Programadora"
+      ],
+      "well_known": [
+        "Tigo Paraguay",
+        "Personal Paraguay",
+        "Claro Paraguay",
+        "COPACO"
+      ],
+      "company_suffixes": [
+        "S.A.",
+        "S.R.L."
+      ],
+      "company_nouns": [
+        "Telecomunicaciones",
+        "Comunicación",
+        "Tecnologías"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}"
+      ]
+    },
+    {
+      "name": "food_beverage",
+      "weight": 0.08,
+      "jobs": [
+        "Cocinero",
+        "Cocinera",
+        "Comerciante"
+      ],
+      "well_known": [
+        "Frigomerc",
+        "Cervepar",
+        "Coca-Cola Paraguay",
+        "Unilever Paraguay"
+      ],
+      "company_suffixes": [
+        "S.A.",
+        "S.R.L."
+      ],
+      "company_nouns": [
+        "Alimentación",
+        "Distribución",
+        "Producción"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{last_name} {suffix}"
+      ]
+    },
+    {
+      "name": "commerce",
+      "weight": 0.08,
+      "jobs": [
+        "Vendedor",
+        "Cajero",
+        "Cajera",
+        "Comerciante"
+      ],
+      "well_known": [
+        "Shopping del Sol",
+        "Superseis",
+        "Real S.A."
+      ],
+      "company_suffixes": [
+        "S.A.",
+        "S.R.L.",
+        "Ltda."
+      ],
+      "company_nouns": [
+        "Comercio",
+        "Distribución",
+        "Trading"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{last_name} {suffix}"
+      ]
+    },
+    {
+      "name": "healthcare",
+      "weight": 0.06,
+      "jobs": [
+        "Médico",
+        "Médica",
+        "Enfermero",
+        "Enfermera",
+        "Farmacéutico",
+        "Farmacéutica"
+      ],
+      "well_known": [],
+      "company_suffixes": [
+        "S.A."
+      ],
+      "company_nouns": [
+        "Salud"
+      ],
+      "company_formats": [
+        "Hospital {last_name}",
+        "Clínica {last_name}",
+        "{adjective} {noun} {suffix}"
+      ]
+    },
+    {
+      "name": "education",
+      "weight": 0.05,
+      "jobs": [
+        "Maestro",
+        "Maestra"
+      ],
+      "well_known": [],
+      "company_suffixes": [],
+      "company_nouns": [
+        "Educación",
+        "Capacitación"
+      ],
+      "company_formats": [
+        "Universidad de {city}",
+        "Colegio {last_name}",
+        "Instituto {last_name}"
+      ]
+    },
+    {
+      "name": "construction",
+      "weight": 0.06,
+      "jobs": [
+        "Arquitecto",
+        "Arquitecta",
+        "Ingeniero",
+        "Ingeniera",
+        "Albañil",
+        "Plomero",
+        "Carpintero",
+        "Electricista"
+      ],
+      "well_known": [],
+      "company_suffixes": [
+        "S.A.",
+        "S.R.L."
+      ],
+      "company_nouns": [
+        "Construcción",
+        "Ingeniería",
+        "Edificación"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "Constructora {last_name}"
+      ]
+    },
+    {
+      "name": "transport",
+      "weight": 0.05,
+      "jobs": [
+        "Chofer",
+        "Guía turístico"
+      ],
+      "well_known": [
+        "LAP - Aeropuerto Silvio Pettirossi"
+      ],
+      "company_suffixes": [
+        "S.A."
+      ],
+      "company_nouns": [
+        "Transporte",
+        "Logística"
+      ],
+      "company_formats": [
+        "Transportes {last_name}",
+        "{adjective} {noun} {suffix}"
+      ]
+    },
+    {
+      "name": "cooperatives",
+      "weight": 0.05,
+      "jobs": [
+        "Agricultor",
+        "Agricultora",
+        "Administrador"
+      ],
+      "well_known": [
+        "Cooperativa Chortitzer",
+        "Cooperativa Neuland",
+        "Cooperativa Fernheim"
+      ],
+      "company_suffixes": [
+        "Ltda."
+      ],
+      "company_nouns": [
+        "Cooperativa"
+      ],
+      "company_formats": [
+        "Cooperativa {last_name}",
+        "{adjective} Cooperativa {suffix}"
+      ]
+    },
+    {
+      "name": "corporate",
+      "weight": 0.09,
+      "jobs": [
+        "Director",
+        "Directora",
+        "Consultor",
+        "Consultora",
+        "Abogado",
+        "Abogada",
+        "Jefe de proyecto",
+        "Analista",
+        "Periodista",
+        "Diseñador",
+        "Diseñadora",
+        "Guardia",
+        "Secretario",
+        "Secretaria"
+      ],
+      "well_known": [
+        "Grupo Cartes",
+        "Grupo Vázquez",
+        "Grupo Zucolillo",
+        "Toyotoshi",
+        "Diesa",
+        "Samuelsohn",
+        "Petropar",
+        "ESSAP",
+        "TABESA",
+        "La Rural del Paraná"
+      ],
+      "company_suffixes": [
+        "S.A.",
+        "S.A.E.",
+        "S.A.C.I.",
+        "S.C.A."
+      ],
+      "company_nouns": [
+        "Grupo",
+        "Holdings",
+        "Servicios",
+        "Empresa"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun} {suffix}",
+        "{last_name} & {last_name} {suffix}"
+      ]
+    },
+    {
+      "name": "insurance",
+      "weight": 0.04,
+      "jobs": [
+        "Analista"
+      ],
+      "well_known": [
+        "Mapfre Paraguay",
+        "Sancor Seguros Paraguay"
+      ],
+      "company_suffixes": [
+        "S.A."
+      ],
+      "company_nouns": [
+        "Seguros"
+      ],
+      "company_formats": [
+        "{adjective} Seguros {suffix}",
+        "Seguros {last_name}"
+      ]
+    },
+    {
+      "name": "technology",
+      "weight": 0.02,
+      "jobs": [
+        "Programador",
+        "Programadora",
+        "Diseñador",
+        "Diseñadora"
+      ],
+      "well_known": [],
+      "company_suffixes": [
+        "S.A.",
+        "S.R.L."
+      ],
+      "company_nouns": [
+        "Tecnologías",
+        "Informática",
+        "Soluciones"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{last_name} {suffix}"
+      ]
+    }
   ]
 }

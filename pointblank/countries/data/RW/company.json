@@ -1,5 +1,13 @@
 {
-  "suffixes": ["S.A.", "S.A.R.L.", "Ltd.", "Ltée", "S.C.", "Coopérative", "SA"],
+  "suffixes": [
+    "S.A.",
+    "S.A.R.L.",
+    "Ltd.",
+    "Ltée",
+    "S.C.",
+    "Coopérative",
+    "SA"
+  ],
   "formats": [
     "{last_name} {suffix}",
     "{last_name} & {last_name} {suffix}",
@@ -7,98 +15,857 @@
     "{noun} {suffix}"
   ],
   "adjectives": [
-    "Nationale", "Générale", "Centrale", "Commerciale", "Industrielle",
-    "Nouvelle", "Grande", "Première", "Principale", "Moderne",
-    "Internationale", "Africaine", "Rwandaise", "Continentale", "Régionale",
-    "Dynamique", "Progressive", "Innovante", "Durable", "Verte",
-    "Solidaire", "Communautaire", "Digitale", "Technologique", "Sociale",
-    "Urbaine", "Rurale", "Agricole", "Financière", "Économique"
+    "Nationale",
+    "Générale",
+    "Centrale",
+    "Commerciale",
+    "Industrielle",
+    "Nouvelle",
+    "Grande",
+    "Première",
+    "Principale",
+    "Moderne",
+    "Internationale",
+    "Africaine",
+    "Rwandaise",
+    "Continentale",
+    "Régionale",
+    "Dynamique",
+    "Progressive",
+    "Innovante",
+    "Durable",
+    "Verte",
+    "Solidaire",
+    "Communautaire",
+    "Digitale",
+    "Technologique",
+    "Sociale",
+    "Urbaine",
+    "Rurale",
+    "Agricole",
+    "Financière",
+    "Économique"
   ],
   "nouns": [
-    "Entreprise", "Compagnie", "Société", "Industries", "Services",
-    "Commerce", "Solutions", "Groupe", "Holdings", "Développement",
-    "Technologies", "Investissements", "Construction", "Transport", "Communication",
-    "Énergie", "Distribution", "Production", "Agriculture", "Finances",
-    "Assurances", "Immobilier", "Trading", "Consulting", "Logistique",
-    "Informatique", "Ingénierie", "Télécommunications", "Bâtiment", "Environnement",
-    "Tourisme", "Café", "Thé", "Banque", "Alimentation", "Formation"
+    "Entreprise",
+    "Compagnie",
+    "Société",
+    "Industries",
+    "Services",
+    "Commerce",
+    "Solutions",
+    "Groupe",
+    "Holdings",
+    "Développement",
+    "Technologies",
+    "Investissements",
+    "Construction",
+    "Transport",
+    "Communication",
+    "Énergie",
+    "Distribution",
+    "Production",
+    "Agriculture",
+    "Finances",
+    "Assurances",
+    "Immobilier",
+    "Trading",
+    "Consulting",
+    "Logistique",
+    "Informatique",
+    "Ingénierie",
+    "Télécommunications",
+    "Bâtiment",
+    "Environnement",
+    "Tourisme",
+    "Café",
+    "Thé",
+    "Banque",
+    "Alimentation",
+    "Formation"
   ],
   "well_known_companies": [
-    {"name": "RwandAir", "cities": ["Kigali", "Gisenyi", "Butare"]},
-    {"name": "MTN Rwanda", "cities": ["Kigali", "Butare", "Ruhengeri", "Gisenyi"]},
-    {"name": "Airtel Rwanda", "cities": ["Kigali", "Butare", "Gitarama"]},
-    {"name": "Bank of Kigali", "cities": ["Kigali", "Butare", "Ruhengeri", "Gisenyi", "Gitarama"]},
-    {"name": "BK Group", "cities": ["Kigali"]},
-    {"name": "Bralirwa", "cities": ["Kigali", "Gisenyi"]},
-    {"name": "CIMERWA", "cities": ["Cyangugu", "Kigali"]},
-    {"name": "Crystal Ventures", "cities": ["Kigali"]},
-    {"name": "Inyange Industries", "cities": ["Kigali"]},
-    {"name": "Sulfo Rwanda", "cities": ["Kigali"]},
-    {"name": "Rwanda Development Board", "cities": ["Kigali"]},
-    {"name": "Rwanda Energy Group", "cities": ["Kigali", "Ruhengeri", "Butare"]},
-    {"name": "EWSA", "cities": ["Kigali", "Butare", "Ruhengeri"]},
-    {"name": "Rwanda Social Security Board", "cities": ["Kigali"]},
-    {"name": "Banque Populaire du Rwanda", "cities": ["Kigali", "Butare", "Gitarama", "Ruhengeri"]},
-    {"name": "I&M Bank Rwanda", "cities": ["Kigali", "Butare", "Gisenyi"]},
-    {"name": "Equity Bank Rwanda", "cities": ["Kigali", "Butare", "Ruhengeri"]},
-    {"name": "KT Press", "cities": ["Kigali"]},
-    {"name": "The New Times", "cities": ["Kigali"]},
-    {"name": "Broadband Systems Corporation", "cities": ["Kigali"]},
-    {"name": "Positivo BGH Rwanda", "cities": ["Kigali"]},
-    {"name": "Rwanda Trading Company", "cities": ["Kigali", "Butare"]},
-    {"name": "SONARWA", "cities": ["Kigali", "Butare", "Gisenyi"]},
-    {"name": "Prime Insurance", "cities": ["Kigali"]},
-    {"name": "RADIANT Insurance", "cities": ["Kigali", "Gisenyi"]},
-    {"name": "Bourbon Coffee", "cities": ["Kigali", "Butare", "Ruhengeri"]},
-    {"name": "Question Coffee", "cities": ["Kigali"]},
-    {"name": "Rwanda Mountain Tea", "cities": ["Kigali", "Nyanza", "Gisenyi"]},
-    {"name": "Beau Monde", "cities": ["Kigali"]},
-    {"name": "Akagera Aviation", "cities": ["Kigali"]},
-    {"name": "Rwanda Utilities Regulatory Authority", "cities": ["Kigali"]},
-    {"name": "Skol Brewery", "cities": ["Kigali"]},
-    {"name": "Cimerwa Cement", "cities": ["Cyangugu", "Kigali"]},
-    {"name": "Cogebanque", "cities": ["Kigali", "Butare", "Gitarama"]},
-    {"name": "Access to Finance Rwanda", "cities": ["Kigali"]},
-    {"name": "Ngali Holdings", "cities": ["Kigali"]},
-    {"name": "Africa Improved Foods", "cities": ["Kigali"]},
-    {"name": "Volkswagen Rwanda", "cities": ["Kigali"]},
-    {"name": "kLab", "cities": ["Kigali"]},
-    {"name": "Irembo", "cities": ["Kigali"]},
-    {"name": "AC Group", "cities": ["Kigali"]},
-    {"name": "Rwanda Mines, Petroleum and Gas Board", "cities": ["Kigali"]},
-    {"name": "Urwego Bank", "cities": ["Kigali", "Butare", "Gitarama", "Ruhengeri"]},
-    {"name": "MINICOM", "cities": ["Kigali"]}
+    {
+      "name": "RwandAir",
+      "cities": [
+        "Kigali",
+        "Gisenyi",
+        "Butare"
+      ]
+    },
+    {
+      "name": "MTN Rwanda",
+      "cities": [
+        "Kigali",
+        "Butare",
+        "Ruhengeri",
+        "Gisenyi"
+      ]
+    },
+    {
+      "name": "Airtel Rwanda",
+      "cities": [
+        "Kigali",
+        "Butare",
+        "Gitarama"
+      ]
+    },
+    {
+      "name": "Bank of Kigali",
+      "cities": [
+        "Kigali",
+        "Butare",
+        "Ruhengeri",
+        "Gisenyi",
+        "Gitarama"
+      ]
+    },
+    {
+      "name": "BK Group",
+      "cities": [
+        "Kigali"
+      ]
+    },
+    {
+      "name": "Bralirwa",
+      "cities": [
+        "Kigali",
+        "Gisenyi"
+      ]
+    },
+    {
+      "name": "CIMERWA",
+      "cities": [
+        "Cyangugu",
+        "Kigali"
+      ]
+    },
+    {
+      "name": "Crystal Ventures",
+      "cities": [
+        "Kigali"
+      ]
+    },
+    {
+      "name": "Inyange Industries",
+      "cities": [
+        "Kigali"
+      ]
+    },
+    {
+      "name": "Sulfo Rwanda",
+      "cities": [
+        "Kigali"
+      ]
+    },
+    {
+      "name": "Rwanda Development Board",
+      "cities": [
+        "Kigali"
+      ]
+    },
+    {
+      "name": "Rwanda Energy Group",
+      "cities": [
+        "Kigali",
+        "Ruhengeri",
+        "Butare"
+      ]
+    },
+    {
+      "name": "EWSA",
+      "cities": [
+        "Kigali",
+        "Butare",
+        "Ruhengeri"
+      ]
+    },
+    {
+      "name": "Rwanda Social Security Board",
+      "cities": [
+        "Kigali"
+      ]
+    },
+    {
+      "name": "Banque Populaire du Rwanda",
+      "cities": [
+        "Kigali",
+        "Butare",
+        "Gitarama",
+        "Ruhengeri"
+      ]
+    },
+    {
+      "name": "I&M Bank Rwanda",
+      "cities": [
+        "Kigali",
+        "Butare",
+        "Gisenyi"
+      ]
+    },
+    {
+      "name": "Equity Bank Rwanda",
+      "cities": [
+        "Kigali",
+        "Butare",
+        "Ruhengeri"
+      ]
+    },
+    {
+      "name": "KT Press",
+      "cities": [
+        "Kigali"
+      ]
+    },
+    {
+      "name": "The New Times",
+      "cities": [
+        "Kigali"
+      ]
+    },
+    {
+      "name": "Broadband Systems Corporation",
+      "cities": [
+        "Kigali"
+      ]
+    },
+    {
+      "name": "Positivo BGH Rwanda",
+      "cities": [
+        "Kigali"
+      ]
+    },
+    {
+      "name": "Rwanda Trading Company",
+      "cities": [
+        "Kigali",
+        "Butare"
+      ]
+    },
+    {
+      "name": "SONARWA",
+      "cities": [
+        "Kigali",
+        "Butare",
+        "Gisenyi"
+      ]
+    },
+    {
+      "name": "Prime Insurance",
+      "cities": [
+        "Kigali"
+      ]
+    },
+    {
+      "name": "RADIANT Insurance",
+      "cities": [
+        "Kigali",
+        "Gisenyi"
+      ]
+    },
+    {
+      "name": "Bourbon Coffee",
+      "cities": [
+        "Kigali",
+        "Butare",
+        "Ruhengeri"
+      ]
+    },
+    {
+      "name": "Question Coffee",
+      "cities": [
+        "Kigali"
+      ]
+    },
+    {
+      "name": "Rwanda Mountain Tea",
+      "cities": [
+        "Kigali",
+        "Nyanza",
+        "Gisenyi"
+      ]
+    },
+    {
+      "name": "Beau Monde",
+      "cities": [
+        "Kigali"
+      ]
+    },
+    {
+      "name": "Akagera Aviation",
+      "cities": [
+        "Kigali"
+      ]
+    },
+    {
+      "name": "Rwanda Utilities Regulatory Authority",
+      "cities": [
+        "Kigali"
+      ]
+    },
+    {
+      "name": "Skol Brewery",
+      "cities": [
+        "Kigali"
+      ]
+    },
+    {
+      "name": "Cimerwa Cement",
+      "cities": [
+        "Cyangugu",
+        "Kigali"
+      ]
+    },
+    {
+      "name": "Cogebanque",
+      "cities": [
+        "Kigali",
+        "Butare",
+        "Gitarama"
+      ]
+    },
+    {
+      "name": "Access to Finance Rwanda",
+      "cities": [
+        "Kigali"
+      ]
+    },
+    {
+      "name": "Ngali Holdings",
+      "cities": [
+        "Kigali"
+      ]
+    },
+    {
+      "name": "Africa Improved Foods",
+      "cities": [
+        "Kigali"
+      ]
+    },
+    {
+      "name": "Volkswagen Rwanda",
+      "cities": [
+        "Kigali"
+      ]
+    },
+    {
+      "name": "kLab",
+      "cities": [
+        "Kigali"
+      ]
+    },
+    {
+      "name": "Irembo",
+      "cities": [
+        "Kigali"
+      ]
+    },
+    {
+      "name": "AC Group",
+      "cities": [
+        "Kigali"
+      ]
+    },
+    {
+      "name": "Rwanda Mines, Petroleum and Gas Board",
+      "cities": [
+        "Kigali"
+      ]
+    },
+    {
+      "name": "Urwego Bank",
+      "cities": [
+        "Kigali",
+        "Butare",
+        "Gitarama",
+        "Ruhengeri"
+      ]
+    },
+    {
+      "name": "MINICOM",
+      "cities": [
+        "Kigali"
+      ]
+    }
   ],
   "jobs": [
-    "Directeur", "Directrice", "Comptable", "Ingénieur", "Médecin",
-    "Enseignant", "Enseignante", "Avocat", "Avocate", "Agriculteur",
-    "Agricultrice", "Chauffeur", "Commerçant", "Commerçante", "Infirmier",
-    "Infirmière", "Secrétaire", "Technicien", "Technicienne", "Journaliste",
-    "Pharmacien", "Pharmacienne", "Architecte", "Consultant", "Consultante",
-    "Analyste", "Développeur", "Développeuse", "Designer", "Chef de projet",
-    "Caissier", "Caissière", "Agent de sécurité", "Électricien", "Plombier",
-    "Menuisier", "Maçon", "Cuisinier", "Cuisinière", "Guide touristique",
-    "Vétérinaire", "Agronome", "Biologiste"
+    "Directeur",
+    "Directrice",
+    "Comptable",
+    "Ingénieur",
+    "Médecin",
+    "Enseignant",
+    "Enseignante",
+    "Avocat",
+    "Avocate",
+    "Agriculteur",
+    "Agricultrice",
+    "Chauffeur",
+    "Commerçant",
+    "Commerçante",
+    "Infirmier",
+    "Infirmière",
+    "Secrétaire",
+    "Technicien",
+    "Technicienne",
+    "Journaliste",
+    "Pharmacien",
+    "Pharmacienne",
+    "Architecte",
+    "Consultant",
+    "Consultante",
+    "Analyste",
+    "Développeur",
+    "Développeuse",
+    "Designer",
+    "Chef de projet",
+    "Caissier",
+    "Caissière",
+    "Agent de sécurité",
+    "Électricien",
+    "Plombier",
+    "Menuisier",
+    "Maçon",
+    "Cuisinier",
+    "Cuisinière",
+    "Guide touristique",
+    "Vétérinaire",
+    "Agronome",
+    "Biologiste"
   ],
   "catch_phrase_adjectives": [
-    "innovant", "durable", "moderne", "performant", "fiable",
-    "dynamique", "efficace", "stratégique", "responsable", "intégré"
+    "innovant",
+    "durable",
+    "moderne",
+    "performant",
+    "fiable",
+    "dynamique",
+    "efficace",
+    "stratégique",
+    "responsable",
+    "intégré"
   ],
   "catch_phrase_nouns": [
-    "solutions", "services", "systèmes", "technologies", "développement",
-    "excellence", "innovation", "croissance", "progrès", "qualité"
+    "solutions",
+    "services",
+    "systèmes",
+    "technologies",
+    "développement",
+    "excellence",
+    "innovation",
+    "croissance",
+    "progrès",
+    "qualité"
   ],
   "catch_phrase_verbs": [
-    "transformer", "innover", "développer", "optimiser", "créer",
-    "améliorer", "construire", "connecter", "inspirer", "réaliser"
+    "transformer",
+    "innover",
+    "développer",
+    "optimiser",
+    "créer",
+    "améliorer",
+    "construire",
+    "connecter",
+    "inspirer",
+    "réaliser"
   ],
   "catch_phrase_connector": [
-    "pour", "avec", "vers", "et", "en faveur de"
+    "pour",
+    "avec",
+    "vers",
+    "et",
+    "en faveur de"
   ],
   "industries": [
-    "Agriculture", "Banque", "Tourisme", "Technologie", "Construction",
-    "Transport", "Énergie", "Télécommunications", "Santé", "Éducation",
-    "Commerce", "Mines", "Café", "Thé", "Immobilier",
-    "Assurance", "Alimentation", "Hôtellerie", "Artisanat", "Environnement"
+    {
+      "name": "agriculture",
+      "weight": 0.15,
+      "jobs": [
+        "Agriculteur",
+        "Agricultrice",
+        "Agronome"
+      ],
+      "well_known": [
+        "Rwanda Mountain Tea",
+        "Africa Improved Foods"
+      ],
+      "company_suffixes": [
+        "S.A.",
+        "S.A.R.L.",
+        "Coopérative"
+      ],
+      "company_nouns": [
+        "Agriculture",
+        "Café",
+        "Thé",
+        "Production"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{last_name} {suffix}",
+        "Coopérative {last_name}"
+      ]
+    },
+    {
+      "name": "banking",
+      "weight": 0.12,
+      "jobs": [
+        "Comptable",
+        "Analyste"
+      ],
+      "well_known": [
+        "Bank of Kigali",
+        "BK Group",
+        "Banque Populaire du Rwanda",
+        "I&M Bank Rwanda",
+        "Equity Bank Rwanda",
+        "Cogebanque",
+        "Access to Finance Rwanda",
+        "Urwego Bank"
+      ],
+      "company_suffixes": [
+        "S.A.",
+        "SA"
+      ],
+      "company_nouns": [
+        "Finances",
+        "Investissements",
+        "Banque",
+        "Capital"
+      ],
+      "company_formats": [
+        "Banque {last_name}",
+        "{adjective} {noun} {suffix}",
+        "{last_name} {suffix}"
+      ]
+    },
+    {
+      "name": "tourism_hospitality",
+      "weight": 0.08,
+      "jobs": [
+        "Cuisinier",
+        "Cuisinière",
+        "Guide touristique"
+      ],
+      "well_known": [
+        "Bourbon Coffee",
+        "Question Coffee"
+      ],
+      "company_suffixes": [
+        "S.A.",
+        "S.A.R.L."
+      ],
+      "company_nouns": [
+        "Tourisme",
+        "Hôtellerie"
+      ],
+      "company_formats": [
+        "Hôtel {last_name}",
+        "{adjective} {noun} {suffix}"
+      ]
+    },
+    {
+      "name": "technology",
+      "weight": 0.08,
+      "jobs": [
+        "Développeur",
+        "Développeuse",
+        "Designer",
+        "Analyste"
+      ],
+      "well_known": [
+        "Broadband Systems Corporation",
+        "kLab",
+        "Irembo"
+      ],
+      "company_suffixes": [
+        "Ltd.",
+        "S.A.R.L."
+      ],
+      "company_nouns": [
+        "Technologies",
+        "Solutions",
+        "Informatique"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{last_name} {suffix}"
+      ]
+    },
+    {
+      "name": "construction",
+      "weight": 0.06,
+      "jobs": [
+        "Architecte",
+        "Ingénieur",
+        "Maçon",
+        "Électricien",
+        "Plombier",
+        "Menuisier"
+      ],
+      "well_known": [
+        "CIMERWA",
+        "Cimerwa Cement"
+      ],
+      "company_suffixes": [
+        "S.A.",
+        "S.A.R.L."
+      ],
+      "company_nouns": [
+        "Construction",
+        "Bâtiment",
+        "Ingénierie"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{last_name} {suffix}"
+      ]
+    },
+    {
+      "name": "telecom",
+      "weight": 0.06,
+      "jobs": [
+        "Technicien",
+        "Technicienne",
+        "Ingénieur"
+      ],
+      "well_known": [
+        "MTN Rwanda",
+        "Airtel Rwanda"
+      ],
+      "company_suffixes": [
+        "S.A.",
+        "Ltd."
+      ],
+      "company_nouns": [
+        "Télécommunications",
+        "Communication"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}"
+      ]
+    },
+    {
+      "name": "energy",
+      "weight": 0.05,
+      "jobs": [
+        "Ingénieur"
+      ],
+      "well_known": [
+        "Rwanda Energy Group",
+        "EWSA"
+      ],
+      "company_suffixes": [
+        "S.A."
+      ],
+      "company_nouns": [
+        "Énergie"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}"
+      ]
+    },
+    {
+      "name": "manufacturing",
+      "weight": 0.07,
+      "jobs": [
+        "Ingénieur",
+        "Technicien",
+        "Technicienne"
+      ],
+      "well_known": [
+        "Inyange Industries",
+        "Sulfo Rwanda",
+        "Bralirwa",
+        "Skol Brewery",
+        "Beau Monde",
+        "Positivo BGH Rwanda"
+      ],
+      "company_suffixes": [
+        "S.A.",
+        "S.A.R.L.",
+        "Ltd."
+      ],
+      "company_nouns": [
+        "Industries",
+        "Production"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{last_name} {suffix}"
+      ]
+    },
+    {
+      "name": "healthcare",
+      "weight": 0.06,
+      "jobs": [
+        "Médecin",
+        "Infirmier",
+        "Infirmière",
+        "Pharmacien",
+        "Pharmacienne",
+        "Biologiste"
+      ],
+      "well_known": [],
+      "company_suffixes": [
+        "S.A."
+      ],
+      "company_nouns": [
+        "Santé"
+      ],
+      "company_formats": [
+        "Hôpital {last_name}",
+        "Clinique {last_name}",
+        "{adjective} {noun} {suffix}"
+      ]
+    },
+    {
+      "name": "education",
+      "weight": 0.05,
+      "jobs": [
+        "Enseignant",
+        "Enseignante"
+      ],
+      "well_known": [],
+      "company_suffixes": [],
+      "company_nouns": [
+        "Éducation",
+        "Formation"
+      ],
+      "company_formats": [
+        "Université de {city}",
+        "Collège {last_name}",
+        "Institut {last_name}"
+      ]
+    },
+    {
+      "name": "transport",
+      "weight": 0.04,
+      "jobs": [
+        "Chauffeur"
+      ],
+      "well_known": [
+        "RwandAir",
+        "Akagera Aviation"
+      ],
+      "company_suffixes": [
+        "S.A."
+      ],
+      "company_nouns": [
+        "Transport",
+        "Logistique"
+      ],
+      "company_formats": [
+        "Transport {last_name}",
+        "{adjective} {noun} {suffix}"
+      ]
+    },
+    {
+      "name": "media",
+      "weight": 0.03,
+      "jobs": [
+        "Journaliste"
+      ],
+      "well_known": [
+        "KT Press",
+        "The New Times"
+      ],
+      "company_suffixes": [
+        "S.A.R.L."
+      ],
+      "company_nouns": [
+        "Media"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}"
+      ]
+    },
+    {
+      "name": "corporate",
+      "weight": 0.09,
+      "jobs": [
+        "Directeur",
+        "Directrice",
+        "Consultant",
+        "Consultante",
+        "Avocat",
+        "Avocate",
+        "Commerçant",
+        "Commerçante",
+        "Chef de projet",
+        "Secrétaire",
+        "Caissier",
+        "Caissière",
+        "Agent de sécurité",
+        "Vétérinaire"
+      ],
+      "well_known": [
+        "Crystal Ventures",
+        "Rwanda Development Board",
+        "Rwanda Social Security Board",
+        "Ngali Holdings",
+        "AC Group",
+        "Rwanda Trading Company",
+        "SONARWA",
+        "Prime Insurance",
+        "RADIANT Insurance",
+        "Volkswagen Rwanda",
+        "Rwanda Utilities Regulatory Authority",
+        "MINICOM",
+        "Rwanda Mines, Petroleum and Gas Board"
+      ],
+      "company_suffixes": [
+        "S.A.",
+        "S.A.R.L.",
+        "Ltd.",
+        "Ltée"
+      ],
+      "company_nouns": [
+        "Groupe",
+        "Holdings",
+        "Services",
+        "Développement"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun} {suffix}",
+        "{last_name} & {last_name} {suffix}"
+      ]
+    },
+    {
+      "name": "insurance",
+      "weight": 0.03,
+      "jobs": [
+        "Analyste"
+      ],
+      "well_known": [],
+      "company_suffixes": [
+        "S.A."
+      ],
+      "company_nouns": [
+        "Assurances"
+      ],
+      "company_formats": [
+        "{adjective} Assurances {suffix}",
+        "Assurances {last_name}"
+      ]
+    },
+    {
+      "name": "mining",
+      "weight": 0.03,
+      "jobs": [
+        "Ingénieur"
+      ],
+      "well_known": [],
+      "company_suffixes": [
+        "S.A."
+      ],
+      "company_nouns": [
+        "Mines"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}"
+      ]
+    }
   ]
 }

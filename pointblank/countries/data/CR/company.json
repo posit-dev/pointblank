@@ -1,152 +1,547 @@
 {
-  "suffixes": ["S.A.", "S.R.L.", "Ltda.", "y Asociados", "Sociedad Anonima"],
+  "suffixes": [
+    "S.A.",
+    "S.R.L.",
+    "Ltda.",
+    "y Asociados",
+    "Sociedad Anonima"
+  ],
   "formats": [
     "{adjective} {noun} {suffix}",
     "{noun} {suffix}",
     "{adjective} {noun}"
   ],
   "adjectives": [
-    "Costarricense", "Nacional", "Centroamericana", "Tropical", "Verde",
-    "Primera", "Moderna", "Internacional", "Continental", "Pacifica",
-    "Atlantica", "Tica", "Ecologica", "Puravida", "Unida",
-    "Progresiva", "Dinamica", "Avanzada", "Pionera", "Sostenible"
+    "Costarricense",
+    "Nacional",
+    "Centroamericana",
+    "Tropical",
+    "Verde",
+    "Primera",
+    "Moderna",
+    "Internacional",
+    "Continental",
+    "Pacifica",
+    "Atlantica",
+    "Tica",
+    "Ecologica",
+    "Puravida",
+    "Unida",
+    "Progresiva",
+    "Dinamica",
+    "Avanzada",
+    "Pionera",
+    "Sostenible"
   ],
   "nouns": [
-    "Comercio", "Construccion", "Agricultura", "Inversion", "Transporte",
-    "Ingenieria", "Turismo", "Inmobiliaria", "Energia", "Tecnologia",
-    "Finanzas", "Logistica", "Servicios", "Alimentos", "Desarrollo",
-    "Comunicacion", "Distribucion", "Produccion", "Cafe", "Banano"
+    "Comercio",
+    "Construccion",
+    "Agricultura",
+    "Inversion",
+    "Transporte",
+    "Ingenieria",
+    "Turismo",
+    "Inmobiliaria",
+    "Energia",
+    "Tecnologia",
+    "Finanzas",
+    "Logistica",
+    "Servicios",
+    "Alimentos",
+    "Desarrollo",
+    "Comunicacion",
+    "Distribucion",
+    "Produccion",
+    "Cafe",
+    "Banano"
   ],
   "well_known_companies": [
-    {"name": "Instituto Costarricense de Electricidad", "cities": ["San Jose"]},
-    {"name": "Banco Nacional de Costa Rica", "cities": ["San Jose", "Alajuela"]},
-    {"name": "Florida Ice and Farm", "cities": ["San Jose", "Heredia"]},
-    {"name": "Grupo Purdy Motor", "cities": ["San Jose"]},
-    {"name": "Dos Pinos", "cities": ["Alajuela"]},
-    {"name": "Walmart Costa Rica", "cities": ["San Jose", "Heredia"]},
-    {"name": "BAC Credomatic", "cities": ["San Jose"]},
-    {"name": "Caja Costarricense de Seguro Social", "cities": ["San Jose"]},
-    {"name": "Intel Costa Rica", "cities": ["Heredia"]},
-    {"name": "Banco de Costa Rica", "cities": ["San Jose", "Cartago"]},
-    {"name": "Cafe Britt", "cities": ["Heredia"]},
-    {"name": "Grupo Nacion", "cities": ["San Jose"]},
-    {"name": "Holcim Costa Rica", "cities": ["San Jose", "Cartago"]},
-    {"name": "Bridgestone Costa Rica", "cities": ["San Jose"]},
-    {"name": "Dole Food Company Costa Rica", "cities": ["San Jose", "Limon"]}
+    {
+      "name": "Instituto Costarricense de Electricidad",
+      "cities": [
+        "San Jose"
+      ]
+    },
+    {
+      "name": "Banco Nacional de Costa Rica",
+      "cities": [
+        "San Jose",
+        "Alajuela"
+      ]
+    },
+    {
+      "name": "Florida Ice and Farm",
+      "cities": [
+        "San Jose",
+        "Heredia"
+      ]
+    },
+    {
+      "name": "Grupo Purdy Motor",
+      "cities": [
+        "San Jose"
+      ]
+    },
+    {
+      "name": "Dos Pinos",
+      "cities": [
+        "Alajuela"
+      ]
+    },
+    {
+      "name": "Walmart Costa Rica",
+      "cities": [
+        "San Jose",
+        "Heredia"
+      ]
+    },
+    {
+      "name": "BAC Credomatic",
+      "cities": [
+        "San Jose"
+      ]
+    },
+    {
+      "name": "Caja Costarricense de Seguro Social",
+      "cities": [
+        "San Jose"
+      ]
+    },
+    {
+      "name": "Intel Costa Rica",
+      "cities": [
+        "Heredia"
+      ]
+    },
+    {
+      "name": "Banco de Costa Rica",
+      "cities": [
+        "San Jose",
+        "Cartago"
+      ]
+    },
+    {
+      "name": "Cafe Britt",
+      "cities": [
+        "Heredia"
+      ]
+    },
+    {
+      "name": "Grupo Nacion",
+      "cities": [
+        "San Jose"
+      ]
+    },
+    {
+      "name": "Holcim Costa Rica",
+      "cities": [
+        "San Jose",
+        "Cartago"
+      ]
+    },
+    {
+      "name": "Bridgestone Costa Rica",
+      "cities": [
+        "San Jose"
+      ]
+    },
+    {
+      "name": "Dole Food Company Costa Rica",
+      "cities": [
+        "San Jose",
+        "Limon"
+      ]
+    }
   ],
   "jobs": [
-    "Desarrollador de Software", "Contador", "Ingeniero Civil", "Profesor", "Enfermero",
-    "Medico", "Agronomo", "Cajero Bancario", "Gerente de Marketing", "Chofer",
-    "Arquitecto", "Farmaceutico", "Abogado", "Economista", "Periodista",
-    "Gerente de Hotel", "Chef", "Representante de Ventas", "Auditor", "Veterinario",
-    "Aduanero", "Catedratico", "Trabajador Social", "Guia Turistico", "Biologo"
+    "Desarrollador de Software",
+    "Contador",
+    "Ingeniero Civil",
+    "Profesor",
+    "Enfermero",
+    "Medico",
+    "Agronomo",
+    "Cajero Bancario",
+    "Gerente de Marketing",
+    "Chofer",
+    "Arquitecto",
+    "Farmaceutico",
+    "Abogado",
+    "Economista",
+    "Periodista",
+    "Gerente de Hotel",
+    "Chef",
+    "Representante de Ventas",
+    "Auditor",
+    "Veterinario",
+    "Aduanero",
+    "Catedratico",
+    "Trabajador Social",
+    "Guia Turistico",
+    "Biologo"
   ],
   "catch_phrase_adjectives": [
-    "confiable", "innovador", "eficiente", "reconocido", "lider",
-    "sostenible", "profesional", "calidad", "moderno", "dedicado",
-    "comprometido", "pionero", "dinamico", "excelente", "progresivo"
+    "confiable",
+    "innovador",
+    "eficiente",
+    "reconocido",
+    "lider",
+    "sostenible",
+    "profesional",
+    "calidad",
+    "moderno",
+    "dedicado",
+    "comprometido",
+    "pionero",
+    "dinamico",
+    "excelente",
+    "progresivo"
   ],
   "catch_phrase_nouns": [
-    "soluciones", "servicios", "excelencia", "alianza", "crecimiento",
-    "innovacion", "desarrollo", "progreso", "calidad", "exito",
-    "prosperidad", "avance", "logro", "compromiso", "transformacion"
+    "soluciones",
+    "servicios",
+    "excelencia",
+    "alianza",
+    "crecimiento",
+    "innovacion",
+    "desarrollo",
+    "progreso",
+    "calidad",
+    "exito",
+    "prosperidad",
+    "avance",
+    "logro",
+    "compromiso",
+    "transformacion"
   ],
   "catch_phrase_verbs": [
-    "entregar", "proveer", "construir", "crear", "transformar",
-    "alcanzar", "impulsar", "inspirar", "empoderar", "conectar",
-    "avanzar", "innovar", "fortalecer", "desarrollar", "facilitar"
+    "entregar",
+    "proveer",
+    "construir",
+    "crear",
+    "transformar",
+    "alcanzar",
+    "impulsar",
+    "inspirar",
+    "empoderar",
+    "conectar",
+    "avanzar",
+    "innovar",
+    "fortalecer",
+    "desarrollar",
+    "facilitar"
   ],
   "catch_phrase_connector": "que",
   "industries": [
     {
-      "name": "turismo",
+      "name": "tourism",
       "weight": 0.16,
-      "jobs": ["Gerente de Hotel", "Guia Turistico", "Recepcionista", "Chef", "Agente de Viajes"],
-      "well_known": ["ICT", "Grupo Marriott Costa Rica"],
-      "company_suffixes": ["Turismo S.A.", "Tours", "Hotel"],
-      "company_nouns": ["Hotel", "Resort", "Aventura", "Ecoturismo", "Viajes"],
-      "company_formats": ["{adjective} {noun} {suffix}", "{noun} {suffix}"]
+      "jobs": [
+        "Gerente de Hotel",
+        "Guia Turistico",
+        "Recepcionista",
+        "Chef",
+        "Agente de Viajes"
+      ],
+      "well_known": [
+        "ICT",
+        "Grupo Marriott Costa Rica"
+      ],
+      "company_suffixes": [
+        "Turismo S.A.",
+        "Tours",
+        "Hotel"
+      ],
+      "company_nouns": [
+        "Hotel",
+        "Resort",
+        "Aventura",
+        "Ecoturismo",
+        "Viajes"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{noun} {suffix}"
+      ]
     },
     {
-      "name": "tecnologia",
+      "name": "technology",
       "weight": 0.14,
-      "jobs": ["Desarrollador de Software", "Ingeniero de Sistemas", "Analista de Datos", "Gerente IT", "Diseñador UX"],
-      "well_known": ["Intel Costa Rica", "Hewlett Packard Costa Rica"],
-      "company_suffixes": ["Tech S.A.", "Software", "Digital"],
-      "company_nouns": ["Tecnologia", "Software", "Digital", "Sistemas", "Datos"],
-      "company_formats": ["{adjective} {noun} {suffix}", "{noun} {suffix}"]
+      "jobs": [
+        "Desarrollador de Software",
+        "Ingeniero de Sistemas",
+        "Analista de Datos",
+        "Gerente IT",
+        "Diseñador UX"
+      ],
+      "well_known": [
+        "Intel Costa Rica",
+        "Hewlett Packard Costa Rica"
+      ],
+      "company_suffixes": [
+        "Tech S.A.",
+        "Software",
+        "Digital"
+      ],
+      "company_nouns": [
+        "Tecnologia",
+        "Software",
+        "Digital",
+        "Sistemas",
+        "Datos"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{noun} {suffix}"
+      ]
     },
     {
-      "name": "agricultura",
+      "name": "agriculture",
       "weight": 0.14,
-      "jobs": ["Agronomo", "Gerente de Finca", "Ingeniero Agricola", "Inspector de Calidad", "Gerente de Exportacion"],
-      "well_known": ["Dole Food Company Costa Rica", "Cafe Britt"],
-      "company_suffixes": ["Agro S.A.", "Exportaciones", "Agricola"],
-      "company_nouns": ["Cafe", "Banano", "Piña", "Finca", "Agricola"],
-      "company_formats": ["{adjective} {noun} {suffix}", "{noun} {suffix}"]
+      "jobs": [
+        "Agronomo",
+        "Gerente de Finca",
+        "Ingeniero Agricola",
+        "Inspector de Calidad",
+        "Gerente de Exportacion"
+      ],
+      "well_known": [
+        "Dole Food Company Costa Rica",
+        "Cafe Britt"
+      ],
+      "company_suffixes": [
+        "Agro S.A.",
+        "Exportaciones",
+        "Agricola"
+      ],
+      "company_nouns": [
+        "Cafe",
+        "Banano",
+        "Piña",
+        "Finca",
+        "Agricola"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{noun} {suffix}"
+      ]
     },
     {
-      "name": "finanzas",
+      "name": "finance",
       "weight": 0.12,
-      "jobs": ["Cajero Bancario", "Contador", "Oficial de Credito", "Auditor", "Analista Financiero"],
-      "well_known": ["Banco Nacional de Costa Rica", "BAC Credomatic"],
-      "company_suffixes": ["Banco", "Seguros", "Financiera"],
-      "company_nouns": ["Finanzas", "Capital", "Credito", "Ahorro", "Inversion"],
-      "company_formats": ["{adjective} {noun} {suffix}", "{noun} {suffix}"]
+      "jobs": [
+        "Cajero Bancario",
+        "Contador",
+        "Oficial de Credito",
+        "Auditor",
+        "Analista Financiero"
+      ],
+      "well_known": [
+        "Banco Nacional de Costa Rica",
+        "BAC Credomatic"
+      ],
+      "company_suffixes": [
+        "Banco",
+        "Seguros",
+        "Financiera"
+      ],
+      "company_nouns": [
+        "Finanzas",
+        "Capital",
+        "Credito",
+        "Ahorro",
+        "Inversion"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{noun} {suffix}"
+      ]
     },
     {
-      "name": "manufactura",
-      "weight": 0.10,
-      "jobs": ["Gerente de Planta", "Control de Calidad", "Supervisor de Produccion", "Ingeniero Industrial", "Tecnico"],
-      "well_known": ["Bridgestone Costa Rica", "Holcim Costa Rica"],
-      "company_suffixes": ["Industrias S.A.", "Manufactura", "Produccion"],
-      "company_nouns": ["Industria", "Manufactura", "Produccion", "Plasticos", "Alimentos"],
-      "company_formats": ["{adjective} {noun} {suffix}", "{noun} {suffix}"]
+      "name": "manufacturing",
+      "weight": 0.1,
+      "jobs": [
+        "Gerente de Planta",
+        "Control de Calidad",
+        "Supervisor de Produccion",
+        "Ingeniero Industrial",
+        "Tecnico"
+      ],
+      "well_known": [
+        "Bridgestone Costa Rica",
+        "Holcim Costa Rica"
+      ],
+      "company_suffixes": [
+        "Industrias S.A.",
+        "Manufactura",
+        "Produccion"
+      ],
+      "company_nouns": [
+        "Industria",
+        "Manufactura",
+        "Produccion",
+        "Plasticos",
+        "Alimentos"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{noun} {suffix}"
+      ]
     },
     {
-      "name": "salud",
+      "name": "healthcare",
       "weight": 0.08,
-      "jobs": ["Medico", "Enfermero", "Farmaceutico", "Laboratorista", "Dentista"],
-      "well_known": ["CCSS", "Hospital CIMA"],
-      "company_suffixes": ["Salud", "Clinica", "Farmaceutica"],
-      "company_nouns": ["Salud", "Medica", "Farmacia", "Clinica", "Bienestar"],
-      "company_formats": ["{adjective} {noun} {suffix}", "{noun} {suffix}"]
+      "jobs": [
+        "Medico",
+        "Enfermero",
+        "Farmaceutico",
+        "Laboratorista",
+        "Dentista"
+      ],
+      "well_known": [
+        "CCSS",
+        "Hospital CIMA"
+      ],
+      "company_suffixes": [
+        "Salud",
+        "Clinica",
+        "Farmaceutica"
+      ],
+      "company_nouns": [
+        "Salud",
+        "Medica",
+        "Farmacia",
+        "Clinica",
+        "Bienestar"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{noun} {suffix}"
+      ]
     },
     {
-      "name": "energia",
+      "name": "energy",
       "weight": 0.08,
-      "jobs": ["Ingeniero Electrico", "Operador de Planta", "Analista de Energia", "Tecnico", "Ingeniero Ambiental"],
-      "well_known": ["ICE", "CNFL"],
-      "company_suffixes": ["Energia S.A.", "Power", "Renovable"],
-      "company_nouns": ["Energia", "Electricidad", "Solar", "Eolica", "Hidroelectrica"],
-      "company_formats": ["{adjective} {noun} {suffix}", "{noun} {suffix}"]
+      "jobs": [
+        "Ingeniero Electrico",
+        "Operador de Planta",
+        "Analista de Energia",
+        "Tecnico",
+        "Ingeniero Ambiental"
+      ],
+      "well_known": [
+        "ICE",
+        "CNFL"
+      ],
+      "company_suffixes": [
+        "Energia S.A.",
+        "Power",
+        "Renovable"
+      ],
+      "company_nouns": [
+        "Energia",
+        "Electricidad",
+        "Solar",
+        "Eolica",
+        "Hidroelectrica"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{noun} {suffix}"
+      ]
     },
     {
-      "name": "construccion",
+      "name": "construction",
       "weight": 0.07,
-      "jobs": ["Ingeniero Civil", "Jefe de Obra", "Arquitecto", "Topografo", "Gerente de Proyecto"],
-      "well_known": ["Grupo Edificar", "Constructora Volio y Trejos"],
-      "company_suffixes": ["Construccion S.A.", "Ingenieria", "Constructora"],
-      "company_nouns": ["Construccion", "Edificacion", "Ingenieria", "Infraestructura", "Inmobiliaria"],
-      "company_formats": ["{adjective} {noun} {suffix}", "{noun} {suffix}"]
+      "jobs": [
+        "Ingeniero Civil",
+        "Jefe de Obra",
+        "Arquitecto",
+        "Topografo",
+        "Gerente de Proyecto"
+      ],
+      "well_known": [
+        "Grupo Edificar",
+        "Constructora Volio y Trejos"
+      ],
+      "company_suffixes": [
+        "Construccion S.A.",
+        "Ingenieria",
+        "Constructora"
+      ],
+      "company_nouns": [
+        "Construccion",
+        "Edificacion",
+        "Ingenieria",
+        "Infraestructura",
+        "Inmobiliaria"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{noun} {suffix}"
+      ]
     },
     {
-      "name": "comercio",
+      "name": "retail",
       "weight": 0.06,
-      "jobs": ["Representante de Ventas", "Gerente Comercial", "Comprador", "Cajero", "Supervisor de Tienda"],
-      "well_known": ["Walmart Costa Rica", "Grupo Purdy Motor"],
-      "company_suffixes": ["Comercial S.A.", "Distribuidora", "Importadora"],
-      "company_nouns": ["Comercio", "Distribucion", "Importacion", "Ventas", "Mayoreo"],
-      "company_formats": ["{adjective} {noun} {suffix}", "{noun} {suffix}"]
+      "jobs": [
+        "Representante de Ventas",
+        "Gerente Comercial",
+        "Comprador",
+        "Cajero",
+        "Supervisor de Tienda"
+      ],
+      "well_known": [
+        "Walmart Costa Rica",
+        "Grupo Purdy Motor"
+      ],
+      "company_suffixes": [
+        "Comercial S.A.",
+        "Distribuidora",
+        "Importadora"
+      ],
+      "company_nouns": [
+        "Comercio",
+        "Distribucion",
+        "Importacion",
+        "Ventas",
+        "Mayoreo"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{noun} {suffix}"
+      ]
     },
     {
-      "name": "educacion",
+      "name": "education",
       "weight": 0.05,
-      "jobs": ["Profesor", "Catedratico", "Director Escolar", "Investigador", "Coordinador Academico"],
-      "well_known": ["Universidad de Costa Rica", "TEC"],
-      "company_suffixes": ["Academia", "Instituto", "Escuela"],
-      "company_nouns": ["Educacion", "Formacion", "Academia", "Capacitacion", "Saber"],
-      "company_formats": ["{adjective} {noun} {suffix}", "{noun} {suffix}"]
+      "jobs": [
+        "Profesor",
+        "Catedratico",
+        "Director Escolar",
+        "Investigador",
+        "Coordinador Academico"
+      ],
+      "well_known": [
+        "Universidad de Costa Rica",
+        "TEC"
+      ],
+      "company_suffixes": [
+        "Academia",
+        "Instituto",
+        "Escuela"
+      ],
+      "company_nouns": [
+        "Educacion",
+        "Formacion",
+        "Academia",
+        "Capacitacion",
+        "Saber"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{noun} {suffix}"
+      ]
     }
   ]
 }

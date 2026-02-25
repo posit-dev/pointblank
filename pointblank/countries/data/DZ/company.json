@@ -1,5 +1,11 @@
 {
-  "suffixes": ["SPA", "SARL", "EURL", "SNC", "Group"],
+  "suffixes": [
+    "SPA",
+    "SARL",
+    "EURL",
+    "SNC",
+    "Group"
+  ],
   "formats": [
     "{last_name} {suffix}",
     "{adjective} {noun} {suffix}",
@@ -7,67 +13,261 @@
     "{last_name} & {last_name} {suffix}"
   ],
   "adjectives": [
-    "Algérien", "National", "Moderne", "International", "Global",
-    "Saharien", "Méditerranéen", "Maghrébin", "Uni", "Nouveau",
-    "Avancé", "Premier", "Grand", "Central", "Général",
-    "Dynamique", "Continental", "Pionnier", "Industriel", "Africain"
+    "Algérien",
+    "National",
+    "Moderne",
+    "International",
+    "Global",
+    "Saharien",
+    "Méditerranéen",
+    "Maghrébin",
+    "Uni",
+    "Nouveau",
+    "Avancé",
+    "Premier",
+    "Grand",
+    "Central",
+    "Général",
+    "Dynamique",
+    "Continental",
+    "Pionnier",
+    "Industriel",
+    "Africain"
   ],
   "nouns": [
-    "Commerce", "Industries", "Construction", "Ingénierie", "Agroalimentaire",
-    "Technologies", "Agriculture", "Logistique", "Pharma", "Transport",
-    "Télécom", "Services", "Solutions", "Investissements", "Holding",
-    "Développement", "Ressources", "Immobilier", "Systèmes", "Énergie"
+    "Commerce",
+    "Industries",
+    "Construction",
+    "Ingénierie",
+    "Agroalimentaire",
+    "Technologies",
+    "Agriculture",
+    "Logistique",
+    "Pharma",
+    "Transport",
+    "Télécom",
+    "Services",
+    "Solutions",
+    "Investissements",
+    "Holding",
+    "Développement",
+    "Ressources",
+    "Immobilier",
+    "Systèmes",
+    "Énergie"
   ],
   "well_known_companies": [
-    {"name": "Sonatrach", "cities": ["Algiers"]},
-    {"name": "Sonelgaz", "cities": ["Algiers"]},
-    {"name": "Air Algérie", "cities": ["Algiers"]},
-    {"name": "Algérie Télécom", "cities": ["Algiers"]},
-    {"name": "Djezzy", "cities": ["Algiers"]},
-    {"name": "Ooredoo Algérie", "cities": ["Algiers"]},
-    {"name": "Mobilis", "cities": ["Algiers"]},
-    {"name": "Cevital", "cities": ["Béjaïa", "Algiers"]},
-    {"name": "BNA", "cities": ["Algiers"]},
-    {"name": "CPA", "cities": ["Algiers"]},
-    {"name": "SNVI", "cities": ["Algiers"]},
-    {"name": "Cosider", "cities": ["Algiers"]},
-    {"name": "Naftal", "cities": ["Algiers"]},
-    {"name": "Condor Electronics", "cities": ["Bordj Bou Arreridj"]},
-    {"name": "Saidal", "cities": ["Algiers"]}
+    {
+      "name": "Sonatrach",
+      "cities": [
+        "Algiers"
+      ]
+    },
+    {
+      "name": "Sonelgaz",
+      "cities": [
+        "Algiers"
+      ]
+    },
+    {
+      "name": "Air Algérie",
+      "cities": [
+        "Algiers"
+      ]
+    },
+    {
+      "name": "Algérie Télécom",
+      "cities": [
+        "Algiers"
+      ]
+    },
+    {
+      "name": "Djezzy",
+      "cities": [
+        "Algiers"
+      ]
+    },
+    {
+      "name": "Ooredoo Algérie",
+      "cities": [
+        "Algiers"
+      ]
+    },
+    {
+      "name": "Mobilis",
+      "cities": [
+        "Algiers"
+      ]
+    },
+    {
+      "name": "Cevital",
+      "cities": [
+        "Béjaïa",
+        "Algiers"
+      ]
+    },
+    {
+      "name": "BNA",
+      "cities": [
+        "Algiers"
+      ]
+    },
+    {
+      "name": "CPA",
+      "cities": [
+        "Algiers"
+      ]
+    },
+    {
+      "name": "SNVI",
+      "cities": [
+        "Algiers"
+      ]
+    },
+    {
+      "name": "Cosider",
+      "cities": [
+        "Algiers"
+      ]
+    },
+    {
+      "name": "Naftal",
+      "cities": [
+        "Algiers"
+      ]
+    },
+    {
+      "name": "Condor Electronics",
+      "cities": [
+        "Bordj Bou Arreridj"
+      ]
+    },
+    {
+      "name": "Saidal",
+      "cities": [
+        "Algiers"
+      ]
+    }
   ],
   "jobs": [
-    "Ingénieur logiciel", "Enseignant", "Médecin", "Ingénieur", "Comptable",
-    "Pharmacien", "Avocat", "Architecte", "Directeur marketing", "Commercial",
-    "Chef de projet", "Designer graphique", "Journaliste", "Fonctionnaire", "Banquier",
-    "Mécanicien", "Électricien", "Chef cuisinier", "Dentiste", "Professeur",
-    "Guide touristique", "Traducteur", "Infirmier", "Pilote", "Policier"
+    "Ingénieur logiciel",
+    "Enseignant",
+    "Médecin",
+    "Ingénieur",
+    "Comptable",
+    "Pharmacien",
+    "Avocat",
+    "Architecte",
+    "Directeur marketing",
+    "Commercial",
+    "Chef de projet",
+    "Designer graphique",
+    "Journaliste",
+    "Fonctionnaire",
+    "Banquier",
+    "Mécanicien",
+    "Électricien",
+    "Chef cuisinier",
+    "Dentiste",
+    "Professeur",
+    "Guide touristique",
+    "Traducteur",
+    "Infirmier",
+    "Pilote",
+    "Policier"
   ],
   "catch_phrase_adjectives": [
-    "innovant", "fiable", "professionnel", "de confiance", "leader",
-    "premier", "dynamique", "efficace", "durable", "moderne",
-    "visionnaire", "stratégique", "créatif", "intégré", "digital"
+    "innovant",
+    "fiable",
+    "professionnel",
+    "de confiance",
+    "leader",
+    "premier",
+    "dynamique",
+    "efficace",
+    "durable",
+    "moderne",
+    "visionnaire",
+    "stratégique",
+    "créatif",
+    "intégré",
+    "digital"
   ],
   "catch_phrase_nouns": [
-    "solutions", "services", "excellence", "innovation", "croissance",
-    "partenariat", "qualité", "succès", "technologie", "avenir",
-    "développement", "progrès", "stratégie", "résultats", "valeur"
+    "solutions",
+    "services",
+    "excellence",
+    "innovation",
+    "croissance",
+    "partenariat",
+    "qualité",
+    "succès",
+    "technologie",
+    "avenir",
+    "développement",
+    "progrès",
+    "stratégie",
+    "résultats",
+    "valeur"
   ],
   "catch_phrase_verbs": [
-    "livre", "crée", "construit", "stimule", "façonne",
-    "transforme", "inspire", "renforce", "connecte", "accomplit",
-    "permet", "avance", "consolide", "optimise", "maintient"
+    "livre",
+    "crée",
+    "construit",
+    "stimule",
+    "façonne",
+    "transforme",
+    "inspire",
+    "renforce",
+    "connecte",
+    "accomplit",
+    "permet",
+    "avance",
+    "consolide",
+    "optimise",
+    "maintient"
   ],
   "catch_phrase_connector": "pour",
   "industries": [
-    {"name": "Oil & Gas", "weight": 0.20},
-    {"name": "Agriculture", "weight": 0.12},
-    {"name": "Construction", "weight": 0.12},
-    {"name": "Telecommunications", "weight": 0.10},
-    {"name": "Banking & Finance", "weight": 0.08},
-    {"name": "Manufacturing", "weight": 0.10},
-    {"name": "Mining", "weight": 0.06},
-    {"name": "Retail & Distribution", "weight": 0.08},
-    {"name": "Energy", "weight": 0.06},
-    {"name": "Technology", "weight": 0.08}
+    {
+      "name": "oil_gas",
+      "weight": 0.2
+    },
+    {
+      "name": "agriculture",
+      "weight": 0.12
+    },
+    {
+      "name": "construction",
+      "weight": 0.12
+    },
+    {
+      "name": "telecom",
+      "weight": 0.1
+    },
+    {
+      "name": "finance",
+      "weight": 0.08
+    },
+    {
+      "name": "manufacturing",
+      "weight": 0.1
+    },
+    {
+      "name": "mining",
+      "weight": 0.06
+    },
+    {
+      "name": "retail",
+      "weight": 0.08
+    },
+    {
+      "name": "energy",
+      "weight": 0.06
+    },
+    {
+      "name": "technology",
+      "weight": 0.08
+    }
   ]
 }

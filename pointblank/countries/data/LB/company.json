@@ -1,58 +1,904 @@
 {
-  "suffixes": ["SAL", "SARL", "SA", "SAE", "Holding", "Group", "& Fils", "et Cie", "International", "Entreprises"],
-  "formats": ["{last_name} {suffix}", "{adjective} {noun} {suffix}", "{noun} {suffix}", "{adjective} {suffix}"],
-  "adjectives": ["Lebanese", "Mediterranean", "Phoenician", "Cedar", "Golden", "Eastern", "Levantine", "United", "National", "First", "Grand", "Royal", "Global", "Modern", "Premier", "Advanced", "Creative", "Dynamic", "Elite", "Innovative", "Progressive", "Strategic", "Supreme", "Capital", "Coastal", "Alpine", "Heritage", "Prestige"],
-  "nouns": ["Commerce", "Trading", "Consulting", "Industries", "Solutions", "Technology", "Construction", "Development", "Finance", "Investment", "Properties", "Logistics", "Engineering", "Media", "Design", "Foods", "Agriculture", "Transport", "Energy", "Textiles", "Import-Export", "Telecommunications", "Services", "Pharmaceuticals", "Education", "Tourism", "Insurance", "Banking", "Maritime", "Aviation", "Hospitality", "Real Estate", "Healthcare", "Mining", "Electronics", "Software"],
-  "well_known_companies": [
-    {"name": "Middle East Airlines", "cities": ["Beirut", "Jounieh", "Tripoli"]},
-    {"name": "Bank Audi", "cities": ["Beirut", "Tripoli", "Sidon", "Zahle"]},
-    {"name": "BLOM Bank", "cities": ["Beirut", "Jounieh", "Byblos", "Sidon"]},
-    {"name": "BankMed", "cities": ["Beirut", "Tripoli", "Zahle"]},
-    {"name": "Solidere", "cities": ["Beirut"]},
-    {"name": "Banque du Liban", "cities": ["Beirut"]},
-    {"name": "Byblos Bank", "cities": ["Beirut", "Byblos", "Tripoli", "Zahle"]},
-    {"name": "Alfa Telecom", "cities": ["Beirut", "Tripoli", "Sidon", "Jounieh"]},
-    {"name": "Touch Telecom", "cities": ["Beirut", "Tripoli", "Sidon", "Zahle"]},
-    {"name": "LibanPost", "cities": ["Beirut", "Tripoli", "Sidon", "Tyre", "Jounieh"]},
-    {"name": "Casino du Liban", "cities": ["Jounieh"]},
-    {"name": "Electricite du Liban", "cities": ["Beirut", "Tripoli", "Sidon", "Zahle"]},
-    {"name": "Ogero Telecom", "cities": ["Beirut", "Tripoli"]},
-    {"name": "Fattal Group", "cities": ["Beirut", "Jounieh", "Byblos"]},
-    {"name": "Debbas Holding", "cities": ["Beirut", "Baabda"]},
-    {"name": "Fransabank", "cities": ["Beirut", "Jounieh", "Tripoli", "Sidon"]},
-    {"name": "Khoury Home", "cities": ["Beirut", "Jounieh", "Baabda"]},
-    {"name": "ABC Department Stores", "cities": ["Beirut", "Baabda"]},
-    {"name": "Le Gray Beirut", "cities": ["Beirut"]},
-    {"name": "Phoenicia Hotel", "cities": ["Beirut"]},
-    {"name": "Patchi", "cities": ["Beirut", "Jounieh", "Tripoli"]},
-    {"name": "Farouk Systems", "cities": ["Beirut"]},
-    {"name": "Beirut Duty Free", "cities": ["Beirut"]},
-    {"name": "Libraire Antoine", "cities": ["Beirut", "Jounieh", "Tripoli"]},
-    {"name": "Credit Libanais", "cities": ["Beirut", "Tripoli", "Sidon", "Zahle"]},
-    {"name": "Societe Generale de Banque au Liban", "cities": ["Beirut", "Jounieh"]},
-    {"name": "IDAL Investment", "cities": ["Beirut"]},
-    {"name": "Kettaneh Group", "cities": ["Beirut", "Tripoli"]},
-    {"name": "Mikati Foundation", "cities": ["Beirut", "Tripoli"]},
-    {"name": "LBCI Television", "cities": ["Beirut", "Jounieh"]},
-    {"name": "MTV Lebanon", "cities": ["Beirut"]},
-    {"name": "Al Mawarid Bank", "cities": ["Beirut", "Tripoli"]},
-    {"name": "Azadea Group", "cities": ["Beirut", "Jounieh"]},
-    {"name": "M1 Group", "cities": ["Beirut"]},
-    {"name": "Holdal Holding", "cities": ["Beirut", "Sidon"]},
-    {"name": "Indevco Group", "cities": ["Beirut", "Baabda"]},
-    {"name": "Malia Group", "cities": ["Beirut", "Jounieh"]},
-    {"name": "TotalEnergies Liban", "cities": ["Beirut", "Tripoli", "Sidon"]},
-    {"name": "Sukleen", "cities": ["Beirut", "Baabda"]},
-    {"name": "Spinney's Lebanon", "cities": ["Beirut", "Jounieh", "Baabda"]},
-    {"name": "Bou Khalil Group", "cities": ["Beirut", "Zahle"]},
-    {"name": "Gandour Industries", "cities": ["Beirut", "Choueifat"]},
-    {"name": "Almaza Brewery", "cities": ["Beirut", "Baabda"]},
-    {"name": "Chateau Ksara", "cities": ["Zahle", "Beirut"]}
+  "suffixes": [
+    "SAL",
+    "SARL",
+    "SA",
+    "SAE",
+    "Holding",
+    "Group",
+    "& Fils",
+    "et Cie",
+    "International",
+    "Entreprises"
   ],
-  "jobs": ["Accountant", "Architect", "Banker", "Business Analyst", "Chef", "Civil Engineer", "Consultant", "Dentist", "Designer", "Developer", "Doctor", "Economist", "Editor", "Electrician", "Engineer", "Entrepreneur", "Financial Analyst", "Graphic Designer", "Hotel Manager", "HR Manager", "IT Specialist", "Journalist", "Lawyer", "Lecturer", "Manager", "Marketing Director", "Mechanic", "Nurse", "Pharmacist", "Photographer", "Pilot", "Professor", "Project Manager", "Real Estate Agent", "Researcher", "Sales Manager", "Secretary", "Software Engineer", "Surgeon", "Teacher", "Translator", "Writer", "Web Developer"],
-  "catch_phrase_adjectives": ["innovative", "reliable", "sustainable", "premium", "dynamic", "trusted", "leading", "progressive", "integrated", "exceptional", "strategic", "comprehensive", "efficient", "advanced", "visionary", "distinguished", "global", "cutting-edge", "pioneering"],
-  "catch_phrase_nouns": ["solutions", "excellence", "quality", "innovation", "service", "performance", "growth", "value", "integrity", "partnership", "vision", "development", "progress", "success", "leadership"],
-  "catch_phrase_verbs": ["deliver", "create", "build", "drive", "empower", "transform", "achieve", "inspire", "connect", "develop", "elevate", "maximize", "optimize", "pioneer", "sustain"],
+  "formats": [
+    "{last_name} {suffix}",
+    "{adjective} {noun} {suffix}",
+    "{noun} {suffix}",
+    "{adjective} {suffix}"
+  ],
+  "adjectives": [
+    "Lebanese",
+    "Mediterranean",
+    "Phoenician",
+    "Cedar",
+    "Golden",
+    "Eastern",
+    "Levantine",
+    "United",
+    "National",
+    "First",
+    "Grand",
+    "Royal",
+    "Global",
+    "Modern",
+    "Premier",
+    "Advanced",
+    "Creative",
+    "Dynamic",
+    "Elite",
+    "Innovative",
+    "Progressive",
+    "Strategic",
+    "Supreme",
+    "Capital",
+    "Coastal",
+    "Alpine",
+    "Heritage",
+    "Prestige"
+  ],
+  "nouns": [
+    "Commerce",
+    "Trading",
+    "Consulting",
+    "Industries",
+    "Solutions",
+    "Technology",
+    "Construction",
+    "Development",
+    "Finance",
+    "Investment",
+    "Properties",
+    "Logistics",
+    "Engineering",
+    "Media",
+    "Design",
+    "Foods",
+    "Agriculture",
+    "Transport",
+    "Energy",
+    "Textiles",
+    "Import-Export",
+    "Telecommunications",
+    "Services",
+    "Pharmaceuticals",
+    "Education",
+    "Tourism",
+    "Insurance",
+    "Banking",
+    "Maritime",
+    "Aviation",
+    "Hospitality",
+    "Real Estate",
+    "Healthcare",
+    "Mining",
+    "Electronics",
+    "Software"
+  ],
+  "well_known_companies": [
+    {
+      "name": "Middle East Airlines",
+      "cities": [
+        "Beirut",
+        "Jounieh",
+        "Tripoli"
+      ]
+    },
+    {
+      "name": "Bank Audi",
+      "cities": [
+        "Beirut",
+        "Tripoli",
+        "Sidon",
+        "Zahle"
+      ]
+    },
+    {
+      "name": "BLOM Bank",
+      "cities": [
+        "Beirut",
+        "Jounieh",
+        "Byblos",
+        "Sidon"
+      ]
+    },
+    {
+      "name": "BankMed",
+      "cities": [
+        "Beirut",
+        "Tripoli",
+        "Zahle"
+      ]
+    },
+    {
+      "name": "Solidere",
+      "cities": [
+        "Beirut"
+      ]
+    },
+    {
+      "name": "Banque du Liban",
+      "cities": [
+        "Beirut"
+      ]
+    },
+    {
+      "name": "Byblos Bank",
+      "cities": [
+        "Beirut",
+        "Byblos",
+        "Tripoli",
+        "Zahle"
+      ]
+    },
+    {
+      "name": "Alfa Telecom",
+      "cities": [
+        "Beirut",
+        "Tripoli",
+        "Sidon",
+        "Jounieh"
+      ]
+    },
+    {
+      "name": "Touch Telecom",
+      "cities": [
+        "Beirut",
+        "Tripoli",
+        "Sidon",
+        "Zahle"
+      ]
+    },
+    {
+      "name": "LibanPost",
+      "cities": [
+        "Beirut",
+        "Tripoli",
+        "Sidon",
+        "Tyre",
+        "Jounieh"
+      ]
+    },
+    {
+      "name": "Casino du Liban",
+      "cities": [
+        "Jounieh"
+      ]
+    },
+    {
+      "name": "Electricite du Liban",
+      "cities": [
+        "Beirut",
+        "Tripoli",
+        "Sidon",
+        "Zahle"
+      ]
+    },
+    {
+      "name": "Ogero Telecom",
+      "cities": [
+        "Beirut",
+        "Tripoli"
+      ]
+    },
+    {
+      "name": "Fattal Group",
+      "cities": [
+        "Beirut",
+        "Jounieh",
+        "Byblos"
+      ]
+    },
+    {
+      "name": "Debbas Holding",
+      "cities": [
+        "Beirut",
+        "Baabda"
+      ]
+    },
+    {
+      "name": "Fransabank",
+      "cities": [
+        "Beirut",
+        "Jounieh",
+        "Tripoli",
+        "Sidon"
+      ]
+    },
+    {
+      "name": "Khoury Home",
+      "cities": [
+        "Beirut",
+        "Jounieh",
+        "Baabda"
+      ]
+    },
+    {
+      "name": "ABC Department Stores",
+      "cities": [
+        "Beirut",
+        "Baabda"
+      ]
+    },
+    {
+      "name": "Le Gray Beirut",
+      "cities": [
+        "Beirut"
+      ]
+    },
+    {
+      "name": "Phoenicia Hotel",
+      "cities": [
+        "Beirut"
+      ]
+    },
+    {
+      "name": "Patchi",
+      "cities": [
+        "Beirut",
+        "Jounieh",
+        "Tripoli"
+      ]
+    },
+    {
+      "name": "Farouk Systems",
+      "cities": [
+        "Beirut"
+      ]
+    },
+    {
+      "name": "Beirut Duty Free",
+      "cities": [
+        "Beirut"
+      ]
+    },
+    {
+      "name": "Libraire Antoine",
+      "cities": [
+        "Beirut",
+        "Jounieh",
+        "Tripoli"
+      ]
+    },
+    {
+      "name": "Credit Libanais",
+      "cities": [
+        "Beirut",
+        "Tripoli",
+        "Sidon",
+        "Zahle"
+      ]
+    },
+    {
+      "name": "Societe Generale de Banque au Liban",
+      "cities": [
+        "Beirut",
+        "Jounieh"
+      ]
+    },
+    {
+      "name": "IDAL Investment",
+      "cities": [
+        "Beirut"
+      ]
+    },
+    {
+      "name": "Kettaneh Group",
+      "cities": [
+        "Beirut",
+        "Tripoli"
+      ]
+    },
+    {
+      "name": "Mikati Foundation",
+      "cities": [
+        "Beirut",
+        "Tripoli"
+      ]
+    },
+    {
+      "name": "LBCI Television",
+      "cities": [
+        "Beirut",
+        "Jounieh"
+      ]
+    },
+    {
+      "name": "MTV Lebanon",
+      "cities": [
+        "Beirut"
+      ]
+    },
+    {
+      "name": "Al Mawarid Bank",
+      "cities": [
+        "Beirut",
+        "Tripoli"
+      ]
+    },
+    {
+      "name": "Azadea Group",
+      "cities": [
+        "Beirut",
+        "Jounieh"
+      ]
+    },
+    {
+      "name": "M1 Group",
+      "cities": [
+        "Beirut"
+      ]
+    },
+    {
+      "name": "Holdal Holding",
+      "cities": [
+        "Beirut",
+        "Sidon"
+      ]
+    },
+    {
+      "name": "Indevco Group",
+      "cities": [
+        "Beirut",
+        "Baabda"
+      ]
+    },
+    {
+      "name": "Malia Group",
+      "cities": [
+        "Beirut",
+        "Jounieh"
+      ]
+    },
+    {
+      "name": "TotalEnergies Liban",
+      "cities": [
+        "Beirut",
+        "Tripoli",
+        "Sidon"
+      ]
+    },
+    {
+      "name": "Sukleen",
+      "cities": [
+        "Beirut",
+        "Baabda"
+      ]
+    },
+    {
+      "name": "Spinney's Lebanon",
+      "cities": [
+        "Beirut",
+        "Jounieh",
+        "Baabda"
+      ]
+    },
+    {
+      "name": "Bou Khalil Group",
+      "cities": [
+        "Beirut",
+        "Zahle"
+      ]
+    },
+    {
+      "name": "Gandour Industries",
+      "cities": [
+        "Beirut",
+        "Choueifat"
+      ]
+    },
+    {
+      "name": "Almaza Brewery",
+      "cities": [
+        "Beirut",
+        "Baabda"
+      ]
+    },
+    {
+      "name": "Chateau Ksara",
+      "cities": [
+        "Zahle",
+        "Beirut"
+      ]
+    }
+  ],
+  "jobs": [
+    "Accountant",
+    "Architect",
+    "Banker",
+    "Business Analyst",
+    "Chef",
+    "Civil Engineer",
+    "Consultant",
+    "Dentist",
+    "Designer",
+    "Developer",
+    "Doctor",
+    "Economist",
+    "Editor",
+    "Electrician",
+    "Engineer",
+    "Entrepreneur",
+    "Financial Analyst",
+    "Graphic Designer",
+    "Hotel Manager",
+    "HR Manager",
+    "IT Specialist",
+    "Journalist",
+    "Lawyer",
+    "Lecturer",
+    "Manager",
+    "Marketing Director",
+    "Mechanic",
+    "Nurse",
+    "Pharmacist",
+    "Photographer",
+    "Pilot",
+    "Professor",
+    "Project Manager",
+    "Real Estate Agent",
+    "Researcher",
+    "Sales Manager",
+    "Secretary",
+    "Software Engineer",
+    "Surgeon",
+    "Teacher",
+    "Translator",
+    "Writer",
+    "Web Developer"
+  ],
+  "catch_phrase_adjectives": [
+    "innovative",
+    "reliable",
+    "sustainable",
+    "premium",
+    "dynamic",
+    "trusted",
+    "leading",
+    "progressive",
+    "integrated",
+    "exceptional",
+    "strategic",
+    "comprehensive",
+    "efficient",
+    "advanced",
+    "visionary",
+    "distinguished",
+    "global",
+    "cutting-edge",
+    "pioneering"
+  ],
+  "catch_phrase_nouns": [
+    "solutions",
+    "excellence",
+    "quality",
+    "innovation",
+    "service",
+    "performance",
+    "growth",
+    "value",
+    "integrity",
+    "partnership",
+    "vision",
+    "development",
+    "progress",
+    "success",
+    "leadership"
+  ],
+  "catch_phrase_verbs": [
+    "deliver",
+    "create",
+    "build",
+    "drive",
+    "empower",
+    "transform",
+    "achieve",
+    "inspire",
+    "connect",
+    "develop",
+    "elevate",
+    "maximize",
+    "optimize",
+    "pioneer",
+    "sustain"
+  ],
   "catch_phrase_connector": "with",
-  "industries": ["Banking", "Telecommunications", "Real Estate", "Tourism", "Education", "Healthcare", "Construction", "Food and Beverage", "Retail", "Media", "Technology", "Insurance", "Agriculture", "Trade", "Manufacturing"]
+  "industries": [
+    {
+      "name": "banking",
+      "weight": 0.15,
+      "jobs": [
+        "Banker",
+        "Financial Analyst",
+        "Accountant"
+      ],
+      "well_known": [
+        "Bank Audi",
+        "BLOM Bank",
+        "BankMed",
+        "Banque du Liban",
+        "Byblos Bank",
+        "Fransabank",
+        "Credit Libanais",
+        "Societe Generale de Banque au Liban",
+        "Al Mawarid Bank"
+      ],
+      "company_suffixes": [
+        "SAL",
+        "SA"
+      ],
+      "company_nouns": [
+        "Finance",
+        "Investment",
+        "Banking",
+        "Capital"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "Banque {last_name}",
+        "{adjective} {noun} {suffix}"
+      ]
+    },
+    {
+      "name": "telecom",
+      "weight": 0.06,
+      "jobs": [
+        "IT Specialist",
+        "Engineer"
+      ],
+      "well_known": [
+        "Alfa Telecom",
+        "Touch Telecom",
+        "Ogero Telecom"
+      ],
+      "company_suffixes": [
+        "SAL",
+        "SARL"
+      ],
+      "company_nouns": [
+        "Telecommunications",
+        "Technology"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}"
+      ]
+    },
+    {
+      "name": "real_estate",
+      "weight": 0.06,
+      "jobs": [
+        "Real Estate Agent",
+        "Architect",
+        "Civil Engineer"
+      ],
+      "well_known": [
+        "Solidere"
+      ],
+      "company_suffixes": [
+        "SAL",
+        "SARL",
+        "Holding"
+      ],
+      "company_nouns": [
+        "Properties",
+        "Real Estate",
+        "Development"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun} {suffix}"
+      ]
+    },
+    {
+      "name": "tourism_hospitality",
+      "weight": 0.08,
+      "jobs": [
+        "Hotel Manager",
+        "Chef",
+        "Photographer"
+      ],
+      "well_known": [
+        "Casino du Liban",
+        "Le Gray Beirut",
+        "Phoenicia Hotel"
+      ],
+      "company_suffixes": [
+        "SAL",
+        "SARL"
+      ],
+      "company_nouns": [
+        "Tourism",
+        "Hospitality"
+      ],
+      "company_formats": [
+        "Hotel {last_name}",
+        "{adjective} {noun} {suffix}"
+      ]
+    },
+    {
+      "name": "education",
+      "weight": 0.06,
+      "jobs": [
+        "Professor",
+        "Lecturer",
+        "Teacher",
+        "Researcher"
+      ],
+      "well_known": [],
+      "company_suffixes": [],
+      "company_nouns": [
+        "Education"
+      ],
+      "company_formats": [
+        "Universite de {city}",
+        "College {last_name}",
+        "Institut {last_name}"
+      ]
+    },
+    {
+      "name": "healthcare",
+      "weight": 0.08,
+      "jobs": [
+        "Doctor",
+        "Surgeon",
+        "Nurse",
+        "Dentist",
+        "Pharmacist"
+      ],
+      "well_known": [],
+      "company_suffixes": [
+        "SAL"
+      ],
+      "company_nouns": [
+        "Healthcare",
+        "Medical"
+      ],
+      "company_formats": [
+        "Hopital {last_name}",
+        "Clinique {last_name}",
+        "{adjective} {noun} {suffix}"
+      ]
+    },
+    {
+      "name": "construction",
+      "weight": 0.06,
+      "jobs": [
+        "Civil Engineer",
+        "Architect",
+        "Electrician"
+      ],
+      "well_known": [],
+      "company_suffixes": [
+        "SAL",
+        "SARL",
+        "et Cie"
+      ],
+      "company_nouns": [
+        "Construction",
+        "Engineering",
+        "Development"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun} {suffix}"
+      ]
+    },
+    {
+      "name": "food_beverage",
+      "weight": 0.07,
+      "jobs": [
+        "Chef",
+        "Manager"
+      ],
+      "well_known": [
+        "Patchi",
+        "Gandour Industries",
+        "Almaza Brewery",
+        "Chateau Ksara"
+      ],
+      "company_suffixes": [
+        "SAL",
+        "SARL",
+        "& Fils"
+      ],
+      "company_nouns": [
+        "Foods",
+        "Agriculture"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun} {suffix}"
+      ]
+    },
+    {
+      "name": "retail",
+      "weight": 0.06,
+      "jobs": [
+        "Sales Manager",
+        "Secretary",
+        "Business Analyst"
+      ],
+      "well_known": [
+        "Khoury Home",
+        "ABC Department Stores",
+        "Libraire Antoine",
+        "Spinney's Lebanon",
+        "Azadea Group"
+      ],
+      "company_suffixes": [
+        "SAL",
+        "SARL"
+      ],
+      "company_nouns": [
+        "Commerce",
+        "Trading",
+        "Import-Export"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun} {suffix}"
+      ]
+    },
+    {
+      "name": "media",
+      "weight": 0.04,
+      "jobs": [
+        "Journalist",
+        "Editor",
+        "Graphic Designer",
+        "Writer"
+      ],
+      "well_known": [
+        "LBCI Television",
+        "MTV Lebanon"
+      ],
+      "company_suffixes": [
+        "SAL",
+        "SARL"
+      ],
+      "company_nouns": [
+        "Media",
+        "Design"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{last_name} {suffix}"
+      ]
+    },
+    {
+      "name": "technology",
+      "weight": 0.08,
+      "jobs": [
+        "Software Engineer",
+        "Web Developer",
+        "Developer",
+        "Designer",
+        "IT Specialist"
+      ],
+      "well_known": [
+        "Farouk Systems"
+      ],
+      "company_suffixes": [
+        "SAL",
+        "SARL",
+        "International"
+      ],
+      "company_nouns": [
+        "Technology",
+        "Solutions",
+        "Software",
+        "Electronics"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}",
+        "{last_name} {suffix}"
+      ]
+    },
+    {
+      "name": "corporate",
+      "weight": 0.1,
+      "jobs": [
+        "Manager",
+        "Consultant",
+        "Lawyer",
+        "Economist",
+        "Entrepreneur",
+        "Marketing Director",
+        "HR Manager",
+        "Project Manager",
+        "Translator",
+        "Mechanic"
+      ],
+      "well_known": [
+        "Fattal Group",
+        "Debbas Holding",
+        "Kettaneh Group",
+        "M1 Group",
+        "Holdal Holding",
+        "Indevco Group",
+        "Malia Group",
+        "Bou Khalil Group",
+        "Mikati Foundation",
+        "IDAL Investment"
+      ],
+      "company_suffixes": [
+        "Holding",
+        "Group",
+        "SAL",
+        "International",
+        "Entreprises"
+      ],
+      "company_nouns": [
+        "Industries",
+        "Services",
+        "Logistics",
+        "Solutions"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun} {suffix}",
+        "{last_name} & {last_name}"
+      ]
+    },
+    {
+      "name": "energy_utilities",
+      "weight": 0.04,
+      "jobs": [
+        "Engineer"
+      ],
+      "well_known": [
+        "Electricite du Liban",
+        "TotalEnergies Liban",
+        "Sukleen"
+      ],
+      "company_suffixes": [
+        "SAL"
+      ],
+      "company_nouns": [
+        "Energy",
+        "Transport"
+      ],
+      "company_formats": [
+        "{adjective} {noun} {suffix}"
+      ]
+    },
+    {
+      "name": "trade_logistics",
+      "weight": 0.06,
+      "jobs": [
+        "Business Analyst",
+        "Manager"
+      ],
+      "well_known": [
+        "LibanPost",
+        "Middle East Airlines",
+        "Beirut Duty Free"
+      ],
+      "company_suffixes": [
+        "SAL",
+        "SARL"
+      ],
+      "company_nouns": [
+        "Trading",
+        "Logistics",
+        "Transport",
+        "Maritime",
+        "Aviation"
+      ],
+      "company_formats": [
+        "{last_name} {suffix}",
+        "{adjective} {noun} {suffix}"
+      ]
+    }
+  ]
 }
