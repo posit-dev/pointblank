@@ -334,7 +334,7 @@ Der Generator unterstützt anspruchsvolle Datengenerierung mit diesen Fähigkeit
 
 - **Realistische Daten mit Presets**: Verwenden Sie integrierte Presets wie `"name"`, `"email"`, `"address"`, `"phone"`, usw.
 - **User-Agent-Strings**: Generieren Sie hochvariable, realistische Browser-User-Agent-Strings aus 17 Browserkategorien mit über 42.000 einzigartigen Kombinationen
-- **Unterstützung von 50+ Ländern**: Generieren Sie länderspezifische Daten (z.B. `country="DE"` für deutsche Adressen)
+- **Unterstützung von 100 Ländern**: Generieren Sie länderspezifische Daten (z.B. `country="DE"` für deutsche Adressen)
 - **Feldeinschränkungen**: Kontrollieren Sie Bereiche, Muster, Eindeutigkeit und erlaubte Werte
 - **Mehrere Ausgabeformate**: Gibt standardmäßig Polars DataFrames zurück, unterstützt aber auch Pandas (`output="pandas"`) oder Dictionaries (`output="dict"`)
 
@@ -344,7 +344,7 @@ Der Generator unterstützt anspruchsvolle Datengenerierung mit diesen Fähigkeit
 - **Für die Zusammenarbeit konzipiert**: Teilen Sie Ergebnisse mit Kollegen durch schöne interaktive Berichte
 - **Praktische Ausgaben**: Erhalten Sie genau das, was Sie brauchen: Zählungen, Auszüge, Zusammenfassungen oder vollständige Berichte
 - **Flexible Einsatzmöglichkeiten**: Verwenden Sie es in Notebooks, Skripten oder Datenpipelines
-- **Synthetische Datengenerierung**: Erstellen Sie realistische Testdaten mit über 30 Presets, User-Agent-Strings, länderspezifischer Formatierung und Unterstützung von über 50 Ländern
+- **Synthetische Datengenerierung**: Erstellen Sie realistische Testdaten mit über 30 Presets, User-Agent-Strings, länderspezifischer Formatierung und Unterstützung von 100 Ländern
 - **Anpassbar**: Passen Sie Validierungsschritte und Berichterstattung an Ihre spezifischen Anforderungen an
 - **Internationalisierung**: Berichte können in 40 Sprachen generiert werden, darunter Englisch, Spanisch, Französisch und Deutsch
 
