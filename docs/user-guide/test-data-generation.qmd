@@ -489,21 +489,21 @@ Letters I, O, Q, and U are excluded from plate generation, matching real-world r
 Pointblank currently supports 100 countries with full locale data for realistic test data generation.
 You can use either ISO 3166-1 alpha-2 codes (e.g., `"US"`) or alpha-3 codes (e.g., `"USA"`).
 
-**Europe (35 countries):**
+**Europe (38 countries):**
 
-- Austria (`AT`), Belgium (`BE`), Bulgaria (`BG`), Croatia (`HR`), Cyprus (`CY`), Czech Republic (`CZ`), Denmark (`DK`), Estonia (`EE`), Finland (`FI`), France (`FR`), Georgia (`GE`), Germany (`DE`), Greece (`GR`), Hungary (`HU`), Iceland (`IS`), Ireland (`IE`), Italy (`IT`), Latvia (`LV`), Lithuania (`LT`), Luxembourg (`LU`), Malta (`MT`), Netherlands (`NL`), Norway (`NO`), Poland (`PL`), Portugal (`PT`), Romania (`RO`), Russia (`RU`), Serbia (`RS`), Slovakia (`SK`), Slovenia (`SI`), Spain (`ES`), Sweden (`SE`), Switzerland (`CH`), Ukraine (`UA`), United Kingdom (`GB`)
+- Armenia (`AM`), Austria (`AT`), Azerbaijan (`AZ`), Belgium (`BE`), Bulgaria (`BG`), Croatia (`HR`), Cyprus (`CY`), Czech Republic (`CZ`), Denmark (`DK`), Estonia (`EE`), Finland (`FI`), France (`FR`), Georgia (`GE`), Germany (`DE`), Greece (`GR`), Hungary (`HU`), Iceland (`IS`), Ireland (`IE`), Italy (`IT`), Latvia (`LV`), Lithuania (`LT`), Luxembourg (`LU`), Malta (`MT`), Moldova (`MD`), Netherlands (`NL`), Norway (`NO`), Poland (`PL`), Portugal (`PT`), Romania (`RO`), Russia (`RU`), Serbia (`RS`), Slovakia (`SK`), Slovenia (`SI`), Spain (`ES`), Sweden (`SE`), Switzerland (`CH`), Ukraine (`UA`), United Kingdom (`GB`)
 
-**Americas (14 countries):**
+**Americas (19 countries):**
 
-- Argentina (`AR`), Brazil (`BR`), Canada (`CA`), Chile (`CL`), Colombia (`CO`), Costa Rica (`CR`), Dominican Republic (`DO`), Ecuador (`EC`), Jamaica (`JM`), Mexico (`MX`), Panama (`PA`), Peru (`PE`), United States (`US`), Uruguay (`UY`)
+- Argentina (`AR`), Bolivia (`BO`), Brazil (`BR`), Canada (`CA`), Chile (`CL`), Colombia (`CO`), Costa Rica (`CR`), Dominican Republic (`DO`), Ecuador (`EC`), El Salvador (`SV`), Guatemala (`GT`), Honduras (`HN`), Jamaica (`JM`), Mexico (`MX`), Panama (`PA`), Paraguay (`PY`), Peru (`PE`), United States (`US`), Uruguay (`UY`)
 
-**Asia-Pacific (18 countries):**
+**Asia-Pacific (22 countries):**
 
-- Australia (`AU`), Bangladesh (`BD`), China (`CN`), Hong Kong (`HK`), India (`IN`), Indonesia (`ID`), Japan (`JP`), Kazakhstan (`KZ`), Malaysia (`MY`), New Zealand (`NZ`), Pakistan (`PK`), Philippines (`PH`), Singapore (`SG`), South Korea (`KR`), Sri Lanka (`LK`), Taiwan (`TW`), Thailand (`TH`), Vietnam (`VN`)
+- Australia (`AU`), Bangladesh (`BD`), Cambodia (`KH`), China (`CN`), Hong Kong (`HK`), India (`IN`), Indonesia (`ID`), Japan (`JP`), Kazakhstan (`KZ`), Malaysia (`MY`), Myanmar (`MM`), Nepal (`NP`), New Zealand (`NZ`), Pakistan (`PK`), Philippines (`PH`), Singapore (`SG`), South Korea (`KR`), Sri Lanka (`LK`), Taiwan (`TW`), Thailand (`TH`), Uzbekistan (`UZ`), Vietnam (`VN`)
 
-**Middle East & Africa (18 countries):**
+**Middle East & Africa (21 countries):**
 
-- Algeria (`DZ`), Cameroon (`CM`), Egypt (`EG`), Ethiopia (`ET`), Ghana (`GH`), Israel (`IL`), Jordan (`JO`), Kenya (`KE`), Morocco (`MA`), Nigeria (`NG`), Saudi Arabia (`SA`), Senegal (`SN`), South Africa (`ZA`), Tanzania (`TZ`), Tunisia (`TN`), Turkey (`TR`), Uganda (`UG`), United Arab Emirates (`AE`)
+- Algeria (`DZ`), Cameroon (`CM`), Egypt (`EG`), Ethiopia (`ET`), Ghana (`GH`), Israel (`IL`), Jordan (`JO`), Kenya (`KE`), Lebanon (`LB`), Morocco (`MA`), Mozambique (`MZ`), Nigeria (`NG`), Rwanda (`RW`), Saudi Arabia (`SA`), Senegal (`SN`), South Africa (`ZA`), Tanzania (`TZ`), Tunisia (`TN`), Turkey (`TR`), Uganda (`UG`), United Arab Emirates (`AE`)
 
 Additional countries and expanded coverage are planned for future releases.
 
@@ -611,7 +611,7 @@ pb.preview(
 )
 ```
 
-All 71 supported country locales have tiered name and location data, so `weighted=True` produces
+All 100 supported country locales have tiered name and location data, so `weighted=True` produces
 realistic frequency distributions for every country.
 
 ## Output Formats

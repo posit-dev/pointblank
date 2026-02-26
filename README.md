@@ -393,7 +393,7 @@ The generator supports sophisticated data generation with these capabilities:
 
 - **Realistic data with presets**: Use built-in presets like `"name"`, `"email"`, `"address"`, `"phone"`, etc.
 - **User agent strings**: Generate highly varied, realistic browser user agent strings from 17 browser categories with over 42,000 unique combinations
-- **50+ country support**: Generate locale-specific data (e.g., `country="DE"` for German addresses)
+- **100 country support**: Generate locale-specific data (e.g., `country="DE"` for German addresses)
 - **Field constraints**: Control ranges, patterns, uniqueness, and allowed values
 - **Multiple output formats**: Returns Polars DataFrames by default, but also supports Pandas (`output="pandas"`) or dictionaries (`output="dict"`)
 
@@ -405,7 +405,7 @@ This makes it easy to generate test data that matches your validation rules, hel
 - **Built for collaboration**: Share results with colleagues through beautiful interactive reports
 - **Practical outputs**: Get exactly what you need: counts, extracts, summaries, or full reports
 - **Flexible deployment**: Use in notebooks, scripts, or data pipelines
-- **Synthetic data generation**: Create realistic test data with 30+ presets, user agent strings, locale-aware formatting, and 50+ country support
+- **Synthetic data generation**: Create realistic test data with 30+ presets, user agent strings, locale-aware formatting, and 100 country support
 - **Customizable**: Tailor validation steps and reporting to your specific needs
 - **Internationalization**: Reports can be generated in 40 languages, including English, Spanish, French, and German
 

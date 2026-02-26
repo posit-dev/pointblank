@@ -870,31 +870,38 @@ class Schema:
         like addresses, phone numbers, and postal codes. Currently, **100 countries** are supported
         with full locale data:
 
-        **Europe (35 countries):** Austria (`"AT"`), Belgium (`"BE"`), Bulgaria (`"BG"`), Croatia
-        (`"HR"`), Cyprus (`"CY"`), Czech Republic (`"CZ"`), Denmark (`"DK"`), Estonia (`"EE"`),
-        Finland (`"FI"`), France (`"FR"`), Georgia (`"GE"`), Germany (`"DE"`), Greece (`"GR"`),
-        Hungary (`"HU"`), Iceland (`"IS"`), Ireland (`"IE"`), Italy (`"IT"`), Latvia (`"LV"`),
-        Lithuania (`"LT"`), Luxembourg (`"LU"`), Malta (`"MT"`), Netherlands (`"NL"`),
-        Norway (`"NO"`), Poland (`"PL"`), Portugal (`"PT"`), Romania (`"RO"`), Russia (`"RU"`),
-        Serbia (`"RS"`), Slovakia (`"SK"`), Slovenia (`"SI"`), Spain (`"ES"`), Sweden (`"SE"`),
+        **Europe (38 countries):** Armenia (`"AM"`), Austria (`"AT"`), Azerbaijan (`"AZ"`),
+        Belgium (`"BE"`), Bulgaria (`"BG"`), Croatia (`"HR"`), Cyprus (`"CY"`),
+        Czech Republic (`"CZ"`), Denmark (`"DK"`), Estonia (`"EE"`), Finland (`"FI"`),
+        France (`"FR"`), Georgia (`"GE"`), Germany (`"DE"`), Greece (`"GR"`),
+        Hungary (`"HU"`), Iceland (`"IS"`), Ireland (`"IE"`), Italy (`"IT"`),
+        Latvia (`"LV"`), Lithuania (`"LT"`), Luxembourg (`"LU"`), Malta (`"MT"`),
+        Moldova (`"MD"`), Netherlands (`"NL"`), Norway (`"NO"`), Poland (`"PL"`),
+        Portugal (`"PT"`), Romania (`"RO"`), Russia (`"RU"`), Serbia (`"RS"`),
+        Slovakia (`"SK"`), Slovenia (`"SI"`), Spain (`"ES"`), Sweden (`"SE"`),
         Switzerland (`"CH"`), Ukraine (`"UA"`), United Kingdom (`"GB"`)
 
-        **Americas (14 countries):** Argentina (`"AR"`), Brazil (`"BR"`), Canada (`"CA"`), Chile
-        (`"CL"`), Colombia (`"CO"`), Costa Rica (`"CR"`), Dominican Republic (`"DO"`),
-        Ecuador (`"EC"`), Jamaica (`"JM"`), Mexico (`"MX"`), Panama (`"PA"`), Peru (`"PE"`),
-        United States (`"US"`), Uruguay (`"UY"`)
+        **Americas (19 countries):** Argentina (`"AR"`), Bolivia (`"BO"`), Brazil (`"BR"`),
+        Canada (`"CA"`), Chile (`"CL"`), Colombia (`"CO"`), Costa Rica (`"CR"`),
+        Dominican Republic (`"DO"`), Ecuador (`"EC"`), El Salvador (`"SV"`),
+        Guatemala (`"GT"`), Honduras (`"HN"`), Jamaica (`"JM"`), Mexico (`"MX"`),
+        Panama (`"PA"`), Paraguay (`"PY"`), Peru (`"PE"`), United States (`"US"`),
+        Uruguay (`"UY"`)
 
-        **Asia-Pacific (18 countries):** Australia (`"AU"`), Bangladesh (`"BD"`), China (`"CN"`),
-        Hong Kong (`"HK"`), India (`"IN"`), Indonesia (`"ID"`), Japan (`"JP"`),
-        Kazakhstan (`"KZ"`), Malaysia (`"MY"`), New Zealand (`"NZ"`), Pakistan (`"PK"`),
-        Philippines (`"PH"`), Singapore (`"SG"`), South Korea (`"KR"`), Sri Lanka (`"LK"`),
-        Taiwan (`"TW"`), Thailand (`"TH"`), Vietnam (`"VN"`)
+        **Asia-Pacific (22 countries):** Australia (`"AU"`), Bangladesh (`"BD"`),
+        Cambodia (`"KH"`), China (`"CN"`), Hong Kong (`"HK"`), India (`"IN"`),
+        Indonesia (`"ID"`), Japan (`"JP"`), Kazakhstan (`"KZ"`), Malaysia (`"MY"`),
+        Myanmar (`"MM"`), Nepal (`"NP"`), New Zealand (`"NZ"`), Pakistan (`"PK"`),
+        Philippines (`"PH"`), Singapore (`"SG"`), South Korea (`"KR"`),
+        Sri Lanka (`"LK"`), Taiwan (`"TW"`), Thailand (`"TH"`), Uzbekistan (`"UZ"`),
+        Vietnam (`"VN"`)
 
-        **Middle East & Africa (18 countries):** Algeria (`"DZ"`), Cameroon (`"CM"`),
+        **Middle East & Africa (21 countries):** Algeria (`"DZ"`), Cameroon (`"CM"`),
         Egypt (`"EG"`), Ethiopia (`"ET"`), Ghana (`"GH"`), Israel (`"IL"`), Jordan (`"JO"`),
-        Kenya (`"KE"`), Morocco (`"MA"`), Nigeria (`"NG"`), Saudi Arabia (`"SA"`),
-        Senegal (`"SN"`), South Africa (`"ZA"`), Tanzania (`"TZ"`), Tunisia (`"TN"`),
-        Turkey (`"TR"`), Uganda (`"UG"`), United Arab Emirates (`"AE"`)
+        Kenya (`"KE"`), Lebanon (`"LB"`), Morocco (`"MA"`), Mozambique (`"MZ"`),
+        Nigeria (`"NG"`), Rwanda (`"RW"`), Saudi Arabia (`"SA"`), Senegal (`"SN"`),
+        South Africa (`"ZA"`), Tanzania (`"TZ"`), Tunisia (`"TN"`), Turkey (`"TR"`),
+        Uganda (`"UG"`), United Arab Emirates (`"AE"`)
 
         Examples
         --------
@@ -1682,34 +1689,38 @@ def generate_dataset(
     -------------------
     The `country=` parameter currently supports 100 countries with full locale data:
 
-    **Europe (35 countries):** Austria (`"AT"`), Belgium (`"BE"`), Bulgaria (`"BG"`),
-    Croatia (`"HR"`), Cyprus (`"CY"`), Czech Republic (`"CZ"`), Denmark (`"DK"`),
-    Estonia (`"EE"`), Finland (`"FI"`), France (`"FR"`), Georgia (`"GE"`),
-    Germany (`"DE"`), Greece (`"GR"`), Hungary (`"HU"`), Iceland (`"IS"`),
-    Ireland (`"IE"`), Italy (`"IT"`), Latvia (`"LV"`), Lithuania (`"LT"`),
-    Luxembourg (`"LU"`), Malta (`"MT"`), Netherlands (`"NL"`), Norway (`"NO"`),
-    Poland (`"PL"`), Portugal (`"PT"`), Romania (`"RO"`), Russia (`"RU"`),
-    Serbia (`"RS"`), Slovakia (`"SK"`), Slovenia (`"SI"`), Spain (`"ES"`),
-    Sweden (`"SE"`), Switzerland (`"CH"`), Ukraine (`"UA"`), United Kingdom (`"GB"`)
+    **Europe (38 countries):** Armenia (`"AM"`), Austria (`"AT"`), Azerbaijan (`"AZ"`),
+    Belgium (`"BE"`), Bulgaria (`"BG"`), Croatia (`"HR"`), Cyprus (`"CY"`),
+    Czech Republic (`"CZ"`), Denmark (`"DK"`), Estonia (`"EE"`), Finland (`"FI"`),
+    France (`"FR"`), Georgia (`"GE"`), Germany (`"DE"`), Greece (`"GR"`),
+    Hungary (`"HU"`), Iceland (`"IS"`), Ireland (`"IE"`), Italy (`"IT"`),
+    Latvia (`"LV"`), Lithuania (`"LT"`), Luxembourg (`"LU"`), Malta (`"MT"`),
+    Moldova (`"MD"`), Netherlands (`"NL"`), Norway (`"NO"`), Poland (`"PL"`),
+    Portugal (`"PT"`), Romania (`"RO"`), Russia (`"RU"`), Serbia (`"RS"`),
+    Slovakia (`"SK"`), Slovenia (`"SI"`), Spain (`"ES"`), Sweden (`"SE"`),
+    Switzerland (`"CH"`), Ukraine (`"UA"`), United Kingdom (`"GB"`)
 
-    **Americas (14 countries):** Argentina (`"AR"`), Brazil (`"BR"`), Canada (`"CA"`),
-    Chile (`"CL"`), Colombia (`"CO"`), Costa Rica (`"CR"`),
-    Dominican Republic (`"DO"`), Ecuador (`"EC"`), Jamaica (`"JM"`),
-    Mexico (`"MX"`), Panama (`"PA"`), Peru (`"PE"`), United States (`"US"`),
+    **Americas (19 countries):** Argentina (`"AR"`), Bolivia (`"BO"`), Brazil (`"BR"`),
+    Canada (`"CA"`), Chile (`"CL"`), Colombia (`"CO"`), Costa Rica (`"CR"`),
+    Dominican Republic (`"DO"`), Ecuador (`"EC"`), El Salvador (`"SV"`),
+    Guatemala (`"GT"`), Honduras (`"HN"`), Jamaica (`"JM"`), Mexico (`"MX"`),
+    Panama (`"PA"`), Paraguay (`"PY"`), Peru (`"PE"`), United States (`"US"`),
     Uruguay (`"UY"`)
 
-    **Asia-Pacific (18 countries):** Australia (`"AU"`), Bangladesh (`"BD"`),
-    China (`"CN"`), Hong Kong (`"HK"`), India (`"IN"`), Indonesia (`"ID"`),
-    Japan (`"JP"`), Kazakhstan (`"KZ"`), Malaysia (`"MY"`), New Zealand (`"NZ"`),
-    Pakistan (`"PK"`), Philippines (`"PH"`), Singapore (`"SG"`), South Korea (`"KR"`),
-    Sri Lanka (`"LK"`), Taiwan (`"TW"`), Thailand (`"TH"`), Vietnam (`"VN"`)
+    **Asia-Pacific (22 countries):** Australia (`"AU"`), Bangladesh (`"BD"`),
+    Cambodia (`"KH"`), China (`"CN"`), Hong Kong (`"HK"`), India (`"IN"`),
+    Indonesia (`"ID"`), Japan (`"JP"`), Kazakhstan (`"KZ"`), Malaysia (`"MY"`),
+    Myanmar (`"MM"`), Nepal (`"NP"`), New Zealand (`"NZ"`), Pakistan (`"PK"`),
+    Philippines (`"PH"`), Singapore (`"SG"`), South Korea (`"KR"`),
+    Sri Lanka (`"LK"`), Taiwan (`"TW"`), Thailand (`"TH"`), Uzbekistan (`"UZ"`),
+    Vietnam (`"VN"`)
 
-    **Middle East & Africa (18 countries):** Algeria (`"DZ"`), Cameroon (`"CM"`),
+    **Middle East & Africa (21 countries):** Algeria (`"DZ"`), Cameroon (`"CM"`),
     Egypt (`"EG"`), Ethiopia (`"ET"`), Ghana (`"GH"`), Israel (`"IL"`),
-    Jordan (`"JO"`), Kenya (`"KE"`), Morocco (`"MA"`), Nigeria (`"NG"`),
-    Saudi Arabia (`"SA"`), Senegal (`"SN"`), South Africa (`"ZA"`),
-    Tanzania (`"TZ"`), Tunisia (`"TN"`), Turkey (`"TR"`), Uganda (`"UG"`),
-    United Arab Emirates (`"AE"`)
+    Jordan (`"JO"`), Kenya (`"KE"`), Lebanon (`"LB"`), Morocco (`"MA"`),
+    Mozambique (`"MZ"`), Nigeria (`"NG"`), Rwanda (`"RW"`), Saudi Arabia (`"SA"`),
+    Senegal (`"SN"`), South Africa (`"ZA"`), Tanzania (`"TZ"`), Tunisia (`"TN"`),
+    Turkey (`"TR"`), Uganda (`"UG"`), United Arab Emirates (`"AE"`)
 
     Pytest Fixture
     --------------
